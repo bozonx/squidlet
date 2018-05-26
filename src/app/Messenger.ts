@@ -51,8 +51,6 @@ export default class Messenger {
       },
     };
 
-    //const fullTopic = this.combineTopic(category, String(messageId), topic);
-
     return new Promise((resolve, reject) => {
       this.app.router.once((response: MessageInterface) => {
         if (response.error) {
