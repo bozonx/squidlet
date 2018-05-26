@@ -17,11 +17,21 @@ export default class DevicesDispatcher {
   }
 
   listenStatus(deviceId: string, statusName: string, handler: Function) {
+    const device = this.app.devices.getDevice(deviceId);
 
+    device.listenStatus(statusName, handler);
   }
 
   listenConfig(deviceId: string, handler: Function) {
+    const device = this.app.devices.getDevice(deviceId);
 
+    device.listenConfig(handler);
+  }
+
+  setConfig(deviceId: string, partialConfig: object) {
+    const device = this.app.devices.getDevice(deviceId);
+
+    device.setConfig(partialConfig);
   }
 
 }

@@ -1,4 +1,5 @@
 import App from './App';
+import DeviceInterface from './DeviceInterface';
 
 
 export default class Devices {
@@ -10,9 +11,7 @@ export default class Devices {
     this.app = app;
   }
 
-  getDevice(deviceId: string): object {
-    // TODO: возвращать по типу BaseDevice или интерфейсу
-
+  getDevice(deviceId: string): DeviceInterface {
     return this.devices[deviceId];
   }
 
