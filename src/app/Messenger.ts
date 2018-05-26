@@ -1,66 +1,77 @@
 import App from './App';
-import * as EventEmitter from 'events';
-
-// TODO: generate hash is more safely
-let idCounter = 0;
+//import * as EventEmitter from 'events';
+import MessageInterface from './MessageInterface';
+import { generateUniqId } from '../helpers/helpres';
 
 
 export default class Messenger {
   private readonly app: App;
-  private readonly events: EventEmitter = new EventEmitter();
+  //private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
     this.app = app;
   }
 
-  // TODO: emit and listener remake to listen and publish by categories
+  async publish(to: string, category: string, topic: string, params: Array<any>) : Promise<void> {
+    // const fullTopic = this.combineTopic(category, topic);
+    // this.events.emit(fullTopic, params);
 
-  async publish(category: string, topic: string, params: Array<any>) : Promise<void> {
-    const fullTopic = this.combineTopic(category, topic);
+    const message = {
+      topic,
+      category,
+      payload: params,
+      from: this.app.getHostId(),
+      to,
+    };
 
-    // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
-
-    this.events.emit(fullTopic, params);
+    await this.app.router.publish(message);
   }
 
-  subscribe(category: string, topic: string, handler: (...args: any[]) => void) {
-    const fullTopic = this.combineTopic(category, topic);
+  subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
+    // const fullTopic = this.combineTopic(category, topic);
+    // this.events.addListener(fullTopic, handler);
 
-    this.events.addListener(fullTopic, handler);
+    this.app.router.subscribe(((message: MessageInterface) => {
+      if (message.category === category) {
+        handler(message);
+      }
+    }));
   }
 
-  request(category: string, topic: string, params: Array<any>): Promise<any> {
-    const messageId: number = this.getNewId();
-    const fullTopic = this.combineTopic(category, String(messageId), topic);
+  request(to: string, category: string, topic: string, params: Array<any>): Promise<any> {
+    const message = {
+      topic,
+      category,
+      payload: params,
+      from: this.app.getHostId(),
+      to,
+      request: {
+        id: generateUniqId(),
+        isRequest: true,
+      },
+    };
+
+    //const fullTopic = this.combineTopic(category, String(messageId), topic);
 
     return new Promise((resolve, reject) => {
-      this.events.once(fullTopic, (error: string, data: any) => {
-        if (error) {
-          reject(new Error(error));
+      this.app.router.once((response: MessageInterface) => {
+        if (response.error) {
+          reject(response.error);
 
           return;
         }
 
-        resolve(data);
+        resolve(response);
       });
 
       // TODO: ждать таймаут ответа - если не дождались - do reject
 
-      this.events.emit(fullTopic, params);
+      this.app.router.publish(message);
     });
   }
 
-  listenCategory(category: string, handler: (...args: any[]) => void) {
-    // TODO: 11
-  }
+  // listenCategory(category: string, handler: (...args: any[]) => void) {
+  //   // TODO: 11
+  // }
 
-  private combineTopic(...items: string[]) {
-    return items.join('|');
-  }
-
-  private getNewId(): number {
-    idCounter++;
-
-    return idCounter;
-  }
 }

@@ -19,4 +19,10 @@ export default class App {
     this.drivers = new Drivers(this);
     this.router = new Router(this);
   }
+
+  getHostId(): string {
+    // TODO: return id of current host
+    return 'testId';
+  }
+
 }

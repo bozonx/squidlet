@@ -7,7 +7,7 @@ export default class DevicesDispatcher {
 
   constructor(app) {
     this.app = app;
-    this.app.messenger.listenCategory(this.callActionCategory, this.handleCallAction);
+    //this.app.messenger.listenCategory(this.callActionCategory, this.handleCallAction);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
@@ -15,27 +15,26 @@ export default class DevicesDispatcher {
     // TODO: проверить что actionName есть в манифесте
     // TODO: нужно дождаться пока отработает сама ф-я
 
+    const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/${actionName}`;
 
-    return this.app.messenger.request(this.callActionCategory, topic, params);
+    return this.app.messenger.request(to, this.callActionCategory, topic, params);
   }
 
   listenStatus(deviceId: string, statusName: string, handler: Function) {
 
     // TODO: remake
 
-    const device = this.app.devices.getDevice(deviceId);
-
-    device.listenStatus(statusName, handler);
+    // const device = this.app.devices.getDevice(deviceId);
+    // device.listenStatus(statusName, handler);
   }
 
   listenConfig(deviceId: string, handler: Function) {
 
     // TODO: remake
 
-    const device = this.app.devices.getDevice(deviceId);
-
-    device.listenConfig(handler);
+    // const device = this.app.devices.getDevice(deviceId);
+    // device.listenConfig(handler);
   }
 
   setConfig(deviceId: string, partialConfig: object) {
@@ -52,5 +51,12 @@ export default class DevicesDispatcher {
 
     return device[actionName](...params);
   };
+
+  private resolveHost(deviceId: string): string {
+
+    // TODO: !!!!
+
+    return '';
+  }
 
 }
