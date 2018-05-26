@@ -1,0 +1,7 @@
+--recursive
+--ui bdd
+--colors
+--compilers coffee:coffeescript/register
+
+./test/main.coffee
+test/**/*.spec.coffee
