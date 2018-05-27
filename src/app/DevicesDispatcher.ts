@@ -13,7 +13,7 @@ export default class DevicesDispatcher {
   constructor(app) {
     this.app = app;
     // listen messages to call actions of local device
-    this.app.messenger.listenCategory(this.callActionCategory, this.handleCallAction);
+    this.app.messenger.listenRequests(this.callActionCategory, this.handleCallActionRequests);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
@@ -86,21 +86,43 @@ export default class DevicesDispatcher {
   /**
    * Listen for actions which have to be called on current host.
    */
-  private handleCallAction = async (message: MessageInterface): Promise<any> => {
-    const [ deviceId, actionName ] = message.topic.split('/');
+  private handleCallActionRequests = (request: MessageInterface): Promise<any> => {
 
-    if (!_.isArray(message.payload)) {
-      throw new Error(`Payload of calling action has to be an array. Message: ${JSON.stringify(message)}`);
+    // TODO: сформировать ответ
+
+    return this.callLocalDeviceAction(request)
+      .then((result: any) => {
+        //this.sendRespondMessage(message, result);
+      })
+      .catch((error) => {
+        //this.sendRespondMessage(message, null, error);
+      });
+
+    // this.sendRespondMessage(message, result);
+
+  };
+
+  private async callLocalDeviceAction(request: MessageInterface): Promise<any> {
+    const [ deviceId, actionName ] = request.topic.split('/');
+
+    if (!_.isArray(request.payload)) {
+      throw new Error(`
+        Payload of calling action has to be an array.
+        Request: ${JSON.stringify(request)}
+      `);
     }
     if (!actionName) {
-      throw new Error(`You have to specify an actionName like this: { topic: deviceId/actionName } . Message: ${JSON.stringify(message)}`);
+      throw new Error(`
+        You have to specify an actionName like this: { topic: deviceId/actionName } .
+        Request: ${JSON.stringify(request)}
+      `);
     }
 
     const device = this.app.devices.getDevice(deviceId);
-    const result = await device[actionName](...message.payload);
+    const result = await device[actionName](...request.payload);
 
     return result;
-  };
+  }
 
   private resolveHost(deviceId: string): string {
 

@@ -77,9 +77,9 @@ export default class Messenger {
     });
   }
 
-  listenCategory(category: string, handler: (message: MessageInterface) => Promise<any>) {
+  listenRequests(category: string, handler: (message: MessageInterface) => Promise<any>) {
     const callBack = (message: MessageInterface) => {
-      if (message.category !== category) return;
+      if (!message.request || message.category !== category) return;
 
       // TODO: почему ответ здесь делается ????
 
@@ -87,16 +87,16 @@ export default class Messenger {
         .then((result: any) => {
           if (!message.request) return;
 
-          this.sendRespondMessage(message, result);
+          //this.sendRespondMessage(message, result);
         })
         .catch((error) => {
-          if (!message.request) {
-            this.app.log.error(error);
+          // if (!message.request) {
+          //   this.app.log.error(error);
+          //
+          //   return;
+          // }
 
-            return;
-          }
-
-          this.sendRespondMessage(message, null, error);
+          //this.sendRespondMessage(message, null, error);
         });
     };
 
