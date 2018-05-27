@@ -5,17 +5,20 @@ import MessageInterface from "./MessageInterface";
 
 export default class DevicesDispatcher {
   private readonly app: App;
-  private readonly callActionCategory: string = 'callDeviceAction';
+  private readonly callActionCategory: string = 'deviceCallAction';
+  private readonly deviceFeedBackCategory: string = 'deviceFeedBack';
+  private readonly statusTopic: string = 'status';
+  private readonly configTopic: string = 'config';
 
   constructor(app) {
     this.app = app;
+    // listen messages to call actions of local device
     this.app.messenger.listenCategory(this.callActionCategory, this.handleCallAction);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
 
     // TODO: проверить что actionName есть в манифесте
-    // TODO: нужно дождаться пока отработает сама ф-я
 
     const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/${actionName}`;
@@ -23,31 +26,65 @@ export default class DevicesDispatcher {
     return this.app.messenger.request(to, this.callActionCategory, topic, params);
   }
 
-  listenStatus(deviceId: string, statusName: string, handler: Function) {
+  /**
+   * Listen for device's status messages.
+   */
+  listenStatus(deviceId: string, handler: (statusName: string, partialStatus: object) => void) {
+    const callBack = (message: MessageInterface) => {
+      handler(message.payload.statusName, message.payload.partialStatus);
+    };
 
-    // TODO: remake
-
-    // const device = this.app.devices.getDevice(deviceId);
-    // device.listenStatus(statusName, handler);
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callBack)
   }
 
-  listenConfig(deviceId: string, handler: Function) {
+  listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
+    const callBack = (message: MessageInterface) => {
+      handler(message.payload.partialConfig);
+    };
 
-    // TODO: remake
-
-    // const device = this.app.devices.getDevice(deviceId);
-    // device.listenConfig(handler);
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callBack)
   }
 
   setConfig(deviceId: string, partialConfig: object) {
-    const device = this.app.devices.getDevice(deviceId);
+    const to = this.resolveHost(deviceId);
+    const topic = `${deviceId}/setConfig`;
 
-    device.setConfig(partialConfig);
+    return this.app.messenger.request(to, this.callActionCategory, topic, partialConfig);
   }
 
+  /**
+   * It runs from local device itself to publish its status changes.
+   */
+  publishStatus(deviceId: string, statusName: string, partialStatus: object): Promise<void> {
+
+    // TODO: должен путликовать всем желающим - кто подписался
+
+    const to = 'master';
+    const payload = {
+      statusName,
+      partialStatus,
+    };
+
+    return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.statusTopic, payload);
+  }
 
   /**
-   * Listen for actions which have to be called on current device.
+   * It runs from device itself to publish its config changes.
+   */
+  publishConfig(deviceId: string, partialConfig: object): Promise<void> {
+
+    // TODO: должен путликовать всем желающим - кто подписался
+
+    const to = 'master';
+    const payload = {
+      partialConfig,
+    };
+
+    return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.configTopic, payload);
+  }
+
+  /**
+   * Listen for actions which have to be called on current host.
    */
   private handleCallAction = async (message: MessageInterface): Promise<any> => {
     const [ deviceId, actionName ] = message.topic.split('/');

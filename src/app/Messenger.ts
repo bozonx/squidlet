@@ -12,7 +12,11 @@ export default class Messenger {
     this.app = app;
   }
 
-  async publish(to: string, category: string, topic: string, payload: Array<any>) : Promise<void> {
+  /**
+   * Send message to specified host.
+   * It doesn't wait for respond. But it wait for delivering of message.
+   */
+  async publish(to: string, category: string, topic: string, payload: any): Promise<void> {
     const message = {
       topic,
       category,
@@ -24,15 +28,26 @@ export default class Messenger {
     await this.app.router.publish(message);
   }
 
+  /**
+   * Listen to messages which was sent by publish method on current on remote host.
+   * It omits responds of requests.
+   */
   subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
     this.app.router.subscribe(((message: MessageInterface) => {
+      if (message.category !== category || message.topic !== topic) return;
+      if (message.request) return;
+
       if (message.category === category && message.topic === topic) {
         handler(message);
       }
     }));
   }
 
-  request(to: string, category: string, topic: string, payload: Array<any>): Promise<any> {
+  unsebscribe() {
+    // TODO: do it
+  }
+
+  request(to: string, category: string, topic: string, payload: any): Promise<any> {
     const message = {
       topic,
       category,
@@ -46,25 +61,22 @@ export default class Messenger {
     };
 
     return new Promise((resolve, reject) => {
-      this.app.router.once((response: MessageInterface) => {
-        if (response.error) {
-          reject(response.error);
-
-          return;
-        }
+      this.waitForMyMessage(message.request.id, (response: MessageInterface) => {
+        if (response.error) return reject(response.error);
 
         resolve(response);
       });
 
-      // TODO: ждать таймаут ответа - если не дождались - do reject
-
-      this.app.router.publish(message);
+      this.app.router.publish(message)
+        .catch(reject);
     });
   }
 
   listenCategory(category: string, handler: (message: MessageInterface) => Promise<any>) {
     const callBack = (message: MessageInterface) => {
       if (message.category !== category) return;
+
+      // TODO: почему ответ здесь делается ????
 
       handler(message)
         .then((result: any) => {
@@ -97,7 +109,7 @@ export default class Messenger {
       from: this.app.getHostId(),
       to: request.from,
       request: {
-        id: generateUniqId(),
+        id: request.request.id,
         isResponse: true,
       },
       payload,
@@ -105,6 +117,17 @@ export default class Messenger {
     };
 
     this.app.router.publish(respondMessage);
+  }
+
+  private waitForMyMessage(messageId: string, callBack: (response: MessageInterface) => void) {
+    // TODO: !!!!!
+
+    // TODO: remake - ждем сообщение с заданнным id
+
+
+    // TODO: ждать таймаут ответа - если не дождались - do reject
+
+
   }
 
 }

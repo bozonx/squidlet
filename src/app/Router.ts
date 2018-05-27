@@ -25,8 +25,12 @@ export default class Router {
     // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
   }
 
-  once(handler: (message: MessageInterface) => void) {
-    // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
+  unsubscribe() {
+    // TODO: !!!!
   }
+
+  // once(handler: (message: MessageInterface) => void) {
+  //   // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
+  // }
 
 }
