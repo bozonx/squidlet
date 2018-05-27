@@ -12,43 +12,37 @@ export default class Messenger {
     this.app = app;
   }
 
-  async publish(to: string, category: string, topic: string, params: Array<any>) : Promise<void> {
-    // const fullTopic = this.combineTopic(category, topic);
-    // this.events.emit(fullTopic, params);
-
+  async publish(to: string, category: string, topic: string, payload: Array<any>) : Promise<void> {
     const message = {
       topic,
       category,
-      payload: params,
       from: this.app.getHostId(),
       to,
+      payload,
     };
 
     await this.app.router.publish(message);
   }
 
   subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
-    // const fullTopic = this.combineTopic(category, topic);
-    // this.events.addListener(fullTopic, handler);
-
     this.app.router.subscribe(((message: MessageInterface) => {
-      if (message.category === category) {
+      if (message.category === category && message.topic === topic) {
         handler(message);
       }
     }));
   }
 
-  request(to: string, category: string, topic: string, params: Array<any>): Promise<any> {
+  request(to: string, category: string, topic: string, payload: Array<any>): Promise<any> {
     const message = {
       topic,
       category,
-      payload: params,
       from: this.app.getHostId(),
       to,
       request: {
         id: generateUniqId(),
         isRequest: true,
       },
+      payload,
     };
 
     return new Promise((resolve, reject) => {
@@ -68,8 +62,49 @@ export default class Messenger {
     });
   }
 
-  // listenCategory(category: string, handler: (...args: any[]) => void) {
-  //   // TODO: 11
-  // }
+  listenCategory(category: string, handler: (message: MessageInterface) => Promise<any>) {
+    const callBack = (message: MessageInterface) => {
+      if (message.category !== category) return;
+
+      handler(message)
+        .then((result: any) => {
+          if (!message.request) return;
+
+          this.sendRespondMessage(message, result);
+        })
+        .catch((error) => {
+          if (!message.request) {
+            this.app.log.error(error);
+
+            return;
+          }
+
+          this.sendRespondMessage(message, null, error);
+        });
+    };
+
+    this.app.router.subscribe(callBack);
+  }
+
+  private sendRespondMessage(
+    request: MessageInterface,
+    payload: any = null,
+    error: { message: string, code: number } = undefined
+  ) {
+    const respondMessage = {
+      topic: request.topic,
+      category: request.category,
+      from: this.app.getHostId(),
+      to: request.from,
+      request: {
+        id: generateUniqId(),
+        isResponse: true,
+      },
+      payload,
+      error,
+    };
+
+    this.app.router.publish(respondMessage);
+  }
 
 }

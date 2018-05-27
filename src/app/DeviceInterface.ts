@@ -1,5 +1,5 @@
 export default interface Device {
-  listenStatus: Function;
-  listenConfig: Function;
-  setConfig: Function;
+  listenStatus: () => void;
+  listenConfig: () => void;
+  setConfig: (partialConfig: object) => void;
 }

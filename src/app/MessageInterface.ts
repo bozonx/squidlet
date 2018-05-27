@@ -1,7 +1,6 @@
 export default interface Message {
   topic: string;
   category: string;
-  payload: Array<any>;
   from: string;
   to: string;
   request?: {
@@ -13,4 +12,5 @@ export default interface Message {
     message: string,
     code: number,
   };
+  payload: any;
 }

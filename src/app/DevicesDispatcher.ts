@@ -1,4 +1,6 @@
+import _ from 'lodash';
 import App from './App';
+import MessageInterface from "./MessageInterface";
 
 
 export default class DevicesDispatcher {
@@ -7,7 +9,7 @@ export default class DevicesDispatcher {
 
   constructor(app) {
     this.app = app;
-    //this.app.messenger.listenCategory(this.callActionCategory, this.handleCallAction);
+    this.app.messenger.listenCategory(this.callActionCategory, this.handleCallAction);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
@@ -43,13 +45,24 @@ export default class DevicesDispatcher {
     device.setConfig(partialConfig);
   }
 
+
   /**
    * Listen for actions which have to be called on current device.
    */
-  private handleCallAction = (deviceId: string, actionName: string, params: Array<any>) => {
-    const device = this.app.devices.getDevice(deviceId);
+  private handleCallAction = async (message: MessageInterface): Promise<any> => {
+    const [ deviceId, actionName ] = message.topic.split('/');
 
-    return device[actionName](...params);
+    if (!_.isArray(message.payload)) {
+      throw new Error(`Payload of calling action has to be an array. Message: ${JSON.stringify(message)}`);
+    }
+    if (!actionName) {
+      throw new Error(`You have to specify an actionName like this: { topic: deviceId/actionName } . Message: ${JSON.stringify(message)}`);
+    }
+
+    const device = this.app.devices.getDevice(deviceId);
+    const result = await device[actionName](...message.payload);
+
+    return result;
   };
 
   private resolveHost(deviceId: string): string {
