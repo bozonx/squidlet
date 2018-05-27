@@ -33,17 +33,17 @@ export default class Messenger {
    * It omits responds of requests.
    */
   subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
-    this.app.router.subscribe(((message: MessageInterface) => {
+    this.app.router.subscribe((message: MessageInterface) => {
       if (message.category !== category || message.topic !== topic) return;
       if (message.request) return;
 
       if (message.category === category && message.topic === topic) {
         handler(message);
       }
-    }));
+    });
   }
 
-  unsebscribe() {
+  unsubscribe() {
     // TODO: do it
   }
 
@@ -61,11 +61,16 @@ export default class Messenger {
     };
 
     return new Promise((resolve, reject) => {
-      this.waitForMyMessage(message.request.id, (response: MessageInterface) => {
-        if (response.error) return reject(response.error);
 
-        resolve(response);
-      });
+      // TODO: наверное надо отменить если сообщение не будет доставленно
+
+      this.waitForMyMessage(message.request.id)
+        .then((response: MessageInterface) => {
+          if (response.error) return reject(response.error);
+
+          resolve(response);
+        })
+        .catch(reject);
 
       this.app.router.publish(message)
         .catch(reject);
@@ -119,15 +124,21 @@ export default class Messenger {
     this.app.router.publish(respondMessage);
   }
 
-  private waitForMyMessage(messageId: string, callBack: (response: MessageInterface) => void) {
-    // TODO: !!!!!
-
-    // TODO: remake - ждем сообщение с заданнным id
-
+  private waitForMyMessage(messageId: string): Promise<MessageInterface> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
+    return new Promise(((resolve, reject) => {
+      const handler = (message: MessageInterface) => {
+        if (!message.request || message.request.id !== messageId) return;
 
+        this.app.router.unsubscribe(handler);
+
+        resolve(message);
+      };
+
+      this.app.router.subscribe(handler);
+    }));
   }
 
 }

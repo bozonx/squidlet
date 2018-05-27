@@ -23,14 +23,11 @@ export default class Router {
   subscribe(handler: (message: MessageInterface) => void) {
 
     // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
+    // TODO: может добавить категорию - тогда будет более оптимально
   }
 
-  unsubscribe() {
+  unsubscribe(handler: (message: MessageInterface) => void) {
     // TODO: !!!!
   }
-
-  // once(handler: (message: MessageInterface) => void) {
-  //   // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
-  // }
 
 }
