@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import * as uniqid from 'uniqid';
-import ConnectionInterface from './interfaces/ConnectionInterface';
+import AddressInterface from '../app/interfaces/AddressInterface';
 
 
 export function generateUniqId(): string {
   return uniqid();
 }
 
-export function generateTunnelId(connection: ConnectionInterface): string {
+export function generateTunnelId(connection: AddressInterface): string {
   return `${connection.hostId}-${connection.type}-${connection.bus}-${connection.address}`;
 }
 

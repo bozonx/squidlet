@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
-import ConnectionInterface from './interfaces/ConnectionInterface';
+import AddressInterface from './interfaces/AddressInterface';
 import { generateTunnelId, findRecursively } from '../helpers/helpres';
 import I2cTunnel from '../tunnels/I2cTunnel';
 //import * as EventEmitter from 'events';
@@ -69,7 +69,7 @@ export default class Router {
     });
   }
 
-  private registerTunnel(connection: ConnectionInterface) {
+  private registerTunnel(connection: AddressInterface) {
     const tunnelId = generateTunnelId(connection);
     const TunnelClass = this.tunnelTypes[connection.type];
 

@@ -1,4 +1,4 @@
-export default interface Connection {
+export default interface Address {
   hostId: string;
   type: string;
 
