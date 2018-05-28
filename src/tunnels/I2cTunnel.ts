@@ -1,17 +1,17 @@
 import MessageInterface from '../app/interfaces/MessageInterface';
-import ConnectionInterface from './interfaces/ConnectionInterface';
+import AddressInterface from '../app/interfaces/AddressInterface';
 
 
 export default class I2cTunnel {
-  constructor(connection: ConnectionInterface) {
+  constructor(connection: AddressInterface) {
 
   }
 
-  send(message: MessageInterface) {
+  async send(message: MessageInterface): Promise<void> {
 
   }
 
-  listen() {
+  listen(handler: (message: MessageInterface) => void): void {
 
   }
 

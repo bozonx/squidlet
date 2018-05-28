@@ -43,6 +43,7 @@ export default class Messenger {
 
   unsubscribe() {
     // TODO: do it
+    //this.app.router.unsubscribe();
   }
 
   request(to: string, category: string, topic: string, payload: any): Promise<any> {

@@ -38,7 +38,7 @@ export default class App {
 
   getHostId(): string {
 
-    // TODO: return id of current host
+    // TODO: return id of current host - master or room.hostName
 
     return 'master';
   }

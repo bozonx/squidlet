@@ -5,7 +5,7 @@ import TunnelInterface from './interfaces/TunnelInterface';
 import AddressInterface from './interfaces/AddressInterface';
 import { generateTunnelId, findRecursively } from '../helpers/helpres';
 import I2cTunnel from '../tunnels/I2cTunnel';
-//import * as EventEmitter from 'events';
+import * as EventEmitter from 'events';
 
 
 /**
@@ -18,7 +18,7 @@ export default class Router {
   private readonly tunnelTypes: object = {
     i2c: I2cTunnel,
   };
-  //private readonly events: EventEmitter = new EventEmitter();
+  private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
     this.app = app;
@@ -26,31 +26,29 @@ export default class Router {
     if (this.app.isMaster()) {
       this.configureMasterTunnels();
     }
+
+    this.listenToAllTunnels();
   }
 
   async publish(message: MessageInterface): Promise<void> {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
-    const tunnel = this.findTunnel(message.to);
+    const tunnel = this.getTunnel(message.to);
 
     await tunnel.send(message);
   }
 
   subscribe(handler: (message: MessageInterface) => void) {
-
-    // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
-    // TODO: может добавить категорию - тогда будет более оптимально
-    // TODO: лушче сразу подписаться на все туннели и поднимать событие на те на которые подписанны в subscribe
+    this.events.on('tunnelMsg', handler);
   }
 
   unsubscribe(handler: (message: MessageInterface) => void) {
-    // TODO: !!!!
+    this.events.off('tunnelMsg', handler);
   }
 
-
   private configureMasterTunnels() {
-    findRecursively(this.app.config.devices, (item, itemPath) => {
+    findRecursively(this.app.config.devices, (item, itemPath): boolean => {
       if (!_.isPlainObject(item)) return false;
       // go deeper
       if (!item.device) return undefined;
@@ -76,15 +74,25 @@ export default class Router {
     this.tunnels[tunnelId] = new TunnelClass(connection);
   }
 
-  private findTunnel(to: string): TunnelInterface {
+  private getTunnel(to: string): TunnelInterface {
 
-    // TODO: точто to будет tunnel id ???
+    // TODO: точно to будет tunnel id ???
 
     if (!this.tunnels[to]) {
       throw new Error(`Can't find tunnel "${to}"`);
     }
 
     return this.tunnels[to];
+  }
+
+  private listenToAllTunnels() {
+    _.each(this.tunnels, (tunnel, tunnelId) => {
+      const listenCb = (message: MessageInterface) => {
+        this.events.emit('tunnelMsg', message);
+      };
+
+      tunnel.listen(listenCb);
+    });
   }
 
 }
