@@ -27,6 +27,8 @@ export default class App {
     this.drivers = new Drivers(this);
     this.router = new Router(this);
     this.log = defaultLogger;
+
+    this.router.init();
   }
 
   isMaster() {

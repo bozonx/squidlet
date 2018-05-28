@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as EventEmitter from 'events';
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
@@ -6,7 +7,6 @@ import AddressInterface from './interfaces/AddressInterface';
 import { generateTunnelId, findRecursively } from '../helpers/helpres';
 import LocalTunnel from '../tunnels/LocalTunnel';
 import I2cTunnel from '../tunnels/I2cTunnel';
-import * as EventEmitter from 'events';
 
 
 /**
@@ -24,13 +24,14 @@ export default class Router {
 
   constructor(app) {
     this.app = app;
+  }
 
+  init() {
     if (this.app.isMaster()) {
       this.configureMasterTunnels();
     }
 
     this.configureTunnels();
-
     this.listenToAllTunnels();
   }
 
@@ -38,7 +39,6 @@ export default class Router {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
-    // TODO: !!! что по части локальныйх запросов ???
     // TODO: !!! наверное если to = from то отсылать локально???
 
     const tunnel = this.getTunnel(message.to);
