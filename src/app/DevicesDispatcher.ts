@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import App from './App';
-import MessageInterface from "./MessageInterface";
+import MessageInterface from "./interfaces/MessageInterface";
 
 
 export default class DevicesDispatcher {

@@ -3,7 +3,7 @@ import Devices from './Devices';
 import DevicesDispatcher from './DevicesDispatcher';
 import Drivers from './Drivers';
 import Router from './Router';
-import LoggerInterface from './LoggerInterface';
+import LoggerInterface from './interfaces/LoggerInterface';
 import * as defaultLogger from './defaultLogger';
 
 

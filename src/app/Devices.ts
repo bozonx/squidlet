@@ -1,5 +1,5 @@
 import App from './App';
-import DeviceInterface from './DeviceInterface';
+import DeviceInterface from './interfaces/DeviceInterface';
 
 
 export default class Devices {

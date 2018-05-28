@@ -1,5 +1,5 @@
 import App from './App';
-import MessageInterface from './MessageInterface';
+import MessageInterface from './interfaces/MessageInterface';
 
 /**
  * It passes messages to corresponding tunnel
@@ -18,6 +18,9 @@ export default class Router {
     // TODO: нужно определить куда отослать сообщение в какой туннель
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
+    const tunnel = this.findTunnel(message.to);
+
+    await tunnel.send();
   }
 
   subscribe(handler: (message: MessageInterface) => void) {
@@ -28,6 +31,11 @@ export default class Router {
 
   unsubscribe(handler: (message: MessageInterface) => void) {
     // TODO: !!!!
+  }
+
+
+  private findTunnel(to: string) {
+    // TODO: find!!!! or exception
   }
 
 }

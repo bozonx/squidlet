@@ -1,6 +1,6 @@
 import App from './App';
 //import * as EventEmitter from 'events';
-import MessageInterface from './MessageInterface';
+import MessageInterface from './interfaces/MessageInterface';
 import { generateUniqId } from '../helpers/helpres';
 
 
