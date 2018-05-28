@@ -1,8 +1,12 @@
+import * as _ from 'lodash';
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
+import ConnectionInterface from './interfaces/ConnectionInterface';
+import { generateTunnelId, findRecursively } from '../helpers/helpres';
 import I2cTunnel from '../tunnels/I2cTunnel';
 //import * as EventEmitter from 'events';
+
 
 /**
  * It passes messages to corresponding tunnel
@@ -10,10 +14,18 @@ import I2cTunnel from '../tunnels/I2cTunnel';
  */
 export default class Router {
   private readonly app: App;
+  private readonly tunnels: object;
+  private readonly tunnelTypes: object = {
+    i2c: I2cTunnel,
+  };
   //private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
     this.app = app;
+
+    if (this.app.isMaster()) {
+      this.configureMasterTunnels();
+    }
   }
 
   async publish(message: MessageInterface): Promise<void> {
@@ -37,9 +49,42 @@ export default class Router {
   }
 
 
+  private configureMasterTunnels() {
+    findRecursively(this.app.config.devices, (item, itemPath) => {
+      if (!_.isPlainObject(item)) return false;
+      // go deeper
+      if (!item.device) return undefined;
+      if (item.device !== 'host') return false;
+
+      const connection = {
+        hostId: itemPath,
+        type: item.address.type,
+        bus: item.address.bus,
+        address: item.address.address,
+      };
+
+      this.registerTunnel(connection);
+
+      return false;
+    });
+  }
+
+  private registerTunnel(connection: ConnectionInterface) {
+    const tunnelId = generateTunnelId(connection);
+    const TunnelClass = this.tunnelTypes[connection.type];
+
+    this.tunnels[tunnelId] = new TunnelClass(connection);
+  }
+
   private findTunnel(to: string): TunnelInterface {
-    // TODO: find!!!! or exception
-    // TODO: нужно определить куда отослать сообщение в какой туннель
+
+    // TODO: точто to будет tunnel id ???
+
+    if (!this.tunnels[to]) {
+      throw new Error(`Can't find tunnel "${to}"`);
+    }
+
+    return this.tunnels[to];
   }
 
 }

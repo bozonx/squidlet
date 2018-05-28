@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 import App from './App';
 import MessageInterface from "./interfaces/MessageInterface";
 

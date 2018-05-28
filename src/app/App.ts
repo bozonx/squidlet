@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 import Messenger from './Messenger';
 import Devices from './Devices';
 import DevicesDispatcher from './DevicesDispatcher';
@@ -17,7 +17,7 @@ export default class App {
   public readonly drivers: Drivers;
   public readonly router: Router;
   public readonly log: LoggerInterface;
-  public readonly config: object;
+  public readonly config: {[index: string]: object};
 
   constructor(specifiedConfig) {
     this.config = this.mergeConfig(specifiedConfig);
@@ -27,6 +27,13 @@ export default class App {
     this.drivers = new Drivers(this);
     this.router = new Router(this);
     this.log = defaultLogger;
+  }
+
+  isMaster() {
+
+    // TODO: на каждом хосте определять
+
+    return true;
   }
 
   getHostId(): string {
