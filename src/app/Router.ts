@@ -1,5 +1,7 @@
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
+import TunnelInterface from './interfaces/TunnelInterface';
+import I2cTunnel from '../tunnels/I2cTunnel';
 
 /**
  * It passes messages to corresponding tunnel
@@ -13,20 +15,19 @@ export default class Router {
   }
 
   async publish(message: MessageInterface): Promise<void> {
-    // TODO: ??? добавить to в message - id компьютера назначения
     // TODO: ждать таймаут ответа - если не дождались - do reject
-    // TODO: нужно определить куда отослать сообщение в какой туннель
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
     const tunnel = this.findTunnel(message.to);
 
-    await tunnel.send();
+    await tunnel.send(message);
   }
 
   subscribe(handler: (message: MessageInterface) => void) {
 
     // TODO: слушаем сообщения из всех туннелей которое адресованно этому мк
     // TODO: может добавить категорию - тогда будет более оптимально
+    // TODO: лушче сразу подписаться на все туннели и поднимать событие на те на которые подписанны в subscribe
   }
 
   unsubscribe(handler: (message: MessageInterface) => void) {
@@ -34,8 +35,9 @@ export default class Router {
   }
 
 
-  private findTunnel(to: string) {
+  private findTunnel(to: string): TunnelInterface {
     // TODO: find!!!! or exception
+    // TODO: нужно определить куда отослать сообщение в какой туннель
   }
 
 }
