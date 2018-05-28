@@ -1,6 +1,6 @@
 {
   "name": "squidlet",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Easy make IoT devices and local net of devices which can be managed by master",
   "main": "build/index.js",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
@@ -21,6 +21,9 @@
     "uniqid": "^4.1.1"
   },
   "devDependencies": {
+    "@types/glob": "^5.0.35",
+    "@types/js-yaml": "^3.11.1",
+    "@types/lodash": "^4.14.109",
     "@types/node": "^10.1.2",
     "@types/uniqid": "^4.1.2",
     "chai": "^4.1.2",

@@ -2,6 +2,7 @@ import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
 import I2cTunnel from '../tunnels/I2cTunnel';
+//import * as EventEmitter from 'events';
 
 /**
  * It passes messages to corresponding tunnel
@@ -9,6 +10,7 @@ import I2cTunnel from '../tunnels/I2cTunnel';
  */
 export default class Router {
   private readonly app: App;
+  //private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
     this.app = app;

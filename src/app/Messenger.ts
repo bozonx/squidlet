@@ -1,12 +1,10 @@
 import App from './App';
-//import * as EventEmitter from 'events';
 import MessageInterface from './interfaces/MessageInterface';
 import { generateUniqId } from '../helpers/helpres';
 
 
 export default class Messenger {
   private readonly app: App;
-  //private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
     this.app = app;
