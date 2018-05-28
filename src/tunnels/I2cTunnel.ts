@@ -6,8 +6,8 @@ import AddressInterface from '../app/interfaces/AddressInterface';
 
 export default class I2cTunnel {
   private readonly app: App;
-  private readonly i2c: I2c;
   private readonly connection: AddressInterface;
+  private readonly i2c: I2c;
   // its "7E"
   private readonly tunnelDataAddr: 126;
 
@@ -18,17 +18,30 @@ export default class I2cTunnel {
   }
 
   async publish(message: MessageInterface): Promise<void> {
-    const packed = JSON.stringify(message);
-    const buffer = new Buffer(packed, 'utf8');
+    const jsonString = JSON.stringify(message);
+    const buffer = new Buffer(jsonString, 'utf8');
     await this.i2c.writeData(this.connection.bus, this.connection.address, this.tunnelDataAddr, buffer);
   }
 
   subscribe(handler: (message: MessageInterface) => void): void {
-    // TODO: !!!!
+    const callBack = (data: Buffer) => {
+
+      // TODO: review - может лучше toString() использовать ???
+
+      const jsonString = data.toJSON().data.join();
+      const message: MessageInterface = JSON.parse(jsonString);
+
+      handler(message);
+    };
+
+    this.i2c.listenData(this.connection.bus, this.connection.address, this.tunnelDataAddr, callBack);
   }
 
   unsubscribe(handler: (message: MessageInterface) => void): void {
     // TODO: !!!!
+
+    // TODO: наверное все через события сделать. А вешаться i2c при инициализации
+
   }
 
 }

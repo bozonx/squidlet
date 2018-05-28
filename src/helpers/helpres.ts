@@ -8,7 +8,15 @@ export function generateUniqId(): string {
 }
 
 export function generateTunnelId(connection: AddressInterface): string {
-  return `${connection.hostId}-${connection.type}-${connection.bus}-${connection.address}`;
+  const items = _.concat([
+    connection.hostId,
+    connection.type,
+    // TODO: не нужно если bus будет строкой
+    (_.isUndefined(connection.bus)) ? undefined : String(connection.bus),
+    connection.address,
+  ]);
+
+  return items.join('-');
 }
 
 /**

@@ -22,6 +22,10 @@ export default class I2c {
 
   }
 
+  unlisten() {
+    // TODO: !!!!
+  }
+
   request(bus: number, address: string, dataAddr: number, data: Buffer): Promise<Buffer> {
     // Write and read - но не давать никому встать в очередь
   }
@@ -38,8 +42,16 @@ export default class I2c {
     // TODO: приходит по одному блоку
   }
 
-  listenData(bus: number, address: string, dataAddr: number) {
+  unlistenBlock() {
+    // TODO: !!!!
+  }
+
+  listenData(bus: number, address: string, dataAddr: number, handler: (data: Buffer) => void) {
     // TODO: склеить блоки. См в заголовке есть ли ещё данные
+  }
+
+  unlistenData() {
+    // TODO: !!!!
   }
 
   writeData(bus: number, address: string, dataAddr: number, data: Buffer): Promise<void> {

@@ -4,6 +4,7 @@ import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
 import AddressInterface from './interfaces/AddressInterface';
 import { generateTunnelId, findRecursively } from '../helpers/helpres';
+import LocalTunnel from '../tunnels/LocalTunnel';
 import I2cTunnel from '../tunnels/I2cTunnel';
 import * as EventEmitter from 'events';
 
@@ -16,6 +17,7 @@ export default class Router {
   private readonly app: App;
   private readonly tunnels: object;
   private readonly tunnelTypes: object = {
+    local: LocalTunnel,
     i2c: I2cTunnel,
   };
   private readonly events: EventEmitter = new EventEmitter();
@@ -27,6 +29,8 @@ export default class Router {
       this.configureMasterTunnels();
     }
 
+    this.configureTunnels();
+
     this.listenToAllTunnels();
   }
 
@@ -35,6 +39,7 @@ export default class Router {
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
     // TODO: !!! что по части локальныйх запросов ???
+    // TODO: !!! наверное если to = from то отсылать локально???
 
     const tunnel = this.getTunnel(message.to);
 
@@ -49,6 +54,10 @@ export default class Router {
     this.events.off('tunnelMsg', handler);
   }
 
+
+  /**
+   * Configure master to slaves tunnels.
+   */
   private configureMasterTunnels() {
     findRecursively(this.app.config.devices, (item, itemPath): boolean => {
       if (!_.isPlainObject(item)) return false;
@@ -67,6 +76,20 @@ export default class Router {
 
       return false;
     });
+  }
+
+  /**
+   * Configure slave to slave and local tunnels.
+   */
+  private configureTunnels() {
+    const connection = {
+      hostId: this.app.getHostId(),
+      type: 'local',
+      bus: undefined,
+      address: undefined,
+    };
+
+    this.registerTunnel(connection);
   }
 
   private registerTunnel(connection: AddressInterface) {
@@ -88,9 +111,6 @@ export default class Router {
   }
 
   private listenToAllTunnels() {
-
-    // TODO: !!! что по части локальныйх запросов ???
-
     _.each(this.tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: MessageInterface) => {
         this.events.emit('tunnelMsg', message);
