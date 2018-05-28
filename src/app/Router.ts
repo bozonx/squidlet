@@ -34,6 +34,8 @@ export default class Router {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
+    // TODO: !!! что по части локальныйх запросов ???
+
     const tunnel = this.getTunnel(message.to);
 
     await tunnel.publish(message);
@@ -86,6 +88,9 @@ export default class Router {
   }
 
   private listenToAllTunnels() {
+
+    // TODO: !!! что по части локальныйх запросов ???
+
     _.each(this.tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: MessageInterface) => {
         this.events.emit('tunnelMsg', message);
