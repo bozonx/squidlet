@@ -36,7 +36,7 @@ export default class Router {
 
     const tunnel = this.getTunnel(message.to);
 
-    await tunnel.send(message);
+    await tunnel.publish(message);
   }
 
   subscribe(handler: (message: MessageInterface) => void) {
@@ -71,7 +71,7 @@ export default class Router {
     const tunnelId = generateTunnelId(connection);
     const TunnelClass = this.tunnelTypes[connection.type];
 
-    this.tunnels[tunnelId] = new TunnelClass(connection);
+    this.tunnels[tunnelId] = new TunnelClass(this.app, connection);
   }
 
   private getTunnel(to: string): TunnelInterface {
@@ -91,7 +91,7 @@ export default class Router {
         this.events.emit('tunnelMsg', message);
       };
 
-      tunnel.listen(listenCb);
+      tunnel.subscribe(listenCb);
     });
   }
 
