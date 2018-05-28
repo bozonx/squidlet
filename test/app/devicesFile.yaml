@@ -1,0 +1,42 @@
+#drivers:
+  # config for drivers
+
+#int:
+
+devices:
+  bedroom:
+    wall-light-toggle:
+      device: GPIO_WallButtonSensor
+      gpio: 'builtin'
+      pin: 21
+      pullup: true
+
+    light-intencity:
+      device: LightIntensitySensorBH1750
+      i2c: 5c
+      valueLogLevel: verbose
+      maxThreshold: 100
+
+  connectingroom:
+    host1:
+      device: host
+      address:
+        type: i2c
+        bus: 1
+        address: 5a
+      links:
+        - host2
+      devices:
+        light:
+          device: GPIO_Relay
+          gpio: 'builtin'
+          pin: 0
+          baseOne: true
+    host2:
+      device: host
+      address:
+        type: i2c
+        bus: 1
+        address: 5b
+      links:
+        - host1
