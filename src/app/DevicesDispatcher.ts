@@ -73,7 +73,7 @@ export default class DevicesDispatcher {
    */
   publishConfig(deviceId: string, partialConfig: object): Promise<void> {
 
-    // TODO: должен путликовать всем желающим - кто подписался
+    // TODO: должен публиковать всем желающим - кто подписался
 
     const to = 'master';
     const payload = {
@@ -86,20 +86,14 @@ export default class DevicesDispatcher {
   /**
    * Listen for actions which have to be called on current host.
    */
-  private handleCallActionRequests = (request: MessageInterface): Promise<any> => {
-
-    // TODO: сформировать ответ
-
-    return this.callLocalDeviceAction(request)
+  private handleCallActionRequests = (request: MessageInterface):void => {
+    this.callLocalDeviceAction(request)
       .then((result: any) => {
-        //this.sendRespondMessage(message, result);
+        this.app.messenger.sendRespondMessage(request, result);
       })
       .catch((error) => {
-        //this.sendRespondMessage(message, null, error);
+        this.app.messenger.sendRespondMessage(request, null, error);
       });
-
-    // this.sendRespondMessage(message, result);
-
   };
 
   private async callLocalDeviceAction(request: MessageInterface): Promise<any> {

@@ -77,33 +77,18 @@ export default class Messenger {
     });
   }
 
-  listenRequests(category: string, handler: (message: MessageInterface) => Promise<any>) {
+  listenRequests(category: string, handler: (message: MessageInterface) => void) {
+    // it will be called on each income message to current host
     const callBack = (message: MessageInterface) => {
       if (!message.request || message.category !== category) return;
 
-      // TODO: почему ответ здесь делается ????
-
-      handler(message)
-        .then((result: any) => {
-          if (!message.request) return;
-
-          //this.sendRespondMessage(message, result);
-        })
-        .catch((error) => {
-          // if (!message.request) {
-          //   this.app.log.error(error);
-          //
-          //   return;
-          // }
-
-          //this.sendRespondMessage(message, null, error);
-        });
+      handler(message);
     };
 
     this.app.router.subscribe(callBack);
   }
 
-  private sendRespondMessage(
+  sendRespondMessage(
     request: MessageInterface,
     payload: any = null,
     error: { message: string, code: number } = undefined
