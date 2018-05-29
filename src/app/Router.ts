@@ -4,7 +4,7 @@ import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
 import AddressInterface from './interfaces/AddressInterface';
-import { generateTunnelId, findRecursively } from '../helpers/helpres';
+import { generateTunnelId, findRecursively } from '../helpers/helpers';
 import LocalTunnel from '../tunnels/LocalTunnel';
 import I2cTunnel from '../tunnels/I2cTunnel';
 

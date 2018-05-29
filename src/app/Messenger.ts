@@ -1,7 +1,7 @@
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import AddressInterface from './interfaces/AddressInterface';
-import { generateUniqId } from '../helpers/helpres';
+import { generateUniqId } from '../helpers/helpers';
 
 
 export default class Messenger {

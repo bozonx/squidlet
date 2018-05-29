@@ -1,5 +1,5 @@
 import DevI2c from '../dev/I2c';
-import { stringToHex } from '../helpers/helpres';
+import { stringToHex } from '../helpers/helpers';
 
 // TODO: сделать очередь
 // TODO: сделать поддержку poling
