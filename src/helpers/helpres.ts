@@ -3,6 +3,12 @@ import * as uniqid from 'uniqid';
 import AddressInterface from '../app/interfaces/AddressInterface';
 
 
+export function stringToHex(addr: string): number {
+  // to hex. eg - "5A" -> 90. "5a" the same
+  return parseInt(addr, 16);
+}
+
+
 export function generateUniqId(): string {
   return uniqid();
 }
@@ -21,10 +27,10 @@ export function generateTunnelId(connection: AddressInterface): string {
 /**
  * It works with common structures like
  *     {
-   *       parent: {
-   *         prop: 'value'
-   *       }
-   *     }
+ *       parent: {
+ *         prop: 'value'
+ *       }
+ *     }
  * @param rootObject
  * @param {function} cb - callback like (items, pathToItem) => {}.
  *                        If it returns false it means don't go deeper.

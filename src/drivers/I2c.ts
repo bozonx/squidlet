@@ -1,4 +1,5 @@
-
+import DevI2c from '../dev/I2c';
+import { stringToHex } from '../helpers/helpres';
 
 // TODO: сделать очередь
 // TODO: сделать поддержку poling
@@ -10,8 +11,11 @@ export default class I2c {
 
   }
 
-  write(bus: string, address: string, dataAddr: number, data: Buffer): Promise<void> {
+  write(bus: string, address: string, dataAddr: number = undefined, data: Buffer = undefined): Promise<void> {
     // TODO: наверное дожидаться  таймаута соединения и обрывать
+    // TODO: если не указан dataAddr - использовать i2cWrite
+    // TODO: если не указан data - использовать bus.writeQuick(addr, bit, cb)
+    const hexAddr = stringToHex(address);
   }
 
   read(bus: string, address: string, dataAddr: number): Promise<Buffer> {
@@ -32,6 +36,8 @@ export default class I2c {
 
   writeBlock(bus: string, address: string, dataAddr: number, data: Buffer, hasNext: boolean): Promise<void> {
     // TODO: послать один блок - нужно чтобы не забить всю память большими данными
+
+
   }
 
   readBlock(bus: string, address: string, dataAddr: number): Promise<Buffer> {

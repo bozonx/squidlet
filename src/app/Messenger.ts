@@ -79,13 +79,13 @@ export default class Messenger {
 
   listenRequests(category: string, handler: (message: MessageInterface) => void) {
     // it will be called on each income message to current host
-    const callBack = (message: MessageInterface) => {
+    const callback = (message: MessageInterface) => {
       if (!message.request || message.category !== category) return;
 
       handler(message);
     };
 
-    this.app.router.subscribe(callBack);
+    this.app.router.subscribe(callback);
   }
 
   sendRespondMessage(

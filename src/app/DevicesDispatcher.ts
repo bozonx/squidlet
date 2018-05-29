@@ -31,19 +31,19 @@ export default class DevicesDispatcher {
    * Listen for device's status messages.
    */
   listenStatus(deviceId: string, handler: (statusName: string, partialStatus: object) => void) {
-    const callBack = (message: MessageInterface) => {
+    const callback = (message: MessageInterface) => {
       handler(message.payload.statusName, message.payload.partialStatus);
     };
 
-    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callBack)
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callback)
   }
 
   listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
-    const callBack = (message: MessageInterface) => {
+    const callback = (message: MessageInterface) => {
       handler(message.payload.partialConfig);
     };
 
-    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callBack)
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callback)
   }
 
   setConfig(deviceId: string, partialConfig: object) {

@@ -24,7 +24,7 @@ export default class I2cTunnel {
   }
 
   subscribe(handler: (message: MessageInterface) => void): void {
-    const callBack = (data: Buffer) => {
+    const callback = (data: Buffer) => {
 
       // TODO: review - может лучше toString() использовать ???
 
@@ -34,7 +34,7 @@ export default class I2cTunnel {
       handler(message);
     };
 
-    this.i2c.listenData(this.connection.bus, this.connection.address, this.tunnelDataAddr, callBack);
+    this.i2c.listenData(this.connection.bus, this.connection.address, this.tunnelDataAddr, callback);
   }
 
   unsubscribe(handler: (message: MessageInterface) => void): void {
