@@ -68,7 +68,8 @@ export default class Router {
       const connection = {
         hostId: itemPath,
         type: item.address.type,
-        bus: item.address.bus,
+        //bus: item.address.bus,
+        bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
         address: item.address.address,
       };
 

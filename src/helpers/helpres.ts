@@ -11,8 +11,7 @@ export function generateTunnelId(connection: AddressInterface): string {
   const items = _.concat([
     connection.hostId,
     connection.type,
-    // TODO: не нужно если bus будет строкой
-    (_.isUndefined(connection.bus)) ? undefined : String(connection.bus),
+    connection.bus,
     connection.address,
   ]);
 

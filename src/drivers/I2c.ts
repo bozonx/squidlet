@@ -10,15 +10,15 @@ export default class I2c {
 
   }
 
-  write(bus: number, address: string, dataAddr: number, data: Buffer): Promise<void> {
+  write(bus: string, address: string, dataAddr: number, data: Buffer): Promise<void> {
     // TODO: наверное дожидаться  таймаута соединения и обрывать
   }
 
-  read(bus: number, address: string, dataAddr: number): Promise<Buffer> {
+  read(bus: string, address: string, dataAddr: number): Promise<Buffer> {
 
   }
 
-  listen(bus: number, address: string, dataAddr: number) {
+  listen(bus: string, address: string, dataAddr: number) {
 
   }
 
@@ -26,19 +26,19 @@ export default class I2c {
     // TODO: !!!!
   }
 
-  request(bus: number, address: string, dataAddr: number, data: Buffer): Promise<Buffer> {
+  request(bus: string, address: string, dataAddr: number, data: Buffer): Promise<Buffer> {
     // Write and read - но не давать никому встать в очередь
   }
 
-  writeBlock(bus: number, address: string, dataAddr: number, data: Buffer, hasNext: boolean): Promise<void> {
+  writeBlock(bus: string, address: string, dataAddr: number, data: Buffer, hasNext: boolean): Promise<void> {
     // TODO: послать один блок - нужно чтобы не забить всю память большими данными
   }
 
-  readBlock(bus: number, address: string, dataAddr: number): Promise<Buffer> {
+  readBlock(bus: string, address: string, dataAddr: number): Promise<Buffer> {
     // TODO: прочитать один блок - нужно чтобы вручную считываь блоки чтобы не забивать память
   }
 
-  listenBlock(bus: number, address: string, dataAddr: number) {
+  listenBlock(bus: string, address: string, dataAddr: number) {
     // TODO: приходит по одному блоку
   }
 
@@ -46,7 +46,7 @@ export default class I2c {
     // TODO: !!!!
   }
 
-  listenData(bus: number, address: string, dataAddr: number, handler: (data: Buffer) => void) {
+  listenData(bus: string, address: string, dataAddr: number, handler: (data: Buffer) => void) {
     // TODO: склеить блоки. См в заголовке есть ли ещё данные
   }
 
@@ -54,11 +54,11 @@ export default class I2c {
     // TODO: !!!!
   }
 
-  writeData(bus: number, address: string, dataAddr: number, data: Buffer): Promise<void> {
+  writeData(bus: string, address: string, dataAddr: number, data: Buffer): Promise<void> {
     // TODO: разбить данные на блоки и отослать поочереди - ставить в конец очереди
   }
 
-  requestData(bus: number, address: string, dataAddr: number): Promise<Buffer> {
+  requestData(bus: string, address: string, dataAddr: number): Promise<Buffer> {
     // TODO: Write and read - но не давать никому встать в очередь
   }
 
