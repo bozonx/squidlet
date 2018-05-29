@@ -25,11 +25,9 @@ export default class I2cTunnel {
 
   async publish(message: MessageInterface): Promise<void> {
     const jsonString = JSON.stringify(message);
-    const buffer = new Buffer(jsonString, 'utf8');
+    const data = StringToUint8Array(jsonString);
 
-    // TODO: !!!! use Uint8Array
-
-    await this.i2c.writeData(this.connection.bus, this.connection.address, this.tunnelDataAddr, buffer);
+    await this.i2c.writeData(this.connection.bus, this.connection.address, this.tunnelDataAddr, data);
   }
 
   subscribe(handler: (message: MessageInterface) => void): void {
@@ -41,17 +39,10 @@ export default class I2cTunnel {
   }
 
   private handleIncomeData = (data: Uint8Array): void => {
-    // TODO: перевести обратно в string
-
-    const result = '';
-
-    // TODO: review - может лучше toString() использовать ???
-
-    const jsonString = data.toJSON().data.join();
+    const jsonString = Uint8ArrayToString(data);
     const message: MessageInterface = JSON.parse(jsonString);
 
-
-    this.events.emit(this.eventName, result);
+    this.events.emit(this.eventName, message);
   }
 
 }
