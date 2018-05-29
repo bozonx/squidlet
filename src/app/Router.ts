@@ -15,12 +15,12 @@ import I2cTunnel from '../tunnels/I2cTunnel';
  */
 export default class Router {
   private readonly app: App;
+  private readonly events: EventEmitter = new EventEmitter();
   private readonly tunnels: object;
   private readonly tunnelTypes: object = {
     local: LocalTunnel,
     i2c: I2cTunnel,
   };
-  private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
     this.app = app;

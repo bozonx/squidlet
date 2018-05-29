@@ -52,7 +52,7 @@ export default class I2c {
     // TODO: !!!!
   }
 
-  listenData(bus: string, address: string, dataAddr: number, handler: (data: Buffer) => void) {
+  listenData(bus: string, address: string, dataAddr: number, handler: (data: Uint8Array) => void) {
     // TODO: склеить блоки. См в заголовке есть ли ещё данные
   }
 
@@ -60,7 +60,7 @@ export default class I2c {
     // TODO: !!!!
   }
 
-  writeData(bus: string, address: string, dataAddr: number, data: Buffer): Promise<void> {
+  writeData(bus: string, address: string, dataAddr: number, data: Uint8Array): Promise<void> {
     // TODO: разбить данные на блоки и отослать поочереди - ставить в конец очереди
   }
 
