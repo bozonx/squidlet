@@ -1,8 +1,11 @@
+import AddressInterface from './AddressInterface';
+
+
 export default interface Message {
   topic: string;
   category: string;
-  from: string;
-  to: string;
+  from: AddressInterface;
+  to: AddressInterface;
   request?: {
     id: string,
     isRequest?: boolean,

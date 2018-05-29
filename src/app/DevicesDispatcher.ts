@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import App from './App';
 import MessageInterface from "./interfaces/MessageInterface";
+import AddressInterface from "./interfaces/AddressInterface";
 
 
 export default class DevicesDispatcher {
@@ -59,7 +60,7 @@ export default class DevicesDispatcher {
 
     // TODO: должен путликовать всем желающим - кто подписался
 
-    const to = 'master';
+    const to = this.resolveHost('master');
     const payload = {
       statusName,
       partialStatus,
@@ -75,7 +76,7 @@ export default class DevicesDispatcher {
 
     // TODO: должен публиковать всем желающим - кто подписался
 
-    const to = 'master';
+    const to = this.resolveHost('master');
     const payload = {
       partialConfig,
     };
@@ -118,11 +119,17 @@ export default class DevicesDispatcher {
     return result;
   }
 
-  private resolveHost(deviceId: string): string {
+  private resolveHost(deviceId: string): AddressInterface {
 
-    // TODO: !!!!
+    // TODO: !!!! посмотреть в конфиге на каком хосте находится девайс и вернуть адрес
+    // TODO: !!!! резолвить master
 
-    return '';
+    return {
+      hostId: '',
+      type: '',
+      bus: '',
+      address: '',
+    };
   }
 
 }

@@ -1,5 +1,6 @@
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
+import AddressInterface from './interfaces/AddressInterface';
 import { generateUniqId } from '../helpers/helpres';
 
 
@@ -14,11 +15,11 @@ export default class Messenger {
    * Send message to specified host.
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(to: string, category: string, topic: string, payload: any): Promise<void> {
+  async publish(to: AddressInterface, category: string, topic: string, payload: any): Promise<void> {
     const message = {
       topic,
       category,
-      from: this.app.getHostId(),
+      from: this.getHostAddress(to.type, to.bus),
       to,
       payload,
     };
@@ -46,11 +47,11 @@ export default class Messenger {
     //this.app.router.unsubscribe();
   }
 
-  request(to: string, category: string, topic: string, payload: any): Promise<any> {
+  request(to: AddressInterface, category: string, topic: string, payload: any): Promise<any> {
     const message = {
       topic,
       category,
-      from: this.app.getHostId(),
+      from: this.getHostAddress(to.type, to.bus),
       to,
       request: {
         id: generateUniqId(),
@@ -95,7 +96,7 @@ export default class Messenger {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
-      from: this.app.getHostId(),
+      from: this.getHostAddress(request.from.type, request.from.bus),
       to: request.from,
       request: {
         id: request.request.id,
@@ -123,6 +124,15 @@ export default class Messenger {
 
       this.app.router.subscribe(handler);
     }));
+  }
+
+  private getHostAddress(type: string, bus: string): AddressInterface {
+    return {
+      hostId: this.app.router.getHostId(),
+      type,
+      bus,
+      address: this.app.router.getMyAddress(type, bus),
+    }
   }
 
 }

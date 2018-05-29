@@ -41,6 +41,8 @@ export default class Router {
 
     // TODO: !!! наверное если to = from то отсылать локально???
 
+    // TODO: remake to
+
     const tunnel = this.getTunnel(message.to);
 
     await tunnel.publish(message);
@@ -54,6 +56,18 @@ export default class Router {
     this.events.off('tunnelMsg', handler);
   }
 
+  getHostId(): string {
+
+    // TODO: return id of current host - master or room.hostName
+
+    return 'master';
+  }
+
+  getMyAddress(type: string, bus: string): string {
+
+    // TODO: получить текущий адрес хоста
+
+  }
 
   /**
    * Configure master to slaves tunnels.
@@ -84,7 +98,7 @@ export default class Router {
    */
   private configureTunnels() {
     const connection = {
-      hostId: this.app.getHostId(),
+      hostId: this.getHostId(),
       type: 'local',
       bus: undefined,
       address: undefined,
@@ -103,6 +117,8 @@ export default class Router {
   private getTunnel(to: string): TunnelInterface {
 
     // TODO: точно to будет tunnel id ???
+
+    // TODO: remake to
 
     if (!this.tunnels[to]) {
       throw new Error(`Can't find tunnel "${to}"`);
