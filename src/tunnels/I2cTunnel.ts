@@ -3,6 +3,7 @@ import App from '../app/App';
 import I2c from '../drivers/I2c';
 import MessageInterface from '../app/interfaces/MessageInterface';
 import AddressInterface from '../app/interfaces/AddressInterface';
+import { Uint8ArrayToString, StringToUint8Array } from '../helpers/helpres';
 
 
 export default class I2cTunnel {

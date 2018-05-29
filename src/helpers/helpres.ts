@@ -3,11 +3,18 @@ import * as uniqid from 'uniqid';
 import AddressInterface from '../app/interfaces/AddressInterface';
 
 
+export function Uint8ArrayToString(arr: Uint8Array): string {
+  // TODO: !!!
+}
+
+export function StringToUint8Array(str: string): Uint8Array {
+  // TODO: !!!
+}
+
 export function stringToHex(addr: string): number {
   // to hex. eg - "5A" -> 90. "5a" the same
   return parseInt(addr, 16);
 }
-
 
 export function generateUniqId(): string {
   return uniqid();
