@@ -3,6 +3,8 @@ Messenger = require('../../src/app/Messenger').default
 
 describe 'app.Messenger', ->
   beforeEach ->
+    @routerSubscribeHanler = undefined
+
     @app = {
       host: {
         generateDestination: (type, bus) ->
@@ -15,6 +17,7 @@ describe 'app.Messenger', ->
       }
       router: {
         publish: sinon.spy()
+        subscribe: (handler) => @routerSubscribeHanler = handler
       }
     }
 
@@ -38,4 +41,26 @@ describe 'app.Messenger', ->
       topic: 'room1.device1'
     })
 
-  it 'subscribe', ->
+  it 'subscribe - add subscribers', ->
+    handler11 = sinon.spy()
+    handler12 = sinon.spy()
+    handler21 = sinon.spy()
+
+    @messenger.subscribe('cat', 'topic1', handler11)
+    @messenger.subscribe('cat', 'topic1', handler12)
+    @messenger.subscribe('cat', 'topic2', handler21)
+
+    assert.deepEqual(_.keys(@messenger['_subscribers']), [ 'cat|topic1', 'cat|topic2' ]);
+
+  it 'subscribe - invoke', ->
+    handler = sinon.spy()
+    handler2 = sinon.spy()
+    @messenger.subscribe('cat', 'topic', handler)
+    @messenger.subscribe('cat', 'topic', handler2)
+
+    @routerSubscribeHanler({ category: 'cat', topic: 'otherTopic' })
+    @routerSubscribeHanler({ category: 'cat', topic: 'topic' })
+
+    sinon.assert.calledOnce(handler)
+    sinon.assert.calledOnce(handler2)
+    sinon.assert.calledWith(handler, { category: 'cat', topic: 'topic' })

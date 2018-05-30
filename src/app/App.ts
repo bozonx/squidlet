@@ -27,14 +27,15 @@ export default class App {
     this.config = this.mergeConfig(specifiedConfig);
     // config for host
     this.host = new HostConfig(this);
+    this.log = defaultLogger;
+    this.router = new Router(this);
     this.messenger = new Messenger(this);
+    this.drivers = new Drivers(this);
     this.devices = new Devices(this);
     this.devicesDispatcher = new DevicesDispatcher(this);
-    this.drivers = new Drivers(this);
-    this.router = new Router(this);
-    this.log = defaultLogger;
 
     this.router.init();
+    this.messenger.init();
   }
 
   private mergeConfig(specifiedConfig: object) {

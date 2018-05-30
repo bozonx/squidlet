@@ -21,13 +21,13 @@ export default class Router {
     local: LocalTunnel,
     i2c: I2cTunnel,
   };
-  private readonly _eventName: 'msg';
+  private readonly _eventName: string = 'msg';
 
   constructor(app) {
     this._app = app;
   }
 
-  init() {
+  init(): void {
     if (this._app.host.isMaster()) {
       this._configureMasterTunnels();
     }

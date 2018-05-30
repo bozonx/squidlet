@@ -12,7 +12,7 @@ export default class LocalTunnel {
     this._app = app;
   }
 
-  init() {
+  init(): void {
   }
 
   async publish(message: MessageInterface): Promise<void> {

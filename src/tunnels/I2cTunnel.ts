@@ -13,7 +13,7 @@ export default class I2cTunnel {
   private readonly _events: EventEmitter = new EventEmitter();
   private readonly _connectionTo: DestinationInterface;
   private readonly _i2c: I2c;
-  private readonly _eventName: 'data';
+  private readonly _eventName: string = 'data';
   // its "7E"
   private readonly _tunnelDataAddr: number = 126;
 
@@ -23,7 +23,7 @@ export default class I2cTunnel {
     this._i2c = this._app.drivers.getDriver('I2c');
   }
 
-  init() {
+  init(): void {
     this._i2c.listenData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, this._handleIncomeData);
   }
 

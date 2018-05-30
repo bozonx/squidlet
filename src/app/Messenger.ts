@@ -1,3 +1,4 @@
+import * as EventEmitter from 'events';
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import DestinationInterface from './interfaces/DestinationInterface';
@@ -10,9 +11,18 @@ import { generateUniqId } from '../helpers/helpers';
  */
 export default class Messenger {
   private readonly _app: App;
+  private readonly _events: EventEmitter = new EventEmitter();
+  //private readonly _eventName: string = 'msg';
+  private _subscribers: object = {};
 
   constructor(app) {
     this._app = app;
+  }
+
+  init(): void {
+    // this._app.router.subscribe((message: MessageInterface): void => {
+    //   this._events.emit(this._eventName, message)
+    // });
   }
 
   /**
@@ -36,21 +46,38 @@ export default class Messenger {
    * It omits responds of requests.
    */
   subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
-    const callback = (message: MessageInterface) => {
+    if (!category) throw new Error(`Category can't be an empty`);
+    if (!topic) throw new Error(`Topic can't be an empty`);
+
+    const eventName = [ category, topic ].join('|');
+
+    this._events.addListener(eventName, handler);
+
+    // if subscriber is registered - there isn't reason to add additional
+    if (this._subscribers[eventName]) return;
+
+    // add new subscriber
+    this._subscribers[eventName] = (message: MessageInterface): void => {
       if (message.category !== category || message.topic !== topic) return;
       if (message.request) return;
 
       if (message.category === category && message.topic === topic) {
-        handler(message);
+        //handler(message);
+        this._events.emit(eventName, message)
       }
     };
 
-    this._app.router.subscribe(callback);
+    this._app.router.subscribe(this._subscribers[eventName]);
   }
 
-  unsubscribe() {
-    // TODO: do it
-    //this._app.router.unsubscribe();
+  unsubscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
+    const eventName = [ category, topic ].join('|');
+
+    this._events.removeListener(eventName, handler);
+
+    // TODO: если больше нет хэндлеров на это событие - удалить subscriber
+
+    //this._app.router.unsubscribe(this._subscribers[eventName]);
   }
 
   request(to: DestinationInterface, category: string, topic: string, payload: any): Promise<any> {
