@@ -8,9 +8,10 @@ describe 'app.Router', ->
       isMaster: ->  true
     }
 
+    @tunnelSubscribeHanler = undefined
     @tunnel = {
       publish: sinon.spy()
-      subscribe: ->
+      subscribe: (handler) => @tunnelSubscribeHanler = handler
     }
 
     @message = {
@@ -49,3 +50,21 @@ describe 'app.Router', ->
     await @router.publish(@message)
 
     sinon.assert.calledWith(@tunnel.publish, @message)
+
+  it 'subscribe', ->
+    @router._tunnels = {
+      'room1.host1-i2c-1-5A': @tunnel
+    }
+    @router._listenToAllTunnels()
+    handler = sinon.spy()
+    @router.subscribe(handler)
+
+    @tunnelSubscribeHanler(@message)
+
+    sinon.assert.calledWith(handler, @message)
+
+  it 'getHostId', ->
+    # TODO: !!!!
+
+  it 'getMyAddress', ->
+    # TODO: !!!!

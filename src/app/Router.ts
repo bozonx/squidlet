@@ -47,11 +47,11 @@ export default class Router {
   }
 
   subscribe(handler: (message: MessageInterface) => void) {
-    this._events.on(this._eventName, handler);
+    this._events.addListener(this._eventName, handler);
   }
 
   unsubscribe(handler: (message: MessageInterface) => void) {
-    this._events.off(this._eventName, handler);
+    this._events.removeListener(this._eventName, handler);
   }
 
   getHostId(): string {
