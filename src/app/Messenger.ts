@@ -23,7 +23,7 @@ export default class Messenger {
     const message = {
       topic,
       category,
-      from: this._getHostAddress(to.type, to.bus),
+      from: this._app.host.generateDestination(to.type, to.bus),
       to,
       payload,
     };
@@ -55,7 +55,7 @@ export default class Messenger {
     const message = {
       topic,
       category,
-      from: this._getHostAddress(to.type, to.bus),
+      from: this._app.host.generateDestination(to.type, to.bus),
       to,
       request: {
         id: generateUniqId(),
@@ -100,7 +100,7 @@ export default class Messenger {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
-      from: this._getHostAddress(request.from.type, request.from.bus),
+      from: this._app.host.generateDestination(request.from.type, request.from.bus),
       to: request.from,
       request: {
         id: request.request.id,
@@ -128,15 +128,6 @@ export default class Messenger {
 
       this._app.router.subscribe(handler);
     }));
-  }
-
-  private _getHostAddress(type: string, bus: string): AddressInterface {
-    return {
-      hostId: this._app.host.getId(),
-      type,
-      bus,
-      address: this._app.router.getMyAddress(type, bus),
-    }
   }
 
 }

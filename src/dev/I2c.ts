@@ -4,7 +4,7 @@ import * as i2cBusModule from 'i2c-bus';
 /**
  * It's raspberry pi implementation of I2C bus.
  */
-export default class {
+export default class I2c {
   private readonly bus: i2cBusModule.I2cBus;
 
   constructor(bus: string) {

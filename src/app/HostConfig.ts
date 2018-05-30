@@ -1,7 +1,8 @@
 import App from "./App";
+import AddressInterface from "./interfaces/AddressInterface";
 
 
-export default class {
+export default class HostConfig {
   private readonly _app: App;
   private readonly _config: object;
 
@@ -23,11 +24,20 @@ export default class {
     return true;
   }
 
-  getHostId() {
+  getId() {
 
     // TODO: return id of current host - master or room.hostName
 
     return 'master';
+  }
+
+  generateDestination(type: string, bus: string): AddressInterface {
+    return {
+      hostId: this.getId(),
+      type,
+      bus,
+      address: this._app.router.getMyAddress(type, bus),
+    }
   }
 
 }
