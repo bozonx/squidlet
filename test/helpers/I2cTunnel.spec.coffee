@@ -1,4 +1,5 @@
-I2cTunnel = require('../../src/tunnels/I2cTunnel')
+I2cTunnel = require('../../src/tunnels/I2cTunnel').default
+helpers = require('../../src/helpers/helpers')
 
 
 describe 'tunnels.I2cTunnel', ->
@@ -46,4 +47,6 @@ describe 'tunnels.I2cTunnel', ->
   it 'publish', ->
     await @tunnel.publish(@message)
 
-    sinon.assert.calledWith(@driver.writeData, '1', '5a', )
+    uint8arr = helpers.stringToUint8Array
+
+    sinon.assert.calledWith(@driver.writeData, '1', '5a', 126, [])

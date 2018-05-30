@@ -4,11 +4,11 @@ import { TextEncoder, TextDecoder } from 'text-encoding';
 import AddressInterface from '../app/interfaces/AddressInterface';
 
 
-export function Uint8ArrayToString(arr: Uint8Array): string {
+export function uint8ArrayToString(arr: Uint8Array): string {
   return new TextDecoder('utf-8').decode(arr);
 }
 
-export function StringToUint8Array(str: string): Uint8Array {
+export function stringToUint8Array(str: string): Uint8Array {
   return new TextEncoder('utf-8').encode(str);
 }
 

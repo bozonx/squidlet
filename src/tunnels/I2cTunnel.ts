@@ -1,9 +1,8 @@
 import * as EventEmitter from 'events';
 import App from '../app/App';
 import I2c from '../drivers/I2c';
-import MessageInterface from '../app/interfaces/MessageInterface';
 import AddressInterface from '../app/interfaces/AddressInterface';
-import { Uint8ArrayToString, StringToUint8Array } from '../helpers/helpers';
+import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
 
 export default class I2cTunnel {
@@ -25,26 +24,26 @@ export default class I2cTunnel {
     this.i2c.listenData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, this.handleIncomeData);
   }
 
-  async publish(message: MessageInterface): Promise<void> {
-    const jsonString = JSON.stringify(message);
-    const data = StringToUint8Array(jsonString);
+  async publish(data: object): Promise<void> {
+    const jsonString = JSON.stringify(data);
+    const uint8Arr = stringToUint8Array(jsonString);
 
-    await this.i2c.writeData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, data);
+    await this.i2c.writeData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, uint8Arr);
   }
 
-  subscribe(handler: (message: MessageInterface) => void): void {
+  subscribe(handler: (data: object) => void): void {
     this.events.addListener(this.eventName, handler);
   }
 
-  unsubscribe(handler: (message: MessageInterface) => void): void {
+  unsubscribe(handler: (data: object) => void): void {
     this.events.removeListener(this.eventName, handler);
   }
 
-  private handleIncomeData = (data: Uint8Array): void => {
-    const jsonString = Uint8ArrayToString(data);
-    const message: MessageInterface = JSON.parse(jsonString);
+  private handleIncomeData = (uint8Arr: Uint8Array): void => {
+    const jsonString = uint8ArrayToString(uint8Arr);
+    const data = JSON.parse(jsonString);
 
-    this.events.emit(this.eventName, message);
+    this.events.emit(this.eventName, data);
   }
 
 }
