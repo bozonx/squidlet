@@ -12,7 +12,7 @@ export default class I2cTunnel {
   private readonly i2c: I2c;
   private readonly eventName: 'data';
   // its "7E"
-  private readonly tunnelDataAddr: 126;
+  private readonly tunnelDataAddr: number = 126;
 
   constructor(app: App, connectionTo: AddressInterface) {
     this.app = app;

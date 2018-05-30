@@ -4,8 +4,9 @@ helpers = require('../../src/helpers/helpers')
 
 describe 'tunnels.I2cTunnel', ->
   beforeEach ->
+    @listenDataHandler = undefined
     @driver = {
-      listenData: ->
+      listenData: (bus, addr, dataAddr, handler) => @listenDataHandler = handler
       writeData: sinon.spy()
     }
 
@@ -35,6 +36,8 @@ describe 'tunnels.I2cTunnel', ->
 #      }
     }
 
+    @uint8arr = helpers.stringToUint8Array(JSON.stringify(@message))
+
     @connectionTo = {
       hostId: 'room1.host1'
       type: 'i2c'
@@ -43,10 +46,17 @@ describe 'tunnels.I2cTunnel', ->
     }
 
     @tunnel = new I2cTunnel(@app, @connectionTo)
+    @tunnel.init()
 
   it 'publish', ->
     await @tunnel.publish(@message)
 
-    uint8arr = helpers.stringToUint8Array
+    sinon.assert.calledWith(@driver.writeData, '1', '5A', 126, @uint8arr)
 
-    sinon.assert.calledWith(@driver.writeData, '1', '5a', 126, [])
+  it 'subscribe', ->
+    handler = sinon.spy()
+    @tunnel.subscribe(handler)
+
+    @listenDataHandler(@uint8arr)
+
+    sinon.assert.calledWith(handler, @message)
