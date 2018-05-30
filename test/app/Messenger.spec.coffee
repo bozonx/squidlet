@@ -18,6 +18,7 @@ describe 'app.Messenger', ->
       router: {
         publish: sinon.spy()
         subscribe: (handler) => @routerSubscribeHanler = handler
+        unsubscribe: sinon.spy()
       }
     }
 
@@ -50,7 +51,7 @@ describe 'app.Messenger', ->
     @messenger.subscribe('cat', 'topic1', handler12)
     @messenger.subscribe('cat', 'topic2', handler21)
 
-    assert.deepEqual(_.keys(@messenger['_subscribers']), [ 'cat|topic1', 'cat|topic2' ]);
+    assert.deepEqual(_.keys(@messenger['_subscribers']), [ 'cat|topic1', 'cat|topic2' ])
 
   it 'subscribe - invoke', ->
     handler = sinon.spy()
@@ -64,3 +65,19 @@ describe 'app.Messenger', ->
     sinon.assert.calledOnce(handler)
     sinon.assert.calledOnce(handler2)
     sinon.assert.calledWith(handler, { category: 'cat', topic: 'topic' })
+
+  it 'unsubscribe', ->
+    handler = sinon.spy()
+    @messenger.subscribe('cat', 'topic', handler)
+    subscriber = @messenger['_subscribers']['cat|topic']
+
+    @messenger.unsubscribe('cat', 'topic', handler)
+
+    @routerSubscribeHanler({ category: 'cat', topic: 'topic' })
+
+    sinon.assert.notCalled(handler)
+    sinon.assert.calledWith(@app.router.unsubscribe, subscriber)
+    assert.deepEqual(_.keys(@messenger['_subscribers']), [])
+
+  it 'request', ->
+

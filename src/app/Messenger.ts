@@ -75,9 +75,10 @@ export default class Messenger {
 
     this._events.removeListener(eventName, handler);
 
-    // TODO: если больше нет хэндлеров на это событие - удалить subscriber
-
-    //this._app.router.unsubscribe(this._subscribers[eventName]);
+    if (this._events.listeners(eventName).length) return;
+    // if there isn't any listeners - remove subscriber
+    this._app.router.unsubscribe(this._subscribers[eventName]);
+    delete this._subscribers[eventName];
   }
 
   request(to: DestinationInterface, category: string, topic: string, payload: any): Promise<any> {
