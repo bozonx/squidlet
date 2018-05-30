@@ -1,11 +1,26 @@
 Router = require('../../src/app/Router').default
-#helpers = require('../../src/helpers/helpers')
 
 
 describe 'app.Router', ->
   beforeEach ->
     @app = {
-      isMaster: ->  true
+      isMaster: ->  false
+      config: {
+        devices: {
+          room1: {
+            host: {
+              device1: {
+                device: 'host'
+                address: {
+                  type: 'i2c'
+                  bus: 1
+                  address: '5A'
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     @tunnelSubscribeHanler = undefined
@@ -13,6 +28,13 @@ describe 'app.Router', ->
       publish: sinon.spy()
       subscribe: (handler) => @tunnelSubscribeHanler = handler
     }
+
+    @tunnelClassConstructor = sinon.spy()
+    tunnelClassConstructor = @tunnelClassConstructor
+    @tunnelClass = class
+      constructor: (params...) -> tunnelClassConstructor(params...)
+      test: 'test'
+      init: ->
 
     @message = {
       topic: 'room1.host.device1'
@@ -35,12 +57,13 @@ describe 'app.Router', ->
     }
 
     @router = new Router(@app)
-    @router['_tunnelTypes'] = { i2c: @tunnel }
+    #@router['_tunnelTypes'] = { i2c: @tunnelClass }
+    @router['_tunnelTypes'].i2c = @tunnelClass
 
-  it 'init', ->
-    #@router.init()
+  it 'init - not master', ->
+    @router.init()
 
-    # TODO: !!!!
+    assert.equal(@router['_tunnels']['master-local'].constructor.name, 'LocalTunnel')
 
   it 'publish', ->
     @router._tunnels = {
@@ -62,6 +85,16 @@ describe 'app.Router', ->
     @tunnelSubscribeHanler(@message)
 
     sinon.assert.calledWith(handler, @message)
+
+  it '_configureMasterTunnels', ->
+    @router._configureMasterTunnels()
+
+    assert.equal(@router['_tunnels']['room1.host.device1-i2c-1-5A'].test, 'test')
+    sinon.assert.calledWith(@tunnelClassConstructor, @app, {
+      @app.config.devices.room1.host.device1.address...
+      hostId: "room1.host.device1"
+      bus: '1'
+    })
 
   it 'getHostId', ->
     # TODO: !!!!

@@ -5,6 +5,9 @@ import AddressInterface from '../app/interfaces/AddressInterface';
 import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
 
+/**
+ * It packs data to send it via i2c.
+ */
 export default class I2cTunnel {
   private readonly _app: App;
   private readonly _events: EventEmitter = new EventEmitter();

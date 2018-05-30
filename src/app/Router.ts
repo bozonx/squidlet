@@ -10,13 +10,13 @@ import I2cTunnel from '../tunnels/I2cTunnel';
 
 
 /**
- * It passes messages to corresponding tunnel
- * and receives messages from all the available tunnels.
+ * It passes messages to corresponding tunnel by `message.to`.
+ * And receives messages from all the available tunnels on current host.
  */
 export default class Router {
   private readonly _app: App;
   private readonly _events: EventEmitter = new EventEmitter();
-  private readonly _tunnels: object;
+  private readonly _tunnels: object = {};
   private readonly _tunnelTypes: object = {
     local: LocalTunnel,
     i2c: I2cTunnel,

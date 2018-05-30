@@ -22,7 +22,7 @@ export function generateUniqId(): string {
 }
 
 export function generateTunnelId(connection: AddressInterface): string {
-  const items = _.concat([
+  const items = _.compact([
     connection.hostId,
     connection.type,
     connection.bus,
