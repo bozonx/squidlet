@@ -15,7 +15,7 @@ import I2cTunnel from '../tunnels/I2cTunnel';
  */
 export default class Router {
   private readonly app: App;
-  private readonly _events: EventEmitter = new EventEmitter();
+  private readonly events: EventEmitter = new EventEmitter();
   private readonly _tunnels: object = {};
   private readonly _tunnelTypes: object = {
     local: LocalTunnel,
@@ -47,11 +47,11 @@ export default class Router {
   }
 
   subscribe(handler: (message: Message) => void) {
-    this._events.addListener(this._eventName, handler);
+    this.events.addListener(this._eventName, handler);
   }
 
   unsubscribe(handler: (message: Message) => void) {
-    this._events.removeListener(this._eventName, handler);
+    this.events.removeListener(this._eventName, handler);
   }
 
   /**
@@ -113,7 +113,7 @@ export default class Router {
   private listenToAllTunnels() {
     _.each(this._tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: Message) => {
-        this._events.emit(this._eventName, message);
+        this.events.emit(this._eventName, message);
       };
 
       tunnel.subscribe(listenCb);

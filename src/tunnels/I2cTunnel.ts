@@ -10,7 +10,7 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
  */
 export default class I2cTunnel {
   private readonly app: App;
-  private readonly _events: EventEmitter = new EventEmitter();
+  private readonly events: EventEmitter = new EventEmitter();
   private readonly _connectionTo: Destination;
   private readonly _i2c: I2cDriver;
   private readonly _eventName: string = 'data';
@@ -24,7 +24,7 @@ export default class I2cTunnel {
   }
 
   init(): void {
-    this._i2c.listenData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, this._handleIncomeData);
+    this._i2c.listenData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, this.handleIncomeData);
   }
 
   async publish(data: object): Promise<void> {
@@ -35,18 +35,18 @@ export default class I2cTunnel {
   }
 
   subscribe(handler: (data: object) => void): void {
-    this._events.addListener(this._eventName, handler);
+    this.events.addListener(this._eventName, handler);
   }
 
   unsubscribe(handler: (data: object) => void): void {
-    this._events.removeListener(this._eventName, handler);
+    this.events.removeListener(this._eventName, handler);
   }
 
-  private _handleIncomeData = (uint8Arr: Uint8Array): void => {
+  private handleIncomeData = (uint8Arr: Uint8Array): void => {
     const jsonString = uint8ArrayToString(uint8Arr);
     const data = JSON.parse(jsonString);
 
-    this._events.emit(this._eventName, data);
+    this.events.emit(this._eventName, data);
   }
 
 }

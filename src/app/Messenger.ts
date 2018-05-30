@@ -11,7 +11,7 @@ import { generateUniqId } from '../helpers/helpers';
  */
 export default class Messenger {
   private readonly app: App;
-  private readonly _events: EventEmitter = new EventEmitter();
+  private readonly events: EventEmitter = new EventEmitter();
   //private readonly _eventName: string = 'msg';
   private _subscribers: object = {};
 
@@ -21,7 +21,7 @@ export default class Messenger {
 
   init(): void {
     // this.app.router.subscribe((message: Message): void => {
-    //   this._events.emit(this._eventName, message)
+    //   this.events.emit(this._eventName, message)
     // });
   }
 
@@ -51,7 +51,7 @@ export default class Messenger {
 
     const eventName = [ category, topic ].join('|');
 
-    this._events.addListener(eventName, handler);
+    this.events.addListener(eventName, handler);
 
     // if subscriber is registered - there isn't reason to add additional
     if (this._subscribers[eventName]) return;
@@ -63,7 +63,7 @@ export default class Messenger {
 
       if (message.category === category && message.topic === topic) {
         //handler(message);
-        this._events.emit(eventName, message)
+        this.events.emit(eventName, message)
       }
     };
 
@@ -73,9 +73,9 @@ export default class Messenger {
   unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
     const eventName = [ category, topic ].join('|');
 
-    this._events.removeListener(eventName, handler);
+    this.events.removeListener(eventName, handler);
 
-    if (this._events.listeners(eventName).length) return;
+    if (this.events.listeners(eventName).length) return;
     // if there isn't any listeners - remove subscriber
     this.app.router.unsubscribe(this._subscribers[eventName]);
     delete this._subscribers[eventName];

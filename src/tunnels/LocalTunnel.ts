@@ -6,7 +6,7 @@ import Destination from '../app/interfaces/Destination';
 
 export default class LocalTunnel {
   private readonly app: App;
-  private readonly _events: EventEmitter = new EventEmitter();
+  private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app: App, connection: Destination) {
     this.app = app;
@@ -16,15 +16,15 @@ export default class LocalTunnel {
   }
 
   async publish(message: Message): Promise<void> {
-    this._events.emit('message', message);
+    this.events.emit('message', message);
   }
 
   subscribe(handler: (message: Message) => void): void {
-    this._events.addListener('message', handler);
+    this.events.addListener('message', handler);
   }
 
   unsubscribe(handler: (message: Message) => void): void {
-    this._events.removeListener('message', handler);
+    this.events.removeListener('message', handler);
   }
 
 }
