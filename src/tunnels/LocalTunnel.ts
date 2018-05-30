@@ -12,6 +12,9 @@ export default class LocalTunnel {
     this.app = app;
   }
 
+  init() {
+  }
+
   async publish(message: MessageInterface): Promise<void> {
     this.events.emit('message', message);
   }

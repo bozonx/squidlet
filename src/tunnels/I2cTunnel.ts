@@ -9,25 +9,27 @@ import { Uint8ArrayToString, StringToUint8Array } from '../helpers/helpers';
 export default class I2cTunnel {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly connection: AddressInterface;
+  private readonly connectionTo: AddressInterface;
   private readonly i2c: I2c;
   private readonly eventName: 'data';
   // its "7E"
   private readonly tunnelDataAddr: 126;
 
-  constructor(app: App, connection: AddressInterface) {
+  constructor(app: App, connectionTo: AddressInterface) {
     this.app = app;
-    this.connection = connection;
+    this.connectionTo = connectionTo;
     this.i2c = this.app.drivers.getDriver('I2c');
+  }
 
-    this.i2c.listenData(this.connection.bus, this.connection.address, this.tunnelDataAddr, this.handleIncomeData);
+  init() {
+    this.i2c.listenData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, this.handleIncomeData);
   }
 
   async publish(message: MessageInterface): Promise<void> {
     const jsonString = JSON.stringify(message);
     const data = StringToUint8Array(jsonString);
 
-    await this.i2c.writeData(this.connection.bus, this.connection.address, this.tunnelDataAddr, data);
+    await this.i2c.writeData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, data);
   }
 
   subscribe(handler: (message: MessageInterface) => void): void {

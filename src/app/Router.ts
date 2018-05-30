@@ -112,6 +112,7 @@ export default class Router {
     const TunnelClass = this.tunnelTypes[connection.type];
 
     this.tunnels[tunnelId] = new TunnelClass(this.app, connection);
+    this.tunnels[tunnelId].init();
   }
 
   private getTunnel(to: string): TunnelInterface {
