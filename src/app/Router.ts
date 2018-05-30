@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
 import TunnelInterface from './interfaces/TunnelInterface';
-import AddressInterface from './interfaces/AddressInterface';
+import DestinationInterface from './interfaces/DestinationInterface';
 import { generateTunnelId, findRecursively } from '../helpers/helpers';
 import LocalTunnel from '../tunnels/LocalTunnel';
 import I2cTunnel from '../tunnels/I2cTunnel';
@@ -99,7 +99,7 @@ export default class Router {
     this._registerTunnel(connection);
   }
 
-  private _registerTunnel(connection: AddressInterface) {
+  private _registerTunnel(connection: DestinationInterface) {
     const tunnelId = generateTunnelId(connection);
     const TunnelClass = this._tunnelTypes[connection.type];
 
@@ -107,7 +107,7 @@ export default class Router {
     this._tunnels[tunnelId].init();
   }
 
-  private _getTunnel(to: AddressInterface): TunnelInterface {
+  private _getTunnel(to: DestinationInterface): TunnelInterface {
     const tunnelId = generateTunnelId(to);
 
     if (!this._tunnels[tunnelId]) {

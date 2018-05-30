@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import App from './App';
 import MessageInterface from "./interfaces/MessageInterface";
-import AddressInterface from "./interfaces/AddressInterface";
+import DestinationInterface from "./interfaces/DestinationInterface";
 
 
 export default class DevicesDispatcher {
@@ -119,7 +119,7 @@ export default class DevicesDispatcher {
     return result;
   }
 
-  private _resolveHost(deviceId: string): AddressInterface {
+  private _resolveHost(deviceId: string): DestinationInterface {
 
     // TODO: !!!! посмотреть в конфиге на каком хосте находится девайс и вернуть адрес
     // TODO: !!!! резолвить master

@@ -1,14 +1,14 @@
 import * as EventEmitter from 'events';
 import App from '../app/App';
 import MessageInterface from '../app/interfaces/MessageInterface';
-import AddressInterface from '../app/interfaces/AddressInterface';
+import DestinationInterface from '../app/interfaces/DestinationInterface';
 
 
 export default class LocalTunnel {
   private readonly _app: App;
   private readonly _events: EventEmitter = new EventEmitter();
 
-  constructor(app: App, connection: AddressInterface) {
+  constructor(app: App, connection: DestinationInterface) {
     this._app = app;
   }
 

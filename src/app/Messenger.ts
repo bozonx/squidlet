@@ -1,6 +1,6 @@
 import App from './App';
 import MessageInterface from './interfaces/MessageInterface';
-import AddressInterface from './interfaces/AddressInterface';
+import DestinationInterface from './interfaces/DestinationInterface';
 import { generateUniqId } from '../helpers/helpers';
 
 
@@ -19,7 +19,7 @@ export default class Messenger {
    * Send message to specified host.
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(to: AddressInterface, category: string, topic: string, payload: any): Promise<void> {
+  async publish(to: DestinationInterface, category: string, topic: string, payload: any): Promise<void> {
     const message = {
       topic,
       category,
@@ -51,7 +51,7 @@ export default class Messenger {
     //this._app.router.unsubscribe();
   }
 
-  request(to: AddressInterface, category: string, topic: string, payload: any): Promise<any> {
+  request(to: DestinationInterface, category: string, topic: string, payload: any): Promise<any> {
     const message = {
       topic,
       category,

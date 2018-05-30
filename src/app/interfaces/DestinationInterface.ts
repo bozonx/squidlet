@@ -1,4 +1,4 @@
-export default interface Address {
+export default interface Destination {
   // unique path to remote host specified in config, like - bedroom.host1
   hostId: string;
   // type of connection - i2c, modbus, xbee, ble5 etc

@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as uniqid from 'uniqid';
 import { TextEncoder, TextDecoder } from 'text-encoding';
-import AddressInterface from '../app/interfaces/AddressInterface';
+import DestinationInterface from '../app/interfaces/DestinationInterface';
 
 
 export function uint8ArrayToString(arr: Uint8Array): string {
@@ -21,7 +21,7 @@ export function generateUniqId(): string {
   return uniqid();
 }
 
-export function generateTunnelId(connection: AddressInterface): string {
+export function generateTunnelId(connection: DestinationInterface): string {
   const items = _.compact([
     connection.hostId,
     connection.type,
