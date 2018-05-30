@@ -23,7 +23,7 @@ describe 'tunnels.I2cTunnel', ->
     @uint8arr = helpers.stringToUint8Array(JSON.stringify(@message))
 
     @connectionTo = {
-      hostId: 'room1.host1'
+      host: 'room1.host1'
       type: 'i2c'
       bus: '1'
       address: '5A'

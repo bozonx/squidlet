@@ -33,7 +33,7 @@ export default class HostConfig {
 
   generateDestination(type: string, bus: string): DestinationInterface {
     return {
-      hostId: this.getId(),
+      host: this.getId(),
       type,
       bus,
       address: this._app.router.getMyAddress(type, bus),

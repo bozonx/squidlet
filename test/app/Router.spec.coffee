@@ -43,13 +43,13 @@ describe 'app.Router', ->
       topic: 'room1.host.device1'
       category: 'deviceCallAction'
       from: {
-        hostId: 'master'
+        host: 'master'
         type: 'i2c'
         bus: '1'
         address: undefined
       }
       to: {
-        hostId: 'room1.host1'
+        host: 'room1.host1'
         type: 'i2c'
         bus: '1'
         address: '5A'
@@ -95,7 +95,7 @@ describe 'app.Router', ->
     assert.equal(@router['_tunnels']['room1.host.device1-i2c-1-5A'].test, 'test')
     sinon.assert.calledWith(@tunnelClassConstructor, @app, {
       @app.config.devices.room1.host.device1.address...
-      hostId: "room1.host.device1"
+      host: "room1.host.device1"
       bus: '1'
     })
 

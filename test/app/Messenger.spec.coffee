@@ -5,7 +5,13 @@ describe 'app.Messenger', ->
   beforeEach ->
     @app = {
       host: {
-        getId: -> 'master'
+        generateDestination: (type, bus) ->
+          {
+            host: 'room1.device1'
+            type
+            bus
+            address: '5a'
+          }
       }
       router: {
         publish: sinon.spy()
@@ -13,7 +19,7 @@ describe 'app.Messenger', ->
     }
 
     @to = {
-      hostId: 'room1.host1'
+      host: 'room1.host1'
       type: 'i2c'
       bus: '1'
       address: '5A'

@@ -125,7 +125,7 @@ export default class DevicesDispatcher {
     // TODO: !!!! резолвить master
 
     return {
-      hostId: '',
+      host: '',
       type: '',
       bus: '',
       address: '',

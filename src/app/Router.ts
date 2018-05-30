@@ -72,7 +72,7 @@ export default class Router {
       if (item.device !== 'host') return false;
 
       const connection = {
-        hostId: itemPath,
+        host: itemPath,
         type: item.address.type,
         //bus: item.address.bus,
         bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
@@ -90,7 +90,7 @@ export default class Router {
    */
   private _configureTunnels() {
     const connection = {
-      hostId: this._app.host.getId(),
+      host: this._app.host.getId(),
       type: 'local',
       bus: undefined,
       address: undefined,
