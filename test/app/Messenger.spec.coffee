@@ -1,4 +1,5 @@
-Messenger = require('../../src/app/Messenger').default
+MessengerModule = rewire('../src/app/Messenger.ts')
+Messenger = MessengerModule.default
 
 
 describe 'app.Messenger', ->
@@ -16,7 +17,7 @@ describe 'app.Messenger', ->
           }
       }
       router: {
-        publish: sinon.spy()
+        publish: sinon.stub().returns(Promise.resolve())
         subscribe: (handler) => @routerSubscribeHanler = handler
         unsubscribe: sinon.spy()
       }
@@ -29,6 +30,8 @@ describe 'app.Messenger', ->
       address: '5A'
     }
 
+    generateUniqIdMock = () -> 'uniqId'
+    MessengerModule.__set__('helpers.generateUniqId', generateUniqIdMock);
     @messenger = new Messenger(@app);
 
   it 'publish', ->
@@ -80,4 +83,18 @@ describe 'app.Messenger', ->
     assert.deepEqual(_.keys(@messenger['subscribers']), [])
 
   it 'request', ->
+    @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
 
+    message = {
+      category: 'deviceCallAction',
+      from: { address: undefined , bus: '1', host: 'master', type: 'i2c' },
+      payload: { data: 'value' },
+      to: { address: '5A', bus: '1', host: 'room1.host1', type: 'i2c' },
+      topic: 'room1.device1'
+      request: {
+        id: 'uniqId'
+        isRequest: true
+      }
+    }
+
+    sinon.assert.calledWith(@app.router.publish, message)

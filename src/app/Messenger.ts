@@ -2,7 +2,7 @@ import * as EventEmitter from 'events';
 import App from './App';
 import Message from './interfaces/Message';
 import Destination from './interfaces/Destination';
-import { generateUniqId } from '../helpers/helpers';
+import * as helpers from '../helpers/helpers';
 
 
 /**
@@ -88,7 +88,7 @@ export default class Messenger {
       from: this.app.host.generateDestination(to.type, to.bus),
       to,
       request: {
-        id: generateUniqId(),
+        id: helpers.generateUniqId(),
         isRequest: true,
       },
       payload,

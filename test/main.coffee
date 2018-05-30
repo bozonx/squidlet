@@ -3,7 +3,7 @@ chai = require('chai')
 sinon = require("sinon")
 sinonChai = require('sinon-chai')
 chaiAsPromised = require('chai-as-promised')
-#rewire = require("rewire")
+rewire = require("rewire")
 
 chai.use(sinonChai)
 chai.use(chaiAsPromised)
@@ -11,7 +11,7 @@ chai.use(chaiAsPromised)
 global.assert = chai.assert
 global.expect = chai.expect
 global.sinon = sinon
-#global.rewire = rewire
+global.rewire = rewire
 
 global._ = require('lodash')
 
