@@ -9,10 +9,10 @@ import { generateUniqId } from '../helpers/helpers';
  * You can subscribe to all the messages.
  */
 export default class Messenger {
-  private readonly app: App;
+  private readonly _app: App;
 
   constructor(app) {
-    this.app = app;
+    this._app = app;
   }
 
   /**
@@ -23,12 +23,12 @@ export default class Messenger {
     const message = {
       topic,
       category,
-      from: this.getHostAddress(to.type, to.bus),
+      from: this._getHostAddress(to.type, to.bus),
       to,
       payload,
     };
 
-    await this.app.router.publish(message);
+    await this._app.router.publish(message);
   }
 
   /**
@@ -36,7 +36,7 @@ export default class Messenger {
    * It omits responds of requests.
    */
   subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
-    this.app.router.subscribe((message: MessageInterface) => {
+    this._app.router.subscribe((message: MessageInterface) => {
       if (message.category !== category || message.topic !== topic) return;
       if (message.request) return;
 
@@ -48,14 +48,14 @@ export default class Messenger {
 
   unsubscribe() {
     // TODO: do it
-    //this.app.router.unsubscribe();
+    //this._app.router.unsubscribe();
   }
 
   request(to: AddressInterface, category: string, topic: string, payload: any): Promise<any> {
     const message = {
       topic,
       category,
-      from: this.getHostAddress(to.type, to.bus),
+      from: this._getHostAddress(to.type, to.bus),
       to,
       request: {
         id: generateUniqId(),
@@ -68,7 +68,7 @@ export default class Messenger {
 
       // TODO: наверное надо отменить если сообщение не будет доставленно
 
-      this.waitForMyMessage(message.request.id)
+      this._waitForMyMessage(message.request.id)
         .then((response: MessageInterface) => {
           if (response.error) return reject(response.error);
 
@@ -76,7 +76,7 @@ export default class Messenger {
         })
         .catch(reject);
 
-      this.app.router.publish(message)
+      this._app.router.publish(message)
         .catch(reject);
     });
   }
@@ -89,7 +89,7 @@ export default class Messenger {
       handler(message);
     };
 
-    this.app.router.subscribe(callback);
+    this._app.router.subscribe(callback);
   }
 
   sendRespondMessage(
@@ -100,7 +100,7 @@ export default class Messenger {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
-      from: this.getHostAddress(request.from.type, request.from.bus),
+      from: this._getHostAddress(request.from.type, request.from.bus),
       to: request.from,
       request: {
         id: request.request.id,
@@ -110,10 +110,10 @@ export default class Messenger {
       error,
     };
 
-    this.app.router.publish(respondMessage);
+    this._app.router.publish(respondMessage);
   }
 
-  private waitForMyMessage(messageId: string): Promise<MessageInterface> {
+  private _waitForMyMessage(messageId: string): Promise<MessageInterface> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
@@ -121,21 +121,21 @@ export default class Messenger {
       const handler = (message: MessageInterface) => {
         if (!message.request || message.request.id !== messageId) return;
 
-        this.app.router.unsubscribe(handler);
+        this._app.router.unsubscribe(handler);
 
         resolve(message);
       };
 
-      this.app.router.subscribe(handler);
+      this._app.router.subscribe(handler);
     }));
   }
 
-  private getHostAddress(type: string, bus: string): AddressInterface {
+  private _getHostAddress(type: string, bus: string): AddressInterface {
     return {
-      hostId: this.app.getHostId(),
+      hostId: this._app.getHostId(),
       type,
       bus,
-      address: this.app.router.getMyAddress(type, bus),
+      address: this._app.router.getMyAddress(type, bus),
     }
   }
 
