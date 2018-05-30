@@ -29,11 +29,11 @@ export default class Router {
 
   init() {
     if (this._app.isMaster()) {
-      this.configureMasterTunnels();
+      this._configureMasterTunnels();
     }
 
-    this.configureTunnels();
-    this.listenToAllTunnels();
+    this._configureTunnels();
+    this._listenToAllTunnels();
   }
 
   async publish(message: MessageInterface): Promise<void> {
@@ -41,7 +41,7 @@ export default class Router {
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
 
-    const tunnel = this.getTunnel(message.to);
+    const tunnel = this._getTunnel(message.to);
 
     await tunnel.publish(message);
   }
@@ -71,7 +71,7 @@ export default class Router {
   /**
    * Configure master to slaves tunnels.
    */
-  private configureMasterTunnels() {
+  private _configureMasterTunnels() {
     findRecursively(this._app.config.devices, (item, itemPath): boolean => {
       if (!_.isPlainObject(item)) return false;
       // go deeper
@@ -86,7 +86,7 @@ export default class Router {
         address: item.address.address,
       };
 
-      this.registerTunnel(connection);
+      this._registerTunnel(connection);
 
       return false;
     });
@@ -95,7 +95,7 @@ export default class Router {
   /**
    * Configure slave to slave and local tunnels.
    */
-  private configureTunnels() {
+  private _configureTunnels() {
     const connection = {
       hostId: this.getHostId(),
       type: 'local',
@@ -103,10 +103,10 @@ export default class Router {
       address: undefined,
     };
 
-    this.registerTunnel(connection);
+    this._registerTunnel(connection);
   }
 
-  private registerTunnel(connection: AddressInterface) {
+  private _registerTunnel(connection: AddressInterface) {
     const tunnelId = generateTunnelId(connection);
     const TunnelClass = this._tunnelTypes[connection.type];
 
@@ -114,7 +114,7 @@ export default class Router {
     this._tunnels[tunnelId].init();
   }
 
-  private getTunnel(to: AddressInterface): TunnelInterface {
+  private _getTunnel(to: AddressInterface): TunnelInterface {
     const tunnelId = generateTunnelId(to);
 
     if (!this._tunnels[tunnelId]) {
@@ -124,7 +124,7 @@ export default class Router {
     return this._tunnels[tunnelId];
   }
 
-  private listenToAllTunnels() {
+  private _listenToAllTunnels() {
     _.each(this._tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: MessageInterface) => {
         this._events.emit(this._eventName, message);
