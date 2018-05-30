@@ -1,6 +1,6 @@
 import * as EventEmitter from 'events';
 import App from '../app/App';
-import I2cDriver from '../drivers/I2c.driver';
+import I2cData from '../drivers/I2cData.driver';
 import Destination from '../app/interfaces/Destination';
 import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
@@ -12,7 +12,7 @@ export default class I2cTunnel {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly connectionTo: Destination;
-  private readonly i2c: I2cDriver;
+  private readonly i2cData: I2cData;
   private readonly eventName: string = 'data';
   // its "7E"
   private readonly tunnelDataAddr: number = 126;
@@ -20,18 +20,18 @@ export default class I2cTunnel {
   constructor(app: App, connectionTo: Destination) {
     this.app = app;
     this.connectionTo = connectionTo;
-    this.i2c = this.app.drivers.getDriver('I2c');
+    this.i2cData = this.app.drivers.getDriver('I2c');
   }
 
   init(): void {
-    this.i2c.listenData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, this.handleIncomeData);
+    this.i2cData.listen(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, this.handleIncomeData);
   }
 
   async publish(data: object): Promise<void> {
     const jsonString = JSON.stringify(data);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    await this.i2c.writeData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, uint8Arr);
+    await this.i2cData.write(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, uint8Arr);
   }
 
   subscribe(handler: (data: object) => void): void {

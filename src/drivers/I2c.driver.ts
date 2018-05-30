@@ -3,7 +3,6 @@ import * as EventEmitter from 'events';
 import DevI2c from '../dev/I2c';
 import { stringToHex } from '../helpers/helpers';
 
-// TODO: сделать очередь
 // TODO: сделать поддержку poling
 // TODO: сделать поддержку int
 
@@ -35,38 +34,6 @@ export default class I2c {
     this.events.removeListener(this.eventName, handler);
   }
 
-  /**
-   * Read block(32 bytes) once on master.
-   * It's need to control big data flow and e.g. write to disk one by one.
-   */
-  readBlock(bus: string, address: string): Promise<Uint8Array> {
-    return this.read(bus, address, this.blockLength);
-  }
-
-  /**
-   * Write block to slave from master.
-   * It's need to control big data flow and e.g. read from disk one by one.
-   */
-  writeBlock(bus: string, address: string, data: Uint8Array): Promise<void> {
-    if (data.length !== this.blockLength) {
-      throw new Error(`Incorrect size of block: ${data.length}, it has to be ${this.blockLength}`);
-    }
-
-    return this.write(bus, address, data);
-  }
-
-  listenBlock(bus: string, address: string, handler: (data: Uint8Array) => void): void {
-    this.listen(bus, address, this.blockLength, handler);
-  }
-
-  writeData(bus: string, address: string, cmd: number, data: Uint8Array): Promise<void> {
-    // TODO: разбить данные на блоки и отослать поочереди - ставить в конец очереди
-  }
-
-  listenData(bus: string, address: string, cmd: number, handler: (data: Uint8Array) => void) {
-    // TODO: склеить блоки. См в заголовке есть ли ещё данные
-  }
-
   unlisten(bus: string, address: string, handler: (data: Uint8Array) => void) {
 
     // TODO: использовать bus и address
@@ -76,10 +43,6 @@ export default class I2c {
 
   // request(bus: string, address: string, dataAddr: number, data: Buffer): Promise<Buffer> {
   //   // Write and read - но не давать никому встать в очередь
-  // }
-
-  // requestData(bus: string, address: string): Promise<Buffer> {
-  //   // TODO: Write and read - но не давать никому встать в очередь
   // }
 
 }

@@ -6,8 +6,8 @@ describe 'tunnels.I2cTunnel', ->
   beforeEach ->
     @listenDataHandler = undefined
     @driver = {
-      listenData: (bus, addr, dataAddr, handler) => @listenDataHandler = handler
-      writeData: sinon.spy()
+      listen: (bus, addr, dataAddr, handler) => @listenDataHandler = handler
+      write: sinon.spy()
     }
 
     @app = {
@@ -35,7 +35,7 @@ describe 'tunnels.I2cTunnel', ->
   it 'publish', ->
     await @tunnel.publish(@message)
 
-    sinon.assert.calledWith(@driver.writeData, '1', '5A', 126, @uint8arr)
+    sinon.assert.calledWith(@driver.write, '1', '5A', 126, @uint8arr)
 
   it 'subscribe', ->
     handler = sinon.spy()
