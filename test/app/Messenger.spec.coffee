@@ -114,7 +114,19 @@ describe 'app.Messenger', ->
     await promise
 
   it 'listenIncomeRequests', ->
-    # TODO: !!!
+    handler = sinon.spy()
+    @messenger.listenIncomeRequests('cat', handler)
+    incomeMessage = {
+      category: 'cat'
+      topic: 'topic'
+      request: {
+        isRequest: true
+      }
+    }
+
+    @routerSubscribeHanler(incomeMessage)
+
+    sinon.assert.calledWith(handler, incomeMessage)
 
   it 'sendResponse', ->
     # TODO: !!!

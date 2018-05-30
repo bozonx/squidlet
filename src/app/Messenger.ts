@@ -117,7 +117,7 @@ export default class Messenger {
   listenIncomeRequests(category: string, handler: (message: Message) => void) {
     // it will be called on each income message to current host
     const callback = (message: Message) => {
-      if (!message.request || message.category !== category) return;
+      if (!message.request || !message.request.isRequest || message.category !== category) return;
 
       handler(message);
     };
