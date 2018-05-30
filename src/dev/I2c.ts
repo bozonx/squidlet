@@ -13,6 +13,8 @@ export default class I2c {
     this.bus = i2cBusModule.openSync(Number(bus));
   }
 
+  // TODO: выдавать сконфигурированные инстансы
+
   readFrom(addrHex: number, quantity: number): Promise<Uint8Array> {
     const bufferToRead = new Buffer(quantity);
 
