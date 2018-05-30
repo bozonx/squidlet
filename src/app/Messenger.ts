@@ -125,11 +125,14 @@ export default class Messenger {
     this.app.router.subscribe(callback);
   }
 
+  /**
+   * Send response on received request.
+   */
   sendResponse(
     request: Message,
     payload: any = null,
     error: { message: string, code: number } = undefined
-  ) {
+  ): Promise<void> {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
@@ -143,7 +146,7 @@ export default class Messenger {
       error,
     };
 
-    this.app.router.publish(respondMessage);
+    return this.app.router.publish(respondMessage);
   }
 
   private waitForResponse(messageId: string): Promise<Message> {

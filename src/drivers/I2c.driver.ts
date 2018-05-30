@@ -1,3 +1,5 @@
+import * as EventEmitter from 'events';
+
 import DevI2c from '../dev/I2c';
 import { stringToHex } from '../helpers/helpers';
 
@@ -7,9 +9,10 @@ import { stringToHex } from '../helpers/helpers';
 
 
 export default class I2c {
-
   // TODO: выставить из конфига
   readonly blockLength: number = 32;
+  private readonly events: EventEmitter = new EventEmitter();
+  private readonly eventName: string = 'data';
 
   constructor() {
 
@@ -24,9 +27,12 @@ export default class I2c {
     const hexAddr = stringToHex(address);
   }
 
-  listen(bus: string, address: string, length: number, handler: (data: Uint8Array) => void) {
+  listen(bus: string, address: string, length: number, handler: (data: Uint8Array) => void): void {
     // TODO: публикуем пришедшие данные заданной длинны
     // TODO: при установке первого листенера - запускается полинг или слушается int
+    // TODO: вешать на конкретный bus и address
+
+    this.events.removeListener(this.eventName, handler);
   }
 
   /**
@@ -49,8 +55,8 @@ export default class I2c {
     return this.write(bus, address, data);
   }
 
-  listenBlock(bus: string, address: string, handler: (data: Uint8Array) => void) {
-    // TODO: приходящие блоки
+  listenBlock(bus: string, address: string, handler: (data: Uint8Array) => void): void {
+    this.listen(bus, address, this.blockLength, handler);
   }
 
   writeData(bus: string, address: string, cmd: number, data: Uint8Array): Promise<void> {
@@ -61,8 +67,11 @@ export default class I2c {
     // TODO: склеить блоки. См в заголовке есть ли ещё данные
   }
 
-  unlisten(bus: string, address: string) {
-    // TODO: !!!! тоже каксается хэндлеров для блоков и данных
+  unlisten(bus: string, address: string, handler: (data: Uint8Array) => void) {
+
+    // TODO: использовать bus и address
+
+    this.events.removeListener(this.eventName, handler);
   }
 
   // request(bus: string, address: string, dataAddr: number, data: Buffer): Promise<Buffer> {

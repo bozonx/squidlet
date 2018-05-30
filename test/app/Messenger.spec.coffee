@@ -129,4 +129,32 @@ describe 'app.Messenger', ->
     sinon.assert.calledWith(handler, incomeMessage)
 
   it 'sendResponse', ->
-    # TODO: !!!
+    request = {
+      category: 'cat'
+      topic: 'topic'
+      from: {
+        type: 'i2c'
+        bus: '1'
+      }
+      to: {
+        type: 'i2c'
+        bus: '1'
+        address: '5a'
+      }
+      request: {
+        id: 1
+        isRequest: true
+      }
+    }
+
+    @messenger.sendResponse(request, 'payload')
+
+    sinon.assert.calledWith(@app.router.publish, {
+      category: 'cat',
+      error: undefined,
+      from: { address: undefined, bus: '1', host: 'master', type: 'i2c' },
+      payload: 'payload',
+      request: { id: 1, isResponse: true },
+      to: { bus: '1', type: 'i2c' },
+      topic: 'topic'
+    })
