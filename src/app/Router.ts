@@ -16,12 +16,12 @@ import I2cTunnel from '../tunnels/I2cTunnel';
 export default class Router {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly _tunnels: object = {};
-  private readonly _tunnelTypes: object = {
+  private readonly tunnels: object = {};
+  private readonly tunnelTypes: object = {
     local: LocalTunnel,
     i2c: I2cTunnel,
   };
-  private readonly _eventName: string = 'msg';
+  private readonly eventName: string = 'msg';
 
   constructor(app) {
     this.app = app;
@@ -41,17 +41,17 @@ export default class Router {
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
 
-    const tunnel = this._getTunnel(message.to);
+    const tunnel = this.getTunnel(message.to);
 
     await tunnel.publish(message);
   }
 
   subscribe(handler: (message: Message) => void) {
-    this.events.addListener(this._eventName, handler);
+    this.events.addListener(this.eventName, handler);
   }
 
   unsubscribe(handler: (message: Message) => void) {
-    this.events.removeListener(this._eventName, handler);
+    this.events.removeListener(this.eventName, handler);
   }
 
   /**
@@ -94,26 +94,26 @@ export default class Router {
 
   private registerTunnel(connection: Destination) {
     const tunnelId = generateTunnelId(connection);
-    const TunnelClass = this._tunnelTypes[connection.type];
+    const TunnelClass = this.tunnelTypes[connection.type];
 
-    this._tunnels[tunnelId] = new TunnelClass(this.app, connection);
-    this._tunnels[tunnelId].init();
+    this.tunnels[tunnelId] = new TunnelClass(this.app, connection);
+    this.tunnels[tunnelId].init();
   }
 
-  private _getTunnel(to: Destination): Tunnel {
+  private getTunnel(to: Destination): Tunnel {
     const tunnelId = generateTunnelId(to);
 
-    if (!this._tunnels[tunnelId]) {
+    if (!this.tunnels[tunnelId]) {
       throw new Error(`Can't find tunnel "${to}"`);
     }
 
-    return this._tunnels[tunnelId];
+    return this.tunnels[tunnelId];
   }
 
   private listenToAllTunnels() {
-    _.each(this._tunnels, (tunnel, tunnelId) => {
+    _.each(this.tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: Message) => {
-        this.events.emit(this._eventName, message);
+        this.events.emit(this.eventName, message);
       };
 
       tunnel.subscribe(listenCb);

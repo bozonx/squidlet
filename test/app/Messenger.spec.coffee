@@ -51,7 +51,7 @@ describe 'app.Messenger', ->
     @messenger.subscribe('cat', 'topic1', handler12)
     @messenger.subscribe('cat', 'topic2', handler21)
 
-    assert.deepEqual(_.keys(@messenger['_subscribers']), [ 'cat|topic1', 'cat|topic2' ])
+    assert.deepEqual(_.keys(@messenger['subscribers']), [ 'cat|topic1', 'cat|topic2' ])
 
   it 'subscribe - invoke', ->
     handler = sinon.spy()
@@ -69,7 +69,7 @@ describe 'app.Messenger', ->
   it 'unsubscribe', ->
     handler = sinon.spy()
     @messenger.subscribe('cat', 'topic', handler)
-    subscriber = @messenger['_subscribers']['cat|topic']
+    subscriber = @messenger['subscribers']['cat|topic']
 
     @messenger.unsubscribe('cat', 'topic', handler)
 
@@ -77,7 +77,7 @@ describe 'app.Messenger', ->
 
     sinon.assert.notCalled(handler)
     sinon.assert.calledWith(@app.router.unsubscribe, subscriber)
-    assert.deepEqual(_.keys(@messenger['_subscribers']), [])
+    assert.deepEqual(_.keys(@messenger['subscribers']), [])
 
   it 'request', ->
 

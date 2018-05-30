@@ -13,7 +13,7 @@ export default class Messenger {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
   //private readonly _eventName: string = 'msg';
-  private _subscribers: object = {};
+  private subscribers: object = {};
 
   constructor(app) {
     this.app = app;
@@ -21,7 +21,7 @@ export default class Messenger {
 
   init(): void {
     // this.app.router.subscribe((message: Message): void => {
-    //   this.events.emit(this._eventName, message)
+    //   this.events.emit(this.eventName, message)
     // });
   }
 
@@ -54,10 +54,10 @@ export default class Messenger {
     this.events.addListener(eventName, handler);
 
     // if subscriber is registered - there isn't reason to add additional
-    if (this._subscribers[eventName]) return;
+    if (this.subscribers[eventName]) return;
 
     // add new subscriber
-    this._subscribers[eventName] = (message: Message): void => {
+    this.subscribers[eventName] = (message: Message): void => {
       if (message.category !== category || message.topic !== topic) return;
       if (message.request) return;
 
@@ -67,7 +67,7 @@ export default class Messenger {
       }
     };
 
-    this.app.router.subscribe(this._subscribers[eventName]);
+    this.app.router.subscribe(this.subscribers[eventName]);
   }
 
   unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
@@ -77,8 +77,8 @@ export default class Messenger {
 
     if (this.events.listeners(eventName).length) return;
     // if there isn't any listeners - remove subscriber
-    this.app.router.unsubscribe(this._subscribers[eventName]);
-    delete this._subscribers[eventName];
+    this.app.router.unsubscribe(this.subscribers[eventName]);
+    delete this.subscribers[eventName];
   }
 
   request(to: Destination, category: string, topic: string, payload: any): Promise<any> {

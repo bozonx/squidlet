@@ -11,42 +11,42 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 export default class I2cTunnel {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly _connectionTo: Destination;
-  private readonly _i2c: I2cDriver;
-  private readonly _eventName: string = 'data';
+  private readonly connectionTo: Destination;
+  private readonly i2c: I2cDriver;
+  private readonly eventName: string = 'data';
   // its "7E"
-  private readonly _tunnelDataAddr: number = 126;
+  private readonly tunnelDataAddr: number = 126;
 
   constructor(app: App, connectionTo: Destination) {
     this.app = app;
-    this._connectionTo = connectionTo;
-    this._i2c = this.app.drivers.getDriver('I2c');
+    this.connectionTo = connectionTo;
+    this.i2c = this.app.drivers.getDriver('I2c');
   }
 
   init(): void {
-    this._i2c.listenData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, this.handleIncomeData);
+    this.i2c.listenData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, this.handleIncomeData);
   }
 
   async publish(data: object): Promise<void> {
     const jsonString = JSON.stringify(data);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    await this._i2c.writeData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, uint8Arr);
+    await this.i2c.writeData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, uint8Arr);
   }
 
   subscribe(handler: (data: object) => void): void {
-    this.events.addListener(this._eventName, handler);
+    this.events.addListener(this.eventName, handler);
   }
 
   unsubscribe(handler: (data: object) => void): void {
-    this.events.removeListener(this._eventName, handler);
+    this.events.removeListener(this.eventName, handler);
   }
 
   private handleIncomeData = (uint8Arr: Uint8Array): void => {
     const jsonString = uint8ArrayToString(uint8Arr);
     const data = JSON.parse(jsonString);
 
-    this.events.emit(this._eventName, data);
+    this.events.emit(this.eventName, data);
   }
 
 }

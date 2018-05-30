@@ -61,15 +61,15 @@ describe 'app.Router', ->
 
     @router = new Router(@app)
     #@router['_tunnelTypes'] = { i2c: @tunnelClass }
-    @router['_tunnelTypes'].i2c = @tunnelClass
+    @router['tunnelTypes'].i2c = @tunnelClass
 
   it 'init - not master', ->
     @router.init()
 
-    assert.equal(@router['_tunnels']['master-local'].constructor.name, 'LocalTunnel')
+    assert.equal(@router['tunnels']['master-local'].constructor.name, 'LocalTunnel')
 
   it 'publish', ->
-    @router._tunnels = {
+    @router.tunnels = {
       'room1.host1-i2c-1-5A': @tunnel
     }
 
@@ -78,7 +78,7 @@ describe 'app.Router', ->
     sinon.assert.calledWith(@tunnel.publish, @message)
 
   it 'subscribe', ->
-    @router._tunnels = {
+    @router.tunnels = {
       'room1.host1-i2c-1-5A': @tunnel
     }
     @router.listenToAllTunnels()
@@ -92,7 +92,7 @@ describe 'app.Router', ->
   it 'private configureMasterTunnels', ->
     @router.configureMasterTunnels()
 
-    assert.equal(@router['_tunnels']['room1.host.device1-i2c-1-5A'].test, 'test')
+    assert.equal(@router['tunnels']['room1.host.device1-i2c-1-5A'].test, 'test')
     sinon.assert.calledWith(@tunnelClassConstructor, @app, {
       @app.config.devices.room1.host.device1.address...
       host: "room1.host.device1"

@@ -6,15 +6,15 @@ import Destination from "./interfaces/Destination";
 
 export default class DevicesDispatcher {
   private readonly app: App;
-  private readonly _callActionCategory: string = 'deviceCallAction';
-  private readonly _deviceFeedBackCategory: string = 'deviceFeedBack';
-  private readonly _statusTopic: string = 'status';
-  private readonly _configTopic: string = 'config';
+  private readonly callActionCategory: string = 'deviceCallAction';
+  private readonly deviceFeedBackCategory: string = 'deviceFeedBack';
+  private readonly statusTopic: string = 'status';
+  private readonly configTopic: string = 'config';
 
   constructor(app) {
     this.app = app;
     // listen messages to call actions of local device
-    this.app.messenger.listenRequests(this._callActionCategory, this.handleCallActionRequests);
+    this.app.messenger.listenRequests(this.callActionCategory, this.handleCallActionRequests);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
@@ -24,7 +24,7 @@ export default class DevicesDispatcher {
     const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/${actionName}`;
 
-    return this.app.messenger.request(to, this._callActionCategory, topic, params);
+    return this.app.messenger.request(to, this.callActionCategory, topic, params);
   }
 
   /**
@@ -35,7 +35,7 @@ export default class DevicesDispatcher {
       handler(message.payload.statusName, message.payload.partialStatus);
     };
 
-    this.app.messenger.subscribe(this._deviceFeedBackCategory, this._statusTopic, callback)
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callback)
   }
 
   listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
@@ -43,14 +43,14 @@ export default class DevicesDispatcher {
       handler(message.payload.partialConfig);
     };
 
-    this.app.messenger.subscribe(this._deviceFeedBackCategory, this._configTopic, callback)
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callback)
   }
 
   setConfig(deviceId: string, partialConfig: object) {
     const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/setConfig`;
 
-    return this.app.messenger.request(to, this._callActionCategory, topic, partialConfig);
+    return this.app.messenger.request(to, this.callActionCategory, topic, partialConfig);
   }
 
   /**
@@ -66,7 +66,7 @@ export default class DevicesDispatcher {
       partialStatus,
     };
 
-    return this.app.messenger.publish(to, this._deviceFeedBackCategory, this._statusTopic, payload);
+    return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.statusTopic, payload);
   }
 
   /**
@@ -81,7 +81,7 @@ export default class DevicesDispatcher {
       partialConfig,
     };
 
-    return this.app.messenger.publish(to, this._deviceFeedBackCategory, this._configTopic, payload);
+    return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.configTopic, payload);
   }
 
   /**
