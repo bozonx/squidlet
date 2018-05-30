@@ -98,6 +98,3 @@ describe 'app.Router', ->
       host: "room1.host.device1"
       bus: '1'
     })
-
-  it 'getMyAddress', ->
-    # TODO: !!!!

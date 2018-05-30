@@ -36,14 +36,16 @@ export default class Messenger {
    * It omits responds of requests.
    */
   subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
-    this._app.router.subscribe((message: MessageInterface) => {
+    const callback = (message: MessageInterface) => {
       if (message.category !== category || message.topic !== topic) return;
       if (message.request) return;
 
       if (message.category === category && message.topic === topic) {
         handler(message);
       }
-    });
+    };
+
+    this._app.router.subscribe(callback);
   }
 
   unsubscribe() {

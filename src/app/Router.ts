@@ -54,13 +54,6 @@ export default class Router {
     this._events.removeListener(this._eventName, handler);
   }
 
-  getMyAddress(type: string, bus: string): string {
-
-    // TODO: получить текущий адрес хоста
-
-    return ''
-  }
-
   /**
    * Configure master to slaves tunnels.
    */

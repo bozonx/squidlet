@@ -31,12 +31,19 @@ export default class HostConfig {
     return 'master';
   }
 
+  getAddress(type: string, bus: string): string {
+
+    // TODO: получить текущий адрес хоста
+
+    return ''
+  }
+
   generateDestination(type: string, bus: string): DestinationInterface {
     return {
       host: this.getId(),
       type,
       bus,
-      address: this._app.router.getMyAddress(type, bus),
+      address: this.getAddress(type, bus),
     }
   }
 
