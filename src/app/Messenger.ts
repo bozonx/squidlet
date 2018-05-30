@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 import App from './App';
-import MessageInterface from './interfaces/MessageInterface';
-import DestinationInterface from './interfaces/DestinationInterface';
+import Message from './interfaces/Message';
+import Destination from './interfaces/Destination';
 import { generateUniqId } from '../helpers/helpers';
 
 
@@ -20,7 +20,7 @@ export default class Messenger {
   }
 
   init(): void {
-    // this._app.router.subscribe((message: MessageInterface): void => {
+    // this._app.router.subscribe((message: Message): void => {
     //   this._events.emit(this._eventName, message)
     // });
   }
@@ -29,7 +29,7 @@ export default class Messenger {
    * Send message to specified host.
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(to: DestinationInterface, category: string, topic: string, payload: any): Promise<void> {
+  async publish(to: Destination, category: string, topic: string, payload: any): Promise<void> {
     const message = {
       topic,
       category,
@@ -45,7 +45,7 @@ export default class Messenger {
    * Listen to messages which was sent by publish method on current on remote host.
    * It omits responds of requests.
    */
-  subscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
+  subscribe(category: string, topic: string, handler: (message: Message) => void) {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
 
@@ -57,7 +57,7 @@ export default class Messenger {
     if (this._subscribers[eventName]) return;
 
     // add new subscriber
-    this._subscribers[eventName] = (message: MessageInterface): void => {
+    this._subscribers[eventName] = (message: Message): void => {
       if (message.category !== category || message.topic !== topic) return;
       if (message.request) return;
 
@@ -70,7 +70,7 @@ export default class Messenger {
     this._app.router.subscribe(this._subscribers[eventName]);
   }
 
-  unsubscribe(category: string, topic: string, handler: (message: MessageInterface) => void) {
+  unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
     const eventName = [ category, topic ].join('|');
 
     this._events.removeListener(eventName, handler);
@@ -81,7 +81,7 @@ export default class Messenger {
     delete this._subscribers[eventName];
   }
 
-  request(to: DestinationInterface, category: string, topic: string, payload: any): Promise<any> {
+  request(to: Destination, category: string, topic: string, payload: any): Promise<any> {
     const message = {
       topic,
       category,
@@ -99,7 +99,7 @@ export default class Messenger {
       // TODO: наверное надо отменить если сообщение не будет доставленно
 
       this._waitForMyMessage(message.request.id)
-        .then((response: MessageInterface) => {
+        .then((response: Message) => {
           if (response.error) return reject(response.error);
 
           resolve(response);
@@ -111,9 +111,9 @@ export default class Messenger {
     });
   }
 
-  listenRequests(category: string, handler: (message: MessageInterface) => void) {
+  listenRequests(category: string, handler: (message: Message) => void) {
     // it will be called on each income message to current host
-    const callback = (message: MessageInterface) => {
+    const callback = (message: Message) => {
       if (!message.request || message.category !== category) return;
 
       handler(message);
@@ -123,7 +123,7 @@ export default class Messenger {
   }
 
   sendRespondMessage(
-    request: MessageInterface,
+    request: Message,
     payload: any = null,
     error: { message: string, code: number } = undefined
   ) {
@@ -143,12 +143,12 @@ export default class Messenger {
     this._app.router.publish(respondMessage);
   }
 
-  private _waitForMyMessage(messageId: string): Promise<MessageInterface> {
+  private _waitForMyMessage(messageId: string): Promise<Message> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
     return new Promise(((resolve, reject) => {
-      const handler = (message: MessageInterface) => {
+      const handler = (message: Message) => {
         if (!message.request || message.request.id !== messageId) return;
 
         this._app.router.unsubscribe(handler);

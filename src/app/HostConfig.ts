@@ -1,5 +1,5 @@
 import App from "./App";
-import DestinationInterface from "./interfaces/DestinationInterface";
+import Destination from "./interfaces/Destination";
 
 
 export default class HostConfig {
@@ -38,7 +38,7 @@ export default class HostConfig {
     return ''
   }
 
-  generateDestination(type: string, bus: string): DestinationInterface {
+  generateDestination(type: string, bus: string): Destination {
     return {
       host: this.getId(),
       type,

@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import App from './App';
-import MessageInterface from './interfaces/MessageInterface';
-import TunnelInterface from './interfaces/TunnelInterface';
-import DestinationInterface from './interfaces/DestinationInterface';
+import Message from './interfaces/Message';
+import Tunnel from './interfaces/Tunnel';
+import Destination from './interfaces/Destination';
 import { generateTunnelId, findRecursively } from '../helpers/helpers';
 import LocalTunnel from '../tunnels/LocalTunnel';
 import I2cTunnel from '../tunnels/I2cTunnel';
@@ -36,7 +36,7 @@ export default class Router {
     this._listenToAllTunnels();
   }
 
-  async publish(message: MessageInterface): Promise<void> {
+  async publish(message: Message): Promise<void> {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
@@ -46,11 +46,11 @@ export default class Router {
     await tunnel.publish(message);
   }
 
-  subscribe(handler: (message: MessageInterface) => void) {
+  subscribe(handler: (message: Message) => void) {
     this._events.addListener(this._eventName, handler);
   }
 
-  unsubscribe(handler: (message: MessageInterface) => void) {
+  unsubscribe(handler: (message: Message) => void) {
     this._events.removeListener(this._eventName, handler);
   }
 
@@ -92,7 +92,7 @@ export default class Router {
     this._registerTunnel(connection);
   }
 
-  private _registerTunnel(connection: DestinationInterface) {
+  private _registerTunnel(connection: Destination) {
     const tunnelId = generateTunnelId(connection);
     const TunnelClass = this._tunnelTypes[connection.type];
 
@@ -100,7 +100,7 @@ export default class Router {
     this._tunnels[tunnelId].init();
   }
 
-  private _getTunnel(to: DestinationInterface): TunnelInterface {
+  private _getTunnel(to: Destination): Tunnel {
     const tunnelId = generateTunnelId(to);
 
     if (!this._tunnels[tunnelId]) {
@@ -112,7 +112,7 @@ export default class Router {
 
   private _listenToAllTunnels() {
     _.each(this._tunnels, (tunnel, tunnelId) => {
-      const listenCb = (message: MessageInterface) => {
+      const listenCb = (message: Message) => {
         this._events.emit(this._eventName, message);
       };
 

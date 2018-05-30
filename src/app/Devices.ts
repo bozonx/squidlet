@@ -1,5 +1,5 @@
 import App from './App';
-import DeviceInterface from './interfaces/DeviceInterface';
+import Device from './interfaces/Device';
 
 
 export default class Devices {
@@ -11,7 +11,7 @@ export default class Devices {
     this.app = app;
   }
 
-  getDevice(deviceId: string): DeviceInterface {
+  getDevice(deviceId: string): Device {
     return this.devices[deviceId];
   }
 

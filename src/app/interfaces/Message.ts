@@ -1,11 +1,11 @@
-import DestinationInterface from './DestinationInterface';
+import Destination from './Destination';
 
 
 export default interface Message {
   topic: string;
   category: string;
-  from: DestinationInterface;
-  to: DestinationInterface;
+  from: Destination;
+  to: Destination;
   request?: {
     id: string,
     isRequest?: boolean,

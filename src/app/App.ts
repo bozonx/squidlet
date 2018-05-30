@@ -5,7 +5,7 @@ import Devices from './Devices';
 import DevicesDispatcher from './DevicesDispatcher';
 import Drivers from './Drivers';
 import Router from './Router';
-import LoggerInterface from './interfaces/LoggerInterface';
+import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import defaultConfig from './defaultConfig';
 import platformConfig from './platformConfig';
@@ -19,7 +19,7 @@ export default class App {
   public readonly devicesDispatcher: DevicesDispatcher;
   public readonly drivers: Drivers;
   public readonly router: Router;
-  public readonly log: LoggerInterface;
+  public readonly log: Logger;
 
 
   constructor(specifiedConfig) {

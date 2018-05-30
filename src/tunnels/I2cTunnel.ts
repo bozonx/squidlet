@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 import App from '../app/App';
 import I2c from '../drivers/I2c';
-import DestinationInterface from '../app/interfaces/DestinationInterface';
+import Destination from '../app/interfaces/Destination';
 import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
 
@@ -11,13 +11,13 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 export default class I2cTunnel {
   private readonly _app: App;
   private readonly _events: EventEmitter = new EventEmitter();
-  private readonly _connectionTo: DestinationInterface;
+  private readonly _connectionTo: Destination;
   private readonly _i2c: I2c;
   private readonly _eventName: string = 'data';
   // its "7E"
   private readonly _tunnelDataAddr: number = 126;
 
-  constructor(app: App, connectionTo: DestinationInterface) {
+  constructor(app: App, connectionTo: Destination) {
     this._app = app;
     this._connectionTo = connectionTo;
     this._i2c = this._app.drivers.getDriver('I2c');

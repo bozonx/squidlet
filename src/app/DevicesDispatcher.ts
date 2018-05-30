@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import App from './App';
-import MessageInterface from "./interfaces/MessageInterface";
-import DestinationInterface from "./interfaces/DestinationInterface";
+import Message from "./interfaces/Message";
+import Destination from "./interfaces/Destination";
 
 
 export default class DevicesDispatcher {
@@ -31,7 +31,7 @@ export default class DevicesDispatcher {
    * Listen for device's status messages.
    */
   listenStatus(deviceId: string, handler: (statusName: string, partialStatus: object) => void) {
-    const callback = (message: MessageInterface) => {
+    const callback = (message: Message) => {
       handler(message.payload.statusName, message.payload.partialStatus);
     };
 
@@ -39,7 +39,7 @@ export default class DevicesDispatcher {
   }
 
   listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
-    const callback = (message: MessageInterface) => {
+    const callback = (message: Message) => {
       handler(message.payload.partialConfig);
     };
 
@@ -87,7 +87,7 @@ export default class DevicesDispatcher {
   /**
    * Listen for actions which have to be called on current host.
    */
-  private _handleCallActionRequests = (request: MessageInterface):void => {
+  private _handleCallActionRequests = (request: Message):void => {
     this._callLocalDeviceAction(request)
       .then((result: any) => {
         this._app.messenger.sendRespondMessage(request, result);
@@ -97,7 +97,7 @@ export default class DevicesDispatcher {
       });
   };
 
-  private async _callLocalDeviceAction(request: MessageInterface): Promise<any> {
+  private async _callLocalDeviceAction(request: Message): Promise<any> {
     const [ deviceId, actionName ] = request.topic.split('/');
 
     if (!_.isArray(request.payload)) {
@@ -119,7 +119,7 @@ export default class DevicesDispatcher {
     return result;
   }
 
-  private _resolveHost(deviceId: string): DestinationInterface {
+  private _resolveHost(deviceId: string): Destination {
 
     // TODO: !!!! посмотреть в конфиге на каком хосте находится девайс и вернуть адрес
     // TODO: !!!! резолвить master
