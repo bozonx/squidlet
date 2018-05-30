@@ -4,6 +4,7 @@ Router = require('../../src/app/Router').default
 describe 'app.Router', ->
   beforeEach ->
     @app = {
+      getHostId: -> 'master'
       isMaster: ->  false
       config: {
         devices: {
@@ -45,7 +46,7 @@ describe 'app.Router', ->
         bus: '1'
         address: undefined
       }
-      to:{
+      to: {
         hostId: 'room1.host1'
         type: 'i2c'
         bus: '1'
@@ -95,9 +96,6 @@ describe 'app.Router', ->
       hostId: "room1.host.device1"
       bus: '1'
     })
-
-  it 'getHostId', ->
-    # TODO: !!!!
 
   it 'getMyAddress', ->
     # TODO: !!!!

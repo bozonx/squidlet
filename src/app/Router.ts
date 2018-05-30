@@ -54,13 +54,6 @@ export default class Router {
     this._events.removeListener(this._eventName, handler);
   }
 
-  getHostId(): string {
-
-    // TODO: return id of current host - master or room.hostName
-
-    return 'master';
-  }
-
   getMyAddress(type: string, bus: string): string {
 
     // TODO: получить текущий адрес хоста
@@ -97,7 +90,7 @@ export default class Router {
    */
   private _configureTunnels() {
     const connection = {
-      hostId: this.getHostId(),
+      hostId: this._app.getHostId(),
       type: 'local',
       bus: undefined,
       address: undefined,

@@ -38,6 +38,13 @@ export default class App {
     return true;
   }
 
+  getHostId(): string {
+
+    // TODO: return id of current host - master or room.hostName
+
+    return 'master';
+  }
+
 
   private mergeConfig(specifiedConfig: object) {
     return _.defaultsDeep({ ...specifiedConfig }, platformConfig, defaultConfig);

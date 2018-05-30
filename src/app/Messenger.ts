@@ -4,6 +4,10 @@ import AddressInterface from './interfaces/AddressInterface';
 import { generateUniqId } from '../helpers/helpers';
 
 
+/**
+ * It's heart of app. It receives and sends messages to router.
+ * You can subscribe to all the messages.
+ */
 export default class Messenger {
   private readonly app: App;
 
@@ -128,7 +132,7 @@ export default class Messenger {
 
   private getHostAddress(type: string, bus: string): AddressInterface {
     return {
-      hostId: this.app.router.getHostId(),
+      hostId: this.app.getHostId(),
       type,
       bus,
       address: this.app.router.getMyAddress(type, bus),
