@@ -81,7 +81,7 @@ describe 'app.Router', ->
     @router._tunnels = {
       'room1.host1-i2c-1-5A': @tunnel
     }
-    @router._listenToAllTunnels()
+    @router.listenToAllTunnels()
     handler = sinon.spy()
     @router.subscribe(handler)
 
@@ -89,8 +89,8 @@ describe 'app.Router', ->
 
     sinon.assert.calledWith(handler, @message)
 
-  it '_configureMasterTunnels', ->
-    @router._configureMasterTunnels()
+  it 'private configureMasterTunnels', ->
+    @router.configureMasterTunnels()
 
     assert.equal(@router['_tunnels']['room1.host.device1-i2c-1-5A'].test, 'test')
     sinon.assert.calledWith(@tunnelClassConstructor, @app, {

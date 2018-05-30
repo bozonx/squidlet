@@ -14,7 +14,7 @@ import I2cTunnel from '../tunnels/I2cTunnel';
  * And receives messages from all the available tunnels on current host.
  */
 export default class Router {
-  private readonly _app: App;
+  private readonly app: App;
   private readonly _events: EventEmitter = new EventEmitter();
   private readonly _tunnels: object = {};
   private readonly _tunnelTypes: object = {
@@ -24,16 +24,16 @@ export default class Router {
   private readonly _eventName: string = 'msg';
 
   constructor(app) {
-    this._app = app;
+    this.app = app;
   }
 
   init(): void {
-    if (this._app.host.isMaster()) {
-      this._configureMasterTunnels();
+    if (this.app.host.isMaster()) {
+      this.configureMasterTunnels();
     }
 
-    this._configureTunnels();
-    this._listenToAllTunnels();
+    this.configureTunnels();
+    this.listenToAllTunnels();
   }
 
   async publish(message: Message): Promise<void> {
@@ -57,8 +57,8 @@ export default class Router {
   /**
    * Configure master to slaves tunnels.
    */
-  private _configureMasterTunnels() {
-    findRecursively(this._app.config.devices, (item, itemPath): boolean => {
+  private configureMasterTunnels() {
+    findRecursively(this.app.config.devices, (item, itemPath): boolean => {
       if (!_.isPlainObject(item)) return false;
       // go deeper
       if (!item.device) return undefined;
@@ -72,7 +72,7 @@ export default class Router {
         address: item.address.address,
       };
 
-      this._registerTunnel(connection);
+      this.registerTunnel(connection);
 
       return false;
     });
@@ -81,22 +81,22 @@ export default class Router {
   /**
    * Configure slave to slave and local tunnels.
    */
-  private _configureTunnels() {
+  private configureTunnels() {
     const connection = {
-      host: this._app.host.getId(),
+      host: this.app.host.getId(),
       type: 'local',
       bus: undefined,
       address: undefined,
     };
 
-    this._registerTunnel(connection);
+    this.registerTunnel(connection);
   }
 
-  private _registerTunnel(connection: Destination) {
+  private registerTunnel(connection: Destination) {
     const tunnelId = generateTunnelId(connection);
     const TunnelClass = this._tunnelTypes[connection.type];
 
-    this._tunnels[tunnelId] = new TunnelClass(this._app, connection);
+    this._tunnels[tunnelId] = new TunnelClass(this.app, connection);
     this._tunnels[tunnelId].init();
   }
 
@@ -110,7 +110,7 @@ export default class Router {
     return this._tunnels[tunnelId];
   }
 
-  private _listenToAllTunnels() {
+  private listenToAllTunnels() {
     _.each(this._tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: Message) => {
         this._events.emit(this._eventName, message);

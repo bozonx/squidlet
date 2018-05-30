@@ -5,26 +5,26 @@ import Destination from "./interfaces/Destination";
 
 
 export default class DevicesDispatcher {
-  private readonly _app: App;
+  private readonly app: App;
   private readonly _callActionCategory: string = 'deviceCallAction';
   private readonly _deviceFeedBackCategory: string = 'deviceFeedBack';
   private readonly _statusTopic: string = 'status';
   private readonly _configTopic: string = 'config';
 
   constructor(app) {
-    this._app = app;
+    this.app = app;
     // listen messages to call actions of local device
-    this._app.messenger.listenRequests(this._callActionCategory, this._handleCallActionRequests);
+    this.app.messenger.listenRequests(this._callActionCategory, this.handleCallActionRequests);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
 
     // TODO: проверить что actionName есть в манифесте
 
-    const to = this._resolveHost(deviceId);
+    const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/${actionName}`;
 
-    return this._app.messenger.request(to, this._callActionCategory, topic, params);
+    return this.app.messenger.request(to, this._callActionCategory, topic, params);
   }
 
   /**
@@ -35,7 +35,7 @@ export default class DevicesDispatcher {
       handler(message.payload.statusName, message.payload.partialStatus);
     };
 
-    this._app.messenger.subscribe(this._deviceFeedBackCategory, this._statusTopic, callback)
+    this.app.messenger.subscribe(this._deviceFeedBackCategory, this._statusTopic, callback)
   }
 
   listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
@@ -43,14 +43,14 @@ export default class DevicesDispatcher {
       handler(message.payload.partialConfig);
     };
 
-    this._app.messenger.subscribe(this._deviceFeedBackCategory, this._configTopic, callback)
+    this.app.messenger.subscribe(this._deviceFeedBackCategory, this._configTopic, callback)
   }
 
   setConfig(deviceId: string, partialConfig: object) {
-    const to = this._resolveHost(deviceId);
+    const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/setConfig`;
 
-    return this._app.messenger.request(to, this._callActionCategory, topic, partialConfig);
+    return this.app.messenger.request(to, this._callActionCategory, topic, partialConfig);
   }
 
   /**
@@ -60,13 +60,13 @@ export default class DevicesDispatcher {
 
     // TODO: должен путликовать всем желающим - кто подписался
 
-    const to = this._resolveHost('master');
+    const to = this.resolveHost('master');
     const payload = {
       statusName,
       partialStatus,
     };
 
-    return this._app.messenger.publish(to, this._deviceFeedBackCategory, this._statusTopic, payload);
+    return this.app.messenger.publish(to, this._deviceFeedBackCategory, this._statusTopic, payload);
   }
 
   /**
@@ -76,28 +76,28 @@ export default class DevicesDispatcher {
 
     // TODO: должен публиковать всем желающим - кто подписался
 
-    const to = this._resolveHost('master');
+    const to = this.resolveHost('master');
     const payload = {
       partialConfig,
     };
 
-    return this._app.messenger.publish(to, this._deviceFeedBackCategory, this._configTopic, payload);
+    return this.app.messenger.publish(to, this._deviceFeedBackCategory, this._configTopic, payload);
   }
 
   /**
    * Listen for actions which have to be called on current host.
    */
-  private _handleCallActionRequests = (request: Message):void => {
-    this._callLocalDeviceAction(request)
+  private handleCallActionRequests = (request: Message):void => {
+    this.callLocalDeviceAction(request)
       .then((result: any) => {
-        this._app.messenger.sendRespondMessage(request, result);
+        this.app.messenger.sendRespondMessage(request, result);
       })
       .catch((error) => {
-        this._app.messenger.sendRespondMessage(request, null, error);
+        this.app.messenger.sendRespondMessage(request, null, error);
       });
   };
 
-  private async _callLocalDeviceAction(request: Message): Promise<any> {
+  private async callLocalDeviceAction(request: Message): Promise<any> {
     const [ deviceId, actionName ] = request.topic.split('/');
 
     if (!_.isArray(request.payload)) {
@@ -113,13 +113,13 @@ export default class DevicesDispatcher {
       `);
     }
 
-    const device = this._app.devices.getDevice(deviceId);
+    const device = this.app.devices.getDevice(deviceId);
     const result = await device[actionName](...request.payload);
 
     return result;
   }
 
-  private _resolveHost(deviceId: string): Destination {
+  private resolveHost(deviceId: string): Destination {
 
     // TODO: !!!! посмотреть в конфиге на каком хосте находится девайс и вернуть адрес
     // TODO: !!!! резолвить master

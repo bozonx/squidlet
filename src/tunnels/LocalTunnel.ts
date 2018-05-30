@@ -5,11 +5,11 @@ import Destination from '../app/interfaces/Destination';
 
 
 export default class LocalTunnel {
-  private readonly _app: App;
+  private readonly app: App;
   private readonly _events: EventEmitter = new EventEmitter();
 
   constructor(app: App, connection: Destination) {
-    this._app = app;
+    this.app = app;
   }
 
   init(): void {

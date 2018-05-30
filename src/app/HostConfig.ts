@@ -3,7 +3,7 @@ import Destination from "./interfaces/Destination";
 
 
 export default class HostConfig {
-  private readonly _app: App;
+  private readonly app: App;
   private readonly _config: object;
 
   get config() {
@@ -14,7 +14,7 @@ export default class HostConfig {
   }
 
   constructor(app) {
-    this._app = app;
+    this.app = app;
   }
 
   isMaster() {

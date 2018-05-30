@@ -10,17 +10,17 @@ import { generateUniqId } from '../helpers/helpers';
  * You can subscribe to all the messages.
  */
 export default class Messenger {
-  private readonly _app: App;
+  private readonly app: App;
   private readonly _events: EventEmitter = new EventEmitter();
   //private readonly _eventName: string = 'msg';
   private _subscribers: object = {};
 
   constructor(app) {
-    this._app = app;
+    this.app = app;
   }
 
   init(): void {
-    // this._app.router.subscribe((message: Message): void => {
+    // this.app.router.subscribe((message: Message): void => {
     //   this._events.emit(this._eventName, message)
     // });
   }
@@ -33,12 +33,12 @@ export default class Messenger {
     const message = {
       topic,
       category,
-      from: this._app.host.generateDestination(to.type, to.bus),
+      from: this.app.host.generateDestination(to.type, to.bus),
       to,
       payload,
     };
 
-    await this._app.router.publish(message);
+    await this.app.router.publish(message);
   }
 
   /**
@@ -67,7 +67,7 @@ export default class Messenger {
       }
     };
 
-    this._app.router.subscribe(this._subscribers[eventName]);
+    this.app.router.subscribe(this._subscribers[eventName]);
   }
 
   unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
@@ -77,7 +77,7 @@ export default class Messenger {
 
     if (this._events.listeners(eventName).length) return;
     // if there isn't any listeners - remove subscriber
-    this._app.router.unsubscribe(this._subscribers[eventName]);
+    this.app.router.unsubscribe(this._subscribers[eventName]);
     delete this._subscribers[eventName];
   }
 
@@ -85,7 +85,7 @@ export default class Messenger {
     const message = {
       topic,
       category,
-      from: this._app.host.generateDestination(to.type, to.bus),
+      from: this.app.host.generateDestination(to.type, to.bus),
       to,
       request: {
         id: generateUniqId(),
@@ -98,7 +98,7 @@ export default class Messenger {
 
       // TODO: наверное надо отменить если сообщение не будет доставленно
 
-      this._waitForMyMessage(message.request.id)
+      this.waitForMyMessage(message.request.id)
         .then((response: Message) => {
           if (response.error) return reject(response.error);
 
@@ -106,7 +106,7 @@ export default class Messenger {
         })
         .catch(reject);
 
-      this._app.router.publish(message)
+      this.app.router.publish(message)
         .catch(reject);
     });
   }
@@ -119,7 +119,7 @@ export default class Messenger {
       handler(message);
     };
 
-    this._app.router.subscribe(callback);
+    this.app.router.subscribe(callback);
   }
 
   sendRespondMessage(
@@ -130,7 +130,7 @@ export default class Messenger {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
-      from: this._app.host.generateDestination(request.from.type, request.from.bus),
+      from: this.app.host.generateDestination(request.from.type, request.from.bus),
       to: request.from,
       request: {
         id: request.request.id,
@@ -140,10 +140,10 @@ export default class Messenger {
       error,
     };
 
-    this._app.router.publish(respondMessage);
+    this.app.router.publish(respondMessage);
   }
 
-  private _waitForMyMessage(messageId: string): Promise<Message> {
+  private waitForMyMessage(messageId: string): Promise<Message> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
@@ -151,12 +151,12 @@ export default class Messenger {
       const handler = (message: Message) => {
         if (!message.request || message.request.id !== messageId) return;
 
-        this._app.router.unsubscribe(handler);
+        this.app.router.unsubscribe(handler);
 
         resolve(message);
       };
 
-      this._app.router.subscribe(handler);
+      this.app.router.subscribe(handler);
     }));
   }
 

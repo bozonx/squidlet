@@ -9,7 +9,7 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
  * It packs data to send it via i2c.
  */
 export default class I2cTunnel {
-  private readonly _app: App;
+  private readonly app: App;
   private readonly _events: EventEmitter = new EventEmitter();
   private readonly _connectionTo: Destination;
   private readonly _i2c: I2c;
@@ -18,9 +18,9 @@ export default class I2cTunnel {
   private readonly _tunnelDataAddr: number = 126;
 
   constructor(app: App, connectionTo: Destination) {
-    this._app = app;
+    this.app = app;
     this._connectionTo = connectionTo;
-    this._i2c = this._app.drivers.getDriver('I2c');
+    this._i2c = this.app.drivers.getDriver('I2c');
   }
 
   init(): void {
