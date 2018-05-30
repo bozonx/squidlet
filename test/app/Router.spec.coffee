@@ -8,6 +8,11 @@ describe 'app.Router', ->
       isMaster: ->  true
     }
 
+    @tunnel = {
+      publish: sinon.spy()
+      subscribe: ->
+    }
+
     @message = {
       topic: 'room1.host.device1'
       category: 'deviceCallAction'
@@ -29,9 +34,18 @@ describe 'app.Router', ->
     }
 
     @router = new Router(@app)
-
+    @router['_tunnelTypes'] = { i2c: @tunnel }
 
   it 'init', ->
-    @router.init()
+    #@router.init()
+
+    # TODO: !!!!
 
   it 'publish', ->
+    @router._tunnels = {
+      'room1.host1-i2c-1-5A': @tunnel
+    }
+
+    await @router.publish(@message)
+
+    sinon.assert.calledWith(@tunnel.publish, @message)

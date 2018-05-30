@@ -14,20 +14,21 @@ import I2cTunnel from '../tunnels/I2cTunnel';
  * and receives messages from all the available tunnels.
  */
 export default class Router {
-  private readonly app: App;
-  private readonly events: EventEmitter = new EventEmitter();
-  private readonly tunnels: object;
-  private readonly tunnelTypes: object = {
+  private readonly _app: App;
+  private readonly _events: EventEmitter = new EventEmitter();
+  private readonly _tunnels: object;
+  private readonly _tunnelTypes: object = {
     local: LocalTunnel,
     i2c: I2cTunnel,
   };
+  private readonly _eventName: 'msg';
 
   constructor(app) {
-    this.app = app;
+    this._app = app;
   }
 
   init() {
-    if (this.app.isMaster()) {
+    if (this._app.isMaster()) {
       this.configureMasterTunnels();
     }
 
@@ -38,7 +39,6 @@ export default class Router {
   async publish(message: MessageInterface): Promise<void> {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
-
     // TODO: !!! наверное если to = from то отсылать локально???
 
     const tunnel = this.getTunnel(message.to);
@@ -47,11 +47,11 @@ export default class Router {
   }
 
   subscribe(handler: (message: MessageInterface) => void) {
-    this.events.on('tunnelMsg', handler);
+    this._events.on(this._eventName, handler);
   }
 
   unsubscribe(handler: (message: MessageInterface) => void) {
-    this.events.off('tunnelMsg', handler);
+    this._events.off(this._eventName, handler);
   }
 
   getHostId(): string {
@@ -72,7 +72,7 @@ export default class Router {
    * Configure master to slaves tunnels.
    */
   private configureMasterTunnels() {
-    findRecursively(this.app.config.devices, (item, itemPath): boolean => {
+    findRecursively(this._app.config.devices, (item, itemPath): boolean => {
       if (!_.isPlainObject(item)) return false;
       // go deeper
       if (!item.device) return undefined;
@@ -108,26 +108,26 @@ export default class Router {
 
   private registerTunnel(connection: AddressInterface) {
     const tunnelId = generateTunnelId(connection);
-    const TunnelClass = this.tunnelTypes[connection.type];
+    const TunnelClass = this._tunnelTypes[connection.type];
 
-    this.tunnels[tunnelId] = new TunnelClass(this.app, connection);
-    this.tunnels[tunnelId].init();
+    this._tunnels[tunnelId] = new TunnelClass(this._app, connection);
+    this._tunnels[tunnelId].init();
   }
 
   private getTunnel(to: AddressInterface): TunnelInterface {
     const tunnelId = generateTunnelId(to);
 
-    if (!this.tunnels[tunnelId]) {
+    if (!this._tunnels[tunnelId]) {
       throw new Error(`Can't find tunnel "${to}"`);
     }
 
-    return this.tunnels[tunnelId];
+    return this._tunnels[tunnelId];
   }
 
   private listenToAllTunnels() {
-    _.each(this.tunnels, (tunnel, tunnelId) => {
+    _.each(this._tunnels, (tunnel, tunnelId) => {
       const listenCb = (message: MessageInterface) => {
-        this.events.emit('tunnelMsg', message);
+        this._events.emit(this._eventName, message);
       };
 
       tunnel.subscribe(listenCb);

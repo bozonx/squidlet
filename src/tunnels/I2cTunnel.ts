@@ -6,44 +6,44 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
 
 export default class I2cTunnel {
-  private readonly app: App;
-  private readonly events: EventEmitter = new EventEmitter();
-  private readonly connectionTo: AddressInterface;
-  private readonly i2c: I2c;
-  private readonly eventName: 'data';
+  private readonly _app: App;
+  private readonly _events: EventEmitter = new EventEmitter();
+  private readonly _connectionTo: AddressInterface;
+  private readonly _i2c: I2c;
+  private readonly _eventName: 'data';
   // its "7E"
-  private readonly tunnelDataAddr: number = 126;
+  private readonly _tunnelDataAddr: number = 126;
 
   constructor(app: App, connectionTo: AddressInterface) {
-    this.app = app;
-    this.connectionTo = connectionTo;
-    this.i2c = this.app.drivers.getDriver('I2c');
+    this._app = app;
+    this._connectionTo = connectionTo;
+    this._i2c = this._app.drivers.getDriver('I2c');
   }
 
   init() {
-    this.i2c.listenData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, this.handleIncomeData);
+    this._i2c.listenData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, this._handleIncomeData);
   }
 
   async publish(data: object): Promise<void> {
     const jsonString = JSON.stringify(data);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    await this.i2c.writeData(this.connectionTo.bus, this.connectionTo.address, this.tunnelDataAddr, uint8Arr);
+    await this._i2c.writeData(this._connectionTo.bus, this._connectionTo.address, this._tunnelDataAddr, uint8Arr);
   }
 
   subscribe(handler: (data: object) => void): void {
-    this.events.addListener(this.eventName, handler);
+    this._events.addListener(this._eventName, handler);
   }
 
   unsubscribe(handler: (data: object) => void): void {
-    this.events.removeListener(this.eventName, handler);
+    this._events.removeListener(this._eventName, handler);
   }
 
-  private handleIncomeData = (uint8Arr: Uint8Array): void => {
+  private _handleIncomeData = (uint8Arr: Uint8Array): void => {
     const jsonString = uint8ArrayToString(uint8Arr);
     const data = JSON.parse(jsonString);
 
-    this.events.emit(this.eventName, data);
+    this._events.emit(this._eventName, data);
   }
 
 }
