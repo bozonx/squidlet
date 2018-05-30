@@ -1,16 +1,15 @@
 import * as _ from 'lodash';
 import * as uniqid from 'uniqid';
+import { TextEncoder, TextDecoder } from 'text-encoding';
 import AddressInterface from '../app/interfaces/AddressInterface';
 
 
 export function Uint8ArrayToString(arr: Uint8Array): string {
-  // TODO: !!!
-  return '';
+  return new TextDecoder('utf-8').decode(arr);
 }
 
-export function StringToUint8Array(str: string): string {
-  // TODO: !!!
-  return '';
+export function StringToUint8Array(str: string): Uint8Array {
+  return new TextEncoder('utf-8').encode(str);
 }
 
 export function stringToHex(addr: string): number {
