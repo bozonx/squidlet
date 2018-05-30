@@ -4,6 +4,7 @@ Messenger = require('../../src/app/Messenger').default
 describe 'app.Messenger', ->
   beforeEach ->
     @app = {
+      getHostId: -> 'master'
       router: {
         publish: sinon.spy()
       }
