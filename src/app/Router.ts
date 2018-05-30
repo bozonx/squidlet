@@ -41,8 +41,6 @@ export default class Router {
 
     // TODO: !!! наверное если to = from то отсылать локально???
 
-    // TODO: remake to
-
     const tunnel = this.getTunnel(message.to);
 
     await tunnel.publish(message);
@@ -67,6 +65,7 @@ export default class Router {
 
     // TODO: получить текущий адрес хоста
 
+    return ''
   }
 
   /**
@@ -115,17 +114,14 @@ export default class Router {
     this.tunnels[tunnelId].init();
   }
 
-  private getTunnel(to: string): TunnelInterface {
+  private getTunnel(to: AddressInterface): TunnelInterface {
+    const tunnelId = generateTunnelId(to);
 
-    // TODO: точно to будет tunnel id ???
-
-    // TODO: remake to
-
-    if (!this.tunnels[to]) {
+    if (!this.tunnels[tunnelId]) {
       throw new Error(`Can't find tunnel "${to}"`);
     }
 
-    return this.tunnels[to];
+    return this.tunnels[tunnelId];
   }
 
   private listenToAllTunnels() {

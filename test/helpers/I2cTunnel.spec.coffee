@@ -18,22 +18,6 @@ describe 'tunnels.I2cTunnel', ->
 
     @message = {
       topic: 'room1.host.device1'
-#      category: 'deviceCallAction'
-#      from: {
-#        hostId: 'master'
-#        type: 'i2c'
-#        bus: '1'
-#        address: undefined
-#      }
-#      to:{
-#        hostId: 'room1.host1'
-#        type: 'i2c'
-#        bus: '1'
-#        address: '5A'
-#      }
-#      payload: {
-#        myData: 'data'
-#      }
     }
 
     @uint8arr = helpers.stringToUint8Array(JSON.stringify(@message))
