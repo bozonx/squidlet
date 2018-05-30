@@ -82,10 +82,10 @@ describe 'app.Messenger', ->
     sinon.assert.calledWith(@app.router.unsubscribe, subscriber)
     assert.deepEqual(_.keys(@messenger['subscribers']), [])
 
-  it 'request', ->
+  it 'request - check message', ->
     @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
 
-    message = {
+    sentMessage = {
       category: 'deviceCallAction',
       from: { address: undefined , bus: '1', host: 'master', type: 'i2c' },
       payload: { data: 'value' },
@@ -97,4 +97,24 @@ describe 'app.Messenger', ->
       }
     }
 
-    sinon.assert.calledWith(@app.router.publish, message)
+    sinon.assert.calledWith(@app.router.publish, sentMessage)
+
+  it 'request - receive response', ->
+    promise = @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
+
+    responseMsg = {
+      request: {
+        id: 'uniqId'
+        isResponse: true
+      }
+    }
+
+    @routerSubscribeHanler(responseMsg)
+
+    await promise
+
+  it 'listenIncomeRequests', ->
+    # TODO: !!!
+
+  it 'sendResponse', ->
+    # TODO: !!!

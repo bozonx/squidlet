@@ -14,7 +14,7 @@ export default class DevicesDispatcher {
   constructor(app) {
     this.app = app;
     // listen messages to call actions of local device
-    this.app.messenger.listenRequests(this.callActionCategory, this.handleCallActionRequests);
+    this.app.messenger.listenIncomeRequests(this.callActionCategory, this.handleCallActionRequests);
   }
 
   callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
@@ -90,10 +90,10 @@ export default class DevicesDispatcher {
   private handleCallActionRequests = (request: Message):void => {
     this.callLocalDeviceAction(request)
       .then((result: any) => {
-        this.app.messenger.sendRespondMessage(request, result);
+        this.app.messenger.sendResponse(request, result);
       })
       .catch((error) => {
-        this.app.messenger.sendRespondMessage(request, null, error);
+        this.app.messenger.sendResponse(request, null, error);
       });
   };
 

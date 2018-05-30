@@ -98,7 +98,7 @@ export default class Messenger {
 
       // TODO: наверное надо отменить если сообщение не будет доставленно
 
-      this.waitForMyMessage(message.request.id)
+      this.waitForResponse(message.request.id)
         .then((response: Message) => {
           if (response.error) return reject(response.error);
 
@@ -111,7 +111,10 @@ export default class Messenger {
     });
   }
 
-  listenRequests(category: string, handler: (message: Message) => void) {
+  /**
+   * Listen for income requests by category
+   */
+  listenIncomeRequests(category: string, handler: (message: Message) => void) {
     // it will be called on each income message to current host
     const callback = (message: Message) => {
       if (!message.request || message.category !== category) return;
@@ -122,7 +125,7 @@ export default class Messenger {
     this.app.router.subscribe(callback);
   }
 
-  sendRespondMessage(
+  sendResponse(
     request: Message,
     payload: any = null,
     error: { message: string, code: number } = undefined
@@ -143,13 +146,15 @@ export default class Messenger {
     this.app.router.publish(respondMessage);
   }
 
-  private waitForMyMessage(messageId: string): Promise<Message> {
+  private waitForResponse(messageId: string): Promise<Message> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
     return new Promise(((resolve, reject) => {
       const handler = (message: Message) => {
-        if (!message.request || message.request.id !== messageId) return;
+        if (!message.request) return;
+        if (!message.request.isResponse) return;
+        if (message.request.id !== messageId) return;
 
         this.app.router.unsubscribe(handler);
 
