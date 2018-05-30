@@ -28,7 +28,7 @@ export default class Router {
   }
 
   init() {
-    if (this._app.isMaster()) {
+    if (this._app.host.isMaster()) {
       this._configureMasterTunnels();
     }
 
@@ -90,7 +90,7 @@ export default class Router {
    */
   private _configureTunnels() {
     const connection = {
-      hostId: this._app.getHostId(),
+      hostId: this._app.host.getId(),
       type: 'local',
       bus: undefined,
       address: undefined,

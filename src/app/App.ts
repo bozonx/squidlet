@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import HostConfig from './HostConfig';
 import Messenger from './Messenger';
 import Devices from './Devices';
 import DevicesDispatcher from './DevicesDispatcher';
@@ -11,16 +12,21 @@ import platformConfig from './platformConfig';
 
 
 export default class App {
+  public readonly config: {[index: string]: object};
+  public readonly host: HostConfig;
   public readonly messenger: Messenger;
   public readonly devices: Devices;
   public readonly devicesDispatcher: DevicesDispatcher;
   public readonly drivers: Drivers;
   public readonly router: Router;
   public readonly log: LoggerInterface;
-  public readonly config: {[index: string]: object};
+
 
   constructor(specifiedConfig) {
+    // master config
     this.config = this.mergeConfig(specifiedConfig);
+    // config for host
+    this.host = new HostConfig(this);
     this.messenger = new Messenger(this);
     this.devices = new Devices(this);
     this.devicesDispatcher = new DevicesDispatcher(this);
@@ -30,21 +36,6 @@ export default class App {
 
     this.router.init();
   }
-
-  isMaster() {
-
-    // TODO: на каждом хосте определять
-
-    return true;
-  }
-
-  getHostId(): string {
-
-    // TODO: return id of current host - master or room.hostName
-
-    return 'master';
-  }
-
 
   private mergeConfig(specifiedConfig: object) {
     return _.defaultsDeep({ ...specifiedConfig }, platformConfig, defaultConfig);

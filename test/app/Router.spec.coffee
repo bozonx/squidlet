@@ -4,8 +4,10 @@ Router = require('../../src/app/Router').default
 describe 'app.Router', ->
   beforeEach ->
     @app = {
-      getHostId: -> 'master'
-      isMaster: ->  false
+      host: {
+        getId: -> 'master'
+        isMaster: ->  false
+      }
       config: {
         devices: {
           room1: {

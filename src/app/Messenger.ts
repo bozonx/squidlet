@@ -132,7 +132,7 @@ export default class Messenger {
 
   private _getHostAddress(type: string, bus: string): AddressInterface {
     return {
-      hostId: this._app.getHostId(),
+      hostId: this._app.host.getId(),
       type,
       bus,
       address: this._app.router.getMyAddress(type, bus),
