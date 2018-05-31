@@ -5,8 +5,8 @@ describe 'app.Router', ->
   beforeEach ->
     @app = {
       host: {
-        getId: -> 'master'
-        isMaster: ->  false
+        id: -> 'master'
+        isMaster: false
       }
       config: {
         devices: {

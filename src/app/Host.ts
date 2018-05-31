@@ -4,9 +4,52 @@ import Destination from "./interfaces/Destination";
 
 export default class HostConfig {
   private readonly app: App;
-  private readonly _config: object;
+  private readonly _config: {[index: string]: any};
 
-  get config() {
+  get id(): string {
+
+    // TODO: return id of current host - master or room.hostName
+
+    return 'master';
+  }
+
+
+  get isMaster(): boolean {
+
+    // TODO: на каждом хосте определять
+
+    return true;
+  }
+
+
+  /**
+   * Manifests by device class name
+   */
+  get devicesManifests(): object {
+    // TODO: !!!
+
+    return {};
+  }
+
+  /**
+   * Devices config by ids
+   */
+  get devicesConfigs(): object {
+    // TODO: !!!
+
+    return {};
+  }
+
+  get driversList(): object {
+    // TODO: !!!
+
+    return {};
+  }
+
+  /**
+   * Full host config
+   */
+  get config(): {[index: string]: any} {
 
     // TODO: use immutable
 
@@ -17,42 +60,23 @@ export default class HostConfig {
     this.app = app;
   }
 
-  isMaster() {
+  getAddress(type: string, bus: string): string | undefined {
+    const addrConfig = this.config.address;
 
-    // TODO: на каждом хосте определять
+    if (!addrConfig) return;
 
-    return true;
-  }
+    // TODO: если несколько адресов - выбрать тот что с заданным type и bus
 
-  getId() {
-
-    // TODO: return id of current host - master or room.hostName
-
-    return 'master';
-  }
-
-  getAddress(type: string, bus: string): string {
-
-    // TODO: получить текущий адрес хоста
-
-    return ''
+    return addrConfig.address;
   }
 
   generateDestination(type: string, bus: string): Destination {
     return {
-      host: this.getId(),
+      host: this.id,
       type,
       bus,
       address: this.getAddress(type, bus),
     }
-  }
-
-  getDevicesManifests() {
-    // TODO: !!!
-  }
-
-  getDevicesConfigs() {
-    // TODO: !!!
   }
 
 }

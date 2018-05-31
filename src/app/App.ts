@@ -24,6 +24,7 @@ export default class App {
 
   constructor(specifiedConfig) {
     // master config
+    // TODO: нужно только на этапе конфигурирования
     this.config = this.mergeConfig(specifiedConfig);
     // config for host
     this.host = new Host(this);

@@ -29,7 +29,7 @@ export default class Router {
   }
 
   init(): void {
-    if (this.app.host.isMaster()) {
+    if (this.app.host.isMaster) {
       this.configureMasterTunnels();
     }
 
@@ -61,6 +61,9 @@ export default class Router {
    * Configure master to slaves tunnels.
    */
   private configureMasterTunnels() {
+
+    // TODO: use host config - там плоская структура
+
     findRecursively(this.app.config.devices, (item, itemPath): boolean => {
       if (!_.isPlainObject(item)) return false;
       // go deeper
@@ -86,7 +89,7 @@ export default class Router {
    */
   private configureTunnels() {
     const connection = {
-      host: this.app.host.getId(),
+      host: this.app.host.id(),
       type: 'local',
       bus: undefined,
       address: undefined,
