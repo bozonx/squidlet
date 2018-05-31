@@ -71,6 +71,9 @@ export default class Messenger {
   }
 
   unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
+    if (!category) throw new Error(`Category can't be an empty`);
+    if (!topic) throw new Error(`Topic can't be an empty`);
+
     const eventName = [ category, topic ].join('|');
 
     this.events.removeListener(eventName, handler);
@@ -82,6 +85,9 @@ export default class Messenger {
   }
 
   request(to: Destination, category: string, topic: string, payload: any): Promise<any> {
+    if (!category) throw new Error(`Category can't be an empty`);
+    if (!topic) throw new Error(`Topic can't be an empty`);
+
     const message = {
       topic,
       category,

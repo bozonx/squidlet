@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import HostConfig from './HostConfig';
+import Host from './Host';
 import Messenger from './Messenger';
 import Devices from './Devices';
 import DevicesDispatcher from './DevicesDispatcher';
@@ -13,7 +13,7 @@ import platformConfig from './platformConfig';
 
 export default class App {
   public readonly config: {[index: string]: object};
-  public readonly host: HostConfig;
+  public readonly host: Host;
   public readonly messenger: Messenger;
   public readonly devices: Devices;
   public readonly devicesDispatcher: DevicesDispatcher;
@@ -26,7 +26,7 @@ export default class App {
     // master config
     this.config = this.mergeConfig(specifiedConfig);
     // config for host
-    this.host = new HostConfig(this);
+    this.host = new Host(this);
     this.log = defaultLogger;
     this.router = new Router(this);
     this.messenger = new Messenger(this);
