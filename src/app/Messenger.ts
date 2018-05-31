@@ -51,23 +51,10 @@ export default class Messenger {
 
     const eventName = [ category, topic ].join('|');
 
+    // listen to event of "cat|topic"
     this.events.addListener(eventName, handler);
-
-    // if subscriber is registered - there isn't reason to add additional
-    if (this.subscribers[eventName]) return;
-
-    // add new subscriber
-    this.subscribers[eventName] = (message: Message): void => {
-      if (message.category !== category || message.topic !== topic) return;
-      if (message.request) return;
-
-      if (message.category === category && message.topic === topic) {
-        //handler(message);
-        this.events.emit(eventName, message)
-      }
-    };
-
-    this.app.router.subscribe(this.subscribers[eventName]);
+    // add subscriber to router if need
+    this.addSubscriber(eventName, category, topic);
   }
 
   unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
@@ -79,6 +66,7 @@ export default class Messenger {
     this.events.removeListener(eventName, handler);
 
     if (this.events.listeners(eventName).length) return;
+
     // if there isn't any listeners - remove subscriber
     this.app.router.unsubscribe(this.subscribers[eventName]);
     delete this.subscribers[eventName];
@@ -102,7 +90,7 @@ export default class Messenger {
 
     return new Promise((resolve, reject) => {
 
-      // TODO: наверное надо отменить если сообщение не будет доставленно
+      // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
 
       this.waitForResponse(message.request.id)
         .then((response: Message) => {
@@ -132,7 +120,7 @@ export default class Messenger {
   }
 
   /**
-   * Send response on received request.
+   * Send response of received request.
    */
   sendResponse(
     request: Message,
@@ -172,6 +160,24 @@ export default class Messenger {
 
       this.app.router.subscribe(handler);
     }));
+  }
+
+  private addSubscriber(eventName: string, category: string, topic: string) {
+    // if subscriber is registered - there isn't reason to add additional
+    if (this.subscribers[eventName]) return;
+
+    // add new subscriber
+    this.subscribers[eventName] = (message: Message): void => {
+      if (message.category !== category || message.topic !== topic) return;
+      if (message.request) return;
+
+      if (message.category === category && message.topic === topic) {
+        //handler(message);
+        this.events.emit(eventName, message)
+      }
+    };
+
+    this.app.router.subscribe(this.subscribers[eventName]);
   }
 
 }
