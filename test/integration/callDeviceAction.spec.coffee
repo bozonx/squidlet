@@ -7,6 +7,11 @@
 
 describe 'intergation. Call device\'s action', ->
   beforeEach ->
+
+    # TODO: mock device class load
+    # TODO: mock i2cData
+    # TODO: mock host
+
     @config = {
       devices: {
         room: {

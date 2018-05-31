@@ -50,7 +50,7 @@ export default class Devices {
   }
 
 
-  private async _initDevice(devicesManifests, rawDeviceConf: object, containerPath: string): Promise<void> {
+  private async _initDevice(devicesManifests, rawDeviceConf: {[index: string]: any}, containerPath: string): Promise<void> {
     const manifest = devicesManifests[rawDeviceConf.device];
     const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, containerPath);
 
