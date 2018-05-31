@@ -1,6 +1,5 @@
 import * as EventEmitter from 'events';
 
-
 import Drivers from '../app/Drivers';
 import I2cDriver from '../drivers/I2c.driver';
 

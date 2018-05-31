@@ -47,4 +47,12 @@ export default class HostConfig {
     }
   }
 
+  getDevicesManifests() {
+    // TODO: !!!
+  }
+
+  getDevicesConfigs() {
+    // TODO: !!!
+  }
+
 }
