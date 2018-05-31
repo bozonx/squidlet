@@ -18,11 +18,11 @@ export default class Router {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly tunnels: object = {};
+  private readonly eventName: string = 'msg';
   private readonly tunnelTypes: object = {
     local: LocalTunnel,
     i2c: I2cTunnel,
   };
-  private readonly eventName: string = 'msg';
 
   constructor(app) {
     this.app = app;
@@ -32,6 +32,8 @@ export default class Router {
     if (this.app.host.isMaster()) {
       this.configureMasterTunnels();
     }
+
+    // TODO: сделать конфигурирование loopTunnel отдельной ф-ей
 
     this.configureTunnels();
     this.listenToAllTunnels();
