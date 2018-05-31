@@ -34,23 +34,32 @@ export default class DevicesDispatcher {
   /**
    * Listen for device's status messages.
    */
-  listenStatus(deviceId: string, handler: (statusName: string, partialStatus: object) => void) {
+  listenStatus(deviceId: string, handler: (status: string, value: any) => void) {
     const callback = (message: Message) => {
-      handler(message.payload.statusName, message.payload.partialStatus);
+
+      // TODO: если message.error? - нужно его возвращать поидее
+
+      handler(message.payload.status, message.payload.value);
     };
 
-    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callback)
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callback);
   }
 
   listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
+
+    // TODO: test
+
     const callback = (message: Message) => {
       handler(message.payload.partialConfig);
     };
 
-    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callback)
+    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callback);
   }
 
   setConfig(deviceId: string, partialConfig: object) {
+
+    // TODO: test
+
     const to = this.resolveHost(deviceId);
     const topic = `${deviceId}/setConfig`;
 
@@ -60,14 +69,13 @@ export default class DevicesDispatcher {
   /**
    * It runs from local device itself to publish its status changes.
    */
-  publishStatus(deviceId: string, statusName: string, partialStatus: object): Promise<void> {
-
+  publishStatus(deviceId: string, status: string, value: any): Promise<void> {
     // TODO: должен путликовать всем желающим - кто подписался
 
     const to = this.resolveHost('master');
     const payload = {
-      statusName,
-      partialStatus,
+      status,
+      value,
     };
 
     return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.statusTopic, payload);
@@ -77,6 +85,8 @@ export default class DevicesDispatcher {
    * It runs from device itself to publish its config changes.
    */
   publishConfig(deviceId: string, partialConfig: object): Promise<void> {
+
+    // TODO: test
 
     // TODO: должен публиковать всем желающим - кто подписался
 

@@ -6,6 +6,7 @@ describe 'app.DevicesDispatcher', ->
     @requestSubscribeCb = undefined
     @app = {
       messenger: {
+        publish: sinon.stub().returns(Promise.resolve())
         request: sinon.stub().returns(Promise.resolve())
         subscribe: (category, topic, cb) => @requestSubscribeCb = cb
       }
@@ -29,16 +30,29 @@ describe 'app.DevicesDispatcher', ->
 
   it 'listenStatus', ->
     handler = sinon.spy()
-
     @devicesDispatcher.listenStatus(@deviceId, handler)
-
-    # TODO: WTF???
 
     @requestSubscribeCb({
       payload: {
-        statusName: 'temperature'
-        partialStatus: { data: 1 }
+        status: 'temperature'
+        value: 1
       }
     })
 
-    sinon.assert.calledWith(handler, '', {})
+    sinon.assert.calledWith(handler, 'temperature', 1)
+
+  it 'publishStatus', ->
+    to = {
+      host: 'master'
+      type: 'i2c'
+      bus: 1
+      address: undefined
+    }
+    @devicesDispatcher.resolveHost = -> to
+
+    @devicesDispatcher.publishStatus(@deviceId, 'temperature', 25)
+
+    sinon.assert.calledWith(@app.messenger.publish, to, 'deviceFeedBack', 'status', {
+      status: 'temperature'
+      value: 25
+    })
