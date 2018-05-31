@@ -33,9 +33,12 @@ export default class App {
     this.drivers = new Drivers(this);
     this.devices = new Devices(this);
     this.devicesDispatcher = new DevicesDispatcher(this);
+  }
 
+  init(): void {
     this.router.init();
     this.messenger.init();
+    this.devicesDispatcher.init();
   }
 
   private mergeConfig(specifiedConfig: object) {

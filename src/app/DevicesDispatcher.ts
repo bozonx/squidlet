@@ -13,12 +13,16 @@ export default class DevicesDispatcher {
 
   constructor(app) {
     this.app = app;
+  }
+
+  init(): void {
     // listen messages to call actions of local device
     this.app.messenger.listenIncomeRequests(this.callActionCategory, this.handleCallActionRequests);
   }
 
-  callAction(deviceId: string, actionName: string, params: Array<any>): Promise<any> {
+  callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<any> {
 
+    // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте
 
     const to = this.resolveHost(deviceId);
@@ -123,9 +127,10 @@ export default class DevicesDispatcher {
 
     // TODO: !!!! посмотреть в конфиге на каком хосте находится девайс и вернуть адрес
     // TODO: !!!! резолвить master
+    // TODO: !!!! test
 
     return {
-      host: '',
+      host: deviceId,
       type: '',
       bus: '',
       address: '',
