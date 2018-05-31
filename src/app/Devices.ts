@@ -2,12 +2,14 @@ import * as _ from 'lodash';
 
 import App from './App';
 import Device from './interfaces/Device';
+import DeviceFactory from './DeviceFactory';
 
 
 export default class Devices {
   private readonly app: App;
   // devices instances by ids
   private readonly instances: object = {};
+  private readonly deviceFactory = DeviceFactory;
 
   constructor(app) {
     this.app = app;
@@ -53,7 +55,7 @@ export default class Devices {
     const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, containerPath);
 
     // save link to device
-    const builder = this._deviceFactory(this._app, deviceConf);
+    const builder = this.deviceFactory(this.app, deviceConf);
     this.instances[deviceConf.instanceId] = await builder.create();
   }
 
