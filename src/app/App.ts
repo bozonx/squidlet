@@ -8,8 +8,8 @@ import Drivers from './Drivers';
 import Router from './Router';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
-import defaultConfig from './defaultConfig';
-import platformConfig from './platformConfig';
+import configHostDefault from './configHostDefault';
+import configHostPlatform from './configHostPlatform';
 
 
 export default class App {
@@ -49,7 +49,7 @@ export default class App {
   }
 
   private mergeConfig(specifiedConfig: object) {
-    return _.defaultsDeep({ ...specifiedConfig }, platformConfig, defaultConfig);
+    return _.defaultsDeep({ ...specifiedConfig }, configHostPlatform, configHostDefault);
   }
 
 }
