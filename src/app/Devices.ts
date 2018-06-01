@@ -7,9 +7,11 @@ import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceConf from './interfaces/DeviceConf';
 import DeviceSchema from './interfaces/DeviceSchema';
-//import { findRecursively } from '../helpers/helpers';
 
 
+/**
+ * Creates instances of local devices and prepare config for them.
+ */
 export default class Devices {
   private readonly app: App;
   // devices instances by ids
@@ -32,13 +34,14 @@ export default class Devices {
     devicesConfigs: {[index: string]: object}
   ): Promise<void[]> {
     return Promise.all(
-      _.map(devicesConfigs, async (rawDeviceConf: object, deviceId: string): Promise<void> => {
+      _.map(devicesConfigs, async (rawDeviceConf: {[index: string]: any}, deviceId: string): Promise<void> => {
         if (!rawDeviceConf.device) {
           this.app.log.fatal(`Unknown device "${JSON.stringify(rawDeviceConf)}"`);
         }
 
         const manifest: DeviceManifest = devicesManifests[rawDeviceConf.device];
         const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
+
         // TODO: review
         // save link to device
         const builder = this.deviceFactory(this.app, deviceConf);
@@ -74,15 +77,29 @@ export default class Devices {
 
     //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
     const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
-    const schema: DeviceSchema = await this.app.system.loadYamlFile(schemaPath);
+    const schema: DeviceSchema = await this.app.system.loadYamlFile(schemaPath) as DeviceSchema;
 
     return {
       className: rawDeviceConf.device,
       deviceId,
-      config: _.omit(rawDeviceConf, 'device'),
+      params: _.omit(rawDeviceConf, 'device'),
       manifest,
       schema,
     };
+  }
+
+  destroy() {
+
+    // TODO: make
+    // TODO: use async
+    // TODO: событие поднять в App
+
+    // // run destroy of devices instances
+    // _.each(this._devicesInstances, (device) => {
+    //   device.destroy && device.destroy();
+    // });
+    //
+    // this._app.events.emit(`app.afterDestroy`);
   }
 
 }

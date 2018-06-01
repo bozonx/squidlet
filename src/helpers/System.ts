@@ -1,23 +1,23 @@
 const fs = require('fs');
-const helpers = require('./helpers');
+const { yamlToJs } = require('./helpers');
 
 
 export default class System {
-  async loadYamlFile(fullPath) {
-    const yamlContent = await this.getFileContent(fullPath);
+  async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
+    const yamlContent: string = await this.getFileContent(fullPath);
 
-    return helpers.yamlToJs(yamlContent);
+    return yamlToJs(yamlContent);
   }
 
-  loadYamlFileSync(fullPath) {
+  loadYamlFileSync(fullPath: string): object {
     const yamlContent = fs.readFileSync(fullPath, 'utf8');
 
-    return helpers.yamlToJs(yamlContent);
+    return yamlToJs(yamlContent);
   }
 
-  getFileContent(filename) {
+  getFileContent(filename: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      fs.readFile(filename, 'utf8', (err, data) => {
+      fs.readFile(filename, 'utf8', (err: NodeJS.ErrnoException, data: string) => {
         if (err) return reject(err);
 
         resolve(data);

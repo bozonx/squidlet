@@ -8,7 +8,7 @@ export default interface DeviceConf {
   // uniq id of device like "room.deviceInstanceName"
   deviceId: string;
   // specific config of device
-  config: object;
+  params: object;
   manifest: DeviceManifest;
   schema: DeviceSchema;
 }

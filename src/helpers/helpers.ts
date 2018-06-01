@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as uniqid from 'uniqid';
+import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import Destination from '../app/interfaces/Destination';
 
@@ -63,4 +64,8 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
   });
 
   return recursive(rootObject, '');
+}
+
+export function yamlToJs(yamlString: string): object {
+  return yaml.safeLoad(yamlString);
 }
