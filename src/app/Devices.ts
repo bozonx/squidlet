@@ -4,7 +4,10 @@ import * as _ from 'lodash';
 import App from './App';
 import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
-import { findRecursively } from '../helpers/helpers';
+import DeviceManifest from './interfaces/DeviceManifest';
+import DeviceConf from './interfaces/DeviceConf';
+import DeviceSchema from './interfaces/DeviceSchema';
+//import { findRecursively } from '../helpers/helpers';
 
 
 export default class Devices {
@@ -24,16 +27,25 @@ export default class Devices {
    *                                   Structure like { DeviceName: { ...manifest } }
    * @param {object} devicesConfigs - user defined devices configs by ids { "room.device": { ...deviceConfig } }
    */
-  init(devicesManifests: object, devicesConfigs: object): Promise<void[]> {
-    return Promise.all(_.map(devicesConfigs, async (rawDeviceConf, deviceId): Promise<void> => {
-      const manifest = devicesManifests[rawDeviceConf.device];
-      const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
-      // TODO: review
-      // save link to device
-      const builder = this.deviceFactory(this.app, deviceConf);
+  init(
+    devicesManifests: {[index: string]: DeviceManifest},
+    devicesConfigs: {[index: string]: object}
+  ): Promise<void[]> {
+    return Promise.all(
+      _.map(devicesConfigs, async (rawDeviceConf: object, deviceId: string): Promise<void> => {
+        if (!rawDeviceConf.device) {
+          this.app.log.fatal(`Unknown device "${JSON.stringify(rawDeviceConf)}"`);
+        }
 
-      this.instances[deviceConf.instanceId] = await builder.create();
-    }));
+        const manifest: DeviceManifest = devicesManifests[rawDeviceConf.device];
+        const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
+        // TODO: review
+        // save link to device
+        const builder = this.deviceFactory(this.app, deviceConf);
+
+        this.instances[deviceConf.deviceId] = await builder.create();
+      })
+    );
   }
 
   /**
@@ -45,37 +57,31 @@ export default class Devices {
 
   /**
    * Prepare config for device instantiating.
-   * @param {object} userDefinedDeviceConf - config of certain device from devices config.
-   * @param {object} manifest - parsed device manifest
-   * @param {string} instanceId - Uniq instance id like "bedroom.switch"
+   * @param {object} rawDeviceConf - config of certain device from devices config.
+   * @param {DeviceManifest} manifest - parsed device manifest
+   * @param {string} deviceId - Uniq instance id like "bedroom.switch"
    * @return {Promise<object>} - complete device config
    * @private
    */
-  private async prepareDeviceConf(userDefinedDeviceConf, manifest, instanceId) {
-    if (!userDefinedDeviceConf.device) {
-      this.app.log.fatal(`Unknown device "${JSON.stringify(userDefinedDeviceConf)}"`);
-    }
+  private async prepareDeviceConf(
+    rawDeviceConf: {[index: string]: any},
+    manifest: DeviceManifest,
+    deviceId: string
+  ): Promise<DeviceConf> {
     if (!manifest) {
-      throw new Error(`Can't find manifest of device "${userDefinedDeviceConf.device}"`);
-    }
-    if (!manifest.schema) {
-      throw new Error(`Manifest of device "${userDefinedDeviceConf.device}" doesn't have a schema`);
+      throw new Error(`Can't find manifest of device "${rawDeviceConf.device}"`);
     }
 
-    const { baseName: placement, name } = helpers.splitLastPartOfPath(instanceId);
-    const schemaPath = path.resolve(manifest.baseDir, manifest.schema);
-    const schema = await this._app.system.loadYamlFile(schemaPath);
-    const deviceTopic = instanceId.replace(/\./g, '/');
+    //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
+    const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
+    const schema: DeviceSchema = await this.app.system.loadYamlFile(schemaPath);
 
     return {
-      ...userDefinedDeviceConf,
-      placement,
+      className: rawDeviceConf.device,
+      deviceId,
+      config: _.omit(rawDeviceConf, 'device'),
       manifest,
       schema,
-      deviceTopic,
-      instanceId,
-      // TODO: зачем нужен name????
-      name,
     };
   }
 

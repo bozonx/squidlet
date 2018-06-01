@@ -19,6 +19,10 @@ export default class Publisher {
     this.app = app;
   }
 
+
+  //const deviceTopic = deviceId.replace(/\./g, '/');
+
+
   async publish(topic: string, params: Array<any>) : Promise<void> {
     //this.events.emit(topic, params);
 

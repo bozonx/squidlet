@@ -33,4 +33,10 @@ export default class MasterConfigurator {
     await recursively(devicesConfig, '');
   }
 
+  validateConfig() {
+    if (!manifest.schema) {
+      throw new Error(`Manifest of device "${rawDeviceConf.device}" doesn't have a schema`);
+    }
+  }
+
 }
