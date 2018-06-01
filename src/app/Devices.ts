@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as _ from 'lodash';
 
 import App from './App';
@@ -42,16 +43,6 @@ export default class Devices {
     return this.instances[deviceId];
   }
 
-
-  private async _initDevice(devicesManifests, rawDeviceConf: {[index: string]: any}, deviceId: string): Promise<void> {
-    const manifest = devicesManifests[rawDeviceConf.device];
-    const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
-
-    // save link to device
-    const builder = this.deviceFactory(this.app, deviceConf);
-    this.instances[deviceConf.instanceId] = await builder.create();
-  }
-
   /**
    * Prepare config for device instantiating.
    * @param {object} userDefinedDeviceConf - config of certain device from devices config.
@@ -62,7 +53,7 @@ export default class Devices {
    */
   private async prepareDeviceConf(userDefinedDeviceConf, manifest, instanceId) {
     if (!userDefinedDeviceConf.device) {
-      this._app.log.fatal(`Unknown device "${JSON.stringify(userDefinedDeviceConf)}"`);
+      this.app.log.fatal(`Unknown device "${JSON.stringify(userDefinedDeviceConf)}"`);
     }
     if (!manifest) {
       throw new Error(`Can't find manifest of device "${userDefinedDeviceConf.device}"`);
