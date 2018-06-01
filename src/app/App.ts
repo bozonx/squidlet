@@ -24,14 +24,15 @@ export default class App {
   readonly router: Router;
   readonly log: Logger;
   // prepared config
-  readonly config: HostConfig;
+  //readonly config: HostConfig;
 
 
   constructor(config: {[index: string]: any}) {
-    this.config = this.mergeConfig(config);
+    //this.config = this.mergeConfig(config);
+    const hostConfig = this.mergeConfig(config);
     this.system = new System();
     // config for current host
-    this.host = new Host(this, config);
+    this.host = new Host(this, hostConfig);
     this.log = defaultLogger;
     this.router = new Router(this);
     this.messenger = new Messenger(this);

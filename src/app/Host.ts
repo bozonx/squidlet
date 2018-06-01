@@ -2,11 +2,12 @@ import App from "./App";
 import Destination from "./interfaces/Destination";
 import DeviceManifest from "./interfaces/DeviceManifest";
 import DeviceConf from "./interfaces/DeviceConf";
+import HostConfig from "./interfaces/HostConfig";
 
 
-export default class HostConfig {
+export default class Host {
   private readonly app: App;
-  private readonly _config: {[index: string]: any};
+  private readonly hostConfig: HostConfig;
 
   get id(): string {
 
@@ -55,11 +56,12 @@ export default class HostConfig {
 
     // TODO: use immutable
 
-    return this._config;
+    return this.hostConfig;
   }
 
-  constructor(app) {
+  constructor(app, hostConfig: HostConfig) {
     this.app = app;
+    this.hostConfig = hostConfig;
   }
 
   getAddress(type: string, bus: string): string | undefined {
