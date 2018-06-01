@@ -30,7 +30,7 @@ describe 'intergation. Call device\'s action', ->
 
     @app = new App()
 
-    @app.init()
+    await @app.init()
 
 
   it 'just callAction', ->
