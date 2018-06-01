@@ -3,65 +3,58 @@ import Destination from "./interfaces/Destination";
 import DeviceManifest from "./interfaces/DeviceManifest";
 import DeviceConf from "./interfaces/DeviceConf";
 import HostConfig from "./interfaces/HostConfig";
+import * as _ from "lodash";
+import configHostPlatform from "./configHostPlatform";
+import configHostDefault from "./configHostDefault";
 
+
+// TODO: ??? use immutable
 
 export default class Host {
   private readonly app: App;
   private readonly hostConfig: HostConfig;
 
   get id(): string {
-
-    // TODO: return id of current host - master or room.hostName
+    if (this.hostConfig.slave) return this.hostConfig.address.host;
 
     return 'master';
   }
 
-
   get isMaster(): boolean {
-
-    // TODO: на каждом хосте определять
-
-    return true;
+    return !this.hostConfig.slave;
   }
 
+
+  // TODO: зачем devicesManifests, devicesConfigs, driversList ????
 
   /**
    * Manifests by device class name
    */
   get devicesManifests(): {[index: string]: DeviceManifest} {
-    // TODO: !!!
-
-    return {};
+    return this.hostConfig.devicesManifests;
   }
 
   /**
    * Devices config by ids
    */
   get devicesConfigs(): {[index: string]: DeviceConf} {
-    // TODO: !!!
-
-    return {};
+    return this.hostConfig.devicesConfigs;
   }
 
-  get driversList(): object {
-    // TODO: !!!
-
-    return {};
+  get driversList(): Array<string> {
+    return this.hostConfig.drivers;
   }
 
   /**
    * Full host config
    */
-  get config(): {[index: string]: any} {
-
-    // TODO: use immutable
-
+  get config(): HostConfig {
     return this.hostConfig;
   }
 
-  constructor(app, hostConfig: HostConfig) {
+  constructor(app: App, hostConfig: HostConfig) {
     this.app = app;
-    this.hostConfig = hostConfig;
+    this.hostConfig = this.mergeConfigs(hostConfig);
   }
 
   getAddress(type: string, bus: string): string | undefined {
@@ -80,6 +73,16 @@ export default class Host {
       type,
       bus,
       address: this.getAddress(type, bus),
+    }
+  }
+
+
+  private mergeConfigs(specifiedConfig: HostConfig): HostConfig {
+    return {
+      ...specifiedConfig,
+      host: {
+        ..._.defaultsDeep({ ...specifiedConfig.host }, configHostPlatform, configHostDefault),
+      }
     }
   }
 

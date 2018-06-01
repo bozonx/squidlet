@@ -9,8 +9,7 @@ import Drivers from './Drivers';
 import Router from './Router';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
-import configHostDefault from './configHostDefault';
-import configHostPlatform from './configHostPlatform';
+
 import HostConfig from './interfaces/HostConfig';
 
 
@@ -27,9 +26,7 @@ export default class App {
   //readonly config: HostConfig;
 
 
-  constructor(config: {[index: string]: any}) {
-    //this.config = this.mergeConfig(config);
-    const hostConfig = this.mergeConfig(config);
+  constructor(hostConfig: HostConfig) {
     this.system = new System();
     // config for current host
     this.host = new Host(this, hostConfig);
@@ -46,10 +43,6 @@ export default class App {
     this.router.init();
     this.messenger.init();
     this.devicesDispatcher.init();
-  }
-
-  private mergeConfig(specifiedConfig: object): HostConfig {
-    return _.defaultsDeep({ ...specifiedConfig }, configHostPlatform, configHostDefault);
   }
 
 }
