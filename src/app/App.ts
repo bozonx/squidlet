@@ -26,12 +26,14 @@ export default class App {
   private readonly masterConfig: {[index: string]: object} | undefined;
 
 
-  constructor(masterConfig: object | undefined) {
+  constructor(config: {[index: string]: any}) {
     this.system = new System();
 
-    if (masterConfig) {
+    // TODO: review
+
+    if (!config.slave) {
       this.masterConfigurator = new MasterConfigurator(this);
-      this.masterConfig = this.mergeConfig(masterConfig);
+      this.masterConfig = this.mergeConfig(config);
     }
 
     // config for current host

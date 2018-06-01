@@ -1,5 +1,7 @@
 import App from "./App";
 import Destination from "./interfaces/Destination";
+import DeviceManifest from "./interfaces/DeviceManifest";
+import DeviceConf from "./interfaces/DeviceConf";
 
 
 export default class HostConfig {
@@ -25,7 +27,7 @@ export default class HostConfig {
   /**
    * Manifests by device class name
    */
-  get devicesManifests(): object {
+  get devicesManifests(): {[index: string]: DeviceManifest} {
     // TODO: !!!
 
     return {};
@@ -34,7 +36,7 @@ export default class HostConfig {
   /**
    * Devices config by ids
    */
-  get devicesConfigs(): object {
+  get devicesConfigs(): {[index: string]: DeviceConf} {
     // TODO: !!!
 
     return {};
