@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
+
 import System from '../helpers/System';
-import MasterConfigurator from './MasterConfigurator';
 import Host from './Host';
 import Messenger from './Messenger';
 import Devices from './Devices';
@@ -11,11 +11,11 @@ import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import configHostDefault from './configHostDefault';
 import configHostPlatform from './configHostPlatform';
+import HostConfig from './interfaces/HostConfig';
 
 
 export default class App {
   readonly system: System;
-  readonly masterConfigurator: MasterConfigurator;
   readonly host: Host;
   readonly messenger: Messenger;
   readonly devices: Devices;
@@ -23,21 +23,15 @@ export default class App {
   readonly drivers: Drivers;
   readonly router: Router;
   readonly log: Logger;
-  private readonly masterConfig: {[index: string]: object} | undefined;
+  // prepared config
+  readonly config: HostConfig;
 
 
   constructor(config: {[index: string]: any}) {
+    this.config = this.mergeConfig(config);
     this.system = new System();
-
-    // TODO: review
-
-    if (!config.slave) {
-      this.masterConfigurator = new MasterConfigurator(this);
-      this.masterConfig = this.mergeConfig(config);
-    }
-
     // config for current host
-    this.host = new Host(this);
+    this.host = new Host(this, config);
     this.log = defaultLogger;
     this.router = new Router(this);
     this.messenger = new Messenger(this);
@@ -53,7 +47,7 @@ export default class App {
     this.devicesDispatcher.init();
   }
 
-  private mergeConfig(specifiedConfig: object) {
+  private mergeConfig(specifiedConfig: object): HostConfig {
     return _.defaultsDeep({ ...specifiedConfig }, configHostPlatform, configHostDefault);
   }
 
