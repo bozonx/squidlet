@@ -14,12 +14,13 @@ import DeviceSchema from './interfaces/DeviceSchema';
  */
 export default class Devices {
   private readonly app: App;
+  private readonly deviceFactory: DeviceFactory;
   // devices instances by ids
   private readonly instances: object = {};
-  private readonly deviceFactory = DeviceFactory;
 
   constructor(app: App) {
     this.app = app;
+    this.deviceFactory = new DeviceFactory(this.app);
   }
 
   /**
@@ -40,13 +41,9 @@ export default class Devices {
         }
 
         const manifest: DeviceManifest = devicesManifests[rawDeviceConf.device];
-        const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
+        const deviceConf: DeviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
 
-        // TODO: review
-        // save link to device
-        const builder = this.deviceFactory(this.app, deviceConf);
-
-        this.instances[deviceConf.deviceId] = await builder.create();
+        this.instances[deviceConf.deviceId] = await this.deviceFactory.create(deviceConf);
       })
     );
   }

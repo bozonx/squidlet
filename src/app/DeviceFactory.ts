@@ -1,28 +1,30 @@
-const _ = require('lodash');
-const path = require('path');
+import * as path from 'path';
+import * as _ from 'lodash';
+
+import App from './App';
+import Device from './interfaces/Device';
+import DeviceConf from './interfaces/DeviceConf';
 
 
-class DeviceBuilder {
-  constructor(app, deviceConf) {
-    this._app = app;
-    this._deviceConf = deviceConf;
+export default class DeviceFactory {
+  private readonly app: App;
+
+  constructor(app: App) {
+    this.app = app;
   }
 
-  async create() {
-    // TODO: ????? зачем это сообщение
-    this._app.log.info(`> Registering device "${this._deviceConf.device}" on topic "${this._deviceConf.deviceTopic}"`);
-
+  async create(deviceConf: DeviceConf): Promise<Device> {
     // make instance of device
-    const devicePath = path.resolve(this._deviceConf.manifest.baseDir, this._deviceConf.manifest.device);
-    const DeviceClass = this._require(devicePath);
-    const device = new DeviceClass(this._app, this._deviceConf);
+    const devicePath: string = path.resolve(deviceConf.manifest.baseDir, deviceConf.manifest.device);
+    const DeviceClass: { new (app: App, deviceConf: DeviceConf): Device } = this.require(devicePath);
+    const device: Device = new DeviceClass(this.app, deviceConf);
 
-    this._validateSchema(this._deviceConf);
+    this._validateSchema(deviceConf);
 
     // TODO: add subscribers from schema
 
     // run own device validate method
-    this._validateDevice(device, this._deviceConf);
+    this._validateDevice(device, deviceConf);
 
     // initialize a device
     await device.init();
@@ -45,7 +47,7 @@ class DeviceBuilder {
     const invalidMsg = device.validate(deviceConf);
 
     if (_.isString(invalidMsg)) {
-      this._app.log.fatal(`Invalid config for device "${deviceConf.deviceTopic}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
+      this.app.log.fatal(`Invalid config for device "${deviceConf.deviceTopic}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
     }
   }
 
@@ -58,37 +60,32 @@ class DeviceBuilder {
 
     // TODO: check connection
 
-    const recursive = (container, curPath) => {
-      _.each(container, (item, name) => {
-        const itemPath = _.trimStart(`${curPath}.${name}`, '.');
-
-        if (_.isString(item)) {
-          // TODO: validate type
-        }
-        else if (_.isPlainObject(item) && item.type) {
-          // TODO: validate type
-        }
-        else if (_.isPlainObject(item)) {
-          recursive(item, itemPath);
-        }
-        else {
-          throw new Error(`Can't parse schema of device ${deviceName}`);
-        }
-      });
-
-    };
-
-    recursive(schema.params, '');
+    // const recursive = (container, curPath) => {
+    //   _.each(container, (item, name) => {
+    //     const itemPath = _.trimStart(`${curPath}.${name}`, '.');
+    //
+    //     if (_.isString(item)) {
+    //       // TODO: validate type
+    //     }
+    //     else if (_.isPlainObject(item) && item.type) {
+    //       // TODO: validate type
+    //     }
+    //     else if (_.isPlainObject(item)) {
+    //       recursive(item, itemPath);
+    //     }
+    //     else {
+    //       throw new Error(`Can't parse schema of device ${deviceName}`);
+    //     }
+    //   });
+    //
+    // };
+    //
+    // recursive(schema.params, '');
   }
 
   // it needs for test purpose
-  _require(devicePath) {
+  private require(devicePath) {
     return require(devicePath);
   }
 
-}
-
-
-export default function (app, deviceConf) {
-  return new DeviceBuilder(app, deviceConf);
 }
