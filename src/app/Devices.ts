@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import App from './App';
 import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
+import { findRecursively } from '../helpers/helpers';
 
 
 export default class Devices {
@@ -20,26 +21,18 @@ export default class Devices {
    * and using user defined config for devices.
    * @param {object} devicesManifests - parsed devices manifests.
    *                                   Structure like { DeviceName: { ...manifest } }
-   * @param {object} devicesConfig - user defined devices configs
+   * @param {object} devicesConfigs - user defined devices configs by ids { "room.device": { ...deviceConfig } }
    */
-  async init(devicesManifests: object, devicesConfig: object): Promise<void> {
-    const recursively = async (container, containerPath) => {
-      if (!_.isPlainObject(container)) return;
+  init(devicesManifests: object, devicesConfigs: object): Promise<void[]> {
+    return Promise.all(_.map(devicesConfigs, async (rawDeviceConf, deviceId): Promise<void> => {
+      const manifest = devicesManifests[rawDeviceConf.device];
+      const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
+      // TODO: review
+      // save link to device
+      const builder = this.deviceFactory(this.app, deviceConf);
 
-      if (container.device) {
-        // device has found - init it
-        return await this._initDevice(devicesManifests, container, containerPath);
-      }
-
-      // go deeper
-      await Promise.all(_.map(container, (item, name) => {
-        const itemPath = _.trimStart(`${containerPath}.${name}`, '.');
-
-        return recursively(item, itemPath);
-      }));
-    };
-
-    await recursively(devicesConfig, '');
+      this.instances[deviceConf.instanceId] = await builder.create();
+    }));
   }
 
   /**
@@ -50,9 +43,9 @@ export default class Devices {
   }
 
 
-  private async _initDevice(devicesManifests, rawDeviceConf: {[index: string]: any}, containerPath: string): Promise<void> {
+  private async _initDevice(devicesManifests, rawDeviceConf: {[index: string]: any}, deviceId: string): Promise<void> {
     const manifest = devicesManifests[rawDeviceConf.device];
-    const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, containerPath);
+    const deviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
 
     // save link to device
     const builder = this.deviceFactory(this.app, deviceConf);
