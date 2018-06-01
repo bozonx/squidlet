@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import System from '../helpers/System';
 import MasterConfigurator from './MasterConfigurator';
 import Host from './Host';
 import Messenger from './Messenger';
@@ -13,7 +14,7 @@ import configHostPlatform from './configHostPlatform';
 
 
 export default class App {
-  //public readonly config: {[index: string]: object};
+  readonly system: System;
   readonly masterConfigurator: MasterConfigurator;
   readonly host: Host;
   readonly messenger: Messenger;
@@ -22,10 +23,12 @@ export default class App {
   readonly drivers: Drivers;
   readonly router: Router;
   readonly log: Logger;
-  private readonly masterConfig: object | undefined;
+  private readonly masterConfig: {[index: string]: object} | undefined;
 
 
   constructor(masterConfig: object | undefined) {
+    this.system = new System();
+
     if (masterConfig) {
       this.masterConfigurator = new MasterConfigurator(this);
       this.masterConfig = this.mergeConfig(masterConfig);
