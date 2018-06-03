@@ -2,12 +2,14 @@ import Destination from './Destination';
 
 
 export default interface Message {
+  // name of category of message
   category: string;
+  // unique topic of message in category
   topic: string;
-  // TODO: не обязательно для локальных сообщений
-  from: Destination;
-  // TODO: не обязательно для локальных сообщений
-  to: Destination;
+  // hostId of host which emits a message
+  from: string;
+  // destination hostId
+  to: string;
   // TODO: сделать плоским
   request?: {
     // TODO: наверное не обязательно для локальных сообщений

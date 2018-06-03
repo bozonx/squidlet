@@ -1,7 +1,6 @@
 import * as EventEmitter from 'events';
 import App from './App';
 import Message from './interfaces/Message';
-import Destination from './interfaces/Destination';
 import * as helpers from '../helpers/helpers';
 
 
@@ -29,11 +28,11 @@ export default class Messenger {
    * Send message to specified host.
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(to: Destination, category: string, topic: string, payload: any): Promise<void> {
+  async publish(to: string, category: string, topic: string, payload: any): Promise<void> {
     const message = {
       topic,
       category,
-      from: this.app.host.generateDestination(to.type, to.bus),
+      from: this.app.host.id,
       to,
       payload,
     };
@@ -72,14 +71,14 @@ export default class Messenger {
     delete this.subscribers[eventName];
   }
 
-  request(to: Destination, category: string, topic: string, payload: any): Promise<any> {
+  request(to: string, category: string, topic: string, payload: any): Promise<any> {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
 
     const message = {
       topic,
       category,
-      from: this.app.host.generateDestination(to.type, to.bus),
+      from: this.app.host.id,
       to,
       request: {
         id: helpers.generateUniqId(),
@@ -130,7 +129,7 @@ export default class Messenger {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
-      from: this.app.host.generateDestination(request.from.type, request.from.bus),
+      from: this.app.host.id,
       to: request.from,
       request: {
         id: request.request.id,

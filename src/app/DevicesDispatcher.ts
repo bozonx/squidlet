@@ -25,7 +25,7 @@ export default class DevicesDispatcher {
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте
 
-    const to = this.resolveHost(deviceId);
+    const to = deviceId;
     const topic = `${deviceId}/${actionName}`;
 
     return this.app.messenger.request(to, this.callActionCategory, topic, params);
@@ -60,7 +60,7 @@ export default class DevicesDispatcher {
 
     // TODO: test
 
-    const to = this.resolveHost(deviceId);
+    const to = deviceId;
     const topic = `${deviceId}/setConfig`;
 
     return this.app.messenger.request(to, this.callActionCategory, topic, partialConfig);
@@ -72,7 +72,7 @@ export default class DevicesDispatcher {
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
     // TODO: должен путликовать всем желающим - кто подписался
 
-    const to = this.resolveHost('master');
+    const to = 'master';
     const payload = {
       status,
       value,
@@ -90,7 +90,7 @@ export default class DevicesDispatcher {
 
     // TODO: должен публиковать всем желающим - кто подписался
 
-    const to = this.resolveHost('master');
+    const to = 'master';
     const payload = {
       partialConfig,
     };
@@ -131,20 +131,6 @@ export default class DevicesDispatcher {
     const result = await device[actionName](...request.payload);
 
     return result;
-  }
-
-  private resolveHost(deviceId: string): Destination {
-
-    // TODO: !!!! посмотреть в конфиге на каком хосте находится девайс и вернуть адрес
-    // TODO: !!!! резолвить master
-    // TODO: !!!! test
-
-    return {
-      host: deviceId,
-      type: '',
-      bus: '',
-      address: '',
-    };
   }
 
 }
