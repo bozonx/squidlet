@@ -10,10 +10,6 @@ export default interface Message {
   from: string;
   // destination hostId
   to: string;
-  // count of routers which message transfer before it will be deleted
-  ttl: number;
-  // hosts between "from" and "to"
-  route: Array<string>;
   // TODO: сделать плоским
   request?: {
     // TODO: наверное не обязательно для локальных сообщений

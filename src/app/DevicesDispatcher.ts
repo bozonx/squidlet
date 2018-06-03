@@ -70,7 +70,8 @@ export default class DevicesDispatcher {
    * It runs from local device itself to publish its status changes.
    */
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
-    // TODO: должен путликовать всем желающим - кто подписался
+
+    // TODO: резолвить сервис message collector
 
     const to = 'master';
     const payload = {
@@ -88,7 +89,7 @@ export default class DevicesDispatcher {
 
     // TODO: test
 
-    // TODO: должен публиковать всем желающим - кто подписался
+    // TODO: резолвить сервис message collector
 
     const to = 'master';
     const payload = {

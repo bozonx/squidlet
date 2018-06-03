@@ -3,6 +3,7 @@ import * as EventEmitter from 'events';
 
 import App from './App';
 import Message from './interfaces/Message';
+import RouterMessage from './interfaces/RouterMessage';
 import Connection from './interfaces/Connection';
 import Destination from './interfaces/Destination';
 import { generateConnectionId, findRecursively } from '../helpers/helpers';
@@ -44,6 +45,11 @@ export default class Router {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
+
+
+    // TODO: !!! сформировать route message - RouterMessage
+    // TODO: !!! сформировать route
+    // TODO: !!! сформировать from - from: this.app.host.id,
 
     const nextHostId: string = this.resolveNextHostId(message);
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
@@ -129,19 +135,44 @@ export default class Router {
   }
 
   private resolveNextHostId(message: Message): string {
-    // TODO: !!!!
+    // the next is "to" if route is empty
+    if (_.isEmpty(message.route)) return message.to;
+
+    const route = [ ...message.route, message.to ];
+    const myIndex = _.indexOf(route, this.app.host.id);
+    const theNextHostShift = 1;
+
+    if (myIndex < 0) {
+      throw new Error(`Can't find my hostId "${this.app.host.id}" in route ${JSON.stringify(route)}`);
+    }
+    if ((route.length - theNextHostShift) <= myIndex) {
+      throw new Error(`Can't find the next host in route ${JSON.stringify(route)}`);
+    }
+
+    return route[myIndex + theNextHostShift];
   }
 
   private resolveHostConnection(hostId: string): Destination {
-    // TODO: !!!!
+    const params: Destination = this.app.host.config.neighbors[hostId];
+
+    if (!params) throw new Error(`Can't find connection params of host "${hostId}"`);
+
+    return params;
   }
 
-  private handleIncomeMessages = (message: Message) => {
+  private handleIncomeMessages = (message: Message): void => {
+    // if it's final destination - pass message to messenger
+    if (this.app.host.id === message.to) {
+      this.events.emit(this.eventName, message);
 
-    // TODO: если это промежуточный хост - пересылаем дальше
-    // TODO: если это конечный хост - поднимаем событие
+      return;
+    }
 
-    this.events.emit(this.eventName, message);
+    // else forward message to next host on route
+
+    // TODO: проверить правильно ли вызывать publish - или сделать все самому?
+
+    this.publish(message);
   };
 
 }
