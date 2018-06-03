@@ -10,5 +10,6 @@ export default interface DeviceConf {
   // specific config of device
   params: object;
   manifest: DeviceManifest;
+  // parsed schema of device
   schema: DeviceSchema;
 }

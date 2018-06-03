@@ -15,6 +15,7 @@ export default interface Message {
     isRequest?: boolean,
     isResponse?: boolean,
   };
+  // TODO: сделать плоским
   error?: {
     message: string,
     code: number,
