@@ -13,6 +13,7 @@ import I2cConnection from '../connections/I2cConnection';
 /**
  * It passes messages to corresponding connection by `message.to`.
  * And receives messages from all the available connections on current host.
+ * It forwards message to next host if current host one of host on route
  */
 export default class Router {
   private readonly app: App;
@@ -44,11 +45,16 @@ export default class Router {
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
 
-    const connection = this.getConnection(message.to);
+    const nextHostId: string = this.resolveNextHostId(message);
+    const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
+    const connection = this.getConnection(nextHostConnectionParams);
 
     await connection.publish(message);
   }
 
+  /**
+   * Listen for messeges which is delivered to this final host.
+   */
   subscribe(handler: (message: Message) => void) {
     this.events.addListener(this.eventName, handler);
   }
@@ -89,7 +95,7 @@ export default class Router {
    */
   private configureConnections() {
     const connection = {
-      host: this.app.host.id(),
+      host: this.app.host.id,
       type: 'local',
       bus: undefined,
       address: undefined,
@@ -118,12 +124,24 @@ export default class Router {
 
   private listenToAllConnections() {
     _.each(this.connections, (connection, connectionId) => {
-      const listenCb = (message: Message) => {
-        this.events.emit(this.eventName, message);
-      };
-
-      connection.subscribe(listenCb);
+      connection.subscribe(this.handleIncomeMessages);
     });
   }
+
+  private resolveNextHostId(message: Message): string {
+    // TODO: !!!!
+  }
+
+  private resolveHostConnection(hostId: string): Destination {
+    // TODO: !!!!
+  }
+
+  private handleIncomeMessages = (message: Message) => {
+
+    // TODO: если это промежуточный хост - пересылаем дальше
+    // TODO: если это конечный хост - поднимаем событие
+
+    this.events.emit(this.eventName, message);
+  };
 
 }
