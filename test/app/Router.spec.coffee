@@ -26,16 +26,16 @@ describe 'app.Router', ->
       }
     }
 
-    @tunnelSubscribeHanler = undefined
-    @tunnel = {
+    @connectionSubscribeHanler = undefined
+    @connection = {
       publish: sinon.spy()
-      subscribe: (handler) => @tunnelSubscribeHanler = handler
+      subscribe: (handler) => @connectionSubscribeHanler = handler
     }
 
-    @tunnelClassConstructor = sinon.spy()
-    tunnelClassConstructor = @tunnelClassConstructor
-    @tunnelClass = class
-      constructor: (params...) -> tunnelClassConstructor(params...)
+    @connectionClassConstructor = sinon.spy()
+    connectionClassConstructor = @connectionClassConstructor
+    @connectionClass = class
+      constructor: (params...) -> connectionClassConstructor(params...)
       test: 'test'
       init: ->
 
@@ -60,40 +60,40 @@ describe 'app.Router', ->
     }
 
     @router = new Router(@app)
-    #@router['_tunnelTypes'] = { i2c: @tunnelClass }
-    @router['tunnelTypes'].i2c = @tunnelClass
+    #@router['_connectionTypes'] = { i2c: @connectionClass }
+    @router['connectionTypes'].i2c = @connectionClass
 
   it 'init - not master', ->
     @router.init()
 
-    assert.equal(@router['tunnels']['master-local'].constructor.name, 'LocalTunnel')
+    assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
 
   it 'publish', ->
-    @router.tunnels = {
-      'room1.host1-i2c-1-5A': @tunnel
+    @router.connections = {
+      'room1.host1-i2c-1-5A': @connection
     }
 
     await @router.publish(@message)
 
-    sinon.assert.calledWith(@tunnel.publish, @message)
+    sinon.assert.calledWith(@connection.publish, @message)
 
   it 'subscribe', ->
-    @router.tunnels = {
-      'room1.host1-i2c-1-5A': @tunnel
+    @router.connections = {
+      'room1.host1-i2c-1-5A': @connection
     }
-    @router.listenToAllTunnels()
+    @router.listenToAllConnections()
     handler = sinon.spy()
     @router.subscribe(handler)
 
-    @tunnelSubscribeHanler(@message)
+    @connectionSubscribeHanler(@message)
 
     sinon.assert.calledWith(handler, @message)
 
-  it 'private configureMasterTunnels', ->
-    @router.configureMasterTunnels()
+  it 'private configureMasterConnections', ->
+    @router.configureMasterConnections()
 
-    assert.equal(@router['tunnels']['room1.host.device1-i2c-1-5A'].test, 'test')
-    sinon.assert.calledWith(@tunnelClassConstructor, @app, {
+    assert.equal(@router['connections']['room1.host.device1-i2c-1-5A'].test, 'test')
+    sinon.assert.calledWith(@connectionClassConstructor, @app, {
       @app.config.devices.room1.host.device1.address...
       host: "room1.host.device1"
       bus: '1'

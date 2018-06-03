@@ -8,7 +8,7 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 /**
  * It packs data to send it via i2c.
  */
-export default class I2cTunnel {
+export default class I2cConnection {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly connectionTo: Destination;

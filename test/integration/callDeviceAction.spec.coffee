@@ -1,6 +1,6 @@
 # Call device's action
 # * device places on remote host
-# * i2c tunnel uses to connect
+# * i2c connection uses to connect
 # * request does from MQTT backed
 
 { App } = require('../../src/index').default;

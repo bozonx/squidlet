@@ -1,7 +1,7 @@
 import Message from './Message';
 
 
-export default interface Tunnel {
+export default interface Connection {
   init: () => void;
   publish: (message: Message) => Promise<void>;
   subscribe: (handler: (message: Message) => void) => void;

@@ -4,7 +4,7 @@ import Message from '../app/interfaces/Message';
 import Destination from '../app/interfaces/Destination';
 
 
-export default class LocalTunnel {
+export default class LocalConnection {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
 

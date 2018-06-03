@@ -3,25 +3,25 @@ import * as EventEmitter from 'events';
 
 import App from './App';
 import Message from './interfaces/Message';
-import Tunnel from './interfaces/Tunnel';
+import Connection from './interfaces/Connection';
 import Destination from './interfaces/Destination';
-import { generateTunnelId, findRecursively } from '../helpers/helpers';
-import LocalTunnel from '../connections/LocalConnection';
-import I2cTunnel from '../connections/I2cConnection';
+import { generateConnectionId, findRecursively } from '../helpers/helpers';
+import LocalConnection from '../connections/LocalConnection';
+import I2cConnection from '../connections/I2cConnection';
 
 
 /**
- * It passes messages to corresponding tunnel by `message.to`.
- * And receives messages from all the available tunnels on current host.
+ * It passes messages to corresponding connection by `message.to`.
+ * And receives messages from all the available connections on current host.
  */
 export default class Router {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly tunnels: object = {};
+  private readonly connections: object = {};
   private readonly eventName: string = 'msg';
-  private readonly tunnelTypes: object = {
-    local: LocalTunnel,
-    i2c: I2cTunnel,
+  private readonly connectionTypes: object = {
+    local: LocalConnection,
+    i2c: I2cConnection,
   };
 
   constructor(app) {
@@ -30,13 +30,13 @@ export default class Router {
 
   init(): void {
     if (this.app.host.isMaster) {
-      this.configureMasterTunnels();
+      this.configureMasterConnections();
     }
 
-    // TODO: сделать конфигурирование loopTunnel отдельной ф-ей
+    // TODO: сделать конфигурирование loopConnection отдельной ф-ей
 
-    this.configureTunnels();
-    this.listenToAllTunnels();
+    this.configureConnections();
+    this.listenToAllConnections();
   }
 
   async publish(message: Message): Promise<void> {
@@ -44,9 +44,9 @@ export default class Router {
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
 
-    const tunnel = this.getTunnel(message.to);
+    const connection = this.getConnection(message.to);
 
-    await tunnel.publish(message);
+    await connection.publish(message);
   }
 
   subscribe(handler: (message: Message) => void) {
@@ -58,9 +58,9 @@ export default class Router {
   }
 
   /**
-   * Configure master to slaves tunnels.
+   * Configure master to slaves connections.
    */
-  private configureMasterTunnels() {
+  private configureMasterConnections() {
 
     // TODO: use host config - там плоская структура
 
@@ -78,16 +78,16 @@ export default class Router {
         address: item.address.address,
       };
 
-      this.registerTunnel(connection);
+      this.registerConnection(connection);
 
       return false;
     });
   }
 
   /**
-   * Configure slave to slave and local tunnels.
+   * Configure slave to slave and local connections.
    */
-  private configureTunnels() {
+  private configureConnections() {
     const connection = {
       host: this.app.host.id(),
       type: 'local',
@@ -95,34 +95,34 @@ export default class Router {
       address: undefined,
     };
 
-    this.registerTunnel(connection);
+    this.registerConnection(connection);
   }
 
-  private registerTunnel(connection: Destination) {
-    const tunnelId = generateTunnelId(connection);
-    const TunnelClass = this.tunnelTypes[connection.type];
+  private registerConnection(connection: Destination) {
+    const connectionId = generateConnectionId(connection);
+    const ConnectionClass = this.connectionTypes[connection.type];
 
-    this.tunnels[tunnelId] = new TunnelClass(this.app, connection);
-    this.tunnels[tunnelId].init();
+    this.connections[connectionId] = new ConnectionClass(this.app, connection);
+    this.connections[connectionId].init();
   }
 
-  private getTunnel(to: Destination): Tunnel {
-    const tunnelId = generateTunnelId(to);
+  private getConnection(to: Destination): Connection {
+    const connectionId = generateConnectionId(to);
 
-    if (!this.tunnels[tunnelId]) {
-      throw new Error(`Can't find tunnel "${to}"`);
+    if (!this.connections[connectionId]) {
+      throw new Error(`Can't find connection "${to}"`);
     }
 
-    return this.tunnels[tunnelId];
+    return this.connections[connectionId];
   }
 
-  private listenToAllTunnels() {
-    _.each(this.tunnels, (tunnel, tunnelId) => {
+  private listenToAllConnections() {
+    _.each(this.connections, (connection, connectionId) => {
       const listenCb = (message: Message) => {
         this.events.emit(this.eventName, message);
       };
 
-      tunnel.subscribe(listenCb);
+      connection.subscribe(listenCb);
     });
   }
 

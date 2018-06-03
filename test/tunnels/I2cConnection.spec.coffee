@@ -29,17 +29,17 @@ describe 'connections.I2cConnection', ->
       address: '5A'
     }
 
-    @tunnel = new I2cConnection(@app, @connectionTo)
-    @tunnel.init()
+    @connection = new I2cConnection(@app, @connectionTo)
+    @connection.init()
 
   it 'publish', ->
-    await @tunnel.publish(@message)
+    await @connection.publish(@message)
 
     sinon.assert.calledWith(@driver.write, '1', '5A', @uint8arr)
 
   it 'subscribe', ->
     handler = sinon.spy()
-    @tunnel.subscribe(handler)
+    @connection.subscribe(handler)
 
     @listenDataHandler(@uint8arr)
 
