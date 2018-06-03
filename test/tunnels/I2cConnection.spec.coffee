@@ -1,8 +1,8 @@
-I2cTunnel = require('../../src/tunnels/I2cTunnel').default
+I2cConnection = require('../../src/connections/I2cConnection').default
 helpers = require('../../src/helpers/helpers')
 
 
-describe 'tunnels.I2cTunnel', ->
+describe 'connections.I2cConnection', ->
   beforeEach ->
     @listenDataHandler = undefined
     @driver = {
@@ -29,7 +29,7 @@ describe 'tunnels.I2cTunnel', ->
       address: '5A'
     }
 
-    @tunnel = new I2cTunnel(@app, @connectionTo)
+    @tunnel = new I2cConnection(@app, @connectionTo)
     @tunnel.init()
 
   it 'publish', ->

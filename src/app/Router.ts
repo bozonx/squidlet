@@ -6,8 +6,8 @@ import Message from './interfaces/Message';
 import Tunnel from './interfaces/Tunnel';
 import Destination from './interfaces/Destination';
 import { generateTunnelId, findRecursively } from '../helpers/helpers';
-import LocalTunnel from '../tunnels/LocalTunnel';
-import I2cTunnel from '../tunnels/I2cTunnel';
+import LocalTunnel from '../connections/LocalConnection';
+import I2cTunnel from '../connections/I2cConnection';
 
 
 /**
