@@ -41,7 +41,7 @@ export default class Router {
     this.listenToAllConnections();
   }
 
-  async publish(to: string, payload: any): Promise<void> {
+  async send(to: string, payload: any): Promise<void> {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
@@ -58,11 +58,11 @@ export default class Router {
   /**
    * Listen for income messages which is delivered to this final host.
    */
-  subscribe(handler: (message: Message) => void) {
+  listenIncome(handler: (message: Message) => void) {
     this.events.addListener(this.eventName, handler);
   }
 
-  unsubscribe(handler: (message: Message) => void) {
+  off(handler: (message: Message) => void) {
     this.events.removeListener(this.eventName, handler);
   }
 

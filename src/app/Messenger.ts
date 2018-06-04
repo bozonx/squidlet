@@ -37,7 +37,7 @@ export default class Messenger {
       payload,
     };
 
-    await this.app.router.publish(message.to, message);
+    await this.app.router.send(message.to, message);
   }
 
   /**
@@ -67,7 +67,7 @@ export default class Messenger {
     if (this.events.listeners(eventName).length) return;
 
     // if there isn't any listeners - remove subscriber
-    this.app.router.unsubscribe(this.subscribers[eventName]);
+    this.app.router.off(this.subscribers[eventName]);
     delete this.subscribers[eventName];
   }
 
@@ -115,7 +115,7 @@ export default class Messenger {
       handler(message);
     };
 
-    this.app.router.subscribe(callback);
+    this.app.router.listenIncome(callback);
   }
 
   /**
@@ -139,7 +139,7 @@ export default class Messenger {
       error,
     };
 
-    return this.app.router.publish(respondMessage.to, respondMessage);
+    return this.app.router.send(respondMessage.to, respondMessage);
   }
 
   private waitForResponse(messageId: string): Promise<Message> {
@@ -152,12 +152,12 @@ export default class Messenger {
         if (!message.request.isResponse) return;
         if (message.request.id !== messageId) return;
 
-        this.app.router.unsubscribe(handler);
+        this.app.router.off(handler);
 
         resolve(message);
       };
 
-      this.app.router.subscribe(handler);
+      this.app.router.listenIncome(handler);
     }));
   }
 
@@ -176,7 +176,7 @@ export default class Messenger {
       }
     };
 
-    this.app.router.subscribe(this.subscribers[eventName]);
+    this.app.router.listenIncome(this.subscribers[eventName]);
   }
 
 }
