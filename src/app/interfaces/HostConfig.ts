@@ -3,6 +3,12 @@ import DeviceConf from "./DeviceConf";
 import Destination from "./Destination";
 
 
+interface Route {
+  type: string;
+  // list of host ids from current host to destination host
+  route: Array<string>
+}
+
 export default interface HostConfig {
   // TODO: не нужно
   slave?: boolean;
@@ -18,7 +24,6 @@ export default interface HostConfig {
   drivers: Array<string>;
   // addresses of the nearest neighbors hosts
   neighbors: {[index: string]: Destination};
-  // TODO: продумать структуру
-  // routes for coordinators and links
-  routes: {[index: string]: Array<string>}
+  // routes for coordinators and links - { configuratorHostId: { type: 'configurator', route: [ ... ] } }
+  routes: {[index: string]: Route};
 }

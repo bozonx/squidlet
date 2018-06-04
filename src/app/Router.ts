@@ -41,17 +41,13 @@ export default class Router {
     this.listenToAllConnections();
   }
 
-  async publish(to: string, message: Message): Promise<void> {
+  async publish(to: string, payload: any): Promise<void> {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
-    // TODO: !!! наверное если to = from то отсылать локально???
 
+    // TODO: !!!! если to = current id то отсылать локально
 
-    // TODO: !!! сформировать route message - RouterMessage
-    // TODO: !!! сформировать route
-    // TODO: !!! сформировать from - from: this.app.host.id,
-
-    const routerMessage: RouterMessage = this.generateMessage(to, message);
+    const routerMessage: RouterMessage = this.generateMessage(to, payload);
     const nextHostId: string = this.resolveNextHostId(routerMessage.route);
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
@@ -60,7 +56,7 @@ export default class Router {
   }
 
   /**
-   * Listen for messeges which is delivered to this final host.
+   * Listen for income messages which is delivered to this final host.
    */
   subscribe(handler: (message: Message) => void) {
     this.events.addListener(this.eventName, handler);
@@ -186,15 +182,17 @@ export default class Router {
     //this.publish(message);
   };
 
-  private generateMessage(to: string, message: Message): RouterMessage {
+  private generateMessage(to: string, payload: any): RouterMessage {
+    if (!this.app.host.config.routes[to]) {
+      throw new Error(`Can't find route to "${to}"`);
+    }
 
-    // TODO: расчитать маршрут
+    const route: Array<string> = this.app.host.config.routes[to].route;
 
     return {
-      route: [],
+      route,
       ttl: this.app.host.config.host.routedMessageTTL,
-      // TODO: может оптимизировать???
-      payload: message,
+      payload,
     };
   }
 
