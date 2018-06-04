@@ -5,7 +5,6 @@ import App from './App';
 import RouterMessage from './interfaces/RouterMessage';
 import Connection from './interfaces/Connection';
 import Destination from './interfaces/Destination';
-import { generateConnectionId, findRecursively } from '../helpers/helpers';
 import I2cConnection from '../connections/I2cConnection';
 
 
@@ -17,7 +16,7 @@ import I2cConnection from '../connections/I2cConnection';
 export default class Router {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly connections: object = {};
+  private readonly connections: { [index: string]: Connection } = {};
   private readonly eventName: string = 'msg';
   private readonly connectionTypes: object = {
     i2c: I2cConnection,
@@ -93,33 +92,44 @@ export default class Router {
    * Configure slave to slave and local connections.
    */
   private configureConnections() {
+    const connectionTypes = this.collectConnectionTypes(this.app.host.config.neighbors);
 
-    // TODO: проходимся по роутам - ищем ближайшие от нас хосты (наверное сверху и снизу)
-    // TODO: потом резолвим параметры соединения этих хостов
-    // TODO: проверяем чтоы не было дубликата по типу соединения
-    // TODO: создаем соединения с ближайшими хостами
-    // TODO: connection создается без учета адреса !!!!!??? только тип и bus ???
-
-    // const connection = {
-    //   host: this.app.host.id,
-    //   type: 'local',
-    //   bus: undefined,
-    //   address: undefined,
-    // };
-    //
-    // this.registerConnection(connection);
+    _.each(connectionTypes, (item: { type: string, bus: string }) => {
+      this.registerConnection(item);
+    });
   }
 
-  private registerConnection(connection: Destination) {
-    const connectionId = generateConnectionId(connection);
-    const ConnectionClass = this.connectionTypes[connection.type];
+  private collectConnectionTypes(neighbors: {[index: string]: Destination}): Array<{ type: string, bus: string }> {
+    const result = {};
 
-    this.connections[connectionId] = new ConnectionClass(this.app, connection);
+    _.each(neighbors, (item: Destination) => {
+
+      // TODO: test
+
+      const connectionType = _.pick(item, 'type', 'bus');
+
+      result[this.generateConnectionId(connectionType)] = connectionType;
+    });
+
+    return _.map(result);
+  }
+
+  private registerConnection(connectionType: { type: string, bus: string }) {
+    const connectionId = this.generateConnectionId(connectionType);
+    const ConnectionClass = this.connectionTypes[connectionType.type];
+
+    this.connections[connectionId] = new ConnectionClass(this.app, connectionType);
     this.connections[connectionId].init();
   }
 
+  generateConnectionId(connection: { type: string, bus: string }): string {
+    return [ connection.type, connection.bus ].join('-');
+  }
+
   private getConnection(connectionParams: Destination): Connection {
-    const connectionId = generateConnectionId(connectionParams);
+    const connectionId = this.generateConnectionId(connectionParams);
+
+    // TODO: review
 
     if (!this.connections[connectionId]) {
       throw new Error(`Can't find connection "${connectionId}"`);

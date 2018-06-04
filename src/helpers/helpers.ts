@@ -22,16 +22,16 @@ export function generateUniqId(): string {
   return uniqid();
 }
 
-export function generateConnectionId(connection: Destination): string {
-  const items = _.compact([
-    connection.host,
-    connection.type,
-    connection.bus,
-    connection.address,
-  ]);
-
-  return items.join('-');
-}
+// export function generateConnectionId(connection: Destination): string {
+//   const items = _.compact([
+//     connection.host,
+//     connection.type,
+//     connection.bus,
+//     connection.address,
+//   ]);
+//
+//   return items.join('-');
+// }
 
 /**
  * It works with common structures like

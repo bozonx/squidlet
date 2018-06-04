@@ -15,7 +15,7 @@ export default class I2cConnection {
   private readonly i2cDataDriver: I2cData;
   private readonly eventName: string = 'data';
 
-  constructor(app: App, connectionTo: Destination) {
+  constructor(app: App, connectionTo: { type: string, bus: string }) {
     this.app = app;
     this.connectionTo = connectionTo;
     this.i2cDataDriver = this.app.drivers.getDriver('I2cData');
