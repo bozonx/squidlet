@@ -11,10 +11,7 @@ describe 'app.Router', ->
             routedMessageTTL: 100
           }
           routes: {
-            'destHost': {
-              type: 'collector'
-              route: [ 'currentHost', 'nextHost', 'destHost' ]
-            }
+            'destHost': [ 'currentHost', 'nextHost', 'destHost' ]
           }
           neighbors: {
             nextHost: {

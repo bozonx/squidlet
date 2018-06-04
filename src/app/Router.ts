@@ -195,7 +195,7 @@ export default class Router {
       throw new Error(`Can't find route to "${to}"`);
     }
 
-    const route: Array<string> = this.app.host.config.routes[to].route;
+    const route: Array<string> = this.app.host.config.routes[to];
 
     return {
       route,

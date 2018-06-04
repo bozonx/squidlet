@@ -3,12 +3,6 @@ import DeviceConf from "./DeviceConf";
 import Destination from "./Destination";
 
 
-interface Route {
-  type: string;
-  // list of host ids from current host to destination host
-  route: Array<string>
-}
-
 export default interface HostConfig {
   // specific config for each host
   host: {[index: string]: any};
@@ -22,6 +16,9 @@ export default interface HostConfig {
   drivers: Array<string>;
   // addresses of the nearest neighbors hosts
   neighbors: {[index: string]: Destination};
-  // routes for coordinators and links - { configuratorHostId: { type: 'configurator', route: [ ... ] } }
-  routes: {[index: string]: Route};
+  // TODO: наверное сделать просто массивом, а список сервисов - отдельно
+  // routes for coordinators and links - { destHostId: route: [ 'currentHost', 'midHost', 'destHostId' ] }
+  routes: {[index: string]: Array<string>};
+  // TODO: сделать линки и координаторы
+  links: object;
 }
