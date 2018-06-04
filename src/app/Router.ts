@@ -47,7 +47,7 @@ export default class Router {
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
 
-    await connection.send(routerMessage);
+    await connection.send(nextHostConnectionParams.address, routerMessage);
   }
 
   /**
@@ -59,33 +59,6 @@ export default class Router {
 
   off(handler: (payload: any) => void) {
     this.events.removeListener(this.eventName, handler);
-  }
-
-  /**
-   * Configure master to slaves connections.
-   */
-  private configureMasterConnections() {
-
-    // TODO: use host config - там плоская структура
-
-    // findRecursively(this.app.host.config.devices, (item, itemPath): boolean => {
-    //   if (!_.isPlainObject(item)) return false;
-    //   // go deeper
-    //   if (!item.device) return undefined;
-    //   if (item.device !== 'host') return false;
-    //
-    //   const connection = {
-    //     host: itemPath,
-    //     type: item.address.type,
-    //     //bus: item.address.bus,
-    //     bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
-    //     address: item.address.address,
-    //   };
-    //
-    //   this.registerConnection(connection);
-    //
-    //   return false;
-    // });
   }
 
   /**
@@ -122,14 +95,8 @@ export default class Router {
     this.connections[connectionId].init();
   }
 
-  generateConnectionId(connection: { type: string, bus: string }): string {
-    return [ connection.type, connection.bus ].join('-');
-  }
-
   private getConnection(connectionParams: Destination): Connection {
     const connectionId = this.generateConnectionId(connectionParams);
-
-    // TODO: review
 
     if (!this.connections[connectionId]) {
       throw new Error(`Can't find connection "${connectionId}"`);
@@ -194,7 +161,7 @@ export default class Router {
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
 
-    connection.send(routerMessage)
+    connection.send(nextHostConnectionParams.address, routerMessage)
       .catch((err) => {
         // TODO: что делать с ошибкой???
       });
@@ -216,6 +183,10 @@ export default class Router {
 
   private sendToLoopBack(payload: any): void {
     this.events.emit(this.eventName, payload);
+  }
+
+  private generateConnectionId(connection: { type: string, bus: string }): string {
+    return [ connection.type, connection.bus ].join('-');
   }
 
 }
