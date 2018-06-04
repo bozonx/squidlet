@@ -135,19 +135,29 @@ export default class Router {
     });
   }
 
+  /**
+   * Try to find the next host after current.
+   * For example we have route [ 'fromHost', 'currentHost', 'nextHost' ]
+   *   * first we found current host
+   *   * and the next one will be result
+   */
   private resolveNextHostId(route: Array<string>): string {
-    // the next is "to" if route is empty
-    if (_.isEmpty(message.route)) return message.to;
+    if (route.length < 2) throw new Error(`Incorrect route ${JSON.stringify(route)}`);
+    if (_.last(route) === this.app.host.id) {
+      throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.app.host.id} is the last`);
+    }
 
-    const route = [ ...message.route, message.to ];
-    const myIndex = _.indexOf(route, this.app.host.id);
     const theNextHostShift = 1;
+
+    // go to next point
+    if (route.length === 2) {
+      return route[theNextHostShift];
+    }
+
+    const myIndex = _.indexOf(route, this.app.host.id);
 
     if (myIndex < 0) {
       throw new Error(`Can't find my hostId "${this.app.host.id}" in route ${JSON.stringify(route)}`);
-    }
-    if ((route.length - theNextHostShift) <= myIndex) {
-      throw new Error(`Can't find the next host in route ${JSON.stringify(route)}`);
     }
 
     return route[myIndex + theNextHostShift];
