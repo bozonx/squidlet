@@ -28,12 +28,12 @@ export default class Messenger {
    * Send message to specified host.
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(to: string, category: string, topic: string, payload: any): Promise<void> {
+  async publish(toHost: string, category: string, topic: string, payload: any): Promise<void> {
     const message: Message = {
       category,
       topic,
       from: this.app.host.id,
-      to,
+      to: toHost,
       payload,
     };
 
@@ -71,7 +71,7 @@ export default class Messenger {
     delete this.subscribers[eventName];
   }
 
-  request(to: string, category: string, topic: string, payload: any): Promise<any> {
+  request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
 
@@ -79,7 +79,7 @@ export default class Messenger {
       topic,
       category,
       from: this.app.host.id,
-      to,
+      to: toHost,
       request: {
         id: helpers.generateUniqId(),
         isRequest: true,

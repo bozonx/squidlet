@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
+
 import App from './App';
-import Message from "./interfaces/Message";
+import Message from './interfaces/Message';
+import { parseDeviceId } from '../helpers/helpers';
 
 
 export default class DevicesDispatcher {
@@ -24,14 +26,10 @@ export default class DevicesDispatcher {
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте
 
-
-    // TODO: !!!! to это хост на котором находится девайс
-    // TODO: !!!! если deviceId это строка, а далее оперируем сгенерированным id - то нужно как-то соотнести
-
-    const to: string = this.resolveDestinationHost(deviceId);
+    const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = `${deviceId}/${actionName}`;
 
-    return this.app.messenger.request(to, this.callActionCategory, topic, params);
+    return this.app.messenger.request(toHost, this.callActionCategory, topic, params);
   }
 
   /**
@@ -70,10 +68,10 @@ export default class DevicesDispatcher {
 
     // TODO: test
 
-    const to: string = this.resolveDestinationHost(deviceId);
+    const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = `${deviceId}/setConfig`;
 
-    return this.app.messenger.request(to, this.callActionCategory, topic, partialConfig);
+    return this.app.messenger.request(toHost, this.callActionCategory, topic, partialConfig);
   }
 
   /**
@@ -81,18 +79,16 @@ export default class DevicesDispatcher {
    */
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
 
-    // TODO: резолвить сервис message collector
+    // TODO: test
 
-    // TODO: !!!! куда отправляем то ????
+    // TODO: !!!! нужно просто поднять всех подписчиков - отправить локально но на спец категорию
 
-    const to = 'master';
-    //const to: string = this.resolveDestinationHost(deviceId);
     const payload = {
       status,
       value,
     };
 
-    return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.statusTopic, payload);
+    return this.app.messenger.publish(undefined, this.deviceFeedBackCategory, this.statusTopic, payload);
   }
 
   /**
@@ -102,16 +98,13 @@ export default class DevicesDispatcher {
 
     // TODO: test
 
-    // TODO: резолвить сервис message collector
+    // TODO: !!!! нужно просто поднять всех подписчиков - отправить локально но на спец категорию
 
-    // TODO: !!!! куда отправляем то ????
-
-    const to = 'master';
     const payload = {
       partialConfig,
     };
 
-    return this.app.messenger.publish(to, this.deviceFeedBackCategory, this.configTopic, payload);
+    return this.app.messenger.publish(undefined, this.deviceFeedBackCategory, this.configTopic, payload);
   }
 
   /**
@@ -150,8 +143,9 @@ export default class DevicesDispatcher {
   }
 
   private resolveDestinationHost(deviceId: string): string {
-    // TODO: resolve 1!!!
+    const { hostId } = parseDeviceId(deviceId);
 
+    return hostId;
   }
 
 }

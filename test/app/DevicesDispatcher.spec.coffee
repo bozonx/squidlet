@@ -41,18 +41,18 @@ describe.only 'app.DevicesDispatcher', ->
 
     sinon.assert.calledWith(handler, 'temperature', 1)
 
-  it 'publishStatus', ->
-    to = {
-      host: 'master'
-      type: 'i2c'
-      bus: 1
-      address: undefined
-    }
-    @devicesDispatcher.resolveHost = -> to
-
-    @devicesDispatcher.publishStatus(@deviceId, 'temperature', 25)
-
-    sinon.assert.calledWith(@app.messenger.publish, to, 'deviceFeedBack', 'status', {
-      status: 'temperature'
-      value: 25
-    })
+#  it 'publishStatus', ->
+#    to = {
+#      host: 'master'
+#      type: 'i2c'
+#      bus: 1
+#      address: undefined
+#    }
+#    @devicesDispatcher.resolveHost = -> to
+#
+#    @devicesDispatcher.publishStatus(@deviceId, 'temperature', 25)
+#
+#    sinon.assert.calledWith(@app.messenger.publish, to, 'deviceFeedBack', 'status', {
+#      status: 'temperature'
+#      value: 25
+#    })
