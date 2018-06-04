@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import App from './App';
 import Message from "./interfaces/Message";
-import Destination from "./interfaces/Destination";
 
 
 export default class DevicesDispatcher {
@@ -25,7 +24,11 @@ export default class DevicesDispatcher {
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте
 
-    const to = deviceId;
+
+    // TODO: !!!! to это хост на котором находится девайс
+    // TODO: !!!! если deviceId это строка, а далее оперируем сгенерированным id - то нужно как-то соотнести
+
+    const to: string = this.resolveDestinationHost(deviceId);
     const topic = `${deviceId}/${actionName}`;
 
     return this.app.messenger.request(to, this.callActionCategory, topic, params);
@@ -35,6 +38,9 @@ export default class DevicesDispatcher {
    * Listen for device's status messages.
    */
   listenStatus(deviceId: string, handler: (status: string, value: any) => void) {
+
+    // TODO: подписываться либо на конкретный статус либо на все сразу
+
     const callback = (message: Message) => {
 
       // TODO: если message.error? - нужно его возвращать поидее
@@ -42,16 +48,20 @@ export default class DevicesDispatcher {
       handler(message.payload.status, message.payload.value);
     };
 
+    // TODO: подписываться с учетом того что девайс может быть на удаленном хосте
+
     this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callback);
   }
 
-  listenConfig(deviceId: string, handler: (partialConfig: object) => void) {
+  listenConfig(deviceId: string, handler: (config: object) => void) {
 
     // TODO: test
 
     const callback = (message: Message) => {
       handler(message.payload.partialConfig);
     };
+
+    // TODO: подписываться с учетом того что девайс может быть на удаленном хосте
 
     this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callback);
   }
@@ -60,7 +70,7 @@ export default class DevicesDispatcher {
 
     // TODO: test
 
-    const to = deviceId;
+    const to: string = this.resolveDestinationHost(deviceId);
     const topic = `${deviceId}/setConfig`;
 
     return this.app.messenger.request(to, this.callActionCategory, topic, partialConfig);
@@ -73,7 +83,10 @@ export default class DevicesDispatcher {
 
     // TODO: резолвить сервис message collector
 
+    // TODO: !!!! куда отправляем то ????
+
     const to = 'master';
+    //const to: string = this.resolveDestinationHost(deviceId);
     const payload = {
       status,
       value,
@@ -90,6 +103,8 @@ export default class DevicesDispatcher {
     // TODO: test
 
     // TODO: резолвить сервис message collector
+
+    // TODO: !!!! куда отправляем то ????
 
     const to = 'master';
     const payload = {
@@ -132,6 +147,11 @@ export default class DevicesDispatcher {
     const result = await device[actionName](...request.payload);
 
     return result;
+  }
+
+  private resolveDestinationHost(deviceId: string): string {
+    // TODO: resolve 1!!!
+
   }
 
 }

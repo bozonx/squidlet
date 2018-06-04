@@ -1,7 +1,7 @@
 DevicesDispatcher = require('../../src/app/DevicesDispatcher').default
 
 
-describe 'app.DevicesDispatcher', ->
+describe.only 'app.DevicesDispatcher', ->
   beforeEach ->
     @requestSubscribeCb = undefined
     @app = {
