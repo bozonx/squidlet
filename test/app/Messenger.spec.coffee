@@ -17,9 +17,9 @@ describe 'app.Messenger', ->
           }
       }
       router: {
-        publish: sinon.stub().returns(Promise.resolve())
-        subscribe: (handler) => @routerSubscribeHanler = handler
-        unsubscribe: sinon.spy()
+        send: sinon.stub().returns(Promise.resolve())
+        listenIncome: (handler) => @routerSubscribeHanler = handler
+        off: sinon.spy()
       }
     }
 
@@ -37,7 +37,7 @@ describe 'app.Messenger', ->
   it 'publish', ->
     await @messenger.publish(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
 
-    sinon.assert.calledWith(@app.router.publish, {
+    sinon.assert.calledWith(@app.router.send, {
       category: 'deviceCallAction',
       from: { address: undefined , bus: '1', host: 'master', type: 'i2c' },
       payload: { data: 'value' },
@@ -79,7 +79,7 @@ describe 'app.Messenger', ->
     @routerSubscribeHanler({ category: 'cat', topic: 'topic' })
 
     sinon.assert.notCalled(handler)
-    sinon.assert.calledWith(@app.router.unsubscribe, subscriber)
+    sinon.assert.calledWith(@app.router.listenIncome, subscriber)
     assert.deepEqual(_.keys(@messenger['subscribers']), [])
 
   it 'request - check message', ->
@@ -97,7 +97,7 @@ describe 'app.Messenger', ->
       }
     }
 
-    sinon.assert.calledWith(@app.router.publish, sentMessage)
+    sinon.assert.calledWith(@app.router.send, sentMessage)
 
   it 'request - receive response', ->
     promise = @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
@@ -149,7 +149,7 @@ describe 'app.Messenger', ->
 
     @messenger.sendResponse(request, 'payload')
 
-    sinon.assert.calledWith(@app.router.publish, {
+    sinon.assert.calledWith(@app.router.send, {
       category: 'cat',
       error: undefined,
       from: { address: undefined, bus: '1', host: 'master', type: 'i2c' },

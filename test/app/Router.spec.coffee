@@ -57,34 +57,13 @@ describe 'app.Router', ->
       test: 'test'
       init: ->
 
-#    @message = {
-#      topic: 'room1.host.device1'
-#      category: 'deviceCallAction'
-#      from: {
-#        host: 'master'
-#        type: 'i2c'
-#        bus: '1'
-#        address: undefined
-#      }
-#      to: {
-#        host: 'room1.host1'
-#        type: 'i2c'
-#        bus: '1'
-#        address: '5A'
-#      }
-#      payload: {
-#        myData: 'data'
-#      }
-#    }
-
     @router = new Router(@app)
-    #@router['_connectionTypes'] = { i2c: @connectionClass }
     @router['connectionTypes'].i2c = @connectionClass
 
-  it 'init - not master', ->
-    @router.init()
-
-    assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
+#  it 'init', ->
+#    @router.init()
+#
+#    assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
 
   it 'send', ->
     @router.connections = {
@@ -102,11 +81,11 @@ describe 'app.Router', ->
   it 'send to loop back', ->
     handler = sinon.spy()
     @router.listenIncome(handler)
-    await @router.send('master', 'payload')
+    await @router.send('currentHost', 'payload')
 
     sinon.assert.calledWith(handler, 'payload')
 
-  it.only 'listenIncome to destination host', ->
+  it 'listenIncome to destination host', ->
     @app.host.id = 'destHost'
     routerMessage = {
       payload: 'payload'
@@ -124,15 +103,15 @@ describe 'app.Router', ->
 
     sinon.assert.calledWith(handler, 'payload')
 
-  it 'private configureMasterConnections', ->
-    @router.configureMasterConnections()
-
-    assert.equal(@router['connections']['room1.host.device1-i2c-1-5A'].test, 'test')
-    sinon.assert.calledWith(@connectionClassConstructor, @app, {
-      @app.config.devices.room1.host.device1.address...
-      host: "room1.host.device1"
-      bus: '1'
-    })
+#  it 'private configureMasterConnections', ->
+#    @router.configureMasterConnections()
+#
+#    assert.equal(@router['connections']['room1.host.device1-i2c-1-5A'].test, 'test')
+#    sinon.assert.calledWith(@connectionClassConstructor, @app, {
+#      @app.config.devices.room1.host.device1.address...
+#      host: "room1.host.device1"
+#      bus: '1'
+#    })
 
   it 'private resolveNextHostId', ->
     @app.host.id = 'currentHost'

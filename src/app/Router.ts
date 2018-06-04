@@ -6,7 +6,6 @@ import RouterMessage from './interfaces/RouterMessage';
 import Connection from './interfaces/Connection';
 import Destination from './interfaces/Destination';
 import { generateConnectionId, findRecursively } from '../helpers/helpers';
-import LocalConnection from '../connections/LocalConnection';
 import I2cConnection from '../connections/I2cConnection';
 
 
@@ -21,7 +20,6 @@ export default class Router {
   private readonly connections: object = {};
   private readonly eventName: string = 'msg';
   private readonly connectionTypes: object = {
-    local: LocalConnection,
     i2c: I2cConnection,
   };
 
@@ -30,12 +28,6 @@ export default class Router {
   }
 
   init(): void {
-    if (this.app.host.isMaster) {
-      this.configureMasterConnections();
-    }
-
-    // TODO: сделать конфигурирование loopConnection отдельной ф-ей
-
     this.configureConnections();
     this.listenToAllConnections();
   }
@@ -101,14 +93,21 @@ export default class Router {
    * Configure slave to slave and local connections.
    */
   private configureConnections() {
-    const connection = {
-      host: this.app.host.id,
-      type: 'local',
-      bus: undefined,
-      address: undefined,
-    };
 
-    this.registerConnection(connection);
+    // TODO: проходимся по роутам - ищем ближайшие от нас хосты (наверное сверху и снизу)
+    // TODO: потом резолвим параметры соединения этих хостов
+    // TODO: проверяем чтоы не было дубликата по типу соединения
+    // TODO: создаем соединения с ближайшими хостами
+    // TODO: connection создается без учета адреса !!!!!??? только тип и bus ???
+
+    // const connection = {
+    //   host: this.app.host.id,
+    //   type: 'local',
+    //   bus: undefined,
+    //   address: undefined,
+    // };
+    //
+    // this.registerConnection(connection);
   }
 
   private registerConnection(connection: Destination) {

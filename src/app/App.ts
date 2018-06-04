@@ -39,7 +39,7 @@ export default class App {
   }
 
   async init(): Promise<void> {
-    await this.devices.init(this.host.devicesManifests, this.host.devicesConfigs);
+    await this.devices.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
     this.router.init();
     this.messenger.init();
     this.devicesDispatcher.init();

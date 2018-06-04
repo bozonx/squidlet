@@ -32,14 +32,14 @@ describe 'connections.I2cConnection', ->
     @connection = new I2cConnection(@app, @connectionTo)
     @connection.init()
 
-  it 'publish', ->
-    await @connection.publish(@message)
+  it 'send', ->
+    await @connection.send(@message)
 
     sinon.assert.calledWith(@driver.write, '1', '5A', @uint8arr)
 
-  it 'subscribe', ->
+  it 'listenIncome', ->
     handler = sinon.spy()
-    @connection.subscribe(handler)
+    @connection.listenIncome(handler)
 
     @listenDataHandler(@uint8arr)
 

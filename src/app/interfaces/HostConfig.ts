@@ -10,8 +10,6 @@ interface Route {
 }
 
 export default interface HostConfig {
-  // TODO: не нужно
-  slave?: boolean;
   // specific config for each host
   host: {[index: string]: any};
   // TODO: review

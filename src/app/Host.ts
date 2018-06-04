@@ -15,35 +15,33 @@ export default class Host {
   private readonly hostConfig: HostConfig;
 
   get id(): string {
-    if (this.hostConfig.slave) return this.hostConfig.address.host;
 
-    return 'master';
+    // TODO: review
+
+    return this.hostConfig.address.host;
+
+    // if (this.hostConfig.slave) return this.hostConfig.address.host;
+    //
+    // return 'master';
   }
 
-  get isMaster(): boolean {
-    return !this.hostConfig.slave;
-  }
+  // /**
+  //  * Manifests by device class name
+  //  */
+  // get devicesManifests(): {[index: string]: DeviceManifest} {
+  //   return this.hostConfig.devicesManifests;
+  // }
 
+  // /**
+  //  * Devices config by ids
+  //  */
+  // get devicesConfigs(): {[index: string]: DeviceConf} {
+  //   return this.hostConfig.devicesConfigs;
+  // }
 
-  // TODO: зачем devicesManifests, devicesConfigs, driversList ????
-
-  /**
-   * Manifests by device class name
-   */
-  get devicesManifests(): {[index: string]: DeviceManifest} {
-    return this.hostConfig.devicesManifests;
-  }
-
-  /**
-   * Devices config by ids
-   */
-  get devicesConfigs(): {[index: string]: DeviceConf} {
-    return this.hostConfig.devicesConfigs;
-  }
-
-  get driversList(): Array<string> {
-    return this.hostConfig.drivers;
-  }
+  // get driversList(): Array<string> {
+  //   return this.hostConfig.drivers;
+  // }
 
   /**
    * Full host config
@@ -57,24 +55,24 @@ export default class Host {
     this.hostConfig = this.mergeConfigs(hostConfig);
   }
 
-  getAddress(type: string, bus: string): string | undefined {
-    const addrConfig = this.config.address;
+  // getAddress(type: string, bus: string): string | undefined {
+  //   const addrConfig = this.config.address;
+  //
+  //   if (!addrConfig) return;
+  //
+  //   // TODO: если несколько адресов - выбрать тот что с заданным type и bus
+  //
+  //   return addrConfig.address;
+  // }
 
-    if (!addrConfig) return;
-
-    // TODO: если несколько адресов - выбрать тот что с заданным type и bus
-
-    return addrConfig.address;
-  }
-
-  generateDestination(type: string, bus: string): Destination {
-    return {
-      host: this.id,
-      type,
-      bus,
-      address: this.getAddress(type, bus),
-    }
-  }
+  // generateDestination(type: string, bus: string): Destination {
+  //   return {
+  //     host: this.id,
+  //     type,
+  //     bus,
+  //     address: this.getAddress(type, bus),
+  //   }
+  // }
 
 
   private mergeConfigs(specifiedConfig: HostConfig): HostConfig {
