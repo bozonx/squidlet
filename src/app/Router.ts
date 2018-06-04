@@ -107,6 +107,9 @@ export default class Router {
 
   private listenToAllConnections(): void {
     _.each(this.connections, (connection: Connection) => {
+
+      // TODO: add address
+
       connection.listenIncome(this.handleIncomeMessages);
     });
   }

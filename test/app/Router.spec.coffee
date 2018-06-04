@@ -1,7 +1,7 @@
 Router = require('../../src/app/Router').default
 
 
-describe 'app.Router', ->
+describe.only 'app.Router', ->
   beforeEach ->
     @app = {
       host: {
@@ -64,7 +64,7 @@ describe 'app.Router', ->
 
   it 'send', ->
     @router.connections = {
-      'nextHost-i2c-1-5a': @connection
+      'i2c-1': @connection
     }
 
     await @router.send('destHost', 'payload')
@@ -90,7 +90,7 @@ describe 'app.Router', ->
       ttl: 100
     }
     @router.connections = {
-      'nextHost-i2c-1-5a': @connection
+      'i2c-1': @connection
     }
     @router.listenToAllConnections()
     handler = sinon.spy()

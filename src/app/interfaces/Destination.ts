@@ -1,4 +1,5 @@
 export default interface Destination {
+  // TODO: особо не нужно
   // unique path to remote host specified in config, like - bedroom.host1
   host: string;
   // TODO: type и bus может объединить ???

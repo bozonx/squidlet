@@ -1,7 +1,6 @@
 import * as EventEmitter from 'events';
 import App from '../app/App';
 import I2cData from '../drivers/I2cData.driver';
-import Destination from '../app/interfaces/Destination';
 import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
 
@@ -11,7 +10,7 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 export default class I2cConnection {
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly connectionTo: Destination;
+  private readonly connectionTo: { type: string, bus: string };
   private readonly i2cDataDriver: I2cData;
   private readonly eventName: string = 'data';
 
@@ -22,17 +21,20 @@ export default class I2cConnection {
   }
 
   init(): void {
-    this.i2cDataDriver.listen(this.connectionTo.bus, this.connectionTo.address, this.handleIncomeData);
+
+    // TODO: походу над слушать конкретный адрес
+
+    //this.i2cDataDriver.listen(this.connectionTo.bus, this.connectionTo.address, this.handleIncomeData);
   }
 
-  async send(payload: any): Promise<void> {
+  async send(address: string, payload: any): Promise<void> {
     const jsonString = JSON.stringify(payload);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    await this.i2cDataDriver.write(this.connectionTo.bus, this.connectionTo.address, uint8Arr);
+    await this.i2cDataDriver.write(this.connectionTo.bus, address, uint8Arr);
   }
 
-  listenIncome(handler: (payload: any) => void): void {
+  listenIncome(address: string, handler: (payload: any) => void): void {
     this.events.addListener(this.eventName, handler);
   }
 
