@@ -42,10 +42,15 @@ export default class Router {
   }
 
   async send(to: string, payload: any): Promise<void> {
+    // local messages forward to loopback
+    if (to === this.app.host.id) {
+      this.sendToLoopBack(payload);
+
+      return;
+    }
+
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
-
-    // TODO: !!!! если to = current id то отсылать локально
 
     const routerMessage: RouterMessage = this.generateMessage(to, payload);
     const nextHostId: string = this.resolveNextHostId(routerMessage.route);
@@ -194,6 +199,10 @@ export default class Router {
       ttl: this.app.host.config.host.routedMessageTTL,
       payload,
     };
+  }
+
+  private sendToLoopBack(payload: any): void {
+    this.events.emit(this.eventName, payload);
   }
 
 }

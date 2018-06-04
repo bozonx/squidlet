@@ -99,7 +99,7 @@ export default class Messenger {
         })
         .catch(reject);
 
-      this.app.router.publish(message.to, message)
+      this.app.router.send(message.to, message)
         .catch(reject);
     });
   }
