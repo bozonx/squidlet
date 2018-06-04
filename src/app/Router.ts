@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import App from './App';
-import Message from './interfaces/Message';
 import RouterMessage from './interfaces/RouterMessage';
 import Connection from './interfaces/Connection';
 import Destination from './interfaces/Destination';
@@ -57,17 +56,17 @@ export default class Router {
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
 
-    await connection.publish(routerMessage);
+    await connection.send(routerMessage);
   }
 
   /**
    * Listen for income messages which is delivered to this final host.
    */
-  listenIncome(handler: (message: Message) => void) {
+  listenIncome(handler: (payload: any) => void) {
     this.events.addListener(this.eventName, handler);
   }
 
-  off(handler: (message: Message) => void) {
+  off(handler: (payload: any) => void) {
     this.events.removeListener(this.eventName, handler);
   }
 
@@ -120,11 +119,11 @@ export default class Router {
     this.connections[connectionId].init();
   }
 
-  private getConnection(to: Destination): Connection {
-    const connectionId = generateConnectionId(to);
+  private getConnection(connectionParams: Destination): Connection {
+    const connectionId = generateConnectionId(connectionParams);
 
     if (!this.connections[connectionId]) {
-      throw new Error(`Can't find connection "${to}"`);
+      throw new Error(`Can't find connection "${connectionId}"`);
     }
 
     return this.connections[connectionId];
@@ -132,7 +131,7 @@ export default class Router {
 
   private listenToAllConnections(): void {
     _.each(this.connections, (connection: Connection) => {
-      connection.subscribe(this.handleIncomeMessages);
+      connection.listenIncome(this.handleIncomeMessages);
     });
   }
 
@@ -186,7 +185,7 @@ export default class Router {
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
 
-    connection.publish(routerMessage)
+    connection.send(routerMessage)
       .catch((err) => {
         // TODO: что делать с ошибкой???
       });

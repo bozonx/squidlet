@@ -3,7 +3,7 @@ import Message from './Message';
 
 export default interface Connection {
   init: () => void;
-  publish: (payload: any) => Promise<void>;
-  subscribe: (handler: (payload: any) => void) => void;
-  unsubscribe: (handler: (payload: any) => void) => void;
+  send: (payload: any) => Promise<void>;
+  listenIncome: (handler: (payload: any) => void) => void;
+  off: (handler: (payload: any) => void) => void;
 }

@@ -5,10 +5,24 @@ describe 'app.Router', ->
   beforeEach ->
     @app = {
       host: {
-        id: 'master'
+        id: 'currentHost'
         config: {
           host: {
             routedMessageTTL: 100
+          }
+          routes: {
+            'destHost': {
+              type: 'collector'
+              route: [ 'currentHost', 'nextHost', 'destHost' ]
+            }
+          }
+          neighbors: {
+            nextHost: {
+              host: 'nextHost'
+              type: 'i2c'
+              bus: '1'
+              address: '5a'
+            }
           }
         }
       }
@@ -32,8 +46,8 @@ describe 'app.Router', ->
 
     @connectionSubscribeHanler = undefined
     @connection = {
-      publish: sinon.spy()
-      subscribe: (handler) => @connectionSubscribeHanler = handler
+      send: sinon.stub().returns(Promise.resolve())
+      listenIncome: (handler) => @connectionSubscribeHanler = handler
     }
 
     @connectionClassConstructor = sinon.spy()
@@ -43,25 +57,25 @@ describe 'app.Router', ->
       test: 'test'
       init: ->
 
-    @message = {
-      topic: 'room1.host.device1'
-      category: 'deviceCallAction'
-      from: {
-        host: 'master'
-        type: 'i2c'
-        bus: '1'
-        address: undefined
-      }
-      to: {
-        host: 'room1.host1'
-        type: 'i2c'
-        bus: '1'
-        address: '5A'
-      }
-      payload: {
-        myData: 'data'
-      }
-    }
+#    @message = {
+#      topic: 'room1.host.device1'
+#      category: 'deviceCallAction'
+#      from: {
+#        host: 'master'
+#        type: 'i2c'
+#        bus: '1'
+#        address: undefined
+#      }
+#      to: {
+#        host: 'room1.host1'
+#        type: 'i2c'
+#        bus: '1'
+#        address: '5A'
+#      }
+#      payload: {
+#        myData: 'data'
+#      }
+#    }
 
     @router = new Router(@app)
     #@router['_connectionTypes'] = { i2c: @connectionClass }
@@ -72,14 +86,18 @@ describe 'app.Router', ->
 
     assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
 
-  it.only 'send', ->
+  it 'send', ->
     @router.connections = {
-      'room1.host1-i2c-1-5A': @connection
+      'nextHost-i2c-1-5a': @connection
     }
 
-    await @router.send(@message)
+    await @router.send('destHost', 'payload')
 
-    sinon.assert.calledWith(@connection.publish, @message)
+    sinon.assert.calledWith(@connection.send, {
+      payload: 'payload'
+      route: ['currentHost', 'nextHost', 'destHost']
+      ttl: 100
+    })
 
   it 'send to loop back', ->
     handler = sinon.spy()
@@ -88,17 +106,23 @@ describe 'app.Router', ->
 
     sinon.assert.calledWith(handler, 'payload')
 
-  it 'subscribe', ->
+  it.only 'listenIncome to destination host', ->
+    @app.host.id = 'destHost'
+    routerMessage = {
+      payload: 'payload'
+      route: ['currentHost', 'nextHost', 'destHost']
+      ttl: 100
+    }
     @router.connections = {
-      'room1.host1-i2c-1-5A': @connection
+      'nextHost-i2c-1-5a': @connection
     }
     @router.listenToAllConnections()
     handler = sinon.spy()
-    @router.subscribe(handler)
+    @router.listenIncome(handler)
 
-    @connectionSubscribeHanler(@message)
+    @connectionSubscribeHanler(routerMessage)
 
-    sinon.assert.calledWith(handler, @message)
+    sinon.assert.calledWith(handler, 'payload')
 
   it 'private configureMasterConnections', ->
     @router.configureMasterConnections()
