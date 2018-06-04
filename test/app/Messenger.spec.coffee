@@ -2,19 +2,13 @@ MessengerModule = rewire('../src/app/Messenger.ts')
 Messenger = MessengerModule.default
 
 
-describe 'app.Messenger', ->
+describe.only 'app.Messenger', ->
   beforeEach ->
     @routerSubscribeHanler = undefined
 
     @app = {
       host: {
-        generateDestination: (type, bus) ->
-          {
-            host: 'master'
-            type
-            bus
-            address: undefined
-          }
+        id: 'master'
       }
       router: {
         send: sinon.stub().returns(Promise.resolve())
@@ -23,12 +17,7 @@ describe 'app.Messenger', ->
       }
     }
 
-    @to = {
-      host: 'room1.host1'
-      type: 'i2c'
-      bus: '1'
-      address: '5A'
-    }
+    @to = 'room1.host1'
 
     generateUniqIdMock = () -> 'uniqId'
     MessengerModule.__set__('helpers.generateUniqId', generateUniqIdMock);
@@ -37,12 +26,12 @@ describe 'app.Messenger', ->
   it 'publish', ->
     await @messenger.publish(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
 
-    sinon.assert.calledWith(@app.router.send, {
-      category: 'deviceCallAction',
-      from: { address: undefined , bus: '1', host: 'master', type: 'i2c' },
-      payload: { data: 'value' },
-      to: { address: '5A', bus: '1', host: 'room1.host1', type: 'i2c' },
+    sinon.assert.calledWith(@app.router.send, @to, {
+      category: 'deviceCallAction'
       topic: 'room1.device1'
+      from: 'master'
+      to: @to
+      payload: { data: 'value' }
     })
 
   it 'subscribe - add subscribers', ->
@@ -79,7 +68,7 @@ describe 'app.Messenger', ->
     @routerSubscribeHanler({ category: 'cat', topic: 'topic' })
 
     sinon.assert.notCalled(handler)
-    sinon.assert.calledWith(@app.router.listenIncome, subscriber)
+    assert.equal(@routerSubscribeHanler, subscriber)
     assert.deepEqual(_.keys(@messenger['subscribers']), [])
 
   it 'request - check message', ->
@@ -87,9 +76,9 @@ describe 'app.Messenger', ->
 
     sentMessage = {
       category: 'deviceCallAction',
-      from: { address: undefined , bus: '1', host: 'master', type: 'i2c' },
+      from: 'master',
       payload: { data: 'value' },
-      to: { address: '5A', bus: '1', host: 'room1.host1', type: 'i2c' },
+      to: @to,
       topic: 'room1.device1'
       request: {
         id: 'uniqId'
@@ -97,7 +86,7 @@ describe 'app.Messenger', ->
       }
     }
 
-    sinon.assert.calledWith(@app.router.send, sentMessage)
+    sinon.assert.calledWith(@app.router.send, @to, sentMessage)
 
   it 'request - receive response', ->
     promise = @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
@@ -129,18 +118,13 @@ describe 'app.Messenger', ->
     sinon.assert.calledWith(handler, incomeMessage)
 
   it 'sendResponse', ->
+    @app.host.id = @to
+
     request = {
       category: 'cat'
       topic: 'topic'
-      from: {
-        type: 'i2c'
-        bus: '1'
-      }
-      to: {
-        type: 'i2c'
-        bus: '1'
-        address: '5a'
-      }
+      from: 'master'
+      to: @to
       request: {
         id: 1
         isRequest: true
@@ -149,12 +133,12 @@ describe 'app.Messenger', ->
 
     @messenger.sendResponse(request, 'payload')
 
-    sinon.assert.calledWith(@app.router.send, {
-      category: 'cat',
-      error: undefined,
-      from: { address: undefined, bus: '1', host: 'master', type: 'i2c' },
-      payload: 'payload',
-      request: { id: 1, isResponse: true },
-      to: { bus: '1', type: 'i2c' },
+    sinon.assert.calledWith(@app.router.send, 'master', {
+      category: 'cat'
+      error: undefined
+      payload: 'payload'
+      request: { id: 1, isResponse: true }
+      from: @to
+      to: 'master'
       topic: 'topic'
     })

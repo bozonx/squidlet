@@ -29,9 +29,9 @@ export default class Messenger {
    * It doesn't wait for respond. But it wait for delivering of message.
    */
   async publish(to: string, category: string, topic: string, payload: any): Promise<void> {
-    const message = {
-      topic,
+    const message: Message = {
       category,
+      topic,
       from: this.app.host.id,
       to,
       payload,
