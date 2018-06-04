@@ -42,7 +42,7 @@ export default class Router {
   }
 
   async send(to: string, payload: any): Promise<void> {
-    // local messages forward to loopback
+    // local messages are forwarded to loop back
     if (to === this.app.host.id) {
       this.sendToLoopBack(payload);
 
@@ -130,8 +130,8 @@ export default class Router {
     return this.connections[connectionId];
   }
 
-  private listenToAllConnections() {
-    _.each(this.connections, (connection, connectionId) => {
+  private listenToAllConnections(): void {
+    _.each(this.connections, (connection: Connection) => {
       connection.subscribe(this.handleIncomeMessages);
     });
   }
@@ -172,19 +172,24 @@ export default class Router {
     return params;
   }
 
-  private handleIncomeMessages = (message: Message): void => {
-    // if it's final destination - pass message to messenger
-    if (this.app.host.id === message.to) {
-      this.events.emit(this.eventName, message);
+  private handleIncomeMessages = (routerMessage: RouterMessage): void => {
+    // if it's final destination - pass message to income listeners
+    if (this.app.host.id === _.last(routerMessage.route)) {
+      this.events.emit(this.eventName, routerMessage.payload);
 
       return;
     }
 
     // else forward message to next host on route
 
-    // TODO: проверить правильно ли вызывать publish - или сделать все самому?
+    const nextHostId: string = this.resolveNextHostId(routerMessage.route);
+    const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
+    const connection = this.getConnection(nextHostConnectionParams);
 
-    //this.publish(message);
+    connection.publish(routerMessage)
+      .catch((err) => {
+        // TODO: что делать с ошибкой???
+      });
   };
 
   private generateMessage(to: string, payload: any): RouterMessage {

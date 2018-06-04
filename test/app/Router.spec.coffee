@@ -72,14 +72,21 @@ describe 'app.Router', ->
 
     assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
 
-  it 'publish', ->
+  it.only 'send', ->
     @router.connections = {
       'room1.host1-i2c-1-5A': @connection
     }
 
-    await @router.publish(@message)
+    await @router.send(@message)
 
     sinon.assert.calledWith(@connection.publish, @message)
+
+  it 'send to loop back', ->
+    handler = sinon.spy()
+    @router.listenIncome(handler)
+    await @router.send('master', 'payload')
+
+    sinon.assert.calledWith(handler, 'payload')
 
   it 'subscribe', ->
     @router.connections = {
@@ -103,7 +110,7 @@ describe 'app.Router', ->
       bus: '1'
     })
 
-  it.only 'private resolveNextHostId', ->
+  it 'private resolveNextHostId', ->
     @app.host.id = 'currentHost'
     route = [ 'fromHost', 'currentHost', 'nextHost' ]
 
