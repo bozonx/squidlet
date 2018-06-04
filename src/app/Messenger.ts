@@ -99,7 +99,7 @@ export default class Messenger {
         })
         .catch(reject);
 
-      this.app.router.publish(message)
+      this.app.router.publish(message.to, message)
         .catch(reject);
     });
   }
@@ -139,7 +139,7 @@ export default class Messenger {
       error,
     };
 
-    return this.app.router.publish(respondMessage);
+    return this.app.router.publish(respondMessage.to, respondMessage);
   }
 
   private waitForResponse(messageId: string): Promise<Message> {

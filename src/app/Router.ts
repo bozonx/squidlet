@@ -183,7 +183,7 @@ export default class Router {
 
     // TODO: проверить правильно ли вызывать publish - или сделать все самому?
 
-    this.publish(message);
+    //this.publish(message);
   };
 
   private generateMessage(to: string, message: Message): RouterMessage {
@@ -192,7 +192,7 @@ export default class Router {
 
     return {
       route: [],
-      ttl: this.app.config.routedMessageTTL,
+      ttl: this.app.host.config.host.routedMessageTTL,
       // TODO: может оптимизировать???
       payload: message,
     };

@@ -1,29 +1,33 @@
 Router = require('../../src/app/Router').default
 
 
-describe.only 'app.Router', ->
+describe 'app.Router', ->
   beforeEach ->
     @app = {
       host: {
-        id: -> 'master'
-        isMaster: false
-      }
-      config: {
-        devices: {
-          room1: {
-            host: {
-              device1: {
-                device: 'host'
-                address: {
-                  type: 'i2c'
-                  bus: 1
-                  address: '5A'
-                }
-              }
-            }
+        id: 'master'
+        config: {
+          host: {
+            routedMessageTTL: 100
           }
         }
       }
+#      config: {
+#        devices: {
+#          room1: {
+#            host: {
+#              device1: {
+#                device: 'host'
+#                address: {
+#                  type: 'i2c'
+#                  bus: 1
+#                  address: '5A'
+#                }
+#              }
+#            }
+#          }
+#        }
+#      }
     }
 
     @connectionSubscribeHanler = undefined
@@ -98,3 +102,11 @@ describe.only 'app.Router', ->
       host: "room1.host.device1"
       bus: '1'
     })
+
+  it.only 'private resolveNextHostId', ->
+    @app.host.id = 'currentHost'
+    route = [ 'fromHost', 'currentHost', 'nextHost' ]
+
+    assert.equal(@router.resolveNextHostId(route), 'nextHost')
+
+    # TODO: test fail situations
