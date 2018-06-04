@@ -41,7 +41,7 @@ export default class Router {
     this.listenToAllConnections();
   }
 
-  async publish(message: Message): Promise<void> {
+  async publish(to: string, message: Message): Promise<void> {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
     // TODO: !!! наверное если to = from то отсылать локально???
@@ -51,11 +51,12 @@ export default class Router {
     // TODO: !!! сформировать route
     // TODO: !!! сформировать from - from: this.app.host.id,
 
-    const nextHostId: string = this.resolveNextHostId(message);
+    const routerMessage: RouterMessage = this.generateMessage(to, message);
+    const nextHostId: string = this.resolveNextHostId(routerMessage.route);
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
 
-    await connection.publish(message);
+    await connection.publish(routerMessage);
   }
 
   /**
@@ -76,24 +77,24 @@ export default class Router {
 
     // TODO: use host config - там плоская структура
 
-    findRecursively(this.app.config.devices, (item, itemPath): boolean => {
-      if (!_.isPlainObject(item)) return false;
-      // go deeper
-      if (!item.device) return undefined;
-      if (item.device !== 'host') return false;
-
-      const connection = {
-        host: itemPath,
-        type: item.address.type,
-        //bus: item.address.bus,
-        bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
-        address: item.address.address,
-      };
-
-      this.registerConnection(connection);
-
-      return false;
-    });
+    // findRecursively(this.app.host.config.devices, (item, itemPath): boolean => {
+    //   if (!_.isPlainObject(item)) return false;
+    //   // go deeper
+    //   if (!item.device) return undefined;
+    //   if (item.device !== 'host') return false;
+    //
+    //   const connection = {
+    //     host: itemPath,
+    //     type: item.address.type,
+    //     //bus: item.address.bus,
+    //     bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
+    //     address: item.address.address,
+    //   };
+    //
+    //   this.registerConnection(connection);
+    //
+    //   return false;
+    // });
   }
 
   /**
@@ -134,7 +135,7 @@ export default class Router {
     });
   }
 
-  private resolveNextHostId(message: Message): string {
+  private resolveNextHostId(route: Array<string>): string {
     // the next is "to" if route is empty
     if (_.isEmpty(message.route)) return message.to;
 
@@ -174,5 +175,17 @@ export default class Router {
 
     this.publish(message);
   };
+
+  private generateMessage(to: string, message: Message): RouterMessage {
+
+    // TODO: расчитать маршрут
+
+    return {
+      route: [],
+      ttl: this.app.config.routedMessageTTL,
+      // TODO: может оптимизировать???
+      payload: message,
+    };
+  }
 
 }

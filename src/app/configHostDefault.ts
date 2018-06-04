@@ -11,4 +11,6 @@ export default {
 
   // publish status interval every minute if status hasn't been changed
   republishIntervalMs: 60000,
+
+  routedMessageTTL: 100,
 };

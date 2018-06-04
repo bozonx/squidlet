@@ -37,7 +37,7 @@ export default class Messenger {
       payload,
     };
 
-    await this.app.router.publish(message);
+    await this.app.router.publish(message.to, message);
   }
 
   /**
