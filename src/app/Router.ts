@@ -27,15 +27,12 @@ export default class Router {
 
   constructor(app) {
     this.app = app;
-    this.destinations = new Destinations(this.app.host.config.neighbors);
+    this.destinations = new Destinations(_.map(this.app.host.config.neighbors));
   }
 
   init(): void {
     this.destinations.init();
-    // this.configureConnections();
-    // this.listenToAllConnections();
-
-
+    this.destinations.listenIncome(this.handleIncomeMessages);
   }
 
   async send(toHost: string, payload: any): Promise<void> {
@@ -73,6 +70,35 @@ export default class Router {
   off(handler: (payload: any) => void) {
     this.events.removeListener(this.eventName, handler);
   }
+
+  /**
+   * Handle all the messages from remote hosts which sent to this host or via this host.
+   */
+  private handleIncomeMessages = (routerMessage: RouterMessage): void => {
+    // if it's final destination - pass message to income listeners
+    if (this.app.host.id === _.last(routerMessage.route)) {
+      this.events.emit(this.eventName, routerMessage.payload);
+
+      return;
+    }
+
+    // else forward message to next host on route
+
+    const nextHostId: string = this.resolveNextHostId(routerMessage.route);
+    const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
+
+    this.destinations.send(nextHostConnectionParams, routerMessage)
+      .catch((err) => {
+        // TODO: что делать с ошибкой???
+      });
+
+    // const connection = this.getConnection(nextHostConnectionParams);
+    //
+    // connection.send(nextHostConnectionParams.address, routerMessage)
+    //   .catch((err) => {
+    //     // TODO: что делать с ошибкой???
+    //   });
+  };
 
   // /**
   //  * Configure slave to slave and local connections.
@@ -162,26 +188,6 @@ export default class Router {
 
     return params;
   }
-
-  private handleIncomeMessages = (routerMessage: RouterMessage): void => {
-    // if it's final destination - pass message to income listeners
-    if (this.app.host.id === _.last(routerMessage.route)) {
-      this.events.emit(this.eventName, routerMessage.payload);
-
-      return;
-    }
-
-    // else forward message to next host on route
-
-    const nextHostId: string = this.resolveNextHostId(routerMessage.route);
-    const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
-    const connection = this.getConnection(nextHostConnectionParams);
-
-    connection.send(nextHostConnectionParams.address, routerMessage)
-      .catch((err) => {
-        // TODO: что делать с ошибкой???
-      });
-  };
 
   private generateMessage(toHost: string, payload: any): RouterMessage {
     if (!this.app.host.config.routes[toHost]) {
