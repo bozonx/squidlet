@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import App from './App';
 import Message from './interfaces/Message';
-import { parseDeviceId } from '../helpers/helpers';
+import { parseDeviceId, combineTopic, topicSeparator } from '../helpers/helpers';
 
 
 export default class DevicesDispatcher {
@@ -21,23 +21,26 @@ export default class DevicesDispatcher {
     this.app.messenger.listenIncomeRequests(this.callActionCategory, this.handleCallActionRequests);
   }
 
+  /**
+   * Call device's action and receive a response
+   */
   callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<any> {
 
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте
 
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = `${deviceId}/${actionName}`;
+    const topic = combineTopic(deviceId, actionName);
 
     return this.app.messenger.request(toHost, this.callActionCategory, topic, params);
   }
 
   /**
-   * Listen for device's status messages.
+   * Listen to certain device's status
    */
   listenStatus(deviceId: string, status: string, handler: (value: any) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = `${this.statusTopic}.${status}`;
+    const topic = combineTopic(this.statusTopic, status);
     const callback = (message: Message) => {
 
       // TODO: если message.error? - нужно его возвращать поидее
@@ -49,7 +52,7 @@ export default class DevicesDispatcher {
   }
 
   /**
-   * Listen for device's status messages.
+   * Listen to whole device's status
    */
   listenStatuses(deviceId: string, handler: (value: any) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
@@ -66,45 +69,61 @@ export default class DevicesDispatcher {
     this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.statusTopic, callback);
   }
 
+  /**
+   * Listen to changes of config or republishes of it.
+   * It calls handler on each event with whole config.
+   */
   listenConfig(deviceId: string, handler: (config: object) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
 
     // TODO: test
 
     const callback = (message: Message) => {
-      handler(message.payload.partialConfig);
+
+      // TODO: если message.error? - нужно его возвращать поидее
+
+      handler(message.payload);
     };
 
     this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.configTopic, callback);
   }
 
+  /**
+   * Set device's config.
+   * You can set only changed parameters, you don't have to set all of them.
+   */
   setConfig(deviceId: string, partialConfig: object) {
 
     // TODO: test
 
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = `${deviceId}/setConfig`;
+    const topic = combineTopic(deviceId, 'setConfig');
 
     return this.app.messenger.request(toHost, this.callActionCategory, topic, partialConfig);
   }
 
   /**
-   * It runs from local device itself to publish its status changes.
+   * Publish change of device status.
+   * It runs from local device itself.
    */
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
 
+    // TODO: deviceId !!! надо передать в топик
     // TODO: test
 
     // TODO: !!!! нужно просто поднять всех подписчиков - отправить локально но на спец категорию
     // TODO: !!!! нужно публиковать как общий так и единичный статус, либо единичный высчитывать
     // TODO: !!!! payload должен быть = value
 
+    // send to local host
+    const toHost: string = this.app.host.id;
+
     const payload = {
       status,
       value,
     };
 
-    return this.app.messenger.publish(undefined, this.deviceFeedBackCategory, this.statusTopic, payload);
+    return this.app.messenger.publish(toHost, this.deviceFeedBackCategory, this.statusTopic, payload);
   }
 
   /**
@@ -137,7 +156,7 @@ export default class DevicesDispatcher {
   };
 
   private async callLocalDeviceAction(request: Message): Promise<any> {
-    const [ deviceId, actionName ] = request.topic.split('/');
+    const [ deviceId, actionName ] = request.topic.split(topicSeparator);
 
     if (!_.isArray(request.payload)) {
       throw new Error(`

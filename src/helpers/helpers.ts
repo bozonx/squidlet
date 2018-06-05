@@ -4,6 +4,27 @@ import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import Destination from '../app/interfaces/Destination';
 
+export const topicSeparator = '/';
+export const deviceIdSeparator = '$';
+
+export function combineTopic(basePath: string, subPath: string): string {
+  if (!subPath) return basePath;
+
+  return [ basePath, subPath ].join(topicSeparator);
+}
+
+export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {
+  const [ hostId, deviceLocalId ] = deviceId.split(deviceIdSeparator);
+
+  if (!hostId || !deviceLocalId) {
+    throw new Error(`Can't parse deviceId "${deviceId}"`);
+  }
+
+  return {
+    hostId,
+    deviceLocalId,
+  };
+}
 
 export function uint8ArrayToString(arr: Uint8Array): string {
   return new TextDecoder('utf-8').decode(arr);
@@ -20,19 +41,6 @@ export function stringToHex(addr: string): number {
 
 export function generateUniqId(): string {
   return uniqid();
-}
-
-export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {
-  const [ hostId, deviceLocalId ] = deviceId.split('/');
-
-  if (!hostId || !deviceLocalId) {
-    throw new Error(`Can't parse deviceId "${deviceId}"`);
-  }
-
-  return {
-    hostId,
-    deviceLocalId,
-  };
 }
 
 /**
