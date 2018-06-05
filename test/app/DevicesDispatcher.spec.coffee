@@ -12,21 +12,14 @@ describe.only 'app.DevicesDispatcher', ->
       }
     }
 
-    @deviceId = 'room1.device1'
-
+    @hostId = 'room/host1'
+    @deviceId = 'room/host1$device1'
     @devicesDispatcher = new DevicesDispatcher(@app)
 
   it 'callAction', ->
-    to = {
-      host: @deviceId
-      type: 'i2c'
-      bus: 1
-      address: '5a'
-    }
-    @devicesDispatcher.resolveHost = -> to
     await @devicesDispatcher.callAction(@deviceId, 'turn', 1)
 
-    sinon.assert.calledWith(@app.messenger.request, to, 'deviceCallAction', 'room1.device1/turn', [1])
+    sinon.assert.calledWith(@app.messenger.request, @hostId, 'deviceCallAction', 'room/host1$device1/turn', [1])
 
   it 'listenStatus', ->
     handler = sinon.spy()
