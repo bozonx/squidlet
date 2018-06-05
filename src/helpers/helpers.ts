@@ -7,10 +7,10 @@ import Destination from '../app/interfaces/Destination';
 export const topicSeparator = '/';
 export const deviceIdSeparator = '$';
 
-export function combineTopic(basePath: string, subPath: string): string {
-  if (!subPath) return basePath;
+export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
+  if (_.isEmpty(subPaths)) return basePath;
 
-  return [ basePath, subPath ].join(topicSeparator);
+  return [ basePath, ...subPaths ].join(topicSeparator);
 }
 
 export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {

@@ -36,11 +36,25 @@ export default class DevicesDispatcher {
   }
 
   /**
+   * Set device's config.
+   * You can set only changed parameters, you don't have to set all of them.
+   */
+  setConfig(deviceId: string, partialConfig: object) {
+
+    // TODO: test
+
+    const toHost: string = this.resolveDestinationHost(deviceId);
+    const topic = combineTopic(deviceId, 'setConfig');
+
+    return this.app.messenger.request(toHost, this.callActionCategory, topic, partialConfig);
+  }
+
+  /**
    * Listen to certain device's status
    */
   listenStatus(deviceId: string, status: string, handler: (value: any) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(this.statusTopic, status);
+    const topic = combineTopic(deviceId, this.statusTopic, status);
     const callback = (message: Message) => {
 
       // TODO: если message.error? - нужно его возвращать поидее
@@ -56,6 +70,7 @@ export default class DevicesDispatcher {
    */
   listenStatuses(deviceId: string, handler: (value: any) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
+    const topic = combineTopic(deviceId, this.statusTopic);
 
     // TODO: test
 
@@ -66,7 +81,7 @@ export default class DevicesDispatcher {
       handler(message.payload);
     };
 
-    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.statusTopic, callback);
+    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
   }
 
   /**
@@ -75,6 +90,7 @@ export default class DevicesDispatcher {
    */
   listenConfig(deviceId: string, handler: (config: object) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
+    const topic = combineTopic(deviceId, this.configTopic);
 
     // TODO: test
 
@@ -85,21 +101,7 @@ export default class DevicesDispatcher {
       handler(message.payload);
     };
 
-    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.configTopic, callback);
-  }
-
-  /**
-   * Set device's config.
-   * You can set only changed parameters, you don't have to set all of them.
-   */
-  setConfig(deviceId: string, partialConfig: object) {
-
-    // TODO: test
-
-    const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, 'setConfig');
-
-    return this.app.messenger.request(toHost, this.callActionCategory, topic, partialConfig);
+    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
   }
 
   /**
@@ -108,39 +110,29 @@ export default class DevicesDispatcher {
    */
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
 
-    // TODO: deviceId !!! надо передать в топик
     // TODO: test
-
-    // TODO: !!!! нужно просто поднять всех подписчиков - отправить локально но на спец категорию
     // TODO: !!!! нужно публиковать как общий так и единичный статус, либо единичный высчитывать
-    // TODO: !!!! payload должен быть = value
 
+    const topic = combineTopic(deviceId, this.statusTopic, status);
     // send to local host
     const toHost: string = this.app.host.id;
 
-    const payload = {
-      status,
-      value,
-    };
-
-    return this.app.messenger.publish(toHost, this.deviceFeedBackCategory, this.statusTopic, payload);
+    return this.app.messenger.publish(toHost, this.deviceFeedBackCategory, topic, value);
   }
 
   /**
    * It runs from device itself to publish its config changes.
    */
   publishConfig(deviceId: string, partialConfig: object): Promise<void> {
+    const topic = combineTopic(deviceId, this.configTopic);
+    // send to local host
+    const toHost: string = this.app.host.id;
 
     // TODO: test
 
-    // TODO: !!!! нужно просто поднять всех подписчиков - отправить локально но на спец категорию
-
-    const payload = {
-      partialConfig,
-    };
-
-    return this.app.messenger.publish(undefined, this.deviceFeedBackCategory, this.configTopic, payload);
+    return this.app.messenger.publish(toHost, this.deviceFeedBackCategory, topic, partialConfig);
   }
+
 
   /**
    * Listen for actions which have to be called on current host.

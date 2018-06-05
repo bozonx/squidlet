@@ -19,6 +19,9 @@ export default class Messenger {
   }
 
   init(): void {
+
+    // TODO: вернуть
+
     // this.app.router.subscribe((message: Message): void => {
     //   this.events.emit(this.eventName, message)
     // });
@@ -125,6 +128,9 @@ export default class Messenger {
    * Listen for income requests by category
    */
   listenIncomeRequests(category: string, handler: (message: Message) => void) {
+
+    // TODO: наверное лучше слушать локальные сообщения
+
     // it will be called on each income message to current host
     const callback = (message: Message) => {
       if (!message.request || !message.request.isRequest || message.category !== category) return;
