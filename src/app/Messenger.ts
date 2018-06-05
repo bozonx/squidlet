@@ -36,10 +36,6 @@ export default class Messenger {
    * It doesn't wait for respond. But it wait for delivering of message.
    */
   async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
-    if (!toHost) throw new Error(`You have to specify a "toHost" param`);
-    if (!topic) throw new Error(`Topic can't be an empty`);
-    if (!category) throw new Error(`You have to specify a "category" param`);
-
     const message: Message = {
       category,
       topic,
@@ -64,10 +60,6 @@ export default class Messenger {
    * If toHost is specified - it will subscribe to remote events
    */
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void) {
-    if (!category) throw new Error(`Category can't be an empty`);
-    if (!topic) throw new Error(`Topic can't be an empty`);
-    if (!toHost) throw new Error(`You have to specify "toHost" param`);
-
     const eventName = this.getEventName(category, topic);
 
     if (toHost === this.app.host.id) {

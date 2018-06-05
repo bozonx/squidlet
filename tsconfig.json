@@ -4,7 +4,14 @@
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "build",
-    "rootDir": "src"
+    "rootDir": "src",
+
+    "strict": true,
+
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true
+
   },
   "include": [
     "src/**/*"

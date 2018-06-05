@@ -12,7 +12,7 @@ export default class DevicesDispatcher {
   private readonly statusTopic: string = 'status';
   private readonly configTopic: string = 'config';
 
-  constructor(app) {
+  constructor(app: App) {
     this.app = app;
   }
 

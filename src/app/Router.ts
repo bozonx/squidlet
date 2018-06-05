@@ -30,7 +30,6 @@ export default class Router {
   }
 
   async send(toHost: string, payload: any): Promise<void> {
-    if (!toHost) throw new Error(`You have to specify a "toHost" param`);
     if (toHost === this.app.host.id) throw new Error(`You can't send message to yourself`);
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
