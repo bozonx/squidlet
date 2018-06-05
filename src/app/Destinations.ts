@@ -31,7 +31,7 @@ export default class Destinations {
   }
 
   listenIncome(handler: (payload: any) => void): void {
-    // TODO: !!!
+    // TODO: !!! слушать со всех хостов сразу
 
     // this.events.addListener(this.eventName, handler);
   }

@@ -13,7 +13,7 @@ import * as helpers from '../helpers/helpers';
 export default class Messenger {
   private readonly app: App;
   readonly router: Router;
-  private readonly eventNameSeparator = '|';
+  //private readonly eventNameSeparator = '|';
   private readonly events: EventEmitter = new EventEmitter();
   private subscribers: object = {};
 
@@ -24,21 +24,22 @@ export default class Messenger {
 
   init(): void {
     this.router.init();
-    // TODO: может удаленные сообщения это отдельная категория ????
 
-    // listen income messages from remote host and rise they on local host as local messages
+    // listen income messages from remote host and rise them on a local host as local messages
     this.router.listenIncome((message: Message): void => {
-      const eventName = this.getEventName(message.category, message.topic);
-
-      this.events.emit(eventName, message)
+      this.events.emit(message.category, message);
     });
   }
 
   /**
-   * Send message to specified host.
+   * Send message to specified host by hostId.
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(toHost: string, category: string, topic: string, payload: any): Promise<void> {
+  async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
+    if (!toHost) throw new Error(`You have to specify a "toHost" param`);
+    if (!topic) throw new Error(`Topic can't be an empty`);
+    if (!category) throw new Error(`You have to specify a "category" param`);
+
     const message: Message = {
       category,
       topic,
@@ -47,8 +48,14 @@ export default class Messenger {
       payload,
     };
 
-    // TODO: если остылаем локально - то нет смысла в роутер посылать ???? можа сразу в events
+    // if message is addressed to local host - rise it immediately
+    if (toHost === this.app.host.id) {
+      this.events.emit(message.category, message);
 
+      return;
+    }
+
+    // or send to remote host
     await this.router.send(message.to, message);
   }
 
