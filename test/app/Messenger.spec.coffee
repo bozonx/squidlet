@@ -2,7 +2,7 @@ MessengerModule = rewire('../src/app/Messenger.ts')
 Messenger = MessengerModule.default
 
 
-describe 'app.Messenger', ->
+describe.only 'app.Messenger', ->
   beforeEach ->
     @routerSubscribeHanler = undefined
 

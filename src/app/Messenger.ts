@@ -12,7 +12,6 @@ export default class Messenger {
   private readonly app: App;
   private readonly eventNameSeparator = '|';
   private readonly events: EventEmitter = new EventEmitter();
-  //private readonly _eventName: string = 'msg';
   private subscribers: object = {};
 
   constructor(app) {
@@ -21,11 +20,14 @@ export default class Messenger {
 
   init(): void {
 
-    // TODO: вернуть
+    // TODO: может удаленные сообщения это отдельная категория ????
 
-    // this.app.router.subscribe((message: Message): void => {
-    //   this.events.emit(this.eventName, message)
-    // });
+    // listen income messages from remote host and rise they on local host as local messages
+    this.app.router.listenIncome((message: Message): void => {
+      const eventName = this.getEventName(message.category, message.topic);
+
+      this.events.emit(eventName, message)
+    });
   }
 
   /**
@@ -55,7 +57,7 @@ export default class Messenger {
     if (!topic) throw new Error(`Topic can't be an empty`);
     if (!toHost) throw new Error(`You have to specify "toHost" param`);
 
-    const eventName = [ category, topic ].join(this.eventNameSeparator);
+    const eventName = this.getEventName(category, topic);
 
     if (toHost === this.app.host.id) {
       // listen to local events
@@ -81,7 +83,7 @@ export default class Messenger {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
 
-    const eventName = [ category, topic ].join(this.eventNameSeparator);
+    const eventName = this.getEventName(category, topic);
 
     this.events.removeListener(eventName, handler);
 
@@ -208,6 +210,10 @@ export default class Messenger {
 
   private subscribeToRemoteHost(toHost: string, eventName: string, handler: (message: Message) => void): void {
     // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
+  }
+
+  private getEventName(category: string, topic: string): string {
+    return [ category, topic ].join(this.eventNameSeparator);
   }
 
 }
