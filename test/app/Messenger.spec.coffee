@@ -10,11 +10,6 @@ describe.only 'app.Messenger', ->
       host: {
         id: 'master'
       }
-      router: {
-        send: sinon.stub().returns(Promise.resolve())
-        listenIncome: (handler) => @routerSubscribeHanler = handler
-        off: sinon.spy()
-      }
     }
 
     @to = 'room1.host1'
@@ -22,11 +17,16 @@ describe.only 'app.Messenger', ->
     generateUniqIdMock = () -> 'uniqId'
     MessengerModule.__set__('helpers.generateUniqId', generateUniqIdMock);
     @messenger = new Messenger(@app);
+    @messenger.router = {
+      send: sinon.stub().returns(Promise.resolve())
+      listenIncome: (handler) => @routerSubscribeHanler = handler
+      off: sinon.spy()
+    }
 
   it 'publish', ->
     await @messenger.publish(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
 
-    sinon.assert.calledWith(@app.router.send, @to, {
+    sinon.assert.calledWith(@messenger.router.send, @to, {
       category: 'deviceCallAction'
       topic: 'room1.device1'
       from: 'master'
@@ -86,7 +86,7 @@ describe.only 'app.Messenger', ->
       }
     }
 
-    sinon.assert.calledWith(@app.router.send, @to, sentMessage)
+    sinon.assert.calledWith(@messenger.router.send, @to, sentMessage)
 
   it 'request - receive response', ->
     promise = @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
@@ -133,7 +133,7 @@ describe.only 'app.Messenger', ->
 
     @messenger.sendResponse(request, 'payload')
 
-    sinon.assert.calledWith(@app.router.send, 'master', {
+    sinon.assert.calledWith(@messenger.router.send, 'master', {
       category: 'cat'
       error: undefined
       payload: 'payload'

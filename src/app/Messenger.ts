@@ -1,5 +1,7 @@
 import * as EventEmitter from 'events';
+
 import App from './App';
+import Router from './Router';
 import Message from './interfaces/Message';
 import * as helpers from '../helpers/helpers';
 
@@ -10,20 +12,22 @@ import * as helpers from '../helpers/helpers';
  */
 export default class Messenger {
   private readonly app: App;
+  readonly router: Router;
   private readonly eventNameSeparator = '|';
   private readonly events: EventEmitter = new EventEmitter();
   private subscribers: object = {};
 
   constructor(app) {
     this.app = app;
+    this.router = new Router(app);
   }
 
   init(): void {
-
+    this.router.init();
     // TODO: может удаленные сообщения это отдельная категория ????
 
     // listen income messages from remote host and rise they on local host as local messages
-    this.app.router.listenIncome((message: Message): void => {
+    this.router.listenIncome((message: Message): void => {
       const eventName = this.getEventName(message.category, message.topic);
 
       this.events.emit(eventName, message)
@@ -45,7 +49,7 @@ export default class Messenger {
 
     // TODO: если остылаем локально - то нет смысла в роутер посылать ???? можа сразу в events
 
-    await this.app.router.send(message.to, message);
+    await this.router.send(message.to, message);
   }
 
   /**
@@ -90,7 +94,7 @@ export default class Messenger {
     if (this.events.listeners(eventName).length) return;
 
     // if there isn't any listeners - remove subscriber
-    this.app.router.off(this.subscribers[eventName]);
+    this.router.off(this.subscribers[eventName]);
     delete this.subscribers[eventName];
   }
 
@@ -122,7 +126,7 @@ export default class Messenger {
         })
         .catch(reject);
 
-      this.app.router.send(message.to, message)
+      this.router.send(message.to, message)
         .catch(reject);
     });
   }
@@ -141,7 +145,7 @@ export default class Messenger {
       handler(message);
     };
 
-    this.app.router.listenIncome(callback);
+    this.router.listenIncome(callback);
   }
 
   /**
@@ -165,7 +169,7 @@ export default class Messenger {
       error,
     };
 
-    return this.app.router.send(respondMessage.to, respondMessage);
+    return this.router.send(respondMessage.to, respondMessage);
   }
 
   private waitForResponse(messageId: string): Promise<Message> {
@@ -178,12 +182,12 @@ export default class Messenger {
         if (!message.request.isResponse) return;
         if (message.request.id !== messageId) return;
 
-        this.app.router.off(handler);
+        this.router.off(handler);
 
         resolve(message);
       };
 
-      this.app.router.listenIncome(handler);
+      this.router.listenIncome(handler);
     }));
   }
 
@@ -205,7 +209,7 @@ export default class Messenger {
       }
     };
 
-    this.app.router.listenIncome(this.subscribers[eventName]);
+    this.router.listenIncome(this.subscribers[eventName]);
   }
 
   private subscribeToRemoteHost(toHost: string, eventName: string, handler: (message: Message) => void): void {
