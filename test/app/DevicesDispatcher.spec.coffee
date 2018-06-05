@@ -91,4 +91,19 @@ describe.only 'app.DevicesDispatcher', ->
       { param: 1 }
     )
 
-# TODO : !!! handleCallActionRequests
+  it 'private callLocalDeviceAction', ->
+    device = {
+      turn: sinon.stub().returns(Promise.resolve('result'))
+    }
+    @app.devices = {
+      getDevice: -> device
+    }
+    request = {
+      topic: 'room/host1$device1/turn'
+      payload: [123]
+    }
+
+    result = await @devicesDispatcher.callLocalDeviceAction(request)
+
+    assert.equal(result, 'result')
+    sinon.assert.calledWith(device.turn, 123)
