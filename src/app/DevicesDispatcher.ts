@@ -35,19 +35,33 @@ export default class DevicesDispatcher {
   /**
    * Listen for device's status messages.
    */
-  listenStatus(deviceId: string, handler: (status: string, value: any) => void) {
+  listenStatus(deviceId: string, status: string, handler: (value: any) => void) {
+    const toHost: string = this.resolveDestinationHost(deviceId);
+    const topic = `${this.statusTopic}.${status}`;
+    const callback = (message: Message) => {
+
+      // TODO: если message.error? - нужно его возвращать поидее
+
+      handler(message.payload);
+    };
+
+    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+  }
+
+  /**
+   * Listen for device's status messages.
+   */
+  listenStatuses(deviceId: string, handler: (value: any) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
 
-    // TODO: подписываться либо на конкретный статус либо на все сразу
+    // TODO: test
 
     const callback = (message: Message) => {
 
       // TODO: если message.error? - нужно его возвращать поидее
 
-      handler(message.payload.status, message.payload.value);
+      handler(message.payload);
     };
-
-    // TODO: подписываться с учетом того что девайс может быть на удаленном хосте
 
     this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.statusTopic, callback);
   }
@@ -82,6 +96,8 @@ export default class DevicesDispatcher {
     // TODO: test
 
     // TODO: !!!! нужно просто поднять всех подписчиков - отправить локально но на спец категорию
+    // TODO: !!!! нужно публиковать как общий так и единичный статус, либо единичный высчитывать
+    // TODO: !!!! payload должен быть = value
 
     const payload = {
       status,

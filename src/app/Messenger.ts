@@ -37,6 +37,8 @@ export default class Messenger {
       payload,
     };
 
+    // TODO: если остылаем локально - то нет смысла в роутер посылать ???? можа сразу в events
+
     await this.app.router.send(message.to, message);
   }
 
