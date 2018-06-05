@@ -2,7 +2,7 @@ export default {
   // default params for connections
   connections: {
     i2c: {
-      pollInterval: 100,
+      pollInterval: 10,
     }
   },
   fileNames: {

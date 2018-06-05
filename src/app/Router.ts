@@ -20,11 +20,12 @@ export default class Router {
 
   constructor(app) {
     this.app = app;
-    this.destinations = new Destinations(_.map(this.app.host.config.neighbors));
+    this.destinations = new Destinations(this.app.drivers, _.map(this.app.host.config.neighbors));
   }
 
   init(): void {
     this.destinations.init();
+    // listen for income messages from all the hosts
     this.destinations.listenIncome(this.handleIncomeMessages);
   }
 
@@ -58,7 +59,7 @@ export default class Router {
    */
   private handleIncomeMessages = (routerMessage: RouterMessage): void => {
     // if it's final destination - pass message to income listeners
-    if (this.app.host.id === _.last(routerMessage.route)) {
+    if (_.last(routerMessage.route) === this.app.host.id) {
       this.events.emit(this.eventName, routerMessage.payload);
 
       return;

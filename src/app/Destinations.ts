@@ -1,18 +1,22 @@
+import * as _ from "lodash";
+
+import Drivers from "./Drivers";
 import Connection from "./interfaces/Connection";
 import I2cConnection from "../connections/I2cConnection";
 import Destination from "./interfaces/Destination";
-import * as _ from "lodash";
 
 
 export default class Destinations {
-  private readonly connectionsParams: Array<Destination>;
+  private readonly drivers: Drivers;
+  private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
   private readonly connectionTypes: object = {
     i2c: I2cConnection,
   };
 
-  constructor(connectionsParams: Array<Destination>) {
-    this.connectionsParams = connectionsParams;
+  constructor(drivers: Drivers, connectionsParams: Array<Destination>) {
+    this.drivers = drivers;
+    this.destinationsList = connectionsParams;
   }
 
   init(): void {
@@ -20,7 +24,7 @@ export default class Destinations {
     this.listenToAllConnections();
   }
 
-  send(destination: Destination, payload: any): Promise<void> {
+  async send(destination: Destination, payload: any): Promise<void> {
     // TODO: !!!
 
 
@@ -42,14 +46,14 @@ export default class Destinations {
    * Configure slave to slave and local connections.
    */
   private configureConnections() {
-    const connectionTypes = this.collectConnectionTypes(this.app.host.config.neighbors);
+    const connectionTypes = this.collectConnectionTypes(this.destinationsList);
 
     _.each(connectionTypes, (item: { type: string, bus: string }) => {
       this.registerConnection(item);
     });
   }
 
-  private collectConnectionTypes(neighbors: {[index: string]: Destination}): Array<{ type: string, bus: string }> {
+  private collectConnectionTypes(neighbors: Array<Destination>): Array<{ type: string, bus: string }> {
     const result = {};
 
     _.each(neighbors, (item: Destination) => {
@@ -68,7 +72,7 @@ export default class Destinations {
     const connectionId = this.generateConnectionId(connectionType);
     const ConnectionClass = this.connectionTypes[connectionType.type];
 
-    this.connections[connectionId] = new ConnectionClass(this.app, connectionType);
+    this.connections[connectionId] = new ConnectionClass(this.drivers, connectionType);
     this.connections[connectionId].init();
   }
 
@@ -87,7 +91,7 @@ export default class Destinations {
 
       // TODO: add address
 
-      connection.listenIncome(this.handleIncomeMessages);
+      //connection.listenIncome(this.handleIncomeMessages);
     });
   }
 

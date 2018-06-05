@@ -18,11 +18,11 @@ export default class Host {
 
     // TODO: review
 
-    return this.hostConfig.address.host;
+    //return this.hostConfig.address.host;
 
     // if (this.hostConfig.slave) return this.hostConfig.address.host;
     //
-    // return 'master';
+    return 'master';
   }
 
   // /**

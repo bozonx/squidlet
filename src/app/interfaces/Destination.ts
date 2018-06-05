@@ -1,7 +1,7 @@
 export default interface Destination {
   // TODO: особо не нужно
   // unique path to remote host specified in config, like - bedroom.host1
-  host: string;
+  //host: string;
   // TODO: type и bus может объединить ???
   // type of connection - i2c, modbus, xbee, ble5 etc
   type: string;

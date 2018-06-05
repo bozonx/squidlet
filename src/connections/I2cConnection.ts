@@ -1,5 +1,5 @@
 import * as EventEmitter from 'events';
-import App from '../app/App';
+import Drivers from "../app/Drivers";
 import I2cData from '../drivers/I2cData.driver';
 import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
 
@@ -8,16 +8,16 @@ import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
  * It packs data to send it via i2c.
  */
 export default class I2cConnection {
-  private readonly app: App;
+  private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly connectionTo: { type: string, bus: string };
   private readonly i2cDataDriver: I2cData;
   private readonly eventName: string = 'data';
 
-  constructor(app: App, connectionTo: { type: string, bus: string }) {
-    this.app = app;
+  constructor(drivers: Drivers, connectionTo: { type: string, bus: string }) {
+    this.drivers = drivers;
     this.connectionTo = connectionTo;
-    this.i2cDataDriver = this.app.drivers.getDriver('I2cData');
+    this.i2cDataDriver = this.drivers.getDriver('I2cData');
   }
 
   init(): void {
