@@ -35,14 +35,14 @@ export default class DevicesDispatcher {
    * Set device's config.
    * You can set only changed parameters, you don't have to set all of them.
    */
-  setConfig(deviceId: string, partialConfig: object) {
+  setConfig(deviceId: string, partialConfig: object): Promise<any> {
     return this.callAction(deviceId, 'setConfig', partialConfig);
   }
 
   /**
    * Listen to certain device's status
    */
-  listenStatus(deviceId: string, status: string, handler: (value: any) => void) {
+  listenStatus(deviceId: string, status: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, this.statusTopic, status);
 
@@ -61,11 +61,10 @@ export default class DevicesDispatcher {
   /**
    * Listen to whole device's status
    */
-  listenStatuses(deviceId: string, handler: (value: any) => void) {
+  listenStatuses(deviceId: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, this.statusTopic);
 
-    // TODO: test
     // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
     const callback = (message: Message) => {
@@ -86,7 +85,6 @@ export default class DevicesDispatcher {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, this.configTopic);
 
-    // TODO: test
     // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
     const callback = (message: Message) => {
@@ -105,7 +103,6 @@ export default class DevicesDispatcher {
    */
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
 
-    // TODO: test
     // TODO: !!!! нужно публиковать как общий так и единичный статус, либо целый высчитывать
 
     const topic = combineTopic(deviceId, this.statusTopic, status);

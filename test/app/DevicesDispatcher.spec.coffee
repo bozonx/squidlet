@@ -5,6 +5,9 @@ describe.only 'app.DevicesDispatcher', ->
   beforeEach ->
     @requestSubscribeCb = undefined
     @app = {
+      host: {
+        id: 'master'
+      }
       messenger: {
         publish: sinon.stub().returns(Promise.resolve())
         request: sinon.stub().returns(Promise.resolve())
@@ -48,18 +51,44 @@ describe.only 'app.DevicesDispatcher', ->
 
     sinon.assert.calledWith(handler, 25)
 
-#  it 'publishStatus', ->
-#    to = {
-#      host: 'master'
-#      type: 'i2c'
-#      bus: 1
-#      address: undefined
-#    }
-#    @devicesDispatcher.resolveHost = -> to
-#
-#    @devicesDispatcher.publishStatus(@deviceId, 'temperature', 25)
-#
-#    sinon.assert.calledWith(@app.messenger.publish, to, 'deviceFeedBack', 'status', {
-#      status: 'temperature'
-#      value: 25
-#    })
+  it 'listenStatuses', ->
+    handler = sinon.spy()
+    @devicesDispatcher.listenStatuses(@deviceId, handler)
+
+    @requestSubscribeCb({
+      payload: { temperature: 25 }
+    })
+
+    sinon.assert.calledWith(handler, { temperature: 25 })
+
+  it 'listenConfig', ->
+    handler = sinon.spy()
+    @devicesDispatcher.listenConfig(@deviceId, handler)
+
+    @requestSubscribeCb({
+      payload: { param: 1 }
+    })
+
+    sinon.assert.calledWith(handler, { param: 1 })
+
+  it 'publishStatus', ->
+    await @devicesDispatcher.publishStatus(@deviceId, 'temperature', 25)
+
+    sinon.assert.calledWith(@app.messenger.publish,
+      'master',
+      'deviceFeedBack',
+      'room/host1$device1/status/temperature',
+      25
+    )
+
+  it 'publishConfig', ->
+    await @devicesDispatcher.publishConfig(@deviceId, { param: 1 })
+
+    sinon.assert.calledWith(@app.messenger.publish,
+      'master',
+      'deviceFeedBack',
+      'room/host1$device1/config',
+      { param: 1 }
+    )
+
+# TODO : !!! handleCallActionRequests
