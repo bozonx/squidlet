@@ -31,9 +31,11 @@ export default class Router {
     this.listenToAllConnections();
   }
 
-  async send(to: string, payload: any): Promise<void> {
+  async send(toHost: string, payload: any): Promise<void> {
+    if (!toHost) throw new Error(`You have to specify a "toHost" param`);
+
     // local messages are forwarded to loop back
-    if (to === this.app.host.id) {
+    if (toHost === this.app.host.id) {
       this.sendToLoopBack(payload);
 
       return;
@@ -42,7 +44,7 @@ export default class Router {
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
-    const routerMessage: RouterMessage = this.generateMessage(to, payload);
+    const routerMessage: RouterMessage = this.generateMessage(toHost, payload);
     const nextHostId: string = this.resolveNextHostId(routerMessage.route);
     const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
     const connection = this.getConnection(nextHostConnectionParams);
@@ -170,12 +172,12 @@ export default class Router {
       });
   };
 
-  private generateMessage(to: string, payload: any): RouterMessage {
-    if (!this.app.host.config.routes[to]) {
-      throw new Error(`Can't find route to "${to}"`);
+  private generateMessage(toHost: string, payload: any): RouterMessage {
+    if (!this.app.host.config.routes[toHost]) {
+      throw new Error(`Can't find route to "${toHost}"`);
     }
 
-    const route: Array<string> = this.app.host.config.routes[to];
+    const route: Array<string> = this.app.host.config.routes[toHost];
 
     return {
       route,

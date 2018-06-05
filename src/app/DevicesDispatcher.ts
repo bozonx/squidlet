@@ -36,6 +36,7 @@ export default class DevicesDispatcher {
    * Listen for device's status messages.
    */
   listenStatus(deviceId: string, handler: (status: string, value: any) => void) {
+    const toHost: string = this.resolveDestinationHost(deviceId);
 
     // TODO: подписываться либо на конкретный статус либо на все сразу
 
@@ -48,10 +49,11 @@ export default class DevicesDispatcher {
 
     // TODO: подписываться с учетом того что девайс может быть на удаленном хосте
 
-    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.statusTopic, callback);
+    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.statusTopic, callback);
   }
 
   listenConfig(deviceId: string, handler: (config: object) => void) {
+    const toHost: string = this.resolveDestinationHost(deviceId);
 
     // TODO: test
 
@@ -59,9 +61,7 @@ export default class DevicesDispatcher {
       handler(message.payload.partialConfig);
     };
 
-    // TODO: подписываться с учетом того что девайс может быть на удаленном хосте
-
-    this.app.messenger.subscribe(this.deviceFeedBackCategory, this.configTopic, callback);
+    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, this.configTopic, callback);
   }
 
   setConfig(deviceId: string, partialConfig: object) {

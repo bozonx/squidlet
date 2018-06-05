@@ -44,19 +44,34 @@ export default class Messenger {
    * Listen to messages which was sent by publish method on current on remote host.
    * It omits responds of requests.
    */
-  subscribe(category: string, topic: string, handler: (message: Message) => void) {
+  subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void) {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
+    if (!toHost) throw new Error(`You have to specify a "toHost" param`);
 
     const eventName = [ category, topic ].join('|');
 
-    // listen to event of "cat|topic"
-    this.events.addListener(eventName, handler);
-    // add subscriber to router if need
-    this.addSubscriber(eventName, category, topic);
+    if (toHost === this.app.host.id) {
+      // listen to local events
+      // listen to event of "cat|topic"
+      this.events.addListener(eventName, handler);
+
+      // TODO: зачем ????
+      // add subscriber to router if need
+      this.addSubscriber(eventName, category, topic);
+
+      return;
+    }
+
+    // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
+    this.subscribeToRemoteHost(toHost, eventName, handler);
   }
 
   unsubscribe(category: string, topic: string, handler: (message: Message) => void) {
+
+    // TODO: review
+    // TODO: добавить toHost
+
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
 
@@ -162,6 +177,9 @@ export default class Messenger {
   }
 
   private addSubscriber(eventName: string, category: string, topic: string) {
+
+    // TODO: review
+
     // if subscriber is registered - there isn't reason to add additional
     if (this.subscribers[eventName]) return;
 
@@ -177,6 +195,10 @@ export default class Messenger {
     };
 
     this.app.router.listenIncome(this.subscribers[eventName]);
+  }
+
+  private subscribeToRemoteHost(toHost: string, eventName: string, handler: (message: Message) => void): void {
+    // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
   }
 
 }
