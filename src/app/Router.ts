@@ -2,10 +2,10 @@ import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import App from './App';
-import Connections from './Connections';
+import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
-import Connection from './interfaces/Connection';
 import Destination from './interfaces/Destination';
+import Connection from './interfaces/Connection';
 import I2cConnection from '../connections/I2cConnection';
 
 
@@ -17,7 +17,7 @@ import I2cConnection from '../connections/I2cConnection';
 export default class Router {
   private readonly app: App;
   // TODO: rename
-  private readonly destinations: Connections;
+  private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
   // private readonly connections: { [index: string]: Connection } = {};
@@ -27,7 +27,7 @@ export default class Router {
 
   constructor(app) {
     this.app = app;
-    this.destinations = new Connections(this.app.host.config.neighbors);
+    this.destinations = new Destinations(this.app.host.config.neighbors);
   }
 
   init(): void {

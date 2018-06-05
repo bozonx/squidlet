@@ -4,7 +4,7 @@ import Destination from "./interfaces/Destination";
 import * as _ from "lodash";
 
 
-export default class Connections {
+export default class Destinations {
   private readonly connectionsParams: {[index: string]: Destination};
   private readonly connections: { [index: string]: Connection } = {};
   private readonly connectionTypes: object = {
