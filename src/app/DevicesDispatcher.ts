@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import App from './App';
 import Message from './interfaces/Message';
-import { parseDeviceId, combineTopic, topicSeparator } from '../helpers/helpers';
+import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
 
 
 export default class DevicesDispatcher {
@@ -25,10 +25,6 @@ export default class DevicesDispatcher {
    * Call device's action and receive a response
    */
   callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<any> {
-
-    // TODO: получить конфиг девайса + манифест
-    // TODO: проверить что actionName есть в манифесте
-
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, actionName);
 
@@ -111,7 +107,7 @@ export default class DevicesDispatcher {
   publishStatus(deviceId: string, status: string, value: any): Promise<void> {
 
     // TODO: test
-    // TODO: !!!! нужно публиковать как общий так и единичный статус, либо единичный высчитывать
+    // TODO: !!!! нужно публиковать как общий так и единичный статус, либо целый высчитывать
 
     const topic = combineTopic(deviceId, this.statusTopic, status);
     // send to local host
@@ -148,7 +144,11 @@ export default class DevicesDispatcher {
   };
 
   private async callLocalDeviceAction(request: Message): Promise<any> {
-    const [ deviceId, actionName ] = request.topic.split(topicSeparator);
+
+    // TODO: получить конфиг девайса + манифест
+    // TODO: проверить что actionName есть в манифесте
+
+    const { rest: deviceId, last: actionName } = splitLastElement(request.topic, topicSeparator);
 
     if (!_.isArray(request.payload)) {
       throw new Error(`

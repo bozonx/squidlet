@@ -2,9 +2,10 @@ import * as _ from 'lodash';
 import * as uniqid from 'uniqid';
 import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
-import Destination from '../app/interfaces/Destination';
+
 
 export const topicSeparator = '/';
+// delimiter between host id and local device id like "path/to/host$path/to/device"
 export const deviceIdSeparator = '$';
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
@@ -24,6 +25,29 @@ export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId
     hostId,
     deviceLocalId,
   };
+}
+
+export function splitLastElement(fullPath: string, separator: string): { last: string, rest: string } {
+
+  // TODO: test
+
+  const split = fullPath.split(separator);
+  const last = _.last(split);
+
+  if (split.length === 1) {
+    return {
+      last: fullPath,
+      rest: undefined,
+    };
+  }
+
+  // remove last element from path
+  split.pop();
+
+  return {
+    last,
+    rest: split.join(separator),
+  }
 }
 
 export function uint8ArrayToString(arr: Uint8Array): string {
