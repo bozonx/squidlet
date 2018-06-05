@@ -8,7 +8,7 @@ describe.only 'app.DevicesDispatcher', ->
       messenger: {
         publish: sinon.stub().returns(Promise.resolve())
         request: sinon.stub().returns(Promise.resolve())
-        subscribe: (category, topic, cb) => @requestSubscribeCb = cb
+        subscribe: (toHost, category, topic, cb) => @requestSubscribeCb = cb
       }
     }
 
@@ -19,20 +19,34 @@ describe.only 'app.DevicesDispatcher', ->
   it 'callAction', ->
     await @devicesDispatcher.callAction(@deviceId, 'turn', 1)
 
-    sinon.assert.calledWith(@app.messenger.request, @hostId, 'deviceCallAction', 'room/host1$device1/turn', [1])
+    sinon.assert.calledWith(
+      @app.messenger.request,
+      @hostId,
+      'deviceCallAction',
+      'room/host1$device1/turn',
+      [1]
+    )
+
+  it 'setConfig', ->
+    await @devicesDispatcher.setConfig(@deviceId, { param: 1 })
+
+    sinon.assert.calledWith(
+      @app.messenger.request,
+      @hostId,
+      'deviceCallAction',
+      'room/host1$device1/setConfig',
+      [{ param: 1 }]
+    )
 
   it 'listenStatus', ->
     handler = sinon.spy()
-    @devicesDispatcher.listenStatus(@deviceId, handler)
+    @devicesDispatcher.listenStatus(@deviceId, 'temperature', handler)
 
     @requestSubscribeCb({
-      payload: {
-        status: 'temperature'
-        value: 1
-      }
+      payload: 25
     })
 
-    sinon.assert.calledWith(handler, 'temperature', 1)
+    sinon.assert.calledWith(handler, 25)
 
 #  it 'publishStatus', ->
 #    to = {
