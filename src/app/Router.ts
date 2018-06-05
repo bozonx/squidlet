@@ -5,8 +5,6 @@ import App from './App';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
-import Connection from './interfaces/Connection';
-import I2cConnection from '../connections/I2cConnection';
 
 
 /**
@@ -16,14 +14,9 @@ import I2cConnection from '../connections/I2cConnection';
  */
 export default class Router {
   private readonly app: App;
-  // TODO: rename
   private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
-  // private readonly connections: { [index: string]: Connection } = {};
-  // private readonly connectionTypes: object = {
-  //   i2c: I2cConnection,
-  // };
 
   constructor(app) {
     this.app = app;
@@ -39,25 +32,14 @@ export default class Router {
     if (!toHost) throw new Error(`You have to specify a "toHost" param`);
     if (toHost === this.app.host.id) throw new Error(`You can't send message to yourself`);
 
-    // // local messages are forwarded to loop back
-    // if (toHost === this.app.host.id) {
-    //   this.sendToLoopBack(payload);
-    //
-    //   return;
-    // }
-
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
 
     const routerMessage: RouterMessage = this.generateMessage(toHost, payload);
     const nextHostId: string = this.resolveNextHostId(routerMessage.route);
-    const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
+    const nextHostConnectionParams: Destination = this.resolveDestination(nextHostId);
 
     await this.destinations.send(nextHostConnectionParams, routerMessage);
-
-    // const connection = this.getConnection(nextHostConnectionParams);
-    //
-    // await connection.send(nextHostConnectionParams.address, routerMessage);
   }
 
   /**
@@ -85,73 +67,13 @@ export default class Router {
     // else forward message to next host on route
 
     const nextHostId: string = this.resolveNextHostId(routerMessage.route);
-    const nextHostConnectionParams: Destination = this.resolveHostConnection(nextHostId);
+    const nextHostConnectionParams: Destination = this.resolveDestination(nextHostId);
 
     this.destinations.send(nextHostConnectionParams, routerMessage)
       .catch((err) => {
         // TODO: что делать с ошибкой???
       });
-
-    // const connection = this.getConnection(nextHostConnectionParams);
-    //
-    // connection.send(nextHostConnectionParams.address, routerMessage)
-    //   .catch((err) => {
-    //     // TODO: что делать с ошибкой???
-    //   });
   };
-
-  // /**
-  //  * Configure slave to slave and local connections.
-  //  */
-  // private configureConnections() {
-  //   const connectionTypes = this.collectConnectionTypes(this.app.host.config.neighbors);
-  //
-  //   _.each(connectionTypes, (item: { type: string, bus: string }) => {
-  //     this.registerConnection(item);
-  //   });
-  // }
-
-  // private collectConnectionTypes(neighbors: {[index: string]: Destination}): Array<{ type: string, bus: string }> {
-  //   const result = {};
-  //
-  //   _.each(neighbors, (item: Destination) => {
-  //
-  //     // TODO: test
-  //
-  //     const connectionType = _.pick(item, 'type', 'bus');
-  //
-  //     result[this.generateConnectionId(connectionType)] = connectionType;
-  //   });
-  //
-  //   return _.map(result);
-  // }
-
-  // private registerConnection(connectionType: { type: string, bus: string }) {
-  //   const connectionId = this.generateConnectionId(connectionType);
-  //   const ConnectionClass = this.connectionTypes[connectionType.type];
-  //
-  //   this.connections[connectionId] = new ConnectionClass(this.app, connectionType);
-  //   this.connections[connectionId].init();
-  // }
-
-  // private getConnection(connectionParams: Destination): Connection {
-  //   const connectionId = this.generateConnectionId(connectionParams);
-  //
-  //   if (!this.connections[connectionId]) {
-  //     throw new Error(`Can't find connection "${connectionId}"`);
-  //   }
-  //
-  //   return this.connections[connectionId];
-  // }
-
-  // private listenToAllConnections(): void {
-  //   _.each(this.connections, (connection: Connection) => {
-  //
-  //     // TODO: add address
-  //
-  //     connection.listenIncome(this.handleIncomeMessages);
-  //   });
-  // }
 
   /**
    * Try to find the next host after current.
@@ -181,10 +103,10 @@ export default class Router {
     return route[myIndex + theNextHostShift];
   }
 
-  private resolveHostConnection(hostId: string): Destination {
+  private resolveDestination(hostId: string): Destination {
     const params: Destination = this.app.host.config.neighbors[hostId];
 
-    if (!params) throw new Error(`Can't find connection params of host "${hostId}"`);
+    if (!params) throw new Error(`Can't find destination connection params of host "${hostId}"`);
 
     return params;
   }
@@ -203,11 +125,4 @@ export default class Router {
     };
   }
 
-  // private sendToLoopBack(payload: any): void {
-  //   this.events.emit(this.eventName, payload);
-  // }
-
-  // private generateConnectionId(connection: { type: string, bus: string }): string {
-  //   return [ connection.type, connection.bus ].join('-');
-  // }
 }

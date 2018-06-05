@@ -16,7 +16,8 @@ export default class Destinations {
   }
 
   init(): void {
-    // TODO: !!!
+    this.configureConnections();
+    this.listenToAllConnections();
   }
 
   send(destination: Destination, payload: any): Promise<void> {
