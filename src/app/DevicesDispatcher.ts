@@ -36,13 +36,7 @@ export default class DevicesDispatcher {
    * You can set only changed parameters, you don't have to set all of them.
    */
   setConfig(deviceId: string, partialConfig: object) {
-
-    // TODO: test
-
-    const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, 'setConfig');
-
-    return this.app.messenger.request(toHost, this.callActionCategory, topic, partialConfig);
+    return this.callAction(deviceId, 'setConfig', partialConfig);
   }
 
   /**
@@ -51,6 +45,9 @@ export default class DevicesDispatcher {
   listenStatus(deviceId: string, status: string, handler: (value: any) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, this.statusTopic, status);
+
+    // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
+
     const callback = (message: Message) => {
 
       // TODO: если message.error? - нужно его возвращать поидее
@@ -69,6 +66,7 @@ export default class DevicesDispatcher {
     const topic = combineTopic(deviceId, this.statusTopic);
 
     // TODO: test
+    // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
     const callback = (message: Message) => {
 
@@ -89,6 +87,7 @@ export default class DevicesDispatcher {
     const topic = combineTopic(deviceId, this.configTopic);
 
     // TODO: test
+    // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
     const callback = (message: Message) => {
 

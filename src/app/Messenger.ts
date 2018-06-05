@@ -10,6 +10,7 @@ import * as helpers from '../helpers/helpers';
  */
 export default class Messenger {
   private readonly app: App;
+  private readonly eventNameSeparator = '|';
   private readonly events: EventEmitter = new EventEmitter();
   //private readonly _eventName: string = 'msg';
   private subscribers: object = {};
@@ -47,14 +48,14 @@ export default class Messenger {
 
   /**
    * Listen to messages which was sent by publish method on current on remote host.
-   * It omits responds of requests.
+   * If toHost is specified - it will subscribe to remote events
    */
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void) {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
-    if (!toHost) throw new Error(`You have to specify a "toHost" param`);
+    if (!toHost) throw new Error(`You have to specify "toHost" param`);
 
-    const eventName = [ category, topic ].join('|');
+    const eventName = [ category, topic ].join(this.eventNameSeparator);
 
     if (toHost === this.app.host.id) {
       // listen to local events
@@ -80,7 +81,7 @@ export default class Messenger {
     if (!category) throw new Error(`Category can't be an empty`);
     if (!topic) throw new Error(`Topic can't be an empty`);
 
-    const eventName = [ category, topic ].join('|');
+    const eventName = [ category, topic ].join(this.eventNameSeparator);
 
     this.events.removeListener(eventName, handler);
 
