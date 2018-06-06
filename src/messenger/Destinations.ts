@@ -18,9 +18,13 @@ export default class Destinations {
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
 
-  constructor(drivers: Drivers, connectionsParams: Array<Destination>) {
+  constructor(
+    drivers: Drivers,
+    myAddresses: Array<ConnectionParams>,
+    destinationsList: Array<Destination>
+  ) {
     this.drivers = drivers;
-    this.destinationsList = connectionsParams;
+    this.destinationsList = destinationsList;
   }
 
   init(): void {
@@ -61,7 +65,7 @@ export default class Destinations {
 
   private collectConnectionsParams(neighbors: Array<Destination>): Array<ConnectionParams> {
 
-    // TODO: впринципе не нужно - можно отсеиать в registerConnection
+    // TODO: нужно брать свой адрес по этому типу и bus
 
     const result: {[index: string]: ConnectionParams} = {};
 
