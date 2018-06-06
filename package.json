@@ -1,6 +1,6 @@
 {
   "name": "squidlet",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Easy make IoT devices and local net of devices which can be managed by master",
   "main": "build/index.js",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",

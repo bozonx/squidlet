@@ -27,6 +27,8 @@ export default class Destinations {
   ) {
     this.drivers = drivers;
     this.destinationsList = destinationsList;
+
+    // TODO: рациональней просто держать ссылку на конфиг
     // convert addresses to convenient structure
     _.each(myAddresses, (addr: MyAddress): void => {
       this.myAddresses[this.generateConnectionId(addr)] = addr;

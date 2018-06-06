@@ -15,6 +15,8 @@ class DriverInstance {
   private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
   private readonly isMaster: boolean;
+
+  // TODO: use octal
   // register of reading from slave
   private readonly slaveReadRegister: number = 125;
   // register of writing to slave

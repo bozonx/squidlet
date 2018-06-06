@@ -22,7 +22,6 @@ export default class Messenger {
   private readonly app: App;
   private readonly router: Router;
   private readonly events: EventEmitter = new EventEmitter();
-  //private topicEventNameSeparator: string = '|';
   private topicListeners: Array<TopicListener> = [];
 
   constructor(app: App) {
