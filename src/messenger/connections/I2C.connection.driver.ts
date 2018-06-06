@@ -11,15 +11,30 @@ import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
 class DriverInstance {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
+  private readonly driverConfig: {[index: string]: any};
   private readonly connectionParams: ConnectionParams;
   private readonly eventName: string = 'data';
+  private readonly isMaster: boolean;
+  // register of reading from slave
+  private readonly slaveReadRegister: number = 125;
+  // register of writing to slave
+  private readonly slaveWriteRegister: number = 126;
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, connectionParams: ConnectionParams) {
     this.drivers = drivers;
+    this.driverConfig = driverConfig;
     this.connectionParams = connectionParams;
+
+    // TODO: выбрать драйвер master | slave в зависимости srcAddres = undefined = master
+    this.isMaster = true;
+
   }
 
   async send(address: string, payload: any): Promise<void> {
+
+    // TODO: review
+    // TODO: если мастер - послать на this.slaveWriteRegister
+
     const jsonString = JSON.stringify(payload);
     const uint8Arr = stringToUint8Array(jsonString);
 
@@ -27,10 +42,18 @@ class DriverInstance {
   }
 
   listenIncome(address: string, handler: (payload: any) => void): void {
+
+    // TODO: review
+
+    // TODO: если мастер - считывать с this.slaveReadRegister
+
     this.events.addListener(this.eventName, handler);
   }
 
   off(handler: (payload: any) => void): void {
+
+    // TODO: review
+
     this.events.removeListener(this.eventName, handler);
   }
 
