@@ -6,15 +6,23 @@ import Message from './interfaces/Message';
 import * as helpers from '../helpers/helpers';
 
 
+interface TopicListener {
+  category: string;
+  topic: string;
+  handler: Function;
+  wrapper: Function;
+}
+
 /**
  * It's heart of app. It receives and sends messages to router.
  * You can subscribe to all the messages.
  */
 export default class Messenger {
   private readonly app: App;
-  readonly router: Router;
+  private readonly router: Router;
   private readonly events: EventEmitter = new EventEmitter();
-  private subscribers: object = {};
+  private topicEventNameSeparator: string = '|';
+  private topicListeners: Array<TopicListener> = [];
 
   constructor(app: App) {
     this.app = app;
@@ -53,7 +61,7 @@ export default class Messenger {
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
     if (toHost === this.app.host.id) {
       // subscribe to local events
-      this.addTopicListener(category, topic, handler);
+      this.addLocalTopicListener(category, topic, handler);
 
       return;
     }
@@ -76,7 +84,21 @@ export default class Messenger {
     this.events.addListener(category, callback);
   }
 
+  /**
+   * Unsubscribe of topic of remote or local host.
+   * Handler has to be the same as has been specified to "subscribe" method previously
+   */
   unsubscribe(category: string, topic: string, handler: (message: Message) => void): void {
+
+    // TODO: !!! отписываться от удаленного хоста
+
+    //const eventName = this.getTopicEventName(category, topic);
+    const wrapper = _.find(this.topicListeners, (item: TopicListener) => {
+      return item.category === category && item.topic === topic && item.handler === handler;
+    });
+
+    this.events.removeListener(eventName, wrapper);
+
 
     // TODO: review
     // TODO: добавить toHost
@@ -176,6 +198,36 @@ export default class Messenger {
     }));
   }
 
+  private addLocalTopicListener = (
+    category: string,
+    topic: string,
+    handler: (message: Message) => void
+  ) => {
+    const wrapper = (message: Message) => {
+      if (message.topic === topic) {
+        handler(message);
+      }
+    };
+
+    const topicListener: TopicListener = {
+      category,
+      topic,
+      handler,
+      wrapper
+    };
+
+    // listen to local events
+    this.events.addListener(category, wrapper);
+    this.topicListeners.push(topicListener);
+  };
+
+  private subscribeToRemoteHost(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+
+    // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
+
+  }
+
+
   private addSubscriber(eventName: string, category: string, topic: string) {
 
     // TODO: review
@@ -197,32 +249,9 @@ export default class Messenger {
     // this.router.listenIncome(this.subscribers[eventName]);
   }
 
-  private subscribeToRemoteHost(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
 
-    // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
-
-  }
-
-
-  private addTopicListener = (category: string, topic: string, handler: (message: Message) => void) => {
-    const cb = (message: Message) => {
-      if (message.topic === topic) {
-        handler(message);
-      }
-    };
-
-    // listen to local events
-    this.events.addListener(category, cb);
-
-    // TODO: зачем ????
-    // add subscriber to router if need
-    //this.addSubscriber(eventName, category, topic);
-
-  };
-
-
-  // private getEventName(category: string, topic: string): string {
-  //   return [ category, topic ].join(this.eventNameSeparator);
+  // private getTopicEventName(category: string, topic: string): string {
+  //   return [ category, topic ].join(this.topicEventNameSeparator);
   // }
 
 }
