@@ -17,7 +17,7 @@ export default class Messenger {
   private readonly events: EventEmitter = new EventEmitter();
   private subscribers: object = {};
 
-  constructor(app) {
+  constructor(app: App) {
     this.app = app;
     this.router = new Router(app);
   }

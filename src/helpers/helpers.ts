@@ -27,12 +27,15 @@ export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId
   };
 }
 
-export function splitLastElement(fullPath: string, separator: string): { last: string, rest: string } {
+export function splitLastElement(
+  fullPath: string,
+  separator: string
+): { last: string | undefined, rest: string | undefined } {
 
   // TODO: test
 
   const split = fullPath.split(separator);
-  const last = _.last(split);
+  const last: string | undefined = _.last(split);
 
   if (split.length === 1) {
     return {
@@ -79,27 +82,33 @@ export function generateUniqId(): string {
  *                        If it returns false it means don't go deeper.
  */
 export function findRecursively(rootObject: object, cb: (item: any, itemPath: string) => boolean) {
-  const recursive = (obj, rootPath) => _.find(obj, (item, name) => {
-    const itemPath = _.trim(`${rootPath}.${name}`, '.');
-    const cbResult = cb(item, itemPath);
 
-    if (_.isUndefined(cbResult)) {
-      // go deeper
-      return recursive(item, itemPath);
-    }
-    else if (cbResult === false) {
-      // don't go deeper
-      return undefined;
-    }
-    else {
-      // found - stop search
-      return cbResult;
-    }
-  });
+  // TODO: test, review
+
+  const recursive = (obj: object, rootPath: string): object | undefined => {
+    return _.find(obj, (item: any, name: string): any => {
+      const itemPath = _.trim(`${rootPath}.${name}`, '.');
+      const cbResult = cb(item, itemPath);
+
+      if (_.isUndefined(cbResult)) {
+        // go deeper
+        return recursive(item, itemPath);
+      }
+      else if (cbResult === false) {
+        // don't go deeper
+        return;
+      }
+      else {
+        // found - stop search
+        //return cbResult;
+        return true;
+      }
+    });
+  };
 
   return recursive(rootObject, '');
 }
 
-export function yamlToJs(yamlString: string): object {
+export function yamlToJs(yamlString: string): any {
   return yaml.safeLoad(yamlString);
 }

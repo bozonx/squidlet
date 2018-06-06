@@ -16,7 +16,7 @@ export default class Devices {
   private readonly app: App;
   private readonly deviceFactory: DeviceFactory;
   // devices instances by ids
-  private readonly instances: object = {};
+  private readonly instances: {[index: string]: Device} = {};
 
   constructor(app: App) {
     this.app = app;

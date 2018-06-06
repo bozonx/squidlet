@@ -39,7 +39,7 @@ export default class DeviceFactory {
    * @param {object} deviceConf - config of device
    * @private
    */
-  _validateDevice(device, deviceConf) {
+  _validateDevice(device: Device, deviceConf: DeviceConf) {
     // own device validate method is optional
     if (!device.validate) return;
 
@@ -47,11 +47,11 @@ export default class DeviceFactory {
     const invalidMsg = device.validate(deviceConf);
 
     if (_.isString(invalidMsg)) {
-      this.app.log.fatal(`Invalid config for device "${deviceConf.deviceTopic}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
+      this.app.log.fatal(`Invalid config for device "${deviceConf.deviceId}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
     }
   }
 
-  _validateSchema(deviceConf) {
+  _validateSchema(deviceConf: DeviceConf) {
 
     // TODO: test
 
@@ -84,7 +84,7 @@ export default class DeviceFactory {
   }
 
   // it needs for test purpose
-  private require(devicePath) {
+  private require(devicePath: string) {
     return require(devicePath);
   }
 

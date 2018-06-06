@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 
 import App from './App';
 import Message from './interfaces/Message';
+import Device from './interfaces/Device';
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
 
 
@@ -159,7 +160,7 @@ export default class DevicesDispatcher {
       `);
     }
 
-    const device = this.app.devices.getDevice(deviceId);
+    const device: {[inde: string]: any} = this.app.devices.getDevice(deviceId);
     const result = await device[actionName](...request.payload);
 
     return result;

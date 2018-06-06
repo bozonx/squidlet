@@ -18,7 +18,7 @@ export default class Router {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
 
-  constructor(app) {
+  constructor(app: App) {
     this.app = app;
     this.destinations = new Destinations(this.app.drivers, _.map(this.app.host.config.neighbors));
   }
