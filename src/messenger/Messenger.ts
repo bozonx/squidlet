@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import App from '../app';
+import App from '../app/App';
 import Router from './Router';
 import Message from './interfaces/Message';
 import * as helpers from '../helpers/helpers';
@@ -126,7 +126,10 @@ export default class Messenger {
 
       this.waitForResponse(message.category, message.requestId)
         .then((response: Message) => {
-          if (response.error) return reject(response.error);
+
+          // TODO: сделать
+
+          //if (response.error) return reject(response.error);
 
           resolve(response);
         })

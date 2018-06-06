@@ -4,7 +4,7 @@ import App from './App';
 export default class Drivers {
   private readonly app: App;
 
-  constructor(app) {
+  constructor(app: App) {
     this.app = app;
   }
 

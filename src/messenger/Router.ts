@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import App from '../app';
+import App from '../app/App';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';

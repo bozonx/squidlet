@@ -1,6 +1,6 @@
 import System from '../helpers/System';
 import Host from './Host';
-import Messenger from './Messenger';
+import Messenger from '../messenger/Messenger';
 import Devices from './Devices';
 import DevicesDispatcher from './DevicesDispatcher';
 import Drivers from './Drivers';

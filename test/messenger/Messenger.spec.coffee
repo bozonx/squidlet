@@ -1,4 +1,4 @@
-MessengerModule = rewire('../src/app/Messenger.ts')
+MessengerModule = rewire('../src/messenger/Messenger.ts')
 Messenger = MessengerModule.default
 
 

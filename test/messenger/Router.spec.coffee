@@ -1,7 +1,7 @@
 Router = require('../../src/messenger/Router').default
 
 
-describe 'app.Router', ->
+describe.only 'app.Router', ->
   beforeEach ->
     @app = {
       host: {

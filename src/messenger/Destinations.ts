@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-import Drivers from "../drivers";
+import Drivers from "../app/Drivers";
 import Connection from "./interfaces/Connection";
 import I2cConnection from "./connections/I2cConnection";
 import Destination from "./interfaces/Destination";
@@ -62,18 +62,18 @@ export default class Destinations {
 
       const connectionType = _.pick(item, 'type', 'bus');
 
-      result[this.generateConnectionId(connectionType)] = connectionType;
+      //result[this.generateConnectionId(connectionType)] = connectionType;
     });
 
     return _.map(result);
   }
 
   private registerConnection(connectionType: { type: string, bus: string }) {
-    const connectionId = this.generateConnectionId(connectionType);
-    const ConnectionClass = this.connectionTypes[connectionType.type];
-
-    this.connections[connectionId] = new ConnectionClass(this.drivers, connectionType);
-    this.connections[connectionId].init();
+    // const connectionId = this.generateConnectionId(connectionType);
+    // const ConnectionClass = this.connectionTypes[connectionType.type];
+    //
+    // this.connections[connectionId] = new ConnectionClass(this.drivers, connectionType);
+    // this.connections[connectionId].init();
   }
 
   private getConnection(connectionParams: Destination): Connection {
