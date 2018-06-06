@@ -30,12 +30,14 @@ export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId
 export function splitLastElement(
   fullPath: string,
   separator: string
-): { last: string | undefined, rest: string | undefined } {
+): { last: string, rest: string | undefined } {
 
   // TODO: test
 
+  if (!fullPath) throw new Error(`fullPath param is empty`);
+
   const split = fullPath.split(separator);
-  const last: string | undefined = _.last(split);
+  const last: string = split[split.length - 1];
 
   if (split.length === 1) {
     return {

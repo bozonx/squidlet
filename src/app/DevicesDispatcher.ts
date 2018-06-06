@@ -19,7 +19,7 @@ export default class DevicesDispatcher {
 
   init(): void {
     // listen messages to call actions of local device
-    this.app.messenger.listenIncomeRequests(this.callActionCategory, this.handleCallActionRequests);
+    this.app.messenger.listen(this.callActionCategory, this.handleCallActionRequests);
   }
 
   /**
@@ -145,7 +145,11 @@ export default class DevicesDispatcher {
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте
 
-    const { rest: deviceId, last: actionName } = splitLastElement(request.topic, topicSeparator);
+    const { rest, last: actionName } = splitLastElement(request.topic, topicSeparator);
+
+    if (!rest) throw new Error(`Can't parse deviceId`);
+
+    const deviceId = rest || '';
 
     if (!_.isArray(request.payload)) {
       throw new Error(`

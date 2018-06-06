@@ -57,7 +57,7 @@ export default class Messenger {
 
   /**
    * Listen to messages which was sent by publish method on current on remote host.
-   * If toHost is specified - it will subscribe to remote events
+   * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
     if (toHost === this.app.host.id) {
@@ -69,6 +69,20 @@ export default class Messenger {
 
     // else subscribe to remote host's events
     this.subscribeToRemoteHost(toHost, category, topic, handler);
+  }
+
+  /**
+   * Listen for local messages of certain category.
+   */
+  listen(category: string, handler: (message: Message) => void) {
+    // it will be called on each income message to current host
+    const callback = (message: Message) => {
+      if (!message.request || !message.request.isRequest) return;
+
+      handler(message);
+    };
+
+    this.events.addListener(category, callback);
   }
 
   unsubscribe(category: string, topic: string, handler: (message: Message) => void): void {
@@ -93,6 +107,9 @@ export default class Messenger {
       category,
       from: this.app.host.id,
       to: toHost,
+
+      // TODO: сделать плоским
+
       request: {
         id: helpers.generateUniqId(),
         isRequest: true,
@@ -104,7 +121,7 @@ export default class Messenger {
 
       // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
 
-      this.waitForResponse(message.request.id)
+      this.waitForResponse(message.category, message.request.id)
         .then((response: Message) => {
           if (response.error) return reject(response.error);
 
@@ -118,30 +135,16 @@ export default class Messenger {
   }
 
   /**
-   * Listen for income requests by category
-   */
-  listenIncomeRequests(category: string, handler: (message: Message) => void) {
-
-    // TODO: наверное лучше слушать локальные сообщения
-
-    // it will be called on each income message to current host
-    const callback = (message: Message) => {
-      if (!message.request || !message.request.isRequest || message.category !== category) return;
-
-      handler(message);
-    };
-
-    this.router.listenIncome(callback);
-  }
-
-  /**
    * Send response of received request.
    */
   sendResponse(
     request: Message,
     payload: any = null,
-    error: { message: string, code: number } = undefined
+    error: { message: string, code: number } | undefined = undefined
   ): Promise<void> {
+
+    // TODO: review !!!!
+
     const respondMessage = {
       topic: request.topic,
       category: request.category,
@@ -158,7 +161,7 @@ export default class Messenger {
     return this.router.send(respondMessage.to, respondMessage);
   }
 
-  private waitForResponse(messageId: string): Promise<Message> {
+  private waitForResponse(category: string, messageId: string): Promise<Message> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
@@ -168,12 +171,15 @@ export default class Messenger {
         if (!message.request.isResponse) return;
         if (message.request.id !== messageId) return;
 
-        this.router.off(handler);
+        //this.router.off(handler);
+        // TODO: проверить что удалиться
+        this.events.removeListener(category, handler);
 
         resolve(message);
       };
 
-      this.router.listenIncome(handler);
+      //this.router.listenIncome(handler);
+      this.events.addListener(category, handler);
     }));
   }
 
@@ -181,25 +187,27 @@ export default class Messenger {
 
     // TODO: review
 
-    // if subscriber is registered - there isn't reason to add additional
-    if (this.subscribers[eventName]) return;
-
-    // add new subscriber
-    this.subscribers[eventName] = (message: Message): void => {
-      if (message.category !== category || message.topic !== topic) return;
-      if (message.request) return;
-
-      if (message.category === category && message.topic === topic) {
-        //handler(message);
-        this.events.emit(eventName, message)
-      }
-    };
-
-    this.router.listenIncome(this.subscribers[eventName]);
+    // // if subscriber is registered - there isn't reason to add additional
+    // if (this.subscribers[eventName]) return;
+    //
+    // // add new subscriber
+    // this.subscribers[eventName] = (message: Message): void => {
+    //   if (message.category !== category || message.topic !== topic) return;
+    //   if (message.request) return;
+    //
+    //   if (message.category === category && message.topic === topic) {
+    //     //handler(message);
+    //     this.events.emit(eventName, message)
+    //   }
+    // };
+    //
+    // this.router.listenIncome(this.subscribers[eventName]);
   }
 
   private subscribeToRemoteHost(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+
     // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
+
   }
 
 
@@ -220,8 +228,8 @@ export default class Messenger {
   };
 
 
-  private getEventName(category: string, topic: string): string {
-    return [ category, topic ].join(this.eventNameSeparator);
-  }
+  // private getEventName(category: string, topic: string): string {
+  //   return [ category, topic ].join(this.eventNameSeparator);
+  // }
 
 }
