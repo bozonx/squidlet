@@ -1,4 +1,4 @@
-Router = require('../../src/app/Router').default
+Router = require('../../src/messenger/Router').default
 
 
 describe 'app.Router', ->

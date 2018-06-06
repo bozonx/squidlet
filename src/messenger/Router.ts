@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import App from './App';
+import App from '../app';
 import Destinations from './Destinations';
-import RouterMessage from './interfaces/RouterMessage';
-import Destination from './interfaces/Destination';
+import RouterMessage from '../app/interfaces/RouterMessage';
+import Destination from '../app/interfaces/Destination';
 
 
 /**

@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
-import Drivers from "../app/Drivers";
-import I2cData from '../drivers/I2cData.driver';
-import { uint8ArrayToString, stringToUint8Array } from '../helpers/helpers';
+import Drivers from "../../app/Drivers";
+import I2cData from '../../drivers/I2cData.driver';
+import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
 
 
 /**

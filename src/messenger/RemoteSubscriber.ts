@@ -1,4 +1,4 @@
-import App from "./App";
+import App from "../app/App";
 
 export default class RemoteSubscriber {
   private readonly app: App;

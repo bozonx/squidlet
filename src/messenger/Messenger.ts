@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import App from './App';
+import App from '../app';
 import Router from './Router';
-import Message from './interfaces/Message';
+import Message from '../app/interfaces/Message';
 import * as helpers from '../helpers/helpers';
 
 
