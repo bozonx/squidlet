@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import * as EventEmitter from 'events';
 
 import Drivers from "../app/Drivers";
 import Connection from "./interfaces/Connection";
@@ -11,16 +12,18 @@ interface ConnectionParams {
   bus: string
 }
 
-interface ConnectionClass {new (drivers: Drivers, connectionParams: ConnectionParams): Connection}
+interface ConnectionClass { new (drivers: Drivers, connectionParams: ConnectionParams): Connection }
 
 /**
  * Send data to physical address of certain connection and listen fo all the physical addresses.
  */
 export default class Destinations {
   private readonly drivers: Drivers;
+  private readonly events: EventEmitter = new EventEmitter();
+  private readonly eventName: string = 'msg';
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
-  private readonly connectionClasses: { [index: string]: ConnectionClass} = {
+  private readonly connectionClasses: { [index: string]: ConnectionClass } = {
     i2c: I2cConnection,
   };
 
@@ -35,21 +38,20 @@ export default class Destinations {
   }
 
   async send(destination: Destination, payload: any): Promise<void> {
-    // TODO: !!!
+    const connection = this.getConnection(destination);
 
-
+    await connection.send(destination.address, payload);
   }
 
-  listenIncome(handler: (payload: any) => void): void {
-    // TODO: !!! слушать со всех хостов сразу
-
-    // this.events.addListener(this.eventName, handler);
+  /**
+   * Lister to all the addresses
+   */
+  listenIncome(handler: (payload: any, fromDest: Destination) => void): void {
+    this.events.addListener(this.eventName, handler);
   }
 
-  off(handler: (payload: any) => void): void {
-    // TODO: !!!
-
-    //this.events.removeListener(this.eventName, handler);
+  off(handler: (payload: any, fromDest: Destination) => void): void {
+    this.events.removeListener(this.eventName, handler);
   }
 
   /**
@@ -65,20 +67,6 @@ export default class Destinations {
       this.registerConnection(item);
     });
   }
-
-
-  private listenToAllConnections(): void {
-
-    // TODO: слушаем все адреса каждого соединения
-
-    _.each(this.connections, (connection: Connection) => {
-
-      // TODO: add address
-
-      //connection.listenIncome(this.handleIncomeMessages);
-    });
-  }
-
 
   private collectConnectionsParams(neighbors: Array<Destination>): Array<ConnectionParams> {
     const result: {[index: string]: ConnectionParams} = {};
@@ -107,10 +95,20 @@ export default class Destinations {
     this.connections[connectionId].init();
   }
 
-  private getConnection(connectionParams: Destination): Connection {
+  private listenToAllConnections(): void {
+    _.each(this.destinationsList, (destination: Destination) => {
+      const connection = this.getConnection(destination);
+      const handler = this.handleIncomeMessages.bind(this, destination);
+      connection.listenIncome(destination.address, handler);
+    });
+  }
 
-    // TODO: test
+  private handleIncomeMessages(fromDest: Destination, payload: any): void {
+    this.events.emit(this.eventName, payload, fromDest);
+  }
 
+  private getConnection(destination: Destination): Connection {
+    const connectionParams: ConnectionParams = _.pick(destination, 'type', 'bus');
     const connectionId = this.generateConnectionId(connectionParams);
 
     if (!this.connections[connectionId]) {
