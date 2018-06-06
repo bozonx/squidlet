@@ -4,4 +4,6 @@ export default interface ConnectionParams {
   type: string;
   // bus which is used to connect if needed. For example on raspberry i2c uses bus 1. Undefined if doesn't need.
   bus: string;
+  // address of current host on this connection
+  srcAddress: string;
 }

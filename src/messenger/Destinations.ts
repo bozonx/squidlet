@@ -5,10 +5,7 @@ import Drivers from "../app/Drivers";
 import Connection from "./interfaces/Connection";
 import ConnectionParams from "./interfaces/ConnectionParams";
 import Destination from "./interfaces/Destination";
-import I2cConnection from "./connections/ConnectionI2c.driver";
 
-
-interface ConnectionClass { new (drivers: Drivers, connectionParams: ConnectionParams): Connection }
 
 /**
  * Send data to physical address of certain connection and listen fo all the physical addresses.
@@ -19,10 +16,6 @@ export default class Destinations {
   private readonly eventName: string = 'msg';
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
-  // TODO: use drivers
-  private readonly connectionClasses: { [index: string]: ConnectionClass } = {
-    i2c: I2cConnection,
-  };
 
   constructor(drivers: Drivers, connectionsParams: Array<Destination>) {
     this.drivers = drivers;
@@ -58,24 +51,27 @@ export default class Destinations {
 
     // TODO: test
 
-    const connectionClasses = this.collectConnectionsParams(this.destinationsList);
+    const connectionParams = this.collectConnectionsParams(this.destinationsList);
 
-    _.each(connectionClasses, (item: ConnectionParams) => {
+    _.each(connectionParams, (item: ConnectionParams) => {
       this.registerConnection(item);
     });
   }
 
   private collectConnectionsParams(neighbors: Array<Destination>): Array<ConnectionParams> {
+
+    // TODO: впринципе не нужно - можно отсеиать в registerConnection
+
     const result: {[index: string]: ConnectionParams} = {};
 
-    _.each(neighbors, (item: Destination) => {
+    _.each(neighbors, (destination: Destination) => {
 
       // TODO: test
 
-      const connectionType: ConnectionParams = _.pick(item, 'type', 'bus');
-      const connectionId: string = this.generateConnectionId(connectionType);
+      const connectionParams: ConnectionParams = this.generateConnectionParams(destination);
+      const connectionId: string = this.generateConnectionId(connectionParams);
 
-      result[connectionId] = connectionType;
+      result[connectionId] = connectionParams;
     });
 
     return _.map(result);
@@ -85,13 +81,9 @@ export default class Destinations {
 
     // TODO: test
 
-    // TODO: use drivers
-
     const connectionId: string = this.generateConnectionId(connectionParams);
-    const ConnectionClass: ConnectionClass = this.connectionClasses[connectionParams.type];
-
-    this.connections[connectionId] = new ConnectionClass(this.drivers, connectionParams);
-    this.connections[connectionId].init();
+    const driverName = this.generateDriverName(connectionParams.type);
+    this.connections[connectionId] = this.drivers.getDriver(driverName).getInstance(connectionParams);
   }
 
   private listenToAllConnections(): void {
@@ -107,7 +99,7 @@ export default class Destinations {
   }
 
   private getConnection(destination: Destination): Connection {
-    const connectionParams: ConnectionParams = _.pick(destination, 'type', 'bus');
+    const connectionParams: ConnectionParams = this.generateConnectionParams(destination);
     const connectionId = this.generateConnectionId(connectionParams);
 
     if (!this.connections[connectionId]) {
@@ -117,8 +109,22 @@ export default class Destinations {
     return this.connections[connectionId];
   }
 
+  private generateConnectionParams(destination: Destination): ConnectionParams {
+    return {
+      ..._.pick(destination, 'type', 'bus'),
+
+      // TODO: add srcAddress
+
+      srcAddress: '111111',
+    };
+  }
+
   private generateConnectionId(connection: { type: string, bus: string }): string {
     return [ connection.type, connection.bus ].join('-');
+  }
+
+  private generateDriverName(connectionType: string): string {
+    return `${connectionType}.connection`;
   }
 
 }

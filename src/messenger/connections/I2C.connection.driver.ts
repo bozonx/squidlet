@@ -53,7 +53,7 @@ export default class ConnectionI2cDriver {
     this.driverConfig = driverConfig;
   }
 
-  getInstance(connectionParams: { type: string, bus: string }) {
+  getInstance(connectionParams: ConnectionParams) {
     return new DriverInstance(this.drivers, this.driverConfig, connectionParams);
   }
 
