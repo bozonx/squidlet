@@ -13,7 +13,6 @@ import * as helpers from '../helpers/helpers';
 export default class Messenger {
   private readonly app: App;
   readonly router: Router;
-  //private readonly eventNameSeparator = '|';
   private readonly events: EventEmitter = new EventEmitter();
   private subscribers: object = {};
 
@@ -44,15 +43,7 @@ export default class Messenger {
       payload,
     };
 
-    // if message is addressed to local host - rise it immediately
-    if (toHost === this.app.host.id) {
-      this.events.emit(message.category, message);
-
-      return;
-    }
-
-    // or send to remote host
-    await this.router.send(message.to, message);
+    await this.sendMessage(message);
   }
 
   /**
@@ -150,14 +141,18 @@ export default class Messenger {
       errorCode: error && error.code,
     };
 
+    await this.sendMessage(respondMessage);
+  }
+
+  private async sendMessage(message: Message): Promise<void> {
     // if message is addressed to local host - rise it immediately
-    if (respondMessage.to === this.app.host.id) {
-      await this.events.emit(respondMessage.category, respondMessage);
+    if (message.to === this.app.host.id) {
+      this.events.emit(message.category, message);
 
       return;
     }
 
-    await this.router.send(respondMessage.to, respondMessage);
+    await this.router.send(message.to, message);
   }
 
   private waitForResponse(category: string, requestId: string): Promise<Message> {
