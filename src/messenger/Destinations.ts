@@ -1,10 +1,10 @@
 import * as _ from "lodash";
 import * as EventEmitter from 'events';
 
-import Drivers from "../app/Drivers";
-import Connection from "./interfaces/Connection";
-import ConnectionParams from "./interfaces/ConnectionParams";
-import Destination from "./interfaces/Destination";
+import Drivers from '../app/Drivers';
+import Connection from './interfaces/Connection';
+import ConnectionParams from './interfaces/ConnectionParams';
+import Destination from './interfaces/Destination';
 
 
 /**

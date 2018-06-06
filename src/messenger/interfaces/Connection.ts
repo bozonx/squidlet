@@ -1,6 +1,3 @@
-import Message from './Message';
-
-
 export default interface Connection {
   init: () => void;
   send: (address: string, payload: any) => Promise<void>;

@@ -3,6 +3,7 @@ import * as EventEmitter from 'events';
 import Drivers from '../app/Drivers';
 import I2cDriver from './I2cMaster.driver';
 
+// TODO: remove
 
 export default class I2cData {
   //readonly blockLength: number = 32;
