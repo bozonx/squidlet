@@ -2,15 +2,23 @@ import * as _ from "lodash";
 
 import Drivers from "../app/Drivers";
 import Connection from "./interfaces/Connection";
-import I2cConnection from "./connections/I2cConnection";
 import Destination from "./interfaces/Destination";
+import I2cConnection from "./connections/I2cConnection";
 
 
+interface ConnectionParams {
+  type: string,
+  bus: string
+}
+
+/**
+ * Send data to physical address of certain connection and listen fo all the physical addresses.
+ */
 export default class Destinations {
   private readonly drivers: Drivers;
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
-  private readonly connectionTypes: object = {
+  private readonly connectionTypes: { [index: string]: {new (drivers: Drivers, connectionParams: ConnectionParams): Connection}} = {
     i2c: I2cConnection,
   };
 
@@ -43,37 +51,52 @@ export default class Destinations {
   }
 
   /**
-   * Configure slave to slave and local connections.
+   * Register all the used connections.
    */
   private configureConnections() {
-    const connectionTypes = this.collectConnectionTypes(this.destinationsList);
+    const connectionTypes = this.collectConnectionsParams(this.destinationsList);
 
-    _.each(connectionTypes, (item: { type: string, bus: string }) => {
+    _.each(connectionTypes, (item: ConnectionParams) => {
       this.registerConnection(item);
     });
   }
 
-  private collectConnectionTypes(neighbors: Array<Destination>): Array<{ type: string, bus: string }> {
-    const result = {};
+
+  private listenToAllConnections(): void {
+
+    // TODO: слушаем все адреса каждого соединения
+
+    _.each(this.connections, (connection: Connection) => {
+
+      // TODO: add address
+
+      //connection.listenIncome(this.handleIncomeMessages);
+    });
+  }
+
+
+  private collectConnectionsParams(neighbors: Array<Destination>): Array<ConnectionParams> {
+    const result: {[index: string]: ConnectionParams} = {};
 
     _.each(neighbors, (item: Destination) => {
 
       // TODO: test
 
-      const connectionType = _.pick(item, 'type', 'bus');
+      const connectionType: ConnectionParams = _.pick(item, 'type', 'bus');
+      const connectionId: string = this.generateConnectionId(connectionType);
 
-      //result[this.generateConnectionId(connectionType)] = connectionType;
+      result[connectionId] = connectionType;
     });
 
     return _.map(result);
   }
 
-  private registerConnection(connectionType: { type: string, bus: string }) {
-    // const connectionId = this.generateConnectionId(connectionType);
-    // const ConnectionClass = this.connectionTypes[connectionType.type];
-    //
-    // this.connections[connectionId] = new ConnectionClass(this.drivers, connectionType);
-    // this.connections[connectionId].init();
+  private registerConnection(connectionParams: ConnectionParams) {
+    const connectionId: string = this.generateConnectionId(connectionParams);
+    const ConnectionClass: {new(): Connection} = this.connectionTypes[connectionParams.type];
+
+    this.connections[connectionId] = new ConnectionClass(this.drivers, connectionParams);
+    this.connections[connectionId].init();
   }
 
   private getConnection(connectionParams: Destination): Connection {
@@ -84,15 +107,6 @@ export default class Destinations {
     }
 
     return this.connections[connectionId];
-  }
-
-  private listenToAllConnections(): void {
-    _.each(this.connections, (connection: Connection) => {
-
-      // TODO: add address
-
-      //connection.listenIncome(this.handleIncomeMessages);
-    });
   }
 
   private generateConnectionId(connection: { type: string, bus: string }): string {
