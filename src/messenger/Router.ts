@@ -21,6 +21,8 @@ export default class Router {
   constructor(app: App) {
     this.app = app;
 
+    // TODO: передать адреса
+
     this.destinations = new Destinations(this.app.drivers, _.map(this.app.host.config.neighbors));
   }
 
