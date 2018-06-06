@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import App from './App';
@@ -10,7 +11,7 @@ interface TopicListener {
   category: string;
   topic: string;
   handler: Function;
-  wrapper: Function;
+  wrapper: (...args: Array<any>) => any;
 }
 
 /**
@@ -21,7 +22,7 @@ export default class Messenger {
   private readonly app: App;
   private readonly router: Router;
   private readonly events: EventEmitter = new EventEmitter();
-  private topicEventNameSeparator: string = '|';
+  //private topicEventNameSeparator: string = '|';
   private topicListeners: Array<TopicListener> = [];
 
   constructor(app: App) {
@@ -74,44 +75,38 @@ export default class Messenger {
    * Listen for local messages of certain category.
    */
   listen(category: string, handler: (message: Message) => void) {
-    // it will be called on each income message to current host
-    const callback = (message: Message) => {
-      if (!message.isRequest) return;
+    this.events.addListener(category, handler);
+  }
 
-      handler(message);
-    };
-
-    this.events.addListener(category, callback);
+  off(category: string, handler: (message: Message) => void) {
+    this.events.removeListener(category, handler);
   }
 
   /**
    * Unsubscribe of topic of remote or local host.
    * Handler has to be the same as has been specified to "subscribe" method previously
    */
-  unsubscribe(category: string, topic: string, handler: (message: Message) => void): void {
-
-    // TODO: !!! отписываться от удаленного хоста
-
-    //const eventName = this.getTopicEventName(category, topic);
-    const wrapper = _.find(this.topicListeners, (item: TopicListener) => {
+  unsubscribe(
+    toHost: string,
+    category: string,
+    topic: string,
+    handler: (message: Message) => void
+  ): void {
+    const index: number = _.findIndex(this.topicListeners, (item: TopicListener) => {
       return item.category === category && item.topic === topic && item.handler === handler;
     });
 
-    this.events.removeListener(eventName, wrapper);
+    // don't rise error - just exit if hasn't found any
+    if (index <= 0) return;
 
+    const topicListener: TopicListener = this.topicListeners[index];
+    // remove it
+    this.topicListeners.splice(index, 1);
 
-    // TODO: review
-    // TODO: добавить toHost
+    this.events.removeListener(category, topicListener.wrapper);
 
-    // TODO: найти topic listener и отписаться
+    // TODO: !!! отписываться от удаленного хоста
 
-    // this.events.removeListener(eventName, handler);
-    //
-    // if (this.events.listeners(eventName).length) return;
-    //
-    // // if there isn't any listeners - remove subscriber
-    // this.router.off(this.subscribers[eventName]);
-    // delete this.subscribers[eventName];
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
@@ -186,14 +181,10 @@ export default class Messenger {
         if (!message.isResponse) return;
         if (message.requestId !== requestId) return;
 
-        //this.router.off(handler);
-        // TODO: проверить что удалиться
         this.events.removeListener(category, handler);
-
         resolve(message);
       };
 
-      //this.router.listenIncome(handler);
       this.events.addListener(category, handler);
     }));
   }
@@ -226,29 +217,6 @@ export default class Messenger {
     // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
 
   }
-
-
-  private addSubscriber(eventName: string, category: string, topic: string) {
-
-    // TODO: review
-
-    // // if subscriber is registered - there isn't reason to add additional
-    // if (this.subscribers[eventName]) return;
-    //
-    // // add new subscriber
-    // this.subscribers[eventName] = (message: Message): void => {
-    //   if (message.category !== category || message.topic !== topic) return;
-    //   if (message.request) return;
-    //
-    //   if (message.category === category && message.topic === topic) {
-    //     //handler(message);
-    //     this.events.emit(eventName, message)
-    //   }
-    // };
-    //
-    // this.router.listenIncome(this.subscribers[eventName]);
-  }
-
 
   // private getTopicEventName(category: string, topic: string): string {
   //   return [ category, topic ].join(this.topicEventNameSeparator);

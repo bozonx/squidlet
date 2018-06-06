@@ -131,6 +131,8 @@ export default class DevicesDispatcher {
    * Listen for actions which have to be called on current host.
    */
   private handleCallActionRequests = (request: Message): void => {
+    if (!request.isRequest) return;
+
     this.callLocalDeviceAction(request)
       .then((result: any) => {
         this.app.messenger.sendResponse(request, result);
