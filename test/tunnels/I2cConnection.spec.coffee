@@ -1,4 +1,4 @@
-I2cConnection = require('../../src/messenger/connections/connectionI2c.driver').default
+I2cConnection = require('../../src/messenger/connections/ConnectionI2c.driver').default
 helpers = require('../../src/helpers/helpers')
 
 

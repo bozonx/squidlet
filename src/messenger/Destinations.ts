@@ -3,14 +3,10 @@ import * as EventEmitter from 'events';
 
 import Drivers from "../app/Drivers";
 import Connection from "./interfaces/Connection";
+import ConnectionParams from "./interfaces/ConnectionParams";
 import Destination from "./interfaces/Destination";
-import I2cConnection from "./connections/connectionI2c.driver";
+import I2cConnection from "./connections/ConnectionI2c.driver";
 
-
-interface ConnectionParams {
-  type: string,
-  bus: string
-}
 
 interface ConnectionClass { new (drivers: Drivers, connectionParams: ConnectionParams): Connection }
 
