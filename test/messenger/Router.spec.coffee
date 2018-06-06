@@ -62,19 +62,22 @@ describe.only 'app.Router', ->
     @router = new Router(@app)
     @router.destinations = @destinations
     #@router['connectionTypes'].i2c = @connectionClass
+  #    @router.connections = {
+  #      'i2c-1': @connection
+  #    }
 
+  #  it 'private configureMasterConnections', ->
+  #    @router.configureMasterConnections()
+  #
+  #    assert.equal(@router['connections']['room1.host.device1-i2c-1-5A'].test, 'test')
+  #    sinon.assert.calledWith(@connectionClassConstructor, @app, {
+  #      @app.config.devices.room1.host.device1.address...
+  #      host: "room1.host.device1"
+  #      bus: '1'
+  #    })
 
-  # TODO: !!!!!
-#  it 'init', ->
-#    @router.init()
-#
-#    assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
 
   it 'send', ->
-#    @router.connections = {
-#      'i2c-1': @connection
-#    }
-
     await @router.send('destHost', 'payload')
 
     sinon.assert.calledWith(@destinations.send,
@@ -86,40 +89,40 @@ describe.only 'app.Router', ->
       }
     )
 
-  it 'send to loop back', ->
-    handler = sinon.spy()
-    @router.listenIncome(handler)
-    await @router.send('currentHost', 'payload')
-
-    sinon.assert.calledWith(handler, 'payload')
-
-  it 'listenIncome to destination host', ->
+  it 'listenIncome and handleIncomeMessages', ->
     @app.host.id = 'destHost'
     routerMessage = {
       payload: 'payload'
       route: ['currentHost', 'nextHost', 'destHost']
       ttl: 100
     }
-    @router.connections = {
-      'i2c-1': @connection
-    }
-    @router.listenToAllConnections()
     handler = sinon.spy()
     @router.listenIncome(handler)
 
-    @connectionSubscribeHanler(routerMessage)
+    @router.handleIncomeMessages(routerMessage)
 
     sinon.assert.calledWith(handler, 'payload')
 
-#  it 'private configureMasterConnections', ->
-#    @router.configureMasterConnections()
-#
-#    assert.equal(@router['connections']['room1.host.device1-i2c-1-5A'].test, 'test')
-#    sinon.assert.calledWith(@connectionClassConstructor, @app, {
-#      @app.config.devices.room1.host.device1.address...
-#      host: "room1.host.device1"
-#      bus: '1'
-#    })
+  it 'handleIncomeMessages - forward to next host', ->
+    @app.host.id = 'currentHost'
+    routerMessage = {
+      payload: 'payload'
+      route: ['currentHost', 'nextHost', 'destHost']
+      ttl: 10
+    }
+    handler = sinon.spy()
+    @router.listenIncome(handler)
+    @router.handleIncomeMessages(routerMessage)
+
+    sinon.assert.notCalled(handler)
+    sinon.assert.calledWith(@destinations.send,
+      @app.host.config.neighbors.nextHost,
+      {
+        payload: 'payload'
+        route: ['currentHost', 'nextHost', 'destHost']
+        ttl: 9
+      }
+    )
 
   it 'private resolveNextHostId', ->
     @app.host.id = 'currentHost'

@@ -78,7 +78,7 @@ export default class Messenger {
     this.events.addListener(category, handler);
   }
 
-  off(category: string, handler: (message: Message) => void) {
+  removeListener(category: string, handler: (message: Message) => void) {
     this.events.removeListener(category, handler);
   }
 

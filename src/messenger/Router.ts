@@ -50,7 +50,7 @@ export default class Router {
     this.events.addListener(this.eventName, handler);
   }
 
-  off(handler: (payload: any) => void) {
+  removeListener(handler: (payload: any) => void) {
     this.events.removeListener(this.eventName, handler);
   }
 
@@ -66,11 +66,14 @@ export default class Router {
     }
 
     // else forward message to next host on route
-
-    const nextHostId: string = this.resolveNextHostId(routerMessage.route);
+    const newRouterMessage = {
+      ...routerMessage,
+      ttl: routerMessage.ttl - 1,
+    };
+    const nextHostId: string = this.resolveNextHostId(newRouterMessage.route);
     const nextHostConnectionParams: Destination = this.resolveDestination(nextHostId);
 
-    this.destinations.send(nextHostConnectionParams, routerMessage)
+    this.destinations.send(nextHostConnectionParams, newRouterMessage)
       .catch((err) => {
         // TODO: что делать с ошибкой???
       });
