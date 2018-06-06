@@ -1,6 +1,3 @@
-import Destination from './Destination';
-
-
 export default interface Message {
   // name of category of message
   category: string;
@@ -10,17 +7,14 @@ export default interface Message {
   from: string;
   // destination hostId
   to: string;
-  // TODO: сделать плоским
-  request?: {
-    // TODO: наверное не обязательно для локальных сообщений
-    id: string,
-    isRequest?: boolean,
-    isResponse?: boolean,
-  };
-  // TODO: сделать плоским
-  error?: {
-    message: string,
-    code: number,
-  };
+
+  // request or response unique id
+  requestId?: string;
+  isRequest?: boolean;
+  isResponse?: boolean;
+
+  errorMessage?: string,
+  errorCode?: number,
+
   payload: any;
 }

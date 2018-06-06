@@ -77,7 +77,7 @@ export default class Messenger {
   listen(category: string, handler: (message: Message) => void) {
     // it will be called on each income message to current host
     const callback = (message: Message) => {
-      if (!message.request || !message.request.isRequest) return;
+      if (!message.isRequest) return;
 
       handler(message);
     };
@@ -107,13 +107,8 @@ export default class Messenger {
       category,
       from: this.app.host.id,
       to: toHost,
-
-      // TODO: сделать плоским
-
-      request: {
-        id: helpers.generateUniqId(),
-        isRequest: true,
-      },
+      requestId: helpers.generateUniqId(),
+      isRequest: true,
       payload,
     };
 
@@ -121,7 +116,7 @@ export default class Messenger {
 
       // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
 
-      this.waitForResponse(message.category, message.request.id)
+      this.waitForResponse(message.category, message.requestId)
         .then((response: Message) => {
           if (response.error) return reject(response.error);
 
@@ -137,39 +132,42 @@ export default class Messenger {
   /**
    * Send response of received request.
    */
-  sendResponse(
+  async sendResponse(
     request: Message,
     payload: any = null,
     error: { message: string, code: number } | undefined = undefined
   ): Promise<void> {
-
-    // TODO: review !!!!
 
     const respondMessage = {
       topic: request.topic,
       category: request.category,
       from: this.app.host.id,
       to: request.from,
-      request: {
-        id: request.request.id,
-        isResponse: true,
-      },
+      requestId: request.requestId,
+      isResponse: true,
       payload,
-      error,
+      errorMessage: error && error.message,
+      errorCode: error && error.code,
     };
 
-    return this.router.send(respondMessage.to, respondMessage);
+    // if message is addressed to local host - rise it immediately
+    if (respondMessage.to === this.app.host.id) {
+      await this.events.emit(respondMessage.category, respondMessage);
+
+      return;
+    }
+
+    await this.router.send(respondMessage.to, respondMessage);
   }
 
-  private waitForResponse(category: string, messageId: string): Promise<Message> {
+  private waitForResponse(category: string, requestId: string): Promise<Message> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
     return new Promise(((resolve, reject) => {
       const handler = (message: Message) => {
-        if (!message.request) return;
-        if (!message.request.isResponse) return;
-        if (message.request.id !== messageId) return;
+        if (!message.isResponse) return;
+        if (message.requestId !== requestId) return;
 
         //this.router.off(handler);
         // TODO: проверить что удалиться
