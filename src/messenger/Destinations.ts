@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 
 import Drivers from "../drivers";
-import Connection from "../app/interfaces/Connection";
+import Connection from "./interfaces/Connection";
 import I2cConnection from "./connections/I2cConnection";
-import Destination from "../app/interfaces/Destination";
+import Destination from "./interfaces/Destination";
 
 
 export default class Destinations {

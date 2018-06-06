@@ -1,6 +1,6 @@
 import DeviceManifest from "./DeviceManifest";
 import DeviceConf from "./DeviceConf";
-import Destination from "./Destination";
+import Destination from "../../messenger/interfaces/Destination";
 
 
 export default interface HostConfig {

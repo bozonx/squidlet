@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import App from './App';
-import Message from './interfaces/Message';
+import Message from '../messenger/interfaces/Message';
 import Device from './interfaces/Device';
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
 

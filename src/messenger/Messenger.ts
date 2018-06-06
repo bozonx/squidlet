@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 
 import App from '../app';
 import Router from './Router';
-import Message from '../app/interfaces/Message';
+import Message from './interfaces/Message';
 import * as helpers from '../helpers/helpers';
 
 

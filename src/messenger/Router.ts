@@ -3,8 +3,8 @@ import * as EventEmitter from 'events';
 
 import App from '../app';
 import Destinations from './Destinations';
-import RouterMessage from '../app/interfaces/RouterMessage';
-import Destination from '../app/interfaces/Destination';
+import RouterMessage from './interfaces/RouterMessage';
+import Destination from './interfaces/Destination';
 
 
 /**

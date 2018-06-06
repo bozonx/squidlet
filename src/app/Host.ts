@@ -1,5 +1,5 @@
 import App from "./App";
-import Destination from "./interfaces/Destination";
+import Destination from "../messenger/interfaces/Destination";
 import DeviceManifest from "./interfaces/DeviceManifest";
 import DeviceConf from "./interfaces/DeviceConf";
 import HostConfig from "./interfaces/HostConfig";
