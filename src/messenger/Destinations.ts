@@ -3,6 +3,7 @@ import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
 import Connection from './interfaces/Connection';
+import ConnectionDriver from './interfaces/ConnectionDriver';
 import ConnectionParams from './interfaces/ConnectionParams';
 import Destination from './interfaces/Destination';
 
@@ -83,7 +84,9 @@ export default class Destinations {
 
     const connectionId: string = this.generateConnectionId(connectionParams);
     const driverName = this.generateDriverName(connectionParams.type);
-    this.connections[connectionId] = this.drivers.getDriver(driverName).getInstance(connectionParams);
+    const connectionDriver: ConnectionDriver = this.drivers.getDriver(driverName) as ConnectionDriver;
+
+    this.connections[connectionId] = connectionDriver.getInstance(connectionParams);
   }
 
   private listenToAllConnections(): void {
