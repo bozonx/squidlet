@@ -15,7 +15,6 @@ describe.only 'app.Router', ->
           }
           neighbors: {
             nextHost: {
-              host: 'nextHost'
               type: 'i2c'
               bus: '1'
               address: '5a'
@@ -41,39 +40,51 @@ describe.only 'app.Router', ->
 #      }
     }
 
-    @connectionSubscribeHanler = undefined
-    @connection = {
+#    @connectionSubscribeHanler = undefined
+#    @connection = {
+#      send: sinon.stub().returns(Promise.resolve())
+#      listenIncome: (handler) => @connectionSubscribeHanler = handler
+#    }
+
+    @destinationsSubscribeHanler = undefined
+    @destinations = {
       send: sinon.stub().returns(Promise.resolve())
-      listenIncome: (handler) => @connectionSubscribeHanler = handler
+      listenIncome: (handler) => @destinationsSubscribeHanler = handler
     }
 
-    @connectionClassConstructor = sinon.spy()
-    connectionClassConstructor = @connectionClassConstructor
-    @connectionClass = class
-      constructor: (params...) -> connectionClassConstructor(params...)
-      test: 'test'
-      init: ->
+#    @connectionClassConstructor = sinon.spy()
+#    connectionClassConstructor = @connectionClassConstructor
+#    @connectionClass = class
+#      constructor: (params...) -> connectionClassConstructor(params...)
+#      test: 'test'
+#      init: ->
 
     @router = new Router(@app)
-    @router['connectionTypes'].i2c = @connectionClass
+    @router.destinations = @destinations
+    #@router['connectionTypes'].i2c = @connectionClass
 
+
+  # TODO: !!!!!
 #  it 'init', ->
 #    @router.init()
 #
 #    assert.equal(@router['connections']['master-local'].constructor.name, 'LocalConnection')
 
   it 'send', ->
-    @router.connections = {
-      'i2c-1': @connection
-    }
+#    @router.connections = {
+#      'i2c-1': @connection
+#    }
 
     await @router.send('destHost', 'payload')
 
-    sinon.assert.calledWith(@connection.send, {
-      payload: 'payload'
-      route: ['currentHost', 'nextHost', 'destHost']
-      ttl: 100
-    })
+    sinon.assert.calledWith(@destinations.send,
+      @app.host.config.neighbors.nextHost,
+      {
+        payload: 'payload'
+        route: ['currentHost', 'nextHost', 'destHost']
+        ttl: 100
+      }
+    )
 
   it 'send to loop back', ->
     handler = sinon.spy()
