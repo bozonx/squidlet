@@ -11,6 +11,8 @@ interface ConnectionParams {
   bus: string
 }
 
+interface ConnectionClass {new (drivers: Drivers, connectionParams: ConnectionParams): Connection}
+
 /**
  * Send data to physical address of certain connection and listen fo all the physical addresses.
  */
@@ -18,7 +20,7 @@ export default class Destinations {
   private readonly drivers: Drivers;
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
-  private readonly connectionTypes: { [index: string]: {new (drivers: Drivers, connectionParams: ConnectionParams): Connection}} = {
+  private readonly connectionClasses: { [index: string]: ConnectionClass} = {
     i2c: I2cConnection,
   };
 
@@ -54,9 +56,12 @@ export default class Destinations {
    * Register all the used connections.
    */
   private configureConnections() {
-    const connectionTypes = this.collectConnectionsParams(this.destinationsList);
 
-    _.each(connectionTypes, (item: ConnectionParams) => {
+    // TODO: test
+
+    const connectionClasses = this.collectConnectionsParams(this.destinationsList);
+
+    _.each(connectionClasses, (item: ConnectionParams) => {
       this.registerConnection(item);
     });
   }
@@ -92,14 +97,20 @@ export default class Destinations {
   }
 
   private registerConnection(connectionParams: ConnectionParams) {
+
+    // TODO: test
+
     const connectionId: string = this.generateConnectionId(connectionParams);
-    const ConnectionClass: {new(): Connection} = this.connectionTypes[connectionParams.type];
+    const ConnectionClass: ConnectionClass = this.connectionClasses[connectionParams.type];
 
     this.connections[connectionId] = new ConnectionClass(this.drivers, connectionParams);
     this.connections[connectionId].init();
   }
 
   private getConnection(connectionParams: Destination): Connection {
+
+    // TODO: test
+
     const connectionId = this.generateConnectionId(connectionParams);
 
     if (!this.connections[connectionId]) {
