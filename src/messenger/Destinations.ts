@@ -15,7 +15,8 @@ export default class Destinations {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
-  private readonly myAddresses: Array<MyAddress>;
+  // addresses by "type-bus"
+  private readonly myAddresses: {[index: string]: MyAddress} = {};
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
 
@@ -28,7 +29,10 @@ export default class Destinations {
 
     // TODO: получить адреса
 
-    this.myAddresses = myAddresses;
+    _.each(myAddresses, (addr: MyAddress): void => {
+      this.myAddresses[this.generateConnectionId(addr)] = addr;
+    });
+
     this.destinationsList = destinationsList;
   }
 
@@ -121,18 +125,21 @@ export default class Destinations {
     return this.connections[connectionId];
   }
 
-  private generateConnectionParams(destination: Destination): MyAddress {
+  private generateConnectionParams({ type, bus }: { type: string, bus: string }): MyAddress {
+    const connectionId = this.generateConnectionId({ type, bus });
+    const myAddr = this.myAddresses[connectionId];
+
+    if (!myAddr) throw new Error(`Can't get address of "${JSON.stringify({ type, bus })}"`);
+
     return {
-      ..._.pick(destination, 'type', 'bus'),
-
-      // TODO: add srcAddress
-
-      srcAddress: '111111',
+      type,
+      bus,
+      address: myAddr.address,
     };
   }
 
-  private generateConnectionId(connection: { type: string, bus: string }): string {
-    return [ connection.type, connection.bus ].join('-');
+  private generateConnectionId({ type, bus }: { type: string, bus: string }): string {
+    return [ type, bus ].join('-');
   }
 
   private generateDriverName(connectionType: string): string {
