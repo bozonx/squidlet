@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import Drivers from "../../app/Drivers";
-import ConnectionParams from "../interfaces/ConnectionParams";
+import MyAddress from '../../app/interfaces/MyAddress';
 import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
 
 
@@ -12,7 +12,7 @@ class DriverInstance {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly driverConfig: {[index: string]: any};
-  private readonly connectionParams: ConnectionParams;
+  private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
   private readonly isMaster: boolean;
   // register of reading from slave
@@ -20,10 +20,10 @@ class DriverInstance {
   // register of writing to slave
   private readonly slaveWriteRegister: number = 126;
 
-  constructor(drivers: Drivers, driverConfig: {[index: string]: any}, connectionParams: ConnectionParams) {
+  constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
     this.driverConfig = driverConfig;
-    this.connectionParams = connectionParams;
+    this.myAddress = myAddress;
 
     // TODO: выбрать драйвер master | slave в зависимости srcAddres = undefined = master
     this.isMaster = true;
@@ -38,7 +38,7 @@ class DriverInstance {
     const jsonString = JSON.stringify(payload);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    //await this.i2cDataDriver.write(this.connectionParams.bus, address, uint8Arr);
+    //await this.i2cDataDriver.write(this.myAddress.bus, address, uint8Arr);
   }
 
   listenIncome(address: string, handler: (payload: any) => void): void {
@@ -76,8 +76,8 @@ export default class ConnectionI2cDriver {
     this.driverConfig = driverConfig;
   }
 
-  getInstance(connectionParams: ConnectionParams) {
-    return new DriverInstance(this.drivers, this.driverConfig, connectionParams);
+  getInstance(myAddress: MyAddress) {
+    return new DriverInstance(this.drivers, this.driverConfig, myAddress);
   }
 
 };

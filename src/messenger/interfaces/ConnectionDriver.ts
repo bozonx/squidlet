@@ -1,7 +1,7 @@
 import Connection from './Connection';
-import ConnectionParams from "./ConnectionParams";
+import MyAddress from '../../app/interfaces/MyAddress';
 
 
 export default interface ConnectionDriver {
-  getInstance: (connectionParams: ConnectionParams) => Connection;
+  getInstance: (connectionParams: MyAddress) => Connection;
 }

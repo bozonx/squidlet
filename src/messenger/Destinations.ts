@@ -4,7 +4,7 @@ import * as EventEmitter from 'events';
 import Drivers from '../app/Drivers';
 import Connection from './interfaces/Connection';
 import ConnectionDriver from './interfaces/ConnectionDriver';
-import ConnectionParams from './interfaces/ConnectionParams';
+import MyAddress from '../app/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
 
 
@@ -15,15 +15,20 @@ export default class Destinations {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
+  private readonly myAddresses: Array<MyAddress>;
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
 
   constructor(
     drivers: Drivers,
-    myAddresses: Array<ConnectionParams>,
+    myAddresses: Array<MyAddress>,
     destinationsList: Array<Destination>
   ) {
     this.drivers = drivers;
+
+    // TODO: получить адреса
+
+    this.myAddresses = myAddresses;
     this.destinationsList = destinationsList;
   }
 
@@ -58,22 +63,22 @@ export default class Destinations {
 
     const connectionParams = this.collectConnectionsParams(this.destinationsList);
 
-    _.each(connectionParams, (item: ConnectionParams) => {
+    _.each(connectionParams, (item: MyAddress) => {
       this.registerConnection(item);
     });
   }
 
-  private collectConnectionsParams(neighbors: Array<Destination>): Array<ConnectionParams> {
+  private collectConnectionsParams(neighbors: Array<Destination>): Array<MyAddress> {
 
     // TODO: нужно брать свой адрес по этому типу и bus
 
-    const result: {[index: string]: ConnectionParams} = {};
+    const result: {[index: string]: MyAddress} = {};
 
     _.each(neighbors, (destination: Destination) => {
 
       // TODO: test
 
-      const connectionParams: ConnectionParams = this.generateConnectionParams(destination);
+      const connectionParams: MyAddress = this.generateConnectionParams(destination);
       const connectionId: string = this.generateConnectionId(connectionParams);
 
       result[connectionId] = connectionParams;
@@ -82,7 +87,7 @@ export default class Destinations {
     return _.map(result);
   }
 
-  private registerConnection(connectionParams: ConnectionParams) {
+  private registerConnection(connectionParams: MyAddress) {
 
     // TODO: test
 
@@ -106,7 +111,7 @@ export default class Destinations {
   }
 
   private getConnection(destination: Destination): Connection {
-    const connectionParams: ConnectionParams = this.generateConnectionParams(destination);
+    const connectionParams: MyAddress = this.generateConnectionParams(destination);
     const connectionId = this.generateConnectionId(connectionParams);
 
     if (!this.connections[connectionId]) {
@@ -116,7 +121,7 @@ export default class Destinations {
     return this.connections[connectionId];
   }
 
-  private generateConnectionParams(destination: Destination): ConnectionParams {
+  private generateConnectionParams(destination: Destination): MyAddress {
     return {
       ..._.pick(destination, 'type', 'bus'),
 
