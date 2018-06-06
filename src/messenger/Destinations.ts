@@ -4,7 +4,7 @@ import * as EventEmitter from 'events';
 import Drivers from "../app/Drivers";
 import Connection from "./interfaces/Connection";
 import Destination from "./interfaces/Destination";
-import I2cConnection from "./connections/I2cConnection";
+import I2cConnection from "./connections/connectionI2c.driver";
 
 
 interface ConnectionParams {
@@ -23,6 +23,7 @@ export default class Destinations {
   private readonly eventName: string = 'msg';
   private readonly destinationsList: Array<Destination>;
   private readonly connections: { [index: string]: Connection } = {};
+  // TODO: use drivers
   private readonly connectionClasses: { [index: string]: ConnectionClass } = {
     i2c: I2cConnection,
   };
@@ -44,13 +45,13 @@ export default class Destinations {
   }
 
   /**
-   * Lister to all the addresses
+   * Listen to all the addresses
    */
   listenIncome(handler: (payload: any, fromDest: Destination) => void): void {
     this.events.addListener(this.eventName, handler);
   }
 
-  off(handler: (payload: any, fromDest: Destination) => void): void {
+  removeListener(handler: (payload: any, fromDest: Destination) => void): void {
     this.events.removeListener(this.eventName, handler);
   }
 
@@ -87,6 +88,8 @@ export default class Destinations {
   private registerConnection(connectionParams: ConnectionParams) {
 
     // TODO: test
+
+    // TODO: use drivers
 
     const connectionId: string = this.generateConnectionId(connectionParams);
     const ConnectionClass: ConnectionClass = this.connectionClasses[connectionParams.type];
