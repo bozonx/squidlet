@@ -7,6 +7,7 @@ import { TextEncoder, TextDecoder } from 'text-encoding';
 export const topicSeparator = '/';
 // delimiter between host id and local device id like "path/to/host$path/to/device"
 export const deviceIdSeparator = '$';
+export const eventNameSeparator = '|';
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
   if (_.isEmpty(subPaths)) return basePath;
