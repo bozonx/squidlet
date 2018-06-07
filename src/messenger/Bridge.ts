@@ -5,8 +5,8 @@ import Message from './interfaces/Message';
 import { generateEventName, generateUniqId } from '../helpers/helpers';
 
 
-interface Handler {
-  linkId: string,
+interface HandlerItem {
+  handlerId: string,
   handler: Function,
 }
 
@@ -21,7 +21,7 @@ export default class Bridge {
   private readonly subscribeTopic: string = 'subscribeToRemoteEvent';
   private readonly unsubscribeTopic: string = 'unsubscribeFromRemoteEvent';
   // handlers of remote events by "toHost-category-topic"
-  private readonly handlers: {[index: string]: Handler} = {};
+  private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
   constructor(app: App, messenger: Messenger) {
     this.app = app;
@@ -40,23 +40,22 @@ export default class Bridge {
 
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
     const eventName = this.generateEventName(toHost, category, topic);
-    const linkId = generateUniqId();
+    const handlerId: string = generateUniqId();
     const message: Message = {
       category: this.systemCategory,
       topic: this.subscribeTopic,
       // TODO: поидее не обязательно указывать - нужно только для реквестов
       from: this.app.host.id,
       to: toHost,
-      payload: linkId,
+      payload: handlerId,
     };
-
-    // TODO: хэндлеров может быть несколько !!!!!
-
-    // register listener
-    this.handlers[eventName] = {
-      linkId,
+    const handlerItem: HandlerItem = {
+      handlerId,
       handler,
     };
+
+    // register listener
+    this.handlers[eventName].push(handlerItem);
 
     this.messenger.router.send(toHost, message)
       .catch((err) => {
@@ -66,25 +65,24 @@ export default class Bridge {
 
   unsubscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
     const eventName = this.generateEventName(toHost, category, topic);
+    const handlerId = this.findHandlerId(eventName, handler);
     const message: Message = {
       category: this.systemCategory,
       topic: this.unsubscribeTopic,
       // TODO: поидее не обязательно указывать - нужно только для реквестов
       from: this.app.host.id,
       to: toHost,
-      payload: linkId,
+      payload: handlerId,
     };
 
-    // TODO: хэндлеров может быть несколько !!!!!
-
-    // remove listener
-    delete this.handlers[eventName];
+    this.removeHandler(eventName, handler);
 
     this.messenger.router.send(toHost, message)
       .catch((err) => {
         // TODO: ожидать ответа - если не дошло - наверное повторить
       });
   }
+
 
   private listenIncomeMessages() {
     // TODO: слушаем входящие сервисные сообщения
@@ -95,6 +93,15 @@ export default class Bridge {
 
   private generateEventName(toHost: string, category: string, topic: string): string {
     const eventName = generateEventName(category, topic);
+  }
+
+  private findHandlerId(eventName: string, handler: Function): HandlerItem {
+    // TODO: !!!!
+  }
+
+  private removeHandler(eventName: string, handler: Function): void {
+    // TODO: !!!!
+    delete this.handlers[eventName];
   }
 
 }
