@@ -2,11 +2,15 @@ import * as EventEmitter from 'events';
 import { eventNameSeparator } from '../helpers/helpers';
 
 import App from './App';
+import * as _ from "lodash";
 
 
 interface TopicListener {
-  category: string;
-  topic: string;
+  // category: string;
+  // topic: string;
+
+  // event name
+  name: string;
   handler: Function;
   wrapper: (...args: Array<any>) => any;
 }
@@ -30,6 +34,7 @@ export default class Events {
    * Listen for local messages of certain category.
    */
   addListener(category: string, topic: string = '*', handler: (payload: any) => void): void {
+    const eventName = this.generateEventName(category, topic);
     const wrapper = (msgCategory: string, msgTopic: string, payload: any): void => {
       if (msgCategory === category && msgTopic === topic) {
         handler(payload);
@@ -37,20 +42,32 @@ export default class Events {
     };
 
     const topicListener: TopicListener = {
-      category,
-      topic,
+      name: eventName,
       handler,
       wrapper
     };
 
     // listen to local events
-    this.events.addListener(category, wrapper);
+    this.events.addListener(eventName, wrapper);
     // save it
     this.topicListeners.push(topicListener);
   }
 
   removeListener(category: string, topic: string = '*', handler: (payload: any) => void): void {
-    this.events.removeListener(category, handler);
+    const eventName = this.generateEventName(category, topic);
+
+    const index: number = _.findIndex(this.topicListeners, (item: TopicListener) => {
+      return item.name === eventName && item.handler === handler;
+    });
+
+    // don't rise error - just exit if hasn't found any
+    if (index <= 0) return;
+
+    const topicListener: TopicListener = this.topicListeners[index];
+    // remove it
+    this.topicListeners.splice(index, 1);
+
+    this.events.removeListener(category, topicListener.wrapper);
   }
 
   private generateEventName(category: string, topic: string): string {

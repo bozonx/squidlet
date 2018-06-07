@@ -94,18 +94,7 @@ export default class Messenger {
     topic: string,
     handler: (message: Message) => void
   ): void {
-    const index: number = _.findIndex(this.topicListeners, (item: TopicListener) => {
-      return item.category === category && item.topic === topic && item.handler === handler;
-    });
-
-    // don't rise error - just exit if hasn't found any
-    if (index <= 0) return;
-
-    const topicListener: TopicListener = this.topicListeners[index];
-    // remove it
-    this.topicListeners.splice(index, 1);
-
-    this.events.removeListener(category, topicListener.wrapper);
+    this.app.events.removeListener(category, topic, handler);
 
     // TODO: !!! отписываться от удаленного хоста
 
@@ -186,11 +175,11 @@ export default class Messenger {
         if (!message.isResponse) return;
         if (message.requestId !== requestId) return;
 
-        this.events.removeListener(category, handler);
+        this.app.events.removeListener(category, undefined, handler);
         resolve(message);
       };
 
-      this.events.addListener(category, handler);
+      this.app.events.addListener(category, undefined, handler);
     }));
   }
 
