@@ -38,14 +38,12 @@ export default class Bridge {
 
   }
 
-  subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+  subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = this.generateEventName(toHost, category, topic);
     const handlerId: string = generateUniqId();
     const message: Message = {
       category: this.systemCategory,
       topic: this.subscribeTopic,
-      // TODO: поидее не обязательно указывать - нужно только для реквестов
-      from: this.app.host.id,
       to: toHost,
       payload: handlerId,
     };
@@ -63,14 +61,12 @@ export default class Bridge {
       });
   }
 
-  unsubscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+  unsubscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = this.generateEventName(toHost, category, topic);
     const handlerId = this.findHandlerId(eventName, handler);
     const message: Message = {
       category: this.systemCategory,
       topic: this.unsubscribeTopic,
-      // TODO: поидее не обязательно указывать - нужно только для реквестов
-      from: this.app.host.id,
       to: toHost,
       payload: handlerId,
     };

@@ -2,6 +2,9 @@ import * as _ from 'lodash';
 
 import App from './App';
 import Message from '../messenger/interfaces/Message';
+import Request from '../messenger/interfaces/Request';
+
+// TODO: почему не используется ????
 import Device from './interfaces/Device';
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
 
@@ -19,6 +22,9 @@ export default class DevicesDispatcher {
 
   init(): void {
     // listen messages to call actions of local device
+
+    // TODO: fix !!!!
+
     this.app.messenger.listen(this.callActionCategory, this.handleCallActionRequests);
   }
 
@@ -130,8 +136,8 @@ export default class DevicesDispatcher {
   /**
    * Listen for actions which have to be called on current host.
    */
-  private handleCallActionRequests = (request: Message): void => {
-    if (!request.isRequest) return;
+  private handleCallActionRequests = (request: Request): void => {
+    if (_.isUndefined(request.isResponse) || request.isResponse) return;
 
     this.callLocalDeviceAction(request)
       .then((result: any) => {
@@ -142,7 +148,7 @@ export default class DevicesDispatcher {
       });
   };
 
-  private async callLocalDeviceAction(request: Message): Promise<any> {
+  private async callLocalDeviceAction(request: Request): Promise<any> {
 
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте

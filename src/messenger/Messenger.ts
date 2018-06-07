@@ -43,7 +43,7 @@ export default class Messenger {
     const message: Message = {
       category,
       topic,
-      from: this.app.host.id,
+      //from: this.app.host.id,
       to: toHost,
       payload,
     };
@@ -92,13 +92,13 @@ export default class Messenger {
       throw new Error(`You have to specify a topic`);
     }
 
-    const message = {
+    const request: Request = {
       topic,
       category,
       from: this.app.host.id,
       to: toHost,
       requestId: generateUniqId(),
-      isRequest: true,
+      isResponse: false,
       payload,
     };
 
@@ -108,18 +108,18 @@ export default class Messenger {
 
       // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
 
-      this.waitForResponse(message.category, message.requestId)
+      this.waitForResponse(request.category, request.requestId)
         .then((response: Message) => {
 
           // TODO: сделать
 
-          //if (response.error) return reject(response.error);
+          if (response.error) return reject(response.error);
 
           resolve(response);
         })
         .catch(reject);
 
-      this.router.send(message.to, message)
+      this.router.send(request.to, request)
         .catch(reject);
     });
   }
@@ -128,7 +128,7 @@ export default class Messenger {
    * Send response of received request.
    */
   async sendResponse(
-    request: Message,
+    request: Request,
     payload: any = null,
     error: { message: string, code: number } | undefined = undefined
   ): Promise<void> {
@@ -158,19 +158,19 @@ export default class Messenger {
     await this.router.send(message.to, message);
   }
 
-  private waitForResponse(category: string, requestId: string): Promise<Message> {
+  private waitForResponse(category: string, requestId: string): Promise<Request> {
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
 
     return new Promise(((resolve, reject) => {
-      const handler = (message: Message) => {
-        if (!message.isResponse) return;
-        if (message.requestId !== requestId) return;
+      const handler = (request: Request) => {
+        if (!request.isResponse) return;
+        if (request.requestId !== requestId) return;
 
         // TODO: почему не топика ?????
 
         this.app.events.removeListener(category, undefined, handler);
-        resolve(message);
+        resolve(request);
       };
 
       this.app.events.addListener(category, undefined, handler);
