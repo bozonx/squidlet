@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import { eventNameSeparator } from '../helpers/helpers';
+import { generateEventName } from '../helpers/helpers';
 
 
 interface TopicListener {
@@ -14,13 +14,16 @@ interface TopicListener {
 export default class Events {
   readonly allTopicsMask = '*';
   private readonly events: EventEmitter = new EventEmitter();
+
+  // TODO: меньше памяти будет занимать если разбить по eventName и там уже список
+
   private readonly topicListeners: Array<TopicListener> = [];
 
   constructor() {
   }
 
   emit(category: string, topic: string = '*', payload: any): void {
-    const eventName = this.generateEventName(category, topic);
+    const eventName = generateEventName(category, topic);
 
     this.events.emit(eventName, category, topic, payload);
   }
@@ -29,7 +32,7 @@ export default class Events {
    * Listen for local messages of certain category.
    */
   addListener(category: string, topic: string = '*', handler: (payload: any) => void): void {
-    const eventName = this.generateEventName(category, topic);
+    const eventName = generateEventName(category, topic);
     const wrapper = (msgCategory: string, msgTopic: string, payload: any): void => {
       if (msgCategory === category && msgTopic === topic) {
         handler(payload);
@@ -49,7 +52,7 @@ export default class Events {
   }
 
   removeListener(category: string, topic: string = '*', handler: (payload: any) => void): void {
-    const eventName = this.generateEventName(category, topic);
+    const eventName = generateEventName(category, topic);
 
     const index: number = _.findIndex(this.topicListeners, (item: TopicListener) => {
       return item.name === eventName && item.handler === handler;
@@ -63,12 +66,6 @@ export default class Events {
     this.topicListeners.splice(index, 1);
 
     this.events.removeListener(category, topicListener.wrapper);
-  }
-
-  private generateEventName(category: string, topic: string): string {
-    if (!topic || topic === '*') return category;
-
-    return [ category, topic ].join(eventNameSeparator);
   }
 
 }

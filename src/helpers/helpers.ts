@@ -9,6 +9,13 @@ export const topicSeparator = '/';
 export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
+
+export function generateEventName(category: string, topic: string): string {
+  if (!topic || topic === '*') return category;
+
+  return [ category, topic ].join(eventNameSeparator);
+}
+
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
   if (_.isEmpty(subPaths)) return basePath;
 

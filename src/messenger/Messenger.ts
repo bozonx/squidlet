@@ -10,18 +10,19 @@ import { generateUniqId } from '../helpers/helpers';
  * You can subscribe to all the messages.
  */
 export default class Messenger {
+  readonly router: Router;
   private readonly app: App;
-  private readonly router: Router;
   private readonly bridge: Bridge;
 
   constructor(app: App) {
     this.app = app;
     this.router = new Router(app);
-    this.bridge = new Bridge(this);
+    this.bridge = new Bridge(app, this);
   }
 
   init(): void {
     this.router.init();
+    this.bridge.init();
 
     // listen income messages from remote host and rise them on a local host as local messages
     this.router.listenIncome((message: Message): void => {
