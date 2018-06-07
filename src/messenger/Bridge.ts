@@ -93,6 +93,8 @@ export default class Bridge {
 
   private generateEventName(toHost: string, category: string, topic: string): string {
     const eventName = generateEventName(category, topic);
+
+    // TODO: !!!!
   }
 
   private findHandlerId(eventName: string, handler: Function): HandlerItem {

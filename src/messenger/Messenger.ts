@@ -2,6 +2,7 @@ import App from '../app/App';
 import Router from './Router';
 import Bridge from './Bridge';
 import Message from './interfaces/Message';
+import Request from './interfaces/Request';
 import { generateUniqId } from '../helpers/helpers';
 
 
