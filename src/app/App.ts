@@ -25,7 +25,7 @@ export default class App {
     this.system = new System();
     // config for current host
     this.host = new Host(this, hostConfig);
-    this.events = new Events(this);
+    this.events = new Events();
     this.log = defaultLogger;
     this.messenger = new Messenger(this);
     this.drivers = new Drivers(this);

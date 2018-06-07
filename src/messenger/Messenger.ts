@@ -1,5 +1,6 @@
 import App from '../app/App';
 import Router from './Router';
+import Bridge from './Bridge';
 import Message from './interfaces/Message';
 import { generateUniqId } from '../helpers/helpers';
 
@@ -11,10 +12,12 @@ import { generateUniqId } from '../helpers/helpers';
 export default class Messenger {
   private readonly app: App;
   private readonly router: Router;
+  private readonly bridge: Bridge;
 
   constructor(app: App) {
     this.app = app;
     this.router = new Router(app);
+    this.bridge = new Bridge(this);
   }
 
   init(): void {
@@ -63,7 +66,7 @@ export default class Messenger {
     }
 
     // else subscribe to remote host's events
-    this.subscribeToRemoteHost(toHost, category, topic, handler);
+    this.bridge.subscribe(toHost, category, topic, handler);
   }
 
   /**
@@ -78,8 +81,8 @@ export default class Messenger {
       return;
     }
 
-    // TODO: !!! отписываться от удаленного хоста
-
+    // unsubscribe from remote host's events
+    this.bridge.unsubscribe(toHost, category, topic, handler);
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
@@ -170,12 +173,6 @@ export default class Messenger {
 
       this.app.events.addListener(category, undefined, handler);
     }));
-  }
-
-  private subscribeToRemoteHost(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
-
-    // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
-
   }
 
 }
