@@ -1,18 +1,8 @@
-import * as _ from 'lodash';
-//import * as EventEmitter from 'events';
-
 import App from '../app/App';
 import Router from './Router';
 import Message from './interfaces/Message';
 import { generateUniqId } from '../helpers/helpers';
 
-
-// interface TopicListener {
-//   category: string;
-//   topic: string;
-//   handler: Function;
-//   wrapper: (...args: Array<any>) => any;
-// }
 
 /**
  * It's heart of app. It receives and sends messages to router.
@@ -21,8 +11,6 @@ import { generateUniqId } from '../helpers/helpers';
 export default class Messenger {
   private readonly app: App;
   private readonly router: Router;
-  //private readonly events: EventEmitter = new EventEmitter();
-  //private topicListeners: Array<TopicListener> = [];
 
   constructor(app: App) {
     this.app = app;
@@ -34,10 +22,7 @@ export default class Messenger {
 
     // listen income messages from remote host and rise them on a local host as local messages
     this.router.listenIncome((message: Message): void => {
-
-      // TODO: use app.events
-
-      this.app.events.emit(message.category, undefined, message);
+      this.app.events.emit(message.category, message.topic, message);
     });
   }
 
@@ -46,6 +31,10 @@ export default class Messenger {
    * It doesn't wait for respond. But it wait for delivering of message.
    */
   async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
+    if (!topic || topic === this.app.events.allTopicsMask) {
+      throw new Error(`You have to specify a topic`);
+    }
+
     const message: Message = {
       category,
       topic,
@@ -62,6 +51,10 @@ export default class Messenger {
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+    if (!topic || topic === this.app.events.allTopicsMask) {
+      throw new Error(`You have to specify a topic`);
+    }
+
     if (toHost === this.app.host.id) {
       // subscribe to local events
       this.app.events.addListener(category, topic, handler);
@@ -72,35 +65,28 @@ export default class Messenger {
     // else subscribe to remote host's events
     this.subscribeToRemoteHost(toHost, category, topic, handler);
   }
-  //
-  // /**
-  //  * Listen for local messages of certain category.
-  //  */
-  // listen(category: string, handler: (message: Message) => void) {
-  //   this.events.addListener(category, handler);
-  // }
-  //
-  // removeListener(category: string, handler: (message: Message) => void) {
-  //   this.events.removeListener(category, handler);
-  // }
 
   /**
    * Unsubscribe of topic of remote or local host.
    * Handler has to be the same as has been specified to "subscribe" method previously
    */
-  unsubscribe(
-    toHost: string,
-    category: string,
-    topic: string,
-    handler: (message: Message) => void
-  ): void {
-    this.app.events.removeListener(category, topic, handler);
+  unsubscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+    if (toHost === this.app.host.id) {
+      // subscribe to local events
+      this.app.events.removeListener(category, topic, handler);
+
+      return;
+    }
 
     // TODO: !!! отписываться от удаленного хоста
 
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
+    if (!topic || topic === this.app.events.allTopicsMask) {
+      throw new Error(`You have to specify a topic`);
+    }
+
     const message = {
       topic,
       category,
@@ -110,6 +96,8 @@ export default class Messenger {
       isRequest: true,
       payload,
     };
+
+    // TODO: !!!! если локально ???
 
     return new Promise((resolve, reject) => {
 
@@ -139,7 +127,6 @@ export default class Messenger {
     payload: any = null,
     error: { message: string, code: number } | undefined = undefined
   ): Promise<void> {
-
     const respondMessage = {
       topic: request.topic,
       category: request.category,
@@ -175,6 +162,8 @@ export default class Messenger {
         if (!message.isResponse) return;
         if (message.requestId !== requestId) return;
 
+        // TODO: почему не топика ?????
+
         this.app.events.removeListener(category, undefined, handler);
         resolve(message);
       };
@@ -183,37 +172,10 @@ export default class Messenger {
     }));
   }
 
-  // private addLocalTopicListener = (
-  //   category: string,
-  //   topic: string,
-  //   handler: (message: Message) => void
-  // ) => {
-  //   const wrapper = (message: Message) => {
-  //     if (message.topic === topic) {
-  //       handler(message);
-  //     }
-  //   };
-  //
-  //   const topicListener: TopicListener = {
-  //     category,
-  //     topic,
-  //     handler,
-  //     wrapper
-  //   };
-  //
-  //   // listen to local events
-  //   this.events.addListener(category, wrapper);
-  //   this.topicListeners.push(topicListener);
-  // };
-
   private subscribeToRemoteHost(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
 
     // TODO: если задан - делаем спец запрос на подпись события удаленного хоста
 
   }
-
-  // private getTopicEventName(category: string, topic: string): string {
-  //   return [ category, topic ].join(this.topicEventNameSeparator);
-  // }
 
 }

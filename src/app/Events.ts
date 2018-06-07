@@ -1,14 +1,11 @@
+import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import { eventNameSeparator } from '../helpers/helpers';
 
 import App from './App';
-import * as _ from "lodash";
 
 
 interface TopicListener {
-  // category: string;
-  // topic: string;
-
   // event name
   name: string;
   handler: Function;
@@ -16,6 +13,7 @@ interface TopicListener {
 }
 
 export default class Events {
+  readonly allTopicsMask = '*';
   private readonly app: App;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly topicListeners: Array<TopicListener> = [];
