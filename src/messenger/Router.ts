@@ -23,7 +23,11 @@ export default class Router {
 
     // TODO: передать адреса
 
-    this.destinations = new Destinations(this.app.drivers, _.map(this.app.host.config.neighbors));
+    this.destinations = new Destinations(
+      this.app.drivers,
+      this.app.host.config.connections,
+      _.map(this.app.host.config.neighbors)
+    );
   }
 
   init(): void {

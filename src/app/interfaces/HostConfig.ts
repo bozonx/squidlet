@@ -1,13 +1,17 @@
-import DeviceManifest from "./DeviceManifest";
-import DeviceConf from "./DeviceConf";
-import Destination from "../../messenger/interfaces/Destination";
+import DeviceManifest from './DeviceManifest';
+import DeviceConf from './DeviceConf';
+import Destination from '../../messenger/interfaces/Destination';
+import MyAddress from './MyAddress';
 
 
 export default interface HostConfig {
   // specific config for each host
   host: {[index: string]: any};
-  // TODO: review
+
+  // TODO: remove
   address: Destination;
+
+  connections: Array<MyAddress>;
   // parsed devices manifests by device's class name
   devicesManifests: {[index: string]: DeviceManifest};
   // config of devices by deviceId

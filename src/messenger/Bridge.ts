@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 import App from '../app/App';
 import Messenger from './Messenger';
 import Router from './Router';
@@ -6,8 +8,8 @@ import { generateEventName, generateUniqId } from '../helpers/helpers';
 
 
 interface HandlerItem {
-  handlerId: string,
-  handler: Function,
+  handlerId: string;
+  handler: Function;
 }
 
 /**
@@ -33,13 +35,13 @@ export default class Bridge {
     // TODO: listen router income
   }
 
-  publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
+  async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
     // TODO: publish тоже можно сюда переденсти
 
   }
 
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
-    const eventName = this.generateEventName(toHost, category, topic);
+    const eventName = generateEventName(category, topic, toHost);
     const handlerId: string = generateUniqId();
     const message: Message = {
       category: this.systemCategory,
@@ -62,7 +64,7 @@ export default class Bridge {
   }
 
   unsubscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
-    const eventName = this.generateEventName(toHost, category, topic);
+    const eventName = generateEventName(category, topic, toHost);
     const handlerId = this.findHandlerId(eventName, handler);
     const message: Message = {
       category: this.systemCategory,
@@ -87,14 +89,15 @@ export default class Bridge {
 
   }
 
-  private generateEventName(toHost: string, category: string, topic: string): string {
-    const eventName = generateEventName(category, topic);
+  private findHandlerId(eventName: string, handler: Function): string {
+    const handlers = this.handlers[eventName];
+    const handerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
+      return item.handler === handler;
+    });
 
-    // TODO: !!!!
-  }
+    if (!handerItem) throw new Error(`Can't find handler of "${eventName}"`);
 
-  private findHandlerId(eventName: string, handler: Function): HandlerItem {
-    // TODO: !!!!
+    return handerItem.handlerId;
   }
 
   private removeHandler(eventName: string, handler: Function): void {

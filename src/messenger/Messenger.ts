@@ -109,11 +109,14 @@ export default class Messenger {
       // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
 
       this.waitForResponse(request.category, request.requestId)
-        .then((response: Message) => {
-
-          // TODO: сделать
-
-          if (response.error) return reject(response.error);
+        .then((response: Request) => {
+          if (Number.isInteger(response.errorCode as any) || response.errorMessage) {
+            // TODO: review
+            reject({
+              message: response.errorMessage,
+              code: response.errorCode,
+            });
+          }
 
           resolve(response);
         })

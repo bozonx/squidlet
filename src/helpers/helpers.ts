@@ -10,10 +10,10 @@ export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
 
-export function generateEventName(category: string, topic: string): string {
-  if (!topic || topic === '*') return category;
+export function generateEventName(category: string, topic: string, ...others: Array<string>): string {
+  if (!topic || topic === '*') return [ category, ...others ].join(eventNameSeparator);
 
-  return [ category, topic ].join(eventNameSeparator);
+  return [ category, topic, ...others ].join(eventNameSeparator);
 }
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {

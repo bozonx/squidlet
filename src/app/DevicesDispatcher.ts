@@ -22,10 +22,7 @@ export default class DevicesDispatcher {
 
   init(): void {
     // listen messages to call actions of local device
-
-    // TODO: fix !!!!
-
-    this.app.messenger.listen(this.callActionCategory, this.handleCallActionRequests);
+    this.app.events.addListener(this.callActionCategory, undefined, this.handleCallActionRequests);
   }
 
   /**
@@ -146,7 +143,7 @@ export default class DevicesDispatcher {
       .catch((error) => {
         this.app.messenger.sendResponse(request, null, error);
       });
-  };
+  }
 
   private async callLocalDeviceAction(request: Request): Promise<any> {
 
