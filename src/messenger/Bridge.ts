@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import App from '../app/App';
 import Messenger from './Messenger';
-import Router from './Router';
+import Router from '../network/Router';
 import Message from './interfaces/Message';
 import { generateEventName, generateUniqId } from '../helpers/helpers';
 

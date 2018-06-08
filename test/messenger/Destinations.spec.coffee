@@ -1,4 +1,4 @@
-Destinations = require('../../src/messenger/Destinations').default
+Destinations = require('../../src/network/Destinations').default
 
 
 describe.only 'app.Destinations', ->

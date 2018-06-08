@@ -1,5 +1,5 @@
 import App from '../app/App';
-import Router from './Router';
+import Router from '../network/Router';
 import Bridge from './Bridge';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
