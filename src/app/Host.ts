@@ -1,4 +1,4 @@
-import App from "./App";
+import System from './System';
 import Destination from "../messenger/interfaces/Destination";
 import DeviceManifest from "./interfaces/DeviceManifest";
 import DeviceConf from "./interfaces/DeviceConf";
@@ -11,7 +11,7 @@ import configHostDefault from "./configHostDefault";
 // TODO: ??? use immutable
 
 export default class Host {
-  private readonly app: App;
+  private readonly system: System;
   private readonly hostConfig: HostConfig;
 
   get id(): string {
@@ -50,8 +50,8 @@ export default class Host {
     return this.hostConfig;
   }
 
-  constructor(app: App, hostConfig: HostConfig) {
-    this.app = app;
+  constructor(system: System, hostConfig: HostConfig) {
+    this.system = system;
     this.hostConfig = this.mergeConfigs(hostConfig);
   }
 

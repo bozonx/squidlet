@@ -12,11 +12,11 @@ export default class Publisher {
 
   // TODO: может это всетаки mqtt-client plugin ????
 
-  private readonly app: App;
+  private readonly system: System;
   //private readonly events: EventEmitter = new EventEmitter();
 
   constructor(app) {
-    this.app = app;
+    this.system = system;
   }
 
 
@@ -27,7 +27,7 @@ export default class Publisher {
     //this.events.emit(topic, params);
 
     // TODO: если приходит внешнее соощение из mqtt брокера - значит это вызов action девайса
-    // TODO: надо вызвать this.app.devicesDispatcher.callAction(...)
+    // TODO: надо вызвать this.system.devicesDispatcher.callAction(...)
     // TODO: но поидее могут быть и какие-то системные вызовы???
   }
 
@@ -35,7 +35,7 @@ export default class Publisher {
     //this.events.addListener(topic, handler);
 
     // TODO: слушаем результат - status, config и тд
-    // TODO: надо вызвать this.app.listenStatus или listenConfig или общуу ф-ю - listen
+    // TODO: надо вызвать this.system.listenStatus или listenConfig или общуу ф-ю - listen
   }
 
 }

@@ -1,11 +1,11 @@
-import App from './App';
+import System from './System';
 
 
 export default class Drivers {
-  private readonly app: App;
+  private readonly system: System;
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
   }
 
   getDriver(driverName: string): any {

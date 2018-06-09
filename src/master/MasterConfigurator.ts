@@ -1,12 +1,12 @@
-import App from "../app/App";
+import System from './System';
 import * as _ from "lodash";
 
 
 export default class MasterConfigurator {
-  private readonly app: App;
+  private readonly system: System;
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
   }
 
   init(): void {
@@ -46,7 +46,7 @@ export default class MasterConfigurator {
 
     // TODO: use host config - там плоская структура
 
-    // findRecursively(this.app.host.config.devices, (item, itemPath): boolean => {
+    // findRecursively(this.system.host.config.devices, (item, itemPath): boolean => {
     //   if (!_.isPlainObject(item)) return false;
     //   // go deeper
     //   if (!item.device) return undefined;

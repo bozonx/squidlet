@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import App from '../app/App';
+import System from '../app/System';
 import Messenger from './Messenger';
 import Router from '../network/Router';
 import Message from './interfaces/Message';
@@ -16,7 +16,7 @@ interface HandlerItem {
  * Subscribe to remote host's events
  */
 export default class Bridge {
-  private readonly app: App;
+  private readonly system: System;
   private readonly messenger: Messenger;
   private readonly router: Router;
   private readonly systemCategory: string = 'system';
@@ -25,8 +25,8 @@ export default class Bridge {
   // handlers of remote events by "toHost-category-topic"
   private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
-  constructor(app: App, messenger: Messenger) {
-    this.app = app;
+  constructor(system: System, messenger: Messenger) {
+    this.system = system;
     this.messenger = messenger;
     this.router = this.messenger.router;
   }

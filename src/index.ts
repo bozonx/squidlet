@@ -2,7 +2,7 @@
 // TODO: сразу экспортировать
 
 import Master from './master/MasterApp';
-import App from './app/App';
+import System from './System';
 
 
 export default {

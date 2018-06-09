@@ -1,4 +1,4 @@
-import App from '../app/App';
+import System from './System';
 import Router from '../network/Router';
 import Bridge from './Bridge';
 import Message from './interfaces/Message';
@@ -12,11 +12,11 @@ import { generateUniqId } from '../helpers/helpers';
  */
 export default class Messenger {
   readonly router: Router;
-  private readonly app: App;
+  private readonly system: System;
   private readonly bridge: Bridge;
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
     this.router = new Router(app);
     this.bridge = new Bridge(app, this);
   }
@@ -27,7 +27,7 @@ export default class Messenger {
 
     // listen income messages from remote host and rise them on a local host as local messages
     this.router.listenIncome((message: Message): void => {
-      this.app.events.emit(message.category, message.topic, message);
+      this.system.events.emit(message.category, message.topic, message);
     });
   }
 
@@ -36,14 +36,14 @@ export default class Messenger {
    * It doesn't wait for respond. But it wait for delivering of message.
    */
   async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
-    if (!topic || topic === this.app.events.allTopicsMask) {
+    if (!topic || topic === this.system.events.allTopicsMask) {
       throw new Error(`You have to specify a topic`);
     }
 
     const message: Message = {
       category,
       topic,
-      //from: this.app.host.id,
+      //from: this.system.host.id,
       to: toHost,
       payload,
     };
@@ -56,13 +56,13 @@ export default class Messenger {
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
   subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
-    if (!topic || topic === this.app.events.allTopicsMask) {
+    if (!topic || topic === this.system.events.allTopicsMask) {
       throw new Error(`You have to specify a topic`);
     }
 
-    if (toHost === this.app.host.id) {
+    if (toHost === this.system.host.id) {
       // subscribe to local events
-      this.app.events.addListener(category, topic, handler);
+      this.system.events.addListener(category, topic, handler);
 
       return;
     }
@@ -76,9 +76,9 @@ export default class Messenger {
    * Handler has to be the same as has been specified to "subscribe" method previously
    */
   unsubscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
-    if (toHost === this.app.host.id) {
+    if (toHost === this.system.host.id) {
       // subscribe to local events
-      this.app.events.removeListener(category, topic, handler);
+      this.system.events.removeListener(category, topic, handler);
 
       return;
     }
@@ -88,14 +88,14 @@ export default class Messenger {
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
-    if (!topic || topic === this.app.events.allTopicsMask) {
+    if (!topic || topic === this.system.events.allTopicsMask) {
       throw new Error(`You have to specify a topic`);
     }
 
     const request: Request = {
       topic,
       category,
-      from: this.app.host.id,
+      from: this.system.host.id,
       to: toHost,
       requestId: generateUniqId(),
       isResponse: false,
@@ -138,7 +138,7 @@ export default class Messenger {
     const respondMessage = {
       topic: request.topic,
       category: request.category,
-      from: this.app.host.id,
+      from: this.system.host.id,
       to: request.from,
       requestId: request.requestId,
       isResponse: true,
@@ -152,8 +152,8 @@ export default class Messenger {
 
   private async sendMessage(message: Message): Promise<void> {
     // if message is addressed to local host - rise it immediately
-    if (message.to === this.app.host.id) {
-      this.app.events.emit(message.category, message.topic, message);
+    if (message.to === this.system.host.id) {
+      this.system.events.emit(message.category, message.topic, message);
 
       return;
     }
@@ -172,11 +172,11 @@ export default class Messenger {
 
         // TODO: почему не топика ?????
 
-        this.app.events.removeListener(category, undefined, handler);
+        this.system.events.removeListener(category, undefined, handler);
         resolve(request);
       };
 
-      this.app.events.addListener(category, undefined, handler);
+      this.system.events.addListener(category, undefined, handler);
     }));
   }
 

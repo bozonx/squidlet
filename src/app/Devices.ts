@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 
-import App from './App';
+import System from './System';
 import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
@@ -13,14 +13,14 @@ import DeviceSchema from './interfaces/DeviceSchema';
  * Creates instances of local devices and prepare config for them.
  */
 export default class Devices {
-  private readonly app: App;
+  private readonly system: System;
   private readonly deviceFactory: DeviceFactory;
   // devices instances by ids
   private readonly instances: {[index: string]: Device} = {};
 
-  constructor(app: App) {
-    this.app = app;
-    this.deviceFactory = new DeviceFactory(this.app);
+  constructor(system: System) {
+    this.system = system;
+    this.deviceFactory = new DeviceFactory(this.system);
   }
 
   /**
@@ -37,7 +37,7 @@ export default class Devices {
     return Promise.all(
       _.map(devicesConfigs, async (rawDeviceConf: {[index: string]: any}, deviceId: string): Promise<void> => {
         if (!rawDeviceConf.device) {
-          this.app.log.fatal(`Unknown device "${JSON.stringify(rawDeviceConf)}"`);
+          this.system.log.fatal(`Unknown device "${JSON.stringify(rawDeviceConf)}"`);
         }
 
         const manifest: DeviceManifest = devicesManifests[rawDeviceConf.device];
@@ -74,7 +74,7 @@ export default class Devices {
 
     //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
     const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
-    const schema: DeviceSchema = await this.app.io.loadYamlFile(schemaPath) as DeviceSchema;
+    const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
 
     return {
       className: rawDeviceConf.device,

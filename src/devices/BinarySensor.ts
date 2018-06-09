@@ -1,11 +1,11 @@
-import App from '../app/App';
+import System from './System';
 
 
 export default class Router {
-  private readonly app: App;
+  private readonly system: System;
 
   constructor(app) {
-    this.app = app;
+    this.system = system;
   }
 
 }

@@ -1,4 +1,4 @@
-import App from '../app/App';
+import System from '../app/System';
 import Router from './Router';
 import Bridge from '../messenger/Bridge';
 
@@ -7,12 +7,12 @@ import Bridge from '../messenger/Bridge';
  * It works independent of app
  */
 export default class Network {
-  private readonly app: App;
+  private readonly system: System;
   private readonly router: Router;
   private readonly bridge: Bridge;
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
     this.router = new Router(app);
     this.bridge = new Bridge(app, this);
   }

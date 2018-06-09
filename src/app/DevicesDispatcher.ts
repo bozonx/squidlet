@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import App from './App';
+import System from './System';
 import Message from '../messenger/interfaces/Message';
 import Request from '../messenger/interfaces/Request';
 
@@ -10,19 +10,19 @@ import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '.
 
 
 export default class DevicesDispatcher {
-  private readonly app: App;
+  private readonly system: System;
   private readonly callActionCategory: string = 'deviceCallAction';
   private readonly deviceFeedBackCategory: string = 'deviceFeedBack';
   private readonly statusTopic: string = 'status';
   private readonly configTopic: string = 'config';
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
   }
 
   init(): void {
     // listen messages to call actions of local device
-    this.app.events.addListener(this.callActionCategory, undefined, this.handleCallActionRequests);
+    this.system.events.addListener(this.callActionCategory, undefined, this.handleCallActionRequests);
   }
 
   /**
@@ -32,7 +32,7 @@ export default class DevicesDispatcher {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, actionName);
 
-    return this.app.messenger.request(toHost, this.callActionCategory, topic, params);
+    return this.system.messenger.request(toHost, this.callActionCategory, topic, params);
   }
 
   /**
@@ -59,7 +59,7 @@ export default class DevicesDispatcher {
       handler(message.payload);
     };
 
-    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+    this.system.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
   }
 
   /**
@@ -78,7 +78,7 @@ export default class DevicesDispatcher {
       handler(message.payload);
     };
 
-    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+    this.system.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
   }
 
   /**
@@ -98,7 +98,7 @@ export default class DevicesDispatcher {
       handler(message.payload);
     };
 
-    this.app.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+    this.system.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
   }
 
   /**
@@ -111,9 +111,9 @@ export default class DevicesDispatcher {
 
     const topic = combineTopic(deviceId, this.statusTopic, status);
     // send to local host
-    const toHost: string = this.app.host.id;
+    const toHost: string = this.system.host.id;
 
-    return this.app.messenger.publish(toHost, this.deviceFeedBackCategory, topic, value);
+    return this.system.messenger.publish(toHost, this.deviceFeedBackCategory, topic, value);
   }
 
   /**
@@ -122,11 +122,11 @@ export default class DevicesDispatcher {
   publishConfig(deviceId: string, partialConfig: object): Promise<void> {
     const topic = combineTopic(deviceId, this.configTopic);
     // send to local host
-    const toHost: string = this.app.host.id;
+    const toHost: string = this.system.host.id;
 
     // TODO: test
 
-    return this.app.messenger.publish(toHost, this.deviceFeedBackCategory, topic, partialConfig);
+    return this.system.messenger.publish(toHost, this.deviceFeedBackCategory, topic, partialConfig);
   }
 
 
@@ -138,10 +138,10 @@ export default class DevicesDispatcher {
 
     this.callLocalDeviceAction(request)
       .then((result: any) => {
-        this.app.messenger.sendResponse(request, result);
+        this.system.messenger.sendResponse(request, result);
       })
       .catch((error) => {
-        this.app.messenger.sendResponse(request, null, error);
+        this.system.messenger.sendResponse(request, null, error);
       });
   }
 
@@ -169,7 +169,7 @@ export default class DevicesDispatcher {
       `);
     }
 
-    const device: {[inde: string]: any} = this.app.devices.getDevice(deviceId);
+    const device: {[inde: string]: any} = this.system.devices.getDevice(deviceId);
     const result = await device[actionName](...request.payload);
 
     return result;

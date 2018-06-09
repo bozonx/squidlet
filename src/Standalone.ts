@@ -1,4 +1,4 @@
-import App from './app/App';
+import System from './System';
 
 
 export default class Standalone {

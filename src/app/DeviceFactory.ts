@@ -1,23 +1,23 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 
-import App from './App';
+import System from './System';
 import Device from './interfaces/Device';
 import DeviceConf from './interfaces/DeviceConf';
 
 
 export default class DeviceFactory {
-  private readonly app: App;
+  private readonly system: System;
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
   }
 
   async create(deviceConf: DeviceConf): Promise<Device> {
     // make instance of device
     const devicePath: string = path.resolve(deviceConf.manifest.baseDir, deviceConf.manifest.device);
-    const DeviceClass: { new (app: App, deviceConf: DeviceConf): Device } = this.require(devicePath);
-    const device: Device = new DeviceClass(this.app, deviceConf);
+    const DeviceClass: { new (system: System, deviceConf: DeviceConf): Device } = this.require(devicePath);
+    const device: Device = new DeviceClass(this.system, deviceConf);
 
     this._validateSchema(deviceConf);
 
@@ -47,7 +47,7 @@ export default class DeviceFactory {
     const invalidMsg = device.validate(deviceConf);
 
     if (_.isString(invalidMsg)) {
-      this.app.log.fatal(`Invalid config for device "${deviceConf.deviceId}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
+      this.system.log.fatal(`Invalid config for device "${deviceConf.deviceId}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
     }
   }
 

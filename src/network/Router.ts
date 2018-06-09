@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import App from '../app/App';
+import System from './System';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from '../messenger/interfaces/Destination';
@@ -13,20 +13,20 @@ import Destination from '../messenger/interfaces/Destination';
  * It forwards message to next host if current host one of host on route
  */
 export default class Router {
-  private readonly app: App;
+  private readonly system: System;
   private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
 
-  constructor(app: App) {
-    this.app = app;
+  constructor(system: System) {
+    this.system = system;
 
     // TODO: передать адреса
 
     this.destinations = new Destinations(
-      this.app.drivers,
-      this.app.host.config.connections,
-      _.map(this.app.host.config.neighbors)
+      this.system.drivers,
+      this.system.host.config.connections,
+      _.map(this.system.host.config.neighbors)
     );
   }
 
@@ -37,7 +37,7 @@ export default class Router {
   }
 
   async send(toHost: string, payload: any): Promise<void> {
-    if (toHost === this.app.host.id) throw new Error(`You can't send message to yourself`);
+    if (toHost === this.system.host.id) throw new Error(`You can't send message to yourself`);
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
@@ -65,7 +65,7 @@ export default class Router {
    */
   private handleIncomeMessages = (routerMessage: RouterMessage): void => {
     // if it's final destination - pass message to income listeners
-    if (_.last(routerMessage.route) === this.app.host.id) {
+    if (_.last(routerMessage.route) === this.system.host.id) {
       this.events.emit(this.eventName, routerMessage.payload);
 
       return;
@@ -93,8 +93,8 @@ export default class Router {
    */
   private resolveNextHostId(route: Array<string>): string {
     if (route.length < 2) throw new Error(`Incorrect route ${JSON.stringify(route)}`);
-    if (_.last(route) === this.app.host.id) {
-      throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.app.host.id} is the last`);
+    if (_.last(route) === this.system.host.id) {
+      throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.system.host.id} is the last`);
     }
 
     const theNextHostShift = 1;
@@ -104,17 +104,17 @@ export default class Router {
       return route[theNextHostShift];
     }
 
-    const myIndex = _.indexOf(route, this.app.host.id);
+    const myIndex = _.indexOf(route, this.system.host.id);
 
     if (myIndex < 0) {
-      throw new Error(`Can't find my hostId "${this.app.host.id}" in route ${JSON.stringify(route)}`);
+      throw new Error(`Can't find my hostId "${this.system.host.id}" in route ${JSON.stringify(route)}`);
     }
 
     return route[myIndex + theNextHostShift];
   }
 
   private resolveDestination(hostId: string): Destination {
-    const params: Destination = this.app.host.config.neighbors[hostId];
+    const params: Destination = this.system.host.config.neighbors[hostId];
 
     if (!params) throw new Error(`Can't find destination connection params of host "${hostId}"`);
 
@@ -122,15 +122,15 @@ export default class Router {
   }
 
   private generateMessage(toHost: string, payload: any): RouterMessage {
-    if (!this.app.host.config.routes[toHost]) {
+    if (!this.system.host.config.routes[toHost]) {
       throw new Error(`Can't find route to "${toHost}"`);
     }
 
-    const route: Array<string> = this.app.host.config.routes[toHost];
+    const route: Array<string> = this.system.host.config.routes[toHost];
 
     return {
       route,
-      ttl: this.app.host.config.host.routedMessageTTL,
+      ttl: this.system.host.config.host.routedMessageTTL,
       payload,
     };
   }
