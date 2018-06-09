@@ -1,4 +1,4 @@
-import System from '../helpers/System';
+import IO from '../helpers/IO';
 import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
@@ -11,8 +11,8 @@ import * as defaultLogger from './defaultLogger';
 import HostConfig from './interfaces/HostConfig';
 
 
-export default class App {
-  readonly system: System;
+export default class System {
+  readonly io: IO;
   readonly host: Host;
   readonly network: Network;
   readonly events: Events;
@@ -24,7 +24,7 @@ export default class App {
 
 
   constructor(hostConfig: HostConfig) {
-    this.system = new System();
+    this.io = new IO();
     // config for current host
     this.host = new Host(this, hostConfig);
     this.network = new Network(this);

@@ -74,7 +74,7 @@ export default class Devices {
 
     //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
     const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
-    const schema: DeviceSchema = await this.app.system.loadYamlFile(schemaPath) as DeviceSchema;
+    const schema: DeviceSchema = await this.app.io.loadYamlFile(schemaPath) as DeviceSchema;
 
     return {
       className: rawDeviceConf.device,
