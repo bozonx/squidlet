@@ -1,4 +1,5 @@
 import System from '../helpers/System';
+import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
 import Messenger from '../messenger/Messenger';
@@ -13,6 +14,7 @@ import HostConfig from './interfaces/HostConfig';
 export default class App {
   readonly system: System;
   readonly host: Host;
+  readonly network: Network;
   readonly events: Events;
   readonly messenger: Messenger;
   readonly devices: Devices;
@@ -25,6 +27,7 @@ export default class App {
     this.system = new System();
     // config for current host
     this.host = new Host(this, hostConfig);
+    this.network = new Network(this);
     this.events = new Events();
     this.log = defaultLogger;
     this.messenger = new Messenger(this);
