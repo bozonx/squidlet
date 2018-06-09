@@ -1,11 +1,28 @@
-import System from './System';
+import System from './app/System';
+import ParseMasterConfig from './master/ParseMasterConfig';
+import HostConfig from './app/interfaces/HostConfig';
 
 
 export default class Standalone {
-  constructor(masterConfig: {[index: string]: any}) {
+  readonly system: System;
+  private readonly configs: ParseMasterConfig;
 
+  constructor(fullConfig: {[index: string]: any}) {
+    this.configs = new ParseMasterConfig(fullConfig);
+    const masterConfig: HostConfig = this.configs.getHostConfig('master');
+
+    this.system = new System(masterConfig);
   }
 
+  async init(): Promise<void> {
+    await this.system.initSystemDrivers();
 
+    // TODO: only if allowed
+    await this.system.initNetwork();
+    // TODO: only if allowed
+    await this.system.initMessanger();
+
+    await this.system.initApp();
+  }
 
 }

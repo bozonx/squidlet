@@ -1,5 +1,5 @@
-import App from './App';
-import DevicesDispatcher from "./DevicesDispatcher";
+import App from '../app';
+import DevicesDispatcher from "../app/DevicesDispatcher";
 //import * as EventEmitter from 'events';
 
 /**

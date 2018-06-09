@@ -36,9 +36,44 @@ export default class System {
     this.devicesDispatcher = new DevicesDispatcher(this);
   }
 
-  async init(): Promise<void> {
-    await this.devices.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
+  async initSystemDrivers(): Promise<void> {
+    // TODO: add
+  }
+
+  async initNetwork(): Promise<void> {
+    // TODO: add
+  }
+
+  async initMessanger(): Promise<void> {
     this.messenger.init();
+  }
+
+//   async initPlugins(): Promise<void> {
+// // TODO: add
+//   }
+//
+//   /**
+//    * Additional drivers which was added by plugins
+//    */
+//   async initDrivers(): Promise<void> {
+//     // TODO: add
+//   }
+
+  /**
+   * Init user layer - device representer, devices, device's drivers and services
+   * @return {Promise<void>}
+   */
+  async initApp(): Promise<void> {
+    // TODO: init initPlugins
+    // TODO: init initDrivers - которые добавленны плагинами
+    // TODO: init device's drivers
+    // TODO: init device representer
+    // TODO: init services
+    // TODO: init devices
+
+
+    await this.devices.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
+
     this.devicesDispatcher.init();
   }
 

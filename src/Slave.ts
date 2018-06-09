@@ -1,11 +1,29 @@
-import System from './System';
+import System from './app/System';
+import ParseMasterConfig from './master/ParseMasterConfig';
+import HostConfig from './app/interfaces/HostConfig';
 
 
 export default class Slave {
-  constructor() {
+  readonly system: System;
+  private readonly configs: ParseMasterConfig;
 
+  constructor(fullConfig: {[index: string]: any}) {
+    this.configs = new ParseMasterConfig(fullConfig);
+    const masterConfig: HostConfig = this.configs.getHostConfig('master');
+
+    this.system = new System(masterConfig);
   }
 
+  async init(): Promise<void> {
+    await this.system.initSystemDrivers();
+    await this.system.initNetwork();
+    await this.system.initMessanger();
 
+    // TODO: init slave network configurator
+    // TODO: init slave updater
+    // TODO: init slave configurator
+
+    await this.system.initApp();
+  }
 
 }

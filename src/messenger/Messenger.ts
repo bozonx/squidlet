@@ -1,4 +1,4 @@
-import System from './System';
+import System from '../app/System';
 import Router from '../network/Router';
 import Bridge from './Bridge';
 import Message from './interfaces/Message';
@@ -17,8 +17,8 @@ export default class Messenger {
 
   constructor(system: System) {
     this.system = system;
-    this.router = new Router(app);
-    this.bridge = new Bridge(app, this);
+    this.router = new Router(this.system);
+    this.bridge = new Bridge(this.system, this);
   }
 
   init(): void {
