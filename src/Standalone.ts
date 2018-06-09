@@ -20,7 +20,7 @@ export default class Standalone {
     // TODO: only if allowed
     await this.system.initNetwork();
     // TODO: only if allowed
-    await this.system.initMessanger();
+    await this.system.initMessenger();
 
     await this.system.initApp();
   }

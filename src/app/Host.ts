@@ -6,6 +6,7 @@ import HostConfig from "./interfaces/HostConfig";
 import * as _ from "lodash";
 import configHostPlatform from "./configHostPlatform";
 import configHostDefault from "./configHostDefault";
+import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
 
 
 // TODO: ??? use immutable
@@ -13,6 +14,7 @@ import configHostDefault from "./configHostDefault";
 export default class Host {
   private readonly system: System;
   private readonly hostConfig: HostConfig;
+  private readonly hostNetworkConfig: HostNetworkConfig;
 
   get id(): string {
 
@@ -50,9 +52,17 @@ export default class Host {
     return this.hostConfig;
   }
 
+  get networkConfig(): HostNetworkConfig {
+    return this.hostNetworkConfig;
+  }
+
   constructor(system: System, hostConfig: HostConfig) {
     this.system = system;
     this.hostConfig = this.mergeConfigs(hostConfig);
+
+    // TODO: откуда его взять
+
+    this.hostNetworkConfig = {};
   }
 
   // getAddress(type: string, bus: string): string | undefined {

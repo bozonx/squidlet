@@ -1,10 +1,12 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import System from '../app/System';
+import Network from './Network';
+import Drivers from '../app/Drivers';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from '../messenger/interfaces/Destination';
+import HostNetworkConfig from './interfaces/HostNetworkConfig';
 
 
 /**
@@ -13,20 +15,22 @@ import Destination from '../messenger/interfaces/Destination';
  * It forwards message to next host if current host one of host on route
  */
 export default class Router {
-  private readonly system: System;
+  private readonly network: Network;
+  private readonly drivers: Drivers;
+  private readonly networkConfig: HostNetworkConfig;
   private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
 
-  constructor(system: System) {
-    this.system = system;
-
-    // TODO: передать адреса
-
+  constructor(network: Network, drivers: Drivers, networkConfig: HostNetworkConfig) {
+    this.network = network;
+    this.drivers = drivers;
+    this.networkConfig = networkConfig;
     this.destinations = new Destinations(
-      this.system.drivers,
-      this.system.host.config.connections,
-      _.map(this.system.host.config.neighbors)
+      this.drivers,
+      this.network.config.connections,
+      // TODO: зачем делать map ????
+      _.map(this.network.config.neighbors)
     );
   }
 
@@ -37,7 +41,7 @@ export default class Router {
   }
 
   async send(toHost: string, payload: any): Promise<void> {
-    if (toHost === this.system.host.id) throw new Error(`You can't send message to yourself`);
+    if (toHost === this.network.hostId) throw new Error(`You can't send message to yourself`);
 
     // TODO: ждать таймаут ответа - если не дождались - do reject
     // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
@@ -65,7 +69,7 @@ export default class Router {
    */
   private handleIncomeMessages = (routerMessage: RouterMessage): void => {
     // if it's final destination - pass message to income listeners
-    if (_.last(routerMessage.route) === this.system.host.id) {
+    if (_.last(routerMessage.route) === this.network.hostId) {
       this.events.emit(this.eventName, routerMessage.payload);
 
       return;
@@ -83,7 +87,7 @@ export default class Router {
       .catch((err) => {
         // TODO: что делать с ошибкой???
       });
-  };
+  }
 
   /**
    * Try to find the next host after current.
@@ -93,8 +97,8 @@ export default class Router {
    */
   private resolveNextHostId(route: Array<string>): string {
     if (route.length < 2) throw new Error(`Incorrect route ${JSON.stringify(route)}`);
-    if (_.last(route) === this.system.host.id) {
-      throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.system.host.id} is the last`);
+    if (_.last(route) === this.network.hostId) {
+      throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.network.hostId} is the last`);
     }
 
     const theNextHostShift = 1;
@@ -104,17 +108,17 @@ export default class Router {
       return route[theNextHostShift];
     }
 
-    const myIndex = _.indexOf(route, this.system.host.id);
+    const myIndex = _.indexOf(route, this.network.hostId);
 
     if (myIndex < 0) {
-      throw new Error(`Can't find my hostId "${this.system.host.id}" in route ${JSON.stringify(route)}`);
+      throw new Error(`Can't find my hostId "${this.network.hostId}" in route ${JSON.stringify(route)}`);
     }
 
     return route[myIndex + theNextHostShift];
   }
 
   private resolveDestination(hostId: string): Destination {
-    const params: Destination = this.system.host.config.neighbors[hostId];
+    const params: Destination = this.network.config.neighbors[hostId];
 
     if (!params) throw new Error(`Can't find destination connection params of host "${hostId}"`);
 
@@ -122,15 +126,15 @@ export default class Router {
   }
 
   private generateMessage(toHost: string, payload: any): RouterMessage {
-    if (!this.system.host.config.routes[toHost]) {
+    if (!this.network.config.routes[toHost]) {
       throw new Error(`Can't find route to "${toHost}"`);
     }
 
-    const route: Array<string> = this.system.host.config.routes[toHost];
+    const route: Array<string> = this.network.config.routes[toHost];
 
     return {
       route,
-      ttl: this.system.host.config.host.routedMessageTTL,
+      ttl: this.network.config.params.routedMessageTTL,
       payload,
     };
   }

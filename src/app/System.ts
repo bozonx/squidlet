@@ -27,11 +27,11 @@ export default class System {
     this.io = new IO();
     // config for current host
     this.host = new Host(this, hostConfig);
-    this.network = new Network(this);
+    this.drivers = new Drivers(this);
+    this.network = new Network(this.drivers, this.host.id, this.host.networkConfig);
     this.events = new Events();
     this.log = defaultLogger;
     this.messenger = new Messenger(this);
-    this.drivers = new Drivers(this);
     this.devices = new Devices(this);
     this.devicesDispatcher = new DevicesDispatcher(this);
   }
@@ -44,20 +44,9 @@ export default class System {
     // TODO: add
   }
 
-  async initMessanger(): Promise<void> {
+  async initMessenger(): Promise<void> {
     this.messenger.init();
   }
-
-//   async initPlugins(): Promise<void> {
-// // TODO: add
-//   }
-//
-//   /**
-//    * Additional drivers which was added by plugins
-//    */
-//   async initDrivers(): Promise<void> {
-//     // TODO: add
-//   }
 
   /**
    * Init user layer - device representer, devices, device's drivers and services

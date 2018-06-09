@@ -1,4 +1,4 @@
-import * as _ from "lodash";
+import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';

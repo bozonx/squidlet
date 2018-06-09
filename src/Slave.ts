@@ -17,7 +17,7 @@ export default class Slave {
   async init(): Promise<void> {
     await this.system.initSystemDrivers();
     await this.system.initNetwork();
-    await this.system.initMessanger();
+    await this.system.initMessenger();
 
     // TODO: init slave network configurator
     // TODO: init slave updater
