@@ -7,7 +7,7 @@ export default interface HostNetworkConfig {
     routedMessageTTL: number,
   };
   connections: Array<MyAddress>;
-  // addresses of the nearest neighbors hosts
+  // addresses of the nearest neighbors hosts by hostId
   neighbors: {[index: string]: Destination};
   // TODO: наверное сделать просто массивом, а список сервисов - отдельно
   // routes for coordinators and links - { destHostId: route: [ 'currentHost', 'midHost', 'destHostId' ] }

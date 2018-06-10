@@ -15,20 +15,15 @@ export default class Destinations {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
-  private readonly destinationsList: Array<Destination>;
+  private readonly neighbors: {[index: string]: Destination};
   // addresses by "type-bus"
-  private readonly myAddresses: {[index: string]: MyAddress} = {};
+  private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
 
-  constructor(drivers: Drivers, myAddresses: Array<MyAddress>, destinationsList: Array<Destination>) {
+  constructor(drivers: Drivers, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
     this.drivers = drivers;
-    this.destinationsList = destinationsList;
-
-    // TODO: рациональней просто держать ссылку на конфиг
-    // convert addresses to convenient structure
-    _.each(myAddresses, (addr: MyAddress): void => {
-      this.myAddresses[this.generateConnectionId(addr)] = addr;
-    });
+    this.neighbors = neighbors;
+    this.myAddresses = myAddresses;
   }
 
   init(): void {
@@ -57,10 +52,7 @@ export default class Destinations {
    * Register all the used connections.
    */
   private setupConnections() {
-
-    // TODO: test
-
-    const myAddresses: Array<MyAddress> = this.collectMyAddresses(this.destinationsList);
+    const myAddresses: Array<MyAddress> = this.collectMyAddresses();
 
     _.each(myAddresses, (myAddress: MyAddress) => this.registerConnection(myAddress));
   }
@@ -68,16 +60,16 @@ export default class Destinations {
   /**
    * Collect all the used connections and deduplicate it.
    */
-  private collectMyAddresses(neighbors: Array<Destination>): Array<MyAddress> {
+  private collectMyAddresses(): Array<MyAddress> {
     const result: {[index: string]: MyAddress} = {};
 
-    _.each(neighbors, (destination: Destination) => {
+    _.each(this.neighbors, (dest: Destination) => {
+      const connectionId: string = this.generateConnectionId(dest);
+      const found = _.find(this.myAddresses, (item) => {
+        return item.type === dest.type && item.bus === dest.bus;
+      });
 
-      // TODO: test
-
-      const connectionId: string = this.generateConnectionId(destination);
-
-      result[connectionId] = this.myAddresses[connectionId];
+      if (found) result[connectionId] = found;
     });
 
     return _.map(result);
@@ -95,7 +87,7 @@ export default class Destinations {
   }
 
   private listenToAllDestinations(): void {
-    _.each(this.destinationsList, (destination: Destination) => {
+    _.each(this.neighbors, (destination: Destination) => {
       const connection = this.getConnection(destination);
       const handler = this.handleIncomeMessages.bind(this, destination);
       connection.listenIncome(destination.address, handler);

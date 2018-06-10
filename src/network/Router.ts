@@ -26,8 +26,7 @@ export default class Router {
     this.destinations = new Destinations(
       this.drivers,
       this.network.config.connections,
-      // TODO: зачем делать map ????
-      _.map(this.network.config.neighbors)
+      this.network.config.neighbors
     );
   }
 
