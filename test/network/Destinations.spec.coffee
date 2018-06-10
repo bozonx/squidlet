@@ -1,24 +1,8 @@
 Destinations = require('../../src/network/Destinations').default
 
 
-describe.only 'app.Destinations', ->
+describe 'app.Destinations', ->
   beforeEach ->
-
-  #@router['connectionTypes'].i2c = @connectionClass
-  #    @router.connections = {
-  #      'i2c-1': @connection
-  #    }
-
-  #  it 'private configureMasterConnections', ->
-  #    @router.configureMasterConnections()
-  #
-  #    assert.equal(@router['connections']['room1.host.device1-i2c-1-5A'].test, 'test')
-  #    sinon.assert.calledWith(@connectionClassConstructor, @app, {
-  #      @app.config.devices.room1.host.device1.address...
-  #      host: "room1.host.device1"
-  #      bus: '1'
-  #    })
-
     @dest = {
       type: 'i2c'
       bus: '1'
@@ -28,11 +12,35 @@ describe.only 'app.Destinations', ->
     @connection = {
       send: sinon.stub().returns(Promise.resolve())
     }
-    @drivers = {}
-    @myAddresses = []
-    destinationsList = []
+    @driverListenHandler = undefined
+    @driver = {
+      listenIncome: (addr, handler) => @driverListenHandler = handler
+    }
+    @drivers = {
+      getDriver: => {
+        getInstance: => @driver
+      }
+    }
+    @myAddresses = [
+      type: 'i2c'
+      bus: '1'
+      address: undefined
+    ]
+    @neighbors = {
+      'remoteHost': @dest
+    }
 
-    @destinations = new Destinations(@drivers, @myAddresses, destinationsList)
+    @destinations = new Destinations(@drivers, @myAddresses, @neighbors)
+
+  it 'init', ->
+    @driver.listenIncome = sinon.spy()
+
+    @destinations.init()
+
+    assert.deepEqual(@destinations.connections, {
+      'i2c-1': @driver
+    })
+    sinon.assert.calledWith(@driver.listenIncome, '5a')
 
   it 'send', ->
     @destinations.connections['i2c-1'] = @connection
@@ -40,10 +48,23 @@ describe.only 'app.Destinations', ->
 
     sinon.assert.calledWith(@connection.send, '5a', @payload)
 
-  it 'listenIncome', ->
+  it 'listenIncome and init', ->
     handler = sinon.spy()
 
     @destinations.init()
     @destinations.listenIncome(handler)
 
-    sinon.assert.calledWith(handler, 1, 2)
+    @driverListenHandler(@payload)
+
+    sinon.assert.calledWith(handler, @payload, @dest)
+
+  it 'removeListener', ->
+    handler = sinon.spy()
+
+    @destinations.init()
+    @destinations.listenIncome(handler)
+    @destinations.removeListener(handler)
+
+    @driverListenHandler(@payload)
+
+    sinon.assert.notCalled(handler)

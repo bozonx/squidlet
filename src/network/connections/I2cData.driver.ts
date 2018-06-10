@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
-import Drivers from '../app/Drivers';
-import I2cDriver from './I2cMaster.driver';
+import Drivers from '../../app/Drivers';
+import I2cDriver from '../../drivers/I2cMaster.driver';
 
 // TODO: remove
 

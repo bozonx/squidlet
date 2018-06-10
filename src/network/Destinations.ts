@@ -54,7 +54,9 @@ export default class Destinations {
   private setupConnections() {
     const myAddresses: Array<MyAddress> = this.collectMyAddresses();
 
-    _.each(myAddresses, (myAddress: MyAddress) => this.registerConnection(myAddress));
+    for(let myAddress of myAddresses) {
+      this.registerConnection(myAddress);
+    }
   }
 
   /**
@@ -76,9 +78,6 @@ export default class Destinations {
   }
 
   private registerConnection(connectionParams: MyAddress) {
-
-    // TODO: test
-
     const connectionId: string = this.generateConnectionId(connectionParams);
     const driverName = this.generateDriverName(connectionParams.type);
     const connectionDriver: ConnectionDriver = this.drivers.getDriver(driverName) as ConnectionDriver;
@@ -115,20 +114,5 @@ export default class Destinations {
   private generateDriverName(connectionType: string): string {
     return `${connectionType}.connection`;
   }
-
-
-  // private generateConnectionParams({ type, bus }: { type: string, bus: string }): MyAddress {
-  //   const connectionId = this.generateConnectionId({ type, bus });
-  //   const myAddr = this.myAddresses[connectionId];
-  //
-  //   if (!myAddr) throw new Error(`Can't get address of "${JSON.stringify({ type, bus })}"`);
-  //
-  //   return {
-  //     type,
-  //     bus,
-  //     address: myAddr.address,
-  //   };
-  // }
-
 
 }

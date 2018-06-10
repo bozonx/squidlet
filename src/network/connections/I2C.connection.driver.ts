@@ -1,9 +1,16 @@
 import * as EventEmitter from 'events';
 
-import Drivers from "../../app/Drivers";
+import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
 import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
 
+
+interface i2cDriver {
+  read: (bus: string, address: string, length: number) => Promise<Uint8Array>;
+  write: (bus: string, address: string, data: Uint8Array) => Promise<void>;
+  listen: (bus: string, address: string, length: number, handler: (data: Uint8Array) => void) => void;
+  unlisten: (bus: string, address: string, handler: (data: Uint8Array) => void) => void;
+}
 
 /**
  * It packs data to send it via i2c.
@@ -15,6 +22,7 @@ class DriverInstance {
   private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
   private readonly isMaster: boolean;
+  private readonly i2cDriver: i2cDriver;
 
   // TODO: use octal
   // register of reading from slave
@@ -26,16 +34,29 @@ class DriverInstance {
     this.drivers = drivers;
     this.driverConfig = driverConfig;
     this.myAddress = myAddress;
+    this.isMaster = typeof this.myAddress === 'undefined';
 
-    // TODO: выбрать драйвер master | slave в зависимости srcAddres = undefined = master
-    this.isMaster = true;
-
+    if (this.isMaster) {
+      // use master driver
+      this.i2cDriver = 1;
+    }
+    else {
+      // use slave driver
+      this.i2cDriver = 2;
+    }
   }
 
   async send(address: string, payload: any): Promise<void> {
+    if (this.isMaster) {
+      // TODO: если мастер - послать на this.slaveWriteRegister
+    }
+    else {
+      // TODO: вызвать метода драйвера слейва
+    }
+
 
     // TODO: review
-    // TODO: если мастер - послать на this.slaveWriteRegister
+
 
     const jsonString = JSON.stringify(payload);
     const uint8Arr = stringToUint8Array(jsonString);
@@ -82,4 +103,4 @@ export default class ConnectionI2cDriver {
     return new DriverInstance(this.drivers, this.driverConfig, myAddress);
   }
 
-};
+}

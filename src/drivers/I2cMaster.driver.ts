@@ -35,7 +35,7 @@ export default class I2c {
     this.events.removeListener(this.eventName, handler);
   }
 
-  unlisten(bus: string, address: string, handler: (data: Uint8Array) => void) {
+  unlisten(bus: string, address: string, handler: (data: Uint8Array) => void): void {
 
     // TODO: использовать bus и address
 
