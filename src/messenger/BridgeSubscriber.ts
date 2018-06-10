@@ -36,10 +36,6 @@ export default class Bridge {
     });
   }
 
-
-  // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
-
-
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = generateEventName(category, topic, toHost);
     const handlerId: string = this.system.io.generateUniqId();
@@ -90,6 +86,9 @@ export default class Bridge {
   }
 
 
+  /**
+   * Proceed responds
+   */
   private handleIncomeMessages(message: Message): void {
     const {
       category,
@@ -102,8 +101,11 @@ export default class Bridge {
 
     if (topic === this.respondTopic) {
       // call subscriber with remote data
-      const eventName = generateEventName(category, topic, remoteHost);
+      const eventName = generateEventName(payload.category, payload.topic, remoteHost);
       const handler = this.findHandlerById(eventName, payload.hadlerId);
+
+      // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
+
       handler(payload.payload);
     }
   }
@@ -121,11 +123,14 @@ export default class Bridge {
 
   private findHandlerById(eventName: string, handlerId: string): Function {
     const handlers = this.handlers[eventName];
+
+    if (!handlers) throw new Error(`Can't find handlers of "${eventName}"`);
+
     const handerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
       return item.handlerId === handlerId;
     });
 
-    if (!handerItem) throw new Error(`Can't find handlerId of "${eventName}"`);
+    if (!handerItem) throw new Error(`Can't find handlerId of "${eventName}" and handler id ${handlerId}`);
 
     return handerItem.handler;
   }

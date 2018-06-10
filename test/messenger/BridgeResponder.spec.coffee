@@ -1,7 +1,7 @@
 Bridge = require('../../src/messenger/BridgeSubscriber').default
 
 
-describe.only 'app.BridgeSubscriber', ->
+describe 'app.BridgeSubscriber', ->
   beforeEach ->
     @toHost = 'remoteHost'
     @category = 'cat'
