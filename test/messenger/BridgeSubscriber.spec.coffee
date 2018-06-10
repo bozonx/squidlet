@@ -29,7 +29,11 @@ describe.only 'app.BridgeSubscriber', ->
       topic: 'subscribeToRemoteEvent'
       from: 'master'
       to: 'remoteHost'
-      payload: '123'
+      payload: {
+        category: 'cat'
+        topic: 'topic'
+        handlerId: '123'
+      }
     })
 
   it 'income respond', ->

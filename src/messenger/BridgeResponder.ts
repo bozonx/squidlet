@@ -1,15 +1,7 @@
-import * as _ from 'lodash';
-
 import System from '../app/System';
 import Messenger from './Messenger';
 import Message from './interfaces/Message';
-import { generateEventName } from '../helpers/helpers';
 
-
-interface HandlerItem {
-  handlerId: string;
-  handler: Function;
-}
 
 /**
  * Subscribe to remote host's events

@@ -1,37 +1,58 @@
-Bridge = require('../../src/messenger/BridgeSubscriber').default
+BridgeResponder = require('../../src/messenger/BridgeResponder').default
 
 
-describe 'app.BridgeSubscriber', ->
+describe.only 'app.BridgeResponder', ->
   beforeEach ->
-    @toHost = 'remoteHost'
+    @subscriberHost = 'master'
     @category = 'cat'
     @topic = 'topic'
-    @subscribeMessage = {
-      category: 'system'
-      topic: 'subscribeToRemoteEvent'
-      to: 'remoteHost'
-      payload: '123'
-    }
     @networkIncomeHandler = null
     @system = {
-      io: {
-        generateUniqId: -> '123'
-      }
       network: {
+        hostId: 'remoteHost'
         send: sinon.stub().returns(Promise.resolve())
         listenIncome: (handler) => @networkIncomeHandler = handler
       }
+      events: {
+        addListener: sinon.spy()
+      }
     }
 
-    @bridge = new Bridge(@system)
+    @bridgeResponder = new BridgeResponder(@system)
 
-  it 'subscribe', ->
-    handler = sinon.spy()
-    @bridge.subscribe(@toHost, @category, @topic, handler)
+  it 'receive request to subscribe to event', ->
+    @incomeMessage = {
+      category: 'system'
+      topic: 'subscribeToRemoteEvent'
+      from: 'master'
+      to: 'remoteHost'
+      payload: {
+        category: 'cat'
+        topic: 'topic'
+        handlerId: '123'
+      }
+    }
 
-    sinon.assert.calledWith(@system.network.send, @toHost, @subscribeMessage)
+    @bridgeResponder.init()
 
-  it 'income message', ->
-    @bridge.init()
+    @networkIncomeHandler(@incomeMessage)
 
-    @networkIncomeHandler(@networkIncomeHandler)
+    sinon.assert.calledWith(@system.events.addListener, @category, @topic, @bridgeResponder.handlers['123'])
+
+  it 'sendResponse', ->
+    @bridgeResponder.sendResponse(@category, @topic, @subscriberHost, '123', 'payload')
+
+    sinon.assert.calledWith(@system.network.send, @subscriberHost, {
+      category: 'system'
+      topic: 'respondOfRemoteEvent'
+      from: 'remoteHost'
+      to: 'master'
+      payload: {
+        category: 'cat'
+        topic: 'topic'
+        handlerId: '123'
+        payload: 'payload'
+      }
+    })
+
+  # TODO: test unsubscribe

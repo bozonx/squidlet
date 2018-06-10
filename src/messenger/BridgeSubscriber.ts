@@ -44,7 +44,11 @@ export default class Bridge {
       topic: this.subscribeTopic,
       from: this.system.network.hostId,
       to: toHost,
-      payload: handlerId,
+      payload: {
+        category,
+        topic,
+        handlerId,
+      },
     };
     const handlerItem: HandlerItem = {
       handlerId,
