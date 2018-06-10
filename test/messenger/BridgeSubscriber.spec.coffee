@@ -24,6 +24,12 @@ describe.only 'app.BridgeSubscriber', ->
     handler = ->
     @bridgeSubscriber.subscribe(@toHost, @category, @topic, handler)
 
+    assert.deepEqual(@bridgeSubscriber.handlers['cat|topic|remoteHost'], [
+      {
+        handler,
+        handlerId: '123'
+      }
+    ])
     sinon.assert.calledWith(@system.network.send, @toHost, {
       category: 'system'
       topic: 'subscribeToRemoteEvent'
@@ -64,4 +70,39 @@ describe.only 'app.BridgeSubscriber', ->
 
     sinon.assert.calledWith(handler, 'payload')
 
-  # TODO: unsubscribe
+  it 'unsubscribe', ->
+    handlerToRemove = ->
+    otherHandler = ->
+    @bridgeSubscriber.handlers['cat|topic|remoteHost'] = [
+      {
+        handlerId: '123'
+        handler: handlerToRemove,
+      }
+      {
+        handlerId: '345'
+        handler: otherHandler,
+      }
+    ]
+
+    @bridgeSubscriber.unsubscribe(@toHost, @category, @topic, handlerToRemove)
+
+    assert.deepEqual(@bridgeSubscriber.handlers, {
+      'cat|topic|remoteHost': [
+        {
+          handlerId: '345'
+          handler: otherHandler,
+        }
+      ]
+    })
+
+    sinon.assert.calledWith(@system.network.send, @toHost, {
+      category: 'system'
+      topic: 'unsubscribeFromRemoteEvent'
+      from: 'master'
+      to: 'remoteHost'
+      payload: {
+        category: 'cat'
+        topic: 'topic'
+        handlerId: '123'
+      }
+    })
