@@ -1,7 +1,7 @@
 Destinations = require('../../src/network/Destinations').default
 
 
-describe 'app.Destinations', ->
+describe.only 'app.Destinations', ->
   beforeEach ->
     @neighbors = [
       {

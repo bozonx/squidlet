@@ -20,11 +20,7 @@ export default class Destinations {
   private readonly myAddresses: {[index: string]: MyAddress} = {};
   private readonly connections: {[index: string]: Connection} = {};
 
-  constructor(
-    drivers: Drivers,
-    myAddresses: Array<MyAddress>,
-    destinationsList: Array<Destination>
-  ) {
+  constructor(drivers: Drivers, myAddresses: Array<MyAddress>, destinationsList: Array<Destination>) {
     this.drivers = drivers;
     this.destinationsList = destinationsList;
 

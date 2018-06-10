@@ -6,7 +6,6 @@ import Drivers from '../app/Drivers';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from '../messenger/interfaces/Destination';
-import HostNetworkConfig from './interfaces/HostNetworkConfig';
 
 
 /**
@@ -17,15 +16,13 @@ import HostNetworkConfig from './interfaces/HostNetworkConfig';
 export default class Router {
   private readonly network: Network;
   private readonly drivers: Drivers;
-  private readonly networkConfig: HostNetworkConfig;
   private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
 
-  constructor(network: Network, drivers: Drivers, networkConfig: HostNetworkConfig) {
+  constructor(network: Network, drivers: Drivers) {
     this.network = network;
     this.drivers = drivers;
-    this.networkConfig = networkConfig;
     this.destinations = new Destinations(
       this.drivers,
       this.network.config.connections,

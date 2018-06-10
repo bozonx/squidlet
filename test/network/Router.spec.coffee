@@ -3,26 +3,32 @@ Router = require('../../src/network/Router').default
 
 describe 'app.Router', ->
   beforeEach ->
-    @app = {
-      host: {
-        id: 'currentHost'
-        config: {
-          host: {
-            routedMessageTTL: 100
+    @network = {
+      hostId: 'currentHost'
+      config: {
+        connections: [
+          {
+            type: 'i2c'
+            bus: '1'
+            assress: '5a'
           }
-          routes: {
-            'destHost': [ 'currentHost', 'nextHost', 'destHost' ]
+        ]
+        routes: {
+          'destHost': [ 'currentHost', 'nextHost', 'destHost' ]
+        }
+        neighbors: {
+          nextHost: {
+            type: 'i2c'
+            bus: '1'
+            address: '5a'
           }
-          neighbors: {
-            nextHost: {
-              type: 'i2c'
-              bus: '1'
-              address: '5a'
-            }
-          }
+        }
+        params: {
+          routedMessageTTL: 10
         }
       }
     }
+    @drivers = {}
 
     @destinationsSubscribeHanler = undefined
     @destinations = {
@@ -30,27 +36,27 @@ describe 'app.Router', ->
       listenIncome: (handler) => @destinationsSubscribeHanler = handler
     }
 
-    @router = new Router(@app)
+    @router = new Router(@network, @drivers)
     @router.destinations = @destinations
 
   it 'send', ->
     await @router.send('destHost', 'payload')
 
     sinon.assert.calledWith(@destinations.send,
-      @app.host.config.neighbors.nextHost,
+      @network.config.neighbors.nextHost,
       {
         payload: 'payload'
         route: ['currentHost', 'nextHost', 'destHost']
-        ttl: 100
+        ttl: 10
       }
     )
 
   it 'listenIncome and handleIncomeMessages', ->
-    @app.host.id = 'destHost'
+    @network.hostId = 'destHost'
     routerMessage = {
       payload: 'payload'
       route: ['currentHost', 'nextHost', 'destHost']
-      ttl: 100
+      ttl: 10
     }
     handler = sinon.spy()
     @router.listenIncome(handler)
@@ -60,7 +66,7 @@ describe 'app.Router', ->
     sinon.assert.calledWith(handler, 'payload')
 
   it 'handleIncomeMessages - forward to next host', ->
-    @app.host.id = 'currentHost'
+    @network.hostId = 'currentHost'
     routerMessage = {
       payload: 'payload'
       route: ['currentHost', 'nextHost', 'destHost']
@@ -72,7 +78,7 @@ describe 'app.Router', ->
 
     sinon.assert.notCalled(handler)
     sinon.assert.calledWith(@destinations.send,
-      @app.host.config.neighbors.nextHost,
+      @network.config.neighbors.nextHost,
       {
         payload: 'payload'
         route: ['currentHost', 'nextHost', 'destHost']
@@ -81,7 +87,7 @@ describe 'app.Router', ->
     )
 
   it 'private resolveNextHostId', ->
-    @app.host.id = 'currentHost'
+    @network.hostId = 'currentHost'
     route = [ 'fromHost', 'currentHost', 'nextHost' ]
 
     assert.equal(@router.resolveNextHostId(route), 'nextHost')
