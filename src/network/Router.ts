@@ -5,7 +5,7 @@ import Network from './Network';
 import Drivers from '../app/Drivers';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
-import Destination from '../messenger/interfaces/Destination';
+import Destination from './interfaces/Destination';
 
 
 /**

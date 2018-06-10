@@ -1,4 +1,4 @@
-import Destination from '../../messenger/interfaces/Destination';
+import Destination from './Destination';
 import MyAddress from '../../app/interfaces/MyAddress';
 
 

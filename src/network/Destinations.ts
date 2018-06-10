@@ -5,7 +5,7 @@ import Drivers from '../app/Drivers';
 import Connection from './interfaces/Connection';
 import ConnectionDriver from './interfaces/ConnectionDriver';
 import MyAddress from '../app/interfaces/MyAddress';
-import Destination from '../messenger/interfaces/Destination';
+import Destination from './interfaces/Destination';
 
 
 /**
