@@ -29,10 +29,6 @@ export default class Bridge {
   }
 
   init(): void {
-    this.system.network.listenIncome((message: Message): void => {
-      // TODO: нужна проверка что это именно сообщение
-      this.handleIncomeMessages(message);
-    });
   }
 
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
@@ -48,6 +44,8 @@ export default class Bridge {
       handlerId,
       handler,
     };
+
+    if (!this.handlers[eventName]) this.handlers[eventName] = [];
 
     // register listener
     this.handlers[eventName].push(handlerItem);
@@ -65,7 +63,11 @@ export default class Bridge {
       category: this.systemCategory,
       topic: this.unsubscribeTopic,
       to: toHost,
-      payload: handlerId,
+      payload: {
+        category,
+        topic,
+        handlerId,
+      },
     };
 
     this.removeHandler(eventName, handler);
@@ -78,10 +80,15 @@ export default class Bridge {
 
 
   private handleIncomeMessages(message: Message): void {
-    // TODO: слушаем входящие сервисные сообщения
-    // TODO: поднимает соответствующие хэндлеры
-    // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
+    if (message.category !== this.systemCategory) return;
 
+    if (message.topic === this.subscribeTopic) {
+      this.addLocalListener();
+    }
+
+    if (message.topic === this.unsubscribeTopic) {
+      this.removeLocalListener();
+    }
   }
 
   private findHandlerId(eventName: string, handler: Function): string {

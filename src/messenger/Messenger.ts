@@ -1,8 +1,8 @@
 import System from '../app/System';
-import Bridge from './Bridge';
+import BridgeSubscriber from './BridgeSubscriber';
+import BridgeRemote from './BridgeRemote';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
-import { generateUniqId } from '../helpers/helpers';
 
 
 /**
@@ -11,15 +11,18 @@ import { generateUniqId } from '../helpers/helpers';
  */
 export default class Messenger {
   private readonly system: System;
-  private readonly bridge: Bridge;
+  private readonly bridgeSubscriber: BridgeSubscriber;
+  private readonly bridgeRemote: BridgeRemote;
 
   constructor(system: System) {
     this.system = system;
-    this.bridge = new Bridge(this.system, this);
+    this.bridgeSubscriber = new BridgeSubscriber(this.system, this);
+    this.bridgeRemote = new BridgeRemote(this.system, this);
   }
 
   init(): void {
-    this.bridge.init();
+    this.bridgeSubscriber.init();
+    this.bridgeRemote.init();
 
     // listen income messages from remote host and rise them on a local host as local messages
     this.system.network.listenIncome((message: Message): void => {
@@ -65,7 +68,7 @@ export default class Messenger {
     }
 
     // else subscribe to remote host's events
-    this.bridge.subscribe(toHost, category, topic, handler);
+    this.bridgeSubscriber.subscribe(toHost, category, topic, handler);
   }
 
   /**
@@ -81,7 +84,7 @@ export default class Messenger {
     }
 
     // unsubscribe from remote host's events
-    this.bridge.unsubscribe(toHost, category, topic, handler);
+    this.bridgeSubscriber.unsubscribe(toHost, category, topic, handler);
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
@@ -94,7 +97,7 @@ export default class Messenger {
       category,
       from: this.system.host.id,
       to: toHost,
-      requestId: generateUniqId(),
+      requestId: this.system.io.generateUniqId(),
       isResponse: false,
       payload,
     };
