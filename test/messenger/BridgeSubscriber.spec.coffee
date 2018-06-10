@@ -1,7 +1,7 @@
-Bridge = require('../../src/messenger/BridgeSubscriber').default
+BridgeSubscriber = require('../../src/messenger/BridgeSubscriber').default
 
 
-describe.only 'app.Router', ->
+describe.only 'app.BridgeSubscriber', ->
   beforeEach ->
     @toHost = 'remoteHost'
     @category = 'cat'
@@ -23,15 +23,15 @@ describe.only 'app.Router', ->
       }
     }
 
-    @bridge = new Bridge(@system)
+    @bridgeSubscriber = new BridgeSubscriber(@system)
 
   it 'subscribe', ->
     handler = sinon.spy()
-    @bridge.subscribe(@toHost, @category, @topic, handler)
+    @bridgeSubscriber.subscribe(@toHost, @category, @topic, handler)
 
     sinon.assert.calledWith(@system.network.send, @toHost, @subscribeMessage)
 
   it 'income message', ->
-    @bridge.init()
+    @bridgeSubscriber.init()
 
     @networkIncomeHandler(@networkIncomeHandler)

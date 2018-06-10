@@ -1,6 +1,6 @@
 import System from '../app/System';
 import BridgeSubscriber from './BridgeSubscriber';
-import BridgeRemote from './BridgeRemote';
+import BridgeResponder from './BridgeResponder';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
 
@@ -12,17 +12,17 @@ import Request from './interfaces/Request';
 export default class Messenger {
   private readonly system: System;
   private readonly bridgeSubscriber: BridgeSubscriber;
-  private readonly bridgeRemote: BridgeRemote;
+  private readonly bridgeResponder: BridgeResponder;
 
   constructor(system: System) {
     this.system = system;
     this.bridgeSubscriber = new BridgeSubscriber(this.system, this);
-    this.bridgeRemote = new BridgeRemote(this.system, this);
+    this.bridgeResponder = new BridgeResponder(this.system, this);
   }
 
   init(): void {
     this.bridgeSubscriber.init();
-    this.bridgeRemote.init();
+    this.bridgeResponder.init();
 
     // listen income messages from remote host and rise them on a local host as local messages
     this.system.network.listenIncome((message: Message): void => {
@@ -43,7 +43,7 @@ export default class Messenger {
     const message: Message = {
       category,
       topic,
-      //from: this.system.host.id,
+      from: this.system.network.hostId,
       to: toHost,
       payload,
     };

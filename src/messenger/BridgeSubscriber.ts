@@ -31,12 +31,17 @@ export default class Bridge {
   init(): void {
   }
 
+
+  // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
+
+
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = generateEventName(category, topic, toHost);
     const handlerId: string = this.system.io.generateUniqId();
     const message: Message = {
       category: this.systemCategory,
       topic: this.subscribeTopic,
+      from: this.system.network.hostId,
       to: toHost,
       payload: handlerId,
     };
@@ -62,6 +67,7 @@ export default class Bridge {
     const message: Message = {
       category: this.systemCategory,
       topic: this.unsubscribeTopic,
+      from: this.system.network.hostId,
       to: toHost,
       payload: {
         category,
@@ -78,18 +84,6 @@ export default class Bridge {
       });
   }
 
-
-  private handleIncomeMessages(message: Message): void {
-    if (message.category !== this.systemCategory) return;
-
-    if (message.topic === this.subscribeTopic) {
-      this.addLocalListener();
-    }
-
-    if (message.topic === this.unsubscribeTopic) {
-      this.removeLocalListener();
-    }
-  }
 
   private findHandlerId(eventName: string, handler: Function): string {
     const handlers = this.handlers[eventName];
