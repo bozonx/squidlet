@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import System from '../app/System';
 import Messenger from './Messenger';
 import Message from './interfaces/Message';
-import { generateEventName, generateUniqId } from '../helpers/helpers';
+import { generateEventName } from '../helpers/helpers';
 
 
 interface HandlerItem {
@@ -37,7 +37,7 @@ export default class Bridge {
 
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = generateEventName(category, topic, toHost);
-    const handlerId: string = generateUniqId();
+    const handlerId: string = this.system.io.generateUniqId();
     const message: Message = {
       category: this.systemCategory,
       topic: this.subscribeTopic,

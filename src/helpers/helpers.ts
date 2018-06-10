@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import * as uniqid from 'uniqid';
 import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
 
@@ -74,10 +73,6 @@ export function stringToUint8Array(str: string): Uint8Array {
 export function stringToHex(addr: string): number {
   // to hex. eg - "5A" -> 90. "5a" the same
   return parseInt(addr, 16);
-}
-
-export function generateUniqId(): string {
-  return uniqid();
 }
 
 /**

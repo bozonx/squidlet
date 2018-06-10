@@ -1,3 +1,5 @@
+import * as uniqid from 'uniqid';
+
 const fs = require('fs');
 const { yamlToJs } = require('./helpers');
 
@@ -23,6 +25,10 @@ export default class System {
         resolve(data);
       });
     });
+  }
+
+  generateUniqId(): string {
+    return uniqid();
   }
 
 }
