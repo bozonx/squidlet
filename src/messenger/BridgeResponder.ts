@@ -31,7 +31,7 @@ export default class Bridge {
 
   init(): void {
     this.system.network.listenIncome((message: Message): void => {
-      // TODO: нужна проверка что это именно сообщение
+      // TODO: нужна проверка что это именно сообщение ???
       this.handleIncomeMessages(message);
     });
   }
@@ -84,7 +84,7 @@ export default class Bridge {
 
     this.system.network.send(subscriberHost, message)
       .catch((err) => {
-        // TODO: ожидать ответа - если не дошло - наверное повторить
+        // TODO: ????
       });
   }
 

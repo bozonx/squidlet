@@ -19,6 +19,7 @@ export default class Bridge {
   private readonly messenger: Messenger;
   private readonly systemCategory: string = 'system';
   private readonly subscribeTopic: string = 'subscribeToRemoteEvent';
+  private readonly respondTopic: string = 'respondOfRemoteEvent';
   private readonly unsubscribeTopic: string = 'unsubscribeFromRemoteEvent';
   // handlers of remote events by "toHost-category-topic"
   private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
@@ -29,6 +30,10 @@ export default class Bridge {
   }
 
   init(): void {
+    this.system.network.listenIncome((message: Message): void => {
+      // TODO: нужна проверка что это именно сообщение ???
+      this.handleIncomeMessages(message);
+    });
   }
 
 
@@ -63,7 +68,7 @@ export default class Bridge {
 
   unsubscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = generateEventName(category, topic, toHost);
-    const handlerId = this.findHandlerId(eventName, handler);
+    const handlerId = this.findHandlerIdByHandler(eventName, handler);
     const message: Message = {
       category: this.systemCategory,
       topic: this.unsubscribeTopic,
@@ -85,7 +90,25 @@ export default class Bridge {
   }
 
 
-  private findHandlerId(eventName: string, handler: Function): string {
+  private handleIncomeMessages(message: Message): void {
+    const {
+      category,
+      topic,
+      from: remoteHost,
+      payload,
+    } = message;
+
+    if (category !== this.systemCategory) return;
+
+    if (topic === this.respondTopic) {
+      // call subscriber with remote data
+      const eventName = generateEventName(category, topic, remoteHost);
+      const handler = this.findHandlerById(eventName, payload.hadlerId);
+      handler(payload.payload);
+    }
+  }
+
+  private findHandlerIdByHandler(eventName: string, handler: Function): string {
     const handlers = this.handlers[eventName];
     const handerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
       return item.handler === handler;
@@ -94,6 +117,17 @@ export default class Bridge {
     if (!handerItem) throw new Error(`Can't find handler of "${eventName}"`);
 
     return handerItem.handlerId;
+  }
+
+  private findHandlerById(eventName: string, handlerId: string): Function {
+    const handlers = this.handlers[eventName];
+    const handerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
+      return item.handlerId === handlerId;
+    });
+
+    if (!handerItem) throw new Error(`Can't find handlerId of "${eventName}"`);
+
+    return handerItem.handler;
   }
 
   private removeHandler(eventName: string, handler: Function): void {
