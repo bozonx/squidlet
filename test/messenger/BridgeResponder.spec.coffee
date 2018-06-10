@@ -1,7 +1,7 @@
 BridgeResponder = require('../../src/messenger/BridgeResponder').default
 
 
-describe.only 'app.BridgeResponder', ->
+describe 'app.BridgeResponder', ->
   beforeEach ->
     @subscriberHost = 'master'
     @category = 'cat'
@@ -15,6 +15,7 @@ describe.only 'app.BridgeResponder', ->
       }
       events: {
         addListener: sinon.spy()
+        removeListener: sinon.spy()
       }
     }
 
@@ -34,7 +35,6 @@ describe.only 'app.BridgeResponder', ->
     }
 
     @bridgeResponder.init()
-
     @networkIncomeHandler(@incomeMessage)
 
     sinon.assert.calledWith(@system.events.addListener, @category, @topic, @bridgeResponder.handlers['123'])
@@ -55,4 +55,26 @@ describe.only 'app.BridgeResponder', ->
       }
     })
 
-  # TODO: test unsubscribe
+  it 'unsubscribe', ->
+    handler = ->
+    @bridgeResponder.handlers = {
+      '123': handler
+    }
+
+    @unsubscribeMessage = {
+      category: 'system'
+      topic: 'unsubscribeFromRemoteEvent'
+      from: 'master'
+      to: 'remoteHost'
+      payload: {
+        category: 'cat'
+        topic: 'topic'
+        handlerId: '123'
+      }
+    }
+
+    @bridgeResponder.init()
+    @networkIncomeHandler(@unsubscribeMessage)
+
+    assert.deepEqual(@bridgeResponder.handlers, {})
+    sinon.assert.calledWith(@system.events.removeListener, @category, @topic, handler)

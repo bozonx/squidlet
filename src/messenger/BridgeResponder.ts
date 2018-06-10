@@ -39,18 +39,18 @@ export default class Bridge {
     if (category !== this.systemCategory) return;
 
     if (topic === this.subscribeTopic) {
-      this.addLocalListener(subscriberHost, payload.category, payload.topic, payload.handlerId);
+      this.addLocalListener(payload.category, payload.topic, payload.handlerId, subscriberHost);
     }
 
     if (topic === this.unsubscribeTopic) {
-      this.removeLocalListener();
+      this.removeLocalListener(payload.category, payload.topic, payload.handlerId);
     }
   }
 
   /**
    * Subscribe to local event and send message to remote subscriber
    */
-  private addLocalListener(subscriberHost: string, category: string, topic: string, handlerId: string) {
+  private addLocalListener(category: string, topic: string, handlerId: string, subscriberHost: string) {
     this.handlers[handlerId] = (payload: any): void => {
       this.sendResponse(category, topic, subscriberHost, handlerId, payload);
     };
@@ -58,8 +58,12 @@ export default class Bridge {
     this.system.events.addListener(category, topic, this.handlers[handlerId]);
   }
 
-  private removeLocalListener() {
-    // TODO: !!!!!
+  /**
+   * Unsubscribe from local event
+   */
+  private removeLocalListener(category: string, topic: string, handlerId: string) {
+    this.system.events.removeListener(category, topic, this.handlers[handlerId]);
+    delete this.handlers[handlerId];
   }
 
   private sendResponse(
