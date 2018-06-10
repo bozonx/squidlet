@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 
 import System from '../app/System';
 import Messenger from './Messenger';
-import Router from '../network/Router';
 import Message from './interfaces/Message';
 import { generateEventName, generateUniqId } from '../helpers/helpers';
 
@@ -18,7 +17,6 @@ interface HandlerItem {
 export default class Bridge {
   private readonly system: System;
   private readonly messenger: Messenger;
-  private readonly router: Router;
   private readonly systemCategory: string = 'system';
   private readonly subscribeTopic: string = 'subscribeToRemoteEvent';
   private readonly unsubscribeTopic: string = 'unsubscribeFromRemoteEvent';
@@ -28,16 +26,13 @@ export default class Bridge {
   constructor(system: System, messenger: Messenger) {
     this.system = system;
     this.messenger = messenger;
-    this.router = this.messenger.router;
   }
 
   init(): void {
-    // TODO: listen router income
-  }
-
-  async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
-    // TODO: publish тоже можно сюда переденсти
-
+    this.system.network.listenIncome((message: Message): void => {
+      // TODO: нужна проверка что это именно сообщение
+      this.handleIncomeMessages(message);
+    });
   }
 
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
@@ -57,7 +52,7 @@ export default class Bridge {
     // register listener
     this.handlers[eventName].push(handlerItem);
 
-    this.messenger.router.send(toHost, message)
+    this.system.network.send(toHost, message)
       .catch((err) => {
         // TODO: ожидать ответа - если не дошло - наверное повторить
       });
@@ -75,14 +70,14 @@ export default class Bridge {
 
     this.removeHandler(eventName, handler);
 
-    this.messenger.router.send(toHost, message)
+    this.system.network.send(toHost, message)
       .catch((err) => {
         // TODO: ожидать ответа - если не дошло - наверное повторить
       });
   }
 
 
-  private listenIncomeMessages() {
+  private handleIncomeMessages(message: Message): void {
     // TODO: слушаем входящие сервисные сообщения
     // TODO: поднимает соответствующие хэндлеры
     // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог

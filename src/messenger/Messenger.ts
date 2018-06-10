@@ -1,5 +1,4 @@
 import System from '../app/System';
-import Router from '../network/Router';
 import Bridge from './Bridge';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
@@ -7,26 +6,24 @@ import { generateUniqId } from '../helpers/helpers';
 
 
 /**
- * It's heart of app. It receives and sends messages to router.
+ * It's heart of app. It receives and sends messages to network.
  * You can subscribe to all the messages.
  */
 export default class Messenger {
-  readonly router: Router;
   private readonly system: System;
   private readonly bridge: Bridge;
 
   constructor(system: System) {
     this.system = system;
-    this.router = new Router(this.system);
     this.bridge = new Bridge(this.system, this);
   }
 
   init(): void {
-    this.router.init();
     this.bridge.init();
 
     // listen income messages from remote host and rise them on a local host as local messages
-    this.router.listenIncome((message: Message): void => {
+    this.system.network.listenIncome((message: Message): void => {
+      // TODO: нужна проверка что это именно сообщение
       this.system.events.emit(message.category, message.topic, message);
     });
   }
@@ -122,7 +119,9 @@ export default class Messenger {
         })
         .catch(reject);
 
-      this.router.send(request.to, request)
+      // TODO: может через бридж делать???
+
+      this.system.network.send(request.to, request)
         .catch(reject);
     });
   }
@@ -158,7 +157,7 @@ export default class Messenger {
       return;
     }
 
-    await this.router.send(message.to, message);
+    await this.system.network.send(message.to, message);
   }
 
   private waitForResponse(category: string, requestId: string): Promise<Request> {

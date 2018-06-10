@@ -25,4 +25,16 @@ export default class Network {
     this.router.init();
   }
 
+  async send(toHost: string, payload: any): Promise<void> {
+    return this.router.send(toHost, payload);
+  }
+
+  listenIncome(handler: (payload: any) => void): void {
+    this.router.listenIncome(handler);
+  }
+
+  removeListener(handler: (payload: any) => void): void {
+    this.router.removeListener(handler);
+  }
+
 }

@@ -56,11 +56,11 @@ export default class Router {
   /**
    * Listen for income messages which is delivered to this final host.
    */
-  listenIncome(handler: (payload: any) => void) {
+  listenIncome(handler: (payload: any) => void): void {
     this.events.addListener(this.eventName, handler);
   }
 
-  removeListener(handler: (payload: any) => void) {
+  removeListener(handler: (payload: any) => void): void {
     this.events.removeListener(this.eventName, handler);
   }
 

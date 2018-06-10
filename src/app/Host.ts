@@ -62,7 +62,7 @@ export default class Host {
 
     // TODO: откуда его взять
 
-    this.hostNetworkConfig = {};
+    this.hostNetworkConfig = {} as HostNetworkConfig;
   }
 
   // getAddress(type: string, bus: string): string | undefined {
