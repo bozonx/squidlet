@@ -18,7 +18,7 @@ export default class Network {
     this.hostId = hostId;
     this.config = config;
     this.drivers = drivers;
-    this.router = new Router(this, this.drivers, this.config);
+    this.router = new Router(this, this.drivers);
   }
 
   init(): void {

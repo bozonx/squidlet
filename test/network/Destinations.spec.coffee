@@ -3,67 +3,6 @@ Destinations = require('../../src/network/Destinations').default
 
 describe.only 'app.Destinations', ->
   beforeEach ->
-    @neighbors = [
-      {
-        type: 'i2c'
-        bus: '1'
-        address: '5a'
-      }
-    ]
-
-#    @app = {
-#      host: {
-#        id: 'currentHost'
-#        config: {
-#          host: {
-#            routedMessageTTL: 100
-#          }
-#          routes: {
-#            'destHost': [ 'currentHost', 'nextHost', 'destHost' ]
-#          }
-#          neighbors: {
-#            nextHost:
-#          }
-#        }
-#      }
-##      config: {
-##        devices: {
-##          room1: {
-##            host: {
-##              device1: {
-##                device: 'host'
-##                address: {
-##                  type: 'i2c'
-##                  bus: 1
-##                  address: '5A'
-##                }
-##              }
-##            }
-##          }
-##        }
-##      }
-#    }
-
-    #    @connectionSubscribeHanler = undefined
-    #    @connection = {
-    #      send: sinon.stub().returns(Promise.resolve())
-    #      listenIncome: (handler) => @connectionSubscribeHanler = handler
-    #    }
-
-#    @destinationsSubscribeHanler = undefined
-#    @destinations = {
-#      send: sinon.stub().returns(Promise.resolve())
-#      listenIncome: (handler) => @destinationsSubscribeHanler = handler
-#    }
-
-    #    @connectionClassConstructor = sinon.spy()
-    #    connectionClassConstructor = @connectionClassConstructor
-    #    @connectionClass = class
-    #      constructor: (params...) -> connectionClassConstructor(params...)
-    #      test: 'test'
-    #      init: ->
-
-    @destinations = new Destinations(@neighbors)
 
   #@router['connectionTypes'].i2c = @connectionClass
   #    @router.connections = {
@@ -80,8 +19,31 @@ describe.only 'app.Destinations', ->
   #      bus: '1'
   #    })
 
+    @dest = {
+      type: 'i2c'
+      bus: '1'
+      address: '5a'
+    }
+    @payload = { payload: 'data' }
+    @connection = {
+      send: sinon.stub().returns(Promise.resolve())
+    }
+    @drivers = {}
+    @myAddresses = []
+    destinationsList = []
+
+    @destinations = new Destinations(@drivers, @myAddresses, destinationsList)
 
   it 'send', ->
+    @destinations.connections['i2c-1'] = @connection
+    @destinations.send(@dest, @payload)
 
+    sinon.assert.calledWith(@connection.send, '5a', @payload)
 
   it 'listenIncome', ->
+    handler = sinon.spy()
+
+    @destinations.init()
+    @destinations.listenIncome(handler)
+
+    sinon.assert.calledWith(handler, 1, 2)
