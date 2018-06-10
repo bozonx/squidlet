@@ -18,27 +18,27 @@ export default class I2cMasterDriver {
 
   }
 
-  send(bus: string, address: string, register: number | undefined, data: Uint8Array): Promise<void> {
-    // TODO: если не указар register - то данные отправлять как есть без подстановки регистра
-    // TODO: наверное дожидаться  таймаута соединения и обрывать
-    const hexAddr = stringToHex(address);
-  }
-
-  addListener(bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
-    // TODO: если не указар register - то принимать все данные
-    // TODO: публикуем пришедшие данные заданной длинны
-    // TODO: при установке первого листенера - запускается полинг или слушается int
-    // TODO: вешать на конкретный bus и address
-
-    this.events.removeListener(this.eventName, handler);
-  }
-
-  removeListener(bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void): void {
-
-    // TODO: использовать bus и address
-
-    this.events.removeListener(this.eventName, handler);
-  }
+  // send(bus: string, address: string, register: number | undefined, data: Uint8Array): Promise<void> {
+  //   // TODO: если не указар register - то данные отправлять как есть без подстановки регистра
+  //   // TODO: наверное дожидаться  таймаута соединения и обрывать
+  //   const hexAddr = stringToHex(address);
+  // }
+  //
+  // listenIncome(bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+  //   // TODO: если не указар register - то принимать все данные
+  //   // TODO: публикуем пришедшие данные заданной длинны
+  //   // TODO: при установке первого листенера - запускается полинг или слушается int
+  //   // TODO: вешать на конкретный bus и address
+  //
+  //   this.events.removeListener(this.eventName, handler);
+  // }
+  //
+  // removeListener(bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void): void {
+  //
+  //   // TODO: использовать bus и address
+  //
+  //   this.events.removeListener(this.eventName, handler);
+  // }
 
 
   read(bus: string, address: string, length: number): Promise<Uint8Array> {

@@ -7,7 +7,7 @@ import I2cMasterDriver from '../../drivers/I2cMaster.driver';
 import I2cSlaveDriver from '../../drivers/I2cSlave.driver';
 
 
-interface i2cDriver {
+interface I2cDataDriver {
   send: (bus: string, address: string, register: number | undefined, data: Uint8Array) => Promise<void>;
   listenIncome: (bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
   removeListener: (bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void) => void;
@@ -23,13 +23,11 @@ class DriverInstance {
   private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
   private readonly isMaster: boolean;
-  private readonly i2cDriver: i2cDriver;
-
-  // TODO: use octal
+  private readonly i2cDataDriver: I2cDataDriver;
   // register of slave where it listen for income data
-  private readonly slaveReceiveRegister: number = 125;
+  private readonly slaveReceiveRegister: number = 0x7d;
   // register of slave where it expose of data to send to master
-  private readonly slaveSendRegister: number = 126;
+  private readonly slaveSendRegister: number = 0x7e;
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -39,11 +37,11 @@ class DriverInstance {
 
     if (this.isMaster) {
       // use master driver
-      this.i2cDriver = this.drivers.getDriver('I2cMaster.driver') as i2cDriver;
+      this.i2cDataDriver = this.drivers.getDriver('I2cMasterData.driver') as I2cDataDriver;
     }
     else {
       // use slave driver
-      this.i2cDriver = this.drivers.getDriver('I2cSlave.driver') as i2cDriver;
+      this.i2cDataDriver = this.drivers.getDriver('I2cSlaveData.driver') as I2cDataDriver;
     }
   }
 
