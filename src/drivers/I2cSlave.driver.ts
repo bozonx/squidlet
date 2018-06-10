@@ -2,15 +2,29 @@ import * as EventEmitter from 'events';
 
 import DevI2c from '../dev/I2c';
 import { stringToHex } from '../helpers/helpers';
-import Drivers from "../app/Drivers";
+import Drivers from '../app/Drivers';
 
 // TODO: сделать поддержку poling
 // TODO: сделать поддержку int
 
 
-export default class I2c {
+export default class I2cSlaveDriver {
+  // TODO: выставить из конфига
+  readonly blockLength: number = 32;
+  private readonly events: EventEmitter = new EventEmitter();
+  private readonly eventName: string = 'data';
+
   constructor(drivers: Drivers, driverParams: {[index: string]: any}) {
 
+  }
+
+  send(bus: string, address: string, data: Uint8Array): Promise<void> {
+  }
+
+  addListener(bus: string, address: string, length: number, handler: (data: Uint8Array) => void): void {
+  }
+
+  removeListener(bus: string, address: string, handler: (data: Uint8Array) => void): void {
   }
 
 }

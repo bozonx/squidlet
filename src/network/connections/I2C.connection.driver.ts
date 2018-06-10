@@ -3,13 +3,14 @@ import * as EventEmitter from 'events';
 import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
 import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
+import I2cMasterDriver from '../../drivers/I2cMaster.driver';
+import I2cSlaveDriver from '../../drivers/I2cSlave.driver';
 
 
 interface i2cDriver {
-  read: (bus: string, address: string, length: number) => Promise<Uint8Array>;
-  write: (bus: string, address: string, data: Uint8Array) => Promise<void>;
-  listen: (bus: string, address: string, length: number, handler: (data: Uint8Array) => void) => void;
-  unlisten: (bus: string, address: string, handler: (data: Uint8Array) => void) => void;
+  send: (bus: string, address: string, data: Uint8Array) => Promise<void>;
+  listenIncome: (bus: string, address: string, length: number, handler: (data: Uint8Array) => void) => void;
+  removeListener: (bus: string, address: string, handler: (data: Uint8Array) => void) => void;
 }
 
 /**
@@ -38,42 +39,35 @@ class DriverInstance {
 
     if (this.isMaster) {
       // use master driver
-      this.i2cDriver = 1;
+      this.i2cDriver = this.drivers.getDriver('I2cMaster.driver') as i2cDriver;
     }
     else {
       // use slave driver
-      this.i2cDriver = 2;
+      this.i2cDriver = this.drivers.getDriver('I2cSlave.driver') as i2cDriver;
     }
   }
 
   async send(address: string, payload: any): Promise<void> {
-    if (this.isMaster) {
-      // TODO: если мастер - послать на this.slaveWriteRegister
-    }
-    else {
-      // TODO: вызвать метода драйвера слейва
-    }
-
-
-    // TODO: review
-
-
     const jsonString = JSON.stringify(payload);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    //await this.i2cDataDriver.write(this.myAddress.bus, address, uint8Arr);
+    // TODO: указать регистр
+
+    await this.i2cDriver.send(this.myAddress.bus, address, uint8Arr);
   }
 
   listenIncome(address: string, handler: (payload: any) => void): void {
 
     // TODO: review
 
+    // TODO: указать регистр
+
     // TODO: если мастер - считывать с this.slaveReadRegister
 
     this.events.addListener(this.eventName, handler);
   }
 
-  off(handler: (payload: any) => void): void {
+  removeListener(handler: (payload: any) => void): void {
 
     // TODO: review
 
