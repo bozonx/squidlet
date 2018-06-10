@@ -18,13 +18,15 @@ export default class I2cSlaveDriver {
 
   }
 
-  send(bus: string, address: string, data: Uint8Array): Promise<void> {
+  send(bus: string, address: string, register: number | undefined, data: Uint8Array): Promise<void> {
+
   }
 
-  addListener(bus: string, address: string, length: number, handler: (data: Uint8Array) => void): void {
+  addListener(bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+    // TODO: если не указар register - то принимать все данные
   }
 
-  removeListener(bus: string, address: string, handler: (data: Uint8Array) => void): void {
+  removeListener(bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void): void {
   }
 
 }

@@ -8,9 +8,9 @@ import I2cSlaveDriver from '../../drivers/I2cSlave.driver';
 
 
 interface i2cDriver {
-  send: (bus: string, address: string, data: Uint8Array) => Promise<void>;
-  listenIncome: (bus: string, address: string, length: number, handler: (data: Uint8Array) => void) => void;
-  removeListener: (bus: string, address: string, handler: (data: Uint8Array) => void) => void;
+  send: (bus: string, address: string, register: number | undefined, data: Uint8Array) => Promise<void>;
+  listenIncome: (bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
+  removeListener: (bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void) => void;
 }
 
 /**
@@ -26,10 +26,10 @@ class DriverInstance {
   private readonly i2cDriver: i2cDriver;
 
   // TODO: use octal
-  // register of reading from slave
-  private readonly slaveReadRegister: number = 125;
-  // register of writing to slave
-  private readonly slaveWriteRegister: number = 126;
+  // register of slave where it listen for income data
+  private readonly slaveReceiveRegister: number = 125;
+  // register of slave where it expose of data to send to master
+  private readonly slaveSendRegister: number = 126;
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -53,7 +53,7 @@ class DriverInstance {
 
     // TODO: указать регистр
 
-    await this.i2cDriver.send(this.myAddress.bus, address, uint8Arr);
+    await this.i2cDriver.send(this.myAddress.bus, address, this.slaveReceiveRegister, uint8Arr);
   }
 
   listenIncome(address: string, handler: (payload: any) => void): void {
