@@ -3,17 +3,32 @@ import * as EventEmitter from 'events';
 import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
 import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
-import I2cMasterDriver from '../../drivers/I2cMaster.driver';
-import I2cSlaveDriver from '../../drivers/I2cSlave.driver';
 
 
 interface I2cDataDriver {
-  send: (bus: string, address: string, register: number | undefined, data: Uint8Array) => Promise<void>;
-  listenIncome: (bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
-  removeListener: (bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void) => void;
+  send: (
+    bus: string,
+    address: string,
+    register: number | undefined,
+    data: Uint8Array
+  ) => Promise<void>;
+  listenIncome: (
+    bus: string,
+    address: string,
+    register: number | undefined,
+    handler: (data: Uint8Array) => void
+  ) => void;
+  removeListener: (
+    bus: string,
+    address: string,
+    register: number | undefined,
+    handler: (data: Uint8Array) => void
+  ) => void;
 }
 
 /**
+ * Instance for each address.
+ * It works as master or slave according to address
  * It packs data to send it via i2c.
  */
 class DriverInstance {
@@ -22,20 +37,17 @@ class DriverInstance {
   private readonly driverConfig: {[index: string]: any};
   private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
-  private readonly isMaster: boolean;
   private readonly i2cDataDriver: I2cDataDriver;
-  // register of slave where it listen for income data
-  private readonly slaveReceiveRegister: number = 0x7d;
-  // register of slave where it expose of data to send to master
-  private readonly slaveSendRegister: number = 0x7e;
+  // register of this driver's data
+  private readonly register: number = 0x1a;
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
     this.driverConfig = driverConfig;
     this.myAddress = myAddress;
-    this.isMaster = typeof this.myAddress === 'undefined';
+    const isMaster = typeof this.myAddress === 'undefined';
 
-    if (this.isMaster) {
+    if (isMaster) {
       // use master driver
       this.i2cDataDriver = this.drivers.getDriver('I2cMasterData.driver') as I2cDataDriver;
     }
@@ -45,30 +57,27 @@ class DriverInstance {
     }
   }
 
+  init() {
+    this.i2cDataDriver.listenIncome(
+      this.myAddress.bus,
+      this.myAddress.address,
+      this.register,
+      this.handleIncomeData
+    );
+  }
+
   async send(address: string, payload: any): Promise<void> {
     const jsonString = JSON.stringify(payload);
     const uint8Arr = stringToUint8Array(jsonString);
 
-    // TODO: указать регистр
-
-    await this.i2cDriver.send(this.myAddress.bus, address, this.slaveReceiveRegister, uint8Arr);
+    await this.i2cDataDriver.send(this.myAddress.bus, address, this.register, uint8Arr);
   }
 
   listenIncome(address: string, handler: (payload: any) => void): void {
-
-    // TODO: review
-
-    // TODO: указать регистр
-
-    // TODO: если мастер - считывать с this.slaveReadRegister
-
     this.events.addListener(this.eventName, handler);
   }
 
   removeListener(handler: (payload: any) => void): void {
-
-    // TODO: review
-
     this.events.removeListener(this.eventName, handler);
   }
 
