@@ -16,8 +16,8 @@ export class DriverInstance {
   private readonly drivers: Drivers;
   private readonly driverConfig: {[index: string]: any};
   private readonly myAddress: MyAddress;
-  private readonly i2cDriver: I2cMasterInstance;
   private readonly eventName: string = 'data';
+  private readonly i2cDriver: I2cMasterInstance;
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
