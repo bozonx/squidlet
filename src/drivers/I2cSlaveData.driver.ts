@@ -23,15 +23,15 @@ export class DriverInstance {
     this.i2cDriver = driver.getInstance(this.myAddress.bus, this.myAddress.address);
   }
 
-  async send(address: string, payload: any): Promise<void> {
+  async send(address: string, payload: Uint8Array): Promise<void> {
     // TODO: review
   }
 
-  listenIncome(address: string, handler: (payload: any) => void): void {
+  listenIncome(address: string, handler: (payload: Uint8Array) => void): void {
     // TODO: review
   }
 
-  removeListener(handler: (payload: any) => void): void {
+  removeListener(handler: (payload: Uint8Array) => void): void {
     // TODO: review
   }
 
