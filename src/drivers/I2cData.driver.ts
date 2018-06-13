@@ -1,7 +1,6 @@
 import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
-import I2cMaster, { DriverInstance as I2cMasterInstance } from './I2cMaster.driver';
 import MyAddress from '../app/interfaces/MyAddress';
 import { hexToBytes, bytesToHex } from '../helpers/helpers';
 
@@ -11,23 +10,27 @@ const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 
+interface I2cDriverInstance {
+  write: (register: number | undefined, data: Uint8Array) => Promise<void>;
+  listen: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
+  removeListener: (register: number | undefined, handler: (data: Uint8Array) => void) => void;
+}
+
+interface I2cDriver {
+  getInstance: (bus: string, address: string) => I2cDriverInstance;
+}
+
 export class DriverInstance {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly drivers: Drivers;
-  private readonly driverConfig: {[index: string]: any};
   private readonly myAddress: MyAddress;
-  private readonly i2cDriver: I2cMasterInstance;
+  private readonly i2cDriver: I2cDriverInstance;
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
 
-  constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
-    this.drivers = drivers;
-    this.driverConfig = driverConfig;
+  constructor(i2cDriver: I2cDriver, myAddress: MyAddress) {
     this.myAddress = myAddress;
-
-    const driver: I2cMaster = this.drivers.getDriver('I2cMaster');
-    this.i2cDriver = driver.getInstance(this.myAddress.bus, this.myAddress.address);
+    this.i2cDriver = i2cDriver.getInstance(this.myAddress.bus, this.myAddress.address);
   }
 
   init(): void {
@@ -118,8 +121,8 @@ export default class I2cMasterDataDriver {
     this.driverConfig = driverConfig;
   }
 
-  getInstance(myAddress: MyAddress) {
-    return new DriverInstance(this.drivers, this.driverConfig, myAddress);
+  getInstance(i2cDriver: I2cDriver, myAddress: MyAddress) {
+    return new DriverInstance(i2cDriver, myAddress);
   }
 
 }

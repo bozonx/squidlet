@@ -2,33 +2,34 @@ import * as EventEmitter from 'events';
 
 import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
+import I2cDataDriver, { DriverInstance as I2cDataDriverInstance } from '../../drivers/I2cData.driver';
 import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
 
 
-interface I2cDataDriverInstance {
-  send: (
-    bus: string,
-    address: string,
-    register: number | undefined,
-    data: Uint8Array
-  ) => Promise<void>;
-  listenIncome: (
-    bus: string,
-    address: string,
-    register: number | undefined,
-    handler: (data: Uint8Array) => void
-  ) => void;
-  removeListener: (
-    bus: string,
-    address: string,
-    register: number | undefined,
-    handler: (data: Uint8Array) => void
-  ) => void;
-}
-
-interface I2cDataDriver {
-  getInstance: (myAddress: MyAddress) => I2cDataDriverInstance;
-}
+// interface I2cDataDriverInstance {
+//   send: (
+//     bus: string,
+//     address: string,
+//     register: number | undefined,
+//     data: Uint8Array
+//   ) => Promise<void>;
+//   listenIncome: (
+//     bus: string,
+//     address: string,
+//     register: number | undefined,
+//     handler: (data: Uint8Array) => void
+//   ) => void;
+//   removeListener: (
+//     bus: string,
+//     address: string,
+//     register: number | undefined,
+//     handler: (data: Uint8Array) => void
+//   ) => void;
+// }
+//
+// interface I2cDataDriver {
+//   getInstance: (myAddress: MyAddress) => I2cDataDriverInstance;
+// }
 
 /**
  * Instance for each address.
@@ -51,18 +52,20 @@ export class DriverInstance {
     this.myAddress = myAddress;
     const isMaster = typeof this.myAddress === 'undefined';
 
-    let driver;
+    const driver: I2cDataDriver = this.drivers.getDriver('I2cData.driver') as I2cDataDriver;
+    const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
+    const i2cDriver = this.drivers.getDriver(i2cDriverName) as I2cDataDriver;
 
-    if (isMaster) {
-      // use master driver
-      driver = this.drivers.getDriver('I2cMasterData.driver') as I2cDataDriver;
-    }
-    else {
-      // use slave driver
-      driver = this.drivers.getDriver('I2cSlaveData.driver') as I2cDataDriver;
-    }
+    // if (isMaster) {
+    //   // use master driver
+    //   driver = this.drivers.getDriver('I2cMasterData.driver') as I2cDataDriver;
+    // }
+    // else {
+    //   // use slave driver
+    //   driver = this.drivers.getDriver('I2cSlaveData.driver') as I2cDataDriver;
+    // }
 
-    this.i2cDataDriver = driver.getInstance(this.myAddress);
+    this.i2cDataDriver = driver.getInstance(i2cDriver, this.myAddress);
   }
 
   init() {
