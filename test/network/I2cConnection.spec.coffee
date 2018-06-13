@@ -6,13 +6,13 @@ describe.only 'connections.I2cConnection', ->
   beforeEach ->
     @listenDataHandler = undefined
     @driver = {
-      listen: (bus, addr, handler) => @listenDataHandler = handler
-      write: sinon.spy()
+      send: sinon.spy()
+      listenIncome: (mark, handler) => @listenDataHandler = handler
     }
 
-    @app = {
-      drivers: {
-        getDriver: => @driver
+    @drivers = {
+      getDriver: => {
+        getInstance: => @driver
       }
     }
 
@@ -23,19 +23,18 @@ describe.only 'connections.I2cConnection', ->
     @uint8arr = helpers.stringToUint8Array(JSON.stringify(@message))
 
     @connectionTo = {
-      host: 'room1.host1'
       type: 'i2c'
       bus: '1'
-      address: '5A'
+      address: '5a'
     }
 
-    @connection = new I2cConnection(@app, @connectionTo)
+    @connection = new I2cConnection(@drivers, {}).getInstance(@connectionTo)
     @connection.init()
 
   it 'send', ->
     await @connection.send(@message)
 
-    sinon.assert.calledWith(@driver.write, '1', '5A', @uint8arr)
+    sinon.assert.calledWith(@driver.send, 0x01, @uint8arr)
 
   it 'listenIncome', ->
     handler = sinon.spy()
