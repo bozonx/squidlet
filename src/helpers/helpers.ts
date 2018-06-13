@@ -31,7 +31,7 @@ export function bytesToHex(bytesArr: Uint8Array): string {
   let result = '';
 
   for(let byte of bytesArr) {
-    result += Number(byte).toString(16);
+    result += hexNumToHexString(Number(byte));
   }
 
   return result;
@@ -87,7 +87,7 @@ export function splitLastElement(
   return {
     last,
     rest: split.join(separator),
-  }
+  };
 }
 
 export function uint8ArrayToString(arr: Uint8Array): string {
@@ -98,9 +98,24 @@ export function stringToUint8Array(str: string): Uint8Array {
   return new TextEncoder('utf-8').encode(str);
 }
 
-export function stringToHex(addr: string): number {
+export function hesStringToHexNum(hesString: string): number {
   // to hex. eg - "5A" -> 90. "5a" the same
-  return parseInt(addr, 16);
+  return parseInt(hesString, 16);
+}
+
+export function hexNumToHexString(hexNum: number): string {
+  // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
+  let hexString: string = hexNum.toString(16);
+  if (hexString.length === 1) hexString = '0' + hexString;
+
+  return hexString;
+}
+
+export function numTo32Bit(num: number): string {
+  let result: string = hexNumToHexString(num);
+  if (result.length === 2) result = '00' + result;
+
+  return result;
 }
 
 /**

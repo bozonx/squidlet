@@ -2,7 +2,7 @@ import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
 import MyAddress from '../app/interfaces/MyAddress';
-import { hexToBytes, bytesToHex } from '../helpers/helpers';
+import { hexToBytes, bytesToHex, numTo32Bit } from '../helpers/helpers';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -63,6 +63,9 @@ export class DriverInstance {
     const dataLengthHex = bytesToHex(payload);
     const dataLength = parseInt(dataLengthHex, 16);
 
+    console.log(1111111, dataLengthHex, dataLength)
+
+
     const receiveDataCb = (payload: Uint8Array) => {
       if (payload.length < 2) throw new Error(`Incorrect received data length ${payload.length}`);
       const dataMark = payload[0];
@@ -92,15 +95,17 @@ export class DriverInstance {
     }
 
     // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
-    // TODO: to helers
-    let lengthHex: string = dataLength.toString(16);
-    if (lengthHex.length === 1) lengthHex = '0' + lengthHex;
+    const lengthHex: string = numTo32Bit(dataLength);
 
     // TODO: длина то должна быть 2 байта, а получается [ 2 ]
 
     const bytes: Uint8Array = hexToBytes(lengthHex);
 
     const lengthToSend: Uint8Array = new Uint8Array(bytes);
+
+
+    console.log(2222, lengthHex, bytes, lengthToSend)
+
 
     this.i2cDriver.write(this.lengthRegister, lengthToSend);
   }

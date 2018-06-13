@@ -1,7 +1,7 @@
 helpers = require('../../src/helpers/helpers')
 
 
-describe 'helpers.helpers', ->
+describe.only 'helpers.helpers', ->
   it 'uint8ArrayToString and stringToUint8Array', ->
     str = 'my строка'
     encoded = helpers.stringToUint8Array(str)
@@ -11,6 +11,8 @@ describe 'helpers.helpers', ->
 
   it 'hexToBytes', ->
     assert.deepEqual(helpers.hexToBytes('ffff'), new Uint8Array([ 255, 255 ]))
+    assert.deepEqual(helpers.hexToBytes('0102'), new Uint8Array([ 1, 2 ]))
 
   it 'bytesToHex', ->
     assert.deepEqual(helpers.bytesToHex(new Uint8Array([ 255, 255 ])), 'ffff')
+    assert.deepEqual(helpers.bytesToHex(new Uint8Array([ 1, 2 ])), '0102')
