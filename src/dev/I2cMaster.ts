@@ -7,13 +7,13 @@ import * as i2cBusModule from 'i2c-bus';
 export default class I2c {
   private readonly bus: i2cBusModule.I2cBus;
 
-  constructor(bus: string) {
-    if (!bus) throw new Error(`You have to specify I2C bus`);
-
+  constructor(bus: number) {
     this.bus = i2cBusModule.openSync(Number(bus));
   }
 
-  // TODO: выдавать сконфигурированные инстансы
+  async writeTo(address: number, data: Uint8Array): Promise<void> {
+
+  }
 
   readFrom(addrHex: number, quantity: number): Promise<Uint8Array> {
     const bufferToRead = new Buffer(quantity);
@@ -35,10 +35,6 @@ export default class I2c {
 
       this.bus.i2cRead(addrHex, quantity, bufferToRead, callback);
     });
-  }
-
-  writeTo(address: number, data: Array<number> | string): Promise<void> {
-    // TODO: может использвать Uint8Array
   }
 
 

@@ -1,7 +1,7 @@
 helpers = require('../../src/helpers/helpers')
 
 
-describe.only 'helpers.helpers', ->
+describe 'helpers.helpers', ->
   it 'uint8ArrayToString and stringToUint8Array', ->
     str = 'my строка'
     encoded = helpers.stringToUint8Array(str)

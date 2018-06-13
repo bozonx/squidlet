@@ -20,6 +20,8 @@ export interface I2cDriver {
   getInstance: (bus: string, address: string) => I2cDriverInstance;
 }
 
+// TODO: rename
+
 export class DriverInstance {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly myAddress: MyAddress;

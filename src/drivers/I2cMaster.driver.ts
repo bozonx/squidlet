@@ -1,6 +1,6 @@
 import * as EventEmitter from 'events';
 
-import DevI2c from '../dev/I2cMaster';
+import I2cMasterDev from '../dev/I2cMaster';
 import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 import MyAddress from '../app/interfaces/MyAddress';
@@ -8,24 +8,43 @@ import MyAddress from '../app/interfaces/MyAddress';
 // TODO: сделать поддержку poling
 // TODO: сделать поддержку int
 
+const REGISTER_POSITION = 0;
+const REGISTER_LENGTH = 1;
+
 
 export class DriverInstance {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'data';
   private readonly bus: number;
   private readonly address: number;
+  private readonly i2cMasterDev: I2cMasterDev;
 
   constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string, address: string) {
-    // TODO: bus и address привести к типу
+    this.bus = parseInt(bus);
+    this.address = hexStringToHexNum(address);
+
+    if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
+
+    this.i2cMasterDev = new I2cMasterDev(this.bus);
   }
 
-  write(register: number | undefined, data: Uint8Array): Promise<void> {
-    // TODO: если не указар register - то данные отправлять как есть без подстановки регистра
-    // TODO: наверное дожидаться  таймаута соединения и обрывать
-    const hexAddr = hexStringToHexNum(address);
+  async write(register: number | undefined, data: Uint8Array): Promise<void> {
+
+    // TODO: test
+
+    let dataToSend = data;
+
+    if (typeof register !== 'undefined') {
+      dataToSend = new Uint8Array(data.length + REGISTER_LENGTH);
+      dataToSend[REGISTER_POSITION] = register;
+      data.forEach((item, index) => dataToSend[index + REGISTER_LENGTH] = item);
+    }
+
+    await this.i2cMasterDev.writeTo(this.address, data);
   }
 
   listen(register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+    // TODO: при полинге сохраняем последние данные и при новом значение - говорим что значение изменилось
     // TODO: если не указар register - то принимать все данные
     // TODO: публикуем пришедшие данные заданной длинны
     // TODO: при установке первого листенера - запускается полинг или слушается int
@@ -34,7 +53,7 @@ export class DriverInstance {
     this.events.removeListener(this.eventName, handler);
   }
 
-  removeListener(register: number | undefined, handler: (data: Uint8Array) => void): void {
+  removeListener(register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
 
     // TODO: использовать bus и address
 
