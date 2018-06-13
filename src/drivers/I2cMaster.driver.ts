@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import DevI2c from '../dev/I2cMaster';
-import { hesStringToHexNum } from '../helpers/helpers';
+import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 import MyAddress from '../app/interfaces/MyAddress';
 
@@ -22,7 +22,7 @@ export class DriverInstance {
   write(register: number | undefined, data: Uint8Array): Promise<void> {
     // TODO: если не указар register - то данные отправлять как есть без подстановки регистра
     // TODO: наверное дожидаться  таймаута соединения и обрывать
-    const hexAddr = hesStringToHexNum(address);
+    const hexAddr = hexStringToHexNum(address);
   }
 
   listen(register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {

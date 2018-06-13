@@ -27,7 +27,7 @@ export function hexToBytes(hex: string): Uint8Array {
   return result;
 }
 
-export function bytesToHex(bytesArr: Uint8Array): string {
+export function bytesToHexString(bytesArr: Uint8Array): string {
   let result = '';
 
   for(let byte of bytesArr) {
@@ -98,7 +98,7 @@ export function stringToUint8Array(str: string): Uint8Array {
   return new TextEncoder('utf-8').encode(str);
 }
 
-export function hesStringToHexNum(hesString: string): number {
+export function hexStringToHexNum(hesString: string): number {
   // to hex. eg - "5A" -> 90. "5a" the same
   return parseInt(hesString, 16);
 }
@@ -111,11 +111,15 @@ export function hexNumToHexString(hexNum: number): string {
   return hexString;
 }
 
-export function numTo32Bit(num: number): string {
+export function numToWord(num: number): string {
   let result: string = hexNumToHexString(num);
   if (result.length === 2) result = '00' + result;
 
   return result;
+}
+
+export function wordToNum(word: string): number {
+  return parseInt(word, 16);
 }
 
 /**

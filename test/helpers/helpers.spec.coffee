@@ -13,6 +13,13 @@ describe.only 'helpers.helpers', ->
     assert.deepEqual(helpers.hexToBytes('ffff'), new Uint8Array([ 255, 255 ]))
     assert.deepEqual(helpers.hexToBytes('0102'), new Uint8Array([ 1, 2 ]))
 
-  it 'bytesToHex', ->
-    assert.deepEqual(helpers.bytesToHex(new Uint8Array([ 255, 255 ])), 'ffff')
-    assert.deepEqual(helpers.bytesToHex(new Uint8Array([ 1, 2 ])), '0102')
+  it 'bytesToHexString', ->
+    assert.equal(helpers.bytesToHexString(new Uint8Array([ 255, 255 ])), 'ffff')
+    assert.equal(helpers.bytesToHexString(new Uint8Array([ 1, 2 ])), '0102')
+
+  it 'hexNumToHexString', ->
+    assert.equal(helpers.hexNumToHexString(1), '01')
+    assert.equal(helpers.hexNumToHexString(0x01), '01')
+
+  it 'hexStringToHexNum', ->
+    assert.equal(helpers.hexNumToHexString('01'), 1)

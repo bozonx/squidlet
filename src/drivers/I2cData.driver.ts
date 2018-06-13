@@ -2,7 +2,7 @@ import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
 import MyAddress from '../app/interfaces/MyAddress';
-import { hexToBytes, bytesToHex, numTo32Bit } from '../helpers/helpers';
+import { hexToBytes, bytesToHexString, numToWord, wordToNum } from '../helpers/helpers';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -13,7 +13,7 @@ const DATA_LENGTH_REQUEST = 2;
 export interface I2cDriverInstance {
   write: (register: number | undefined, data: Uint8Array) => Promise<void>;
   listen: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
-  removeListener: (register: number | undefined, handler: (data: Uint8Array) => void) => void;
+  removeListener: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
 }
 
 export interface I2cDriver {
@@ -60,29 +60,26 @@ export class DriverInstance {
   }
 
   private handleIncomeLength = (payload: Uint8Array): void => {
-    const dataLengthHex = bytesToHex(payload);
-    const dataLength = parseInt(dataLengthHex, 16);
-
-    console.log(1111111, dataLengthHex, dataLength)
-
+    const dataLengthHex: string = bytesToHexString(payload);
+    const dataLength: number = wordToNum(dataLengthHex);
 
     const receiveDataCb = (payload: Uint8Array) => {
       if (payload.length < 2) throw new Error(`Incorrect received data length ${payload.length}`);
       const dataMark = payload[0];
       const data = new Uint8Array(payload.length - 1);
 
-      // TODO: упростить - должен быть что-то вроде unshift
-      data.forEach((item, index) => {
+      payload.forEach((item, index) => {
         // skip index 0
         if (index === DATA_MARK_POSITION) return;
 
         data[index - DATA_MARK_LENGTH] = item;
       });
 
+      // unlisten of data
+      this.i2cDriver.removeListener(this.sendDataRegister, dataLength, receiveDataCb);
+      // rise event
       this.events.emit(dataMark.toString(16), data);
     };
-
-    // TODO: наверное дату слушать постоянно и сохранять последнюю на несколько секунд пока не будет прочитанно
 
     // listen for data
     this.i2cDriver.listen(this.sendDataRegister, dataLength, receiveDataCb);
@@ -95,17 +92,9 @@ export class DriverInstance {
     }
 
     // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
-    const lengthHex: string = numTo32Bit(dataLength);
-
-    // TODO: длина то должна быть 2 байта, а получается [ 2 ]
-
+    const lengthHex: string = numToWord(dataLength);
     const bytes: Uint8Array = hexToBytes(lengthHex);
-
     const lengthToSend: Uint8Array = new Uint8Array(bytes);
-
-
-    console.log(2222, lengthHex, bytes, lengthToSend)
-
 
     this.i2cDriver.write(this.lengthRegister, lengthToSend);
   }
@@ -114,7 +103,6 @@ export class DriverInstance {
     const dataToSend: Uint8Array = new Uint8Array(dataLength + DATA_MARK_LENGTH);
     // add data mark
     dataToSend[DATA_MARK_POSITION] = dataMark;
-    // TODO: упростить - использовать spread ???
     // fill array
     data.forEach((item, index) => dataToSend[index + DATA_MARK_LENGTH] = item);
 

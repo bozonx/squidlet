@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import DevI2c from '../dev/I2cMaster';
-import { hesStringToHexNum } from '../helpers/helpers';
+import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 
 // TODO: сделать поддержку poling
