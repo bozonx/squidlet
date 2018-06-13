@@ -1,6 +1,6 @@
 import * as EventEmitter from 'events';
 
-import DevI2c from '../dev/I2c';
+import DevI2c from '../dev/I2cMaster';
 import { stringToHex } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 import MyAddress from '../app/interfaces/MyAddress';
@@ -33,13 +33,13 @@ export class DriverInstance {
 
     this.events.removeListener(this.eventName, handler);
   }
-  //
-  // removeListener(bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void): void {
-  //
-  //   // TODO: использовать bus и address
-  //
-  //   this.events.removeListener(this.eventName, handler);
-  // }
+
+  removeListener(register: number | undefined, handler: (data: Uint8Array) => void): void {
+
+    // TODO: использовать bus и address
+
+    this.events.removeListener(this.eventName, handler);
+  }
 
 
   read(bus: string, address: string, length: number): Promise<Uint8Array> {

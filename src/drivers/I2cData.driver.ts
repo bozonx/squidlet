@@ -10,13 +10,13 @@ const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 
-interface I2cDriverInstance {
+export interface I2cDriverInstance {
   write: (register: number | undefined, data: Uint8Array) => Promise<void>;
   listen: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
   removeListener: (register: number | undefined, handler: (data: Uint8Array) => void) => void;
 }
 
-interface I2cDriver {
+export interface I2cDriver {
   getInstance: (bus: string, address: string) => I2cDriverInstance;
 }
 
