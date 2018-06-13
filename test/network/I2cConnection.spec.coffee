@@ -2,7 +2,7 @@ I2cConnection = require('../../src/network/connections/I2C.connection.driver').d
 helpers = require('../../src/helpers/helpers')
 
 
-describe.only 'connections.I2cConnection', ->
+describe 'connections.I2cConnection', ->
   beforeEach ->
     @listenDataHandler = undefined
     @driver = {

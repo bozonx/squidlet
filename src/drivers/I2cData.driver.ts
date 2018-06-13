@@ -92,8 +92,15 @@ export class DriverInstance {
     }
 
     // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
-    const lengthHex = dataLength.toString(16);
-    const lengthToSend: Uint8Array = new Uint8Array(hexToBytes(lengthHex));
+    // TODO: to helers
+    let lengthHex: string = dataLength.toString(16);
+    if (lengthHex.length === 1) lengthHex = '0' + lengthHex;
+
+    // TODO: длина то должна быть 2 байта, а получается [ 2 ]
+
+    const bytes: Uint8Array = hexToBytes(lengthHex);
+
+    const lengthToSend: Uint8Array = new Uint8Array(bytes);
 
     this.i2cDriver.write(this.lengthRegister, lengthToSend);
   }
