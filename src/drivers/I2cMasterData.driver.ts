@@ -3,11 +3,13 @@ import * as EventEmitter from 'events';
 import Drivers from '../app/Drivers';
 import I2cMaster, { DriverInstance as I2cMasterInstance } from './I2cMaster.driver';
 import MyAddress from '../app/interfaces/MyAddress';
+import { hexToBytes } from '../helpers/helpers';
 
 
-const DATA_TRANSFER_REGISTER_POSITION = 0;
-const DATA_MARK_POSITION = 1;
-const DATA_LENGTH_REQUEST = 3;
+//const DATA_TRANSFER_REGISTER_POSITION = 0;
+const DATA_MARK_POSITION = 0;
+const DATA_MARK_LENGTH = 1;
+const DATA_LENGTH_REQUEST = 2;
 
 export class DriverInstance {
   private readonly events: EventEmitter = new EventEmitter();
@@ -16,8 +18,9 @@ export class DriverInstance {
   private readonly myAddress: MyAddress;
   private readonly i2cDriver: I2cMasterInstance;
   private readonly eventName: string = 'data';
-  private readonly defaultRegister: number = 0x00;
-  private readonly lengthRegister: number = 0x1b;
+  private readonly defaultDataMark: number = 0x00;
+  private readonly lengthRegister: number = 0x1a;
+  private readonly sendDataRegister: number = 0x1b;
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -29,27 +32,15 @@ export class DriverInstance {
   }
 
   init(): void {
-    this.i2cDriver.listen();
+    this.i2cDriver.listen(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
   }
 
-  send(register: number | undefined, data: Uint8Array): Promise<void> {
-    const dataOffset = 2;
-    const lengthToSend:Uint8Array = new Uint8Array(DATA_LENGTH_REQUEST);
-    // data transfer register
-    lengthToSend[DATA_TRANSFER_REGISTER_POSITION] = this.lengthRegister;
-    // data mark
-    //lengthToSend[DATA_MARK_POSITION] = (typeof register === 'undefined') ? this.defaultRegister : register;
+  async send(dataMark: number | undefined, data: Uint8Array): Promise<void> {
+    const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
+    const dataLength = data.length;
 
-    // TODO: формируем длинну данных из 2х байт
-
-    // TODO: упростить
-    // data.forEach((item, index) => {
-    //   dataToSend[index + dataOffset] = item;
-    // });
-
-    // TODO: отправляем на регистр приема длинны сообщения длинну сообщения 16 бит
-    // TODO: там длинна принимается и ожидается на регистре приема данных
-    // TODO: передаем на регистр приема данных данные заданной длинны
+    await this.sendLength(dataLength);
+    await this.sendData(completeDataMark, dataLength, data);
   }
 
   listenIncome(register: number | undefined, handler: (data: Uint8Array) => void): void {
@@ -64,8 +55,33 @@ export class DriverInstance {
   //   // TODO: Write and read - но не давать никому встать в очередь
   // }
 
-}
+  private handleIncomeLength = () => {
+    // TODO: 111
+  }
 
+  private async sendLength(dataLength: number): Promise<void> {
+    // 16 bit (2 bytes) integer
+    if (dataLength > 65535) throw new Error(`Data is too long, allowed length until 65535 bytes`);
+
+    // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
+    const lengthHex = dataLength.toString(16);
+    const lengthToSend: Uint8Array = new Uint8Array(hexToBytes(lengthHex));
+
+    this.i2cDriver.write(this.lengthRegister, lengthToSend);
+  }
+
+  private async sendData(dataMark: number, dataLength: number, data: Uint8Array): Promise<void> {
+    const dataToSend: Uint8Array = new Uint8Array(dataLength + DATA_MARK_LENGTH);
+    // add data mark
+    dataToSend[DATA_MARK_POSITION] = dataMark;
+    // TODO: упростить - использовать spread ???
+    // fill array
+    data.forEach((item, index) => dataToSend[index + DATA_MARK_LENGTH] = item);
+
+    this.i2cDriver.write(this.sendDataRegister, dataToSend);
+  }
+
+}
 
 
 export default class I2cMasterDataDriver {

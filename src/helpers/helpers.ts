@@ -8,6 +8,34 @@ export const topicSeparator = '/';
 export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
+/**
+ * Convert hex like "ffff" to array of bytes [ 255, 255 ]
+ */
+export function hexToBytes(hex: string): Uint8Array {
+  if (hex.length < 2) throw new Error(`Incorrect length of hex data`);
+  if (hex.length / 2 !== Math.ceil(hex.length / 2)) {
+    throw new Error(`Incorrect length of hex data. It has to be even`);
+  }
+
+  const result: Uint8Array = new Uint8Array(hex.length / 2);
+
+  for(let i = 0; i < hex.length; i += 2) {
+    const byte = hex[i] + hex[i + 1];
+    result[i / 2] = parseInt(byte, 16);
+  }
+
+  return result;
+}
+
+export function bytesToHex(bytesArr: Uint8Array): string {
+  let result = '';
+
+  for(let byte of bytesArr) {
+    result += Number(byte).toString(16);
+  }
+
+  return result;
+}
 
 export function generateEventName(category: string, topic: string, ...others: Array<string>): string {
   if (!topic || topic === '*') return [ category, ...others ].join(eventNameSeparator);
