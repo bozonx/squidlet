@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';
@@ -16,9 +17,9 @@ const REGISTER_LENGTH = 1;
 export class I2cMasterDriver {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly eventName: string = 'data';
   private readonly bus: number;
   private readonly i2cMasterDev: I2cMasterDev;
+  private pollLastData: {[index: string]: Uint8Array} = {};
 
   constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string | number) {
     this.drivers = drivers;
@@ -34,11 +35,13 @@ export class I2cMasterDriver {
   }
 
   startPolling(addrHex: string | number, register: number | undefined, length: number): void {
+    const address = this.normilizeAddr(addrHex);
     // TODO: запустить, если запущен то проверить длинну и ничего не делать
     // TODO: если длина не совпадает то не фатальная ошибка
   }
 
   startInt(addrHex: string | number, register: number | undefined, length: number, gpioInput: number) {
+    const address = this.normilizeAddr(addrHex);
     // TODO: запустить, если запущен то проверить длинну и ничего не делать
     // TODO: если длина не совпадает то не фатальная ошибка
   }
@@ -61,35 +64,50 @@ export class I2cMasterDriver {
 
   listen(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
     const address = this.normilizeAddr(addrHex);
+    const eventName = this.generateEventName(address, register);
 
-    // TODO: может запустить polling если не был запущен ранее, а може ругаться ???
-
-    // TODO: при полинге сохраняем последние данные и при новом значение - говорим что значение изменилось
-    // TODO: если не указар register - то принимать все данные
-    // TODO: публикуем пришедшие данные заданной длинны
-    // TODO: при установке первого листенера - запускается полинг или слушается int
-    // TODO: вешать на конкретный bus и address
-
-    this.events.addListener(this.eventName, handler);
+    // start poling/int if need
+    this.startListen(address, register, length);
+    // listen to events of this address and register
+    this.events.addListener(eventName, handler);
   }
 
   removeListener(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
     const address = this.normilizeAddr(addrHex);
+    const eventName = this.generateEventName(address, register);
 
+    // TODO: length наверное не нужен
     // TODO: останавливает полинг если уже нет ни одного слушателя
-    // TODO: использовать bus и address
 
-    this.events.removeListener(this.eventName, handler);
+    this.events.removeListener(eventName, handler);
   }
 
-  poll(addrHex: string | number, register: number | undefined, length: number): void {
+  /**
+   * Read data and rise data event
+   */
+  async poll(addrHex: string | number, register: number | undefined, length: number): Promise<void> {
     const address = this.normilizeAddr(addrHex);
+    const eventName = this.generateEventName(address, register);
 
-    // TODO: послать запрос на регистр и ожидать ответ
-    // TODO: разбираем ответ и поднимаем событие на геристр
+    // TODO: проверить длинну - если есть полинг - то должна соответствовать ????
+    // TODO: сохранять последний результат чтобы определить изменились ли данные
+    // TODO: если не указар register - то принимать все данные
+
+    const data: Uint8Array = await this.read(address, register, length);
+
+    // if data is equal to previous data - do nothing
+    if (
+      typeof this.pollLastData[eventName] !== 'undefined'
+      && _.isEqual(this.pollLastData[eventName], data)
+    ) return;
+
+    // save previous data
+    this.pollLastData[eventName] = data;
+    // finally rise an event
+    this.events.emit(eventName, data);
   }
 
-  request(addrHex: string | number, register: number, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
+  async request(addrHex: string | number, register: number, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
     const address = this.normilizeAddr(addrHex);
 
     // TODO: Write and read - но не давать никому встать в очередь
@@ -100,6 +118,9 @@ export class I2cMasterDriver {
    * If register is specified, it do request to data address(register) first.
    */
   async read(addrHex: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
+
+    // TODO: test
+
     const address = this.normilizeAddr(addrHex);
 
     if (typeof register !== 'undefined') {
@@ -109,7 +130,13 @@ export class I2cMasterDriver {
     return this.i2cMasterDev.readFrom(address, length);
   }
 
+  /**
+   * Write only a register to bus
+   */
   writeEmpty(addrHex: string | number, register: number): Promise<void> {
+
+    // TODO: test
+
     const address = this.normilizeAddr(addrHex);
     const data = new Uint8Array(1);
 
@@ -122,6 +149,16 @@ export class I2cMasterDriver {
     return (Number.isInteger(address as any))
       ? address as number
       : hexStringToHexNum(address as string);
+  }
+
+  private generateEventName(address: number, register: number | undefined): string {
+    // TODO:  !!!!!
+  }
+
+  private startListen(address: number, register: number | undefined, length: number): void {
+    // TODO: в соответсвии с конфигом запустить poling или int
+    // TODO: если уже запущенно - ничего не делаем
+    // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль
   }
 
 }
