@@ -95,13 +95,27 @@ export class I2cMasterDriver {
     // TODO: Write and read - но не давать никому встать в очередь
   }
 
-  read(addrHex: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
+  /**
+   * Read once from bus.
+   * If register is specified, it do request to data address(register) first.
+   */
+  async read(addrHex: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
     const address = this.normilizeAddr(addrHex);
 
-    this.i2cMasterDev.readFrom(address, );
+    if (typeof register !== 'undefined') {
+      await this.writeEmpty(address, register);
+    }
 
-    // TODO: прочитать один раз данные заданной длинны
-    // TODO: если есть register - сделать предварительный запрос
+    return this.i2cMasterDev.readFrom(address, length);
+  }
+
+  writeEmpty(addrHex: string | number, register: number): Promise<void> {
+    const address = this.normilizeAddr(addrHex);
+    const data = new Uint8Array(1);
+
+    data[0] = register;
+
+    return this.i2cMasterDev.writeTo(address, data);
   }
 
   private normilizeAddr(address: string | number) {
