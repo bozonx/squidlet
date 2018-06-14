@@ -1,18 +1,22 @@
 import * as i2cBusModule from 'i2c-bus';
+import {I2CConnectionDriver} from '../network/connections/I2C.connection.driver';
+import MyAddress from '../app/interfaces/MyAddress';
+import DriverFactoryBase from '../app/DriverFactoryBase';
+import Drivers from '../app/Drivers';
 
 
 /**
  * It's raspberry pi implementation of I2C bus.
  */
-export default class I2c {
+export class I2cMasterDev {
   private readonly bus: i2cBusModule.I2cBus;
 
-  constructor(bus: number) {
+  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: number) {
     this.bus = i2cBusModule.openSync(Number(bus));
   }
 
-  async writeTo(address: number, data: Uint8Array): Promise<void> {
-
+  async writeTo(addrHex: number, data: Uint8Array): Promise<void> {
+    // TODO: !!!!
   }
 
   readFrom(addrHex: number, quantity: number): Promise<Uint8Array> {
@@ -201,3 +205,12 @@ export default class I2c {
 //     this.bus.writeQuick(addrHex, cmd, bit, callback);
 //   });
 // }
+
+
+export default class Factory extends DriverFactoryBase {
+  protected DriverClass: { new (
+      drivers: Drivers,
+      driverParams: {[index: string]: any},
+      bus: number
+    ): I2cMasterDev } = I2cMasterDev;
+}
