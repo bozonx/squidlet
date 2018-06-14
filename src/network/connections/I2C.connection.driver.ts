@@ -12,7 +12,7 @@ import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
  * It works as master or slave according to address
  * It packs data to send it via i2c.
  */
-export class DriverInstance {
+export class I2CConnectionDriver {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly driverConfig: {[index: string]: any};
@@ -65,17 +65,10 @@ export class DriverInstance {
 }
 
 
-export default class ConnectionI2cDriver {
-  private readonly drivers: Drivers;
-  private readonly driverConfig: {[index: string]: any};
-
-  constructor(drivers: Drivers, driverConfig: {[index: string]: any} = {}) {
-    this.drivers = drivers;
-    this.driverConfig = driverConfig;
-  }
-
-  getInstance(myAddress: MyAddress) {
-    return new DriverInstance(this.drivers, this.driverConfig, myAddress);
-  }
-
+export default class Factory extends DriverFactoryBase {
+  protected DriverClass: { new (
+      drivers: Drivers,
+      driverParams: {[index: string]: any},
+      myAddress: MyAddress,
+    ): I2CConnectionDriver } = I2CConnectionDriver;
 }

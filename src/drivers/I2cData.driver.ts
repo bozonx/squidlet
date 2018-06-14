@@ -119,7 +119,7 @@ export class I2cDataDriver {
 }
 
 
-export default class I2cDataFactory extends DriverFactoryBase {
+export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
       driverParams: {[index: string]: any},

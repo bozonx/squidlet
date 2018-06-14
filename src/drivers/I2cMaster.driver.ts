@@ -77,7 +77,7 @@ export class I2cMasterDriver {
 }
 
 
-export default class I2cMasterFactory extends DriverFactoryBase {
+export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
       driverParams: {[index: string]: any},
