@@ -1,6 +1,6 @@
 import * as EventEmitter from 'events';
 
-import I2cMasterDev from '../dev/I2cMaster';
+import I2cMasterDev from '../dev/I2cMaster.dev';
 import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 import MyAddress from '../app/interfaces/MyAddress';
