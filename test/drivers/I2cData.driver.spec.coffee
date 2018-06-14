@@ -21,13 +21,10 @@ describe 'I2cData.driver', ->
     @lengthToSend = new Uint8Array([ 0, 2 ])
     @dataToSend = new Uint8Array([ 1, 255, 255 ])
 
-    @connectionTo = {
-      type: 'i2c'
-      bus: '1'
-      address: '5a'
-    }
+    @bus = 1
+    @address = '5a'
 
-    @i2cData = new I2cData(@drivers, {}).getInstance(@i2cDriver, @connectionTo)
+    @i2cData = new I2cData(@drivers, {}).getInstance(@i2cDriver, @bus, @address)
     @i2cData.init()
 
   it 'send', ->

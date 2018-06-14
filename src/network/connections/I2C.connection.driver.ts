@@ -2,7 +2,8 @@ import * as EventEmitter from 'events';
 
 import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
-import I2cDataDriver, { DriverInstance as I2cDataDriverInstance, I2cDriver } from '../../drivers/I2cData.driver';
+import DriverFactoryBase from '../../app/DriverFactoryBase';
+import { I2cDataDriver, I2cDriverClass } from '../../drivers/I2cData.driver';
 import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
 
 
@@ -17,7 +18,7 @@ export class DriverInstance {
   private readonly driverConfig: {[index: string]: any};
   private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
-  private readonly i2cDataDriver: I2cDataDriverInstance;
+  private readonly i2cDataDriver: I2cDataDriver;
   // register of this driver's data
   private readonly dataMark: number = 0x01;
 
@@ -27,12 +28,12 @@ export class DriverInstance {
     this.myAddress = myAddress;
 
     const isMaster = typeof this.myAddress === 'undefined';
-    const dataDriver: I2cDataDriver = this.drivers.getDriver('I2cData.driver');
+    const dataDriver: DriverFactoryBase = this.drivers.getDriver('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
     // get low level i2c driver
-    const i2cDriver: I2cDriver = this.drivers.getDriver(i2cDriverName) as I2cDriver;
+    const i2cDriver: I2cDriverClass = this.drivers.getDriver(i2cDriverName) as I2cDriverClass;
 
-    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus, this.myAddress.address);
+    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus, this.myAddress.address) as I2cDataDriver;
   }
 
   init() {

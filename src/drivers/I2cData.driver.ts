@@ -37,7 +37,7 @@ export class I2cDataDriver {
   ) {
     this.bus = bus;
     this.address = address;
-    this.i2cDriver = i2cDriver.getInstance(this.bus, this.address);
+    this.i2cDriver = i2cDriver.getInstance(this.bus, this.address) as I2cDriverClass;
   }
 
   init(): void {

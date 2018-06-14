@@ -15,7 +15,7 @@ export default abstract class DriverFactoryBase {
     this.driverConfig = driverConfig;
   }
 
-  getInstance(...params: Array<any>) {
+  getInstance(...params: Array<any>): object {
     return new this.DriverClass(this.drivers, this.driverConfig, ...params);
   }
 
