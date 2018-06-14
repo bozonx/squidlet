@@ -90,11 +90,11 @@ export function splitLastElement(
   };
 }
 
-export function uint8ArrayToString(arr: Uint8Array): string {
+export function uint8ArrayToText(arr: Uint8Array): string {
   return new TextDecoder('utf-8').decode(arr);
 }
 
-export function stringToUint8Array(str: string): Uint8Array {
+export function textToUint8Array(str: string): Uint8Array {
   return new TextEncoder('utf-8').encode(str);
 }
 

@@ -4,7 +4,7 @@ import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass } from '../../drivers/I2cData.driver';
-import { uint8ArrayToString, stringToUint8Array } from '../../helpers/helpers';
+import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 
 
 /**
@@ -42,7 +42,7 @@ export class I2CConnectionDriver {
 
   async send(payload: any): Promise<void> {
     const jsonString = JSON.stringify(payload);
-    const uint8Arr = stringToUint8Array(jsonString);
+    const uint8Arr = textToUint8Array(jsonString);
 
     await this.i2cDataDriver.send(this.dataMark, uint8Arr);
   }
@@ -56,7 +56,7 @@ export class I2CConnectionDriver {
   }
 
   private handleIncomeData = (uint8Arr: Uint8Array): void => {
-    const jsonString = uint8ArrayToString(uint8Arr);
+    const jsonString = uint8ArrayToText(uint8Arr);
     const data = JSON.parse(jsonString);
 
     this.events.emit(this.eventName, data);

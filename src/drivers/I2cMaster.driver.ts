@@ -98,6 +98,8 @@ export class I2cMasterDriver {
   read(addrHex: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
     const address = this.normilizeAddr(addrHex);
 
+    this.i2cMasterDev.readFrom(address, );
+
     // TODO: прочитать один раз данные заданной длинны
     // TODO: если есть register - сделать предварительный запрос
   }

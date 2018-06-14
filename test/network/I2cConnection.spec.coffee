@@ -20,7 +20,7 @@ describe 'connections.I2cConnection', ->
       topic: 'room1.host.device1'
     }
 
-    @uint8arr = helpers.stringToUint8Array(JSON.stringify(@message))
+    @uint8arr = helpers.textToUint8Array(JSON.stringify(@message))
 
     @connectionTo = {
       type: 'i2c'
