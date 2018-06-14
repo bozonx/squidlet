@@ -1,5 +1,6 @@
 import * as EventEmitter from 'events';
 
+import DriverFactoryBase from '../app/DriverFactoryBase';
 import I2cMasterDev from '../dev/I2cMaster.dev';
 import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
@@ -12,7 +13,7 @@ const REGISTER_POSITION = 0;
 const REGISTER_LENGTH = 1;
 
 
-export class DriverInstance {
+export class I2cMasterDriverClass {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'data';
   private readonly bus: number;
@@ -72,17 +73,11 @@ export class DriverInstance {
 }
 
 
-export default class I2cMasterDriver {
-  private readonly drivers: Drivers;
-  private readonly driverConfig: {[index: string]: any};
-
-  constructor(drivers: Drivers, driverConfig: {[index: string]: any} = {}) {
-    this.drivers = drivers;
-    this.driverConfig = driverConfig;
-  }
-
-  getInstance(bus: string, address: string) {
-    return new DriverInstance(this.drivers, this.driverConfig, bus, address);
-  }
-
+export default class I2cMasterDriver extends DriverFactoryBase {
+  DriverClass: { new (
+      drivers: Drivers,
+      driverParams: {[index: string]: any},
+      bus: string,
+      address: string
+    ): I2cMasterDriverClass } = I2cMasterDriverClass;
 }
