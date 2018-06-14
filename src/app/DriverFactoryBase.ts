@@ -2,11 +2,11 @@ import Drivers from './Drivers';
 
 
 export default abstract class DriverFactoryBase {
-  abstract DriverClass: { new (
-    drivers: Drivers,
-    driverParams: {[index: string]: any},
-    ...params: Array<any>
-  ): object };
+  protected abstract DriverClass: { new (
+      drivers: Drivers,
+      driverParams: {[index: string]: any},
+      ...params: Array<any>
+    ): object };
   private readonly drivers: Drivers;
   private readonly driverConfig: {[index: string]: any};
 

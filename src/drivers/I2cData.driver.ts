@@ -1,8 +1,10 @@
 import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
-import MyAddress from '../app/interfaces/MyAddress';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum } from '../helpers/helpers';
+import DriverFactoryBase from '../app/DriverFactoryBase';
+import MyAddress from '../app/interfaces/MyAddress';
+import {I2cMasterDriver} from './I2cMaster.driver';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -10,29 +12,32 @@ const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 
-export interface I2cDriverInstance {
+export interface I2cDriverClass {
   write: (register: number | undefined, data: Uint8Array) => Promise<void>;
   listen: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
   removeListener: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
 }
 
-export interface I2cDriver {
-  getInstance: (bus: string, address: string) => I2cDriverInstance;
-}
 
-// TODO: rename
-
-export class DriverInstance {
+export class I2cDataDriver {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly myAddress: MyAddress;
-  private readonly i2cDriver: I2cDriverInstance;
+  private readonly bus: string | number;
+  private readonly address: string | number;
+  private readonly i2cDriver: I2cDriverClass;
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
 
-  constructor(i2cDriver: I2cDriver, myAddress: MyAddress) {
-    this.myAddress = myAddress;
-    this.i2cDriver = i2cDriver.getInstance(this.myAddress.bus, this.myAddress.address);
+  constructor(
+    drivers: Drivers,
+    driverParams: {[index: string]: any},
+    i2cDriver: DriverFactoryBase,
+    bus: string | number,
+    address: string | number
+  ) {
+    this.bus = bus;
+    this.address = address;
+    this.i2cDriver = i2cDriver.getInstance(this.bus, this.address);
   }
 
   init(): void {
@@ -114,17 +119,12 @@ export class DriverInstance {
 }
 
 
-export default class I2cMasterDataDriver {
-  private readonly drivers: Drivers;
-  private readonly driverConfig: {[index: string]: any};
-
-  constructor(drivers: Drivers, driverConfig: {[index: string]: any} = {}) {
-    this.drivers = drivers;
-    this.driverConfig = driverConfig;
-  }
-
-  getInstance(i2cDriver: I2cDriver, myAddress: MyAddress) {
-    return new DriverInstance(i2cDriver, myAddress);
-  }
-
+export default class I2cDataFactory extends DriverFactoryBase {
+  protected DriverClass: { new (
+      drivers: Drivers,
+      driverParams: {[index: string]: any},
+      i2cDriver: DriverFactoryBase,
+      bus: string,
+      address: string
+    ): I2cDataDriver } = I2cDataDriver;
 }

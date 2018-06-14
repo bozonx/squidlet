@@ -13,16 +13,20 @@ const REGISTER_POSITION = 0;
 const REGISTER_LENGTH = 1;
 
 
-export class I2cMasterDriverClass {
+export class I2cMasterDriver {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'data';
   private readonly bus: number;
   private readonly address: number;
   private readonly i2cMasterDev: I2cMasterDev;
 
-  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string, address: string) {
-    this.bus = parseInt(bus);
-    this.address = hexStringToHexNum(address);
+  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string | number, address: string | number) {
+    this.bus = (Number.isInteger(bus as any))
+      ? bus as number
+      : parseInt(bus as any);
+    this.address = (Number.isInteger(address as any))
+      ? address as number
+      : hexStringToHexNum(address as string);
 
     if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
 
@@ -73,11 +77,11 @@ export class I2cMasterDriverClass {
 }
 
 
-export default class I2cMasterDriver extends DriverFactoryBase {
-  DriverClass: { new (
+export default class I2cMasterFactory extends DriverFactoryBase {
+  protected DriverClass: { new (
       drivers: Drivers,
       driverParams: {[index: string]: any},
       bus: string,
       address: string
-    ): I2cMasterDriverClass } = I2cMasterDriverClass;
+    ): I2cMasterDriver } = I2cMasterDriver;
 }

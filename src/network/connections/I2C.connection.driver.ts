@@ -32,7 +32,7 @@ export class DriverInstance {
     // get low level i2c driver
     const i2cDriver: I2cDriver = this.drivers.getDriver(i2cDriverName) as I2cDriver;
 
-    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress);
+    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus, this.myAddress.address);
   }
 
   init() {
