@@ -1,12 +1,9 @@
 Poling = require('../../src/helpers/Poling');
 
 
-describe.only 'Poling', ->
+describe 'Poling', ->
   beforeEach ->
-    log = {
-      warn: ->
-    }
-    @poling = new Poling(log)
+    @poling = new Poling()
 
   it "startPoling", (done) ->
     listenHandler = (err, data) ->
@@ -18,17 +15,16 @@ describe.only 'Poling', ->
     @poling.addPolingListener(listenHandler)
 
     @poling.startPoling(methodWhichWillPoll, 10000)
-    clearInterval(@poling._pollIntervalTimer)
+    clearInterval(@poling.pollIntervalTimerId)
 
-    expect(@poling._pollIntervalTimer).to.be.not.equal(null)
-    expect(@poling._methodWhichWillPoll).to.be.not.equal(methodWhichWillPoll)
+    assert.notEqual(@poling.pollIntervalTimerId, -1)
 
   it "startPoling - don't run polling if it's", ->
     methodWhichWillPoll = sinon.stub().returns(Promise.resolve(1))
 
     @poling.startPoling(methodWhichWillPoll, 10000)
-    @poling.startPoling(methodWhichWillPoll, 10000)
+    assert.throws(() => @poling.startPoling(methodWhichWillPoll, 10000))
 
-    clearInterval(@poling._pollIntervalTimer)
+    @poling.stopPoling()
 
     expect(methodWhichWillPoll).to.be.calledOnce

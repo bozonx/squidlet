@@ -14,7 +14,7 @@ module.exports = class Poling {
   }
 
   isPollInProgress(): boolean {
-    return this.pollIntervalTimerId > NO_INTERVAL;
+    return this.pollIntervalTimerId !== NO_INTERVAL;
   }
 
   /**
