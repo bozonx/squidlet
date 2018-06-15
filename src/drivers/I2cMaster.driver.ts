@@ -52,9 +52,9 @@ export class I2cMasterDriver {
     // TODO: если длина не совпадает то не фатальная ошибка
   }
 
-  listen(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+  listenIncome(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
 
-    // TODO: test
+    // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
 
     const address = this.normilizeAddr(addrHex);
     const eventName = this.generateEventName(address, register);
@@ -82,15 +82,10 @@ export class I2cMasterDriver {
    * Read data and rise data event
    */
   async poll(addrHex: string | number, register: number | undefined, length: number): Promise<void> {
-
-    // TODO: test
-
     const address = this.normilizeAddr(addrHex);
     const eventName = this.generateEventName(address, register);
 
-    // TODO: проверить длинну - если есть полинг - то должна соответствовать ????
-    // TODO: сохранять последний результат чтобы определить изменились ли данные
-    // TODO: если не указар register - то принимать все данные
+    // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
 
     const data: Uint8Array = await this.read(address, register, length);
 

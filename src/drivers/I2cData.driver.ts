@@ -12,9 +12,11 @@ const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 
+// TODO: адрес передается в каждой ф-ии
+
 export interface I2cDriverClass {
   write: (register: number | undefined, data: Uint8Array) => Promise<void>;
-  listen: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
+  listenIncome: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
   removeListener: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
 }
 
@@ -45,7 +47,7 @@ export class I2cDataDriver {
   }
 
   init(): void {
-    this.i2cDriver.listen(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
+    this.i2cDriver.listenIncome(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
   }
 
   async send(dataMark: number | undefined, data: Uint8Array): Promise<void> {
@@ -93,7 +95,7 @@ export class I2cDataDriver {
     };
 
     // listen for data
-    this.i2cDriver.listen(this.sendDataRegister, dataLength, receiveDataCb);
+    this.i2cDriver.listenIncome(this.sendDataRegister, dataLength, receiveDataCb);
   }
 
   private async sendLength(dataLength: number): Promise<void> {

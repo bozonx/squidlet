@@ -23,6 +23,28 @@ describe.only 'I2cMaster.driver', ->
 
     @i2cMaster = new I2cMaster(@drivers, {}).getInstance(@bus)
 
+  it 'poll to dataAddress and listenIncome', ->
+    handler = sinon.spy()
+    @i2cMaster.startListen = sinon.spy()
+    @i2cMaster.listenIncome(@address, @dataAddrHex, 1, handler)
+
+    await @i2cMaster.poll(@address, @dataAddrHex, 1)
+    await @i2cMaster.poll(@address, @dataAddrHex, 1)
+
+    sinon.assert.calledWith(@i2cMaster.startListen, @addressHex, @dataAddrHex, 1)
+    sinon.assert.calledOnce(handler)
+    sinon.assert.calledWith(handler, @readResult)
+
+  it 'poll and listenIncome without dataAddress', ->
+    handler = sinon.spy()
+    @i2cMaster.startListen = sinon.spy()
+    @i2cMaster.listenIncome(@address, undefined, 1, handler)
+
+    await @i2cMaster.poll(@address, undefined, 1)
+
+    sinon.assert.calledWith(@i2cMaster.startListen, @addressHex, undefined, 1)
+    sinon.assert.calledWith(handler, @readResult)
+
   it 'request to dataAddress', ->
     @i2cMaster.write = sinon.stub().returns(Promise.resolve())
     @i2cMaster.read = sinon.stub().returns(Promise.resolve(@readResult))
@@ -32,7 +54,7 @@ describe.only 'I2cMaster.driver', ->
     sinon.assert.calledWith(@i2cMaster.write, @addressHex, @dataAddrHex, @data)
     sinon.assert.calledWith(@i2cMaster.read, @addressHex, @dataAddrHex, 1)
 
-  it 'request from dataAddress', ->
+  it 'request without dataAddress', ->
     @i2cMaster.write = sinon.stub().returns(Promise.resolve())
     @i2cMaster.read = sinon.stub().returns(Promise.resolve(@readResult))
 
