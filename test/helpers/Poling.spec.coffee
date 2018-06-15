@@ -1,8 +1,9 @@
-Poling = require('../../src/helpers/Poling');
+Poling = require('../../src/helpers/Poling').default;
 
 
-describe 'Poling', ->
+describe.only 'Poling', ->
   beforeEach ->
+    @id = 'myId'
     @poling = new Poling()
 
   it "startPoling", (done) ->
@@ -12,19 +13,20 @@ describe 'Poling', ->
       done()
 
     methodWhichWillPoll = sinon.stub().returns(Promise.resolve(1))
-    @poling.addPolingListener(listenHandler)
+    @poling.addListener(listenHandler, @id)
 
-    @poling.startPoling(methodWhichWillPoll, 10000)
-    clearInterval(@poling.pollIntervalTimerId)
+    @poling.startPoling(methodWhichWillPoll, 10000, @id)
+    clearInterval(@poling.intervals[@id])
 
-    assert.notEqual(@poling.pollIntervalTimerId, -1)
+    assert.isObject(@poling.intervals[@id])
 
   it "startPoling - don't run polling if it's", ->
     methodWhichWillPoll = sinon.stub().returns(Promise.resolve(1))
 
-    @poling.startPoling(methodWhichWillPoll, 10000)
-    assert.throws(() => @poling.startPoling(methodWhichWillPoll, 10000))
+    @poling.startPoling(methodWhichWillPoll, 10000, @id)
+    assert.throws(() => @poling.startPoling(methodWhichWillPoll, 10000, @id))
 
-    @poling.stopPoling()
+    @poling.stopPoling(@id)
 
     expect(methodWhichWillPoll).to.be.calledOnce
+    assert.isUndefined(@poling.intervals[@id])

@@ -5,6 +5,7 @@ import DriverFactoryBase from '../app/DriverFactoryBase';
 import { I2cMasterDev } from '../dev/I2cMaster.dev';
 import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
+import Poling from '../helpers/Poling';
 
 
 const REGISTER_POSITION = 0;
@@ -16,10 +17,12 @@ export class I2cMasterDriver {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cMasterDev: I2cMasterDev;
+  private readonly poling: Poling;
   private pollLastData: {[index: string]: Uint8Array} = {};
 
   constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string | number) {
     this.drivers = drivers;
+    this.poling = new Poling();
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
       : parseInt(bus as any);
@@ -32,12 +35,24 @@ export class I2cMasterDriver {
   }
 
   startPolling(addrHex: string | number, register: number | undefined, length: number): void {
+    const address = this.normilizeAddr(addrHex);
+    const eventName = this.generateEventName(address, register);
 
     // TODO: test
 
-    const address = this.normilizeAddr(addrHex);
-    // TODO: запустить, если запущен то проверить длинну и ничего не делать
-    // TODO: если длина не совпадает то не фатальная ошибка
+    if (this.poling.isInProgress(eventName)) {
+      // TODO: если запущен то проверить длинну и ничего не делать
+      // TODO: если длина не совпадает то не фатальная ошибка
+
+      return;
+    }
+
+    const cbWhichPoll = (): Promise<void> => {
+      return this.poll(address, register, length);
+    };
+
+    // TODO: где взять poll interval ???
+    this.poling.startPoling(cbWhichPoll, 1000, eventName);
   }
 
   startInt(addrHex: string | number, register: number | undefined, length: number, gpioInput: number) {
@@ -155,6 +170,7 @@ export class I2cMasterDriver {
       : hexStringToHexNum(address as string);
   }
 
+  // TODO: rename to generateId
   private generateEventName(address: number, register: number | undefined): string {
     return [ address.toString(), register ].join('-');
   }
