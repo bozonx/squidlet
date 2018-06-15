@@ -13,8 +13,7 @@ describe.only 'I2cMaster.driver', ->
     @bus = 1
     @address = '5a'
     @addressHex = parseInt(@address, 16)
-    @dataAddr = '1a'
-    @dataAddrHex = parseInt(@dataAddr, 16)
+    @dataAddrHex = 0x1a
     @data = new Uint8Array(1)
     @data[0] = 255
 
@@ -25,7 +24,7 @@ describe.only 'I2cMaster.driver', ->
     @i2cMaster = new I2cMaster(@drivers, {}).getInstance(@bus)
 
   it 'write to dataAddress', ->
-    await @i2cMaster.write(@address, @dataAddr, @data)
+    await @i2cMaster.write(@address, @dataAddrHex, @data)
 
     dataToWrite = new Uint8Array(2)
     dataToWrite[0] = @dataAddrHex

@@ -37,6 +37,10 @@ export class I2cDataDriver {
   ) {
     this.bus = bus;
     this.address = address;
+
+
+    // TODO: адрес передается в каждой ф-ии
+
     this.i2cDriver = i2cDriver.getInstance(this.bus, this.address) as I2cDriverClass;
   }
 
