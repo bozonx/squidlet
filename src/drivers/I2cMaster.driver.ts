@@ -36,11 +36,11 @@ export class I2cMasterDriver {
 
   startPolling(addrHex: string | number, register: number | undefined, length: number): void {
     const address = this.normilizeAddr(addrHex);
-    const eventName = this.generateEventName(address, register);
+    const id = this.generateId(address, register);
 
     // TODO: test
 
-    if (this.poling.isInProgress(eventName)) {
+    if (this.poling.isInProgress(id)) {
       // TODO: если запущен то проверить длинну и ничего не делать
       // TODO: если длина не совпадает то не фатальная ошибка
 
@@ -52,7 +52,7 @@ export class I2cMasterDriver {
     };
 
     // TODO: где взять poll interval ???
-    this.poling.startPoling(cbWhichPoll, 1000, eventName);
+    this.poling.startPoling(cbWhichPoll, 1000, id);
   }
 
   startInt(addrHex: string | number, register: number | undefined, length: number, gpioInput: number) {
@@ -69,12 +69,12 @@ export class I2cMasterDriver {
     // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
 
     const address = this.normilizeAddr(addrHex);
-    const eventName = this.generateEventName(address, register);
+    const id = this.generateId(address, register);
 
     // start poling/int if need
     this.startListen(address, register, length);
     // listen to events of this address and register
-    this.events.addListener(eventName, handler);
+    this.events.addListener(id, handler);
   }
 
   removeListener(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
@@ -82,12 +82,12 @@ export class I2cMasterDriver {
     // TODO: test
 
     const address = this.normilizeAddr(addrHex);
-    const eventName = this.generateEventName(address, register);
+    const id = this.generateId(address, register);
 
     // TODO: length наверное не нужен
     // TODO: останавливает полинг если уже нет ни одного слушателя
 
-    this.events.removeListener(eventName, handler);
+    this.events.removeListener(id, handler);
   }
 
   /**
@@ -95,7 +95,7 @@ export class I2cMasterDriver {
    */
   async poll(addrHex: string | number, register: number | undefined, length: number): Promise<void> {
     const address = this.normilizeAddr(addrHex);
-    const eventName = this.generateEventName(address, register);
+    const id = this.generateId(address, register);
 
     // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
 
@@ -103,14 +103,14 @@ export class I2cMasterDriver {
 
     // if data is equal to previous data - do nothing
     if (
-      typeof this.pollLastData[eventName] !== 'undefined'
-      && _.isEqual(this.pollLastData[eventName], data)
+      typeof this.pollLastData[id] !== 'undefined'
+      && _.isEqual(this.pollLastData[id], data)
     ) return;
 
     // save previous data
-    this.pollLastData[eventName] = data;
+    this.pollLastData[id] = data;
     // finally rise an event
-    this.events.emit(eventName, data);
+    this.events.emit(id, data);
   }
 
   /**
@@ -170,8 +170,7 @@ export class I2cMasterDriver {
       : hexStringToHexNum(address as string);
   }
 
-  // TODO: rename to generateId
-  private generateEventName(address: number, register: number | undefined): string {
+  private generateId(address: number, register: number | undefined): string {
     return [ address.toString(), register ].join('-');
   }
 
