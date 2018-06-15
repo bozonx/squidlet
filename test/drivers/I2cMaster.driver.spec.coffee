@@ -1,15 +1,15 @@
 I2cMaster = require('../../src/drivers/I2cMaster.driver').default
-#helpers = require('../../src/helpers/helpers')
 
 
 describe.only 'I2cMaster.driver', ->
   beforeEach ->
+    @readResult = new Uint8Array(1)
+    @readResult[0] = 10
     @i2cDevInstance = {
       writeTo: sinon.stub().returns(Promise.resolve())
-#      listen: (register, length, handler) => @listenHandler = handler
+      readFrom: sinon.stub().returns(Promise.resolve(@readResult))
     }
     @i2cDev = getInstance: => @i2cDevInstance
-
     @bus = 1
     @address = '5a'
     @addressHex = parseInt(@address, 16)
@@ -22,6 +22,40 @@ describe.only 'I2cMaster.driver', ->
     }
 
     @i2cMaster = new I2cMaster(@drivers, {}).getInstance(@bus)
+
+  it 'request to dataAddress', ->
+    @i2cMaster.write = sinon.stub().returns(Promise.resolve())
+    @i2cMaster.read = sinon.stub().returns(Promise.resolve(@readResult))
+
+    await @i2cMaster.request(@address, @dataAddrHex, @data, 1)
+
+    sinon.assert.calledWith(@i2cMaster.write, @addressHex, @dataAddrHex, @data)
+    sinon.assert.calledWith(@i2cMaster.read, @addressHex, @dataAddrHex, 1)
+
+  it 'request from dataAddress', ->
+    @i2cMaster.write = sinon.stub().returns(Promise.resolve())
+    @i2cMaster.read = sinon.stub().returns(Promise.resolve(@readResult))
+
+    await @i2cMaster.request(@address, undefined, @data, 1)
+
+    sinon.assert.calledWith(@i2cMaster.write, @addressHex, undefined, @data)
+    sinon.assert.calledWith(@i2cMaster.read, @addressHex, undefined, 1)
+
+  it 'read from dataAddress', ->
+    @i2cMaster.writeEmpty = sinon.stub().returns(Promise.resolve())
+
+    await @i2cMaster.read(@address, @dataAddrHex, 1)
+
+    sinon.assert.calledWith(@i2cMaster.writeEmpty, @addressHex, @dataAddrHex)
+    sinon.assert.calledWith(@i2cDevInstance.readFrom, @addressHex, 1)
+
+  it 'read without dataAddress', ->
+    @i2cMaster.writeEmpty = sinon.stub().returns(Promise.resolve())
+
+    await @i2cMaster.read(@address, undefined , 1)
+
+    sinon.assert.notCalled(@i2cMaster.writeEmpty)
+    sinon.assert.calledWith(@i2cDevInstance.readFrom, @addressHex, 1)
 
   it 'write to dataAddress', ->
     await @i2cMaster.write(@address, @dataAddrHex, @data)

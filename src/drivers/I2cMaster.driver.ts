@@ -106,23 +106,22 @@ export class I2cMasterDriver {
     this.events.emit(eventName, data);
   }
 
-  // async request(addrHex: string | number, register: number, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-  //
-  //   // TODO: test
-  //
-  //   const address = this.normilizeAddr(addrHex);
-  //
-  //   // TODO: Write and read - но не давать никому встать в очередь
-  // }
+  /**
+   * Write and read from the same data address.
+   */
+  async request(addrHex: string | number, register: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
+    const address = this.normilizeAddr(addrHex);
+
+    await this.write(address, register, dataToSend);
+
+    return this.read(address, register, readLength);
+  }
 
   /**
    * Read once from bus.
    * If register is specified, it do request to data address(register) first.
    */
   async read(addrHex: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
-
-    // TODO: test
-
     const address = this.normilizeAddr(addrHex);
 
     if (typeof register !== 'undefined') {
@@ -149,9 +148,6 @@ export class I2cMasterDriver {
    * Write only a register to bus
    */
   writeEmpty(addrHex: string | number, register: number): Promise<void> {
-
-    // TODO: можно ли делать запись вообще без данных ???
-
     const address = this.normilizeAddr(addrHex);
     const dataToWrite = new Uint8Array(REGISTER_LENGTH);
 
@@ -168,9 +164,6 @@ export class I2cMasterDriver {
   }
 
   private generateEventName(address: number, register: number | undefined): string {
-
-    // TODO: проверить что будет если нет регистра
-
     return [ address.toString(), register ].join('-');
   }
 
