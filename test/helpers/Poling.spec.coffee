@@ -1,7 +1,7 @@
 Poling = require('../../src/helpers/Poling').default;
 
 
-describe.only 'Poling', ->
+describe 'Poling', ->
   beforeEach ->
     @id = 'myId'
     @poling = new Poling()

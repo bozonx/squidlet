@@ -22,13 +22,13 @@ describe 'connections.I2cConnection', ->
 
     @uint8arr = helpers.textToUint8Array(JSON.stringify(@message))
 
-    @connectionTo = {
+    @myAddress = {
       type: 'i2c'
       bus: '1'
-      address: '5a'
+      address: undefined
     }
 
-    @connection = new I2cConnection(@drivers, {}).getInstance(@connectionTo)
+    @connection = new I2cConnection(@drivers, {}).getInstance(@myAddress)
     @connection.init()
 
   it 'send', ->
