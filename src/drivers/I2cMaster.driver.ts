@@ -117,6 +117,8 @@ export class I2cMasterDriver {
       && _.isEqual(this.pollLastData[id], data)
     ) return;
 
+    // TODO: всегда поднимать событие у слушателя без регистра и на регистре - 1й байт
+
     // save previous data
     this.pollLastData[id] = data;
     // finally rise an event
@@ -197,7 +199,7 @@ export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
       driverParams: {[index: string]: any},
-      bus: string,
+      bus: string | number,
     ): I2cMasterDriver } = I2cMasterDriver;
   private instances: {[index: string]: I2cMasterDriver} = {};
 

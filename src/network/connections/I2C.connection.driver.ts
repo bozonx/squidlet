@@ -40,18 +40,18 @@ export class I2CConnectionDriver {
     this.i2cDataDriver.listenIncome(this.dataMark, this.handleIncomeData);
   }
 
-  async send(payload: any): Promise<void> {
+  async send(address: string, payload: any): Promise<void> {
     const jsonString = JSON.stringify(payload);
     const uint8Arr = textToUint8Array(jsonString);
 
     await this.i2cDataDriver.send(this.dataMark, uint8Arr);
   }
 
-  listenIncome(handler: (payload: any) => void): void {
+  listenIncome(address: string, handler: (payload: any) => void): void {
     this.events.addListener(this.eventName, handler);
   }
 
-  removeListener(handler: (payload: any) => void): void {
+  removeListener(address: string, handler: (payload: any) => void): void {
     this.events.removeListener(this.eventName, handler);
   }
 

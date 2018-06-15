@@ -10,7 +10,6 @@ const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 
-// TODO: адрес передается в каждой ф-ии
 
 export interface I2cDriverClass {
   write: (i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array) => Promise<void>;
@@ -49,18 +48,21 @@ export class I2cDataDriver {
   ) {
     this.bus = bus;
     this.address = address;
-
-    // TODO: адрес передается в каждой ф-ии
-
     this.i2cDriver = i2cDriver.getInstance(this.bus, this.address) as I2cDriverClass;
   }
 
   init(): void {
+
+    // TODO: где взять адрес ???
+    // TODO: зачем тут init ????
+
     this.i2cDriver.listenIncome(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
   }
 
   async send(dataMark: number | undefined, data: Uint8Array): Promise<void> {
     if (!data.length) throw new Error(`Nothing to send`);
+
+    // TODO: use address
 
     const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
     const dataLength = data.length;
@@ -72,11 +74,15 @@ export class I2cDataDriver {
   listenIncome(dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
     const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
 
+    // TODO: use address
+
     this.events.addListener(completeDataMark.toString(16), handler);
   }
 
   removeListener(dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
     const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
+
+    // TODO: use address
 
     this.events.removeListener(completeDataMark.toString(16), handler);
   }
@@ -140,6 +146,7 @@ export default class Factory extends DriverFactoryBase {
       driverParams: {[index: string]: any},
       i2cDriver: DriverFactoryBase,
       bus: string,
-      address: string
+      myAddress: string
+      //toAddress:
     ): I2cDataDriver } = I2cDataDriver;
 }
