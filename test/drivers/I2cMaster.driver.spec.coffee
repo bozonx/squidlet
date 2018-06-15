@@ -33,3 +33,6 @@ describe.only 'I2cMaster.driver', ->
     sinon.assert.calledWith(@i2cDevInstance.writeTo, @addressHex, dataToWrite)
 
   it 'write without dataAddress', ->
+    await @i2cMaster.write(@address, undefined, @data)
+
+    sinon.assert.calledWith(@i2cDevInstance.writeTo, @addressHex, @data)
