@@ -1,18 +1,16 @@
-import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
-import Logger from '../app/interfaces/Logger';
 
 const NO_INTERVAL = -1;
 
+
 module.exports = class Poling {
-  private readonly log: Logger;
+  //private readonly log: Logger;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'poll';
   private pollIntervalTimerId: number = NO_INTERVAL;
 
-  constructor(log: Logger) {
-    this.log = log;
+  constructor() {
   }
 
   isPollInProgress(): boolean {
@@ -25,17 +23,15 @@ module.exports = class Poling {
    * @param {function} methodWhichWillPoll - it has to return a promise
    * @param {number} pollInterval - in ms
    */
-  startPoling(methodWhichWillPoll, pollInterval) {
+  startPoling(methodWhichWillPoll: (...args: any[]) => Promise<any>, pollInterval: number): void {
     if (this.isPollInProgress()) {
-      this.log.warn(`Poling.startPoling(func, ${pollInterval}): This poll already is in progress`);
-
-      return;
+      throw new Error(`Poling.startPoling(func, ${pollInterval}): This poll already is in progress`);
     }
 
-    const polingCbWrapper = () => {
+    const polingCbWrapper: Function = () => {
       methodWhichWillPoll()
-        .then((result) => this._events.emit(this.eventName, null, result))
-        .catch((err) => this._events.emit(this.eventName, err));
+        .then((result) => this.events.emit(this.eventName, null, result))
+        .catch((err) => this.events.emit(this.eventName, err));
     };
 
     // start first time immediately
@@ -44,19 +40,18 @@ module.exports = class Poling {
     this.pollIntervalTimerId = setInterval(polingCbWrapper, pollInterval);
   }
 
-  addPolingListener(handler) {
+  addPolingListener(handler: (err: Error, result: any) => void) {
     // add event listener on status change
-    this._events.on(this.eventName, handler);
+    this.events.addListener(this.eventName, handler);
   }
 
-  off(handler) {
-    this._events.removeListener(this.eventName, handler);
+  off(handler: (err: Error, result: any) => void) {
+    this.events.removeListener(this.eventName, handler);
   }
 
   stopPoling() {
     clearInterval(this.pollIntervalTimerId);
     this.pollIntervalTimerId = NO_INTERVAL;
-    this._methodWhichWillPoll = null;
   }
 
 };
