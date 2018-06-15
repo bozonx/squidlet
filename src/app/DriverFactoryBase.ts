@@ -7,8 +7,8 @@ export default abstract class DriverFactoryBase {
       driverParams: {[index: string]: any},
       ...params: Array<any>
     ): object };
-  private readonly drivers: Drivers;
-  private readonly driverConfig: {[index: string]: any};
+  protected readonly drivers: Drivers;
+  protected readonly driverConfig: {[index: string]: any};
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any} = {}) {
     this.drivers = drivers;

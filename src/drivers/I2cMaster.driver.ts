@@ -7,9 +7,6 @@ import { hexStringToHexNum } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 
 
-// TODO: сделать поддержку poling
-// TODO: сделать поддержку int
-
 const REGISTER_POSITION = 0;
 const REGISTER_LENGTH = 1;
 
@@ -79,7 +76,7 @@ export class I2cMasterDriver {
   }
 
   /**
-   * Read data and rise data event
+   * Read data once and rise data event
    */
   async poll(addrHex: string | number, register: number | undefined, length: number): Promise<void> {
     const address = this.normilizeAddr(addrHex);
@@ -171,12 +168,17 @@ export class I2cMasterDriver {
 }
 
 
-// TODO: может лучше запоминать инстанс на bus и выдавать тот же самый?
-
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
       driverParams: {[index: string]: any},
       bus: string,
     ): I2cMasterDriver } = I2cMasterDriver;
+  private instances: {[index: string]: I2cMasterDriver} = {};
+
+  getInstance(bus: string) {
+    this.instances[bus] = super.getInstance(bus) as I2cMasterDriver;
+
+    return this.instances[bus];
+  }
 }

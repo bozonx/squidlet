@@ -1,7 +1,7 @@
 I2cMaster = require('../../src/drivers/I2cMaster.driver').default
 
 
-describe.only 'I2cMaster.driver', ->
+describe 'I2cMaster.driver', ->
   beforeEach ->
     @readResult = new Uint8Array(1)
     @readResult[0] = 10
