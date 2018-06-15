@@ -52,19 +52,6 @@ export class I2cMasterDriver {
     // TODO: если длина не совпадает то не фатальная ошибка
   }
 
-  async write(addrHex: string | number, register: number | undefined, data: Uint8Array): Promise<void> {
-    const address = this.normilizeAddr(addrHex);
-    let dataToWrite = data;
-
-    if (typeof register !== 'undefined') {
-      dataToWrite = new Uint8Array(data.length + REGISTER_LENGTH);
-      dataToWrite[REGISTER_POSITION] = register;
-      data.forEach((item, index) => dataToWrite[index + REGISTER_LENGTH] = item);
-    }
-
-    await this.i2cMasterDev.writeTo(address, dataToWrite);
-  }
-
   listen(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
 
     // TODO: test
@@ -145,20 +132,34 @@ export class I2cMasterDriver {
     return this.i2cMasterDev.readFrom(address, length);
   }
 
+  async write(addrHex: string | number, register: number | undefined, data: Uint8Array): Promise<void> {
+    const address = this.normilizeAddr(addrHex);
+    let dataToWrite = data;
+
+    if (typeof register !== 'undefined') {
+      dataToWrite = new Uint8Array(data.length + REGISTER_LENGTH);
+      dataToWrite[REGISTER_POSITION] = register;
+      data.forEach((item, index) => dataToWrite[index + REGISTER_LENGTH] = item);
+    }
+
+    await this.i2cMasterDev.writeTo(address, dataToWrite);
+  }
+
   /**
    * Write only a register to bus
    */
   writeEmpty(addrHex: string | number, register: number): Promise<void> {
 
-    // TODO: test
+    // TODO: можно ли делать запись вообще без данных ???
 
     const address = this.normilizeAddr(addrHex);
-    const data = new Uint8Array(1);
+    const dataToWrite = new Uint8Array(REGISTER_LENGTH);
 
-    data[0] = register;
+    dataToWrite[0] = register;
 
-    return this.i2cMasterDev.writeTo(address, data);
+    return this.i2cMasterDev.writeTo(address, dataToWrite);
   }
+
 
   private normilizeAddr(address: string | number) {
     return (Number.isInteger(address as any))
@@ -167,7 +168,9 @@ export class I2cMasterDriver {
   }
 
   private generateEventName(address: number, register: number | undefined): string {
+
     // TODO: проверить что будет если нет регистра
+
     return [ address.toString(), register ].join('-');
   }
 

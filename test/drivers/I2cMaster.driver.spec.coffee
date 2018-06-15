@@ -36,3 +36,11 @@ describe.only 'I2cMaster.driver', ->
     await @i2cMaster.write(@address, undefined, @data)
 
     sinon.assert.calledWith(@i2cDevInstance.writeTo, @addressHex, @data)
+
+  it 'writeEmpty', ->
+    await @i2cMaster.writeEmpty(@address, @dataAddrHex)
+
+    dataToWrite = new Uint8Array(1)
+    dataToWrite[0] = @dataAddrHex
+
+    sinon.assert.calledWith(@i2cDevInstance.writeTo, @addressHex, dataToWrite)
