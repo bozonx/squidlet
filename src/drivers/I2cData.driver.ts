@@ -13,14 +13,19 @@ const DATA_LENGTH_REQUEST = 2;
 // TODO: адрес передается в каждой ф-ии
 
 export interface I2cDriverClass {
-  write: (register: number | undefined, data: Uint8Array) => Promise<void>;
+  write: (i2cAddress: string | number, register: number | undefined, data: Uint8Array) => Promise<void>;
   listenIncome: (
     i2cAddress: string | number,
     register: number | undefined,
     length: number,
     handler: (data: Uint8Array) => void
   ) => void;
-  removeListener: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
+  removeListener: (
+    i2cAddress: string | number,
+    register: number | undefined,
+    length: number,
+    handler: (data: Uint8Array) => void
+  ) => void;
 }
 
 

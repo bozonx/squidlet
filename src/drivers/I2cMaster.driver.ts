@@ -82,7 +82,12 @@ export class I2cMasterDriver {
     this.events.addListener(id, handler);
   }
 
-  removeListener(i2cAddress: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+  removeListener(
+    i2cAddress: string | number,
+    register: number | undefined,
+    length: number,
+    handler: (data: Uint8Array) => void
+  ): void {
 
     // TODO: test
 
