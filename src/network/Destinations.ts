@@ -15,7 +15,7 @@ export default class Destinations {
   private readonly drivers: Drivers;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
-  private readonly neighbors: {[index: string]: Destination};
+  private readonly neighbors: {[index: string]: Destination} = {};
   // addresses by "type-bus"
   private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
@@ -65,14 +65,15 @@ export default class Destinations {
   private collectMyAddresses(): Array<MyAddress> {
     const result: {[index: string]: MyAddress} = {};
 
-    _.each(this.neighbors, (dest: Destination) => {
+    for (let name in this.neighbors) {
+      const dest = this.neighbors[name];
       const connectionId: string = this.generateConnectionId(dest);
       const found = _.find(this.myAddresses, (item) => {
         return item.type === dest.type && item.bus === dest.bus;
       });
 
       if (found) result[connectionId] = found;
-    });
+    }
 
     return _.map(result);
   }
@@ -86,11 +87,12 @@ export default class Destinations {
   }
 
   private listenToAllDestinations(): void {
-    _.each(this.neighbors, (destination: Destination) => {
+    for (let name in this.neighbors) {
+      const destination = this.neighbors[name];
       const connection = this.getConnection(destination);
       const handler = this.handleIncomeMessages.bind(this, destination);
       connection.listenIncome(destination.address, handler);
-    });
+    }
   }
 
   private handleIncomeMessages(fromDest: Destination, payload: any): void {
