@@ -34,9 +34,9 @@ export class I2cMasterDriver {
     this.i2cMasterDev = i2cDevDriver.getInstance(this.bus) as I2cMasterDev;
   }
 
-  startPolling(addrHex: string | number, register: number | undefined, length: number): void {
-    const address = this.normilizeAddr(addrHex);
-    const id = this.generateId(address, register);
+  startPolling(i2cAddress: string | number, register: number | undefined, length: number): void {
+    const addressHex = this.normilizeAddr(i2cAddress);
+    const id = this.generateId(addressHex, register);
 
     // TODO: test
 
@@ -48,41 +48,46 @@ export class I2cMasterDriver {
     }
 
     const cbWhichPoll = (): Promise<void> => {
-      return this.poll(address, register, length);
+      return this.poll(addressHex, register, length);
     };
 
     // TODO: где взять poll interval ???
     this.poling.startPoling(cbWhichPoll, 1000, id);
   }
 
-  startInt(addrHex: string | number, register: number | undefined, length: number, gpioInput: number) {
+  startInt(i2cAddress: string | number, register: number | undefined, length: number, gpioInput: number) {
 
     // TODO: test
 
-    const address = this.normilizeAddr(addrHex);
+    const addressHex = this.normilizeAddr(i2cAddress);
     // TODO: запустить, если запущен то проверить длинну и ничего не делать
     // TODO: если длина не совпадает то не фатальная ошибка
   }
 
-  listenIncome(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+  listenIncome(
+    i2cAddress: string | number,
+    register: number | undefined,
+    length: number,
+    handler: (data: Uint8Array) => void
+  ): void {
 
     // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
 
-    const address = this.normilizeAddr(addrHex);
-    const id = this.generateId(address, register);
+    const addressHex = this.normilizeAddr(i2cAddress);
+    const id = this.generateId(addressHex, register);
 
     // start poling/int if need
-    this.startListen(address, register, length);
+    this.startListen(addressHex, register, length);
     // listen to events of this address and register
     this.events.addListener(id, handler);
   }
 
-  removeListener(addrHex: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+  removeListener(i2cAddress: string | number, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
 
     // TODO: test
 
-    const address = this.normilizeAddr(addrHex);
-    const id = this.generateId(address, register);
+    const addressHex = this.normilizeAddr(i2cAddress);
+    const id = this.generateId(addressHex, register);
 
     // TODO: length наверное не нужен
     // TODO: останавливает полинг если уже нет ни одного слушателя
@@ -93,13 +98,13 @@ export class I2cMasterDriver {
   /**
    * Read data once and rise data event
    */
-  async poll(addrHex: string | number, register: number | undefined, length: number): Promise<void> {
-    const address = this.normilizeAddr(addrHex);
-    const id = this.generateId(address, register);
+  async poll(i2cAddress: string | number, register: number | undefined, length: number): Promise<void> {
+    const addressHex = this.normilizeAddr(i2cAddress);
+    const id = this.generateId(addressHex, register);
 
     // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
 
-    const data: Uint8Array = await this.read(address, register, length);
+    const data: Uint8Array = await this.read(addressHex, register, length);
 
     // if data is equal to previous data - do nothing
     if (
@@ -116,30 +121,30 @@ export class I2cMasterDriver {
   /**
    * Write and read from the same data address.
    */
-  async request(addrHex: string | number, register: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    const address = this.normilizeAddr(addrHex);
+  async request(i2cAddress: string | number, register: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
+    const addressHex = this.normilizeAddr(i2cAddress);
 
-    await this.write(address, register, dataToSend);
+    await this.write(addressHex, register, dataToSend);
 
-    return this.read(address, register, readLength);
+    return this.read(addressHex, register, readLength);
   }
 
   /**
    * Read once from bus.
    * If register is specified, it do request to data address(register) first.
    */
-  async read(addrHex: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
-    const address = this.normilizeAddr(addrHex);
+  async read(i2cAddress: string | number, register: number | undefined, length: number): Promise<Uint8Array> {
+    const addressHex = this.normilizeAddr(i2cAddress);
 
     if (typeof register !== 'undefined') {
-      await this.writeEmpty(address, register);
+      await this.writeEmpty(addressHex, register);
     }
 
-    return this.i2cMasterDev.readFrom(address, length);
+    return this.i2cMasterDev.readFrom(addressHex, length);
   }
 
-  async write(addrHex: string | number, register: number | undefined, data: Uint8Array): Promise<void> {
-    const address = this.normilizeAddr(addrHex);
+  async write(i2cAddress: string | number, register: number | undefined, data: Uint8Array): Promise<void> {
+    const addressHex = this.normilizeAddr(i2cAddress);
     let dataToWrite = data;
 
     if (typeof register !== 'undefined') {
@@ -148,33 +153,33 @@ export class I2cMasterDriver {
       data.forEach((item, index) => dataToWrite[index + REGISTER_LENGTH] = item);
     }
 
-    await this.i2cMasterDev.writeTo(address, dataToWrite);
+    await this.i2cMasterDev.writeTo(addressHex, dataToWrite);
   }
 
   /**
    * Write only a register to bus
    */
-  writeEmpty(addrHex: string | number, register: number): Promise<void> {
-    const address = this.normilizeAddr(addrHex);
+  writeEmpty(i2cAddress: string | number, register: number): Promise<void> {
+    const addressHex = this.normilizeAddr(i2cAddress);
     const dataToWrite = new Uint8Array(REGISTER_LENGTH);
 
     dataToWrite[0] = register;
 
-    return this.i2cMasterDev.writeTo(address, dataToWrite);
+    return this.i2cMasterDev.writeTo(addressHex, dataToWrite);
   }
 
 
-  private normilizeAddr(address: string | number) {
-    return (Number.isInteger(address as any))
-      ? address as number
-      : hexStringToHexNum(address as string);
+  private normilizeAddr(addressHex: string | number) {
+    return (Number.isInteger(addressHex as any))
+      ? addressHex as number
+      : hexStringToHexNum(addressHex as string);
   }
 
-  private generateId(address: number, register: number | undefined): string {
-    return [ address.toString(), register ].join('-');
+  private generateId(addressHex: number, register: number | undefined): string {
+    return [ addressHex.toString(), register ].join('-');
   }
 
-  private startListen(address: number, register: number | undefined, length: number): void {
+  private startListen(addressHex: number, register: number | undefined, length: number): void {
     // TODO: в соответсвии с конфигом запустить poling или int
     // TODO: если уже запущенно - ничего не делаем
     // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль

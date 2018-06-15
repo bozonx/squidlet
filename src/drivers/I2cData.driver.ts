@@ -3,8 +3,6 @@ import * as EventEmitter from 'events';
 import Drivers from '../app/Drivers';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import MyAddress from '../app/interfaces/MyAddress';
-import {I2cMasterDriver} from './I2cMaster.driver';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -16,7 +14,12 @@ const DATA_LENGTH_REQUEST = 2;
 
 export interface I2cDriverClass {
   write: (register: number | undefined, data: Uint8Array) => Promise<void>;
-  listenIncome: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
+  listenIncome: (
+    i2cAddress: string | number,
+    register: number | undefined,
+    length: number,
+    handler: (data: Uint8Array) => void
+  ) => void;
   removeListener: (register: number | undefined, length: number, handler: (data: Uint8Array) => void) => void;
 }
 
