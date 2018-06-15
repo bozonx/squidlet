@@ -18,15 +18,15 @@ export class DriverInstance {
     // TODO: bus и address привести к типу
   }
 
-  write(bus: string, address: string, register: number | undefined, data: Uint8Array): Promise<void> {
+  write(bus: string, address: string, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
 
   }
 
-  listen(bus: string, address: string, register: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
+  listen(bus: string, address: string, dataAddress: number | undefined, length: number, handler: (data: Uint8Array) => void): void {
     // TODO: если не указар register - то принимать все данные
   }
 
-  removeListener(bus: string, address: string, register: number | undefined, handler: (data: Uint8Array) => void): void {
+  removeListener(bus: string, address: string, dataAddress: number | undefined, handler: (data: Uint8Array) => void): void {
   }
 
 }

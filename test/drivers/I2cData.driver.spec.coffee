@@ -7,7 +7,7 @@ describe 'I2cData.driver', ->
     @listenHandler = undefined
     @i2cDriverInstance = {
       write: sinon.stub().returns(Promise.resolve())
-      listen: (register, length, handler) => @listenHandler = handler
+      listen: (dataAddress, length, handler) => @listenHandler = handler
       removeListener: ->
     }
     @i2cDriver = getInstance: => @i2cDriverInstance

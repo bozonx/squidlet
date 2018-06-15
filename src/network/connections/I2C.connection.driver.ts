@@ -19,7 +19,7 @@ export class I2CConnectionDriver {
   private readonly myAddress: MyAddress;
   private readonly eventName: string = 'data';
   private readonly i2cDataDriver: I2cDataDriver;
-  // register of this driver's data
+  // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
