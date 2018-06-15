@@ -27,7 +27,7 @@ export class I2CConnectionDriver {
     this.driverConfig = driverConfig;
     this.myAddress = myAddress;
 
-    const isMaster = typeof this.myAddress === 'undefined';
+    const isMaster = typeof this.myAddress.address === 'undefined';
     const dataDriver: DriverFactoryBase = this.drivers.getDriver('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
     // get low level i2c driver

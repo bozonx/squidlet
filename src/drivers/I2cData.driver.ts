@@ -34,12 +34,13 @@ export class I2cDataDriver {
     drivers: Drivers,
     driverParams: {[index: string]: any},
     i2cDriver: DriverFactoryBase,
+    // bus to use
     bus: string | number,
+    // address of current host on this bus
     address: string | number
   ) {
     this.bus = bus;
     this.address = address;
-
 
     // TODO: адрес передается в каждой ф-ии
 
