@@ -1,12 +1,10 @@
 import * as i2cBusModule from 'i2c-bus';
-import {I2CConnectionDriver} from '../network/connections/I2C.connection.driver';
-import MyAddress from '../app/interfaces/MyAddress';
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import Drivers from '../app/Drivers';
 
 
 /**
- * It's raspberry pi implementation of I2C bus.
+ * It's raspberry pi implementation of I2C master.
  */
 export class I2cMasterDev {
   private readonly bus: i2cBusModule.I2cBus;

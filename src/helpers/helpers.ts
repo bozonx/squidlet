@@ -8,6 +8,21 @@ export const topicSeparator = '/';
 export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
+
+export function removeFirstItemUnit8Arr(arr: Uint8Array): Uint8Array {
+
+  // TODO: test
+
+  const shift = 1;
+  const result = new Uint8Array(arr.length - shift);
+
+  for (let i = 0; i < arr.length; i++) {
+    result[i] = arr[i + shift];
+  }
+
+  return result;
+}
+
 /**
  * Convert hex like "ffff" to array of bytes [ 255, 255 ]
  */

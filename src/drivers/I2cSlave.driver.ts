@@ -1,12 +1,12 @@
 import * as EventEmitter from 'events';
 
-import I2cSlaveDev from '../dev/I2cSlave.dev';
+import { I2cSlaveDev } from '../dev/I2cSlave.dev';
 import Drivers from '../app/Drivers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import { hexStringToHexNum } from '../helpers/helpers';
+import { removeFirstItemUnit8Arr } from '../helpers/helpers';
 
-// TODO: сделать поддержку poling
-// TODO: сделать поддержку int
+
+const NO_DATA_ADDRESS = 'null';
 
 
 export class I2cSlaveDriver {
@@ -27,12 +27,13 @@ export class I2cSlaveDriver {
 
     this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlaveDev;
 
+    this.i2cSlaveDev.listenIncome(this.handleIncomeData);
     // TODO: повешать слушателя handleIncomeData прерываний i2c
   }
 
   // TODO: поддержка int
 
-  async write(i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+  async write(i2cAddress: undefined, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
 
     // TODO: test
 
@@ -42,16 +43,16 @@ export class I2cSlaveDriver {
   }
 
   listenIncome(
-    i2cAddress: string | number,
+    i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
     handler: (data: Uint8Array) => void
   ): void {
 
+    // TODO: i2cAddress не нужен, так данные приходят всегда с мастера
     // TODO: test
 
-    const addressHex = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
+    const id = this.generateId(dataAddress);
 
     this.events.addListener(id, handler);
 
@@ -59,7 +60,7 @@ export class I2cSlaveDriver {
   }
 
   removeListener(
-    i2cAddress: string | number,
+    i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
     handler: (data: Uint8Array) => void
@@ -67,27 +68,26 @@ export class I2cSlaveDriver {
 
     // TODO: test
 
-    const addressHex = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
+    const id = this.generateId(dataAddress);
 
     this.events.removeListener(id, handler);
   }
 
-  private handleIncomeData(data: Uint8Array) {
+  private handleIncomeData = (data: Uint8Array) => {
 
     // TODO: test
 
-    // TODO: поднять событие на слушателе без регистра и на регистре - 1й байт
+    this.events.emit(NO_DATA_ADDRESS, data);
+
+    if (data.length) {
+      this.events.emit(data[0].toString(), removeFirstItemUnit8Arr(data));
+    }
   }
 
-  private normilizeAddr(addressHex: string | number) {
-    return (Number.isInteger(addressHex as any))
-      ? addressHex as number
-      : hexStringToHexNum(addressHex as string);
-  }
+  private generateId(dataAddress: number | undefined): string {
+    if (typeof dataAddress === 'undefined') return NO_DATA_ADDRESS;
 
-  private generateId(addressHex: number, dataAddress: number | undefined): string {
-    return [ addressHex.toString(), dataAddress ].join('-');
+    return dataAddress.toString();
   }
 
 }
