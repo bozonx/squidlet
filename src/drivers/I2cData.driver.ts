@@ -31,7 +31,6 @@ export interface I2cDriverClass {
 export class I2cDataDriver {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: string | number;
-  private readonly address: string | number;
   private readonly i2cDriver: I2cDriverClass;
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
@@ -43,12 +42,9 @@ export class I2cDataDriver {
     i2cDriver: DriverFactoryBase,
     // bus to use
     bus: string | number,
-    // address of current host on this bus
-    address: string | number
   ) {
     this.bus = bus;
-    this.address = address;
-    this.i2cDriver = i2cDriver.getInstance(this.bus, this.address) as I2cDriverClass;
+    this.i2cDriver = i2cDriver.getInstance(this.bus) as I2cDriverClass;
   }
 
   init(): void {
@@ -59,7 +55,7 @@ export class I2cDataDriver {
     this.i2cDriver.listenIncome(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
   }
 
-  async send(dataMark: number | undefined, data: Uint8Array): Promise<void> {
+  async send(i2cAddress: string | number, dataMark: number | undefined, data: Uint8Array): Promise<void> {
     if (!data.length) throw new Error(`Nothing to send`);
 
     // TODO: use address
@@ -71,7 +67,7 @@ export class I2cDataDriver {
     await this.sendData(completeDataMark, dataLength, data);
   }
 
-  listenIncome(dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
+  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
     const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
 
     // TODO: use address
@@ -79,7 +75,7 @@ export class I2cDataDriver {
     this.events.addListener(completeDataMark.toString(16), handler);
   }
 
-  removeListener(dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
+  removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
     const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
 
     // TODO: use address
@@ -88,6 +84,9 @@ export class I2cDataDriver {
   }
 
   private handleIncomeLength = (payload: Uint8Array): void => {
+
+    // TODO: review
+
     const dataLengthHex: string = bytesToHexString(payload);
     const dataLength: number = wordToNum(dataLengthHex);
 
@@ -145,8 +144,6 @@ export default class Factory extends DriverFactoryBase {
       drivers: Drivers,
       driverParams: {[index: string]: any},
       i2cDriver: DriverFactoryBase,
-      bus: string,
-      myAddress: string
-      //toAddress:
+      bus: string
     ): I2cDataDriver } = I2cDataDriver;
 }

@@ -10,6 +10,7 @@ import Destination from './interfaces/Destination';
 
 /**
  * Send data to physical address of certain connection and listen fo all the physical addresses.
+ * It initializes connection of this host by type and bus and current address of host.
  */
 export default class Destinations {
   private readonly drivers: Drivers;
@@ -78,12 +79,12 @@ export default class Destinations {
     return _.map(result);
   }
 
-  private registerConnection(connectionParams: MyAddress) {
-    const connectionId: string = this.generateConnectionId(connectionParams);
-    const driverName = this.generateDriverName(connectionParams.type);
+  private registerConnection(myAddress: MyAddress) {
+    const connectionId: string = this.generateConnectionId(myAddress);
+    const driverName = this.generateDriverName(myAddress.type);
     const connectionDriver: DriverFactoryBase = this.drivers.getDriver(driverName);
 
-    this.connections[connectionId] = connectionDriver.getInstance(connectionParams) as Connection;
+    this.connections[connectionId] = connectionDriver.getInstance(myAddress) as Connection;
   }
 
   private listenToAllDestinations(): void {

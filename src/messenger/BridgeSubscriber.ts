@@ -148,6 +148,8 @@ export default class Bridge {
     if (handlerIndex < 0) throw new Error(`Can't find handler index of "${eventName}"`);
 
     handlers.splice(handlerIndex, 1);
+
+    // TODO: а удалить сам this.handlers[eventName] ?
   }
 
 }

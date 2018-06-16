@@ -1,26 +1,24 @@
-import * as EventEmitter from 'events';
-
 import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass } from '../../drivers/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
+import * as _ from 'lodash';
 
 
 /**
- * Instance for each address.
+ * Instance for each type of connection and bus and address of current host.
  * It works as master or slave according to address
  * It packs data to send it via i2c.
  */
 export class I2CConnectionDriver {
   private readonly drivers: Drivers;
-  private readonly events: EventEmitter = new EventEmitter();
   private readonly driverConfig: {[index: string]: any};
   private readonly myAddress: MyAddress;
-  private readonly eventName: string = 'data';
   private readonly i2cDataDriver: I2cDataDriver;
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
+  private readonly handlers: {[index: string]: Array<{ handler: Function, wrapper: Function }>} = {};
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -33,33 +31,46 @@ export class I2CConnectionDriver {
     // get low level i2c driver
     const i2cDriver: I2cDriverClass = this.drivers.getDriver(i2cDriverName) as I2cDriverClass;
 
-    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus, this.myAddress.address) as I2cDataDriver;
+    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus) as I2cDataDriver;
   }
 
-  init() {
-    this.i2cDataDriver.listenIncome(this.dataMark, this.handleIncomeData);
-  }
-
-  async send(address: string, payload: any): Promise<void> {
+  async send(remoteAddress: string, payload: any): Promise<void> {
     const jsonString = JSON.stringify(payload);
     const uint8Arr = textToUint8Array(jsonString);
 
-    await this.i2cDataDriver.send(this.dataMark, uint8Arr);
+    await this.i2cDataDriver.send(remoteAddress, this.dataMark, uint8Arr);
   }
 
-  listenIncome(address: string, handler: (payload: any) => void): void {
-    this.events.addListener(this.eventName, handler);
+  listenIncome(remoteAddress: string, handler: (payload: any) => void): void {
+    const wrapper = (uint8Arr: Uint8Array): void => {
+      const jsonString = uint8ArrayToText(uint8Arr);
+      const data = JSON.parse(jsonString);
+
+      handler(data);
+    };
+
+    if (!this.handlers[remoteAddress]) this.handlers[remoteAddress] = [];
+    this.handlers[remoteAddress].push({
+      wrapper,
+      handler,
+    });
+
+    this.i2cDataDriver.listenIncome(remoteAddress, this.dataMark, wrapper);
   }
 
-  removeListener(address: string, handler: (payload: any) => void): void {
-    this.events.removeListener(this.eventName, handler);
-  }
+  removeListener(remoteAddress: string, handler: (payload: any) => void): void {
+    const handlers = this.handlers[remoteAddress];
+    const handlerIndex = _.findIndex(handlers, (item) => {
+      return item.handler === handler;
+    });
 
-  private handleIncomeData = (uint8Arr: Uint8Array): void => {
-    const jsonString = uint8ArrayToText(uint8Arr);
-    const data = JSON.parse(jsonString);
+    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${remoteAddress}"`);
 
-    this.events.emit(this.eventName, data);
+    handlers.splice(handlerIndex, 1);
+
+    if (!this.handlers[remoteAddress].length) {
+      delete this.handlers[remoteAddress];
+    }
   }
 
 }
