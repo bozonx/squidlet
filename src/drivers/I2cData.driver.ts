@@ -58,29 +58,27 @@ export class I2cDataDriver {
   async send(i2cAddress: string | number, dataMark: number | undefined, data: Uint8Array): Promise<void> {
     if (!data.length) throw new Error(`Nothing to send`);
 
-    // TODO: use address
-
-    const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
+    const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataLength = data.length;
 
-    await this.sendLength(dataLength);
-    await this.sendData(completeDataMark, dataLength, data);
+    await this.sendLength(i2cAddress, dataLength);
+    await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
   }
 
   listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
-    const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
+    const resolvedDataMark = this.resolveDataMark(dataMark);
 
     // TODO: use address
 
-    this.events.addListener(completeDataMark.toString(16), handler);
+    this.events.addListener(resolvedDataMark.toString(16), handler);
   }
 
   removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
-    const completeDataMark = (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
+    const resolvedDataMark = this.resolveDataMark(dataMark);
 
     // TODO: use address
 
-    this.events.removeListener(completeDataMark.toString(16), handler);
+    this.events.removeListener(resolvedDataMark.toString(16), handler);
   }
 
   private handleIncomeLength = (payload: Uint8Array): void => {
@@ -112,8 +110,8 @@ export class I2cDataDriver {
     this.i2cDriver.listenIncome(this.sendDataRegister, dataLength, receiveDataCb);
   }
 
-  private async sendLength(dataLength: number): Promise<void> {
-    // 16 bit (2 bytes) integer
+  private async sendLength(i2cAddress: string | number, dataLength: number): Promise<void> {
+    // max is 0xffff - 16 bit (2 bytes) integer
     if (dataLength > MAX_BLOCK_LENGTH) {
       throw new Error(`Data is too long, allowed length until "${MAX_BLOCK_LENGTH}" bytes`);
     }
@@ -123,17 +121,21 @@ export class I2cDataDriver {
     const bytes: Uint8Array = hexToBytes(lengthHex);
     const lengthToSend: Uint8Array = new Uint8Array(bytes);
 
-    this.i2cDriver.write(this.lengthRegister, lengthToSend);
+    this.i2cDriver.write(i2cAddress, this.lengthRegister, lengthToSend);
   }
 
-  private async sendData(dataMark: number, dataLength: number, data: Uint8Array): Promise<void> {
+  private async sendData(i2cAddress: string | number, dataMark: number, dataLength: number, data: Uint8Array): Promise<void> {
     const dataToSend: Uint8Array = new Uint8Array(dataLength + DATA_MARK_LENGTH);
     // add data mark
     dataToSend[DATA_MARK_POSITION] = dataMark;
     // fill array
     data.forEach((item, index) => dataToSend[index + DATA_MARK_LENGTH] = item);
 
-    this.i2cDriver.write(this.sendDataRegister, dataToSend);
+    this.i2cDriver.write(i2cAddress, this.sendDataRegister, dataToSend);
+  }
+
+  private resolveDataMark(dataMark: number | undefined): number {
+    return (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
   }
 
 }
