@@ -3,6 +3,7 @@ import * as EventEmitter from 'events';
 import Drivers from '../app/Drivers';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
+import * as _ from 'lodash';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -35,6 +36,7 @@ export class I2cDataDriver {
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
+  private readonly handlers: {[index: string]: Array<{ handler: (data: Uint8Array) => void, wrapper: Function }>} = {};
 
   constructor(
     drivers: Drivers,
@@ -52,7 +54,7 @@ export class I2cDataDriver {
     // TODO: где взять адрес ???
     // TODO: зачем тут init ????
 
-    this.i2cDriver.listenIncome(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
+    // this.i2cDriver.listenIncome(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
   }
 
   async send(i2cAddress: string | number, dataMark: number | undefined, data: Uint8Array): Promise<void> {
@@ -65,49 +67,87 @@ export class I2cDataDriver {
     await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
   }
 
-  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
+  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: (payload: Uint8Array) => void): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
+    const dataId = resolvedDataMark.toString(16);
 
-    // TODO: use address
+    const wrapper = async (payload: Uint8Array) => {
+      const dataLength: number = this.lengthBytesToNumber(payload);
 
-    this.events.addListener(resolvedDataMark.toString(16), handler);
+      try {
+        const payload: Uint8Array = await this.receiveData(i2cAddress, resolvedDataMark, dataLength);
+        handler(payload);
+      }
+      catch(err) {
+        // TODO: !!!! что делать в случае ошибки
+      }
+    };
+
+    if (!this.handlers[dataId]) this.handlers[dataId] = [];
+    this.handlers[dataId].push({
+      wrapper,
+      handler,
+    });
+
+    this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
   removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
+    const dataId = resolvedDataMark.toString(16);
 
-    // TODO: use address
+    const handlers = this.handlers[dataId];
+    const handlerIndex = _.findIndex(handlers, (item) => {
+      return item.handler === handler;
+    });
 
-    this.events.removeListener(resolvedDataMark.toString(16), handler);
+    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
+
+    const wrapper = this.handlers[dataId][handlerIndex].wrapper as (data: Uint8Array) => void;
+
+    // unlisten
+    this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
+
+    // remove handler
+    handlers.splice(handlerIndex, 1);
+
+    if (!this.handlers[dataId].length) {
+      delete this.handlers[dataId];
+    }
+
   }
 
-  private handleIncomeLength = (payload: Uint8Array): void => {
+  private receiveData(
+    i2cAddress: string | number,
+    dataMark: number,
+    dataLength: number,
+  ): Promise<Uint8Array> {
+    return new Promise((resolve, reject) => {
+      // TODO: в каком случае ошибка ??? если таймаут?
+      // TODO: review
+      // TODO: dataMark
 
-    // TODO: review
+      const receiveDataCb = (payload: Uint8Array) => {
+        if (payload.length < 2) throw new Error(`Incorrect received data length ${payload.length}`);
+        const dataMark = payload[0];
+        const data = new Uint8Array(payload.length - 1);
 
-    const dataLengthHex: string = bytesToHexString(payload);
-    const dataLength: number = wordToNum(dataLengthHex);
+        payload.forEach((item, index) => {
+          // skip index 0
+          if (index === DATA_MARK_POSITION) return;
 
-    const receiveDataCb = (payload: Uint8Array) => {
-      if (payload.length < 2) throw new Error(`Incorrect received data length ${payload.length}`);
-      const dataMark = payload[0];
-      const data = new Uint8Array(payload.length - 1);
+          data[index - DATA_MARK_LENGTH] = item;
+        });
 
-      payload.forEach((item, index) => {
-        // skip index 0
-        if (index === DATA_MARK_POSITION) return;
+        // unlisten of data
+        this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
 
-        data[index - DATA_MARK_LENGTH] = item;
-      });
+        resolve(data);
+      };
 
-      // unlisten of data
-      this.i2cDriver.removeListener(this.sendDataRegister, dataLength, receiveDataCb);
-      // rise event
-      this.events.emit(dataMark.toString(16), data);
-    };
-
-    // listen for data
-    this.i2cDriver.listenIncome(this.sendDataRegister, dataLength, receiveDataCb);
+      // listen for data
+      this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
+    });
   }
 
   private async sendLength(i2cAddress: string | number, dataLength: number): Promise<void> {
@@ -136,6 +176,12 @@ export class I2cDataDriver {
 
   private resolveDataMark(dataMark: number | undefined): number {
     return (typeof dataMark === 'undefined') ? this.defaultDataMark : dataMark;
+  }
+
+  private lengthBytesToNumber(bytes: Uint8Array): number {
+    const dataLengthHex: string = bytesToHexString(bytes);
+
+    return wordToNum(dataLengthHex);
   }
 
 }

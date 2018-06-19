@@ -68,6 +68,8 @@ export class I2CConnectionDriver {
 
     handlers.splice(handlerIndex, 1);
 
+    // TODO: где сам remove listener
+
     if (!this.handlers[remoteAddress].length) {
       delete this.handlers[remoteAddress];
     }
