@@ -5,8 +5,10 @@ import { I2cDataDriver, I2cDriverClass } from '../../drivers/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 
 
+type Handler = (error: Error | null, payload?: any) => void;
+
 interface HandlerItem {
-  handler: (payload: any) => void;
+  handler: Handler;
   wrapper: Function;
 }
 
@@ -46,12 +48,18 @@ export class I2CConnectionDriver {
     await this.i2cDataDriver.send(remoteAddress, this.dataMark, uint8Arr);
   }
 
-  listenIncome(remoteAddress: string, handler: (payload: any) => void): void {
-    const wrapper = (uint8Arr: Uint8Array): void => {
-      const jsonString = uint8ArrayToText(uint8Arr);
+  listenIncome(remoteAddress: string, handler: Handler): void {
+    const wrapper = (error: Error | null, payload?: Uint8Array): void => {
+      if (error) {
+        handler(error);
+
+        return;
+      }
+
+      const jsonString = uint8ArrayToText(payload as Uint8Array);
       const data = JSON.parse(jsonString);
 
-      handler(data);
+      handler(null, data);
     };
 
     if (!this.handlers[remoteAddress]) this.handlers[remoteAddress] = [];
@@ -63,7 +71,7 @@ export class I2CConnectionDriver {
     this.i2cDataDriver.listenIncome(remoteAddress, this.dataMark, wrapper);
   }
 
-  removeListener(remoteAddress: string, handler: (payload: any) => void): void {
+  removeListener(remoteAddress: string, handler: Handler): void {
     const handlers: Array<HandlerItem> = this.handlers[remoteAddress];
     const handlerIndex: number = handlers.findIndex((item) => {
       return item.handler === handler;

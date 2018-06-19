@@ -7,7 +7,10 @@ const MAX_BLOCK_LENGTH = 65535;
 const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
+const MIN_DATA_LENGTH = 1;
 
+
+type Handler = (error: Error | null, payload?: Uint8Array) => void;
 
 export interface I2cDriverClass {
   write: (i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array) => Promise<void>;
@@ -15,22 +18,23 @@ export interface I2cDriverClass {
     i2cAddress: string | number,
     dataAddress: number | undefined,
     length: number,
+
+    // TODO: принимать ошибку
     handler: (data: Uint8Array) => void
   ) => void;
   removeListener: (
     i2cAddress: string | number,
     dataAddress: number | undefined,
     length: number,
+    // TODO: принимать ошибку
     handler: (data: Uint8Array) => void
   ) => void;
 }
 
 interface HandlerItem {
-  handler: (data: Uint8Array) => void;
+  handler: Handler;
   wrapper: Function;
 }
-
-type Handler = (payload: Uint8Array) => void;
 
 
 export class I2cDataDriver {
@@ -58,10 +62,6 @@ export class I2cDataDriver {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataLength = data.length;
 
-    if (dataLength < 1) {
-      throw new Error(`Incorrect received data length ${dataLength}`);
-    }
-
     await this.sendLength(i2cAddress, dataLength);
     await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
   }
@@ -76,10 +76,10 @@ export class I2cDataDriver {
       // receive data with this length
       try {
         const payload: Uint8Array = await this.receiveData(i2cAddress, resolvedDataMark, dataLength);
-        handler(payload);
+        handler(null, payload);
       }
       catch(err) {
-        // TODO: !!!! что делать в случае ошибки
+        handler(err);
       }
     };
 
@@ -123,7 +123,8 @@ export class I2cDataDriver {
     dataLength: number,
   ): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
-      // TODO: ошибка если таймаут?
+
+      // TODO: ошибка если таймаут
 
       const receiveDataCb = (payload: Uint8Array) => {
         const receivedDataMark = payload[0];
@@ -136,7 +137,7 @@ export class I2cDataDriver {
           return;
         }
 
-        const data = withoutFirstItemUnit8Arr(payload);
+        const data: Uint8Array = withoutFirstItemUnit8Arr(payload);
 
         // unlisten of data
         this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
@@ -144,14 +145,16 @@ export class I2cDataDriver {
         resolve(data);
       };
 
-      // TODO: может сделать метод once ???
-
       // temporary listen for data
       this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
     });
   }
 
   private async sendLength(i2cAddress: string | number, dataLength: number): Promise<void> {
+    if (dataLength < MIN_DATA_LENGTH) {
+      throw new Error(`Incorrect received data length ${dataLength}`);
+    }
+
     // max is 0xffff - 16 bit (2 bytes) integer
     if (dataLength > MAX_BLOCK_LENGTH) {
       throw new Error(`Data is too long, allowed length until "${MAX_BLOCK_LENGTH}" bytes`);
@@ -162,7 +165,7 @@ export class I2cDataDriver {
     const bytes: Uint8Array = hexToBytes(lengthHex);
     const lengthToSend: Uint8Array = new Uint8Array(bytes);
 
-    this.i2cDriver.write(i2cAddress, this.lengthRegister, lengthToSend);
+    await this.i2cDriver.write(i2cAddress, this.lengthRegister, lengthToSend);
   }
 
   private async sendData(i2cAddress: string | number, dataMark: number, dataLength: number, data: Uint8Array): Promise<void> {
@@ -172,7 +175,7 @@ export class I2cDataDriver {
     // fill array
     data.forEach((item, index) => dataToSend[index + DATA_MARK_LENGTH] = item);
 
-    this.i2cDriver.write(i2cAddress, this.sendDataRegister, dataToSend);
+    await this.i2cDriver.write(i2cAddress, this.sendDataRegister, dataToSend);
   }
 
   private resolveDataMark(dataMark: number | undefined): number {
