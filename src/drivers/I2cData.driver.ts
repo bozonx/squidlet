@@ -1,7 +1,8 @@
+import * as _ from 'lodash';
+
 import Drivers from '../app/Drivers';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUnit8Arr } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import * as _ from 'lodash';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -26,6 +27,11 @@ export interface I2cDriverClass {
   ) => void;
 }
 
+interface HandlerItem {
+  handler: (data: Uint8Array) => void;
+  wrapper: Function;
+}
+
 
 export class I2cDataDriver {
   private readonly bus: string | number;
@@ -33,7 +39,7 @@ export class I2cDataDriver {
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
-  private readonly handlers: {[index: string]: Array<{ handler: (data: Uint8Array) => void, wrapper: Function }>} = {};
+  private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
   constructor(
     drivers: Drivers,
@@ -93,8 +99,8 @@ export class I2cDataDriver {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId = resolvedDataMark.toString(16);
 
-    const handlers = this.handlers[dataId];
-    const handlerIndex = _.findIndex(handlers, (item) => {
+    const handlers: Array<HandlerItem> = this.handlers[dataId];
+    const handlerIndex: number = handlers.findIndex((item) => {
       return item.handler === handler;
     });
 
