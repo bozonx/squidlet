@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
-import { hexToBytes, bytesToHexString, numToWord, wordToNum } from '../helpers/helpers';
+import { hexToBytes, bytesToHexString, numToWord, wordToNum, wothoutFirstItemUnit8Arr } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import * as _ from 'lodash';
 
@@ -128,16 +128,22 @@ export class I2cDataDriver {
       // TODO: dataMark
 
       const receiveDataCb = (payload: Uint8Array) => {
-        if (payload.length < 2) throw new Error(`Incorrect received data length ${payload.length}`);
-        const dataMark = payload[0];
-        const data = new Uint8Array(payload.length - 1);
+        if (payload.length < 2) {
+          reject(new Error(`Incorrect received data length ${payload.length}`));
 
-        payload.forEach((item, index) => {
-          // skip index 0
-          if (index === DATA_MARK_POSITION) return;
+          return;
+        }
 
-          data[index - DATA_MARK_LENGTH] = item;
-        });
+        const receivedDataMark = payload[0];
+        const data = wothoutFirstItemUnit8Arr(payload);
+
+        //const data = new Uint8Array(payload.length - 1);
+        // payload.forEach((item, index) => {
+        //   // skip index 0
+        //   if (index === DATA_MARK_POSITION) return;
+        //
+        //   data[index - DATA_MARK_LENGTH] = item;
+        // });
 
         // unlisten of data
         this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
@@ -145,7 +151,9 @@ export class I2cDataDriver {
         resolve(data);
       };
 
-      // listen for data
+      // TODO: может сделать метод once ???
+
+      // temporary listen for data
       this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
     });
   }
