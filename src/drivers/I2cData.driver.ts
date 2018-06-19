@@ -30,6 +30,8 @@ interface HandlerItem {
   wrapper: Function;
 }
 
+type Handler = (payload: Uint8Array) => void;
+
 
 export class I2cDataDriver {
   private readonly bus: string | number;
@@ -50,31 +52,28 @@ export class I2cDataDriver {
     this.i2cDriver = i2cDriver.getInstance(this.bus) as I2cDriverClass;
   }
 
-  init(): void {
-
-    // TODO: где взять адрес ???
-    // TODO: зачем тут init ????
-
-    // this.i2cDriver.listenIncome(this.lengthRegister, DATA_LENGTH_REQUEST, this.handleIncomeLength);
-  }
-
   async send(i2cAddress: string | number, dataMark: number | undefined, data: Uint8Array): Promise<void> {
     if (!data.length) throw new Error(`Nothing to send`);
 
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataLength = data.length;
 
+    if (dataLength < 1) {
+      throw new Error(`Incorrect received data length ${dataLength}`);
+    }
+
     await this.sendLength(i2cAddress, dataLength);
     await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
   }
 
-  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: (payload: Uint8Array) => void): void {
+  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: Handler): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId = resolvedDataMark.toString(16);
 
     const wrapper = async (payload: Uint8Array) => {
       const dataLength: number = this.lengthBytesToNumber(payload);
 
+      // receive data with this length
       try {
         const payload: Uint8Array = await this.receiveData(i2cAddress, resolvedDataMark, dataLength);
         handler(payload);
@@ -93,7 +92,7 @@ export class I2cDataDriver {
     this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
-  removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: (data: Uint8Array) => void): void {
+  removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: Handler): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId = resolvedDataMark.toString(16);
 
@@ -131,7 +130,7 @@ export class I2cDataDriver {
 
         if (dataMark !== receivedDataMark) return;
 
-        if (payload.length < 2) {
+        if (payload.length !== dataLength) {
           reject(new Error(`Incorrect received data length ${payload.length}`));
 
           return;
