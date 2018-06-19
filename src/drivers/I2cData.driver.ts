@@ -1,7 +1,5 @@
-import * as EventEmitter from 'events';
-
 import Drivers from '../app/Drivers';
-import { hexToBytes, bytesToHexString, numToWord, wordToNum, wothoutFirstItemUnit8Arr } from '../helpers/helpers';
+import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUnit8Arr } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import * as _ from 'lodash';
 
@@ -30,7 +28,6 @@ export interface I2cDriverClass {
 
 
 export class I2cDataDriver {
-  private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: string | number;
   private readonly i2cDriver: I2cDriverClass;
   private readonly defaultDataMark: number = 0x00;
@@ -123,27 +120,20 @@ export class I2cDataDriver {
     dataLength: number,
   ): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
-      // TODO: в каком случае ошибка ??? если таймаут?
-      // TODO: review
-      // TODO: dataMark
+      // TODO: ошибка если таймаут?
 
       const receiveDataCb = (payload: Uint8Array) => {
+        const receivedDataMark = payload[0];
+
+        if (dataMark !== receivedDataMark) return;
+
         if (payload.length < 2) {
           reject(new Error(`Incorrect received data length ${payload.length}`));
 
           return;
         }
 
-        const receivedDataMark = payload[0];
-        const data = wothoutFirstItemUnit8Arr(payload);
-
-        //const data = new Uint8Array(payload.length - 1);
-        // payload.forEach((item, index) => {
-        //   // skip index 0
-        //   if (index === DATA_MARK_POSITION) return;
-        //
-        //   data[index - DATA_MARK_LENGTH] = item;
-        // });
+        const data = withoutFirstItemUnit8Arr(payload);
 
         // unlisten of data
         this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);

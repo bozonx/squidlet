@@ -9,7 +9,7 @@ export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
 
-export function wothoutFirstItemUnit8Arr(arr: Uint8Array): Uint8Array {
+export function withoutFirstItemUnit8Arr(arr: Uint8Array): Uint8Array {
 
   // TODO: test
 

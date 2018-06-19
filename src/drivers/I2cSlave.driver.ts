@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import { I2cSlaveDev } from '../dev/I2cSlave.dev';
 import Drivers from '../app/Drivers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import { wothoutFirstItemUnit8Arr } from '../helpers/helpers';
+import { withoutFirstItemUnit8Arr } from '../helpers/helpers';
 
 
 const NO_DATA_ADDRESS = 'null';
@@ -80,7 +80,7 @@ export class I2cSlaveDriver {
     this.events.emit(NO_DATA_ADDRESS, data);
 
     if (data.length) {
-      this.events.emit(data[0].toString(), wothoutFirstItemUnit8Arr(data));
+      this.events.emit(data[0].toString(), withoutFirstItemUnit8Arr(data));
     }
   }
 
