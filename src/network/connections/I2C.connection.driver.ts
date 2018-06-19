@@ -3,7 +3,12 @@ import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass } from '../../drivers/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
-import * as _ from 'lodash';
+
+
+interface HandlerItem {
+  handler: (payload: any) => void;
+  wrapper: Function;
+}
 
 
 /**
@@ -18,7 +23,7 @@ export class I2CConnectionDriver {
   private readonly i2cDataDriver: I2cDataDriver;
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
-  private readonly handlers: {[index: string]: Array<{ handler: Function, wrapper: Function }>} = {};
+  private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -59,8 +64,8 @@ export class I2CConnectionDriver {
   }
 
   removeListener(remoteAddress: string, handler: (payload: any) => void): void {
-    const handlers = this.handlers[remoteAddress];
-    const handlerIndex = _.findIndex(handlers, (item) => {
+    const handlers: Array<HandlerItem> = this.handlers[remoteAddress];
+    const handlerIndex: number = handlers.findIndex((item) => {
       return item.handler === handler;
     });
 

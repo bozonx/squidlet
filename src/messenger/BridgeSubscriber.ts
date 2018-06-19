@@ -140,8 +140,8 @@ export default class Bridge {
   }
 
   private removeHandler(eventName: string, handler: Function): void {
-    const handlers = this.handlers[eventName];
-    const handlerIndex = _.findIndex(handlers, (item) => {
+    const handlers: Array<HandlerItem> = this.handlers[eventName];
+    const handlerIndex: number = handlers.findIndex((item) => {
       return item.handler === handler;
     });
 

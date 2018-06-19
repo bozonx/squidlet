@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import Drivers from '../app/Drivers';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUnit8Arr } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';

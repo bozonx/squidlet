@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import { generateEventName } from '../helpers/helpers';
@@ -54,7 +53,7 @@ export default class Events {
   removeListener(category: string, topic: string = '*', handler: (payload: any) => void): void {
     const eventName = generateEventName(category, topic);
 
-    const index: number = _.findIndex(this.topicListeners, (item: TopicListener) => {
+    const index: number = this.topicListeners.findIndex((item: TopicListener) => {
       return item.name === eventName && item.handler === handler;
     });
 
