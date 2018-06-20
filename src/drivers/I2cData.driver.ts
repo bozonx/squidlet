@@ -188,9 +188,13 @@ export class I2cDataDriver {
     const dataLength: number = this.lengthBytesToNumber(payload);
 
     // receive data with this length
-    return this.receiveData(i2cAddress, dataMark, dataLength)
-      .then((payload: Uint8Array) => handler(null, payload))
-      .catch((err) => handler(err));
+    try {
+      const payload: Uint8Array = await this.receiveData(i2cAddress, dataMark, dataLength);
+      handler(null, payload);
+    }
+    catch(err) {
+      handler(err);
+    }
   }
 
 }
