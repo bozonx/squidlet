@@ -4,11 +4,15 @@ helpers = require('../../src/helpers/helpers')
 
 describe.only 'I2cData.driver', ->
   beforeEach ->
+    @dataMark = 0x01
+    @remoteAddress = '5a'
+    @bus = 1
+
     @data = new Uint8Array(2)
     @data[0] = 255
     @data[1] = 255
 
-    @lengthToSend = new Uint8Array([ 0, 2 ])
+    @lengthToSend = new Uint8Array([ 1, 0, 2 ])
     @dataToSend = new Uint8Array([ 1, 255, 255 ])
 
     @listenHandler = undefined
@@ -19,14 +23,8 @@ describe.only 'I2cData.driver', ->
       removeListener: sinon.spy()
     }
     @i2cDriver = getInstance: => @i2cDriverInstance
-    @remoteAddress = '5a'
-    @dataMark = 0x01
 
-
-    @bus = 1
-    @address = '5a'
-
-    @i2cData = new I2cData(@drivers, {}).getInstance(@i2cDriver, @bus, @address)
+    @i2cData = new I2cData(@drivers, {}).getInstance(@i2cDriver, @bus, @remoteAddress)
 
   it 'send', ->
     await @i2cData.send(@remoteAddress, @dataMark, @data)
@@ -39,7 +37,7 @@ describe.only 'I2cData.driver', ->
     handler = sinon.spy()
     otherHandler = sinon.spy()
     @i2cData.listenIncome(@remoteAddress, @dataMark, handler)
-    #@i2cData.listenIncome(@remoteAddress, 5, handler)
+    @i2cData.listenIncome(@remoteAddress, 5, otherHandler)
 
     await @listenHandler(null, @lengthToSend)
 

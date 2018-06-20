@@ -7,7 +7,8 @@ import HandlersManager from '../helpers/HandlersManager';
 const MAX_BLOCK_LENGTH = 65535;
 const DATA_MARK_POSITION = 0;
 const DATA_MARK_LENGTH = 1;
-const DATA_LENGTH_REQUEST = 2;
+// length in bytes of data length request
+const DATA_LENGTH_REQUEST = 3;
 const MIN_DATA_LENGTH = 1;
 
 export type DataHandler = (error: Error | null, payload?: Uint8Array) => void;
@@ -62,11 +63,14 @@ export class I2cDataDriver {
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
     const dataLength = data.length;
 
-    await this.sendLength(i2cAddress, dataLength);
+    await this.sendLength(i2cAddress, resolvedDataMark, dataLength);
     await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
   }
 
   listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
+
+    // TODO: запрос длинны должен содержать mark, а данные наверное не обязанны
+
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId: string = resolvedDataMark.toString(16);
 
@@ -137,7 +141,7 @@ export class I2cDataDriver {
     // });
   }
 
-  private async sendLength(i2cAddress: string | number, dataLength: number): Promise<void> {
+  private async sendLength(i2cAddress: string | number, dataMark: number, dataLength: number): Promise<void> {
     if (dataLength < MIN_DATA_LENGTH) {
       throw new Error(`Incorrect received data length ${dataLength}`);
     }
@@ -150,7 +154,10 @@ export class I2cDataDriver {
     // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
     const lengthHex: string = numToWord(dataLength);
     const bytes: Uint8Array = hexToBytes(lengthHex);
-    const lengthToSend: Uint8Array = new Uint8Array(bytes);
+    const lengthToSend: Uint8Array = new Uint8Array(DATA_LENGTH_REQUEST);
+    lengthToSend[0] = dataMark;
+    lengthToSend[1] = bytes[0];
+    lengthToSend[2] = bytes[1];
 
     await this.i2cDriver.write(i2cAddress, this.lengthRegister, lengthToSend);
   }
@@ -185,7 +192,13 @@ export class I2cDataDriver {
     if (error)  return handler(error);
     if (!payload) return handler(new Error(`Payload is undefined`));
 
-    const dataLength: number = this.lengthBytesToNumber(payload);
+    const receivedDataMark = payload[DATA_MARK_POSITION];
+
+    // do nothing if it isn't my data mark
+    if (dataMark !== receivedDataMark) return;
+
+    const lengthBytes: Uint8Array = withoutFirstItemUnit8Arr(payload);
+    const dataLength: number = this.lengthBytesToNumber(lengthBytes);
 
     // receive data with this length
     try {
