@@ -19,12 +19,11 @@ export class I2cMasterDriver {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cMasterDev: I2cMasterDev;
-  private readonly poling: Poling;
+  private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
   constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string | number) {
     this.drivers = drivers;
-    this.poling = new Poling();
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
       : parseInt(bus as any);
@@ -37,7 +36,7 @@ export class I2cMasterDriver {
   }
 
   startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     const id = this.generateId(addressHex, dataAddress);
 
     // TODO: test
@@ -61,7 +60,7 @@ export class I2cMasterDriver {
 
     // TODO: test
 
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     // TODO: запустить, если запущен то проверить длинну и ничего не делать
     // TODO: если длина не совпадает то не фатальная ошибка
   }
@@ -75,7 +74,7 @@ export class I2cMasterDriver {
 
     // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
 
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     const id = this.generateId(addressHex, dataAddress);
 
     // start poling/int if need
@@ -93,7 +92,7 @@ export class I2cMasterDriver {
 
     // TODO: test
 
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     const id = this.generateId(addressHex, dataAddress);
 
     // TODO: length наверное не нужен
@@ -106,7 +105,7 @@ export class I2cMasterDriver {
    * Read data once and rise data event
    */
   async poll(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<void> {
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     const id = this.generateId(addressHex, dataAddress);
 
     // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
@@ -140,7 +139,7 @@ export class I2cMasterDriver {
    * Write and read from the same data address.
    */
   async request(i2cAddress: string | number, dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
 
     await this.write(addressHex, dataAddress, dataToSend);
 
@@ -152,7 +151,7 @@ export class I2cMasterDriver {
    * If dataAddress is specified, it do request to data address(dataAddress) first.
    */
   async read(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
 
     // write command
     if (typeof dataAddress !== 'undefined') {
@@ -163,7 +162,7 @@ export class I2cMasterDriver {
   }
 
   async write(i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     let dataToWrite = data;
 
     if (typeof dataAddress !== 'undefined') {
@@ -179,7 +178,7 @@ export class I2cMasterDriver {
    * Write only a dataAddress to bus
    */
   writeEmpty(i2cAddress: string | number, dataAddress: number): Promise<void> {
-    const addressHex = this.normilizeAddr(i2cAddress);
+    const addressHex: number = this.normilizeAddr(i2cAddress);
     const dataToWrite = new Uint8Array(REGISTER_LENGTH);
 
     dataToWrite[0] = dataAddress;
@@ -188,7 +187,7 @@ export class I2cMasterDriver {
   }
 
 
-  private normilizeAddr(addressHex: string | number) {
+  private normilizeAddr(addressHex: string | number): number {
     return (Number.isInteger(addressHex as any))
       ? addressHex as number
       : hexStringToHexNum(addressHex as string);

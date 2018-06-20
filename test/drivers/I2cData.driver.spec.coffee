@@ -2,7 +2,7 @@ I2cData = require('../../src/drivers/I2cData.driver').default
 helpers = require('../../src/helpers/helpers')
 
 
-describe.only 'I2cData.driver', ->
+describe 'I2cData.driver', ->
   beforeEach ->
     @dataMark = 0x01
     @remoteAddress = '5a'
@@ -43,3 +43,15 @@ describe.only 'I2cData.driver', ->
     sinon.assert.calledOnce(handler)
     sinon.assert.calledWith(handler, null, @data)
     sinon.assert.notCalled(otherHandler)
+
+  it 'removeListener', ->
+    handler = sinon.spy()
+    @i2cData.listenIncome(@remoteAddress, @dataMark, handler)
+
+    assert.equal(@i2cData.handlersManager.handlers['5a-1'].length, 1)
+
+    @i2cData.removeListener(@remoteAddress, @dataMark, handler)
+
+    sinon.assert.notCalled(handler)
+    sinon.assert.calledWith(@i2cDriverInstance.removeListener, @remoteAddress, @i2cData.lengthRegister, 3)
+    assert.deepEqual(@i2cData.handlersManager.handlers, {})

@@ -44,7 +44,6 @@ export class I2cDataDriver {
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
-  //private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
   constructor(
     drivers: Drivers,
@@ -79,9 +78,6 @@ export class I2cDataDriver {
   }
 
   removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
-
-    // TODO: test
-
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
     const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
     const wrapper: DataHandler = this.handlersManager.getWrapper(dataId, handler) as DataHandler;

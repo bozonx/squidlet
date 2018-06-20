@@ -1,7 +1,7 @@
 I2cMaster = require('../../src/drivers/I2cMaster.driver').default
 
 
-describe 'I2cMaster.driver', ->
+describe.only 'I2cMaster.driver', ->
   beforeEach ->
     @readResult = new Uint8Array(1)
     @readResult[0] = 10
@@ -33,7 +33,7 @@ describe 'I2cMaster.driver', ->
 
     sinon.assert.calledWith(@i2cMaster.startListen, @addressHex, @dataAddrHex, 1)
     sinon.assert.calledOnce(handler)
-    sinon.assert.calledWith(handler, @readResult)
+    sinon.assert.calledWith(handler, null, @readResult)
 
   it 'poll and listenIncome without dataAddress', ->
     handler = sinon.spy()
@@ -43,7 +43,7 @@ describe 'I2cMaster.driver', ->
     await @i2cMaster.poll(@address, undefined, 1)
 
     sinon.assert.calledWith(@i2cMaster.startListen, @addressHex, undefined, 1)
-    sinon.assert.calledWith(handler, @readResult)
+    sinon.assert.calledWith(handler, null, @readResult)
 
   it 'request to dataAddress', ->
     @i2cMaster.write = sinon.stub().returns(Promise.resolve())
