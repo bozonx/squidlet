@@ -56,7 +56,7 @@ export class I2cDataDriver {
   async send(i2cAddress: string | number, dataMark: number | undefined, data: Uint8Array): Promise<void> {
     if (!data.length) throw new Error(`Nothing to send`);
 
-    const resolvedDataMark = this.resolveDataMark(dataMark);
+    const resolvedDataMark: number = this.resolveDataMark(dataMark);
     const dataLength = data.length;
 
     await this.sendLength(i2cAddress, dataLength);
@@ -67,24 +67,11 @@ export class I2cDataDriver {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId: string = resolvedDataMark.toString(16);
 
-    const wrapper = async (error: Error | null, payload?: Uint8Array) => {
-      if (error)  return handler(error);
-      if (!payload) return handler(new Error(`Payload is undefined`));
-
-      const dataLength: number = this.lengthBytesToNumber(payload);
-
-      // receive data with this length
-      try {
-        const payload: Uint8Array = await this.receiveData(i2cAddress, resolvedDataMark, dataLength);
-        handler(null, payload);
-      }
-      catch(err) {
-        handler(err);
-      }
+    const wrapper = (error: Error | null, payload?: Uint8Array): void => {
+      this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
     };
 
     this.saveHandler(dataId, handler, wrapper);
-
     this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
@@ -186,6 +173,24 @@ export class I2cDataDriver {
     const dataLengthHex: string = bytesToHexString(bytes);
 
     return wordToNum(dataLengthHex);
+  }
+
+  private handleIncome(
+    i2cAddress: string | number,
+    dataMark: number,
+    handler: Handler,
+    error: Error | null,
+    payload?: Uint8Array
+  ): void {
+    if (error)  return handler(error);
+    if (!payload) return handler(new Error(`Payload is undefined`));
+
+    const dataLength: number = this.lengthBytesToNumber(payload);
+
+    // receive data with this length
+    this.receiveData(i2cAddress, dataMark, dataLength)
+      .then((payload: Uint8Array) => handler(null, payload))
+      .catch((err) => handler(err));
   }
 
   private saveHandler(dataId: string, handler: Handler, wrapper: I2cDriverHandler) {
