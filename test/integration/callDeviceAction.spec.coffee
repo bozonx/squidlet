@@ -5,7 +5,7 @@
 
 { App } = require('../../src/index').default;
 
-describe 'intergation. Call device\'s action', ->
+describe.skip 'intergation. Call device\'s action', ->
   beforeEach ->
 
     # TODO: mock device class load
