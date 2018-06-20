@@ -13,7 +13,7 @@ describe.only 'I2cData.driver', ->
     @data[1] = 255
 
     @lengthToSend = new Uint8Array([ 1, 0, 2 ])
-    @dataToSend = new Uint8Array([ 1, 255, 255 ])
+    @dataToSend = new Uint8Array([ 255, 255 ])
 
     @listenHandler = undefined
     @i2cDriverInstance = {

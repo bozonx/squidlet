@@ -61,10 +61,9 @@ export class I2cDataDriver {
     if (!data.length) throw new Error(`Nothing to send`);
 
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
-    const dataLength = data.length;
 
-    await this.sendLength(i2cAddress, resolvedDataMark, dataLength);
-    await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
+    await this.sendLength(i2cAddress, resolvedDataMark, data.length);
+    await this.i2cDriver.write(i2cAddress, this.sendDataRegister, data);
   }
 
   listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
@@ -160,16 +159,6 @@ export class I2cDataDriver {
     lengthToSend[2] = bytes[1];
 
     await this.i2cDriver.write(i2cAddress, this.lengthRegister, lengthToSend);
-  }
-
-  private async sendData(i2cAddress: string | number, dataMark: number, dataLength: number, data: Uint8Array): Promise<void> {
-    const dataToSend: Uint8Array = new Uint8Array(dataLength + DATA_MARK_LENGTH);
-    // add data mark
-    dataToSend[DATA_MARK_POSITION] = dataMark;
-    // fill array
-    data.forEach((item, index) => dataToSend[index + DATA_MARK_LENGTH] = item);
-
-    await this.i2cDriver.write(i2cAddress, this.sendDataRegister, dataToSend);
   }
 
   private resolveDataMark(dataMark: number | undefined): number {
