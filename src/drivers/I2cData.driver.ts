@@ -65,7 +65,7 @@ export class I2cDataDriver {
 
   listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: Handler): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
-    const dataId = resolvedDataMark.toString(16);
+    const dataId: string = resolvedDataMark.toString(16);
 
     const wrapper = async (error: Error | null, payload?: Uint8Array) => {
       if (error)  return handler(error);
@@ -83,11 +83,7 @@ export class I2cDataDriver {
       }
     };
 
-    if (!this.handlers[dataId]) this.handlers[dataId] = [];
-    this.handlers[dataId].push({
-      wrapper,
-      handler,
-    });
+    this.saveHandler(dataId, handler, wrapper);
 
     this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
@@ -146,6 +142,9 @@ export class I2cDataDriver {
         resolve(data);
       };
 
+      // TODO: может нужно использовать read ???
+      // TODO: и считать первые попавшиеся данные и если это не то - то ошибка
+
       // temporary listen for data
       this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
     });
@@ -187,6 +186,14 @@ export class I2cDataDriver {
     const dataLengthHex: string = bytesToHexString(bytes);
 
     return wordToNum(dataLengthHex);
+  }
+
+  private saveHandler(dataId: string, handler: Handler, wrapper: I2cDriverHandler) {
+    if (!this.handlers[dataId]) this.handlers[dataId] = [];
+    this.handlers[dataId].push({
+      wrapper,
+      handler,
+    });
   }
 
 }
