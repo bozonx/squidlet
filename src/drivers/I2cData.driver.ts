@@ -76,29 +76,21 @@ export class I2cDataDriver {
   }
 
   removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: Handler): void {
-    const resolvedDataMark = this.resolveDataMark(dataMark);
-    const dataId = resolvedDataMark.toString(16);
-
-    const handlers: Array<HandlerItem> = this.handlers[dataId];
-    const handlerIndex: number = handlers.findIndex((item) => {
-      return item.handler === handler;
-    });
-
-    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
-
-    const wrapper = this.handlers[dataId][handlerIndex].wrapper;
+    const resolvedDataMark: number = this.resolveDataMark(dataMark);
+    const dataId: string = resolvedDataMark.toString(16);
+    const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
 
     // unlisten
     this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
 
     // remove handler
-    handlers.splice(handlerIndex, 1);
-
+    this.handlers[dataId].splice(handlerIndex, 1);
+    // remove container if it is an empty
     if (!this.handlers[dataId].length) {
       delete this.handlers[dataId];
     }
-
   }
+
 
   private receiveData(
     i2cAddress: string | number,
@@ -199,6 +191,23 @@ export class I2cDataDriver {
       wrapper,
       handler,
     });
+  }
+
+  /**
+   * Find wrapper of handler in this.handlers
+   */
+  private findWrapper(dataId: string, handler: Handler): { wrapper: I2cDriverHandler, handlerIndex: number } {
+    const handlers: Array<HandlerItem> = this.handlers[dataId];
+    const handlerIndex: number = handlers.findIndex((item) => {
+      return item.handler === handler;
+    });
+
+    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
+
+    return {
+      wrapper: this.handlers[dataId][handlerIndex].wrapper,
+      handlerIndex,
+    };
   }
 
 }
