@@ -67,11 +67,8 @@ export class I2cDataDriver {
   }
 
   listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
-
-    // TODO: запрос длинны должен содержать mark, а данные наверное не обязанны
-
     const resolvedDataMark = this.resolveDataMark(dataMark);
-    const dataId: string = resolvedDataMark.toString(16);
+    const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
 
     const wrapper = async (error: Error | null, payload?: Uint8Array): Promise<void> => {
       await this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
@@ -86,58 +83,12 @@ export class I2cDataDriver {
     // TODO: test
 
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
-    const dataId: string = resolvedDataMark.toString(16);
+    const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
     const wrapper: DataHandler = this.handlersManager.getWrapper(dataId, handler) as DataHandler;
 
     // unlisten
     this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
     this.handlersManager.removeByHandler(dataId, handler);
-  }
-
-
-  private async receiveData(
-    i2cAddress: string | number,
-    dataMark: number,
-    dataLength: number,
-  ): Promise<Uint8Array> {
-    const payload = await this.i2cDriver.read(i2cAddress, this.sendDataRegister, dataLength);
-    const receivedDataMark = payload[0];
-
-    if (dataMark !== receivedDataMark) {
-      throw new Error(`Incorrect received data mark ${receivedDataMark}. Expected ${dataMark}`);
-    }
-
-    if ((payload.length - DATA_MARK_LENGTH) !== dataLength) {
-      throw new Error(`Incorrect received data length ${payload.length}`);
-    }
-
-    return withoutFirstItemUnit8Arr(payload);
-
-
-    // return new Promise((resolve, reject) => {
-    //   const receiveDataCb = (error: Error | null, payload?: Uint8Array): void => {
-    //     if (error)  return reject(error);
-    //     if (!payload) return reject(new Error(`Payload is undefined`));
-    //
-    //     const receivedDataMark = payload[0];
-    //
-    //     if (dataMark !== receivedDataMark) return;
-    //
-    //     if (payload.length !== dataLength) {
-    //       return reject(new Error(`Incorrect received data length ${payload.length}`));
-    //     }
-    //
-    //     const data: Uint8Array = withoutFirstItemUnit8Arr(payload);
-    //
-    //     // unlisten of data
-    //     this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
-    //
-    //     resolve(data);
-    //   };
-    //
-    //   // temporary listen for data
-    //   this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
-    // });
   }
 
   private async sendLength(i2cAddress: string | number, dataMark: number, dataLength: number): Promise<void> {
@@ -154,6 +105,7 @@ export class I2cDataDriver {
     const lengthHex: string = numToWord(dataLength);
     const bytes: Uint8Array = hexToBytes(lengthHex);
     const lengthToSend: Uint8Array = new Uint8Array(DATA_LENGTH_REQUEST);
+
     lengthToSend[0] = dataMark;
     lengthToSend[1] = bytes[0];
     lengthToSend[2] = bytes[1];
@@ -180,23 +132,29 @@ export class I2cDataDriver {
   ): Promise<void> {
     if (error)  return handler(error);
     if (!payload) return handler(new Error(`Payload is undefined`));
-
-    const receivedDataMark = payload[DATA_MARK_POSITION];
-
     // do nothing if it isn't my data mark
-    if (dataMark !== receivedDataMark) return;
+    if (dataMark !== payload[DATA_MARK_POSITION]) return;
 
     const lengthBytes: Uint8Array = withoutFirstItemUnit8Arr(payload);
     const dataLength: number = this.lengthBytesToNumber(lengthBytes);
 
     // receive data with this length
     try {
-      const payload: Uint8Array = await this.receiveData(i2cAddress, dataMark, dataLength);
-      handler(null, payload);
+      const data: Uint8Array = await this.i2cDriver.read(i2cAddress, this.sendDataRegister, dataLength);
+
+      if (data.length !== dataLength) {
+        return handler(new Error(`Incorrect received data length ${data.length}`));
+      }
+
+      handler(null, data);
     }
     catch(err) {
       handler(err);
     }
+  }
+
+  private generateId(i2cAddress: string | number, dataMark: number): string {
+    return [ i2cAddress.toString(), dataMark.toString(16) ].join('-');
   }
 
 }

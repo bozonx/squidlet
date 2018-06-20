@@ -13,13 +13,12 @@ describe.only 'I2cData.driver', ->
     @data[1] = 255
 
     @lengthToSend = new Uint8Array([ 1, 0, 2 ])
-    @dataToSend = new Uint8Array([ 255, 255 ])
 
-    @listenHandler = undefined
+    @listenHandlers = []
     @i2cDriverInstance = {
       write: sinon.stub().returns(Promise.resolve())
-      read: => @dataToSend
-      listenIncome: (i2cAddress, dataAddress, length, handler) => @listenHandler = handler
+      read: => @data
+      listenIncome: (i2cAddress, dataAddress, length, handler) => @listenHandlers.push(handler)
       removeListener: sinon.spy()
     }
     @i2cDriver = getInstance: => @i2cDriverInstance
@@ -30,7 +29,7 @@ describe.only 'I2cData.driver', ->
     await @i2cData.send(@remoteAddress, @dataMark, @data)
 
     sinon.assert.calledWith(@i2cDriverInstance.write.getCall(0), @remoteAddress, 0x1a, @lengthToSend)
-    dataToSend = new Uint8Array(@dataToSend)
+    dataToSend = new Uint8Array(@data)
     sinon.assert.calledWith(@i2cDriverInstance.write.getCall(1), @remoteAddress, 0x1b, dataToSend)
 
   it 'listenIncome', ->
@@ -39,7 +38,7 @@ describe.only 'I2cData.driver', ->
     @i2cData.listenIncome(@remoteAddress, @dataMark, handler)
     @i2cData.listenIncome(@remoteAddress, 5, otherHandler)
 
-    await @listenHandler(null, @lengthToSend)
+    await @listenHandlers[0](null, @lengthToSend)
 
     sinon.assert.calledOnce(handler)
     sinon.assert.calledWith(handler, null, @data)
