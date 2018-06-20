@@ -3,14 +3,10 @@ import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
+import HandlersManager from '../../helpers/HandlersManager';
 
 
-type Handler = (error: Error | null, payload?: any) => void;
-
-interface HandlerItem {
-  handler: Handler;
-  wrapper: DataHandler;
-}
+type ConnectionHandler = (error: Error | null, payload?: any) => void;
 
 
 /**
@@ -25,7 +21,7 @@ export class I2CConnectionDriver {
   private readonly i2cDataDriver: I2cDataDriver;
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
-  private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
+  private handlersManager: HandlersManager = new HandlersManager();
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -48,7 +44,7 @@ export class I2CConnectionDriver {
     await this.i2cDataDriver.send(remoteAddress, this.dataMark, uint8Arr);
   }
 
-  listenIncome(remoteAddress: string, handler: Handler): void {
+  listenIncome(remoteAddress: string, handler: ConnectionHandler): void {
     const wrapper = (error: Error | null, payload?: Uint8Array): void => {
       if (error)  return handler(error);
       if (!payload) return handler(new Error(`Payload is undefined`));
@@ -59,46 +55,35 @@ export class I2CConnectionDriver {
       handler(null, data);
     };
 
-    if (!this.handlers[remoteAddress]) this.handlers[remoteAddress] = [];
-    this.handlers[remoteAddress].push({
-      wrapper,
-      handler,
-    });
-
+    this.handlersManager.addHandler(remoteAddress, handler, wrapper);
     this.i2cDataDriver.listenIncome(remoteAddress, this.dataMark, wrapper);
   }
 
-  removeListener(remoteAddress: string, handler: Handler): void {
-    const dataId: string = remoteAddress;
-    const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
+  removeListener(remoteAddress: string, handler: ConnectionHandler): void {
+    //const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
+    const wrapper: DataHandler = this.handlersManager.getWrapper(remoteAddress, handler);
 
     // unlisten
     this.i2cDataDriver.removeListener(remoteAddress, this.dataMark, wrapper);
-
-    // remove handler
-    this.handlers[dataId].splice(handlerIndex, 1);
-    // remove container if it is an empty
-    if (!this.handlers[dataId].length) {
-      delete this.handlers[dataId];
-    }
+    this.handlersManager.removeByHandler(remoteAddress, handler);
   }
 
-  /**
-   * Find wrapper of handler in this.handlers
-   */
-  private findWrapper(dataId: string, handler: Handler): { wrapper: DataHandler, handlerIndex: number } {
-    const handlers: Array<HandlerItem> = this.handlers[dataId];
-    const handlerIndex: number = handlers.findIndex((item) => {
-      return item.handler === handler;
-    });
-
-    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
-
-    return {
-      wrapper: this.handlers[dataId][handlerIndex].wrapper,
-      handlerIndex,
-    };
-  }
+  // /**
+  //  * Find wrapper of handler in this.handlers
+  //  */
+  // private findWrapper(dataId: string, handler: Handler): { wrapper: DataHandler, handlerIndex: number } {
+  //   const handlers: Array<HandlerItem> = this.handlers[dataId];
+  //   const handlerIndex: number = handlers.findIndex((item) => {
+  //     return item.handler === handler;
+  //   });
+  //
+  //   if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
+  //
+  //   return {
+  //     wrapper: this.handlers[dataId][handlerIndex].wrapper,
+  //     handlerIndex,
+  //   };
+  // }
 
 }
 
