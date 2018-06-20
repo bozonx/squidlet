@@ -53,5 +53,5 @@ describe 'I2cData.driver', ->
     @i2cData.removeListener(@remoteAddress, @dataMark, handler)
 
     sinon.assert.notCalled(handler)
-    sinon.assert.calledWith(@i2cDriverInstance.removeListener, @remoteAddress, @i2cData.lengthRegister, 3)
+    sinon.assert.calledWith(@i2cDriverInstance.removeListener, @remoteAddress, @i2cData.lengthRegister)
     assert.deepEqual(@i2cData.handlersManager.handlers, {})

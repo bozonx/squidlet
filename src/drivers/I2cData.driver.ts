@@ -6,7 +6,6 @@ import HandlersManager from '../helpers/HandlersManager';
 
 const MAX_BLOCK_LENGTH = 65535;
 const DATA_MARK_POSITION = 0;
-const DATA_MARK_LENGTH = 1;
 // length in bytes of data length request
 const DATA_LENGTH_REQUEST = 3;
 const MIN_DATA_LENGTH = 1;
@@ -28,11 +27,6 @@ export interface I2cDriverClass {
     dataAddress: number | undefined,
     handler: I2cDriverHandler
   ) => void;
-}
-
-interface HandlerItem {
-  handler: DataHandler;
-  wrapper: I2cDriverHandler;
 }
 
 
@@ -101,7 +95,7 @@ export class I2cDataDriver {
     const bytes: Uint8Array = hexToBytes(lengthHex);
     const lengthToSend: Uint8Array = new Uint8Array(DATA_LENGTH_REQUEST);
 
-    lengthToSend[0] = dataMark;
+    lengthToSend[DATA_MARK_POSITION] = dataMark;
     lengthToSend[1] = bytes[0];
     lengthToSend[2] = bytes[1];
 
