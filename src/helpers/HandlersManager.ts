@@ -1,14 +1,13 @@
 const HANDLER_POSITION = 0;
-const WRAPPER_POSITION = 0;
+const WRAPPER_POSITION = 1;
 
 
-export default class HandlersManager {
-  // TODO: использовать подстановку типа вместо Function
+export default class HandlersManager<HandlerType, WrapperType> {
   // item is [ handler, wrapper ]
-  private readonly handlers: {[index: string]: Array<[ Function, Function ]>} = {};
+  private readonly handlers: {[index: string]: Array<[ HandlerType, WrapperType ]>} = {};
 
 
-  getWrapper(dataId: string, handler: Function): Function {
+  getWrapper(dataId: string, handler: HandlerType): WrapperType {
     const handlerIndex: number = this.handlers[dataId].findIndex((item) => {
       return item[HANDLER_POSITION] === handler;
     });
@@ -18,7 +17,7 @@ export default class HandlersManager {
     return this.handlers[dataId][handlerIndex][WRAPPER_POSITION];
   }
 
-  removeByHandler(dataId: string, handler: Function): void {
+  removeByHandler(dataId: string, handler: HandlerType): void {
     const handlerIndex: number = this.handlers[dataId].findIndex((item) => {
       return item[HANDLER_POSITION] === handler;
     });
@@ -30,7 +29,7 @@ export default class HandlersManager {
     }
   }
 
-  addHandler(dataId: string, handler: Function, wrapper: Function): void {
+  addHandler(dataId: string, handler: HandlerType, wrapper: WrapperType): void {
     if (!this.handlers[dataId]) this.handlers[dataId] = [];
 
     this.handlers[dataId].push([ handler, wrapper ]);

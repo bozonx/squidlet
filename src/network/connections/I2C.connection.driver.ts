@@ -21,7 +21,7 @@ export class I2CConnectionDriver {
   private readonly i2cDataDriver: I2cDataDriver;
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
-  private handlersManager: HandlersManager = new HandlersManager();
+  private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
   constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
     this.drivers = drivers;
@@ -61,29 +61,12 @@ export class I2CConnectionDriver {
 
   removeListener(remoteAddress: string, handler: ConnectionHandler): void {
     //const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
-    const wrapper: DataHandler = this.handlersManager.getWrapper(remoteAddress, handler);
+    const wrapper: DataHandler = this.handlersManager.getWrapper(remoteAddress, handler) as DataHandler;
 
     // unlisten
     this.i2cDataDriver.removeListener(remoteAddress, this.dataMark, wrapper);
     this.handlersManager.removeByHandler(remoteAddress, handler);
   }
-
-  // /**
-  //  * Find wrapper of handler in this.handlers
-  //  */
-  // private findWrapper(dataId: string, handler: Handler): { wrapper: DataHandler, handlerIndex: number } {
-  //   const handlers: Array<HandlerItem> = this.handlers[dataId];
-  //   const handlerIndex: number = handlers.findIndex((item) => {
-  //     return item.handler === handler;
-  //   });
-  //
-  //   if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
-  //
-  //   return {
-  //     wrapper: this.handlers[dataId][handlerIndex].wrapper,
-  //     handlerIndex,
-  //   };
-  // }
 
 }
 

@@ -2,7 +2,7 @@ I2cData = require('../../src/drivers/I2cData.driver').default
 helpers = require('../../src/helpers/helpers')
 
 
-describe 'I2cData.driver', ->
+describe.only 'I2cData.driver', ->
   beforeEach ->
     @listenHandler = undefined
     @i2cDriverInstance = {
