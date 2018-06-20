@@ -14,6 +14,7 @@ type I2cDriverHandler = (error: Error | null, data?: Uint8Array) => void;
 
 export interface I2cDriverClass {
   write: (i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array) => Promise<void>;
+  read: (i2cAddress: string | number, dataAddress: number | undefined, length: number) => Promise<Uint8Array>;
   listenIncome: (
     i2cAddress: string | number,
     dataAddress: number | undefined,
@@ -92,41 +93,49 @@ export class I2cDataDriver {
   }
 
 
-  private receiveData(
+  private async receiveData(
     i2cAddress: string | number,
     dataMark: number,
     dataLength: number,
   ): Promise<Uint8Array> {
-    return new Promise((resolve, reject) => {
+    const payload = await this.i2cDriver.read(i2cAddress, this.sendDataRegister, dataLength);
+    const receivedDataMark = payload[0];
 
-      // TODO: ошибка если таймаут
+    if (dataMark !== receivedDataMark) {
+      throw new Error(`Incorrect received data mark ${receivedDataMark}. Expected ${dataMark}`);
+    }
 
-      const receiveDataCb = (error: Error | null, payload?: Uint8Array): void => {
-        if (error)  return reject(error);
-        if (!payload) return reject(new Error(`Payload is undefined`));
+    if (payload.length !== dataLength) {
+      throw new Error(`Incorrect received data length ${payload.length}`);
+    }
 
-        const receivedDataMark = payload[0];
+    return withoutFirstItemUnit8Arr(payload);
 
-        if (dataMark !== receivedDataMark) return;
 
-        if (payload.length !== dataLength) {
-          return reject(new Error(`Incorrect received data length ${payload.length}`));
-        }
-
-        const data: Uint8Array = withoutFirstItemUnit8Arr(payload);
-
-        // unlisten of data
-        this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
-
-        resolve(data);
-      };
-
-      // TODO: может нужно использовать read ???
-      // TODO: и считать первые попавшиеся данные и если это не то - то ошибка
-
-      // temporary listen for data
-      this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
-    });
+    // return new Promise((resolve, reject) => {
+    //   const receiveDataCb = (error: Error | null, payload?: Uint8Array): void => {
+    //     if (error)  return reject(error);
+    //     if (!payload) return reject(new Error(`Payload is undefined`));
+    //
+    //     const receivedDataMark = payload[0];
+    //
+    //     if (dataMark !== receivedDataMark) return;
+    //
+    //     if (payload.length !== dataLength) {
+    //       return reject(new Error(`Incorrect received data length ${payload.length}`));
+    //     }
+    //
+    //     const data: Uint8Array = withoutFirstItemUnit8Arr(payload);
+    //
+    //     // unlisten of data
+    //     this.i2cDriver.removeListener(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
+    //
+    //     resolve(data);
+    //   };
+    //
+    //   // temporary listen for data
+    //   this.i2cDriver.listenIncome(i2cAddress, this.sendDataRegister, dataLength, receiveDataCb);
+    // });
   }
 
   private async sendLength(i2cAddress: string | number, dataLength: number): Promise<void> {

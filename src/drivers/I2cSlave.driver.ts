@@ -44,6 +44,10 @@ export class I2cSlaveDriver {
     // TODO: !!!! ??? последние данные будут удаляться или висеть ???
   }
 
+  async read(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+    // TODO: test
+  }
+
   listenIncome(
     i2cAddress: undefined,
     dataAddress: number | undefined,

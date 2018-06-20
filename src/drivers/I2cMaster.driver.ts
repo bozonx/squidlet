@@ -154,10 +154,11 @@ export class I2cMasterDriver {
   async read(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
     const addressHex = this.normilizeAddr(i2cAddress);
 
+    // write command
     if (typeof dataAddress !== 'undefined') {
       await this.writeEmpty(addressHex, dataAddress);
     }
-
+    // read from bus
     return this.i2cMasterDev.readFrom(addressHex, length);
   }
 
