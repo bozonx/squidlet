@@ -7,9 +7,9 @@ describe 'connections.I2cConnection', ->
     @listenDataHandler = undefined
     @driver = {
       send: sinon.spy()
-      listenIncome: (mark, handler) => @listenDataHandler = handler
+      listenIncome: (remoteAddress, mark, handler) => @listenDataHandler = handler
     }
-
+    @remoteAddress = '5a'
     @drivers = {
       getDriver: => {
         getInstance: => @driver
@@ -29,17 +29,16 @@ describe 'connections.I2cConnection', ->
     }
 
     @connection = new I2cConnection(@drivers, {}).getInstance(@myAddress)
-    @connection.init()
 
   it 'send', ->
-    await @connection.send(@message)
+    await @connection.send(@remoteAddress, @message)
 
-    sinon.assert.calledWith(@driver.send, 0x01, @uint8arr)
+    sinon.assert.calledWith(@driver.send, @remoteAddress, 0x01, @uint8arr)
 
   it 'listenIncome', ->
     handler = sinon.spy()
-    @connection.listenIncome(handler)
+    @connection.listenIncome(@remoteAddress, handler)
 
-    @listenDataHandler(@uint8arr)
+    @listenDataHandler(null, @uint8arr)
 
-    sinon.assert.calledWith(handler, @message)
+    sinon.assert.calledWith(handler, null, @message)
