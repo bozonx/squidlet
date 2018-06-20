@@ -23,6 +23,18 @@ export function withoutFirstItemUnit8Arr(arr: Uint8Array): Uint8Array {
   return result;
 }
 
+export function addFirstItemUnit8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
+
+  // TODO: test
+
+  const itemsToAdd = 1;
+  const result = new Uint8Array(arr.length + itemsToAdd);
+  result[0] = itemToAdd;
+  arr.forEach((item, index) => result[index + itemsToAdd] = item);
+
+  return result;
+}
+
 /**
  * Convert hex like "ffff" to array of bytes [ 255, 255 ]
  */

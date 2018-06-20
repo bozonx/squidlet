@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import { I2cMasterDev } from '../dev/I2cMaster.dev';
-import { hexStringToHexNum } from '../helpers/helpers';
+import { hexStringToHexNum, addFirstItemUnit8Arr } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 import Poling from '../helpers/Poling';
 
@@ -86,7 +86,6 @@ export class I2cMasterDriver {
   removeListener(
     i2cAddress: string | number,
     dataAddress: number | undefined,
-    length: number,
     handler: Handler
   ): void {
 
@@ -95,7 +94,6 @@ export class I2cMasterDriver {
     const addressHex: number = this.normilizeAddr(i2cAddress);
     const id = this.generateId(addressHex, dataAddress);
 
-    // TODO: length наверное не нужен
     // TODO: останавливает полинг если уже нет ни одного слушателя
 
     this.events.removeListener(id, handler);
@@ -166,9 +164,7 @@ export class I2cMasterDriver {
     let dataToWrite = data;
 
     if (typeof dataAddress !== 'undefined') {
-      dataToWrite = new Uint8Array(data.length + REGISTER_LENGTH);
-      dataToWrite[REGISTER_POSITION] = dataAddress;
-      data.forEach((item, index) => dataToWrite[index + REGISTER_LENGTH] = item);
+      dataToWrite = addFirstItemUnit8Arr(data, dataAddress);
     }
 
     await this.i2cMasterDev.writeTo(addressHex, dataToWrite);

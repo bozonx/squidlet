@@ -26,7 +26,6 @@ export interface I2cDriverClass {
   removeListener: (
     i2cAddress: string | number,
     dataAddress: number | undefined,
-    length: number,
     handler: I2cDriverHandler
   ) => void;
 }
@@ -83,7 +82,7 @@ export class I2cDataDriver {
     const wrapper: DataHandler = this.handlersManager.getWrapper(dataId, handler) as DataHandler;
 
     // unlisten
-    this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
+    this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, wrapper);
     this.handlersManager.removeByHandler(dataId, handler);
   }
 
