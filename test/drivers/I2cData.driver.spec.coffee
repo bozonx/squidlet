@@ -11,7 +11,7 @@ describe.only 'I2cData.driver', ->
       removeListener: ->
     }
     @i2cDriver = getInstance: => @i2cDriverInstance
-
+    @remoteAddress = '5a'
     @dataMark = 0x01
 
     @data = new Uint8Array(2)
@@ -25,14 +25,13 @@ describe.only 'I2cData.driver', ->
     @address = '5a'
 
     @i2cData = new I2cData(@drivers, {}).getInstance(@i2cDriver, @bus, @address)
-    @i2cData.init()
 
   it 'send', ->
-    await @i2cData.send(@dataMark, @data)
+    await @i2cData.send(@remoteAddress, @dataMark, @data)
 
-    sinon.assert.calledWith(@i2cDriverInstance.write.getCall(0), 0x1a, @lengthToSend)
+    sinon.assert.calledWith(@i2cDriverInstance.write.getCall(0), @remoteAddress, 0x1a, @lengthToSend)
     dataToSend = new Uint8Array(@dataToSend)
-    sinon.assert.calledWith(@i2cDriverInstance.write.getCall(1), 0x1b, dataToSend)
+    sinon.assert.calledWith(@i2cDriverInstance.write.getCall(1), @remoteAddress, 0x1b, dataToSend)
 
   it 'listenIncome', ->
     handler = sinon.spy()

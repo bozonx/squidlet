@@ -26,6 +26,9 @@ export default class Network {
   }
 
   async send(toHost: string, payload: any): Promise<void> {
+
+    // TODO: можеть на всякий случай ждать таймаут чтобы не было зависших запросов ?
+
     return this.router.send(toHost, payload);
   }
 

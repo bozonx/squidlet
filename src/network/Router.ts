@@ -39,9 +39,6 @@ export default class Router {
   async send(toHost: string, payload: any): Promise<void> {
     if (toHost === this.network.hostId) throw new Error(`You can't send message to yourself`);
 
-    // TODO: ждать таймаут ответа - если не дождались - do reject
-    // TODO: как-то нужно дождаться что сообщение было доставленно принимающей стороной
-
     const routerMessage: RouterMessage = this.generateMessage(toHost, payload);
     const nextHostId: string = this.resolveNextHostId(routerMessage.route);
     const nextHostConnectionParams: Destination = this.resolveDestination(nextHostId);

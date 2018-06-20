@@ -60,7 +60,6 @@ export class I2CConnectionDriver {
   }
 
   removeListener(remoteAddress: string, handler: ConnectionHandler): void {
-    //const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
     const wrapper: DataHandler = this.handlersManager.getWrapper(remoteAddress, handler) as DataHandler;
 
     // unlisten

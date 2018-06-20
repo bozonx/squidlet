@@ -1,6 +1,7 @@
 import Drivers from '../app/Drivers';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUnit8Arr } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
+import HandlersManager from '../helpers/HandlersManager';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -41,7 +42,8 @@ export class I2cDataDriver {
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
-  private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
+  private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
+  //private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
   constructor(
     drivers: Drivers,
@@ -72,24 +74,21 @@ export class I2cDataDriver {
       this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
     };
 
-    this.saveHandler(dataId, handler, wrapper);
+    this.handlersManager.addHandler(dataId, handler, wrapper);
     this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
   removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
+
+    // TODO: test
+
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
     const dataId: string = resolvedDataMark.toString(16);
-    const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
+    const wrapper: DataHandler = this.handlersManager.getWrapper(dataId, handler) as DataHandler;
 
     // unlisten
     this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
-
-    // remove handler
-    this.handlers[dataId].splice(handlerIndex, 1);
-    // remove container if it is an empty
-    if (!this.handlers[dataId].length) {
-      delete this.handlers[dataId];
-    }
+    this.handlersManager.removeByHandler(dataId, handler);
   }
 
 
@@ -192,31 +191,6 @@ export class I2cDataDriver {
     this.receiveData(i2cAddress, dataMark, dataLength)
       .then((payload: Uint8Array) => handler(null, payload))
       .catch((err) => handler(err));
-  }
-
-  private saveHandler(dataId: string, handler: DataHandler, wrapper: I2cDriverHandler) {
-    if (!this.handlers[dataId]) this.handlers[dataId] = [];
-    this.handlers[dataId].push({
-      wrapper,
-      handler,
-    });
-  }
-
-  /**
-   * Find wrapper of handler in this.handlers
-   */
-  private findWrapper(dataId: string, handler: DataHandler): { wrapper: I2cDriverHandler, handlerIndex: number } {
-    const handlers: Array<HandlerItem> = this.handlers[dataId];
-    const handlerIndex: number = handlers.findIndex((item) => {
-      return item.handler === handler;
-    });
-
-    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
-
-    return {
-      wrapper: this.handlers[dataId][handlerIndex].wrapper,
-      handlerIndex,
-    };
   }
 
 }
