@@ -9,7 +9,7 @@ const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 const MIN_DATA_LENGTH = 1;
 
-type Handler = (error: Error | null, payload?: Uint8Array) => void;
+export type DataHandler = (error: Error | null, payload?: Uint8Array) => void;
 type I2cDriverHandler = (error: Error | null, data?: Uint8Array) => void;
 
 export interface I2cDriverClass {
@@ -30,7 +30,7 @@ export interface I2cDriverClass {
 }
 
 interface HandlerItem {
-  handler: Handler;
+  handler: DataHandler;
   wrapper: I2cDriverHandler;
 }
 
@@ -64,7 +64,7 @@ export class I2cDataDriver {
     await this.sendData(i2cAddress, resolvedDataMark, dataLength, data);
   }
 
-  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: Handler): void {
+  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId: string = resolvedDataMark.toString(16);
 
@@ -76,7 +76,7 @@ export class I2cDataDriver {
     this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
-  removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: Handler): void {
+  removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
     const dataId: string = resolvedDataMark.toString(16);
     const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
@@ -179,7 +179,7 @@ export class I2cDataDriver {
   private handleIncome(
     i2cAddress: string | number,
     dataMark: number,
-    handler: Handler,
+    handler: DataHandler,
     error: Error | null,
     payload?: Uint8Array
   ): void {
@@ -194,7 +194,7 @@ export class I2cDataDriver {
       .catch((err) => handler(err));
   }
 
-  private saveHandler(dataId: string, handler: Handler, wrapper: I2cDriverHandler) {
+  private saveHandler(dataId: string, handler: DataHandler, wrapper: I2cDriverHandler) {
     if (!this.handlers[dataId]) this.handlers[dataId] = [];
     this.handlers[dataId].push({
       wrapper,
@@ -205,7 +205,7 @@ export class I2cDataDriver {
   /**
    * Find wrapper of handler in this.handlers
    */
-  private findWrapper(dataId: string, handler: Handler): { wrapper: I2cDriverHandler, handlerIndex: number } {
+  private findWrapper(dataId: string, handler: DataHandler): { wrapper: I2cDriverHandler, handlerIndex: number } {
     const handlers: Array<HandlerItem> = this.handlers[dataId];
     const handlerIndex: number = handlers.findIndex((item) => {
       return item.handler === handler;

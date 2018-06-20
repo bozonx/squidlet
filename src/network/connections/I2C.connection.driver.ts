@@ -1,7 +1,7 @@
 import Drivers from '../../app/Drivers';
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
-import { I2cDataDriver, I2cDriverClass } from '../../drivers/I2cData.driver';
+import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 
 
@@ -9,7 +9,7 @@ type Handler = (error: Error | null, payload?: any) => void;
 
 interface HandlerItem {
   handler: Handler;
-  wrapper: Function;
+  wrapper: DataHandler;
 }
 
 
@@ -69,20 +69,35 @@ export class I2CConnectionDriver {
   }
 
   removeListener(remoteAddress: string, handler: Handler): void {
-    const handlers: Array<HandlerItem> = this.handlers[remoteAddress];
+    const dataId: string = remoteAddress;
+    const { wrapper, handlerIndex } = this.findWrapper(dataId, handler);
+
+    // unlisten
+    this.i2cDataDriver.removeListener(remoteAddress, this.dataMark, wrapper);
+
+    // remove handler
+    this.handlers[dataId].splice(handlerIndex, 1);
+    // remove container if it is an empty
+    if (!this.handlers[dataId].length) {
+      delete this.handlers[dataId];
+    }
+  }
+
+  /**
+   * Find wrapper of handler in this.handlers
+   */
+  private findWrapper(dataId: string, handler: Handler): { wrapper: DataHandler, handlerIndex: number } {
+    const handlers: Array<HandlerItem> = this.handlers[dataId];
     const handlerIndex: number = handlers.findIndex((item) => {
       return item.handler === handler;
     });
 
-    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${remoteAddress}"`);
+    if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
 
-    handlers.splice(handlerIndex, 1);
-
-    // TODO: где сам remove listener
-
-    if (!this.handlers[remoteAddress].length) {
-      delete this.handlers[remoteAddress];
-    }
+    return {
+      wrapper: this.handlers[dataId][handlerIndex].wrapper,
+      handlerIndex,
+    };
   }
 
 }

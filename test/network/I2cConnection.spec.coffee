@@ -2,7 +2,7 @@ I2cConnection = require('../../src/network/connections/I2C.connection.driver').d
 helpers = require('../../src/helpers/helpers')
 
 
-describe 'connections.I2cConnection', ->
+describe.only 'connections.I2cConnection', ->
   beforeEach ->
     @listenDataHandler = undefined
     @driver = {
@@ -42,3 +42,12 @@ describe 'connections.I2cConnection', ->
     @listenDataHandler(null, @uint8arr)
 
     sinon.assert.calledWith(handler, null, @message)
+
+  it 'removeListener', ->
+    handler = sinon.spy()
+    @connection.listenIncome(@remoteAddress, handler)
+    @connection.removeListener(@remoteAddress, handler)
+
+    @listenDataHandler(null, @uint8arr)
+
+    sinon.assert.notCalled(handler)
