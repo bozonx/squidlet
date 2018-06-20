@@ -70,8 +70,8 @@ export class I2cDataDriver {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId: string = resolvedDataMark.toString(16);
 
-    const wrapper = (error: Error | null, payload?: Uint8Array): void => {
-      this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
+    const wrapper = async (error: Error | null, payload?: Uint8Array): Promise<void> => {
+      await this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
     };
 
     this.handlersManager.addHandler(dataId, handler, wrapper);
@@ -104,7 +104,7 @@ export class I2cDataDriver {
       throw new Error(`Incorrect received data mark ${receivedDataMark}. Expected ${dataMark}`);
     }
 
-    if (payload.length !== dataLength) {
+    if ((payload.length - DATA_MARK_LENGTH) !== dataLength) {
       throw new Error(`Incorrect received data length ${payload.length}`);
     }
 
@@ -175,20 +175,20 @@ export class I2cDataDriver {
     return wordToNum(dataLengthHex);
   }
 
-  private handleIncome(
+  private async handleIncome(
     i2cAddress: string | number,
     dataMark: number,
     handler: DataHandler,
     error: Error | null,
     payload?: Uint8Array
-  ): void {
+  ): Promise<void> {
     if (error)  return handler(error);
     if (!payload) return handler(new Error(`Payload is undefined`));
 
     const dataLength: number = this.lengthBytesToNumber(payload);
 
     // receive data with this length
-    this.receiveData(i2cAddress, dataMark, dataLength)
+    return this.receiveData(i2cAddress, dataMark, dataLength)
       .then((payload: Uint8Array) => handler(null, payload))
       .catch((err) => handler(err));
   }
