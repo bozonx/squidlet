@@ -50,13 +50,10 @@ export class I2CConnectionDriver {
 
   listenIncome(remoteAddress: string, handler: Handler): void {
     const wrapper = (error: Error | null, payload?: Uint8Array): void => {
-      if (error) {
-        handler(error);
+      if (error)  return handler(error);
+      if (!payload) return handler(new Error(`Payload is undefined`));
 
-        return;
-      }
-
-      const jsonString = uint8ArrayToText(payload as Uint8Array);
+      const jsonString = uint8ArrayToText(payload);
       const data = JSON.parse(jsonString);
 
       handler(null, data);

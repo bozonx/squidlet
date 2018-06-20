@@ -8,6 +8,8 @@ import { withoutFirstItemUnit8Arr } from '../helpers/helpers';
 
 const NO_DATA_ADDRESS = 'null';
 
+type Handler = (error: Error | null, data?: Uint8Array) => void;
+
 
 export class I2cSlaveDriver {
   private readonly drivers: Drivers;
@@ -46,7 +48,7 @@ export class I2cSlaveDriver {
     i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
-    handler: (data: Uint8Array) => void
+    handler: Handler
   ): void {
 
     // TODO: i2cAddress не нужен, так данные приходят всегда с мастера
@@ -63,7 +65,7 @@ export class I2cSlaveDriver {
     i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
-    handler: (data: Uint8Array) => void
+    handler: Handler
   ): void {
 
     // TODO: test

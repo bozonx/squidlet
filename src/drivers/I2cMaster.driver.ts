@@ -11,6 +11,8 @@ import Poling from '../helpers/Poling';
 const REGISTER_POSITION = 0;
 const REGISTER_LENGTH = 1;
 
+type Handler = (error: Error | null, data?: Uint8Array) => void;
+
 
 export class I2cMasterDriver {
   private readonly drivers: Drivers;
@@ -68,7 +70,7 @@ export class I2cMasterDriver {
     i2cAddress: string | number,
     dataAddress: number | undefined,
     length: number,
-    handler: (data: Uint8Array) => void
+    handler: Handler
   ): void {
 
     // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
@@ -86,7 +88,7 @@ export class I2cMasterDriver {
     i2cAddress: string | number,
     dataAddress: number | undefined,
     length: number,
-    handler: (data: Uint8Array) => void
+    handler: Handler
   ): void {
 
     // TODO: test
@@ -109,7 +111,16 @@ export class I2cMasterDriver {
 
     // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
 
-    const data: Uint8Array = await this.read(addressHex, dataAddress, length);
+    let data: Uint8Array;
+
+    try {
+      data = await this.read(addressHex, dataAddress, length);
+    }
+    catch (err) {
+      this.events.emit(id, err);
+
+      return;
+    }
 
     // if data is equal to previous data - do nothing
     if (
@@ -122,7 +133,7 @@ export class I2cMasterDriver {
     // save previous data
     this.pollLastData[id] = data;
     // finally rise an event
-    this.events.emit(id, data);
+    this.events.emit(id, null, data);
   }
 
   /**

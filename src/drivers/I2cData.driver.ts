@@ -9,8 +9,8 @@ const DATA_MARK_LENGTH = 1;
 const DATA_LENGTH_REQUEST = 2;
 const MIN_DATA_LENGTH = 1;
 
-
 type Handler = (error: Error | null, payload?: Uint8Array) => void;
+type I2cDriverHandler = (error: Error | null, data?: Uint8Array) => void;
 
 export interface I2cDriverClass {
   write: (i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array) => Promise<void>;
@@ -18,22 +18,19 @@ export interface I2cDriverClass {
     i2cAddress: string | number,
     dataAddress: number | undefined,
     length: number,
-
-    // TODO: принимать ошибку
-    handler: (data: Uint8Array) => void
+    handler: I2cDriverHandler
   ) => void;
   removeListener: (
     i2cAddress: string | number,
     dataAddress: number | undefined,
     length: number,
-    // TODO: принимать ошибку
-    handler: (data: Uint8Array) => void
+    handler: I2cDriverHandler
   ) => void;
 }
 
 interface HandlerItem {
   handler: Handler;
-  wrapper: Function;
+  wrapper: I2cDriverHandler;
 }
 
 
@@ -70,7 +67,10 @@ export class I2cDataDriver {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId = resolvedDataMark.toString(16);
 
-    const wrapper = async (payload: Uint8Array) => {
+    const wrapper = async (error: Error | null, payload?: Uint8Array) => {
+      if (error)  return handler(error);
+      if (!payload) return handler(new Error(`Payload is undefined`));
+
       const dataLength: number = this.lengthBytesToNumber(payload);
 
       // receive data with this length
@@ -103,7 +103,7 @@ export class I2cDataDriver {
 
     if (handlerIndex < 0) throw new Error(`Can't find handler index of "${dataId}"`);
 
-    const wrapper = this.handlers[dataId][handlerIndex].wrapper as (data: Uint8Array) => void;
+    const wrapper = this.handlers[dataId][handlerIndex].wrapper;
 
     // unlisten
     this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
@@ -126,15 +126,16 @@ export class I2cDataDriver {
 
       // TODO: ошибка если таймаут
 
-      const receiveDataCb = (payload: Uint8Array) => {
+      const receiveDataCb = (error: Error | null, payload?: Uint8Array): void => {
+        if (error)  return reject(error);
+        if (!payload) return reject(new Error(`Payload is undefined`));
+
         const receivedDataMark = payload[0];
 
         if (dataMark !== receivedDataMark) return;
 
         if (payload.length !== dataLength) {
-          reject(new Error(`Incorrect received data length ${payload.length}`));
-
-          return;
+          return reject(new Error(`Incorrect received data length ${payload.length}`));
         }
 
         const data: Uint8Array = withoutFirstItemUnit8Arr(payload);
