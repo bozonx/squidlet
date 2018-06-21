@@ -28,3 +28,5 @@ describe.only 'app.Drivers', ->
     @drivers.init(@driversPaths, @driversConfig)
 
     sinon.assert.calledWith(@drivers.require, '/path/to/MyDriver')
+    assert.equal(@drivers.getDriver('MyDriver').config, @driversConfig['MyDriver'])
+    sinon.assert.calledOnce(@drivers.getDriver('MyDriver').init)
