@@ -32,11 +32,11 @@ export default class Network {
     return this.router.send(toHost, payload);
   }
 
-  listenIncome(handler: (payload: any) => void): void {
+  listenIncome(handler: (error: Error | null, payload?: any) => void): void {
     this.router.listenIncome(handler);
   }
 
-  removeListener(handler: (payload: any) => void): void {
+  removeListener(handler: (error: Error | null, payload?: any) => void): void {
     this.router.removeListener(handler);
   }
 

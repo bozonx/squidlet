@@ -27,5 +27,5 @@ describe.skip 'integration network', ->
     @networkSrc.send(@toHost, @payload)
 
     sinon.assert.calledOnce(handler)
-    sinon.assert.calledWith(handler, @payload)
+    sinon.assert.calledWith(handler, null, @payload)
     # TODO: на другом конце network.listenIncome - мы должны получить отправленные данные

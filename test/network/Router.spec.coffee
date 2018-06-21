@@ -61,9 +61,9 @@ describe 'app.Router', ->
     handler = sinon.spy()
     @router.listenIncome(handler)
 
-    @router.handleIncomeMessages(routerMessage)
+    @router.handleIncomeMessages(null, routerMessage)
 
-    sinon.assert.calledWith(handler, 'payload')
+    sinon.assert.calledWith(handler, null, 'payload')
 
   it 'handleIncomeMessages - forward to next host', ->
     @network.hostId = 'currentHost'
@@ -74,7 +74,7 @@ describe 'app.Router', ->
     }
     handler = sinon.spy()
     @router.listenIncome(handler)
-    @router.handleIncomeMessages(routerMessage)
+    @router.handleIncomeMessages(null, routerMessage)
 
     sinon.assert.notCalled(handler)
     sinon.assert.calledWith(@destinations.send,
