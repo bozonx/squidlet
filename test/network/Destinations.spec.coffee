@@ -54,9 +54,9 @@ describe 'app.Destinations', ->
     @destinations.init()
     @destinations.listenIncome(handler)
 
-    @driverListenHandler(@payload)
+    @driverListenHandler(null, @payload)
 
-    sinon.assert.calledWith(handler, @payload, @dest)
+    sinon.assert.calledWith(handler, null, @payload, @dest)
 
   it 'removeListener', ->
     handler = sinon.spy()
@@ -65,6 +65,6 @@ describe 'app.Destinations', ->
     @destinations.listenIncome(handler)
     @destinations.removeListener(handler)
 
-    @driverListenHandler(@payload)
+    @driverListenHandler(null, @payload)
 
     sinon.assert.notCalled(handler)

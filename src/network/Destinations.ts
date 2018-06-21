@@ -8,6 +8,9 @@ import MyAddress from '../app/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
 
 
+type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Destination) => void;
+
+
 /**
  * Send data to physical address of certain connection and listen fo all the physical addresses.
  * It initializes connection of this host by type and bus and current address of host.
@@ -41,11 +44,11 @@ export default class Destinations {
   /**
    * Listen to all the addresses
    */
-  listenIncome(handler: (payload: any, fromDest: Destination) => void): void {
+  listenIncome(handler: DestHandler): void {
     this.events.addListener(this.eventName, handler);
   }
 
-  removeListener(handler: (payload: any, fromDest: Destination) => void): void {
+  removeListener(handler: DestHandler): void {
     this.events.removeListener(this.eventName, handler);
   }
 
@@ -64,6 +67,9 @@ export default class Destinations {
    * Collect all the used connections and deduplicate it.
    */
   private collectMyAddresses(): Array<MyAddress> {
+
+    // TODO: remove lodash
+
     const result: {[index: string]: MyAddress} = {};
 
     for (let name in this.neighbors) {
@@ -82,7 +88,7 @@ export default class Destinations {
   private registerConnection(myAddress: MyAddress) {
     const connectionId: string = this.generateConnectionId(myAddress);
     const driverName = this.generateDriverName(myAddress.type);
-    const connectionDriver: DriverFactoryBase = this.drivers.getDriver(driverName);
+    const connectionDriver = this.drivers.getDriver(driverName) as DriverFactoryBase;
 
     this.connections[connectionId] = connectionDriver.getInstance(myAddress) as Connection;
   }
@@ -96,8 +102,8 @@ export default class Destinations {
     }
   }
 
-  private handleIncomeMessages(fromDest: Destination, payload: any): void {
-    this.events.emit(this.eventName, payload, fromDest);
+  private handleIncomeMessages(fromDest: Destination, error: Error, payload?: any): void {
+    this.events.emit(this.eventName, error, payload, fromDest);
   }
 
   private getConnection(destination: Destination): Connection {

@@ -3,7 +3,7 @@
 Drivers = require('../../src/app/Drivers').default
 
 
-describe.only 'app.Drivers', ->
+describe 'app.Drivers', ->
   beforeEach ->
     @MyDriver = class
       config: undefined

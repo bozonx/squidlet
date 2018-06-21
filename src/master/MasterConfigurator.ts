@@ -1,5 +1,4 @@
 import System from './System';
-import * as _ from "lodash";
 
 
 export default class MasterConfigurator {
