@@ -8,6 +8,9 @@ import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
 
 
+type RouterHandler = (error: Error | null, payload?: any) => void;
+
+
 /**
  * It passes messages to corresponding connection by `message.to`.
  * And receives messages from all the available connections on current host.
@@ -49,21 +52,32 @@ export default class Router {
   /**
    * Listen for income messages which is delivered to this final host.
    */
-  listenIncome(handler: (payload: any) => void): void {
+  listenIncome(handler: RouterHandler): void {
     this.events.addListener(this.eventName, handler);
   }
 
-  removeListener(handler: (payload: any) => void): void {
+  removeListener(handler: RouterHandler): void {
     this.events.removeListener(this.eventName, handler);
   }
 
   /**
    * Handle all the messages from remote hosts which sent to this host or via this host.
    */
-  private handleIncomeMessages = (routerMessage: RouterMessage): void => {
+  private handleIncomeMessages = (error: Error | null, routerMessage?: RouterMessage): void => {
+    if (error) {
+      this.events.emit(this.eventName, error);
+
+      return;
+    }
+    if (!routerMessage) {
+      this.events.emit(this.eventName, `RouterMessage is undefined`);
+
+      return;
+    }
+
     // if it's final destination - pass message to income listeners
     if (_.last(routerMessage.route) === this.network.hostId) {
-      this.events.emit(this.eventName, routerMessage.payload);
+      this.events.emit(this.eventName, null, routerMessage.payload);
 
       return;
     }
@@ -77,9 +91,7 @@ export default class Router {
     const nextHostConnectionParams: Destination = this.resolveDestination(nextHostId);
 
     this.destinations.send(nextHostConnectionParams, newRouterMessage)
-      .catch((err) => {
-        // TODO: что делать с ошибкой???
-      });
+      .catch((err) => this.events.emit(this.eventName, err));
   }
 
   /**
