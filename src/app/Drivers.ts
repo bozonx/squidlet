@@ -1,3 +1,5 @@
+import { Map } from 'immutable';
+
 import System from './System';
 
 
@@ -8,23 +10,26 @@ interface Driver {
 
 export default class Drivers {
   private readonly system: System;
-  private readonly instances: Map<string, Driver> = new Map();
+  private instances: Map<string, Driver> = Map<string, Driver>();
 
   constructor(system: System) {
     this.system = system;
   }
 
   init(driversPaths: Map<string, string>, driversConfig: {[index: string]: object} = {}) {
-    driversPaths.forEach((driverPath: string, driverName: string) => {
-      const DriverClass = this._require(driverPath);
+    driversPaths.forEach((driverPath: string | undefined, driverName: string | undefined) => {
+      if (!driverPath || !driverName) return;
 
-      this.instances.set(driverName, new DriverClass(this, driversConfig[driverName]));
+      const DriverClass = this.require(driverPath);
+
+      this.instances = this.instances.set(driverName, new DriverClass(this, driversConfig[driverName]));
     });
 
     // initialize drivers
-    for(let [key, driver] of this.instances) {
-      if (driver.init) driver.init();
-    }
+    this.instances.forEach((driver: Driver | undefined) => {
+      if (driver && driver.init) driver.init();
+    });
+
   }
 
   getDriver(driverName: string): Driver | undefined {
@@ -33,7 +38,7 @@ export default class Drivers {
   }
 
   // it needs for test purpose
-  _require(devicePath: string) {
+  private require(devicePath: string) {
     return require(devicePath);
   }
 
