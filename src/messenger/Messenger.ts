@@ -25,7 +25,14 @@ export default class Messenger {
     this.bridgeResponder.init();
 
     // listen income messages from remote host and rise them on a local host as local messages
-    this.system.network.listenIncome((message: Message): void => {
+    this.system.network.listenIncome((error: Error | null, message: Message): void => {
+      if (error) {
+        // TODO: что делать в случае ошибки - наверное в лог писать или сделать message.error ???
+        this.system.log.error(error.toString());
+
+        return;
+      }
+
       // TODO: нужна проверка что это именно сообщение
       this.system.events.emit(message.category, message.topic, message);
     });

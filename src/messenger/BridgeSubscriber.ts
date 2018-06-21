@@ -30,7 +30,14 @@ export default class Bridge {
   }
 
   init(): void {
-    this.system.network.listenIncome((message: Message): void => {
+    this.system.network.listenIncome((error: Error | null, message: Message): void => {
+      if (error) {
+        // TODO: что делать в случае ошибки - наверное в лог писать или сделать message.error ???
+        this.system.log.error(error.toString());
+
+        return;
+      }
+
       // TODO: нужна проверка что это именно сообщение ???
       this.handleIncomeMessages(message);
     });

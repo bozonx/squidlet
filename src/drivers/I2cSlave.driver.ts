@@ -25,7 +25,7 @@ export class I2cSlaveDriver {
 
     if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
 
-    const i2cSlaveDev: DriverFactoryBase = this.drivers.getDriver('I2cSlave.dev');
+    const i2cSlaveDev = this.drivers.getDriver('I2cSlave.dev') as DriverFactoryBase;
 
     this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlaveDev;
 
