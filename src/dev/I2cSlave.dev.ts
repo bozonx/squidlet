@@ -12,6 +12,7 @@ export class I2cSlaveDev {
 
   listenIncome(handler: (data: Uint8Array) => void): void {
     // TODO: слушать все входящие запросы
+    // TODO: ошбку наверное тоже надо отдавать ???
     // TODO: дается длинна и можно считать данные этой длинны и поднять хэндлер
   }
 
