@@ -44,19 +44,18 @@ export class I2cSlaveDriver {
 
     this.i2cSlaveDev.send(dataToWrite);
 
-    // TODO: test
-
     // TODO: !!!! ??? сделать очередь чтобы мастер считал при полинге
     // TODO: !!!! ??? последние данные будут удаляться или висеть ???
   }
 
-  // async read(i2cAddress: undefined, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-  //
-  //   // TODO: test
-  //
-  //   // TODO: может повешаться на listenIncome и ждать dataAddress и потом отписаться ???
-  //
-  // }
+  async read(i2cAddress: undefined, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+
+
+    // TODO: test
+
+    // TODO: может повешаться на listenIncome и ждать dataAddress и потом отписаться ???
+
+  }
 
   listenIncome(
     i2cAddress: undefined,
@@ -65,7 +64,9 @@ export class I2cSlaveDriver {
     handler: SlaveHandler
   ): void {
 
-    // TODO: что делать с lenght ????
+    // TODO: что делать с lenght ???? наверное проверить длинну
+    // TODO: если слушаем data address - то возвращать ошибку что дина не совпадает
+    // TODO: если слушаем все данные ? то наверное не писать ошибку ???
 
     const id = this.generateId(dataAddress);
 
@@ -90,12 +91,16 @@ export class I2cSlaveDriver {
     // emit handler for all the income data any way
     this.events.emit(NO_DATA_ADDRESS, null, data);
 
+    if (!data.length) return;
+
+    const id = this.generateId(data[0]);
+
     // emit handler of data address
     if (data.length > REGISTER_LENGTH) {
-      this.events.emit(data[0].toString(), null, withoutFirstItemUint8Arr(data));
+      this.events.emit(id, null, withoutFirstItemUint8Arr(data));
     }
     else if (data.length === REGISTER_LENGTH) {
-      this.events.emit(data[0].toString(), null, undefined);
+      this.events.emit(id, null, undefined);
     }
   }
 

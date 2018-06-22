@@ -13,6 +13,9 @@ describe.only 'I2cMaster.driver', ->
     @dataAddrHex = 0x1a
     @data = new Uint8Array(1)
     @data[0] = 255
+    @dataToWrite = new Uint8Array(2)
+    @dataToWrite[0] = @dataAddrHex
+    @dataToWrite[1] = @data[0]
 
     @drivers = {
       getDriver: => @i2cSlaveDev
@@ -20,37 +23,31 @@ describe.only 'I2cMaster.driver', ->
 
     @i2cSlave = new I2cSlave(@drivers, {}).getInstance(@bus)
 
-#  it 'write to dataAddress', ->
-#    await @i2cSlave.write(undefined , @dataAddrHex, @data)
-#
-#    dataToWrite = new Uint8Array(2)
-#    dataToWrite[0] = @dataAddrHex
-#    dataToWrite[1] = @data[0]
-#
-#    sinon.assert.calledWith(@i2cDevInstance.writeTo, @addressHex, dataToWrite)
-#
-#  it 'write without dataAddress', ->
-#    await @i2cMaster.write(@address, undefined, @data)
-#
-#    sinon.assert.calledWith(@i2cDevInstance.writeTo, @addressHex, @data)
+  it 'write to dataAddress', ->
+    await @i2cSlave.write(undefined , @dataAddrHex, @data)
 
+    sinon.assert.calledWith(@i2cSlaveDevInstance.send,  @dataToWrite)
+
+  it 'write without dataAddress', ->
+    await @i2cSlave.write(undefined, undefined, @data)
+
+    sinon.assert.calledWith(@i2cSlaveDevInstance.send,  @data)
+
+  it 'read', ->
 
   it 'listenIncome', ->
     handler = sinon.spy()
     handlerForAll = sinon.spy()
-    data = new Uint8Array(2)
-    data[0] = @dataAddrHex
-    data[1] = 255
 
     @i2cSlave.listenIncome(undefined, @dataAddrHex, 1, handler)
     @i2cSlave.listenIncome(undefined, undefined, 2, handlerForAll)
 
-    @listenHanlder(data)
+    @listenHanlder(@dataToWrite)
 
     sinon.assert.calledOnce(handler)
-    #sinon.assert.calledWith(handler, null, data[1])
+    sinon.assert.calledWith(handler, null, @data)
     sinon.assert.calledOnce(handlerForAll)
-    sinon.assert.calledWith(handlerForAll, null, data)
+    sinon.assert.calledWith(handlerForAll, null, @dataToWrite)
 
   it 'listenIncome without data', ->
     handler = sinon.spy()
