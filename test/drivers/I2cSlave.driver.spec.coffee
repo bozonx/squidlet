@@ -42,12 +42,28 @@ describe.only 'I2cMaster.driver', ->
     data[0] = @dataAddrHex
     data[1] = 255
 
-    @i2cSlave.listenIncome(undefined, @dataAddrHex, 2, handler)
+    @i2cSlave.listenIncome(undefined, @dataAddrHex, 1, handler)
     @i2cSlave.listenIncome(undefined, undefined, 2, handlerForAll)
 
     @listenHanlder(data)
 
     sinon.assert.calledOnce(handler)
-    sinon.assert.calledWith(handler, null, data[1])
+    #sinon.assert.calledWith(handler, null, data[1])
+    sinon.assert.calledOnce(handlerForAll)
+    sinon.assert.calledWith(handlerForAll, null, data)
+
+  it 'listenIncome without data', ->
+    handler = sinon.spy()
+    handlerForAll = sinon.spy()
+    data = new Uint8Array(1)
+    data[0] = @dataAddrHex
+
+    @i2cSlave.listenIncome(undefined, @dataAddrHex, 0, handler)
+    @i2cSlave.listenIncome(undefined, undefined, 1, handlerForAll)
+
+    @listenHanlder(data)
+
+    sinon.assert.calledOnce(handler)
+    sinon.assert.calledWith(handler, null, undefined)
     sinon.assert.calledOnce(handlerForAll)
     sinon.assert.calledWith(handlerForAll, null, data)

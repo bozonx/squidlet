@@ -3,10 +3,11 @@ import * as EventEmitter from 'events';
 import { I2cSlaveDev } from '../dev/I2cSlave.dev';
 import Drivers from '../app/Drivers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import { addFirstItemUint8Arr, withoutFirstItemUnit8Arr } from '../helpers/helpers';
+import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../helpers/helpers';
 
 
 const NO_DATA_ADDRESS = 'null';
+const REGISTER_LENGTH = 1;
 
 type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
@@ -64,8 +65,6 @@ export class I2cSlaveDriver {
     handler: SlaveHandler
   ): void {
 
-    // TODO: test
-
     // TODO: что делать с lenght ????
 
     const id = this.generateId(dataAddress);
@@ -88,15 +87,15 @@ export class I2cSlaveDriver {
   }
 
   private handleIncomeData = (data: Uint8Array) => {
-
-    // TODO: test
-
     // emit handler for all the income data any way
     this.events.emit(NO_DATA_ADDRESS, null, data);
 
     // emit handler of data address
-    if (data.length) {
-      this.events.emit(data[0].toString(), null, withoutFirstItemUnit8Arr(data));
+    if (data.length > REGISTER_LENGTH) {
+      this.events.emit(data[0].toString(), null, withoutFirstItemUint8Arr(data));
+    }
+    else if (data.length === REGISTER_LENGTH) {
+      this.events.emit(data[0].toString(), null, undefined);
     }
   }
 

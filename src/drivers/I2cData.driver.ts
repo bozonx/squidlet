@@ -1,5 +1,5 @@
 import Drivers from '../app/Drivers';
-import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUnit8Arr } from '../helpers/helpers';
+import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../helpers/helpers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import HandlersManager from '../helpers/HandlersManager';
 
@@ -124,7 +124,7 @@ export class I2cDataDriver {
     // do nothing if it isn't my data mark
     if (dataMark !== payload[DATA_MARK_POSITION]) return;
 
-    const lengthBytes: Uint8Array = withoutFirstItemUnit8Arr(payload);
+    const lengthBytes: Uint8Array = withoutFirstItemUint8Arr(payload);
     const dataLength: number = this.lengthBytesToNumber(lengthBytes);
 
     // receive data with this length
