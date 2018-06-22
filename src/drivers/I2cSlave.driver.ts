@@ -3,12 +3,12 @@ import * as EventEmitter from 'events';
 import { I2cSlaveDev } from '../dev/I2cSlave.dev';
 import Drivers from '../app/Drivers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import { withoutFirstItemUnit8Arr } from '../helpers/helpers';
+import { addFirstItemUnit8Arr, withoutFirstItemUnit8Arr } from '../helpers/helpers';
 
 
 const NO_DATA_ADDRESS = 'null';
 
-type Handler = (error: Error | null, data?: Uint8Array) => void;
+type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cSlaveDriver {
@@ -28,48 +28,54 @@ export class I2cSlaveDriver {
     const i2cSlaveDev = this.drivers.getDriver('I2cSlave.dev') as DriverFactoryBase;
 
     this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlaveDev;
-
+    // listen all the income data
     this.i2cSlaveDev.listenIncome(this.handleIncomeData);
-    // TODO: повешать слушателя handleIncomeData прерываний i2c
   }
 
   // TODO: поддержка int
 
   async write(i2cAddress: undefined, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+    let dataToWrite = data;
+
+    if (typeof dataAddress !== 'undefined') {
+      dataToWrite = addFirstItemUnit8Arr(data, dataAddress);
+    }
+
+    this.i2cSlaveDev.send(dataToWrite);
 
     // TODO: test
 
-    // TODO: !!!! выставить данные чтобы мастер их считал
-    // TODO: !!!! сделать очередь чтобы мастер считал при полинге
+    // TODO: !!!! ??? сделать очередь чтобы мастер считал при полинге
     // TODO: !!!! ??? последние данные будут удаляться или висеть ???
   }
 
-  async read(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+  async read(i2cAddress: undefined, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+
     // TODO: test
+
+    // TODO: может повешаться на listenIncome и ждать dataAddress и потом отписаться ???
+
   }
 
   listenIncome(
     i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
-    handler: Handler
+    handler: SlaveHandler
   ): void {
 
-    // TODO: i2cAddress не нужен, так данные приходят всегда с мастера
     // TODO: test
 
     const id = this.generateId(dataAddress);
 
     this.events.addListener(id, handler);
-
-    // TODO: если не указар dataAddress - то принимать все данные
   }
 
   removeListener(
     i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
-    handler: Handler
+    handler: SlaveHandler
   ): void {
 
     // TODO: test
@@ -83,10 +89,12 @@ export class I2cSlaveDriver {
 
     // TODO: test
 
-    this.events.emit(NO_DATA_ADDRESS, data);
+    // emit handler for all the income data any way
+    this.events.emit(NO_DATA_ADDRESS, null, data);
 
+    // emit handler of data address
     if (data.length) {
-      this.events.emit(data[0].toString(), withoutFirstItemUnit8Arr(data));
+      this.events.emit(data[0].toString(), null, withoutFirstItemUnit8Arr(data));
     }
   }
 
