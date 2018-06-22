@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import { I2cMasterDev } from '../dev/I2cMaster.dev';
-import { hexStringToHexNum, addFirstItemUnit8Arr } from '../helpers/helpers';
+import { hexStringToHexNum, addFirstItemUint8Arr } from '../helpers/helpers';
 import Drivers from '../app/Drivers';
 import Poling from '../helpers/Poling';
 
@@ -164,7 +164,7 @@ export class I2cMasterDriver {
     let dataToWrite = data;
 
     if (typeof dataAddress !== 'undefined') {
-      dataToWrite = addFirstItemUnit8Arr(data, dataAddress);
+      dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
 
     await this.i2cMasterDev.writeTo(addressHex, dataToWrite);

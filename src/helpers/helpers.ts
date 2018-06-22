@@ -23,7 +23,7 @@ export function withoutFirstItemUnit8Arr(arr: Uint8Array): Uint8Array {
   return result;
 }
 
-export function addFirstItemUnit8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
+export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
 
   // TODO: test
 

@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import { I2cSlaveDev } from '../dev/I2cSlave.dev';
 import Drivers from '../app/Drivers';
 import DriverFactoryBase from '../app/DriverFactoryBase';
-import { addFirstItemUnit8Arr, withoutFirstItemUnit8Arr } from '../helpers/helpers';
+import { addFirstItemUint8Arr, withoutFirstItemUnit8Arr } from '../helpers/helpers';
 
 
 const NO_DATA_ADDRESS = 'null';
@@ -38,7 +38,7 @@ export class I2cSlaveDriver {
     let dataToWrite = data;
 
     if (typeof dataAddress !== 'undefined') {
-      dataToWrite = addFirstItemUnit8Arr(data, dataAddress);
+      dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
 
     this.i2cSlaveDev.send(dataToWrite);
