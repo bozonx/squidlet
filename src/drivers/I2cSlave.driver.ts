@@ -42,16 +42,13 @@ export class I2cSlaveDriver {
       dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
 
-    this.i2cSlaveDev.send(dataToWrite);
+    await this.i2cSlaveDev.send(dataToWrite);
 
     // TODO: !!!! ??? сделать очередь чтобы мастер считал при полинге
     // TODO: !!!! ??? последние данные будут удаляться или висеть ???
   }
 
   async read(i2cAddress: undefined, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-
-    // TODO: test
-
     return new Promise<Uint8Array>((resolve, reject) => {
       const handler = (data: Uint8Array): void => {
         if (typeof dataAddress === 'undefined') {
@@ -59,7 +56,7 @@ export class I2cSlaveDriver {
         }
         else {
           // not our data
-          if (dataAddress === data[0]) return;
+          if (data[0] !== dataAddress) return;
 
           resolve(withoutFirstItemUint8Arr(data));
         }

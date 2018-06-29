@@ -1,12 +1,13 @@
 I2cSlave = require('../../src/drivers/I2cSlave.driver').default
 
 
-describe.only 'I2cMaster.driver', ->
+describe 'I2cSlave.driver', ->
   beforeEach ->
     @listenHanlder = undefined
     @i2cSlaveDevInstance = {
       send: sinon.stub().returns(Promise.resolve())
       listenIncome: (handler) => @listenHanlder = handler
+      removeListener: sinon.spy()
     }
     @i2cSlaveDev = getInstance: => @i2cSlaveDevInstance
     @bus = 1
@@ -34,6 +35,24 @@ describe.only 'I2cMaster.driver', ->
     sinon.assert.calledWith(@i2cSlaveDevInstance.send,  @data)
 
   it 'read', ->
+    readPromise = @i2cSlave.read(undefined, @dataAddrHex, @data)
+
+    @listenHanlder(@dataToWrite)
+
+    result = await readPromise
+
+    assert.deepEqual(result, @data)
+    sinon.assert.calledOnce(@i2cSlaveDevInstance.removeListener)
+
+  it 'read - any data', ->
+    readPromise = @i2cSlave.read(undefined, undefined , @data)
+
+    @listenHanlder(@data)
+
+    result = await readPromise
+
+    assert.deepEqual(result, @data)
+    sinon.assert.calledOnce(@i2cSlaveDevInstance.removeListener)
 
   it 'listenIncome', ->
     handler = sinon.spy()
