@@ -13,6 +13,6 @@ export default {
   republishIntervalMs: 60000,
 
   network: {
-    routedMessageTTL: 100,
+    routedMessageTTL: 10,
   },
 };

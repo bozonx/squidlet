@@ -27,7 +27,7 @@ export default class System {
     this.io = new IO();
     // config for current host
     this.host = new Host(this, hostConfig);
-    this.drivers = new Drivers(this);
+    this.drivers = new Drivers();
     this.network = new Network(this.drivers, this.host.id, this.host.networkConfig);
     this.events = new Events();
     this.log = defaultLogger;

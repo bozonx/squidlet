@@ -1,23 +1,35 @@
 Network = require('../../src/network/Network').default
+Drivers = require('../../src/app/Drivers').default
+{ Map } = require('immutable');
 
-describe.skip 'integration network', ->
+
+describe.only 'integration network', ->
   beforeEach ->
-    @drivers = {
+    driversPaths = new Map({
       # TODO: !!!!
-    }
-    @fromHost = 'master'
-    @toHost = 'bedroom/host'
+    })
+    @drivers = new Drivers()
+    @srcHost = 'master'
+    @dstHost = 'remote'
     @config = {
+      routes: {
+        [@dstHost]: [ @srcHost ]
+      }
+      params: {
+        routedMessageTTL: 10
+      }
       # TODO: !!!!
     }
 
     @payload = {
-      to: @toHost
+      to: @dstHost
       payload: { myData: 1 }
     }
 
-    @networkSrc = new Network(@drivers, @fromHost, @config)
-    @networkDst = new Network(@drivers, @fromHost, @config)
+    @networkSrc = new Network(@drivers, @srcHost, @config)
+    @networkDst = new Network(@drivers, @dstHost, @config)
+
+    @drivers.init(driversPaths, {})
     @networkSrc.init()
     @networkDst.init()
 

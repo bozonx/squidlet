@@ -1,7 +1,5 @@
 import { Map } from 'immutable';
 
-import System from './System';
-
 
 interface Driver {
   init?: () => void;
@@ -9,11 +7,9 @@ interface Driver {
 
 
 export default class Drivers {
-  private readonly system: System;
   private instances: Map<string, Driver> = Map<string, Driver>();
 
-  constructor(system: System) {
-    this.system = system;
+  constructor() {
   }
 
   init(driversPaths: Map<string, string>, driversConfig: {[index: string]: object} = {}) {
