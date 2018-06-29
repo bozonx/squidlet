@@ -16,6 +16,10 @@ export class I2cSlaveDev {
     // TODO: дается длинна и можно считать данные этой длинны и поднять хэндлер
   }
 
+  removeListener(handler: (data: Uint8Array) => void): void {
+
+  }
+
 }
 
 

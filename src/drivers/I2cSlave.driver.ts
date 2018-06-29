@@ -50,11 +50,28 @@ export class I2cSlaveDriver {
 
   async read(i2cAddress: undefined, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
 
-
     // TODO: test
 
-    // TODO: может повешаться на listenIncome и ждать dataAddress и потом отписаться ???
+    return new Promise<Uint8Array>((resolve, reject) => {
+      const handler = (data: Uint8Array): void => {
+        if (typeof dataAddress === 'undefined') {
+          resolve(data);
+        }
+        else {
+          // not our data
+          if (dataAddress === data[0]) return;
 
+          resolve(withoutFirstItemUint8Arr(data));
+        }
+
+        this.i2cSlaveDev.removeListener(handler);
+      };
+
+      this.i2cSlaveDev.listenIncome(handler);
+
+      // TODO: по таймауту 60 сек отписаться и поднять ошибку - reject
+
+    });
   }
 
   listenIncome(
