@@ -14,16 +14,16 @@ export type DataHandler = (error: Error | null, payload?: Uint8Array) => void;
 type I2cDriverHandler = (error: Error | null, data?: Uint8Array) => void;
 
 export interface I2cDriverClass {
-  write: (i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array) => Promise<void>;
-  read: (i2cAddress: string | number, dataAddress: number | undefined, length: number) => Promise<Uint8Array>;
+  write: (i2cAddress: string | number | undefined, dataAddress: number | undefined, data: Uint8Array) => Promise<void>;
+  read: (i2cAddress: string | number | undefined, dataAddress: number | undefined, length: number) => Promise<Uint8Array>;
   listenIncome: (
-    i2cAddress: string | number,
+    i2cAddress: string | number | undefined,
     dataAddress: number | undefined,
     length: number,
     handler: I2cDriverHandler
   ) => void;
   removeListener: (
-    i2cAddress: string | number,
+    i2cAddress: string | number | undefined,
     dataAddress: number | undefined,
     handler: I2cDriverHandler
   ) => void;
@@ -49,7 +49,7 @@ export class I2cDataDriver {
     this.i2cDriver = i2cDriver.getInstance(this.bus) as I2cDriverClass;
   }
 
-  async send(i2cAddress: string | number, dataMark: number | undefined, data: Uint8Array): Promise<void> {
+  async send(i2cAddress: string | number | undefined, dataMark: number | undefined, data: Uint8Array): Promise<void> {
     if (!data.length) throw new Error(`Nothing to send`);
 
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
@@ -58,7 +58,7 @@ export class I2cDataDriver {
     await this.i2cDriver.write(i2cAddress, this.sendDataRegister, data);
   }
 
-  listenIncome(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
+  listenIncome(i2cAddress: string | number | undefined, dataMark: number | undefined, handler: DataHandler): void {
     const resolvedDataMark = this.resolveDataMark(dataMark);
     const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
 
@@ -70,7 +70,7 @@ export class I2cDataDriver {
     this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
-  removeListener(i2cAddress: string | number, dataMark: number | undefined, handler: DataHandler): void {
+  removeListener(i2cAddress: string | number | undefined, dataMark: number | undefined, handler: DataHandler): void {
     const resolvedDataMark: number = this.resolveDataMark(dataMark);
     const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
     const wrapper: DataHandler = this.handlersManager.getWrapper(dataId, handler) as DataHandler;
@@ -80,7 +80,7 @@ export class I2cDataDriver {
     this.handlersManager.removeByHandler(dataId, handler);
   }
 
-  private async sendLength(i2cAddress: string | number, dataMark: number, dataLength: number): Promise<void> {
+  private async sendLength(i2cAddress: string | number | undefined, dataMark: number, dataLength: number): Promise<void> {
     if (dataLength < MIN_DATA_LENGTH) {
       throw new Error(`Incorrect received data length ${dataLength}`);
     }
@@ -113,7 +113,7 @@ export class I2cDataDriver {
   }
 
   private async handleIncome(
-    i2cAddress: string | number,
+    i2cAddress: string | number | undefined,
     dataMark: number,
     handler: DataHandler,
     error: Error | null,
@@ -142,7 +142,12 @@ export class I2cDataDriver {
     }
   }
 
-  private generateId(i2cAddress: string | number, dataMark: number): string {
+  private generateId(i2cAddress: string | number | undefined, dataMark: number): string {
+    // for master
+    if (typeof i2cAddress === 'undefined') {
+      return dataMark.toString(16);
+    }
+
     return [ i2cAddress.toString(), dataMark.toString(16) ].join('-');
   }
 

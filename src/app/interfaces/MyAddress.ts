@@ -5,5 +5,5 @@ export default interface MyAddress {
   // bus which is used to connect if needed. For example on raspberry i2c uses bus 1. Undefined if doesn't need.
   bus: string;
   // address of current host on this connection
-  address: string;
+  address?: string;
 }
