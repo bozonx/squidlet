@@ -10,7 +10,7 @@ describe 'app.Router', ->
           {
             type: 'i2c'
             bus: '1'
-            assress: '5a'
+            address: '5a'
           }
         ]
         routes: {

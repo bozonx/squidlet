@@ -6,19 +6,56 @@ Drivers = require('../../src/app/Drivers').default
 describe.only 'integration network', ->
   beforeEach ->
     driversPaths = new Map({
-      # TODO: !!!!
+      'I2C.connection.driver': './src/network/connections/I2C.connection.driver.ts'
     })
     @drivers = new Drivers()
     @srcHost = 'master'
     @dstHost = 'remote'
-    @config = {
+    @srcConfig = {
+      connections: [
+        {
+          type: 'i2c'
+          bus: '1'
+          address: undefined
+        }
+      ]
       routes: {
         [@dstHost]: [ @srcHost ]
+      }
+      neighbors: {
+        [@dstHost]: {
+          type: 'i2c'
+          # TODO: bus тут не нужен - это bus на удаленном хосте
+          bus: '1'
+          address: '5a'
+        }
       }
       params: {
         routedMessageTTL: 10
       }
-      # TODO: !!!!
+    }
+    @dstConfig = {
+      connections: [
+        {
+          type: 'i2c'
+          bus: '1'
+          address: '5a'
+        }
+      ]
+      routes: {
+        [@srcHost]: [ @dstHost ]
+      }
+      neighbors: {
+        [@srcHost]: {
+          type: 'i2c'
+          # TODO: bus тут не нужен - это bus на удаленном хосте
+          bus: '1'
+          address: undefined
+        }
+      }
+      params: {
+        routedMessageTTL: 10
+      }
     }
 
     @payload = {
@@ -26,8 +63,8 @@ describe.only 'integration network', ->
       payload: { myData: 1 }
     }
 
-    @networkSrc = new Network(@drivers, @srcHost, @config)
-    @networkDst = new Network(@drivers, @dstHost, @config)
+    @networkSrc = new Network(@drivers, @srcHost, @srcConfig)
+    @networkDst = new Network(@drivers, @dstHost, @dstConfig)
 
     @drivers.init(driversPaths, {})
     @networkSrc.init()
