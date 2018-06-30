@@ -14,7 +14,7 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
  * It works as master or slave according to address
  * It packs data to send it via i2c.
  */
-export class I2CConnectionDriver {
+export class I2cConnectionDriver {
   private readonly drivers: Drivers;
   private readonly driverConfig: {[index: string]: any};
   private readonly myAddress: MyAddress;
@@ -75,5 +75,5 @@ export default class Factory extends DriverFactoryBase {
       drivers: Drivers,
       driverParams: {[index: string]: any},
       myAddress: MyAddress,
-    ): I2CConnectionDriver } = I2CConnectionDriver;
+    ): I2cConnectionDriver } = I2cConnectionDriver;
 }
