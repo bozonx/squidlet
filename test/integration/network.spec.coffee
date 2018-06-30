@@ -14,7 +14,7 @@ srcConfig = {
     }
   ]
   routes: {
-    [dstHost]: [ srcHost ]
+    [dstHost]: [ srcHost, dstHost ]
   }
   neighbors: {
     [dstHost]: {
@@ -37,7 +37,7 @@ dstConfig = {
     }
   ]
   routes: {
-    [srcHost]: [ dstHost ]
+    [srcHost]: [ dstHost, srcHost ]
   }
   neighbors: {
     [srcHost]: {
@@ -71,18 +71,21 @@ describe.only 'integration network', ->
     @drivers = new Drivers()
 
     @I2cMasterDevInstance = {
-
+      writeTo: (addrHex, data) =>
+        console.log(2222222222, addrHex, data)
     }
-    @I2cMasterDev = class
-      getInstance: -> @I2cMasterDevInstance
+    @I2cMasterDev = {
+      getInstance: => @I2cMasterDevInstance
+    }
 
     @I2cSlaveDevInstance = {
-
+      listenIncome: =>
     }
-    @I2cSlaveDev = class
-      getInstance: -> @I2cSlaveDevInstance
+    @I2cSlaveDev = {
+      getInstance: => @I2cSlaveDevInstance
+    }
 
-    oldGetDriver = @drivers.getDriver
+    oldGetDriver = @drivers.getDriver.bind(@drivers)
     @drivers.getDriver = (driverName) =>
       if (driverName == 'I2cMaster.dev')
         return @I2cMasterDev
@@ -92,16 +95,16 @@ describe.only 'integration network', ->
       return oldGetDriver(driverName)
 
     @networkSrc = new Network(@drivers, srcHost, srcConfig)
-    @networkDst = new Network(@drivers, dstHost, dstConfig)
+    #@networkDst = new Network(@drivers, dstHost, dstConfig)
 
     @drivers.init(driversPaths, {})
     @networkSrc.init()
-    @networkDst.init()
+    #@networkDst.init()
 
   it 'send', ->
     handler = sinon.spy()
-    @networkDst.listenIncome(handler)
-    @networkSrc.send(toHost, payload)
+    #@networkDst.listenIncome(handler)
+    @networkSrc.send(dstHost, payload)
 
     sinon.assert.calledOnce(handler)
     sinon.assert.calledWith(handler, null, payload)
