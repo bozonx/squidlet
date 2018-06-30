@@ -102,7 +102,7 @@ describe 'integration network', ->
     @networkSrc.init()
     @networkDst.init()
 
-  it 'send', ->
+  it 'send and receive', ->
     handler = sinon.spy()
     @networkDst.listenIncome(handler)
     await @networkSrc.send(dstHost, payload)

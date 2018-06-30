@@ -125,8 +125,6 @@ export class I2cMasterDriver {
       && _.isEqual(this.pollLastData[id], data)
     ) return;
 
-    // TODO: всегда поднимать событие у слушателя без регистра и на регистре - 1й байт
-
     // save previous data
     this.pollLastData[id] = data;
     // finally rise an event
