@@ -9,7 +9,7 @@ import Device from './interfaces/Device';
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
 
 
-export default class DevicesDispatcher {
+export default class Devices {
   private readonly system: System;
   private readonly callActionCategory: string = 'deviceCallAction';
   private readonly deviceFeedBackCategory: string = 'deviceFeedBack';
@@ -169,7 +169,7 @@ export default class DevicesDispatcher {
       `);
     }
 
-    const device: {[inde: string]: any} = this.system.devices.getDevice(deviceId);
+    const device: {[inde: string]: any} = this.system.devicesManager.getDevice(deviceId);
     const result = await device[actionName](...request.payload);
 
     return result;

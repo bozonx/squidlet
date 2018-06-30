@@ -34,6 +34,6 @@ describe.skip 'intergation. Call device\'s action', ->
 
 
   it 'just callAction', ->
-    await @app.devicesDispatcher.callAction('room.test', 'turn', 1)
+    await @app.devices.callAction('room.test', 'turn', 1)
 
   # TODO: call from mqtt backend

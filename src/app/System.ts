@@ -4,7 +4,7 @@ import Host from './Host';
 import Events from './Events';
 import Messenger from '../messenger/Messenger';
 import DevicesManager from './DevicesManager';
-import DevicesDispatcher from './DevicesDispatcher';
+import Devices from './Devices';
 import Drivers from './Drivers';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
@@ -18,7 +18,7 @@ export default class System {
   readonly events: Events;
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
-  readonly devicesDispatcher: DevicesDispatcher;
+  readonly devices: Devices;
   readonly drivers: Drivers;
   readonly log: Logger;
 
@@ -33,7 +33,7 @@ export default class System {
     this.log = defaultLogger;
     this.messenger = new Messenger(this);
     this.devicesManager = new DevicesManager(this);
-    this.devicesDispatcher = new DevicesDispatcher(this);
+    this.devices = new Devices(this);
   }
 
   async initSystemDrivers(): Promise<void> {
@@ -63,7 +63,7 @@ export default class System {
 
     await this.devicesManager.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
 
-    this.devicesDispatcher.init();
+    this.devices.init();
   }
 
 }

@@ -1,5 +1,5 @@
 import App from '../app';
-import DevicesDispatcher from "../app/DevicesDispatcher";
+import Devices from "../app/Devices";
 //import * as EventEmitter from 'events';
 
 /**
@@ -27,7 +27,7 @@ export default class Publisher {
     //this.events.emit(topic, params);
 
     // TODO: если приходит внешнее соощение из mqtt брокера - значит это вызов action девайса
-    // TODO: надо вызвать this.system.devicesDispatcher.callAction(...)
+    // TODO: надо вызвать this.system.devices.callAction(...)
     // TODO: но поидее могут быть и какие-то системные вызовы???
   }
 

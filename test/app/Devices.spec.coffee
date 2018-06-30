@@ -1,4 +1,4 @@
-DevicesDispatcher = require('../../src/app/DevicesDispatcher').default
+Devices = require('../../src/app/Devices').default
 
 
 describe 'app.DevicesDispatcher', ->
@@ -17,10 +17,10 @@ describe 'app.DevicesDispatcher', ->
 
     @hostId = 'room/host1'
     @deviceId = 'room/host1$device1'
-    @devicesDispatcher = new DevicesDispatcher(@app)
+    @devices = new Devices(@app)
 
   it 'callAction', ->
-    await @devicesDispatcher.callAction(@deviceId, 'turn', 1)
+    await @devices.callAction(@deviceId, 'turn', 1)
 
     sinon.assert.calledWith(
       @app.messenger.request,
@@ -31,7 +31,7 @@ describe 'app.DevicesDispatcher', ->
     )
 
   it 'setConfig', ->
-    await @devicesDispatcher.setConfig(@deviceId, { param: 1 })
+    await @devices.setConfig(@deviceId, { param: 1 })
 
     sinon.assert.calledWith(
       @app.messenger.request,
@@ -43,7 +43,7 @@ describe 'app.DevicesDispatcher', ->
 
   it 'listenStatus', ->
     handler = sinon.spy()
-    @devicesDispatcher.listenStatus(@deviceId, 'temperature', handler)
+    @devices.listenStatus(@deviceId, 'temperature', handler)
 
     @requestSubscribeCb({
       payload: 25
@@ -53,7 +53,7 @@ describe 'app.DevicesDispatcher', ->
 
   it 'listenStatuses', ->
     handler = sinon.spy()
-    @devicesDispatcher.listenStatuses(@deviceId, handler)
+    @devices.listenStatuses(@deviceId, handler)
 
     @requestSubscribeCb({
       payload: { temperature: 25 }
@@ -63,7 +63,7 @@ describe 'app.DevicesDispatcher', ->
 
   it 'listenConfig', ->
     handler = sinon.spy()
-    @devicesDispatcher.listenConfig(@deviceId, handler)
+    @devices.listenConfig(@deviceId, handler)
 
     @requestSubscribeCb({
       payload: { param: 1 }
@@ -72,7 +72,7 @@ describe 'app.DevicesDispatcher', ->
     sinon.assert.calledWith(handler, { param: 1 })
 
   it 'publishStatus', ->
-    await @devicesDispatcher.publishStatus(@deviceId, 'temperature', 25)
+    await @devices.publishStatus(@deviceId, 'temperature', 25)
 
     sinon.assert.calledWith(@app.messenger.publish,
       'master',
@@ -82,7 +82,7 @@ describe 'app.DevicesDispatcher', ->
     )
 
   it 'publishConfig', ->
-    await @devicesDispatcher.publishConfig(@deviceId, { param: 1 })
+    await @devices.publishConfig(@deviceId, { param: 1 })
 
     sinon.assert.calledWith(@app.messenger.publish,
       'master',
@@ -95,7 +95,7 @@ describe 'app.DevicesDispatcher', ->
     device = {
       turn: sinon.stub().returns(Promise.resolve('result'))
     }
-    @app.devices = {
+    @app.devicesManager = {
       getDevice: -> device
     }
     request = {
@@ -103,7 +103,7 @@ describe 'app.DevicesDispatcher', ->
       payload: [123]
     }
 
-    result = await @devicesDispatcher.callLocalDeviceAction(request)
+    result = await @devices.callLocalDeviceAction(request)
 
     assert.equal(result, 'result')
     sinon.assert.calledWith(device.turn, 123)
