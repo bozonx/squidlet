@@ -6,7 +6,12 @@ Drivers = require('../../src/app/Drivers').default
 describe.only 'integration network', ->
   beforeEach ->
     driversPaths = new Map({
-      'I2c.connection': '../network/connections/I2c.connection.driver.ts'
+      'I2c.connection.driver': '../network/connections/I2c.connection.driver.ts'
+      'I2cMaster.driver': '../drivers/I2cMaster.driver.ts'
+      'I2cSlave.driver': '../drivers/I2cSlave.driver.ts'
+      'I2cData.driver': '../drivers/I2cData.driver.ts'
+#      'I2cMaster.dev': '../dev/I2cMaster.dev.ts'
+#      'I2cSlave.dev': '../dev/I2cSlave.dev.ts'
     })
     @drivers = new Drivers()
     @srcHost = 'master'
@@ -62,6 +67,27 @@ describe.only 'integration network', ->
       to: @dstHost
       payload: { myData: 1 }
     }
+
+    @I2cMasterDevInstance = {
+
+    }
+    @I2cMasterDev = class
+      getInstance: -> @I2cMasterDevInstance
+
+    @I2cSlaveDevInstance = {
+
+    }
+    @I2cSlaveDev = class
+      getInstance: -> @I2cSlaveDevInstance
+
+    oldGetDriver = @drivers.getDriver
+    @drivers.getDriver = (driverName) =>
+      if (driverName == 'I2cMaster.dev')
+        return @I2cMasterDev
+      if (driverName == 'I2cSlave.dev')
+        return @I2cSlaveDev
+
+      return oldGetDriver(driverName)
 
     @networkSrc = new Network(@drivers, @srcHost, @srcConfig)
     @networkDst = new Network(@drivers, @dstHost, @dstConfig)

@@ -121,7 +121,7 @@ export default class Destinations {
   }
 
   private generateDriverName(connectionType: string): string {
-    return `${_.capitalize(connectionType)}.connection`;
+    return `${_.capitalize(connectionType)}.connection.driver`;
   }
 
 }
