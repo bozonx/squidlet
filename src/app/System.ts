@@ -3,7 +3,7 @@ import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
 import Messenger from '../messenger/Messenger';
-import Devices from './Devices';
+import DevicesManager from './DevicesManager';
 import DevicesDispatcher from './DevicesDispatcher';
 import Drivers from './Drivers';
 import Logger from './interfaces/Logger';
@@ -17,7 +17,7 @@ export default class System {
   readonly network: Network;
   readonly events: Events;
   readonly messenger: Messenger;
-  readonly devices: Devices;
+  readonly devicesManager: DevicesManager;
   readonly devicesDispatcher: DevicesDispatcher;
   readonly drivers: Drivers;
   readonly log: Logger;
@@ -32,7 +32,7 @@ export default class System {
     this.events = new Events();
     this.log = defaultLogger;
     this.messenger = new Messenger(this);
-    this.devices = new Devices(this);
+    this.devicesManager = new DevicesManager(this);
     this.devicesDispatcher = new DevicesDispatcher(this);
   }
 
@@ -61,7 +61,7 @@ export default class System {
     // TODO: init devices
 
 
-    await this.devices.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
+    await this.devicesManager.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
 
     this.devicesDispatcher.init();
   }

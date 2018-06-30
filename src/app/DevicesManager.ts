@@ -12,7 +12,7 @@ import DeviceSchema from './interfaces/DeviceSchema';
 /**
  * Creates instances of local devices and prepare config for them.
  */
-export default class Devices {
+export default class DevicesManager {
   private readonly system: System;
   private readonly deviceFactory: DeviceFactory;
   // devices instances by ids

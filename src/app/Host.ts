@@ -35,7 +35,7 @@ export default class Host {
   // }
 
   // /**
-  //  * Devices config by ids
+  //  * DevicesManager config by ids
   //  */
   // get devicesConfigs(): {[index: string]: DeviceConf} {
   //   return this.hostConfig.devicesConfigs;
