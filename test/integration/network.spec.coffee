@@ -6,7 +6,7 @@ Drivers = require('../../src/app/Drivers').default
 describe.only 'integration network', ->
   beforeEach ->
     driversPaths = new Map({
-      'I2C.connection.driver': './src/network/connections/I2C.connection.driver.ts'
+      'I2c.connection': '../network/connections/I2C.connection.driver.ts'
     })
     @drivers = new Drivers()
     @srcHost = 'master'

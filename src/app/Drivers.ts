@@ -16,7 +16,7 @@ export default class Drivers {
     driversPaths.forEach((driverPath: string | undefined, driverName: string | undefined) => {
       if (!driverPath || !driverName) return;
 
-      const DriverClass = this.require(driverPath);
+      const DriverClass = this.require(driverPath).default;
 
       this.instances = this.instances.set(driverName, new DriverClass(this, driversConfig[driverName]));
     });
@@ -29,6 +29,7 @@ export default class Drivers {
   }
 
   getDriver(driverName: string): Driver | undefined {
+    console.log(1111111, driverName)
     // TODO: вернуть тип возвращаемого драйвера
     return this.instances.get(driverName);
   }
