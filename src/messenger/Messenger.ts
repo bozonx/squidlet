@@ -25,15 +25,7 @@ export default class Messenger {
     this.bridgeResponder.init();
 
     // listen income messages from remote host and rise them on a local host as local messages
-    this.system.network.listenIncome((error: Error | null, message: Message): void => {
-      // put error to log
-      if (error) return this.system.log.error(error.toString());
-      if (!message || !message.category || !message.topic) return this.system.log.error(
-        `Incorrect message ${JSON.stringify(message)}`
-      );
-
-      this.system.events.emit(message.category, message.topic, message);
-    });
+    this.system.network.listenIncome(this.handleIncomeMessages);
   }
 
   /**
@@ -157,6 +149,20 @@ export default class Messenger {
     };
 
     await this.sendMessage(respondMessage);
+  }
+
+
+  /**
+   * Rise all income messages on events
+   */
+  private handleIncomeMessages = (error: Error | null, message: Message): void => {
+    // put error to log
+    if (error) return this.system.log.error(error.toString());
+    if (!message || !message.category || !message.topic) return this.system.log.error(
+      `Incorrect message ${JSON.stringify(message)}`
+    );
+
+    this.system.events.emit(message.category, message.topic, message);
   }
 
   private async sendMessage(message: Message): Promise<void> {
