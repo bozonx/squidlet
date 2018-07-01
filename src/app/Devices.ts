@@ -4,17 +4,17 @@ import System from './System';
 import Message from '../messenger/interfaces/Message';
 import Request from '../messenger/interfaces/Request';
 
-// TODO: почему не используется ????
-import Device from './interfaces/Device';
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
+
+
+const CALL_ACTION_CATEGORY = 'deviceCallAction';
+const DEVICE_FEEDBACK_CATEGORY = 'deviceFeedBack';
+const STATUS_TOPIC = 'status';
+const CONFIG_TOPIC = 'config';
 
 
 export default class Devices {
   private readonly system: System;
-  private readonly callActionCategory: string = 'deviceCallAction';
-  private readonly deviceFeedBackCategory: string = 'deviceFeedBack';
-  private readonly statusTopic: string = 'status';
-  private readonly configTopic: string = 'config';
 
   constructor(system: System) {
     this.system = system;
@@ -22,7 +22,7 @@ export default class Devices {
 
   init(): void {
     // listen messages to call actions of local device
-    this.system.events.addListener(this.callActionCategory, undefined, this.handleCallActionRequests);
+    this.system.events.addListener(CALL_ACTION_CATEGORY, undefined, this.handleCallActionRequests);
   }
 
   /**
@@ -32,7 +32,7 @@ export default class Devices {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, actionName);
 
-    return this.system.messenger.request(toHost, this.callActionCategory, topic, params);
+    return this.system.messenger.request(toHost, CALL_ACTION_CATEGORY, topic, params);
   }
 
   /**
@@ -48,7 +48,7 @@ export default class Devices {
    */
   listenStatus(deviceId: string, status: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, this.statusTopic, status);
+    const topic = combineTopic(deviceId, STATUS_TOPIC, status);
 
     // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
@@ -59,7 +59,7 @@ export default class Devices {
       handler(message.payload);
     };
 
-    this.system.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, callback);
   }
 
   /**
@@ -67,7 +67,7 @@ export default class Devices {
    */
   listenStatuses(deviceId: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, this.statusTopic);
+    const topic = combineTopic(deviceId, STATUS_TOPIC);
 
     // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
@@ -78,7 +78,7 @@ export default class Devices {
       handler(message.payload);
     };
 
-    this.system.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, callback);
   }
 
   /**
@@ -87,7 +87,7 @@ export default class Devices {
    */
   listenConfig(deviceId: string, handler: (config: object) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, this.configTopic);
+    const topic = combineTopic(deviceId, CONFIG_TOPIC);
 
     // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
 
@@ -98,7 +98,7 @@ export default class Devices {
       handler(message.payload);
     };
 
-    this.system.messenger.subscribe(toHost, this.deviceFeedBackCategory, topic, callback);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, callback);
   }
 
   /**
@@ -109,24 +109,24 @@ export default class Devices {
 
     // TODO: !!!! нужно публиковать как общий так и единичный статус, либо целый высчитывать
 
-    const topic = combineTopic(deviceId, this.statusTopic, status);
+    const topic = combineTopic(deviceId, STATUS_TOPIC, status);
     // send to local host
     const toHost: string = this.system.host.id;
 
-    return this.system.messenger.publish(toHost, this.deviceFeedBackCategory, topic, value);
+    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_CATEGORY, topic, value);
   }
 
   /**
    * It runs from device itself to publish its config changes.
    */
   publishConfig(deviceId: string, partialConfig: object): Promise<void> {
-    const topic = combineTopic(deviceId, this.configTopic);
+    const topic = combineTopic(deviceId, CONFIG_TOPIC);
     // send to local host
     const toHost: string = this.system.host.id;
 
     // TODO: test
 
-    return this.system.messenger.publish(toHost, this.deviceFeedBackCategory, topic, partialConfig);
+    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_CATEGORY, topic, partialConfig);
   }
 
 
