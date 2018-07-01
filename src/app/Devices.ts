@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 
 import System from './System';
-import Message from '../messenger/interfaces/Message';
 import Request from '../messenger/interfaces/Request';
 
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
@@ -44,7 +43,8 @@ export default class Devices {
   }
 
   /**
-   * Listen to certain device's status
+   * Listen to certain device's status.
+   * To listed default status use 'default' as statusName.
    */
   listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
@@ -53,15 +53,15 @@ export default class Devices {
     this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
   }
 
-  /**
-   * Listen to whole device's status
-   */
-  listenStatuses(deviceId: string, handler: (value: any) => void): void {
-    const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, STATUS_TOPIC);
-
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
-  }
+  // /**
+  //  * Listen to whole device's status
+  //  */
+  // listenStatuses(deviceId: string, handler: (value: any) => void): void {
+  //   const toHost: string = this.resolveDestinationHost(deviceId);
+  //   const topic = combineTopic(deviceId, STATUS_TOPIC);
+  //
+  //   this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
+  // }
 
   /**
    * Listen to changes of config or republishes of it.
@@ -78,11 +78,8 @@ export default class Devices {
    * Publish change of device status.
    * It runs from local device itself.
    */
-  publishStatus(deviceId: string, status: string, value: any): Promise<void> {
-
-    // TODO: !!!! нужно публиковать как общий так и единичный статус, либо целый высчитывать
-
-    const topic = combineTopic(deviceId, STATUS_TOPIC, status);
+  publishStatus(deviceId: string, statusName: string, value: any): Promise<void> {
+    const topic = combineTopic(deviceId, STATUS_TOPIC, statusName);
     // send to local host
     const toHost: string = this.system.host.id;
 
@@ -120,11 +117,6 @@ export default class Devices {
   }
 
   private async callLocalDeviceAction(request: Request): Promise<any> {
-    // TODO: если нет заданного action  - вернуть ошибку
-
-    // TODO: получить конфиг девайса + манифест
-    // TODO: проверить что actionName есть в манифесте
-
     const { rest, last: actionName } = splitLastElement(request.topic, topicSeparator);
 
     if (!rest) throw new Error(`Can't parse deviceId`);
@@ -145,6 +137,11 @@ export default class Devices {
     }
 
     const device: {[inde: string]: any} = this.system.devicesManager.getDevice(deviceId);
+
+    if (!device[actionName]) {
+      throw new Error(`Device "${deviceId}" doesn't have an action ${actionName}`);
+    }
+
     const result = await device[actionName](...request.payload);
 
     return result;
