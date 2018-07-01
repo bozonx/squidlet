@@ -46,20 +46,11 @@ export default class Devices {
   /**
    * Listen to certain device's status
    */
-  listenStatus(deviceId: string, status: string, handler: (value: any) => void): void {
+  listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, STATUS_TOPIC, status);
+    const topic = combineTopic(deviceId, STATUS_TOPIC, statusName);
 
-    // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
-
-    const callback = (message: Message) => {
-
-      // TODO: если message.error? - нужно его возвращать поидее
-
-      handler(message.payload);
-    };
-
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, callback);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
   }
 
   /**
@@ -69,16 +60,7 @@ export default class Devices {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, STATUS_TOPIC);
 
-    // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
-
-    const callback = (message: Message) => {
-
-      // TODO: если message.error? - нужно его возвращать поидее
-
-      handler(message.payload);
-    };
-
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, callback);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
   }
 
   /**
@@ -89,16 +71,7 @@ export default class Devices {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, CONFIG_TOPIC);
 
-    // TODO: ??? зачем возвращается весь мessage если нежен только payload ???
-
-    const callback = (message: Message) => {
-
-      // TODO: если message.error? - нужно его возвращать поидее
-
-      handler(message.payload);
-    };
-
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, callback);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
   }
 
   /**
@@ -134,6 +107,10 @@ export default class Devices {
    * Listen for actions which have to be called on current host.
    */
   private handleCallActionRequests = (request: Request): void => {
+
+    // TODO: review
+    // TODO: если нет заданного action  - вернуть ошибку
+
     if (_.isUndefined(request.isResponse) || request.isResponse) return;
 
     this.callLocalDeviceAction(request)

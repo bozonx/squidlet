@@ -62,10 +62,12 @@ export default class Messenger {
    * Listen to messages which was sent by publish method on current on remote host.
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
-  subscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+  subscribe(toHost: string, category: string, topic: string, handler: (payload: any, message: Message) => void): void {
     if (!topic || topic === this.system.events.allTopicsMask) {
       throw new Error(`You have to specify a topic`);
     }
+
+    // TODO: сделать handler - (payload: any, message: Message) => void
 
     if (toHost === this.system.host.id) {
       // subscribe to local events
