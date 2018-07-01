@@ -94,8 +94,6 @@ export default class Devices {
     // send to local host
     const toHost: string = this.system.host.id;
 
-    // TODO: test
-
     return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_CATEGORY, topic, partialConfig);
   }
 
