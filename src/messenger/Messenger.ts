@@ -143,8 +143,8 @@ export default class Messenger {
    */
   async sendResponse(
     request: Request,
-    payload: any = null,
-    error: { message: string, code: number } | undefined = undefined
+    error: { message: string, code: number } | null,
+    payload?: any
   ): Promise<void> {
     const respondMessage = {
       topic: request.topic,

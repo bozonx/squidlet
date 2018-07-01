@@ -107,22 +107,20 @@ export default class Devices {
    * Listen for actions which have to be called on current host.
    */
   private handleCallActionRequests = (request: Request): void => {
-
-    // TODO: review
-    // TODO: если нет заданного action  - вернуть ошибку
-
-    if (_.isUndefined(request.isResponse) || request.isResponse) return;
+    // handle only requests
+    if (request.isResponse !== false) return;
 
     this.callLocalDeviceAction(request)
       .then((result: any) => {
-        this.system.messenger.sendResponse(request, result);
+        this.system.messenger.sendResponse(request, null, result);
       })
       .catch((error) => {
-        this.system.messenger.sendResponse(request, null, error);
+        this.system.messenger.sendResponse(request, error);
       });
   }
 
   private async callLocalDeviceAction(request: Request): Promise<any> {
+    // TODO: если нет заданного action  - вернуть ошибку
 
     // TODO: получить конфиг девайса + манифест
     // TODO: проверить что actionName есть в манифесте

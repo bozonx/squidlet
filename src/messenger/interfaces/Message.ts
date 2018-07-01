@@ -7,5 +7,5 @@ export default interface Message {
   from: string;
   // destination hostId
   to: string;
-  payload: any;
+  payload?: any;
 }
