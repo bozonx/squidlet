@@ -44,6 +44,9 @@ export default class Bridge {
   }
 
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any) => void): void {
+
+    // TODO: в handler должно передаться message либо - payload, message
+
     const eventName = generateEventName(category, topic, toHost);
     const handlerId: string = this.system.io.generateUniqId();
     const message: Message = {

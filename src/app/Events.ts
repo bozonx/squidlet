@@ -2,6 +2,7 @@ import * as EventEmitter from 'events';
 
 import { generateEventName } from '../helpers/helpers';
 
+export const ALL_TOPIC_MASK = '*';
 
 interface TopicListener {
   // event name
@@ -11,7 +12,6 @@ interface TopicListener {
 }
 
 export default class Events {
-  readonly allTopicsMask = '*';
   private readonly events: EventEmitter = new EventEmitter();
 
   // TODO: меньше памяти будет занимать если разбить по eventName и там уже список

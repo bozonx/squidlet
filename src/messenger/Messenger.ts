@@ -3,6 +3,7 @@ import BridgeSubscriber from './BridgeSubscriber';
 import BridgeResponder from './BridgeResponder';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
+import {ALL_TOPIC_MASK} from '../app/Events';
 
 
 /**
@@ -30,10 +31,11 @@ export default class Messenger {
 
   /**
    * Send message to specified host by hostId.
+   * This message will rise on remote host as local message
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(toHost: string, category: string, topic: string, payload: any | undefined): Promise<void> {
-    if (!topic || topic === this.system.events.allTopicsMask) {
+  async publish(toHost: string, category: string, topic: string, payload?: any): Promise<void> {
+    if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
     }
 
@@ -53,9 +55,13 @@ export default class Messenger {
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
   subscribe(toHost: string, category: string, topic: string, handler: (payload: any, message: Message) => void): void {
-    if (!topic || topic === this.system.events.allTopicsMask) {
+    if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
     }
+
+    const cb = (message: Message) => {
+      handler(message.payload, message);
+    };
 
     // TODO: сделать handler - (payload: any, message: Message) => void
 
@@ -87,7 +93,7 @@ export default class Messenger {
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
-    if (!topic || topic === this.system.events.allTopicsMask) {
+    if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
     }
 
@@ -156,6 +162,9 @@ export default class Messenger {
    * Rise all income messages on events
    */
   private handleIncomeMessages = (error: Error | null, message: Message): void => {
+
+    // TODO: наверное исключить системные сообщения???
+
     // put error to log
     if (error) return this.system.log.error(error.toString());
     if (!message || !message.category || !message.topic) return this.system.log.error(
