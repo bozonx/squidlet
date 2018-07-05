@@ -14,5 +14,7 @@ export default {
 
   network: {
     routedMessageTTL: 10,
+    // timeout of waiting of request has finished
+    requestTimeout: 60000,
   },
 };

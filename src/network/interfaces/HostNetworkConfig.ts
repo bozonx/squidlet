@@ -5,6 +5,8 @@ import MyAddress from '../../app/interfaces/MyAddress';
 export default interface HostNetworkConfig {
   params: {
     routedMessageTTL: number,
+    // timeout of waiting of request has finished
+    requestTimeout: number,
   };
   connections: Array<MyAddress>;
   // addresses of the nearest neighbors hosts by hostId

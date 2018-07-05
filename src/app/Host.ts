@@ -16,6 +16,8 @@ export default class Host {
   private readonly hostConfig: HostConfig;
   private readonly hostNetworkConfig: HostNetworkConfig;
 
+  // TODO: config - почему бы не брать общий конфиг в таком виде как передан в приложение ?
+
   get id(): string {
 
     // TODO: review

@@ -8,6 +8,7 @@ import Response from './interfaces/Response';
 export default class RequestResponse {
   private readonly system: System;
   private readonly messenger: Messenger;
+  private readonly timeouts: {[index: string]: NodeJS.Timer} = {};
 
 
   constructor(system: System, messenger: Messenger) {
@@ -62,12 +63,16 @@ export default class RequestResponse {
       if (!request.isResponse) return;
       if (request.requestId !== requestId) return;
 
-      // TODO: add timeout
+      // TODO: использовать системный category
       // TODO: почему не топика ????? - наверное использовать системный топик
 
       this.system.events.removeListener(category, undefined, cb);
       handler(null, request);
     };
+
+    this.timeouts[requestId] = setTimeout(() => {
+      this.stopWaitForResponse(category, requestId);
+    }, this.system.host.networkConfig.params.requestTimeout);
 
     this.system.events.addListener(category, undefined, cb);
   }
