@@ -50,7 +50,7 @@ export default class Messenger {
       payload,
     };
 
-    await this.sendMessage(message);
+    await this.$sendMessage(message);
   }
 
   /**
@@ -110,6 +110,16 @@ export default class Messenger {
     return this.requestResponse.sendResponse(request, error, payload);
   }
 
+  async $sendMessage(message: Message | Request): Promise<void> {
+    // if message is addressed to local host - rise it immediately
+    if (message.to === this.system.host.id) {
+      this.system.events.emit(message.category, message.topic, message);
+
+      return;
+    }
+
+    await this.system.network.send(message.to, message);
+  }
 
   /**
    * Rise all income messages on events
@@ -125,17 +135,6 @@ export default class Messenger {
     );
 
     this.system.events.emit(message.category, message.topic, message);
-  }
-
-  private async sendMessage(message: Message | Request): Promise<void> {
-    // if message is addressed to local host - rise it immediately
-    if (message.to === this.system.host.id) {
-      this.system.events.emit(message.category, message.topic, message);
-
-      return;
-    }
-
-    await this.system.network.send(message.to, message);
   }
 
 }

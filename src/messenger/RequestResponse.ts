@@ -1,6 +1,7 @@
 import {ALL_TOPIC_MASK} from '../app/Events';
 import Messenger from './Messenger';
 import System from '../app/System';
+import Request from './interfaces/Request';
 
 
 export default class RequestResponse {
@@ -19,19 +20,10 @@ export default class RequestResponse {
     }
 
     return new Promise((resolve, reject) => {
-      const request: Request = {
-        topic,
-        category,
-        from: this.system.host.id,
-        to: toHost,
-        requestId: this.system.io.generateUniqId(),
-        isResponse: false,
-        payload,
-      };
-
-      // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
+      const request: Request = this.generateRequestMsg(toHost, category, topic, payload);
 
       const responseHandler = (error: Error | null, response: Request): void => {
+        // TODO: review
         if (error) return reject(error);
 
         if (Number.isInteger(response.errorCode as any) || response.errorMessage) {
@@ -49,7 +41,7 @@ export default class RequestResponse {
       this.startWaitForResponse(request.category, request.requestId, responseHandler);
 
       // send request
-      this.sendMessage(request)
+      this.messenger.$sendMessage(request)
         .catch((err) => {
           this.stopWaitForResponse(request.category, request.requestId);
           reject(err);
@@ -77,26 +69,7 @@ export default class RequestResponse {
       errorCode: error && error.code,
     };
 
-    await this.sendMessage(respondMessage);
-  }
-
-  private waitForResponse(category: string, requestId: string): Promise<Request> {
-
-    // TODO: ждать таймаут ответа - если не дождались - do reject
-
-    return new Promise(((resolve, reject) => {
-      const handler = (request: Request) => {
-        if (!request.isResponse) return;
-        if (request.requestId !== requestId) return;
-
-        // TODO: почему не топика ?????
-
-        this.system.events.removeListener(category, undefined, handler);
-        resolve(request);
-      };
-
-      this.system.events.addListener(category, undefined, handler);
-    }));
+    await this.messenger.$sendMessage(respondMessage);
   }
 
   private startWaitForResponse(
@@ -108,17 +81,31 @@ export default class RequestResponse {
       if (!request.isResponse) return;
       if (request.requestId !== requestId) return;
 
-      // TODO: почему не топика ?????
+      // TODO: add timeout
+      // TODO: почему не топика ????? - наверное использовать системный топик
 
-      this.system.events.removeListener(category, undefined, handler);
-      resolve(request);
-
-      this.system.events.addListener(category, undefined, handler);
+      this.system.events.removeListener(category, undefined, cb);
+      handler(null, request);
     };
+
+    this.system.events.addListener(category, undefined, cb);
   }
 
   private stopWaitForResponse(category: string, requestId: string): void {
+    // TODO: отменить таймаут
+    // TODO: удалить листенер
+  }
 
+  private generateRequestMsg(toHost: string, category: string, topic: string, payload: any): Request {
+    return {
+      topic,
+      category,
+      from: this.system.host.id,
+      to: toHost,
+      requestId: this.system.io.generateUniqId(),
+      isResponse: false,
+      payload,
+    };
   }
 
 }
