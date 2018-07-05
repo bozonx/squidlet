@@ -17,7 +17,7 @@ export default class RequestResponse {
 
   /**
    * Send request and wait for response.
-   * It wait for 60 seconds and after that or if message hasn't delivered promise will rejected.
+   * It wait for 60 seconds and after that or if message hasn't delivered a promise will rejected.
    */
   request(toHost: string, category: string, topic: string, payload: any): Promise<Response> {
     if (!topic || topic === ALL_TOPIC_MASK) {
@@ -47,26 +47,10 @@ export default class RequestResponse {
   /**
    * Send response of received request.
    */
-  async sendResponse(
-    request: Request,
-    error?: string,
-    code?: number,
-    payload?: any
-  ): Promise<void> {
-    const respondMessage: Response = {
-      topic: request.topic,
-      category: request.category,
-      from: this.system.host.id,
-      to: request.from,
-      payload,
+  sendResponse(request: Request, error?: string, code?: number, payload?: any): Promise<void> {
+    const respondMessage: Response = this.generateResponseMsg(request, error, code, payload);
 
-      requestId: request.requestId,
-      isResponse: true,
-      error: error,
-      code: code,
-    };
-
-    await this.messenger.$sendMessage(respondMessage);
+    return this.messenger.$sendMessage(respondMessage);
   }
 
   private startWaitForResponse(
@@ -103,6 +87,21 @@ export default class RequestResponse {
 
       requestId: this.system.io.generateUniqId(),
       isRequest: true,
+    };
+  }
+
+  private generateResponseMsg(request: Request, error?: string, code?: number, payload?: any): Response {
+    return {
+      topic: request.topic,
+      category: request.category,
+      from: this.system.host.id,
+      to: request.from,
+      payload,
+
+      requestId: request.requestId,
+      isResponse: true,
+      error: error,
+      code: code,
     };
   }
 
