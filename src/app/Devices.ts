@@ -4,6 +4,7 @@ import System from './System';
 import Request from '../messenger/interfaces/Request';
 
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
+import Response from '../messenger/interfaces/Response';
 
 
 const CALL_ACTION_CATEGORY = 'deviceCallAction';
@@ -27,7 +28,7 @@ export default class Devices {
   /**
    * Call device's action and receive a response
    */
-  callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<any> {
+  callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<Response> {
     const toHost: string = this.resolveDestinationHost(deviceId);
     const topic = combineTopic(deviceId, actionName);
 

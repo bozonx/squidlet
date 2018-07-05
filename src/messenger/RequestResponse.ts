@@ -2,6 +2,7 @@ import {ALL_TOPIC_MASK} from '../app/Events';
 import Messenger from './Messenger';
 import System from '../app/System';
 import Request from './interfaces/Request';
+import Response from './interfaces/Response';
 
 
 export default class RequestResponse {
@@ -14,7 +15,7 @@ export default class RequestResponse {
     this.messenger = messenger;
   }
 
-  request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
+  request(toHost: string, category: string, topic: string, payload: any): Promise<Response> {
     if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
     }
@@ -22,17 +23,17 @@ export default class RequestResponse {
     return new Promise((resolve, reject) => {
       const request: Request = this.generateRequestMsg(toHost, category, topic, payload);
 
-      const responseHandler = (error: Error | null, response: Request): void => {
+      const responseHandler = (error: Error | null, response: Response): void => {
         // TODO: review
         if (error) return reject(error);
 
-        if (Number.isInteger(response.errorCode as any) || response.errorMessage) {
-          // TODO: review
-          reject({
-            message: response.errorMessage,
-            code: response.errorCode,
-          });
-        }
+        // if (Number.isInteger(response.errorCode as any) || response.errorMessage) {
+        //   // TODO: review
+        //   reject({
+        //     message: response.errorMessage,
+        //     code: response.errorCode,
+        //   });
+        // }
 
         resolve(response);
       };
@@ -102,9 +103,10 @@ export default class RequestResponse {
       category,
       from: this.system.host.id,
       to: toHost,
-      requestId: this.system.io.generateUniqId(),
-      isResponse: false,
       payload,
+
+      requestId: this.system.io.generateUniqId(),
+      isRequest: true,
     };
   }
 
