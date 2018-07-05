@@ -1,9 +1,10 @@
 import System from '../app/System';
+import {ALL_TOPIC_MASK} from '../app/Events';
 import BridgeSubscriber from './BridgeSubscriber';
 import BridgeResponder from './BridgeResponder';
+import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
-import {ALL_TOPIC_MASK} from '../app/Events';
 
 
 /**
@@ -14,11 +15,13 @@ export default class Messenger {
   private readonly system: System;
   private readonly bridgeSubscriber: BridgeSubscriber;
   private readonly bridgeResponder: BridgeResponder;
+  private readonly requestResponse: RequestResponse;
 
   constructor(system: System) {
     this.system = system;
     this.bridgeSubscriber = new BridgeSubscriber(this.system, this);
     this.bridgeResponder = new BridgeResponder(this.system, this);
+    this.requestResponse = new RequestResponse(this.system, this);
   }
 
   init(): void {
@@ -93,68 +96,18 @@ export default class Messenger {
   }
 
   request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
-    if (!topic || topic === ALL_TOPIC_MASK) {
-      throw new Error(`You have to specify a topic`);
-    }
-
-    const request: Request = {
-      topic,
-      category,
-      from: this.system.host.id,
-      to: toHost,
-      requestId: this.system.io.generateUniqId(),
-      isResponse: false,
-      payload,
-    };
-
-    // TODO: !!!! если локально ???
-
-    return new Promise((resolve, reject) => {
-
-      // TODO: наверное надо отменить waitForResponse если сообщение не будет доставленно
-
-      this.waitForResponse(request.category, request.requestId)
-        .then((response: Request) => {
-          if (Number.isInteger(response.errorCode as any) || response.errorMessage) {
-            // TODO: review
-            reject({
-              message: response.errorMessage,
-              code: response.errorCode,
-            });
-          }
-
-          resolve(response);
-        })
-        .catch(reject);
-
-      // TODO: может через бридж делать???
-
-      this.system.network.send(request.to, request)
-        .catch(reject);
-    });
+    return this.requestResponse.request(toHost, category, topic, payload);
   }
 
   /**
    * Send response of received request.
    */
-  async sendResponse(
+  sendResponse(
     request: Request,
     error: { message: string, code: number } | null,
     payload?: any
   ): Promise<void> {
-    const respondMessage = {
-      topic: request.topic,
-      category: request.category,
-      from: this.system.host.id,
-      to: request.from,
-      requestId: request.requestId,
-      isResponse: true,
-      payload,
-      errorMessage: error && error.message,
-      errorCode: error && error.code,
-    };
-
-    await this.sendMessage(respondMessage);
+    return this.requestResponse.sendResponse(request, error, payload);
   }
 
 
@@ -174,7 +127,7 @@ export default class Messenger {
     this.system.events.emit(message.category, message.topic, message);
   }
 
-  private async sendMessage(message: Message): Promise<void> {
+  private async sendMessage(message: Message | Request): Promise<void> {
     // if message is addressed to local host - rise it immediately
     if (message.to === this.system.host.id) {
       this.system.events.emit(message.category, message.topic, message);
@@ -183,25 +136,6 @@ export default class Messenger {
     }
 
     await this.system.network.send(message.to, message);
-  }
-
-  private waitForResponse(category: string, requestId: string): Promise<Request> {
-
-    // TODO: ждать таймаут ответа - если не дождались - do reject
-
-    return new Promise(((resolve, reject) => {
-      const handler = (request: Request) => {
-        if (!request.isResponse) return;
-        if (request.requestId !== requestId) return;
-
-        // TODO: почему не топика ?????
-
-        this.system.events.removeListener(category, undefined, handler);
-        resolve(request);
-      };
-
-      this.system.events.addListener(category, undefined, handler);
-    }));
   }
 
 }
