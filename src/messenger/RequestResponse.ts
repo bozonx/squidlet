@@ -60,7 +60,7 @@ export default class RequestResponse {
     handler: (error: Error | null, response: Response) => void
   ): void {
     const cb = (request: Request) => {
-      if (!request.isResponse) return;
+      if (!request.isRequest) return;
       if (request.requestId !== requestId) return;
 
       // TODO: использовать системный category
@@ -78,8 +78,9 @@ export default class RequestResponse {
   }
 
   private stopWaitForResponse(category: string, requestId: string): void {
-    // TODO: отменить таймаут
-    // TODO: удалить листенер
+    clearTimeout(this.timeouts[requestId]);
+    delete this.timeouts[requestId];
+    this.system.events.removeListener(category, undefined, cb);
   }
 
   private generateRequestMsg(toHost: string, category: string, topic: string, payload: any): Request {

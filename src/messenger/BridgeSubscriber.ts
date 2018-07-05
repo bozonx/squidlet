@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import System from '../app/System';
-import Messenger from './Messenger';
+import Messenger, {SYSTEM_CATEGORY} from './Messenger';
 import Message from './interfaces/Message';
 import { generateEventName } from '../helpers/helpers';
 
@@ -17,7 +17,8 @@ interface HandlerItem {
 export default class Bridge {
   private readonly system: System;
   private readonly messenger: Messenger;
-  private readonly systemCategory: string = 'system';
+
+  // TODO: make consts
   private readonly subscribeTopic: string = 'subscribeToRemoteEvent';
   private readonly respondTopic: string = 'respondOfRemoteEvent';
   private readonly unsubscribeTopic: string = 'unsubscribeFromRemoteEvent';
@@ -50,7 +51,7 @@ export default class Bridge {
     const eventName = generateEventName(category, topic, toHost);
     const handlerId: string = this.system.io.generateUniqId();
     const message: Message = {
-      category: this.systemCategory,
+      category: SYSTEM_CATEGORY,
       topic: this.subscribeTopic,
       from: this.system.network.hostId,
       to: toHost,
@@ -80,7 +81,7 @@ export default class Bridge {
     const eventName = generateEventName(category, topic, toHost);
     const handlerId = this.findHandlerIdByHandler(eventName, handler);
     const message: Message = {
-      category: this.systemCategory,
+      category: SYSTEM_CATEGORY,
       topic: this.unsubscribeTopic,
       from: this.system.network.hostId,
       to: toHost,
@@ -111,7 +112,7 @@ export default class Bridge {
       payload,
     } = message;
 
-    if (category !== this.systemCategory) return;
+    if (category !== SYSTEM_CATEGORY) return;
 
     if (topic === this.respondTopic) {
       // call subscriber with remote data

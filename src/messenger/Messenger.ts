@@ -7,6 +7,9 @@ import Message from './interfaces/Message';
 import Request from './interfaces/Request';
 
 
+export const SYSTEM_CATEGORY = 'system';
+
+
 /**
  * It receives and sends messages to network.
  * You can subscribe to all the local and remote messages.
