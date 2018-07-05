@@ -104,14 +104,14 @@ export default class Devices {
    */
   private handleCallActionRequests = (request: Request): void => {
     // handle only requests
-    if (request.isResponse !== false) return;
+    if (!request.isRequest) return;
 
     this.callLocalDeviceAction(request)
       .then((result: any) => {
-        this.system.messenger.sendResponse(request, null, result);
+        this.system.messenger.sendResponse(request, undefined, 0, result);
       })
       .catch((error) => {
-        this.system.messenger.sendResponse(request, error);
+        this.system.messenger.sendResponse(request, error, 2);
       });
   }
 

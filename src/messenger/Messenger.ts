@@ -104,10 +104,11 @@ export default class Messenger {
    */
   sendResponse(
     request: Request,
-    error: { message: string, code: number } | null,
+    error?: string,
+    code?: number,
     payload?: any
   ): Promise<void> {
-    return this.requestResponse.sendResponse(request, error, payload);
+    return this.requestResponse.sendResponse(request, error, code, payload);
   }
 
   async $sendMessage(message: Message | Request): Promise<void> {

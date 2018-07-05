@@ -15,6 +15,10 @@ export default class RequestResponse {
     this.messenger = messenger;
   }
 
+  /**
+   * Send request and wait for response.
+   * It wait for 60 seconds and after that or if message hasn't delivered promise will rejected.
+   */
   request(toHost: string, category: string, topic: string, payload: any): Promise<Response> {
     if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
@@ -24,17 +28,7 @@ export default class RequestResponse {
       const request: Request = this.generateRequestMsg(toHost, category, topic, payload);
 
       const responseHandler = (error: Error | null, response: Response): void => {
-        // TODO: review
         if (error) return reject(error);
-
-        // if (Number.isInteger(response.errorCode as any) || response.errorMessage) {
-        //   // TODO: review
-        //   reject({
-        //     message: response.errorMessage,
-        //     code: response.errorCode,
-        //   });
-        // }
-
         resolve(response);
       };
 
@@ -55,19 +49,21 @@ export default class RequestResponse {
    */
   async sendResponse(
     request: Request,
-    error: { message: string, code: number } | null,
+    error?: string,
+    code?: number,
     payload?: any
   ): Promise<void> {
-    const respondMessage = {
+    const respondMessage: Response = {
       topic: request.topic,
       category: request.category,
       from: this.system.host.id,
       to: request.from,
+      payload,
+
       requestId: request.requestId,
       isResponse: true,
-      payload,
-      errorMessage: error && error.message,
-      errorCode: error && error.code,
+      error: error,
+      code: code,
     };
 
     await this.messenger.$sendMessage(respondMessage);
@@ -76,7 +72,7 @@ export default class RequestResponse {
   private startWaitForResponse(
     category: string,
     requestId: string,
-    handler: (error: Error | null, response: Request) => void
+    handler: (error: Error | null, response: Response) => void
   ): void {
     const cb = (request: Request) => {
       if (!request.isResponse) return;
