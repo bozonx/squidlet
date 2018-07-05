@@ -108,10 +108,10 @@ export default class Devices {
 
     this.callLocalDeviceAction(request)
       .then((result: any) => {
-        this.system.messenger.sendResponse(request, undefined, 0, result);
+        this.system.messenger.response(request, undefined, 0, result);
       })
       .catch((error) => {
-        this.system.messenger.sendResponse(request, error, 2);
+        this.system.messenger.response(request, error, 2);
       });
   }
 

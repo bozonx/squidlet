@@ -117,7 +117,7 @@ describe 'app.Messenger', ->
 
     sinon.assert.calledWith(handler, incomeMessage)
 
-  it 'sendResponse', ->
+  it 'response', ->
     @app.host.id = @to
 
     request = {
@@ -131,7 +131,7 @@ describe 'app.Messenger', ->
       }
     }
 
-    @messenger.sendResponse(request, 'payload')
+    @messenger.response(request, 'payload')
 
     sinon.assert.calledWith(@messenger.router.send, 'master', {
       category: 'cat'

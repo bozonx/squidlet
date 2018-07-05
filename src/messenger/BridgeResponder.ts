@@ -59,7 +59,7 @@ export default class Bridge {
    */
   private addLocalListener(category: string, topic: string, handlerId: string, subscriberHost: string) {
     this.handlers[handlerId] = (payload: any): void => {
-      this.sendResponse(category, topic, subscriberHost, handlerId, payload);
+      this.response(category, topic, subscriberHost, handlerId, payload);
     };
 
     this.system.events.addListener(category, topic, this.handlers[handlerId]);
@@ -73,7 +73,7 @@ export default class Bridge {
     delete this.handlers[handlerId];
   }
 
-  private sendResponse(
+  private response(
     category: string,
     topic: string,
     subscriberHost: string,

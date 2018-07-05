@@ -47,7 +47,7 @@ export default class RequestResponse {
   /**
    * Send response of received request.
    */
-  sendResponse(request: Request, error?: string, code?: number, payload?: any): Promise<void> {
+  response(request: Request, error?: string, code?: number, payload?: any): Promise<void> {
     const respondMessage: Response = this.generateResponseMsg(request, error, code, payload);
 
     return this.messenger.$sendMessage(respondMessage);

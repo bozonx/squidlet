@@ -39,8 +39,8 @@ describe 'app.BridgeResponder', ->
 
     sinon.assert.calledWith(@system.events.addListener, @category, @topic, @bridgeResponder.handlers['123'])
 
-  it 'sendResponse', ->
-    @bridgeResponder.sendResponse(@category, @topic, @subscriberHost, '123', 'payload')
+  it 'response', ->
+    @bridgeResponder.response(@category, @topic, @subscriberHost, '123', 'payload')
 
     sinon.assert.calledWith(@system.network.send, @subscriberHost, {
       category: 'system'

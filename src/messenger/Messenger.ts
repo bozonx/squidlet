@@ -102,13 +102,8 @@ export default class Messenger {
   /**
    * Send response of received request.
    */
-  sendResponse(
-    request: Request,
-    error?: string,
-    code?: number,
-    payload?: any
-  ): Promise<void> {
-    return this.requestResponse.sendResponse(request, error, code, payload);
+  response(request: Request, error?: string, code?: number, payload?: any): Promise<void> {
+    return this.requestResponse.response(request, error, code, payload);
   }
 
   async $sendMessage(message: Message | Request): Promise<void> {
