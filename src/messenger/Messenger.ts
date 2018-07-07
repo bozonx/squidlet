@@ -5,8 +5,11 @@ import BridgeResponder from './BridgeResponder';
 import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
+import {validateMessage} from '../helpers/helpers';
 
 
+export const PUBLISH_CATEGORY = 'publish';
+export const REQUEST_CATEGORY = 'request';
 export const SYSTEM_CATEGORY = 'system';
 
 
@@ -22,6 +25,8 @@ export default class Messenger {
 
   constructor(system: System) {
     this.system = system;
+
+    // TODO: может перенести в определение ???
     this.bridgeSubscriber = new BridgeSubscriber(this.system, this);
     this.bridgeResponder = new BridgeResponder(this.system, this);
     this.requestResponse = new RequestResponse(this.system, this);
@@ -40,13 +45,13 @@ export default class Messenger {
    * This message will rise on remote host as local message
    * It doesn't wait for respond. But it wait for delivering of message.
    */
-  async publish(toHost: string, category: string, topic: string, payload?: any): Promise<void> {
+  async publish(toHost: string, topic: string, payload?: any): Promise<void> {
     if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
     }
 
     const message: Message = {
-      category,
+      category: PUBLISH_CATEGORY,
       topic,
       from: this.system.network.hostId,
       to: toHost,
@@ -60,7 +65,7 @@ export default class Messenger {
    * Listen to messages which was sent by publish method on current on remote host.
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
-  subscribe(toHost: string, category: string, topic: string, handler: (payload: any, message: Message) => void): void {
+  subscribe(toHost: string, topic: string, handler: (payload: any, message: Message) => void): void {
     if (!topic || topic === ALL_TOPIC_MASK) {
       throw new Error(`You have to specify a topic`);
     }
@@ -73,33 +78,33 @@ export default class Messenger {
 
     if (toHost === this.system.host.id) {
       // subscribe to local events
-      this.system.events.addListener(category, topic, handler);
+      this.system.events.addListener(PUBLISH_CATEGORY, topic, handler);
 
       return;
     }
 
     // else subscribe to remote host's events
-    this.bridgeSubscriber.subscribe(toHost, category, topic, handler);
+    this.bridgeSubscriber.subscribe(toHost, PUBLISH_CATEGORY, topic, handler);
   }
 
   /**
-   * Unsubscribe of topic of remote or local host.
+   * Unsubscribe of topic of remote or local host event handler which was set by subscribe method.
    * Handler has to be the same as has been specified to "subscribe" method previously
    */
-  unsubscribe(toHost: string, category: string, topic: string, handler: (message: Message) => void): void {
+  unsubscribe(toHost: string, topic: string, handler: (message: Message) => void): void {
     if (toHost === this.system.host.id) {
       // subscribe to local events
-      this.system.events.removeListener(category, topic, handler);
+      this.system.events.removeListener(PUBLISH_CATEGORY, topic, handler);
 
       return;
     }
 
     // unsubscribe from remote host's events
-    this.bridgeSubscriber.unsubscribe(toHost, category, topic, handler);
+    this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, handler);
   }
 
-  request(toHost: string, category: string, topic: string, payload: any): Promise<any> {
-    return this.requestResponse.request(toHost, category, topic, payload);
+  request(toHost: string, topic: string, payload: any): Promise<any> {
+    return this.requestResponse.request(toHost, topic, payload);
   }
 
   /**
@@ -121,17 +126,14 @@ export default class Messenger {
   }
 
   /**
-   * Rise all income messages on events
+   * Rise all the income messages as local events.
    */
   private handleIncomeMessages = (error: Error | null, message: Message): void => {
-
-    // TODO: наверное исключить системные сообщения???
-
     // put error to log
     if (error) return this.system.log.error(error.toString());
-    if (!message || !message.category || !message.topic) return this.system.log.error(
-      `Incorrect message ${JSON.stringify(message)}`
-    );
+    if (!validateMessage(message)) {
+      return this.system.log.error(`Incorrect message ${JSON.stringify(message)}`);
+    }
 
     this.system.events.emit(message.category, message.topic, message);
   }

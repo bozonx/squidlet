@@ -18,8 +18,6 @@ export default class Events {
 
   private readonly topicListeners: Array<TopicListener> = [];
 
-  constructor() {
-  }
 
   emit(category: string, topic: string = '*', payload: any): void {
     const eventName = generateEventName(category, topic);

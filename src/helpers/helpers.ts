@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
+import Message from '../messenger/interfaces/Message';
 
 
 export const topicSeparator = '/';
@@ -8,6 +9,10 @@ export const topicSeparator = '/';
 export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
+
+export function validateMessage(message: Message) {
+  return message && message.category && message.topic && message.from && message.to;
+}
 
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
 

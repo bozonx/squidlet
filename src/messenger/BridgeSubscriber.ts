@@ -31,6 +31,9 @@ export default class Bridge {
   }
 
   init(): void {
+
+    // TODO: слушать events - так как все сообщение направленны туда из Messanger
+
     this.system.network.listenIncome((error: Error | null, message: Message): void => {
       if (error) {
         // TODO: что делать в случае ошибки - наверное в лог писать или сделать message.error ???
