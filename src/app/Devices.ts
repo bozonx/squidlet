@@ -5,12 +5,36 @@ import Request from '../messenger/interfaces/Request';
 
 import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
+import {REQUEST_CATEGORY} from '../messenger/Messenger';
 
 
-const CALL_ACTION_CATEGORY = 'deviceCallAction';
-const DEVICE_FEEDBACK_CATEGORY = 'deviceFeedBack';
+const CALL_ACTION_TOPIC = 'deviceCallAction';
+const DEVICE_FEEDBACK_TOPIC = 'deviceFeedBack';
 const STATUS_TOPIC = 'status';
+const STATUS_ACTION = 'status';
 const CONFIG_TOPIC = 'config';
+const CONFIG_ACTION = 'config';
+
+
+interface CallActionPayload {
+  deviceId: string;
+  actionName: string;
+  // params for device's method
+  params: Array<any>;
+}
+
+interface StatusPayload {
+  deviceId: string;
+  actionName: 'status';
+  statusName: string;
+  value: any;
+}
+
+interface ConfigPayload {
+  deviceId: string;
+  actionName: 'config';
+  config: {[idnex: string]: any};
+}
 
 
 export default class Devices {
@@ -21,8 +45,9 @@ export default class Devices {
   }
 
   init(): void {
+    // TODO: наверное лучше слушать через messenger
     // listen messages to call actions of local device
-    this.system.events.addListener(CALL_ACTION_CATEGORY, undefined, this.handleCallActionRequests);
+    this.system.events.addListener(REQUEST_CATEGORY, CALL_ACTION_TOPIC, this.handleCallActionRequests);
   }
 
   /**
@@ -30,16 +55,20 @@ export default class Devices {
    */
   callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<Response> {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, actionName);
+    const payload: CallActionPayload = {
+      deviceId,
+      actionName,
+      params,
+    };
 
-    return this.system.messenger.request(toHost, CALL_ACTION_CATEGORY, topic, params);
+    return this.system.messenger.request(toHost, CALL_ACTION_TOPIC, payload);
   }
 
   /**
    * Set device's config.
    * You can set only changed parameters, you don't have to set all of them.
    */
-  setConfig(deviceId: string, partialConfig: object): Promise<any> {
+  setConfig(deviceId: string, partialConfig: {[index: string]: any}): Promise<any> {
     return this.callAction(deviceId, 'setConfig', partialConfig);
   }
 
@@ -49,30 +78,34 @@ export default class Devices {
    */
   listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, STATUS_TOPIC, statusName);
+    const cb = (payload: StatusPayload) => {
+      if (
+        payload.deviceId !== deviceId
+        || payload.actionName !== STATUS_ACTION
+        || payload.statusName !== statusName
+      ) return;
 
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
+      handler(payload.value);
+    };
+
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, cb);
   }
 
-  // /**
-  //  * Listen to whole device's status
-  //  */
-  // listenStatuses(deviceId: string, handler: (value: any) => void): void {
-  //   const toHost: string = this.resolveDestinationHost(deviceId);
-  //   const topic = combineTopic(deviceId, STATUS_TOPIC);
-  //
-  //   this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
-  // }
+  // TODO: add removeListener - status or config
 
   /**
    * Listen to changes of config or republishes of it.
    * It calls handler on each event with whole config.
    */
-  listenConfig(deviceId: string, handler: (config: object) => void) {
+  listenConfig(deviceId: string, handler: (config: {[index: string]: any}) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const topic = combineTopic(deviceId, CONFIG_TOPIC);
+    const cb = (payload: ConfigPayload) => {
+      if (payload.deviceId !== deviceId || payload.actionName !== CONFIG_ACTION) return;
 
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_CATEGORY, topic, handler);
+      handler(payload.config);
+    };
+
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, cb);
   }
 
   /**
@@ -84,7 +117,7 @@ export default class Devices {
     // send to local host
     const toHost: string = this.system.host.id;
 
-    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_CATEGORY, topic, value);
+    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, topic, value);
   }
 
   /**
@@ -95,7 +128,7 @@ export default class Devices {
     // send to local host
     const toHost: string = this.system.host.id;
 
-    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_CATEGORY, topic, partialConfig);
+    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, topic, partialConfig);
   }
 
 
