@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import System from './System';
 import Request from '../messenger/interfaces/Request';
 
-import { parseDeviceId, combineTopic, splitLastElement, topicSeparator } from '../helpers/helpers';
+import { parseDeviceId } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
 import {REQUEST_CATEGORY} from '../messenger/Messenger';
 
@@ -11,26 +11,26 @@ import {REQUEST_CATEGORY} from '../messenger/Messenger';
 const CALL_ACTION_TOPIC = 'deviceCallAction';
 const DEVICE_FEEDBACK_TOPIC = 'deviceFeedBack';
 const STATUS_ACTION = 'status';
-const CONFIG_TOPIC = 'config';
 const CONFIG_ACTION = 'config';
 
 
-interface CallActionPayload {
+interface Payload {
   deviceId: string;
   actionName: string;
+}
+
+interface CallActionPayload extends Payload {
   // params for device's method
   params: Array<any>;
 }
 
-interface StatusPayload {
-  deviceId: string;
+interface StatusPayload extends Payload {
   actionName: 'status';
   statusName: string;
   value: any;
 }
 
-interface ConfigPayload {
-  deviceId: string;
+interface ConfigPayload extends Payload {
   actionName: 'config';
   config: {[idnex: string]: any};
 }
@@ -43,8 +43,8 @@ export default class Devices {
     this.system = system;
   }
 
+
   init(): void {
-    // TODO: наверное лучше слушать через messenger
     // listen messages to call actions of local device
     this.system.events.addListener(REQUEST_CATEGORY, CALL_ACTION_TOPIC, this.handleCallActionRequests);
   }
@@ -145,10 +145,13 @@ export default class Devices {
    */
   private handleCallActionRequests = (request: Request): void => {
     // handle only requests
-    if (!request.isRequest) return;
+    if (!request.isRequest || !request.payload || !request.payload.deviceId || !request.payload.params) return;
 
     this.callLocalDeviceAction(request)
       .then((result: any) => {
+
+        // TODO: что делать в случае ошибки???
+
         this.system.messenger.response(request, undefined, 0, result);
       })
       .catch((error) => {
@@ -157,34 +160,39 @@ export default class Devices {
   }
 
   private async callLocalDeviceAction(request: Request): Promise<any> {
-    const { rest, last: actionName } = splitLastElement(request.topic, topicSeparator);
+    this.checkCallActionPayload(request.payload, request);
 
-    if (!rest) throw new Error(`Can't parse deviceId`);
+    const payload: CallActionPayload = request.payload;
+    const deviceId = payload.deviceId;
+    const device: {[index: string]: any} = this.system.devicesManager.getDevice(deviceId);
 
-    const deviceId = rest || '';
+    if (!device[payload.actionName]) {
+      throw new Error(`Device "${deviceId}" doesn't have an action ${payload.actionName}`);
+    }
 
-    if (!_.isArray(request.payload)) {
+    const result = await device[payload.actionName](...request.payload);
+
+    return result;
+  }
+
+  private checkCallActionPayload(payload: CallActionPayload, request: Request): void {
+    if (!payload.deviceId) {
+      throw new Error(`There isn't deviceId param in payload of Request ${JSON.stringify(request)}`);
+    }
+
+    if (!_.isArray(payload.params)) {
       throw new Error(`
         Payload of calling action has to be an array.
         Request: ${JSON.stringify(request)}
       `);
     }
-    if (!actionName) {
+
+    if (!payload.actionName) {
       throw new Error(`
         You have to specify an actionName like this: { topic: deviceId/actionName } .
         Request: ${JSON.stringify(request)}
       `);
     }
-
-    const device: {[inde: string]: any} = this.system.devicesManager.getDevice(deviceId);
-
-    if (!device[actionName]) {
-      throw new Error(`Device "${deviceId}" doesn't have an action ${actionName}`);
-    }
-
-    const result = await device[actionName](...request.payload);
-
-    return result;
   }
 
   private resolveDestinationHost(deviceId: string): string {
