@@ -6,11 +6,15 @@ import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
 import {validateMessage} from '../helpers/helpers';
+import HandlerWrappers from '../helpers/HandlerWrappers';
 
 
 export const PUBLISH_CATEGORY = 'publish';
 export const REQUEST_CATEGORY = 'request';
 export const SYSTEM_CATEGORY = 'system';
+
+type Handler = (payload: any, message: Message) => void;
+type HandlerWrapper = (message: Message) => void;
 
 
 /**
@@ -22,6 +26,7 @@ export default class Messenger {
   private readonly bridgeSubscriber: BridgeSubscriber;
   private readonly bridgeResponder: BridgeResponder;
   private readonly requestResponse: RequestResponse;
+  private handlerWrappers: HandlerWrappers<Handler, HandlerWrapper> = new HandlerWrappers<Handler, HandlerWrapper>();
 
   constructor(system: System) {
     this.system = system;
@@ -70,21 +75,19 @@ export default class Messenger {
       throw new Error(`You have to specify a topic`);
     }
 
-    const cb = (message: Message) => {
+    const wrapper = (message: Message) => {
       handler(message.payload, message);
     };
 
-    // TODO: сделать handler - (payload: any, message: Message) => void
+    this.handlerWrappers.addHandler(handler, wrapper);
 
     if (toHost === this.system.host.id) {
       // subscribe to local events
-      this.system.events.addListener(PUBLISH_CATEGORY, topic, handler);
-
-      return;
+      return this.system.events.addListener(PUBLISH_CATEGORY, topic, wrapper);
     }
 
     // else subscribe to remote host's events
-    this.bridgeSubscriber.subscribe(toHost, PUBLISH_CATEGORY, topic, handler);
+    this.bridgeSubscriber.subscribe(toHost, PUBLISH_CATEGORY, topic, wrapper);
   }
 
   /**
@@ -99,6 +102,7 @@ export default class Messenger {
       return;
     }
 
+    this.handlerWrappers.removeByHandler(handler);
     // unsubscribe from remote host's events
     this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, handler);
   }
@@ -131,6 +135,7 @@ export default class Messenger {
   private handleIncomeMessages = (error: Error | null, message: Message): void => {
     // put error to log
     if (error) return this.system.log.error(error.toString());
+
     if (!validateMessage(message)) {
       return this.system.log.error(`Incorrect message ${JSON.stringify(message)}`);
     }
