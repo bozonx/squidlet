@@ -10,7 +10,6 @@ import {REQUEST_CATEGORY} from '../messenger/Messenger';
 
 const CALL_ACTION_TOPIC = 'deviceCallAction';
 const DEVICE_FEEDBACK_TOPIC = 'deviceFeedBack';
-const STATUS_TOPIC = 'status';
 const STATUS_ACTION = 'status';
 const CONFIG_TOPIC = 'config';
 const CONFIG_ACTION = 'config';
@@ -91,8 +90,6 @@ export default class Devices {
     this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, cb);
   }
 
-  // TODO: add removeListener - status or config
-
   /**
    * Listen to changes of config or republishes of it.
    * It calls handler on each event with whole config.
@@ -108,27 +105,38 @@ export default class Devices {
     this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, cb);
   }
 
+  // TODO: add removeListener - status or config
+
   /**
    * Publish change of device status.
    * It runs from local device itself.
    */
   publishStatus(deviceId: string, statusName: string, value: any): Promise<void> {
-    const topic = combineTopic(deviceId, STATUS_TOPIC, statusName);
     // send to local host
     const toHost: string = this.system.host.id;
+    const payload: StatusPayload = {
+      deviceId,
+      actionName: STATUS_ACTION,
+      statusName,
+      value,
+    };
 
-    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, topic, value);
+    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, payload);
   }
 
   /**
    * It runs from device itself to publish its config changes.
    */
   publishConfig(deviceId: string, partialConfig: object): Promise<void> {
-    const topic = combineTopic(deviceId, CONFIG_TOPIC);
     // send to local host
     const toHost: string = this.system.host.id;
+    const payload: ConfigPayload = {
+      deviceId,
+      actionName: CONFIG_ACTION,
+      config: partialConfig,
+    };
 
-    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, topic, partialConfig);
+    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, payload);
   }
 
 
