@@ -2,8 +2,8 @@ import * as _ from 'lodash';
 
 import System from './System';
 import Request from '../messenger/interfaces/Request';
-
-import { parseDeviceId } from '../helpers/helpers';
+import HandlerWrappers from '../helpers/HandlerWrappers';
+import { parseDeviceId, combineTopic } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
 import {REQUEST_CATEGORY} from '../messenger/Messenger';
 
@@ -12,7 +12,6 @@ const CALL_ACTION_TOPIC = 'deviceCallAction';
 const DEVICE_FEEDBACK_TOPIC = 'deviceFeedBack';
 const STATUS_ACTION = 'status';
 const CONFIG_ACTION = 'config';
-
 
 interface Payload {
   deviceId: string;
@@ -35,9 +34,13 @@ interface ConfigPayload extends Payload {
   config: {[idnex: string]: any};
 }
 
+type Handler = (payload: CallActionPayload | StatusPayload | ConfigPayload) => void;
+type HandlerWrapper = (payload: any) => void;
+
 
 export default class Devices {
   private readonly system: System;
+  private handlerWrappers: HandlerWrappers<Handler, HandlerWrapper> = new HandlerWrappers<Handler, HandlerWrapper>();
 
   constructor(system: System) {
     this.system = system;
@@ -74,10 +77,11 @@ export default class Devices {
   /**
    * Listen to certain device's status.
    * To listed default status use 'default' as statusName.
+   * Handler have to be a new function each time.
    */
   listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const cb = (payload: StatusPayload) => {
+    const wrapper = (payload: StatusPayload) => {
       if (
         payload.deviceId !== deviceId
         || payload.actionName !== STATUS_ACTION
@@ -87,25 +91,31 @@ export default class Devices {
       handler(payload.value);
     };
 
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, cb);
+    //combineTopic(deviceId, 'status', statusName)
+    this.handlerWrappers.addHandler(handler, wrapper);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
   /**
    * Listen to changes of config or republishes of it.
    * It calls handler on each event with whole config.
+   * Handler have to be a new function each time.
    */
   listenConfig(deviceId: string, handler: (config: {[index: string]: any}) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const cb = (payload: ConfigPayload) => {
+    const wrapper = (payload: ConfigPayload) => {
       if (payload.deviceId !== deviceId || payload.actionName !== CONFIG_ACTION) return;
 
       handler(payload.config);
     };
 
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, cb);
+    this.handlerWrappers.addHandler(handler, wrapper);
+    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
-  // TODO: add removeListener - status or config
+  removeListener(handler: (value: any) => void) {
+    this.handlerWrappers.removeByHandler(handler);
+  }
 
   /**
    * Publish change of device status.
