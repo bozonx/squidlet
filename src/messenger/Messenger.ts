@@ -10,7 +10,7 @@ import HandlerWrappers from '../helpers/HandlerWrappers';
 
 
 export const PUBLISH_CATEGORY = 'publish';
-export const REQUEST_CATEGORY = 'request';
+export const REQUEST_RESPONSE_CATEGORY = 'request-response';
 export const SYSTEM_CATEGORY = 'system';
 
 type Handler = (payload: any, message: Message) => void;
