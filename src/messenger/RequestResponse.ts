@@ -69,7 +69,9 @@ export default class RequestResponse {
     const wrapper = (request: Request) => {
       if (!request.isRequest) return;
       if (request.requestId !== requestId) return;
-      this.system.events.removeListener(REQUEST_CATEGORY, undefined, cb);
+
+      // remove listener because we already have got a message
+      this.system.events.removeListener(REQUEST_CATEGORY, undefined, wrapper);
       handler(null, request);
     };
 

@@ -102,12 +102,10 @@ export default class Messenger {
       return;
     }
 
-    this.handlerWrappers.removeByHandler(handler);
+    const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
     // unsubscribe from remote host's events
-
-    // TODO: get wrapper
-
-    this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, handler);
+    this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, wrapper);
+    this.handlerWrappers.removeByHandler(handler);
   }
 
   request(toHost: string, topic: string, payload: any): Promise<any> {

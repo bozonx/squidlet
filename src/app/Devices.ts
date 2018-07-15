@@ -115,6 +115,9 @@ export default class Devices {
 
   removeListener(handler: (value: any) => void) {
     this.handlerWrappers.removeByHandler(handler);
+
+    // TODO: run unsubscribe ???
+
   }
 
   /**
