@@ -104,6 +104,9 @@ export default class Messenger {
 
     this.handlerWrappers.removeByHandler(handler);
     // unsubscribe from remote host's events
+
+    // TODO: get wrapper
+
     this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, handler);
   }
 

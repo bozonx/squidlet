@@ -5,10 +5,16 @@ import Request from './interfaces/Request';
 import Response from './interfaces/Response';
 
 
+//type Handler = (error: Error | null, response: Response) => void;
+type HandlerWrapper = (request: Request) => void;
+
+
 export default class RequestResponse {
   private readonly system: System;
   private readonly messenger: Messenger;
   private readonly timeouts: {[index: string]: NodeJS.Timer} = {};
+  // handlers by requestId
+  private readonly handlers: {[index: string]: HandlerWrapper} = {};
 
 
   constructor(system: System, messenger: Messenger) {
@@ -30,6 +36,7 @@ export default class RequestResponse {
 
       const responseHandler = (error: Error | null, response: Response): void => {
         if (error) return reject(error);
+
         resolve(response);
       };
 
@@ -54,31 +61,33 @@ export default class RequestResponse {
     return this.messenger.$sendMessage(respondMessage);
   }
 
+
   private startWaitForResponse(
     requestId: string,
     handler: (error: Error | null, response: Response) => void
   ): void {
-    const cb = (request: Request) => {
+    const wrapper = (request: Request) => {
       if (!request.isRequest) return;
       if (request.requestId !== requestId) return;
-
-      // TODO: почему не топика ?????
-
       this.system.events.removeListener(REQUEST_CATEGORY, undefined, cb);
       handler(null, request);
     };
 
+    // start wait timeout for response
     this.timeouts[requestId] = setTimeout(() => {
       this.stopWaitForResponse(requestId);
     }, this.system.host.networkConfig.params.requestTimeout);
 
-    this.system.events.addListener(REQUEST_CATEGORY, undefined, cb);
+    this.handlers[requestId] = wrapper;
+    // listen for all the topics of request category
+    this.system.events.addListener(REQUEST_CATEGORY, undefined, wrapper);
   }
 
   private stopWaitForResponse(requestId: string): void {
     clearTimeout(this.timeouts[requestId]);
     delete this.timeouts[requestId];
-    this.system.events.removeListener(REQUEST_CATEGORY, undefined, cb);
+    this.system.events.removeListener(REQUEST_CATEGORY, undefined, this.handlers[requestId]);
+    delete this.handlers[requestId];
   }
 
   private generateRequestMsg(toHost: string, topic: string, payload: any): Request {
