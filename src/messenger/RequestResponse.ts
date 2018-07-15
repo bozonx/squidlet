@@ -5,8 +5,7 @@ import Request from './interfaces/Request';
 import Response from './interfaces/Response';
 
 
-//type Handler = (error: Error | null, response: Response) => void;
-type HandlerWrapper = (request: Request) => void;
+type HandlerWrapper = (response: Response) => void;
 
 
 export default class RequestResponse {
@@ -61,18 +60,29 @@ export default class RequestResponse {
     return this.messenger.$sendMessage(respondMessage);
   }
 
+  /**
+   * Listen for incoming request to genereate response.
+   */
+  listenRequests(topic: string, handler: (payload: any) => void): void {
+    this.system.events.addListener(REQUEST_CATEGORY, topic, handler);
+  }
+
+  removeRequestsListener(topic: string, handler: (payload: any) => void): void {
+    this.system.events.removeListener(REQUEST_CATEGORY, topic, handler);
+  }
+
 
   private startWaitForResponse(
     requestId: string,
     handler: (error: Error | null, response: Response) => void
   ): void {
-    const wrapper = (request: Request) => {
-      if (!request.isRequest) return;
-      if (request.requestId !== requestId) return;
+    const wrapper = (response: Response) => {
+      if (!response.isResponse) return;
+      if (response.requestId !== requestId) return;
 
       // remove listener because we already have got a message
       this.system.events.removeListener(REQUEST_CATEGORY, undefined, wrapper);
-      handler(null, request);
+      handler(null, response);
     };
 
     // start wait timeout for response
@@ -81,6 +91,8 @@ export default class RequestResponse {
     }, this.system.host.networkConfig.params.requestTimeout);
 
     this.handlers[requestId] = wrapper;
+
+    // TODO: почему request а не response
     // listen for all the topics of request category
     this.system.events.addListener(REQUEST_CATEGORY, undefined, wrapper);
   }

@@ -3,9 +3,8 @@ import * as _ from 'lodash';
 import System from './System';
 import Request from '../messenger/interfaces/Request';
 import HandlerWrappers from '../helpers/HandlerWrappers';
-import { parseDeviceId, combineTopic } from '../helpers/helpers';
+import { parseDeviceId } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
-import {REQUEST_CATEGORY} from '../messenger/Messenger';
 
 
 const CALL_ACTION_TOPIC = 'deviceCallAction';
@@ -49,7 +48,7 @@ export default class Devices {
 
   init(): void {
     // listen messages to call actions of local device
-    this.system.events.addListener(REQUEST_CATEGORY, CALL_ACTION_TOPIC, this.handleCallActionRequests);
+    this.system.messenger.listenRequests(CALL_ACTION_TOPIC, this.handleCallActionRequests);
   }
 
   /**

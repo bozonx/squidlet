@@ -119,6 +119,15 @@ export default class Messenger {
     return this.requestResponse.response(request, error, code, payload);
   }
 
+  listenRequests(topic: string, handler: (payload: any) => void): void {
+    this.requestResponse.listenRequests(topic, handler);
+  }
+
+  removeRequestsListener(topic: string, handler: (payload: any) => void): void {
+    this.requestResponse.removeRequestsListener(topic, handler);
+  }
+
+
   async $sendMessage(message: Message | Request): Promise<void> {
     // if message is addressed to local host - rise it immediately
     if (message.to === this.system.host.id) {
