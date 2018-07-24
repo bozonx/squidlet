@@ -51,15 +51,21 @@ export default class BridgeSubscriber {
     });
   }
 
+  /**
+   * Subscribe to remote host's events.
+   * It sends special message to remote host, remote host responds messages on each event.
+   * And it listens to this messages of remote evens.
+   */
   subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
-
-    // TODO: в handler должно передаться message либо - payload, message
-
     const handlerId: string = this.system.io.generateUniqId();
     const message: Message = this.generateMessage(toHost, category, topic, this.subscribeTopic, handlerId);
 
-    this.addHander(category, topic, toHost, handlerId, handler);
+    // TODO: может сразу подписываться на events????
 
+    // listen to messages from remote host
+    this.addHandler(category, topic, toHost, handlerId, handler);
+
+    // add handler of events of remote host
     this.system.network.send(toHost, message)
       .catch((err) => {
         // TODO: ожидать ответа - если не дошло - наверное повторить
@@ -80,7 +86,7 @@ export default class BridgeSubscriber {
   }
 
 
-  private addHander(
+  private addHandler(
     toHost: string,
     category: string,
     topic: string,
