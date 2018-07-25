@@ -1,6 +1,7 @@
 import System from '../app/System';
 import Messenger, {SYSTEM_CATEGORY} from './Messenger';
 import Message from './interfaces/Message';
+import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscriber';
 
 
 /**
@@ -9,11 +10,6 @@ import Message from './interfaces/Message';
 export default class Bridge {
   private readonly system: System;
   private readonly messenger: Messenger;
-
-  // TODO: make consts
-  private readonly subscribeTopic: string = 'subscribeToRemoteEvent';
-  private readonly respondTopic: string = 'respondOfRemoteEvent';
-  private readonly unsubscribeTopic: string = 'unsubscribeFromRemoteEvent';
   // handlers of local events by handleId
   private readonly handlers: {[index: string]: (payload: any) => void} = {};
 
@@ -49,11 +45,11 @@ export default class Bridge {
 
     if (category !== SYSTEM_CATEGORY) return;
 
-    if (topic === this.subscribeTopic) {
+    if (topic === SUBSCRIBE_TOPIC) {
       this.addLocalListener(payload.category, payload.topic, payload.handlerId, subscriberHost);
     }
 
-    if (topic === this.unsubscribeTopic) {
+    if (topic === UNSUBSCRIBE_TOPIC) {
       this.removeLocalListener(payload.category, payload.topic, payload.handlerId);
     }
   }
@@ -86,7 +82,7 @@ export default class Bridge {
   ): void {
     const message: Message = {
       category: SYSTEM_CATEGORY,
-      topic: this.respondTopic,
+      topic: RESPOND_TOPIC,
       from: this.system.network.hostId,
       to: subscriberHost,
       payload: {

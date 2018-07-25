@@ -9,6 +9,9 @@ import { generateEventName } from '../helpers/helpers';
 // position of handler in HandlerItem
 const HANDLER_ID_POSITION = 0;
 const HANDLER_POSITION = 1;
+export const SUBSCRIBE_TOPIC = 'subscribeToRemoteEvent';
+export const UNSUBSCRIBE_TOPIC = 'unsubscribeTopic';
+export const RESPOND_TOPIC = 'respondOfRemoteEvent';
 
 type Handler = (payload: any) => void;
 type HandlerItem = [ string, Handler ];
@@ -20,12 +23,6 @@ type HandlerItem = [ string, Handler ];
 export default class BridgeSubscriber {
   private readonly system: System;
   private readonly messenger: Messenger;
-
-  // TODO: make consts
-
-  private readonly subscribeTopic: string = 'subscribeToRemoteEvent';
-  private readonly respondTopic: string = 'respondOfRemoteEvent';
-  private readonly unsubscribeTopic: string = 'unsubscribeFromRemoteEvent';
   // handlers of remote events by "toHost-category-topic"
   private readonly handlers: {[index: string]: Array<HandlerItem>} = {};
 
@@ -45,7 +42,7 @@ export default class BridgeSubscriber {
    */
   subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
     const handlerId: string = this.system.io.generateUniqId();
-    const message: Message = this.generateMessage(toHost, category, topic, this.subscribeTopic, handlerId);
+    const message: Message = this.generateMessage(toHost, category, topic, SUBSCRIBE_TOPIC, handlerId);
 
     // listen to messages from remote host
     this.addHandler(toHost, category, topic, handlerId, handler);
@@ -63,7 +60,7 @@ export default class BridgeSubscriber {
 
     if (!handlerId) return;
 
-    const message: Message = this.generateMessage(toHost, category, topic, this.unsubscribeTopic, handlerId);
+    const message: Message = this.generateMessage(toHost, category, topic, UNSUBSCRIBE_TOPIC, handlerId);
 
     // remove local handler
     this.removeHandler(eventName, handler);
@@ -141,7 +138,7 @@ export default class BridgeSubscriber {
       payload,
     } = message;
 
-    if (topic !== this.respondTopic) return;
+    if (topic !== RESPOND_TOPIC) return;
 
     // call subscriber with remote data
     const eventName = generateEventName(payload.category, payload.topic, remoteHost);
