@@ -6,12 +6,12 @@ import Message from './interfaces/Message';
 import { generateEventName } from '../helpers/helpers';
 
 
-type Handler = (payload: any) => void;
+// position of handler in HandlerItem
+const HANDLER_ID_POSITION = 0;
+const HANDLER_POSITION = 1;
 
-interface HandlerItem {
-  handlerId: string;
-  handler: Handler;
-}
+type Handler = (payload: any) => void;
+type HandlerItem = [ string, Handler ];
 
 
 /**
@@ -84,10 +84,7 @@ export default class BridgeSubscriber {
     handler: Handler
   ): void {
     const eventName = generateEventName(category, topic, toHost);
-    const handlerItem: HandlerItem = {
-      handlerId,
-      handler,
-    };
+    const handlerItem: HandlerItem = [ handlerId, handler ];
 
     if (!this.handlers[eventName]) this.handlers[eventName] = [];
 
@@ -97,15 +94,41 @@ export default class BridgeSubscriber {
 
   private removeHandler(eventName: string, handler: Function): void {
     const handlers: Array<HandlerItem> = this.handlers[eventName];
-    const handlerIndex: number = handlers.findIndex((item) => {
-      return item.handler === handler;
+    const handlerIndex: number = handlers.findIndex((item: HandlerItem) => {
+      return item[HANDLER_POSITION] === handler;
     });
 
     if (handlerIndex < 0) throw new Error(`Can't find handler index of "${eventName}"`);
 
+    // remove handler item
     handlers.splice(handlerIndex, 1);
+    // remove container
+    if (!this.handlers[eventName].length) delete this.handlers[eventName];
+  }
 
-    // TODO: а удалить сам this.handlers[eventName] ?
+  private findHandlerIdByHandler(eventName: string, handler: Function): string {
+    const handlers = this.handlers[eventName];
+    const handlerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
+      return item[HANDLER_POSITION] === handler;
+    });
+
+    if (!handlerItem) throw new Error(`Can't find handler of "${eventName}"`);
+
+    return handlerItem[HANDLER_ID_POSITION];
+  }
+
+  private findHandlerById(eventName: string, handlerId: string): Function {
+    const handlers = this.handlers[eventName];
+
+    if (!handlers) throw new Error(`Can't find handlers of "${eventName}"`);
+
+    const handlerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
+      return item[HANDLER_ID_POSITION] === handlerId;
+    });
+
+    if (!handlerItem) throw new Error(`Can't find handlerId of "${eventName}" and handler id ${handlerId}`);
+
+    return handlerItem[HANDLER_POSITION];
   }
 
   /**
@@ -142,31 +165,6 @@ export default class BridgeSubscriber {
         handlerId,
       },
     };
-  }
-
-  private findHandlerIdByHandler(eventName: string, handler: Function): string {
-    const handlers = this.handlers[eventName];
-    const handerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
-      return item.handler === handler;
-    });
-
-    if (!handerItem) throw new Error(`Can't find handler of "${eventName}"`);
-
-    return handerItem.handlerId;
-  }
-
-  private findHandlerById(eventName: string, handlerId: string): Function {
-    const handlers = this.handlers[eventName];
-
-    if (!handlers) throw new Error(`Can't find handlers of "${eventName}"`);
-
-    const handerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
-      return item.handlerId === handlerId;
-    });
-
-    if (!handerItem) throw new Error(`Can't find handlerId of "${eventName}" and handler id ${handlerId}`);
-
-    return handerItem.handler;
   }
 
 }
