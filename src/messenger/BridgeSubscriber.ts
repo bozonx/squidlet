@@ -13,6 +13,7 @@ interface HandlerItem {
   handler: Handler;
 }
 
+
 /**
  * Subscribe to remote host's events
  */
@@ -35,20 +36,6 @@ export default class BridgeSubscriber {
 
   init(): void {
     this.system.events.addListener(SYSTEM_CATEGORY, undefined, this.handleSystemEvents);
-
-    // TODO: слушать events - так как все сообщение направленны туда из Messanger
-
-    this.system.network.listenIncome((error: Error | null, message: Message): void => {
-      if (error) {
-        // TODO: что делать в случае ошибки - наверное в лог писать или сделать message.error ???
-        this.system.log.error(error.toString());
-
-        return;
-      }
-
-      // TODO: нужна проверка что это именно сообщение ???
-      this.handleIncomeMessages(message);
-    });
   }
 
   /**
@@ -118,8 +105,26 @@ export default class BridgeSubscriber {
     // TODO: а удалить сам this.handlers[eventName] ?
   }
 
-  private handleSystemEvents = (): void => {
-    // TODO: !!!!
+  /**
+   * Proceed responds
+   */
+  private handleSystemEvents = (message: Message): void => {
+    const {
+      topic,
+      from: remoteHost,
+      payload,
+    } = message;
+
+    if (topic !== this.respondTopic) return;
+
+    // call subscriber with remote data
+    const eventName = generateEventName(payload.category, payload.topic, remoteHost);
+    const handler = this.findHandlerById(eventName, payload.hadlerId);
+
+    // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
+
+    // call handler
+    handler(payload.payload);
   }
 
   private generateMessage(toHost: string, category: string, topic: string, specialTopic: string, handlerId: string): Message {
@@ -134,30 +139,6 @@ export default class BridgeSubscriber {
         handlerId,
       },
     };
-  }
-
-  /**
-   * Proceed responds
-   */
-  private handleIncomeMessages(message: Message): void {
-    const {
-      category,
-      topic,
-      from: remoteHost,
-      payload,
-    } = message;
-
-    if (category !== SYSTEM_CATEGORY) return;
-
-    if (topic === this.respondTopic) {
-      // call subscriber with remote data
-      const eventName = generateEventName(payload.category, payload.topic, remoteHost);
-      const handler = this.findHandlerById(eventName, payload.hadlerId);
-
-      // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
-
-      handler(payload.payload);
-    }
   }
 
   private findHandlerIdByHandler(eventName: string, handler: Function): string {
