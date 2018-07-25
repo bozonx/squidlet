@@ -47,10 +47,8 @@ export default class BridgeSubscriber {
     const handlerId: string = this.system.io.generateUniqId();
     const message: Message = this.generateMessage(toHost, category, topic, this.subscribeTopic, handlerId);
 
-    // TODO: может сразу подписываться на events????
-
     // listen to messages from remote host
-    this.addHandler(category, topic, toHost, handlerId, handler);
+    this.addHandler(toHost, category, topic, handlerId, handler);
 
     // add handler of events of remote host
     this.system.network.send(toHost, message)
@@ -62,10 +60,15 @@ export default class BridgeSubscriber {
   unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
     const eventName = generateEventName(category, topic, toHost);
     const handlerId = this.findHandlerIdByHandler(eventName, handler);
+
+    if (!handlerId) return;
+
     const message: Message = this.generateMessage(toHost, category, topic, this.unsubscribeTopic, handlerId);
 
+    // remove local handler
     this.removeHandler(eventName, handler);
 
+    // send message to remove remote emitter
     this.system.network.send(toHost, message)
       .catch((err) => {
         // TODO: ожидать ответа - если не дошло - наверное повторить
