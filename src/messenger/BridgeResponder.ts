@@ -4,6 +4,9 @@ import Message from './interfaces/Message';
 import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscriber';
 
 
+type Hanler = (payload: any) => void;
+
+
 /**
  * Subscribe to remote host's events
  */
@@ -11,7 +14,7 @@ export default class Bridge {
   private readonly system: System;
   private readonly messenger: Messenger;
   // handlers of local events by handleId
-  private readonly handlers: {[index: string]: (payload: any) => void} = {};
+  private readonly handlers: {[index: string]: Hanler} = {};
 
   constructor(system: System, messenger: Messenger) {
     this.system = system;
@@ -32,12 +35,12 @@ export default class Bridge {
     if (!subscriberHost) return;
 
     if (topic === SUBSCRIBE_TOPIC) {
-      // TODO: поднять ошибку
+      // TODO: rise an error to error collector
       if (!this.checkIncomeMsgPayload(payload)) return;
       this.addLocalListener(payload.category, payload.topic, payload.handlerId, subscriberHost);
     }
     else if (topic === UNSUBSCRIBE_TOPIC) {
-      // TODO: поднять ошибку
+      // TODO: rise an error to error collector
       if (!this.checkIncomeMsgPayload(payload)) return;
       this.removeLocalListener(payload.category, payload.topic, payload.handlerId);
     }
@@ -84,7 +87,7 @@ export default class Bridge {
 
     this.system.network.send(subscriberHost, message)
       .catch((err) => {
-        // TODO: ????
+        // TODO: rise an error to error collector
       });
   }
 
