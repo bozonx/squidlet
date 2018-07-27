@@ -19,37 +19,26 @@ export default class Bridge {
   }
 
   init(): void {
-
-    // TODO: слушать events - так как все сообщение направленны туда из Messanger
-
-    this.system.network.listenIncome((error: Error | null, message: Message): void => {
-      if (error) {
-        // TODO: что делать в случае ошибки - наверное в лог писать или сделать message.error ???
-        this.system.log.error(error.toString());
-
-        return;
-      }
-
-      // TODO: нужна проверка что это именно сообщение ???
-      this.handleIncomeMessages(message);
-    });
+    this.system.events.addListener(SYSTEM_CATEGORY, undefined, this.handleSystemEvents);
   }
 
-  private handleIncomeMessages(message: Message): void {
+  private handleSystemEvents(message: Message): void {
     const {
-      category,
       topic,
       from: subscriberHost,
       payload,
     } = message;
 
-    if (category !== SYSTEM_CATEGORY) return;
+    if (!subscriberHost) return;
 
     if (topic === SUBSCRIBE_TOPIC) {
+      // TODO: поднять ошибку
+      if (!this.checkIncomeMsgPayload(payload)) return;
       this.addLocalListener(payload.category, payload.topic, payload.handlerId, subscriberHost);
     }
-
-    if (topic === UNSUBSCRIBE_TOPIC) {
+    else if (topic === UNSUBSCRIBE_TOPIC) {
+      // TODO: поднять ошибку
+      if (!this.checkIncomeMsgPayload(payload)) return;
       this.removeLocalListener(payload.category, payload.topic, payload.handlerId);
     }
   }
@@ -97,6 +86,12 @@ export default class Bridge {
       .catch((err) => {
         // TODO: ????
       });
+  }
+
+  private checkIncomeMsgPayload(payload: any): boolean {
+    if (typeof payload !== 'object') return false;
+
+    return payload.category && payload.topic && payload.handlerId;
   }
 
 }

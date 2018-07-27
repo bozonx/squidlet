@@ -138,7 +138,10 @@ export default class BridgeSubscriber {
       payload,
     } = message;
 
+    if (!remoteHost) return;
     if (topic !== RESPOND_TOPIC) return;
+
+    // TODO: check payload
 
     // call subscriber with remote data
     const eventName = generateEventName(payload.category, payload.topic, remoteHost);
