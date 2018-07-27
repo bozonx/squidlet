@@ -4,7 +4,7 @@ import Message from './interfaces/Message';
 import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscriber';
 
 
-type Hanler = (payload: any) => void;
+type Hanвler = (payload: any) => void;
 
 
 /**
@@ -14,7 +14,7 @@ export default class Bridge {
   private readonly system: System;
   private readonly messenger: Messenger;
   // handlers of local events by handleId
-  private readonly handlers: {[index: string]: Hanler} = {};
+  private readonly handlers: {[index: string]: Hanвler} = {};
 
   constructor(system: System, messenger: Messenger) {
     this.system = system;
@@ -25,7 +25,7 @@ export default class Bridge {
     this.system.events.addListener(SYSTEM_CATEGORY, undefined, this.handleSystemEvents);
   }
 
-  private handleSystemEvents(message: Message): void {
+  private handleSystemEvents = (message: Message): void => {
     const {
       topic,
       from: subscriberHost,
@@ -40,6 +40,7 @@ export default class Bridge {
       this.addLocalListener(payload.category, payload.topic, payload.handlerId, subscriberHost);
     }
     else if (topic === UNSUBSCRIBE_TOPIC) {
+
       // TODO: rise an error to error collector
       if (!this.checkIncomeMsgPayload(payload)) return;
       this.removeLocalListener(payload.category, payload.topic, payload.handlerId);

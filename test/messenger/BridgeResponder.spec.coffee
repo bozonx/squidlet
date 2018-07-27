@@ -6,15 +6,20 @@ describe 'app.BridgeResponder', ->
     @subscriberHost = 'master'
     @category = 'cat'
     @topic = 'topic'
-    @networkIncomeHandler = null
+    @incomeHandler = null
+    @addLocalHandler = sinon.spy()
     @system = {
       network: {
         hostId: 'remoteHost'
         send: sinon.stub().returns(Promise.resolve())
-        listenIncome: (handler) => @networkIncomeHandler = handler
       }
       events: {
-        addListener: sinon.spy()
+        addListener: (category, topic, handler) =>
+          if (category == 'system')
+            @incomeHandler = handler
+          else
+            @addLocalHandler(category, topic, handler)
+
         removeListener: sinon.spy()
       }
     }
@@ -35,9 +40,9 @@ describe 'app.BridgeResponder', ->
     }
 
     @bridgeResponder.init()
-    @networkIncomeHandler(@incomeMessage)
+    @incomeHandler(@incomeMessage)
 
-    sinon.assert.calledWith(@system.events.addListener, @category, @topic, @bridgeResponder.handlers['123'])
+    sinon.assert.calledWith(@addLocalHandler, @category, @topic, @bridgeResponder.handlers['123'])
 
   it 'response', ->
     @bridgeResponder.response(@category, @topic, @subscriberHost, '123', 'payload')
@@ -74,7 +79,7 @@ describe 'app.BridgeResponder', ->
     }
 
     @bridgeResponder.init()
-    @networkIncomeHandler(@unsubscribeMessage)
+    @incomeHandler(@unsubscribeMessage)
 
     assert.deepEqual(@bridgeResponder.handlers, {})
     sinon.assert.calledWith(@system.events.removeListener, @category, @topic, handler)

@@ -10,7 +10,7 @@ import { generateEventName } from '../helpers/helpers';
 const HANDLER_ID_POSITION = 0;
 const HANDLER_POSITION = 1;
 export const SUBSCRIBE_TOPIC = 'subscribeToRemoteEvent';
-export const UNSUBSCRIBE_TOPIC = 'unsubscribeTopic';
+export const UNSUBSCRIBE_TOPIC = 'unsubscribeFromRemoteEvent';
 export const RESPOND_TOPIC = 'respondOfRemoteEvent';
 
 type Handler = (payload: any) => void;
