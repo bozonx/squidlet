@@ -1,12 +1,12 @@
 BridgeSubscriber = require('../../src/messenger/BridgeSubscriber').default
 
 
-describe 'app.BridgeSubscriber', ->
+describe.only 'app.BridgeSubscriber', ->
   beforeEach ->
     @toHost = 'remoteHost'
     @category = 'cat'
     @topic = 'topic'
-    @networkIncomeHandler = null
+    @incomeHandler = null
     @system = {
       io: {
         generateUniqId: -> '123'
@@ -14,7 +14,9 @@ describe 'app.BridgeSubscriber', ->
       network: {
         hostId: 'master'
         send: sinon.stub().returns(Promise.resolve())
-        listenIncome: (handler) => @networkIncomeHandler = handler
+      }
+      events: {
+        addListener: (category, topic, handler) => @incomeHandler = handler
       }
     }
 
@@ -25,10 +27,10 @@ describe 'app.BridgeSubscriber', ->
     @bridgeSubscriber.subscribe(@toHost, @category, @topic, handler)
 
     assert.deepEqual(@bridgeSubscriber.handlers['cat|topic|remoteHost'], [
-      {
-        handler,
-        handlerId: '123'
-      }
+      [
+        '123'
+        handler
+      ]
     ])
     sinon.assert.calledWith(@system.network.send, @toHost, {
       category: 'system'
@@ -58,15 +60,15 @@ describe 'app.BridgeSubscriber', ->
     handler = sinon.spy()
     @bridgeSubscriber.handlers = {
       'cat|topic|remoteHost': [
-        {
-          handlerId: @handlerId
+        [
+          @handlerId
           handler
-        }
+        ]
       ]
     }
     @bridgeSubscriber.init()
 
-    @networkIncomeHandler(@respondMessage)
+    @incomeHandler(@respondMessage)
 
     sinon.assert.calledWith(handler, 'payload')
 
@@ -74,24 +76,24 @@ describe 'app.BridgeSubscriber', ->
     handlerToRemove = ->
     otherHandler = ->
     @bridgeSubscriber.handlers['cat|topic|remoteHost'] = [
-      {
-        handlerId: '123'
-        handler: handlerToRemove,
-      }
-      {
-        handlerId: '345'
-        handler: otherHandler,
-      }
+      [
+        '123'
+        handlerToRemove,
+      ]
+      [
+        '345'
+        otherHandler,
+      ]
     ]
 
     @bridgeSubscriber.unsubscribe(@toHost, @category, @topic, handlerToRemove)
 
     assert.deepEqual(@bridgeSubscriber.handlers, {
       'cat|topic|remoteHost': [
-        {
-          handlerId: '345'
-          handler: otherHandler,
-        }
+        [
+          '345'
+          otherHandler,
+        ]
       ]
     })
 

@@ -141,7 +141,8 @@ export default class BridgeSubscriber {
     if (!remoteHost) return;
     if (topic !== RESPOND_TOPIC) return;
 
-    // TODO: check payload
+    // TODO: rise an error to error collector
+    if (!this.checkIncomeMsgPayload(payload)) return;
 
     // call subscriber with remote data
     const eventName = generateEventName(payload.category, payload.topic, remoteHost);
@@ -165,6 +166,12 @@ export default class BridgeSubscriber {
         handlerId,
       },
     };
+  }
+
+  private checkIncomeMsgPayload(payload: any): boolean {
+    if (typeof payload !== 'object') return false;
+
+    return payload.category && payload.topic && payload.handlerId;
   }
 
 }
