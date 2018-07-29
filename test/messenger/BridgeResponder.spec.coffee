@@ -1,7 +1,7 @@
 BridgeResponder = require('../../src/messenger/BridgeResponder').default
 
 
-describe 'app.BridgeResponder', ->
+describe 'messenger.BridgeResponder', ->
   beforeEach ->
     @subscriberHost = 'master'
     @category = 'cat'

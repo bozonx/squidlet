@@ -21,6 +21,7 @@ export default class Host {
   get id(): string {
 
     // TODO: review
+    // TODO: может использовать network.hostId
 
     //return this.hostConfig.address.host;
 
