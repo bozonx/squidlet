@@ -61,7 +61,7 @@ export default class RequestResponse {
   }
 
   /**
-   * Listen for incoming request to genereate response.
+   * Listen for incoming request to generate response.
    */
   listenRequests(topic: string, handler: (payload: any) => void): void {
     this.system.events.addListener(REQUEST_RESPONSE_CATEGORY, topic, handler);

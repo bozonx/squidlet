@@ -6,7 +6,8 @@ describe.only 'messenger.RequestResponse', ->
     @toHost = 'remoteHost'
     @topic = 'topic'
     @payload = 'req payload'
-#    @incomeHandler = null
+    @incomeHandler = null
+    @requestId = '123'
     @system = {
       host: {
         id: 'master'
@@ -17,22 +18,19 @@ describe.only 'messenger.RequestResponse', ->
         }
       }
       io: {
-        generateUniqId: -> '123'
+        generateUniqId: => @requestId
       }
-#      network: {
-#        hostId: 'master'
-#        send: sinon.stub().returns(Promise.resolve())
-#      }
-#      events: {
-#        addListener: (category, topic, handler) => @incomeHandler = handler
-#      }
+      events: {
+        addListener: (category, topic, handler) => @incomeHandler = handler
+        removeListener: sinon.spy()
+      }
     }
     @messenger = {
-      $sendMessage: () => Promise.resolve()
+      $sendMessage: sinon.stub().returns(Promise.resolve())
     }
     @response = {
       payload: 'resp payload'
-      requestId: '123'
+      requestId: @requestId
       isResponse: true
     }
 
@@ -48,3 +46,46 @@ describe.only 'messenger.RequestResponse', ->
     response = await responsePromise
 
     assert.deepEqual(response, @response)
+
+  it 'response', ->
+    request = {
+      topic: @topic
+      from: @toHost
+      requestId: @requestId
+    }
+
+    await @requestResponse.response(request, undefined, undefined, @payload)
+
+    sinon.assert.calledWith(@messenger.$sendMessage, {
+      category: 'request-response'
+      code: undefined
+      error: undefined
+      from: 'master'
+      isResponse: true
+      payload: 'req payload'
+      requestId: @requestId
+      to: 'remoteHost'
+      topic: 'topic'
+    })
+
+  it 'startWaitForResponse', ->
+    handler = sinon.spy()
+    @requestResponse.startWaitForResponse(@requestId, handler)
+
+    @incomeHandler(@response)
+
+    sinon.assert.calledWith(handler, null, @response)
+    sinon.assert.calledWith(@system.events.removeListener, 'request-response', undefined)
+
+  it 'start and stop wait for response', ->
+    handler = sinon.spy()
+    @requestResponse.startWaitForResponse(@requestId, handler)
+
+    assert.isOk(@requestResponse.timeouts[@requestId])
+    assert.isOk(@requestResponse.handlers[@requestId])
+
+    @requestResponse.stopWaitForResponse(@requestId)
+
+    assert.isNotOk(@requestResponse.timeouts[@requestId])
+    assert.isNotOk(@requestResponse.handlers[@requestId])
+    sinon.assert.calledWith(@system.events.removeListener, 'request-response', undefined)
