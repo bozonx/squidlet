@@ -1,7 +1,7 @@
 RequestResponse = require('../../src/messenger/RequestResponse').default
 
 
-describe.only 'messenger.RequestResponse', ->
+describe 'messenger.RequestResponse', ->
   beforeEach ->
     @toHost = 'remoteHost'
     @topic = 'topic'
