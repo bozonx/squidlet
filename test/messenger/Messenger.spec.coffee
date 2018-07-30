@@ -14,6 +14,7 @@ describe 'app.Messenger', ->
       }
       events: {
         addListener: sinon.spy()
+        removeListener: sinon.spy()
         emit: sinon.spy()
       }
     }
@@ -72,86 +73,25 @@ describe 'app.Messenger', ->
     sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
 
   it.only 'unsubscribe from remote', ->
+    @messenger.bridgeSubscriber.subscribe = sinon.spy()
     @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
     handler = sinon.spy()
 
     @messenger.subscribe(@to, @topic, handler)
     @messenger.unsubscribe(@to, @topic, handler)
 
-    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe)
-    sinon.assert.notCalled(@system.events.addListener)
+    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe, @to, 'publish', @topic)
+    sinon.assert.notCalled(@system.events.removeListener)
+    assert.deepEqual(@messenger.handlerWrappers.handlers, [])
 
+  it.only 'unsubscribe from local', ->
+    @messenger.bridgeSubscriber.subscribe = sinon.spy()
+    @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
+    handler = sinon.spy()
 
+    @messenger.subscribe('master', @topic, handler)
+    @messenger.unsubscribe('master', @topic, handler)
 
-#
-#  it 'request - check message', ->
-#    @messenger.request(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
-#
-#    sentMessage = {
-#      category: 'deviceCallAction',
-#      from: 'master',
-#      payload: { data: 'value' },
-#      to: @to,
-#      topic: 'room1.device1'
-#      request: {
-#        id: 'uniqId'
-#        isRequest: true
-#      }
-#    }
-#
-#    sinon.assert.calledWith(@messenger.router.send, @to, sentMessage)
-
-#  it 'request - receive response', ->
-#    promise = @messenger.request(@to, 'deviceCallAction', { deviceId: 'room1.device1' })
-#
-#    responseMsg = {
-#      request: {
-#        id: 'uniqId'
-#        isResponse: true
-#      }
-#    }
-#
-#    @routerSubscribeHanler(responseMsg)
-#
-#    await promise
-#
-#  it 'listenIncomeRequests', ->
-#    handler = sinon.spy()
-#    @messenger.listenIncomeRequests('cat', handler)
-#    incomeMessage = {
-#      category: 'cat'
-#      topic: 'topic'
-#      request: {
-#        isRequest: true
-#      }
-#    }
-#
-#    @routerSubscribeHanler(incomeMessage)
-#
-#    sinon.assert.calledWith(handler, incomeMessage)
-
-#  it 'response', ->
-#    @system.host.id = @to
-#
-#    request = {
-#      category: 'cat'
-#      topic: 'topic'
-#      from: 'master'
-#      to: @to
-#      request: {
-#        id: 1
-#        isRequest: true
-#      }
-#    }
-#
-#    @messenger.response(request, 'payload')
-#
-#    sinon.assert.calledWith(@messenger.router.send, 'master', {
-#      category: 'cat'
-#      error: undefined
-#      payload: 'payload'
-#      request: { id: 1, isResponse: true }
-#      from: @to
-#      to: 'master'
-#      topic: 'topic'
-#    })
+    sinon.assert.calledWith(@system.events.removeListener, 'publish', @topic)
+    sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
+    assert.deepEqual(@messenger.handlerWrappers.handlers, [])

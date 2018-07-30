@@ -81,7 +81,7 @@ export default class Messenger {
 
     this.handlerWrappers.addHandler(handler, wrapper);
 
-    if (toHost === this.system.host.id) {
+    if (this.isLocalHost(toHost)) {
       // subscribe to local events
       return this.system.events.addListener(PUBLISH_CATEGORY, topic, wrapper);
     }
@@ -95,19 +95,17 @@ export default class Messenger {
    * Handler has to be the same as has been specified to "subscribe" method previously
    */
   unsubscribe(toHost: string, topic: string, handler: (message: Message) => void): void {
-    if (toHost === this.system.host.id) {
-      // subscribe to local events
-      this.system.events.removeListener(PUBLISH_CATEGORY, topic, handler);
-
-      return;
-    }
-
     const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
 
-    // TODO: local
+    if (this.isLocalHost(toHost)) {
+      // subscribe to local events
+      this.system.events.removeListener(PUBLISH_CATEGORY, topic, handler);
+    }
+    else {
+      // unsubscribe from remote host's events
+      this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, wrapper);
+    }
 
-    // unsubscribe from remote host's events
-    this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, wrapper);
     this.handlerWrappers.removeByHandler(handler);
   }
 
@@ -133,7 +131,7 @@ export default class Messenger {
 
   async $sendMessage(message: Message | Request): Promise<void> {
     // if message is addressed to local host - rise it immediately
-    if (message.to === this.system.host.id) {
+    if (this.isLocalHost(message.to)) {
       this.system.events.emit(message.category, message.topic, message);
 
       return;
@@ -154,6 +152,10 @@ export default class Messenger {
     }
 
     this.system.events.emit(message.category, message.topic, message);
+  }
+
+  private isLocalHost(toHost?: string) {
+    return !toHost || toHost === this.system.host.id;
   }
 
 }
