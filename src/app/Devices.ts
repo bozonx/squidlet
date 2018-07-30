@@ -176,6 +176,9 @@ export default class Devices {
 
     const payload: CallActionPayload = request.payload;
     const deviceId = payload.deviceId;
+
+    // TODO: review
+
     const device: {[index: string]: any} = this.system.devicesManager.getDevice(deviceId);
 
     if (!device[payload.actionName]) {

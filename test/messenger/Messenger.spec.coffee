@@ -72,7 +72,7 @@ describe 'app.Messenger', ->
     sinon.assert.calledWith(@system.events.addListener, 'publish', @topic)
     sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
 
-  it.only 'unsubscribe from remote', ->
+  it 'unsubscribe from remote', ->
     @messenger.bridgeSubscriber.subscribe = sinon.spy()
     @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
     handler = sinon.spy()
@@ -84,7 +84,7 @@ describe 'app.Messenger', ->
     sinon.assert.notCalled(@system.events.removeListener)
     assert.deepEqual(@messenger.handlerWrappers.handlers, [])
 
-  it.only 'unsubscribe from local', ->
+  it 'unsubscribe from local', ->
     @messenger.bridgeSubscriber.subscribe = sinon.spy()
     @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
     handler = sinon.spy()

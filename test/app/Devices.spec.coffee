@@ -1,102 +1,111 @@
 Devices = require('../../src/app/Devices').default
 
 
-describe 'app.Devices', ->
+describe.only 'app.Devices', ->
   beforeEach ->
     @requestSubscribeCb = undefined
-    @app = {
+    @device = {
+      turn: sinon.spy()
+    }
+    @system = {
       host: {
         id: 'master'
       }
       messenger: {
         publish: sinon.stub().returns(Promise.resolve())
         request: sinon.stub().returns(Promise.resolve())
-        subscribe: (toHost, category, topic, cb) => @requestSubscribeCb = cb
+        subscribe: (toHost, topic, cb) => @requestSubscribeCb = cb
+      }
+      devicesManager: {
+        getDevice: => @device
       }
     }
 
     @hostId = 'room/host1'
     @deviceId = 'room/host1$device1'
-    @devices = new Devices(@app)
+    @devices = new Devices(@system)
 
   it 'callAction', ->
     await @devices.callAction(@deviceId, 'turn', 1)
 
-    sinon.assert.calledWith(
-      @app.messenger.request,
+    sinon.assert.calledWith(@system.messenger.request,
       @hostId,
       'deviceCallAction',
-      'room/host1$device1/turn',
-      [1]
+      { actionName: 'turn', deviceId: @deviceId, params: [1] }
     )
 
   it 'setConfig', ->
     await @devices.setConfig(@deviceId, { param: 1 })
 
     sinon.assert.calledWith(
-      @app.messenger.request,
+      @system.messenger.request,
       @hostId,
       'deviceCallAction',
-      'room/host1$device1/setConfig',
-      [{ param: 1 }]
+      { actionName: 'setConfig', deviceId: @deviceId, params: [{ param: 1 }] }
     )
 
   it 'listenStatus', ->
     handler = sinon.spy()
     @devices.listenStatus(@deviceId, 'temperature', handler)
 
-    @requestSubscribeCb(25)
+    @requestSubscribeCb({
+      actionName: 'status'
+      statusName: 'temperature'
+      deviceId: @deviceId
+      value: 25
+    })
 
     sinon.assert.calledWith(handler, 25)
-
-#  it 'listenStatuses', ->
-#    handler = sinon.spy()
-#    @devices.listenStatuses(@deviceId, handler)
-#
-#    @requestSubscribeCb({
-#      payload: { temperature: 25 }
-#    })
-#
-#    sinon.assert.calledWith(handler, { temperature: 25 })
 
   it 'listenConfig', ->
     handler = sinon.spy()
     @devices.listenConfig(@deviceId, handler)
 
-    @requestSubscribeCb({ param: 1 })
+    @requestSubscribeCb({
+      actionName: 'config'
+      deviceId: @deviceId
+      config: { param: 1 }
+    })
 
     sinon.assert.calledWith(handler, { param: 1 })
 
   it 'publishStatus', ->
     await @devices.publishStatus(@deviceId, 'temperature', 25)
 
-    sinon.assert.calledWith(@app.messenger.publish,
+    sinon.assert.calledWith(@system.messenger.publish,
       'master',
       'deviceFeedBack',
-      'room/host1$device1/status/temperature',
-      25
+      {
+        actionName: 'status'
+        deviceId: @deviceId
+        statusName: 'temperature'
+        value: 25
+      }
     )
 
   it 'publishConfig', ->
     await @devices.publishConfig(@deviceId, { param: 1 })
 
-    sinon.assert.calledWith(@app.messenger.publish,
+    sinon.assert.calledWith(@system.messenger.publish,
       'master',
       'deviceFeedBack',
-      'room/host1$device1/config',
-      { param: 1 }
+      { actionName: 'config', config: { param: 1 }, deviceId: @deviceId }
     )
 
   it 'private callLocalDeviceAction', ->
     device = {
       turn: sinon.stub().returns(Promise.resolve('result'))
     }
-    @app.devicesManager = {
+    @system.devicesManager = {
       getDevice: -> device
     }
     request = {
       topic: 'room/host1$device1/turn'
-      payload: [123]
+      payload: {
+        deviceId: @deviceId
+        actionName: 'turn'
+        params: [123]
+      }
     }
 
     result = await @devices.callLocalDeviceAction(request)
