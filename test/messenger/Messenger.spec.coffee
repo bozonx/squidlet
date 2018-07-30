@@ -1,71 +1,85 @@
 Messenger = require('../../src/messenger/Messenger.ts').default
 
 
-describe.only 'app.Messenger', ->
+describe 'app.Messenger', ->
   beforeEach ->
     @routerSubscribeHanler = undefined
-
-    @app = {
+    @system = {
       host: {
         id: 'master'
       }
+      network: {
+        hostId: 'master'
+        send: sinon.spy()
+      }
+      events: {
+        addListener: sinon.spy()
+        emit: sinon.spy()
+      }
     }
-
     @to = 'room1.host1'
-    @messenger = new Messenger(@app);
+    @topic = 'deviceCallAction'
+    @messenger = new Messenger(@system);
     @messenger.network = {
       send: sinon.stub().returns(Promise.resolve())
       listenIncome: (handler) => @routerSubscribeHanler = handler
-      #off: sinon.spy()
     }
 
   it 'publish', ->
-    await @messenger.publish(@to, 'deviceCallAction', 'room1.device1', { data: 'value' })
-
-    sinon.assert.calledWith(@messenger.router.send, @to, {
-      category: 'deviceCallAction'
-      topic: 'room1.device1'
+    message = {
+      category: 'publish'
+      topic: @topic
       from: 'master'
       to: @to
-      payload: { data: 'value' }
-    })
+      payload: { deviceId: 'room1.device1' }
+    }
 
-  it 'subscribe - add subscribers', ->
-    handler11 = sinon.spy()
-    handler12 = sinon.spy()
-    handler21 = sinon.spy()
+    await @messenger.publish(@to, @topic, { deviceId: 'room1.device1' })
 
-    @messenger.subscribe('cat', 'topic1', handler11)
-    @messenger.subscribe('cat', 'topic1', handler12)
-    @messenger.subscribe('cat', 'topic2', handler21)
+    sinon.assert.notCalled(@system.events.emit)
+    sinon.assert.calledWith(@system.network.send, @to, message)
 
-    assert.deepEqual(_.keys(@messenger['subscribers']), [ 'cat|topic1', 'cat|topic2' ])
+  it 'publish to local', ->
+    message = {
+      category: 'publish'
+      topic: @topic
+      from: 'master'
+      to: 'master'
+      payload: { deviceId: 'room1.device1' }
+    }
 
-  it 'subscribe - invoke', ->
+    await @messenger.publish('master', @topic, { deviceId: 'room1.device1' })
+
+    sinon.assert.calledWith(@system.events.emit, 'publish', @topic, message)
+    sinon.assert.notCalled(@system.network.send)
+
+  it 'subscribe  to remote', ->
+    @messenger.bridgeSubscriber.subscribe = sinon.spy()
     handler = sinon.spy()
-    handler2 = sinon.spy()
-    @messenger.subscribe('cat', 'topic', handler)
-    @messenger.subscribe('cat', 'topic', handler2)
 
-    @routerSubscribeHanler({ category: 'cat', topic: 'otherTopic' })
-    @routerSubscribeHanler({ category: 'cat', topic: 'topic' })
+    @messenger.subscribe(@to, @topic, handler)
 
-    sinon.assert.calledOnce(handler)
-    sinon.assert.calledOnce(handler2)
-    sinon.assert.calledWith(handler, { category: 'cat', topic: 'topic' })
+    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe, @to, 'publish', @topic)
+    sinon.assert.notCalled(@system.events.addListener)
 
-  it 'unsubscribe', ->
+  it 'subscribe  to local', ->
+    @messenger.bridgeSubscriber.subscribe = sinon.spy()
     handler = sinon.spy()
-    @messenger.subscribe('cat', 'topic', handler)
-    subscriber = @messenger['subscribers']['cat|topic']
 
-    @messenger.unsubscribe('cat', 'topic', handler)
+    @messenger.subscribe('master', @topic, handler)
 
-    @routerSubscribeHanler({ category: 'cat', topic: 'topic' })
+    sinon.assert.calledWith(@system.events.addListener, 'publish', @topic)
+    sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
 
-    sinon.assert.notCalled(handler)
-    assert.equal(@routerSubscribeHanler, subscriber)
-    assert.deepEqual(_.keys(@messenger['subscribers']), [])
+  it.only 'unsubscribe from remote', ->
+    @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
+    handler = sinon.spy()
+
+    @messenger.subscribe(@to, @topic, handler)
+    @messenger.unsubscribe(@to, @topic, handler)
+
+    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe)
+    sinon.assert.notCalled(@system.events.addListener)
 
 
 
@@ -117,7 +131,7 @@ describe.only 'app.Messenger', ->
 #    sinon.assert.calledWith(handler, incomeMessage)
 
 #  it 'response', ->
-#    @app.host.id = @to
+#    @system.host.id = @to
 #
 #    request = {
 #      category: 'cat'

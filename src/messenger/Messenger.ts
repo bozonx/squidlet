@@ -103,6 +103,9 @@ export default class Messenger {
     }
 
     const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
+
+    // TODO: local
+
     // unsubscribe from remote host's events
     this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, wrapper);
     this.handlerWrappers.removeByHandler(handler);
