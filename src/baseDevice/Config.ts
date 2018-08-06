@@ -16,11 +16,17 @@ export default class Config {
     this.republish = new Republish(republishInterval);
   }
 
-  async getConfig(): Promise<void> {
+  /**
+   * Get whole config from device.
+   */
+  getConfig = async (): Promise<void> => {
 
   }
 
-  async setConfig(): Promise<void> {
+  /**
+   * Set config to device
+   */
+  setConfig = async (partialConfig: {[index: string]: any}): Promise<void> => {
     // TODO: check types via schema
   }
 

@@ -19,11 +19,17 @@ export default class Status {
     this.republish = new Republish(republishInterval);
   }
 
-  async getStatus(): Promise<void> {
+  /**
+   * Get status from device.
+   */
+  getStatus = async (statusName: string = 'default'): Promise<void> => {
 
   }
 
-  async setStatus(): Promise<void> {
+  /**
+   * Set status of device.
+   */
+  setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
     // TODO: check types via schema
   }
 

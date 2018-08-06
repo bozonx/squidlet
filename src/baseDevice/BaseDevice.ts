@@ -27,33 +27,10 @@ export default class BaseDevice {
     this.config = new Config(configRepublishInterval, this.$configGetter, this.$configSetter);
   }
 
-  /**
-   * Get status from device.
-   */
-  async getStatus(statusName: string = 'default'): Promise<void> {
-
-  }
-
-  /**
-   * Get whole config from device.
-   */
-  async getConfig(): Promise<void> {
-
-  }
-
-  /**
-   * Set status of device.
-   */
-  async setStatus(newValue: any, statusName: string = 'default'): Promise<void> {
-
-  }
-
-  /**
-   * Set config to device
-   */
-  async setConfig(partialConfig: {[index: string]: any}): Promise<void> {
-
-  }
+  getStatus: Status['getStatus'] = this.status.getStatus;
+  getConfig: Config['getConfig'] = this.config.getConfig;
+  setStatus: Status['setStatus'] = this.status.setStatus;
+  setConfig: Config['setConfig'] = this.config.setConfig;
 
   // async publishAction(actionName: string, result: any): Promise<void> {
   //   // TODO: может делаться на удаленное устройство
