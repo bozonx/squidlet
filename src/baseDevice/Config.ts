@@ -16,11 +16,11 @@ export default class Config {
     this.republish = new Republish(republishInterval);
   }
 
-  getConfig() {
+  async getConfig(): Promise<void> {
 
   }
 
-  setConfig() {
+  async setConfig(): Promise<void> {
     // TODO: check types via schema
   }
 

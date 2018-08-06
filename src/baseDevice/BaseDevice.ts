@@ -18,8 +18,13 @@ export default class BaseDevice {
   constructor(system: System, deviceConf: {[index: string]: any}) {
     this.system = system;
     this.deviceConf = deviceConf;
-    this.status = new Status(this.$statusGetter, this.$statusSetter);
-    this.config = new Config(this.$configGetter, this.$configSetter);
+
+    // TODO: наверное из конфига взять
+    const statusRepublishInterval = 1000;
+    const configRepublishInterval = 10000;
+
+    this.status = new Status(statusRepublishInterval, this.$statusGetter, this.$statusSetter);
+    this.config = new Config(configRepublishInterval, this.$configGetter, this.$configSetter);
   }
 
   /**

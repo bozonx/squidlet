@@ -19,11 +19,11 @@ export default class Status {
     this.republish = new Republish(republishInterval);
   }
 
-  getStatus() {
+  async getStatus(): Promise<void> {
 
   }
 
-  setStatus() {
+  async setStatus(): Promise<void> {
     // TODO: check types via schema
   }
 
