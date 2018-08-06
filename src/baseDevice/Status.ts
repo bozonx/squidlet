@@ -2,8 +2,8 @@ import * as EventEmitter from 'events';
 import Republish from './Republish';
 
 
-export type StatusGetter = () => Promise<void>;
-export type StatusSetter = () => Promise<void>;
+export type StatusGetter = (statusName: string) => Promise<any>;
+export type StatusSetter = (newValue: any, statusName: string) => Promise<void>;
 // TODO: что должно быть???
 type ChangeHandler = () => void;
 
@@ -14,8 +14,14 @@ type ChangeHandler = () => void;
 export default class Status {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
+  // TODO: нужно ли указывать тип?
+  private readonly localCache: {[index: string]: any} = {};
+  private readonly statusGetter?: StatusGetter;
+  private readonly statusSetter?: StatusSetter;
 
   constructor(republishInterval: number, statusGetter?: StatusGetter, statusSetter?: StatusSetter) {
+    this.statusGetter = statusGetter;
+    this.statusSetter = statusSetter;
     this.republish = new Republish(republishInterval);
   }
 
@@ -23,7 +29,9 @@ export default class Status {
    * Get status from device.
    */
   getStatus = async (statusName: string = 'default'): Promise<void> => {
+    if (this.statusGetter) {
 
+    }
   }
 
   /**
