@@ -177,15 +177,13 @@ export default class Devices {
     const payload: CallActionPayload = request.payload;
     const deviceId = payload.deviceId;
 
-    // TODO: review
-
     const device: {[index: string]: any} = this.system.devicesManager.getDevice(deviceId);
 
     if (!device[payload.actionName]) {
       throw new Error(`Device "${deviceId}" doesn't have an action ${payload.actionName}`);
     }
 
-    const result = await device[payload.actionName](...request.payload);
+    const result = await device[payload.actionName](...request.payload.params);
 
     return result;
   }

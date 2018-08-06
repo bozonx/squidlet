@@ -1,7 +1,7 @@
 Devices = require('../../src/app/Devices').default
 
 
-describe.only 'app.Devices', ->
+describe 'app.Devices', ->
   beforeEach ->
     @requestSubscribeCb = undefined
     @device = {
