@@ -12,12 +12,12 @@ export default class BaseDevice {
   protected $configSetter?: ConfigSetter;
   private readonly system: System;
   // TODO: нужно устанавливать тип для каждого девайса
-  private readonly deviceConf: {[index: string]: any};
+  private readonly params: {[index: string]: any};
 
 
-  constructor(system: System, deviceConf: {[index: string]: any}) {
+  constructor(system: System, params: {[index: string]: any}) {
     this.system = system;
-    this.deviceConf = deviceConf;
+    this.params = params;
 
     // TODO: наверное из конфига взять
     const statusRepublishInterval = 1000;
@@ -35,5 +35,8 @@ export default class BaseDevice {
   // async publishAction(actionName: string, result: any): Promise<void> {
   //   // TODO: может делаться на удаленное устройство
   // }
+
+  // TODO: валидация конфига + дополнительный метод валидации девайса
+  // TODO: destroy
 
 }
