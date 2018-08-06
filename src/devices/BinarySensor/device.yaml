@@ -1,0 +1,7 @@
+name: BinarySensor
+device: ./BinarySensor.ts
+schema:
+  type: binart-sensor
+
+  connections:
+    - gpio
