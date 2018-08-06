@@ -3,28 +3,34 @@ import Config, {ConfigGetter, ConfigSetter} from './Config';
 import System from '../app/System';
 
 
+type BaseParams = {[index: string]: any};
+
+
 export default class DeviceBase {
   readonly status: Status;
   readonly config: Config;
-  protected $statusGetter?: StatusGetter;
-  protected $statusSetter?: StatusSetter;
-  protected $configGetter?: ConfigGetter;
-  protected $configSetter?: ConfigSetter;
+  // TODO: передавать тип
+  // transform initial params of device
+  protected transformParams?: (params: BaseParams) => BaseParams;
+  protected statusGetter?: StatusGetter;
+  protected statusSetter?: StatusSetter;
+  protected configGetter?: ConfigGetter;
+  protected configSetter?: ConfigSetter;
   private readonly system: System;
   // TODO: нужно устанавливать тип для каждого девайса
   private readonly params: {[index: string]: any};
 
 
-  constructor(system: System, params: {[index: string]: any}) {
+  constructor(system: System, params: BaseParams) {
     this.system = system;
-    this.params = params;
+    this.params = (typeof this.transformParams === 'undefined') ? params : this.transformParams(params);
 
     // TODO: наверное из конфига взять
     const statusRepublishInterval = 1000;
     const configRepublishInterval = 10000;
 
-    this.status = new Status(statusRepublishInterval, this.$statusGetter, this.$statusSetter);
-    this.config = new Config(configRepublishInterval, this.$configGetter, this.$configSetter);
+    this.status = new Status(statusRepublishInterval, this.statusGetter, this.statusSetter);
+    this.config = new Config(configRepublishInterval, this.configGetter, this.configSetter);
   }
 
   getStatus: Status['getStatus'] = this.status.getStatus;
