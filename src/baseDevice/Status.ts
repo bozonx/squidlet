@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import Republish from './Republish';
 
@@ -35,9 +36,16 @@ export default class Status {
 
     // TODO: писать в лог при ошибке
 
+    const oldValue = this.localCache[statusName];
+
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
       this.localCache[statusName] = await this.statusGetter(statusName);
+
+      if (!_.isEqual(oldValue, this.localCache[statusName])) {
+        // TODO: call republish
+        this.events.emit(ChangeEventName, this.localCache[statusName], statusName);
+      }
     }
 
     return this.localCache[statusName];
@@ -47,6 +55,7 @@ export default class Status {
    * Set status of device.
    */
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
+    const oldValue = this.localCache[statusName];
     // TODO: check types via schema
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
@@ -58,8 +67,14 @@ export default class Status {
       await this.statusSetter(newValue, statusName);
     }
 
+    // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
+
     this.localCache[statusName] = newValue;
-    this.events.emit(ChangeEventName, newValue, statusName);
+
+    if (!_.isEqual(oldValue, newValue)) {
+      // TODO: call republish
+      this.events.emit(ChangeEventName, newValue, statusName);
+    }
   }
 
   onChange(cb: ChangeHandler) {

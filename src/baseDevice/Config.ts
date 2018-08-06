@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import Republish from './Republish';
-import {StatusGetter, StatusSetter} from './Status';
 
 
 // TODO: нужно ли указывать тип?
@@ -34,9 +34,16 @@ export default class Config {
 
     // TODO: писать в лог при ошибке
 
+    const oldConfig = this.localCache;
+
     // update local cache if configGetter is defined
     if (this.configGetter) {
       this.localCache = await this.configGetter();
+
+      if (!_.isEqual(oldConfig, this.localCache)) {
+        // TODO: call republish
+        this.events.emit(ChangeEventName, this.localCache);
+      }
     }
 
     return this.localCache;
@@ -53,6 +60,8 @@ export default class Config {
 
     // TODO: писать в лог при ошибке
 
+    const oldConfig = this.localCache;
+
     const newConfig = {
       ...this.localCache,
       ...partialConfig,
@@ -62,8 +71,14 @@ export default class Config {
       await this.configSetter(newConfig);
     }
 
+    // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
+
     this.localCache = newConfig;
-    this.events.emit(ChangeEventName, newConfig);
+
+    if (!_.isEqual(oldConfig, newConfig)) {
+      // TODO: call republish
+      this.events.emit(ChangeEventName, newConfig);
+    }
   }
 
   onChange(cb: ChangeHandler) {
