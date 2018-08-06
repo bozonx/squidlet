@@ -6,10 +6,10 @@ import System from '../app/System';
 export default class BaseDevice {
   readonly status: Status;
   readonly config: Config;
-  $statusGetter?: StatusGetter;
-  $statusSetter?: StatusSetter;
-  $configGetter?: ConfigGetter;
-  $configSetter?: ConfigSetter;
+  protected $statusGetter?: StatusGetter;
+  protected $statusSetter?: StatusSetter;
+  protected $configGetter?: ConfigGetter;
+  protected $configSetter?: ConfigSetter;
   private readonly system: System;
   // TODO: нужно устанавливать тип для каждого девайса
   private readonly deviceConf: {[index: string]: any};
@@ -18,7 +18,6 @@ export default class BaseDevice {
   constructor(system: System, deviceConf: {[index: string]: any}) {
     this.system = system;
     this.deviceConf = deviceConf;
-
     this.status = new Status(this.$statusGetter, this.$statusSetter);
     this.config = new Config(this.$configGetter, this.$configSetter);
   }
@@ -54,13 +53,5 @@ export default class BaseDevice {
   // async publishAction(actionName: string, result: any): Promise<void> {
   //   // TODO: может делаться на удаленное устройство
   // }
-
-  // async abstract $statusGetter(): Promise<void>;
-  //
-  // async abstract $statusSetter(): Promise<void>;
-  //
-  // async abstract $configGetter(): Promise<void>;
-  //
-  // async abstract $configSetter(): Promise<void>;
 
 }

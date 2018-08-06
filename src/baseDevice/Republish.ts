@@ -1,6 +1,8 @@
 export default class Republish {
-  constructor() {
+  private republishInterval: number = 0;
 
+  constructor(republishInterval: number) {
+    this.republishInterval = republishInterval;
   }
 
 }

@@ -1,15 +1,19 @@
 import * as EventEmitter from 'events';
+import Republish from './Republish';
 
 
 export type ConfigGetter = () => Promise<void>;
 export type ConfigSetter = () => Promise<void>;
+// TODO: что должно быть???
+type ChangeHandler = () => void;
 
 
 export default class Config {
   private readonly events: EventEmitter = new EventEmitter();
+  private readonly republish: Republish;
 
-  constructor(configGetter?: ConfigGetter, configSetter?: ConfigSetter) {
-
+  constructor(republishInterval: number, configGetter?: ConfigGetter, configSetter?: ConfigSetter) {
+    this.republish = new Republish(republishInterval);
   }
 
   getConfig() {
@@ -20,12 +24,12 @@ export default class Config {
     // TODO: check types via schema
   }
 
-  onChange() {
-
+  onChange(cb: ChangeHandler) {
+    this.events.addListener('change', cb);
   }
 
-  removeListener() {
-
+  removeListener(cb: ChangeHandler) {
+    this.events.removeListener('change', cb);
   }
 
 }
