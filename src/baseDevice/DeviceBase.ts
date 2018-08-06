@@ -3,7 +3,7 @@ import Config, {ConfigGetter, ConfigSetter} from './Config';
 import System from '../app/System';
 
 
-export default class BaseDevice {
+export default class DeviceBase {
   readonly status: Status;
   readonly config: Config;
   protected $statusGetter?: StatusGetter;

@@ -1,11 +1,14 @@
 import System from '../../app/System';
+import DeviceBase from '../../baseDevice/DeviceBase';
 
 
-export default class BinarySensor {
-  private readonly system: System;
+export default class BinarySensor extends DeviceBase {
+  protected $statusGetter = async (statusName: string): Promise<any> => {
 
-  constructor(system: System) {
-    this.system = system;
+  }
+
+  protected $statusSetter = async (statusName: string): Promise<any> => {
+
   }
 
 }
