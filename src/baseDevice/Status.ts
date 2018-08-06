@@ -4,8 +4,9 @@ import Republish from './Republish';
 
 export type StatusGetter = (statusName: string) => Promise<any>;
 export type StatusSetter = (newValue: any, statusName: string) => Promise<void>;
-// TODO: что должно быть???
-type ChangeHandler = () => void;
+type ChangeHandler = (newValue: any, statusName: string) => void;
+
+const ChangeEventName = 'change';
 
 
 /**
@@ -28,10 +29,18 @@ export default class Status {
   /**
    * Get status from device.
    */
-  getStatus = async (statusName: string = 'default'): Promise<void> => {
-    if (this.statusGetter) {
+  getStatus = async (statusName: string = 'default'): Promise<any> => {
+    // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
+      // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
+    // TODO: писать в лог при ошибке
+
+    // update local cache if statusGetter is defined
+    if (this.statusGetter) {
+      this.localCache[statusName] = await this.statusGetter(statusName);
     }
+
+    return this.localCache[statusName];
   }
 
   /**
@@ -39,14 +48,26 @@ export default class Status {
    */
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
     // TODO: check types via schema
+
+    // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
+        // при этом в очереди может быть только 1 запрос - самый последний
+
+    // TODO: писать в лог при ошибке
+
+    if (this.statusSetter) {
+      await this.statusSetter(newValue, statusName);
+    }
+
+    this.localCache[statusName] = newValue;
+    this.events.emit(ChangeEventName, newValue, statusName);
   }
 
   onChange(cb: ChangeHandler) {
-    this.events.addListener('change', cb);
+    this.events.addListener(ChangeEventName, cb);
   }
 
   removeListener(cb: ChangeHandler) {
-    this.events.removeListener('change', cb);
+    this.events.removeListener(ChangeEventName, cb);
   }
 
 }

@@ -3,17 +3,19 @@ import Republish from './Republish';
 import {StatusGetter, StatusSetter} from './Status';
 
 
-export type ConfigGetter = () => Promise<void>;
-export type ConfigSetter = (partialConfig: {[index: string]: any}) => Promise<void>;
-// TODO: что должно быть???
-type ChangeHandler = () => void;
+// TODO: нужно ли указывать тип?
+type DeviceConfig = {[index: string]: any};
+export type ConfigGetter = () => Promise<DeviceConfig>;
+export type ConfigSetter = (partialConfig: DeviceConfig) => Promise<void>;
+type ChangeHandler = (config: DeviceConfig) => void;
+
+const ChangeEventName = 'change';
 
 
 export default class Config {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
-  // TODO: нужно ли указывать тип?
-  private readonly localCache: {[index: string]: any} = {};
+  private localCache: DeviceConfig = {};
   private readonly configGetter?: ConfigGetter;
   private readonly configSetter?: ConfigSetter;
 
@@ -26,24 +28,50 @@ export default class Config {
   /**
    * Get whole config from device.
    */
-  getConfig = async (): Promise<void> => {
+  getConfig = async (): Promise<DeviceConfig> => {
+    // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
+       // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
+    // TODO: писать в лог при ошибке
+
+    // update local cache if configGetter is defined
+    if (this.configGetter) {
+      this.localCache = await this.configGetter();
+    }
+
+    return this.localCache;
   }
 
   /**
    * Set config to device
    */
-  setConfig = async (partialConfig: {[index: string]: any}): Promise<void> => {
+  setConfig = async (partialConfig: DeviceConfig): Promise<void> => {
     // TODO: check types via schema
-    // TODO: нужно ли указывать тип?
+
+    // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
+      // при этом в очереди может быть только 1 запрос - самый последний
+
+    // TODO: писать в лог при ошибке
+
+    const newConfig = {
+      ...this.localCache,
+      ...partialConfig,
+    };
+
+    if (this.configSetter) {
+      await this.configSetter(newConfig);
+    }
+
+    this.localCache = newConfig;
+    this.events.emit(ChangeEventName, newConfig);
   }
 
   onChange(cb: ChangeHandler) {
-    this.events.addListener('change', cb);
+    this.events.addListener(ChangeEventName, cb);
   }
 
   removeListener(cb: ChangeHandler) {
-    this.events.removeListener('change', cb);
+    this.events.removeListener(ChangeEventName, cb);
   }
 
 }
