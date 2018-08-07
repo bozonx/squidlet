@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import Republish from './Republish';
+import {Publisher} from './DeviceBase';
 
 
 // TODO: нужно ли указывать тип?
@@ -11,19 +12,29 @@ type ChangeHandler = (config: DeviceConfig) => void;
 
 const ChangeEventName = 'change';
 
-// TODO: вначале нужно получить первый конфиг и дать возможность навешаться на событие получения первого конфига
 
 export default class Config {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
   private localCache: DeviceConfig = {};
+  private readonly publish?: Publisher;
   private readonly configGetter?: ConfigGetter;
   private readonly configSetter?: ConfigSetter;
 
-  constructor(republishInterval: number, configGetter?: ConfigGetter, configSetter?: ConfigSetter) {
+  constructor(
+    republishInterval: number,
+    publish: Publisher,
+    configGetter?: ConfigGetter,
+    configSetter?: ConfigSetter
+  ) {
+    this.publish = publish;
     this.configGetter = configGetter;
     this.configSetter = configSetter;
     this.republish = new Republish(republishInterval);
+  }
+
+  init(): Promise<void> {
+    // TODO: initialize - get values
   }
 
   /**

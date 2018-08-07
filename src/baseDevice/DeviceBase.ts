@@ -1,9 +1,11 @@
 import Status, {StatusGetter, StatusSetter} from './Status';
 import Config, {ConfigGetter, ConfigSetter} from './Config';
 import System from '../app/System';
+import PublishParams from '../app/interfaces/PublishParams';
 
 
 type BaseParams = {[index: string]: any};
+export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
 
 
 export default class DeviceBase {
@@ -27,18 +29,35 @@ export default class DeviceBase {
 
   constructor(system: System, params: BaseParams) {
     this.system = system;
-    // TODO: сделать автоматическую трансформацию prams - из главного кокнфига и из дефолтного конфига
     this.params = this.transformDeviceParams(params);
 
     // TODO: наверное из конфига взять
     const statusRepublishInterval = 1000;
     const configRepublishInterval = 10000;
 
-    this.status = new Status(statusRepublishInterval, this.statusGetter, this.statusSetter);
-    this.config = new Config(configRepublishInterval, this.configGetter, this.configSetter);
+    this.status = new Status(
+      statusRepublishInterval,
+      this.publish,
+      this.statusGetter,
+      this.statusSetter
+    );
+    this.config = new Config(
+      configRepublishInterval,
+      this.publish,
+      this.configGetter,
+      this.configSetter
+    );
 
-    // TODO: наверное запускать после получения статусов и конфигов или после инициализации приложения?
-    if (typeof this.init !== 'undefined') this.init();
+    Promise.all([
+      this.status.init(),
+      this.config.init(),
+    ])
+      .then(() => {
+        if (typeof this.init !== 'undefined') this.init();
+      })
+      .catch(() => {
+        // TODO: что делаем ???
+      });
   }
 
   getStatus: Status['getStatus'] = this.status.getStatus;
@@ -46,9 +65,10 @@ export default class DeviceBase {
   setStatus: Status['setStatus'] = this.status.setStatus;
   setConfig: Config['setConfig'] = this.config.setConfig;
 
-  // async publishAction(actionName: string, result: any): Promise<void> {
-  //   // TODO: может делаться на удаленное устройство
-  // }
+  publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
+    // TODO: топик девайса + subtopic
+    // TODO: может делаться на удаленное устройство
+  }
 
   // TODO: валидация конфига + дополнительный метод валидации девайса
   // TODO: destroy

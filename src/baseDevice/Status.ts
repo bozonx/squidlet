@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import Republish from './Republish';
+import {Publisher} from './DeviceBase';
 
 
 export type StatusGetter = (statusName: string) => Promise<any>;
@@ -9,7 +10,6 @@ type ChangeHandler = (newValue: any, statusName: string) => void;
 
 const ChangeEventName = 'change';
 
-// TODO: вначале нужно получить первые статусы и дать возможность навешаться на событие получения первых статусов
 
 /**
  * Manage local status
@@ -19,13 +19,24 @@ export default class Status {
   private readonly republish: Republish;
   // TODO: нужно ли указывать тип?
   private readonly localCache: {[index: string]: any} = {};
+  private readonly publish?: Publisher;
   private readonly statusGetter?: StatusGetter;
   private readonly statusSetter?: StatusSetter;
 
-  constructor(republishInterval: number, statusGetter?: StatusGetter, statusSetter?: StatusSetter) {
+  constructor(
+    republishInterval: number,
+    publish: Publisher,
+    statusGetter?: StatusGetter,
+    statusSetter?: StatusSetter
+  ) {
+    this.publish = publish;
     this.statusGetter = statusGetter;
     this.statusSetter = statusSetter;
     this.republish = new Republish(republishInterval);
+  }
+
+  init(): Promise<void> {
+    // TODO: initialize - get values
   }
 
   /**
