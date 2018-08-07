@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import Republish from './Republish';
 import {Publisher} from './DeviceBase';
+import {combineTopic} from '../helpers/helpers';
 
 
 // if statusNames is undefined - it means get all the statuses
@@ -37,10 +38,12 @@ export default class Status {
   }
 
   async init(): Promise<void> {
-    // TODO: initialize - get values
     await this.getStatuses();
   }
 
+  /**
+   * Get all the statuses
+   */
   getStatuses = async (): Promise<{[index: string]: any}> => {
     // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
 
@@ -49,6 +52,7 @@ export default class Status {
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
       // TODO: validate result
+      // TODO: писать в лог при ошибке
       this.localCache = await this.statusGetter();
 
       if (!_.isEqual(oldCache, this.localCache)) {
@@ -115,8 +119,9 @@ export default class Status {
     this.localCache[statusName] = newValue;
 
     if (!_.isEqual(oldValue, newValue)) {
-      // TODO: call republish
       this.events.emit(ChangeEventName, statusName);
+      // TODO: call republish
+      this.publishStatus(statusName, this.localCache[statusName]);
     }
   }
 
@@ -129,11 +134,14 @@ export default class Status {
   }
 
   private publishStatus(statusName: string, value: any): Promise<void> {
+    // TODO: нужно ли устанавливать параметры publish?
     if (statusName === 'default') {
-      return this.publish('', value);
+      return this.publish('status', value);
     }
 
-    return this.publish(statusName, value);
+    const subStatus = combineTopic('status', statusName);
+
+    return this.publish(subStatus, value);
   }
 
 }

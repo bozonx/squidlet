@@ -6,6 +6,7 @@ import {Publisher} from './DeviceBase';
 
 // TODO: нужно ли указывать тип?
 type DeviceConfig = {[index: string]: any};
+// get whole config
 export type ConfigGetter = () => Promise<DeviceConfig>;
 export type ConfigSetter = (partialConfig: DeviceConfig) => Promise<void>;
 type ChangeHandler = (config: DeviceConfig) => void;
@@ -17,7 +18,7 @@ export default class Config {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
   private localCache: DeviceConfig = {};
-  private readonly publish?: Publisher;
+  private readonly publish: Publisher;
   private readonly configGetter?: ConfigGetter;
   private readonly configSetter?: ConfigSetter;
 
@@ -33,8 +34,8 @@ export default class Config {
     this.republish = new Republish(republishInterval);
   }
 
-  init(): Promise<void> {
-    // TODO: initialize - get values
+  async init(): Promise<void> {
+    await this.getConfig();
   }
 
   /**
@@ -53,8 +54,10 @@ export default class Config {
       this.localCache = await this.configGetter();
 
       if (!_.isEqual(oldConfig, this.localCache)) {
-        // TODO: call republish
         this.events.emit(ChangeEventName, this.localCache);
+        // TODO: нужно ли устанавливать параметры?
+        this.publish('config', this.localCache);
+        // TODO: call republish
       }
     }
 
@@ -88,8 +91,10 @@ export default class Config {
     this.localCache = newConfig;
 
     if (!_.isEqual(oldConfig, newConfig)) {
-      // TODO: call republish
       this.events.emit(ChangeEventName, newConfig);
+      // TODO: нужно ли устанавливать параметры?
+      this.publish('config', this.localCache);
+      // TODO: call republish
     }
   }
 
