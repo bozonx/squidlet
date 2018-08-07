@@ -1,0 +1,19 @@
+# which driver use: 'raspberry' or 'pcf8574' etc
+gpio: string
+# i2c bus 1 or 0. By default is 1.
+bus: number
+# address of device on I2C bus
+i2c: string
+# GPIO pin number
+pin: number
+# log level of changes of value. e.g. verbose. Default is info.
+valueLogLevel: string
+
+# Invert logic before it will be processing. Default is false.
+negative: boolean
+# use pull down resistor. Default is false.
+pulldown: boolean
+# use pull up resistor. Default is false.
+pullup: boolean
+# invert outer result which responses on mqtt. Default is false
+invertResult: boolean

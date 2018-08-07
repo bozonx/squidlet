@@ -1,0 +1,10 @@
+extends: gpioBaseProps
+
+# debounce time in ms. default is config.impulseSensorDebounceDefault
+debounce:
+  type: number
+  default: 10
+# timeout after received signal. At this time we don't receive any signals.
+deadTime:
+  type: number
+  default: 300
