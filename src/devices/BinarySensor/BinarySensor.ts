@@ -33,15 +33,6 @@ export default class BinarySensor extends DeviceBase {
   // TODO: make publish
   // TODO: set topic to status manager
 
-  // protected transformParams = (params: {[index: string]: any}): BinarySensorParams => {
-  //
-  //   // TODO: !!!!
-  //
-  //   return {
-  //
-  //   };
-  // }
-
   private onInputChange = (): void => {
     // do nothing if there is debounce or dead time
     if (this.debounceInProgress || this.deadTimeInProgress) return;

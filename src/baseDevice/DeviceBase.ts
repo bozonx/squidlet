@@ -28,7 +28,7 @@ export default class DeviceBase {
   constructor(system: System, params: BaseParams) {
     this.system = system;
     // TODO: сделать автоматическую трансформацию prams - из главного кокнфига и из дефолтного конфига
-    this.params = (typeof this.transformParams === 'undefined') ? params : this.transformParams(params);
+    this.params = this.transformDeviceParams(params);
 
     // TODO: наверное из конфига взять
     const statusRepublishInterval = 1000;
@@ -52,5 +52,22 @@ export default class DeviceBase {
 
   // TODO: валидация конфига + дополнительный метод валидации девайса
   // TODO: destroy
+
+  protected transformDeviceParams(instanceParams: BaseParams): BaseParams {
+    // TODO: get it
+    const thisClassName = this.constructor.name;
+
+    const result: BaseParams = {
+      ...this.defaultParams,
+      ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[thisClassName],
+      ...instanceParams,
+    };
+
+    if (typeof this.transformParams !== 'undefined')  {
+      return this.transformParams(result);
+    }
+
+    return result;
+  }
 
 }

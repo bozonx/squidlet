@@ -15,6 +15,8 @@ export default interface HostConfig {
   // paths to files of drivers on local storage
   drivers: Array<string>;
 
+  // override default params of devices
+  devicesDefaults: {[index: string]: any};
 
   // // TODO: remove
   // address: Destination;
