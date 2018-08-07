@@ -209,6 +209,10 @@ export default class Factory extends DriverFactoryBase {
   private instances: {[index: string]: I2cMasterDriver} = {};
 
   getInstance(bus: string) {
+
+    // TODO: возвращать тип I2cMasterDriver
+    // TODO: если есть инстанс наверное нужно возвращать его а не создавать новый - проверить в других драйверах
+
     this.instances[bus] = super.getInstance(bus) as I2cMasterDriver;
 
     return this.instances[bus];
