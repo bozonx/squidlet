@@ -3,11 +3,13 @@ import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import Drivers from '../app/Drivers';
-import Poling from '../helpers/Poling';
+import {BinaryValue} from '../app/CommonTypes';
 
+
+type Handler = (value: BinaryValue) => void;
 
 interface GpioInputDriverParams {
-
+  // TODO: !!!!
 }
 
 
@@ -21,15 +23,41 @@ export class GpioInputDriver {
     this.driverParams = driverParams;
   }
 
+  getLevel(): BinaryValue {
+
+  }
+
+  onChange(handler: Handler): void {
+
+  }
+
+  removeListener(handler: Handler): void {
+
+  }
+
 }
 
 
 export default class GpioInputFactory extends DriverFactoryBase {
+  protected DriverClass: { new (
+      drivers: Drivers,
+      driverParams: {[index: string]: any},
+    ): GpioInputDriver } = GpioInputDriver;
   private instances: {[index: string]: GpioInputDriver} = {};
 
-  getInstance(): GpioInputDriver {
-    this.instances[bus] = super.getInstance(bus) as GpioInputDriver;
+  getInstance(deviceParams: {[index: string]: any}): GpioInputDriver {
 
-    return this.instances[bus];
+    // TODO: validate params
+    // TODO: validate specific for certain driver params
+    // TODO: make uniq string for driver - raspberry-1-5a
+
+    const instanceId = '1';
+
+    if (!this.instances[instanceId]) {
+      this.instances[instanceId] = super.getInstance(instanceId) as GpioInputDriver;
+    }
+
+    return this.instances[instanceId];
   }
+
 }
