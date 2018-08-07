@@ -65,7 +65,7 @@ export default class DeviceBase {
   setStatus: Status['setStatus'] = this.status.setStatus;
   setConfig: Config['setConfig'] = this.config.setConfig;
 
-  publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
+  protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
     // TODO: топик девайса + subtopic
     // TODO: может делаться на удаленное устройство
   }

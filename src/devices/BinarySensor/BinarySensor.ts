@@ -24,8 +24,8 @@ export default class BinarySensor extends DeviceBase {
     this.gpioInputDriver.onChange(this.onInputChange);
   }
 
-  protected statusGetter = (statusName: string): Promise<BinaryLevel> => {
-    return this.gpioInputDriver.getLevel();
+  protected statusGetter = async (): Promise<{[index: string]: BinaryLevel}> => {
+    return { 'default': await this.gpioInputDriver.getLevel() };
   }
 
   // TODO: this.params должны быть BinarySensorParams

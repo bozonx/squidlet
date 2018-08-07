@@ -4,9 +4,10 @@ import Republish from './Republish';
 import {Publisher} from './DeviceBase';
 
 
-export type StatusGetter = (statusName: string) => Promise<any>;
+// if statusNames is undefined - it means get all the statuses
+export type StatusGetter = (statusNames?: string[]) => Promise<{[index: string]: any}>;
 export type StatusSetter = (newValue: any, statusName: string) => Promise<void>;
-type ChangeHandler = (newValue: any, statusName: string) => void;
+type ChangeHandler = (statusName?: string) => void;
 
 const ChangeEventName = 'change';
 
@@ -18,8 +19,8 @@ export default class Status {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
   // TODO: нужно ли указывать тип?
-  private readonly localCache: {[index: string]: any} = {};
-  private readonly publish?: Publisher;
+  private localCache: {[index: string]: any} = {};
+  private readonly publish: Publisher;
   private readonly statusGetter?: StatusGetter;
   private readonly statusSetter?: StatusSetter;
 
@@ -35,8 +36,32 @@ export default class Status {
     this.republish = new Republish(republishInterval);
   }
 
-  init(): Promise<void> {
+  async init(): Promise<void> {
     // TODO: initialize - get values
+    await this.getStatuses();
+  }
+
+  getStatuses = async (): Promise<{[index: string]: any}> => {
+    // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
+
+    const oldCache = this.localCache;
+
+    // update local cache if statusGetter is defined
+    if (this.statusGetter) {
+      // TODO: validate result
+      this.localCache = await this.statusGetter();
+
+      if (!_.isEqual(oldCache, this.localCache)) {
+        this.events.emit(ChangeEventName);
+        // publish all the statuses
+        for (let statusName in Object.keys(this.localCache)) {
+          this.publishStatus(statusName, this.localCache[statusName]);
+        }
+        // TODO: call republish
+      }
+    }
+
+    return this.localCache;
   }
 
   /**
@@ -52,11 +77,16 @@ export default class Status {
 
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
-      this.localCache[statusName] = await this.statusGetter(statusName);
+      // TODO: validate result
+      this.localCache = {
+        ...this.localCache,
+        ...await this.statusGetter([statusName]),
+      };
 
       if (!_.isEqual(oldValue, this.localCache[statusName])) {
+        this.events.emit(ChangeEventName, statusName);
+        this.publishStatus(statusName, this.localCache[statusName]);
         // TODO: call republish
-        this.events.emit(ChangeEventName, this.localCache[statusName], statusName);
       }
     }
 
@@ -69,6 +99,7 @@ export default class Status {
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
     const oldValue = this.localCache[statusName];
     // TODO: check types via schema
+    // TODO: validate new value
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
         // при этом в очереди может быть только 1 запрос - самый последний
@@ -85,7 +116,7 @@ export default class Status {
 
     if (!_.isEqual(oldValue, newValue)) {
       // TODO: call republish
-      this.events.emit(ChangeEventName, newValue, statusName);
+      this.events.emit(ChangeEventName, statusName);
     }
   }
 
@@ -95,6 +126,14 @@ export default class Status {
 
   removeListener(cb: ChangeHandler) {
     this.events.removeListener(ChangeEventName, cb);
+  }
+
+  private publishStatus(statusName: string, value: any): Promise<void> {
+    if (statusName === 'default') {
+      return this.publish('', value);
+    }
+
+    return this.publish(statusName, value);
   }
 
 }
