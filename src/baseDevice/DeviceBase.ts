@@ -11,12 +11,13 @@ export default class DeviceBase {
   readonly config: Config;
   protected readonly system: System;
   // TODO: нужно устанавливать тип для каждого девайса
-  protected readonly params: {[index: string]: any};
+  protected readonly params: BaseParams;
 
-  // TODO: передавать тип
-  // transform initial params of device
+  protected defaultParams?: BaseParams;
   protected init?: () => void;
   protected destroy?: () => void;
+  // TODO: передавать тип
+  // transform initial params of device
   protected transformParams?: (params: BaseParams) => BaseParams;
   protected statusGetter?: StatusGetter;
   protected statusSetter?: StatusSetter;

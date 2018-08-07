@@ -1,11 +1,13 @@
-import DeviceBase from '../../baseDevice/DeviceBase';
-import BinarySensorParams from './BinarySensorParams';
-import GpioInputFactory, {GpioInputDriver} from '../../drivers/GpioInput.driver';
 import System from '../../app/System';
+import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
+import GpioInputFactory, {GpioInputDriver} from '../../drivers/GpioInput.driver';
+import BinarySensorParams from './BinarySensorParams';
+import defaultParams from './defaultParams';
 
 
 export default class BinarySensor extends DeviceBase {
+  protected readonly defaultParams: BinarySensorParams = defaultParams;
   private readonly gpioInputDriver: GpioInputDriver;
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;

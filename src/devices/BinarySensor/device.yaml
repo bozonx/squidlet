@@ -1,6 +1,5 @@
 name: BinarySensor
 device: ./BinarySensor.ts
-defaultParams: ./defaultParams.ts
 schema:
   type: binart-sensor
 
