@@ -3,10 +3,10 @@ import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import Drivers from '../app/Drivers';
-import {BinaryValue} from '../app/CommonTypes';
+import {BinaryLevel} from '../app/CommonTypes';
 
 
-type Handler = (value: BinaryValue) => void;
+type Handler = (level: BinaryLevel) => void;
 
 interface GpioInputDriverParams {
   // TODO: !!!!
@@ -23,16 +23,20 @@ export class GpioInputDriver {
     this.driverParams = driverParams;
   }
 
-  getLevel(): BinaryValue {
+  async getLevel(): Promise<BinaryLevel> {
+    // TODO: add
+    // TODO: трансформировать левел
 
+    return 1;
   }
 
   onChange(handler: Handler): void {
-
+    // TODO: add
+    // TODO: трансформировать левел
   }
 
   removeListener(handler: Handler): void {
-
+    // TODO: add
   }
 
 }

@@ -1,1 +1,1 @@
-export type BinaryValue = 0 | 1;
+export type BinaryLevel = 0 | 1;
