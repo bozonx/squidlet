@@ -9,6 +9,7 @@ type ChangeHandler = (newValue: any, statusName: string) => void;
 
 const ChangeEventName = 'change';
 
+// TODO: вначале нужно получить первые статусы и дать возможность навешаться на событие получения первых статусов
 
 /**
  * Manage local status

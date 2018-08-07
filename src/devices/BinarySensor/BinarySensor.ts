@@ -3,7 +3,7 @@ import BinarySensorParams from './BinarySensorParams';
 
 
 export default class BinarySensor extends DeviceBase {
-  init() {
+  protected init = (): void => {
     // TODO: могут передать любой драйвер - нужно его получить
     // TODO: сконфигурировать binary input sensor
   }

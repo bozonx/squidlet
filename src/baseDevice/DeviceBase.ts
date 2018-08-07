@@ -11,6 +11,8 @@ export default class DeviceBase {
   readonly config: Config;
   // TODO: передавать тип
   // transform initial params of device
+  protected init?: () => void;
+  protected destroy?: () => void;
   protected transformParams?: (params: BaseParams) => BaseParams;
   protected statusGetter?: StatusGetter;
   protected statusSetter?: StatusSetter;
@@ -31,6 +33,8 @@ export default class DeviceBase {
 
     this.status = new Status(statusRepublishInterval, this.statusGetter, this.statusSetter);
     this.config = new Config(configRepublishInterval, this.configGetter, this.configSetter);
+
+    if (typeof this.init !== 'undefined') this.init();
   }
 
   getStatus: Status['getStatus'] = this.status.getStatus;

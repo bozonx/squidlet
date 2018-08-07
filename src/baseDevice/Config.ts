@@ -11,6 +11,7 @@ type ChangeHandler = (config: DeviceConfig) => void;
 
 const ChangeEventName = 'change';
 
+// TODO: вначале нужно получить первый конфиг и дать возможность навешаться на событие получения первого конфига
 
 export default class Config {
   private readonly events: EventEmitter = new EventEmitter();
