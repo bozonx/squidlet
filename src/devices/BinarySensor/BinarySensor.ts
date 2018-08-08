@@ -1,7 +1,8 @@
 import System from '../../app/System';
-import DeviceBase, {BaseParams} from '../../baseDevice/DeviceBase';
+import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import GpioInputFactory, {GpioInputDriver} from '../../drivers/GpioInput.driver';
+import DeviceConf from '../../app/interfaces/DeviceConf';
 
 
 export default class BinarySensor extends DeviceBase {
@@ -9,15 +10,15 @@ export default class BinarySensor extends DeviceBase {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
-  constructor(system: System, params: BaseParams) {
-    super(system, params);
+  constructor(system: System, deviceConf: DeviceConf) {
+    super(system, deviceConf);
 
     const gpioInputDriverFactory = this.system.drivers.getDriver('GpioInput.driver') as GpioInputFactory;
 
-    this.gpioInputDriver = gpioInputDriverFactory.getInstance(this.params);
+    this.gpioInputDriver = gpioInputDriverFactory.getInstance(this.deviceConf.props);
   }
 
-  protected init = (): void => {
+  protected afterInit = (): void => {
     this.gpioInputDriver.onChange(this.onInputChange);
   }
 
@@ -25,10 +26,6 @@ export default class BinarySensor extends DeviceBase {
     return { 'default': await this.gpioInputDriver.getLevel() };
   }
 
-  // TODO: this.params должны быть BinarySensorParams
-  // TODO: add validation
-  // TODO: make publish
-  // TODO: set topic to status manager
 
   private onInputChange = (): void => {
     // do nothing if there is debounce or dead time
@@ -40,7 +37,7 @@ export default class BinarySensor extends DeviceBase {
     setTimeout(async () => {
       this.debounceInProgress = false;
       await this.startValueLogic();
-    }, this.params.debounceTime);
+    }, this.deviceConf.props.debounceTime);
   }
 
   private async startValueLogic(): Promise<void> {
@@ -53,13 +50,13 @@ export default class BinarySensor extends DeviceBase {
       currentLevel = await this.gpioInputDriver.getLevel();
     }
     catch (err) {
-      setTimeout(() => this.deadTimeInProgress = false, this.params.deadTime);
+      setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
 
       return;
     }
 
     await this.status.setStatus(currentLevel);
-    setTimeout(() => this.deadTimeInProgress = false, this.params.deadTime);
+    setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
   }
 
 }

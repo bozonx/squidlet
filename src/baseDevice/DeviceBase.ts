@@ -2,9 +2,9 @@ import Status, {StatusGetter, StatusSetter} from './Status';
 import Config, {ConfigGetter, ConfigSetter} from './Config';
 import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
+import DeviceConf from '../app/interfaces/DeviceConf';
 
 
-export type BaseParams = {[index: string]: any};
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
 
 
@@ -12,27 +12,25 @@ export default class DeviceBase {
   readonly status: Status;
   readonly config: Config;
   protected readonly system: System;
-  // TODO: нужно устанавливать тип для каждого девайса
-  protected readonly params: BaseParams;
+  protected readonly deviceConf: DeviceConf;
 
-  protected init?: () => void;
+  protected afterInit?: () => void;
   protected destroy?: () => void;
-  // TODO: передавать тип
-  // transform initial params of device
-  protected transformParams?: (params: BaseParams) => BaseParams;
   protected statusGetter?: StatusGetter;
   protected statusSetter?: StatusSetter;
   protected configGetter?: ConfigGetter;
   protected configSetter?: ConfigSetter;
 
 
-  constructor(system: System, params: BaseParams) {
+  constructor(system: System, deviceConf: DeviceConf) {
     this.system = system;
-    this.params = this.transformDeviceParams(params);
+    this.deviceConf = deviceConf;
 
     // TODO: наверное из конфига взять
     const statusRepublishInterval = 1000;
     const configRepublishInterval = 10000;
+
+    // TODO: set topic to status manager
 
     this.status = new Status(
       statusRepublishInterval,
@@ -52,7 +50,7 @@ export default class DeviceBase {
       this.config.init(),
     ])
       .then(() => {
-        if (typeof this.init !== 'undefined') this.init();
+        if (typeof this.afterInit !== 'undefined') this.afterInit();
       })
       .catch(() => {
         // TODO: что делаем ???
@@ -69,25 +67,28 @@ export default class DeviceBase {
     // TODO: может делаться на удаленное устройство
   }
 
+  // TODO: как сделать чтобы props имел тип???
   // TODO: валидация конфига + дополнительный метод валидации девайса
   // TODO: destroy
 
-  protected transformDeviceParams(instanceParams: BaseParams): BaseParams {
-    // TODO: get it
-    const thisClassName = this.constructor.name;
 
-    const result: BaseParams = {
-      // TODO: получить из схемы
-      //...this.defaultParams,
-      ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[thisClassName],
-      ...instanceParams,
-    };
 
-    if (typeof this.transformParams !== 'undefined')  {
-      return this.transformParams(result);
-    }
-
-    return result;
-  }
+  // protected transformDeviceParams(instanceParams: BaseParams): BaseParams {
+  //   // TODO: get it
+  //   const thisClassName = this.constructor.name;
+  //
+  //   const result: BaseParams = {
+  //     // TODO: получить из схемы
+  //     //...this.defaultParams,
+  //     ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[thisClassName],
+  //     ...instanceParams,
+  //   };
+  //
+  //   if (typeof this.transformParams !== 'undefined')  {
+  //     return this.transformParams(result);
+  //   }
+  //
+  //   return result;
+  // }
 
 }

@@ -1,3 +1,4 @@
+// parsed manifest of device
 export default interface DeviceManifest {
   // directory where manifest places. It is set on master configure time
   baseDir: string;
@@ -9,11 +10,8 @@ export default interface DeviceManifest {
   // generic type of device
   type: string;
 
-  // props of device or path to yaml file with props
-  props?: string | {[index: string]: any};
-  // status of device or path to yaml file with status
-  status?: string | {[index: string]: any};
-
-  // path to device's schema definition in yaml format
-  //schema: string;
+  // props of device
+  props?: {[index: string]: any};
+  // status of device
+  status?: {[index: string]: any};
 }

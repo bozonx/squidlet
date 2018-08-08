@@ -34,13 +34,13 @@ export default class DevicesManager {
     devicesConfigs: {[index: string]: object}
   ): Promise<void[]> {
     return Promise.all(
-      _.map(devicesConfigs, async (rawDeviceConf: {[index: string]: any}, deviceId: string): Promise<void> => {
-        if (!rawDeviceConf.device) {
-          this.system.log.fatal(`Unknown device "${JSON.stringify(rawDeviceConf)}"`);
+      _.map(devicesConfigs, async (rawProps: {[index: string]: any}, deviceId: string): Promise<void> => {
+        if (!rawProps.device) {
+          this.system.log.fatal(`Unknown device "${JSON.stringify(rawProps)}"`);
         }
 
-        const manifest: DeviceManifest = devicesManifests[rawDeviceConf.device];
-        const deviceConf: DeviceConf = await this.prepareDeviceConf(rawDeviceConf, manifest, deviceId);
+        const manifest: DeviceManifest = devicesManifests[rawProps.device];
+        const deviceConf: DeviceConf = await this.prepareDeviceConf(rawProps, manifest, deviceId);
 
         this.instances[deviceConf.deviceId] = await this.deviceFactory.create(deviceConf);
       })
@@ -56,31 +56,31 @@ export default class DevicesManager {
 
   /**
    * Prepare config for device instantiating.
-   * @param {object} rawDeviceConf - config of certain device from devices config.
+   * @param {object} rawProps - config of certain device from devices config.
    * @param {DeviceManifest} manifest - parsed device manifest
    * @param {string} deviceId - Uniq instance id like "bedroom.switch"
    * @return {Promise<object>} - complete device config
    * @private
    */
   private async prepareDeviceConf(
-    rawDeviceConf: {[index: string]: any},
+    rawProps: {[index: string]: any},
     manifest: DeviceManifest,
     deviceId: string
   ): Promise<DeviceConf> {
     if (!manifest) {
-      throw new Error(`Can't find manifest of device "${rawDeviceConf.device}"`);
+      throw new Error(`Can't find manifest of device "${rawProps.device}"`);
     }
 
     //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
-    const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
-    const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
+    // const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
+    // const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
 
     return {
-      className: rawDeviceConf.device,
+      className: rawProps.device,
       deviceId,
-      params: _.omit(rawDeviceConf, 'device'),
+      // TODO: может здесь все смержить ???
+      props: _.omit(rawProps, 'device'),
       manifest,
-      schema,
     };
   }
 

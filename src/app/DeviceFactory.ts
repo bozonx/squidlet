@@ -6,6 +6,9 @@ import Device from './interfaces/Device';
 import DeviceConf from './interfaces/DeviceConf';
 
 
+type DeviceType = { new (system: System, deviceConf: DeviceConf): Device };
+
+
 export default class DeviceFactory {
   private readonly system: System;
 
@@ -16,7 +19,7 @@ export default class DeviceFactory {
   async create(deviceConf: DeviceConf): Promise<Device> {
     // make instance of device
     const devicePath: string = path.resolve(deviceConf.manifest.baseDir, deviceConf.manifest.device);
-    const DeviceClass: { new (system: System, deviceConf: DeviceConf): Device } = this.require(devicePath);
+    const DeviceClass: DeviceType = this.require(devicePath);
     const device: Device = new DeviceClass(this.system, deviceConf);
 
     this._validateSchema(deviceConf);

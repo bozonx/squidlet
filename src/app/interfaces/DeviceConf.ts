@@ -1,5 +1,4 @@
 import DeviceManifest from './DeviceManifest';
-//import DeviceSchema from './DeviceSchema';
 
 
 export default interface DeviceConf {
@@ -7,9 +6,8 @@ export default interface DeviceConf {
   className: string;
   // uniq id of device like "room.deviceInstanceName"
   deviceId: string;
-  // specific config of device
-  params: object;
+  // specific props of device instance
+  props: {[index: string]: any};
+  // parsed manifest of device
   manifest: DeviceManifest;
-  // // parsed schema of device
-  // schema: DeviceSchema;
 }
