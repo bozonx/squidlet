@@ -1,4 +1,4 @@
-extends: gpioBaseProps
+$extends: gpioBaseProps
 
 # debounce time in ms
 debounce:

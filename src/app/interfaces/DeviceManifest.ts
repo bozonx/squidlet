@@ -5,6 +5,15 @@ export default interface DeviceManifest {
   name: string;
   // path to device main file
   device: string;
+
+  // generic type of device
+  type: string;
+
+  // props of device or path to yaml file with props
+  props?: string | {[index: string]: any};
+  // status of device or path to yaml file with status
+  status?: string | {[index: string]: any};
+
   // path to device's schema definition in yaml format
-  schema: string;
+  //schema: string;
 }

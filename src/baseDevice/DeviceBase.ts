@@ -4,7 +4,7 @@ import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
 
 
-type BaseParams = {[index: string]: any};
+export type BaseParams = {[index: string]: any};
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
 
 

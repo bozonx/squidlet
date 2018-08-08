@@ -6,7 +6,6 @@ import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceConf from './interfaces/DeviceConf';
-import DeviceSchema from './interfaces/DeviceSchema';
 
 
 /**
