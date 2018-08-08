@@ -1,10 +1,7 @@
 name: BinarySensor
+type: binary-sensor
+
 device: ./BinarySensor.ts
-
-schema:
-  type: binary-sensor
-  props: ./props.yaml
-  status: ./status.yaml
-
-  connections:
-    - gpio
+props: ./props.yaml
+status:
+  default: boolean

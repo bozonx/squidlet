@@ -15,7 +15,6 @@ export default class DeviceBase {
   // TODO: нужно устанавливать тип для каждого девайса
   protected readonly params: BaseParams;
 
-  protected defaultParams?: BaseParams;
   protected init?: () => void;
   protected destroy?: () => void;
   // TODO: передавать тип
@@ -78,7 +77,8 @@ export default class DeviceBase {
     const thisClassName = this.constructor.name;
 
     const result: BaseParams = {
-      ...this.defaultParams,
+      // TODO: получить из схемы
+      //...this.defaultParams,
       ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[thisClassName],
       ...instanceParams,
     };

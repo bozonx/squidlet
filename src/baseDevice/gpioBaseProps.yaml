@@ -1,3 +1,4 @@
+# TODO: use one of raspberry | pcf8574
 # which driver use: 'raspberry' or 'pcf8574' etc
 gpio: string
 # i2c bus 1 or 0. By default is 1.
@@ -6,14 +7,25 @@ bus: number
 i2c: string
 # GPIO pin number
 pin: number
-# log level of changes of value. e.g. verbose. Default is info.
-valueLogLevel: string
+# log level of changes of value. e.g. verbose
+valueLogLevel:
+  # TODO: use one of error | warn | info | verbose
+  type: string
+  default: info
 
-# Invert logic before it will be processing. Default is false.
-negative: boolean
-# use pull down resistor. Default is false.
-pulldown: boolean
-# use pull up resistor. Default is false.
-pullup: boolean
-# invert outer result which responses on mqtt. Default is false
-invertResult: boolean
+# Invert logic before it will be processing
+negative:
+  type: boolean
+  default: false
+# use pull down resistor
+pulldown:
+  type: boolean
+  default: false
+# use pull up resistor
+pullup:
+  type: boolean
+  default: false
+# invert outer result which responses on MQTT
+invertResult:
+  type: boolean
+  default: false
