@@ -44,7 +44,7 @@ export default class BinarySensor extends DeviceBase {
     // start dead time - ignore all the signals
     this.deadTimeInProgress = true;
 
-    let currentLevel: BinaryLevel = 0;
+    let currentLevel: BinaryLevel = false;
 
     try {
       currentLevel = await this.gpioInputDriver.getLevel();

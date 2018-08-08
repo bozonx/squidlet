@@ -29,6 +29,9 @@ export default class Drivers {
   }
 
   getDriver(driverName: string): Driver | undefined {
+
+    // TODO: если драйвера нет - throw
+
     // TODO: вернуть тип возвращаемого драйвера
     return this.instances.get(driverName);
   }

@@ -27,7 +27,7 @@ export class GpioInputDriver {
     // TODO: add
     // TODO: трансформировать левел
 
-    return 1;
+    return true;
   }
 
   onChange(handler: Handler): void {

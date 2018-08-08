@@ -1,4 +1,4 @@
-import * as path from 'path';
+const _omit = require('lodash/omit');
 import * as _ from 'lodash';
 
 import System from './System';
@@ -56,19 +56,19 @@ export default class DevicesManager {
 
   /**
    * Prepare config for device instantiating.
-   * @param {object} rawProps - config of certain device from devices config.
+   * @param {object} rawInstanceProps - config of certain device from devices config.
    * @param {DeviceManifest} manifest - parsed device manifest
    * @param {string} deviceId - Uniq instance id like "bedroom.switch"
    * @return {Promise<object>} - complete device config
    * @private
    */
   private async prepareDeviceConf(
-    rawProps: {[index: string]: any},
+    rawInstanceProps: {[index: string]: any},
     manifest: DeviceManifest,
     deviceId: string
   ): Promise<DeviceConf> {
     if (!manifest) {
-      throw new Error(`Can't find manifest of device "${rawProps.device}"`);
+      throw new Error(`Can't find manifest of device "${rawInstanceProps.device}"`);
     }
 
     //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
@@ -76,11 +76,11 @@ export default class DevicesManager {
     // const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
 
     return {
-      className: rawProps.device,
+      className: rawInstanceProps.device,
       deviceId,
-      // TODO: может здесь все смержить ???
-      props: _.omit(rawProps, 'device'),
-      manifest,
+      props: this.mergeProps(rawInstanceProps.device, _omit(rawInstanceProps, 'device'), manifest.props),
+      // remove props from manifest
+      manifest: _omit(manifest, 'props'),
     };
   }
 
@@ -96,6 +96,21 @@ export default class DevicesManager {
     // });
     //
     // this._app.events.emit(`app.afterDestroy`);
+  }
+
+  private mergeProps(
+    className: string,
+    instanceProps: {[index: string]: any},
+    manifestProps?: {[index: string]: any}
+  ): {[index: string]: any} {
+    return {
+      // default props from device's manifest
+      ...manifestProps,
+      // default props from config.devicesDefaults
+      ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[className],
+      // specified props for certain instance
+      ...instanceProps,
+    };
   }
 
 }

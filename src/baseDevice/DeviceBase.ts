@@ -71,24 +71,4 @@ export default class DeviceBase {
   // TODO: валидация конфига + дополнительный метод валидации девайса
   // TODO: destroy
 
-
-
-  // protected transformDeviceParams(instanceParams: BaseParams): BaseParams {
-  //   // TODO: get it
-  //   const thisClassName = this.constructor.name;
-  //
-  //   const result: BaseParams = {
-  //     // TODO: получить из схемы
-  //     //...this.defaultParams,
-  //     ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[thisClassName],
-  //     ...instanceParams,
-  //   };
-  //
-  //   if (typeof this.transformParams !== 'undefined')  {
-  //     return this.transformParams(result);
-  //   }
-  //
-  //   return result;
-  // }
-
 }
