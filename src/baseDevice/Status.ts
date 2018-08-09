@@ -21,6 +21,7 @@ const ChangeEventName = 'change';
  * Manage local status
  */
 export default class Status {
+  private readonly deviceId: string;
   private readonly system: System;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly schema: Schema;
@@ -32,6 +33,7 @@ export default class Status {
   private readonly statusSetter?: StatusSetter;
 
   constructor(
+    deviceId: string,
     system: System,
     schema: Schema,
     publish: Publisher,
@@ -39,6 +41,7 @@ export default class Status {
     statusGetter?: StatusGetter,
     statusSetter?: StatusSetter
   ) {
+    this.deviceId = deviceId;
     this.system = system;
     this.schema = schema;
     this.publish = publish;
@@ -90,18 +93,27 @@ export default class Status {
     // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
       // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
-    // TODO: писать в лог при ошибке
-
     const oldValue = this.localCache[statusName];
 
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
-      // TODO: validate result
+      let result: {[index: string]: any};
 
-      const result: {[index: string]: any} = await this.statusGetter([statusName]);
+      try {
+        result = await this.statusGetter([statusName]);
+      }
+      catch(err) {
+        this.system.log.error(`Can't fetch status "${statusName}" of device "${this.deviceId}": ${err.toString()}`);
+        throw new Error(err);
+      }
 
-      if (validateParam()) {
+      const validateError: string | undefined = validateParam(this.schema, statusName, result[statusName]);
 
+      if (validateError) {
+        const errMsg = `Invalid status "${statusName}" of device "${this.deviceId}": ${validateError}`;
+
+        this.system.log.error(errMsg);
+        throw new Error(errMsg);
       }
 
       this.localCache = {

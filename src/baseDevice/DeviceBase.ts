@@ -27,6 +27,7 @@ export default class DeviceBase {
     this.deviceConf = deviceConf;
 
     this.status = new Status(
+      this.deviceConf.deviceId,
       this.system,
       this.deviceConf.manifest.status || {},
       this.publish,
@@ -35,6 +36,7 @@ export default class DeviceBase {
       this.statusSetter
     );
     this.config = new Config(
+      this.deviceConf.deviceId,
       this.system,
       this.deviceConf.manifest.config || {},
       this.publish,

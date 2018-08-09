@@ -17,6 +17,7 @@ const ChangeEventName = 'change';
 
 
 export default class Config {
+  private readonly deviceId: string;
   private readonly system: System;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly schema: Schema;
@@ -27,6 +28,7 @@ export default class Config {
   private readonly configSetter?: ConfigSetter;
 
   constructor(
+    deviceId: string,
     system: System,
     schema: Schema,
     publish: Publisher,
@@ -34,6 +36,7 @@ export default class Config {
     configGetter?: ConfigGetter,
     configSetter?: ConfigSetter
   ) {
+    this.deviceId = deviceId;
     this.system = system;
     this.schema = schema;
     this.publish = publish;
