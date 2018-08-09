@@ -69,13 +69,14 @@ export default class Status {
 
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
-      const result: {[index: string]: any} = this.fetch(
+      const result: {[index: string]: any} = await this.fetch(
         this.statusGetter,
         `Can't fetch statuses of device "${this.deviceId}"`
       );
 
+      // TODO: лучш валидировать всю схему целиком
       for (let statusName in Object.keys(this.localCache)) {
-        this.validateStatus(statusName, result[statusName]);
+        this.validateStatus(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
       }
 
       this.localCache = result;
@@ -104,12 +105,12 @@ export default class Status {
 
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
-      const result: {[index: string]: any} = this.fetch(
+      const result: {[index: string]: any} = await this.fetch(
         () => this.statusGetter && this.statusGetter([statusName]),
         `Can't fetch status "${statusName}" of device "${this.deviceId}"`
       );
 
-      this.validateStatus(statusName, result[statusName]);
+      this.validateStatus(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
 
       this.localCache = {
         ...this.localCache,
@@ -131,16 +132,16 @@ export default class Status {
    */
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
     const oldValue = this.localCache[statusName];
-    // TODO: check types via schema
-    // TODO: validate new value
+    this.validateStatus(statusName, newValue, `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
         // при этом в очереди может быть только 1 запрос - самый последний
 
-    // TODO: писать в лог при ошибке
-
     if (this.statusSetter) {
-      await this.statusSetter(newValue, statusName);
+      await this.fetch(
+        () => this.statusSetter && this.statusSetter(newValue, statusName),
+        `Can't save status "${statusName}" of device "${this.deviceId}"`
+      );
     }
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
@@ -173,14 +174,14 @@ export default class Status {
     return this.publish(subStatus, value);
   }
 
-  private validateStatus(statusName: string, value: any) {
+  private validateStatus(statusName: string, value: any, errorMsg: string) {
     const validateError: string | undefined = validateParam(this.schema, statusName, value);
 
     if (validateError) {
-      const errMsg = `Invalid status "${statusName}" of device "${this.deviceId}": ${validateError}`;
+      const completeErrMsg = `${errorMsg}: ${validateError}`;
 
-      this.system.log.error(errMsg);
-      throw new Error(errMsg);
+      this.system.log.error(completeErrMsg);
+      throw new Error(completeErrMsg);
     }
   }
 
