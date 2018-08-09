@@ -1,5 +1,7 @@
 import * as _ from 'lodash';
 import * as EventEmitter from 'events';
+
+import System from '../app/System';
 import Republish from './Republish';
 import {Publisher} from './DeviceBase';
 import {combineTopic} from '../helpers/helpers';
@@ -17,6 +19,7 @@ const ChangeEventName = 'change';
  * Manage local status
  */
 export default class Status {
+  private readonly system: System;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
   // TODO: нужно ли указывать тип?
@@ -26,15 +29,22 @@ export default class Status {
   private readonly statusSetter?: StatusSetter;
 
   constructor(
-    republishInterval: number,
+    system: System,
     publish: Publisher,
+    republishInterval?: number,
     statusGetter?: StatusGetter,
     statusSetter?: StatusSetter
   ) {
+    this.system = system;
     this.publish = publish;
     this.statusGetter = statusGetter;
     this.statusSetter = statusSetter;
-    this.republish = new Republish(republishInterval);
+
+    const realRepublishInterval = (typeof republishInterval === 'undefined')
+      ? this.system.host.config.devices.defaultStatusRepublishIntervalMs
+      : republishInterval;
+
+    this.republish = new Republish(realRepublishInterval);
   }
 
   async init(): Promise<void> {

@@ -26,21 +26,17 @@ export default class DeviceBase {
     this.system = system;
     this.deviceConf = deviceConf;
 
-    // TODO: наверное из конфига взять
-    const statusRepublishInterval = 1000;
-    const configRepublishInterval = 10000;
-
-    // TODO: set topic to status manager
-
     this.status = new Status(
-      statusRepublishInterval,
+      this.system,
       this.publish,
+      this.deviceConf.props.statusRepublishInterval,
       this.statusGetter,
       this.statusSetter
     );
     this.config = new Config(
-      configRepublishInterval,
+      this.system,
       this.publish,
+      this.deviceConf.props.configRepublishInterval,
       this.configGetter,
       this.configSetter
     );
@@ -63,7 +59,7 @@ export default class DeviceBase {
   setConfig: Config['setConfig'] = this.config.setConfig;
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
-    // TODO: топик девайса + subtopic
+    // TODO: передать deviceConf.deviceId, subtopic, value, params
     // TODO: может делаться на удаленное устройство
   }
 

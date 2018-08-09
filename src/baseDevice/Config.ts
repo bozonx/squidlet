@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 import Republish from './Republish';
 import {Publisher} from './DeviceBase';
+import System from '../app/System';
 
 
 // TODO: нужно ли указывать тип?
@@ -15,6 +16,7 @@ const ChangeEventName = 'change';
 
 
 export default class Config {
+  private readonly system: System;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly republish: Republish;
   private localCache: DeviceConfig = {};
@@ -23,15 +25,22 @@ export default class Config {
   private readonly configSetter?: ConfigSetter;
 
   constructor(
-    republishInterval: number,
+    system: System,
     publish: Publisher,
+    republishInterval?: number,
     configGetter?: ConfigGetter,
     configSetter?: ConfigSetter
   ) {
+    this.system = system;
     this.publish = publish;
     this.configGetter = configGetter;
     this.configSetter = configSetter;
-    this.republish = new Republish(republishInterval);
+
+    const realRepublishInterval = (typeof republishInterval === 'undefined')
+      ? this.system.host.config.devices.defaultConfigRepublishIntervalMs
+      : republishInterval;
+
+    this.republish = new Republish(realRepublishInterval);
   }
 
   async init(): Promise<void> {

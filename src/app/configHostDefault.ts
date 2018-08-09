@@ -9,8 +9,12 @@ export default {
     manifestFileName: 'device.yaml',
   },
 
-  // publish status interval every minute if status hasn't been changed in ms
-  republishIntervalMs: 60000,
+  devices: {
+    // republish status silently every minute if it hasn't been changed
+    defaultStatusRepublishIntervalMs: 60000,
+    // republish config silently every 10 minutes if it hasn't been changed
+    defaultConfigRepublishIntervalMs: 600000,
+  },
 
   network: {
     routedMessageTTL: 10,
