@@ -69,24 +69,16 @@ export default class Status {
 
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
-      // TODO: validate result
-      // TODO: писать в лог при ошибке
-
-      let result: {[index: string]: any};
-
-      try {
-        result = await this.statusGetter();
-      }
-      catch(err) {
-        this.system.log.error(`Can't fetch statuses of device "${this.deviceId}": ${err.toString()}`);
-        throw new Error(err);
-      }
-
-      this.localCache = result;
+      const result: {[index: string]: any} = this.fetch(
+        this.statusGetter,
+        `Can't fetch statuses of device "${this.deviceId}"`
+      );
 
       for (let statusName in Object.keys(this.localCache)) {
         this.validateStatus(statusName, result[statusName]);
       }
+
+      this.localCache = result;
 
       if (!_.isEqual(oldCache, this.localCache)) {
         // publish all the statuses
@@ -112,15 +104,10 @@ export default class Status {
 
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
-      let result: {[index: string]: any};
-
-      try {
-        result = await this.statusGetter([statusName]);
-      }
-      catch(err) {
-        this.system.log.error(`Can't fetch status "${statusName}" of device "${this.deviceId}": ${err.toString()}`);
-        throw new Error(err);
-      }
+      const result: {[index: string]: any} = this.fetch(
+        () => this.statusGetter && this.statusGetter([statusName]),
+        `Can't fetch status "${statusName}" of device "${this.deviceId}"`
+      );
 
       this.validateStatus(statusName, result[statusName]);
 
@@ -195,6 +182,20 @@ export default class Status {
       this.system.log.error(errMsg);
       throw new Error(errMsg);
     }
+  }
+
+  private async fetch(fetcher: () => void, errorMsg: string): Promise<any> {
+    let result;
+
+    try {
+      result = await fetcher();
+    }
+    catch(err) {
+      this.system.log.error(`${errorMsg}: ${err.toString()}`);
+      throw new Error(err);
+    }
+
+    return result;
   }
 
 }
