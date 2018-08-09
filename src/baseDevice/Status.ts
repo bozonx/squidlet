@@ -5,8 +5,10 @@ import System from '../app/System';
 import Republish from './Republish';
 import {Publisher} from './DeviceBase';
 import {combineTopic} from '../helpers/helpers';
+import {validateParam} from '../helpers/validateSchema';
 
 
+type Schema = {[index: string]: any};
 // if statusNames is undefined - it means get all the statuses
 export type StatusGetter = (statusNames?: string[]) => Promise<{[index: string]: any}>;
 export type StatusSetter = (newValue: any, statusName: string) => Promise<void>;
@@ -21,6 +23,7 @@ const ChangeEventName = 'change';
 export default class Status {
   private readonly system: System;
   private readonly events: EventEmitter = new EventEmitter();
+  private readonly schema: Schema;
   private readonly republish: Republish;
   // TODO: нужно ли указывать тип?
   private localCache: {[index: string]: any} = {};
@@ -30,12 +33,14 @@ export default class Status {
 
   constructor(
     system: System,
+    schema: Schema,
     publish: Publisher,
     republishInterval?: number,
     statusGetter?: StatusGetter,
     statusSetter?: StatusSetter
   ) {
     this.system = system;
+    this.schema = schema;
     this.publish = publish;
     this.statusGetter = statusGetter;
     this.statusSetter = statusSetter;
@@ -66,11 +71,11 @@ export default class Status {
       this.localCache = await this.statusGetter();
 
       if (!_.isEqual(oldCache, this.localCache)) {
-        this.events.emit(ChangeEventName);
         // publish all the statuses
         for (let statusName in Object.keys(this.localCache)) {
           this.publishStatus(statusName, this.localCache[statusName]);
         }
+        this.events.emit(ChangeEventName);
         // TODO: call republish
       }
     }
@@ -92,14 +97,21 @@ export default class Status {
     // update local cache if statusGetter is defined
     if (this.statusGetter) {
       // TODO: validate result
+
+      const result: {[index: string]: any} = await this.statusGetter([statusName]);
+
+      if (validateParam()) {
+
+      }
+
       this.localCache = {
         ...this.localCache,
-        ...await this.statusGetter([statusName]),
+        ...result,
       };
 
       if (!_.isEqual(oldValue, this.localCache[statusName])) {
-        this.events.emit(ChangeEventName, statusName);
         this.publishStatus(statusName, this.localCache[statusName]);
+        this.events.emit(ChangeEventName, statusName);
         // TODO: call republish
       }
     }
@@ -129,9 +141,9 @@ export default class Status {
     this.localCache[statusName] = newValue;
 
     if (!_.isEqual(oldValue, newValue)) {
-      this.events.emit(ChangeEventName, statusName);
       // TODO: call republish
       this.publishStatus(statusName, this.localCache[statusName]);
+      this.events.emit(ChangeEventName, statusName);
     }
   }
 

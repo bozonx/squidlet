@@ -12,6 +12,8 @@ export default interface DeviceManifest {
 
   // props of device
   props?: {[index: string]: any};
-  // status of device
+  // schema of statuses of device
   status?: {[index: string]: any};
+  // schema of config of device
+  config?: {[index: string]: any};
 }

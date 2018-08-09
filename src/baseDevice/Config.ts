@@ -5,6 +5,7 @@ import {Publisher} from './DeviceBase';
 import System from '../app/System';
 
 
+type Schema = {[index: string]: any};
 // TODO: нужно ли указывать тип?
 type DeviceConfig = {[index: string]: any};
 // get whole config
@@ -18,6 +19,7 @@ const ChangeEventName = 'change';
 export default class Config {
   private readonly system: System;
   private readonly events: EventEmitter = new EventEmitter();
+  private readonly schema: Schema;
   private readonly republish: Republish;
   private localCache: DeviceConfig = {};
   private readonly publish: Publisher;
@@ -26,12 +28,14 @@ export default class Config {
 
   constructor(
     system: System,
+    schema: Schema,
     publish: Publisher,
     republishInterval?: number,
     configGetter?: ConfigGetter,
     configSetter?: ConfigSetter
   ) {
     this.system = system;
+    this.schema = schema;
     this.publish = publish;
     this.configGetter = configGetter;
     this.configSetter = configSetter;

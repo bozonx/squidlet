@@ -28,6 +28,7 @@ export default class DeviceBase {
 
     this.status = new Status(
       this.system,
+      this.deviceConf.manifest.status || {},
       this.publish,
       this.deviceConf.props.statusRepublishInterval,
       this.statusGetter,
@@ -35,6 +36,7 @@ export default class DeviceBase {
     );
     this.config = new Config(
       this.system,
+      this.deviceConf.manifest.config || {},
       this.publish,
       this.deviceConf.props.configRepublishInterval,
       this.configGetter,
