@@ -71,7 +71,22 @@ export default class Status {
     if (this.statusGetter) {
       // TODO: validate result
       // TODO: писать в лог при ошибке
-      this.localCache = await this.statusGetter();
+
+      let result: {[index: string]: any};
+
+      try {
+        result = await this.statusGetter();
+      }
+      catch(err) {
+        this.system.log.error(`Can't fetch statuses of device "${this.deviceId}": ${err.toString()}`);
+        throw new Error(err);
+      }
+
+      this.localCache = result;
+
+      for (let statusName in Object.keys(this.localCache)) {
+        this.validateStatus(statusName, result[statusName]);
+      }
 
       if (!_.isEqual(oldCache, this.localCache)) {
         // publish all the statuses
@@ -107,14 +122,7 @@ export default class Status {
         throw new Error(err);
       }
 
-      const validateError: string | undefined = validateParam(this.schema, statusName, result[statusName]);
-
-      if (validateError) {
-        const errMsg = `Invalid status "${statusName}" of device "${this.deviceId}": ${validateError}`;
-
-        this.system.log.error(errMsg);
-        throw new Error(errMsg);
-      }
+      this.validateStatus(statusName, result[statusName]);
 
       this.localCache = {
         ...this.localCache,
@@ -176,6 +184,17 @@ export default class Status {
     const subStatus = combineTopic('status', statusName);
 
     return this.publish(subStatus, value);
+  }
+
+  private validateStatus(statusName: string, value: any) {
+    const validateError: string | undefined = validateParam(this.schema, statusName, value);
+
+    if (validateError) {
+      const errMsg = `Invalid status "${statusName}" of device "${this.deviceId}": ${validateError}`;
+
+      this.system.log.error(errMsg);
+      throw new Error(errMsg);
+    }
   }
 
 }
