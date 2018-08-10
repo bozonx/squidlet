@@ -1,4 +1,4 @@
-import Status, {DEFATULT_STATUS, Getter as StatusGetter, Setter as StatusSetter} from './Status';
+import Status, {DEFAULT_STATUS, Getter as StatusGetter, Setter as StatusSetter} from './Status';
 import Config, {Getter as ConfigGetter, Setter as ConfigSetter} from './Config';
 import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
@@ -59,7 +59,7 @@ export default class DeviceBase {
 
   getStatus: Status['readParam'] = this.status.readParam;
   getConfig: Config['read'] = this.config.read;
-  setStatus = (newValue: any, statusName: string = DEFATULT_STATUS): Promise<void> => {
+  setStatus = (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
     return this.status.write({[statusName]: newValue});
   }
   setConfig: Config['write'] = this.config.write;

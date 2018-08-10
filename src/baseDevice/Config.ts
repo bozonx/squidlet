@@ -1,6 +1,4 @@
-import System from '../app/System';
-import {Publisher} from './DeviceBase';
-import DeviceDataManagerBase, {Data, Getter, Schema, Setter} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, Getter, Setter} from './DeviceDataManagerBase';
 
 
 // TODO: наверное массив измененных параметров
@@ -14,21 +12,6 @@ export type Getter = Getter;
  */
 export default class Config extends DeviceDataManagerBase {
   protected readonly getter?: Getter;
-  protected readonly setter?: Setter;
-
-  constructor(
-    deviceId: string,
-    system: System,
-    schema: Schema,
-    publish: Publisher,
-    republishInterval?: number,
-    getter?: Getter,
-    setter?: Setter
-  ) {
-    super(deviceId, system, schema, publish, republishInterval);
-    this.getter = getter;
-    this.setter = setter;
-  }
 
   onChange(cb: ChangeHandler): void {
     super.onChange(cb);

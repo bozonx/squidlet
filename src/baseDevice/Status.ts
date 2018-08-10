@@ -1,6 +1,4 @@
-import System from '../app/System';
-import {Publisher} from './DeviceBase';
-import DeviceDataManagerBase, {Data, Schema, Setter} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, Setter} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 
 
@@ -10,7 +8,7 @@ export type Getter = (statusNames?: string[]) => Promise<Data>;
 export type Setter = Setter;
 type ChangeHandler = (statusName?: string) => void;
 
-export const DEFATULT_STATUS = 'default';
+export const DEFAULT_STATUS = 'default';
 
 
 /**
@@ -18,21 +16,6 @@ export const DEFATULT_STATUS = 'default';
  */
 export default class Status extends DeviceDataManagerBase {
   protected readonly getter?: Getter;
-  protected readonly setter?: Setter;
-
-  constructor(
-    deviceId: string,
-    system: System,
-    schema: Schema,
-    publish: Publisher,
-    republishInterval?: number,
-    getter?: Getter,
-    setter?: Setter
-  ) {
-    super(deviceId, system, schema, publish, republishInterval);
-    this.getter = getter;
-    this.setter = setter;
-  }
 
   onChange(cb: ChangeHandler): void {
     super.onChange(cb);
@@ -94,7 +77,7 @@ export default class Status extends DeviceDataManagerBase {
 
   private publishStatus(statusName: string, value: any): Promise<void> {
     // TODO: нужно ли устанавливать параметры publish?
-    if (statusName === 'default') {
+    if (statusName === DEFAULT_STATUS) {
       return this.publish('status', value);
     }
 

@@ -27,21 +27,25 @@ export default abstract class DeviceDataManagerBase {
   protected readonly schema: Schema;
   protected readonly republish: Republish;
   protected readonly getter?: Function;
-  protected readonly setter?: Function;
+  protected readonly setter?: Setter;
 
   protected localData: Data = {};
 
-  protected constructor(
+  constructor(
     deviceId: string,
     system: System,
     schema: Schema,
     publish: Publisher,
     republishInterval?: number,
+    getter?: Function,
+    setter?: Setter
   ) {
     this.deviceId = deviceId;
     this.system = system;
     this.schema = schema;
     this.publish = publish;
+    this.getter = getter;
+    this.setter = setter;
 
     const realRepublishInterval = (typeof republishInterval === 'undefined')
       ? this.system.host.config.devices.defaultStatusRepublishIntervalMs
