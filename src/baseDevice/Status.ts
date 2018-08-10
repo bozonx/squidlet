@@ -1,11 +1,9 @@
-import DeviceDataManagerBase, {Data, Setter} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 
 
 // TODO: remake to ParamGetter
 // if statusNames is undefined - it means get all the statuses
-export type Getter = (statusNames?: string[]) => Promise<Data>;
-export type Setter = Setter;
 type ChangeHandler = (statusName?: string) => void;
 
 export const DEFAULT_STATUS = 'default';
@@ -15,8 +13,6 @@ export const DEFAULT_STATUS = 'default';
  * Manage status of device
  */
 export default class Status extends DeviceDataManagerBase {
-  protected readonly getter?: Getter;
-
   onChange(cb: ChangeHandler): void {
     super.onChange(cb);
   }

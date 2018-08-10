@@ -1,18 +1,14 @@
-import DeviceDataManagerBase, {Data, Getter, Setter} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
 
 
 // TODO: наверное массив измененных параметров
 type ChangeHandler = () => void;
-export type Setter = Setter;
-export type Getter = Getter;
 
 
 /**
  * Manage config of device
  */
 export default class Config extends DeviceDataManagerBase {
-  protected readonly getter?: Getter;
-
   onChange(cb: ChangeHandler): void {
     super.onChange(cb);
   }

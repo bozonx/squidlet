@@ -1,5 +1,6 @@
-import Status, {DEFAULT_STATUS, Getter as StatusGetter, Setter as StatusSetter} from './Status';
-import Config, {Getter as ConfigGetter, Setter as ConfigSetter} from './Config';
+import {Getter, Setter} from './DeviceDataManagerBase';
+import Status, {DEFAULT_STATUS} from './Status';
+import Config from './Config';
 import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
 import DeviceConf from '../app/interfaces/DeviceConf';
@@ -16,10 +17,10 @@ export default class DeviceBase {
 
   protected afterInit?: () => void;
   protected destroy?: () => void;
-  protected statusGetter?: StatusGetter;
-  protected statusSetter?: StatusSetter;
-  protected configGetter?: ConfigGetter;
-  protected configSetter?: ConfigSetter;
+  protected statusGetter?: Getter;
+  protected statusSetter?: Setter;
+  protected configGetter?: Getter;
+  protected configSetter?: Setter;
 
 
   constructor(system: System, deviceConf: DeviceConf) {

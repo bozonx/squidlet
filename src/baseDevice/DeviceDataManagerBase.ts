@@ -7,8 +7,7 @@ import {Publisher} from './DeviceBase';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 
 
-export type ParamGetter = (statusNames?: string[]) => Promise<Data>;
-export type Getter = () => Promise<Data>;
+export type Getter = (itemNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
@@ -26,7 +25,7 @@ export default abstract class DeviceDataManagerBase {
   protected readonly publish: Publisher;
   protected readonly schema: Schema;
   protected readonly republish: Republish;
-  protected readonly getter?: Function;
+  protected readonly getter?: Getter;
   protected readonly setter?: Setter;
 
   protected localData: Data = {};
@@ -37,7 +36,7 @@ export default abstract class DeviceDataManagerBase {
     schema: Schema,
     publish: Publisher,
     republishInterval?: number,
-    getter?: Function,
+    getter?: Getter,
     setter?: Setter
   ) {
     this.deviceId = deviceId;
@@ -55,7 +54,7 @@ export default abstract class DeviceDataManagerBase {
   }
 
   abstract read: () => Promise<Data>;
-  // TODO: add write
+  abstract write: (partialData: Data) => Promise<void>;
 
   async init(): Promise<void> {
     if (this.getter) {
