@@ -77,8 +77,30 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
-  protected async fetch(fetcher: () => void, errorMsg: string): Promise<any> {
+  protected async load(fetcher: () => void, errorMsg: string): Promise<any> {
     let result;
+
+    // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
+
+    // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
+      // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
+
+    try {
+      result = await fetcher();
+    }
+    catch(err) {
+      this.system.log.error(`${errorMsg}: ${err.toString()}`);
+      throw new Error(err);
+    }
+
+    return result;
+  }
+
+  protected async save(fetcher: () => void, errorMsg: string): Promise<any> {
+    let result;
+
+    // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
+      // при этом в очереди может быть только 1 запрос - самый последний
 
     try {
       result = await fetcher();

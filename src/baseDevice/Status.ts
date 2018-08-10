@@ -1,6 +1,6 @@
 import System from '../app/System';
 import {Publisher} from './DeviceBase';
-import DeviceDataManagerBase, {changeEventName, Schema} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Schema} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 
 
@@ -51,9 +51,7 @@ export default class Status extends DeviceDataManagerBase {
     if (!this.getter) return this.localData;
     // else fetch statuses if getter is defined
 
-    // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
-
-    const result: {[index: string]: any} = await this.fetch(
+    const result: {[index: string]: any} = await this.load(
       this.getter,
       `Can't fetch statuses of device "${this.deviceId}"`
     );
@@ -80,10 +78,8 @@ export default class Status extends DeviceDataManagerBase {
     if (!this.getter) return this.localData[statusName];
     // else fetch status if getter is defined
 
-    // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
-      // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
-    const result: {[index: string]: any} = await this.fetch(
+    const result: {[index: string]: any} = await this.load(
       () => this.getter && this.getter([statusName]),
       `Can't fetch status "${statusName}" of device "${this.deviceId}"`
     );
@@ -114,10 +110,8 @@ export default class Status extends DeviceDataManagerBase {
     }
     // else do request to device if getter is defined
 
-    // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
-        // при этом в очереди может быть только 1 запрос - самый последний
 
-    await this.fetch(
+    await this.save(
       () => this.setter && this.setter(newValue, statusName),
       `Can't save status "${statusName}: ${newValue}" of device "${this.deviceId}"`
     );
