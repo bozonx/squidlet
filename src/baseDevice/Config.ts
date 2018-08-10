@@ -1,22 +1,10 @@
 import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
 
 
-// TODO: наверное массив измененных параметров
-type ChangeHandler = () => void;
-
-
 /**
  * Manage config of device
  */
 export default class Config extends DeviceDataManagerBase {
-  onChange(cb: ChangeHandler): void {
-    super.onChange(cb);
-  }
-
-  removeListener(cb: ChangeHandler) {
-    super.removeListener(cb);
-  }
-
   /**
    * Get whole config from device.
    */

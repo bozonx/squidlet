@@ -7,10 +7,11 @@ import {Publisher} from './DeviceBase';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 
 
-export type Getter = (itemNames?: string[]) => Promise<Data>;
+export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
+export type ChangeHandler = (changedParams: string[]) => void;
 
 export const changeEventName = 'change';
 
@@ -65,11 +66,11 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
-  onChange(cb: (...params: any[]) => void) {
+  onChange(cb: ChangeHandler) {
     this.events.addListener(changeEventName, cb);
   }
 
-  removeListener(cb: (...params: any[]) => void) {
+  removeListener(cb: ChangeHandler) {
     this.events.removeListener(changeEventName, cb);
   }
 
@@ -192,7 +193,7 @@ export default abstract class DeviceDataManagerBase {
     if (this.localData[paramName] === value) return false;
 
     this.localData[paramName] = value;
-    this.events.emit(changeEventName, paramName);
+    this.events.emit(changeEventName, [paramName]);
     // TODO: call republish
 
     return true;
@@ -206,7 +207,8 @@ export default abstract class DeviceDataManagerBase {
     if (_isEqual(this.localData, newLocalData)) return false;
 
     this.localData = newLocalData;
-    this.events.emit(changeEventName);
+    // TODO: нужно передавать только те параметры, которые изменились
+    this.events.emit(changeEventName, newLocalData.keys());
     // TODO: call republish
 
     return true;
@@ -215,7 +217,7 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Set default values to local data
    */
-  setDefaultValues() {
+  protected setDefaultValues() {
     for (let name of Object.keys(this.schema)) {
       // TODO: наверное поддерживать короткую запись значения по умаолчанию
       if (typeof this.schema[name] === 'object' && this.schema[name].type && this.schema[name].default) {
