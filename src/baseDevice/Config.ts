@@ -16,6 +16,9 @@ type ChangeHandler = (config: DeviceConfig) => void;
 const ChangeEventName = 'change';
 
 
+/**
+ * Manage config of device
+ */
 export default class Config {
   private readonly deviceId: string;
   private readonly system: System;

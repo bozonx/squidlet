@@ -1,36 +1,26 @@
-import * as _ from 'lodash';
-import * as EventEmitter from 'events';
+const _isEqual = require('lodash/_isEqual');
 
-import System from '../app/System';
-import Republish from './Republish';
-import {Publisher} from './DeviceBase';
 import {combineTopic} from '../helpers/helpers';
-import {validateParam} from '../helpers/validateSchema';
+import DeviceDataManagerBase, {changeEventName, Schema} from './DeviceDataManagerBase';
+import System from '../app/System';
+import {Publisher} from './DeviceBase';
 
 
-type Schema = {[index: string]: any};
 // if statusNames is undefined - it means get all the statuses
-export type StatusGetter = (statusNames?: string[]) => Promise<{[index: string]: any}>;
-export type StatusSetter = (newValue: any, statusName: string) => Promise<void>;
+export type Getter = (statusNames?: string[]) => Promise<{[index: string]: any}>;
+export type Setter = (newValue: any, statusName: string) => Promise<void>;
+// TODO: review
 type ChangeHandler = (statusName?: string) => void;
-
-const ChangeEventName = 'change';
 
 
 /**
- * Manage local status
+ * Manage status of device
  */
-export default class Status {
-  private readonly deviceId: string;
-  private readonly system: System;
-  private readonly events: EventEmitter = new EventEmitter();
-  private readonly schema: Schema;
-  private readonly republish: Republish;
+export default class Status extends DeviceDataManagerBase {
   // TODO: нужно ли указывать тип?
   private localCache: {[index: string]: any} = {};
-  private readonly publish: Publisher;
-  private readonly statusGetter?: StatusGetter;
-  private readonly statusSetter?: StatusSetter;
+  private readonly getter?: Getter;
+  private readonly setter?: Setter;
 
   constructor(
     deviceId: string,
@@ -38,25 +28,24 @@ export default class Status {
     schema: Schema,
     publish: Publisher,
     republishInterval?: number,
-    statusGetter?: StatusGetter,
-    statusSetter?: StatusSetter
+    getter?: Getter,
+    setter?: Setter
   ) {
-    this.deviceId = deviceId;
-    this.system = system;
-    this.schema = schema;
-    this.publish = publish;
-    this.statusGetter = statusGetter;
-    this.statusSetter = statusSetter;
-
-    const realRepublishInterval = (typeof republishInterval === 'undefined')
-      ? this.system.host.config.devices.defaultStatusRepublishIntervalMs
-      : republishInterval;
-
-    this.republish = new Republish(realRepublishInterval);
+    super(deviceId, system, schema, publish, republishInterval);
+    this.getter = getter;
+    this.setter = setter;
   }
 
   async init(): Promise<void> {
     await this.getStatuses();
+  }
+
+  onChange(cb: ChangeHandler): void {
+    super.onChange(cb);
+  }
+
+  removeListener(cb: ChangeHandler) {
+    super.removeListener(cb);
   }
 
   /**
@@ -67,10 +56,10 @@ export default class Status {
 
     const oldCache = this.localCache;
 
-    // update local cache if statusGetter is defined
-    if (this.statusGetter) {
+    // update local cache if getter is defined
+    if (this.getter) {
       const result: {[index: string]: any} = await this.fetch(
-        this.statusGetter,
+        this.getter,
         `Can't fetch statuses of device "${this.deviceId}"`
       );
 
@@ -81,12 +70,12 @@ export default class Status {
 
       this.localCache = result;
 
-      if (!_.isEqual(oldCache, this.localCache)) {
+      if (!_isEqual(oldCache, this.localCache)) {
         // publish all the statuses
         for (let statusName in Object.keys(this.localCache)) {
           this.publishStatus(statusName, this.localCache[statusName]);
         }
-        this.events.emit(ChangeEventName);
+        this.events.emit(changeEventName);
         // TODO: call republish
       }
     }
@@ -103,10 +92,10 @@ export default class Status {
 
     const oldValue = this.localCache[statusName];
 
-    // update local cache if statusGetter is defined
-    if (this.statusGetter) {
+    // update local cache if getter is defined
+    if (this.getter) {
       const result: {[index: string]: any} = await this.fetch(
-        () => this.statusGetter && this.statusGetter([statusName]),
+        () => this.getter && this.getter([statusName]),
         `Can't fetch status "${statusName}" of device "${this.deviceId}"`
       );
 
@@ -117,9 +106,9 @@ export default class Status {
         ...result,
       };
 
-      if (!_.isEqual(oldValue, this.localCache[statusName])) {
+      if (!_isEqual(oldValue, this.localCache[statusName])) {
         this.publishStatus(statusName, this.localCache[statusName]);
-        this.events.emit(ChangeEventName, statusName);
+        this.events.emit(changeEventName, statusName);
         // TODO: call republish
       }
     }
@@ -137,9 +126,9 @@ export default class Status {
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
         // при этом в очереди может быть только 1 запрос - самый последний
 
-    if (this.statusSetter) {
+    if (this.setter) {
       await this.fetch(
-        () => this.statusSetter && this.statusSetter(newValue, statusName),
+        () => this.setter && this.setter(newValue, statusName),
         `Can't save status "${statusName}" of device "${this.deviceId}"`
       );
     }
@@ -148,19 +137,11 @@ export default class Status {
 
     this.localCache[statusName] = newValue;
 
-    if (!_.isEqual(oldValue, newValue)) {
+    if (!_isEqual(oldValue, newValue)) {
       // TODO: call republish
       this.publishStatus(statusName, this.localCache[statusName]);
-      this.events.emit(ChangeEventName, statusName);
+      this.events.emit(changeEventName, statusName);
     }
-  }
-
-  onChange(cb: ChangeHandler) {
-    this.events.addListener(ChangeEventName, cb);
-  }
-
-  removeListener(cb: ChangeHandler) {
-    this.events.removeListener(ChangeEventName, cb);
   }
 
   private publishStatus(statusName: string, value: any): Promise<void> {
@@ -172,31 +153,6 @@ export default class Status {
     const subStatus = combineTopic('status', statusName);
 
     return this.publish(subStatus, value);
-  }
-
-  private validateStatus(statusName: string, value: any, errorMsg: string) {
-    const validateError: string | undefined = validateParam(this.schema, statusName, value);
-
-    if (validateError) {
-      const completeErrMsg = `${errorMsg}: ${validateError}`;
-
-      this.system.log.error(completeErrMsg);
-      throw new Error(completeErrMsg);
-    }
-  }
-
-  private async fetch(fetcher: () => void, errorMsg: string): Promise<any> {
-    let result;
-
-    try {
-      result = await fetcher();
-    }
-    catch(err) {
-      this.system.log.error(`${errorMsg}: ${err.toString()}`);
-      throw new Error(err);
-    }
-
-    return result;
   }
 
 }
