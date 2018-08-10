@@ -55,7 +55,7 @@ export default class BinarySensor extends DeviceBase {
       return;
     }
 
-    await this.status.setStatus(currentLevel);
+    await this.setStatus(currentLevel);
     setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
   }
 

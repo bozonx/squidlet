@@ -1,5 +1,3 @@
-const _isEqual = require('lodash/_isEqual');
-
 import System from '../app/System';
 import {Publisher} from './DeviceBase';
 import DeviceDataManagerBase, {changeEventName, Schema} from './DeviceDataManagerBase';
@@ -35,7 +33,7 @@ export default class Config extends DeviceDataManagerBase {
   }
 
   async init(): Promise<void> {
-    await this.getConfig();
+    await this.read();
   }
 
   onChange(cb: ChangeHandler): void {
@@ -49,7 +47,7 @@ export default class Config extends DeviceDataManagerBase {
   /**
    * Get whole config from device.
    */
-  getConfig = async (): Promise<DeviceConfig> => {
+  read = async (): Promise<DeviceConfig> => {
     // if there isn't a data getter - just return local config
     if (!this.getter) return this.localData;
     // else fetch config if getter is defined
@@ -77,7 +75,7 @@ export default class Config extends DeviceDataManagerBase {
   /**
    * Set config to device
    */
-  setConfig = async (partialConfig: DeviceConfig): Promise<void> => {
+  write = async (partialConfig: DeviceConfig): Promise<void> => {
     this.validateDict(partialConfig,
       `Invalid config "${JSON.stringify(partialConfig)}" which tried to set to device "${this.deviceId}"`);
 

@@ -32,7 +32,7 @@ export default class Status extends DeviceDataManagerBase {
   }
 
   async init(): Promise<void> {
-    await this.getStatuses();
+    await this.read();
   }
 
   onChange(cb: ChangeHandler): void {
@@ -46,7 +46,7 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Get all the statuses
    */
-  getStatuses = async (): Promise<{[index: string]: any}> => {
+  read = async (): Promise<{[index: string]: any}> => {
     // if there isn't a data getter - just return local statuses
     if (!this.getter) return this.localData;
     // else fetch statuses if getter is defined
@@ -75,7 +75,7 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Get status from device.
    */
-  getStatus = async (statusName: string = 'default'): Promise<any> => {
+  readParam = async (statusName: string = 'default'): Promise<any> => {
     // if there isn't a data getter - just return local status
     if (!this.getter) return this.localData[statusName];
     // else fetch status if getter is defined
@@ -102,7 +102,7 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Set status of device.
    */
-  setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
+  write = async (newValue: any, statusName: string = 'default'): Promise<void> => {
     this.validateParam(statusName, newValue,
       `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
 

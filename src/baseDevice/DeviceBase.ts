@@ -1,5 +1,5 @@
-import Status, {StatusGetter, StatusSetter} from './Status';
-import Config, {ConfigGetter, ConfigSetter} from './Config';
+import Status, {Getter as StatusGetter, Setter as StatusSetter} from './Status';
+import Config, {Getter as ConfigGetter, Setter as ConfigSetter} from './Config';
 import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
 import DeviceConf from '../app/interfaces/DeviceConf';
@@ -57,10 +57,10 @@ export default class DeviceBase {
       });
   }
 
-  getStatus: Status['getStatus'] = this.status.getStatus;
-  getConfig: Config['getConfig'] = this.config.getConfig;
-  setStatus: Status['setStatus'] = this.status.setStatus;
-  setConfig: Config['setConfig'] = this.config.setConfig;
+  getStatus: Status['readParam'] = this.status.readParam;
+  getConfig: Config['read'] = this.config.read;
+  setStatus: Status['write'] = this.status.write;
+  setConfig: Config['write'] = this.config.write;
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
     // TODO: передать deviceConf.deviceId, subtopic, value, params
