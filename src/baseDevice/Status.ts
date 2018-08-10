@@ -14,8 +14,8 @@ type ChangeHandler = (statusName?: string) => void;
  * Manage status of device
  */
 export default class Status extends DeviceDataManagerBase {
-  private readonly getter?: Getter;
-  private readonly setter?: Setter;
+  protected readonly getter?: Getter;
+  protected readonly setter?: Setter;
 
   constructor(
     deviceId: string,
@@ -29,10 +29,6 @@ export default class Status extends DeviceDataManagerBase {
     super(deviceId, system, schema, publish, republishInterval);
     this.getter = getter;
     this.setter = setter;
-  }
-
-  async init(): Promise<void> {
-    await this.read();
   }
 
   onChange(cb: ChangeHandler): void {
@@ -51,7 +47,7 @@ export default class Status extends DeviceDataManagerBase {
 
     return this.readAllData('status', getter, () => {
       // publish all the statuses
-      for (let statusName in Object.keys(this.localData)) {
+      for (let statusName of Object.keys(this.localData)) {
         this.publishStatus(statusName, this.localData[statusName]);
       }
     });
@@ -86,6 +82,9 @@ export default class Status extends DeviceDataManagerBase {
    * Set status of device.
    */
   write = async (newValue: any, statusName: string = 'default'): Promise<void> => {
+
+    // TODO: наверное сделать тоже partial чтобы было единообразно с config
+
     this.validateParam(statusName, newValue,
       `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
 

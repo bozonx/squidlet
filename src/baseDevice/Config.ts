@@ -30,10 +30,6 @@ export default class Config extends DeviceDataManagerBase {
     this.setter = setter;
   }
 
-  async init(): Promise<void> {
-    await this.read();
-  }
-
   onChange(cb: ChangeHandler): void {
     super.onChange(cb);
   }

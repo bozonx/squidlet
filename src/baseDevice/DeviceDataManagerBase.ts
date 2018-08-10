@@ -23,6 +23,8 @@ export default abstract class DeviceDataManagerBase {
   protected readonly publish: Publisher;
   protected readonly schema: Schema;
   protected readonly republish: Republish;
+  protected readonly getter?: Function;
+  protected readonly setter?: Function;
 
   protected localData: Data = {};
 
@@ -45,7 +47,17 @@ export default abstract class DeviceDataManagerBase {
     this.republish = new Republish(realRepublishInterval);
   }
 
-  abstract async init(): Promise<void>;
+  abstract read: () => Promise<Data>;
+  // TODO: add write
+
+  async init(): Promise<void> {
+    if (this.getter) {
+      await this.read();
+    }
+    else {
+      this.setDefaultValues();
+    }
+  }
 
   onChange(cb: (...params: any[]) => void) {
     this.events.addListener(changeEventName, cb);
@@ -161,6 +173,18 @@ export default abstract class DeviceDataManagerBase {
     // TODO: call republish
 
     return true;
+  }
+
+  /**
+   * Set default values to local data
+   */
+  setDefaultValues() {
+    for (let name of Object.keys(this.schema)) {
+      // TODO: наверное поддерживать короткую запись значения по умаолчанию
+      if (typeof this.schema[name] === 'object' && this.schema[name].type && this.schema[name].default) {
+        this.localData[name] = this.schema[name].default;
+      }
+    }
   }
 
 }
