@@ -7,6 +7,9 @@ import {Publisher} from './DeviceBase';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 
 
+export type ParamGetter = (statusNames?: string[]) => Promise<Data>;
+export type Getter = () => Promise<Data>;
+export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
 
@@ -87,6 +90,37 @@ export default abstract class DeviceDataManagerBase {
     }
 
     return this.localData;
+  }
+
+  protected async writeData(typeNameOfData: string, partialData: Data, onUpdate: () => void): Promise<void> {
+    this.validateDict(partialData,
+      `Invalid ${typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
+
+    const newData = {
+      ...this.localData,
+      ...partialData,
+    };
+
+    // if there isn't a data setter - just set to local status
+    if (!this.setter) {
+      this.setLocalData(newData);
+
+      return;
+    }
+    // else do request to device if getter is defined
+
+    await this.save(
+      () => this.setter && this.setter(newData),
+      `Can't save ${typeNameOfData} "${JSON.stringify(newData)}" of device "${this.deviceId}"`
+    );
+
+    // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
+
+    const wasSet = this.setLocalData(newData);
+
+    if (wasSet) {
+      onUpdate();
+    }
   }
 
   protected validateParam(statusName: string, value: any, errorMsg: string) {

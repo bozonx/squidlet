@@ -1,12 +1,12 @@
 import System from '../app/System';
 import {Publisher} from './DeviceBase';
-import DeviceDataManagerBase, {Data, Schema} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, Schema, Setter} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 
 
+// TODO: remake to ParamGetter
 // if statusNames is undefined - it means get all the statuses
 export type Getter = (statusNames?: string[]) => Promise<Data>;
-export type Setter = (newValue: any, statusName: string) => Promise<void>;
 type ChangeHandler = (statusName?: string) => void;
 
 
@@ -81,34 +81,12 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Set status of device.
    */
-  write = async (newValue: any, statusName: string = 'default'): Promise<void> => {
-
-    // TODO: наверное сделать тоже partial чтобы было единообразно с config
-
-    this.validateParam(statusName, newValue,
-      `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
-
-    // if there isn't a data setter - just set to local status
-    if (!this.setter) {
-      this.setLocalDataParam(statusName, newValue);
-
-      return;
-    }
-    // else do request to device if getter is defined
-
-
-    await this.save(
-      () => this.setter && this.setter(newValue, statusName),
-      `Can't save status "${statusName}: ${newValue}" of device "${this.deviceId}"`
-    );
-
-    // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
-
-    const wasSet = this.setLocalDataParam(statusName, newValue);
-
-    if (wasSet) {
-      this.publishStatus(statusName, this.localData[statusName]);
-    }
+  write = async (partialData: Data): Promise<void> => {
+    return this.writeData('status', partialData, () => {
+      for (let statusName of Object.keys(this.localData)) {
+        this.publishStatus(statusName, this.localData[statusName]);
+      }
+    });
   }
 
   private publishStatus(statusName: string, value: any): Promise<void> {

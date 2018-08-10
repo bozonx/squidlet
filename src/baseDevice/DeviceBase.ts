@@ -59,7 +59,9 @@ export default class DeviceBase {
 
   getStatus: Status['readParam'] = this.status.readParam;
   getConfig: Config['read'] = this.config.read;
-  setStatus: Status['write'] = this.status.write;
+  setStatus = (newValue: any, statusName: string = 'default'): Promise<void> => {
+    return this.status.write({[statusName]: newValue});
+  }
   setConfig: Config['write'] = this.config.write;
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
