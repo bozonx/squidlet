@@ -63,7 +63,7 @@ export default class Config extends DeviceDataManagerBase {
         `Can't fetch config of device "${this.deviceId}"`
       );
 
-      // TODO: validate config
+      this.validateDict(result, `Invalid fetched config "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
       this.localCache = result;
 
@@ -82,7 +82,8 @@ export default class Config extends DeviceDataManagerBase {
    * Set config to device
    */
   setConfig = async (partialConfig: DeviceConfig): Promise<void> => {
-    // TODO: check types via schema
+    this.validateDict(partialConfig,
+      `Invalid config "${JSON.stringify(partialConfig)}" which tried to set to device "${this.deviceId}"`);
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
       // при этом в очереди может быть только 1 запрос - самый последний

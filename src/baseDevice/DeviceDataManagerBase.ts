@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import System from '../app/System';
 import Republish from './Republish';
 import {Publisher} from './DeviceBase';
-import {validateParam} from '../helpers/validateSchema';
+import {validateParam, validateDict} from '../helpers/validateSchema';
 
 
 export type Schema = {[index: string]: any};
@@ -51,8 +51,19 @@ export default abstract class DeviceDataManagerBase {
     this.events.removeListener(changeEventName, cb);
   }
 
-  protected validateStatus(statusName: string, value: any, errorMsg: string) {
+  protected validateParam(statusName: string, value: any, errorMsg: string) {
     const validateError: string | undefined = validateParam(this.schema, statusName, value);
+
+    if (validateError) {
+      const completeErrMsg = `${errorMsg}: ${validateError}`;
+
+      this.system.log.error(completeErrMsg);
+      throw new Error(completeErrMsg);
+    }
+  }
+
+  protected validateDict(dict: {[index: string]: any}, errorMsg: string) {
+    const validateError: string | undefined = validateDict(this.schema, dict);
 
     if (validateError) {
       const completeErrMsg = `${errorMsg}: ${validateError}`;

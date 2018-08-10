@@ -14,3 +14,9 @@ export function validateParam(schema: {[index: string]: any}, pathToParam: strin
   //
   // return;
 }
+
+export function validateDict(schema: {[index: string]: any}, dict: {[index: string]: any}): string | undefined {
+  return;
+
+  // TODO: !!!!
+}

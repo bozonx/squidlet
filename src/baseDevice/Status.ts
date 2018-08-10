@@ -62,10 +62,7 @@ export default class Status extends DeviceDataManagerBase {
         `Can't fetch statuses of device "${this.deviceId}"`
       );
 
-      // TODO: лучш валидировать всю схему целиком
-      for (let statusName in Object.keys(this.localCache)) {
-        this.validateStatus(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
-      }
+      this.validateDict(result, `Invalid fetched statuses "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
       this.localCache = result;
 
@@ -98,7 +95,7 @@ export default class Status extends DeviceDataManagerBase {
         `Can't fetch status "${statusName}" of device "${this.deviceId}"`
       );
 
-      this.validateStatus(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
+      this.validateParam(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
 
       this.localCache = {
         ...this.localCache,
@@ -120,7 +117,8 @@ export default class Status extends DeviceDataManagerBase {
    */
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
     const oldValue = this.localCache[statusName];
-    this.validateStatus(statusName, newValue, `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
+    this.validateParam(statusName, newValue,
+      `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
         // при этом в очереди может быть только 1 запрос - самый последний
