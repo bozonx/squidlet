@@ -17,7 +17,7 @@ type ChangeHandler = (statusName?: string) => void;
  */
 export default class Status extends DeviceDataManagerBase {
   // TODO: нужно ли указывать тип?
-  private localCache: {[index: string]: any} = {};
+  private localData: {[index: string]: any} = {};
   private readonly getter?: Getter;
   private readonly setter?: Setter;
 
@@ -53,7 +53,7 @@ export default class Status extends DeviceDataManagerBase {
   getStatuses = async (): Promise<{[index: string]: any}> => {
     // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
 
-    const oldCache = this.localCache;
+    const oldData = this.localData;
 
     // update local cache if getter is defined
     if (this.getter) {
@@ -64,19 +64,19 @@ export default class Status extends DeviceDataManagerBase {
 
       this.validateDict(result, `Invalid fetched statuses "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
-      this.localCache = result;
+      this.localData = result;
 
-      if (!_isEqual(oldCache, this.localCache)) {
+      if (!_isEqual(oldData, this.localData)) {
         // publish all the statuses
-        for (let statusName in Object.keys(this.localCache)) {
-          this.publishStatus(statusName, this.localCache[statusName]);
+        for (let statusName in Object.keys(this.localData)) {
+          this.publishStatus(statusName, this.localData[statusName]);
         }
         this.events.emit(changeEventName);
         // TODO: call republish
       }
     }
 
-    return this.localCache;
+    return this.localData;
   }
 
   /**
@@ -86,7 +86,7 @@ export default class Status extends DeviceDataManagerBase {
     // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
       // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
-    const oldValue = this.localCache[statusName];
+    const oldValue = this.localData[statusName];
 
     // update local cache if getter is defined
     if (this.getter) {
@@ -97,26 +97,26 @@ export default class Status extends DeviceDataManagerBase {
 
       this.validateParam(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
 
-      this.localCache = {
-        ...this.localCache,
+      this.localData = {
+        ...this.localData,
         ...result,
       };
 
-      if (!_isEqual(oldValue, this.localCache[statusName])) {
-        this.publishStatus(statusName, this.localCache[statusName]);
+      if (!_isEqual(oldValue, this.localData[statusName])) {
+        this.publishStatus(statusName, this.localData[statusName]);
         this.events.emit(changeEventName, statusName);
         // TODO: call republish
       }
     }
 
-    return this.localCache[statusName];
+    return this.localData[statusName];
   }
 
   /**
    * Set status of device.
    */
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
-    const oldValue = this.localCache[statusName];
+    const oldValue = this.localData[statusName];
     this.validateParam(statusName, newValue,
       `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
 
@@ -132,11 +132,11 @@ export default class Status extends DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    this.localCache[statusName] = newValue;
+    this.localData[statusName] = newValue;
 
     if (!_isEqual(oldValue, newValue)) {
       // TODO: call republish
-      this.publishStatus(statusName, this.localCache[statusName]);
+      this.publishStatus(statusName, this.localData[statusName]);
       this.events.emit(changeEventName, statusName);
     }
   }

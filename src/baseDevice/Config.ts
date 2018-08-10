@@ -17,7 +17,7 @@ type ChangeHandler = (config: DeviceConfig) => void;
  * Manage config of device
  */
 export default class Config extends DeviceDataManagerBase {
-  private localCache: DeviceConfig = {};
+  private localData: DeviceConfig = {};
   private readonly getter?: Getter;
   private readonly setter?: Setter;
 
@@ -54,7 +54,7 @@ export default class Config extends DeviceDataManagerBase {
     // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
        // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
-    const oldConfig = this.localCache;
+    const oldData = this.localData;
 
     // update local cache if getter is defined
     if (this.getter) {
@@ -65,17 +65,17 @@ export default class Config extends DeviceDataManagerBase {
 
       this.validateDict(result, `Invalid fetched config "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
-      this.localCache = result;
+      this.localData = result;
 
-      if (!_isEqual(oldConfig, this.localCache)) {
-        this.events.emit(changeEventName, this.localCache);
+      if (!_isEqual(oldData, this.localData)) {
+        this.events.emit(changeEventName, this.localData);
         // TODO: нужно ли устанавливать параметры?
-        this.publish('config', this.localCache);
+        this.publish('config', this.localData);
         // TODO: call republish
       }
     }
 
-    return this.localCache;
+    return this.localData;
   }
 
   /**
@@ -88,10 +88,10 @@ export default class Config extends DeviceDataManagerBase {
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
       // при этом в очереди может быть только 1 запрос - самый последний
 
-    const oldConfig = this.localCache;
+    const oldData = this.localData;
 
     const newConfig = {
-      ...this.localCache,
+      ...this.localData,
       ...partialConfig,
     };
 
@@ -104,12 +104,12 @@ export default class Config extends DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    this.localCache = newConfig;
+    this.localData = newConfig;
 
-    if (!_isEqual(oldConfig, newConfig)) {
+    if (!_isEqual(oldData, newConfig)) {
       this.events.emit(changeEventName, newConfig);
       // TODO: нужно ли устанавливать параметры?
-      this.publish('config', this.localCache);
+      this.publish('config', this.localData);
       // TODO: call republish
     }
   }
