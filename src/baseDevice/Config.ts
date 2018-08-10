@@ -5,6 +5,8 @@ import DeviceDataManagerBase, {Data, Getter, Schema, Setter} from './DeviceDataM
 
 // TODO: наверное массив измененных параметров
 type ChangeHandler = () => void;
+export type Setter = Setter;
+export type Getter = Getter;
 
 
 /**
