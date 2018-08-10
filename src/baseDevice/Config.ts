@@ -51,12 +51,15 @@ export default class Config extends DeviceDataManagerBase {
    * Get whole config from device.
    */
   getConfig = async (): Promise<DeviceConfig> => {
+    // if there isn't a data getter - just return local config
+    if (!this.getter) return this.localData;
+    // else fetch config if getter is defined
+
     // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
        // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
     const oldData = this.localData;
 
-    // update local cache if getter is defined
     if (this.getter) {
       const result: {[index: string]: any} = await this.fetch(
         this.getter,
