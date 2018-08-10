@@ -16,8 +16,6 @@ type ChangeHandler = (statusName?: string) => void;
  * Manage status of device
  */
 export default class Status extends DeviceDataManagerBase {
-  // TODO: нужно ли указывать тип?
-  private localData: {[index: string]: any} = {};
   private readonly getter?: Getter;
   private readonly setter?: Setter;
 
@@ -67,15 +65,14 @@ export default class Status extends DeviceDataManagerBase {
 
     this.validateDict(result, `Invalid fetched statuses "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
-    this.localData = result;
+    //this.localData = result;
 
-    if (!_isEqual(oldData, this.localData)) {
+    if (!_isEqual(oldData, result)) {
+      this.setLocalData(result);
       // publish all the statuses
       for (let statusName in Object.keys(this.localData)) {
         this.publishStatus(statusName, this.localData[statusName]);
       }
-      this.events.emit(changeEventName);
-      // TODO: call republish
     }
 
     return this.localData;
@@ -101,15 +98,14 @@ export default class Status extends DeviceDataManagerBase {
 
     this.validateParam(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
 
-    this.localData = {
-      ...this.localData,
-      ...result,
-    };
+    // const newData = {
+    //   ...this.localData,
+    //   ...result,
+    // };
 
-    if (!_isEqual(oldValue, this.localData[statusName])) {
+    if (!_isEqual(oldValue, result[statusName])) {
+      this.setLocalDataParam(statusName, result[statusName]);
       this.publishStatus(statusName, this.localData[statusName]);
-      this.events.emit(changeEventName, statusName);
-      // TODO: call republish
     }
 
     return this.localData[statusName];

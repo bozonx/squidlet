@@ -7,6 +7,7 @@ import {validateParam, validateDict} from '../helpers/validateSchema';
 
 
 export type Schema = {[index: string]: any};
+export type LocalData = {[index: string]: any};
 
 export const changeEventName = 'change';
 
@@ -21,6 +22,8 @@ export default abstract class DeviceDataManagerBase {
   protected readonly publish: Publisher;
   protected readonly schema: Schema;
   protected readonly republish: Republish;
+
+  protected localData: LocalData = {};
 
   protected constructor(
     deviceId: string,
@@ -85,6 +88,18 @@ export default abstract class DeviceDataManagerBase {
     }
 
     return result;
+  }
+
+  protected setLocalDataParam(paramName: string, value: any): void {
+    this.localData[paramName] = value;
+    this.events.emit(changeEventName, paramName);
+    // TODO: call republish
+  }
+
+  protected setLocalData(newLocalData: LocalData): void {
+    this.localData = newLocalData;
+    this.events.emit(changeEventName);
+    // TODO: call republish
   }
 
 }
