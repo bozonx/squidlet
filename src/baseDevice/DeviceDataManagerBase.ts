@@ -1,3 +1,4 @@
+const _isEqual = require('lodash/_isEqual');
 import * as EventEmitter from 'events';
 
 import System from '../app/System';
@@ -90,16 +91,32 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  protected setLocalDataParam(paramName: string, value: any): void {
+  /**
+   * Set param to local data.
+   * If param was set it returns true else false
+   */
+  protected setLocalDataParam(paramName: string, value: any): boolean {
+    if (this.localData[paramName] === value) return false;
+
     this.localData[paramName] = value;
     this.events.emit(changeEventName, paramName);
     // TODO: call republish
+
+    return true;
   }
 
-  protected setLocalData(newLocalData: LocalData): void {
+  /**
+   * Set whole structure to local data.
+   * If structure was set it returns true else false.
+   */
+  protected setLocalData(newLocalData: LocalData): boolean {
+    if (_isEqual(this.localData, newLocalData)) return false;
+
     this.localData = newLocalData;
     this.events.emit(changeEventName);
     // TODO: call republish
+
+    return true;
   }
 
 }

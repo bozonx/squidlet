@@ -57,8 +57,6 @@ export default class Config extends DeviceDataManagerBase {
     // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
        // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
-    const oldData = this.localData;
-
     const result: {[index: string]: any} = await this.fetch(
       this.getter,
       `Can't fetch config of device "${this.deviceId}"`
@@ -66,8 +64,9 @@ export default class Config extends DeviceDataManagerBase {
 
     this.validateDict(result, `Invalid fetched config "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
-    if (!_isEqual(oldData, result)) {
-      this.setLocalData(result);
+    const wasSet = this.setLocalData(result);
+
+    if (wasSet) {
       // TODO: нужно ли устанавливать параметры publish?
       this.publish('config', this.localData);
     }
@@ -88,13 +87,15 @@ export default class Config extends DeviceDataManagerBase {
     };
 
     // if there isn't a data setter - just set to local status
-    if (!this.setter) return this.setLocalData(newConfig);
+    if (!this.setter) {
+      this.setLocalData(newConfig);
+
+      return;
+    }
     // else do request to device if getter is defined
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
       // при этом в очереди может быть только 1 запрос - самый последний
-
-    const oldData = this.localData;
 
     await this.fetch(
       () => this.setter && this.setter(newConfig),
@@ -103,8 +104,9 @@ export default class Config extends DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    if (!_isEqual(oldData, newConfig)) {
-      this.setLocalData(newConfig);
+    const wasSet = this.setLocalData(newConfig);
+
+    if (wasSet) {
       // TODO: нужно ли устанавливать параметры publish?
       this.publish('config', this.localData);
     }
