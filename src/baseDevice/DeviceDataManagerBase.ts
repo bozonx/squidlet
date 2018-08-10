@@ -43,11 +43,11 @@ export default abstract class DeviceDataManagerBase {
 
   abstract async init(): Promise<void>;
 
-  onChange(cb: () => void) {
+  onChange(cb: (...params: any[]) => void) {
     this.events.addListener(changeEventName, cb);
   }
 
-  removeListener(cb: () => void) {
+  removeListener(cb: (...params: any[]) => void) {
     this.events.removeListener(changeEventName, cb);
   }
 

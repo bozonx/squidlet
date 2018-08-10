@@ -1,34 +1,25 @@
-import * as _ from 'lodash';
-import * as EventEmitter from 'events';
-import Republish from './Republish';
-import {Publisher} from './DeviceBase';
+const _isEqual = require('lodash/_isEqual');
+
 import System from '../app/System';
+import {Publisher} from './DeviceBase';
+import DeviceDataManagerBase, {changeEventName, Schema} from './DeviceDataManagerBase';
 
 
-type Schema = {[index: string]: any};
 // TODO: нужно ли указывать тип?
 type DeviceConfig = {[index: string]: any};
 // get whole config
-export type ConfigGetter = () => Promise<DeviceConfig>;
-export type ConfigSetter = (partialConfig: DeviceConfig) => Promise<void>;
+export type Getter = () => Promise<DeviceConfig>;
+export type Setter = (partialConfig: DeviceConfig) => Promise<void>;
 type ChangeHandler = (config: DeviceConfig) => void;
-
-const ChangeEventName = 'change';
 
 
 /**
  * Manage config of device
  */
-export default class Config {
-  private readonly deviceId: string;
-  private readonly system: System;
-  private readonly events: EventEmitter = new EventEmitter();
-  private readonly schema: Schema;
-  private readonly republish: Republish;
+export default class Config extends DeviceDataManagerBase {
   private localCache: DeviceConfig = {};
-  private readonly publish: Publisher;
-  private readonly configGetter?: ConfigGetter;
-  private readonly configSetter?: ConfigSetter;
+  private readonly getter?: Getter;
+  private readonly setter?: Setter;
 
   constructor(
     deviceId: string,
@@ -36,25 +27,24 @@ export default class Config {
     schema: Schema,
     publish: Publisher,
     republishInterval?: number,
-    configGetter?: ConfigGetter,
-    configSetter?: ConfigSetter
+    getter?: Getter,
+    setter?: Setter
   ) {
-    this.deviceId = deviceId;
-    this.system = system;
-    this.schema = schema;
-    this.publish = publish;
-    this.configGetter = configGetter;
-    this.configSetter = configSetter;
-
-    const realRepublishInterval = (typeof republishInterval === 'undefined')
-      ? this.system.host.config.devices.defaultConfigRepublishIntervalMs
-      : republishInterval;
-
-    this.republish = new Republish(realRepublishInterval);
+    super(deviceId, system, schema, publish, republishInterval);
+    this.getter = getter;
+    this.setter = setter;
   }
 
   async init(): Promise<void> {
     await this.getConfig();
+  }
+
+  onChange(cb: ChangeHandler): void {
+    super.onChange(cb);
+  }
+
+  removeListener(cb: ChangeHandler) {
+    super.removeListener(cb);
   }
 
   /**
@@ -64,16 +54,21 @@ export default class Config {
     // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
        // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
-    // TODO: писать в лог при ошибке
-
     const oldConfig = this.localCache;
 
-    // update local cache if configGetter is defined
-    if (this.configGetter) {
-      this.localCache = await this.configGetter();
+    // update local cache if getter is defined
+    if (this.getter) {
+      const result: {[index: string]: any} = await this.fetch(
+        this.getter,
+        `Can't fetch config of device "${this.deviceId}"`
+      );
 
-      if (!_.isEqual(oldConfig, this.localCache)) {
-        this.events.emit(ChangeEventName, this.localCache);
+      // TODO: validate config
+
+      this.localCache = result;
+
+      if (!_isEqual(oldConfig, this.localCache)) {
+        this.events.emit(changeEventName, this.localCache);
         // TODO: нужно ли устанавливать параметры?
         this.publish('config', this.localCache);
         // TODO: call republish
@@ -92,8 +87,6 @@ export default class Config {
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
       // при этом в очереди может быть только 1 запрос - самый последний
 
-    // TODO: писать в лог при ошибке
-
     const oldConfig = this.localCache;
 
     const newConfig = {
@@ -101,28 +94,23 @@ export default class Config {
       ...partialConfig,
     };
 
-    if (this.configSetter) {
-      await this.configSetter(newConfig);
+    if (this.setter) {
+      await this.fetch(
+        () => this.setter && this.setter(newConfig),
+        `Can't save config "${JSON.stringify(newConfig)}" of device "${this.deviceId}"`
+      );
     }
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
     this.localCache = newConfig;
 
-    if (!_.isEqual(oldConfig, newConfig)) {
-      this.events.emit(ChangeEventName, newConfig);
+    if (!_isEqual(oldConfig, newConfig)) {
+      this.events.emit(changeEventName, newConfig);
       // TODO: нужно ли устанавливать параметры?
       this.publish('config', this.localCache);
       // TODO: call republish
     }
-  }
-
-  onChange(cb: ChangeHandler) {
-    this.events.addListener(ChangeEventName, cb);
-  }
-
-  removeListener(cb: ChangeHandler) {
-    this.events.removeListener(ChangeEventName, cb);
   }
 
 }

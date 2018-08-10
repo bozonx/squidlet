@@ -1,15 +1,14 @@
 const _isEqual = require('lodash/_isEqual');
 
-import {combineTopic} from '../helpers/helpers';
-import DeviceDataManagerBase, {changeEventName, Schema} from './DeviceDataManagerBase';
 import System from '../app/System';
 import {Publisher} from './DeviceBase';
+import DeviceDataManagerBase, {changeEventName, Schema} from './DeviceDataManagerBase';
+import {combineTopic} from '../helpers/helpers';
 
 
 // if statusNames is undefined - it means get all the statuses
 export type Getter = (statusNames?: string[]) => Promise<{[index: string]: any}>;
 export type Setter = (newValue: any, statusName: string) => Promise<void>;
-// TODO: review
 type ChangeHandler = (statusName?: string) => void;
 
 
@@ -129,7 +128,7 @@ export default class Status extends DeviceDataManagerBase {
     if (this.setter) {
       await this.fetch(
         () => this.setter && this.setter(newValue, statusName),
-        `Can't save status "${statusName}" of device "${this.deviceId}"`
+        `Can't save status "${statusName}: ${newValue}" of device "${this.deviceId}"`
       );
     }
 
