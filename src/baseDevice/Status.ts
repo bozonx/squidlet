@@ -51,7 +51,6 @@ export default class Status extends DeviceDataManagerBase {
   getStatuses = async (): Promise<{[index: string]: any}> => {
     // if there isn't a data getter - just return local statuses
     if (!this.getter) return this.localData;
-
     // else fetch statuses if getter is defined
 
     // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
@@ -64,8 +63,6 @@ export default class Status extends DeviceDataManagerBase {
     );
 
     this.validateDict(result, `Invalid fetched statuses "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-
-    //this.localData = result;
 
     if (!_isEqual(oldData, result)) {
       this.setLocalData(result);

@@ -17,7 +17,6 @@ type ChangeHandler = (config: DeviceConfig) => void;
  * Manage config of device
  */
 export default class Config extends DeviceDataManagerBase {
-  private localData: DeviceConfig = {};
   private readonly getter?: Getter;
   private readonly setter?: Setter;
 
@@ -60,22 +59,17 @@ export default class Config extends DeviceDataManagerBase {
 
     const oldData = this.localData;
 
-    if (this.getter) {
-      const result: {[index: string]: any} = await this.fetch(
-        this.getter,
-        `Can't fetch config of device "${this.deviceId}"`
-      );
+    const result: {[index: string]: any} = await this.fetch(
+      this.getter,
+      `Can't fetch config of device "${this.deviceId}"`
+    );
 
-      this.validateDict(result, `Invalid fetched config "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+    this.validateDict(result, `Invalid fetched config "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
-      this.localData = result;
-
-      if (!_isEqual(oldData, this.localData)) {
-        this.events.emit(changeEventName, this.localData);
-        // TODO: нужно ли устанавливать параметры?
-        this.publish('config', this.localData);
-        // TODO: call republish
-      }
+    if (!_isEqual(oldData, result)) {
+      this.setLocalData(result);
+      // TODO: нужно ли устанавливать параметры publish?
+      this.publish('config', this.localData);
     }
 
     return this.localData;
@@ -88,19 +82,19 @@ export default class Config extends DeviceDataManagerBase {
     this.validateDict(partialConfig,
       `Invalid config "${JSON.stringify(partialConfig)}" which tried to set to device "${this.deviceId}"`);
 
+    const newConfig = {
+      ...this.localData,
+      ...partialConfig,
+    };
+
     // if there isn't a data setter - just set to local status
-    if (!this.setter) return this.localData = newConfig;
+    if (!this.setter) return this.setLocalData(newConfig);
     // else do request to device if getter is defined
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
       // при этом в очереди может быть только 1 запрос - самый последний
 
     const oldData = this.localData;
-
-    const newConfig = {
-      ...this.localData,
-      ...partialConfig,
-    };
 
     await this.fetch(
       () => this.setter && this.setter(newConfig),
@@ -109,13 +103,10 @@ export default class Config extends DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    this.localData = newConfig;
-
     if (!_isEqual(oldData, newConfig)) {
-      this.events.emit(changeEventName, newConfig);
-      // TODO: нужно ли устанавливать параметры?
+      this.setLocalData(newConfig);
+      // TODO: нужно ли устанавливать параметры publish?
       this.publish('config', this.localData);
-      // TODO: call republish
     }
   }
 
