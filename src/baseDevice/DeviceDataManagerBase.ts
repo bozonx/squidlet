@@ -8,7 +8,7 @@ import {validateParam, validateDict} from '../helpers/validateSchema';
 
 
 export type Schema = {[index: string]: any};
-export type LocalData = {[index: string]: any};
+export type Data = {[index: string]: any};
 
 export const changeEventName = 'change';
 
@@ -24,7 +24,7 @@ export default abstract class DeviceDataManagerBase {
   protected readonly schema: Schema;
   protected readonly republish: Republish;
 
-  protected localData: LocalData = {};
+  protected localData: Data = {};
 
   protected constructor(
     deviceId: string,
@@ -53,6 +53,28 @@ export default abstract class DeviceDataManagerBase {
 
   removeListener(cb: (...params: any[]) => void) {
     this.events.removeListener(changeEventName, cb);
+  }
+
+
+  protected async readAllData(typeNameOfData: string, getter: () => Promise<Data>, onUpdate: () => void): Promise<Data> {
+    // if there isn't a data getter - just return local config
+    if (!getter) return this.localData;
+    // else fetch config if getter is defined
+
+    const result: Data = await this.load(
+      getter,
+      `Can't fetch ${typeNameOfData} of device "${this.deviceId}"`
+    );
+
+    this.validateDict(result, `Invalid fetched ${typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+
+    const wasSet = this.setLocalData(result);
+
+    if (wasSet) {
+      onUpdate();
+    }
+
+    return this.localData;
   }
 
   protected validateParam(statusName: string, value: any, errorMsg: string) {
@@ -131,7 +153,7 @@ export default abstract class DeviceDataManagerBase {
    * Set whole structure to local data.
    * If structure was set it returns true else false.
    */
-  protected setLocalData(newLocalData: LocalData): boolean {
+  protected setLocalData(newLocalData: Data): boolean {
     if (_isEqual(this.localData, newLocalData)) return false;
 
     this.localData = newLocalData;

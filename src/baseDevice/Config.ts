@@ -1,14 +1,12 @@
 import System from '../app/System';
 import {Publisher} from './DeviceBase';
-import DeviceDataManagerBase, {Schema} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, Schema} from './DeviceDataManagerBase';
 
 
-// TODO: нужно ли указывать тип?
-type DeviceConfig = {[index: string]: any};
 // get whole config
-export type Getter = () => Promise<DeviceConfig>;
-export type Setter = (partialConfig: DeviceConfig) => Promise<void>;
-type ChangeHandler = (config: DeviceConfig) => void;
+export type Getter = () => Promise<Data>;
+export type Setter = (partialConfig: Data) => Promise<void>;
+type ChangeHandler = (config: Data) => void;
 
 
 /**
@@ -47,32 +45,19 @@ export default class Config extends DeviceDataManagerBase {
   /**
    * Get whole config from device.
    */
-  read = async (): Promise<DeviceConfig> => {
-    // if there isn't a data getter - just return local config
-    if (!this.getter) return this.localData;
-    // else fetch config if getter is defined
+  read = async (): Promise<Data> => {
+    const getter = async () => this.getter && await this.getter() || {};
 
-    const result: {[index: string]: any} = await this.load(
-      this.getter,
-      `Can't fetch config of device "${this.deviceId}"`
-    );
-
-    this.validateDict(result, `Invalid fetched config "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-
-    const wasSet = this.setLocalData(result);
-
-    if (wasSet) {
+    return this.readAllData('config', getter, () => {
       // TODO: нужно ли устанавливать параметры publish?
       this.publish('config', this.localData);
-    }
-
-    return this.localData;
+    });
   }
 
   /**
    * Set config to device
    */
-  write = async (partialConfig: DeviceConfig): Promise<void> => {
+  write = async (partialConfig: Data): Promise<void> => {
     this.validateDict(partialConfig,
       `Invalid config "${JSON.stringify(partialConfig)}" which tried to set to device "${this.deviceId}"`);
 

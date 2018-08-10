@@ -1,11 +1,11 @@
 import System from '../app/System';
 import {Publisher} from './DeviceBase';
-import DeviceDataManagerBase, {Schema} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, Schema} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 
 
 // if statusNames is undefined - it means get all the statuses
-export type Getter = (statusNames?: string[]) => Promise<{[index: string]: any}>;
+export type Getter = (statusNames?: string[]) => Promise<Data>;
 export type Setter = (newValue: any, statusName: string) => Promise<void>;
 type ChangeHandler = (statusName?: string) => void;
 
@@ -46,28 +46,15 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Get all the statuses
    */
-  read = async (): Promise<{[index: string]: any}> => {
-    // if there isn't a data getter - just return local statuses
-    if (!this.getter) return this.localData;
-    // else fetch statuses if getter is defined
+  read = async (): Promise<Data> => {
+    const getter = async () => this.getter && await this.getter() || {};
 
-    const result: {[index: string]: any} = await this.load(
-      this.getter,
-      `Can't fetch statuses of device "${this.deviceId}"`
-    );
-
-    this.validateDict(result, `Invalid fetched statuses "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-
-    const wasSet = this.setLocalData(result);
-
-    if (wasSet) {
+    return this.readAllData('status', getter, () => {
       // publish all the statuses
       for (let statusName in Object.keys(this.localData)) {
         this.publishStatus(statusName, this.localData[statusName]);
       }
-    }
-
-    return this.localData;
+    });
   }
 
   /**
