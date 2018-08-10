@@ -88,6 +88,10 @@ export default class Config extends DeviceDataManagerBase {
     this.validateDict(partialConfig,
       `Invalid config "${JSON.stringify(partialConfig)}" which tried to set to device "${this.deviceId}"`);
 
+    // if there isn't a data setter - just set to local status
+    if (!this.setter) return this.localData = newConfig;
+    // else do request to device if getter is defined
+
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
       // при этом в очереди может быть только 1 запрос - самый последний
 
@@ -98,12 +102,10 @@ export default class Config extends DeviceDataManagerBase {
       ...partialConfig,
     };
 
-    if (this.setter) {
-      await this.fetch(
-        () => this.setter && this.setter(newConfig),
-        `Can't save config "${JSON.stringify(newConfig)}" of device "${this.deviceId}"`
-      );
-    }
+    await this.fetch(
+      () => this.setter && this.setter(newConfig),
+      `Can't save config "${JSON.stringify(newConfig)}" of device "${this.deviceId}"`
+    );
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 

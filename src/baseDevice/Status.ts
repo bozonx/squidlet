@@ -119,19 +119,22 @@ export default class Status extends DeviceDataManagerBase {
    * Set status of device.
    */
   setStatus = async (newValue: any, statusName: string = 'default'): Promise<void> => {
-    const oldValue = this.localData[statusName];
     this.validateParam(statusName, newValue,
       `Invalid status params "${statusName}" which tried to set to device "${this.deviceId}"`);
+
+    // if there isn't a data setter - just set to local status
+    if (!this.setter) return this.localData[statusName] = newValue;
+    // else do request to device if getter is defined
+
+    const oldValue = this.localData[statusName];
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
         // при этом в очереди может быть только 1 запрос - самый последний
 
-    if (this.setter) {
-      await this.fetch(
-        () => this.setter && this.setter(newValue, statusName),
-        `Can't save status "${statusName}: ${newValue}" of device "${this.deviceId}"`
-      );
-    }
+    await this.fetch(
+      () => this.setter && this.setter(newValue, statusName),
+      `Can't save status "${statusName}: ${newValue}" of device "${this.deviceId}"`
+    );
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
