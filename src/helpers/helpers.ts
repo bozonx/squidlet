@@ -196,3 +196,9 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
 export function yamlToJs(yamlString: string): any {
   return yaml.safeLoad(yamlString);
 }
+
+export function convertToLevel(value: any): boolean {
+  return value === '1' || value === 1
+    || value === 'ON' || value === 'on' || value === 'On'
+    || value === 'true' || value === true;
+}

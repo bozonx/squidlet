@@ -1,0 +1,6 @@
+$extends: gpioBaseProps
+
+# timeout after switching. At this time it doesn't receive any signals.
+deadTime:
+  type: number
+  default: 100

@@ -60,6 +60,8 @@ export default abstract class DeviceDataManagerBase {
   async init(): Promise<void> {
     if (this.getter) {
       await this.read();
+
+      // TODO: если не получилось прочитать - установить значение по умолчанию
     }
     else {
       this.setDefaultValues();

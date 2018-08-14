@@ -3,6 +3,8 @@ import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import GpioInputFactory, {GpioInputDriver} from '../../drivers/GpioInput.driver';
 import DeviceConf from '../../app/interfaces/DeviceConf';
+import {Data} from '../../baseDevice/DeviceDataManagerBase';
+import {DEFAULT_STATUS} from '../../baseDevice/Status';
 
 
 export default class BinarySensor extends DeviceBase {
@@ -22,8 +24,8 @@ export default class BinarySensor extends DeviceBase {
     this.gpioInputDriver.onChange(this.onInputChange);
   }
 
-  protected statusGetter = async (): Promise<{[index: string]: BinaryLevel}> => {
-    return { 'default': await this.gpioInputDriver.getLevel() };
+  protected statusGetter = async (): Promise<Data> => {
+    return { [DEFAULT_STATUS]: await this.gpioInputDriver.getLevel() };
   }
 
 
