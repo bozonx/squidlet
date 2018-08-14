@@ -33,6 +33,8 @@ describe.only 'baseDevice.Status', ->
   it 'init', ->
     # TODO: !!!!
 
+  # TODO: !!!! events
+
   it 'read - use local', ->
     @status.localData = @data
 
@@ -67,3 +69,24 @@ describe.only 'baseDevice.Status', ->
     assert.deepEqual(@status.localData, {default: 1})
     sinon.assert.calledOnce(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
+
+  it 'write - use local', ->
+    @setter = undefined
+    @status.localData = {
+      default: 0
+      temperature: 25
+    }
+
+    await @status.write({default: 1})
+
+    assert.deepEqual(@status.localData, @data)
+    sinon.assert.calledOnce(@publisher)
+    sinon.assert.calledWith(@publisher, 'status', 1)
+
+  it 'write - use getter', ->
+    await @status.write(@data)
+
+    assert.deepEqual(@status.localData, @data)
+    sinon.assert.calledTwice(@publisher)
+    sinon.assert.calledWith(@publisher, 'status', 1)
+    sinon.assert.calledWith(@publisher, 'status/temperature', 25)

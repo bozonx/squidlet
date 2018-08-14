@@ -56,7 +56,7 @@ export default class Status extends DeviceDataManagerBase {
    */
   write = async (partialData: Data): Promise<void> => {
     return this.writeData('status', partialData, () => {
-      for (let statusName of Object.keys(this.localData)) {
+      for (let statusName of Object.keys(partialData)) {
         this.publishStatus(statusName, this.localData[statusName]);
       }
     });
