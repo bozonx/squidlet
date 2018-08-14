@@ -1,4 +1,4 @@
-const _isEqual = require('lodash/_isEqual');
+const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
 import System from '../app/System';
@@ -209,8 +209,9 @@ export default abstract class DeviceDataManagerBase {
     if (_isEqual(this.localData, newLocalData)) return false;
 
     this.localData = newLocalData;
+
     // TODO: нужно передавать только те параметры, которые изменились
-    this.events.emit(changeEventName, newLocalData.keys());
+    this.events.emit(changeEventName, Object.keys(newLocalData));
     // TODO: call republish
 
     return true;
