@@ -34,19 +34,36 @@ describe.only 'baseDevice.Status', ->
     # TODO: !!!!
 
   it 'read - use local', ->
-    # TODO: !!!!
+    @status.localData = @data
+
+    @getter = undefined
+    result = await @status.read()
+
+    assert.deepEqual(result, @data)
+    sinon.assert.notCalled(@publisher)
 
   it 'read - use getter', ->
     result = await @status.read()
 
     assert.deepEqual(result, @data)
     assert.deepEqual(@status.localData, @data)
-
+    sinon.assert.calledTwice(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
     sinon.assert.calledWith(@publisher, 'status/temperature', 25)
 
   it 'readParam - use local', ->
-    # TODO: !!!!
+    @status.localData = @data
+
+    @getter = undefined
+    result = await @status.readParam('default')
+
+    assert.deepEqual(result, 1)
+    sinon.assert.notCalled(@publisher)
 
   it 'readParam - use getter', ->
-    # TODO: !!!!
+    result = await @status.readParam('default')
+
+    assert.deepEqual(result, 1)
+    assert.deepEqual(@status.localData, {default: 1})
+    sinon.assert.calledOnce(@publisher)
+    sinon.assert.calledWith(@publisher, 'status', 1)
