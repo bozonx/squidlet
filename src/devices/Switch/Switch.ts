@@ -28,7 +28,7 @@ export default class Switch extends DeviceBase {
     return this.gpioOutputDriver.setLevel(partialData[DEFAULT_STATUS]);
   }
 
-  actions = {
+  protected actions = {
     turn: async (onOrOff: any): Promise<BinaryLevel> => {
       // skip while switch at dead time
       if (this.deadTimeInProgress) return this.getStatus();

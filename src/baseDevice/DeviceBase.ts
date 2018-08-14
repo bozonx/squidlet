@@ -21,6 +21,7 @@ export default class DeviceBase {
   protected statusSetter?: Setter;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
+  protected actions: {[index: string]: Function} = {};
 
 
   constructor(system: System, deviceConf: DeviceConf) {
@@ -64,6 +65,23 @@ export default class DeviceBase {
     return this.status.write({[statusName]: newValue});
   }
   setConfig: Config['write'] = this.config.write;
+
+  /**
+   * Call action and publish it's result.
+   */
+  async action(actionName: string, ...params: any[]): Promise<any> {
+    if (!this.actions[actionName]) throw new Error(`Unknown action ${actionName}`);
+
+    // TODO: валидация входных параметров действия
+
+    const result = await this.actions[actionName](...params);
+
+    // TODO: если произобша ошибка наверное лучше записать в лог здесь?
+    // TODO: нужны ли параметры паблиша?
+    this.publish(actionName, result);
+
+    return result;
+  }
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
     // TODO: передать deviceConf.deviceId, subtopic, value, params

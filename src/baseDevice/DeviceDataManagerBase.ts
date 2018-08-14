@@ -22,12 +22,12 @@ export const changeEventName = 'change';
 export default abstract class DeviceDataManagerBase {
   protected readonly deviceId: string;
   protected readonly system: System;
-  protected readonly events: EventEmitter = new EventEmitter();
-  protected readonly publish: Publisher;
   protected readonly schema: Schema;
+  protected readonly publish: Publisher;
   protected readonly republish: Republish;
   protected readonly getter?: Getter;
   protected readonly setter?: Setter;
+  protected readonly events: EventEmitter = new EventEmitter();
 
   protected localData: Data = {};
 
