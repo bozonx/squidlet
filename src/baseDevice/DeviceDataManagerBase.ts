@@ -102,27 +102,22 @@ export default abstract class DeviceDataManagerBase {
     this.validateDict(partialData,
       `Invalid ${typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
-    const newData = {
-      ...this.localData,
-      ...partialData,
-    };
-
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
-      this.setLocalData(newData);
+      this.setLocalData(partialData);
 
       return;
     }
     // else do request to device if getter is defined
 
     await this.save(
-      () => this.setter && this.setter(newData),
-      `Can't save ${typeNameOfData} "${JSON.stringify(newData)}" of device "${this.deviceId}"`
+      () => this.setter && this.setter(partialData),
+      `Can't save ${typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`
     );
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    const wasSet = this.setLocalData(newData);
+    const wasSet = this.setLocalData(partialData);
 
     if (wasSet) {
       onUpdate();
@@ -205,13 +200,16 @@ export default abstract class DeviceDataManagerBase {
    * Set whole structure to local data.
    * If structure was set it returns true else false.
    */
-  protected setLocalData(newLocalData: Data): boolean {
-    if (_isEqual(this.localData, newLocalData)) return false;
+  protected setLocalData(partialData: Data): boolean {
+    const newData = {
+      ...this.localData,
+      ...partialData,
+    };
 
-    this.localData = newLocalData;
+    if (_isEqual(this.localData, newData)) return false;
 
-    // TODO: нужно передавать только те параметры, которые изменились
-    this.events.emit(changeEventName, Object.keys(newLocalData));
+    this.localData = newData;
+    this.events.emit(changeEventName, Object.keys(partialData));
     // TODO: call republish
 
     return true;

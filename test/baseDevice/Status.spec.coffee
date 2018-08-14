@@ -8,9 +8,8 @@ describe.only 'baseDevice.Status', ->
         id: 'master'
       }
     }
-    @schema = {
-
-    }
+    @schema = {}
+    @handler = sinon.spy()
     @data = {
       default: 1
       temperature: 25
@@ -29,6 +28,7 @@ describe.only 'baseDevice.Status', ->
       @getter,
       @setter
     )
+    @status.onChange(@handler)
 
   it 'init', ->
     # TODO: !!!!
@@ -43,6 +43,7 @@ describe.only 'baseDevice.Status', ->
 
     assert.deepEqual(result, @data)
     sinon.assert.notCalled(@publisher)
+    sinon.assert.notCalled(@handler)
 
   it 'read - use getter', ->
     result = await @status.read()
@@ -52,6 +53,8 @@ describe.only 'baseDevice.Status', ->
     sinon.assert.calledTwice(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
     sinon.assert.calledWith(@publisher, 'status/temperature', 25)
+    sinon.assert.calledOnce(@handler)
+    sinon.assert.calledWith(@handler, ['default', 'temperature'])
 
   it 'readParam - use local', ->
     @status.localData = @data
@@ -61,6 +64,7 @@ describe.only 'baseDevice.Status', ->
 
     assert.deepEqual(result, 1)
     sinon.assert.notCalled(@publisher)
+    sinon.assert.notCalled(@handler)
 
   it 'readParam - use getter', ->
     result = await @status.readParam('default')
@@ -69,6 +73,8 @@ describe.only 'baseDevice.Status', ->
     assert.deepEqual(@status.localData, {default: 1})
     sinon.assert.calledOnce(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
+    sinon.assert.calledOnce(@handler)
+    sinon.assert.calledWith(@handler, ['default'])
 
   it 'write - use local', ->
     @setter = undefined
@@ -82,6 +88,8 @@ describe.only 'baseDevice.Status', ->
     assert.deepEqual(@status.localData, @data)
     sinon.assert.calledOnce(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
+    sinon.assert.calledOnce(@handler)
+    sinon.assert.calledWith(@handler, ['default'])
 
   it 'write - use getter', ->
     await @status.write(@data)
@@ -90,3 +98,5 @@ describe.only 'baseDevice.Status', ->
     sinon.assert.calledTwice(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
     sinon.assert.calledWith(@publisher, 'status/temperature', 25)
+    sinon.assert.calledOnce(@handler)
+    sinon.assert.calledWith(@handler, ['default', 'temperature'])
