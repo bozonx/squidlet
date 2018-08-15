@@ -10,7 +10,16 @@ describe.only 'devices.BinarySensor', ->
     }
     @system = {
       drivers: {
-        getDriver: => @driver
+        getDriver: => {
+          getInstance: => @driver
+        }
+      }
+      host: {
+        config: {
+          devices: {
+            defaultStatusRepublishIntervalMs: 1000
+          }
+        }
       }
     }
     @deviceConf = {
@@ -22,6 +31,7 @@ describe.only 'devices.BinarySensor', ->
           }
         }
       }
+      props: {}
     }
     @binarySensor = new BinarySensor(@system, @deviceConf)
     @binarySensor.publish = sinon.spy()

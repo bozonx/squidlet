@@ -11,7 +11,9 @@ export type Publisher = (subtopic: string, value: any, params?: PublishParams) =
 
 export default class DeviceBase {
   readonly status: Status;
-  readonly config: Config;
+  readonly config?: Config;
+  readonly getConfig?: Config['read'];
+  readonly setConfig?: Config['write'];
   protected readonly system: System;
   protected readonly deviceConf: DeviceConf;
 
@@ -37,19 +39,24 @@ export default class DeviceBase {
       this.statusGetter,
       this.statusSetter
     );
-    this.config = new Config(
-      this.deviceConf.deviceId,
-      this.system,
-      this.deviceConf.manifest.config || {},
-      this.publish,
-      this.deviceConf.props.configRepublishInterval,
-      this.configGetter,
-      this.configSetter
-    );
+    if (this.deviceConf.manifest.config) {
+      this.config = new Config(
+        this.deviceConf.deviceId,
+        this.system,
+        this.deviceConf.manifest.config || {},
+        this.publish,
+        this.deviceConf.props.configRepublishInterval,
+        this.configGetter,
+        this.configSetter
+      );
+
+      this.getConfig = this.config.read;
+      this.setConfig = this.config.write;
+    }
 
     Promise.all([
       this.status.init(),
-      this.config.init(),
+      this.config && this.config.init(),
     ])
       .then(() => {
         if (typeof this.afterInit !== 'undefined') this.afterInit();
@@ -62,14 +69,9 @@ export default class DeviceBase {
   getStatus = (statusName?: string): Promise<any> => {
     return this.status.readParam(statusName);
   }
-  getConfig = (): Promise<Data> => {
-    return this.config.read();
-  }
+
   setStatus = (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
     return this.status.write({[statusName]: newValue});
-  }
-  setConfig = (partialData: Data): Promise<void> => {
-    return this.config.write(partialData);
   }
 
   /**
