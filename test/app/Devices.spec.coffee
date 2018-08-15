@@ -4,9 +4,6 @@ Devices = require('../../src/app/Devices').default
 describe 'app.Devices', ->
   beforeEach ->
     @requestSubscribeCb = undefined
-    @device = {
-      turn: sinon.spy()
-    }
     @system = {
       host: {
         id: 'master'
@@ -15,9 +12,6 @@ describe 'app.Devices', ->
         publish: sinon.stub().returns(Promise.resolve())
         request: sinon.stub().returns(Promise.resolve())
         subscribe: (toHost, topic, cb) => @requestSubscribeCb = cb
-      }
-      devicesManager: {
-        getDevice: => @device
       }
     }
 
@@ -94,7 +88,10 @@ describe 'app.Devices', ->
 
   it 'private callLocalDeviceAction', ->
     device = {
-      turn: sinon.stub().returns(Promise.resolve('result'))
+      action: sinon.stub().returns(Promise.resolve('result'))
+      actions: {
+        turn: =>
+      }
     }
     @system.devicesManager = {
       getDevice: -> device
@@ -111,4 +108,4 @@ describe 'app.Devices', ->
     result = await @devices.callLocalDeviceAction(request)
 
     assert.equal(result, 'result')
-    sinon.assert.calledWith(device.turn, 123)
+    sinon.assert.calledWith(device.action, 'turn', 123)

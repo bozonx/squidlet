@@ -177,11 +177,11 @@ export default class Devices {
 
     const device: {[index: string]: any} = this.system.devicesManager.getDevice(deviceId);
 
-    if (!device[payload.actionName]) {
+    if (!device.actions[payload.actionName]) {
       throw new Error(`Device "${deviceId}" doesn't have an action ${payload.actionName}`);
     }
 
-    const result = await device[payload.actionName](...request.payload.params);
+    const result = await device.action(payload.actionName, ...request.payload.params);
 
     return result;
   }
