@@ -8,7 +8,15 @@ describe.only 'baseDevice.Status', ->
         id: 'master'
       }
     }
-    @schema = {}
+    @schema = {
+      default: {
+        type: 'number'
+        default: 0
+      }
+      temperature: {
+        type: 'number'
+      }
+    }
     @handler = sinon.spy()
     @data = {
       default: 1
@@ -30,15 +38,24 @@ describe.only 'baseDevice.Status', ->
     )
     @status.onChange(@handler)
 
-  it 'init', ->
-    # TODO: !!!!
+  it 'init - with getter - load data', ->
+    @status.read = sinon.spy()
 
-  # TODO: !!!! events
+    await @status.init()
+
+    sinon.assert.calledOnce(@status.read)
+
+  it 'init - without getter - set defaults', ->
+    @status.getter = undefined
+
+    await @status.init()
+
+    assert.deepEqual(@status.localData, {default: 0})
 
   it 'read - use local', ->
     @status.localData = @data
 
-    @getter = undefined
+    @status.getter = undefined
     result = await @status.read()
 
     assert.deepEqual(result, @data)
@@ -59,7 +76,7 @@ describe.only 'baseDevice.Status', ->
   it 'readParam - use local', ->
     @status.localData = @data
 
-    @getter = undefined
+    @status.getter = undefined
     result = await @status.readParam('default')
 
     assert.deepEqual(result, 1)
@@ -77,7 +94,7 @@ describe.only 'baseDevice.Status', ->
     sinon.assert.calledWith(@handler, ['default'])
 
   it 'write - use local', ->
-    @setter = undefined
+    @status.setter = undefined
     @status.localData = {
       default: 0
       temperature: 25

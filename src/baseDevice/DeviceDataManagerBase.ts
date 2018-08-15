@@ -221,7 +221,11 @@ export default abstract class DeviceDataManagerBase {
   protected setDefaultValues() {
     for (let name of Object.keys(this.schema)) {
       // TODO: наверное поддерживать короткую запись значения по умаолчанию
-      if (typeof this.schema[name] === 'object' && this.schema[name].type && this.schema[name].default) {
+      if (
+        typeof this.schema[name] === 'object'
+        && this.schema[name].type
+        && typeof this.schema[name].default !== 'undefined'
+      ) {
         this.localData[name] = this.schema[name].default;
       }
     }
