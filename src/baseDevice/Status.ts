@@ -26,7 +26,7 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Get status from device.
    */
-  readParam = async (statusName: string = 'default'): Promise<any> => {
+  readParam = async (statusName: string = DEFAULT_STATUS): Promise<any> => {
 
     // TODO: move to base class
 

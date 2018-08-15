@@ -1,4 +1,4 @@
-import {Getter, Setter} from './DeviceDataManagerBase';
+import {Data, Getter, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import System from '../app/System';
@@ -59,14 +59,18 @@ export default class DeviceBase {
       });
   }
 
-  // TODO: переделать !!!!
-
-  getStatus: Status['readParam'] = this.status.readParam;
-  getConfig: Config['read'] = this.config.read;
+  getStatus = (statusName?: string): Promise<any> => {
+    return this.status.readParam(statusName);
+  }
+  getConfig = (): Promise<Data> => {
+    return this.config.read();
+  }
   setStatus = (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
     return this.status.write({[statusName]: newValue});
   }
-  setConfig: Config['write'] = this.config.write;
+  setConfig = (partialData: Data): Promise<void> => {
+    return this.config.write(partialData);
+  }
 
   /**
    * Call action and publish it's result.
