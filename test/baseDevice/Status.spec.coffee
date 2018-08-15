@@ -100,11 +100,12 @@ describe.only 'baseDevice.Status', ->
       temperature: 25
     }
 
-    await @status.write({default: 1})
+    await @status.write(@data)
 
     assert.deepEqual(@status.localData, @data)
-    sinon.assert.calledOnce(@publisher)
+    sinon.assert.calledTwice(@publisher)
     sinon.assert.calledWith(@publisher, 'status', 1)
+    sinon.assert.calledWith(@publisher, 'status/temperature', 25)
     sinon.assert.calledOnce(@handler)
     sinon.assert.calledWith(@handler, ['default'])
 

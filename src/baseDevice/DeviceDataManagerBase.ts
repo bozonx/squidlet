@@ -77,7 +77,11 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
-  protected async readAllData(typeNameOfData: string, getter: () => Promise<Data>, onUpdate: () => void): Promise<Data> {
+  protected async readAllData(
+    typeNameOfData: string,
+    getter: () => Promise<Data>,
+    onUpdate: (updatedParams: string[]
+  ) => void): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!getter) return this.localData;
     // else fetch config if getter is defined
@@ -89,26 +93,30 @@ export default abstract class DeviceDataManagerBase {
 
     this.validateDict(result, `Invalid fetched ${typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
-    const wasSet = this.setLocalData(result);
+    const updatedParams: string[] = this.setLocalData(result);
 
-    if (wasSet) {
-      onUpdate();
+    if (updatedParams.length) {
+      onUpdate(updatedParams);
     }
 
     return this.localData;
   }
 
-  protected async writeData(typeNameOfData: string, partialData: Data, onUpdate: () => void): Promise<void> {
+  protected async writeData(
+    typeNameOfData: string,
+    partialData: Data,
+    onUpdate: (updatedParams: string[]
+  ) => void): Promise<void> {
     this.validateDict(partialData,
       `Invalid ${typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
       // TODO: получать список измененных параметров
-      const wasSet = this.setLocalData(partialData);
+      const updatedParams: string[] = this.setLocalData(partialData);
 
-      if (wasSet) {
-        onUpdate();
+      if (updatedParams.length) {
+        onUpdate(updatedParams);
       }
 
       return;
@@ -122,10 +130,10 @@ export default abstract class DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    const wasSet = this.setLocalData(partialData);
+    const updatedParams: string[] = this.setLocalData(partialData);
 
-    if (wasSet) {
-      onUpdate();
+    if (updatedParams.length) {
+      onUpdate(updatedParams);
     }
   }
 
@@ -204,20 +212,25 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Set whole structure to local data.
    * If structure was set it returns true else false.
+   * @returns {string} List of params names which was updated
    */
-  protected setLocalData(partialData: Data): boolean {
-    const newData = {
+  protected setLocalData(partialData: Data): string[] {
+    const updatedParams: string[] = [];
+
+    for (let name of Object.keys(partialData)) {
+      if (partialData[name] !== this.localData[name]) updatedParams.push(name);
+    }
+
+    if (!updatedParams.length) return updatedParams;
+
+    this.localData = {
       ...this.localData,
       ...partialData,
     };
-
-    if (_isEqual(this.localData, newData)) return false;
-
-    this.localData = newData;
-    this.events.emit(changeEventName, Object.keys(partialData));
+    this.events.emit(changeEventName, updatedParams);
     // TODO: call republish
 
-    return true;
+    return updatedParams;
   }
 
   /**
