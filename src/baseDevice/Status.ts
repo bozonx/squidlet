@@ -56,6 +56,9 @@ export default class Status extends DeviceDataManagerBase {
    */
   write = async (partialData: Data): Promise<void> => {
     return this.writeData('status', partialData, () => {
+
+      // TODO: поднимать паблиш только если реально был изменен статус
+
       for (let statusName of Object.keys(partialData)) {
         this.publishStatus(statusName, this.localData[statusName]);
       }

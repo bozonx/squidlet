@@ -104,7 +104,12 @@ export default abstract class DeviceDataManagerBase {
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
-      this.setLocalData(partialData);
+      // TODO: получать список измененных параметров
+      const wasSet = this.setLocalData(partialData);
+
+      if (wasSet) {
+        onUpdate();
+      }
 
       return;
     }
