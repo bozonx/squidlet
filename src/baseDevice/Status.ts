@@ -15,9 +15,9 @@ export default class Status extends DeviceDataManagerBase {
   read = async (): Promise<Data> => {
     const getter = async () => this.getter && await this.getter() || {};
 
-    return this.readAllData('status', getter, () => {
+    return this.readAllData('status', getter, (changedParams: string[]) => {
       // publish all the statuses
-      for (let statusName of Object.keys(this.localData)) {
+      for (let statusName of changedParams) {
         this.publishStatus(statusName, this.localData[statusName]);
       }
     });
@@ -55,11 +55,8 @@ export default class Status extends DeviceDataManagerBase {
    * Set status of device.
    */
   write = async (partialData: Data): Promise<void> => {
-    return this.writeData('status', partialData, () => {
-
-      // TODO: поднимать паблиш только если реально был изменен статус
-
-      for (let statusName of Object.keys(partialData)) {
+    return this.writeData('status', partialData, (changedParams: string[]) => {
+      for (let statusName of changedParams) {
         this.publishStatus(statusName, this.localData[statusName]);
       }
     });
