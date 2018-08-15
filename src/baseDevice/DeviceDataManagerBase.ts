@@ -1,4 +1,3 @@
-const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
 import System from '../app/System';

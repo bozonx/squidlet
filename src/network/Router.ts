@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+const _last = require('lodash/last');
 import * as EventEmitter from 'events';
 
 import Network from './Network';
@@ -76,7 +76,7 @@ export default class Router {
     }
 
     // if it's final destination - pass message to income listeners
-    if (_.last(routerMessage.route) === this.network.hostId) {
+    if (_last(routerMessage.route) === this.network.hostId) {
       this.events.emit(this.eventName, null, routerMessage.payload);
 
       return;
@@ -102,7 +102,7 @@ export default class Router {
    */
   private resolveNextHostId(route: Array<string>): string {
     if (route.length < 2) throw new Error(`Incorrect route ${JSON.stringify(route)}`);
-    if (_.last(route) === this.network.hostId) {
+    if (_last(route) === this.network.hostId) {
       throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.network.hostId} is the last`);
     }
 
@@ -113,7 +113,7 @@ export default class Router {
       return route[theNextHostShift];
     }
 
-    const myIndex = _.indexOf(route, this.network.hostId);
+    const myIndex: number = route.indexOf(this.network.hostId);
 
     if (myIndex < 0) {
       throw new Error(`Can't find my hostId "${this.network.hostId}" in route ${JSON.stringify(route)}`);

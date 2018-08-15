@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';
@@ -122,7 +122,7 @@ export class I2cMasterDriver {
     // if data is equal to previous data - do nothing
     if (
       typeof this.pollLastData[id] !== 'undefined'
-      && _.isEqual(this.pollLastData[id], data)
+      && _isEqual(this.pollLastData[id], data)
     ) return;
 
     // save previous data

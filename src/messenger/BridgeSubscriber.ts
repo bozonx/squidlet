@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+const _find = require('lodash/find');
 
 import System from '../app/System';
 import Messenger, {SYSTEM_CATEGORY} from './Messenger';
@@ -105,7 +105,7 @@ export default class BridgeSubscriber {
 
   private findHandlerIdByHandler(eventName: string, handler: Function): string {
     const handlers = this.handlers[eventName];
-    const handlerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
+    const handlerItem: HandlerItem | undefined = _find(handlers, (item: HandlerItem) => {
       return item[HANDLER_POSITION] === handler;
     });
 
@@ -119,7 +119,7 @@ export default class BridgeSubscriber {
 
     if (!handlers) throw new Error(`Can't find handlers of "${eventName}"`);
 
-    const handlerItem: HandlerItem | undefined = _.find(handlers, (item: HandlerItem) => {
+    const handlerItem: HandlerItem | undefined = _find(handlers, (item: HandlerItem) => {
       return item[HANDLER_ID_POSITION] === handlerId;
     });
 

@@ -1,9 +1,9 @@
+const _defaultsDeep = require('lodash/defaultsDeep');
 import System from './System';
 // import Destination from '../network/interfaces/Destination';
 // import DeviceManifest from './interfaces/DeviceManifest';
 // import DeviceConf from './interfaces/DeviceConf';
 import HostConfig from './interfaces/HostConfig';
-import * as _ from 'lodash';
 import configHostPlatform from './configHostPlatform';
 import configHostDefault from './configHostDefault';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
@@ -92,7 +92,7 @@ export default class Host {
     return {
       ...specifiedConfig,
       host: {
-        ..._.defaultsDeep({ ...specifiedConfig.host }, configHostPlatform, configHostDefault),
+        ..._defaultsDeep({ ...specifiedConfig.host }, configHostPlatform, configHostDefault),
       }
     }
   }

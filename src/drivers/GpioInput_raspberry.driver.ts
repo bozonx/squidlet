@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../app/DriverFactoryBase';

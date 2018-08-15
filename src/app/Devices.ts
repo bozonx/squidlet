@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import System from './System';
 import Request from '../messenger/interfaces/Request';
 import HandlerWrappers from '../helpers/HandlerWrappers';
@@ -193,7 +191,7 @@ export default class Devices {
       throw new Error(`There isn't deviceId param in payload of Request ${JSON.stringify(request)}`);
     }
 
-    if (!_.isArray(payload.params)) {
+    if (!Array.isArray(payload.params)) {
       throw new Error(`
         Payload of calling action has to be an array.
         Request: ${JSON.stringify(request)}

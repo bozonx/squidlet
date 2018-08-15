@@ -1,5 +1,4 @@
 const _omit = require('lodash/omit');
-import * as _ from 'lodash';
 
 import System from './System';
 import Device from './interfaces/Device';
@@ -34,7 +33,9 @@ export default class DevicesManager {
     devicesConfigs: {[index: string]: object}
   ): Promise<void[]> {
     return Promise.all(
-      _.map(devicesConfigs, async (rawProps: {[index: string]: any}, deviceId: string): Promise<void> => {
+      Object.keys(devicesConfigs).map(async (deviceId: string): Promise<void> => {
+        const rawProps: {[index: string]: any} = devicesConfigs[deviceId];
+
         if (!rawProps.device) {
           this.system.log.fatal(`Unknown device "${JSON.stringify(rawProps)}"`);
         }

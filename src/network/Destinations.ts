@@ -1,4 +1,5 @@
-import * as _ from 'lodash';
+const _find = require('lodash/find');
+const _capitalize = require('lodash/capitalize');
 import * as EventEmitter from 'events';
 
 import Drivers from '../app/Drivers';
@@ -67,22 +68,19 @@ export default class Destinations {
    * Collect all the used connections and deduplicate it.
    */
   private collectMyAddresses(): Array<MyAddress> {
-
-    // TODO: remove lodash
-
     const result: {[index: string]: MyAddress} = {};
 
     for (let name in this.neighbors) {
       const dest = this.neighbors[name];
       const connectionId: string = this.generateConnectionId(dest);
-      const found = _.find(this.myAddresses, (item) => {
+      const found = _find(this.myAddresses, (item: MyAddress) => {
         return item.type === dest.type && item.bus === dest.bus;
       });
 
       if (found) result[connectionId] = found;
     }
 
-    return _.map(result);
+    return Object.keys(result).map((name) => result[name]);
   }
 
   private registerConnection(myAddress: MyAddress) {
@@ -121,7 +119,7 @@ export default class Destinations {
   }
 
   private generateDriverName(connectionType: string): string {
-    return `${_.capitalize(connectionType)}.connection.driver`;
+    return `${_capitalize(connectionType)}.connection.driver`;
   }
 
 }

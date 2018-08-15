@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as _ from 'lodash';
 
 import System from './System';
 import Device from './interfaces/Device';
@@ -49,7 +48,7 @@ export default class DeviceFactory {
     // do validate of device config
     const invalidMsg = device.validate(deviceConf);
 
-    if (_.isString(invalidMsg)) {
+    if (typeof invalidMsg === 'string') {
       this.system.log.fatal(`Invalid config for device "${deviceConf.deviceId}: ${invalidMsg}. Config: ${JSON.stringify(deviceConf)}"`);
     }
   }

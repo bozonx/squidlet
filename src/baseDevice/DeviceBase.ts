@@ -59,6 +59,8 @@ export default class DeviceBase {
       });
   }
 
+  // TODO: переделать !!!!
+
   getStatus: Status['readParam'] = this.status.readParam;
   getConfig: Config['read'] = this.config.read;
   setStatus = (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {

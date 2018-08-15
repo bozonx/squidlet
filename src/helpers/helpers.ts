@@ -1,4 +1,6 @@
-import * as _ from 'lodash';
+const _isEmpty = require('lodash/isEmpty');
+const _find = require('lodash/find');
+const _trim = require('lodash/trim');
 import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import Message from '../messenger/interfaces/Message';
@@ -76,7 +78,7 @@ export function generateEventName(category: string, topic: string, ...others: Ar
 }
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
-  if (_.isEmpty(subPaths)) return basePath;
+  if (_isEmpty(subPaths)) return basePath;
 
   return [ basePath, ...subPaths ].join(topicSeparator);
 }
@@ -170,11 +172,11 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
   // TODO: test, review
 
   const recursive = (obj: object, rootPath: string): object | undefined => {
-    return _.find(obj, (item: any, name: string): any => {
-      const itemPath = _.trim(`${rootPath}.${name}`, '.');
+    return _find(obj, (item: any, name: string): any => {
+      const itemPath = _trim(`${rootPath}.${name}`, '.');
       const cbResult = cb(item, itemPath);
 
-      if (_.isUndefined(cbResult)) {
+      if (typeof cbResult === 'undefined') {
         // go deeper
         return recursive(item, itemPath);
       }
