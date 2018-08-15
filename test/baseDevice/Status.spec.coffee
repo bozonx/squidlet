@@ -1,12 +1,9 @@
 Status = require('../../src/baseDevice/Status').default
 
 
-describe.only 'baseDevice.Status', ->
+describe 'baseDevice.Status', ->
   beforeEach ->
     @system = {
-      host: {
-        id: 'master'
-      }
     }
     @schema = {
       default: {
