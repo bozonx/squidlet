@@ -46,6 +46,8 @@ export default class BinarySensor extends DeviceBase {
     // start dead time - ignore all the signals
     this.deadTimeInProgress = true;
 
+    // TODO: review
+
     let currentLevel: BinaryLevel = false;
 
     try {
@@ -58,6 +60,7 @@ export default class BinarySensor extends DeviceBase {
     }
 
     await this.setStatus(currentLevel);
+
     setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
   }
 

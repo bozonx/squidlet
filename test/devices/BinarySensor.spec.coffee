@@ -6,6 +6,7 @@ describe.only 'devices.BinarySensor', ->
     @getResult = 1
     @driver = {
       getLevel: => @result
+      onChange: =>
       #getLevel: sinon.stub().returns(Promise.resolve(1))
     }
     @system = {
@@ -17,7 +18,7 @@ describe.only 'devices.BinarySensor', ->
       host: {
         config: {
           devices: {
-            defaultStatusRepublishIntervalMs: 1000
+            defaultStatusRepublishIntervalMs: 0
           }
         }
       }
@@ -31,45 +32,45 @@ describe.only 'devices.BinarySensor', ->
           }
         }
       }
-      props: {}
+      props: {
+        debounceTime: 20
+        deadTime: 50
+      }
     }
     @binarySensor = new BinarySensor(@system, @deviceConf)
     @binarySensor.publish = sinon.spy()
 
-  it 'init', ->
-    # TODO: !!!!
-
-  it 'listen changes', ->
-
-
   it "$handleBinaryStatusChange", ->
-    @binarySensor.init()
+    @binarySensor.afterInit()
     clock = sinon.useFakeTimers()
 
     getLevelPromise = Promise.resolve(1)
-    @binarySensor.gpioInputSensor.getGpioLevel = sinon.stub().returns(getLevelPromise)
+    @binarySensor.gpioInputDriver.getLevel = sinon.stub().returns(getLevelPromise)
     handleStatusChange = sinon.spy()
-    @binarySensor.statusCtl.onChange(handleStatusChange)
+    @binarySensor.onChange(handleStatusChange)
 
-    @binarySensor.$handleBinaryStatusChange(1)
+    # like driver has risen an event
+    @binarySensor.onInputChange()
 
-    assert.isTrue(@binarySensor._debounceInProgress)
-    assert.isFalse(@binarySensor._deadTimeInProgress)
+    assert.isTrue(@binarySensor.debounceInProgress)
+    assert.isFalse(@binarySensor.deadTimeInProgress)
 
+    # wait for debounce time has finished and startValueLogic has started
     clock.tick(20)
 
-    assert.isFalse(@binarySensor._debounceInProgress)
-    assert.isTrue(@binarySensor._deadTimeInProgress)
+    assert.isFalse(@binarySensor.debounceInProgress)
+    assert.isTrue(@binarySensor.deadTimeInProgress)
 
-    getLevelPromise.then =>
-      assert.equal(@binarySensor.statusCtl.getLastStatus(), 1)
+    await getLevelPromise
 
-      sinon.assert.calledOnce(handleStatusChange);
-      sinon.assert.calledWith(handleStatusChange, 'path/to/status', 1, { isRepeat: false });
+    assert.equal(@binarySensor.status.getLocal().default, 1)
 
-      clock.tick(20)
+    sinon.assert.calledOnce(handleStatusChange);
+    sinon.assert.calledWith(handleStatusChange, ['default']);
 
-      assert.isFalse(@binarySensor._debounceInProgress)
-      assert.isFalse(@binarySensor._deadTimeInProgress)
+    clock.tick(50)
 
-      clock.restore()
+    assert.isFalse(@binarySensor.debounceInProgress)
+    assert.isFalse(@binarySensor.deadTimeInProgress)
+
+    clock.restore()

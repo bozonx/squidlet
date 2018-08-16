@@ -1,4 +1,4 @@
-import {Data, Getter, Setter} from './DeviceDataManagerBase';
+import {ChangeHandler, Data, Getter, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import System from '../app/System';
@@ -72,6 +72,10 @@ export default class DeviceBase {
 
   setStatus = (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
     return this.status.write({[statusName]: newValue});
+  }
+
+  onChange(cb: ChangeHandler): void {
+    this.status.onChange(cb);
   }
 
   /**

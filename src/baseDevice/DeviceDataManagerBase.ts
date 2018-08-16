@@ -67,6 +67,10 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
+  getLocal(): Data {
+    return this.localData;
+  }
+
   onChange(cb: ChangeHandler) {
     this.events.addListener(changeEventName, cb);
   }
