@@ -36,38 +36,33 @@ export default class BinarySensor extends DeviceBase {
     this.debounceInProgress = true;
 
     // waiting for debounce
-    setTimeout(async () => {
+    setTimeout(() => {
       this.debounceInProgress = false;
-      await this.startValueLogic();
+      this.startValueLogic();
     }, this.deviceConf.props.debounceTime);
   }
 
-  private startValueLogic(): Promise<void> {
-    return new Promise(async (resolve) => {
-      // start dead time - ignore all the signals
-      this.deadTimeInProgress = true;
+  private async startValueLogic(): Promise<void> {
+    // start dead time - ignore all the signals
+    this.deadTimeInProgress = true;
 
-      // TODO: review
+    let currentLevel: BinaryLevel = false;
+    const waitDeadTime = () => setTimeout(() => {
+      this.deadTimeInProgress = false;
+    }, this.deviceConf.props.deadTime);
 
-      let currentLevel: BinaryLevel = false;
-      const waitDeadTime = () => setTimeout(() => {
-        this.deadTimeInProgress = false;
-        resolve();
-      }, this.deviceConf.props.deadTime);
-
-      try {
-        currentLevel = await this.gpioInputDriver.getLevel();
-      }
-      catch (err) {
-        waitDeadTime();
-
-        return;
-      }
-
-      this.setStatus(currentLevel);
-
+    try {
+      currentLevel = await this.gpioInputDriver.getLevel();
+    }
+    catch (err) {
       waitDeadTime();
-    });
+
+      return;
+    }
+
+    this.setStatus(currentLevel);
+
+    waitDeadTime();
   }
 
 }

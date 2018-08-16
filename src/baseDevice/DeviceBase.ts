@@ -34,7 +34,7 @@ export default class DeviceBase {
       this.deviceConf.deviceId,
       this.system,
       this.deviceConf.manifest.status || {},
-      this.publish,
+      (...params) => this.publish(...params),
       this.deviceConf.props.statusRepublishInterval,
       this.statusGetter,
       this.statusSetter
@@ -44,7 +44,7 @@ export default class DeviceBase {
         this.deviceConf.deviceId,
         this.system,
         this.deviceConf.manifest.config || {},
-        this.publish,
+        (...params) => this.publish(...params),
         this.deviceConf.props.configRepublishInterval,
         this.configGetter,
         this.configSetter

@@ -73,4 +73,5 @@ describe.only 'devices.BinarySensor', ->
 
     clock.restore()
 
-    # TODO: check publish
+    sinon.assert.calledOnce(@binarySensor.publish)
+    sinon.assert.calledWith(@binarySensor.publish, 'status', 1)
