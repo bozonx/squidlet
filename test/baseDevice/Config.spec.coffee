@@ -33,22 +33,21 @@ describe 'baseDevice.Config', ->
       @schema,
       @publisher,
       undefined,
-      @getter,
-      @setter
     )
     @config.onChange(@handler)
+    @init = => @config.init(@getter, @setter)
 
   it 'init - with getter - load data', ->
     @config.read = sinon.spy()
 
-    await @config.init()
+    await @init()
 
     sinon.assert.calledOnce(@config.read)
 
   it 'init - without getter - set defaults', ->
-    @config.getter = undefined
+    @getter = undefined
 
-    await @config.init()
+    await @init()
 
     assert.deepEqual(@config.localData, {param1: 500})
 
@@ -63,6 +62,7 @@ describe 'baseDevice.Config', ->
     sinon.assert.notCalled(@handler)
 
   it 'read - use getter', ->
+    await @init()
     result = await @config.read()
 
     assert.deepEqual(result, @data)
@@ -87,6 +87,7 @@ describe 'baseDevice.Config', ->
     sinon.assert.calledWith(@handler, ['param1'])
 
   it 'write - use getter', ->
+    await @init()
     await @config.write(@data)
 
     assert.deepEqual(@config.localData, @data)

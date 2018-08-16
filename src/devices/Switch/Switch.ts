@@ -25,8 +25,6 @@ export default class Switch extends DeviceBase {
   }
 
   protected statusSetter = (partialData: Data): Promise<void> => {
-
-    console.log(11111111)
     return this.gpioOutputDriver.setLevel(partialData[DEFAULT_STATUS]);
   }
 

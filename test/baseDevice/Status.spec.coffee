@@ -30,29 +30,28 @@ describe 'baseDevice.Status', ->
       @schema,
       @publisher,
       1000,
-      @getter,
-      @setter
     )
     @status.onChange(@handler)
+    @init = => @status.init(@getter, @setter)
 
   it 'init - with getter - load data', ->
     @status.read = sinon.spy()
 
-    await @status.init()
+    await @init()
 
     sinon.assert.calledOnce(@status.read)
 
   it 'init - without getter - set defaults', ->
-    @status.getter = undefined
+    @getter = undefined
 
-    await @status.init()
+    await @init()
 
     assert.deepEqual(@status.localData, {default: 0})
 
   it 'read - use local', ->
     @status.localData = @data
 
-    @status.getter = undefined
+    @getter = undefined
     result = await @status.read()
 
     assert.deepEqual(result, @data)
@@ -60,6 +59,7 @@ describe 'baseDevice.Status', ->
     sinon.assert.notCalled(@handler)
 
   it 'read - use getter', ->
+    await @init()
     result = await @status.read()
 
     assert.deepEqual(result, @data)
@@ -73,7 +73,7 @@ describe 'baseDevice.Status', ->
   it 'readParam - use local', ->
     @status.localData = @data
 
-    @status.getter = undefined
+    @.getter = undefined
     result = await @status.readParam('default')
 
     assert.deepEqual(result, 1)
@@ -81,6 +81,8 @@ describe 'baseDevice.Status', ->
     sinon.assert.notCalled(@handler)
 
   it 'readParam - use getter', ->
+    @status.read = =>
+    await @init()
     result = await @status.readParam('default')
 
     assert.deepEqual(result, 1)
@@ -91,7 +93,7 @@ describe 'baseDevice.Status', ->
     sinon.assert.calledWith(@handler, ['default'])
 
   it 'write - use local', ->
-    @status.setter = undefined
+    @setter = undefined
     @status.localData = {
       default: 0
       temperature: 25
@@ -106,6 +108,7 @@ describe 'baseDevice.Status', ->
     sinon.assert.calledWith(@handler, ['default'])
 
   it 'write - use getter', ->
+    await @init()
     await @status.write(@data)
 
     assert.deepEqual(@status.localData, @data)

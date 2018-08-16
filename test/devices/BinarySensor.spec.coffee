@@ -1,7 +1,7 @@
 BinarySensor = require('../../src/devices/BinarySensor/BinarySensor').default
 
 
-describe 'devices.BinarySensor', ->
+describe.only 'devices.BinarySensor', ->
   beforeEach ->
     @getLevelResult = Promise.resolve(1)
     @driver = {
@@ -41,7 +41,8 @@ describe 'devices.BinarySensor', ->
     @binarySensor.publish = sinon.spy()
 
   it "main logic", ->
-    @binarySensor.afterInit()
+    await @binarySensor.init()
+    #@binarySensor.afterInit()
     clock = sinon.useFakeTimers()
 
     handleStatusChange = sinon.spy()

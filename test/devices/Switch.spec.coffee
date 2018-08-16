@@ -1,7 +1,7 @@
 Switch = require('../../src/devices/Switch/Switch').default
 
 
-describe.only 'devices.Switch', ->
+describe 'devices.Switch', ->
   beforeEach ->
     @getLevelResult = Promise.resolve(1)
     @setLevelPromise = Promise.resolve()
@@ -40,7 +40,7 @@ describe.only 'devices.Switch', ->
     @switch.publish = sinon.spy()
     await @switch.init()
 
-  it.only "turn", () ->
+  it "turn", () ->
     #await @switch.init()
 
     result = await @switch.action('turn', 0)
