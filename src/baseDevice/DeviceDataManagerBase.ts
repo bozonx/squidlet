@@ -108,7 +108,6 @@ export default abstract class DeviceDataManagerBase {
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
-      // TODO: получать список измененных параметров
       const updatedParams: string[] = this.setLocalData(partialData);
 
       if (updatedParams.length) {
@@ -223,6 +222,7 @@ export default abstract class DeviceDataManagerBase {
       ...this.localData,
       ...partialData,
     };
+
     this.events.emit(changeEventName, updatedParams);
     // TODO: call republish
 

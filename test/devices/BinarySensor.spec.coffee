@@ -1,9 +1,9 @@
 BinarySensor = require('../../src/devices/BinarySensor/BinarySensor').default
 
 
-describe.only 'devices.BinarySensor', ->
+describe 'devices.BinarySensor', ->
   beforeEach ->
-    @getLevelResult = Promise.resolve(1)
+    @getLevelResult = Promise.resolve(0)
     @driver = {
       getLevel: => @getLevelResult
       onChange: =>
@@ -37,16 +37,19 @@ describe.only 'devices.BinarySensor', ->
         deadTime: 50
       }
     }
+    @handleStatusChange = sinon.spy()
     @binarySensor = new BinarySensor(@system, @deviceConf)
     @binarySensor.publish = sinon.spy()
+    @binarySensor.onChange(@handleStatusChange)
+    @binarySensor.init()
 
   it "main logic", ->
-    await @binarySensor.init()
-    #@binarySensor.afterInit()
+    assert.equal(@binarySensor.status.getLocal().default, 0)
+
+    @getLevelResult = Promise.resolve(1)
     clock = sinon.useFakeTimers()
 
-    handleStatusChange = sinon.spy()
-    @binarySensor.onChange(handleStatusChange)
+
 
     # like driver has risen an event
     @binarySensor.onInputChange()
@@ -62,10 +65,11 @@ describe.only 'devices.BinarySensor', ->
 
     await @getLevelResult
 
+    # after setStatus
     assert.equal(@binarySensor.status.getLocal().default, 1)
 
-    sinon.assert.calledOnce(handleStatusChange);
-    sinon.assert.calledWith(handleStatusChange, ['default']);
+    sinon.assert.calledTwice(@handleStatusChange);
+    sinon.assert.calledWith(@handleStatusChange, ['default']);
 
     clock.tick(50)
 
@@ -74,5 +78,6 @@ describe.only 'devices.BinarySensor', ->
 
     clock.restore()
 
-    sinon.assert.calledOnce(@binarySensor.publish)
+    sinon.assert.calledTwice(@binarySensor.publish)
+    sinon.assert.calledWith(@binarySensor.publish, 'status', 0)
     sinon.assert.calledWith(@binarySensor.publish, 'status', 1)

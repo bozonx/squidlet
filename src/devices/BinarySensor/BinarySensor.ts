@@ -60,6 +60,7 @@ export default class BinarySensor extends DeviceBase {
       return;
     }
 
+    // TODO: wait for promise ???
     this.setStatus(currentLevel);
 
     waitDeadTime();

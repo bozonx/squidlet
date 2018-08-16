@@ -1,7 +1,7 @@
 Switch = require('../../src/devices/Switch/Switch').default
 
 
-describe 'devices.Switch', ->
+describe.only 'devices.Switch', ->
   beforeEach ->
     @getLevelResult = Promise.resolve(1)
     @setLevelPromise = Promise.resolve()

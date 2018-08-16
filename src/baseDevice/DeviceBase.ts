@@ -55,18 +55,19 @@ export default class DeviceBase {
     }
   }
 
-  init(): Promise<void> {
-    return Promise.all([
-      this.status && this.status.init(this.statusGetter, this.statusSetter),
-      this.config && this.config.init(this.configGetter, this.configSetter),
-      this.onInit && this.onInit(),
-    ])
-      .then(() => {
-        if (this.afterInit) this.afterInit();
-      })
-      .catch(() => {
-        // TODO: что делаем ???
-      });
+  async init(): Promise<void> {
+    try {
+      await Promise.all([
+        this.status && this.status.init(this.statusGetter, this.statusSetter),
+        this.config && this.config.init(this.configGetter, this.configSetter),
+        this.onInit && this.onInit(),
+      ]);
+    }
+    catch (err) {
+      throw new Error(err);
+    }
+
+    if (this.afterInit) this.afterInit();
   }
 
   getStatus = (statusName?: string): Promise<any> => {
@@ -87,7 +88,7 @@ export default class DeviceBase {
   async action(actionName: string, ...params: any[]): Promise<any> {
     if (!this.actions[actionName]) throw new Error(`Unknown action ${actionName}`);
 
-    // TODO: валидация входных параметров действия
+    // TODO: ??? валидация входных параметров действия
 
     const result = await this.actions[actionName](...params);
 
