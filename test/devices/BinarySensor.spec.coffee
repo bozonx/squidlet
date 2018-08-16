@@ -3,9 +3,9 @@ BinarySensor = require('../../src/devices/BinarySensor/BinarySensor').default
 
 describe.only 'devices.BinarySensor', ->
   beforeEach ->
-    @getResult = 1
+    @getLevelResult = Promise.resolve(1)
     @driver = {
-      getLevel: => @result
+      getLevel: => @getLevelResult
       onChange: =>
       #getLevel: sinon.stub().returns(Promise.resolve(1))
     }
@@ -40,12 +40,10 @@ describe.only 'devices.BinarySensor', ->
     @binarySensor = new BinarySensor(@system, @deviceConf)
     @binarySensor.publish = sinon.spy()
 
-  it "$handleBinaryStatusChange", ->
+  it "main logic", ->
     @binarySensor.afterInit()
     clock = sinon.useFakeTimers()
 
-    getLevelPromise = Promise.resolve(1)
-    @binarySensor.gpioInputDriver.getLevel = sinon.stub().returns(getLevelPromise)
     handleStatusChange = sinon.spy()
     @binarySensor.onChange(handleStatusChange)
 
@@ -61,7 +59,7 @@ describe.only 'devices.BinarySensor', ->
     assert.isFalse(@binarySensor.debounceInProgress)
     assert.isTrue(@binarySensor.deadTimeInProgress)
 
-    await getLevelPromise
+    await @getLevelResult
 
     assert.equal(@binarySensor.status.getLocal().default, 1)
 
@@ -74,3 +72,5 @@ describe.only 'devices.BinarySensor', ->
     assert.isFalse(@binarySensor.deadTimeInProgress)
 
     clock.restore()
+
+    # TODO: check publish

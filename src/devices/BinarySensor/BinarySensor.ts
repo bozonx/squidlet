@@ -42,26 +42,32 @@ export default class BinarySensor extends DeviceBase {
     }, this.deviceConf.props.debounceTime);
   }
 
-  private async startValueLogic(): Promise<void> {
-    // start dead time - ignore all the signals
-    this.deadTimeInProgress = true;
+  private startValueLogic(): Promise<void> {
+    return new Promise(async (resolve) => {
+      // start dead time - ignore all the signals
+      this.deadTimeInProgress = true;
 
-    // TODO: review
+      // TODO: review
 
-    let currentLevel: BinaryLevel = false;
+      let currentLevel: BinaryLevel = false;
+      const waitDeadTime = () => setTimeout(() => {
+        this.deadTimeInProgress = false;
+        resolve();
+      }, this.deviceConf.props.deadTime);
 
-    try {
-      currentLevel = await this.gpioInputDriver.getLevel();
-    }
-    catch (err) {
-      setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
+      try {
+        currentLevel = await this.gpioInputDriver.getLevel();
+      }
+      catch (err) {
+        waitDeadTime();
 
-      return;
-    }
+        return;
+      }
 
-    await this.setStatus(currentLevel);
+      this.setStatus(currentLevel);
 
-    setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
+      waitDeadTime();
+    });
   }
 
 }
