@@ -24,27 +24,17 @@ export default abstract class DeviceDataManagerBase {
   protected readonly schema: Schema;
   protected readonly publish: Publisher;
   protected readonly republish: Republish;
-  protected readonly getter?: Getter;
-  protected readonly setter?: Setter;
+  protected getter?: Getter;
+  protected setter?: Setter;
   protected readonly events: EventEmitter = new EventEmitter();
 
   protected localData: Data = {};
 
-  constructor(
-    deviceId: string,
-    system: System,
-    schema: Schema,
-    publish: Publisher,
-    republishInterval?: number,
-    getter?: Getter,
-    setter?: Setter
-  ) {
+  constructor(deviceId: string, system: System, schema: Schema, publish: Publisher, republishInterval?: number) {
     this.deviceId = deviceId;
     this.system = system;
     this.schema = schema;
     this.publish = publish;
-    this.getter = getter;
-    this.setter = setter;
 
     const realRepublishInterval = (typeof republishInterval === 'undefined')
       ? this.system.host.config.devices.defaultStatusRepublishIntervalMs
@@ -56,7 +46,10 @@ export default abstract class DeviceDataManagerBase {
   abstract read: () => Promise<Data>;
   abstract write: (partialData: Data) => Promise<void>;
 
-  async init(): Promise<void> {
+  async init(getter?: Getter, setter?: Setter): Promise<void> {
+    this.getter = getter;
+    this.setter = setter;
+
     if (this.getter) {
       await this.read();
 

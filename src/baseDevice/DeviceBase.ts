@@ -17,6 +17,9 @@ export default class DeviceBase {
   protected readonly system: System;
   protected readonly deviceConf: DeviceConf;
 
+  // better place to do initial requests
+  protected onInit?: () => Promise<void>;
+  // it calls after device init, status and config init have been finished
   protected afterInit?: () => void;
   protected destroy?: () => void;
   protected statusGetter?: Getter;
@@ -36,9 +39,8 @@ export default class DeviceBase {
       this.deviceConf.manifest.status || {},
       (...params) => this.publish(...params),
       this.deviceConf.props.statusRepublishInterval,
-      this.statusGetter,
-      this.statusSetter
     );
+
     if (this.deviceConf.manifest.config) {
       this.config = new Config(
         this.deviceConf.deviceId,
@@ -46,20 +48,21 @@ export default class DeviceBase {
         this.deviceConf.manifest.config || {},
         (...params) => this.publish(...params),
         this.deviceConf.props.configRepublishInterval,
-        this.configGetter,
-        this.configSetter
       );
 
       this.getConfig = this.config.read;
       this.setConfig = this.config.write;
     }
+  }
 
-    Promise.all([
-      this.status.init(),
-      this.config && this.config.init(),
+  init(): Promise<void> {
+    return Promise.all([
+      this.status && this.status.init(this.statusGetter, this.statusSetter),
+      this.config && this.config.init(this.configGetter, this.configSetter),
+      this.onInit && this.onInit(),
     ])
       .then(() => {
-        if (typeof this.afterInit !== 'undefined') this.afterInit();
+        if (this.afterInit) this.afterInit();
       })
       .catch(() => {
         // TODO: что делаем ???

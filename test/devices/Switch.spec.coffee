@@ -38,6 +38,7 @@ describe.only 'devices.Switch', ->
     }
     @switch = new Switch(@system, @deviceConf)
     @switch.publish = sinon.spy()
+    await @switch.init()
 
   it.only "turn", () ->
     #await @switch.init()
