@@ -1,9 +1,9 @@
 Switch = require('../../src/devices/Switch/Switch').default
 
 
-describe.only 'devices.Switch', ->
+describe 'devices.Switch', ->
   beforeEach ->
-    @getLevelResult = Promise.resolve(1)
+    @getLevelResult = Promise.resolve(true)
     @setLevelPromise = Promise.resolve()
     @driver = {
       getLevel: => @getLevelResult
@@ -36,28 +36,34 @@ describe.only 'devices.Switch', ->
         deadTime: 50
       }
     }
+    @handleStatusChange = sinon.spy()
     @switch = new Switch(@system, @deviceConf)
     @switch.publish = sinon.spy()
+    @switch.onChange(@handleStatusChange)
     await @switch.init()
 
   it "turn", () ->
-    #await @switch.init()
-
     result = await @switch.action('turn', 0)
 
     await @setLevelPromise
 
     sinon.assert.calledOnce(@driver.setLevel)
-    sinon.assert.calledWith(@driver.setLevel, 0)
+    sinon.assert.calledWith(@driver.setLevel, false)
     assert.isFalse(result)
     assert.isFalse(@switch.status.getLocal().default)
 
+    sinon.assert.calledTwice(@handleStatusChange);
+    sinon.assert.calledWith(@handleStatusChange, ['default']);
 
-    sinon.assert.calledTwice(@switch.publish)
-    sinon.assert.calledWith(@switch.publish.onCall(0), 'status', false)
-    sinon.assert.calledWith(@switch.publish.onCall(1), 'status', false)
+    sinon.assert.calledThrice(@switch.publish)
+    # on init
+    sinon.assert.calledWith(@switch.publish.getCall(0), 'status', true)
+    # on call action and setStatus()
+    sinon.assert.calledWith(@switch.publish.getCall(1), 'status', false)
+    # after call action
+    sinon.assert.calledWith(@switch.publish.getCall(2), 'turn', false)
 
-  it "turn - deadTime", () ->
+  it.only "turn - deadTime", () ->
     clock = sinon.useFakeTimers()
 
     @initInstance()
