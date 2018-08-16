@@ -15,6 +15,8 @@ export default class Switch extends DeviceBase {
   constructor(system: System, deviceConf: DeviceConf) {
     super(system, deviceConf);
 
+    console.log(3333333333, this.statusSetter)
+
     const gpioOutputDriverFactory = this.system.drivers.getDriver('GpioOutput.driver') as GpioOutputFactory;
 
     this.gpioOutputDriver = gpioOutputDriverFactory.getInstance(this.deviceConf.props);
@@ -25,13 +27,15 @@ export default class Switch extends DeviceBase {
   }
 
   protected statusSetter = (partialData: Data): Promise<void> => {
+
+    console.log(11111111)
     return this.gpioOutputDriver.setLevel(partialData[DEFAULT_STATUS]);
   }
 
   protected actions = {
     turn: async (onOrOff: any): Promise<BinaryLevel> => {
       // skip while switch at dead time
-      if (this.deadTimeInProgress) return this.getStatus();
+      if (this.deadTimeInProgress) return this.status.getLocal().default;
 
       this.deadTimeInProgress = true;
       setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
