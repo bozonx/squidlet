@@ -1,7 +1,7 @@
 BinarySensor = require('../../src/devices/BinarySensor/BinarySensor').default
 
 
-describe.only 'devices.BinarySensor', ->
+describe 'devices.BinarySensor', ->
   beforeEach ->
     @getLevelResult = Promise.resolve(1)
     @driver = {
