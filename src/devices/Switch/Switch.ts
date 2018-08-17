@@ -53,10 +53,10 @@ export default class Switch extends DeviceBase {
       const currentLevel: boolean = await this.getStatus();
 
       if (currentLevel) {
-        return this.actions.turn(0);
+        return this.actions.turn(false);
       }
       else {
-        return this.actions.turn(1);
+        return this.actions.turn(true);
       }
     }
   };

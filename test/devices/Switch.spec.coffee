@@ -63,45 +63,38 @@ describe 'devices.Switch', ->
     # after call action
     sinon.assert.calledWith(@switch.publish.getCall(2), 'turn', false)
 
-  it.only "turn - deadTime", () ->
+  it "turn - deadTime", () ->
     clock = sinon.useFakeTimers()
 
-    @initInstance()
-    await @switch.init()
+    await @switch.action('turn', 1)
+    sinon.assert.calledOnce(@driver.setLevel)
 
-    @gpio.setLevel = sinon.stub().returns(Promise.resolve());
-
-    await @switch.turn(1)
-    sinon.assert.calledOnce(@gpio.setLevel)
-
-    await @switch.turn(0)
-    sinon.assert.calledOnce(@gpio.setLevel)
+    await @switch.action('turn', 0)
+    sinon.assert.calledOnce(@driver.setLevel)
 
     clock.tick(100)
 
-    await @switch.turn(1)
-    sinon.assert.calledTwice(@gpio.setLevel)
+    await @switch.action('turn', 1)
+    sinon.assert.calledTwice(@driver.setLevel)
 
     clock.restore()
 
   it "toggle 1=>0", ->
-    @initInstance()
-    await @switch.init()
-    @switch.turn = sinon.spy()
-    await @switch.toggle()
+    @switch.actions.turn = sinon.spy()
 
-    sinon.assert.calledOnce(@switch.turn)
-    sinon.assert.calledWith(@switch.turn, 0)
+    await @switch.action('toggle')
+
+    sinon.assert.calledOnce(@switch.actions.turn)
+    sinon.assert.calledWith(@switch.actions.turn, false)
 
   it "toggle 0=>1", ->
-    @initInstance()
-    await @switch.init()
-    @gpio.getLevel = sinon.stub().returns(Promise.resolve(0))
-    @switch.turn = sinon.spy()
-    await @switch.toggle()
+    @getLevelResult = Promise.resolve(false)
+    @switch.actions.turn = sinon.spy()
 
-    sinon.assert.calledOnce(@switch.turn)
-    sinon.assert.calledWith(@switch.turn, 1)
+    await @switch.action('toggle')
+
+    sinon.assert.calledOnce(@switch.actions.turn)
+    sinon.assert.calledWith(@switch.actions.turn, true)
 
   it "toggle - deadTime", () ->
     clock = sinon.useFakeTimers()
