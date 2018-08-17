@@ -1,2 +1,3 @@
 name: GpioInput_raspberry.driver
 main: GpioInput_raspberry.driver.ts
+type: system

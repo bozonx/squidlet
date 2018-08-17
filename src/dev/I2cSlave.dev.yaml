@@ -1,0 +1,3 @@
+name: I2cSlave.dev
+main: MQTT.dev.ts
+type: io
