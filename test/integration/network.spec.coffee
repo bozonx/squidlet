@@ -62,9 +62,9 @@ describe 'integration network', ->
   beforeEach ->
     driversPaths = new Map({
       'I2c.connection.driver': '../network/connections/I2c.connection.driver.ts'
-      'I2cMaster.driver': '../drivers/I2cMaster.driver.ts'
-      'I2cSlave.driver': '../drivers/I2cSlave.driver.ts'
-      'I2cData.driver': '../drivers/I2cData.driver.ts'
+      'I2cMaster.driver': '../drivers/I2c/I2cMaster.driver.ts'
+      'I2cSlave.driver': '../drivers/I2c/I2cSlave.driver.ts'
+      'I2cData.driver': '../drivers/I2c/I2cData.driver.ts'
     })
     @drivers = new Drivers()
 

@@ -26,7 +26,7 @@ export class GpioInputRaspberryDriver {
 export default class GpioInputFactory extends DriverFactoryBase {
   private instances: {[index: string]: GpioInputRaspberryDriver} = {};
 
-  getInstance(): GpioInputDriver {
+  getInstance(): GpioInputRaspberryDriver {
     this.instances[bus] = super.getInstance(bus) as GpioInputRaspberryDriver;
 
     return this.instances[bus];

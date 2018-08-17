@@ -6,6 +6,9 @@ interface Driver {
 }
 
 
+/**
+ * Drivers manager
+ */
 export default class Drivers {
   private instances: Map<string, Driver> = Map<string, Driver>();
 

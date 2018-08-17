@@ -17,7 +17,7 @@ export default class DeviceFactory {
 
   async create(deviceConf: DeviceConf): Promise<Device> {
     // make instance of device
-    const devicePath: string = path.resolve(deviceConf.manifest.baseDir, deviceConf.manifest.device);
+    const devicePath: string = path.resolve(deviceConf.manifest.baseDir, deviceConf.manifest.main);
     const DeviceClass: DeviceType = this.require(devicePath);
     const device: Device = new DeviceClass(this.system, deviceConf);
 

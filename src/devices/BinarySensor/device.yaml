@@ -1,7 +1,7 @@
 name: BinarySensor
 type: binary-sensor
 
-device: ./BinarySensor.ts
+main: ./BinarySensor.ts
 props: ./props.yaml
 status:
   default: boolean

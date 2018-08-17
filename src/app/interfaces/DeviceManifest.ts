@@ -5,7 +5,7 @@ export default interface DeviceManifest {
   // name of device e.g. "BinarySensor"
   name: string;
   // path to device main file
-  device: string;
+  main: string;
 
   // generic type of device
   type: string;

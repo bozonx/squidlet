@@ -1,0 +1,3 @@
+name: GpioOutput.driver
+main: GpioOutput.driver.ts
+

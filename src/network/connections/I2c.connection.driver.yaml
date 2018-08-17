@@ -1,0 +1,2 @@
+name: I2c.connection.driver
+main: I2c.connection.driver.ts

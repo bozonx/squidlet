@@ -1,7 +1,7 @@
 name: Switch
 type: switch
 
-device: ./Switch.ts
+main: ./Switch.ts
 props: ./props.yaml
 status:
   default: boolean
