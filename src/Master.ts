@@ -15,7 +15,7 @@ export default class Master {
   }
 
   async init(): Promise<void> {
-    await this.system.initSystemDrivers();
+    await this.system.initDrivers();
     await this.system.initNetwork();
     await this.system.initMessenger();
 

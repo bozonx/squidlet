@@ -18,21 +18,15 @@ export default class Drivers {
 
   /**
    * Make instances of drivers
-   * @param driversPaths - uniq drivers like {DriverName: pathToManifest}
+   * @param driverManifests - uniq drivers manifests like {DriverName: DriverManifest}
    * @param driversConfig - user devined config for drivers
    */
-  init(driversPaths: Map<string, string>, driversConfig: {[index: string]: object} = {}) {
-    const manifests: {[index: string]: DriverManifest} = this.loadManifests();
+  init(driverManifests: {[index: string]: DriverManifest}, driversConfig: {[index: string]: object} = {}) {
+    const sortedDrivers: {[index: string]: DriverManifest} = this.sort(driverManifests);
 
-    driversPaths.forEach((driverManifestPath?: string, driverName?: string) => {
-      if (!driverManifestPath || !driverName) {
-        throw new Error(`Wrong driver definition "${driverName}": "${driverManifestPath}"`);
-      }
+    const DriverClass = this.require(driverManifestPath).default;
 
-      const DriverClass = this.require(driverManifestPath).default;
-
-      this.instances = this.instances.set(driverName, new DriverClass(this, driversConfig[driverName]));
-    });
+    this.instances = this.instances.set(driverName, new DriverClass(this, driversConfig[driverName]));
 
     // initialize drivers
     this.instances.forEach((driver: Driver | undefined) => {
@@ -49,15 +43,25 @@ export default class Drivers {
     return this.instances.get(driverName);
   }
 
-  private loadManifests() {
-
-  }
+  // private loadManifests(driversPaths: Map<string, string>): {[index: string]: DriverManifest} {
+  //   const manifests: {[index: string]: DriverManifest} = {};
+  //
+  //   driversPaths.forEach((driverManifestPath?: string, driverName?: string) => {
+  //     if (!driverManifestPath || !driverName) {
+  //       throw new Error(`Wrong driver definition "${driverName}": "${driverManifestPath}"`);
+  //     }
+  //
+  //
+  //   });
+  //
+  //   return manifests;
+  // }
 
   private generateDriversMainFilePaths() {
 
   }
 
-  private sortDrivers() {
+  private sort(driverManifests: {[index: string]: DriverManifest}): {[index: string]: DriverManifest} {
 
   }
 

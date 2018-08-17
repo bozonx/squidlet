@@ -15,7 +15,7 @@ export default class Standalone {
   }
 
   async init(): Promise<void> {
-    await this.system.initSystemDrivers();
+    await this.system.initDrivers();
 
     // TODO: only if allowed - by default is off
     await this.system.initNetwork();

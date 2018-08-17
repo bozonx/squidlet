@@ -36,8 +36,8 @@ export default class System {
     this.devices = new Devices(this);
   }
 
-  async initSystemDrivers(): Promise<void> {
-    // TODO: add
+  async initDrivers(): Promise<void> {
+    this.drivers.init(this.host.config.driversManifests);
   }
 
   async initNetwork(): Promise<void> {

@@ -1,5 +1,6 @@
-import DeviceManifest from './DeviceManifest';
 import DeviceConf from './DeviceConf';
+import DeviceManifest from './DeviceManifest';
+import DriverManifest from './DriverManifest';
 // import Destination from '../../messenger/interfaces/Destination';
 // import MyAddress from './MyAddress';
 
@@ -12,8 +13,8 @@ export default interface HostConfig {
   devicesManifests: {[index: string]: DeviceManifest};
   // config of devices by deviceId
   devicesConfigs: {[index: string]: DeviceConf};
-  // paths to files of drivers on local storage
-  drivers: Array<string>;
+  // parsed drivers manifests by driver name
+  driversManifests: {[index: string]: DriverManifest};
 
   devices: {
     defaultStatusRepublishIntervalMs: number,
