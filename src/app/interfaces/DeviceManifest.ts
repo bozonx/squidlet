@@ -6,12 +6,13 @@ export default interface DeviceManifest {
   name: string;
   // path to device main file
   main: string;
-
   // generic type of device
   type: string;
-
+  // drivers dependencies - list of drivers names which is used in this driver
+  drivers?: string[];
   // props of device
   props?: {[index: string]: any};
+
   // schema of statuses of device
   status?: {[index: string]: any};
   // schema of config of device
