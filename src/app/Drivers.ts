@@ -18,51 +18,35 @@ export default class Drivers {
 
   /**
    * Make instances of drivers
-   * @param driverManifests - uniq drivers manifests like {DriverName: DriverManifest}
-   * @param driversConfig - user devined config for drivers
+   * @param driverManifests - uniq drivers manifests
+   * @param driversConfig - user defined config for drivers
    */
-  init(driverManifests: {[index: string]: DriverManifest}, driversConfig: {[index: string]: object} = {}) {
-    const sortedDrivers: {[index: string]: DriverManifest} = this.sort(driverManifests);
+  init(driverManifests: DriverManifest[], driversConfig: {[index: string]: object} = {}) {
+    // make instances
+    for (let manifest of driverManifests) {
+      const DriverClass = this.require(manifest.main).default;
+      const instance: Driver = new DriverClass(this, driversConfig[manifest.name]);
 
-    const DriverClass = this.require(driverManifestPath).default;
+      this.instances = this.instances.set(manifest.name, instance);
+    }
 
-    this.instances = this.instances.set(driverName, new DriverClass(this, driversConfig[driverName]));
+    // TODO: сделать Promise.all
+    // TODO: потом поднять событие что драйверы инициализировались
 
     // initialize drivers
     this.instances.forEach((driver: Driver | undefined) => {
       if (driver && driver.init) driver.init();
     });
-
   }
 
-  getDriver(driverName: string): Driver | undefined {
+  getDriver(driverName: string): Driver {
+    const driver: Driver = this.instances.get(driverName);
 
-    // TODO: если драйвера нет - throw
+    if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
-    // TODO: вернуть тип возвращаемого драйвера
+    // TODO: как вернуть тип возвращаемого драйвера???
+
     return this.instances.get(driverName);
-  }
-
-  // private loadManifests(driversPaths: Map<string, string>): {[index: string]: DriverManifest} {
-  //   const manifests: {[index: string]: DriverManifest} = {};
-  //
-  //   driversPaths.forEach((driverManifestPath?: string, driverName?: string) => {
-  //     if (!driverManifestPath || !driverName) {
-  //       throw new Error(`Wrong driver definition "${driverName}": "${driverManifestPath}"`);
-  //     }
-  //
-  //
-  //   });
-  //
-  //   return manifests;
-  // }
-
-  private generateDriversMainFilePaths() {
-
-  }
-
-  private sort(driverManifests: {[index: string]: DriverManifest}): {[index: string]: DriverManifest} {
-
   }
 
   // it needs for test purpose
