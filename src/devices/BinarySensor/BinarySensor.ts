@@ -1,7 +1,7 @@
 import System from '../../app/System';
 import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioInputFactory, {GpioInputDriver} from '../../drivers/GpioInput.driver';
+import GpioInputFactory, {GpioInputDriver} from '../../drivers/Gpio/GpioInput.driver';
 import DeviceConf from '../../app/interfaces/DeviceConf';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
@@ -15,7 +15,7 @@ export default class BinarySensor extends DeviceBase {
   constructor(system: System, deviceConf: DeviceConf) {
     super(system, deviceConf);
 
-    const gpioInputDriverFactory = this.system.drivers.getDriver('GpioInput.driver') as GpioInputFactory;
+    const gpioInputDriverFactory = this.system.drivers.getDriver('GpioInputDriver.driver') as GpioInputFactory;
 
     this.gpioInputDriver = gpioInputDriverFactory.getInstance(this.deviceConf.props);
   }

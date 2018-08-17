@@ -1,7 +1,7 @@
-import Drivers from '../app/Drivers';
-import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../helpers/helpers';
-import DriverFactoryBase from '../app/DriverFactoryBase';
-import HandlersManager from '../helpers/HandlersManager';
+import Drivers from '../../app/Drivers';
+import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
+import DriverFactoryBase from '../../app/DriverFactoryBase';
+import HandlersManager from '../../helpers/HandlersManager';
 
 
 const MAX_BLOCK_LENGTH = 65535;

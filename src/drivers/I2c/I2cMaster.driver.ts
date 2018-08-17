@@ -1,11 +1,11 @@
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
-import DriverFactoryBase from '../app/DriverFactoryBase';
-import { I2cMasterDev } from '../dev/I2cMaster.dev';
-import { hexStringToHexNum, addFirstItemUint8Arr } from '../helpers/helpers';
-import Drivers from '../app/Drivers';
-import Poling from '../helpers/Poling';
+import DriverFactoryBase from '../../app/DriverFactoryBase';
+import { I2cMasterDev } from '../../dev/I2cMaster.dev';
+import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
+import Drivers from '../../app/Drivers';
+import Poling from '../../helpers/Poling';
 
 
 const REGISTER_POSITION = 0;

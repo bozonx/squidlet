@@ -1,8 +1,8 @@
 import * as EventEmitter from 'events';
 
-import DriverFactoryBase from '../app/DriverFactoryBase';
-import Drivers from '../app/Drivers';
-import Poling from '../helpers/Poling';
+import DriverFactoryBase from '../../app/DriverFactoryBase';
+import Drivers from '../../app/Drivers';
+import Poling from '../../helpers/Poling';
 
 
 interface GpioInputDriverParams {

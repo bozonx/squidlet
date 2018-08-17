@@ -1,23 +1,23 @@
 import * as EventEmitter from 'events';
 
-import DriverFactoryBase from '../app/DriverFactoryBase';
-import Drivers from '../app/Drivers';
-import {BinaryLevel} from '../app/CommonTypes';
+import DriverFactoryBase from '../../app/DriverFactoryBase';
+import Drivers from '../../app/Drivers';
+import {BinaryLevel} from '../../app/CommonTypes';
 
 
 type Handler = (level: BinaryLevel) => void;
 
-interface GpioInputDriverParams {
+interface GpioOutputDriverParams {
   // TODO: !!!!
 }
 
 
-export class GpioInputDriver {
+export class GpioOutputDriver {
   private readonly drivers: Drivers;
-  private readonly driverParams: GpioInputDriverParams;
+  private readonly driverParams: GpioOutputDriverParams;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: Drivers, driverParams: GpioInputDriverParams) {
+  constructor(drivers: Drivers, driverParams: GpioOutputDriverParams) {
     this.drivers = drivers;
     this.driverParams = driverParams;
   }
@@ -27,6 +27,12 @@ export class GpioInputDriver {
     // TODO: трансформировать левел
 
     return true;
+  }
+
+  async setLevel(newLevel: BinaryLevel): Promise<void> {
+    // TODO: add
+    // TODO: трансформировать левел
+
   }
 
   onChange(handler: Handler): void {
@@ -41,14 +47,14 @@ export class GpioInputDriver {
 }
 
 
-export default class GpioInputFactory extends DriverFactoryBase {
+export default class GpioOutputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
       driverParams: {[index: string]: any},
-    ): GpioInputDriver } = GpioInputDriver;
-  private instances: {[index: string]: GpioInputDriver} = {};
+    ): GpioOutputDriver } = GpioOutputDriver;
+  private instances: {[index: string]: GpioOutputDriver} = {};
 
-  getInstance(deviceParams: {[index: string]: any}): GpioInputDriver {
+  getInstance(deviceParams: {[index: string]: any}): GpioOutputDriver {
 
     // TODO: validate params
     // TODO: validate specific for certain driver params
@@ -57,7 +63,7 @@ export default class GpioInputFactory extends DriverFactoryBase {
     const instanceId = '1';
 
     if (!this.instances[instanceId]) {
-      this.instances[instanceId] = super.getInstance(instanceId) as GpioInputDriver;
+      this.instances[instanceId] = super.getInstance(instanceId) as GpioOutputDriver;
     }
 
     return this.instances[instanceId];
