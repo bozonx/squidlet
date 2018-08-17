@@ -99,21 +99,18 @@ describe 'devices.Switch', ->
   it "toggle - deadTime", () ->
     clock = sinon.useFakeTimers()
 
-    @initInstance()
-    await @switch.init()
+    @getLevelResult = Promise.resolve(true)
+    @switch.actions.turn = sinon.stub().returns(Promise.resolve());
 
-    @gpio.getLevel = sinon.stub().returns(Promise.resolve(1));
-    @switch.turn = sinon.stub().returns(Promise.resolve());
+    await @switch.action('toggle')
+    sinon.assert.calledOnce(@switch.actions.turn)
 
-    await @switch.toggle(1)
-    sinon.assert.calledOnce(@switch.turn)
-
-    await @switch.toggle(0)
-    sinon.assert.calledOnce(@switch.turn)
+    await @switch.action('toggle')
+    sinon.assert.calledOnce(@switch.actions.turn)
 
     clock.tick(100)
 
-    await @switch.toggle(1)
-    sinon.assert.calledTwice(@switch.turn)
+    await @switch.action('toggle')
+    sinon.assert.calledTwice(@switch.actions.turn)
 
     clock.restore()
