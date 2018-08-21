@@ -1,8 +1,8 @@
 import DeviceConf from './DeviceConf';
-import DeviceManifest from './DeviceManifest';
-import DriverManifest from './DriverManifest';
+import DeviceManifest from '../../master/interfaces/DeviceManifest';
+import DriverManifest from '../../master/interfaces/DriverManifest';
 import ServiceDefinition from './ServiceDefinition';
-import ServiceManifest from './ServiceManifest';
+import ServiceManifest from '../../master/interfaces/ServiceManifest';
 // import Destination from '../../messenger/interfaces/Destination';
 // import MyAddress from './MyAddress';
 

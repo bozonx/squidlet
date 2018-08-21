@@ -3,7 +3,7 @@ const _omit = require('lodash/omit');
 import System from './System';
 import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
-import DeviceManifest from './interfaces/DeviceManifest';
+import DeviceManifest from '../master/interfaces/DeviceManifest';
 import DeviceConf from './interfaces/DeviceConf';
 
 

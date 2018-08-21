@@ -1,6 +1,6 @@
-import DeviceManifest from '../app/interfaces/DeviceManifest';
-import DriverManifest from '../app/interfaces/DriverManifest';
-import ServiceManifest from '../app/interfaces/ServiceManifest';
+import DeviceManifest from './interfaces/DeviceManifest';
+import DriverManifest from './interfaces/DriverManifest';
+import ServiceManifest from './interfaces/ServiceManifest';
 import validateService from './validateService';
 import validateDevice from './validateDevice';
 import validateDriver from './validateDriver';
@@ -30,8 +30,7 @@ export default class Registrator {
     if (validateError) throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
 
     // TODO: add base path
-    // TODO: слить определения с дефолтными значениями из главного конфига
-    // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
+    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
   addDriver(manifest: string | DriverManifest) {
@@ -45,8 +44,7 @@ export default class Registrator {
     if (validateError) throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
 
     // TODO: add base path
-    // TODO: слить определения с дефолтными значениями из главного конфига
-    // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
+    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
   /**
@@ -67,9 +65,7 @@ export default class Registrator {
 
 
     // TODO: add base path
-    // TODO: слить определения с дефолтными значениями из главного конфига
-    // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
-
+    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
   private resolveManifest<T>(manifest: string | T): T {

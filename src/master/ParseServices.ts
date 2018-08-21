@@ -1,6 +1,6 @@
 import ServiceDefinition from '../app/interfaces/ServiceDefinition';
 import System from '../app/System';
-import ServiceManifest from '../app/interfaces/ServiceManifest';
+import ServiceManifest from './interfaces/ServiceManifest';
 
 
 export default class ParseServices {

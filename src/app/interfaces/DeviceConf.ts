@@ -1,4 +1,4 @@
-import DeviceManifest from './DeviceManifest';
+import DeviceManifest from '../../master/interfaces/DeviceManifest';
 
 
 export default interface DeviceConf {
