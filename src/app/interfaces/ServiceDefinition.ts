@@ -1,5 +1,7 @@
 export default interface ServiceDefinition {
-  // service class
+  // service manifest name
   service: string;
+  // unique id of service
+  id: string;
   [index: string]: any;
 }

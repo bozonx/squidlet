@@ -2,6 +2,7 @@ import DeviceConf from './DeviceConf';
 import DeviceManifest from './DeviceManifest';
 import DriverManifest from './DriverManifest';
 import ServiceDefinition from './ServiceDefinition';
+import ServiceManifest from './ServiceManifest';
 // import Destination from '../../messenger/interfaces/Destination';
 // import MyAddress from './MyAddress';
 
@@ -15,19 +16,21 @@ export default interface HostConfig {
   devicesManifests: {[index: string]: DeviceManifest};
   // config of devices by deviceId
   devicesConfigs: {[index: string]: DeviceConf};
+  // TODO: почему тут список а в других местах объект?
   // parsed and sorted drivers manifests
   driversManifests: DriverManifest[];
   // configs of drivers by driver name
   driversConfigs: {[index: string]: DeviceConf};
+  // services definitions by service id
+  services: {[index: string]: ServiceDefinition};
+  // parsed manifests of services
+  servicesManifests: {[index: string]: ServiceManifest};
 
   devices: {
     defaultStatusRepublishIntervalMs: number,
     defaultConfigRepublishIntervalMs: number,
   };
 
-  // services definitions by service id
-  services: {[index: string]: ServiceDefinition};
-  servicesManifests: {[index: string]: ServiceManifest};
 
   // override default params of devices
   devicesDefaults: {[index: string]: any};

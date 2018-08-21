@@ -2,6 +2,7 @@ import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import Driver from './interfaces/Driver';
 import System from './System';
+import Service from './interfaces/Service';
 
 
 /**
@@ -41,7 +42,7 @@ export default class Drivers {
   }
 
   getDriver(driverName: string): Driver {
-    const driver: Driver = this.instances.get(driverName);
+    const driver: Driver | undefined = this.instances.get(driverName);
 
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
@@ -51,8 +52,8 @@ export default class Drivers {
   }
 
   // it needs for test purpose
-  private require(devicePath: string) {
-    return require(devicePath);
+  private require(pathToFile: string) {
+    return require(pathToFile);
   }
 
 }

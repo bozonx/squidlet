@@ -79,6 +79,7 @@ export default class DevicesManager {
     return {
       className: rawInstanceProps.device,
       deviceId,
+      // TODO: это делать в парсинге конфига
       props: this.mergeProps(rawInstanceProps.device, _omit(rawInstanceProps, 'device'), manifest.props),
       // remove props from manifest
       manifest: _omit(manifest, 'props'),
