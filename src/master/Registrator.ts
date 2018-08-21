@@ -4,15 +4,16 @@ import ServiceManifest from '../app/interfaces/ServiceManifest';
 import validateService from './validateService';
 import validateDevice from './validateDevice';
 import validateDriver from './validateDriver';
+import {Map} from 'immutable';
 
 
 /**
  * Register a new type of device, driver or service
  */
 export default class Registrator {
-  private readonly devicesManifests: {[index: string]: DeviceManifest} = {};
-  private readonly driversManifests: {[index: string]: DriverManifest} = {};
-  private readonly servicesManifests: {[index: string]: ServiceManifest} = {};
+  private readonly devicesManifests: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
+  private readonly driversManifests: Map<string, DriverManifest> = Map<string, DriverManifest>();
+  private readonly servicesManifests: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
 
 
   constructor() {
@@ -22,9 +23,12 @@ export default class Registrator {
     let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
     const validateError: string | undefined = validateDevice(parsedManifest);
 
+    if (this.devicesManifests.get(parsedManifest.name)) {
+      throw new Error(`Device "${parsedManifest.name}" is already exists!`);
+    }
+
     if (validateError) throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
 
-    // TODO: check unique name
     // TODO: add base path
     // TODO: слить определения с дефолтными значениями из главного конфига
     // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
@@ -34,9 +38,12 @@ export default class Registrator {
     let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
     const validateError: string | undefined = validateDriver(parsedManifest);
 
+    if (this.driversManifests.get(parsedManifest.name)) {
+      throw new Error(`Driver "${parsedManifest.name}" is already exists!`);
+    }
+
     if (validateError) throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
 
-    // TODO: check unique name
     // TODO: add base path
     // TODO: слить определения с дефолтными значениями из главного конфига
     // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
@@ -50,10 +57,15 @@ export default class Registrator {
     let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
     const validateError: string | undefined = validateService(parsedManifest);
 
-    if (validateError) throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
+    if (this.servicesManifests.get(parsedManifest.name)) {
+      throw new Error(`Service "${parsedManifest.name}" is already exists!`);
+    }
+
+    if (validateError) {
+      throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
+    }
 
 
-    // TODO: check unique name
     // TODO: add base path
     // TODO: слить определения с дефолтными значениями из главного конфига
     // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
