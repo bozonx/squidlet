@@ -18,11 +18,11 @@ export default class Registrator {
   constructor() {
   }
 
-  addDevice(deviceName: string, manifest: string | DeviceManifest) {
-    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(deviceName, manifest);
+  addDevice(manifest: string | DeviceManifest) {
+    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
     const validateError: string | undefined = validateDevice(parsedManifest);
 
-    if (validateError) throw new Error(`Invalid manifest of device: ${deviceName}: ${validateError}`);
+    if (validateError) throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
 
     // TODO: check unique name
     // TODO: add base path
@@ -30,11 +30,11 @@ export default class Registrator {
     // TODO: слить определение из дефолтного конфига сервиса указанного в манифесте
   }
 
-  addDriver(driverName: string, manifest: string | DriverManifest) {
-    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(driverName, manifest);
+  addDriver(manifest: string | DriverManifest) {
+    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
     const validateError: string | undefined = validateDriver(parsedManifest);
 
-    if (validateError) throw new Error(`Invalid manifest of driver: ${driverName}: ${validateError}`);
+    if (validateError) throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
 
     // TODO: check unique name
     // TODO: add base path
@@ -43,15 +43,14 @@ export default class Registrator {
   }
 
   /**
-   * Add new service to system.
-   * @param serviceName - unique name of service
+   * Add new service to the system.
    * @param manifest - it can be path to manifest yaml file or js plain object
    */
-  addService(serviceName: string, manifest: string | ServiceManifest): void {
-    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(serviceName, manifest);
+  addService(manifest: string | ServiceManifest): void {
+    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
     const validateError: string | undefined = validateService(parsedManifest);
 
-    if (validateError) throw new Error(`Invalid manifest of service: ${serviceName}: ${validateError}`);
+    if (validateError) throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
 
 
     // TODO: check unique name
@@ -61,7 +60,7 @@ export default class Registrator {
 
   }
 
-  private resolveManifest<T>(name: string, manifest: string | T): T {
+  private resolveManifest<T>(manifest: string | T): T {
     let parsedManifest: T;
 
     if (typeof manifest === 'string') {
@@ -74,7 +73,7 @@ export default class Registrator {
       parsedManifest = manifest;
     }
     else {
-      throw new Error(`Incorrect type of manifest of ${name}: ${JSON.parse(manifest)}`);
+      throw new Error(`Incorrect type of manifest: ${JSON.parse(manifest)}`);
     }
 
     return parsedManifest;
