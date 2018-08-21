@@ -2,7 +2,6 @@ import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import Driver from './interfaces/Driver';
 import System from './System';
-import Service from './interfaces/Service';
 
 
 /**
@@ -41,7 +40,8 @@ export default class Drivers {
     }));
   }
 
-  getDriver(driverName: string): Driver {
+  // TODO: наверное возвращать Drivers?
+  getDriver(driverName: string): any {
     const driver: Driver | undefined = this.instances.get(driverName);
 
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);

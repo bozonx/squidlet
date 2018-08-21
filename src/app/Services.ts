@@ -17,14 +17,14 @@ export default class Services {
     const servicesDefinitions: {[index: string]: ServiceDefinition} = this.system.host.config.services;
     const servicesManifests: {[index: string]: ServiceManifest} = this.system.host.config.servicesManifests;
 
-    Object.keys(servicesDefinitions).map((serviceId: string) => {
+    for (let serviceId of Object.keys(servicesDefinitions)) {
       const definition = servicesDefinitions[serviceId];
       const manifest = servicesManifests[definition.service];
       const ServiceClass = this.require(manifest.main).default;
       const instance: Service = new ServiceClass(this.system, definition);
 
       this.instances.set(serviceId, instance);
-    });
+    }
 
     // initialize all the services
     await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
