@@ -1,11 +1,13 @@
 import DeviceConf from './DeviceConf';
 import DeviceManifest from './DeviceManifest';
 import DriverManifest from './DriverManifest';
+import ServiceDefinition from './ServiceDefinition';
 // import Destination from '../../messenger/interfaces/Destination';
 // import MyAddress from './MyAddress';
 
 
 export default interface HostConfig {
+  // TODO: review
   // specific config for each host
   host: {[index: string]: any};
 
@@ -22,6 +24,10 @@ export default interface HostConfig {
     defaultStatusRepublishIntervalMs: number,
     defaultConfigRepublishIntervalMs: number,
   };
+
+  // services definitions by service id
+  services: {[index: string]: ServiceDefinition};
+  servicesManifests: {[index: string]: ServiceManifest};
 
   // override default params of devices
   devicesDefaults: {[index: string]: any};

@@ -1,13 +1,19 @@
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import Driver from './interfaces/Driver';
+import System from './System';
 
 
 /**
  * Drivers manager
  */
 export default class Drivers {
+  readonly system: System;
   private instances: Map<string, Driver> = Map<string, Driver>();
+
+  constructor(system: System) {
+    this.system = system;
+  }
 
   /**
    * Make instances of drivers
@@ -15,6 +21,9 @@ export default class Drivers {
    * @param driversConfig - user defined config for drivers
    */
   async init(driverManifests: DriverManifest[], driversConfig: {[index: string]: object} = {}): Promise<void> {
+
+    // TODO: может конфиги брать из system?
+
     // make instances
     for (let manifest of driverManifests) {
       const DriverClass = this.require(manifest.main).default;

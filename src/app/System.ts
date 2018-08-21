@@ -6,6 +6,7 @@ import Messenger from '../messenger/Messenger';
 import DevicesManager from './DevicesManager';
 import Devices from './Devices';
 import Drivers from './Drivers';
+import Services from './Services';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import HostConfig from './interfaces/HostConfig';
@@ -20,6 +21,7 @@ export default class System {
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
   readonly drivers: Drivers;
+  readonly services: Services;
   readonly log: Logger;
 
 
@@ -27,7 +29,8 @@ export default class System {
     this.io = new IO();
     // config for current host
     this.host = new Host(this, hostConfig);
-    this.drivers = new Drivers();
+    this.drivers = new Drivers(this);
+    this.services = new Services(this);
     this.network = new Network(this.drivers, this.host.id, this.host.networkConfig);
     this.events = new Events();
     this.log = defaultLogger;
