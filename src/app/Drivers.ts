@@ -1,10 +1,6 @@
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
-
-
-interface Driver {
-  init?: () => void;
-}
+import Driver from './interfaces/Driver';
 
 
 /**
@@ -13,15 +9,12 @@ interface Driver {
 export default class Drivers {
   private instances: Map<string, Driver> = Map<string, Driver>();
 
-  constructor() {
-  }
-
   /**
    * Make instances of drivers
    * @param driverManifests - uniq drivers manifests
    * @param driversConfig - user defined config for drivers
    */
-  init(driverManifests: DriverManifest[], driversConfig: {[index: string]: object} = {}) {
+  async init(driverManifests: DriverManifest[], driversConfig: {[index: string]: object} = {}): Promise<void> {
     // make instances
     for (let manifest of driverManifests) {
       const DriverClass = this.require(manifest.main).default;
@@ -30,13 +23,12 @@ export default class Drivers {
       this.instances = this.instances.set(manifest.name, instance);
     }
 
-    // TODO: сделать Promise.all
-    // TODO: потом поднять событие что драйверы инициализировались
-
     // initialize drivers
-    this.instances.forEach((driver: Driver | undefined) => {
-      if (driver && driver.init) driver.init();
-    });
+    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
+      const driver: Driver = this.instances.get(name);
+
+      await driver.init();
+    }));
   }
 
   getDriver(driverName: string): Driver {

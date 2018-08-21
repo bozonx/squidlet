@@ -37,7 +37,15 @@ export default class System {
   }
 
   async initDrivers(): Promise<void> {
-    this.drivers.init(this.host.config.driversManifests);
+    await this.drivers.init(this.host.config.driversManifests, this.host.config.driversConfigs);
+
+    // TODO: потом поднять событие что драйверы инициализировались
+  }
+
+  async initServices(): Promise<void> {
+    await this.services.init();
+
+    // TODO: потом поднять событие что services инициализировались
   }
 
   async initNetwork(): Promise<void> {

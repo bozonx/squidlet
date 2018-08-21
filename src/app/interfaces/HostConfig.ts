@@ -15,6 +15,8 @@ export default interface HostConfig {
   devicesConfigs: {[index: string]: DeviceConf};
   // parsed and sorted drivers manifests
   driversManifests: DriverManifest[];
+  // configs of drivers by driver name
+  driversConfigs: {[index: string]: DeviceConf};
 
   devices: {
     defaultStatusRepublishIntervalMs: number,
