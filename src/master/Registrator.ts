@@ -5,6 +5,7 @@ import validateService from './validateService';
 import validateDevice from './validateDevice';
 import validateDriver from './validateDriver';
 import {Map} from 'immutable';
+import Plugin from './interfaces/Plugin';
 
 
 /**
@@ -17,6 +18,10 @@ export default class Registrator {
 
 
   constructor() {
+  }
+
+  addPlugin(plugin: () => Plugin) {
+    // TODO: !!!
   }
 
   addDevice(manifest: string | DeviceManifest) {

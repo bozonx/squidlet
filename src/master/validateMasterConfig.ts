@@ -1,0 +1,3 @@
+export default function validateMasterConfig(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
