@@ -1,11 +1,13 @@
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
 import Registrator from './Registrator';
+import systemPlugin from './systemPlugin';
 
 
 export default class Configurator {
   private readonly masterConfig: MasterConfig;
   private readonly registrator: Registrator = new Registrator();
+
 
   constructor(masterConfig: {[index: string]: any}) {
     // TODO: validate config
@@ -22,7 +24,6 @@ export default class Configurator {
     this.registrator.addPlugin(plugin);
   }
 
-
   addDevice: Registrator['addDevice'] = (manifest) => {
     this.registrator.addDevice(manifest);
   }
@@ -36,9 +37,20 @@ export default class Configurator {
   }
 
   private init() {
-    // TODO: register system devices, plugins and services - можно сделать через плагин
-    // TODO: запускается инициализация плагинов
+    this.addPlugin(systemPlugin);
+
+    // register plugins from config
+    if (this.masterConfig.plugins) {
+      for (let pluginPath of this.masterConfig.plugins) {
+        this.addPlugin(pluginPath);
+      }
+    }
+
+    // initialize all the plugins
+    this.registrator.initPlugins();
+
     // TODO: разбор и резолв манифестов
+    // TODO: формирование конфигов хостов
 
   }
 

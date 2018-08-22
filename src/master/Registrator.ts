@@ -12,6 +12,7 @@ import Plugin from './interfaces/Plugin';
  * Register a new type of device, driver or service
  */
 export default class Registrator {
+  private readonly plugins: Plugin[] = [];
   private readonly devicesManifests: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private readonly driversManifests: Map<string, DriverManifest> = Map<string, DriverManifest>();
   private readonly servicesManifests: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
@@ -20,8 +21,13 @@ export default class Registrator {
   constructor() {
   }
 
-  addPlugin(plugin: () => Plugin) {
-    // TODO: !!!
+  addPlugin(plugin: string | Plugin) {
+    if (typeof plugin === 'string') {
+      this.plugins.push(this.require(plugin) as Plugin);
+    }
+    else {
+      this.plugins.push(plugin);
+    }
   }
 
   addDevice(manifest: string | DeviceManifest) {
@@ -73,6 +79,11 @@ export default class Registrator {
     // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
+  initPlugins() {
+    // TODO: !!!!
+  }
+
+
   private resolveManifest<T>(manifest: string | T): T {
     let parsedManifest: T;
 
@@ -94,6 +105,11 @@ export default class Registrator {
 
   private loadManifest(pathToManifest: string): {[index: string]: any} {
     // TODO: add
+  }
+
+  // it needs for test purpose
+  private require(devicePath: string) {
+    return require(devicePath);
   }
 
 }
