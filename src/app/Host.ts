@@ -3,7 +3,6 @@ import DeviceManifest from './interfaces/DeviceManifest';
 const _defaultsDeep = require('lodash/defaultsDeep');
 import System from './System';
 // import Destination from '../network/interfaces/Destination';
-// import DeviceManifest from './interfaces/DeviceManifest';
 // import DeviceConf from './interfaces/DeviceConf';
 import HostConfig from './interfaces/HostConfig';
 import configHostPlatform from './configHostPlatform';

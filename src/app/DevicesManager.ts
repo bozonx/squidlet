@@ -26,15 +26,15 @@ export default class DevicesManager {
    * and using user defined config for devices.
    * @param {object} devicesManifests - parsed devices manifests.
    *                                   Structure like { DeviceName: { ...manifest } }
-   * @param {object} devicesConfigs - user defined devices configs by ids { "room.device": { ...deviceConfig } }
+   * @param {object} devices - user defined definition of devices by ids { "room.device": { ...deviceConfig } }
    */
   init(
     devicesManifests: {[index: string]: DeviceManifest},
-    devicesConfigs: {[index: string]: object}
+    devices: {[index: string]: object}
   ): Promise<void[]> {
     return Promise.all(
-      Object.keys(devicesConfigs).map(async (deviceId: string): Promise<void> => {
-        const rawProps: {[index: string]: any} = devicesConfigs[deviceId];
+      Object.keys(devices).map(async (deviceId: string): Promise<void> => {
+        const rawProps: {[index: string]: any} = devices[deviceId];
 
         if (!rawProps.device) {
           this.system.log.fatal(`Unknown device "${JSON.stringify(rawProps)}"`);

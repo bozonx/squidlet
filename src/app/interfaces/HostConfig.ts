@@ -1,29 +1,24 @@
 import DeviceConf from './DeviceConf';
-import DeviceManifest from './DeviceManifest';
-import DriverManifest from './DriverManifest';
 import ServiceDefinition from './ServiceDefinition';
-import ServiceManifest from './ServiceManifest';
-// import Destination from '../../messenger/interfaces/Destination';
-// import MyAddress from './MyAddress';
 
 
 export default interface HostConfig {
-  // TODO: review
   // specific config for each host
-  host: {[index: string]: any};
-
-  // config of devices by deviceId
-  devicesConfigs: {[index: string]: DeviceConf};
-  // configs of drivers by driver name
-  driversConfigs: {[index: string]: DeviceConf};
-  // services definitions by service id
-  services: {[index: string]: ServiceDefinition};
-
-  devices: {
-    defaultStatusRepublishIntervalMs: number,
-    defaultConfigRepublishIntervalMs: number,
+  host: {
+    // republish status silently every minute if it hasn't been changed
+    defaultStatusRepublishIntervalMs: number;
+    // republish config silently every 10 minutes if it hasn't been changed
+    defaultConfigRepublishIntervalMs: number;
+    // custom params
+    params: {[index: string]: any};
   };
 
+  // devices definitions by deviceId
+  devices: {[index: string]: DeviceConf};
+  // drivers definitions by driver name
+  drivers: {[index: string]: DeviceConf};
+  // services definitions by service id
+  services: {[index: string]: ServiceDefinition};
 
   // override default params of devices
   devicesDefaults: {[index: string]: any};

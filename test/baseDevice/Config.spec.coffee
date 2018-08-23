@@ -6,7 +6,7 @@ describe 'baseDevice.Config', ->
     @system = {
       host: {
         config: {
-          devices: {
+          host: {
             defaultStatusRepublishIntervalMs: 1000
           }
         }

@@ -17,7 +17,7 @@ describe 'devices.Switch', ->
       }
       host: {
         config: {
-          devices: {
+          host: {
             defaultStatusRepublishIntervalMs: 0
           }
         }

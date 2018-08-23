@@ -17,7 +17,7 @@ describe 'devices.BinarySensor', ->
       }
       host: {
         config: {
-          devices: {
+          host: {
             defaultStatusRepublishIntervalMs: 0
           }
         }
