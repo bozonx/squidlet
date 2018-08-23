@@ -1,5 +1,5 @@
 // parsed manifest of device
-export default interface ManifestBase {
+export default interface PreManifestBase {
   // directory where manifest places. It is set on master configure time
   baseDir: string;
   // unique name
@@ -11,4 +11,6 @@ export default interface ManifestBase {
   drivers?: string[];
   // properties of instance
   props?: {[index: string]: any};
+  // additional files
+  files?: string[],
 }
