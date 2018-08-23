@@ -4,13 +4,15 @@ import Register from './Register';
 import Manager from './Manager';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
+import HostsConfig from './HostsConfig';
 
 
 export default class Configurator {
   private readonly masterConfig: MasterConfig;
-  private readonly manager: Manager;
   private readonly register: Register;
   private readonly manifests: Manifests;
+  private readonly hostsConfig: HostsConfig;
+  private readonly manager: Manager;
 
 
   constructor(masterConfig: {[index: string]: any}) {
@@ -21,6 +23,8 @@ export default class Configurator {
     this.masterConfig = masterConfig as MasterConfig;
     this.register = new Register();
     this.manifests = new Manifests();
+    this.hostsConfig = new HostsConfig(this.masterConfig, this.manifests);
+    // TODO: наверное передать лучше manifests, hostsConfig
     this.manager = new Manager(this.masterConfig, this.register);
   }
 
@@ -41,7 +45,9 @@ export default class Configurator {
     // resolve and prepare manifest
     this.manifests.prepare();
 
-    // TODO: формирование конфигов хостов
+    // generate hosts configs
+    this.hostsConfig.generate();
+
     // TODO: формирование списка файлов и данных для отправки хостам
   }
 

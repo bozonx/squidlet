@@ -1,3 +1,4 @@
+const _omit = require('lodash/omit');
 import {Map} from 'immutable';
 
 import DeviceManifest from '../app/interfaces/DeviceManifest';
@@ -32,6 +33,7 @@ interface FilesPaths {
 
 
 export default class Manifests {
+  // TODO: наверное использвать immutale
   private devices: DeviceManifest[] = [];
   private drivers: DriverManifest[] = [];
   private services: ServiceManifest[] = [];
@@ -73,37 +75,32 @@ export default class Manifests {
 
   proceed<PreManifest extends PreManifestBase, ProcessedManifest extends ManifestBase>(
     manifestType: string,
-    manifest: PreManifest
+    preManifest: PreManifest
   ) {
-    const processedManifest: PreManifest = { ...manifest as object } as PreManifest;
+    const processedManifest: ProcessedManifest = _omit(preManifest, 'files', 'drivers');
     const plural: PluralName = `${manifestType}s` as PluralName;
 
     // collect files
     this.filesPaths[plural][manifest.name] = [
-      manifest.main,
-      ...manifest.files || [],
+      preManifest.main,
+      ...preManifest.files || [],
     ];
-    // remove files list from manifest
-    delete processedManifest.files;
 
     // TODO: merge props with config defaults
     // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
 
     // proceed drivers
-    if (manifest.drivers) {
-      for (let driverPath of manifest.drivers) {
+    if (preManifest.drivers) {
+      for (let driverPath of preManifest.drivers) {
         // TODO: load driver manifest
         // TODO: if driver is registered - do nothing
         // TODO: run proceed
       }
     }
 
-    // remove drivers list from manifest
-    delete processedManifest.drivers;
+    const processedManifests = this[plural] as ProcessedManifest[];
 
-    const processedManifests = this[plural] as PreManifest[];
-
-    processedManifests.push(processedManifest as PreManifest);
+    processedManifests.push(processedManifest);
   }
 
 }
