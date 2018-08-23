@@ -1,6 +1,6 @@
 import ServiceDefinition from '../app/interfaces/ServiceDefinition';
 import System from '../app/System';
-import ServiceManifest from './interfaces/ServiceManifest';
+import PreServiceManifest from './interfaces/PreServiceManifest';
 
 
 export default class ParseServices {
@@ -10,13 +10,13 @@ export default class ParseServices {
     this.system = system;
   }
 
-  parseManifests(): {[index: string]: ServiceManifest} {
+  parseManifests(): {[index: string]: PreServiceManifest} {
     // TODO: получить все зарегистрированные сервисы
   }
 
   generateHostDefinitions(
     hostServicesDefinitions: {[index: string]: any},
-    servicesManifests: {[index: string]: ServiceManifest}
+    servicesManifests: {[index: string]: PreServiceManifest}
   ): {[index: string]: ServiceDefinition} {
     const completedDefinitions: {[index: string]: ServiceDefinition} = {};
 

@@ -1,4 +1,4 @@
-import ServiceManifest from './interfaces/ServiceManifest';
+import PreServiceManifest from './interfaces/PreServiceManifest';
 import ServiceDefinition from '../app/interfaces/ServiceDefinition';
 
 
@@ -14,7 +14,7 @@ export default class HostConfigGenerator {
   }
 
   private generateServices(
-    servicesManifests: {[index: string]: ServiceManifest}
+    servicesManifests: {[index: string]: PreServiceManifest}
   ): {[index: string]: ServiceDefinition} {
     // TODO: слить props
     // TODO: сформировать service definition - вставить из манифеста что нужно

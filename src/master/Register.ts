@@ -1,6 +1,6 @@
 import DeviceManifest from './interfaces/DeviceManifest';
 import DriverManifest from './interfaces/DriverManifest';
-import ServiceManifest from './interfaces/ServiceManifest';
+import PreServiceManifest from './interfaces/PreServiceManifest';
 import validateService from './validateService';
 import validateDevice from './validateDevice';
 import validateDriver from './validateDriver';
@@ -16,7 +16,7 @@ export default class Register {
   private readonly plugins: Plugin[] = [];
   private readonly devicesManifests: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private readonly driversManifests: Map<string, DriverManifest> = Map<string, DriverManifest>();
-  private readonly servicesManifests: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
+  private readonly servicesManifests: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
 
 
   constructor() {
@@ -35,7 +35,7 @@ export default class Register {
   }
 
   addDevice(manifest: string | DeviceManifest) {
-    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
+    let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
     const validateError: string | undefined = validateDevice(parsedManifest);
 
     if (this.devicesManifests.get(parsedManifest.name)) {
@@ -49,7 +49,7 @@ export default class Register {
   }
 
   addDriver(manifest: string | DriverManifest) {
-    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
+    let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
     const validateError: string | undefined = validateDriver(parsedManifest);
 
     if (this.driversManifests.get(parsedManifest.name)) {
@@ -66,8 +66,8 @@ export default class Register {
    * Add new service to the system.
    * @param manifest - it can be path to manifest yaml file or js plain object
    */
-  addService(manifest: string | ServiceManifest): void {
-    let parsedManifest: ServiceManifest = this.resolveManifest<ServiceManifest>(manifest);
+  addService(manifest: string | PreServiceManifest): void {
+    let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
     const validateError: string | undefined = validateService(parsedManifest);
 
     if (this.servicesManifests.get(parsedManifest.name)) {
