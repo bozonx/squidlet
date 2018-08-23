@@ -1,6 +1,8 @@
-// prepared definition of service of host
+import DefinitionBase from './DefinitionBase';
 
-export default interface ServiceDefinition {
+
+// prepared definition of service of host
+export default interface ServiceDefinition extends DefinitionBase {
   // // parsed and prepared manifest
   // entity: {
   //   // directory where manifest places. It is set on master configure time
@@ -14,5 +16,6 @@ export default interface ServiceDefinition {
   service: string;
   // unique id of service
   id: string;
-  [index: string]: any;
+  // any other params
+  //[index: string]: any;
 }
