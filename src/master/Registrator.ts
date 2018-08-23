@@ -80,7 +80,9 @@ export default class Registrator {
   }
 
   initPlugins() {
-    // TODO: !!!!
+    for (let plugin of this.plugins) {
+      plugin(this.configurator);
+    }
   }
 
 
