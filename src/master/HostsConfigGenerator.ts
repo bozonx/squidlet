@@ -1,3 +1,7 @@
+import DeviceConf from '../app/interfaces/DeviceConf';
+
+const _defaultsDeep = require('lodash/defaultsDeep');
+
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import ServiceDefinition from '../app/interfaces/ServiceDefinition';
 import MasterConfig from './interfaces/MasterConfig';
@@ -21,36 +25,54 @@ export default class HostsConfigGenerator {
   // TODO: !!!! add devs specified to platform
 
   generate() {
-    const hosts = this.getHosts();
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs();
 
+    for (let hostId of Object.keys(rawHostsConfigs)) {
+      const rawHostConfig = rawHostsConfigs[hostId];
+      const hostConfig: HostConfig = {
+        host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
+        devices: this.generateDevices(rawHostConfig.devices || {}),
+        drivers: this.generateDevices(rawHostConfig.drivers || {}),
+        services: this.generateServices(rawHostConfig.services || {}),
+        devicesDefaults: rawHostConfig.devicesDefaults || {},
+      };
 
-    // TODO: передать общиие параметры - взять из hostDefaults и в определении самого хоста
-    // TODO: воткнуть все используемые манифесты
-    // TODO: сформировать определения девайсов
-    // TODO: сформировать определения сервисов
-    // TODO: сформировать driversConfigs
+      this.hostsConfigs[hostId] = hostConfig;
+    }
   }
 
-  private generateServices(
-    servicesManifests: {[index: string]: PreServiceManifest}
-  ): {[index: string]: ServiceDefinition} {
+  private generateDevices(rawDevices: {[index: string]: any}): {[index: string]: DeviceConf} {
+    // TODO: !!!
+  }
+
+  private generateDrivers(rawDrivers: {[index: string]: any}): {[index: string]: any} {
+    // TODO: !!!
+  }
+
+  private generateServices(rawServices: {[index: string]: any}): {[index: string]: ServiceDefinition} {
     // TODO: слить props
     // TODO: сформировать service definition - вставить из манифеста что нужно
 
   }
 
-  private getHosts() {
+  mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
+    return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
+  }
+
+  private getHostsConfigs(): {[index: string]: PreHostConfig} {
     if (!this.masterConfig.host || this.masterConfig.hosts) {
       throw new Error(`Master config doesn't have "host" or "hosts" params`);
     }
 
-    let hosts: PreHostConfig[] = [];
+    let hosts: {[index: string]: PreHostConfig} = {};
 
     if (this.masterConfig.hosts) {
       hosts = this.masterConfig.hosts;
     }
     else if (this.masterConfig.host) {
-      hosts = [this.masterConfig.host];
+      hosts = {
+        master: this.masterConfig.host,
+      };
     }
 
     return hosts;

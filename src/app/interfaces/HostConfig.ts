@@ -16,7 +16,7 @@ export default interface HostConfig {
   // devices definitions by deviceId
   devices: {[index: string]: DeviceConf};
   // drivers definitions by driver name
-  drivers: {[index: string]: DeviceConf};
+  drivers: {[index: string]: any};
   // services definitions by service id
   services: {[index: string]: ServiceDefinition};
 
