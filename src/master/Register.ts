@@ -1,5 +1,5 @@
-import DeviceManifest from '../app/interfaces/DeviceManifest';
-import DriverManifest from '../app/interfaces/DriverManifest';
+import PreDeviceManifest from './interfaces/PreDeviceManifest';
+import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import validateService from './validateService';
 import validateDevice from './validateDevice';
@@ -14,13 +14,10 @@ import Manager from './Manager';
  */
 export default class Register {
   private readonly plugins: Plugin[] = [];
-  private readonly devicesManifests: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
-  private readonly driversManifests: Map<string, DriverManifest> = Map<string, DriverManifest>();
+  private readonly devicesManifests: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
+  private readonly driversManifests: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
   private readonly servicesManifests: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
 
-
-  constructor() {
-  }
 
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
@@ -37,33 +34,31 @@ export default class Register {
     }
   }
 
-  addDevice(manifest: string | DeviceManifest) {
-    let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
+  addDevice(manifest: string | PreDeviceManifest) {
+    let parsedManifest: PreDeviceManifest = this.resolveManifest<PreDeviceManifest>(manifest);
     const validateError: string | undefined = validateDevice(parsedManifest);
+
+    if (validateError) {
+      throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
+    }
 
     if (this.devicesManifests.get(parsedManifest.name)) {
       throw new Error(`Device "${parsedManifest.name}" is already exists!`);
     }
-
-    if (validateError) throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
-
-    // TODO: add base path
-    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
-  addDriver(manifest: string | DriverManifest) {
-    let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
+  addDriver(manifest: string | PreDriverManifest) {
+    let parsedManifest: PreDriverManifest = this.resolveManifest<PreDriverManifest>(manifest);
     const validateError: string | undefined = validateDriver(parsedManifest);
+
+    if (validateError) {
+      throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
+    }
 
     if (this.driversManifests.get(parsedManifest.name)) {
       throw new Error(`Driver "${parsedManifest.name}" is already exists!`);
     }
-
-    if (validateError) throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
-
-    // TODO: add base path
-    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
-  }
+ }
 
   /**
    * Add new service to the system.
@@ -73,22 +68,18 @@ export default class Register {
     let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
     const validateError: string | undefined = validateService(parsedManifest);
 
-    if (this.servicesManifests.get(parsedManifest.name)) {
-      throw new Error(`Service "${parsedManifest.name}" is already exists!`);
-    }
-
     if (validateError) {
       throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
     }
 
-
-    // TODO: add base path
-    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
+    if (this.servicesManifests.get(parsedManifest.name)) {
+      throw new Error(`Service "${parsedManifest.name}" is already exists!`);
+    }
   }
 
   initPlugins(manager: Manager) {
     for (let plugin of this.plugins) {
-      plugin(this.manager);
+      plugin(manager);
     }
   }
 
@@ -100,11 +91,15 @@ export default class Register {
       // TODO: load
       // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
       // TODO: расширение yaml - можно подставлять - необязательно указывать
-      // TODO: validate
       parsedManifest = this.loadManifest(manifest) as T;
+      // TODO: add baseDir
+      //parsedManifest.baseDir = manifest;
     }
     else if (typeof manifest === 'object') {
-      // TODO: validate
+      if (!(manifest as any).baseDir) {
+        throw new Error(`Param "baseDir" has to be specified in manifest ${JSON.parse(manifest)}`);
+      }
+
       parsedManifest = manifest;
     }
     else {

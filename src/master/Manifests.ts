@@ -47,6 +47,7 @@ export default class Manifests {
 
   prepare() {
     // TODO: collect props
+    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
   private resolve() {
