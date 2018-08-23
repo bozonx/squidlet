@@ -3,7 +3,7 @@ import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
-import DeviceConf from '../app/interfaces/DeviceConf';
+import DeviceDefinition from '../app/interfaces/DeviceDefinition';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -15,7 +15,7 @@ export default class DeviceBase {
   readonly getConfig?: Config['read'];
   readonly setConfig?: Config['write'];
   protected readonly system: System;
-  protected readonly deviceConf: DeviceConf;
+  protected readonly deviceConf: DeviceDefinition;
 
   // better place to do initial requests
   protected onInit?: () => Promise<void>;
@@ -29,7 +29,7 @@ export default class DeviceBase {
   protected actions: {[index: string]: Function} = {};
 
 
-  constructor(system: System, deviceConf: DeviceConf) {
+  constructor(system: System, deviceConf: DeviceDefinition) {
     this.system = system;
     this.deviceConf = deviceConf;
 

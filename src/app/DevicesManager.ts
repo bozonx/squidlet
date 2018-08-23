@@ -4,7 +4,7 @@ import System from './System';
 import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
-import DeviceConf from './interfaces/DeviceConf';
+import DeviceDefinition from './interfaces/DeviceDefinition';
 
 
 /**
@@ -41,7 +41,7 @@ export default class DevicesManager {
         }
 
         const manifest: DeviceManifest = devicesManifests[rawProps.device];
-        const deviceConf: DeviceConf = await this.prepareDeviceConf(rawProps, manifest, deviceId);
+        const deviceConf: DeviceDefinition = await this.prepareDeviceConf(rawProps, manifest, deviceId);
 
         this.instances[deviceConf.deviceId] = await this.deviceFactory.create(deviceConf);
       })
@@ -67,7 +67,7 @@ export default class DevicesManager {
     rawInstanceProps: {[index: string]: any},
     manifest: DeviceManifest,
     deviceId: string
-  ): Promise<DeviceConf> {
+  ): Promise<DeviceDefinition> {
     if (!manifest) {
       throw new Error(`Can't find manifest of device "${rawInstanceProps.device}"`);
     }

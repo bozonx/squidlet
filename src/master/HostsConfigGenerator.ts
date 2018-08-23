@@ -1,4 +1,4 @@
-import DeviceConf from '../app/interfaces/DeviceConf';
+import DeviceDefinition from '../app/interfaces/DeviceDefinition';
 
 const _defaultsDeep = require('lodash/defaultsDeep');
 
@@ -42,7 +42,7 @@ export default class HostsConfigGenerator {
     }
   }
 
-  private generateDevices(rawDevices: {[index: string]: any}): DeviceConf[] {
+  private generateDevices(rawDevices: {[index: string]: any}): DeviceDefinition[] {
     // TODO: !!!
   }
 

@@ -2,7 +2,7 @@ import System from '../../app/System';
 import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import GpioOutputFactory, {GpioOutputDriver} from '../../drivers/Gpio/GpioOutput.driver';
-import DeviceConf from '../../app/interfaces/DeviceConf';
+import DeviceDefinition from '../../app/interfaces/DeviceDefinition';
 import {convertToLevel} from '../../helpers/helpers';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
@@ -12,7 +12,7 @@ export default class Switch extends DeviceBase {
   private readonly gpioOutputDriver: GpioOutputDriver;
   private deadTimeInProgress: boolean = false;
 
-  constructor(system: System, deviceConf: DeviceConf) {
+  constructor(system: System, deviceConf: DeviceDefinition) {
     super(system, deviceConf);
 
     const gpioOutputDriverFactory = this.system.drivers.getDriver('GpioOutputDriver.driver') as GpioOutputFactory;

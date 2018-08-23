@@ -1,4 +1,4 @@
-import DeviceConf from './DeviceConf';
+import DeviceDefinition from './DeviceDefinition';
 import ServiceDefinition from './ServiceDefinition';
 import DriverDefinition from './DriverDefinition';
 
@@ -15,7 +15,7 @@ export default interface HostConfig {
   };
 
   // devices definitions by deviceId
-  devices: DeviceConf[];
+  devices: DeviceDefinition[];
   // drivers definitions by driver name
   drivers: DriverDefinition[];
   // services definitions by service id
