@@ -9,6 +9,9 @@ import Manifests from './Manifests';
 import HostConfig from '../app/interfaces/HostConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import DriverDefinition from '../app/interfaces/DriverDefinition';
+import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
+import PreDriverDefinition from './interfaces/PreDriverDefinition';
+import PreServiceDefinition from './interfaces/PreServiceDefinition';
 
 
 export default class HostsConfigGenerator {
@@ -42,32 +45,56 @@ export default class HostsConfigGenerator {
     }
   }
 
-  private generateDevices(rawDevices: {[index: string]: any}): DeviceDefinition[] {
-    // TODO: !!!
+  private generateDevices(rawDevices: {[index: string]: PreDeviceDefinition}): DeviceDefinition[] {
+    const definitions: DeviceDefinition[] = [];
+
+    for (let deviceId of Object.keys(rawDevices)) {
+      const device: DeviceDefinition = {
+        id: deviceId,
+        className: rawDevices[deviceId].device,
+        props: {
+          // TODO: слить props c манифестом и дефолтными параметрами в конфиге хоста
+        },
+      };
+
+      definitions.push(device);
+    }
+
+    return definitions;
   }
 
-  private generateDrivers(rawDrivers: {[index: string]: any}): DriverDefinition[] {
-    // TODO: наверное лучше использвать driverDefinition
-    // TODO: !!!
+  private generateDrivers(rawDrivers: {[index: string]: PreDriverDefinition}): DriverDefinition[] {
+    const definitions: DriverDefinition[] = [];
+
+    for (let driverId of Object.keys(rawDrivers)) {
+      const driver: DriverDefinition = {
+        id: driverId,
+        className: rawDrivers[driverId].driver,
+        props: {
+          // TODO: слить props c манифестом и дефолтными параметрами в конфиге хоста
+        },
+      };
+
+      definitions.push(driver);
+    }
+
+    return definitions;
   }
 
-  private generateServices(rawServices: {[index: string]: any}): ServiceDefinition[] {
+  private generateServices(rawServices: {[index: string]: PreServiceDefinition}): ServiceDefinition[] {
     const definitions: ServiceDefinition[] = [];
 
-    for (let serviceId of rawServices) {
+    for (let serviceId of Object.keys(rawServices)) {
       const service: ServiceDefinition = {
         id: serviceId,
         className: rawServices[serviceId].service,
         props: {
-          // TODO: слить props
+          // TODO: слить props c манифестом и дефолтными параметрами в конфиге хоста
         },
       };
 
+      definitions.push(service);
     }
-
-
-
-    // TODO: сформировать service definition - вставить из манифеста что нужно
 
     return definitions;
   }

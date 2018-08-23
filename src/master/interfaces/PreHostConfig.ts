@@ -1,3 +1,8 @@
+import PreDeviceDefinition from './PreDeviceDefinition';
+import PreDriverDefinition from './PreDriverDefinition';
+import PreServiceDefinition from './PreServiceDefinition';
+
+
 // raw host config specified in master config
 export default interface PreHostConfig {
   // specific config for each host
@@ -11,11 +16,11 @@ export default interface PreHostConfig {
   };
 
   // devices definitions by deviceId
-  devices?: {[index: string]: any};
+  devices?: {[index: string]: PreDeviceDefinition};
   // drivers definitions by driver name
-  drivers?: {[index: string]: any};
+  drivers?: {[index: string]: PreDriverDefinition};
   // services definitions by service id
-  services?: {[index: string]: any};
+  services?: {[index: string]: PreServiceDefinition};
 
   // override default params of devices
   devicesDefaults?: {[index: string]: any};
