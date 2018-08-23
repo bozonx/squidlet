@@ -89,6 +89,8 @@ export default class Registrator {
 
     if (typeof manifest === 'string') {
       // TODO: load
+      // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
+      // TODO: расширение yaml - можно подставлять - необязательно указывать
       // TODO: validate
       parsedManifest = this.loadManifest(manifest) as T;
     }
