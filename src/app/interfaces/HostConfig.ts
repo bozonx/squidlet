@@ -1,5 +1,6 @@
 import DeviceConf from './DeviceConf';
 import ServiceDefinition from './ServiceDefinition';
+import DriverDefinition from './DriverDefinition';
 
 
 export default interface HostConfig {
@@ -14,11 +15,11 @@ export default interface HostConfig {
   };
 
   // devices definitions by deviceId
-  devices: {[index: string]: DeviceConf};
+  devices: DeviceConf[];
   // drivers definitions by driver name
-  drivers: {[index: string]: any};
+  drivers: DriverDefinition[];
   // services definitions by service id
-  services: {[index: string]: ServiceDefinition};
+  services: ServiceDefinition[];
 
   // override default params of devices
   devicesDefaults: {[index: string]: any};

@@ -8,6 +8,7 @@ import MasterConfig from './interfaces/MasterConfig';
 import Manifests from './Manifests';
 import HostConfig from '../app/interfaces/HostConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
+import DriverDefinition from '../app/interfaces/DriverDefinition';
 
 
 export default class HostsConfigGenerator {
@@ -32,7 +33,7 @@ export default class HostsConfigGenerator {
       const hostConfig: HostConfig = {
         host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
         devices: this.generateDevices(rawHostConfig.devices || {}),
-        drivers: this.generateDevices(rawHostConfig.drivers || {}),
+        drivers: this.generateDrivers(rawHostConfig.drivers || {}),
         services: this.generateServices(rawHostConfig.services || {}),
         devicesDefaults: rawHostConfig.devicesDefaults || {},
       };
@@ -41,18 +42,34 @@ export default class HostsConfigGenerator {
     }
   }
 
-  private generateDevices(rawDevices: {[index: string]: any}): {[index: string]: DeviceConf} {
+  private generateDevices(rawDevices: {[index: string]: any}): DeviceConf[] {
     // TODO: !!!
   }
 
-  private generateDrivers(rawDrivers: {[index: string]: any}): {[index: string]: any} {
+  private generateDrivers(rawDrivers: {[index: string]: any}): DriverDefinition[] {
+    // TODO: наверное лучше использвать driverDefinition
     // TODO: !!!
   }
 
-  private generateServices(rawServices: {[index: string]: any}): {[index: string]: ServiceDefinition} {
-    // TODO: слить props
+  private generateServices(rawServices: {[index: string]: any}): ServiceDefinition[] {
+    const definitions: ServiceDefinition[] = [];
+
+    for (let serviceId of rawServices) {
+      const service: ServiceDefinition = {
+        id: serviceId,
+        className: rawServices[serviceId].service,
+        props: {
+          // TODO: слить props
+        },
+      };
+
+    }
+
+
+
     // TODO: сформировать service definition - вставить из манифеста что нужно
 
+    return definitions;
   }
 
   mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {

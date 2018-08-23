@@ -14,6 +14,7 @@ export default class Services {
   }
 
   async init(): Promise<void> {
+    // TODO: будет array
     const servicesDefinitions: {[index: string]: ServiceDefinition} = this.system.host.config.services;
     const servicesManifests: {[index: string]: ServiceManifest} = this.system.host.servicesManifests;
 
