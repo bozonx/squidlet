@@ -13,23 +13,24 @@ import Manager from './Manager';
  * Register a new type of device, driver or service
  */
 export default class Register {
-  private readonly manager: Manager;
   private readonly plugins: Plugin[] = [];
   private readonly devicesManifests: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private readonly driversManifests: Map<string, DriverManifest> = Map<string, DriverManifest>();
   private readonly servicesManifests: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
 
 
-  constructor(manager: Manager) {
-    this.manager = manager;
+  constructor() {
   }
 
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
       this.plugins.push(this.require(plugin) as Plugin);
     }
-    else {
+    else if (typeof plugin === 'function') {
       this.plugins.push(plugin);
+    }
+    else {
+      throw new Error(`Incorrect type of plugin "${JSON.stringify(plugin)}"`);
     }
   }
 
@@ -82,7 +83,7 @@ export default class Register {
     // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }
 
-  initPlugins() {
+  initPlugins(manager: Manager) {
     for (let plugin of this.plugins) {
       plugin(this.manager);
     }
