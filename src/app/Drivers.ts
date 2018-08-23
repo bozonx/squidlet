@@ -1,5 +1,5 @@
 import { Map } from 'immutable';
-import DriverManifest from '../master/interfaces/DriverManifest';
+import DriverManifest from './interfaces/DriverManifest';
 import Driver from './interfaces/Driver';
 import System from './System';
 

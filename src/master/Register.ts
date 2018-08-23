@@ -1,5 +1,5 @@
-import DeviceManifest from './interfaces/DeviceManifest';
-import DriverManifest from './interfaces/DriverManifest';
+import DeviceManifest from '../app/interfaces/DeviceManifest';
+import DriverManifest from '../app/interfaces/DriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import validateService from './validateService';
 import validateDevice from './validateDevice';

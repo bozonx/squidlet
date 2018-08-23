@@ -1,6 +1,6 @@
 import System from './System';
 import ServiceDefinition from './interfaces/ServiceDefinition';
-import ServiceManifest from '../master/interfaces/ServiceManifest';
+import ServiceManifest from './interfaces/ServiceManifest';
 import {Map} from 'immutable';
 import Service from './interfaces/Service';
 

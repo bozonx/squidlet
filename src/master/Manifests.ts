@@ -1,4 +1,4 @@
-import DeviceManifest from './interfaces/DeviceManifest';
+import DeviceManifest from '../app/interfaces/DeviceManifest';
 
 export default class Manifests {
   private devices: DeviceManifest;
