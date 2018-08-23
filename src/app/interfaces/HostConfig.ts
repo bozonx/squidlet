@@ -12,19 +12,12 @@ export default interface HostConfig {
   // specific config for each host
   host: {[index: string]: any};
 
-  // parsed devices manifests by device's class name
-  devicesManifests: {[index: string]: DeviceManifest};
   // config of devices by deviceId
   devicesConfigs: {[index: string]: DeviceConf};
-  // TODO: почему тут список а в других местах объект?
-  // parsed and sorted drivers manifests
-  driversManifests: DriverManifest[];
   // configs of drivers by driver name
   driversConfigs: {[index: string]: DeviceConf};
   // services definitions by service id
   services: {[index: string]: ServiceDefinition};
-  // parsed manifests of services
-  servicesManifests: {[index: string]: ServiceManifest};
 
   devices: {
     defaultStatusRepublishIntervalMs: number,

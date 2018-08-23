@@ -40,7 +40,7 @@ export default class System {
   }
 
   async initDrivers(): Promise<void> {
-    await this.drivers.init(this.host.config.driversManifests, this.host.config.driversConfigs);
+    await this.drivers.init(this.host.driversManifests, this.host.config.driversConfigs);
 
     // TODO: потом поднять событие что драйверы инициализировались
   }
@@ -72,7 +72,7 @@ export default class System {
     // TODO: init devices
 
 
-    await this.devicesManager.init(this.host.config.devicesManifests, this.host.config.devicesConfigs);
+    await this.devicesManager.init(this.host.devicesManifests, this.host.config.devicesConfigs);
 
     this.devices.init();
   }

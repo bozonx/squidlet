@@ -1,3 +1,5 @@
+import DeviceManifest from './interfaces/DeviceManifest';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 import System from './System';
 // import Destination from '../network/interfaces/Destination';
@@ -7,6 +9,8 @@ import HostConfig from './interfaces/HostConfig';
 import configHostPlatform from './configHostPlatform';
 import configHostDefault from './configHostDefault';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
+import DriverManifest from './interfaces/DriverManifest';
+import ServiceManifest from './interfaces/ServiceManifest';
 
 
 // TODO: ??? use immutable
@@ -57,6 +61,22 @@ export default class Host {
 
   get networkConfig(): HostNetworkConfig {
     return this.hostNetworkConfig;
+  }
+
+  // parsed devices manifests by device's class name
+  get devicesManifests(): {[index: string]: DeviceManifest} {
+
+  }
+
+  // TODO: почему тут список а в других местах объект?
+  // parsed and sorted drivers manifests
+  get driversManifests(): DriverManifest[] {
+
+  }
+
+  // parsed manifests of services
+  get servicesManifests(): {[index: string]: ServiceManifest} {
+
   }
 
   constructor(system: System, hostConfig: HostConfig) {
