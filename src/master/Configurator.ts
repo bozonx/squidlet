@@ -4,14 +4,14 @@ import Register from './Register';
 import Manager from './Manager';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
-import HostsConfig from './HostsConfig';
+import HostsConfigGenerator from './HostsConfigGenerator';
 
 
 export default class Configurator {
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;
   private readonly manifests: Manifests;
-  private readonly hostsConfig: HostsConfig;
+  private readonly hostsConfigGenerator: HostsConfigGenerator;
   private readonly manager: Manager;
 
 
@@ -23,7 +23,7 @@ export default class Configurator {
     this.masterConfig = masterConfig as MasterConfig;
     this.register = new Register();
     this.manifests = new Manifests();
-    this.hostsConfig = new HostsConfig(this.masterConfig, this.manifests);
+    this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
     // TODO: наверное передать лучше manifests, hostsConfig
     this.manager = new Manager(this.masterConfig, this.register);
   }

@@ -5,7 +5,7 @@ import Manifests from './Manifests';
 import HostConfig from '../app/interfaces/HostConfig';
 
 
-export default class HostsConfig {
+export default class HostsConfigGenerator {
   private readonly masterConfig: MasterConfig;
   private readonly manifests: Manifests;
   // hosts configs by hostId
