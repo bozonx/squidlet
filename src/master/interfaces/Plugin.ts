@@ -1,6 +1,6 @@
-import Configurator from '../Configurator';
+import Manager from '../Manager';
 
 
 export default interface Plugin {
-  (configurator: Configurator): void;
+  (manager: Manager): void;
 }

@@ -1,32 +1,30 @@
 import MasterConfig from './interfaces/MasterConfig';
-import validateMasterConfig from './validateMasterConfig';
-import Registrator from './Registrator';
-import systemPlugin from './systemPlugin';
+import Register from './Register';
 
 
 export default class Configurator {
   private readonly masterConfig: MasterConfig;
-  private readonly registrator: Registrator = new Registrator();
+  private readonly register: Register = new Register();
 
 
   constructor(masterConfig: MasterConfig) {
     this.masterConfig = masterConfig;
   }
 
-  addPlugin: Registrator['addPlugin'] = (plugin) => {
-    this.registrator.addPlugin(plugin);
+  addPlugin: Register['addPlugin'] = (plugin) => {
+    this.register.addPlugin(plugin);
   }
 
-  addDevice: Registrator['addDevice'] = (manifest) => {
-    this.registrator.addDevice(manifest);
+  addDevice: Register['addDevice'] = (manifest) => {
+    this.register.addDevice(manifest);
   }
 
-  addDriver: Registrator['addDriver'] = (manifest) => {
-    this.registrator.addDriver(manifest);
+  addDriver: Register['addDriver'] = (manifest) => {
+    this.register.addDriver(manifest);
   }
 
-  addService: Registrator['addService'] = (manifest) => {
-    this.registrator.addService(manifest);
+  addService: Register['addService'] = (manifest) => {
+    this.register.addService(manifest);
   }
 
 }

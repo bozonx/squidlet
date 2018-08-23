@@ -1,12 +1,12 @@
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
-import Registrator from './Registrator';
+import Register from './Register';
 import systemPlugin from './systemPlugin';
 
 
 export default class Configurator {
   private readonly masterConfig: MasterConfig;
-  private readonly registrator: Registrator = new Registrator();
+  private readonly registrator: Register = new Register();
 
 
   constructor(masterConfig: {[index: string]: any}) {
@@ -20,19 +20,19 @@ export default class Configurator {
     this.init();
   }
 
-  addPlugin: Registrator['addPlugin'] = (plugin) => {
+  addPlugin: Register['addPlugin'] = (plugin) => {
     this.registrator.addPlugin(plugin);
   }
 
-  addDevice: Registrator['addDevice'] = (manifest) => {
+  addDevice: Register['addDevice'] = (manifest) => {
     this.registrator.addDevice(manifest);
   }
 
-  addDriver: Registrator['addDriver'] = (manifest) => {
+  addDriver: Register['addDriver'] = (manifest) => {
     this.registrator.addDriver(manifest);
   }
 
-  addService: Registrator['addService'] = (manifest) => {
+  addService: Register['addService'] = (manifest) => {
     this.registrator.addService(manifest);
   }
 

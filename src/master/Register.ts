@@ -6,19 +6,22 @@ import validateDevice from './validateDevice';
 import validateDriver from './validateDriver';
 import {Map} from 'immutable';
 import Plugin from './interfaces/Plugin';
+import Manager from './Manager';
 
 
 /**
  * Register a new type of device, driver or service
  */
-export default class Registrator {
+export default class Register {
+  private readonly manager: Manager;
   private readonly plugins: Plugin[] = [];
   private readonly devicesManifests: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private readonly driversManifests: Map<string, DriverManifest> = Map<string, DriverManifest>();
   private readonly servicesManifests: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
 
 
-  constructor() {
+  constructor(manager: Manager) {
+    this.manager = manager;
   }
 
   addPlugin(plugin: string | Plugin) {
@@ -81,7 +84,7 @@ export default class Registrator {
 
   initPlugins() {
     for (let plugin of this.plugins) {
-      plugin(this.configurator);
+      plugin(this.manager);
     }
   }
 
