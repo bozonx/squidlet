@@ -1,5 +1,6 @@
 import DeviceManifest from './DeviceManifest';
 
+// TODO: review
 
 export default interface DeviceConf {
   // name of device class e.g. "BinarySensor"

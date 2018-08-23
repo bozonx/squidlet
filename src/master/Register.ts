@@ -24,6 +24,9 @@ export default class Register {
 
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
+
+      // TODO: запретить относительные пути
+
       this.plugins.push(this.require(plugin) as Plugin);
     }
     else if (typeof plugin === 'function') {

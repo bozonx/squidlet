@@ -36,4 +36,8 @@ export default class Configurator {
     this.register.addService(manifest);
   }
 
+  afterInit(handler: () => void) {
+    // TODO: навешаться на событие которое вызывается после инициализации плагинов и тд
+  }
+
 }
