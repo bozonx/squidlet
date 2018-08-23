@@ -3,6 +3,9 @@ import {Map} from 'immutable';
 import DeviceManifest from '../app/interfaces/DeviceManifest';
 import DriverManifest from '../app/interfaces/DriverManifest';
 import ServiceManifest from '../app/interfaces/ServiceManifest';
+import PreDeviceManifest from './interfaces/PreDeviceManifest';
+import PreDriverManifest from './interfaces/PreDriverManifest';
+import PreServiceManifest from './interfaces/PreServiceManifest';
 
 
 interface FilesPaths {
@@ -45,7 +48,11 @@ export default class Manifests {
 
   }
 
-  prepare() {
+  prepare(
+    preDevicesManifests: PreDeviceManifest,
+    prePreDriverManifest: PreDriverManifest,
+    prePreServiceManifest: PreServiceManifest
+  ) {
     // TODO: collect props
     // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
   }

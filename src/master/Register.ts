@@ -1,9 +1,9 @@
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
-import validateService from './validateServiceManifest';
-import validateDevice from './validateDeviceManifest';
-import validateDriver from './validateDriverManifest';
+import validateServiceManifest from './validateServiceManifest';
+import validateDeviceManifest from './validateDeviceManifest';
+import validateDriverManifest from './validateDriverManifest';
 import {Map} from 'immutable';
 import Plugin from './interfaces/Plugin';
 import Manager from './Manager';
@@ -36,7 +36,7 @@ export default class Register {
 
   addDevice(manifest: string | PreDeviceManifest) {
     let parsedManifest: PreDeviceManifest = this.resolveManifest<PreDeviceManifest>(manifest);
-    const validateError: string | undefined = validateDevice(parsedManifest);
+    const validateError: string | undefined = validateDeviceManifest(parsedManifest);
 
     if (validateError) {
       throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
@@ -49,7 +49,7 @@ export default class Register {
 
   addDriver(manifest: string | PreDriverManifest) {
     let parsedManifest: PreDriverManifest = this.resolveManifest<PreDriverManifest>(manifest);
-    const validateError: string | undefined = validateDriver(parsedManifest);
+    const validateError: string | undefined = validateDriverManifest(parsedManifest);
 
     if (validateError) {
       throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
@@ -66,7 +66,7 @@ export default class Register {
    */
   addService(manifest: string | PreServiceManifest): void {
     let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
-    const validateError: string | undefined = validateService(parsedManifest);
+    const validateError: string | undefined = validateServiceManifest(parsedManifest);
 
     if (validateError) {
       throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
