@@ -38,32 +38,32 @@ export default class MasterConfigurator {
   //   }
   // }
 
-  /**
-   * Configure master to slaves connections.
-   */
-  private configureMasterConnections() {
-
-    // TODO: use host config - там плоская структура
-
-    // findRecursively(this.system.host.config.devices, (item, itemPath): boolean => {
-    //   if (!_.isPlainObject(item)) return false;
-    //   // go deeper
-    //   if (!item.device) return undefined;
-    //   if (item.device !== 'host') return false;
-    //
-    //   const connection = {
-    //     host: itemPath,
-    //     type: item.address.type,
-    //     //bus: item.address.bus,
-    //     bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
-    //     address: item.address.address,
-    //   };
-    //
-    //   this.registerConnection(connection);
-    //
-    //   return false;
-    // });
-  }
+  // /**
+  //  * Configure master to slaves connections.
+  //  */
+  // private configureMasterConnections() {
+  //
+  //   // TODO: use host config - там плоская структура
+  //
+  //   // findRecursively(this.system.host.config.devices, (item, itemPath): boolean => {
+  //   //   if (!_.isPlainObject(item)) return false;
+  //   //   // go deeper
+  //   //   if (!item.device) return undefined;
+  //   //   if (item.device !== 'host') return false;
+  //   //
+  //   //   const connection = {
+  //   //     host: itemPath,
+  //   //     type: item.address.type,
+  //   //     //bus: item.address.bus,
+  //   //     bus: (_.isUndefined(item.address.bus)) ? undefined : String(item.address.bus),
+  //   //     address: item.address.address,
+  //   //   };
+  //   //
+  //   //   this.registerConnection(connection);
+  //   //
+  //   //   return false;
+  //   // });
+  // }
 
 }
 

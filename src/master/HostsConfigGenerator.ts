@@ -1,7 +1,7 @@
-import DeviceDefinition from '../app/interfaces/DeviceDefinition';
-
 const _defaultsDeep = require('lodash/defaultsDeep');
+const _omit = require('lodash/omit');
 
+import DeviceDefinition from '../app/interfaces/DeviceDefinition';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import ServiceDefinition from '../app/interfaces/ServiceDefinition';
 import MasterConfig from './interfaces/MasterConfig';
@@ -52,9 +52,10 @@ export default class HostsConfigGenerator {
       const device: DeviceDefinition = {
         id: deviceId,
         className: rawDevices[deviceId].device,
-        props: {
-          // TODO: слить props c манифестом и дефолтными параметрами в конфиге хоста
-        },
+
+        // TODO: merge with devicesDefaults
+
+        props: _omit(rawDevices[deviceId], 'device'),
       };
 
       definitions.push(device);
@@ -70,9 +71,11 @@ export default class HostsConfigGenerator {
       const driver: DriverDefinition = {
         id: driverId,
         className: rawDrivers[driverId].driver,
-        props: {
-          // TODO: слить props c манифестом и дефолтными параметрами в конфиге хоста
-        },
+
+
+        // TODO: отсортировать для каждого хоста - сначала dev, потом system потом остальные
+
+        props: _omit(rawDrivers[driverId], 'driver'),
       };
 
       definitions.push(driver);
@@ -88,9 +91,7 @@ export default class HostsConfigGenerator {
       const service: ServiceDefinition = {
         id: serviceId,
         className: rawServices[serviceId].service,
-        props: {
-          // TODO: слить props c манифестом и дефолтными параметрами в конфиге хоста
-        },
+        props: _omit(rawServices[serviceId], 'service'),
       };
 
       definitions.push(service);

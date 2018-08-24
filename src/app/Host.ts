@@ -80,6 +80,8 @@ export default class Host {
 
   constructor(system: System, hostConfig: HostConfig) {
     this.system = system;
+
+    // TODO: прочитать разово с диска и удалить из памяти
     this.hostConfig = this.mergeConfigs(hostConfig);
 
     // TODO: откуда его взять
@@ -108,6 +110,8 @@ export default class Host {
 
 
   private mergeConfigs(specifiedConfig: HostConfig): HostConfig {
+    // TODO: не нужно
+
     return {
       ...specifiedConfig,
       host: {

@@ -46,7 +46,7 @@ export default class Configurator {
     this.manifests.prepare();
 
     // generate hosts configs
-    this.hostsConfig.generate();
+    this.hostsConfigGenerator.generate();
 
     // TODO: формирование списка файлов и данных для отправки хостам
   }
