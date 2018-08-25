@@ -29,11 +29,11 @@ export default interface PreHostConfig {
   devicesDefaults?: {[index: string]: any};
 
   // shortcut for automation service
-  automation: {[index: string]: any};
+  automation?: PreServiceDefinition;
   // shortcut for mqtt service
-  mqtt: {[index: string]: any};
+  mqtt?: PreServiceDefinition;
   // shortcut for logger service
-  logger: {[index: string]: any};
+  logger?: PreServiceDefinition;
   // shortcut for webApi service
-  webApi: {[index: string]: any};
+  webApi?: PreServiceDefinition;
 }

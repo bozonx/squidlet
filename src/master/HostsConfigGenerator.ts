@@ -2,7 +2,6 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _omit = require('lodash/omit');
 
 import DeviceDefinition from '../app/interfaces/DeviceDefinition';
-import PreServiceManifest from './interfaces/PreServiceManifest';
 import ServiceDefinition from '../app/interfaces/ServiceDefinition';
 import MasterConfig from './interfaces/MasterConfig';
 import Manifests from './Manifests';
@@ -12,6 +11,14 @@ import DriverDefinition from '../app/interfaces/DriverDefinition';
 import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
+
+
+const servicesShortcut = [
+  'automation',
+  'mqtt',
+  'logger',
+  'webApi',
+];
 
 
 export default class HostsConfigGenerator {
@@ -43,11 +50,12 @@ export default class HostsConfigGenerator {
         host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
         devices: this.generateDevices(rawHostConfig.devices || {}),
         drivers: this.generateDrivers(rawHostConfig.drivers || {}),
-        services: this.generateServices(rawHostConfig.services || {}),
+        services: {
+          ...this.generateServices(rawHostConfig.services || {}),
+          ...this.generatePreDefinedServices(rawHostConfig),
+        },
         devicesDefaults: rawHostConfig.devicesDefaults || {},
       };
-
-      // TODO: добавить сервисы automation, mqtt, logger, webApi
 
       this.hostsConfigs[hostId] = hostConfig;
     }
@@ -104,16 +112,39 @@ export default class HostsConfigGenerator {
     const definitions: ServiceDefinition[] = [];
 
     for (let serviceId of Object.keys(rawServices)) {
-      const service: ServiceDefinition = {
-        id: serviceId,
-        className: rawServices[serviceId].service,
-        props: _omit(rawServices[serviceId], 'service'),
-      };
+      const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
 
       definitions.push(service);
     }
 
     return definitions;
+  }
+
+  /**
+   * Generate service from shortcuts like 'automation', 'logger' etc.
+   */
+  private generatePreDefinedServices(rawHostConfig: {[index: string]: any}): ServiceDefinition[] {
+    const result: ServiceDefinition[] = [];
+
+    for (let serviceId of servicesShortcut) {
+      const shortcut = rawHostConfig[serviceId];
+
+      if (shortcut) {
+        const serviceDefinition: ServiceDefinition = this.makeServiceDefinition(serviceId, shortcut);
+
+        result.push(serviceDefinition);
+      }
+    }
+
+    return result;
+  }
+
+  makeServiceDefinition(serviceId: string, preService: PreServiceDefinition): ServiceDefinition {
+    return {
+      id: serviceId,
+      className: preService.service,
+      props: _omit(preService, 'service'),
+    };
   }
 
   /**
