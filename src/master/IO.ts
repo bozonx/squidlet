@@ -1,8 +1,27 @@
 import * as uniqid from 'uniqid';
+import * as path from "path";
+import PreManifestBase from './interfaces/PreManifestBase';
 
 const fs = require('fs');
 const { yamlToJs } = require('./helpers');
 
+
+export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
+
+
+export async function loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {
+  if (pathToDirOrFile.indexOf('/') !== 0) {
+    throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
+  }
+
+  const resolvedPathToManifest: string = await resolveFile(pathToDirOrFile, 'yaml', INDEX_MANIFEST_FILE_NAMES);
+
+  const parsedManifest: T = (await loadYamlFile(resolvedPathToManifest)) as T;
+
+  parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
+
+  return parsedManifest;
+}
 
 export async function resolveFile(pathToDirOrDile: string, ext: string, indexFileName: string[]): string {
   // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml

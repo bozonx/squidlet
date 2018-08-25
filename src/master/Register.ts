@@ -1,5 +1,3 @@
-import {INDEX_MANIFEST_FILE_NAMES} from './Configurator';
-
 const _map = require('lodash/map');
 
 import * as path from 'path';
@@ -11,7 +9,7 @@ import PreServiceManifest from './interfaces/PreServiceManifest';
 import validateServiceManifest from './validateServiceManifest';
 import validateDeviceManifest from './validateDeviceManifest';
 import validateDriverManifest from './validateDriverManifest';
-import {resolveFile, loadYamlFile} from './IO';
+import {loadManifest} from './IO';
 import {Map} from 'immutable';
 import Plugin from './interfaces/Plugin';
 import Manager from './Manager';
@@ -121,14 +119,7 @@ export default class Register {
 
     if (typeof manifest === 'string') {
       // it's path to manifest - let's load it
-      if (manifest.indexOf('/') !== 0) {
-        throw new Error(`You have to specify an absolute path of "${manifest}"`);
-      }
-
-      const resolvedPathToManifest: string = await this.resolveManifestPath(manifest);
-
-      parsedManifest = await this.loadManifest<T>(resolvedPathToManifest);
-      parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
+      parsedManifest = await this.loadManifest<T>(manifest);
     }
     else if (typeof manifest === 'object') {
       // it's manifest as a js object
@@ -145,12 +136,8 @@ export default class Register {
     return parsedManifest;
   }
 
-  private async resolveManifestPath(pathToManifest: string): Promise<string> {
-    return await resolveFile(pathToManifest, 'yaml', INDEX_MANIFEST_FILE_NAMES);
-  }
-
   private async loadManifest<T>(resolvedPathToManifest: string): Promise<T> {
-    return (await loadYamlFile(resolvedPathToManifest)) as T;
+    return await loadManifest<T>(resolvedPathToManifest);
   }
 
   // it needs for test purpose
