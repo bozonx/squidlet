@@ -22,15 +22,6 @@ interface FilesPaths {
   services: {[index: string]: string[]};
 }
 
-// interface Props {
-//   // devices props by device name
-//   devices: {[index: string]: {[index: string]: any}};
-//   // drivers props by driver name
-//   drivers: {[index: string]: {[index: string]: any}};
-//   // services props by service name
-//   services: {[index: string]: {[index: string]: any}};
-// }
-
 
 export default class Manifests {
   private devices: List<DeviceManifest> = List<DeviceManifest>();
@@ -42,13 +33,6 @@ export default class Manifests {
     drivers: {},
     services: {},
   };
-
-  // // props from manifests
-  // private props: Props = {
-  //   devices: {},
-  //   drivers: {},
-  //   services: {},
-  // };
 
   constructor() {
   }
@@ -83,34 +67,47 @@ export default class Manifests {
     }
   }
 
-  proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
+
+  private proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
     manifestType: string,
     preManifest: PreManifest
   ) {
-    const finalManifest: FinalManifest = _omit(preManifest, 'files', 'drivers');
+    const finalManifest: FinalManifest = this.prepareManifest(preManifest);
     const plural: PluralName = `${manifestType}s` as PluralName;
+    const finalManifests = this[plural] as List<FinalManifest>;
 
     // collect files
-    this.filesPaths[plural][manifest.name] = [
+    this.filesPaths[plural][preManifest.name] = [
       preManifest.main,
       ...preManifest.files || [],
     ];
 
-    // TODO: merge props with config defaults
-    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
-
     // proceed drivers
     if (preManifest.drivers) {
       for (let driverPath of preManifest.drivers) {
-        // TODO: load driver manifest
-        // TODO: if driver is registered - do nothing
-        // TODO: run proceed
+        this.proceedDriverManifest(driverPath);
       }
     }
 
-    const finalManifests = this[plural] as List<FinalManifest>;
-
+    // add to list of manifests
     finalManifests.push(finalManifest);
+  }
+
+  private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
+    const finalManifest: FinalManifest = _omit(preManifest, 'files', 'drivers');
+
+
+    // TODO: merge props with config defaults
+    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
+
+
+    return finalManifest;
+  }
+
+  private proceedDriverManifest(driverPath: string) {
+    // TODO: load driver manifest
+    // TODO: if driver is registered - do nothing
+    // TODO: run proceed
   }
 
 }
