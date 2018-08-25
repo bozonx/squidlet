@@ -1,8 +1,5 @@
 const _map = require('lodash/map');
 
-import * as path from 'path';
-
-
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';

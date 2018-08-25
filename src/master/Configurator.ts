@@ -30,7 +30,7 @@ export default class Configurator {
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
 
-  init() {
+  async init() {
     // register system plugin which registering system devices, drivers and services
     this.register.addPlugin(systemPlugin);
 
@@ -44,8 +44,10 @@ export default class Configurator {
     // initialize all the plugins
     this.register.initPlugins(this.manager);
 
+    // TODO: дождаться когда все файлы прогрузятся
+
     // resolve and prepare manifest
-    this.manifests.prepare(
+    await this.manifests.generate(
       this.register.getDevicesPreManifests(),
       this.register.getDriversPreManifests(),
       this.register.getServicesPreManifests()

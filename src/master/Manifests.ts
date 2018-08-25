@@ -1,7 +1,8 @@
-import {loadManifest} from './IO';
-
 const _omit = require('lodash/omit');
-import {List} from 'immutable';
+const _map = require('lodash/map');
+
+import {loadManifest} from './IO';
+import {Map} from 'immutable';
 
 import DeviceManifest from '../app/interfaces/DeviceManifest';
 import DriverManifest from '../app/interfaces/DriverManifest';
@@ -26,9 +27,9 @@ interface FilesPaths {
 
 
 export default class Manifests {
-  private devices: List<DeviceManifest> = List<DeviceManifest>();
-  private drivers: List<DriverManifest> = List<DriverManifest>();
-  private services: List<ServiceManifest> = List<ServiceManifest>();
+  private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
+  private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
+  private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
   // file paths collected from manifests
   private filesPaths: FilesPaths = {
     devices: {},
@@ -40,43 +41,43 @@ export default class Manifests {
   }
 
   getDevicesManifests(): DeviceManifest[] {
-    return this.devices.toArray();
+    return _map(this.devices.toJS());
   }
 
   getDriversManifests(): DriverManifest[] {
-    return this.drivers.toArray();
+    return _map(this.drivers.toJS());
   }
 
   getServicesManifests(): ServiceManifest[] {
-    return this.services.toArray();
+    return _map(this.services.toJS());
   }
 
-  prepare(
+  async generate(
     preDevicesManifests: PreDeviceManifest[],
     prePreDriverManifest: PreDriverManifest[],
     prePreServiceManifest: PreServiceManifest[]
   ) {
     for (let item of preDevicesManifests) {
-      this.proceed<PreDeviceManifest, DeviceManifest>('device', item);
+      await this.proceed<PreDeviceManifest, DeviceManifest>('device', item);
     }
 
     for (let item of prePreDriverManifest) {
-      this.proceed<PreDriverManifest, DriverManifest>('driver', item);
+      await this.proceed<PreDriverManifest, DriverManifest>('driver', item);
     }
 
     for (let item of prePreServiceManifest) {
-      this.proceed<PreServiceManifest, ServiceManifest>('device', item);
+      await this.proceed<PreServiceManifest, ServiceManifest>('device', item);
     }
   }
 
 
-  private proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
+  private async proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
     manifestType: string,
     preManifest: PreManifest
   ) {
     const finalManifest: FinalManifest = this.prepareManifest(preManifest);
     const plural: PluralName = `${manifestType}s` as PluralName;
-    const finalManifests = this[plural] as List<FinalManifest>;
+    const finalManifests = this[plural] as Map<string, FinalManifest>;
 
     // collect files
     this.filesPaths[plural][preManifest.name] = [
@@ -87,12 +88,12 @@ export default class Manifests {
     // proceed drivers
     if (preManifest.drivers) {
       for (let driverPath of preManifest.drivers) {
-        this.proceedDriverManifest(driverPath);
+        await this.proceedDriverManifest(driverPath);
       }
     }
 
     // add to list of manifests
-    finalManifests.push(finalManifest);
+    finalManifests.set(finalManifest.name, finalManifest);
   }
 
   private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
@@ -106,11 +107,18 @@ export default class Manifests {
   }
 
   private async proceedDriverManifest(driverManifestPath: string) {
+
+    // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
+    // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
+    //       был ли он загружен или нет - лучше наверное сравнивать по resolved имени файла
+
     const parsedManifest: PreDeviceManifest = await this.loadManifest<PreDeviceManifest>(driverManifestPath);
 
-    // TODO: if driver is registered - do nothing
+    // if driver is registered - do nothing
+    if (this.drivers.get(parsedManifest.name)) return;
 
-    this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
+    // proceed it
+    return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
   }
 
   private async loadManifest<T extends PreManifestBase>(resolvedPathToManifest: string): Promise<T> {

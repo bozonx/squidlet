@@ -9,6 +9,7 @@ const { yamlToJs } = require('./helpers');
 export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
 
 
+// TODO: move to class
 export async function loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {
   if (pathToDirOrFile.indexOf('/') !== 0) {
     throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
