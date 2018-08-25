@@ -1,10 +1,13 @@
 import PreDeviceDefinition from './PreDeviceDefinition';
 import PreDriverDefinition from './PreDriverDefinition';
 import PreServiceDefinition from './PreServiceDefinition';
+import Platforms from './Platforms';
 
 
 // raw host config specified in master config
 export default interface PreHostConfig {
+  platform: Platforms;
+
   // specific config for each host
   host: {
     // republish status silently every minute if it hasn't been changed

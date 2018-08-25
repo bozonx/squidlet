@@ -1,9 +1,12 @@
 import DeviceDefinition from './DeviceDefinition';
 import ServiceDefinition from './ServiceDefinition';
 import DriverDefinition from './DriverDefinition';
+import Platforms from '../../master/interfaces/Platforms';
 
 
 export default interface HostConfig {
+  platform: Platforms;
+
   // specific config for each host
   host: {
     // republish status silently every minute if it hasn't been changed
