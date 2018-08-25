@@ -22,15 +22,10 @@ function resolveMasterConfig() {
   return yaml.safeLoad(yamlString);
 }
 
-async function start() {
-  const configurator = new Configurator(resolveMasterConfig());
 
-  await configurator.init();
+const configurator = new Configurator(resolveMasterConfig());
 
-  // TODO: сбилдить host и посчитать хэш сумму - чтобы потом обновить систему на дочерних нодах
-}
-
-start()
+configurator.init()
   .catch((err) => {
     throw new Error(err);
   });
