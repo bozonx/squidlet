@@ -12,5 +12,5 @@ export default interface PreManifestBase {
   // properties of instance
   props?: {[index: string]: any};
   // additional files
-  files?: string[],
+  files?: string[];
 }

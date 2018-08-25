@@ -60,16 +60,16 @@ export default class Configurator {
     this.register.addPlugin(plugin);
   }
 
-  addDevice: Register['addDevice'] = (manifest) => {
-    this.register.addDevice(manifest);
+  addDevice: Register['addDevice'] = async (manifest) => {
+    await this.register.addDevice(manifest);
   }
 
-  addDriver: Register['addDriver'] = (manifest) => {
-    this.register.addDriver(manifest);
+  addDriver: Register['addDriver'] = async (manifest) => {
+    await this.register.addDriver(manifest);
   }
 
-  addService: Register['addService'] = (manifest) => {
-    this.register.addService(manifest);
+  addService: Register['addService'] = async (manifest) => {
+    await this.register.addService(manifest);
   }
 
   afterInit(handler: () => void) {

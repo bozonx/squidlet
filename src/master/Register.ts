@@ -21,6 +21,7 @@ export default class Register {
   private readonly devicesManifests: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
   private readonly driversManifests: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
   private readonly servicesManifests: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
+  private registerPromises: Promise<any>[] = [];
 
 
   getDevicesPreManifests(): PreDeviceManifest[] {
@@ -33,6 +34,10 @@ export default class Register {
 
   getServicesPreManifests(): PreServiceManifest[] {
     return _map(this.servicesManifests.toJS());
+  }
+
+  getRegisterPromises(): Promise<any>[] {
+    return this.registerPromises;
   }
 
   addPlugin(plugin: string | Plugin) {
@@ -56,7 +61,11 @@ export default class Register {
   }
 
   async addDevice(manifest: string | PreDeviceManifest) {
-    let parsedManifest: PreDeviceManifest = await this.resolveManifest<PreDeviceManifest>(manifest);
+    const resolvePromise: Promise<PreDeviceManifest> = this.resolveManifest<PreDeviceManifest>(manifest);
+
+    this.registerPromises.push(resolvePromise);
+
+    const parsedManifest = await resolvePromise;
     const validateError: string | undefined = validateDeviceManifest(parsedManifest);
 
     if (validateError) {
@@ -71,7 +80,11 @@ export default class Register {
   }
 
   async addDriver(manifest: string | PreDriverManifest) {
-    let parsedManifest: PreDriverManifest = await this.resolveManifest<PreDriverManifest>(manifest);
+    const resolvePromise: Promise<PreDriverManifest> = this.resolveManifest<PreDriverManifest>(manifest);
+
+    this.registerPromises.push(resolvePromise);
+
+    const parsedManifest = await resolvePromise;
     const validateError: string | undefined = validateDriverManifest(parsedManifest);
 
     if (validateError) {
@@ -90,7 +103,11 @@ export default class Register {
    * @param manifest - it can be path to manifest yaml file or js plain object
    */
   async addService(manifest: string | PreServiceManifest) {
-    let parsedManifest: PreServiceManifest = await this.resolveManifest<PreServiceManifest>(manifest);
+    const resolvePromise: Promise<PreServiceManifest> = this.resolveManifest<PreServiceManifest>(manifest);
+
+    this.registerPromises.push(resolvePromise);
+
+    const parsedManifest = await resolvePromise;
     const validateError: string | undefined = validateServiceManifest(parsedManifest);
 
     if (validateError) {
@@ -104,9 +121,9 @@ export default class Register {
     this.servicesManifests.set(parsedManifest.name, parsedManifest);
   }
 
-  initPlugins(manager: Manager) {
+  async initPlugins(manager: Manager) {
     for (let plugin of this.plugins) {
-      plugin(manager);
+      await plugin(manager);
     }
   }
 

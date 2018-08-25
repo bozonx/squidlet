@@ -42,9 +42,9 @@ export default class Configurator {
     }
 
     // initialize all the plugins
-    this.register.initPlugins(this.manager);
-
-    // TODO: дождаться когда все файлы прогрузятся
+    await this.register.initPlugins(this.manager);
+    // wait for all the registering processes. It needs if plugin doesn't wait for register promise.
+    await Promise.all(this.register.getRegisterPromises());
 
     // resolve and prepare manifest
     await this.manifests.generate(
