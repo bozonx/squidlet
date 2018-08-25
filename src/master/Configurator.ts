@@ -5,6 +5,7 @@ import Manager from './Manager';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
 import HostsConfigGenerator from './HostsConfigGenerator';
+import HostsFilesGenerator from './HostsFilesGenerator';
 
 
 export default class Configurator {
@@ -12,6 +13,7 @@ export default class Configurator {
   private readonly register: Register;
   private readonly manifests: Manifests;
   private readonly hostsConfigGenerator: HostsConfigGenerator;
+  private readonly hostsFilesGenerator: HostsFilesGenerator;
   private readonly manager: Manager;
 
 
@@ -51,7 +53,11 @@ export default class Configurator {
     // call after init handlers
     this.manager.$riseAfterInit();
 
-    // TODO: формирование списка файлов и данных для отправки хостам
+    this.hostsFilesGenerator.generate();
+
+    // TODO: поднять соединения к хостам, дождаться пока все станут доступны
+    // TODO: если какие-то хосты не доступны то работать только с доступными, а на те написать ошибку
+    // TODO: отправить данные доступным хостам
   }
 
 }
