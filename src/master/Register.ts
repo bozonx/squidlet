@@ -1,3 +1,5 @@
+const _map = require('lodash/map');
+
 import * as path from 'path';
 
 
@@ -23,6 +25,18 @@ export default class Register {
   private readonly driversManifests: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
   private readonly servicesManifests: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
 
+
+  getDevicesPreManifests(): PreDeviceManifest[] {
+    return _map(this.devicesManifests.toJS());
+  }
+
+  getDriversPreManifests(): PreDriverManifest[] {
+    return _map(this.driversManifests.toJS());
+  }
+
+  getServicesPreManifests(): PreServiceManifest[] {
+    return _map(this.servicesManifests.toJS());
+  }
 
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
@@ -55,6 +69,8 @@ export default class Register {
     if (this.devicesManifests.get(parsedManifest.name)) {
       throw new Error(`Device "${parsedManifest.name}" is already exists!`);
     }
+
+    this.devicesManifests.set(parsedManifest.name, parsedManifest);
   }
 
   async addDriver(manifest: string | PreDriverManifest) {
@@ -68,13 +84,15 @@ export default class Register {
     if (this.driversManifests.get(parsedManifest.name)) {
       throw new Error(`Driver "${parsedManifest.name}" is already exists!`);
     }
+
+    this.driversManifests.set(parsedManifest.name, parsedManifest);
  }
 
   /**
    * Add new service to the system.
    * @param manifest - it can be path to manifest yaml file or js plain object
    */
-  async addService(manifest: string | PreServiceManifest): void {
+  async addService(manifest: string | PreServiceManifest) {
     let parsedManifest: PreServiceManifest = await this.resolveManifest<PreServiceManifest>(manifest);
     const validateError: string | undefined = validateServiceManifest(parsedManifest);
 
@@ -85,6 +103,8 @@ export default class Register {
     if (this.servicesManifests.get(parsedManifest.name)) {
       throw new Error(`Service "${parsedManifest.name}" is already exists!`);
     }
+
+    this.servicesManifests.set(parsedManifest.name, parsedManifest);
   }
 
   initPlugins(manager: Manager) {
@@ -98,6 +118,7 @@ export default class Register {
     let parsedManifest: T;
 
     if (typeof manifest === 'string') {
+      // it's path to manifest - let's load it
       if (manifest.indexOf('/') !== 0) {
         throw new Error(`You have to specify an absolute path of "${manifest}"`);
       }
@@ -108,6 +129,7 @@ export default class Register {
       parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
     }
     else if (typeof manifest === 'object') {
+      // it's manifest as a js object
       if (!(manifest as any).baseDir) {
         throw new Error(`Param "baseDir" has to be specified in manifest ${JSON.stringify(manifest)}`);
       }

@@ -26,6 +26,7 @@ export default class Configurator {
     this.register = new Register();
     this.manifests = new Manifests();
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
+    this.hostsFilesGenerator = new HostsFilesGenerator();
     // TODO: наверное передать лучше manifests, hostsConfig
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
@@ -45,7 +46,11 @@ export default class Configurator {
     this.register.initPlugins(this.manager);
 
     // resolve and prepare manifest
-    this.manifests.prepare();
+    this.manifests.prepare(
+      this.register.getDevicesPreManifests(),
+      this.register.getDriversPreManifests(),
+      this.register.getServicesPreManifests()
+    );
 
     // generate hosts configs
     this.hostsConfigGenerator.generate();
