@@ -16,7 +16,6 @@ function resolveMasterConfig() {
   }
 
   const resolvedPath = path.resolve(yargs.argv.config);
-  // TODO: use helpers
   const yamlString = fs.readFileSync(resolvedPath, 'utf8');
 
   return yamlToJs(yamlString);

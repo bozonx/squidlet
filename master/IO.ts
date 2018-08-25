@@ -54,8 +54,8 @@ export function yamlToJs(yamlString: string): any {
 }
 
 
-  // loadYamlFileSync(fullPath: string): object {
-  //   const yamlContent = fs.readFileSync(fullPath, 'utf8');
-  //
-  //   return yamlToJs(yamlContent);
-  // }
+// loadYamlFileSync(fullPath: string): object {
+//   const yamlContent = fs.readFileSync(fullPath, 'utf8');
+//
+//   return yamlToJs(yamlContent);
+// }

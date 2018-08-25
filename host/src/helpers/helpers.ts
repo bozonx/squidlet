@@ -11,6 +11,7 @@ export const deviceIdSeparator = '$';
 export const eventNameSeparator = '|';
 
 
+// TODO: move to separate file
 export function validateMessage(message: Message) {
   return message && message.category && message.topic && message.from && message.to;
 }
