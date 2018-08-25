@@ -1,11 +1,17 @@
+/**
+ * run `tsc ./index.ts --config ./myConfigFile.yaml`
+ */
 import * as path from 'path';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
+// TODO: add help
+
 const argv = require('yargs').argv;
 
+import Configurator from './Configurator';
 
-export default function resolveMasterConfig() {
+function resolveMasterConfig() {
   if (!argv.config) {
     throw new Error(`You have to specify a "--config" param`);
   }
@@ -15,3 +21,16 @@ export default function resolveMasterConfig() {
 
   return yaml.safeLoad(yamlString);
 }
+
+async function init() {
+  const configurator = new Configurator(resolveMasterConfig());
+
+  await configurator.init();
+
+  // TODO: start local host
+}
+
+init()
+  .catch((err) => {
+    throw new Error(err);
+  });
