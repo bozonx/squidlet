@@ -4,14 +4,14 @@ const _map = require('lodash/map');
 import {loadManifest} from './IO';
 import {Map} from 'immutable';
 
-import DeviceManifest from '../../src/app/interfaces/DeviceManifest';
-import DriverManifest from '../../src/app/interfaces/DriverManifest';
-import ServiceManifest from '../../src/app/interfaces/ServiceManifest';
+import DeviceManifest from '../../host/src/app/interfaces/DeviceManifest';
+import DriverManifest from '../../host/src/app/interfaces/DriverManifest';
+import ServiceManifest from '../../host/src/app/interfaces/ServiceManifest';
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
-import ManifestBase from '../../src/app/interfaces/ManifestBase';
+import ManifestBase from '../../host/src/app/interfaces/ManifestBase';
 
 
 type PluralName = 'devices' | 'drivers' | 'services';

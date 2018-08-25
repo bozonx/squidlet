@@ -6,7 +6,7 @@ import Messenger from '../messenger/Messenger';
 import DevicesManager from './DevicesManager';
 import Devices from './Devices';
 import Drivers from './Drivers';
-import Services from './Services';
+import Services from '../services';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import HostConfig from './interfaces/HostConfig';

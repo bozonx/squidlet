@@ -3,7 +3,7 @@
 # * i2c connection uses to connect
 # * request does from MQTT backed
 
-{ App } = require('../../src/index').default;
+{ App } = require('../../host/src/index').default;
 
 describe.skip 'intergation. Call device\'s action', ->
   beforeEach ->

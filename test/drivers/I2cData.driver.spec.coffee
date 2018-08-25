@@ -1,5 +1,5 @@
-I2cData = require('../../src/drivers/I2c/I2cData.driver').default
-helpers = require('../../src/helpers/helpers')
+I2cData = require('../../host/src/drivers/I2c/I2cData.driver').default
+helpers = require('../../host/src/helpers/helpers')
 
 
 describe 'I2cData.driver', ->

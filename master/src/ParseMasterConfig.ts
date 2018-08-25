@@ -1,4 +1,4 @@
-import HostConfig from '../../src/app/interfaces/HostConfig';
+import HostConfig from '../../host/src/app/interfaces/HostConfig';
 
 
 export default class ParseMasterConfig {

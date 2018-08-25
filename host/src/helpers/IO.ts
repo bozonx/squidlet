@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { yamlToJs } from '../helpers/helpers';
+import { yamlToJs } from './helpers';
 
 import * as uniqid from 'uniqid';
 

@@ -1,6 +1,6 @@
 { Map } = require('immutable')
 
-Drivers = require('../../src/app/Drivers').default
+Drivers = require('../../host/src/app/Drivers').default
 
 
 describe.only 'app.Drivers', ->

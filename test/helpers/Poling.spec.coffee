@@ -1,4 +1,4 @@
-Poling = require('../../src/helpers/Poling').default;
+Poling = require('../../host/src/helpers/Poling').default;
 
 
 describe 'Poling', ->
