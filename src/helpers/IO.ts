@@ -1,7 +1,7 @@
-import * as uniqid from 'uniqid';
+import * as fs from 'fs';
+import { yamlToJs } from '../helpers/helpers';
 
-const fs = require('fs');
-const { yamlToJs } = require('./helpers');
+import * as uniqid from 'uniqid';
 
 
 export default class IO {
