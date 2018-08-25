@@ -1,9 +1,9 @@
 import * as fs from 'fs';
-import { yamlToJs } from '../host/src/helpers/helpers';
 
 import * as uniqid from 'uniqid';
 import * as path from 'path';
 import PreManifestBase from './interfaces/PreManifestBase';
+import * as yaml from 'js-yaml';
 
 
 export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
@@ -48,6 +48,11 @@ export function getFileContent(filename: string): Promise<string> {
 export function generateUniqId(): string {
   return uniqid();
 }
+
+export function yamlToJs(yamlString: string): any {
+  return yaml.safeLoad(yamlString);
+}
+
 
   // loadYamlFileSync(fullPath: string): object {
   //   const yamlContent = fs.readFileSync(fullPath, 'utf8');

@@ -3,10 +3,10 @@
  */
 import * as path from 'path';
 import * as fs from 'fs';
-import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
 import Configurator from './Configurator';
+import { yamlToJs } from './IO';
 
 // TODO: add help
 
@@ -19,7 +19,7 @@ function resolveMasterConfig() {
   // TODO: use helpers
   const yamlString = fs.readFileSync(resolvedPath, 'utf8');
 
-  return yaml.safeLoad(yamlString);
+  return yamlToJs(yamlString);
 }
 
 

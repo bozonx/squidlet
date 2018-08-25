@@ -1,7 +1,6 @@
 const _isEmpty = require('lodash/isEmpty');
 const _find = require('lodash/find');
 const _trim = require('lodash/trim');
-import * as yaml from 'js-yaml';
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import Message from '../messenger/interfaces/Message';
 
@@ -193,10 +192,6 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
   };
 
   return recursive(rootObject, '');
-}
-
-export function yamlToJs(yamlString: string): any {
-  return yaml.safeLoad(yamlString);
 }
 
 export function convertToLevel(value: any): boolean {
