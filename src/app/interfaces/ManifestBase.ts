@@ -5,5 +5,5 @@ export default interface ManifestBase {
   // path to device main file
   main: string;
   // properties of instance
-  //props?: {[index: string]: any};
+  props: {[index: string]: any};
 }

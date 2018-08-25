@@ -2,6 +2,6 @@
 import ManifestBase from './ManifestBase';
 
 export default interface DriverManifest extends ManifestBase {
-  // generic type of device
-  type: string;
+  // type of driver: system, dev. If type isn't defined it means a regular driver.
+  type?: string;
 }
