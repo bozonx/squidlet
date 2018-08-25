@@ -1,4 +1,4 @@
-import {loadYamlFile, resolveFile} from './IO';
+import {loadManifest} from './IO';
 
 const _omit = require('lodash/omit');
 import {List} from 'immutable';
@@ -11,7 +11,6 @@ import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../app/interfaces/ManifestBase';
-import {INDEX_MANIFEST_FILE_NAMES} from './Configurator';
 
 
 type PluralName = 'devices' | 'drivers' | 'services';
@@ -106,19 +105,16 @@ export default class Manifests {
     return finalManifest;
   }
 
-  private proceedDriverManifest(driverPath: string) {
+  private async proceedDriverManifest(driverManifestPath: string) {
+    const parsedManifest: PreDeviceManifest = await this.loadManifest<PreDeviceManifest>(driverManifestPath);
 
-    // TODO: load driver manifest
     // TODO: if driver is registered - do nothing
-    // TODO: run proceed
+
+    this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
   }
 
-  private async resolveManifestPath(pathToManifest: string): Promise<string> {
-    return await resolveFile(pathToManifest, 'yaml', INDEX_MANIFEST_FILE_NAMES);
-  }
-
-  private async loadManifest<T>(resolvedPathToManifest: string): Promise<T> {
-    return (await loadYamlFile(resolvedPathToManifest)) as T;
+  private async loadManifest<T extends PreManifestBase>(resolvedPathToManifest: string): Promise<T> {
+    return await loadManifest<T>(resolvedPathToManifest);
   }
 
 }

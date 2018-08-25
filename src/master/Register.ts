@@ -136,7 +136,7 @@ export default class Register {
     return parsedManifest;
   }
 
-  private async loadManifest<T>(resolvedPathToManifest: string): Promise<T> {
+  private async loadManifest<T extends PreManifestBase>(resolvedPathToManifest: string): Promise<T> {
     return await loadManifest<T>(resolvedPathToManifest);
   }
 
