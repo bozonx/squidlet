@@ -48,8 +48,8 @@ export default class Configurator {
     return this.manifests.getDriversManifests();
   }
 
-  getSevicesManifests(): ServiceManifest[] {
-    return this.manifests.getSevicesManifests();
+  getServicesManifests(): ServiceManifest[] {
+    return this.manifests.getServicesManifests();
   }
 
   getHostsConfig(): {[index: string]: HostConfig} {

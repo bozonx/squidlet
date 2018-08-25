@@ -1,5 +1,5 @@
 const _omit = require('lodash/omit');
-import {Map} from 'immutable';
+import {List} from 'immutable';
 
 import DeviceManifest from '../app/interfaces/DeviceManifest';
 import DriverManifest from '../app/interfaces/DriverManifest';
@@ -33,10 +33,9 @@ interface FilesPaths {
 
 
 export default class Manifests {
-  // TODO: наверное использвать immutale
-  private devices: DeviceManifest[] = [];
-  private drivers: DriverManifest[] = [];
-  private services: ServiceManifest[] = [];
+  private devices: List<DeviceManifest> = List<DeviceManifest>();
+  private drivers: List<DriverManifest> = List<DriverManifest>();
+  private services: List<ServiceManifest> = List<ServiceManifest>();
   // file paths collected from manifests
   private filesPaths: FilesPaths = {
     devices: {},
@@ -52,19 +51,18 @@ export default class Manifests {
   // };
 
   constructor() {
-
   }
 
   getDevicesManifests(): DeviceManifest[] {
-    // TODO: !!!
+    return this.devices.toArray();
   }
 
   getDriversManifests(): DriverManifest[] {
-    // TODO: !!!
+    return this.drivers.toArray();
   }
 
-  getSevicesManifests(): ServiceManifest[] {
-    // TODO: !!!
+  getServicesManifests(): ServiceManifest[] {
+    return this.services.toArray();
   }
 
   prepare(
@@ -85,11 +83,11 @@ export default class Manifests {
     }
   }
 
-  proceed<PreManifest extends PreManifestBase, ProcessedManifest extends ManifestBase>(
+  proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
     manifestType: string,
     preManifest: PreManifest
   ) {
-    const processedManifest: ProcessedManifest = _omit(preManifest, 'files', 'drivers');
+    const finalManifest: FinalManifest = _omit(preManifest, 'files', 'drivers');
     const plural: PluralName = `${manifestType}s` as PluralName;
 
     // collect files
@@ -110,9 +108,9 @@ export default class Manifests {
       }
     }
 
-    const processedManifests = this[plural] as ProcessedManifest[];
+    const finalManifests = this[plural] as List<FinalManifest>;
 
-    processedManifests.push(processedManifest);
+    finalManifests.push(finalManifest);
   }
 
 }
