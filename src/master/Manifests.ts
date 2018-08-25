@@ -55,6 +55,18 @@ export default class Manifests {
 
   }
 
+  getDevicesManifests(): DeviceManifest[] {
+    // TODO: !!!
+  }
+
+  getDriversManifests(): DriverManifest[] {
+    // TODO: !!!
+  }
+
+  getSevicesManifests(): ServiceManifest[] {
+    // TODO: !!!
+  }
+
   prepare(
     preDevicesManifests: PreDeviceManifest[],
     prePreDriverManifest: PreDriverManifest[],

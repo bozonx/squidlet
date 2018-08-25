@@ -25,7 +25,7 @@ export default class Configurator {
     this.manifests = new Manifests();
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
     // TODO: наверное передать лучше manifests, hostsConfig
-    this.manager = new Manager(this.masterConfig, this.register);
+    this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
 
   init() {
@@ -47,6 +47,9 @@ export default class Configurator {
 
     // generate hosts configs
     this.hostsConfigGenerator.generate();
+
+    // call after init handlers
+    this.manager.$riseAfterInit();
 
     // TODO: формирование списка файлов и данных для отправки хостам
   }

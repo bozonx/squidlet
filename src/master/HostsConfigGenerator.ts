@@ -26,6 +26,13 @@ export default class HostsConfigGenerator {
     this.manifests = manifests;
   }
 
+  getHostsConfig(): {[index: string]: HostConfig} {
+
+    // TODO: clone or immutable
+
+    return this.hostsConfigs;
+  }
+
   // TODO: !!!! add devs specified to platform
 
   generate() {
