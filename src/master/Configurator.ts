@@ -5,7 +5,7 @@ import Manager from './Manager';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import HostsFilesGenerator from './HostsFilesGenerator';
+import HostsFiles from './HostsFiles';
 
 
 export default class Configurator {
@@ -13,7 +13,7 @@ export default class Configurator {
   private readonly register: Register;
   private readonly manifests: Manifests;
   private readonly hostsConfigGenerator: HostsConfigGenerator;
-  private readonly hostsFilesGenerator: HostsFilesGenerator;
+  private readonly hostsFiles: HostsFiles;
   private readonly manager: Manager;
 
 
@@ -26,7 +26,7 @@ export default class Configurator {
     this.register = new Register();
     this.manifests = new Manifests();
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
-    this.hostsFilesGenerator = new HostsFilesGenerator();
+    this.hostsFiles = new HostsFiles();
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
 
@@ -59,7 +59,7 @@ export default class Configurator {
     // call after init handlers
     this.manager.$riseAfterInit();
 
-    this.hostsFilesGenerator.generate();
+    this.hostsFiles.generate();
 
     // TODO: поднять соединения к хостам, дождаться пока все станут доступны
     // TODO: если какие-то хосты не доступны то работать только с доступными, а на те написать ошибку

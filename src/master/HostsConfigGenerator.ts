@@ -33,14 +33,13 @@ export default class HostsConfigGenerator {
     return this.hostsConfigs;
   }
 
-  // TODO: !!!! add devs specified to platform
-
   generate() {
     const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs();
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig = rawHostsConfigs[hostId];
       const hostConfig: HostConfig = {
+        platform: rawHostConfig.platform,
         host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
         devices: this.generateDevices(rawHostConfig.devices || {}),
         drivers: this.generateDrivers(rawHostConfig.drivers || {}),
@@ -48,8 +47,18 @@ export default class HostsConfigGenerator {
         devicesDefaults: rawHostConfig.devicesDefaults || {},
       };
 
+      // TODO: добавить сервисы automation, mqtt, logger, webApi
+
       this.hostsConfigs[hostId] = hostConfig;
     }
+  }
+
+  /**
+   * Merge params of host with hostDefaults.
+   * @param hostParams
+   */
+  private mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
+    return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
   }
 
   private generateDevices(rawDevices: {[index: string]: PreDeviceDefinition}): DeviceDefinition[] {
@@ -107,10 +116,9 @@ export default class HostsConfigGenerator {
     return definitions;
   }
 
-  mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
-    return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
-  }
-
+  /**
+   * Use "hosts" of {master: host} params of master config.
+   */
   private getHostsConfigs(): {[index: string]: PreHostConfig} {
     if (!this.masterConfig.host || this.masterConfig.hosts) {
       throw new Error(`Master config doesn't have "host" or "hosts" params`);

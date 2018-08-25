@@ -27,4 +27,13 @@ export default interface PreHostConfig {
 
   // override default params of devices
   devicesDefaults?: {[index: string]: any};
+
+  // shortcut for automation service
+  automation: {[index: string]: any};
+  // shortcut for mqtt service
+  mqtt: {[index: string]: any};
+  // shortcut for logger service
+  logger: {[index: string]: any};
+  // shortcut for webApi service
+  webApi: {[index: string]: any};
 }
