@@ -4,7 +4,7 @@ const fs = require('fs');
 const { yamlToJs } = require('./helpers');
 
 
-export async function resolveFile(ext): string {
+export async function resolveFile(pathToDirOrDile: string, ext: string, indexFileName: string[]): string {
   // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
   // TODO: расширение yaml - можно подставлять - необязательно указывать
 }

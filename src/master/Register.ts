@@ -1,3 +1,5 @@
+import {INDEX_MANIFEST_FILE_NAMES} from './Configurator';
+
 const _map = require('lodash/map');
 
 import * as path from 'path';
@@ -144,7 +146,7 @@ export default class Register {
   }
 
   private async resolveManifestPath(pathToManifest: string): Promise<string> {
-    return await resolveFile('yaml');
+    return await resolveFile(pathToManifest, 'yaml', INDEX_MANIFEST_FILE_NAMES);
   }
 
   private async loadManifest<T>(resolvedPathToManifest: string): Promise<T> {

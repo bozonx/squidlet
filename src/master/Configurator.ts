@@ -8,6 +8,9 @@ import HostsConfigGenerator from './HostsConfigGenerator';
 import HostsFilesGenerator from './HostsFilesGenerator';
 
 
+export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
+
+
 export default class Configurator {
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;
