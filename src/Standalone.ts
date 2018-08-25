@@ -1,5 +1,5 @@
 import System from './app/System';
-import ParseMasterConfig from './master/ParseMasterConfig';
+import ParseMasterConfig from '../master/src/ParseMasterConfig';
 import HostConfig from './app/interfaces/HostConfig';
 
 
