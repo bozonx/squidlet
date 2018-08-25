@@ -16,18 +16,21 @@ function resolveMasterConfig() {
   }
 
   const resolvedPath = path.resolve(yargs.argv.config);
+  // TODO: use helpers
   const yamlString = fs.readFileSync(resolvedPath, 'utf8');
 
   return yaml.safeLoad(yamlString);
 }
 
-async function init() {
+async function start() {
   const configurator = new Configurator(resolveMasterConfig());
 
   await configurator.init();
+
+  // TODO: сбилдить host и посчитать хэш сумму - чтобы потом обновить систему на дочерних нодах
 }
 
-init()
+start()
   .catch((err) => {
     throw new Error(err);
   });
