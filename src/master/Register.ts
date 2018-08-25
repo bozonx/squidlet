@@ -1,12 +1,17 @@
+import * as path from 'path';
+
+
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import validateServiceManifest from './validateServiceManifest';
 import validateDeviceManifest from './validateDeviceManifest';
 import validateDriverManifest from './validateDriverManifest';
+import {resolveFile, loadYamlFile} from './IO';
 import {Map} from 'immutable';
 import Plugin from './interfaces/Plugin';
 import Manager from './Manager';
+import PreManifestBase from './interfaces/PreManifestBase';
 
 
 /**
@@ -21,12 +26,17 @@ export default class Register {
 
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
+      // it's path to plugin - let's load it
+      if (plugin.indexOf('/') !== 0) {
+        throw new Error(`You have to specify an absolute path of "${plugin}"`);
+      }
 
-      // TODO: запретить относительные пути
+      const pluginFunction: Plugin = this.require(plugin);
 
-      this.plugins.push(this.require(plugin) as Plugin);
+      this.plugins.push(pluginFunction);
     }
     else if (typeof plugin === 'function') {
+      // it's a function - just add it
       this.plugins.push(plugin);
     }
     else {
@@ -34,8 +44,8 @@ export default class Register {
     }
   }
 
-  addDevice(manifest: string | PreDeviceManifest) {
-    let parsedManifest: PreDeviceManifest = this.resolveManifest<PreDeviceManifest>(manifest);
+  async addDevice(manifest: string | PreDeviceManifest) {
+    let parsedManifest: PreDeviceManifest = await this.resolveManifest<PreDeviceManifest>(manifest);
     const validateError: string | undefined = validateDeviceManifest(parsedManifest);
 
     if (validateError) {
@@ -47,8 +57,8 @@ export default class Register {
     }
   }
 
-  addDriver(manifest: string | PreDriverManifest) {
-    let parsedManifest: PreDriverManifest = this.resolveManifest<PreDriverManifest>(manifest);
+  async addDriver(manifest: string | PreDriverManifest) {
+    let parsedManifest: PreDriverManifest = await this.resolveManifest<PreDriverManifest>(manifest);
     const validateError: string | undefined = validateDriverManifest(parsedManifest);
 
     if (validateError) {
@@ -64,8 +74,8 @@ export default class Register {
    * Add new service to the system.
    * @param manifest - it can be path to manifest yaml file or js plain object
    */
-  addService(manifest: string | PreServiceManifest): void {
-    let parsedManifest: PreServiceManifest = this.resolveManifest<PreServiceManifest>(manifest);
+  async addService(manifest: string | PreServiceManifest): void {
+    let parsedManifest: PreServiceManifest = await this.resolveManifest<PreServiceManifest>(manifest);
     const validateError: string | undefined = validateServiceManifest(parsedManifest);
 
     if (validateError) {
@@ -84,33 +94,39 @@ export default class Register {
   }
 
 
-  private resolveManifest<T>(manifest: string | T): T {
+  private async resolveManifest<T extends PreManifestBase>(manifest: string | T): Promise<T> {
     let parsedManifest: T;
 
     if (typeof manifest === 'string') {
-      // TODO: load
-      // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
-      // TODO: расширение yaml - можно подставлять - необязательно указывать
-      parsedManifest = this.loadManifest(manifest) as T;
-      // TODO: add baseDir
-      //parsedManifest.baseDir = manifest;
+      if (manifest.indexOf('/') !== 0) {
+        throw new Error(`You have to specify an absolute path of "${manifest}"`);
+      }
+
+      const resolvedPathToManifest: string = await this.resolveManifestPath(manifest);
+
+      parsedManifest = await this.loadManifest<T>(resolvedPathToManifest);
+      parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
     }
     else if (typeof manifest === 'object') {
       if (!(manifest as any).baseDir) {
-        throw new Error(`Param "baseDir" has to be specified in manifest ${JSON.parse(manifest)}`);
+        throw new Error(`Param "baseDir" has to be specified in manifest ${JSON.stringify(manifest)}`);
       }
 
       parsedManifest = manifest;
     }
     else {
-      throw new Error(`Incorrect type of manifest: ${JSON.parse(manifest)}`);
+      throw new Error(`Incorrect type of manifest: ${JSON.stringify(manifest)}`);
     }
 
     return parsedManifest;
   }
 
-  private loadManifest(pathToManifest: string): {[index: string]: any} {
-    // TODO: add
+  private async resolveManifestPath(pathToManifest: string): Promise<string> {
+    return await resolveFile('yaml');
+  }
+
+  private async loadManifest<T>(resolvedPathToManifest: string): Promise<T> {
+    return (await loadYamlFile(resolvedPathToManifest)) as T;
   }
 
   // it needs for test purpose

@@ -4,7 +4,7 @@ const fs = require('fs');
 const { yamlToJs } = require('./helpers');
 
 
-export default class System {
+export default class IO {
   // async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
   //   const yamlContent: string = await this.getFileContent(fullPath);
   //
