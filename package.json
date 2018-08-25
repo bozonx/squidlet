@@ -1,6 +1,6 @@
 {
   "name": "squidlet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Easy make IoT devices and local net of devices which can be managed by master",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
@@ -11,9 +11,9 @@
   "scripts": {
     "start": "node .",
     "master-rpi": "npm master-configure && npm build && npm host-rpi",
-    "master-configure": "ts-node ./master/src",
-    "build": "",
-    "host-rpi": "ts-node ./host/src",
+    "master-configure": "ts-node ./master/index.ts",
+    "build": "echo 'DO IT!'",
+    "host-rpi": "ts-node ./host/src/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },
@@ -23,13 +23,14 @@
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.4",
     "text-encoding": "^0.6.4",
-    "uniqid": "^5.0.3"
+    "uniqid": "^5.0.3",
+    "yargs": "^12.0.1"
   },
   "devDependencies": {
     "@types/glob": "^5.0.35",
     "@types/js-yaml": "^3.11.2",
     "@types/lodash": "^4.14.116",
-    "@types/node": "^10.7.1",
+    "@types/node": "^10.9.2",
     "@types/text-encoding": "^0.0.33",
     "@types/uniqid": "^4.1.2",
     "@types/yargs": "^11.1.1",

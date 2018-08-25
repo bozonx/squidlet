@@ -1,13 +1,13 @@
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _omit = require('lodash/omit');
 
-import DeviceDefinition from '../../host/src/app/interfaces/DeviceDefinition';
-import ServiceDefinition from '../../host/src/app/interfaces/ServiceDefinition';
+import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
+import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import MasterConfig from './interfaces/MasterConfig';
 import Manifests from './Manifests';
-import HostConfig from '../../host/src/app/interfaces/HostConfig';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
-import DriverDefinition from '../../host/src/app/interfaces/DriverDefinition';
+import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';

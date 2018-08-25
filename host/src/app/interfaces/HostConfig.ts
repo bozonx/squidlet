@@ -1,7 +1,7 @@
 import DeviceDefinition from './DeviceDefinition';
 import ServiceDefinition from './ServiceDefinition';
 import DriverDefinition from './DriverDefinition';
-import Platforms from '../../../../master/src/interfaces/Platforms';
+import Platforms from '../../../../master/interfaces/Platforms';
 
 
 export default interface HostConfig {

@@ -2,10 +2,10 @@ import MasterConfig from './interfaces/MasterConfig';
 import Register from './Register';
 import Manifests from './Manifests';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import ServiceManifest from '../../host/src/app/interfaces/ServiceManifest';
-import DriverManifest from '../../host/src/app/interfaces/DriverManifest';
-import DeviceManifest from '../../host/src/app/interfaces/DeviceManifest';
-import HostConfig from '../../host/src/app/interfaces/HostConfig';
+import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
+import DriverManifest from '../host/src/app/interfaces/DriverManifest';
+import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 import * as EventEmitter from 'events';
 
 
