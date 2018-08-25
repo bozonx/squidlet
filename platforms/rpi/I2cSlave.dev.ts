@@ -1,5 +1,5 @@
-import DriverFactoryBase from '../app/DriverFactoryBase';
-import Drivers from '../app/Drivers';
+import DriverFactoryBase from '../../host/src/app/DriverFactoryBase';
+import Drivers from '../../host/src/app/Drivers';
 
 
 export class I2cSlaveDev {

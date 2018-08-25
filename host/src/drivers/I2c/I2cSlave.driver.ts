@@ -1,6 +1,6 @@
 import * as EventEmitter from 'events';
 
-import { I2cSlaveDev } from '../../dev/I2cSlave.dev';
+import I2cSlaveDev from '../../app/interfaces/dev/I2cSlave.dev';
 import Drivers from '../../app/Drivers';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';

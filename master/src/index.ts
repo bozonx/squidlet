@@ -1,5 +1,5 @@
 /**
- * run `tsc ./index.ts --config ./myConfigFile.yaml`
+ * run `ts-node ./index.ts --config ./myConfigFile.yaml`
  */
 import * as path from 'path';
 import * as fs from 'fs';
