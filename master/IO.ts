@@ -45,6 +45,14 @@ export function getFileContent(filename: string): Promise<string> {
   });
 }
 
+export async function writeFile(fileName: string, content: string) {
+  // TODO: !!!!
+}
+
+export async function copyFile(fromFileName: string, toFileName: string) {
+  // TODO: !!!!
+}
+
 export function generateUniqId(): string {
   return uniqid();
 }

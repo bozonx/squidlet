@@ -10,6 +10,7 @@ import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import config from './config';
+import {copyFile, writeFile} from './IO';
 
 
 interface HostFilesSet {
@@ -71,7 +72,12 @@ export default class HostsFiles {
       const hostFileSet: HostFilesSet = this.files[hostId];
       const hostPath = path.join(basePath, hostId);
 
+      // TODO: write config
+      // TODO: write manifests
 
+      await this.copyEntityFiles(hostPath, hostFileSet.devicesFiles);
+      await this.copyEntityFiles(hostPath, hostFileSet.driversFiles);
+      await this.copyEntityFiles(hostPath, hostFileSet.servicesFiles);
     }
   }
 
@@ -101,6 +107,16 @@ export default class HostsFiles {
     }
 
     return result;
+  }
+
+  async copyEntityFiles(hostPath: string, fileSet: {[index: string]: string[]}) {
+    for (let entityClassName of Object.keys(fileSet)) {
+      for (let fromFileName of fileSet[entityClassName]) {
+        const toFileName = path.join(hostPath, entityClassName);
+
+        await copyFile(fromFileName, toFileName);
+      }
+    }
   }
 
 }
