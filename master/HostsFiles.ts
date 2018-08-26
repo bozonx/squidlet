@@ -4,10 +4,10 @@ import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
 import Manifests, {ManifestsTypePluralName} from './Manifests';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import config from './config';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
+import config from './config';
 
 
 interface HostFilesSet {
@@ -53,9 +53,9 @@ export default class HostsFiles {
         devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
         driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
         servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
-        driversFiles: 1,
-        devicesFiles: 1,
-        servicesFiles: 1,
+        driversFiles: this.collectFiles('devices', devicesClasses),
+        devicesFiles: this.collectFiles('drivers', driversClasses),
+        servicesFiles: this.collectFiles('services', servicesClasses),
       };
     }
   }
@@ -72,13 +72,26 @@ export default class HostsFiles {
    * @param manifestType
    * @param manifestNames
    */
-  private collectManifests<T>(manifestType: ManifestsTypePluralName, manifestNames: string[]): T[] {
+  private collectManifests<T>(manifestType: ManifestsTypePluralName, entityNames: string[]): T[] {
     const manifests = this.manifests.getManifests() as any;
     const manifestsOfType: {[index: string]: T} = manifests[manifestType];
 
-    return manifestNames.map((usedManifestName: string) => {
-      return manifestsOfType[usedManifestName];
-    });
+    return entityNames.map((usedEntityName: string) => manifestsOfType[usedEntityName]);
+  }
+
+  private collectFiles(
+    manifestType: ManifestsTypePluralName,
+    entityNames: string[]
+  ): {[index: string]: string[]} {
+    const files = this.manifests.getFiles()[manifestType];
+    // files paths by entity name
+    const result: {[index: string]: string[]} = {};
+
+    for (let usedEntityName of entityNames) {
+      result[usedEntityName] = files[usedEntityName];
+    }
+
+    return result;
   }
 
 }

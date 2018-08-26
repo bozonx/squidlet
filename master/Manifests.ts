@@ -54,6 +54,12 @@ export default class Manifests {
     };
   }
 
+  getFiles(): FilesPaths {
+    // TODO: clone or immutable
+
+    return this.filesPaths;
+  }
+
   // TODO: не нужно !!!!
   getDevicesManifests(): DeviceManifest[] {
     return _map(this.devices.toJS());
