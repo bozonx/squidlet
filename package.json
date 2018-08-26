@@ -9,11 +9,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "node .",
     "master-rpi": "npm master-configure && npm build && npm host-rpi",
     "master-configure": "ts-node ./master/index.ts",
     "build": "echo 'DO IT!'",
-    "host-rpi": "ts-node ./host/src/index.ts",
+    "host-rpi": "ts-node ./builder/squidlet-rpi/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },
