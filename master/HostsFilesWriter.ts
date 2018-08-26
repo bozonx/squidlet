@@ -15,8 +15,6 @@ import HostFilesSet from './interfaces/HostFilesSet';
 export default class HostsFilesWriter {
   private readonly manifests: Manifests;
   private readonly hostsConfigGenerator: HostsConfigGenerator;
-  // file sets by hostId
-  private files: {[index: string]: HostFilesSet} = {};
 
   constructor(manifests: Manifests, hostsConfigGenerator: HostsConfigGenerator) {
     this.manifests = manifests;
@@ -26,13 +24,13 @@ export default class HostsFilesWriter {
   /**
    * Copy files for hosts to storage to dir of ConfigUpdater plugin
    */
-  async writeToStorage() {
+  async writeToStorage(filesCollection: {[index: string]: HostFilesSet}) {
     const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigGenerator.getHostsConfig();
     const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
     const basePath = path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
 
-    for (let hostId of Object.keys(this.files)) {
-      const hostFileSet: HostFilesSet = this.files[hostId];
+    for (let hostId of Object.keys(filesCollection)) {
+      const hostFileSet: HostFilesSet = filesCollection[hostId];
       const hostPath = path.join(basePath, hostId);
       const devicesPath = path.join(hostPath, systemConfig.entityDirs.devices);
       const driversPath = path.join(hostPath, systemConfig.entityDirs.drivers);

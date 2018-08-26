@@ -5,7 +5,7 @@ import Manager from './Manager';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import HostsFiles from './HostsFiles';
+import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 
 
@@ -14,7 +14,7 @@ export default class Configurator {
   private readonly register: Register;
   private readonly manifests: Manifests;
   private readonly hostsConfigGenerator: HostsConfigGenerator;
-  private readonly hostsFiles: HostsFiles;
+  private readonly hostsFilesSet: HostsFilesSet;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly manager: Manager;
 
@@ -28,7 +28,7 @@ export default class Configurator {
     this.register = new Register();
     this.manifests = new Manifests();
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
-    this.hostsFiles = new HostsFiles(this.manifests, this.hostsConfigGenerator);
+    this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigGenerator);
     this.hostsFilesWriter = new HostsFilesWriter(this.manifests, this.hostsConfigGenerator);
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
@@ -49,8 +49,8 @@ export default class Configurator {
     // call handlers after init
     this.manager.$riseAfterInit();
 
-    this.hostsFiles.generate();
-    await this.hostsFilesWriter.writeToStorage();
+    this.hostsFilesSet.collect();
+    await this.hostsFilesWriter.writeToStorage(this.hostsFilesSet.getCollection());
   }
 
   private async registering() {

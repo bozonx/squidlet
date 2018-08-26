@@ -10,7 +10,7 @@ import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import HostFilesSet from './interfaces/HostFilesSet';
 
 
-export default class HostsFiles {
+export default class HostsFilesSet {
   private readonly manifests: Manifests;
   private readonly hostsConfigGenerator: HostsConfigGenerator;
   // file sets by hostId
@@ -21,10 +21,14 @@ export default class HostsFiles {
     this.hostsConfigGenerator = hostsConfigGenerator;
   }
 
+  getCollection(): {[index: string]: HostFilesSet} {
+    return this.files;
+  }
+
   /**
    * Generate file set for each host
    */
-  generate() {
+  collect() {
     const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigGenerator.getHostsConfig();
 
     for (let hostId of Object.keys(hostsConfigs)) {
