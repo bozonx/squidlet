@@ -37,14 +37,19 @@ export default class HostsFilesSet {
       const devicesClasses = hostConfig.devices.map((item: DeviceDefinition) => item.className);
       const driversClasses = hostConfig.drivers.map((item: DriverDefinition) => item.className);
       const servicesClasses = hostConfig.services.map((item: ServiceDefinition) => item.className);
+      const fullDriversClasses = this.collectDriverNamesWithDependencies(
+        devicesClasses,
+        driversClasses,
+        servicesClasses
+      );
 
       this.files[hostId] = {
         config: hostConfig,
         devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
-        driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
+        driversManifests: this.collectManifests<DriverManifest>('drivers', fullDriversClasses),
         servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
         driversFiles: this.collectFiles('devices', devicesClasses),
-        devicesFiles: this.collectFiles('drivers', driversClasses),
+        devicesFiles: this.collectFiles('drivers', fullDriversClasses),
         servicesFiles: this.collectFiles('services', servicesClasses),
       };
     }
@@ -52,7 +57,6 @@ export default class HostsFilesSet {
     //
     // TODO: смержить конфиг платформы
     // TODO: смержить props
-    // TODO: добавить все зависимые драйверы !!!
     // TODO: добавить connection driver и его зависимые драйверы которые используются в network
 
   }
@@ -66,13 +70,17 @@ export default class HostsFilesSet {
     servicesClasses: string[]
   ): string[] {
     const dependencies: Dependencies = this.manifests.getDependencies();
+    // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
     function addDeps(type: ManifestsTypePluralName, classNames: string[]) {
       for (let className of classNames) {
-        dependencies[type][className].forEach((depDriverName: string) => {
-          depsDriversNames[depDriverName] = true;
-        });
+        if (!dependencies[type][className]) return;
+
+        dependencies[type][className]
+          .forEach((depDriverName: string) => {
+            depsDriversNames[depDriverName] = true;
+          });
       }
     }
 
