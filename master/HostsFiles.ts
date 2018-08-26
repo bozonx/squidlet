@@ -9,20 +9,10 @@ import HostsConfigGenerator from './HostsConfigGenerator';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
-import config from './config';
+import systemConfig from './systemConfig';
 import {copyFile, writeFile} from './IO';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
-
-
-interface HostFilesSet {
-  config: HostConfig;
-  devicesManifests: DeviceManifest[];
-  driversManifests: DriverManifest[];
-  servicesManifests: ServiceManifest[];
-  driversFiles: {[index: string]: string[]};
-  devicesFiles: {[index: string]: string[]};
-  servicesFiles: {[index: string]: string[]};
-}
+import HostFilesSet from './interfaces/HostFilesSet';
 
 
 export default class HostsFiles {
@@ -67,16 +57,16 @@ export default class HostsFiles {
   async copyToStorage() {
     const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigGenerator.getHostsConfig();
     const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
-    const basePath = path.join(pathToStoreOnMaster, config.pathToSaveHostsFileSet);
+    const basePath = path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
 
     for (let hostId of Object.keys(this.files)) {
       const hostFileSet: HostFilesSet = this.files[hostId];
       const hostPath = path.join(basePath, hostId);
-      const devicesPath = path.join(hostPath, 'devices');
-      const driversPath = path.join(hostPath, 'drivers');
-      const servicesPath = path.join(hostPath, 'services');
+      const devicesPath = path.join(hostPath, systemConfig.entityDirs.devices);
+      const driversPath = path.join(hostPath, systemConfig.entityDirs.drivers);
+      const servicesPath = path.join(hostPath, systemConfig.entityDirs.services);
 
-      // TODO: write config
+      await this.writeHostConfig(hostPath, hostFileSet.config);
 
       await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
       await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
@@ -116,9 +106,16 @@ export default class HostsFiles {
     return result;
   }
 
+  async writeHostConfig(hostPath: string, hostConfig: HostConfig) {
+    const fileName = path.join(hostPath, systemConfig.entityDirs.config, systemConfig.hostConfigFileName);
+    const content = JSON.stringify(hostConfig);
+
+    await writeFile(fileName, content);
+  }
+
   async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
     for (let manifest of manifests) {
-      const fileName = path.join(entityTypeDirPath, manifest.name);
+      const fileName = path.join(entityTypeDirPath, `${manifest.name}.json`);
       const content = JSON.stringify(manifest);
 
       await writeFile(fileName, content);
