@@ -56,7 +56,7 @@ export default class Configurator {
     // generate hosts configs
     this.hostsConfigGenerator.generate();
 
-    // call after init handlers
+    // call handlers after init
     this.manager.$riseAfterInit();
 
     this.hostsFiles.generate();
