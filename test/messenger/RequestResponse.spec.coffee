@@ -16,8 +16,6 @@ describe 'messenger.RequestResponse', ->
             requestTimeout: 0
           }
         }
-      }
-      io: {
         generateUniqId: => @requestId
       }
       events: {

@@ -3,7 +3,7 @@ const _find = require('lodash/find');
 import System from '../app/System';
 import Messenger, {SYSTEM_CATEGORY} from './Messenger';
 import Message from './interfaces/Message';
-import { generateEventName, generateUniqId } from '../helpers/helpers';
+import { generateEventName } from '../helpers/helpers';
 
 
 // position of handler in HandlerItem
@@ -41,7 +41,7 @@ export default class BridgeSubscriber {
    * And it listens to this messages of remote evens.
    */
   subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
-    const handlerId: string = generateUniqId();
+    const handlerId: string = this.system.host.generateUniqId();
     const message: Message = this.generateMessage(toHost, category, topic, SUBSCRIBE_TOPIC, handlerId);
 
     // listen to messages from remote host

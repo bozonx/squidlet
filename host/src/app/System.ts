@@ -1,4 +1,3 @@
-import IO from '../helpers/IO';
 import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
@@ -13,7 +12,6 @@ import HostConfig from './interfaces/HostConfig';
 
 
 export default class System {
-  readonly io: IO;
   readonly host: Host;
   readonly network: Network;
   readonly events: Events;
@@ -26,7 +24,6 @@ export default class System {
 
 
   constructor(hostConfig: HostConfig) {
-    this.io = new IO();
     // config for current host
     this.host = new Host(this, hostConfig);
     this.drivers = new Drivers(this);

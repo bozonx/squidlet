@@ -1,12 +1,9 @@
-import DeviceManifest from './interfaces/DeviceManifest';
-
 const _defaultsDeep = require('lodash/defaultsDeep');
+import * as uniqid from 'uniqid';
+
+import DeviceManifest from './interfaces/DeviceManifest';
 import System from './System';
-// import Destination from '../network/interfaces/Destination';
-// import DeviceConf from './interfaces/DeviceConf';
 import HostConfig from './interfaces/HostConfig';
-import configHostPlatform from '../../../master/configHostPlatform';
-import configHostDefault from '../../../master/configHostDefault';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
 import DriverManifest from './interfaces/DriverManifest';
 import ServiceManifest from './interfaces/ServiceManifest';
@@ -89,6 +86,10 @@ export default class Host {
     this.hostNetworkConfig = {} as HostNetworkConfig;
   }
 
+  generateUniqId(): string {
+    return uniqid();
+  }
+
   // getAddress(type: string, bus: string): string | undefined {
   //   const addrConfig = this.config.address;
   //
@@ -112,12 +113,12 @@ export default class Host {
   private mergeConfigs(specifiedConfig: HostConfig): HostConfig {
     // TODO: не нужно
 
-    return {
-      ...specifiedConfig,
-      host: {
-        ..._defaultsDeep({ ...specifiedConfig.host }, configHostPlatform, configHostDefault),
-      }
-    }
+    // return {
+    //   ...specifiedConfig,
+    //   host: {
+    //     ..._defaultsDeep({ ...specifiedConfig.host }, configHostPlatform, configHostDefault),
+    //   }
+    // }
   }
 
 }

@@ -30,7 +30,7 @@ export default class Configurator {
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
 
-  async init() {
+  async start() {
     // register system plugin which registering system devices, drivers and services
     this.register.addPlugin(systemPlugin);
 

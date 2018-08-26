@@ -8,7 +8,7 @@ describe 'messenger.BridgeSubscriber', ->
     @topic = 'topic'
     @incomeHandler = null
     @system = {
-      io: {
+      host: {
         generateUniqId: -> '123'
       }
       network: {
