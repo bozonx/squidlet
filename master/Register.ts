@@ -24,6 +24,8 @@ export default class Register {
   private registerPromises: Promise<any>[] = [];
 
 
+  // TODO: зачем преобразовывать в массив ?????
+
   getDevicesPreManifests(): PreDeviceManifest[] {
     return _map(this.devicesManifests.toJS());
   }

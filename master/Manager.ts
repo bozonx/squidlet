@@ -1,10 +1,7 @@
 import MasterConfig from './interfaces/MasterConfig';
 import Register from './Register';
-import Manifests from './Manifests';
+import Manifests, {AllManifests} from './Manifests';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
-import DriverManifest from '../host/src/app/interfaces/DriverManifest';
-import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import * as EventEmitter from 'events';
 
@@ -35,21 +32,13 @@ export default class Configurator {
     this.hostsConfigGenerator = hostsConfigGenerator;
   }
 
-  getConfig() {
+  getMasterConfig() {
     // TODO: клонировать или делать immutable
     return this.masterConfig;
   }
 
-  getDevicesManifests(): DeviceManifest[] {
-    return this.manifests.getDevicesManifests();
-  }
-
-  getDriversManifests(): DriverManifest[] {
-    return this.manifests.getDriversManifests();
-  }
-
-  getServicesManifests(): ServiceManifest[] {
-    return this.manifests.getServicesManifests();
+  getManifests(): AllManifests {
+    return this.manifests.getManifests();
   }
 
   getHostsConfig(): {[index: string]: HostConfig} {

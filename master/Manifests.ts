@@ -1,5 +1,4 @@
 const _omit = require('lodash/omit');
-const _map = require('lodash/map');
 
 import {loadManifest} from './IO';
 import {Map} from 'immutable';
@@ -25,7 +24,7 @@ interface FilesPaths {
   services: {[index: string]: string[]};
 }
 
-interface AllManifests {
+export interface AllManifests {
   devices: {[index: string]: DeviceManifest};
   drivers: {[index: string]: DriverManifest};
   services: {[index: string]: ServiceManifest};
@@ -58,21 +57,6 @@ export default class Manifests {
     // TODO: clone or immutable
 
     return this.filesPaths;
-  }
-
-  // TODO: не нужно !!!!
-  getDevicesManifests(): DeviceManifest[] {
-    return _map(this.devices.toJS());
-  }
-
-  // TODO: не нужно !!!!
-  getDriversManifests(): DriverManifest[] {
-    return _map(this.drivers.toJS());
-  }
-
-  // TODO: не нужно !!!!
-  getServicesManifests(): ServiceManifest[] {
-    return _map(this.services.toJS());
   }
 
   async generate(

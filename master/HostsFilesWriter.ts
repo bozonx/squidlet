@@ -4,27 +4,28 @@ import HostConfig from '../host/src/app/interfaces/HostConfig';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
-import Manifests from './Manifests';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import systemConfig from './systemConfig';
-import {copyFile, writeFile} from './IO';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import HostFilesSet from './interfaces/HostFilesSet';
+import HostsFilesSet from './HostsFilesSet';
+import systemConfig from './systemConfig';
+import {copyFile, writeFile} from './IO';
 
 
 export default class HostsFilesWriter {
-  private readonly manifests: Manifests;
+  private readonly hostsFilesSet: HostsFilesSet;
   private readonly hostsConfigGenerator: HostsConfigGenerator;
 
-  constructor(manifests: Manifests, hostsConfigGenerator: HostsConfigGenerator) {
-    this.manifests = manifests;
+  constructor(hostsFilesSet: HostsFilesSet, hostsConfigGenerator: HostsConfigGenerator) {
+    this.hostsFilesSet = hostsFilesSet;
     this.hostsConfigGenerator = hostsConfigGenerator;
   }
 
   /**
    * Copy files for hosts to storage to dir of ConfigUpdater plugin
    */
-  async writeToStorage(filesCollection: {[index: string]: HostFilesSet}) {
+  async writeToStorage() {
+    const filesCollection: {[index: string]: HostFilesSet} = this.hostsFilesSet.getCollection();
     const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigGenerator.getHostsConfig();
     const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
     const basePath = path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);

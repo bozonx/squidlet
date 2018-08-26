@@ -29,14 +29,15 @@ export default class Configurator {
     this.manifests = new Manifests();
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
     this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigGenerator);
-    this.hostsFilesWriter = new HostsFilesWriter(this.manifests, this.hostsConfigGenerator);
+    this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigGenerator);
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
 
   async start() {
+    // registering of plugins, devices, drivers and services
     await this.registering();
 
-    // resolve and prepare manifest
+    // resolve and prepare manifests
     await this.manifests.generate(
       this.register.getDevicesPreManifests(),
       this.register.getDriversPreManifests(),
@@ -50,7 +51,7 @@ export default class Configurator {
     this.manager.$riseAfterInit();
 
     this.hostsFilesSet.collect();
-    await this.hostsFilesWriter.writeToStorage(this.hostsFilesSet.getCollection());
+    await this.hostsFilesWriter.writeToStorage();
   }
 
   private async registering() {
