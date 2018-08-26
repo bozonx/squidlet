@@ -30,6 +30,8 @@ export default class HostsFilesWriter {
     const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
     const basePath = path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
 
+    // TODO: создать папку хранилища, девайсов, драйверов и тд
+
     for (let hostId of Object.keys(filesCollection)) {
       const hostFileSet: HostFilesSet = filesCollection[hostId];
       const hostPath = path.join(basePath, hostId);

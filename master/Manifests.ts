@@ -156,7 +156,7 @@ export default class Manifests {
 
     // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
     // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
-    //       был ли он загружен или нет - лучше наверное сравнивать по resolved имени файла
+    //       был ли он загружен или нет - лучше наверное сравнивать по resolved или softPath имени файла
 
     const parsedManifest: PreDeviceManifest = await this.loadManifest<PreDeviceManifest>(driverManifestSoftPath);
 

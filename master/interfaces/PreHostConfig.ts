@@ -27,7 +27,7 @@ export default interface PreHostConfig {
   // services definitions by service id
   services?: {[index: string]: PreServiceDefinition};
 
-  // override default params of devices
+  // override default params of devices by device class name
   devicesDefaults?: {[index: string]: any};
 
   // shortcut for automation service
