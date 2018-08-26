@@ -2,11 +2,13 @@ import HostConfig from '../host/src/app/interfaces/HostConfig';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
+import Manifests from './Manifests';
+import HostsConfigGenerator from './HostsConfigGenerator';
 
 
 interface HostFilesSet {
   config: HostConfig;
-  devicessManifests: DeviceManifest[];
+  devicesManifests: DeviceManifest[];
   driversManifests: DriverManifest[];
   servicesManifests: ServiceManifest[];
   driversFiles: {[index: string]: string[]};
@@ -16,9 +18,15 @@ interface HostFilesSet {
 
 
 export default class HostsFiles {
+  private readonly manifests: Manifests;
+  private readonly hostsConfigGenerator: HostsConfigGenerator;
+  // file sets by hostId
   private files: {[index: string]: HostFilesSet};
 
-  constructor() {
+  constructor(manifests: Manifests, hostsConfigGenerator: HostsConfigGenerator) {
+    this.manifests = manifests;
+    this.hostsConfigGenerator = hostsConfigGenerator;
+
   }
 
   // TODO: собрать конфиг, манифесты и список файлов для каждого хоста

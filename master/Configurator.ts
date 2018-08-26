@@ -26,7 +26,7 @@ export default class Configurator {
     this.register = new Register();
     this.manifests = new Manifests();
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
-    this.hostsFiles = new HostsFiles();
+    this.hostsFiles = new HostsFiles(this.manifests, this.hostsConfigGenerator);
     this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
   }
 
