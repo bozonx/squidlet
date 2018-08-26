@@ -14,7 +14,7 @@ import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 
 
-type PluralName = 'devices' | 'drivers' | 'services';
+export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
 interface FilesPaths {
   // list of devices files by device name
@@ -23,6 +23,12 @@ interface FilesPaths {
   drivers: {[index: string]: string[]};
   // list of services files by service name
   services: {[index: string]: string[]};
+}
+
+interface AllManifests {
+  devices: {[index: string]: DeviceManifest};
+  drivers: {[index: string]: DriverManifest};
+  services: {[index: string]: ServiceManifest};
 }
 
 
@@ -40,14 +46,25 @@ export default class Manifests {
   constructor() {
   }
 
+  getManifests(): AllManifests {
+    return {
+      devices: this.devices.toJS(),
+      drivers: this.drivers.toJS(),
+      services: this.services.toJS(),
+    };
+  }
+
+  // TODO: не нужно !!!!
   getDevicesManifests(): DeviceManifest[] {
     return _map(this.devices.toJS());
   }
 
+  // TODO: не нужно !!!!
   getDriversManifests(): DriverManifest[] {
     return _map(this.drivers.toJS());
   }
 
+  // TODO: не нужно !!!!
   getServicesManifests(): ServiceManifest[] {
     return _map(this.services.toJS());
   }
@@ -76,7 +93,7 @@ export default class Manifests {
     preManifest: PreManifest
   ) {
     const finalManifest: FinalManifest = this.prepareManifest(preManifest);
-    const plural: PluralName = `${manifestType}s` as PluralName;
+    const plural: ManifestsTypePluralName = `${manifestType}s` as ManifestsTypePluralName;
     const finalManifests = this[plural] as Map<string, FinalManifest>;
 
     // collect files
