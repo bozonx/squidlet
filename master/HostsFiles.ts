@@ -11,6 +11,7 @@ import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import config from './config';
 import {copyFile, writeFile} from './IO';
+import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 
 
 interface HostFilesSet {
@@ -71,13 +72,19 @@ export default class HostsFiles {
     for (let hostId of Object.keys(this.files)) {
       const hostFileSet: HostFilesSet = this.files[hostId];
       const hostPath = path.join(basePath, hostId);
+      const devicesPath = path.join(hostPath, 'devices');
+      const driversPath = path.join(hostPath, 'drivers');
+      const servicesPath = path.join(hostPath, 'services');
 
       // TODO: write config
-      // TODO: write manifests
 
-      await this.copyEntityFiles(hostPath, hostFileSet.devicesFiles);
-      await this.copyEntityFiles(hostPath, hostFileSet.driversFiles);
-      await this.copyEntityFiles(hostPath, hostFileSet.servicesFiles);
+      await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
+      await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
+      await this.writeManifests<ServiceManifest>(servicesPath, hostFileSet.servicesManifests);
+
+      await this.copyEntityFiles(devicesPath, hostFileSet.devicesFiles);
+      await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
+      await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
     }
   }
 
@@ -109,10 +116,19 @@ export default class HostsFiles {
     return result;
   }
 
-  async copyEntityFiles(hostPath: string, fileSet: {[index: string]: string[]}) {
+  async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
+    for (let manifest of manifests) {
+      const fileName = path.join(entityTypeDirPath, manifest.name);
+      const content = JSON.stringify(manifest);
+
+      await writeFile(fileName, content);
+    }
+  }
+
+  async copyEntityFiles(entityTypeDirPath: string, fileSet: {[index: string]: string[]}) {
     for (let entityClassName of Object.keys(fileSet)) {
       for (let fromFileName of fileSet[entityClassName]) {
-        const toFileName = path.join(hostPath, entityClassName);
+        const toFileName = path.join(entityTypeDirPath, entityClassName);
 
         await copyFile(fromFileName, toFileName);
       }
