@@ -23,7 +23,10 @@ export default class System {
   readonly log: Logger;
 
 
-  constructor(hostConfig: HostConfig) {
+  constructor() {
+
+    // TODO: загрузить конфиг - hostConfig: HostConfig
+
     // config for current host
     this.host = new Host(this, hostConfig);
     this.drivers = new Drivers(this);
@@ -36,9 +39,10 @@ export default class System {
     this.devices = new Devices(this);
   }
 
-  async initDrivers(): Promise<void> {
+  async initSystemDrivers(): Promise<void> {
     await this.drivers.init(this.host.driversManifests, this.host.config.drivers);
 
+    // TODO: только системные драйверы и dev
     // TODO: потом поднять событие что драйверы инициализировались
   }
 
@@ -56,18 +60,20 @@ export default class System {
     this.messenger.init();
   }
 
+  async initSystemServices(): Promise<void> {
+    // TODO: init master network configurator
+    // TODO: init master updater
+    // TODO: init master configurator
+  }
+
   /**
    * Init user layer - device representer, devices, device's drivers and services
    * @return {Promise<void>}
    */
   async initApp(): Promise<void> {
-    // TODO: init initPlugins
-    // TODO: init initDrivers - которые добавленны плагинами
-    // TODO: init device's drivers
-    // TODO: init device representer
+    // TODO: init other drivers
     // TODO: init services
     // TODO: init devices
-
 
     await this.devicesManager.init(this.host.devicesManifests, this.host.config.devices);
 

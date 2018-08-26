@@ -7,6 +7,7 @@ export default class HostsFiles {
 
   // TODO: !!!! add devs specified to platform
   // TODO: записать все во временное хранилище на мастере, чтобы сервис потом это все считал
+  // TODO: разделить системные драверы + dev и остальные драйверы
 
   generate() {
 

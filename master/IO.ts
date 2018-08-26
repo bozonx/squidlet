@@ -1,9 +1,9 @@
 import * as fs from 'fs';
-
 import * as uniqid from 'uniqid';
 import * as path from 'path';
-import PreManifestBase from './interfaces/PreManifestBase';
 import * as yaml from 'js-yaml';
+
+import PreManifestBase from './interfaces/PreManifestBase';
 
 
 export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
@@ -24,7 +24,7 @@ export async function loadManifest<T extends PreManifestBase>(pathToDirOrFile: s
   return parsedManifest;
 }
 
-export async function resolveFile(pathToDirOrDile: string, ext: string, indexFileName: string[]): string {
+export async function resolveFile(pathToDirOrFile: string, ext: string, indexFileName: string[]): string {
   // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
   // TODO: расширение yaml - можно подставлять - необязательно указывать
 }
