@@ -1,4 +1,23 @@
+import HostConfig from '../host/src/app/interfaces/HostConfig';
+import DriverManifest from '../host/src/app/interfaces/DriverManifest';
+import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
+import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
+
+
+interface HostFilesSet {
+  config: HostConfig;
+  devicessManifests: DeviceManifest[];
+  driversManifests: DriverManifest[];
+  servicesManifests: ServiceManifest[];
+  driversFiles: {[index: string]: string[]};
+  devicesFiles: {[index: string]: string[]};
+  servicesFiles: {[index: string]: string[]};
+}
+
+
 export default class HostsFiles {
+  private files: {[index: string]: HostFilesSet};
+
   constructor() {
   }
 
@@ -10,6 +29,10 @@ export default class HostsFiles {
   // TODO: разделить системные драверы + dev и остальные драйверы
 
   generate() {
+
+  }
+
+  private copyToStorage() {
 
   }
 

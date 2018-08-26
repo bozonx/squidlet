@@ -39,6 +39,23 @@ export default class System {
     this.devices = new Devices(this);
   }
 
+  async start() {
+    await this.loadConfig();
+    await this.initSystemDrivers();
+    await this.initNetwork();
+    await this.initMessenger();
+    await this.initSystemServices();
+    await this.initApp();
+  }
+
+
+  /**
+   * load config from storage
+   */
+  async loadConfig(): Promise<void> {
+    // TODO: !!!
+  }
+
   async initSystemDrivers(): Promise<void> {
     await this.drivers.init(this.host.driversManifests, this.host.config.drivers);
 
@@ -64,6 +81,7 @@ export default class System {
     // TODO: init master network configurator
     // TODO: init master updater
     // TODO: init master configurator
+    // TODO: после конфигурирования - перезагружаться
   }
 
   /**
