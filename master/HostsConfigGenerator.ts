@@ -21,6 +21,8 @@ const servicesShortcut = [
 ];
 
 
+// TODO: rename
+
 export default class HostsConfigGenerator {
   private readonly masterConfig: MasterConfig;
   private readonly manifests: Manifests;
