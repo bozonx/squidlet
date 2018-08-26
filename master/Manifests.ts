@@ -119,7 +119,9 @@ export default class Manifests {
       }
     }
 
-    this.dependencies[plural][preManifest.name] = this.collectDependencies<PreManifest>(preManifest);
+    if (preManifest.drivers) {
+      this.dependencies[plural][preManifest.name] = this.collectDependencies<PreManifest>(preManifest);
+    }
 
     // add to list of manifests
     finalManifests.set(finalManifest.name, finalManifest);
@@ -132,6 +134,8 @@ export default class Manifests {
       if (!this.driversSoftPaths[softPath]) {
         throw new Error(`Can't find driver name by softPath "${softPath}"`);
       }
+
+      // TODO: наверное dev исключить, так как они должны быть на хосте уже
 
       return this.driversSoftPaths[softPath];
     });
@@ -148,6 +152,7 @@ export default class Manifests {
   }
 
   private async proceedDriverManifest(driverManifestSoftPath: string) {
+    // TODO: наверное dev исключить
 
     // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
     // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять

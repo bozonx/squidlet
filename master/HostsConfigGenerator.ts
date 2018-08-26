@@ -103,7 +103,7 @@ export default class HostsConfigGenerator {
         className: rawDrivers[driverId].driver,
 
 
-        // TODO: отсортировать для каждого хоста - сначала dev, потом system потом остальные
+        // TODO: ??? отсортировать для каждого хоста - сначала dev, потом system потом остальные
 
         props: _omit(rawDrivers[driverId], 'driver'),
       };

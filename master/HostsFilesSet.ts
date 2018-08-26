@@ -50,6 +50,8 @@ export default class HostsFilesSet {
     }
 
     //    const dependencies: Dependencies = this.manifests.getDependencies();
+    // TODO: смержить конфиг платформы
+    // TODO: смержить props
     // TODO: добавить все зависимые драйверы !!!
     // TODO: добавить connection driver и его зависимые драйверы которые используются в network
 
