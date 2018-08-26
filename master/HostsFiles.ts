@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
@@ -32,9 +34,6 @@ export default class HostsFiles {
     this.hostsConfigGenerator = hostsConfigGenerator;
   }
 
-  // TODO: записать все во временное хранилище на мастере, чтобы сервис потом это все считал
-  // TODO: разделить системные драверы + dev и остальные драйверы
-
   /**
    * Generate file set for each host
    */
@@ -64,13 +63,11 @@ export default class HostsFiles {
    * Copy files for hosts to storage to dir of ConfigUpdater plugin
    */
   copyToStorage() {
-
+    const basePath = path.join(this.masterConfig. , config.pathToSaveHostsFileSet);
   }
 
   /**
    * Collect all the host manifest
-   * @param manifestType
-   * @param manifestNames
    */
   private collectManifests<T>(manifestType: ManifestsTypePluralName, entityNames: string[]): T[] {
     const manifests = this.manifests.getManifests() as any;
@@ -79,6 +76,9 @@ export default class HostsFiles {
     return entityNames.map((usedEntityName: string) => manifestsOfType[usedEntityName]);
   }
 
+  /**
+   * Collect all the host files
+   */
   private collectFiles(
     manifestType: ManifestsTypePluralName,
     entityNames: string[]
