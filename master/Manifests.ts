@@ -24,7 +24,7 @@ interface FilesPaths {
   services: {[index: string]: string[]};
 }
 
-interface Dependencies {
+export interface Dependencies {
   // list of dependencies of devices by device name
   devices: {[index: string]: string[]};
   // list of dependencies of drivers by driver name

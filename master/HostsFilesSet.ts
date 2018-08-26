@@ -2,7 +2,7 @@ import HostConfig from '../host/src/app/interfaces/HostConfig';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
-import Manifests, {ManifestsTypePluralName} from './Manifests';
+import Manifests, {Dependencies, ManifestsTypePluralName} from './Manifests';
 import HostsConfigGenerator from './HostsConfigGenerator';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
@@ -49,7 +49,7 @@ export default class HostsFilesSet {
       };
     }
 
-    //    const dependencies: Dependencies = this.manifests.getDependencies();
+    //
     // TODO: смержить конфиг платформы
     // TODO: смержить props
     // TODO: добавить все зависимые драйверы !!!
@@ -58,7 +58,40 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Collect all the host manifest
+   * Collect of the drivers which are dependencies of devices, drivers or services
+   */
+  private collectDriverNamesWithDependencies(
+    devicesClasses: string[],
+    driversClasses: string[],
+    servicesClasses: string[]
+  ): string[] {
+    const dependencies: Dependencies = this.manifests.getDependencies();
+    const depsDriversNames: {[index: string]: true} = {};
+
+    function addDeps(type: ManifestsTypePluralName, classNames: string[]) {
+      for (let className of classNames) {
+        dependencies[type][className].forEach((depDriverName: string) => {
+          depsDriversNames[depDriverName] = true;
+        });
+      }
+    }
+
+    // first add all the driver names
+    for (let className of driversClasses) {
+      depsDriversNames[className] = true;
+    }
+    // add deps of devices
+    addDeps('devices', devicesClasses);
+    // add deps of drivers
+    addDeps('drivers', driversClasses);
+    // add deps of services
+    addDeps('services', servicesClasses);
+
+    return Object.keys(depsDriversNames);
+  }
+
+  /**
+   * Collect all the used host manifest of devices, drivers or services
    */
   private collectManifests<T>(manifestType: ManifestsTypePluralName, entityNames: string[]): T[] {
     const manifests = this.manifests.getManifests() as any;
@@ -68,7 +101,7 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Collect all the host files
+   * Collect all the used host files of devices, drivers or services
    */
   private collectFiles(
     manifestType: ManifestsTypePluralName,
