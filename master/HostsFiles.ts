@@ -62,8 +62,17 @@ export default class HostsFiles {
   /**
    * Copy files for hosts to storage to dir of ConfigUpdater plugin
    */
-  copyToStorage() {
-    const basePath = path.join(this.masterConfig. , config.pathToSaveHostsFileSet);
+  async copyToStorage() {
+    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigGenerator.getHostsConfig();
+    const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
+    const basePath = path.join(pathToStoreOnMaster, config.pathToSaveHostsFileSet);
+
+    for (let hostId of Object.keys(this.files)) {
+      const hostFileSet: HostFilesSet = this.files[hostId];
+      const hostPath = path.join(basePath, hostId);
+
+
+    }
   }
 
   /**

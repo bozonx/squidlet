@@ -60,7 +60,7 @@ export default class Configurator {
     this.manager.$riseAfterInit();
 
     this.hostsFiles.generate();
-    this.hostsFiles.copyToStorage();
+    await this.hostsFiles.copyToStorage();
   }
 
 }

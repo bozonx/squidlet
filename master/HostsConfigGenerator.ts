@@ -68,6 +68,10 @@ export default class HostsConfigGenerator {
    * @param hostParams
    */
   private mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
+
+    // TODO: смержить ещё с захардкоженным default конфигом где указан дефолтный storeDir и тд
+    // TODO: смержить ещё с platform config
+
     return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
   }
 
