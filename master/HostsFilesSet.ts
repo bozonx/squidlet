@@ -33,23 +33,19 @@ export default class HostsFilesSet {
 
     for (let hostId of Object.keys(hostsConfigs)) {
       const hostConfig: HostConfig = hostsConfigs[hostId];
-
-      const devicesClasses = hostConfig.devices.map((item: DeviceDefinition) => item.className);
-      const driversClasses = hostConfig.drivers.map((item: DriverDefinition) => item.className);
-      const servicesClasses = hostConfig.services.map((item: ServiceDefinition) => item.className);
-      const fullDriversClasses = this.collectDriverNamesWithDependencies(
+      const {
         devicesClasses,
         driversClasses,
-        servicesClasses
-      );
+        servicesClasses,
+      } = this.generateClassNames(hostConfig);
 
       this.files[hostId] = {
         config: hostConfig,
         devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
-        driversManifests: this.collectManifests<DriverManifest>('drivers', fullDriversClasses),
+        driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
         servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
         driversFiles: this.collectFiles('devices', devicesClasses),
-        devicesFiles: this.collectFiles('drivers', fullDriversClasses),
+        devicesFiles: this.collectFiles('drivers', driversClasses),
         servicesFiles: this.collectFiles('services', servicesClasses),
       };
     }
@@ -59,6 +55,23 @@ export default class HostsFilesSet {
     // TODO: смержить props
     // TODO: добавить connection driver и его зависимые драйверы которые используются в network
 
+  }
+
+  private generateClassNames(hostConfig: HostConfig) {
+    const devicesClasses = hostConfig.devices.map((item: DeviceDefinition) => item.className);
+    const onlyDriversClasses = hostConfig.drivers.map((item: DriverDefinition) => item.className);
+    const servicesClasses = hostConfig.services.map((item: ServiceDefinition) => item.className);
+    const driversClasses = this.collectDriverNamesWithDependencies(
+      devicesClasses,
+      onlyDriversClasses,
+      servicesClasses,
+    );
+
+    return {
+      devicesClasses,
+      driversClasses,
+      servicesClasses,
+    };
   }
 
   /**
@@ -95,6 +108,9 @@ export default class HostsFilesSet {
     // add deps of services
     addDeps('services', servicesClasses);
 
+    // TODO: исключить dev или это сделать в manifests ????
+
+    // get only driver class names
     return Object.keys(depsDriversNames);
   }
 
