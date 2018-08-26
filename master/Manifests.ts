@@ -24,6 +24,15 @@ interface FilesPaths {
   services: {[index: string]: string[]};
 }
 
+interface Dependencies {
+  // list of dependencies of devices by device name
+  devices: {[index: string]: string[]};
+  // list of dependencies of drivers by driver name
+  drivers: {[index: string]: string[]};
+  // list of dependencies of services by service name
+  services: {[index: string]: string[]};
+}
+
 export interface AllManifests {
   devices: {[index: string]: DeviceManifest};
   drivers: {[index: string]: DriverManifest};
@@ -41,6 +50,13 @@ export default class Manifests {
     drivers: {},
     services: {},
   };
+  private dependencies: Dependencies = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
+  // driver names by soft paths to manifest or dir with manifest like {softPath: DriverName}
+  private driversSoftPaths: {[index: string]: string} = {};
 
   constructor() {
   }
@@ -57,6 +73,10 @@ export default class Manifests {
     // TODO: clone or immutable
 
     return this.filesPaths;
+  }
+
+  getDependencies(): Dependencies {
+    return this.dependencies;
   }
 
   async generate(
@@ -94,13 +114,27 @@ export default class Manifests {
 
     // proceed drivers
     if (preManifest.drivers) {
-      for (let driverPath of preManifest.drivers) {
-        await this.proceedDriverManifest(driverPath);
+      for (let driverSoftPath of preManifest.drivers) {
+        await this.proceedDriverManifest(driverSoftPath);
       }
     }
 
+    this.dependencies[plural][preManifest.name] = this.collectDependencies<PreManifest>(preManifest);
+
     // add to list of manifests
     finalManifests.set(finalManifest.name, finalManifest);
+  }
+
+  private collectDependencies<PreManifest extends PreManifestBase>(preManifest: PreManifest): string[] {
+    if (!preManifest.drivers) return [];
+
+    return preManifest.drivers.map((softPath: string) => {
+      if (!this.driversSoftPaths[softPath]) {
+        throw new Error(`Can't find driver name by softPath "${softPath}"`);
+      }
+
+      return this.driversSoftPaths[softPath];
+    });
   }
 
   private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
@@ -113,16 +147,18 @@ export default class Manifests {
     return finalManifest;
   }
 
-  private async proceedDriverManifest(driverManifestPath: string) {
+  private async proceedDriverManifest(driverManifestSoftPath: string) {
 
     // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
     // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
     //       был ли он загружен или нет - лучше наверное сравнивать по resolved имени файла
 
-    const parsedManifest: PreDeviceManifest = await this.loadManifest<PreDeviceManifest>(driverManifestPath);
+    const parsedManifest: PreDeviceManifest = await this.loadManifest<PreDeviceManifest>(driverManifestSoftPath);
 
     // if driver is registered - do nothing
     if (this.drivers.get(parsedManifest.name)) return;
+    // save soft paths cache
+    this.driversSoftPaths[driverManifestSoftPath] = parsedManifest.name;
 
     // proceed it
     return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);

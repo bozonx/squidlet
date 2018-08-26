@@ -49,6 +49,7 @@ export default class HostsFilesSet {
       };
     }
 
+    //    const dependencies: Dependencies = this.manifests.getDependencies();
     // TODO: добавить все зависимые драйверы !!!
     // TODO: добавить connection driver и его зависимые драйверы которые используются в network
 
