@@ -7,21 +7,21 @@ const servicesRoot = path.resolve(__dirname, '../services');
 const networkConnectionDriversRoot = path.resolve(__dirname, '../network/connections');
 
 
-export default function systemPlugin (manager: Manager) {
+export default async function systemPlugin (manager: Manager) {
   // devices
-  manager.addDevice(path.join(devicesRoot, 'BinarySensor'));
-  manager.addDevice(path.join(devicesRoot, 'Switch'));
+  await manager.addDevice(path.join(devicesRoot, 'BinarySensor'));
+  await manager.addDevice(path.join(devicesRoot, 'Switch'));
 
   // drivers
-  manager.addDriver(path.join(driversRoot, 'GPIO/GpioInput.driver'));
-  manager.addDriver(path.join(driversRoot, 'GPIO/GpioInput_raspberry.driver'));
-  manager.addDriver(path.join(driversRoot, 'GPIO/GpioOutput.driver'));
-  manager.addDriver(path.join(driversRoot, 'I2c/I2cData.driver'));
-  manager.addDriver(path.join(driversRoot, 'I2c/I2cMaster.driver'));
-  manager.addDriver(path.join(driversRoot, 'I2c/I2cSlave.driver'));
+  await manager.addDriver(path.join(driversRoot, 'GPIO/GpioInput.driver'));
+  await manager.addDriver(path.join(driversRoot, 'GPIO/GpioInput_raspberry.driver'));
+  await manager.addDriver(path.join(driversRoot, 'GPIO/GpioOutput.driver'));
+  await manager.addDriver(path.join(driversRoot, 'I2c/I2cData.driver'));
+  await manager.addDriver(path.join(driversRoot, 'I2c/I2cMaster.driver'));
+  await manager.addDriver(path.join(driversRoot, 'I2c/I2cSlave.driver'));
   // network connections drivers
-  manager.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection.driver'));
+  await manager.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection.driver'));
 
   // services
-  manager.addService(path.join(servicesRoot, 'Mqtt'));
+  await manager.addService(path.join(servicesRoot, 'Mqtt'));
 }
