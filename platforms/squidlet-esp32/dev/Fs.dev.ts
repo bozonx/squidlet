@@ -78,6 +78,19 @@ export default class FsDev {
     });
   }
 
+  exists(path: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const fn = (fs.statSync as any) as (path: string) => object | undefined;
+      const result: object | undefined = fn(path);
+
+      if (result) return resolve(true);
+
+      resolve(false);
+    });
+
+    // TODO: !!! можно прочитать stat файла и выяснить есть ли он или нет
+  }
+
 
   // additional
 
@@ -85,9 +98,6 @@ export default class FsDev {
     // TODO: !!! можно создать новый и удалить старый файл
   }
 
-  async exists(path: string): Promise<boolean> {
-    // TODO: !!! можно прочитать stat файла и выяснить есть ли он или нет
-  }
 
   rename(oldPath: string, newPath: string): Promise<void> {
     // TODO: можно удалить старый файл и создать новый с тем же содержимым

@@ -61,15 +61,15 @@ export default class FsDev {
     };
   }
 
+  async exists(path: string): Promise<boolean> {
+    return fs.existsSync(path);
+  }
+
 
   // additional
 
   copyFile(src: string, dest: string): Promise<void> {
     return fsPromises.copyFile(src, dest);
-  }
-
-  async exists(path: string): Promise<boolean> {
-    return fs.existsSync(path);
   }
 
   rename(oldPath: string, newPath: string): Promise<void> {

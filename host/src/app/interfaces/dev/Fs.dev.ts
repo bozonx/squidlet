@@ -17,8 +17,8 @@ export default interface Storage {
   unlink(path: string): Promise<void>;
   writeFile(path: string, data: string | Uint8Array): Promise<void>;
   stat(path: string): Promise<Stats>;
+  exists(path: string): Promise<boolean>;
   // additional
   copyFile(src: string, dest: string): Promise<void>;
-  exists(path: string): Promise<boolean>;
   rename(oldPath: string, newPath: string): Promise<void>;
 }
