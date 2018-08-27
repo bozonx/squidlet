@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
-import Driver from './interfaces/Driver';
+import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverFactory from './interfaces/DriverFactory';
 import DriverDefinition from './interfaces/DriverDefinition';
@@ -15,7 +15,7 @@ type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]:
  */
 export default class Drivers {
   readonly system: System;
-  private instances: Map<string, Driver> = Map<string, Driver>();
+  private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
 
   constructor(system: System) {
     this.system = system;
@@ -30,7 +30,7 @@ export default class Drivers {
   getDriver(driverName: string): any {
     // TODO: если запрашивается dev - то вернуть dev
 
-    const driver: Driver | undefined = this.instances.get(driverName);
+    const driver: DriverInstance | undefined = this.instances.get(driverName);
 
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 

@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
-import Driver from './interfaces/Driver';
+import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverFactory from './interfaces/DriverFactory';
 import DriverDefinition from './interfaces/DriverDefinition';
@@ -15,7 +15,7 @@ type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]:
  */
 export default class Drivers {
   readonly system: System;
-  private instances: Map<string, Driver> = Map<string, Driver>();
+  private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
 
   constructor(system: System) {
     this.system = system;
@@ -46,7 +46,7 @@ export default class Drivers {
     // make instances of drivers
     for (let manifest of driverManifests) {
       const DriverClass = this.require(manifest.main).default;
-      const instance: Driver = new DriverClass(this, driversConfig[manifest.name]);
+      const instance: DriverInstance = new DriverClass(this, driversConfig[manifest.name]);
 
       this.instances = this.instances.set(manifest.name, instance);
     }
@@ -61,7 +61,7 @@ export default class Drivers {
   getDriver(driverName: string): any {
     // TODO: если запрашивается dev - то вернуть dev
 
-    const driver: Driver | undefined = this.instances.get(driverName);
+    const driver: DriverInstance | undefined = this.instances.get(driverName);
 
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
@@ -78,7 +78,7 @@ export default class Drivers {
 
     // initialize drivers
     await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: Driver = this.instances.get(name);
+      const driver: DriverInstance = this.instances.get(name);
 
       await driver.init();
     }));
@@ -89,7 +89,7 @@ export default class Drivers {
   async $initUserLayerDrivers(): Promise<void> {
     // initialize drivers
     await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: Driver = this.instances.get(name);
+      const driver: DriverInstance = this.instances.get(name);
 
       await driver.init();
     }));
