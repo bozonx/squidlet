@@ -2,6 +2,10 @@ import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import Driver from './interfaces/Driver';
 import System from './System';
+import DriverFactory from './interfaces/DriverFactory';
+
+
+type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
 
 
 /**
@@ -22,9 +26,11 @@ export default class Drivers {
    */
   async init(driverManifests: DriverManifest[], driversConfig: {[index: string]: object} = {}): Promise<void> {
 
+    // TODO: манифесты загружать и забывать
+    // TODO: инициализировать devs
     // TODO: может конфиги брать из system?
 
-    // make instances
+    // make instances of drivers
     for (let manifest of driverManifests) {
       const DriverClass = this.require(manifest.main).default;
       const instance: Driver = new DriverClass(this, driversConfig[manifest.name]);
@@ -42,6 +48,8 @@ export default class Drivers {
 
   // TODO: наверное возвращать Drivers?
   getDriver(driverName: string): any {
+    // TODO: если запрашивается dev - то вернуть dev
+
     const driver: Driver | undefined = this.instances.get(driverName);
 
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
@@ -50,6 +58,15 @@ export default class Drivers {
 
     return this.instances.get(driverName);
   }
+
+  /**
+   * Set platform specific devs
+   * @param devs - like {DeviClassName: DevClass}
+   */
+  $setDevs(devs: {[index: string]: DriverFactoryClass}) {
+    // TODO: указать тип - new () => any  \ DriverFactory
+  }
+
 
   // it needs for test purpose
   private require(pathToFile: string) {

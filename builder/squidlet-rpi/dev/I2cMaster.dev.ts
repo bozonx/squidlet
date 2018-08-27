@@ -1,8 +1,8 @@
 // See interface in squidlet/host/src/app/interfaces/dev/I2cMaster.dev.ts
 
 import * as i2cBusModule from 'i2c-bus';
-import DriverFactoryBase from '../../host/src/app/DriverFactoryBase';
-import Drivers from '../../host/src/app/Drivers';
+import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
+import Drivers from '../../../host/src/app/Drivers';
 
 
 /**
