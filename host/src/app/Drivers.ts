@@ -3,6 +3,8 @@ import DriverManifest from './interfaces/DriverManifest';
 import Driver from './interfaces/Driver';
 import System from './System';
 import DriverFactory from './interfaces/DriverFactory';
+import DriverDefinition from './interfaces/DriverDefinition';
+import StorageDev from './interfaces/dev/Storage.dev';
 
 
 type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
@@ -23,13 +25,17 @@ export default class Drivers {
    * Make instances of drivers
    */
   async init(): Promise<void> {
+    const storage: StorageDev = this.getDev<StorageDev>('Storage');
+
+
+
     // TODO: пройтись по папке drivers в хранилище
     // TODO: загрузить все манифесты
     // TODO: выписать системные и не системные имена драйверов
     // TODO: создать инстансы всех драйверов
 
 
-    const driversConfig: {[index: string]: object} = this.system.host.config.drivers;
+    const driversConfig: DriverDefinition[] = this.system.host.config.drivers;
     // driverManifests: DriverManifest[],
     // TODO: собрать список системных и обычных драйверов
 
@@ -44,6 +50,10 @@ export default class Drivers {
 
       this.instances = this.instances.set(manifest.name, instance);
     }
+
+  }
+
+  getDev<T>(shortDevName: string): T {
 
   }
 
