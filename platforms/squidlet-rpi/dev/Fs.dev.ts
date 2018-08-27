@@ -64,8 +64,8 @@ export default class FsDev {
 
   // additional
 
-  copyFile(src: string, dest: string, flags?: number): Promise<void> {
-    return fsPromises.copyFile(src, dest, flags);
+  copyFile(src: string, dest: string): Promise<void> {
+    return fsPromises.copyFile(src, dest);
   }
 
   async exists(path: string): Promise<boolean> {

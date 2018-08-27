@@ -6,7 +6,7 @@ import {promisify} from 'es6-promisify';
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
 import {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
-import {promises as fsPromises} from "fs";
+import {promises as fsPromises} from 'fs';
 
 
 export default class FsDev {
@@ -81,7 +81,7 @@ export default class FsDev {
 
   // additional
 
-  copyFile(src: string, dest: string, flags?: number): Promise<void> {
+  copyFile(src: string, dest: string): Promise<void> {
     // TODO: !!! можно создать новый и удалить старый файл
   }
 

@@ -18,7 +18,7 @@ export default interface Storage {
   writeFile(path: string, data: string | Uint8Array): Promise<void>;
   stat(path: string): Promise<Stats>;
   // additional
-  copyFile(src: string, dest: string, flags?: number): Promise<void>;
+  copyFile(src: string, dest: string): Promise<void>;
   exists(path: string): Promise<boolean>;
   rename(oldPath: string, newPath: string): Promise<void>;
 }
