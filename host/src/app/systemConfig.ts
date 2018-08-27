@@ -1,4 +1,5 @@
 export default {
+  // dirs of file system root
   rootDirs: {
     // files which received from master
     host: 'host',
@@ -9,6 +10,7 @@ export default {
     // custom data or state of user layer
     data: 'data',
   },
+  // dirs of host dir
   hostDirs: {
     config: 'config',
     devices: 'devices',

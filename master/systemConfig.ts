@@ -3,6 +3,7 @@
  */
 
 export default {
+  // dirs of host dir
   hostDirs: {
     config: 'config',
     devices: 'devices',
