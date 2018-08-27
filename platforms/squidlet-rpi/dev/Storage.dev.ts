@@ -13,6 +13,14 @@ export default class StorageDev {
 
   // TODO: сделать конструктор который может заменить кодировку
 
+  appendFile(path: string, data: string | Uint8Array): Promise<void> {
+    if (typeof data === 'string') {
+      return fsPromises.appendFile(path, data, this.defaultEncode);
+    }
+    else {
+      return fsPromises.appendFile(path, data);
+    }
+  }
 
   mkdir(path: string): Promise<void> {
     return fsPromises.mkdir(path);

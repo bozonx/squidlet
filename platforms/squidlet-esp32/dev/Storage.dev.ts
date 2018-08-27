@@ -8,6 +8,17 @@ import Drivers from '../../../host/src/app/Drivers';
 
 
 export default class StorageDev {
+  appendFile(path: string, data: string | Uint8Array): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const fn = fs.appendFileSync as (path: string, data: string | Uint8Array) => boolean;
+      const result: boolean = fn(path, data);
+
+      if (result) return resolve();
+
+      reject();
+    });
+  }
+
   mkdir(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const fn = fs.mkdirSync as (path: string) => boolean;
@@ -52,6 +63,9 @@ export default class StorageDev {
       reject();
     });
   }
+
+
+
 
   copyFile(src: string, dest: string, flags?: number): Promise<void> {
     // TODO: !!! можно создать новый и удалить старый файл
