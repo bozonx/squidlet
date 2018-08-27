@@ -35,9 +35,11 @@ export default class System {
   }
 
   async start() {
-    //await this.driversManager.init();
     await this.host.$loadConfig();
     await this.driversManager.$initSystemDrivers();
+
+    // TODO: потом поднять событие что драйверы инициализировались
+
     await this.initNetwork();
     await this.initMessenger();
     await this.initSystemServices();
@@ -60,11 +62,11 @@ export default class System {
   }
 
   /**
-   * Init user layer - device representer, devices, device's drivers and services
+   * Init user layer - device representeur, devices, device's drivers and services
    * @return {Promise<void>}
    */
   async initApp(): Promise<void> {
-    await this.driversManager.$initUserLayerDrivers();
+    await this.driversManager.$initRegularDrivers();
 
     await this.devicesManager.init(this.host.devicesManifests, this.host.config.devices);
     this.devices.init();

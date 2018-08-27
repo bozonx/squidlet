@@ -27,41 +27,8 @@ export default class DriversManager {
     this.drivers = new Drivers(this.system);
   }
 
-  /**
-   * Make instances of drivers
-   */
-  async init(): Promise<void> {
-    const fs: FsDev = this.getDev<FsDev>('Fs');
-
-
-
-
-    // TODO: пройтись по папке drivers в хранилище
-    // TODO: загрузить все манифесты
-    // TODO: выписать системные и не системные имена драйверов
-    // TODO: создать инстансы всех драйверов
-
-
-    const driversConfig: DriverDefinition[] = this.system.host.config.drivers;
-    // driverManifests: DriverManifest[],
-    // TODO: собрать список системных и обычных драйверов
-
-    // TODO: манифесты загружать и забывать
-    // TODO: инициализировать devs
-    // TODO: может конфиги брать из system?
-
-    // make instances of drivers
-    for (let manifest of driverManifests) {
-      const DriverClass = this.require(manifest.main).default;
-      const instance: DriverInstance = new DriverClass(this, driversConfig[manifest.name]);
-
-      this.instances = this.instances.set(manifest.name, instance);
-    }
-
-  }
-
   getDev<T>(shortDevName: string): T {
-
+    // TODO: !!!
   }
 
   // TODO: наверное возвращать Drivers?
@@ -79,7 +46,6 @@ export default class DriversManager {
 
 
   async $initSystemDrivers(): Promise<void> {
-
     const systemDriversJsonFile = path.join(
       systemConfig.rootDirs.host,
       systemConfig.hostDirs.config,
@@ -87,35 +53,18 @@ export default class DriversManager {
     );
     const systemDriversList: string[] = await this.loadJson(systemDriversJsonFile);
 
-    for (let driverName of systemDriversList) {
-      // TODO: load manifest json
-      // TODO: load main file
-    }
-
-
-    // TODO: только системные драйверы и dev
-    // TODO: потом поднять событие что драйверы инициализировались
-
-
-    // initialize drivers
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: DriverInstance = this.instances.get(name);
-
-      await driver.init();
-    }));
-
-    // TODO: удалить список системных драйверов
+    await this.initDrivers(systemDriversList);
   }
 
-  async $initUserLayerDrivers(): Promise<void> {
-    // initialize drivers
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: DriverInstance = this.instances.get(name);
+  async $initRegularDrivers(): Promise<void> {
+    const regularDriversJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.regularDrivers
+    );
+    const regularDriversList: string[] = await this.loadJson(regularDriversJsonFile);
 
-      await driver.init();
-    }));
-
-    // TODO: удалить список пользовательских драйверов
+    await this.initDrivers(regularDriversList);
   }
 
   /**
@@ -126,6 +75,42 @@ export default class DriversManager {
     // TODO: указать тип - new () => any  \ DriverFactory
   }
 
+
+  private async initDrivers(driverNames: string[]) {
+    for (let driverName of driverNames) {
+      await this.instantiateDriver(driverName);
+    }
+
+    for (let driverName of driverNames) {
+      const driver: DriverInstance = this.instances.get(driverName);
+
+      if (driver.init) await driver.init();
+    }
+  }
+
+  private async instantiateDriver(driverName: string) {
+    // TODO: get definition from config
+    // TODO: put manifest to config
+    // TODO: load manifest json
+    // TODO: load main file
+
+    // make instances of drivers
+    for (let manifest of driverManifests) {
+      const DriverClass = this.require(manifest.main).default;
+      const instance: DriverInstance = new DriverClass(this, driversConfig[manifest.name]);
+
+      this.instances = this.instances.set(manifest.name, instance);
+    }
+
+    const driversConfig: DriverDefinition[] = this.system.host.config.drivers;
+    // initialize drivers
+    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
+      const driver: DriverInstance = this.instances.get(name);
+
+      await driver.init();
+    }));
+
+  }
 
   // it needs for test purpose
   private require(pathToFile: string) {
