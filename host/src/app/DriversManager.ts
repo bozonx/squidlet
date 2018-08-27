@@ -1,10 +1,10 @@
+const _capitalize = require('lodash/capitalize');
 import * as path from 'path';
 
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
-import DriverFactory from './interfaces/DriverFactory';
 import DriverDefinition from './interfaces/DriverDefinition';
 import FsDev from './interfaces/dev/Fs.dev';
 import Drivers from './Drivers';
@@ -12,7 +12,7 @@ import systemConfig from './systemConfig';
 import DriverProps from './interfaces/DriverProps';
 
 
-type DriverFactoryClass = new (drivers: Drivers, driverProps: DriverProps) => DriverFactory;
+type DriverClassType = new (drivers: Drivers, driverProps: DriverProps) => DriverInstance;
 
 
 /**
@@ -28,15 +28,21 @@ export default class DriversManager {
     this.drivers = new Drivers(this.system);
   }
 
+  /**
+   * Get dev by short name line 'fs', 'gpio' etc
+   */
   getDev<T>(shortDevName: string): T {
-    // TODO: !!!
+    const driverName = `${_capitalize(shortDevName)}.dev`;
+
+    // TODO: использовать try ???
+
+    return this.getDriver<T>(driverName);
   }
 
   getDriver<T extends DriverInstance>(driverName: string): T {
-    // TODO: если запрашивается dev - то вернуть dev
-
     const driver: DriverInstance | undefined = this.instances.get(driverName);
 
+    // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
     return this.instances.get(driverName) as T;
@@ -69,8 +75,27 @@ export default class DriversManager {
    * Set platform specific devs
    * @param devs - like {DeviClassName: DevClass}
    */
-  $setDevs(devs: {[index: string]: DriverFactoryClass}) {
-    // TODO: указать тип - new () => any  \ DriverFactory
+  async $setDevs(devs: {[index: string]: DriverClassType}) {
+    const driverDefinitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.regularDrivers
+    );
+    const driverDefinitions: {[index: string]: DriverDefinition} = await this.loadJson(driverDefinitionsJsonFile);
+
+    for (let driverName of Object.keys(devs)) {
+      const DriverClass: DriverClassType = devs[driverName];
+      const driverProps: DriverProps = {
+        ...driverDefinitions[driverName],
+        manifest: {
+          name: driverName,
+          type: 'dev',
+        },
+      };
+      const driverInstance: DriverInstance = new DriverClass(this.drivers, driverProps);
+
+      this.instances = this.instances.set(driverName, driverInstance);
+    }
   }
 
 
@@ -99,9 +124,9 @@ export default class DriversManager {
     const driverDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.drivers, driverName);
     const manifestPath = path.join(driverDir, systemConfig.fileNames.manifest);
     const manifest: DriverManifest = await this.loadJson(manifestPath);
-    // TODO: переделать - наверное просто загружать main.js
+    // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(driverDir, manifest.main);
-    const DriverClass = this.require(mainFilePath).default;
+    const DriverClass: DriverClassType = this.require(mainFilePath).default;
     const driverProps: DriverProps = {
       ...driverDefinition,
       manifest: manifest,

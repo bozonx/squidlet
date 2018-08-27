@@ -67,10 +67,8 @@ export default class System {
    */
   async initApp(): Promise<void> {
     await this.driversManager.$initRegularDrivers();
-
-    await this.devicesManager.init(this.host.devicesManifests, this.host.config.devices);
+    await this.devicesManager.init();
     this.devices.init();
-
     await this.services.init();
   }
 

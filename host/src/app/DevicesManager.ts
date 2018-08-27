@@ -29,9 +29,12 @@ export default class DevicesManager {
    * @param {object} devices - user defined definition of devices by ids { "room.device": { ...deviceConfig } }
    */
   init(
-    devicesManifests: {[index: string]: DeviceManifest},
-    devices: {[index: string]: object}
+    //devicesManifests: {[index: string]: DeviceManifest},
+    //devices: {[index: string]: object}
   ): Promise<void[]> {
+
+    // TODO: загрузить манифесты и definitions
+
     return Promise.all(
       Object.keys(devices).map(async (deviceId: string): Promise<void> => {
         const rawProps: {[index: string]: any} = devices[deviceId];
