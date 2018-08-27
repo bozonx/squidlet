@@ -1,8 +1,7 @@
 // See interface in squidlet/host/src/app/interfaces/dev/Storage.dev.ts
 
 import * as fs from 'fs';
-import {promises as fsPromises} from 'fs';
-import * as util from 'util';
+import {promisify} from 'es6-promisify';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
