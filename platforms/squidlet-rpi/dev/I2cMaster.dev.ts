@@ -3,6 +3,7 @@
 import * as i2cBusModule from 'i2c-bus';
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
+import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 
 
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
@@ -14,7 +15,7 @@ import Drivers from '../../../host/src/app/Drivers';
 export class I2cMasterDev {
   private readonly bus: i2cBusModule.I2cBus;
 
-  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: number) {
+  constructor(drivers: Drivers, driverProps: DriverProps, bus: number) {
     this.bus = i2cBusModule.openSync(Number(bus));
   }
 
@@ -70,7 +71,7 @@ export class I2cMasterDev {
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: DriverProps,
       bus: number
     ): I2cMasterDev } = I2cMasterDev;
 }

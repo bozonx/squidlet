@@ -9,9 +9,10 @@ import DriverDefinition from './interfaces/DriverDefinition';
 import FsDev from './interfaces/dev/Fs.dev';
 import Drivers from './Drivers';
 import systemConfig from './systemConfig';
+import DriverProps from './interfaces/DriverProps';
 
 
-type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
+type DriverFactoryClass = new (drivers: Drivers, driverProps: DriverProps) => DriverFactory;
 
 
 /**
@@ -77,8 +78,15 @@ export default class DriversManager {
 
 
   private async initDrivers(driverNames: string[]) {
+    const driverDefinitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.regularDrivers
+    );
+    const driverDefinitions: {[index: string]: DriverDefinition} = await this.loadJson(driverDefinitionsJsonFile);
+
     for (let driverName of driverNames) {
-      const driverInstance: DriverInstance = await this.instantiateDriver(driverName);
+      const driverInstance: DriverInstance = await this.instantiateDriver(driverName, driverDefinitions[driverName]);
 
       this.instances = this.instances.set(driverName, driverInstance);
     }
@@ -90,26 +98,19 @@ export default class DriversManager {
     }
   }
 
-  private async instantiateDriver(driverName: string): Promise<DriverInstance> {
+  private async instantiateDriver(driverName: string, driverDefinition: DriverDefinition): Promise<DriverInstance> {
     const driverDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.drivers, driverName);
     const manifestPath = path.join(driverDir, systemConfig.fileNames.manifest);
     const manifest: DriverManifest = await this.loadJson(manifestPath);
     // TODO: переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(driverDir, manifest.main);
     const DriverClass = this.require(mainFilePath).default;
-
-    // TODO: удобнее чтобы был объект
-
-    const driversDefinition: DriverDefinition = this.system.host.config.drivers[driverName];
-
-    // TODO: указать тип
-
-    const driverConfig = {
-      ...driversDefinition,
+    const driverProps: DriverProps = {
+      ...driverDefinition,
       manifest: manifest,
     };
 
-    return new DriverClass(this, driverConfig);
+    return new DriverClass(this.drivers, driverProps);
   }
 
   // it needs for test purpose

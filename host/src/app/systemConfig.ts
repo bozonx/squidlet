@@ -22,5 +22,8 @@ export default {
     manifest: 'manifest.json',
     systemDrivers: 'systemDrivers.json',
     regularDrivers: 'regularDrivers.json',
+    devicesDefinitions: 'devicesDefinitions.json',
+    driversDefinitions: 'driversDefinitions.json',
+    servicesDefinitions: 'servicesDefinitions.json',
   },
 };

@@ -2,6 +2,7 @@ import Drivers from '../../app/Drivers';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
+import DriverProps from '../../app/interfaces/DriverProps';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -40,7 +41,7 @@ export class I2cDataDriver {
 
   constructor(
     drivers: Drivers,
-    driverParams: {[index: string]: any},
+    driverProps: DriverProps,
     i2cDriver: DriverFactoryBase,
     // bus to use
     bus: string | number,
@@ -158,7 +159,7 @@ export class I2cDataDriver {
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: DriverProps,
       i2cDriver: DriverFactoryBase,
       bus: string
     ): I2cDataDriver } = I2cDataDriver;

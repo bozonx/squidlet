@@ -2,13 +2,14 @@
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
+import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 
 
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
 
 
 export class I2cSlaveDev {
-  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: number) {
+  constructor(drivers: Drivers, driverProps: DriverProps, bus: number) {
   }
 
   async send(data: Uint8Array): Promise<void> {
@@ -31,7 +32,7 @@ export class I2cSlaveDev {
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: DriverProps,
       bus: number
     ): I2cSlaveDev } = I2cSlaveDev;
 }

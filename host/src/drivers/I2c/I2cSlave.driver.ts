@@ -4,6 +4,7 @@ import I2cSlaveDev from '../../app/interfaces/dev/I2cSlave.dev';
 import Drivers from '../../app/Drivers';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
+import DriverProps from '../../app/interfaces/DriverProps';
 
 
 const NO_DATA_ADDRESS = 'null';
@@ -18,7 +19,7 @@ export class I2cSlaveDriver {
   private readonly bus: number;
   private readonly i2cSlaveDev: I2cSlaveDev;
 
-  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string | number) {
+  constructor(drivers: Drivers, driverProps: DriverProps, bus: string | number) {
     this.drivers = drivers;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
@@ -130,7 +131,7 @@ export class I2cSlaveDriver {
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: DriverProps,
       bus: string | number,
     ): I2cSlaveDriver } = I2cSlaveDriver;
   private instances: {[index: string]: I2cSlaveDriver} = {};

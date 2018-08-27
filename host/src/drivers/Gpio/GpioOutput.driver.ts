@@ -3,23 +3,24 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import Drivers from '../../app/Drivers';
 import {BinaryLevel} from '../../app/CommonTypes';
+import DriverProps from '../../app/interfaces/DriverProps';
 
 
 type Handler = (level: BinaryLevel) => void;
 
-interface GpioOutputDriverParams {
+interface GpioOutputDriverProps extends DriverProps {
   // TODO: !!!!
 }
 
 
 export class GpioOutputDriver {
   private readonly drivers: Drivers;
-  private readonly driverParams: GpioOutputDriverParams;
+  private readonly driverProps: GpioOutputDriverProps;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: Drivers, driverParams: GpioOutputDriverParams) {
+  constructor(drivers: Drivers, driverProps: GpioOutputDriverProps) {
     this.drivers = drivers;
-    this.driverParams = driverParams;
+    this.driverProps = driverProps;
   }
 
   async getLevel(): Promise<BinaryLevel> {
@@ -50,7 +51,7 @@ export class GpioOutputDriver {
 export default class GpioOutputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: GpioOutputDriverProps,
     ): GpioOutputDriver } = GpioOutputDriver;
   private instances: {[index: string]: GpioOutputDriver} = {};
 

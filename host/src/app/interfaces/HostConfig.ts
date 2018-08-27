@@ -19,12 +19,12 @@ export default interface HostConfig {
     params: {[index: string]: any};
   };
 
-  // devices definitions by deviceId
-  devices: DeviceDefinition[];
-  // drivers definitions by driver name
-  drivers: DriverDefinition[];
-  // services definitions by service id
-  services: ServiceDefinition[];
+  // // devices definitions by deviceId
+  // devices: DeviceDefinition[];
+  // // drivers definitions by driver name
+  // drivers: DriverDefinition[];
+  // // services definitions by service id
+  // services: ServiceDefinition[];
 
   // override default params of devices
   devicesDefaults: {[index: string]: any};

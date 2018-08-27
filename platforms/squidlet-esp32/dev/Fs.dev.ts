@@ -126,6 +126,6 @@ export default class FsDev {
 // export default class Factory extends DriverFactoryBase {
 //   protected DriverClass: { new (
 //       drivers: Drivers,
-//       driverParams: {[index: string]: any},
+//       driverProps: DriverProps,
 //     ): FsDev } = FsDev;
 // }

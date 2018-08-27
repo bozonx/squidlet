@@ -4,6 +4,7 @@ import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
+import DriverProps from '../../app/interfaces/DriverProps';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
@@ -16,16 +17,16 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
  */
 export class I2cConnectionDriver {
   private readonly drivers: Drivers;
-  private readonly driverConfig: {[index: string]: any};
+  private readonly driverProps: DriverProps;
   private readonly myAddress: MyAddress;
   private readonly i2cDataDriver: I2cDataDriver;
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
-  constructor(drivers: Drivers, driverConfig: {[index: string]: any}, myAddress: MyAddress) {
+  constructor(drivers: Drivers, driverProps: DriverProps, myAddress: MyAddress) {
     this.drivers = drivers;
-    this.driverConfig = driverConfig;
+    this.driverProps = driverProps;
     this.myAddress = myAddress;
 
     const isMaster = typeof this.myAddress.address === 'undefined';
@@ -73,7 +74,7 @@ export class I2cConnectionDriver {
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: DriverProps,
       myAddress: MyAddress,
     ): I2cConnectionDriver } = I2cConnectionDriver;
 }

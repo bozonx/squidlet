@@ -3,21 +3,22 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import Drivers from '../../app/Drivers';
 import Poling from '../../helpers/Poling';
+import DriverProps from '../../app/interfaces/DriverProps';
 
 
-interface GpioInputDriverParams {
+interface GpioInputDriverProps extends DriverProps {
 
 }
 
 
 export class GpioInputRaspberryDriver {
   private readonly drivers: Drivers;
-  private readonly driverParams: GpioInputDriverParams;
+  private readonly driverProps: GpioInputDriverProps;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: Drivers, driverParams: GpioInputDriverParams) {
+  constructor(drivers: Drivers, driverProps: GpioInputDriverProps) {
     this.drivers = drivers;
-    this.driverParams = driverParams;
+    this.driverProps = driverProps;
   }
 
 }

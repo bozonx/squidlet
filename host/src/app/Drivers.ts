@@ -1,10 +1,7 @@
 import { Map } from 'immutable';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
-import DriverFactory from './interfaces/DriverFactory';
 
-
-type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
 
 
 /**

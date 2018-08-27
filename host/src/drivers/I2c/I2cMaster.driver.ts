@@ -1,3 +1,5 @@
+import DriverProps from '../../app/interfaces/DriverProps';
+
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
@@ -22,7 +24,7 @@ export class I2cMasterDriver {
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
-  constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: string | number) {
+  constructor(drivers: Drivers, driverProps: DriverProps, bus: string | number) {
     this.drivers = drivers;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
@@ -203,7 +205,7 @@ export class I2cMasterDriver {
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
       drivers: Drivers,
-      driverParams: {[index: string]: any},
+      driverProps: DriverProps,
       bus: string | number,
     ): I2cMasterDriver } = I2cMasterDriver;
   private instances: {[index: string]: I2cMasterDriver} = {};
