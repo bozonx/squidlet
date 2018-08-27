@@ -3,12 +3,15 @@
  */
 
 export default {
-  entityDirs: {
+  hostDirs: {
     config: 'config',
     devices: 'devices',
     drivers: 'drivers',
     services: 'services',
   },
-  hostConfigFileName: 'hostConfig.json',
-  pathToSaveHostsFileSet: 'services/ConfigUpdater/hosts',
+  fileNames: {
+    hostConfig: 'hostConfig.json',
+  },
+  pathToSaveHostsFileSet: 'hosts',
+  //pathToSaveHostsFileSet: 'services/ConfigUpdater/hosts',
 };
