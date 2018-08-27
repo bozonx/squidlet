@@ -27,26 +27,8 @@ export default class StorageDev {
     return promisify(fs.readFile)(path, this.defaultEncode);
   }
 
-
-
   rmdir(path: string): Promise<void> {
-    // TODO: !!!
-    return fsPromises.rmdir(path);
-  }
-
-  copyFile(src: string, dest: string, flags?: number): Promise<void> {
-    // TODO: !!!
-    return fsPromises.copyFile(src, dest, flags);
-  }
-
-  async exists(path: string): Promise<boolean> {
-    // TODO: !!!
-    return fs.existsSync(path);
-  }
-
-  rename(oldPath: string, newPath: string): Promise<void> {
-    // TODO: !!!
-    return fsPromises.rename(oldPath, newPath);
+    return this.unlink(path);
   }
 
   unlink(path: string): Promise<void> {
@@ -60,8 +42,28 @@ export default class StorageDev {
     });
   }
 
-  writeFile(path: string, data: string | Buffer | Uint8Array, options: object | string): Promise<void> {
-    return fsPromises.writeFile(path, data, options);
+  writeFile(path: string, data: string | Uint8Array): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const fn = fs.writeFileSync as (path: string, data: string | Uint8Array) => boolean;
+      const result: boolean = fn(path, data);
+
+      if (result) return resolve();
+
+      reject();
+    });
+  }
+
+  copyFile(src: string, dest: string, flags?: number): Promise<void> {
+    // TODO: !!! можно создать новый и удалить старый файл
+  }
+
+  async exists(path: string): Promise<boolean> {
+    // TODO: !!! можно прочитать stat файла и выяснить есть ли он или нет
+  }
+
+  rename(oldPath: string, newPath: string): Promise<void> {
+    // TODO: можно удалить старый файл и создать новый с тем же содержимым
+    return fsPromises.rename(oldPath, newPath);
   }
 
   // TODO: add stat

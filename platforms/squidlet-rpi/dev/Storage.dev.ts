@@ -23,15 +23,28 @@ export default class StorageDev {
   }
 
   readFile(path: string): Promise<string> {
-    // TODO: нужно ли устанавливать кодировку ? - если не установить то вернется Buffer
     return fsPromises.readFile(path, this.defaultEncode) as Promise<string> ;
   }
-
-
 
   rmdir(path: string): Promise<void> {
     return fsPromises.rmdir(path);
   }
+
+  unlink(path: string): Promise<void> {
+    return fsPromises.unlink(path);
+  }
+
+  writeFile(path: string, data: string | Uint8Array): Promise<void> {
+    if (typeof data === 'string') {
+      return fsPromises.writeFile(path, data, this.defaultEncode);
+    }
+    else {
+      return fsPromises.writeFile(path, data);
+    }
+  }
+
+
+
 
   copyFile(src: string, dest: string, flags?: number): Promise<void> {
     return fsPromises.copyFile(src, dest, flags);
@@ -45,13 +58,8 @@ export default class StorageDev {
     return fsPromises.rename(oldPath, newPath);
   }
 
-  unlink(path: string): Promise<void> {
-    return fsPromises.unlink(path);
-  }
 
-  writeFile(path: string, data: string | Buffer | Uint8Array, options: object | string): Promise<void> {
-    return fsPromises.writeFile(path, data, options);
-  }
+
 
   // TODO: add stat
   // stat(path: string): Promise<Stats> {
