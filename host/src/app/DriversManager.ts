@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
@@ -6,6 +8,7 @@ import DriverFactory from './interfaces/DriverFactory';
 import DriverDefinition from './interfaces/DriverDefinition';
 import FsDev from './interfaces/dev/Fs.dev';
 import Drivers from './Drivers';
+import systemConfig from './systemConfig';
 
 
 type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
@@ -29,6 +32,7 @@ export default class DriversManager {
    */
   async init(): Promise<void> {
     const fs: FsDev = this.getDev<FsDev>('Fs');
+
 
 
 
@@ -75,6 +79,20 @@ export default class DriversManager {
 
 
   async $initSystemDrivers(): Promise<void> {
+
+    const systemDriversJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.systemDrivers
+    );
+    const systemDriversList: string[] = await this.loadJson(systemDriversJsonFile);
+
+    for (let driverName of systemDriversList) {
+      // TODO: load manifest json
+      // TODO: load main file
+    }
+
+
     // TODO: только системные драйверы и dev
     // TODO: потом поднять событие что драйверы инициализировались
 
@@ -112,6 +130,14 @@ export default class DriversManager {
   // it needs for test purpose
   private require(pathToFile: string) {
     return require(pathToFile);
+  }
+
+  private async loadJson(filePath: string): Promise<any> {
+    const fs: FsDev = this.getDev<FsDev>('fs');
+
+    const systemDriversListString = await fs.readFile(filePath);
+
+    return JSON.stringify(systemDriversListString);
   }
 
 }

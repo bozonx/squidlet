@@ -11,7 +11,9 @@
   "scripts": {
     "start": "ts-node ./index.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "path": "^0.12.7"
+  },
   "devDependencies": {
     "@types/node": "^10.9.2",
     "ts-node": "^7.0.1",

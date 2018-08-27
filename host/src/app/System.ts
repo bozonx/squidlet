@@ -35,8 +35,8 @@ export default class System {
   }
 
   async start() {
+    //await this.driversManager.init();
     await this.host.$loadConfig();
-    await this.driversManager.init();
     await this.driversManager.$initSystemDrivers();
     await this.initNetwork();
     await this.initMessenger();

@@ -19,5 +19,6 @@ export default {
   },
   fileNames: {
     hostConfig: 'hostConfig.json',
+    systemDrivers: 'systemDrivers.json',
   },
 };
