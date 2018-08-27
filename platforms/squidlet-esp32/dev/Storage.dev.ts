@@ -5,6 +5,8 @@ import {promisify} from 'es6-promisify';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
+import {Stats} from '../../../host/src/app/interfaces/dev/Storage.dev';
+import {promises as fsPromises} from "fs";
 
 
 export default class StorageDev {
@@ -31,6 +33,7 @@ export default class StorageDev {
   }
 
   async readdir(path: string): Promise<string[]> {
+    // TODO: проверить что возвращает
     return fs.readdirSync(path);
   }
 
@@ -64,8 +67,19 @@ export default class StorageDev {
     });
   }
 
+  stat(path: string): Promise<Stats> {
+    return new Promise((resolve, reject) => {
+      const fn = (fs.statSync as any) as (path: string) => Stats | undefined;
+      const result: Stats | undefined = fn(path);
+
+      if (result) return resolve(result);
+
+      reject();
+    });
+  }
 
 
+  // additional
 
   copyFile(src: string, dest: string, flags?: number): Promise<void> {
     // TODO: !!! можно создать новый и удалить старый файл

@@ -6,6 +6,7 @@ import * as util from 'util';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
+import {Stats} from '../../../host/src/app/interfaces/dev/Storage.dev';
 
 
 export default class StorageDev {
@@ -51,8 +52,17 @@ export default class StorageDev {
     }
   }
 
+  async stat(path: string): Promise<Stats> {
+    const stat = await fsPromises.stat(path);
+    return {
+      size: stat.size,
+      dir: stat.isDirectory(),
+      mtime: stat.mtimeMs,
+    };
+  }
 
 
+  // additional
 
   copyFile(src: string, dest: string, flags?: number): Promise<void> {
     return fsPromises.copyFile(src, dest, flags);
@@ -69,10 +79,6 @@ export default class StorageDev {
 
 
 
-  // TODO: add stat
-  // stat(path: string): Promise<Stats> {
-  //   return fsPromises.stat(path);
-  // }
 
 }
 

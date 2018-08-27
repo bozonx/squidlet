@@ -1,12 +1,11 @@
-// TODO: сделать fsstat
-
-export interface Stat {
+export interface Stats {
   // in bytes
   size: number;
   // is it dir or file
   dir: boolean;
   // modified time
-  mtime: Date;
+  // TODO: какой всетаки формат? - в nodejs mtimeMs - number - 1318289051000.1
+  mtime: number;
 }
 
 export default interface Storage {
@@ -17,7 +16,7 @@ export default interface Storage {
   rmdir(path: string): Promise<void>;
   unlink(path: string): Promise<void>;
   writeFile(path: string, data: string | Uint8Array): Promise<void>;
-  stat(path: string): Promise<Stat>;
+  stat(path: string): Promise<Stats>;
   // additional
   copyFile(src: string, dest: string, flags?: number): Promise<void>;
   exists(path: string): Promise<boolean>;
