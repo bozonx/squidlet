@@ -33,16 +33,14 @@ export default class DriversManager {
   }
 
   // TODO: наверное возвращать Drivers?
-  getDriver(driverName: string): any {
+  getDriver<T extends DriverInstance>(driverName: string): T {
     // TODO: если запрашивается dev - то вернуть dev
 
     const driver: DriverInstance | undefined = this.instances.get(driverName);
 
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
-    // TODO: как вернуть тип возвращаемого драйвера???
-
-    return this.instances.get(driverName);
+    return this.instances.get(driverName) as T;
   }
 
 

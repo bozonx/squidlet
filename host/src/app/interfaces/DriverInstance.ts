@@ -1,4 +1,4 @@
 export default interface DriverInstance {
-  init: () => Promise<void>;
+  init?: () => Promise<void>;
   [index: string]: any;
 }
