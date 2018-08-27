@@ -75,7 +75,7 @@ export default class Host {
 
   }
 
-  constructor(system: System, hostConfig: HostConfig) {
+  constructor(system: System) {
     this.system = system;
 
     // TODO: прочитать разово с диска и удалить из памяти
@@ -87,8 +87,18 @@ export default class Host {
   }
 
   generateUniqId(): string {
+    // TODO: почему не используется из helpers ???
     return uniqid();
   }
+
+
+  /**
+   * load config from storage
+   */
+  async $loadConfig(): Promise<void> {
+    // TODO: !!! hostConfig: HostConfig
+  }
+
 
   // getAddress(type: string, bus: string): string | undefined {
   //   const addrConfig = this.config.address;

@@ -46,6 +46,7 @@ export class I2cDataDriver {
     bus: string | number,
   ) {
     this.bus = bus;
+    // TODO: можно же самому запросить из drivers
     this.i2cDriver = i2cDriver.getInstance(this.bus) as I2cDriverClass;
   }
 

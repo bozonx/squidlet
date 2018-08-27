@@ -21,10 +21,17 @@ export default class Drivers {
 
   /**
    * Make instances of drivers
-   * @param driverManifests - uniq drivers manifests
-   * @param driversConfig - user defined config for drivers
    */
-  async init(driverManifests: DriverManifest[], driversConfig: {[index: string]: object} = {}): Promise<void> {
+  async init(): Promise<void> {
+    // TODO: пройтись по папке drivers в хранилище
+    // TODO: загрузить все манифесты
+    // TODO: выписать системные и не системные имена драйверов
+    // TODO: создать инстансы всех драйверов
+
+
+    const driversConfig: {[index: string]: object} = this.system.host.config.drivers;
+    // driverManifests: DriverManifest[],
+    // TODO: собрать список системных и обычных драйверов
 
     // TODO: манифесты загружать и забывать
     // TODO: инициализировать devs
@@ -38,12 +45,6 @@ export default class Drivers {
       this.instances = this.instances.set(manifest.name, instance);
     }
 
-    // initialize drivers
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: Driver = this.instances.get(name);
-
-      await driver.init();
-    }));
   }
 
   // TODO: наверное возвращать Drivers?
@@ -57,6 +58,33 @@ export default class Drivers {
     // TODO: как вернуть тип возвращаемого драйвера???
 
     return this.instances.get(driverName);
+  }
+
+
+  async $initSystemDrivers(): Promise<void> {
+    // TODO: только системные драйверы и dev
+    // TODO: потом поднять событие что драйверы инициализировались
+
+
+    // initialize drivers
+    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
+      const driver: Driver = this.instances.get(name);
+
+      await driver.init();
+    }));
+
+    // TODO: удалить список системных драйверов
+  }
+
+  async $initUserLayerDrivers(): Promise<void> {
+    // initialize drivers
+    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
+      const driver: Driver = this.instances.get(name);
+
+      await driver.init();
+    }));
+
+    // TODO: удалить список пользовательских драйверов
   }
 
   /**

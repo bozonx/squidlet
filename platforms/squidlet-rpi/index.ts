@@ -8,6 +8,8 @@ import StorageDev from './dev/Storage.dev';
 async function init() {
   const system = new System();
 
+  // TODO: может вынести в отдельный файлы чтобы можно было подключать в своем проекте
+
   system.drivers.$setDevs({
     'Gpio.dev': GpioDev,
     'I2cMaster.dev': I2cMasterDev,
@@ -19,5 +21,7 @@ async function init() {
 
 init()
   .catch((err) => {
-    throw new Error(err);
+    console.error(err.toString());
+
+    throw err;
   });
