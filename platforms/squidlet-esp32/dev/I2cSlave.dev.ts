@@ -4,6 +4,9 @@ import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
 
 
+// TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
+
+
 export class I2cSlaveDev {
   constructor(drivers: Drivers, driverParams: {[index: string]: any}, bus: number) {
   }

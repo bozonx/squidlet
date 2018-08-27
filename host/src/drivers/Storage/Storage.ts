@@ -3,28 +3,22 @@ import FsDev, {Stats} from '../../app/interfaces/dev/Fs.dev';
 
 
 export class Storage {
-  //protected readonly drivers: Drivers;
-  //protected readonly driverConfig: {[index: string]: any};
   private fsDev: FsDev;
-
 
   constructor(drivers: Drivers) {
     this.fsDev = drivers.getDev<FsDev>('Fs');
   }
 
-  /**
-   * Make dir even parent dir doesn't exist
-   */
-  mkDirP(pathToDir: string) {
-    // TODO: !!!!
+  async isDir(pathToDir: string): Promise<boolean> {
+    const stats: Stats = await this.fsDev.stat(pathToDir);
+
+    return stats.dir;
   }
 
-  isDir(pathToDir: string) {
-    // TODO: !!!!
-  }
+  async isFile(pathToFile: string) {
+    const stats: Stats = await this.fsDev.stat(pathToFile);
 
-  isFile(pathToFile: string) {
-    // TODO: !!!!
+    return !stats.dir;
   }
 
   isExists(pathToFileOrDir: string): Promise<boolean> {
@@ -42,41 +36,28 @@ export class Storage {
     return this.fsDev.readdir(pathToDir);
   }
 
-  /**
-   * Read the only files of dir
-   */
-  readDirFiles(pathToDir: string) {
-    // TODO: !!!!
-  }
+  // /**
+  //  * Read the only files of dir
+  //  */
+  // readDirFiles(pathToDir: string) {
+  // }
 
   writeFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
     return this.fsDev.writeFile(pathToFile, data);
   }
 
-  cp() {
-    // TODO: !!!!
-  }
-
-  mv() {
-    // TODO: !!!!
-  }
-
-  rename() {
-    // TODO: !!!!
-  }
-
   /**
    * Remove only a file of an empty dir
    */
-  rm(pathToFileOrDir: string) {
-    // TODO: !!!!
-  }
+  async rm(pathToFileOrDir: string) {
+    const stats: Stats = await this.fsDev.stat(pathToFileOrDir);
 
-  /**
-   * Remove dir recursively or file.
-   */
-  rmRf(pathToFileOrDir: string) {
-    // TODO: !!!!
+    if (stats.dir) {
+      return this.fsDev.rmdir(pathToFileOrDir);
+    }
+    else {
+      return this.fsDev.unlink(pathToFileOrDir);
+    }
   }
 
   appendFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
@@ -85,6 +66,36 @@ export class Storage {
 
   stat(pathToFileOrDir: string): Promise<Stats> {
     return this.fsDev.stat(pathToFileOrDir);
+  }
+
+
+  async cp(fromPath: string, toPath: string): Promise<void> {
+    // TODO: !!!!
+    // TODO: !!!! support dirs
+  }
+
+  async mv(fromPath: string, toPath: string): Promise<void> {
+    // TODO: !!!!
+    // TODO: !!!! support dirs
+  }
+
+  async rename(pathToFileOrDir: string, newName: string): Promise<void> {
+    // TODO: !!!!
+    // TODO: !!!! support dirs
+  }
+
+  /**
+   * Make dir even parent dir doesn't exist
+   */
+  async mkDirP(pathToDir: string): Promise<void> {
+    // TODO: !!!!
+  }
+
+  /**
+   * Remove dir recursively or file.
+   */
+  async rmRf(pathToFileOrDir: string): Promise<void> {
+    // TODO: !!!!
   }
 
 }
