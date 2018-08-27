@@ -1,7 +1,6 @@
 // See interface in squidlet/host/src/app/interfaces/dev/Fs.dev.ts
 
 import * as fs from 'fs';
-import {promisify} from 'es6-promisify';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
@@ -32,13 +31,26 @@ export default class FsDev {
     });
   }
 
-  async readdir(path: string): Promise<string[]> {
-    // TODO: проверить что возвращает
-    return fs.readdirSync(path);
+  readdir(path: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      const fn = fs.readdirSync as (path: string) => string[] | undefined;
+      const result: string[] | undefined = fn(path);
+
+      if (result) return resolve(result);
+
+      reject(new Error(`Directory couldn't be listed`));
+    });
   }
 
   readFile(path: string): Promise<string> {
-    return promisify(fs.readFile)(path, this.defaultEncode);
+    return new Promise((resolve, reject) => {
+      const fn = fs.readFileSync as (path: string) => string | undefined;
+      const result: string | undefined = fn(path);
+
+      if (result) return resolve(result);
+
+      reject(new Error(`file doesn't exist`));
+    });
   }
 
   rmdir(path: string): Promise<void> {
@@ -87,8 +99,6 @@ export default class FsDev {
 
       resolve(false);
     });
-
-    // TODO: !!! можно прочитать stat файла и выяснить есть ли он или нет
   }
 
 
