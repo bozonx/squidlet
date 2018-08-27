@@ -5,6 +5,7 @@ import System from './System';
 import DriverFactory from './interfaces/DriverFactory';
 import DriverDefinition from './interfaces/DriverDefinition';
 import FsDev from './interfaces/dev/Fs.dev';
+import Drivers from './Drivers';
 
 
 type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
@@ -13,12 +14,14 @@ type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]:
 /**
  * Drivers manager
  */
-export default class Drivers {
+export default class DriversManager {
   readonly system: System;
+  readonly drivers: Drivers;
   private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
 
   constructor(system: System) {
     this.system = system;
+    this.drivers = new Drivers(this.system);
   }
 
   /**

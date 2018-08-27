@@ -27,7 +27,7 @@ export default class System {
     this.events = new Events();
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
-    this.network = new Network(this.drivers, this.host.id, this.host.networkConfig);
+    this.network = new Network(this.driversManager.drivers, this.host.id, this.host.networkConfig);
     this.services = new Services(this);
     this.messenger = new Messenger(this);
     this.devicesManager = new DevicesManager(this);

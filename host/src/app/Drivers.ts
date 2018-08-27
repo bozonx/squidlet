@@ -1,10 +1,7 @@
 import { Map } from 'immutable';
-import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverFactory from './interfaces/DriverFactory';
-import DriverDefinition from './interfaces/DriverDefinition';
-import FsDev from './interfaces/dev/Fs.dev';
 
 
 type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
@@ -27,7 +24,7 @@ export default class Drivers {
   }
 
   // TODO: наверное возвращать Drivers?
-  getDriver(driverName: string): any {
+  getDriver<T>(driverName: string): T {
     // TODO: если запрашивается dev - то вернуть dev
 
     const driver: DriverInstance | undefined = this.instances.get(driverName);
