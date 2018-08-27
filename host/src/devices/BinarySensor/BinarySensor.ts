@@ -15,7 +15,8 @@ export default class BinarySensor extends DeviceBase {
   constructor(system: System, deviceConf: DeviceDefinition) {
     super(system, deviceConf);
 
-    const gpioInputDriverFactory = this.system.drivers.getDriver('GpioInputDriver.driver') as GpioInputFactory;
+    // TODO: !!!!????
+    const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('GpioInputDriver.driver');
 
     this.gpioInputDriver = gpioInputDriverFactory.getInstance(this.deviceConf.props);
   }

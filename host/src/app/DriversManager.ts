@@ -32,7 +32,6 @@ export default class DriversManager {
     // TODO: !!!
   }
 
-  // TODO: наверное возвращать Drivers?
   getDriver<T extends DriverInstance>(driverName: string): T {
     // TODO: если запрашивается dev - то вернуть dev
 

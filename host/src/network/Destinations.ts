@@ -86,7 +86,7 @@ export default class Destinations {
   private registerConnection(myAddress: MyAddress) {
     const connectionId: string = this.generateConnectionId(myAddress);
     const driverName = this.generateDriverName(myAddress.type);
-    const connectionDriver = this.drivers.getDriver(driverName) as DriverFactoryBase;
+    const connectionDriver = this.drivers.getDriver<DriverFactoryBase>(driverName);
 
     this.connections[connectionId] = connectionDriver.getInstance(myAddress) as Connection;
   }

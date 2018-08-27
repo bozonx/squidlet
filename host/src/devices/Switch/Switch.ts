@@ -15,7 +15,8 @@ export default class Switch extends DeviceBase {
   constructor(system: System, deviceConf: DeviceDefinition) {
     super(system, deviceConf);
 
-    const gpioOutputDriverFactory = this.system.drivers.getDriver('GpioOutputDriver.driver') as GpioOutputFactory;
+    // TODO: !!!!???
+    const gpioOutputDriverFactory = this.system.drivers.getDriver<GpioOutputFactory>('GpioOutputDriver.driver');
 
     this.gpioOutputDriver = gpioOutputDriverFactory.getInstance(this.deviceConf.props);
   }
