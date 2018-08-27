@@ -4,9 +4,9 @@
 
 export default interface Storage {
   mkdir(path: string): Promise<void>;
+  readdir(path: string): Promise<string[]>;
   rmdir(path: string): Promise<void>;
   readFile(path: string): Promise<string | Buffer>;
-  readdir(path: string, options?: object | string): Promise<string[] | Buffer[]>;
   copyFile(src: string, dest: string, flags?: number): Promise<void>;
   exists(path: string): Promise<boolean>;
   rename(oldPath: string, newPath: string): Promise<void>;

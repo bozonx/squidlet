@@ -13,12 +13,13 @@ export default class StorageDev {
 
   // TODO: сделать конструктор который может заменить кодировку
 
+
   mkdir(path: string): Promise<void> {
     return fsPromises.mkdir(path);
   }
 
-  rmdir(path: string): Promise<void> {
-    return fsPromises.rmdir(path);
+  readdir(path: string): Promise<string[]> {
+    return fsPromises.readdir(path, this.defaultEncode) as Promise<string[]>;
   }
 
   readFile(path: string): Promise<string> {
@@ -26,8 +27,10 @@ export default class StorageDev {
     return fsPromises.readFile(path, this.defaultEncode) as Promise<string> ;
   }
 
-  readdir(path: string, options?: object | string): Promise<string[] | Buffer[]> {
-    return fsPromises.readdir(path, options);
+
+
+  rmdir(path: string): Promise<void> {
+    return fsPromises.rmdir(path);
   }
 
   copyFile(src: string, dest: string, flags?: number): Promise<void> {
@@ -46,15 +49,14 @@ export default class StorageDev {
     return fsPromises.unlink(path);
   }
 
-  // stat(path: string): Promise<Stats> {
-  //   return fsPromises.stat(path);
-  // }
-
   writeFile(path: string, data: string | Buffer | Uint8Array, options: object | string): Promise<void> {
     return fsPromises.writeFile(path, data, options);
   }
 
-
+  // TODO: add stat
+  // stat(path: string): Promise<Stats> {
+  //   return fsPromises.stat(path);
+  // }
 
 }
 

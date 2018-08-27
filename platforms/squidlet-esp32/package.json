@@ -1,7 +1,7 @@
 {
   "name": "squidlet-esp32",
   "version": "0.0.4",
-  "description": "Squidlet build for raspberry pi",
+  "description": "Squidlet build for ESP32",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
   "engines": {
@@ -12,9 +12,10 @@
     "start": "ts-node ./index.ts"
   },
   "dependencies": {
-    "i2c-bus": "^4.0.1"
+    "es6-promisify": "^6.0.0"
   },
   "devDependencies": {
+    "@types/es6-promisify": "^6.0.0",
     "@types/node": "^10.9.2",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.1"
