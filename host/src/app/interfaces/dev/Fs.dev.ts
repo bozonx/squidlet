@@ -8,7 +8,7 @@ export interface Stats {
   mtime: number;
 }
 
-export default interface Storage {
+export default interface FsDev {
   appendFile(path: string, data: string | Uint8Array): Promise<void>;
   mkdir(path: string): Promise<void>;
   readdir(path: string): Promise<string[]>;
