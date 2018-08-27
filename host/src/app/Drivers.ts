@@ -4,7 +4,7 @@ import Driver from './interfaces/Driver';
 import System from './System';
 import DriverFactory from './interfaces/DriverFactory';
 import DriverDefinition from './interfaces/DriverDefinition';
-import StorageDev from './interfaces/dev/Storage.dev';
+import FsDev from './interfaces/dev/Fs.dev';
 
 
 type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]: any}) => DriverFactory;
@@ -25,7 +25,7 @@ export default class Drivers {
    * Make instances of drivers
    */
   async init(): Promise<void> {
-    const storage: StorageDev = this.getDev<StorageDev>('Storage');
+    const fs: FsDev = this.getDev<FsDev>('Fs');
 
 
 

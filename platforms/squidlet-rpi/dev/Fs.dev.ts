@@ -1,4 +1,4 @@
-// See interface in squidlet/host/src/app/interfaces/dev/Storage.dev.ts
+// See interface in squidlet/host/src/app/interfaces/dev/Fs.dev.ts
 
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
@@ -6,10 +6,10 @@ import * as util from 'util';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
-import {Stats} from '../../../host/src/app/interfaces/dev/Storage.dev';
+import {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
 
 
-export default class StorageDev {
+export default class FsDev {
   private defaultEncode = 'utf8';
 
   // TODO: сделать конструктор который может заменить кодировку
@@ -87,5 +87,5 @@ export default class StorageDev {
 //   protected DriverClass: { new (
 //       drivers: Drivers,
 //       driverParams: {[index: string]: any},
-//     ): StorageDev } = StorageDev;
+//     ): FsDev } = FsDev;
 // }

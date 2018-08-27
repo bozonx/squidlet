@@ -1,15 +1,15 @@
-// See interface in squidlet/host/src/app/interfaces/dev/Storage.dev.ts
+// See interface in squidlet/host/src/app/interfaces/dev/Fs.dev.ts
 
 import * as fs from 'fs';
 import {promisify} from 'es6-promisify';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import Drivers from '../../../host/src/app/Drivers';
-import {Stats} from '../../../host/src/app/interfaces/dev/Storage.dev';
+import {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
 import {promises as fsPromises} from "fs";
 
 
-export default class StorageDev {
+export default class FsDev {
   appendFile(path: string, data: string | Uint8Array): Promise<void> {
     return new Promise((resolve, reject) => {
       const fn = fs.appendFileSync as (path: string, data: string | Uint8Array) => boolean;
@@ -107,5 +107,5 @@ export default class StorageDev {
 //   protected DriverClass: { new (
 //       drivers: Drivers,
 //       driverParams: {[index: string]: any},
-//     ): StorageDev } = StorageDev;
+//     ): FsDev } = FsDev;
 // }

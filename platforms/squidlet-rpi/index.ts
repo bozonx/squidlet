@@ -2,7 +2,7 @@ import System from '../../host/src/app/System';
 
 import GpioDev from './dev/Gpio.dev';
 import I2cMasterDev from './dev/I2cMaster.dev';
-import StorageDev from './dev/Storage.dev';
+import FsDev from './dev/Fs.dev';
 
 
 async function init() {
@@ -13,7 +13,7 @@ async function init() {
   system.drivers.$setDevs({
     'Gpio.dev': GpioDev,
     'I2cMaster.dev': I2cMasterDev,
-    'Storage.dev': StorageDev,
+    'Fs.dev': FsDev,
   });
 
   await system.start();
