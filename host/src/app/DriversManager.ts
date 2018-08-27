@@ -78,7 +78,9 @@ export default class DriversManager {
 
   private async initDrivers(driverNames: string[]) {
     for (let driverName of driverNames) {
-      await this.instantiateDriver(driverName);
+      const driverInstance: DriverInstance = await this.instantiateDriver(driverName);
+
+      this.instances = this.instances.set(driverName, driverInstance);
     }
 
     for (let driverName of driverNames) {
@@ -88,36 +90,40 @@ export default class DriversManager {
     }
   }
 
-  private async instantiateDriver(driverName: string) {
-    // TODO: get definition from config
-    // TODO: put manifest to config
-    // TODO: load manifest json
-    // TODO: load main file
+  private async instantiateDriver(driverName: string): Promise<DriverInstance> {
+    const driverDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.drivers, driverName);
+    const manifestPath = path.join(driverDir, systemConfig.fileNames.manifest);
+    const manifest: DriverManifest = await this.loadJson(manifestPath);
+    // TODO: переделать - наверное просто загружать main.js
+    const mainFilePath = path.resolve(driverDir, manifest.main);
+    const DriverClass = this.require(mainFilePath).default;
 
-    // make instances of drivers
-    for (let manifest of driverManifests) {
-      const DriverClass = this.require(manifest.main).default;
-      const instance: DriverInstance = new DriverClass(this, driversConfig[manifest.name]);
+    // TODO: удобнее чтобы был объект
 
-      this.instances = this.instances.set(manifest.name, instance);
-    }
+    const driversDefinition: DriverDefinition = this.system.host.config.drivers[driverName];
 
-    const driversConfig: DriverDefinition[] = this.system.host.config.drivers;
-    // initialize drivers
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: DriverInstance = this.instances.get(name);
+    // TODO: указать тип
 
-      await driver.init();
-    }));
+    const driverConfig = {
+      ...driversDefinition,
+      manifest: manifest,
+    };
 
+    return new DriverClass(this, driverConfig);
   }
 
   // it needs for test purpose
   private require(pathToFile: string) {
+
+    // TODO: если на epspuino не будет рабоать с файлами из storage то загрузить файл и сделать eval
+
     return require(pathToFile);
   }
 
   private async loadJson(filePath: string): Promise<any> {
+
+    // TODO: может будет работать через require на espurino?
+
     const fs: FsDev = this.getDev<FsDev>('fs');
 
     const systemDriversListString = await fs.readFile(filePath);

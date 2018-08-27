@@ -19,6 +19,7 @@ export default {
   },
   fileNames: {
     hostConfig: 'hostConfig.json',
+    manifest: 'manifest.json',
     systemDrivers: 'systemDrivers.json',
     regularDrivers: 'regularDrivers.json',
   },
