@@ -11,7 +11,7 @@ type DriverFactoryClass = new (drivers: Drivers, driverConfig: {[index: string]:
 
 
 /**
- * Drivers manager
+ * It is singleton which is passed to all the drivers
  */
 export default class Drivers {
   readonly system: System;
@@ -21,37 +21,6 @@ export default class Drivers {
     this.system = system;
   }
 
-  /**
-   * Make instances of drivers
-   */
-  async init(): Promise<void> {
-    const fs: FsDev = this.getDev<FsDev>('Fs');
-
-
-
-    // TODO: пройтись по папке drivers в хранилище
-    // TODO: загрузить все манифесты
-    // TODO: выписать системные и не системные имена драйверов
-    // TODO: создать инстансы всех драйверов
-
-
-    const driversConfig: DriverDefinition[] = this.system.host.config.drivers;
-    // driverManifests: DriverManifest[],
-    // TODO: собрать список системных и обычных драйверов
-
-    // TODO: манифесты загружать и забывать
-    // TODO: инициализировать devs
-    // TODO: может конфиги брать из system?
-
-    // make instances of drivers
-    for (let manifest of driverManifests) {
-      const DriverClass = this.require(manifest.main).default;
-      const instance: Driver = new DriverClass(this, driversConfig[manifest.name]);
-
-      this.instances = this.instances.set(manifest.name, instance);
-    }
-
-  }
 
   getDev<T>(shortDevName: string): T {
 
@@ -68,47 +37,6 @@ export default class Drivers {
     // TODO: как вернуть тип возвращаемого драйвера???
 
     return this.instances.get(driverName);
-  }
-
-
-  async $initSystemDrivers(): Promise<void> {
-    // TODO: только системные драйверы и dev
-    // TODO: потом поднять событие что драйверы инициализировались
-
-
-    // initialize drivers
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: Driver = this.instances.get(name);
-
-      await driver.init();
-    }));
-
-    // TODO: удалить список системных драйверов
-  }
-
-  async $initUserLayerDrivers(): Promise<void> {
-    // initialize drivers
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const driver: Driver = this.instances.get(name);
-
-      await driver.init();
-    }));
-
-    // TODO: удалить список пользовательских драйверов
-  }
-
-  /**
-   * Set platform specific devs
-   * @param devs - like {DeviClassName: DevClass}
-   */
-  $setDevs(devs: {[index: string]: DriverFactoryClass}) {
-    // TODO: указать тип - new () => any  \ DriverFactory
-  }
-
-
-  // it needs for test purpose
-  private require(pathToFile: string) {
-    return require(pathToFile);
   }
 
 }

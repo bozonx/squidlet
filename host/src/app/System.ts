@@ -4,7 +4,7 @@ import Events from './Events';
 import Messenger from '../messenger/Messenger';
 import DevicesManager from './DevicesManager';
 import Devices from './Devices';
-import Drivers from './Drivers';
+import DriversManager from './DriversManager';
 import Services from './Services';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
@@ -14,7 +14,7 @@ export default class System {
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
-  readonly drivers: Drivers;
+  readonly driversManager: DriversManager;
   readonly network: Network;
   readonly services: Services;
   readonly messenger: Messenger;
@@ -26,7 +26,7 @@ export default class System {
     this.log = defaultLogger;
     this.events = new Events();
     this.host = new Host(this);
-    this.drivers = new Drivers(this);
+    this.driversManager = new DriversManager(this);
     this.network = new Network(this.drivers, this.host.id, this.host.networkConfig);
     this.services = new Services(this);
     this.messenger = new Messenger(this);
@@ -36,8 +36,8 @@ export default class System {
 
   async start() {
     await this.host.$loadConfig();
-    await this.drivers.init();
-    await this.drivers.$initSystemDrivers();
+    await this.driversManager.init();
+    await this.driversManager.$initSystemDrivers();
     await this.initNetwork();
     await this.initMessenger();
     await this.initSystemServices();
@@ -64,7 +64,7 @@ export default class System {
    * @return {Promise<void>}
    */
   async initApp(): Promise<void> {
-    await this.drivers.$initUserLayerDrivers();
+    await this.driversManager.$initUserLayerDrivers();
 
     await this.devicesManager.init(this.host.devicesManifests, this.host.config.devices);
     this.devices.init();
