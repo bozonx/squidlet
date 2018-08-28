@@ -6,6 +6,7 @@ import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import systemConfig from './systemConfig';
 import DeviceProps from './interfaces/DeviceProps';
+import ServiceInstance from './interfaces/ServiceInstance';
 
 
 type DeviceClassType = new (system: System, props: DeviceProps) => DeviceInstance;
@@ -62,8 +63,13 @@ export default class DevicesManager {
   /**
    * Get device instance
    */
-  getDevice(deviceId: string): DeviceInstance {
-    return this.instances[deviceId];
+  getDevice<T extends DeviceInstance>(deviceId: string): T {
+    const device: DeviceInstance | undefined = this.instances[deviceId];
+
+    // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
+    if (!device) throw new Error(`Can't find device "${deviceId}"`);
+
+    return device as T;
   }
 
 

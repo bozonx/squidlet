@@ -5,12 +5,7 @@ import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
 import systemConfig from './systemConfig';
-import DriverDefinition from './interfaces/DriverDefinition';
-import DriverInstance from './interfaces/DriverInstance';
-import DriverManifest from './interfaces/DriverManifest';
-import DriverProps from './interfaces/DriverProps';
-import DeviceProps from './interfaces/DeviceProps';
-import DeviceInstance from './interfaces/DeviceInstance';
+import ServiceProps from './interfaces/ServiceProps';
 
 
 type ServiceClassType = new (system: System, props: ServiceProps) => ServiceInstance;
@@ -24,32 +19,25 @@ export default class ServicesManager {
     this.system = system;
   }
 
-  async init(): Promise<void> {
-    // TODO: будет array
-    const servicesDefinitions: {[index: string]: ServiceDefinition} = this.system.host.config.services;
-    const servicesManifests: {[index: string]: ServiceManifest} = this.system.host.servicesManifests;
+  getService<T extends ServiceInstance>(serviceId: string): T {
+    const service: ServiceInstance | undefined = this.instances[serviceId];
 
-    for (let serviceId of Object.keys(servicesDefinitions)) {
-      const definition = servicesDefinitions[serviceId];
-      const manifest = servicesManifests[definition.service];
-      const ServiceClass = this.require(manifest.main).default;
-      const instance: ServiceInstance = new ServiceClass(this.system, definition);
+    // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
+    if (!service) throw new Error(`Can't find service "${serviceId}"`);
 
-      this.instances.set(serviceId, instance);
-    }
-
-    // initialize all the services
-    await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const service: ServiceInstance = this.instances.get(name);
-
-      await service.init();
-    }));
+    return service as T;
   }
 
   async initSystemServices() {
-    // TODO: init master network configurator
-    // TODO: init master updater
-    // TODO: init master configurator
+    const systemServicesJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.systemServices
+    );
+    const systemServicesList: string[] = await this.system.loadJson(systemServicesJsonFile);
+
+    await this.initServices(systemServicesList);
+
     // TODO: после загрузки новой версии или конфига - перезагружаться
   }
 
@@ -63,17 +51,6 @@ export default class ServicesManager {
 
     await this.initServices(regularServicesList);
   }
-
-  getService(serviceId: string): ServiceInstance {
-    const service: ServiceInstance | undefined = this.instances.get(serviceId);
-
-    if (!service) throw new Error(`Can't find service "${serviceId}"`);
-
-    // TODO: как вернуть тип возвращаемого драйвера???
-
-    return this.instances.get(serviceId);
-  }
-
 
   private async initServices(servicesId: string[]) {
     const definitionsJsonFile = path.join(
@@ -109,7 +86,7 @@ export default class ServicesManager {
     const mainFilePath = path.resolve(serviceDir, manifest.main);
     const ServiceClass: ServiceClassType = this.system.require(mainFilePath).default;
     const props: ServiceProps = {
-      // TODO: driverDefinition тоже имеет props
+      // TODO: serviceDefinition тоже имеет props
       ...serviceDefinition,
       manifest,
     };

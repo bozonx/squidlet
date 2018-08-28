@@ -45,7 +45,7 @@ export default class DriversManager {
     // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
-    return this.instances.get(driverName) as T;
+    return driver as T;
   }
 
 
