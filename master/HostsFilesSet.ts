@@ -143,3 +143,18 @@ export default class HostsFilesSet {
   }
 
 }
+
+// private mergeProps(
+//   className: string,
+//   instanceProps: {[index: string]: any},
+// manifestProps?: {[index: string]: any}
+// ): {[index: string]: any} {
+//   return {
+//     // default props from device's manifest
+//     ...manifestProps,
+//     // default props from config.devicesDefaults
+//     ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[className],
+//     // specified props for certain instance
+//     ...instanceProps,
+//   };
+// }

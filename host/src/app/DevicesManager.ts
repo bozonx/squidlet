@@ -1,14 +1,10 @@
 import * as path from 'path';
 
-const _omit = require('lodash/omit');
-
 import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
-import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import systemConfig from './systemConfig';
-import DriverInstance from './interfaces/DriverInstance';
 
 
 type DeviceClassType = new (system: System, deviceProps: DeviceProps) => DeviceInstance;
@@ -19,13 +15,11 @@ type DeviceClassType = new (system: System, deviceProps: DeviceProps) => DeviceI
  */
 export default class DevicesManager {
   private readonly system: System;
-  private readonly deviceFactory: DeviceFactory;
   // devices instances by ids
   private readonly instances: {[index: string]: DeviceInstance} = {};
 
   constructor(system: System) {
     this.system = system;
-    this.deviceFactory = new DeviceFactory(this.system);
   }
 
   /**
@@ -100,42 +94,10 @@ export default class DevicesManager {
     const deviceDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.devices, definition.id);
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(deviceDir, manifest.main);
-    const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;;
+    const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;
 
-    return await this.deviceFactory.create(props);
+    return new DeviceClass(this.system, props);
   }
-
-
-  // /**
-  //  * Prepare config for device instantiating.
-  //  * @param {object} rawInstanceProps - config of certain device from devices config.
-  //  * @param {DeviceManifest} manifest - parsed device manifest
-  //  * @param {string} deviceId - Uniq instance id like "bedroom.switch"
-  //  * @return {Promise<object>} - complete device config
-  //  * @private
-  //  */
-  // private async prepareDeviceConf(
-  //   rawInstanceProps: {[index: string]: any},
-  //   manifest: DeviceManifest,
-  //   deviceId: string
-  // ): Promise<DeviceDefinition> {
-  //   if (!manifest) {
-  //     throw new Error(`Can't find manifest of device "${rawInstanceProps.device}"`);
-  //   }
-  //
-  //   //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
-  //   // const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
-  //   // const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
-  //
-  //   return {
-  //     className: rawInstanceProps.device,
-  //     deviceId,
-  //     // TODO: это делать в парсинге конфига
-  //     props: this.mergeProps(rawInstanceProps.device, _omit(rawInstanceProps, 'device'), manifest.props),
-  //     // remove props from manifest
-  //     manifest: _omit(manifest, 'props'),
-  //   };
-  // }
 
   destroy() {
 
@@ -151,19 +113,5 @@ export default class DevicesManager {
     // this._app.events.emit(`app.afterDestroy`);
   }
 
-  private mergeProps(
-    className: string,
-    instanceProps: {[index: string]: any},
-    manifestProps?: {[index: string]: any}
-  ): {[index: string]: any} {
-    return {
-      // default props from device's manifest
-      ...manifestProps,
-      // default props from config.devicesDefaults
-      ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[className],
-      // specified props for certain instance
-      ...instanceProps,
-    };
-  }
 
 }
