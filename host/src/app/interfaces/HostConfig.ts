@@ -1,6 +1,3 @@
-import DeviceDefinition from './DeviceDefinition';
-import ServiceDefinition from './ServiceDefinition';
-import DriverDefinition from './DriverDefinition';
 import Platforms from '../../../../master/interfaces/Platforms';
 
 
@@ -18,16 +15,6 @@ export default interface HostConfig {
     // custom params
     params: {[index: string]: any};
   };
-
-  // // devices definitions by deviceId
-  // devices: DeviceDefinition[];
-  // // drivers definitions by driver name
-  // drivers: DriverDefinition[];
-  // // services definitions by service id
-  // services: ServiceDefinition[];
-
-  // override default params of devices
-  devicesDefaults: {[index: string]: any};
 
   // // TODO: remove
   // address: Destination;
