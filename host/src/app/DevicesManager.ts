@@ -3,7 +3,7 @@ import * as path from 'path';
 const _omit = require('lodash/omit');
 
 import System from './System';
-import Device from './interfaces/Device';
+import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
@@ -17,7 +17,7 @@ export default class DevicesManager {
   private readonly system: System;
   private readonly deviceFactory: DeviceFactory;
   // devices instances by ids
-  private readonly instances: {[index: string]: Device} = {};
+  private readonly instances: {[index: string]: DeviceInstance} = {};
 
   constructor(system: System) {
     this.system = system;
@@ -48,7 +48,7 @@ export default class DevicesManager {
 
       // each definition of menifest
       for (let definition of groupedByManifests[className]) {
-        const instance: Device = await this.instantiateDevice(definition, manifest);
+        const instance: DeviceInstance = await this.instantiateDevice(definition, manifest);
 
         this.instances[definition.id] = instance;
       }
@@ -58,12 +58,12 @@ export default class DevicesManager {
   /**
    * Get device instance
    */
-  getDevice(deviceId: string): Device {
+  getDevice(deviceId: string): DeviceInstance {
     return this.instances[deviceId];
   }
 
 
-  private async instantiateDevice (definition: DeviceDefinition, manifest: DeviceManifest): Device {
+  private async instantiateDevice (definition: DeviceDefinition, manifest: DeviceManifest): DeviceInstance {
     const props: DeviceProps = {
       // TODO: definition тоже имеет props
       ...definition,

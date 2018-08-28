@@ -1,11 +1,11 @@
 import * as path from 'path';
 
 import System from './System';
-import Device from './interfaces/Device';
+import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 
 
-type DeviceType = { new (system: System, deviceConf: DeviceDefinition): Device };
+type DeviceType = { new (system: System, deviceConf: DeviceDefinition): DeviceInstance };
 
 
 export default class DeviceFactory {
@@ -15,11 +15,11 @@ export default class DeviceFactory {
     this.system = system;
   }
 
-  async create(deviceConf: DeviceDefinition): Promise<Device> {
+  async create(deviceConf: DeviceDefinition): Promise<DeviceInstance> {
     // make instance of device
     const devicePath: string = path.resolve(deviceConf.manifest.baseDir, deviceConf.manifest.main);
     const DeviceClass: DeviceType = this.require(devicePath);
-    const device: Device = new DeviceClass(this.system, deviceConf);
+    const device: DeviceInstance = new DeviceClass(this.system, deviceConf);
 
     this._validateSchema(deviceConf);
 
@@ -41,7 +41,7 @@ export default class DeviceFactory {
    * @param {object} deviceConf - config of device
    * @private
    */
-  _validateDevice(device: Device, deviceConf: DeviceDefinition) {
+  _validateDevice(device: DeviceInstance, deviceConf: DeviceDefinition) {
     // own device validate method is optional
     if (!device.validate) return;
 

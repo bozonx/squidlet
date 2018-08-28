@@ -1,6 +1,6 @@
 import DeviceDefinition from './DeviceDefinition';
 
-export default interface Device {
+export default interface DeviceInstance {
   init: () => Promise<void>;
   listenStatus: () => void;
   listenConfig: () => void;
