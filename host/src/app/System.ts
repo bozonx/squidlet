@@ -8,6 +8,7 @@ import DriversManager from './DriversManager';
 import Services from './Services';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
+import FsDev from './interfaces/dev/Fs.dev';
 
 
 export default class System {
@@ -70,6 +71,25 @@ export default class System {
     await this.devicesManager.init();
     this.devices.init();
     await this.services.init();
+  }
+
+
+  // it needs for test purpose
+  require(pathToFile: string) {
+
+    // TODO: если на epspuino не будет рабоать с файлами из storage то загрузить файл и сделать eval
+
+    return require(pathToFile);
+  }
+
+  async loadJson(filePath: string): Promise<any> {
+
+    // TODO: может будет работать через require на espurino?
+
+    const fs: FsDev = this.driversManager.getDev<FsDev>('fs');
+    const systemDriversListString = await fs.readFile(filePath);
+
+    return JSON.stringify(systemDriversListString);
   }
 
 }

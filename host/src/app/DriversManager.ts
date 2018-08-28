@@ -55,7 +55,7 @@ export default class DriversManager {
       systemConfig.hostDirs.config,
       systemConfig.fileNames.systemDrivers
     );
-    const systemDriversList: string[] = await this.loadJson(systemDriversJsonFile);
+    const systemDriversList: string[] = await this.system.loadJson(systemDriversJsonFile);
 
     await this.initDrivers(systemDriversList);
   }
@@ -66,7 +66,7 @@ export default class DriversManager {
       systemConfig.hostDirs.config,
       systemConfig.fileNames.regularDrivers
     );
-    const regularDriversList: string[] = await this.loadJson(regularDriversJsonFile);
+    const regularDriversList: string[] = await this.system.loadJson(regularDriversJsonFile);
 
     await this.initDrivers(regularDriversList);
   }
@@ -76,17 +76,17 @@ export default class DriversManager {
    * @param devs - like {DeviClassName: DevClass}
    */
   async $setDevs(devs: {[index: string]: DriverClassType}) {
-    const driverDefinitionsJsonFile = path.join(
+    const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
       systemConfig.hostDirs.config,
-      systemConfig.fileNames.regularDrivers
+      systemConfig.fileNames.driversDefinitions
     );
-    const driverDefinitions: {[index: string]: DriverDefinition} = await this.loadJson(driverDefinitionsJsonFile);
+    const definitions: {[index: string]: DriverDefinition} = await this.system.loadJson(definitionsJsonFile);
 
     for (let driverName of Object.keys(devs)) {
       const DriverClass: DriverClassType = devs[driverName];
       const driverProps: DriverProps = {
-        ...driverDefinitions[driverName],
+        ...definitions[driverName],
         manifest: {
           name: driverName,
           type: 'dev',
@@ -100,15 +100,15 @@ export default class DriversManager {
 
 
   private async initDrivers(driverNames: string[]) {
-    const driverDefinitionsJsonFile = path.join(
+    const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
       systemConfig.hostDirs.config,
-      systemConfig.fileNames.regularDrivers
+      systemConfig.fileNames.driversDefinitions
     );
-    const driverDefinitions: {[index: string]: DriverDefinition} = await this.loadJson(driverDefinitionsJsonFile);
+    const definitions: {[index: string]: DriverDefinition} = await this.system.loadJson(definitionsJsonFile);
 
     for (let driverName of driverNames) {
-      const driverInstance: DriverInstance = await this.instantiateDriver(driverName, driverDefinitions[driverName]);
+      const driverInstance: DriverInstance = await this.instantiateDriver(driverName, definitions[driverName]);
 
       this.instances = this.instances.set(driverName, driverInstance);
     }
@@ -123,35 +123,16 @@ export default class DriversManager {
   private async instantiateDriver(driverName: string, driverDefinition: DriverDefinition): Promise<DriverInstance> {
     const driverDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.drivers, driverName);
     const manifestPath = path.join(driverDir, systemConfig.fileNames.manifest);
-    const manifest: DriverManifest = await this.loadJson(manifestPath);
+    const manifest: DriverManifest = await this.system.loadJson(manifestPath);
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(driverDir, manifest.main);
-    const DriverClass: DriverClassType = this.require(mainFilePath).default;
+    const DriverClass: DriverClassType = this.system.require(mainFilePath).default;
     const driverProps: DriverProps = {
       ...driverDefinition,
       manifest: manifest,
     };
 
     return new DriverClass(this.drivers, driverProps);
-  }
-
-  // it needs for test purpose
-  private require(pathToFile: string) {
-
-    // TODO: если на epspuino не будет рабоать с файлами из storage то загрузить файл и сделать eval
-
-    return require(pathToFile);
-  }
-
-  private async loadJson(filePath: string): Promise<any> {
-
-    // TODO: может будет работать через require на espurino?
-
-    const fs: FsDev = this.getDev<FsDev>('fs');
-
-    const systemDriversListString = await fs.readFile(filePath);
-
-    return JSON.stringify(systemDriversListString);
   }
 
 }

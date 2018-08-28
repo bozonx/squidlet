@@ -1,3 +1,5 @@
+import * as path from "path";
+
 const _omit = require('lodash/omit');
 
 import System from './System';
@@ -5,6 +7,8 @@ import Device from './interfaces/Device';
 import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
+import systemConfig from './systemConfig';
+import DriverDefinition from './interfaces/DriverDefinition';
 
 
 /**
@@ -28,12 +32,23 @@ export default class DevicesManager {
    *                                   Structure like { DeviceName: { ...manifest } }
    * @param {object} devices - user defined definition of devices by ids { "room.device": { ...deviceConfig } }
    */
-  init(
-    //devicesManifests: {[index: string]: DeviceManifest},
-    //devices: {[index: string]: object}
-  ): Promise<void[]> {
+  async init(): Promise<void> {
+    // TODO: пройтись по definitions и загружать манифесты
+    // TODO: манифесты можно кэшировать в память чтобы не загружать одно и тоже
+    // TODO: либо сгруппировать девайсы по манифестам и инстанцировать подгружая один манифест на группу
 
-    // TODO: загрузить манифесты и definitions
+    const definitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.devicesDefinitions
+    );
+    const definitions: {[index: string]: DeviceDefinition} = await this.system.loadJson(definitionsJsonFile);
+
+    for (let driverId of Object.keys(definitions)) {
+      const definition = definitions[driverId];
+
+
+    }
 
     return Promise.all(
       Object.keys(devices).map(async (deviceId: string): Promise<void> => {

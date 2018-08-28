@@ -20,10 +20,15 @@ export default {
   fileNames: {
     hostConfig: 'hostConfig.json',
     manifest: 'manifest.json',
+    // list of system drivers like {driverName: DriverDefinition}
     systemDrivers: 'systemDrivers.json',
+    // list of regular drivers like {driverName: DriverDefinition}
     regularDrivers: 'regularDrivers.json',
+    // definitions of devices like {fullDeviceId: DeviceDefinition}
     devicesDefinitions: 'devicesDefinitions.json',
+    // definitions of drivers like {driverName: DriverDefinition}
     driversDefinitions: 'driversDefinitions.json',
+    // definitions of services like {serviceId: ServiceDefinition}
     servicesDefinitions: 'servicesDefinitions.json',
   },
 };
