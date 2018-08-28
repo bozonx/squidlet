@@ -101,12 +101,7 @@ export default class DriversManager {
 
 
   private async initDrivers(driverNames: string[]) {
-    const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.config,
-      this.system.initCfg.fileNames.driversDefinitions
-    );
-    const definitions: {[index: string]: DriverDefinition} = await this.system.loadJson(definitionsJsonFile);
+    const definitions: {[index: string]: DriverDefinition} = await this.loadDefinitions();
 
     for (let driverName of driverNames) {
       const driverInstance: DriverInstance = await this.instantiateDriver(definitions[driverName]);
@@ -115,6 +110,16 @@ export default class DriversManager {
     }
 
     await this.initializeAll(driverNames);
+  }
+
+  private async loadDefinitions(): Promise<{[index: string]: DriverDefinition}> {
+    const definitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.driversDefinitions
+    );
+
+    return await this.system.loadJson(definitionsJsonFile);
   }
 
   private async initializeAll(driverNames: string[]) {
