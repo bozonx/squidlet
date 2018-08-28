@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from 'path';
 
 const _omit = require('lodash/omit');
 
@@ -8,7 +8,6 @@ import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import systemConfig from './systemConfig';
-import DriverDefinition from './interfaces/DriverDefinition';
 
 
 /**
@@ -26,17 +25,9 @@ export default class DevicesManager {
   }
 
   /**
-   * Initialize all the devices on current host specified by manifests
-   * and using user defined config for devices.
-   * @param {object} devicesManifests - parsed devices manifests.
-   *                                   Structure like { DeviceName: { ...manifest } }
-   * @param {object} devices - user defined definition of devices by ids { "room.device": { ...deviceConfig } }
+   * Initialize all the devices on current host specified by its definitions in config
    */
   async init(): Promise<void> {
-    // TODO: пройтись по definitions и загружать манифесты
-    // TODO: манифесты можно кэшировать в память чтобы не загружать одно и тоже
-    // TODO: либо сгруппировать девайсы по манифестам и инстанцировать подгружая один манифест на группу
-
     const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
       systemConfig.hostDirs.config,
@@ -44,16 +35,22 @@ export default class DevicesManager {
     );
     // TODO: наверное лучше просто массив
     const definitions: {[index: string]: DeviceDefinition} = await this.system.loadJson(definitionsJsonFile);
-    const groupedsByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
+    const groupedByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 
-
-    for (let className of Object.keys(groupedsByManifests)) {
-      // TODO: load manifest
-      const manifest = 1;
+    for (let className of Object.keys(groupedByManifests)) {
+      const manifestPath = path.join(
+        systemConfig.rootDirs.host,
+        systemConfig.hostDirs.devices,
+        className,
+        systemConfig.fileNames.manifest
+      );
+      const manifest: DeviceManifest = await this.system.loadJson(manifestPath);
 
       // each definition of menifest
-      for (let definition of groupedsByManifests[className]) {
-        await this.instantiateDevice(definition, manifest);
+      for (let definition of groupedByManifests[className]) {
+        const instance: Device = await this.instantiateDevice(definition, manifest);
+
+        this.instances[definition.id] = instance;
       }
     }
   }
@@ -66,22 +63,14 @@ export default class DevicesManager {
   }
 
 
-  private async instantiateDevice (definition: DeviceDefinition, manifest: DeviceManifest) {
+  private async instantiateDevice (definition: DeviceDefinition, manifest: DeviceManifest): Device {
+    const props: DeviceProps = {
+      // TODO: definition тоже имеет props
+      ...definition,
+      manifest,
+    };
 
-    return Promise.all(
-      Object.keys(devices).map(async (deviceId: string): Promise<void> => {
-        const rawProps: {[index: string]: any} = devices[deviceId];
-
-        if (!rawProps.device) {
-          this.system.log.fatal(`Unknown device "${JSON.stringify(rawProps)}"`);
-        }
-
-        const manifest: DeviceManifest = devicesManifests[rawProps.device];
-        const deviceConf: DeviceDefinition = await this.prepareDeviceConf(rawProps, manifest, deviceId);
-
-        this.instances[deviceConf.deviceId] = await this.deviceFactory.create(deviceConf);
-      })
-    );
+     = await this.deviceFactory.create(deviceConf);
   }
 
   private groupDevicesDefinitionsByClass(
@@ -100,36 +89,36 @@ export default class DevicesManager {
     return result;
   }
 
-  /**
-   * Prepare config for device instantiating.
-   * @param {object} rawInstanceProps - config of certain device from devices config.
-   * @param {DeviceManifest} manifest - parsed device manifest
-   * @param {string} deviceId - Uniq instance id like "bedroom.switch"
-   * @return {Promise<object>} - complete device config
-   * @private
-   */
-  private async prepareDeviceConf(
-    rawInstanceProps: {[index: string]: any},
-    manifest: DeviceManifest,
-    deviceId: string
-  ): Promise<DeviceDefinition> {
-    if (!manifest) {
-      throw new Error(`Can't find manifest of device "${rawInstanceProps.device}"`);
-    }
-
-    //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
-    // const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
-    // const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
-
-    return {
-      className: rawInstanceProps.device,
-      deviceId,
-      // TODO: это делать в парсинге конфига
-      props: this.mergeProps(rawInstanceProps.device, _omit(rawInstanceProps, 'device'), manifest.props),
-      // remove props from manifest
-      manifest: _omit(manifest, 'props'),
-    };
-  }
+  // /**
+  //  * Prepare config for device instantiating.
+  //  * @param {object} rawInstanceProps - config of certain device from devices config.
+  //  * @param {DeviceManifest} manifest - parsed device manifest
+  //  * @param {string} deviceId - Uniq instance id like "bedroom.switch"
+  //  * @return {Promise<object>} - complete device config
+  //  * @private
+  //  */
+  // private async prepareDeviceConf(
+  //   rawInstanceProps: {[index: string]: any},
+  //   manifest: DeviceManifest,
+  //   deviceId: string
+  // ): Promise<DeviceDefinition> {
+  //   if (!manifest) {
+  //     throw new Error(`Can't find manifest of device "${rawInstanceProps.device}"`);
+  //   }
+  //
+  //   //const { baseName: placement, name } = helpers.splitLastPartOfPath(deviceId);
+  //   // const schemaPath: string = path.resolve(manifest.baseDir, manifest.schema);
+  //   // const schema: DeviceSchema = await this.system.io.loadYamlFile(schemaPath) as DeviceSchema;
+  //
+  //   return {
+  //     className: rawInstanceProps.device,
+  //     deviceId,
+  //     // TODO: это делать в парсинге конфига
+  //     props: this.mergeProps(rawInstanceProps.device, _omit(rawInstanceProps, 'device'), manifest.props),
+  //     // remove props from manifest
+  //     manifest: _omit(manifest, 'props'),
+  //   };
+  // }
 
   destroy() {
 

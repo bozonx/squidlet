@@ -6,4 +6,5 @@ export default interface Device {
   listenConfig: () => void;
   setConfig: (partialConfig: object) => void;
   validate: (deviceConf: DeviceDefinition) => string | undefined;
+  [index: string]: any;
 }

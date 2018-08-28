@@ -127,12 +127,13 @@ export default class DriversManager {
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(driverDir, manifest.main);
     const DriverClass: DriverClassType = this.system.require(mainFilePath).default;
-    const driverProps: DriverProps = {
+    const props: DriverProps = {
+      // TODO: driverDefinition тоже имеет props
       ...driverDefinition,
-      manifest: manifest,
+      manifest,
     };
 
-    return new DriverClass(this.drivers, driverProps);
+    return new DriverClass(this.drivers, props);
   }
 
 }
