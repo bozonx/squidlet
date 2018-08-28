@@ -1,8 +1,7 @@
 const _omit = require('lodash/omit');
-
-import {loadManifest} from './IO';
 import {Map} from 'immutable';
 
+import Main from './Main';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
@@ -42,6 +41,7 @@ export interface AllManifests {
 
 
 export default class Manifests {
+  private readonly main: Main;
   private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
   private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
@@ -59,9 +59,10 @@ export default class Manifests {
   // driver names by soft paths to manifest or dir with manifest like {softPath: DriverName}
   private driversSoftPaths: {[index: string]: string} = {};
 
-  constructor() {
-  }
 
+  constructor(main: Main) {
+    this.main = main;
+  }
   getManifests(): AllManifests {
     return {
       devices: this.devices.toJS(),
@@ -165,7 +166,7 @@ export default class Manifests {
     // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
     //       был ли он загружен или нет - лучше наверное сравнивать по resolved или softPath имени файла
 
-    const parsedManifest: PreDeviceManifest = await this.loadManifest<PreDeviceManifest>(driverManifestSoftPath);
+    const parsedManifest: PreDeviceManifest = await this.main.$loadManifest<PreDeviceManifest>(driverManifestSoftPath);
 
     // if driver is registered - do nothing
     if (this.drivers.get(parsedManifest.name)) return;
@@ -174,10 +175,6 @@ export default class Manifests {
 
     // proceed it
     return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
-  }
-
-  private async loadManifest<T extends PreManifestBase>(resolvedPathToManifest: string): Promise<T> {
-    return await loadManifest<T>(resolvedPathToManifest);
   }
 
 }
