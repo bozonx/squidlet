@@ -24,11 +24,11 @@ export default {
     systemDrivers: 'systemDrivers.json',
     // list of regular drivers like {driverName: DriverDefinition}
     regularDrivers: 'regularDrivers.json',
-    // definitions of devices like {fullDeviceId: DeviceDefinition}
+    // definitions of devices like DeviceDefinition[]
     devicesDefinitions: 'devicesDefinitions.json',
     // definitions of drivers like {driverName: DriverDefinition}
     driversDefinitions: 'driversDefinitions.json',
-    // definitions of services like {serviceId: ServiceDefinition}
+    // definitions of services like ServiceDefinition[]
     servicesDefinitions: 'servicesDefinitions.json',
   },
 };

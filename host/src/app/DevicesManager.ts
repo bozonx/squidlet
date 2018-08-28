@@ -33,8 +33,7 @@ export default class DevicesManager {
       systemConfig.hostDirs.config,
       systemConfig.fileNames.devicesDefinitions
     );
-    // TODO: наверное лучше просто массив
-    const definitions: {[index: string]: DeviceDefinition} = await this.system.loadJson(definitionsJsonFile);
+    const definitions: DeviceDefinition[] = await this.system.loadJson(definitionsJsonFile);
     const groupedByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 
     for (let className of Object.keys(groupedByManifests)) {
@@ -48,9 +47,7 @@ export default class DevicesManager {
 
       // each definition of menifest
       for (let definition of groupedByManifests[className]) {
-        const instance: DeviceInstance = await this.instantiateDevice(definition, manifest);
-
-        this.instances[definition.id] = instance;
+        this.instances[definition.id] = await this.instantiateDevice(definition, manifest);
       }
     }
   }
@@ -63,27 +60,30 @@ export default class DevicesManager {
   }
 
 
-  private async instantiateDevice (definition: DeviceDefinition, manifest: DeviceManifest): DeviceInstance {
+  private async instantiateDevice (
+    definition: DeviceDefinition,
+    manifest: DeviceManifest
+  ): Promise<DeviceInstance> {
     const props: DeviceProps = {
       // TODO: definition тоже имеет props
       ...definition,
       manifest,
     };
 
-     = await this.deviceFactory.create(deviceConf);
+    return await this.deviceFactory.create(props);
   }
 
   private groupDevicesDefinitionsByClass(
-    definitions: {[index: string]: DeviceDefinition}
+    definitions: DeviceDefinition[]
   ): {[index: string]: DeviceDefinition[]} {
     const result: {[index: string]: DeviceDefinition[]} = {};
 
-    for (let driverId of Object.keys(definitions)) {
-      const className: string = definitions[driverId].className;
+    for (let definition of definitions) {
+      const {className} = definition;
 
       if (!result[className]) result[className] = [];
 
-      result[className].push(definitions[driverId]);
+      result[className].push(definition);
     }
 
     return result;
