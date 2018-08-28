@@ -3,11 +3,15 @@ import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import {Map} from 'immutable';
 import Service from './interfaces/Service';
+import * as path from "path";
+import systemConfig from './systemConfig';
+import DriverDefinition from './interfaces/DriverDefinition';
+import DriverInstance from './interfaces/DriverInstance';
 
 
 export default class ServicesManager {
   private readonly system: System;
-  private instances: Map<string, Service> = Map<string, Service>();
+  private instances: {[index: string]: Service} = {};
 
   constructor(system: System) {
     this.system = system;
@@ -43,7 +47,35 @@ export default class ServicesManager {
   }
 
   async initRegularServices() {
+    const regularServicesJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.regularServices
+    );
+    const regularServicesList: string[] = await this.system.loadJson(regularServicesJsonFile);
 
+    await this.initServices(regularServicesList);
+  }
+
+  private async initServices(servicesId: string[]) {
+    const definitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.config,
+      systemConfig.fileNames.servicesDefinitions
+    );
+    const definitions: {[index: string]: ServiceDefinition} = await this.system.loadJson(definitionsJsonFile);
+
+    for (let serviceId of servicesId) {
+      const serviceInstance: ServiceInstance = await this.instantiateDriver(driverName, definitions[driverName]);
+
+      this.instances[serviceId] = serviceInstance;
+    }
+
+    for (let driverName of driverNames) {
+      const driver: DriverInstance = this.instances.get(driverName);
+
+      if (driver.init) await driver.init();
+    }
   }
 
   getService(serviceId: string): Service {
