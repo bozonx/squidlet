@@ -1,7 +1,4 @@
-import DeviceManifest from './interfaces/DeviceManifest';
-
 const _capitalize = require('lodash/capitalize');
-import * as path from 'path';
 
 import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
@@ -10,7 +7,6 @@ import System from './System';
 import DriverDefinition from './interfaces/DriverDefinition';
 import DriverEnv from './DriverEnv';
 import DriverProps from './interfaces/DriverProps';
-import systemConfig from './systemConfig';
 
 
 type DriverClassType = new (driverEnv: DriverEnv, props: DriverProps) => DriverInstance;
@@ -21,14 +17,12 @@ type DriverClassType = new (driverEnv: DriverEnv, props: DriverProps) => DriverI
  */
 export default class DriversManager {
   readonly system: System;
-  // TODO: reveiw
   readonly driverEnv: DriverEnv;
-  // TODO: зачем тут immutable?
-  private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
+  private instances: {[index: string]: DriverInstance} = {};
 
   constructor(system: System) {
     this.system = system;
-    this.drivers = new DriverEnv(this.system);
+    this.driverEnv = new DriverEnv(this.system);
   }
 
   /**
@@ -43,7 +37,7 @@ export default class DriversManager {
   }
 
   getDriver<T extends DriverInstance>(driverName: string): T {
-    const driver: DriverInstance | undefined = this.instances.get(driverName);
+    const driver: DriverInstance | undefined = this.instances[driverName];
 
     // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
@@ -88,7 +82,7 @@ export default class DriversManager {
       };
       const driverInstance: DriverInstance = new DriverClass(this.driverEnv, driverProps);
 
-      this.instances = this.instances.set(driverName, driverInstance);
+      this.instances[driverName] = driverInstance;
     }
   }
 
@@ -101,7 +95,7 @@ export default class DriversManager {
     for (let driverName of driverNames) {
       const driverInstance: DriverInstance = await this.instantiateDriver(definitions[driverName]);
 
-      this.instances = this.instances.set(driverName, driverInstance);
+      this.instances[driverName] = driverInstance;
     }
 
     await this.initializeAll(driverNames);
@@ -109,7 +103,7 @@ export default class DriversManager {
 
   private async initializeAll(driverNames: string[]) {
     for (let driverName of driverNames) {
-      const driver: DriverInstance = this.instances.get(driverName);
+      const driver: DriverInstance = this.instances[driverName];
 
       if (driver.init) await driver.init();
     }
