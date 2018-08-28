@@ -42,13 +42,31 @@ export default class DevicesManager {
       systemConfig.hostDirs.config,
       systemConfig.fileNames.devicesDefinitions
     );
+    // TODO: наверное лучше просто массив
     const definitions: {[index: string]: DeviceDefinition} = await this.system.loadJson(definitionsJsonFile);
-
-    for (let driverId of Object.keys(definitions)) {
-      const definition = definitions[driverId];
+    const groupedsByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 
 
+    for (let className of Object.keys(groupedsByManifests)) {
+      // TODO: load manifest
+      const manifest = 1;
+
+      // each definition of menifest
+      for (let definition of groupedsByManifests[className]) {
+        await this.instantiateDevice(definition, manifest);
+      }
     }
+  }
+
+  /**
+   * Get device instance
+   */
+  getDevice(deviceId: string): Device {
+    return this.instances[deviceId];
+  }
+
+
+  private async instantiateDevice (definition: DeviceDefinition, manifest: DeviceManifest) {
 
     return Promise.all(
       Object.keys(devices).map(async (deviceId: string): Promise<void> => {
@@ -66,11 +84,20 @@ export default class DevicesManager {
     );
   }
 
-  /**
-   * Get device instance
-   */
-  getDevice(deviceId: string): Device {
-    return this.instances[deviceId];
+  private groupDevicesDefinitionsByClass(
+    definitions: {[index: string]: DeviceDefinition}
+  ): {[index: string]: DeviceDefinition[]} {
+    const result: {[index: string]: DeviceDefinition[]} = {};
+
+    for (let driverId of Object.keys(definitions)) {
+      const className: string = definitions[driverId].className;
+
+      if (!result[className]) result[className] = [];
+
+      result[className].push(definitions[driverId]);
+    }
+
+    return result;
   }
 
   /**
