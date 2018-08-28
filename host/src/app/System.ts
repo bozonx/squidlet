@@ -9,6 +9,8 @@ import ServicesManager from './ServicesManager';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import FsDev from './interfaces/dev/Fs.dev';
+import initializationConfig from './initializationConfig';
+import InitializationConfig from './interfaces/InitializationConfig';
 
 
 export default class System {
@@ -21,9 +23,15 @@ export default class System {
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
+  private initializationConfig?: InitializationConfig;
 
+  get initCfg(): InitializationConfig {
+    return this.initializationConfig as InitializationConfig;
+  }
 
   constructor() {
+    // config which is used only on initialization time
+    this.initializationConfig = initializationConfig();
     this.log = defaultLogger;
     this.events = new Events();
     this.host = new Host(this);
@@ -52,6 +60,9 @@ export default class System {
 
     await this.initApp();
     this.riseEvent('system.appInitialized');
+
+    // remove initialization config
+    delete this.initializationConfig;
   }
 
   /**
