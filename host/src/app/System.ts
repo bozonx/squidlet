@@ -15,6 +15,7 @@ import Env from './Env';
 import DriverDefinition from './interfaces/DriverDefinition';
 import * as path from "path";
 import systemConfig from './systemConfig';
+import DeviceManifest from './interfaces/DeviceManifest';
 
 
 export default class System {
@@ -109,6 +110,28 @@ export default class System {
     );
 
     return await this.loadJson(definitionsJsonFile);
+  }
+
+  async loadManifest<T>(typeDir: string, entityDir: string) : Promise<T> {
+    const manifestPath = path.join(
+      systemConfig.rootDirs.host,
+      typeDir,
+      entityDir,
+      this.initCfg.fileNames.manifest
+    );
+
+    return await this.loadJson(manifestPath);
+  }
+
+  async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
+    const manifestPath = path.join(
+      systemConfig.rootDirs.host,
+      typeDir,
+      entityDir,
+      this.initCfg.fileNames.mainJs
+    );
+
+    return this.require(manifestPath).default;
   }
 
   private riseEvent(eventName: string) {

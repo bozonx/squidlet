@@ -7,6 +7,7 @@ import ServiceInstance from './interfaces/ServiceInstance';
 import ServiceProps from './interfaces/ServiceProps';
 import systemConfig from './systemConfig';
 import Env from './Env';
+import DriverManifest from './interfaces/DriverManifest';
 
 
 type ServiceClassType = new (env: Env, props: ServiceProps) => ServiceInstance;
@@ -71,16 +72,14 @@ export default class ServicesManager {
   }
 
   private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
-    const serviceDir = path.join(
-      systemConfig.rootDirs.host,
+    const manifest = await this.system.loadManifest<ServiceManifest>(
       this.system.initCfg.hostDirs.services,
       serviceDefinition.className
     );
-    const manifestPath = path.join(serviceDir, this.system.initCfg.fileNames.manifest);
-    const manifest: ServiceManifest = await this.system.loadJson(manifestPath);
-    // TODO: !!!! переделать - наверное просто загружать main.js
-    const mainFilePath = path.resolve(serviceDir, manifest.main);
-    const ServiceClass: ServiceClassType = this.system.require(mainFilePath).default;
+    const ServiceClass = await this.system.loadEntityClass<ServiceClassType>(
+      this.system.initCfg.hostDirs.services,
+      serviceDefinition.className
+    );
     const props: ServiceProps = {
       // TODO: serviceDefinition тоже имеет props
       ...serviceDefinition,

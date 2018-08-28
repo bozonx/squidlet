@@ -36,13 +36,10 @@ export default class DevicesManager {
     const groupedByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 
     for (let className of Object.keys(groupedByManifests)) {
-      const manifestPath = path.join(
-        systemConfig.rootDirs.host,
+      const manifest = await this.system.loadManifest<DeviceManifest>(
         this.system.initCfg.hostDirs.devices,
         className,
-        this.system.initCfg.fileNames.manifest
       );
-      const manifest: DeviceManifest = await this.system.loadJson(manifestPath);
 
       // each definition of manifest
       for (let definition of groupedByManifests[className]) {
@@ -94,19 +91,15 @@ export default class DevicesManager {
     definition: DeviceDefinition,
     manifest: DeviceManifest
   ): Promise<DeviceInstance> {
+    const DeviceClass = await this.system.loadEntityClass<DeviceClassType>(
+      this.system.initCfg.hostDirs.devices,
+      definition.id
+    );
     const props: DeviceProps = {
       // TODO: definition тоже имеет props
       ...definition,
       manifest,
     };
-    const deviceDir = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.devices,
-      definition.id
-    );
-    // TODO: !!!! переделать - наверное просто загружать main.js
-    const mainFilePath = path.resolve(deviceDir, manifest.main);
-    const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;
 
     return new DeviceClass(this.system.env, props);
   }

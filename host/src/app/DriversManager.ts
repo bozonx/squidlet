@@ -1,3 +1,5 @@
+import DeviceManifest from './interfaces/DeviceManifest';
+
 const _capitalize = require('lodash/capitalize');
 import * as path from 'path';
 
@@ -114,16 +116,14 @@ export default class DriversManager {
   }
 
   private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
-    const driverDir = path.join(
-      systemConfig.rootDirs.host,
+    const manifest = await this.system.loadManifest<DriverManifest>(
       this.system.initCfg.hostDirs.drivers,
-      driverDefinition.className)
-    ;
-    const manifestPath = path.join(driverDir, this.system.initCfg.fileNames.manifest);
-    const manifest: DriverManifest = await this.system.loadJson(manifestPath);
-    // TODO: !!!! переделать - наверное просто загружать main.js
-    const mainFilePath = path.resolve(driverDir, manifest.main);
-    const DriverClass: DriverClassType = this.system.require(mainFilePath).default;
+      driverDefinition.className
+    );
+    const DriverClass = await this.system.loadEntityClass<DriverClassType>(
+      this.system.initCfg.hostDirs.drivers,
+      driverDefinition.className
+    );
     const props: DriverProps = {
       // TODO: driverDefinition тоже имеет props
       ...driverDefinition,
