@@ -16,7 +16,7 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
  * It packs data to send it via i2c.
  */
 export class I2cConnectionDriver {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly driverProps: DriverProps;
   private readonly myAddress: MyAddress;
   private readonly i2cDataDriver: I2cDataDriver;
@@ -24,16 +24,16 @@ export class I2cConnectionDriver {
   private readonly dataMark: number = 0x01;
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
-  constructor(drivers: DriverEnv, driverProps: DriverProps, myAddress: MyAddress) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps, myAddress: MyAddress) {
+    this.driverEnv = driverEnv;
     this.driverProps = driverProps;
     this.myAddress = myAddress;
 
     const isMaster = typeof this.myAddress.address === 'undefined';
-    const dataDriver = this.drivers.getDriver<DriverFactoryBase>('I2cData.driver');
+    const dataDriver = this.driverEnv.getDriver<DriverFactoryBase>('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
     // get low level i2c driver
-    const i2cDriver: I2cDriverClass = this.drivers.getDriver<I2cDriverClass>(i2cDriverName);
+    const i2cDriver: I2cDriverClass = this.driverEnv.getDriver<I2cDriverClass>(i2cDriverName);
 
     this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus) as I2cDataDriver;
   }
@@ -73,7 +73,7 @@ export class I2cConnectionDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       myAddress: MyAddress,
     ): I2cConnectionDriver } = I2cConnectionDriver;

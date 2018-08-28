@@ -5,8 +5,8 @@ import FsDev, {Stats} from '../../app/interfaces/dev/Fs.dev';
 export class Storage {
   private fsDev: FsDev;
 
-  constructor(drivers: DriverEnv) {
-    this.fsDev = drivers.getDev<FsDev>('Fs');
+  constructor(driverEnv: DriverEnv) {
+    this.fsDev = driverEnv.getDev<FsDev>('Fs');
   }
 
   async isDir(pathToDir: string): Promise<boolean> {

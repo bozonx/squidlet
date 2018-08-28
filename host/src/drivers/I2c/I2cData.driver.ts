@@ -40,7 +40,7 @@ export class I2cDataDriver {
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
   constructor(
-    drivers: DriverEnv,
+    driverEnv: DriverEnv,
     driverProps: DriverProps,
     i2cDriver: DriverFactoryBase,
     // bus to use
@@ -158,7 +158,7 @@ export class I2cDataDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       i2cDriver: DriverFactoryBase,
       bus: string

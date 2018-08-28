@@ -9,7 +9,7 @@ import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 
 
 export class I2cSlaveDev {
-  constructor(drivers: DriverEnv, driverProps: DriverProps, bus: number) {
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: number) {
   }
 
   async send(data: Uint8Array): Promise<void> {
@@ -31,7 +31,7 @@ export class I2cSlaveDev {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       bus: number
     ): I2cSlaveDev } = I2cSlaveDev;

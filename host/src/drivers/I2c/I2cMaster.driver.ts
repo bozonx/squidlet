@@ -17,22 +17,22 @@ type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cMasterDriver {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cMasterDev: I2cMasterDev;
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
-  constructor(drivers: DriverEnv, driverProps: DriverProps, bus: string | number) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: string | number) {
+    this.driverEnv = driverEnv;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
       : parseInt(bus as any);
 
     if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
 
-    const i2cDevDriver = this.drivers.getDriver<DriverFactoryBase>('I2cMaster.dev');
+    const i2cDevDriver = this.driverEnv.getDriver<DriverFactoryBase>('I2cMaster.dev');
 
     this.i2cMasterDev = i2cDevDriver.getInstance(this.bus) as I2cMasterDev;
   }
@@ -204,7 +204,7 @@ export class I2cMasterDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       bus: string | number,
     ): I2cMasterDriver } = I2cMasterDriver;

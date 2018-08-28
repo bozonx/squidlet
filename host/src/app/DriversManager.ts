@@ -13,7 +13,7 @@ import DriverProps from './interfaces/DriverProps';
 import systemConfig from './systemConfig';
 
 
-type DriverClassType = new (drivers: DriverEnv, props: DriverProps) => DriverInstance;
+type DriverClassType = new (driverEnv: DriverEnv, props: DriverProps) => DriverInstance;
 
 
 /**
@@ -22,7 +22,7 @@ type DriverClassType = new (drivers: DriverEnv, props: DriverProps) => DriverIns
 export default class DriversManager {
   readonly system: System;
   // TODO: reveiw
-  readonly drivers: DriverEnv;
+  readonly driverEnv: DriverEnv;
   // TODO: зачем тут immutable?
   private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
 
@@ -86,7 +86,7 @@ export default class DriversManager {
           type: 'dev',
         },
       };
-      const driverInstance: DriverInstance = new DriverClass(this.drivers, driverProps);
+      const driverInstance: DriverInstance = new DriverClass(this.driverEnv, driverProps);
 
       this.instances = this.instances.set(driverName, driverInstance);
     }
@@ -130,7 +130,7 @@ export default class DriversManager {
       manifest,
     };
 
-    return new DriverClass(this.drivers, props);
+    return new DriverClass(this.driverEnv, props);
   }
 
 }

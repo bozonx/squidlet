@@ -14,20 +14,20 @@ type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cSlaveDriver {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cSlaveDev: I2cSlaveDev;
 
-  constructor(drivers: DriverEnv, driverProps: DriverProps, bus: string | number) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: string | number) {
+    this.driverEnv = driverEnv;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
       : parseInt(bus as any);
 
     if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
 
-    const i2cSlaveDev = this.drivers.getDriver<DriverFactoryBase>('I2cSlave.dev');
+    const i2cSlaveDev = this.driverEnv.getDriver<DriverFactoryBase>('I2cSlave.dev');
 
     this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlaveDev;
     // listen all the income data
@@ -130,7 +130,7 @@ export class I2cSlaveDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       bus: string | number,
     ): I2cSlaveDriver } = I2cSlaveDriver;

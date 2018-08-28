@@ -17,7 +17,7 @@ type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Des
  * It initializes connection of this host by type and bus and current address of host.
  */
 export default class Destinations {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
   private readonly neighbors: {[index: string]: Destination} = {};
@@ -25,8 +25,8 @@ export default class Destinations {
   private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
 
-  constructor(drivers: DriverEnv, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
+    this.driverEnv = driverEnv;
     this.neighbors = neighbors;
     this.myAddresses = myAddresses;
   }
@@ -86,7 +86,7 @@ export default class Destinations {
   private registerConnection(myAddress: MyAddress) {
     const connectionId: string = this.generateConnectionId(myAddress);
     const driverName = this.generateDriverName(myAddress.type);
-    const connectionDriver = this.drivers.getDriver<DriverFactoryBase>(driverName);
+    const connectionDriver = this.driverEnv.getDriver<DriverFactoryBase>(driverName);
 
     this.connections[connectionId] = connectionDriver.getInstance(myAddress) as Connection;
   }

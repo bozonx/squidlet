@@ -1,25 +1,25 @@
-import Drivers from './Drivers';
+import DriverEnv from './DriverEnv';
 import DriverProps from './interfaces/DriverProps';
 
 
 export default abstract class DriverFactoryBase {
   protected abstract DriverClass: { new (
-      drivers: Drivers,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       ...params: Array<any>
     ): object };
-  protected readonly drivers: Drivers;
+  protected readonly driverEnv: DriverEnv;
   protected readonly driverProps: DriverProps;
 
-  constructor(drivers: Drivers, driverProps: DriverProps = {}) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps = {}) {
+    this.driverEnv = driverEnv;
     this.driverProps = driverProps;
   }
 
   // TODO: возвращать обобщение
 
   getInstance(...params: Array<any>) {
-    return new this.DriverClass(this.drivers, this.driverProps, ...params);
+    return new this.DriverClass(this.driverEnv, this.driverProps, ...params);
   }
 
 }

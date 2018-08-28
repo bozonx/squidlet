@@ -18,16 +18,16 @@ type RouterHandler = (error: Error | null, payload?: any) => void;
  */
 export default class Router {
   private readonly network: Network;
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
 
-  constructor(network: Network, drivers: DriverEnv) {
+  constructor(network: Network, driverEnv: DriverEnv) {
     this.network = network;
-    this.drivers = drivers;
+    this.driverEnv = driverEnv;
     this.destinations = new Destinations(
-      this.drivers,
+      this.driverEnv,
       this.network.config.connections,
       this.network.config.neighbors
     );

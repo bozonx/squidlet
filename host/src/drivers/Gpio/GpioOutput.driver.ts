@@ -14,12 +14,12 @@ interface GpioOutputDriverProps extends DriverProps {
 
 
 export class GpioOutputDriver {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly driverProps: GpioOutputDriverProps;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: DriverEnv, driverProps: GpioOutputDriverProps) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: GpioOutputDriverProps) {
+    this.driverEnv = driverEnv;
     this.driverProps = driverProps;
   }
 
@@ -50,7 +50,7 @@ export class GpioOutputDriver {
 
 export default class GpioOutputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: GpioOutputDriverProps,
     ): GpioOutputDriver } = GpioOutputDriver;
   private instances: {[index: string]: GpioOutputDriver} = {};

@@ -15,7 +15,7 @@ import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 export class I2cMasterDev {
   private readonly bus: i2cBusModule.I2cBus;
 
-  constructor(drivers: DriverEnv, driverProps: DriverProps, bus: number) {
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: number) {
     this.bus = i2cBusModule.openSync(Number(bus));
   }
 
@@ -70,7 +70,7 @@ export class I2cMasterDev {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
       bus: number
     ): I2cMasterDev } = I2cMasterDev;

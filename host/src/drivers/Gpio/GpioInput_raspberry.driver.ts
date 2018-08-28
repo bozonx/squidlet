@@ -12,12 +12,12 @@ interface GpioInputDriverProps extends DriverProps {
 
 
 export class GpioInputRaspberryDriver {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly driverProps: GpioInputDriverProps;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: DriverEnv, driverProps: GpioInputDriverProps) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: GpioInputDriverProps) {
+    this.driverEnv = driverEnv;
     this.driverProps = driverProps;
   }
 

@@ -10,12 +10,12 @@ type Handler = (level: BinaryLevel) => void;
 
 
 export class GpioInputDriver {
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly driverProps: DriverProps;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: DriverEnv, driverProps: DriverProps) {
-    this.drivers = drivers;
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps) {
+    this.driverEnv = driverEnv;
     this.driverProps = driverProps;
   }
 
@@ -40,7 +40,7 @@ export class GpioInputDriver {
 
 export default class GpioInputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: DriverEnv,
+      driverEnv: DriverEnv,
       driverProps: DriverProps,
     ): GpioInputDriver } = GpioInputDriver;
   private instances: {[index: string]: GpioInputDriver} = {};

@@ -11,14 +11,14 @@ export default class Network {
   readonly hostId: string;
   readonly config: HostNetworkConfig;
 
-  private readonly drivers: DriverEnv;
+  private readonly driverEnv: DriverEnv;
   private readonly router: Router;
 
-  constructor(drivers: DriverEnv, hostId: string, config: HostNetworkConfig) {
+  constructor(driverEnv: DriverEnv, hostId: string, config: HostNetworkConfig) {
     this.hostId = hostId;
     this.config = config;
-    this.drivers = drivers;
-    this.router = new Router(this, this.drivers);
+    this.driverEnv = driverEnv;
+    this.router = new Router(this, this.driverEnv);
   }
 
   init(): void {
