@@ -8,7 +8,7 @@ import systemConfig from './systemConfig';
 import DeviceProps from './interfaces/DeviceProps';
 
 
-type DeviceClassType = new (system: System, deviceProps: DeviceProps) => DeviceInstance;
+type DeviceClassType = new (system: System, props: DeviceProps) => DeviceInstance;
 
 
 /**

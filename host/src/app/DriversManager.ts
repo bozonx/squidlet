@@ -11,7 +11,7 @@ import systemConfig from './systemConfig';
 import DriverProps from './interfaces/DriverProps';
 
 
-type DriverClassType = new (drivers: Drivers, driverProps: DriverProps) => DriverInstance;
+type DriverClassType = new (drivers: Drivers, props: DriverProps) => DriverInstance;
 
 
 /**
@@ -108,11 +108,12 @@ export default class DriversManager {
     const definitions: {[index: string]: DriverDefinition} = await this.system.loadJson(definitionsJsonFile);
 
     for (let driverName of driverNames) {
-      const driverInstance: DriverInstance = await this.instantiateDriver(driverName, definitions[driverName]);
+      const driverInstance: DriverInstance = await this.instantiateDriver(definitions[driverName]);
 
       this.instances = this.instances.set(driverName, driverInstance);
     }
 
+    // initialize
     for (let driverName of driverNames) {
       const driver: DriverInstance = this.instances.get(driverName);
 
@@ -120,8 +121,12 @@ export default class DriversManager {
     }
   }
 
-  private async instantiateDriver(driverName: string, driverDefinition: DriverDefinition): Promise<DriverInstance> {
-    const driverDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.drivers, driverName);
+  private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
+    const driverDir = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.drivers,
+      driverDefinition.className)
+    ;
     const manifestPath = path.join(driverDir, systemConfig.fileNames.manifest);
     const manifest: DriverManifest = await this.system.loadJson(manifestPath);
     // TODO: !!!! переделать - наверное просто загружать main.js

@@ -1,17 +1,24 @@
+import * as path from 'path';
+
 import System from './System';
 import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
-import {Map} from 'immutable';
-import Service from './interfaces/Service';
-import * as path from "path";
+import ServiceInstance from './interfaces/ServiceInstance';
 import systemConfig from './systemConfig';
 import DriverDefinition from './interfaces/DriverDefinition';
 import DriverInstance from './interfaces/DriverInstance';
+import DriverManifest from './interfaces/DriverManifest';
+import DriverProps from './interfaces/DriverProps';
+import DeviceProps from './interfaces/DeviceProps';
+import DeviceInstance from './interfaces/DeviceInstance';
+
+
+type ServiceClassType = new (system: System, props: ServiceProps) => ServiceInstance;
 
 
 export default class ServicesManager {
   private readonly system: System;
-  private instances: {[index: string]: Service} = {};
+  private instances: {[index: string]: ServiceInstance} = {};
 
   constructor(system: System) {
     this.system = system;
@@ -26,14 +33,14 @@ export default class ServicesManager {
       const definition = servicesDefinitions[serviceId];
       const manifest = servicesManifests[definition.service];
       const ServiceClass = this.require(manifest.main).default;
-      const instance: Service = new ServiceClass(this.system, definition);
+      const instance: ServiceInstance = new ServiceClass(this.system, definition);
 
       this.instances.set(serviceId, instance);
     }
 
     // initialize all the services
     await Promise.all(Object.keys(this.instances).map(async (name: string): Promise<void> => {
-      const service: Service = this.instances.get(name);
+      const service: ServiceInstance = this.instances.get(name);
 
       await service.init();
     }));
@@ -57,6 +64,17 @@ export default class ServicesManager {
     await this.initServices(regularServicesList);
   }
 
+  getService(serviceId: string): ServiceInstance {
+    const service: ServiceInstance | undefined = this.instances.get(serviceId);
+
+    if (!service) throw new Error(`Can't find service "${serviceId}"`);
+
+    // TODO: как вернуть тип возвращаемого драйвера???
+
+    return this.instances.get(serviceId);
+  }
+
+
   private async initServices(servicesId: string[]) {
     const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
@@ -66,31 +84,37 @@ export default class ServicesManager {
     const definitions: {[index: string]: ServiceDefinition} = await this.system.loadJson(definitionsJsonFile);
 
     for (let serviceId of servicesId) {
-      const serviceInstance: ServiceInstance = await this.instantiateDriver(driverName, definitions[driverName]);
+      const serviceInstance: ServiceInstance = await this.instantiateService(definitions[serviceId]);
 
       this.instances[serviceId] = serviceInstance;
     }
 
-    for (let driverName of driverNames) {
-      const driver: DriverInstance = this.instances.get(driverName);
+    // initialize
+    for (let serviceId of servicesId) {
+      const serviceInstance: ServiceInstance = this.instances[serviceId];
 
-      if (driver.init) await driver.init();
+      if (serviceInstance.init) await serviceInstance.init();
     }
   }
 
-  getService(serviceId: string): Service {
-    const service: Service | undefined = this.instances.get(serviceId);
+  private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
+    const serviceDir = path.join(
+      systemConfig.rootDirs.host,
+      systemConfig.hostDirs.services,
+      serviceDefinition.className
+    );
+    const manifestPath = path.join(serviceDir, systemConfig.fileNames.manifest);
+    const manifest: ServiceManifest = await this.system.loadJson(manifestPath);
+    // TODO: !!!! переделать - наверное просто загружать main.js
+    const mainFilePath = path.resolve(serviceDir, manifest.main);
+    const ServiceClass: ServiceClassType = this.system.require(mainFilePath).default;
+    const props: ServiceProps = {
+      // TODO: driverDefinition тоже имеет props
+      ...serviceDefinition,
+      manifest,
+    };
 
-    if (!service) throw new Error(`Can't find service "${serviceId}"`);
-
-    // TODO: как вернуть тип возвращаемого драйвера???
-
-    return this.instances.get(serviceId);
-  }
-
-  // it needs for test purpose
-  private require(pathToFile: string) {
-    return require(pathToFile);
+    return new ServiceClass(this.system, props);
   }
 
 }
