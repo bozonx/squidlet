@@ -6,26 +6,27 @@ import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverDefinition from './interfaces/DriverDefinition';
-import Drivers from './Drivers';
+import DriverEnv from './DriverEnv';
 import DriverProps from './interfaces/DriverProps';
 import systemConfig from './systemConfig';
 
 
-type DriverClassType = new (drivers: Drivers, props: DriverProps) => DriverInstance;
+type DriverClassType = new (drivers: DriverEnv, props: DriverProps) => DriverInstance;
 
 
 /**
- * Drivers manager
+ * Driver manager
  */
 export default class DriversManager {
   readonly system: System;
-  readonly drivers: Drivers;
+  // TODO: reveiw
+  readonly drivers: DriverEnv;
   // TODO: зачем тут immutable?
   private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
 
   constructor(system: System) {
     this.system = system;
-    this.drivers = new Drivers(this.system);
+    this.drivers = new DriverEnv(this.system);
   }
 
   /**

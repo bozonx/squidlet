@@ -2,7 +2,7 @@ const _last = require('lodash/last');
 import * as EventEmitter from 'events';
 
 import Network from './Network';
-import Drivers from '../app/Drivers';
+import DriverEnv from '../app/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
@@ -18,12 +18,12 @@ type RouterHandler = (error: Error | null, payload?: any) => void;
  */
 export default class Router {
   private readonly network: Network;
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly destinations: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
 
-  constructor(network: Network, drivers: Drivers) {
+  constructor(network: Network, drivers: DriverEnv) {
     this.network = network;
     this.drivers = drivers;
     this.destinations = new Destinations(

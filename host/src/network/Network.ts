@@ -1,5 +1,5 @@
 import Router from './Router';
-import Drivers from '../app/Drivers';
+import DriverEnv from '../app/DriverEnv';
 import HostNetworkConfig from './interfaces/HostNetworkConfig';
 
 
@@ -11,10 +11,10 @@ export default class Network {
   readonly hostId: string;
   readonly config: HostNetworkConfig;
 
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly router: Router;
 
-  constructor(drivers: Drivers, hostId: string, config: HostNetworkConfig) {
+  constructor(drivers: DriverEnv, hostId: string, config: HostNetworkConfig) {
     this.hostId = hostId;
     this.config = config;
     this.drivers = drivers;

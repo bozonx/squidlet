@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import I2cSlaveDev from '../../app/interfaces/dev/I2cSlave.dev';
-import Drivers from '../../app/Drivers';
+import DriverEnv from '../../app/DriverEnv';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverProps from '../../app/interfaces/DriverProps';
@@ -14,12 +14,12 @@ type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cSlaveDriver {
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cSlaveDev: I2cSlaveDev;
 
-  constructor(drivers: Drivers, driverProps: DriverProps, bus: string | number) {
+  constructor(drivers: DriverEnv, driverProps: DriverProps, bus: string | number) {
     this.drivers = drivers;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
@@ -130,7 +130,7 @@ export class I2cSlaveDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: Drivers,
+      drivers: DriverEnv,
       driverProps: DriverProps,
       bus: string | number,
     ): I2cSlaveDriver } = I2cSlaveDriver;

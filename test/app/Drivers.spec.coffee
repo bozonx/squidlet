@@ -1,9 +1,9 @@
 { Map } = require('immutable')
 
-Drivers = require('../../host/src/app/Drivers').default
+DriverEnv = require('../../host/src/app/DriverEnv').default
 
 
-describe.only 'app.Drivers', ->
+describe.only 'app.DriverEnv', ->
   beforeEach ->
     @MyDriver = class
       config: undefined
@@ -21,7 +21,7 @@ describe.only 'app.Drivers', ->
     }
 
     @system = {}
-    @drivers = new Drivers(@system)
+    @drivers = new DriverEnv(@system)
     @drivers.require = sinon.stub().returns(@MyDriver)
 
   it 'init and getDriver', ->

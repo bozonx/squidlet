@@ -1,4 +1,4 @@
-import Drivers from '../../app/Drivers';
+import DriverEnv from '../../app/DriverEnv';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
@@ -40,7 +40,7 @@ export class I2cDataDriver {
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
   constructor(
-    drivers: Drivers,
+    drivers: DriverEnv,
     driverProps: DriverProps,
     i2cDriver: DriverFactoryBase,
     // bus to use
@@ -158,7 +158,7 @@ export class I2cDataDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: Drivers,
+      drivers: DriverEnv,
       driverProps: DriverProps,
       i2cDriver: DriverFactoryBase,
       bus: string

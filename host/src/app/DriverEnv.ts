@@ -4,7 +4,7 @@ import System from './System';
 /**
  * It is singleton which is passed to all the drivers
  */
-export default class Drivers {
+export default class DriverEnv {
   readonly system: System;
 
   constructor(system: System) {

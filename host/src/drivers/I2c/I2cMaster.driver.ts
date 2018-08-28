@@ -6,7 +6,7 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import I2cMasterDev from '../../app/interfaces/dev/I2cMaster.dev';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
-import Drivers from '../../app/Drivers';
+import DriverEnv from '../../app/DriverEnv';
 import Poling from '../../helpers/Poling';
 
 
@@ -17,14 +17,14 @@ type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cMasterDriver {
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cMasterDev: I2cMasterDev;
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
-  constructor(drivers: Drivers, driverProps: DriverProps, bus: string | number) {
+  constructor(drivers: DriverEnv, driverProps: DriverProps, bus: string | number) {
     this.drivers = drivers;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
@@ -204,7 +204,7 @@ export class I2cMasterDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: Drivers,
+      drivers: DriverEnv,
       driverProps: DriverProps,
       bus: string | number,
     ): I2cMasterDriver } = I2cMasterDriver;

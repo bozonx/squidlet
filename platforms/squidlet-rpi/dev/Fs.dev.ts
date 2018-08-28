@@ -5,7 +5,7 @@ import {promises as fsPromises} from 'fs';
 import * as util from 'util';
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
-import Drivers from '../../../host/src/app/Drivers';
+import DriverEnv from '../../../host/src/app/DriverEnv';
 import {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
 
 
@@ -81,7 +81,7 @@ export default class FsDev {
 //
 // export default class Factory extends DriverFactoryBase {
 //   protected DriverClass: { new (
-//       drivers: Drivers,
+//       drivers: DriverEnv,
 //       driverProps: DriverProps,
 //     ): FsDev } = FsDev;
 // }

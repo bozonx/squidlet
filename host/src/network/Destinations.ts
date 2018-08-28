@@ -2,7 +2,7 @@ const _find = require('lodash/find');
 const _capitalize = require('lodash/capitalize');
 import * as EventEmitter from 'events';
 
-import Drivers from '../app/Drivers';
+import DriverEnv from '../app/DriverEnv';
 import Connection from './interfaces/Connection';
 import DriverFactoryBase from '../app/DriverFactoryBase';
 import MyAddress from '../app/interfaces/MyAddress';
@@ -17,7 +17,7 @@ type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Des
  * It initializes connection of this host by type and bus and current address of host.
  */
 export default class Destinations {
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
   private readonly neighbors: {[index: string]: Destination} = {};
@@ -25,7 +25,7 @@ export default class Destinations {
   private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
 
-  constructor(drivers: Drivers, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
+  constructor(drivers: DriverEnv, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
     this.drivers = drivers;
     this.neighbors = neighbors;
     this.myAddresses = myAddresses;

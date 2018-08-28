@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../../app/DriverFactoryBase';
-import Drivers from '../../app/Drivers';
+import DriverEnv from '../../app/DriverEnv';
 import {BinaryLevel} from '../../app/CommonTypes';
 import DriverProps from '../../app/interfaces/DriverProps';
 
@@ -14,11 +14,11 @@ interface GpioOutputDriverProps extends DriverProps {
 
 
 export class GpioOutputDriver {
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly driverProps: GpioOutputDriverProps;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(drivers: Drivers, driverProps: GpioOutputDriverProps) {
+  constructor(drivers: DriverEnv, driverProps: GpioOutputDriverProps) {
     this.drivers = drivers;
     this.driverProps = driverProps;
   }
@@ -50,7 +50,7 @@ export class GpioOutputDriver {
 
 export default class GpioOutputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: Drivers,
+      drivers: DriverEnv,
       driverProps: GpioOutputDriverProps,
     ): GpioOutputDriver } = GpioOutputDriver;
   private instances: {[index: string]: GpioOutputDriver} = {};

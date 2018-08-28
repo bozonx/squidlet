@@ -1,11 +1,11 @@
-import Drivers from '../../app/Drivers';
+import DriverEnv from '../../app/DriverEnv';
 import FsDev, {Stats} from '../../app/interfaces/dev/Fs.dev';
 
 
 export class Storage {
   private fsDev: FsDev;
 
-  constructor(drivers: Drivers) {
+  constructor(drivers: DriverEnv) {
     this.fsDev = drivers.getDev<FsDev>('Fs');
   }
 

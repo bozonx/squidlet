@@ -1,4 +1,4 @@
-import Drivers from '../../app/Drivers';
+import DriverEnv from '../../app/DriverEnv';
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2cData.driver';
@@ -16,7 +16,7 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
  * It packs data to send it via i2c.
  */
 export class I2cConnectionDriver {
-  private readonly drivers: Drivers;
+  private readonly drivers: DriverEnv;
   private readonly driverProps: DriverProps;
   private readonly myAddress: MyAddress;
   private readonly i2cDataDriver: I2cDataDriver;
@@ -24,7 +24,7 @@ export class I2cConnectionDriver {
   private readonly dataMark: number = 0x01;
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
-  constructor(drivers: Drivers, driverProps: DriverProps, myAddress: MyAddress) {
+  constructor(drivers: DriverEnv, driverProps: DriverProps, myAddress: MyAddress) {
     this.drivers = drivers;
     this.driverProps = driverProps;
     this.myAddress = myAddress;
@@ -73,7 +73,7 @@ export class I2cConnectionDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      drivers: Drivers,
+      drivers: DriverEnv,
       driverProps: DriverProps,
       myAddress: MyAddress,
     ): I2cConnectionDriver } = I2cConnectionDriver;
