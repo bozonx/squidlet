@@ -53,6 +53,7 @@ export default class ServicesManager {
     await this.initServices(regularServicesList);
   }
 
+
   private async initServices(servicesId: string[]) {
     const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
@@ -67,13 +68,17 @@ export default class ServicesManager {
       this.instances[serviceId] = serviceInstance;
     }
 
-    // initialize
+    await this.initializeAll(servicesId);
+  }
+
+  private async initializeAll(servicesId: string[]) {
     for (let serviceId of servicesId) {
       const serviceInstance: ServiceInstance = this.instances[serviceId];
 
       if (serviceInstance.init) await serviceInstance.init();
     }
   }
+
 
   private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
     const serviceDir = path.join(

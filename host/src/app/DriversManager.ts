@@ -114,7 +114,10 @@ export default class DriversManager {
       this.instances = this.instances.set(driverName, driverInstance);
     }
 
-    // initialize
+    await this.initializeAll(driverNames);
+  }
+
+  private async initializeAll(driverNames: string[]) {
     for (let driverName of driverNames) {
       const driver: DriverInstance = this.instances.get(driverName);
 

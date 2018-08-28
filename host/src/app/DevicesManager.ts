@@ -52,12 +52,7 @@ export default class DevicesManager {
       }
     }
 
-    // initialize
-    for (let driverId of Object.keys(this.instances)) {
-      const device: DeviceInstance = this.instances[driverId];
-
-      await device.init();
-    }
+    await this.initializeAll();
   }
 
   /**
@@ -72,6 +67,14 @@ export default class DevicesManager {
     return device as T;
   }
 
+
+  private async initializeAll() {
+    for (let driverId of Object.keys(this.instances)) {
+      const device: DeviceInstance = this.instances[driverId];
+
+      await device.init();
+    }
+  }
 
   private groupDevicesDefinitionsByClass(
     definitions: DeviceDefinition[]
