@@ -6,9 +6,10 @@ import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import DeviceProps from './interfaces/DeviceProps';
 import systemConfig from './systemConfig';
+import Env from './Env';
 
 
-type DeviceClassType = new (system: System, props: DeviceProps) => DeviceInstance;
+type DeviceClassType = new (env: Env, props: DeviceProps) => DeviceInstance;
 
 
 /**
@@ -106,7 +107,7 @@ export default class DevicesManager {
     const mainFilePath = path.resolve(deviceDir, manifest.main);
     const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;
 
-    return new DeviceClass(this.system, props);
+    return new DeviceClass(this.system.env, props);
   }
 
   destroy() {

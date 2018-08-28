@@ -11,9 +11,11 @@ import * as defaultLogger from './defaultLogger';
 import FsDev from './interfaces/dev/Fs.dev';
 import initializationConfig from './initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
+import Env from './Env';
 
 
 export default class System {
+  readonly env: Env;
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
@@ -30,6 +32,7 @@ export default class System {
   }
 
   constructor() {
+    this.env = new Env(this);
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.log = defaultLogger;

@@ -6,9 +6,10 @@ import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
 import ServiceProps from './interfaces/ServiceProps';
 import systemConfig from './systemConfig';
+import Env from './Env';
 
 
-type ServiceClassType = new (system: System, props: ServiceProps) => ServiceInstance;
+type ServiceClassType = new (env: Env, props: ServiceProps) => ServiceInstance;
 
 
 export default class ServicesManager {
@@ -91,7 +92,7 @@ export default class ServicesManager {
       manifest,
     };
 
-    return new ServiceClass(this.system, props);
+    return new ServiceClass(this.system.env, props);
   }
 
 }
