@@ -15,6 +15,7 @@ export default class DeviceBase {
   readonly getConfig?: Config['read'];
   readonly setConfig?: Config['write'];
   protected readonly system: System;
+  // TODO: или это props ???
   protected readonly deviceConf: DeviceDefinition;
 
   // better place to do initial requests

@@ -142,7 +142,13 @@ export default class Manifests {
   }
 
   private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
-    const finalManifest: FinalManifest = _omit(preManifest, 'files', 'drivers');
+    const finalManifest: FinalManifest = _omit(
+      preManifest,
+      'files',
+      'drivers',
+      'props',
+      'main',
+    );
 
 
     // TODO: merge props with config defaults

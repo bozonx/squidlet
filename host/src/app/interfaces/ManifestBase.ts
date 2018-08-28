@@ -1,12 +1,8 @@
 // parsed manifest of device
 export default interface ManifestBase {
 
-  // TODO: поидее все это можно убрать
+  // TODO: поидее name можно убрать ???
 
-  // unique name
+  // unique name. Usually it is ClassName of main class
   name: string;
-  // // path to device main file
-  // main: string;
-  // // properties of instance
-  // props: {[index: string]: any};
 }

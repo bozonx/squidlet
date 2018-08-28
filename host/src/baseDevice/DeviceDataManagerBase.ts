@@ -1,4 +1,4 @@
-import * as EventEmitter from 'events';
+import * as EventEmitter from 'eventemitter3';
 
 import System from '../app/System';
 import Republish from './Republish';
