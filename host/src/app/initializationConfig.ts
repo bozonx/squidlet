@@ -28,7 +28,7 @@ export default function initializationConfig () {
       devicesDefinitions: 'devicesDefinitions.json',
       // definitions of drivers like {driverName: DriverDefinition}
       driversDefinitions: 'driversDefinitions.json',
-      // definitions of services like ServiceDefinition[]
+      // definitions of services like {serviceId: ServiceDefinition}
       servicesDefinitions: 'servicesDefinitions.json',
     },
   };

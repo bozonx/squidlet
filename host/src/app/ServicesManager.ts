@@ -55,12 +55,7 @@ export default class ServicesManager {
 
 
   private async initServices(servicesId: string[]) {
-    const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.config,
-      this.system.initCfg.fileNames.servicesDefinitions
-    );
-    const definitions: {[index: string]: ServiceDefinition} = await this.system.loadJson(definitionsJsonFile);
+    const definitions: {[index: string]: ServiceDefinition} = await this.loadDefinitions();
 
     for (let serviceId of servicesId) {
       const serviceInstance: ServiceInstance = await this.instantiateService(definitions[serviceId]);
@@ -79,6 +74,15 @@ export default class ServicesManager {
     }
   }
 
+  private async loadDefinitions(): Promise<{[index: string]: ServiceDefinition}> {
+    const definitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.servicesDefinitions
+    );
+
+    return await this.system.loadJson(definitionsJsonFile);
+  }
 
   private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
     const serviceDir = path.join(
