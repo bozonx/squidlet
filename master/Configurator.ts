@@ -54,7 +54,7 @@ export default class Configurator {
     await this.hostsFilesWriter.writeToStorage();
   }
 
-  private async registering() {
+  private async registering(): Promise<void> {
     // register system plugin which registering system devices, drivers and services
     this.register.addPlugin(systemPlugin);
 
