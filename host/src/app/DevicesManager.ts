@@ -8,6 +8,10 @@ import DeviceFactory from './DeviceFactory';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import systemConfig from './systemConfig';
+import DriverInstance from './interfaces/DriverInstance';
+
+
+type DeviceClassType = new (system: System, deviceProps: DeviceProps) => DeviceInstance;
 
 
 /**
@@ -34,6 +38,7 @@ export default class DevicesManager {
       systemConfig.fileNames.devicesDefinitions
     );
     const definitions: DeviceDefinition[] = await this.system.loadJson(definitionsJsonFile);
+    // it's need to load one manifest file for group of devices which are used it
     const groupedByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 
     for (let className of Object.keys(groupedByManifests)) {
@@ -45,10 +50,17 @@ export default class DevicesManager {
       );
       const manifest: DeviceManifest = await this.system.loadJson(manifestPath);
 
-      // each definition of menifest
+      // each definition of manifest
       for (let definition of groupedByManifests[className]) {
         this.instances[definition.id] = await this.instantiateDevice(definition, manifest);
       }
+    }
+
+    // initialize
+    for (let driverId of Object.keys(this.instances)) {
+      const device: DeviceInstance = this.instances[driverId];
+
+      await device.init();
     }
   }
 
@@ -59,19 +71,6 @@ export default class DevicesManager {
     return this.instances[deviceId];
   }
 
-
-  private async instantiateDevice (
-    definition: DeviceDefinition,
-    manifest: DeviceManifest
-  ): Promise<DeviceInstance> {
-    const props: DeviceProps = {
-      // TODO: definition тоже имеет props
-      ...definition,
-      manifest,
-    };
-
-    return await this.deviceFactory.create(props);
-  }
 
   private groupDevicesDefinitionsByClass(
     definitions: DeviceDefinition[]
@@ -88,6 +87,24 @@ export default class DevicesManager {
 
     return result;
   }
+
+  private async instantiateDevice (
+    definition: DeviceDefinition,
+    manifest: DeviceManifest
+  ): Promise<DeviceInstance> {
+    const props: DeviceProps = {
+      // TODO: definition тоже имеет props
+      ...definition,
+      manifest,
+    };
+    const deviceDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.devices, definition.id);
+    // TODO: !!!! переделать - наверное просто загружать main.js
+    const mainFilePath = path.resolve(deviceDir, manifest.main);
+    const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;;
+
+    return await this.deviceFactory.create(props);
+  }
+
 
   // /**
   //  * Prepare config for device instantiating.

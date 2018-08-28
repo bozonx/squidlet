@@ -62,27 +62,7 @@ export default class DeviceFactory {
 
     // TODO: check connection
 
-    // const recursive = (container, curPath) => {
-    //   _.each(container, (item, name) => {
-    //     const itemPath = _.trimStart(`${curPath}.${name}`, '.');
-    //
-    //     if (_.isString(item)) {
-    //       // TODO: validate type
-    //     }
-    //     else if (_.isPlainObject(item) && item.type) {
-    //       // TODO: validate type
-    //     }
-    //     else if (_.isPlainObject(item)) {
-    //       recursive(item, itemPath);
-    //     }
-    //     else {
-    //       throw new Error(`Can't parse schema of device ${deviceName}`);
-    //     }
-    //   });
-    //
-    // };
-    //
-    // recursive(schema.params, '');
+
   }
 
   // it needs for test purpose

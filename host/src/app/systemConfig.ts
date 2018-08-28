@@ -13,6 +13,7 @@ export default {
   // dirs of host dir
   hostDirs: {
     config: 'config',
+    // there is devices are placed by deviceId
     devices: 'devices',
     drivers: 'drivers',
     services: 'services',

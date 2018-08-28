@@ -21,6 +21,7 @@ type DriverClassType = new (drivers: Drivers, driverProps: DriverProps) => Drive
 export default class DriversManager {
   readonly system: System;
   readonly drivers: Drivers;
+  // TODO: зачем тут immutable?
   private instances: Map<string, DriverInstance> = Map<string, DriverInstance>();
 
   constructor(system: System) {
