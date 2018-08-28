@@ -1,4 +1,4 @@
-import * as EventEmitter from 'Events';
+import * as EventEmitter from 'eventemitter3';
 
 import { generateEventName } from '../helpers/helpers';
 

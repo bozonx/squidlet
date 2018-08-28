@@ -1,11 +1,8 @@
-import * as path from 'path';
-
 import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import DeviceProps from './interfaces/DeviceProps';
-import systemConfig from './systemConfig';
 import Env from './Env';
 
 
