@@ -5,7 +5,7 @@ import Messenger from '../messenger/Messenger';
 import DevicesManager from './DevicesManager';
 import Devices from './Devices';
 import DriversManager from './DriversManager';
-import Services from './Services';
+import ServicesManager from './ServicesManager';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import FsDev from './interfaces/dev/Fs.dev';
@@ -17,7 +17,7 @@ export default class System {
   readonly host: Host;
   readonly driversManager: DriversManager;
   readonly network: Network;
-  readonly services: Services;
+  readonly servicesManager: ServicesManager;
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
@@ -29,37 +29,29 @@ export default class System {
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
     this.network = new Network(this.driversManager.drivers, this.host.id, this.host.networkConfig);
-    this.services = new Services(this);
+    this.servicesManager = new ServicesManager(this);
     this.messenger = new Messenger(this);
     this.devicesManager = new DevicesManager(this);
     this.devices = new Devices(this);
   }
 
   async start() {
+    // runtime config
     await this.host.$loadConfig();
-    await this.driversManager.$initSystemDrivers();
+    await this.driversManager.initSystemDrivers();
+    this.riseEvent('system.systemDriversInitialized');
 
-    // TODO: потом поднять событие что драйверы инициализировались
+    this.network.init();
+    this.riseEvent('system.networkInitialized');
 
-    await this.initNetwork();
-    await this.initMessenger();
-    await this.initSystemServices();
-    await this.initApp();
-  }
-
-  async initNetwork(): Promise<void> {
-    // TODO: add
-  }
-
-  async initMessenger(): Promise<void> {
     this.messenger.init();
-  }
+    this.riseEvent('system.messengerInitialized');
 
-  async initSystemServices(): Promise<void> {
-    // TODO: init master network configurator
-    // TODO: init master updater
-    // TODO: init master configurator
-    // TODO: после загрузки новой версии или конфига - перезагружаться
+    await this.servicesManager.initSystemServices();
+    this.riseEvent('system.systemServicesInitialized');
+
+    await this.initApp();
+    this.riseEvent('system.appInitialized');
   }
 
   /**
@@ -67,10 +59,10 @@ export default class System {
    * @return {Promise<void>}
    */
   async initApp(): Promise<void> {
-    await this.driversManager.$initRegularDrivers();
+    await this.driversManager.initRegularDrivers();
     await this.devicesManager.init();
     this.devices.init();
-    await this.services.init();
+    await this.servicesManager.initRegularServices();
   }
 
 
@@ -90,6 +82,10 @@ export default class System {
     const systemDriversListString = await fs.readFile(filePath);
 
     return JSON.stringify(systemDriversListString);
+  }
+
+  private riseEvent(eventName: string) {
+    // TODO: это общие события или чисто для System?
   }
 
 }

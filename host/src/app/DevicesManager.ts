@@ -5,6 +5,7 @@ import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import systemConfig from './systemConfig';
+import DeviceProps from './interfaces/DeviceProps';
 
 
 type DeviceClassType = new (system: System, deviceProps: DeviceProps) => DeviceInstance;

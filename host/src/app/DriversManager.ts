@@ -6,7 +6,6 @@ import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverDefinition from './interfaces/DriverDefinition';
-import FsDev from './interfaces/dev/Fs.dev';
 import Drivers from './Drivers';
 import systemConfig from './systemConfig';
 import DriverProps from './interfaces/DriverProps';
@@ -50,7 +49,7 @@ export default class DriversManager {
   }
 
 
-  async $initSystemDrivers(): Promise<void> {
+  async initSystemDrivers(): Promise<void> {
     const systemDriversJsonFile = path.join(
       systemConfig.rootDirs.host,
       systemConfig.hostDirs.config,
@@ -61,7 +60,7 @@ export default class DriversManager {
     await this.initDrivers(systemDriversList);
   }
 
-  async $initRegularDrivers(): Promise<void> {
+  async initRegularDrivers(): Promise<void> {
     const regularDriversJsonFile = path.join(
       systemConfig.rootDirs.host,
       systemConfig.hostDirs.config,

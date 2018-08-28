@@ -5,7 +5,7 @@ import {Map} from 'immutable';
 import Service from './interfaces/Service';
 
 
-export default class Services {
+export default class ServicesManager {
   private readonly system: System;
   private instances: Map<string, Service> = Map<string, Service>();
 
@@ -33,6 +33,17 @@ export default class Services {
 
       await service.init();
     }));
+  }
+
+  async initSystemServices() {
+    // TODO: init master network configurator
+    // TODO: init master updater
+    // TODO: init master configurator
+    // TODO: после загрузки новой версии или конфига - перезагружаться
+  }
+
+  async initRegularServices() {
+
   }
 
   getService(serviceId: string): Service {
