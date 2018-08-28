@@ -1,6 +1,5 @@
 const _capitalize = require('lodash/capitalize');
 
-import { Map } from 'immutable';
 import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';

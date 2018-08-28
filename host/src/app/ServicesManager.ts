@@ -1,13 +1,9 @@
-import * as path from 'path';
-
 import System from './System';
 import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
 import ServiceProps from './interfaces/ServiceProps';
-import systemConfig from './systemConfig';
 import Env from './Env';
-import DriverManifest from './interfaces/DriverManifest';
 
 
 type ServiceClassType = new (env: Env, props: ServiceProps) => ServiceInstance;

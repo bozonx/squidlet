@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
@@ -12,10 +14,7 @@ import FsDev from './interfaces/dev/Fs.dev';
 import initializationConfig from './initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import Env from './Env';
-import DriverDefinition from './interfaces/DriverDefinition';
-import * as path from "path";
 import systemConfig from './systemConfig';
-import DeviceManifest from './interfaces/DeviceManifest';
 
 
 export default class System {
