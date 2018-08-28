@@ -11,6 +11,7 @@ import Plugin from './interfaces/Plugin';
 import Manager from './Manager';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
+import {ManifestsTypeName, ManifestsTypePluralName} from './Manifests';
 
 
 /**
@@ -20,11 +21,11 @@ export default class Register {
   private readonly main: Main;
   private readonly plugins: Plugin[] = [];
   // devices manifest by manifest name
-  private readonly devicesManifests: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
+  private readonly devices: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
   // drivers manifest by manifest name
-  private readonly driversManifests: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
+  private readonly drivers: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
   // services manifest by manifest name
-  private readonly servicesManifests: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
+  private readonly services: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
   private registeringPromises: Promise<any>[] = [];
 
 
@@ -36,15 +37,15 @@ export default class Register {
   // TODO: если использовать массив - зачем тогда immutable ?
 
   getDevicesPreManifests(): PreDeviceManifest[] {
-    return _map(this.devicesManifests.toJS());
+    return _map(this.devices.toJS());
   }
 
   getDriversPreManifests(): PreDriverManifest[] {
-    return _map(this.driversManifests.toJS());
+    return _map(this.drivers.toJS());
   }
 
   getServicesPreManifests(): PreServiceManifest[] {
-    return _map(this.servicesManifests.toJS());
+    return _map(this.services.toJS());
   }
 
   getRegisteringPromises(): Promise<any>[] {
@@ -83,11 +84,44 @@ export default class Register {
       throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
     }
 
-    if (this.devicesManifests.get(parsedManifest.name)) {
+    if (this.devices.get(parsedManifest.name)) {
       throw new Error(`Device "${parsedManifest.name}" has been already registered!`);
     }
 
-    this.devicesManifests.set(parsedManifest.name, parsedManifest);
+    this.devices.set(parsedManifest.name, parsedManifest);
+  }
+  
+  private async addEntity<T extends PreManifestBase>(manifestType: ManifestsTypeName, manifest: string | T) {
+    const resolvePromise: Promise<T> = this.resolveManifest<T>(manifest);
+
+    this.registeringPromises.push(resolvePromise);
+
+    const parsedManifest: T = await resolvePromise;
+    const validateError: string | undefined = this.validate(manifestType, parsedManifest);
+
+    if (validateError) {
+      throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
+    }
+
+    const plural: ManifestsTypePluralName = `${manifestType}s` as ManifestsTypePluralName;
+    const manifestsOfType = this[plural] as Map<string, T>;
+
+    if (manifestsOfType.get(parsedManifest.name)) {
+      throw new Error(`The same ${manifestType} "${parsedManifest.name}" has been already registered!`);
+    }
+
+    manifestsOfType.set(parsedManifest.name, parsedManifest);
+  }
+
+  private validate(manifestType: ManifestsTypeName, manifest: {[index: string]: any}): string | undefined {
+    switch (manifestType) {
+      case 'device':
+        return validateDeviceManifest(manifest);
+      case 'driver':
+        return validateDriverManifest(manifest);
+      case 'service':
+        return validateServiceManifest(manifest);
+    }
   }
 
   async addDriver(manifest: string | PreDriverManifest) {
@@ -102,11 +136,11 @@ export default class Register {
       throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
     }
 
-    if (this.driversManifests.get(parsedManifest.name)) {
+    if (this.drivers.get(parsedManifest.name)) {
       throw new Error(`Driver "${parsedManifest.name}" has been already registered!`);
     }
 
-    this.driversManifests.set(parsedManifest.name, parsedManifest);
+    this.drivers.set(parsedManifest.name, parsedManifest);
  }
 
   /**
@@ -125,11 +159,11 @@ export default class Register {
       throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
     }
 
-    if (this.servicesManifests.get(parsedManifest.name)) {
+    if (this.services.get(parsedManifest.name)) {
       throw new Error(`Service "${parsedManifest.name}" has been already registered!`);
     }
 
-    this.servicesManifests.set(parsedManifest.name, parsedManifest);
+    this.services.set(parsedManifest.name, parsedManifest);
   }
 
   async initPlugins(manager: Manager) {

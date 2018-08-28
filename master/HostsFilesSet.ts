@@ -86,11 +86,11 @@ export default class HostsFilesSet {
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
-    function addDeps(type: ManifestsTypePluralName, classNames: string[]) {
+    function addDeps(pluralType: ManifestsTypePluralName, classNames: string[]) {
       for (let className of classNames) {
-        if (!dependencies[type][className]) return;
+        if (!dependencies[pluralType][className]) return;
 
-        dependencies[type][className]
+        dependencies[pluralType][className]
           .forEach((depDriverName: string) => {
             depsDriversNames[depDriverName] = true;
           });
@@ -117,9 +117,9 @@ export default class HostsFilesSet {
   /**
    * Collect all the used host manifest of devices, drivers or services
    */
-  private collectManifests<T>(manifestType: ManifestsTypePluralName, entityNames: string[]): T[] {
+  private collectManifests<T>(manifestPluralType: ManifestsTypePluralName, entityNames: string[]): T[] {
     const manifests = this.manifests.getManifests() as any;
-    const manifestsOfType: {[index: string]: T} = manifests[manifestType];
+    const manifestsOfType: {[index: string]: T} = manifests[manifestPluralType];
 
     return entityNames.map((usedEntityName: string) => manifestsOfType[usedEntityName]);
   }
@@ -128,10 +128,10 @@ export default class HostsFilesSet {
    * Collect all the used host files of devices, drivers or services
    */
   private collectFiles(
-    manifestType: ManifestsTypePluralName,
+    manifestPluralType: ManifestsTypePluralName,
     entityNames: string[]
   ): {[index: string]: string[]} {
-    const files = this.manifests.getFiles()[manifestType];
+    const files = this.manifests.getFiles()[manifestPluralType];
     // files paths by entity name
     const result: {[index: string]: string[]} = {};
 

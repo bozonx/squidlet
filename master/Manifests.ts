@@ -13,6 +13,7 @@ import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 
 
+export type ManifestsTypeName = 'device' | 'driver' | 'service';
 export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
 interface FilesPaths {
@@ -99,11 +100,11 @@ export default class Manifests {
 
 
   private async proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
-    manifestType: string,
+    manifestType: ManifestsTypeName,
     preManifest: PreManifest
   ) {
     const finalManifest: FinalManifest = this.prepareManifest(preManifest);
-    const plural: ManifestsTypePluralName = `${manifestType}s` as ManifestsTypePluralName;
+    const plural = `${manifestType}s` as ManifestsTypePluralName;
     const finalManifests = this[plural] as Map<string, FinalManifest>;
 
     // collect files
