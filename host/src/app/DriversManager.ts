@@ -8,6 +8,7 @@ import System from './System';
 import DriverDefinition from './interfaces/DriverDefinition';
 import Drivers from './Drivers';
 import DriverProps from './interfaces/DriverProps';
+import systemConfig from './systemConfig';
 
 
 type DriverClassType = new (drivers: Drivers, props: DriverProps) => DriverInstance;
@@ -50,7 +51,7 @@ export default class DriversManager {
 
   async initSystemDrivers(): Promise<void> {
     const systemDriversJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.systemDrivers
     );
@@ -61,7 +62,7 @@ export default class DriversManager {
 
   async initRegularDrivers(): Promise<void> {
     const regularDriversJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.regularDrivers
     );
@@ -76,7 +77,7 @@ export default class DriversManager {
    */
   async $setDevs(devs: {[index: string]: DriverClassType}) {
     const definitionsJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.driversDefinitions
     );
@@ -100,7 +101,7 @@ export default class DriversManager {
 
   private async initDrivers(driverNames: string[]) {
     const definitionsJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.driversDefinitions
     );
@@ -122,7 +123,7 @@ export default class DriversManager {
 
   private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
     const driverDir = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.drivers,
       driverDefinition.className)
     ;

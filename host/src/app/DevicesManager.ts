@@ -5,6 +5,7 @@ import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
 import DeviceProps from './interfaces/DeviceProps';
+import systemConfig from './systemConfig';
 
 
 type DeviceClassType = new (system: System, props: DeviceProps) => DeviceInstance;
@@ -27,7 +28,7 @@ export default class DevicesManager {
    */
   async init(): Promise<void> {
     const definitionsJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.devicesDefinitions
     );
@@ -37,7 +38,7 @@ export default class DevicesManager {
 
     for (let className of Object.keys(groupedByManifests)) {
       const manifestPath = path.join(
-        this.system.initCfg.rootDirs.host,
+        systemConfig.rootDirs.host,
         this.system.initCfg.hostDirs.devices,
         className,
         this.system.initCfg.fileNames.manifest
@@ -96,7 +97,11 @@ export default class DevicesManager {
       ...definition,
       manifest,
     };
-    const deviceDir = path.join(this.system.initCfg.rootDirs.host, this.system.initCfg.hostDirs.devices, definition.id);
+    const deviceDir = path.join(
+      systemConfig.rootDirs.host,
+      this.system.initCfg.hostDirs.devices,
+      definition.id
+    );
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(deviceDir, manifest.main);
     const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;

@@ -5,6 +5,7 @@ import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
 import ServiceProps from './interfaces/ServiceProps';
+import systemConfig from './systemConfig';
 
 
 type ServiceClassType = new (system: System, props: ServiceProps) => ServiceInstance;
@@ -29,7 +30,7 @@ export default class ServicesManager {
 
   async initSystemServices() {
     const systemServicesJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.systemServices
     );
@@ -42,7 +43,7 @@ export default class ServicesManager {
 
   async initRegularServices() {
     const regularServicesJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.regularServices
     );
@@ -53,7 +54,7 @@ export default class ServicesManager {
 
   private async initServices(servicesId: string[]) {
     const definitionsJsonFile = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.config,
       this.system.initCfg.fileNames.servicesDefinitions
     );
@@ -75,7 +76,7 @@ export default class ServicesManager {
 
   private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
     const serviceDir = path.join(
-      this.system.initCfg.rootDirs.host,
+      systemConfig.rootDirs.host,
       this.system.initCfg.hostDirs.services,
       serviceDefinition.className
     );
