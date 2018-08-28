@@ -4,7 +4,6 @@ import System from './System';
 import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
-import systemConfig from './systemConfig';
 import ServiceProps from './interfaces/ServiceProps';
 
 
@@ -30,9 +29,9 @@ export default class ServicesManager {
 
   async initSystemServices() {
     const systemServicesJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.systemServices
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.systemServices
     );
     const systemServicesList: string[] = await this.system.loadJson(systemServicesJsonFile);
 
@@ -43,9 +42,9 @@ export default class ServicesManager {
 
   async initRegularServices() {
     const regularServicesJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.regularServices
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.regularServices
     );
     const regularServicesList: string[] = await this.system.loadJson(regularServicesJsonFile);
 
@@ -54,9 +53,9 @@ export default class ServicesManager {
 
   private async initServices(servicesId: string[]) {
     const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.servicesDefinitions
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.servicesDefinitions
     );
     const definitions: {[index: string]: ServiceDefinition} = await this.system.loadJson(definitionsJsonFile);
 
@@ -76,11 +75,11 @@ export default class ServicesManager {
 
   private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
     const serviceDir = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.services,
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.services,
       serviceDefinition.className
     );
-    const manifestPath = path.join(serviceDir, systemConfig.fileNames.manifest);
+    const manifestPath = path.join(serviceDir, this.system.initCfg.fileNames.manifest);
     const manifest: ServiceManifest = await this.system.loadJson(manifestPath);
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(serviceDir, manifest.main);

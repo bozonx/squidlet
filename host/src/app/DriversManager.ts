@@ -7,7 +7,6 @@ import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverDefinition from './interfaces/DriverDefinition';
 import Drivers from './Drivers';
-import systemConfig from './systemConfig';
 import DriverProps from './interfaces/DriverProps';
 
 
@@ -51,9 +50,9 @@ export default class DriversManager {
 
   async initSystemDrivers(): Promise<void> {
     const systemDriversJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.systemDrivers
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.systemDrivers
     );
     const systemDriversList: string[] = await this.system.loadJson(systemDriversJsonFile);
 
@@ -62,9 +61,9 @@ export default class DriversManager {
 
   async initRegularDrivers(): Promise<void> {
     const regularDriversJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.regularDrivers
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.regularDrivers
     );
     const regularDriversList: string[] = await this.system.loadJson(regularDriversJsonFile);
 
@@ -77,9 +76,9 @@ export default class DriversManager {
    */
   async $setDevs(devs: {[index: string]: DriverClassType}) {
     const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.driversDefinitions
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.driversDefinitions
     );
     const definitions: {[index: string]: DriverDefinition} = await this.system.loadJson(definitionsJsonFile);
 
@@ -101,9 +100,9 @@ export default class DriversManager {
 
   private async initDrivers(driverNames: string[]) {
     const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.driversDefinitions
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.driversDefinitions
     );
     const definitions: {[index: string]: DriverDefinition} = await this.system.loadJson(definitionsJsonFile);
 
@@ -123,11 +122,11 @@ export default class DriversManager {
 
   private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
     const driverDir = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.drivers,
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.drivers,
       driverDefinition.className)
     ;
-    const manifestPath = path.join(driverDir, systemConfig.fileNames.manifest);
+    const manifestPath = path.join(driverDir, this.system.initCfg.fileNames.manifest);
     const manifest: DriverManifest = await this.system.loadJson(manifestPath);
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(driverDir, manifest.main);

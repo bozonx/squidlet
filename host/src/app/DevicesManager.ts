@@ -4,9 +4,7 @@ import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
-import systemConfig from './systemConfig';
 import DeviceProps from './interfaces/DeviceProps';
-import ServiceInstance from './interfaces/ServiceInstance';
 
 
 type DeviceClassType = new (system: System, props: DeviceProps) => DeviceInstance;
@@ -29,9 +27,9 @@ export default class DevicesManager {
    */
   async init(): Promise<void> {
     const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      systemConfig.hostDirs.config,
-      systemConfig.fileNames.devicesDefinitions
+      this.system.initCfg.rootDirs.host,
+      this.system.initCfg.hostDirs.config,
+      this.system.initCfg.fileNames.devicesDefinitions
     );
     const definitions: DeviceDefinition[] = await this.system.loadJson(definitionsJsonFile);
     // it's need to load one manifest file for group of devices which are used it
@@ -39,10 +37,10 @@ export default class DevicesManager {
 
     for (let className of Object.keys(groupedByManifests)) {
       const manifestPath = path.join(
-        systemConfig.rootDirs.host,
-        systemConfig.hostDirs.devices,
+        this.system.initCfg.rootDirs.host,
+        this.system.initCfg.hostDirs.devices,
         className,
-        systemConfig.fileNames.manifest
+        this.system.initCfg.fileNames.manifest
       );
       const manifest: DeviceManifest = await this.system.loadJson(manifestPath);
 
@@ -98,7 +96,7 @@ export default class DevicesManager {
       ...definition,
       manifest,
     };
-    const deviceDir = path.join(systemConfig.rootDirs.host, systemConfig.hostDirs.devices, definition.id);
+    const deviceDir = path.join(this.system.initCfg.rootDirs.host, this.system.initCfg.hostDirs.devices, definition.id);
     // TODO: !!!! переделать - наверное просто загружать main.js
     const mainFilePath = path.resolve(deviceDir, manifest.main);
     const DeviceClass: DeviceClassType = this.system.require(mainFilePath).default;
