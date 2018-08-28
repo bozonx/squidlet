@@ -30,12 +30,9 @@ export default class ServicesManager {
   }
 
   async initSystemServices() {
-    const systemServicesJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.config,
+    const systemServicesList = await this.system.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
     );
-    const systemServicesList: string[] = await this.system.loadJson(systemServicesJsonFile);
 
     await this.initServices(systemServicesList);
 
@@ -43,19 +40,18 @@ export default class ServicesManager {
   }
 
   async initRegularServices() {
-    const regularServicesJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.config,
+    const regularServicesList = await this.system.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularServices
     );
-    const regularServicesList: string[] = await this.system.loadJson(regularServicesJsonFile);
 
     await this.initServices(regularServicesList);
   }
 
 
   private async initServices(servicesId: string[]) {
-    const definitions: {[index: string]: ServiceDefinition} = await this.loadDefinitions();
+    const definitions = await this.system.loadConfig<{[index: string]: ServiceDefinition}>(
+      this.system.initCfg.fileNames.servicesDefinitions
+    );
 
     for (let serviceId of servicesId) {
       const serviceInstance: ServiceInstance = await this.instantiateService(definitions[serviceId]);
@@ -72,16 +68,6 @@ export default class ServicesManager {
 
       if (serviceInstance.init) await serviceInstance.init();
     }
-  }
-
-  private async loadDefinitions(): Promise<{[index: string]: ServiceDefinition}> {
-    const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.config,
-      this.system.initCfg.fileNames.servicesDefinitions
-    );
-
-    return await this.system.loadJson(definitionsJsonFile);
   }
 
   private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {

@@ -28,12 +28,10 @@ export default class DevicesManager {
    * Initialize all the devices on current host specified by its definitions in config
    */
   async init(): Promise<void> {
-    const definitionsJsonFile = path.join(
-      systemConfig.rootDirs.host,
-      this.system.initCfg.hostDirs.config,
+    const definitions = await this.system.loadConfig<DeviceDefinition[]>(
       this.system.initCfg.fileNames.devicesDefinitions
     );
-    const definitions: DeviceDefinition[] = await this.system.loadJson(definitionsJsonFile);
+
     // it's need to load one manifest file for group of devices which are used it
     const groupedByManifests: {[index: string]: DeviceDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 

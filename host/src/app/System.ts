@@ -12,6 +12,9 @@ import FsDev from './interfaces/dev/Fs.dev';
 import initializationConfig from './initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import Env from './Env';
+import DriverDefinition from './interfaces/DriverDefinition';
+import * as path from "path";
+import systemConfig from './systemConfig';
 
 
 export default class System {
@@ -96,6 +99,16 @@ export default class System {
     const systemDriversListString = await fs.readFile(filePath);
 
     return JSON.stringify(systemDriversListString);
+  }
+
+  async loadConfig<T>(configFileName: string): Promise<T> {
+    const definitionsJsonFile = path.join(
+      systemConfig.rootDirs.host,
+      this.initCfg.hostDirs.config,
+      configFileName
+    );
+
+    return await this.loadJson(definitionsJsonFile);
   }
 
   private riseEvent(eventName: string) {
