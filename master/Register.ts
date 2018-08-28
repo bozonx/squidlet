@@ -72,25 +72,37 @@ export default class Register {
     }
   }
 
+  /**
+   * Add new device to the system.
+   * @param manifest - it can be path to manifest yaml file or js plain object
+   */
   async addDevice(manifest: string | PreDeviceManifest) {
-    const resolvePromise: Promise<PreDeviceManifest> = this.resolveManifest<PreDeviceManifest>(manifest);
-
-    this.registeringPromises.push(resolvePromise);
-
-    const parsedManifest: PreDeviceManifest = await resolvePromise;
-    const validateError: string | undefined = validateDeviceManifest(parsedManifest);
-
-    if (validateError) {
-      throw new Error(`Invalid manifest of device: ${parsedManifest.name}: ${validateError}`);
-    }
-
-    if (this.devices.get(parsedManifest.name)) {
-      throw new Error(`Device "${parsedManifest.name}" has been already registered!`);
-    }
-
-    this.devices.set(parsedManifest.name, parsedManifest);
+    return this.addEntity<PreDeviceManifest>('device', manifest);
   }
-  
+
+  /**
+   * Add new driver to the system.
+   * @param manifest - it can be path to manifest yaml file or js plain object
+   */
+  async addDriver(manifest: string | PreDriverManifest) {
+    return this.addEntity<PreDriverManifest>('driver', manifest);
+ }
+
+  /**
+   * Add new service to the system.
+   * @param manifest - it can be path to manifest yaml file or js plain object
+   */
+  async addService(manifest: string | PreServiceManifest) {
+    return this.addEntity<PreServiceManifest>('service', manifest);
+  }
+
+  async initPlugins(manager: Manager) {
+    for (let plugin of this.plugins) {
+      await plugin(manager);
+    }
+  }
+
+
   private async addEntity<T extends PreManifestBase>(manifestType: ManifestsTypeName, manifest: string | T) {
     const resolvePromise: Promise<T> = this.resolveManifest<T>(manifest);
 
@@ -103,8 +115,8 @@ export default class Register {
       throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
     }
 
-    const plural: ManifestsTypePluralName = `${manifestType}s` as ManifestsTypePluralName;
-    const manifestsOfType = this[plural] as Map<string, T>;
+    const pluralManifestType = `${manifestType}s` as ManifestsTypePluralName;
+    const manifestsOfType = this[pluralManifestType] as Map<string, T>;
 
     if (manifestsOfType.get(parsedManifest.name)) {
       throw new Error(`The same ${manifestType} "${parsedManifest.name}" has been already registered!`);
@@ -123,55 +135,6 @@ export default class Register {
         return validateServiceManifest(manifest);
     }
   }
-
-  async addDriver(manifest: string | PreDriverManifest) {
-    const resolvePromise: Promise<PreDriverManifest> = this.resolveManifest<PreDriverManifest>(manifest);
-
-    this.registeringPromises.push(resolvePromise);
-
-    const parsedManifest: PreDriverManifest = await resolvePromise;
-    const validateError: string | undefined = validateDriverManifest(parsedManifest);
-
-    if (validateError) {
-      throw new Error(`Invalid manifest of driver: ${parsedManifest.name}: ${validateError}`);
-    }
-
-    if (this.drivers.get(parsedManifest.name)) {
-      throw new Error(`Driver "${parsedManifest.name}" has been already registered!`);
-    }
-
-    this.drivers.set(parsedManifest.name, parsedManifest);
- }
-
-  /**
-   * Add new service to the system.
-   * @param manifest - it can be path to manifest yaml file or js plain object
-   */
-  async addService(manifest: string | PreServiceManifest) {
-    const resolvePromise: Promise<PreServiceManifest> = this.resolveManifest<PreServiceManifest>(manifest);
-
-    this.registeringPromises.push(resolvePromise);
-
-    const parsedManifest: PreServiceManifest = await resolvePromise;
-    const validateError: string | undefined = validateServiceManifest(parsedManifest);
-
-    if (validateError) {
-      throw new Error(`Invalid manifest of service: ${parsedManifest.name}: ${validateError}`);
-    }
-
-    if (this.services.get(parsedManifest.name)) {
-      throw new Error(`Service "${parsedManifest.name}" has been already registered!`);
-    }
-
-    this.services.set(parsedManifest.name, parsedManifest);
-  }
-
-  async initPlugins(manager: Manager) {
-    for (let plugin of this.plugins) {
-      await plugin(manager);
-    }
-  }
-
 
   private async resolveManifest<T extends PreManifestBase>(manifest: string | T): Promise<T> {
     let parsedManifest: T;
