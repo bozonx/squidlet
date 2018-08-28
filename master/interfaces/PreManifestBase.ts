@@ -1,8 +1,8 @@
 // parsed manifest of device
 export default interface PreManifestBase {
-  // TODO: зачем ????
-  // // directory where manifest places. It is set on master configure time
-  // baseDir: string;
+  // directory where manifest places. It is base dir for "main" and "files" params.
+  // You have to set it if you register manifest as an object
+  baseDir?: string;
   // unique name. Usually it is ClassName of main class
   name: string;
   // path to device main file
