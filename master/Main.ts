@@ -9,7 +9,7 @@ import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 
 
-export default class Configurator {
+export default class Main {
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;
   private readonly manifests: Manifests;

@@ -4,7 +4,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import Configurator from './Configurator';
+import Main from './Main';
 import { loadYamlFile } from './IO';
 
 // TODO: add help
@@ -17,7 +17,7 @@ async function init() {
 
   const resolvedPath = path.resolve(yargs.argv.config);
   const configJs = await loadYamlFile(resolvedPath);
-  const configurator = new Configurator(configJs);
+  const configurator = new Main(configJs);
 
   await configurator.start();
 }
