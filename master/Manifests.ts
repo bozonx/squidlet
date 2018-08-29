@@ -142,7 +142,16 @@ export default class Manifests {
   }
 
   private collectFiles(baseDir: string, paths: string[]): string[] {
-    return paths.map((item) => path.resolve(baseDir, item));
+    return paths.map((item) => {
+      if (item.indexOf('/') === 0) {
+        throw new Error(`You must not specify an absolute path of "${item}". Only relative is allowed.`);
+      }
+      else if (item.match(/\.\./)) {
+        throw new Error(`Path "${item}" has to relative to its manifest base dir`);
+      }
+
+      return path.resolve(baseDir, item);
+    });
   }
 
   private collectDependencies<PreManifest extends PreManifestBase>(preManifest: PreManifest): string[] {
