@@ -1,3 +1,5 @@
+import DefinitionBase from '../host/src/app/interfaces/DefinitionBase';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _omit = require('lodash/omit');
 
@@ -78,7 +80,7 @@ export default class HostsConfigGenerator {
     }
   }
 
-  getDevicesDefinitions(hostId: string): DeviceDefinition[] {
+  getDevicesDefinitions(hostId: string): {[index: string]: DeviceDefinition} {
     // TODO: !!!!
   }
 
@@ -202,4 +204,42 @@ export default class HostsConfigGenerator {
     return hosts;
   }
 
+
+  private generateDefinitions<T extends DefinitionBase>(
+    definitions: {[index: string]: T}
+  ): {[index: string]: T} {
+    const result: {[index: string]: T} = {};
+
+    for (let id of Object.keys(definitions)) {
+      const definiton: T = definitions[id];
+
+      result[id] = {
+        ...definiton as object,
+        props: {
+          ...definiton.props,
+          // TODO: manifest props
+        },
+      } as T;
+    }
+
+
+    return result;
+  }
+
 }
+
+
+// private mergeProps(
+//   className: string,
+//   instanceProps: {[index: string]: any},
+// manifestProps?: {[index: string]: any}
+// ): {[index: string]: any} {
+//   return {
+//     // default props from device's manifest
+//     ...manifestProps,
+//     // default props from config.devicesDefaults
+//     ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[className],
+//     // specified props for certain instance
+//     ...instanceProps,
+//   };
+// }

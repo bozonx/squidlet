@@ -1,12 +1,10 @@
-import HostConfig from '../host/src/app/interfaces/HostConfig';
+const _map = require('lodash/map');
+
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
 import Manifests, {Dependencies, ManifestsTypePluralName} from './Manifests';
 import HostsConfigGenerator from './HostsConfigGenerator';
-import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
-import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
-import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import HostFilesSet from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
@@ -68,23 +66,31 @@ export default class HostsFilesSet {
       systemServices,
       regularServices,
 
-      devicesDefinitions: this.hostsConfigGenerator.getDevicesDefinitions(hostId),
+      devicesDefinitions: _map(this.hostsConfigGenerator.getDevicesDefinitions(hostId)),
       driversDefinitions: this.hostsConfigGenerator.getDriversDefinitions(hostId),
       servicesDefinitions: this.hostsConfigGenerator.getServicesDefinitions(hostId),
     };
   }
 
   /**
-   * Generage entities manifest names which are used on host
+   * Generaеe entities manifest names which are used on host
    */
   private generateEntityNames(
     hostId: string
   ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
-    const hostConfig: HostConfig = hostsConfigs[hostId];
+    const devicesDefinitions = this.hostsConfigGenerator.getDevicesDefinitions(hostId);
+    const driversDefinitions = this.hostsConfigGenerator.getDriversDefinitions(hostId);
+    const servicesDefinitions = this.hostsConfigGenerator.getServicesDefinitions(hostId);
 
-    const devicesClasses = hostConfig.devices.map((item: DeviceDefinition) => item.className);
-    const onlyDriversClasses = hostConfig.drivers.map((item: DriverDefinition) => item.className);
-    const servicesClasses = hostConfig.services.map((item: ServiceDefinition) => item.className);
+    // collect manifest names of used entities
+    const devicesClasses = Object.keys(devicesDefinitions)
+      .map((id: string) => devicesDefinitions[id].className);
+    const onlyDriversClasses = Object.keys(driversDefinitions)
+      .map((id: string) => driversDefinitions[id].className);
+    const servicesClasses = Object.keys(servicesDefinitions)
+      .map((id: string) => servicesDefinitions[id].className);
+
+    // collect all the drivers dependencies
     const driversClasses = this.collectDriverNamesWithDependencies(
       devicesClasses,
       onlyDriversClasses,
@@ -110,16 +116,13 @@ export default class HostsFilesSet {
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
-    // TODO: почему бы не взять сразу весь список ????
+    function addDeps(pluralType: ManifestsTypePluralName, names: string[]) {
+      for (let entityName of names) {
+        // do nothing id entity doesn't have a dependencies
+        if (!dependencies[pluralType][entityName]) return;
 
-    function addDeps(pluralType: ManifestsTypePluralName, classNames: string[]) {
-      for (let className of classNames) {
-        if (!dependencies[pluralType][className]) return;
-
-        dependencies[pluralType][className]
-          .forEach((depDriverName: string) => {
-            depsDriversNames[depDriverName] = true;
-          });
+        dependencies[pluralType][entityName]
+          .forEach((depDriverName: string) => depsDriversNames[depDriverName] = true);
       }
     }
 
@@ -133,8 +136,6 @@ export default class HostsFilesSet {
     addDeps('drivers', driversClasses);
     // add deps of services
     addDeps('services', servicesClasses);
-
-    // TODO: исключить dev или это сделать в manifests ????
 
     // get only driver class names
     return Object.keys(depsDriversNames);
@@ -189,18 +190,3 @@ export default class HostsFilesSet {
   }
 
 }
-
-// private mergeProps(
-//   className: string,
-//   instanceProps: {[index: string]: any},
-// manifestProps?: {[index: string]: any}
-// ): {[index: string]: any} {
-//   return {
-//     // default props from device's manifest
-//     ...manifestProps,
-//     // default props from config.devicesDefaults
-//     ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[className],
-//     // specified props for certain instance
-//     ...instanceProps,
-//   };
-// }

@@ -4,6 +4,8 @@ import Platforms from '../../../../master/interfaces/Platforms';
 export default interface HostConfig {
   platform: Platforms;
 
+  // TODO: rename host to props ?
+
   // specific config for each host
   host: {
     // path to dir where will be placed storage of host
