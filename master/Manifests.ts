@@ -52,13 +52,20 @@ export default class Manifests {
     drivers: {},
     services: {},
   };
+  // driver deps like {EntityType: {EntityId: [...DriverName]}}
   private dependencies: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // driver names by soft paths to manifest or dir with manifest like {softPath: DriverName}
-  private driversSoftPaths: {[index: string]: string} = {};
+  // list of devs
+  private devDependencies: Dependencies = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
+  private systemDrivers: string[] = [];
+  private systemServices: string[] = [];
 
 
   constructor(main: Main) {
@@ -99,6 +106,8 @@ export default class Manifests {
     for (let item of prePreServiceManifest) {
       await this.proceed<PreServiceManifest, ServiceManifest>('device', item);
     }
+
+    this.validateDeps();
   }
 
 
@@ -122,19 +131,14 @@ export default class Manifests {
       ...this.collectFiles(preManifest.baseDir, preManifest.files || []),
     ];
 
-    // TODO: тут указываются только имена драйверов, а не пути !!!!
-
-    // proceed drivers dependencies
     if (preManifest.drivers) {
-      for (let driverSoftPath of preManifest.drivers) {
-        await this.proceedDriverManifest(driverSoftPath);
-      }
-    }
+      // const deps: string[] = this.collectDependencies<PreManifest>(preManifest);
+      //
+      // this.dependencies[plural][preManifest.name] = deps;
+      this.proceedDependencies(preManifest);
 
-    // TODO: WTF ???
-
-    if (preManifest.drivers) {
-      this.dependencies[plural][preManifest.name] = this.collectDependencies<PreManifest>(preManifest);
+      // TODO: devs не должны попадать в список зависимостей их вычленить в отдельный список
+      this.dependencies[plural][preManifest.name] = preManifest.drivers;
     }
 
     // add to list of manifests
@@ -154,18 +158,34 @@ export default class Manifests {
     });
   }
 
-  private collectDependencies<PreManifest extends PreManifestBase>(preManifest: PreManifest): string[] {
-    if (!preManifest.drivers) return [];
+  private validateDeps() {
+    // TODO: проверить что у драйвера есть зарегистрированный манифест
+  }
 
-    return preManifest.drivers.map((softPath: string) => {
-      if (!this.driversSoftPaths[softPath]) {
-        throw new Error(`Can't find driver name by softPath "${softPath}"`);
-      }
+  private proceedDependencies(preManifest: PreManifestBase) {
+    if (!preManifest.drivers) return;
 
-      // TODO: наверное dev исключить, так как они должны быть на хосте уже
+    preManifest.drivers.map((driverName: string) => {
 
-      return this.driversSoftPaths[softPath];
+
+      // TODO: добавляем в список зависимостей если это обычный драйвер
+      // TODO: добавляем в список devs если это dev
+
+    // private systemDrivers: string[] = [];
+    // private regularDrivers: string[] = [];
+    // private systemServices: string[] = [];
+    // private regularServices: string[] = [];
     });
+
+    // return preManifest.drivers.map((softPath: string) => {
+    //   if (!this.driversSoftPaths[softPath]) {
+    //     throw new Error(`Can't find driver name by softPath "${softPath}"`);
+    //   }
+    //
+    //   // TODO: наверное dev исключить, так как они должны быть на хосте уже
+    //
+    //   return this.driversSoftPaths[softPath];
+    // });
   }
 
   private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
@@ -184,24 +204,7 @@ export default class Manifests {
     return finalManifest;
   }
 
-  private async proceedDriverManifest(driverManifestSoftPath: string) {
-    // TODO: наверное dev исключить
 
-    // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
-    // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
-    //       был ли он загружен или нет - лучше наверное сравнивать по resolved или softPath имени файла
-
-    // it add a baseDir param
-    const parsedManifest: PreDeviceManifest = await this.main.$loadManifest<PreDeviceManifest>(driverManifestSoftPath);
-
-    // if driver is registered - do nothing
-    if (this.drivers.get(parsedManifest.name)) return;
-    // save soft paths cache
-    this.driversSoftPaths[driverManifestSoftPath] = parsedManifest.name;
-
-    // proceed it
-    return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
-  }
 
   private generateTmpMainFileName(absoluteMainFileName: string): string {
     // TODO: !!!!! вернуть имя файла во временной папке
@@ -213,3 +216,31 @@ export default class Manifests {
   }
 
 }
+
+
+
+// // registering
+// if (preManifest.drivers) {
+//   for (let driverSoftPath of preManifest.drivers) {
+//     await this.proceedDriverManifest(driverSoftPath);
+//   }
+// }
+
+// private async proceedDriverManifest(driverManifestSoftPath: string) {
+//   // TODO: наверное dev исключить
+//
+//   // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
+//   // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
+//   //       был ли он загружен или нет - лучше наверное сравнивать по resolved или softPath имени файла
+//
+//   // it add a baseDir param
+//   const parsedManifest: PreDeviceManifest = await this.main.$loadManifest<PreDeviceManifest>(driverManifestSoftPath);
+//
+//   // if driver is registered - do nothing
+//   if (this.drivers.get(parsedManifest.name)) return;
+//   // save soft paths cache
+//   this.driversSoftPaths[driverManifestSoftPath] = parsedManifest.name;
+//
+//   // proceed it
+//   return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
+// }

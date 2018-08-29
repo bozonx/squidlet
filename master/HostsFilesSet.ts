@@ -86,6 +86,8 @@ export default class HostsFilesSet {
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
+    // TODO: почему бы не взять сразу весь список ????
+
     function addDeps(pluralType: ManifestsTypePluralName, classNames: string[]) {
       for (let className of classNames) {
         if (!dependencies[pluralType][className]) return;
