@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
 import Register from './Register';
@@ -8,7 +10,12 @@ import HostsConfigGenerator from './HostsConfigGenerator';
 import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
-import {loadManifest} from './IO';
+import {loadYamlFile, resolveFile} from './IO';
+
+
+// TODO: move to config
+export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
+
 
 
 export default class Main {
@@ -57,9 +64,17 @@ export default class Main {
   }
 
 
-  async $loadManifest<T extends PreManifestBase>(resolvedPathToManifest: string): Promise<T> {
-    // TODO: move from helpers
-    return await loadManifest<T>(resolvedPathToManifest);
+  async $loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {
+    if (pathToDirOrFile.indexOf('/') !== 0) {
+      throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
+    }
+
+    const resolvedPathToManifest: string = await resolveFile(pathToDirOrFile, 'yaml', INDEX_MANIFEST_FILE_NAMES);
+    const parsedManifest = (await loadYamlFile(resolvedPathToManifest)) as T;
+
+    parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
+
+    return parsedManifest;
   }
 
   // it needs for test purpose

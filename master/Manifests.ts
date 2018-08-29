@@ -109,9 +109,11 @@ export default class Manifests {
     const finalManifest: FinalManifest = this.prepareManifest(preManifest);
     const plural = `${manifestType}s` as ManifestsTypePluralName;
     const finalManifests = this[plural] as Map<string, FinalManifest>;
+
     const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
     const tmpMainFileName = this.generateTmpMainFileName(absoluteMainFileName);
 
+    // build an entity main file
     await this.buildMainFile(absoluteMainFileName, tmpMainFileName);
 
     // collect files
@@ -180,6 +182,7 @@ export default class Manifests {
     // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
     //       был ли он загружен или нет - лучше наверное сравнивать по resolved или softPath имени файла
 
+    // it add a baseDir param
     const parsedManifest: PreDeviceManifest = await this.main.$loadManifest<PreDeviceManifest>(driverManifestSoftPath);
 
     // if driver is registered - do nothing

@@ -141,10 +141,8 @@ export default class Register {
 
     if (typeof manifest === 'string') {
       // it's path to manifest - let's load it
+      // it add a baseDir param
       parsedManifest = await this.main.$loadManifest<T>(manifest);
-
-      // TODO: добавить baseDir
-
     }
     else if (typeof manifest === 'object') {
       // it's manifest as a js object
