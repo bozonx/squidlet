@@ -90,6 +90,14 @@ export default class Manifests {
     return this.dependencies;
   }
 
+  getSystemDrivers(): string[] {
+    // TODO: !!!!
+  }
+
+  getSystemServices(): string[] {
+    // TODO: !!!!
+  }
+
   async generate(
     preDevicesManifests: PreDeviceManifest[],
     prePreDriverManifest: PreDriverManifest[],

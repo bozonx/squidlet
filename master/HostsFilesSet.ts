@@ -8,6 +8,7 @@ import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import HostFilesSet from './interfaces/HostFilesSet';
+import {sortByIncludeInList} from './helpers';
 
 
 export default class HostsFilesSet {
@@ -33,21 +34,8 @@ export default class HostsFilesSet {
 
     for (let hostId of Object.keys(hostsConfigs)) {
       const hostConfig: HostConfig = hostsConfigs[hostId];
-      const {
-        devicesClasses,
-        driversClasses,
-        servicesClasses,
-      } = this.generateClassNames(hostConfig);
 
-      this.files[hostId] = {
-        config: hostConfig,
-        devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
-        driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
-        servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
-        driversFiles: this.collectFiles('devices', devicesClasses),
-        devicesFiles: this.collectFiles('drivers', driversClasses),
-        servicesFiles: this.collectFiles('services', servicesClasses),
-      };
+      this.files[hostId] = this.combineHostFileSet(hostConfig);
     }
 
     //
@@ -57,7 +45,48 @@ export default class HostsFilesSet {
 
   }
 
-  private generateClassNames(hostConfig: HostConfig) {
+  private combineHostFileSet(hostConfig: HostConfig): HostFilesSet {
+    const {
+      devicesClasses,
+      driversClasses,
+      servicesClasses,
+    } = this.generateEntityNames(hostConfig);
+    const [
+      systemDrivers,
+      regularDrivers,
+    ] = this.sortDrivers(driversClasses);
+    const [
+      systemServices,
+      regularServices,
+    ] = this.sortServices(servicesClasses);
+
+    return {
+      config: hostConfig,
+
+      devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
+      driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
+      servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
+
+      driversFiles: this.collectFiles('devices', devicesClasses),
+      devicesFiles: this.collectFiles('drivers', driversClasses),
+      servicesFiles: this.collectFiles('services', servicesClasses),
+
+      systemDrivers,
+      regularDrivers,
+      systemServices,
+      regularServices,
+
+      devicesDefinitions: this.collectDefinitions(),
+      driversDefinitions: this.collectDefinitions(),
+      servicesDefinitions: this.collectDefinitions(),
+    }
+  }
+
+  /**
+   * Generage entities manifest names which are used on host
+   * @param hostConfig
+   */
+  private generateEntityNames(hostConfig: HostConfig) {
     const devicesClasses = hostConfig.devices.map((item: DeviceDefinition) => item.className);
     const onlyDriversClasses = hostConfig.drivers.map((item: DriverDefinition) => item.className);
     const servicesClasses = hostConfig.services.map((item: ServiceDefinition) => item.className);
@@ -142,6 +171,26 @@ export default class HostsFilesSet {
     }
 
     return result;
+  }
+
+  /**
+   * sort drivers to system and regular
+   * @returns [systemDrivers, regularDrivers]
+   */
+  private sortDrivers(driversClasses: string[]): [string[], string[]] {
+    const allSystemDrivers: string[] = this.manifests.getSystemDrivers();
+
+    return sortByIncludeInList(driversClasses, allSystemDrivers);
+  }
+
+  /**
+   * sort services to system and regular
+   * @returns [systemServices, regularServices]
+   */
+  private sortServices(servicesClasses: string[]) {
+    const allSystemServices: string[] = this.manifests.getSystemServices();
+
+    return sortByIncludeInList(servicesClasses, allSystemServices);
   }
 
 }
