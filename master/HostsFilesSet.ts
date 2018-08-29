@@ -30,27 +30,19 @@ export default class HostsFilesSet {
    * Generate file set for each host
    */
   collect() {
-    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigGenerator.getHostsConfig();
+    const hostIds: string[] = this.hostsConfigGenerator.getHostsIds();
 
-    for (let hostId of Object.keys(hostsConfigs)) {
-      const hostConfig: HostConfig = hostsConfigs[hostId];
-
-      this.files[hostId] = this.combineHostFileSet(hostConfig);
+    for (let hostId of hostIds) {
+      this.files[hostId] = this.combineHostFileSet(hostId);
     }
-
-    //
-    // TODO: смержить конфиг платформы
-    // TODO: смержить props
-    // TODO: добавить connection driver и его зависимые драйверы которые используются в network
-
   }
 
-  private combineHostFileSet(hostConfig: HostConfig): HostFilesSet {
+  private combineHostFileSet(hostId: string): HostFilesSet {
     const {
       devicesClasses,
       driversClasses,
       servicesClasses,
-    } = this.generateEntityNames(hostConfig);
+    } = this.generateEntityNames(hostId);
     const [
       systemDrivers,
       regularDrivers,
@@ -61,7 +53,7 @@ export default class HostsFilesSet {
     ] = this.sortServices(servicesClasses);
 
     return {
-      config: hostConfig,
+      config: this.hostsConfigGenerator.getHostConfig(hostId),
 
       devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
       driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
@@ -76,17 +68,20 @@ export default class HostsFilesSet {
       systemServices,
       regularServices,
 
-      devicesDefinitions: this.collectDefinitions(),
-      driversDefinitions: this.collectDefinitions(),
-      servicesDefinitions: this.collectDefinitions(),
-    }
+      devicesDefinitions: this.hostsConfigGenerator.getDevicesDefinitions(hostId),
+      driversDefinitions: this.hostsConfigGenerator.getDriversDefinitions(hostId),
+      servicesDefinitions: this.hostsConfigGenerator.getServicesDefinitions(hostId),
+    };
   }
 
   /**
    * Generage entities manifest names which are used on host
-   * @param hostConfig
    */
-  private generateEntityNames(hostConfig: HostConfig) {
+  private generateEntityNames(
+    hostId: string
+  ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
+    const hostConfig: HostConfig = hostsConfigs[hostId];
+
     const devicesClasses = hostConfig.devices.map((item: DeviceDefinition) => item.className);
     const onlyDriversClasses = hostConfig.drivers.map((item: DriverDefinition) => item.className);
     const servicesClasses = hostConfig.services.map((item: ServiceDefinition) => item.className);
@@ -148,11 +143,11 @@ export default class HostsFilesSet {
   /**
    * Collect all the used host manifest of devices, drivers or services
    */
-  private collectManifests<T>(manifestPluralType: ManifestsTypePluralName, entityNames: string[]): T[] {
-    const manifests = this.manifests.getManifests() as any;
-    const manifestsOfType: {[index: string]: T} = manifests[manifestPluralType];
+  private collectManifests<T>(manifestPluralType: ManifestsTypePluralName, usedEntityNames: string[]): T[] {
+    const allManifests = this.manifests.getManifests() as any;
+    const allManifestsOfType: {[index: string]: T} = allManifests[manifestPluralType];
 
-    return entityNames.map((usedEntityName: string) => manifestsOfType[usedEntityName]);
+    return usedEntityNames.map((usedEntityName: string) => allManifestsOfType[usedEntityName]);
   }
 
   /**

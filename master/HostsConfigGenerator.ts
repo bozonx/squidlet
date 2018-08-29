@@ -35,6 +35,14 @@ export default class HostsConfigGenerator {
     this.manifests = manifests;
   }
 
+  getHostsIds(): string[] {
+    // TODO: !!!
+  }
+
+  getHostConfig(hostId: string): HostConfig {
+    // TODO: !!!
+  }
+
   getHostsConfig(): {[index: string]: HostConfig} {
 
     // TODO: clone or immutable
@@ -44,6 +52,13 @@ export default class HostsConfigGenerator {
 
   generate() {
     const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs();
+
+
+    //
+    // TODO: смержить конфиг платформы
+    // TODO: смержить props
+    // TODO: добавить connection driver и его зависимые драйверы которые используются в network
+
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig = rawHostsConfigs[hostId];
@@ -61,6 +76,18 @@ export default class HostsConfigGenerator {
 
       this.hostsConfigs[hostId] = hostConfig;
     }
+  }
+
+  getDevicesDefinitions(hostId: string): DeviceDefinition[] {
+    // TODO: !!!!
+  }
+
+  getDriversDefinitions(hostId: string): {[index: string]: DriverDefinition} {
+    // TODO: !!!!
+  }
+
+  getServicesDefinitions(hostId: string): {[index: string]: ServiceDefinition} {
+    // TODO: !!!!
   }
 
   /**
