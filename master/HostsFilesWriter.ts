@@ -8,7 +8,7 @@ import HostsConfigGenerator from './HostsConfigGenerator';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import HostFilesSet from './interfaces/HostFilesSet';
 import HostsFilesSet from './HostsFilesSet';
-import systemConfig from './systemConfig';
+import systemConfig from './configs/systemConfig';
 import {copyFile, writeFile} from './IO';
 
 
