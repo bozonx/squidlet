@@ -28,7 +28,7 @@ export default class Main {
 
     this.masterConfig = masterConfig as MasterConfig;
     this.register = new Register(this);
-    this.manifests = new Manifests();
+    this.manifests = new Manifests(this);
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
     this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigGenerator);
     this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigGenerator);

@@ -1,4 +1,5 @@
 const _omit = require('lodash/omit');
+import * as path from 'path';
 import {Map} from 'immutable';
 
 import Main from './Main';
@@ -63,6 +64,7 @@ export default class Manifests {
   constructor(main: Main) {
     this.main = main;
   }
+
   getManifests(): AllManifests {
     return {
       devices: this.devices.toJS(),
@@ -107,19 +109,27 @@ export default class Manifests {
     const finalManifest: FinalManifest = this.prepareManifest(preManifest);
     const plural = `${manifestType}s` as ManifestsTypePluralName;
     const finalManifests = this[plural] as Map<string, FinalManifest>;
+    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
+    const tmpMainFileName = this.generateTmpMainFileName(absoluteMainFileName);
+
+    await this.buildMainFile(absoluteMainFileName, tmpMainFileName);
 
     // collect files
     this.filesPaths[plural][preManifest.name] = [
-      preManifest.main,
-      ...preManifest.files || [],
+      tmpMainFileName,
+      ...this.collectFiles(preManifest.baseDir, preManifest.files || []),
     ];
 
-    // proceed drivers
+    // TODO: тут указываются только имена драйверов, а не пути !!!!
+
+    // proceed drivers dependencies
     if (preManifest.drivers) {
       for (let driverSoftPath of preManifest.drivers) {
         await this.proceedDriverManifest(driverSoftPath);
       }
     }
+
+    // TODO: WTF ???
 
     if (preManifest.drivers) {
       this.dependencies[plural][preManifest.name] = this.collectDependencies<PreManifest>(preManifest);
@@ -127,6 +137,10 @@ export default class Manifests {
 
     // add to list of manifests
     finalManifests.set(finalManifest.name, finalManifest);
+  }
+
+  private collectFiles(baseDir: string, paths: string[]): string[] {
+    return paths.map((item) => path.resolve(baseDir, item));
   }
 
   private collectDependencies<PreManifest extends PreManifestBase>(preManifest: PreManifest): string[] {
@@ -175,6 +189,15 @@ export default class Manifests {
 
     // proceed it
     return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
+  }
+
+  private generateTmpMainFileName(absoluteMainFileName: string): string {
+    // TODO: !!!!! вернуть имя файла во временной папке
+  }
+
+  private async buildMainFile(absoluteMainFileName: string, jsFileName: string) {
+    // TODO: !!!!! билдить во временную папку
+
   }
 
 }
