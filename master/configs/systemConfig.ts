@@ -2,7 +2,7 @@
  * This is system config for master configurator and host
  */
 
-import initializationConfig from '../../host/src/app/initializationConfig';
+import initializationConfig from '../../host/src/app/config/initializationConfig';
 import InitializationConfig from '../../host/src/app/interfaces/InitializationConfig';
 
 

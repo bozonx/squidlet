@@ -11,10 +11,10 @@ import ServicesManager from './ServicesManager';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import FsDev from './interfaces/dev/Fs.dev';
-import initializationConfig from './initializationConfig';
+import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import Env from './Env';
-import systemConfig from './systemConfig';
+import systemConfig from './config/systemConfig';
 
 
 export default class System {

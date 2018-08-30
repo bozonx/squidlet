@@ -1,3 +1,5 @@
+// TODO: разве не нужен интерфейс????
+
 export default {
   // dirs of file system root
   rootDirs: {
