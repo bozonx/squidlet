@@ -168,6 +168,9 @@ export default class Manifests {
     if (!preManifest.drivers) return;
 
     preManifest.drivers.map((driverName: string) => {
+
+      // TODO: проверять по manifest.type === 'dev'
+
       if (driverName.match(/\.dev$/)) {
         // add to devs list
         if (!this.dependencies[pluralType][preManifest.name]) {
@@ -230,11 +233,19 @@ export default class Manifests {
   }
 
   private generateSystemDriversList() {
-    // TODO: !!!!
+    const drivers: {[index: string]: DriverManifest} = this.drivers.toJS();
+
+    for (let driverName of Object.keys(drivers)) {
+      if (drivers[driverName].system) this.systemDrivers.push(driverName);
+    }
   }
 
   private generateSystemServicesList() {
-    // TODO: !!!!
+    const services: {[index: string]: ServiceManifest} = this.services.toJS();
+
+    for (let serviceName of Object.keys(services)) {
+      if (services[serviceName].system) this.systemServices.push(serviceName);
+    }
   }
 
 }
