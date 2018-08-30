@@ -11,6 +11,7 @@ import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
+import systemConfig from './configs/systemConfig';
 
 
 export type ManifestsTypeName = 'device' | 'driver' | 'service';
@@ -136,14 +137,14 @@ export default class Manifests {
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
     const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
-    const tmpMainFileName = this.generateTmpMainFileName(absoluteMainFileName);
+    const jsMainFileName = this.generateJsMainFileName(pluralType, preManifest.name);
 
     // build an entity main file
-    await this.buildMainFile(absoluteMainFileName, tmpMainFileName);
+    await this.buildMainFile(absoluteMainFileName, jsMainFileName);
 
     // collect files
     this.filesPaths[pluralType][preManifest.name] = [
-      tmpMainFileName,
+      jsMainFileName,
       ...this.collectFiles(preManifest.baseDir, preManifest.files || []),
     ];
 
@@ -178,7 +179,6 @@ export default class Manifests {
       preManifest,
       'files',
       'drivers',
-      'props',
       'main',
     );
 
@@ -189,8 +189,13 @@ export default class Manifests {
     return finalManifest;
   }
 
-  private generateTmpMainFileName(absoluteMainFileName: string): string {
-    // TODO: !!!!! вернуть имя файла во временной папке
+  private generateJsMainFileName(pluralType: string, entityName: string): string {
+
+    return path.join(
+      // TODO: !!!!! путь к хранилищу
+      systemConfig.entityBuildDir,
+      `${pluralType}_${entityName}.js`
+    );
   }
 
   private async buildMainFile(absoluteMainFileName: string, jsFileName: string) {
