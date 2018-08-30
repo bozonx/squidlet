@@ -51,6 +51,7 @@ export default class HostsFilesSet {
     ] = this.sortServices(servicesClasses);
 
     // TODO: проверить что запрашиваемые имена есть среди манифестов
+    // TODO: проверить что getDevDependencies есть среди devs платформы
 
     return {
       config: this.hostsConfigGenerator.getHostConfig(hostId),

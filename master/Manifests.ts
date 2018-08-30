@@ -214,9 +214,19 @@ export default class Manifests {
   }
 
   private validateDeps() {
-    // TODO: проверить что у драйвера есть зарегистрированный манифест
-    // TODO: когда все будет законченно проверяем чтобы на каждый драйвер был манифест
+    const validateType = (dictByName: {[index: string]: string[]}) => {
+      for (let entityName of Object.keys(dictByName)) {
+        for (let driverName of dictByName[entityName]) {
+          if (!this.drivers.get(driverName)) {
+            throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
+          }
+        }
+      }
+    };
 
+    validateType(this.dependencies.devices);
+    validateType(this.dependencies.drivers);
+    validateType(this.dependencies.services);
   }
 
   private generateSystemDriversList() {
