@@ -11,11 +11,11 @@ import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
 import {loadYamlFile, resolveFile} from './IO';
+import masterConfigDefaults from './configs/masterConfigDefaults';
 
 
 // TODO: move to config
 export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
-
 
 
 export default class Main {
@@ -27,13 +27,16 @@ export default class Main {
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly manager: Manager;
 
+  get buildDir(): string {
+    return this.masterConfig.buildDir as string;
+  }
 
   constructor(masterConfig: {[index: string]: any}) {
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    this.masterConfig = masterConfig as MasterConfig;
+    this.masterConfig = this.prepareMasterConfig(masterConfig);
     this.register = new Register(this);
     this.manifests = new Manifests(this);
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
@@ -99,6 +102,13 @@ export default class Main {
     await this.register.initPlugins(this.manager);
     // wait for all the registering processes. It needs if plugin doesn't wait for register promise.
     await Promise.all(this.register.getRegisteringPromises());
+  }
+
+  private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
+    return {
+      ...preMasterConfig,
+      ...masterConfigDefaults,
+    } as MasterConfig;
   }
 
 }
