@@ -52,6 +52,12 @@ export default class Manifests {
     drivers: {},
     services: {},
   };
+  // temporary driver and devs deps list like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
+  private unsortedDependencies: Dependencies = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
   // driver deps like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
   private dependencies: Dependencies = {
     devices: {},
@@ -117,7 +123,8 @@ export default class Manifests {
       await this.proceed<PreServiceManifest, ServiceManifest>('device', item);
     }
 
-    this.validateDeps();
+    // sort deps drivers and devs and save they to separate list
+    this.sortDependencies();
     this.generateSystemDriversList();
     this.generateSystemServicesList();
   }
@@ -140,8 +147,10 @@ export default class Manifests {
       ...this.collectFiles(preManifest.baseDir, preManifest.files || []),
     ];
 
-    // sort deps drivers and devs and save they
-    this.proceedDependencies(pluralType, preManifest);
+    // just save unsorted deps
+    if (preManifest.drivers) {
+      this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
+    }
 
     // prepare to add to list of manifests
     const finalManifest: FinalManifest = this.prepareManifest(preManifest);
@@ -161,32 +170,6 @@ export default class Manifests {
       }
 
       return path.resolve(baseDir, item);
-    });
-  }
-
-  private proceedDependencies(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
-    if (!preManifest.drivers) return;
-
-    preManifest.drivers.map((driverName: string) => {
-
-      // TODO: проверять по manifest.type === 'dev'
-
-      if (driverName.match(/\.dev$/)) {
-        // add to devs list
-        if (!this.dependencies[pluralType][preManifest.name]) {
-          this.dependencies[pluralType][preManifest.name] = [];
-        }
-
-        this.dependencies[pluralType][preManifest.name].push(driverName);
-      }
-      else {
-        // add to driver list
-        if (!this.devDependencies[pluralType][preManifest.name]) {
-          this.devDependencies[pluralType][preManifest.name] = [];
-        }
-
-        this.devDependencies[pluralType][preManifest.name].push(driverName);
-      }
     });
   }
 
@@ -216,20 +199,45 @@ export default class Manifests {
 
   }
 
-  private validateDeps() {
-    const validateType = (dictByName: {[index: string]: string[]}) => {
+  private sortDependencies() {
+    const sortType = (pluralType: ManifestsTypePluralName) => {
+      const dictByName: {[index: string]: string[]} = this.unsortedDependencies[pluralType];
+
       for (let entityName of Object.keys(dictByName)) {
-        for (let driverName of dictByName[entityName]) {
-          if (!this.drivers.get(driverName)) {
-            throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
-          }
-        }
+        this.proceedSortDeps(pluralType, entityName, dictByName[entityName]);
       }
     };
 
-    validateType(this.dependencies.devices);
-    validateType(this.dependencies.drivers);
-    validateType(this.dependencies.services);
+    sortType('devices');
+    sortType('drivers');
+    sortType('services');
+  }
+
+  private proceedSortDeps(
+    pluralType: ManifestsTypePluralName,
+    entityName: string,
+    unsortedDrivers: string[]
+  ) {
+    unsortedDrivers.map((driverName: string) => {
+      if (!this.drivers.get(driverName)) {
+        throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
+      }
+
+      const driverManifest: DriverManifest = this.drivers.get(driverName);
+
+      if (driverManifest.dev) {
+        // add to devs list
+        if (!this.dependencies[pluralType][entityName]) this.dependencies[pluralType][entityName] = [];
+
+        this.dependencies[pluralType][entityName].push(driverName);
+      }
+      else {
+        // add to driver list
+        if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
+
+        this.devDependencies[pluralType][entityName].push(driverName);
+      }
+    });
   }
 
   private generateSystemDriversList() {
