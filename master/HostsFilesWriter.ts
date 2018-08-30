@@ -35,9 +35,9 @@ export default class HostsFilesWriter {
     for (let hostId of Object.keys(filesCollection)) {
       const hostFileSet: HostFilesSet = filesCollection[hostId];
       const hostPath = path.join(basePath, hostId);
-      const devicesPath = path.join(hostPath, systemConfig.hostDirs.devices);
-      const driversPath = path.join(hostPath, systemConfig.hostDirs.drivers);
-      const servicesPath = path.join(hostPath, systemConfig.hostDirs.services);
+      const devicesPath = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.devices);
+      const driversPath = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.drivers);
+      const servicesPath = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.services);
 
       await this.writeHostConfig(hostPath, hostFileSet.config);
 
@@ -55,7 +55,7 @@ export default class HostsFilesWriter {
   }
 
   async writeHostConfig(hostPath: string, hostConfig: HostConfig) {
-    const fileName = path.join(hostPath, systemConfig.hostDirs.config, systemConfig.fileNames.hostConfig);
+    const fileName = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.config, systemConfig.hostInitCfg.fileNames.hostConfig);
     const content = JSON.stringify(hostConfig);
 
     await writeFile(fileName, content);
