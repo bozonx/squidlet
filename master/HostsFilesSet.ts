@@ -50,6 +50,8 @@ export default class HostsFilesSet {
       regularServices,
     ] = this.sortServices(servicesClasses);
 
+    // TODO: проверить что запрашиваемые имена есть среди манифестов
+
     return {
       config: this.hostsConfigGenerator.getHostConfig(hostId),
 
@@ -85,6 +87,7 @@ export default class HostsFilesSet {
     // collect manifest names of used entities
     const devicesClasses = Object.keys(devicesDefinitions)
       .map((id: string) => devicesDefinitions[id].className);
+    // TODO: могут быть указанны dev в definitions - их не нужно подключать
     const onlyDriversClasses = Object.keys(driversDefinitions)
       .map((id: string) => driversDefinitions[id].className);
     const servicesClasses = Object.keys(servicesDefinitions)

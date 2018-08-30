@@ -22,7 +22,7 @@ export default class HostsFilesWriter {
   }
 
   /**
-   * Copy files for hosts to storage to dir of ConfigUpdater plugin
+   * Copy files for hosts to storage to store of master
    */
   async writeToStorage() {
     const filesCollection: {[index: string]: HostFilesSet} = this.hostsFilesSet.getCollection();
@@ -48,6 +48,9 @@ export default class HostsFilesWriter {
       await this.copyEntityFiles(devicesPath, hostFileSet.devicesFiles);
       await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
       await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
+
+      //await this.writeJson(, hostFileSet.systemDrivers);
+      // TODO: add a new items
     }
   }
 
@@ -60,6 +63,7 @@ export default class HostsFilesWriter {
 
   async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
     for (let manifest of manifests) {
+      // TODO: use file name from config
       const fileName = path.join(entityTypeDirPath, `${manifest.name}.json`);
       const content = JSON.stringify(manifest);
 

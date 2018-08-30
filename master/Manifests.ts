@@ -52,13 +52,13 @@ export default class Manifests {
     drivers: {},
     services: {},
   };
-  // driver deps like {EntityType: {EntityId: [...DriverName]}}
+  // driver deps like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
   private dependencies: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // list of devs
+  // list of devs like {EntityType: {EntityId: [...DriverName]}}
   private devDependencies: Dependencies = {
     devices: {},
     drivers: {},
@@ -81,8 +81,6 @@ export default class Manifests {
   }
 
   getFiles(): FilesPaths {
-    // TODO: clone or immutable
-
     return this.filesPaths;
   }
 
@@ -90,12 +88,16 @@ export default class Manifests {
     return this.dependencies;
   }
 
+  getDevDependencies(): Dependencies {
+    return this.devDependencies;
+  }
+
   getSystemDrivers(): string[] {
-    // TODO: !!!!
+    return this.systemDrivers;
   }
 
   getSystemServices(): string[] {
-    // TODO: !!!!
+    return this.systemServices;
   }
 
   async generate(
@@ -116,6 +118,8 @@ export default class Manifests {
     }
 
     this.validateDeps();
+    this.generateSystemDriversList();
+    this.generateSystemServicesList();
   }
 
 
@@ -123,10 +127,7 @@ export default class Manifests {
     manifestType: ManifestsTypeName,
     preManifest: PreManifest
   ) {
-    const finalManifest: FinalManifest = this.prepareManifest(preManifest);
-    const plural = `${manifestType}s` as ManifestsTypePluralName;
-    const finalManifests = this[plural] as Map<string, FinalManifest>;
-
+    const pluralType = `${manifestType}s` as ManifestsTypePluralName;
     const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
     const tmpMainFileName = this.generateTmpMainFileName(absoluteMainFileName);
 
@@ -134,23 +135,20 @@ export default class Manifests {
     await this.buildMainFile(absoluteMainFileName, tmpMainFileName);
 
     // collect files
-    this.filesPaths[plural][preManifest.name] = [
+    this.filesPaths[pluralType][preManifest.name] = [
       tmpMainFileName,
       ...this.collectFiles(preManifest.baseDir, preManifest.files || []),
     ];
 
-    if (preManifest.drivers) {
-      // const deps: string[] = this.collectDependencies<PreManifest>(preManifest);
-      //
-      // this.dependencies[plural][preManifest.name] = deps;
-      this.proceedDependencies(preManifest);
+    // sort deps drivers and devs and save they
+    this.proceedDependencies(pluralType, preManifest);
 
-      // TODO: devs не должны попадать в список зависимостей их вычленить в отдельный список
-      this.dependencies[plural][preManifest.name] = preManifest.drivers;
-    }
+    // prepare to add to list of manifests
+    const finalManifest: FinalManifest = this.prepareManifest(preManifest);
+    const manifestsSet = this[pluralType] as Map<string, FinalManifest>;
 
     // add to list of manifests
-    finalManifests.set(finalManifest.name, finalManifest);
+    manifestsSet.set(finalManifest.name, finalManifest);
   }
 
   private collectFiles(baseDir: string, paths: string[]): string[] {
@@ -166,34 +164,27 @@ export default class Manifests {
     });
   }
 
-  private validateDeps() {
-    // TODO: проверить что у драйвера есть зарегистрированный манифест
-  }
-
-  private proceedDependencies(preManifest: PreManifestBase) {
+  private proceedDependencies(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
     if (!preManifest.drivers) return;
 
     preManifest.drivers.map((driverName: string) => {
+      if (driverName.match(/\.dev$/)) {
+        // add to devs list
+        if (!this.dependencies[pluralType][preManifest.name]) {
+          this.dependencies[pluralType][preManifest.name] = [];
+        }
 
+        this.dependencies[pluralType][preManifest.name].push(driverName);
+      }
+      else {
+        // add to driver list
+        if (!this.devDependencies[pluralType][preManifest.name]) {
+          this.devDependencies[pluralType][preManifest.name] = [];
+        }
 
-      // TODO: добавляем в список зависимостей если это обычный драйвер
-      // TODO: добавляем в список devs если это dev
-
-    // private systemDrivers: string[] = [];
-    // private regularDrivers: string[] = [];
-    // private systemServices: string[] = [];
-    // private regularServices: string[] = [];
+        this.devDependencies[pluralType][preManifest.name].push(driverName);
+      }
     });
-
-    // return preManifest.drivers.map((softPath: string) => {
-    //   if (!this.driversSoftPaths[softPath]) {
-    //     throw new Error(`Can't find driver name by softPath "${softPath}"`);
-    //   }
-    //
-    //   // TODO: наверное dev исключить, так как они должны быть на хосте уже
-    //
-    //   return this.driversSoftPaths[softPath];
-    // });
   }
 
   private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
@@ -212,15 +203,28 @@ export default class Manifests {
     return finalManifest;
   }
 
-
-
   private generateTmpMainFileName(absoluteMainFileName: string): string {
     // TODO: !!!!! вернуть имя файла во временной папке
   }
 
   private async buildMainFile(absoluteMainFileName: string, jsFileName: string) {
     // TODO: !!!!! билдить во временную папку
+    // TODO: !!!!! написать в лог что билдится файл
 
+  }
+
+  private validateDeps() {
+    // TODO: проверить что у драйвера есть зарегистрированный манифест
+    // TODO: когда все будет законченно проверяем чтобы на каждый драйвер был манифест
+
+  }
+
+  private generateSystemDriversList() {
+    // TODO: !!!!
+  }
+
+  private generateSystemServicesList() {
+    // TODO: !!!!
   }
 
 }

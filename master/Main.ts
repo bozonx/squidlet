@@ -43,6 +43,8 @@ export default class Main {
   }
 
   async start() {
+    // TODO: писать в лог о каждом этапе
+
     // registering of plugins, devices, drivers and services
     await this.registering();
 
