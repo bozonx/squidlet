@@ -4,6 +4,7 @@
 
 import initializationConfig from '../../host/src/app/config/initializationConfig';
 import InitializationConfig from '../../host/src/app/interfaces/InitializationConfig';
+import systemConfig from '../../host/src/app/config/systemConfig';
 
 
 const hostInitCfg: InitializationConfig = initializationConfig();
@@ -21,9 +22,9 @@ export default {
   // },
 
   hostInitCfg,
+  hostSysCfg: systemConfig,
 
   entityBuildDir: 'entityBuild',
   pathToSaveHostsFileSet: 'hosts',
   //pathToSaveHostsFileSet: 'services/ConfigUpdater/hosts',
 };
-

@@ -1,6 +1,7 @@
-// TODO: разве не нужен интерфейс????
+import SystemConfig from '../interfaces/SystemConfig';
 
-export default {
+
+const systemConfig: SystemConfig = {
   // dirs of file system root
   rootDirs: {
     // files which received from master
@@ -13,3 +14,5 @@ export default {
     data: 'data',
   },
 };
+
+export default systemConfig;

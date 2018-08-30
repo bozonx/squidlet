@@ -1,6 +1,7 @@
-// TODO: сделать чтобы он был json - тогда не должен сохраняться в памяти
+import InitializationConfig from '../interfaces/InitializationConfig';
 
-export default function initializationConfig () {
+
+export default function initializationConfig(): InitializationConfig {
   return {
     // dirs of host dir
     hostDirs: {

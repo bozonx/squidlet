@@ -103,7 +103,6 @@ export default class System {
 
   async loadConfig<T>(configFileName: string): Promise<T> {
     const definitionsJsonFile = path.join(
-      // TODO: ???? rootDirs
       systemConfig.rootDirs.host,
       this.initCfg.hostDirs.config,
       configFileName
@@ -114,7 +113,6 @@ export default class System {
 
   async loadManifest<T>(typeDir: string, entityDir: string) : Promise<T> {
     const manifestPath = path.join(
-      // TODO: ???? rootDirs
       systemConfig.rootDirs.host,
       typeDir,
       entityDir,
@@ -126,7 +124,6 @@ export default class System {
 
   async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
     const manifestPath = path.join(
-      // TODO: ???? rootDirs
       systemConfig.rootDirs.host,
       typeDir,
       entityDir,
