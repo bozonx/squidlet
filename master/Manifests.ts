@@ -204,7 +204,9 @@ export default class Manifests {
       const dictByName: {[index: string]: string[]} = this.unsortedDependencies[pluralType];
 
       for (let entityName of Object.keys(dictByName)) {
-        this.proceedSortDeps(pluralType, entityName, dictByName[entityName]);
+        for (let driverName of dictByName[entityName]) {
+          this.sortDriver(pluralType, entityName, driverName);
+        }
       }
     };
 
@@ -213,31 +215,25 @@ export default class Manifests {
     sortType('services');
   }
 
-  private proceedSortDeps(
-    pluralType: ManifestsTypePluralName,
-    entityName: string,
-    unsortedDrivers: string[]
-  ) {
-    unsortedDrivers.map((driverName: string) => {
-      if (!this.drivers.get(driverName)) {
-        throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
-      }
+  private sortDriver(pluralType: ManifestsTypePluralName, entityName: string, driverName: string) {
+    if (!this.drivers.get(driverName)) {
+      throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
+    }
 
-      const driverManifest: DriverManifest = this.drivers.get(driverName);
+    const driverManifest: DriverManifest = this.drivers.get(driverName);
 
-      if (driverManifest.dev) {
-        // add to devs list
-        if (!this.dependencies[pluralType][entityName]) this.dependencies[pluralType][entityName] = [];
+    if (driverManifest.dev) {
+      // add to devs list
+      if (!this.dependencies[pluralType][entityName]) this.dependencies[pluralType][entityName] = [];
 
-        this.dependencies[pluralType][entityName].push(driverName);
-      }
-      else {
-        // add to driver list
-        if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
+      this.dependencies[pluralType][entityName].push(driverName);
+    }
+    else {
+      // add to driver list
+      if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
 
-        this.devDependencies[pluralType][entityName].push(driverName);
-      }
-    });
+      this.devDependencies[pluralType][entityName].push(driverName);
+    }
   }
 
   private generateSystemDriversList() {
