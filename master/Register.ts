@@ -1,4 +1,4 @@
-const _map = require('lodash/map');
+const _values = require('lodash/values');
 
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
@@ -37,15 +37,15 @@ export default class Register {
   // TODO: если использовать массив - зачем тогда immutable ?
 
   getDevicesPreManifests(): PreDeviceManifest[] {
-    return _map(this.devices.toJS());
+    return _values(this.devices.toJS());
   }
 
   getDriversPreManifests(): PreDriverManifest[] {
-    return _map(this.drivers.toJS());
+    return _values(this.drivers.toJS());
   }
 
   getServicesPreManifests(): PreServiceManifest[] {
-    return _map(this.services.toJS());
+    return _values(this.services.toJS());
   }
 
   getRegisteringPromises(): Promise<any>[] {

@@ -1,4 +1,4 @@
-const _map = require('lodash/map');
+const _values = require('lodash/values');
 
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
@@ -73,9 +73,9 @@ export default class HostsFilesSet {
       systemServices,
       regularServices,
 
-      devicesDefinitions: _map(this.hostsConfigSet.getDevicesDefinitions(hostId)),
-      driversDefinitions: this.hostsConfigSet.getDriversDefinitions(hostId),
-      servicesDefinitions: this.hostsConfigSet.getServicesDefinitions(hostId),
+      devicesDefinitions: _values(this.hostsConfigSet.getHostDevicesDefinitions(hostId)),
+      driversDefinitions: this.hostsConfigSet.getHostDriversDefinitions(hostId),
+      servicesDefinitions: this.hostsConfigSet.getHostServicesDefinitions(hostId),
     };
   }
 

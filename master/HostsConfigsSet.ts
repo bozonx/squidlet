@@ -30,6 +30,10 @@ export default class HostsConfigsSet {
   private readonly main: Main;
   // hosts configs by hostId
   private hostsConfigs: {[index: string]: HostConfig} = {};
+  // definitions like {hostId: {entityId: Definition}}
+  private devicesDefinitions: {[index: string]: {[index: string]: DeviceDefinition}} = {};
+  private driversDefinitions: {[index: string]: {[index: string]: DriverDefinition}} = {};
+  private servicesDefinitions: {[index: string]: {[index: string]: ServiceDefinition}} = {};
 
 
   constructor(main: Main) {
@@ -50,44 +54,38 @@ export default class HostsConfigsSet {
     return this.hostsConfigs;
   }
 
+  getHostDevicesDefinitions(hostId: string): {[index: string]: DeviceDefinition} {
+    return this.devicesDefinitions[hostId];
+  }
+
+  getHostDriversDefinitions(hostId: string): {[index: string]: DriverDefinition} {
+    return this.driversDefinitions[hostId];
+  }
+
+  getHostServicesDefinitions(hostId: string): {[index: string]: ServiceDefinition} {
+    return this.servicesDefinitions[hostId];
+  }
+
   generate() {
+    // TODO: переделать получение конфигов
     const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs111();
 
-
-    //
-    // TODO: смержить конфиг платформы
-    // TODO: смержить props
-    // TODO: добавить connection driver и его зависимые драйверы которые используются в network
-
-
     for (let hostId of Object.keys(rawHostsConfigs)) {
-      const rawHostConfig = rawHostsConfigs[hostId];
-      const hostConfig: HostConfig = {
-        platform: rawHostConfig.platform,
-        host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
-        devices: this.generateDevices(rawHostConfig.devices || {}),
-        drivers: this.generateDrivers(rawHostConfig.drivers || {}),
-        services: {
-          ...this.generateServices(rawHostConfig.services || {}),
-          ...this.generatePreDefinedServices(rawHostConfig),
-        },
-        devicesDefaults: rawHostConfig.devicesDefaults || {},
-      };
+      const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
 
-      this.hostsConfigs[hostId] = hostConfig;
+      if (rawHostConfig.devices) {
+        this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(rawHostConfig.devices);
+      }
+      if (rawHostConfig.drivers) {
+        this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
+      }
+      if (rawHostConfig.services) {
+        this.servicesDefinitions[hostId] = this.collectServicesDefinitions(rawHostConfig.services);
+      }
+
+      // final host config
+      this.hostsConfigs[hostId] = this.generateHostConfig(rawHostConfig);
     }
-  }
-
-  getDevicesDefinitions(hostId: string): {[index: string]: DeviceDefinition} {
-    // TODO: !!!!
-  }
-
-  getDriversDefinitions(hostId: string): {[index: string]: DriverDefinition} {
-    // TODO: !!!!
-  }
-
-  getServicesDefinitions(hostId: string): {[index: string]: ServiceDefinition} {
-    // TODO: !!!!
   }
 
   /**
@@ -95,14 +93,17 @@ export default class HostsConfigsSet {
    * @param hostParams
    */
   private mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
-
-    // TODO: смержить ещё с захардкоженным default конфигом где указан дефолтный storeDir и тд
+    // TODO: смержить ещё с configHostDefault.ts конфигом где указан дефолтный storeDir и тд
     // TODO: смержить ещё с platform config
 
     return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
   }
 
-  private generateDevices(rawDevices: {[index: string]: PreDeviceDefinition}): DeviceDefinition[] {
+  private collectDevicesDefinitions(
+    rawDevices: {[index: string]: PreDeviceDefinition}
+  ): {[index: string]: DeviceDefinition} {
+    // TODO: use devicesDefaults: rawHostConfig.devicesDefaults || {},
+
     const definitions: DeviceDefinition[] = [];
 
     for (let deviceId of Object.keys(rawDevices)) {
@@ -121,7 +122,9 @@ export default class HostsConfigsSet {
     return definitions;
   }
 
-  private generateDrivers(rawDrivers: {[index: string]: PreDriverDefinition}): DriverDefinition[] {
+  private collectDriversDefinitions(
+    rawDrivers: {[index: string]: PreDriverDefinition}
+  ): {[index: string]: DriverDefinition} {
     const definitions: DriverDefinition[] = [];
 
     for (let driverId of Object.keys(rawDrivers)) {
@@ -141,7 +144,12 @@ export default class HostsConfigsSet {
     return definitions;
   }
 
-  private generateServices(rawServices: {[index: string]: PreServiceDefinition}): ServiceDefinition[] {
+  private collectServicesDefinitions(
+    rawServices: {[index: string]: PreServiceDefinition}
+  ): {[index: string]: ServiceDefinition} {
+    // TODO: ...this.generatePreDefinedServices(rawHostConfig),
+
+
     const definitions: ServiceDefinition[] = [];
 
     for (let serviceId of Object.keys(rawServices)) {
@@ -180,10 +188,23 @@ export default class HostsConfigsSet {
     };
   }
 
+
+  private generateHostConfig(rawHostConfig: PreHostConfig) {
+    return {
+      platform: rawHostConfig.platform,
+      host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
+    };
+  }
+
+
   /**
-   * Use "hosts" of {master: host} params of master config.
+   * Use "hosts" or {master: host} params of master config.
    */
   private getHostsConfigs111(): {[index: string]: PreHostConfig} {
+    // TODO: смержить конфиг платформы
+    // TODO: добавить connection driver и его зависимые драйверы которые используются в network
+    // TODO: наверное вынести в main
+
     if (!this.masterConfig.host || this.masterConfig.hosts) {
       throw new Error(`Master config doesn't have "host" or "hosts" params`);
     }
