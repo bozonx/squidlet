@@ -65,17 +65,28 @@ export default class HostsFilesWriter {
   }
 
   private async writeHostConfig(hostPath: string, hostConfig: HostConfig) {
-    const fileName = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.config, systemConfig.hostInitCfg.fileNames.hostConfig);
+    const fileName = path.join(
+      hostPath,
+      systemConfig.hostInitCfg.hostDirs.config,
+      systemConfig.hostInitCfg.fileNames.hostConfig
+    );
     const content = JSON.stringify(hostConfig);
+
+    // TODO: создать папку - hostId/config
 
     await writeFile(fileName, content);
   }
 
   async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
     for (let manifest of manifests) {
-      // TODO: use file name from config
-      const fileName = path.join(entityTypeDirPath, `${manifest.name}.json`);
+      const fileName = path.join(
+        entityTypeDirPath,
+        manifest.name,
+        systemConfig.hostInitCfg.fileNames.manifest
+      );
       const content = JSON.stringify(manifest);
+
+      // TODO: создать папку - entityTypeDirPath/manifest.name
 
       await writeFile(fileName, content);
     }
@@ -84,7 +95,13 @@ export default class HostsFilesWriter {
   async copyEntityFiles(entityTypeDirPath: string, fileSet: {[index: string]: string[]}) {
     for (let entityClassName of Object.keys(fileSet)) {
       for (let fromFileName of fileSet[entityClassName]) {
-        const toFileName = path.join(entityTypeDirPath, entityClassName);
+        const toFileName = path.join(
+          entityTypeDirPath,
+          entityClassName,
+          path.basename(fromFileName),
+        );
+
+        // TODO: создать папку - entityTypeDirPath/entityClassName
 
         await copyFile(fromFileName, toFileName);
       }
