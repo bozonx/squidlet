@@ -15,7 +15,7 @@ export default {
   hostInitCfg,
   hostSysCfg,
 
-  buildDir: '~/.squidlet/build',
+  defaultDuildDir: '~/.squidlet/build',
   indexManifestFileNames: ['manifest.yaml'],
   entityBuildDir: 'entityBuild',
   //pathToSaveHostsFileSet: 'hosts',

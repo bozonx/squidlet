@@ -1,6 +1,12 @@
 export default function validateMasterConfig(rawConfig: {[index: string]: any}): string | undefined {
   // TODO: add
   // TODO: validate definitions
+
+  // if (!this.masterConfig.host || this.masterConfig.hosts) {
+  //   throw new Error(`Master config doesn't have "host" or "hosts" params`);
+  // }
+
+
   return undefined;
 }
 // const recursive = (container, curPath) => {

@@ -197,20 +197,7 @@ export default class HostsConfigsSet {
     // TODO: наверное вынести в main
     // TODO: у драйверов id - это name
 
-    if (!this.masterConfig.host || this.masterConfig.hosts) {
-      throw new Error(`Master config doesn't have "host" or "hosts" params`);
-    }
 
-    let hosts: {[index: string]: PreHostConfig} = {};
-
-    if (this.masterConfig.hosts) {
-      hosts = this.masterConfig.hosts;
-    }
-    else if (this.masterConfig.host) {
-      hosts = {
-        master: this.masterConfig.host,
-      };
-    }
 
     return hosts;
   }

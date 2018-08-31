@@ -1,4 +1,5 @@
 import * as path from 'path';
+const _omit = require('lodash/omit');
 
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
@@ -12,6 +13,7 @@ import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
 import {loadYamlFile, resolveFile} from './IO';
 import systemConfig from './configs/systemConfig';
+import PreHostConfig from './interfaces/PreHostConfig';
 
 
 export default class Main {
@@ -24,10 +26,11 @@ export default class Main {
   private readonly pluginEnv: PluginEnv;
 
   get buildDir(): string {
+    if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
+      return this.masterConfig.hosts.master.host.storageDir;
+    }
 
-    // TODO: !!!! use host's storageDir
-
-    return this.masterConfig.buildDir as string;
+    return systemConfig.defaultDuildDir;
   }
 
   constructor(masterConfig: {[index: string]: any}) {
@@ -35,10 +38,10 @@ export default class Main {
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    this.masterConfig = masterConfig as MasterConfig;
+    this.masterConfig = this.prepareMasterConfig(masterConfig);
     this.register = new Register(this);
     this.manifests = new Manifests(this);
-    this.hostsConfigSet = new HostsConfigsSet(this.masterConfig, this.manifests);
+    this.hostsConfigSet = new HostsConfigsSet(this);
     this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigSet);
     this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigSet);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
@@ -106,12 +109,22 @@ export default class Main {
     await Promise.all(this.register.getRegisteringPromises());
   }
 
+  private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
+    let hosts: {[index: string]: PreHostConfig} = {};
 
-  // private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
-  //   return {
-  //     ...preMasterConfig,
-  //     ...masterConfigDefaults,
-  //   } as MasterConfig;
-  // }
+    if (this.masterConfig.hosts) {
+      hosts = this.masterConfig.hosts;
+    }
+    else if (this.masterConfig.host) {
+      hosts = {
+        master: this.masterConfig.host,
+      };
+    }
+
+    return {
+      ..._omit(preMasterConfig, 'host', 'hosts'),
+      hosts
+    };
+  }
 
 }
