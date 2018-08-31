@@ -74,7 +74,10 @@ export default class HostsConfigsSet {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
 
       if (rawHostConfig.devices) {
-        this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(rawHostConfig.devices);
+        this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(
+          rawHostConfig.devices,
+          rawHostConfig.devicesDefaults
+        );
       }
       if (rawHostConfig.drivers) {
         this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
@@ -89,36 +92,46 @@ export default class HostsConfigsSet {
   }
 
   private collectDevicesDefinitions(
-    rawDevices: {[index: string]: PreDeviceDefinition}
+    rawDevices: {[index: string]: PreDeviceDefinition},
+    devicesDefaults?: {[index: string]: any}
   ): {[index: string]: DeviceDefinition} {
     return this.generateEntityDefinition<DeviceDefinition>(
+
+      // TODO: пересмотреть !!!!
+
       rawDevices,
       'device',
-      (entityId: string, entityDef: PreDeviceDefinition): DeviceDefinition => {
+      (entityId: string, entityDef: DeviceDefinition): DeviceDefinition => {
         return {
-          // TODO: use devicesDefaults: rawHostConfig.devicesDefaults || {},
-          // TODO: merge with devicesDefaults
+          ...entityDef,
+          props: {
+            ...entityDef,
+            ...entityDef.props,
+          }
         } as DeviceDefinition;
       }
     );
   }
 
-  private generateEntityDefinition<T>(
+  private generateEntityDefinition<T extends DefinitionBase>(
     rawDefinitions: {[index: string]: any},
     classNameParam: string,
-    cb?: (entityId: string, entityDef: any) => T
+    cb?: (entityId: string, entityDef: T) => T
   ): {[index: string]: T} {
     const result: {[index: string]: T} = {};
 
-    for (let itemId of Object.keys(rawDefinitions)) {
-      const entityDef: {[index: string]: any} = rawDefinitions[itemId];
+    for (let entityId of Object.keys(rawDefinitions)) {
+      const entityDef: {[index: string]: any} = rawDefinitions[entityId];
 
-      result[itemId] = {
-        id: itemId,
-        className: entityDef[classNameParam],
-        props: _omit(entityDef, classNameParam),
-        ...cb && cb(itemId, entityDef) as any,
+      // TODO: доделать !!!!
+
+      result[entityId] = {
+        id: entityId as string,
+        className: entityDef[classNameParam] as string,
+        props: _omit(entityDef, classNameParam) as {[index: string]: any},
       };
+
+      if (cb) cb(entityId, result[entityId]);
     }
 
     return result;
@@ -142,7 +155,6 @@ export default class HostsConfigsSet {
           // TODO: !!!!
           // TODO: ...this.generatePreDefinedServices(rawHostConfig),
           //const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
-
 
         } as ServiceDefinition;
       }
