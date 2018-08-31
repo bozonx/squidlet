@@ -17,7 +17,7 @@ import PreHostConfig from './interfaces/PreHostConfig';
 
 
 export default class Main {
-  private readonly masterConfig: MasterConfig;
+  readonly masterConfig: MasterConfig;
   private readonly register: Register;
   private readonly manifests: Manifests;
   private readonly hostsConfigSet: HostsConfigsSet;
@@ -31,6 +31,10 @@ export default class Main {
     }
 
     return systemConfig.defaultDuildDir;
+  }
+
+  get masterConfigHosts(): {[index: string]: PreHostConfig} {
+    return this.masterConfig.hosts as {[index: string]: PreHostConfig};
   }
 
   constructor(masterConfig: {[index: string]: any}) {

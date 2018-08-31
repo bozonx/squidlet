@@ -65,8 +65,7 @@ export default class HostsConfigsSet {
   }
 
   generate() {
-    // TODO: переделать получение конфигов
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs111();
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfigHosts;
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
@@ -78,6 +77,9 @@ export default class HostsConfigsSet {
         );
       }
       if (rawHostConfig.drivers) {
+
+        // TODO: у драйверов id - это name
+
         this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
       }
       if (rawHostConfig.services) {
@@ -178,28 +180,17 @@ export default class HostsConfigsSet {
   }
 
   /**
-   * Merge params of host with hostDefaults.
-   * @param hostParams
+   * Merge params of host.
    */
-  private mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
+  private mergeHostParams(rawHostConfig: PreHostConfig): {[index: string]: any} {
     // TODO: смержить ещё с configHostDefault.ts конфигом где указан дефолтный storeDir и тд
     // TODO: смержить ещё с platform config
-
-    return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
-  }
-
-  /**
-   * Use "hosts" or {master: host} params of master config.
-   */
-  private getHostsConfigs111(): {[index: string]: PreHostConfig} {
-    // TODO: смержить конфиг платформы
     // TODO: добавить connection driver и его зависимые драйверы которые используются в network
-    // TODO: наверное вынести в main
-    // TODO: у драйверов id - это name
 
-
-
-    return hosts;
+    return _defaultsDeep(
+      { ...rawHostConfig.host },
+      this.main.masterConfig.hostDefaults
+    );
   }
 
 }
