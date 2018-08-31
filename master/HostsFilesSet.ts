@@ -85,9 +85,9 @@ export default class HostsFilesSet {
   private generateEntityNames(
     hostId: string
   ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
-    const devicesDefinitions = this.hostsConfigSet.getDevicesDefinitions(hostId);
-    const driversDefinitions = this.hostsConfigSet.getDriversDefinitions(hostId);
-    const servicesDefinitions = this.hostsConfigSet.getServicesDefinitions(hostId);
+    const devicesDefinitions = this.hostsConfigSet.getHostDevicesDefinitions(hostId);
+    const driversDefinitions = this.hostsConfigSet.getHostDriversDefinitions(hostId);
+    const servicesDefinitions = this.hostsConfigSet.getHostServicesDefinitions(hostId);
 
     // collect manifest names of used entities
     const devicesClasses = Object.keys(devicesDefinitions)

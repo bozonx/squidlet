@@ -4,8 +4,6 @@ const _omit = require('lodash/omit');
 import DefinitionBase from '../host/src/app/interfaces/DefinitionBase';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
-import MasterConfig from './interfaces/MasterConfig';
-import Manifests from './Manifests';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
@@ -83,13 +81,17 @@ export default class HostsConfigsSet {
         this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
       }
       if (rawHostConfig.services) {
-        this.servicesDefinitions[hostId] = this.collectServicesDefinitions(rawHostConfig.services);
+        this.servicesDefinitions[hostId] = {
+          ...this.collectServicesDefinitions(rawHostConfig.services),
+          ...this.collectServicesFromShortcuts(rawHostConfig),
+        };
       }
 
       // final host config
       this.hostsConfigs[hostId] = this.generateHostConfig(rawHostConfig);
     }
   }
+
 
   private collectDevicesDefinitions(
     rawDevices: {[index: string]: PreDeviceDefinition},
@@ -120,17 +122,7 @@ export default class HostsConfigsSet {
   private collectServicesDefinitions(
     rawServices: {[index: string]: PreServiceDefinition}
   ): {[index: string]: ServiceDefinition} {
-    return this.generateEntityDefinition<ServiceDefinition>(
-      rawServices,
-      'service',
-      (entityId: string, entityDef: ServiceDefinition): ServiceDefinition => {
-        return {
-
-          // TODO: ...this.generatePreDefinedServices(rawHostConfig),
-
-        } as ServiceDefinition;
-      }
-    );
+    return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
   }
 
   private generateEntityDefinition<T extends DefinitionBase>(
@@ -155,34 +147,28 @@ export default class HostsConfigsSet {
     return result;
   }
 
-
   /**
    * Generate service from shortcuts like 'automation', 'logger' etc.
    */
-  private generatePreDefinedServices(rawHostConfig: {[index: string]: any}): ServiceDefinition[] {
-    const result: ServiceDefinition[] = [];
+  private collectServicesFromShortcuts(
+    rawHostConfig: {[index: string]: any}
+  ): {[index: string]: ServiceDefinition} {
+    const rawServices: {[index: string]: PreServiceDefinition} = {};
 
+    // collect services
     for (let serviceId of servicesShortcut) {
-      const shortcut = rawHostConfig[serviceId];
+      const definition: PreServiceDefinition = rawHostConfig[serviceId];
 
-      if (shortcut) {
-        const serviceDefinition: ServiceDefinition = this.makeServiceDefinition(serviceId, shortcut);
+      if (!definition) continue;
 
-        result.push(serviceDefinition);
-      }
+      rawServices[serviceId] = {
+        service: serviceId,
+        ...rawHostConfig[serviceId]
+      };
     }
 
-    return result;
+    return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
   }
-
-  makeServiceDefinition(serviceId: string, preService: PreServiceDefinition): ServiceDefinition {
-    return {
-      id: serviceId,
-      className: preService.service,
-      props: _omit(preService, 'service'),
-    };
-  }
-
 
   private generateHostConfig(rawHostConfig: PreHostConfig) {
     return {
@@ -229,42 +215,4 @@ export default class HostsConfigsSet {
     return hosts;
   }
 
-
-  private generateDefinitions<T extends DefinitionBase>(
-    definitions: {[index: string]: T}
-  ): {[index: string]: T} {
-    const result: {[index: string]: T} = {};
-
-    for (let id of Object.keys(definitions)) {
-      const definiton: T = definitions[id];
-
-      result[id] = {
-        ...definiton as object,
-        props: {
-          ...definiton.props,
-          // TODO: manifest props
-        },
-      } as T;
-    }
-
-
-    return result;
-  }
-
 }
-
-
-// private mergeProps(
-//   className: string,
-//   instanceProps: {[index: string]: any},
-// manifestProps?: {[index: string]: any}
-// ): {[index: string]: any} {
-//   return {
-//     // default props from device's manifest
-//     ...manifestProps,
-//     // default props from config.devicesDefaults
-//     ...this.system.host.config.devicesDefaults && this.system.host.config.devicesDefaults[className],
-//     // specified props for certain instance
-//     ...instanceProps,
-//   };
-// }
