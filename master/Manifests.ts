@@ -12,6 +12,8 @@ import PreServiceManifest from './interfaces/PreServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import systemConfig from './configs/systemConfig';
+import {isAbsoluteFileName} from './helpers';
+
 
 
 export type ManifestsTypeName = 'device' | 'driver' | 'service';
@@ -163,7 +165,7 @@ export default class Manifests {
 
   private collectFiles(baseDir: string, paths: string[]): string[] {
     return paths.map((item) => {
-      if (item.indexOf('/') === 0) {
+      if (isAbsoluteFileName(item)) {
         throw new Error(`You must not specify an absolute path of "${item}". Only relative is allowed.`);
       }
       else if (item.match(/\.\./)) {

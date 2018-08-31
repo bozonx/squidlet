@@ -12,6 +12,7 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
 import {ManifestsTypeName, ManifestsTypePluralName} from './Manifests';
+import {isAbsoluteFileName} from './helpers';
 
 
 /**
@@ -55,7 +56,7 @@ export default class Register {
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
       // it's path to plugin - let's load it
-      if (plugin.indexOf('/') !== 0) {
+      if (!isAbsoluteFileName(plugin)) {
         throw new Error(`You have to specify an absolute path of "${plugin}"`);
       }
 

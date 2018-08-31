@@ -14,6 +14,7 @@ import PreManifestBase from './interfaces/PreManifestBase';
 import {loadYamlFile, resolveFile} from './IO';
 import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
+import {isAbsoluteFileName} from './helpers';
 
 
 export default class Main {
@@ -127,8 +128,10 @@ export default class Main {
 
   private makeBuildDir(masterConfigPath: string): string {
     if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
+      // use master's storage dir
       const storageDir = this.masterConfig.hosts.master.host.storageDir;
-      if (masterConfigPath.indexOf('/') === 0 || this.masterConfigPath.indexOf('`') === 0) {
+
+      if (isAbsoluteFileName(masterConfigPath)) {
         // it's an absolute path
         return storageDir;
       }
@@ -138,6 +141,7 @@ export default class Main {
       }
     }
 
+    // use default build dir
     return systemConfig.defaultDuildDir;
   }
 
