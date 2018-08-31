@@ -52,8 +52,6 @@ export default class HostsFilesWriter {
     const driversPath = path.join(hostDir, hostDirs.drivers);
     const servicesPath = path.join(hostDir, hostDirs.services);
 
-    // TODO: создать папку хранилища, девайсов, драйверов и тд
-
     await this.writeHostConfig(configDir, hostFileSet.config);
 
     await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
@@ -69,7 +67,9 @@ export default class HostsFilesWriter {
     await this.writeJson(path.join(configDir, fileNames.systemServices), hostFileSet.systemServices);
     await this.writeJson(path.join(configDir, fileNames.regularServices), hostFileSet.regularServices);
 
-    // TODO: add definitions
+    await this.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostFileSet.devicesDefinitions);
+    await this.writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
+    await this.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
   }
 
   private async writeHostConfig(configDir: string, hostConfig: HostConfig) {
