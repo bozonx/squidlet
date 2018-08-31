@@ -25,6 +25,9 @@ export default class Main {
   private readonly manager: Manager;
 
   get buildDir(): string {
+
+    // TODO: !!!! use host's storageDir
+
     return this.masterConfig.buildDir as string;
   }
 
@@ -104,6 +107,8 @@ export default class Main {
     await Promise.all(this.register.getRegisteringPromises());
   }
 
+
+  // TODO: не нужно !!!!
   private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
     return {
       ...preMasterConfig,

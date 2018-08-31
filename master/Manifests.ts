@@ -182,17 +182,14 @@ export default class Manifests {
       'main',
     );
 
-
-    // TODO: merge props with config defaults
-    // TODO: слить определения из дефолтного конфига сервиса указанного в манифесте с дефолтными значениями из главного конфига
+    // TODO: props может быть отдельным yaml файлом - подгружать его
 
     return finalManifest;
   }
 
   private generateJsMainFileName(pluralType: string, entityName: string): string {
-
     return path.join(
-      // TODO: !!!!! путь к хранилищу
+      this.main.buildDir,
       systemConfig.entityBuildDir,
       `${pluralType}_${entityName}.js`
     );

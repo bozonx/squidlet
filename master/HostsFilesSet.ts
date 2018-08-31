@@ -53,6 +53,10 @@ export default class HostsFilesSet {
     // TODO: проверить что запрашиваемые имена есть среди манифестов
     // TODO: проверить что getDevDependencies есть среди devs платформы
 
+
+    // TODO: смержить props: дефолтные значения указанные в devicesDefaults и определения девайсов
+
+
     return {
       config: this.hostsConfigGenerator.getHostConfig(hostId),
 
