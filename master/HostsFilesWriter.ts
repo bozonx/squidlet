@@ -1,40 +1,30 @@
 import * as path from 'path';
 
+import Main from './Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
-import HostsConfigsSet from './HostsConfigsSet';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import HostFilesSet from './interfaces/HostFilesSet';
-import HostsFilesSet from './HostsFilesSet';
 import systemConfig from './configs/systemConfig';
 import {copyFile, mkdirP, writeFile} from './IO';
 
 
 export default class HostsFilesWriter {
-  private readonly hostsFilesSet: HostsFilesSet;
-  private readonly hostsConfigSet: HostsConfigsSet;
+  private readonly main: Main;
+  private readonly baseDir: string;
 
-  private get baseDir(): string {
-    // TODO: move to constructor ???
-    // TODO: review
-    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigSet.getHostsConfigs();
-    const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
-    // TODO: review
-    return path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
-  }
-
-  constructor(hostsFilesSet: HostsFilesSet, hostsConfigSet: HostsConfigsSet) {
-    this.hostsFilesSet = hostsFilesSet;
-    this.hostsConfigSet = hostsConfigSet;
+  constructor(main: Main) {
+    this.main = main;
+    this.baseDir = path.join(this.main.buildDir, systemConfig.pathToSaveHostsFileSet);
   }
 
   /**
    * Copy files for hosts to storage to store of master
    */
   async writeToStorage() {
-    const filesCollection: {[index: string]: HostFilesSet} = this.hostsFilesSet.getCollection();
+    const filesCollection: {[index: string]: HostFilesSet} = this.main.hostsFilesSet.getCollection();
 
     for (let hostId of Object.keys(filesCollection)) {
       await this.proceedHost(hostId, filesCollection[hostId]);

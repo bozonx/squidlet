@@ -18,10 +18,10 @@ import PreHostConfig from './interfaces/PreHostConfig';
 
 export default class Main {
   readonly masterConfig: MasterConfig;
+  readonly hostsFilesSet: HostsFilesSet;
+  private readonly hostsConfigSet: HostsConfigsSet;
   private readonly register: Register;
   private readonly manifests: Manifests;
-  private readonly hostsConfigSet: HostsConfigsSet;
-  private readonly hostsFilesSet: HostsFilesSet;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
@@ -47,7 +47,7 @@ export default class Main {
     this.manifests = new Manifests(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
     this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigSet);
-    this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigSet);
+    this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
   }
 
