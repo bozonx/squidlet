@@ -1,8 +1,7 @@
-import DefinitionBase from '../host/src/app/interfaces/DefinitionBase';
-
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _omit = require('lodash/omit');
 
+import DefinitionBase from '../host/src/app/interfaces/DefinitionBase';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import MasterConfig from './interfaces/MasterConfig';
@@ -13,6 +12,7 @@ import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
+import Main from './Main';
 
 
 const servicesShortcut = [
@@ -23,32 +23,30 @@ const servicesShortcut = [
 ];
 
 
-// TODO: rename
-
+/**
+ * Parse prepare hosts configs.
+ */
 export default class HostsConfigsSet {
-  private readonly masterConfig: MasterConfig;
-  private readonly manifests: Manifests;
+  private readonly main: Main;
   // hosts configs by hostId
   private hostsConfigs: {[index: string]: HostConfig} = {};
 
 
-  constructor(masterConfig: MasterConfig, manifests: Manifests) {
-    this.masterConfig = masterConfig;
-    this.manifests = manifests;
+  constructor(main: Main) {
+    this.main = main;
   }
 
   getHostsIds(): string[] {
-    // TODO: !!!
+    return Object.keys(this.hostsConfigs);
   }
 
   getHostConfig(hostId: string): HostConfig {
-    // TODO: !!!
+    if (!this.hostsConfigs[hostId]) throw new Error(`Host "${hostId}" not found`);
+
+    return this.hostsConfigs[hostId];
   }
 
   getHostsConfig(): {[index: string]: HostConfig} {
-
-    // TODO: clone or immutable
-
     return this.hostsConfigs;
   }
 
