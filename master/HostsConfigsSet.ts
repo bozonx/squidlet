@@ -11,6 +11,8 @@ import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
+import hostDefaultConfig from './configs/hostDefaultConfig';
+
 
 
 const servicesShortcut = [
@@ -183,13 +185,12 @@ export default class HostsConfigsSet {
    * Merge params of host.
    */
   private mergeHostParams(rawHostConfig: PreHostConfig): {[index: string]: any} {
-    // TODO: смержить ещё с configHostDefault.ts конфигом где указан дефолтный storeDir и тд
     // TODO: смержить ещё с platform config
-    // TODO: добавить connection driver и его зависимые драйверы которые используются в network
 
     return _defaultsDeep(
       { ...rawHostConfig.host },
-      this.main.masterConfig.hostDefaults
+      this.main.masterConfig.hostDefaults,
+      hostDefaultConfig
     );
   }
 

@@ -1,10 +1,6 @@
 export default {
-  host: {
-    defaultStatusRepublishIntervalMs: 60000,
-    defaultConfigRepublishIntervalMs: 600000,
-  },
-
-
+  defaultStatusRepublishIntervalMs: 60000,
+  defaultConfigRepublishIntervalMs: 600000,
 
   // TODO: review
 
@@ -15,9 +11,7 @@ export default {
     }
   },
 
-  fileNames: {
-    manifestFileName: 'device.yaml',
-  },
+  // TODO: review
 
   network: {
     routedMessageTTL: 10,
