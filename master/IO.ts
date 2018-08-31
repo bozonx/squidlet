@@ -3,7 +3,7 @@ import * as uniqid from 'uniqid';
 import * as yaml from 'js-yaml';
 
 
-export async function resolveFile(pathToDirOrFile: string, ext: string, indexFileName: string[]): string {
+export async function resolveFile(pathToDirOrFile: string, indexFileNames: string[]): string {
   // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
   // TODO: расширение yaml - можно подставлять - необязательно указывать
 }

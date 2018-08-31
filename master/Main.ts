@@ -12,10 +12,7 @@ import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
 import {loadYamlFile, resolveFile} from './IO';
 import masterConfigDefaults from './configs/masterConfigDefaults';
-
-
-// TODO: move to config
-export const INDEX_MANIFEST_FILE_NAMES = ['manifest'];
+import systemConfig from './configs/systemConfig';
 
 
 export default class Main {
@@ -74,7 +71,10 @@ export default class Main {
       throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
     }
 
-    const resolvedPathToManifest: string = await resolveFile(pathToDirOrFile, 'yaml', INDEX_MANIFEST_FILE_NAMES);
+    const resolvedPathToManifest: string = await resolveFile(
+      pathToDirOrFile,
+      systemConfig.indexManifestFileNames
+    );
     const parsedManifest = (await loadYamlFile(resolvedPathToManifest)) as T;
 
     parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
