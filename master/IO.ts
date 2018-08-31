@@ -1,6 +1,7 @@
-import * as fs from 'fs';
+import {promises as fsPromises} from 'fs';
 import * as uniqid from 'uniqid';
 import * as yaml from 'js-yaml';
+import systemConfig from './configs/systemConfig';
 
 
 export async function resolveFile(pathToDirOrFile: string, indexFileNames: string[]): string {
@@ -14,22 +15,27 @@ export async function loadYamlFile(fullPath: string): Promise<{[index: string]: 
   return yamlToJs(yamlContent);
 }
 
-export function getFileContent(filename: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filename, 'utf8', (err: NodeJS.ErrnoException, data: string) => {
-      if (err) return reject(err);
-
-      resolve(data);
-    });
-  });
+export function getFileContent(path: string): Promise<string> {
+  return fsPromises.readFile(path, systemConfig.filesEncode) as Promise<string>;
 }
 
-export async function writeFile(fileName: string, content: string) {
-  // TODO: !!!!
+export async function writeFile(path: string, data: string | Uint8Array): Promise<void> {
+  if (typeof data === 'string') {
+    return fsPromises.writeFile(path, data, systemConfig.filesEncode);
+  }
+  else {
+    return fsPromises.writeFile(path, data);
+  }
 }
 
-export async function copyFile(fromFileName: string, toFileName: string) {
-  // TODO: !!!!
+export async function copyFile(src: string, dest: string): Promise<void> {
+  return fsPromises.copyFile(src, dest);
+}
+
+export async function mkdirP(dirName: string) {
+  // TODO: !!!! use logic of mkdirP
+
+  return fsPromises.mkdir(dirName);
 }
 
 export function generateUniqId(): string {

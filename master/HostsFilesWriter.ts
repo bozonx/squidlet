@@ -9,7 +9,7 @@ import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import HostFilesSet from './interfaces/HostFilesSet';
 import HostsFilesSet from './HostsFilesSet';
 import systemConfig from './configs/systemConfig';
-import {copyFile, writeFile} from './IO';
+import {copyFile, mkdirP, writeFile} from './IO';
 
 
 export default class HostsFilesWriter {
@@ -75,8 +75,6 @@ export default class HostsFilesWriter {
   private async writeHostConfig(configDir: string, hostConfig: HostConfig) {
     const fileName = path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig);
 
-    // TODO: создать папку - hostId/config
-
     await this.writeJson(fileName, hostConfig);
   }
 
@@ -87,8 +85,6 @@ export default class HostsFilesWriter {
         manifest.name,
         systemConfig.hostInitCfg.fileNames.manifest
       );
-
-      // TODO: создать папку - entityTypeDirPath/manifest.name
 
       await this.writeJson(fileName, manifest);
     }
@@ -103,7 +99,7 @@ export default class HostsFilesWriter {
           path.basename(fromFileName),
         );
 
-        // TODO: создать папку - entityTypeDirPath/entityClassName
+        await mkdirP(path.dirname(toFileName));
 
         await copyFile(fromFileName, toFileName);
       }
@@ -112,6 +108,8 @@ export default class HostsFilesWriter {
 
   private async writeJson(fileName: string, contentJs: any) {
     const content = JSON.stringify(contentJs);
+
+    await mkdirP(path.dirname(fileName));
 
     await writeFile(fileName, content);
   }

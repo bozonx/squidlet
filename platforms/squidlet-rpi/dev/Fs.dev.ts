@@ -32,7 +32,7 @@ export default class FsDev {
   }
 
   readFile(path: string): Promise<string> {
-    return fsPromises.readFile(path, this.defaultEncode) as Promise<string> ;
+    return fsPromises.readFile(path, this.defaultEncode) as Promise<string>;
   }
 
   rmdir(path: string): Promise<void> {

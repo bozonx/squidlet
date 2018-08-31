@@ -20,4 +20,5 @@ export default {
   entityBuildDir: 'entityBuild',
   //pathToSaveHostsFileSet: 'hosts',
   pathToSaveHostsFileSet: `${hostInitCfg.hostDirs.services}/ConfigUpdater/hosts`,
+  filesEncode: 'utf8',
 };
