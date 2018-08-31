@@ -44,13 +44,17 @@ export default class HostsFilesWriter {
 
   private async proceedHost(hostId: string, hostFileSet: HostFilesSet) {
     const hostDir = path.join(this.baseDir, hostId);
-    const devicesPath = path.join(hostDir, systemConfig.hostInitCfg.hostDirs.devices);
-    const driversPath = path.join(hostDir, systemConfig.hostInitCfg.hostDirs.drivers);
-    const servicesPath = path.join(hostDir, systemConfig.hostInitCfg.hostDirs.services);
+    const hostDirs = systemConfig.hostInitCfg.hostDirs;
+    const fileNames = systemConfig.hostInitCfg.fileNames;
+
+    const configDir = path.join(hostDir, hostDirs.config);
+    const devicesPath = path.join(hostDir, hostDirs.devices);
+    const driversPath = path.join(hostDir, hostDirs.drivers);
+    const servicesPath = path.join(hostDir, hostDirs.services);
 
     // TODO: создать папку хранилища, девайсов, драйверов и тд
 
-    await this.writeHostConfig(hostDir, hostFileSet.config);
+    await this.writeHostConfig(configDir, hostFileSet.config);
 
     await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
     await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
@@ -60,21 +64,20 @@ export default class HostsFilesWriter {
     await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
     await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
 
-    //await this.writeJson(, hostFileSet.systemDrivers);
-    // TODO: add a new items
+    await this.writeJson(path.join(configDir, fileNames.systemDrivers), hostFileSet.systemDrivers);
+    await this.writeJson(path.join(configDir, fileNames.regularDrivers), hostFileSet.regularDrivers);
+    await this.writeJson(path.join(configDir, fileNames.systemServices), hostFileSet.systemServices);
+    await this.writeJson(path.join(configDir, fileNames.regularServices), hostFileSet.regularServices);
+
+    // TODO: add definitions
   }
 
-  private async writeHostConfig(hostPath: string, hostConfig: HostConfig) {
-    const fileName = path.join(
-      hostPath,
-      systemConfig.hostInitCfg.hostDirs.config,
-      systemConfig.hostInitCfg.fileNames.hostConfig
-    );
-    const content = JSON.stringify(hostConfig);
+  private async writeHostConfig(configDir: string, hostConfig: HostConfig) {
+    const fileName = path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig);
 
     // TODO: создать папку - hostId/config
 
-    await writeFile(fileName, content);
+    await this.writeJson(fileName, hostConfig);
   }
 
   async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
@@ -84,11 +87,10 @@ export default class HostsFilesWriter {
         manifest.name,
         systemConfig.hostInitCfg.fileNames.manifest
       );
-      const content = JSON.stringify(manifest);
 
       // TODO: создать папку - entityTypeDirPath/manifest.name
 
-      await writeFile(fileName, content);
+      await this.writeJson(fileName, manifest);
     }
   }
 
@@ -106,6 +108,12 @@ export default class HostsFilesWriter {
         await copyFile(fromFileName, toFileName);
       }
     }
+  }
+
+  private async writeJson(fileName: string, contentJs: any) {
+    const content = JSON.stringify(contentJs);
+
+    await writeFile(fileName, content);
   }
 
 }
