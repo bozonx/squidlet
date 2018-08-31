@@ -96,45 +96,19 @@ export default class HostsConfigsSet {
     devicesDefaults?: {[index: string]: any}
   ): {[index: string]: DeviceDefinition} {
     return this.generateEntityDefinition<DeviceDefinition>(
-
-      // TODO: пересмотреть !!!!
-
       rawDevices,
       'device',
       (entityId: string, entityDef: DeviceDefinition): DeviceDefinition => {
         return {
           ...entityDef,
+          // merge default props with entity props
           props: {
-            ...entityDef,
+            ...devicesDefaults,
             ...entityDef.props,
           }
-        } as DeviceDefinition;
+        };
       }
     );
-  }
-
-  private generateEntityDefinition<T extends DefinitionBase>(
-    rawDefinitions: {[index: string]: any},
-    classNameParam: string,
-    cb?: (entityId: string, entityDef: T) => T
-  ): {[index: string]: T} {
-    const result: {[index: string]: T} = {};
-
-    for (let entityId of Object.keys(rawDefinitions)) {
-      const entityDef: {[index: string]: any} = rawDefinitions[entityId];
-
-      // TODO: доделать !!!!
-
-      result[entityId] = {
-        id: entityId as string,
-        className: entityDef[classNameParam] as string,
-        props: _omit(entityDef, classNameParam) as {[index: string]: any},
-      };
-
-      if (cb) cb(entityId, result[entityId]);
-    }
-
-    return result;
   }
 
   private collectDriversDefinitions(
@@ -149,17 +123,38 @@ export default class HostsConfigsSet {
     return this.generateEntityDefinition<ServiceDefinition>(
       rawServices,
       'service',
-      (entityId: string, entityDef: PreServiceDefinition): ServiceDefinition => {
+      (entityId: string, entityDef: ServiceDefinition): ServiceDefinition => {
         return {
 
-          // TODO: !!!!
           // TODO: ...this.generatePreDefinedServices(rawHostConfig),
-          //const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
 
         } as ServiceDefinition;
       }
     );
   }
+
+  private generateEntityDefinition<T extends DefinitionBase>(
+    rawDefinitions: {[index: string]: any},
+    classNameParam: string,
+    transform?: (entityId: string, entityDef: T) => T
+  ): {[index: string]: T} {
+    const result: {[index: string]: T} = {};
+
+    for (let entityId of Object.keys(rawDefinitions)) {
+      const entityDef: {[index: string]: any} = rawDefinitions[entityId];
+
+      result[entityId] = {
+        id: entityId,
+        className: entityDef[classNameParam],
+        props: _omit(entityDef, classNameParam),
+      } as T;
+
+      if (transform) result[entityId] = transform(entityId, result[entityId]);
+    }
+
+    return result;
+  }
+
 
   /**
    * Generate service from shortcuts like 'automation', 'logger' etc.
