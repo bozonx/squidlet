@@ -6,7 +6,7 @@ import Register from './Register';
 import Manager from './Manager';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
-import HostsConfigGenerator from './HostsConfigGenerator';
+import HostsConfigsSet from './HostsConfigsSet';
 import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
@@ -18,7 +18,7 @@ export default class Main {
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;
   private readonly manifests: Manifests;
-  private readonly hostsConfigGenerator: HostsConfigGenerator;
+  private readonly hostsConfigSet: HostsConfigsSet;
   private readonly hostsFilesSet: HostsFilesSet;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly manager: Manager;
@@ -38,10 +38,10 @@ export default class Main {
     this.masterConfig = masterConfig as MasterConfig;
     this.register = new Register(this);
     this.manifests = new Manifests(this);
-    this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
-    this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigGenerator);
-    this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigGenerator);
-    this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigGenerator);
+    this.hostsConfigSet = new HostsConfigsSet(this.masterConfig, this.manifests);
+    this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigSet);
+    this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigSet);
+    this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
   }
 
   async start() {
@@ -58,7 +58,7 @@ export default class Main {
     );
 
     // generate hosts configs
-    this.hostsConfigGenerator.generate();
+    this.hostsConfigSet.generate();
 
     // call handlers after init
     this.manager.$riseAfterInit();

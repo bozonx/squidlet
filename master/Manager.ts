@@ -1,7 +1,7 @@
 import MasterConfig from './interfaces/MasterConfig';
 import Register from './Register';
 import Manifests, {AllManifests} from './Manifests';
-import HostsConfigGenerator from './HostsConfigGenerator';
+import HostsConfigsSet from './HostsConfigsSet';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import * as EventEmitter from 'events';
 
@@ -17,19 +17,19 @@ export default class Configurator {
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;
   private readonly manifests: Manifests;
-  private readonly hostsConfigGenerator: HostsConfigGenerator;
+  private readonly hostsConfigSet: HostsConfigsSet;
 
 
   constructor(
     masterConfig: MasterConfig,
     register: Register,
     manifests: Manifests,
-    hostsConfigGenerator: HostsConfigGenerator
+    hostsConfigSet: HostsConfigsSet
   ) {
     this.masterConfig = masterConfig;
     this.register = register;
     this.manifests = manifests;
-    this.hostsConfigGenerator = hostsConfigGenerator;
+    this.hostsConfigSet = hostsConfigSet;
   }
 
   getMasterConfig() {
@@ -42,7 +42,7 @@ export default class Configurator {
   }
 
   getHostsConfig(): {[index: string]: HostConfig} {
-    return this.hostsConfigGenerator.getHostsConfig();
+    return this.hostsConfigSet.getHostsConfig();
   }
 
   addPlugin: Register['addPlugin'] = (plugin) => {

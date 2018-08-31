@@ -4,20 +4,20 @@ import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
 import Manifests, {Dependencies, ManifestsTypePluralName} from './Manifests';
-import HostsConfigGenerator from './HostsConfigGenerator';
+import HostsConfigsSet from './HostsConfigsSet';
 import HostFilesSet from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
 
 export default class HostsFilesSet {
   private readonly manifests: Manifests;
-  private readonly hostsConfigGenerator: HostsConfigGenerator;
+  private readonly hostsConfigSet: HostsConfigsSet;
   // file sets by hostId
   private files: {[index: string]: HostFilesSet} = {};
 
-  constructor(manifests: Manifests, hostsConfigGenerator: HostsConfigGenerator) {
+  constructor(manifests: Manifests, hostsConfigSet: HostsConfigsSet) {
     this.manifests = manifests;
-    this.hostsConfigGenerator = hostsConfigGenerator;
+    this.hostsConfigSet = hostsConfigSet;
   }
 
   getCollection(): {[index: string]: HostFilesSet} {
@@ -28,7 +28,7 @@ export default class HostsFilesSet {
    * Generate file set for each host
    */
   collect() {
-    const hostIds: string[] = this.hostsConfigGenerator.getHostsIds();
+    const hostIds: string[] = this.hostsConfigSet.getHostsIds();
 
     for (let hostId of hostIds) {
       this.files[hostId] = this.combineHostFileSet(hostId);
@@ -58,7 +58,7 @@ export default class HostsFilesSet {
 
 
     return {
-      config: this.hostsConfigGenerator.getHostConfig(hostId),
+      config: this.hostsConfigSet.getHostConfig(hostId),
 
       devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
       driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
@@ -73,9 +73,9 @@ export default class HostsFilesSet {
       systemServices,
       regularServices,
 
-      devicesDefinitions: _map(this.hostsConfigGenerator.getDevicesDefinitions(hostId)),
-      driversDefinitions: this.hostsConfigGenerator.getDriversDefinitions(hostId),
-      servicesDefinitions: this.hostsConfigGenerator.getServicesDefinitions(hostId),
+      devicesDefinitions: _map(this.hostsConfigSet.getDevicesDefinitions(hostId)),
+      driversDefinitions: this.hostsConfigSet.getDriversDefinitions(hostId),
+      servicesDefinitions: this.hostsConfigSet.getServicesDefinitions(hostId),
     };
   }
 
@@ -85,9 +85,9 @@ export default class HostsFilesSet {
   private generateEntityNames(
     hostId: string
   ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
-    const devicesDefinitions = this.hostsConfigGenerator.getDevicesDefinitions(hostId);
-    const driversDefinitions = this.hostsConfigGenerator.getDriversDefinitions(hostId);
-    const servicesDefinitions = this.hostsConfigGenerator.getServicesDefinitions(hostId);
+    const devicesDefinitions = this.hostsConfigSet.getDevicesDefinitions(hostId);
+    const driversDefinitions = this.hostsConfigSet.getDriversDefinitions(hostId);
+    const servicesDefinitions = this.hostsConfigSet.getServicesDefinitions(hostId);
 
     // collect manifest names of used entities
     const devicesClasses = Object.keys(devicesDefinitions)
