@@ -1,5 +1,8 @@
+import {AllManifests} from './Manifests';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _omit = require('lodash/omit');
+const _values = require('lodash/values');
 
 import DefinitionBase from '../host/src/app/interfaces/DefinitionBase';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
@@ -12,6 +15,7 @@ import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import hostDefaultConfig from './configs/hostDefaultConfig';
+import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 
 
 
@@ -94,6 +98,9 @@ export default class HostsConfigsSet {
       // final host config
       this.hostsConfigs[hostId] = this.generateHostConfig(rawHostConfig);
     }
+
+    // check for definition have a manifest
+    this.checkDefinitions();
   }
 
 
@@ -192,6 +199,29 @@ export default class HostsConfigsSet {
       this.main.masterConfig.hostDefaults,
       hostDefaultConfig
     );
+  }
+
+  /**
+   * Check for definitions classNames exist in manifests.
+   */
+  private checkDefinitions() {
+    const manifests: AllManifests = this.main.manifests.getManifests();
+    const check = (
+      manifests: {[index: string]: ManifestBase},
+      definitions: {[index: string]: {[index: string]:DefinitionBase}}
+    ) => {
+      for(let hostId of Object.keys(definitions)) {
+        for (let entityDef of _values(definitions[hostId])) {
+          if (!manifests[entityDef.className]) {
+            throw new Error(`Can't find a manifest "${entityDef.className}" of definition ${JSON.stringify(entityDef)}`);
+          }
+        }
+      }
+    };
+
+    check(manifests.devices, this.devicesDefinitions);
+    check(manifests.drivers, this.driversDefinitions);
+    check(manifests.services, this.servicesDefinitions);
   }
 
 }

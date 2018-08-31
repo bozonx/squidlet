@@ -50,12 +50,7 @@ export default class HostsFilesSet {
       regularServices,
     ] = this.sortServices(servicesClasses);
 
-    // TODO: проверить что запрашиваемые имена есть среди манифестов
     // TODO: проверить что getDevDependencies есть среди devs платформы
-
-
-    // TODO: смержить props: дефолтные значения указанные в devicesDefaults и определения девайсов
-
 
     return {
       config: this.hostsConfigSet.getHostConfig(hostId),

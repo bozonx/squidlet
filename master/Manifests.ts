@@ -200,6 +200,7 @@ export default class Manifests {
   private async buildMainFile(absoluteMainFileName: string, jsFileName: string) {
     // TODO: !!!!! билдить во временную папку
     // TODO: !!!!! написать в лог что билдится файл
+    // TODO: !!!!! поддержка билда js файлов
 
   }
 

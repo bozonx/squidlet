@@ -19,11 +19,11 @@ import {isAbsoluteFileName} from './helpers';
 
 export default class Main {
   readonly masterConfig: MasterConfig;
+  readonly manifests: Manifests;
   readonly hostsFilesSet: HostsFilesSet;
   readonly buildDir: string;
   private readonly hostsConfigSet: HostsConfigsSet;
   private readonly register: Register;
-  private readonly manifests: Manifests;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
