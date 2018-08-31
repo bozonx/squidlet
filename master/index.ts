@@ -17,7 +17,7 @@ async function init() {
 
   const resolvedPath = path.resolve(yargs.argv.config);
   const configJs = await loadYamlFile(resolvedPath);
-  const configurator = new Main(configJs);
+  const configurator = new Main(configJs, resolvedPath);
 
   await configurator.start();
 }

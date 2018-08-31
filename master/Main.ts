@@ -19,30 +19,24 @@ import PreHostConfig from './interfaces/PreHostConfig';
 export default class Main {
   readonly masterConfig: MasterConfig;
   readonly hostsFilesSet: HostsFilesSet;
+  readonly buildDir: string;
   private readonly hostsConfigSet: HostsConfigsSet;
   private readonly register: Register;
   private readonly manifests: Manifests;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
-  get buildDir(): string {
-    if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
-      return path.resolve(__dirname, this.masterConfig.hosts.master.host.storageDir);
-    }
-
-    return systemConfig.defaultDuildDir;
-  }
-
   get masterConfigHosts(): {[index: string]: PreHostConfig} {
     return this.masterConfig.hosts as {[index: string]: PreHostConfig};
   }
 
-  constructor(masterConfig: {[index: string]: any}) {
+  constructor(masterConfig: {[index: string]: any}, masterConfigPath: string) {
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
     this.masterConfig = this.prepareMasterConfig(masterConfig);
+    this.buildDir = this.makeBuildDir(masterConfigPath);
     this.register = new Register(this);
     this.manifests = new Manifests(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
@@ -129,6 +123,22 @@ export default class Main {
       ..._omit(preMasterConfig, 'host', 'hosts'),
       hosts
     };
+  }
+
+  private makeBuildDir(masterConfigPath: string): string {
+    if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
+      const storageDir = this.masterConfig.hosts.master.host.storageDir;
+      if (masterConfigPath.indexOf('/') === 0 || this.masterConfigPath.indexOf('`') === 0) {
+        // it's an absolute path
+        return storageDir;
+      }
+      else {
+        // relative path - make it relative to config file
+        return path.join(path.dirname(masterConfigPath), storageDir);
+      }
+    }
+
+    return systemConfig.defaultDuildDir;
   }
 
 }
