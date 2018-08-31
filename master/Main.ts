@@ -14,6 +14,7 @@ import PreManifestBase from './interfaces/PreManifestBase';
 import {loadYamlFile, resolveFile} from './IO';
 import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
+import * as defaultLogger from './defaultLogger';
 import {isAbsoluteFileName} from './helpers';
 
 
@@ -22,6 +23,7 @@ export default class Main {
   readonly manifests: Manifests;
   readonly hostsFilesSet: HostsFilesSet;
   readonly buildDir: string;
+  readonly log = defaultLogger;
   private readonly hostsConfigSet: HostsConfigsSet;
   private readonly register: Register;
   private readonly hostsFilesWriter: HostsFilesWriter;
@@ -47,26 +49,29 @@ export default class Main {
   }
 
   async start() {
-    // TODO: писать в лог о каждом этапе
-
-    // registering of plugins, devices, drivers and services
+    this.log.info(`Registering plugins, devices, drivers and services`);
     await this.registering();
 
-    // resolve and prepare manifests
+    this.log.info(`Resolving and preparing manifests`);
     await this.manifests.generate(
       this.register.getDevicesPreManifests(),
       this.register.getDriversPreManifests(),
       this.register.getServicesPreManifests()
     );
 
-    // generate hosts configs
+    this.log.info(`Generating hosts configs`);
     this.hostsConfigSet.generate();
 
+    this.log.info(`Initialization has finished`);
     // call handlers after init
     this.pluginEnv.$riseAfterInit();
 
+    this.log.info(`Collecting files set`);
     this.hostsFilesSet.collect();
+    this.log.info(`Write hosts files`);
     await this.hostsFilesWriter.writeToStorage();
+
+    this.log.info(`Done!`);
   }
 
 
