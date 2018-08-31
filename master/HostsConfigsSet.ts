@@ -46,12 +46,12 @@ export default class HostsConfigsSet {
     return this.hostsConfigs[hostId];
   }
 
-  getHostsConfig(): {[index: string]: HostConfig} {
+  getHostsConfigs(): {[index: string]: HostConfig} {
     return this.hostsConfigs;
   }
 
   generate() {
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs();
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.getHostsConfigs111();
 
 
     //
@@ -183,7 +183,7 @@ export default class HostsConfigsSet {
   /**
    * Use "hosts" of {master: host} params of master config.
    */
-  private getHostsConfigs(): {[index: string]: PreHostConfig} {
+  private getHostsConfigs111(): {[index: string]: PreHostConfig} {
     if (!this.masterConfig.host || this.masterConfig.hosts) {
       throw new Error(`Master config doesn't have "host" or "hosts" params`);
     }

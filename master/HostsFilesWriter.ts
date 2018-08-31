@@ -26,7 +26,7 @@ export default class HostsFilesWriter {
    */
   async writeToStorage() {
     const filesCollection: {[index: string]: HostFilesSet} = this.hostsFilesSet.getCollection();
-    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigSet.getHostsConfig();
+    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigSet.getHostsConfigs();
     const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
     const basePath = path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
 

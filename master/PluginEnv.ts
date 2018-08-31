@@ -41,8 +41,8 @@ export default class PluginEnv {
     return this.manifests.getManifests();
   }
 
-  getHostsConfig(): {[index: string]: HostConfig} {
-    return this.hostsConfigSet.getHostsConfig();
+  getHostsConfigs(): {[index: string]: HostConfig} {
+    return this.hostsConfigSet.getHostsConfigs();
   }
 
   addPlugin: Register['addPlugin'] = (plugin) => {
