@@ -12,7 +12,7 @@ const AFTER_INIT_EVENT = 'afterInit';
 /**
  * This manager is passed to plugins.
  */
-export default class Configurator {
+export default class PluginEnv {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;

@@ -8,7 +8,7 @@ import validateDeviceManifest from './validateDeviceManifest';
 import validateDriverManifest from './validateDriverManifest';
 import {Map} from 'immutable';
 import Plugin from './interfaces/Plugin';
-import Manager from './Manager';
+import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
 import {ManifestsTypeName, ManifestsTypePluralName} from './Manifests';
@@ -96,9 +96,9 @@ export default class Register {
     return this.addEntity<PreServiceManifest>('service', manifest);
   }
 
-  async initPlugins(manager: Manager) {
+  async initPlugins(pluginEnv: PluginEnv) {
     for (let plugin of this.plugins) {
-      await plugin(manager);
+      await plugin(pluginEnv);
     }
   }
 

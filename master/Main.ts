@@ -3,7 +3,7 @@ import * as path from 'path';
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
 import Register from './Register';
-import Manager from './Manager';
+import PluginEnv from './PluginEnv';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
 import HostsConfigsSet from './HostsConfigsSet';
@@ -21,7 +21,7 @@ export default class Main {
   private readonly hostsConfigSet: HostsConfigsSet;
   private readonly hostsFilesSet: HostsFilesSet;
   private readonly hostsFilesWriter: HostsFilesWriter;
-  private readonly manager: Manager;
+  private readonly pluginEnv: PluginEnv;
 
   get buildDir(): string {
 
@@ -41,7 +41,7 @@ export default class Main {
     this.hostsConfigSet = new HostsConfigsSet(this.masterConfig, this.manifests);
     this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigSet);
     this.hostsFilesWriter = new HostsFilesWriter(this.hostsFilesSet, this.hostsConfigSet);
-    this.manager = new Manager(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
+    this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
   }
 
   async start() {
@@ -61,7 +61,7 @@ export default class Main {
     this.hostsConfigSet.generate();
 
     // call handlers after init
-    this.manager.$riseAfterInit();
+    this.pluginEnv.$riseAfterInit();
 
     this.hostsFilesSet.collect();
     await this.hostsFilesWriter.writeToStorage();
@@ -101,7 +101,7 @@ export default class Main {
     }
 
     // initialize all the plugins
-    await this.register.initPlugins(this.manager);
+    await this.register.initPlugins(this.pluginEnv);
     // wait for all the registering processes. It needs if plugin doesn't wait for register promise.
     await Promise.all(this.register.getRegisteringPromises());
   }

@@ -1,6 +1,6 @@
-import Manager from '../Manager';
+import PluginEnv from '../PluginEnv';
 
 
 export default interface Plugin {
-  (manager: Manager): void;
+  (pluginEnv: PluginEnv): void;
 }
