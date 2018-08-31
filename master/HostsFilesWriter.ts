@@ -16,6 +16,15 @@ export default class HostsFilesWriter {
   private readonly hostsFilesSet: HostsFilesSet;
   private readonly hostsConfigSet: HostsConfigsSet;
 
+  private get baseDir(): string {
+    // TODO: move to constructor ???
+    // TODO: review
+    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigSet.getHostsConfigs();
+    const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
+    // TODO: review
+    return path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
+  }
+
   constructor(hostsFilesSet: HostsFilesSet, hostsConfigSet: HostsConfigsSet) {
     this.hostsFilesSet = hostsFilesSet;
     this.hostsConfigSet = hostsConfigSet;
@@ -26,35 +35,36 @@ export default class HostsFilesWriter {
    */
   async writeToStorage() {
     const filesCollection: {[index: string]: HostFilesSet} = this.hostsFilesSet.getCollection();
-    const hostsConfigs: {[index: string]: HostConfig} = this.hostsConfigSet.getHostsConfigs();
-    const pathToStoreOnMaster: string = hostsConfigs.master.host.storageDir;
-    const basePath = path.join(pathToStoreOnMaster, systemConfig.pathToSaveHostsFileSet);
-
-    // TODO: создать папку хранилища, девайсов, драйверов и тд
 
     for (let hostId of Object.keys(filesCollection)) {
-      const hostFileSet: HostFilesSet = filesCollection[hostId];
-      const hostPath = path.join(basePath, hostId);
-      const devicesPath = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.devices);
-      const driversPath = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.drivers);
-      const servicesPath = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.services);
-
-      await this.writeHostConfig(hostPath, hostFileSet.config);
-
-      await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
-      await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
-      await this.writeManifests<ServiceManifest>(servicesPath, hostFileSet.servicesManifests);
-
-      await this.copyEntityFiles(devicesPath, hostFileSet.devicesFiles);
-      await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
-      await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
-
-      //await this.writeJson(, hostFileSet.systemDrivers);
-      // TODO: add a new items
+      await this.proceedHost(hostId, filesCollection[hostId]);
     }
   }
 
-  async writeHostConfig(hostPath: string, hostConfig: HostConfig) {
+
+  private async proceedHost(hostId: string, hostFileSet: HostFilesSet) {
+    const hostDir = path.join(this.baseDir, hostId);
+    const devicesPath = path.join(hostDir, systemConfig.hostInitCfg.hostDirs.devices);
+    const driversPath = path.join(hostDir, systemConfig.hostInitCfg.hostDirs.drivers);
+    const servicesPath = path.join(hostDir, systemConfig.hostInitCfg.hostDirs.services);
+
+    // TODO: создать папку хранилища, девайсов, драйверов и тд
+
+    await this.writeHostConfig(hostDir, hostFileSet.config);
+
+    await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
+    await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
+    await this.writeManifests<ServiceManifest>(servicesPath, hostFileSet.servicesManifests);
+
+    await this.copyEntityFiles(devicesPath, hostFileSet.devicesFiles);
+    await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
+    await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
+
+    //await this.writeJson(, hostFileSet.systemDrivers);
+    // TODO: add a new items
+  }
+
+  private async writeHostConfig(hostPath: string, hostConfig: HostConfig) {
     const fileName = path.join(hostPath, systemConfig.hostInitCfg.hostDirs.config, systemConfig.hostInitCfg.fileNames.hostConfig);
     const content = JSON.stringify(hostConfig);
 
