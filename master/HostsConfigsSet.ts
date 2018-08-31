@@ -93,15 +93,11 @@ export default class HostsConfigsSet {
   ): {[index: string]: DeviceDefinition} {
     return this.generateEntityDefinition<DeviceDefinition>(
       rawDevices,
+      'device',
       (entityId: string, entityDef: PreDeviceDefinition): DeviceDefinition => {
         return {
-          id: entityId,
-          className: entityDef.device,
-
           // TODO: use devicesDefaults: rawHostConfig.devicesDefaults || {},
           // TODO: merge with devicesDefaults
-
-          props: _omit(entityDef, 'device'),
         } as DeviceDefinition;
       }
     );
@@ -109,14 +105,20 @@ export default class HostsConfigsSet {
 
   private generateEntityDefinition<T>(
     rawDefinitions: {[index: string]: any},
-    cb: (entityId: string, entityDef: any) => T
+    classNameParam: string,
+    cb?: (entityId: string, entityDef: any) => T
   ): {[index: string]: T} {
     const result: {[index: string]: T} = {};
 
     for (let itemId of Object.keys(rawDefinitions)) {
-      const item: {[index: string]: any} = rawDefinitions[itemId];
+      const entityDef: {[index: string]: any} = rawDefinitions[itemId];
 
-      result[itemId] = cb(itemId, item);
+      result[itemId] = {
+        id: itemId,
+        className: entityDef[classNameParam],
+        props: _omit(entityDef, classNameParam),
+        ...cb && cb(itemId, entityDef) as any,
+      };
     }
 
     return result;
@@ -125,16 +127,7 @@ export default class HostsConfigsSet {
   private collectDriversDefinitions(
     rawDrivers: {[index: string]: PreDriverDefinition}
   ): {[index: string]: DriverDefinition} {
-    return this.generateEntityDefinition<DriverDefinition>(
-      rawDrivers,
-      (entityId: string, entityDef: PreDriverDefinition): DriverDefinition => {
-        return {
-          id: entityDef.driver,
-          className: entityDef.driver,
-          props: _omit(entityDef, 'driver'),
-        } as DriverDefinition;
-      }
-    );
+    return this.generateEntityDefinition<DriverDefinition>(rawDrivers, 'driver');
   }
 
   private collectServicesDefinitions(
@@ -142,16 +135,15 @@ export default class HostsConfigsSet {
   ): {[index: string]: ServiceDefinition} {
     return this.generateEntityDefinition<ServiceDefinition>(
       rawServices,
+      'service',
       (entityId: string, entityDef: PreServiceDefinition): ServiceDefinition => {
-
-        // TODO: !!!!
-        // TODO: ...this.generatePreDefinedServices(rawHostConfig),
-        //const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
-
         return {
-          id: entityId,
-          className: entityDef.service,
-          props: _omit(entityDef, 'service'),
+
+          // TODO: !!!!
+          // TODO: ...this.generatePreDefinedServices(rawHostConfig),
+          //const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
+
+
         } as ServiceDefinition;
       }
     );
