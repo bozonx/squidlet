@@ -88,77 +88,73 @@ export default class HostsConfigsSet {
     }
   }
 
-  /**
-   * Merge params of host with hostDefaults.
-   * @param hostParams
-   */
-  private mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
-    // TODO: смержить ещё с configHostDefault.ts конфигом где указан дефолтный storeDir и тд
-    // TODO: смержить ещё с platform config
-
-    return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
-  }
-
   private collectDevicesDefinitions(
     rawDevices: {[index: string]: PreDeviceDefinition}
   ): {[index: string]: DeviceDefinition} {
-    // TODO: use devicesDefaults: rawHostConfig.devicesDefaults || {},
+    return this.generateEntityDefinition<DeviceDefinition>(
+      rawDevices,
+      (entityId: string, entityDef: PreDeviceDefinition): DeviceDefinition => {
+        return {
+          id: entityId,
+          className: entityDef.device,
 
-    const definitions: DeviceDefinition[] = [];
+          // TODO: use devicesDefaults: rawHostConfig.devicesDefaults || {},
+          // TODO: merge with devicesDefaults
 
-    for (let deviceId of Object.keys(rawDevices)) {
-      const device: DeviceDefinition = {
-        id: deviceId,
-        className: rawDevices[deviceId].device,
+          props: _omit(entityDef, 'device'),
+        } as DeviceDefinition;
+      }
+    );
+  }
 
-        // TODO: merge with devicesDefaults
+  private generateEntityDefinition<T>(
+    rawDefinitions: {[index: string]: any},
+    cb: (entityId: string, entityDef: any) => T
+  ): {[index: string]: T} {
+    const result: {[index: string]: T} = {};
 
-        props: _omit(rawDevices[deviceId], 'device'),
-      };
+    for (let itemId of Object.keys(rawDefinitions)) {
+      const item: {[index: string]: any} = rawDefinitions[itemId];
 
-      definitions.push(device);
+      result[itemId] = cb(itemId, item);
     }
 
-    return definitions;
+    return result;
   }
 
   private collectDriversDefinitions(
     rawDrivers: {[index: string]: PreDriverDefinition}
   ): {[index: string]: DriverDefinition} {
-    const definitions: DriverDefinition[] = [];
-
-    for (let driverId of Object.keys(rawDrivers)) {
-      const driver: DriverDefinition = {
-        id: driverId,
-        className: rawDrivers[driverId].driver,
-
-
-        // TODO: ??? отсортировать для каждого хоста - сначала dev, потом system потом остальные
-
-        props: _omit(rawDrivers[driverId], 'driver'),
-      };
-
-      definitions.push(driver);
-    }
-
-    return definitions;
+    return this.generateEntityDefinition<DriverDefinition>(
+      rawDrivers,
+      (entityId: string, entityDef: PreDriverDefinition): DriverDefinition => {
+        return {
+          id: entityDef.driver,
+          className: entityDef.driver,
+          props: _omit(entityDef, 'driver'),
+        } as DriverDefinition;
+      }
+    );
   }
 
   private collectServicesDefinitions(
     rawServices: {[index: string]: PreServiceDefinition}
   ): {[index: string]: ServiceDefinition} {
-    // TODO: ...this.generatePreDefinedServices(rawHostConfig),
+    return this.generateEntityDefinition<ServiceDefinition>(
+      rawServices,
+      (entityId: string, entityDef: PreServiceDefinition): ServiceDefinition => {
 
+        // TODO: !!!!
+        // TODO: ...this.generatePreDefinedServices(rawHostConfig),
+        //const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
 
-    const definitions: ServiceDefinition[] = [];
-
-    for (let serviceId of Object.keys(rawServices)) {
-      const service: ServiceDefinition = this.makeServiceDefinition(serviceId, rawServices[serviceId]);
-
-      definitions.push(service);
-    }
-
-    return definitions;
+        return {
+          id: entityId,
+          className: entityDef.service,
+          props: _omit(entityDef, 'service'),
+        } as ServiceDefinition;
+      }
+    );
   }
 
   /**
@@ -196,6 +192,16 @@ export default class HostsConfigsSet {
     };
   }
 
+  /**
+   * Merge params of host with hostDefaults.
+   * @param hostParams
+   */
+  private mergeHostParams(hostParams: {[index: string]: any}): {[index: string]: any} {
+    // TODO: смержить ещё с configHostDefault.ts конфигом где указан дефолтный storeDir и тд
+    // TODO: смержить ещё с platform config
+
+    return _defaultsDeep({ ...hostParams }, this.masterConfig.hostDefaults);
+  }
 
   /**
    * Use "hosts" or {master: host} params of master config.
@@ -204,6 +210,7 @@ export default class HostsConfigsSet {
     // TODO: смержить конфиг платформы
     // TODO: добавить connection driver и его зависимые драйверы которые используются в network
     // TODO: наверное вынести в main
+    // TODO: у драйверов id - это name
 
     if (!this.masterConfig.host || this.masterConfig.hosts) {
       throw new Error(`Master config doesn't have "host" or "hosts" params`);
