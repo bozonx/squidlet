@@ -27,7 +27,7 @@ export default class Main {
 
   get buildDir(): string {
     if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
-      return this.masterConfig.hosts.master.host.storageDir;
+      return path.resolve(__dirname, this.masterConfig.hosts.master.host.storageDir);
     }
 
     return systemConfig.defaultDuildDir;
