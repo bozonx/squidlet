@@ -11,7 +11,6 @@ import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
 import {loadYamlFile, resolveFile} from './IO';
-import masterConfigDefaults from './configs/masterConfigDefaults';
 import systemConfig from './configs/systemConfig';
 
 
@@ -36,7 +35,7 @@ export default class Main {
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    this.masterConfig = this.prepareMasterConfig(masterConfig);
+    this.masterConfig = masterConfig as MasterConfig;
     this.register = new Register(this);
     this.manifests = new Manifests(this);
     this.hostsConfigGenerator = new HostsConfigGenerator(this.masterConfig, this.manifests);
@@ -108,12 +107,11 @@ export default class Main {
   }
 
 
-  // TODO: не нужно !!!!
-  private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
-    return {
-      ...preMasterConfig,
-      ...masterConfigDefaults,
-    } as MasterConfig;
-  }
+  // private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
+  //   return {
+  //     ...preMasterConfig,
+  //     ...masterConfigDefaults,
+  //   } as MasterConfig;
+  // }
 
 }

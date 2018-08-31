@@ -2,8 +2,6 @@ import PreHostConfig from './PreHostConfig';
 
 
 export default interface MasterConfig {
-  // path to dir where will be placed all the files prepared for hosts
-  buildDir?: string;
   plugins?: string[];
   // it is short record of hosts: { master: {...PreHostConfig} }
   host?: PreHostConfig;

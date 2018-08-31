@@ -12,22 +12,12 @@ const hostInitCfg: InitializationConfig = initializationConfig();
 const hostSysCfg: SystemConfig = systemConfig;
 
 export default {
-  // // dirs of host dir
-  // hostDirs: {
-  //   config: 'config',
-  //   devices: 'devices',
-  //   drivers: 'drivers',
-  //   services: 'services',
-  // },
-  // fileNames: {
-  //   hostConfig: 'hostConfig.json',
-  // },
-
   hostInitCfg,
   hostSysCfg,
 
+  buildDir: '~/.squidlet/build',
   indexManifestFileNames: ['manifest.yaml'],
   entityBuildDir: 'entityBuild',
-  pathToSaveHostsFileSet: 'hosts',
-  //pathToSaveHostsFileSet: 'services/ConfigUpdater/hosts',
+  //pathToSaveHostsFileSet: 'hosts',
+  pathToSaveHostsFileSet: `${hostInitCfg.hostDirs.services}/ConfigUpdater/hosts`,
 };
