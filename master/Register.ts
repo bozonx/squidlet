@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from 'path';
 
 const _values = require('lodash/values');
 
@@ -34,9 +34,6 @@ export default class Register {
   constructor(main: Main) {
     this.main = main;
   }
-
-  // TODO: зачем преобразовывать в массив ?????
-  // TODO: если использовать массив - зачем тогда immutable ?
 
   getDevicesPreManifests(): PreDeviceManifest[] {
     return _values(this.devices.toJS());

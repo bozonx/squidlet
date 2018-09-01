@@ -107,11 +107,11 @@ export default class Manifests {
     return this.systemServices;
   }
 
-  async generate(
-    preDevicesManifests: PreDeviceManifest[],
-    prePreDriverManifest: PreDriverManifest[],
-    prePreServiceManifest: PreServiceManifest[]
-  ) {
+  async generate() {
+    const preDevicesManifests = this.main.register.getDevicesPreManifests();
+    const prePreDriverManifest = this.main.register.getDriversPreManifests();
+    const prePreServiceManifest = this.main.register.getServicesPreManifests();
+
     for (let item of preDevicesManifests) {
       await this.proceed<PreDeviceManifest, DeviceManifest>('device', item);
     }

@@ -19,12 +19,12 @@ import * as defaultLogger from './defaultLogger';
 
 export default class Main {
   readonly masterConfig: MasterConfig;
+  readonly register: Register;
   readonly manifests: Manifests;
   readonly hostsFilesSet: HostsFilesSet;
   readonly buildDir: string;
   readonly log = defaultLogger;
   private readonly hostsConfigSet: HostsConfigsSet;
-  private readonly register: Register;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
@@ -52,11 +52,7 @@ export default class Main {
     await this.registering();
 
     this.log.info(`Resolving and preparing manifests`);
-    await this.manifests.generate(
-      this.register.getDevicesPreManifests(),
-      this.register.getDriversPreManifests(),
-      this.register.getServicesPreManifests()
-    );
+    await this.manifests.generate();
 
     this.log.info(`Generating hosts configs`);
     this.hostsConfigSet.generate();

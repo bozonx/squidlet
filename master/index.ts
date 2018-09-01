@@ -7,7 +7,10 @@ import * as yargs from 'yargs';
 import Main from './Main';
 import { loadYamlFile } from './IO';
 
-// TODO: add help
+
+yargs.help(`
+suqidlet-build --config ./path-to-my-config
+`);
 
 
 async function init() {
