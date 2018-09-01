@@ -14,7 +14,7 @@ export default async function mkdirPLogic (
 
   // path parts from closest to further
   const pathParts: string[] = [];
-  let existentBasePath: string;
+  let existentBasePath: string = '';
 
   async function recursionFind(localPathToDir: string) {
     if (await isDirExists(localPathToDir)) {
@@ -38,5 +38,13 @@ export default async function mkdirPLogic (
   await recursionFind(pathToDir);
 
 
+  for (let pathIndex in pathParts) {
+    const pathPart = pathParts.slice(0, pathIndex as any)
+      .join(path.delimiter);
+    const fullPath = path.join(existentBasePath, pathPart);
+    console.log(1111111, pathParts, pathPart, fullPath, path.delimiter);
+
+    await mkdir(fullPath);
+  }
 
 }

@@ -1,9 +1,9 @@
-mkdirPLogic = require('../../host/src/helpers/mkdirPLogic')
+mkdirPLogic = require('../../host/src/helpers/mkdirPLogic').default
 
 
 describe.only 'helpers.mkdirPLogic', ->
   it 'common usage', ->
-    fullPath = '/path/to/dir'
+    fullPath = '/path/to/my/dir'
     existentPath = '/path'
     isDirExists = (dirName) =>
       dirName == existentPath
@@ -11,6 +11,9 @@ describe.only 'helpers.mkdirPLogic', ->
 
     await mkdirPLogic(fullPath, isDirExists, mkdir)
 
-    sinon.assert.calledTwice(mkdir)
+    sinon.assert.calledThrice(mkdir)
     sinon.assert.calledWith(mkdir.getCall(0), '/path/to')
-    sinon.assert.calledWith(mkdir.getCall(0), fullPath)
+    sinon.assert.calledWith(mkdir.getCall(1), '/path/to/my')
+    sinon.assert.calledWith(mkdir.getCall(2), fullPath)
+
+# TODO: test for путь не существует или доходит до главного слэша
