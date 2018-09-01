@@ -3,12 +3,8 @@ import {promises as fsPromises} from 'fs';
 import * as yaml from 'js-yaml';
 import systemConfig from './configs/systemConfig';
 import mkdirPLogic from '../host/src/helpers/mkdirPLogic';
+import {Stats} from '../host/src/app/interfaces/dev/Fs.dev';
 
-
-export async function resolveFile(pathToDirOrFile: string, indexFileNames: string[]): string {
-  // TODO: если это папка - то смотреть manifest.yaml / device.yaml | driver.yaml | service.yaml
-  // TODO: расширение yaml - можно подставлять - необязательно указывать
-}
 
 export async function loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
   const yamlContent: string = await getFileContent(fullPath);
@@ -47,6 +43,16 @@ export function yamlToJs(yamlString: string): any {
 
 export async function exists(path: string): Promise<boolean> {
   return fs.existsSync(path);
+}
+
+export async function stat(path: string): Promise<Stats> {
+  const stat = await fsPromises.stat(path);
+
+  return {
+    size: stat.size,
+    dir: stat.isDirectory(),
+    mtime: stat.mtimeMs,
+  };
 }
 
 // loadYamlFileSync(fullPath: string): object {

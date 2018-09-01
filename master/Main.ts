@@ -11,7 +11,7 @@ import HostsConfigsSet from './HostsConfigsSet';
 import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
-import {loadYamlFile, resolveFile} from './IO';
+import {exists, loadYamlFile, stat} from './IO';
 import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
@@ -79,9 +79,7 @@ export default class Main {
       throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
     }
 
-    // TODO: review
-
-    const resolvedPathToManifest: string = await resolveFile(
+    const resolvedPathToManifest: string = await this.resolveIndexFile(
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );
@@ -149,6 +147,24 @@ export default class Main {
 
     // use default build dir
     return systemConfig.defaultDuildDir;
+  }
+
+  private async resolveIndexFile(pathToDirOrFile: string, indexFileNames: string[]): Promise<string> {
+    if (!(await stat(pathToDirOrFile)).dir) {
+      // if it's file - return it
+      return pathToDirOrFile;
+    }
+    // else is dir
+
+    for (let indexFile of indexFileNames) {
+      const fullPath = path.join(pathToDirOrFile, indexFile);
+
+      if (exists(fullPath)) {
+        return fullPath;
+      }
+    }
+
+    throw new Error(`Can't resolve index file "${pathToDirOrFile}"`);
   }
 
 }

@@ -54,6 +54,7 @@ export default class FsDev {
 
   async stat(path: string): Promise<Stats> {
     const stat = await fsPromises.stat(path);
+
     return {
       size: stat.size,
       dir: stat.isDirectory(),
