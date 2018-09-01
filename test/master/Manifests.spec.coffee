@@ -1,27 +1,34 @@
 Manifests = require('../../master/Manifests').default
 
 
-describe 'devices.BinarySensor', ->
+describe.only 'master.Manifests', ->
   beforeEach ->
     @preDevicesManifests = [
       {
-        device: 'DeviceClass',
+        main: 'DeviceClass'
+        baseDir: '/myBaseDir'
+        main: './main.ts'
         param: 'value'
       }
     ]
     @prePreDriverManifest = [
       {
-        driver: 'DeviceClass',
+        main: 'DriverClass'
+        baseDir: '/myBaseDir'
+        main: './main.ts'
         param: 'value'
       }
     ]
     @prePreServiceManifest = [
       {
-        service: 'DeviceClass',
+        main: 'ServiceClass'
+        baseDir: '/myBaseDir'
+        main: './main.ts'
         param: 'value'
       }
     ]
     @main = {
+      buildDir: '/buildDir'
       register: {
         getDevicesPreManifests: => @preDevicesManifests
         getDriversPreManifests: => @prePreDriverManifest
@@ -33,4 +40,25 @@ describe 'devices.BinarySensor', ->
   it 'generate', ->
     await @manifests.generate()
 
+    assert.deepEqual(@manifests.getManifests(), {
+      device: {
+        DeviceClass: {
+          name: 'DeviceClass'
+          param: 'value'
+        }
+      },
+      drivers: {
+        DriverClass: {
+          name: 'DriverClass'
+          param: 'value'
+        }
+      },
+      services: {
+        ServiceClass: {
+          name: 'ServiceClass'
+          param: 'value'
+        }
+      },
+    })
 
+    # TODO: test files, etc
