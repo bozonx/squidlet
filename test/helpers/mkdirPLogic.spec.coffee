@@ -9,11 +9,20 @@ describe.only 'helpers.mkdirPLogic', ->
       dirName == existentPath
     mkdir = sinon.spy()
 
-    await mkdirPLogic(fullPath, isDirExists, mkdir)
+    result = await mkdirPLogic(fullPath, isDirExists, mkdir)
 
+    assert.isTrue(result)
     sinon.assert.calledThrice(mkdir)
     sinon.assert.calledWith(mkdir.getCall(0), '/path/to')
     sinon.assert.calledWith(mkdir.getCall(1), '/path/to/my')
     sinon.assert.calledWith(mkdir.getCall(2), fullPath)
 
-# TODO: test for путь не существует или доходит до главного слэша
+  it 'don\'t create if the last path is /', ->
+    fullPath = '/path/to/my/dir'
+    isDirExists = () => false
+    mkdir = sinon.spy()
+
+    result = await mkdirPLogic(fullPath, isDirExists, mkdir)
+
+    assert.isFalse(result)
+    sinon.assert.notCalled(mkdir)
