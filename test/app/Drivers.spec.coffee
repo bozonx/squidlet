@@ -3,7 +3,7 @@
 DriverEnv = require('../../host/src/app/DriverEnv').default
 
 
-describe.only 'app.DriverEnv', ->
+describe 'app.DriverEnv', ->
   beforeEach ->
     @MyDriver = class
       config: undefined

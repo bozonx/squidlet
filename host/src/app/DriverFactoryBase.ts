@@ -11,7 +11,10 @@ export default abstract class DriverFactoryBase {
   protected readonly driverEnv: DriverEnv;
   protected readonly driverProps: DriverProps;
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps = {}) {
+  constructor(driverEnv: DriverEnv, driverProps: DriverProps) {
+
+    // TODO: reveiw driverProps - значение по умолчанию
+
     this.driverEnv = driverEnv;
     this.driverProps = driverProps;
   }

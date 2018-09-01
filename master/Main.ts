@@ -80,6 +80,8 @@ export default class Main {
       throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
     }
 
+    // TODO: review
+
     const resolvedPathToManifest: string = await resolveFile(
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
