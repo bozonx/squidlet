@@ -121,7 +121,7 @@ export default class Manifests {
     }
 
     for (let item of prePreServiceManifest) {
-      await this.proceed<PreServiceManifest, ServiceManifest>('device', item);
+      await this.proceed<PreServiceManifest, ServiceManifest>('service', item);
     }
 
     // sort deps drivers and devs and save they to separate list
@@ -158,7 +158,7 @@ export default class Manifests {
     const manifestsSet = this[pluralType] as Map<string, FinalManifest>;
 
     // add to list of manifests
-    manifestsSet.set(finalManifest.name, finalManifest);
+    this[pluralType] = manifestsSet.set(finalManifest.name, finalManifest);
   }
 
   private collectFiles(baseDir: string, paths: string[]): string[] {
@@ -180,6 +180,7 @@ export default class Manifests {
       'files',
       'drivers',
       'main',
+      'baseDir'
     );
 
     // TODO: props может быть отдельным yaml файлом - подгружать его

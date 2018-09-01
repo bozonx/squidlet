@@ -5,7 +5,7 @@ describe.only 'master.Manifests', ->
   beforeEach ->
     @preDevicesManifests = [
       {
-        main: 'DeviceClass'
+        name: 'DeviceClass'
         baseDir: '/myBaseDir'
         main: './main.ts'
         param: 'value'
@@ -13,7 +13,7 @@ describe.only 'master.Manifests', ->
     ]
     @prePreDriverManifest = [
       {
-        main: 'DriverClass'
+        name: 'DriverClass'
         baseDir: '/myBaseDir'
         main: './main.ts'
         param: 'value'
@@ -21,7 +21,7 @@ describe.only 'master.Manifests', ->
     ]
     @prePreServiceManifest = [
       {
-        main: 'ServiceClass'
+        name: 'ServiceClass'
         baseDir: '/myBaseDir'
         main: './main.ts'
         param: 'value'
@@ -38,10 +38,12 @@ describe.only 'master.Manifests', ->
     @manifests = new Manifests(@main)
 
   it 'generate', ->
+    @manifests.buildMainFile = sinon.stub().returns(Promise.resolve())
+
     await @manifests.generate()
 
     assert.deepEqual(@manifests.getManifests(), {
-      device: {
+      devices: {
         DeviceClass: {
           name: 'DeviceClass'
           param: 'value'
@@ -60,5 +62,13 @@ describe.only 'master.Manifests', ->
         }
       },
     })
+
+    sinon.assert.calledThrice(@manifests.buildMainFile)
+    sinon.assert.calledWith(@manifests.buildMainFile.getCall(0),
+      '/myBaseDir/main.ts', '/buildDir/entityBuild/devices_DeviceClass.js')
+    sinon.assert.calledWith(@manifests.buildMainFile.getCall(1),
+      '/myBaseDir/main.ts', '/buildDir/entityBuild/drivers_DriverClass.js')
+    sinon.assert.calledWith(@manifests.buildMainFile.getCall(2),
+      '/myBaseDir/main.ts', '/buildDir/entityBuild/services_ServiceClass.js')
 
     # TODO: test files, etc
