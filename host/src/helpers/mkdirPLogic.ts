@@ -6,8 +6,8 @@ import * as path from 'path';
 export default async function mkdirPLogic (
   pathToDir: string,
   isDirExists: (dirName: string) => Promise<boolean>,
-  mkdir: (dirName: string) => Promise<boolean>
-) {
+  mkdir: (dirName: string) => Promise<void>
+): Promise<boolean> {
   if (!path.isAbsolute(pathToDir)) {
     throw new Error(`path "${pathToDir}" has to be absolute`);
   }
