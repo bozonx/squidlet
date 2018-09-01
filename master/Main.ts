@@ -15,7 +15,6 @@ import {loadYamlFile, resolveFile} from './IO';
 import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
-import {isAbsoluteFileName} from './helpers';
 
 
 export default class Main {
@@ -138,7 +137,7 @@ export default class Main {
       // use master's storage dir
       const storageDir = this.masterConfig.hosts.master.host.storageDir;
 
-      if (isAbsoluteFileName(masterConfigPath)) {
+      if (path.isAbsolute(masterConfigPath)) {
         // it's an absolute path
         return storageDir;
       }

@@ -1,3 +1,5 @@
+import * as path from "path";
+
 const _values = require('lodash/values');
 
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
@@ -12,7 +14,6 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
 import {ManifestsTypeName, ManifestsTypePluralName} from './Manifests';
-import {isAbsoluteFileName} from './helpers';
 
 
 /**
@@ -56,7 +57,7 @@ export default class Register {
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
       // it's path to plugin - let's load it
-      if (!isAbsoluteFileName(plugin)) {
+      if (!path.isAbsolute(plugin)) {
         throw new Error(`You have to specify an absolute path of "${plugin}"`);
       }
 

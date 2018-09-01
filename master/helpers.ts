@@ -1,6 +1,6 @@
-export function isAbsoluteFileName(fileName: string): boolean {
-  return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
-}
+// export function isAbsoluteFileName(fileName: string): boolean {
+//   return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
+// }
 
 export function sortByIncludeInList(items: string[], searchList: string[]): [string[], string[]] {
   const included: string[] = [];
