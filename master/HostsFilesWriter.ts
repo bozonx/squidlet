@@ -41,9 +41,11 @@ export default class HostsFilesWriter {
     // const driversPath = path.join(hostDir, hostDirs.drivers);
     // const servicesPath = path.join(hostDir, hostDirs.services);
 
-    await this.writeHostConfig(configDir, hostFileSet.config);
-
-    // TODO: нет смысла копировать манифесты и entityFiles - их просто брать из папки манифестов
+    //await this.writeHostConfig(configDir, hostFileSet.config);
+    await this.writeJson(
+      path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
+      hostFileSet.config
+    );
 
     // await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
     // await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
@@ -53,8 +55,6 @@ export default class HostsFilesWriter {
     // await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
     // await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
 
-    await this.writeJson(path.join(configDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
-
     await this.writeJson(path.join(configDir, fileNames.systemDrivers), hostFileSet.systemDrivers);
     await this.writeJson(path.join(configDir, fileNames.regularDrivers), hostFileSet.regularDrivers);
     await this.writeJson(path.join(configDir, fileNames.systemServices), hostFileSet.systemServices);
@@ -63,13 +63,16 @@ export default class HostsFilesWriter {
     await this.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostFileSet.devicesDefinitions);
     await this.writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
     await this.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
+
+    await this.writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
+
   }
 
-  private async writeHostConfig(configDir: string, hostConfig: HostConfig) {
-    const fileName = path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig);
-
-    await this.writeJson(fileName, hostConfig);
-  }
+  // private async writeHostConfig(configDir: string, hostConfig: HostConfig) {
+  //   const fileName = path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig);
+  //
+  //   await this.writeJson(fileName, hostConfig);
+  // }
 
   async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
     for (let manifest of manifests) {

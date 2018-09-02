@@ -1,7 +1,7 @@
 Register = require('../../master/Register').default
 
 
-describe.only 'master.Register', ->
+describe 'master.Register', ->
   beforeEach ->
     @plugin = sinon.spy()
     @entity = {
