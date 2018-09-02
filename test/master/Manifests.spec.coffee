@@ -36,9 +36,9 @@ describe.only 'master.Manifests', ->
         files: [
           'serviceFile.json'
         ]
-#        drivers: [
-#          'DevName.dev'
-#        ]
+        drivers: [
+          'DevName.dev'
+        ]
         param: 'value'
       }
     ]
@@ -107,9 +107,13 @@ describe.only 'master.Manifests', ->
       services: {},
     })
 
-#    assert.deepEqual(@manifests.getDevDependencies(), {
-#
-#    })
+    assert.deepEqual(@manifests.getDevDependencies(), {
+      devices: {},
+      drivers: {},
+      services: {
+        ServiceClass: [ 'DevName.dev' ]
+      },
+    })
 
     sinon.assert.calledThrice(@manifests.buildMainFile)
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(0),

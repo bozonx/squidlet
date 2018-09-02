@@ -220,13 +220,17 @@ export default class Manifests {
   }
 
   private sortDriver(pluralType: ManifestsTypePluralName, entityName: string, driverName: string) {
-    if (!this.drivers.get(driverName)) {
+    // TODO: неправильно смотреть по имени - нужно смотреть тип, но манифест для dev не существует
+
+    //if (!driverName.match(/\.dev$/) && !this.drivers.get(driverName)) {
+    if (!driverName.match(/\.dev$/) && !this.drivers.get(driverName)) {
       throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
     }
 
     const driverManifest: DriverManifest = this.drivers.get(driverName);
 
-    if (driverManifest.dev) {
+    //if (driverManifest.dev) {
+    if (driverName.match(/\.dev$/)) {
       // add to devs list
       if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
 
