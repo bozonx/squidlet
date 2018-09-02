@@ -16,6 +16,7 @@ import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
+import systemConfig from './configs/systemConfig';
 
 
 interface PreparedEntity {
@@ -122,7 +123,7 @@ export default class HostsConfigsSet {
     const devices: PreparedEntities = {};
     const drivers: PreparedEntities = {};
     const services: PreparedEntities = {};
-    const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain();
+    const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
     for (let entityName of Object.keys(plainDevices.devices)) {
       devices[entityName] = {
@@ -159,7 +160,9 @@ export default class HostsConfigsSet {
     };
   }
 
-  private makeDevicesPlain(preDevices: {[index: string]: any}): {[index: string]: PreDeviceDefinition} {
+  private makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: PreDeviceDefinition} {
+    if (!preDevices) return {};
+
     const result: {[index: string]: PreDeviceDefinition} = {};
 
     const recursively = (root: string, preDevicesOrRoom: {[index: string]: any}) => {
@@ -172,8 +175,8 @@ export default class HostsConfigsSet {
 
       // else it's room - go deeper in room
       for (let itemName of Object.keys(preDevicesOrRoom)) {
-        const newRoot = [ root, itemName ].join('.');
-        recursively(itemName, preDevicesOrRoom[itemName]);
+        const newRoot = [ root, itemName ].join(systemConfig.hostSysCfg.deviceIdSeparator);
+        recursively(newRoot, preDevicesOrRoom[itemName]);
       }
     };
 
