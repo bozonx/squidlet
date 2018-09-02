@@ -51,7 +51,6 @@ describe.only 'master.Register', ->
     assert.deepEqual(@register.getDriversPreManifests(), [ @entity ])
     assert.deepEqual(@register.getServicesPreManifests(), [ @entity ])
 
-
-
-
-# TODO: тестировать что уже зарегистрирован
+  it "don't add double", ->
+    await @register.addDevice(@entity)
+    assert.isRejected(@register.addDevice(@entity))
