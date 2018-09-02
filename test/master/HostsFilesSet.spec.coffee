@@ -3,7 +3,47 @@ HostsFilesSet = require('../../master/HostsFilesSet').default
 
 describe.only 'master.HostsFilesSet', ->
   beforeEach ->
+    @hostConfig = { host: 'config' }
+    @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
+    @driversDefinitions = {
+      'SysDriver': { id: 'SysDriver', className: 'SysDriver', system: true }
+      'RegularDriver': { id: 'RegularDriver', className: 'RegularDriver' }
+    }
+    @servicesDefinitions = {
+      'SysService': { id: 'myService', className: 'SysService', system: true }
+      'RegularService': { id: 'myService2', className: 'RegularService' }
+    }
+    # TODO: !!!!!
+    @dependencies = {
+      devices: {
+
+      }
+      drivers: {
+
+      }
+      services: {
+
+      }
+    }
+    @systemDrivers = [ 'SysDriver' ]
+    @systemServices = [ 'SysService' ]
+
+
     @main = {
+      hostsConfigSet: {
+        getHostsIds: => [ 'master' ]
+        getHostConfig: => @hostConfig
+      }
+      definitions: {
+        getHostDevicesDefinitions: () => @devicesDefinitions
+        getHostDriversDefinitions: () => @driversDefinitions
+        getHostServicesDefinitions: () => @servicesDefinitions
+      }
+      manifests: {
+        getDependencies: => @dependencies
+        getSystemDrivers: => @systemDrivers
+        getSystemServices: => @systemServices
+      }
     }
     @hostsFilesSet = new HostsFilesSet(@main)
 
@@ -12,9 +52,7 @@ describe.only 'master.HostsFilesSet', ->
 
     assert.deepEqual(@hostsFilesSet.getCollection(), {
       master: {
-        config: {
-
-        }
+        config: @hostConfig
         entitiesFiles: {
           devices: {
 
@@ -26,17 +64,13 @@ describe.only 'master.HostsFilesSet', ->
 
           }
         }
-        systemDrivers: []
-        regularDrivers: []
-        systemServices: []
-        regularServices: []
+        systemDrivers: @systemDrivers
+        regularDrivers: [ 'RegularDriver' ]
+        systemServices: @systemServices
+        regularServices: [ 'RegularService' ]
 
-        devicesDefinitions: []
-        driversDefinitions: {
-
-        }
-        servicesDefinitions: {
-
-        }
+        devicesDefinitions: Object.values(@devicesDefinitions)
+        driversDefinitions: @driversDefinitions
+        servicesDefinitions: @servicesDefinitions
       }
     })

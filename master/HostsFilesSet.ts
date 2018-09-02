@@ -51,7 +51,17 @@ export default class HostsFilesSet {
       config: this.main.hostsConfigSet.getHostConfig(hostId),
 
       // TODO: !!!!! add
-      entitiesFiles: {},
+      entitiesFiles: {
+        devices: {
+
+        },
+        drivers: {
+
+        },
+        services: {
+
+        },
+      },
 
       systemDrivers,
       regularDrivers,
