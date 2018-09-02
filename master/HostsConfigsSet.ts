@@ -130,7 +130,7 @@ export default class HostsConfigsSet {
 
     if (rawHostConfig.drivers) {
       for (let entityName of Object.keys(rawHostConfig.drivers || {})) {
-        drivers[entityName] = this.generateDriverDef(rawHostConfig.drivers[entityName]);
+        drivers[entityName] = this.generateDriverDef(entityName, rawHostConfig.drivers[entityName]);
       }
     }
 
@@ -155,10 +155,10 @@ export default class HostsConfigsSet {
     };
   }
 
-  private generateDriverDef(driverDef: PreDriverDefinition): DriverDefinition {
+  private generateDriverDef(driverId: string, driverDef: PreDriverDefinition): DriverDefinition {
     return {
-      id: driverDef.name,
-      className: driverDef.name,
+      id: driverId,
+      className: driverId,
       props: driverDef,
     };
   }
