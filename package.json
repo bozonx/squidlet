@@ -12,6 +12,7 @@
     "master-rpi": "npm master-configure && npm build && npm host-rpi",
     "master-configure": "ts-node ./master/index.ts",
     "build": "echo 'DO IT!'",
+    "testbuild": "tsc -p ./master/builder",
     "host-rpi": "ts-node ./builder/squidlet-rpi/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"

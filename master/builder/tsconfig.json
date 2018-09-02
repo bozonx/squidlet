@@ -1,35 +1,19 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "alwaysStrict": true,
     "checkJs": true,
     "listEmittedFiles": true,
+    //"lib": ["ES5"],
+    "module": "system",
+    //"moduleResolution": "node",
     "noEmitOnError": true,
-
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-
     "outFile": "build/result.js",
     "removeComments": true,
     // for jsons
-    "resolveJsonModule": true,
+    //"resolveJsonModule": true,
     "rootDir": "src",
-
-
-    "target": "es6",
-    "module": "commonjs",
-    "sourceMap": true,
-    "outDir": "build",
-
     "strict": true,
-
-
-
-
-
-  },
-  "include": [
-    "src/**/*"
-  ]
+    "target": "es5"
+  }
 }
