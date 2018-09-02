@@ -11,8 +11,8 @@ export default interface PreManifestBase {
 
   // drivers and devs dependencies - list of drivers names which is used
   drivers?: string[];
-  // properties of instance
-  props?: {[index: string]: any};
+  // properties of instance - can be an object or a path to props yal file
+  props?: {[index: string]: any} | string;
   // additional files relative to manifest place.
   files?: string[];
 }

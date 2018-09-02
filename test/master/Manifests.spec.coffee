@@ -1,7 +1,7 @@
 Manifests = require('../../master/Manifests').default
 
 
-describe 'master.Manifests', ->
+describe.only 'master.Manifests', ->
   beforeEach ->
     @preDevicesManifests = [
       {
@@ -43,6 +43,7 @@ describe 'master.Manifests', ->
         baseDir: '/myBaseDir'
         main: './main.ts'
         system: true
+        props: './myProps.yaml'
         files: [
           'serviceFile.json'
         ]
@@ -93,6 +94,9 @@ describe 'master.Manifests', ->
         ServiceClass: {
           name: 'ServiceClass'
           system: true
+          props: {
+            loadedProp: 'value'
+          }
           param: 'value'
         }
       },

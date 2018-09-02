@@ -158,7 +158,7 @@ export default class Manifests {
     }
 
     // prepare to add to list of manifests
-    const finalManifest: FinalManifest = this.prepareManifest(preManifest);
+    const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
     const manifestsSet = this[pluralType] as Map<string, FinalManifest>;
 
     // add to list of manifests
@@ -178,7 +178,7 @@ export default class Manifests {
     });
   }
 
-  private prepareManifest<PreManifestBase, FinalManifest>(preManifest: PreManifestBase): FinalManifest {
+  private async prepareManifest<FinalManifest>(preManifest: PreManifestBase): Promise<FinalManifest> {
     const finalManifest: FinalManifest = _omit(
       preManifest,
       'files',
@@ -187,7 +187,11 @@ export default class Manifests {
       'baseDir'
     );
 
-    // TODO: props может быть отдельным yaml файлом - подгружать его
+    if (typeof preManifest.props === 'string') {
+      //loadYamlFile();
+      // TODO: props может быть отдельным yaml файлом - подгружать его
+    }
+
 
     return finalManifest;
   }
@@ -263,31 +267,3 @@ export default class Manifests {
   }
 
 }
-
-
-
-// // registering
-// if (preManifest.drivers) {
-//   for (let driverSoftPath of preManifest.drivers) {
-//     await this.proceedDriverManifest(driverSoftPath);
-//   }
-// }
-
-// private async proceedDriverManifest(driverManifestSoftPath: string) {
-//   // TODO: наверное dev исключить
-//
-//   // TODO: поидее можно сравнивать по baseDir - чтобы не подгружать файл
-//   // TODO: не оптимально что сначала загружается файл чтобы понять имя манифеста чтобы понять
-//   //       был ли он загружен или нет - лучше наверное сравнивать по resolved или softPath имени файла
-//
-//   // it add a baseDir param
-//   const parsedManifest: PreDeviceManifest = await this.main.$loadManifest<PreDeviceManifest>(driverManifestSoftPath);
-//
-//   // if driver is registered - do nothing
-//   if (this.drivers.get(parsedManifest.name)) return;
-//   // save soft paths cache
-//   this.driversSoftPaths[driverManifestSoftPath] = parsedManifest.name;
-//
-//   // proceed it
-//   return this.proceed<PreDeviceManifest, DriverManifest>('driver', parsedManifest);
-// }
