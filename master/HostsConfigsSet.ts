@@ -1,6 +1,5 @@
-import {AllManifests} from './Manifests';
-
 const _defaultsDeep = require('lodash/defaultsDeep');
+const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 const _values = require('lodash/values');
 
@@ -17,6 +16,7 @@ import Main from './Main';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import systemConfig from './configs/systemConfig';
+import {AllManifests} from './Manifests';
 
 
 interface PreparedEntity {
@@ -86,19 +86,13 @@ export default class HostsConfigsSet {
       const { devices, drivers, services } = this.prepareEntities(rawHostConfig);
 
       if (rawHostConfig.devices) {
-        // TODO: merge props with defaults
-        // this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(
-        //   rawHostConfig.devices,
-        //   rawHostConfig.devicesDefaults
-        // );
+        this.devicesDefinitions[hostId] = this.mergeDevicesDefaults(devices, rawHostConfig.devicesDefaults);
       }
       if (rawHostConfig.drivers) {
-        //this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
         this.driversDefinitions[hostId] = drivers;
       }
       if (rawHostConfig.services) {
         this.servicesDefinitions[hostId] = {
-          //...this.collectServicesDefinitions(rawHostConfig.services),
           ...services,
           ...this.collectServicesFromShortcuts(rawHostConfig),
         };
@@ -120,14 +114,18 @@ export default class HostsConfigsSet {
    */
   private prepareEntities(
     rawHostConfig: PreHostConfig
-  ): { devices: PreparedEntities, drivers: PreparedEntities, services: PreparedEntities } {
-    const devices: PreparedEntities = {};
-    const drivers: PreparedEntities = {};
-    const services: PreparedEntities = {};
+  ): {
+    devices: {[index: string]: DeviceDefinition},
+    drivers: {[index: string]: DriverDefinition},
+    services: {[index: string]: ServiceDefinition}
+  } {
+    const devices: {[index: string]: DeviceDefinition} = {};
+    const drivers: {[index: string]: DriverDefinition} = {};
+    const services: {[index: string]: ServiceDefinition} = {};
     const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
     for (let entityName of Object.keys(plainDevices.devices)) {
-      devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName])
+      devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName]);
     }
 
     if (rawHostConfig.drivers) {
@@ -194,6 +192,30 @@ export default class HostsConfigsSet {
     };
 
     recursively('', preDevices);
+
+    return result;
+  }
+
+  private mergeDevicesDefaults(
+    devices: {[index: string]: DeviceDefinition},
+    devicesDefaults?: {[index: string]: any}
+  ): {[index: string]: DeviceDefinition} {
+    if (!devicesDefaults) return devices;
+
+    const result: {[index: string]: DeviceDefinition} = {};
+
+    for (let deviceId of Object.keys(devices)) {
+      const deviceDefClone = _cloneDeep(devices[deviceId]);
+
+      devices[deviceId] = {
+        ...deviceDefClone,
+        // merge default props with entity props
+        props: {
+          ...devicesDefaults,
+          ...deviceDefClone.props,
+        }
+      };
+    }
 
     return result;
   }
@@ -293,7 +315,7 @@ export default class HostsConfigsSet {
     // TODO: смержить ещё с platform config
 
     return _defaultsDeep(
-      { ...rawHostConfig.host },
+      _cloneDeep(rawHostConfig.host),
       this.main.masterConfig.hostDefaults,
       hostDefaultConfig
     );
