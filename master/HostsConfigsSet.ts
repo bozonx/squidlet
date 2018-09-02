@@ -127,33 +127,18 @@ export default class HostsConfigsSet {
     const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
     for (let entityName of Object.keys(plainDevices.devices)) {
-      devices[entityName] = {
-        //..._omit(plainDevices[entityName], 'device'),
-        id: entityName,
-        className: plainDevices[entityName].device,
-        props: _omit(plainDevices[entityName], 'device'),
-      };
+      devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName])
     }
 
     if (rawHostConfig.drivers) {
-      for (let entityName of Object.keys(rawHostConfig.drivers)) {
-        drivers[entityName] = {
-          //...rawHostConfig.drivers[entityName],
-          id: entityName,
-          className: entityName,
-          props: _omit(rawHostConfig.drivers[entityName], 'driver'),
-        };
+      for (let entityName of Object.keys(rawHostConfig.drivers || {})) {
+        drivers[entityName] = this.generateDriverDef(rawHostConfig.drivers[entityName]);
       }
     }
 
     if (rawHostConfig.services) {
-      for (let entityName of Object.keys(rawHostConfig.services)) {
-        services[entityName] = {
-          //..._omit(rawHostConfig.services[entityName], 'service'),
-          id: entityName,
-          className: rawHostConfig.services[entityName].service,
-          props: _omit(rawHostConfig.services[entityName], 'service'),
-        };
+      for (let entityName of Object.keys(rawHostConfig.services || {})) {
+        services[entityName] = this.generateServiceDef(entityName, rawHostConfig.services[entityName]);
       }
     }
 
@@ -161,6 +146,30 @@ export default class HostsConfigsSet {
       devices,
       drivers,
       services,
+    };
+  }
+
+  private generateDeviceDef(deviceId: string, deviceDef: PreDeviceDefinition): DeviceDefinition {
+    return {
+      id: deviceId,
+      className: deviceDef.device,
+      props: _omit(deviceDef, 'device'),
+    };
+  }
+
+  private generateDriverDef(driverDef: PreDriverDefinition): DriverDefinition {
+    return {
+      id: driverDef.name,
+      className: driverDef.name,
+      props: driverDef,
+    };
+  }
+
+  private generateServiceDef(serviceId: string, serviceDef: PreServiceDefinition): ServiceDefinition {
+    return {
+      id: serviceId,
+      className: serviceDef.service,
+      props: _omit(serviceDef, 'service'),
     };
   }
 
@@ -223,27 +232,27 @@ export default class HostsConfigsSet {
   //   return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
   // }
 
-  private generateEntityDefinition<T extends DefinitionBase>(
-    rawDefinitions: {[index: string]: any},
-    classNameParam: string,
-    transform?: (entityId: string, entityDef: T) => T
-  ): {[index: string]: T} {
-    const result: {[index: string]: T} = {};
-
-    for (let entityId of Object.keys(rawDefinitions)) {
-      const entityDef: {[index: string]: any} = rawDefinitions[entityId];
-
-      result[entityId] = {
-        id: entityId,
-        className: entityDef[classNameParam],
-        props: _omit(entityDef, classNameParam),
-      } as T;
-
-      if (transform) result[entityId] = transform(entityId, result[entityId]);
-    }
-
-    return result;
-  }
+  // private generateEntityDefinition<T extends DefinitionBase>(
+  //   rawDefinitions: {[index: string]: any},
+  //   classNameParam: string,
+  //   transform?: (entityId: string, entityDef: T) => T
+  // ): {[index: string]: T} {
+  //   const result: {[index: string]: T} = {};
+  //
+  //   for (let entityId of Object.keys(rawDefinitions)) {
+  //     const entityDef: {[index: string]: any} = rawDefinitions[entityId];
+  //
+  //     result[entityId] = {
+  //       id: entityId,
+  //       className: entityDef[classNameParam],
+  //       props: _omit(entityDef, classNameParam),
+  //     } as T;
+  //
+  //     if (transform) result[entityId] = transform(entityId, result[entityId]);
+  //   }
+  //
+  //   return result;
+  // }
 
   /**
    * Generate service from shortcuts like 'automation', 'logger' etc.
@@ -264,6 +273,8 @@ export default class HostsConfigsSet {
         ...rawHostConfig[serviceId]
       };
     }
+
+    // TODO: remake
 
     return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
   }
