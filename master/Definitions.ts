@@ -14,7 +14,7 @@ import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import systemConfig from './configs/systemConfig';
-import {AllManifests} from './Manifests';
+import {AllManifests} from './Entities';
 
 
 const servicesShortcut = [
@@ -217,7 +217,8 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
-    const manifests: AllManifests = this.main.manifests.getManifests();
+    // TODO: rename to entities
+    const manifests: AllManifests = this.main.entities.getManifests();
     const check = (
       manifests: {[index: string]: ManifestBase},
       definitions: {[index: string]: {[index: string]:DefinitionBase}}

@@ -4,7 +4,7 @@ import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
 import Register from './Register';
 import PluginEnv from './PluginEnv';
-import Manifests from './Manifests';
+import Entities from './Entities';
 import systemPlugin from './systemPlugin';
 import HostsConfigsSet from './HostsConfigsSet';
 import Definitions from './Definitions';
@@ -22,7 +22,7 @@ import {prepareMasterConfig, generateBuildDir} from './prepareMasterConfig';
 export default class Main {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
-  readonly manifests: Manifests;
+  readonly entities: Entities;
   readonly hostsConfigSet: HostsConfigsSet;
   readonly definitions: Definitions;
   readonly hostsFilesSet: HostsFilesSet;
@@ -44,20 +44,20 @@ export default class Main {
     this.masterConfig = prepareMasterConfig(masterConfig);
     this.buildDir = generateBuildDir(this.masterConfig, masterConfigPath);
     this.register = new Register(this);
-    this.manifests = new Manifests(this);
+    this.entities = new Entities(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
     this.definitions = new Definitions(this);
     this.hostsFilesSet = new HostsFilesSet(this);
     this.hostsFilesWriter = new HostsFilesWriter(this);
-    this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
+    this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities, this.hostsConfigSet);
   }
 
   async start() {
     this.log.info(`Registering plugins, devices, drivers and services`);
     await this.registering();
 
-    this.log.info(`Resolving and preparing manifests`);
-    await this.manifests.generate();
+    this.log.info(`Resolving and preparing entities`);
+    await this.entities.generate();
 
     this.log.info(`Generating hosts configs`);
     this.hostsConfigSet.generate();

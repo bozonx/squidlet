@@ -12,7 +12,7 @@ import Plugin from './interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
-import {ManifestsTypeName, ManifestsTypePluralName} from './Manifests';
+import {ManifestsTypeName, ManifestsTypePluralName} from './Entities';
 
 
 /**

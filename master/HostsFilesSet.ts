@@ -1,7 +1,7 @@
 const _values = require('lodash/values');
 
 import Main from './Main';
-import {Dependencies, ManifestsTypePluralName} from './Manifests';
+import {Dependencies, ManifestsTypePluralName} from './Entities';
 import HostFilesSet from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
@@ -117,7 +117,7 @@ export default class HostsFilesSet {
     driversClasses: string[],
     servicesClasses: string[]
   ): string[] {
-    const dependencies: Dependencies = this.main.manifests.getDependencies();
+    const dependencies: Dependencies = this.main.entities.getDependencies();
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
@@ -151,7 +151,7 @@ export default class HostsFilesSet {
    * @returns [systemDrivers, regularDrivers]
    */
   private sortDrivers(driversClasses: string[]): [string[], string[]] {
-    const allSystemDrivers: string[] = this.main.manifests.getSystemDrivers();
+    const allSystemDrivers: string[] = this.main.entities.getSystemDrivers();
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
   }
@@ -161,7 +161,7 @@ export default class HostsFilesSet {
    * @returns [systemServices, regularServices]
    */
   private sortServices(servicesClasses: string[]) {
-    const allSystemServices: string[] = this.main.manifests.getSystemServices();
+    const allSystemServices: string[] = this.main.entities.getSystemServices();
 
     return sortByIncludeInList(servicesClasses, allSystemServices);
   }

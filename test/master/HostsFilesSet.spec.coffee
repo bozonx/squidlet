@@ -41,7 +41,7 @@ describe.only 'master.HostsFilesSet', ->
         getHostDriversDefinitions: () => @driversDefinitions
         getHostServicesDefinitions: () => @servicesDefinitions
       }
-      manifests: {
+      entities: {
         getDependencies: => @dependencies
         getSystemDrivers: => @systemDrivers
         getSystemServices: => @systemServices

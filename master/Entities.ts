@@ -42,7 +42,7 @@ export interface AllManifests {
 }
 
 
-export default class Manifests {
+export default class Entities {
   private readonly main: Main;
   private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();

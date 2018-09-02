@@ -1,6 +1,6 @@
 import MasterConfig from './interfaces/MasterConfig';
 import Register from './Register';
-import Manifests, {AllManifests} from './Manifests';
+import Entities, {AllManifests} from './Entities';
 import HostsConfigsSet from './HostsConfigsSet';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import * as EventEmitter from 'events';
@@ -16,19 +16,19 @@ export default class PluginEnv {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly masterConfig: MasterConfig;
   private readonly register: Register;
-  private readonly manifests: Manifests;
+  private readonly entities: Entities;
   private readonly hostsConfigSet: HostsConfigsSet;
 
 
   constructor(
     masterConfig: MasterConfig,
     register: Register,
-    manifests: Manifests,
+    entities: Entities,
     hostsConfigSet: HostsConfigsSet
   ) {
     this.masterConfig = masterConfig;
     this.register = register;
-    this.manifests = manifests;
+    this.entities = entities;
     this.hostsConfigSet = hostsConfigSet;
   }
 
@@ -38,7 +38,7 @@ export default class PluginEnv {
   }
 
   getManifests(): AllManifests {
-    return this.manifests.getManifests();
+    return this.entities.getManifests();
   }
 
   getHostsConfigs(): {[index: string]: HostConfig} {

@@ -1,7 +1,7 @@
-Manifests = require('../../master/Manifests').default
+Entities = require('../../master/Entities').default
 
 
-describe.only 'master.Manifests', ->
+describe 'master.Entities', ->
   beforeEach ->
     @preDevicesManifests = [
       {
@@ -67,14 +67,14 @@ describe.only 'master.Manifests', ->
           }
       }
     }
-    @manifests = new Manifests(@main)
+    @entities = new Entities(@main)
 
   it 'generate', ->
-    @manifests.buildMainFile = sinon.stub().returns(Promise.resolve())
+    @entities.buildMainFile = sinon.stub().returns(Promise.resolve())
 
-    await @manifests.generate()
+    await @entities.generate()
 
-    assert.deepEqual(@manifests.getManifests(), {
+    assert.deepEqual(@entities.getManifests(), {
       devices: {
         DeviceClass: {
           name: 'DeviceClass'
@@ -108,7 +108,7 @@ describe.only 'master.Manifests', ->
       },
     })
 
-    assert.deepEqual(@manifests.getFiles(), {
+    assert.deepEqual(@entities.getFiles(), {
       devices: {
         DeviceClass: [
           '/myBaseDir/deviceFile.json'
@@ -129,7 +129,7 @@ describe.only 'master.Manifests', ->
       }
     })
 
-    assert.deepEqual(@manifests.getDependencies(), {
+    assert.deepEqual(@entities.getDependencies(), {
       devices: {
         DeviceClass: [ 'DriverName.driver' ]
       },
@@ -137,7 +137,7 @@ describe.only 'master.Manifests', ->
       services: {},
     })
 
-    assert.deepEqual(@manifests.getDevDependencies(), {
+    assert.deepEqual(@entities.getDevDependencies(), {
       devices: {},
       drivers: {},
       services: {
@@ -145,13 +145,13 @@ describe.only 'master.Manifests', ->
       },
     })
 
-    assert.deepEqual(@manifests.getSystemDrivers(), [ 'DriverName.driver' ])
-    assert.deepEqual(@manifests.getSystemServices(), [ 'ServiceClass' ])
+    assert.deepEqual(@entities.getSystemDrivers(), [ 'DriverName.driver' ])
+    assert.deepEqual(@entities.getSystemServices(), [ 'ServiceClass' ])
 
-    sinon.assert.calledThrice(@manifests.buildMainFile)
-    sinon.assert.calledWith(@manifests.buildMainFile.getCall(0),
+    sinon.assert.calledThrice(@entities.buildMainFile)
+    sinon.assert.calledWith(@entities.buildMainFile.getCall(0),
       '/myBaseDir/main.ts', '/buildDir/entities/devices_DeviceClass.js')
-    sinon.assert.calledWith(@manifests.buildMainFile.getCall(1),
+    sinon.assert.calledWith(@entities.buildMainFile.getCall(1),
       '/myBaseDir/main.ts', '/buildDir/entities/drivers_DriverName.driver.js')
-    sinon.assert.calledWith(@manifests.buildMainFile.getCall(2),
+    sinon.assert.calledWith(@entities.buildMainFile.getCall(2),
       '/myBaseDir/main.ts', '/buildDir/entities/services_ServiceClass.js')
