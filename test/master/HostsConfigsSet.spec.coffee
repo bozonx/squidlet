@@ -60,14 +60,16 @@ describe.only 'master.HostsConfigsSet', ->
     # TODO: !!!!
     #assert.deepEqual(@hostsConfigsSet.getHostConfig('master'), @hostConfigsResult.master)
     #assert.deepEqual(@hostsConfigsSet.getHostsConfigs(), @hostConfigsResult)
-#    assert.deepEqual(@hostsConfigsSet.getHostDevicesDefinitions('master'), {
-#      'room1.relay': {
-#        id: 'room1.relay'
-#        className: 'Relay'
-#        pin: 1
-#        baseOne: true
-#      }
-#    })
+    assert.deepEqual(@hostsConfigsSet.getHostDevicesDefinitions('master'), {
+      'room1.relay': {
+        id: 'room1.relay'
+        className: 'Relay'
+        props: {
+          pin: 1
+          baseOne: true
+        }
+      }
+    })
     assert.deepEqual(@hostsConfigsSet.getHostDriversDefinitions('master'), {
       'Gpio.driver': {
         id: 'Gpio.driver'

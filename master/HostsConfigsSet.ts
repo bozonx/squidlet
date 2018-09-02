@@ -186,7 +186,9 @@ export default class HostsConfigsSet {
 
       // else it's room - go deeper in room
       for (let itemName of Object.keys(preDevicesOrRoom)) {
-        const newRoot = [ root, itemName ].join(systemConfig.hostSysCfg.deviceIdSeparator);
+        const newRoot = (root)
+          ? [ root, itemName ].join(systemConfig.hostSysCfg.deviceIdSeparator)
+          : itemName;
         recursively(newRoot, preDevicesOrRoom[itemName]);
       }
     };
@@ -207,13 +209,10 @@ export default class HostsConfigsSet {
     for (let deviceId of Object.keys(devices)) {
       const deviceDefClone = _cloneDeep(devices[deviceId]);
 
-      devices[deviceId] = {
+      result[deviceId] = {
         ...deviceDefClone,
         // merge default props with entity props
-        props: {
-          ...devicesDefaults,
-          ...deviceDefClone.props,
-        }
+        props: _defaultsDeep(deviceDefClone.props, devicesDefaults[deviceDefClone.className]),
       };
     }
 
