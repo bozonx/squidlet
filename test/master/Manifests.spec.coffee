@@ -8,14 +8,23 @@ describe.only 'master.Manifests', ->
         name: 'DeviceClass'
         baseDir: '/myBaseDir'
         main: './main.ts'
+        files: [
+          'deviceFile.json'
+        ]
+        drivers: [
+          'DriverName.driver'
+        ]
         param: 'value'
       }
     ]
     @prePreDriverManifest = [
       {
-        name: 'DriverClass'
+        name: 'DriverName.driver'
         baseDir: '/myBaseDir'
         main: './main.ts'
+        files: [
+          'driverFile.json'
+        ]
         param: 'value'
       }
     ]
@@ -24,6 +33,12 @@ describe.only 'master.Manifests', ->
         name: 'ServiceClass'
         baseDir: '/myBaseDir'
         main: './main.ts'
+        files: [
+          'serviceFile.json'
+        ]
+#        drivers: [
+#          'DevName.dev'
+#        ]
         param: 'value'
       }
     ]
@@ -50,8 +65,8 @@ describe.only 'master.Manifests', ->
         }
       },
       drivers: {
-        DriverClass: {
-          name: 'DriverClass'
+        'DriverName.driver': {
+          name: 'DriverName.driver'
           param: 'value'
         }
       },
@@ -63,12 +78,47 @@ describe.only 'master.Manifests', ->
       },
     })
 
+    assert.deepEqual(@manifests.getFiles(), {
+      devices: {
+        DeviceClass: [
+          '/buildDir/entityBuild/devices_DeviceClass.js'
+          '/myBaseDir/deviceFile.json'
+        ]
+      }
+      drivers: {
+        'DriverName.driver': [
+          '/buildDir/entityBuild/drivers_DriverName.driver.js'
+          '/myBaseDir/driverFile.json'
+        ]
+      }
+      services: {
+        ServiceClass: [
+          '/buildDir/entityBuild/services_ServiceClass.js'
+          '/myBaseDir/serviceFile.json'
+        ]
+      }
+    })
+
+    assert.deepEqual(@manifests.getDependencies(), {
+      devices: {
+        DeviceClass: [ 'DriverName.driver' ]
+      },
+      drivers: {},
+      services: {},
+    })
+
+#    assert.deepEqual(@manifests.getDevDependencies(), {
+#
+#    })
+
     sinon.assert.calledThrice(@manifests.buildMainFile)
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(0),
       '/myBaseDir/main.ts', '/buildDir/entityBuild/devices_DeviceClass.js')
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(1),
-      '/myBaseDir/main.ts', '/buildDir/entityBuild/drivers_DriverClass.js')
+      '/myBaseDir/main.ts', '/buildDir/entityBuild/drivers_DriverName.driver.js')
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(2),
       '/myBaseDir/main.ts', '/buildDir/entityBuild/services_ServiceClass.js')
 
-    # TODO: test files, etc
+
+
+    # TODO: test dev deps, system drivers and services

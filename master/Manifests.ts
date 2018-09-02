@@ -228,15 +228,15 @@ export default class Manifests {
 
     if (driverManifest.dev) {
       // add to devs list
-      if (!this.dependencies[pluralType][entityName]) this.dependencies[pluralType][entityName] = [];
-
-      this.dependencies[pluralType][entityName].push(driverName);
-    }
-    else {
-      // add to driver list
       if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
 
       this.devDependencies[pluralType][entityName].push(driverName);
+    }
+    else {
+      // add to driver list
+      if (!this.dependencies[pluralType][entityName]) this.dependencies[pluralType][entityName] = [];
+
+      this.dependencies[pluralType][entityName].push(driverName);
     }
   }
 
