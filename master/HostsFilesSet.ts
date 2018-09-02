@@ -1,5 +1,6 @@
 const _values = require('lodash/values');
 
+import Main from './Main';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
@@ -10,14 +11,12 @@ import {sortByIncludeInList} from './helpers';
 
 
 export default class HostsFilesSet {
-  private readonly manifests: Manifests;
-  private readonly hostsConfigSet: HostsConfigsSet;
+  private readonly main: Main;
   // file sets by hostId
   private files: {[index: string]: HostFilesSet} = {};
 
-  constructor(manifests: Manifests, hostsConfigSet: HostsConfigsSet) {
-    this.manifests = manifests;
-    this.hostsConfigSet = hostsConfigSet;
+  constructor(main: Main) {
+    this.main = main;
   }
 
   getCollection(): {[index: string]: HostFilesSet} {
@@ -28,7 +27,7 @@ export default class HostsFilesSet {
    * Generate file set for each host
    */
   collect() {
-    const hostIds: string[] = this.hostsConfigSet.getHostsIds();
+    const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
 
     for (let hostId of hostIds) {
       this.files[hostId] = this.combineHostFileSet(hostId);
@@ -53,7 +52,7 @@ export default class HostsFilesSet {
     // TODO: проверить что getDevDependencies есть среди devs платформы
 
     return {
-      config: this.hostsConfigSet.getHostConfig(hostId),
+      config: this.main.hostsConfigSet.getHostConfig(hostId),
 
       devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
       driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
@@ -68,9 +67,9 @@ export default class HostsFilesSet {
       systemServices,
       regularServices,
 
-      devicesDefinitions: _values(this.hostsConfigSet.getHostDevicesDefinitions(hostId)),
-      driversDefinitions: this.hostsConfigSet.getHostDriversDefinitions(hostId),
-      servicesDefinitions: this.hostsConfigSet.getHostServicesDefinitions(hostId),
+      devicesDefinitions: _values(this.main.definitions.getHostDevicesDefinitions(hostId)),
+      driversDefinitions: this.main.definitions.getHostDriversDefinitions(hostId),
+      servicesDefinitions: this.main.definitions.getHostServicesDefinitions(hostId),
     };
   }
 
@@ -80,9 +79,9 @@ export default class HostsFilesSet {
   private generateEntityNames(
     hostId: string
   ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
-    const devicesDefinitions = this.hostsConfigSet.getHostDevicesDefinitions(hostId);
-    const driversDefinitions = this.hostsConfigSet.getHostDriversDefinitions(hostId);
-    const servicesDefinitions = this.hostsConfigSet.getHostServicesDefinitions(hostId);
+    const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
+    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
+    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
 
     // collect manifest names of used entities
     const devicesClasses = Object.keys(devicesDefinitions)
@@ -115,7 +114,7 @@ export default class HostsFilesSet {
     driversClasses: string[],
     servicesClasses: string[]
   ): string[] {
-    const dependencies: Dependencies = this.manifests.getDependencies();
+    const dependencies: Dependencies = this.main.manifests.getDependencies();
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
@@ -148,7 +147,7 @@ export default class HostsFilesSet {
    * Collect all the used host manifest of devices, drivers or services
    */
   private collectManifests<T>(manifestPluralType: ManifestsTypePluralName, usedEntityNames: string[]): T[] {
-    const allManifests = this.manifests.getManifests() as any;
+    const allManifests = this.main.manifests.getManifests() as any;
     const allManifestsOfType: {[index: string]: T} = allManifests[manifestPluralType];
 
     return usedEntityNames.map((usedEntityName: string) => allManifestsOfType[usedEntityName]);
@@ -161,7 +160,7 @@ export default class HostsFilesSet {
     manifestPluralType: ManifestsTypePluralName,
     entityNames: string[]
   ): {[index: string]: string[]} {
-    const files = this.manifests.getFiles()[manifestPluralType];
+    const files = this.main.manifests.getFiles()[manifestPluralType];
     // files paths by entity name
     const result: {[index: string]: string[]} = {};
 
@@ -177,7 +176,7 @@ export default class HostsFilesSet {
    * @returns [systemDrivers, regularDrivers]
    */
   private sortDrivers(driversClasses: string[]): [string[], string[]] {
-    const allSystemDrivers: string[] = this.manifests.getSystemDrivers();
+    const allSystemDrivers: string[] = this.main.manifests.getSystemDrivers();
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
   }
@@ -187,7 +186,7 @@ export default class HostsFilesSet {
    * @returns [systemServices, regularServices]
    */
   private sortServices(servicesClasses: string[]) {
-    const allSystemServices: string[] = this.manifests.getSystemServices();
+    const allSystemServices: string[] = this.main.manifests.getSystemServices();
 
     return sortByIncludeInList(servicesClasses, allSystemServices);
   }

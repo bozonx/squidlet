@@ -7,6 +7,7 @@ import PluginEnv from './PluginEnv';
 import Manifests from './Manifests';
 import systemPlugin from './systemPlugin';
 import HostsConfigsSet from './HostsConfigsSet';
+import Definitions from './Definitions';
 import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
@@ -22,11 +23,12 @@ export default class Main {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly manifests: Manifests;
+  readonly hostsConfigSet: HostsConfigsSet;
+  readonly definitions: Definitions;
   readonly hostsFilesSet: HostsFilesSet;
   readonly buildDir: string;
   readonly log = defaultLogger;
   readonly io = Io;
-  private readonly hostsConfigSet: HostsConfigsSet;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
@@ -44,7 +46,8 @@ export default class Main {
     this.register = new Register(this);
     this.manifests = new Manifests(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
-    this.hostsFilesSet = new HostsFilesSet(this.manifests, this.hostsConfigSet);
+    this.definitions = new Definitions(this);
+    this.hostsFilesSet = new HostsFilesSet(this);
     this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.manifests, this.hostsConfigSet);
   }
@@ -58,6 +61,8 @@ export default class Main {
 
     this.log.info(`Generating hosts configs`);
     this.hostsConfigSet.generate();
+    this.log.info(`Generating hosts entities definitions`);
+    this.definitions.generate();
 
     this.log.info(`Initialization has finished`);
     // call handlers after init
