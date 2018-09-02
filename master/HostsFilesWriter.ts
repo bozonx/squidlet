@@ -8,7 +8,6 @@ import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import HostFilesSet from './interfaces/HostFilesSet';
 import systemConfig from './configs/systemConfig';
-import {copyFile, mkdirP, writeFile} from './IO';
 
 
 export default class HostsFilesWriter {
@@ -89,9 +88,9 @@ export default class HostsFilesWriter {
           path.basename(fromFileName),
         );
 
-        await mkdirP(path.dirname(toFileName));
+        await this.main.io.mkdirP(path.dirname(toFileName));
 
-        await copyFile(fromFileName, toFileName);
+        await this.main.io.copyFile(fromFileName, toFileName);
       }
     }
   }
@@ -99,9 +98,8 @@ export default class HostsFilesWriter {
   private async writeJson(fileName: string, contentJs: any) {
     const content = JSON.stringify(contentJs);
 
-    await mkdirP(path.dirname(fileName));
-
-    await writeFile(fileName, content);
+    await this.main.io.mkdirP(path.dirname(fileName));
+    await this.main.io.writeFile(fileName, content);
   }
 
 }

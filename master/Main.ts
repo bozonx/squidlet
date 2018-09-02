@@ -11,7 +11,7 @@ import HostsConfigsSet from './HostsConfigsSet';
 import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
 import PreManifestBase from './interfaces/PreManifestBase';
-import {exists, loadYamlFile, stat} from './IO';
+import * as Io from './IO';
 import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
@@ -24,6 +24,7 @@ export default class Main {
   readonly hostsFilesSet: HostsFilesSet;
   readonly buildDir: string;
   readonly log = defaultLogger;
+  readonly io = Io;
   private readonly hostsConfigSet: HostsConfigsSet;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
@@ -79,7 +80,7 @@ export default class Main {
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );
-    const parsedManifest = (await loadYamlFile(resolvedPathToManifest)) as T;
+    const parsedManifest = (await this.io.loadYamlFile(resolvedPathToManifest)) as T;
 
     parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
 
@@ -146,7 +147,7 @@ export default class Main {
   }
 
   private async resolveIndexFile(pathToDirOrFile: string, indexFileNames: string[]): Promise<string> {
-    if (!(await stat(pathToDirOrFile)).dir) {
+    if (!(await this.io.stat(pathToDirOrFile)).dir) {
       // if it's file - return it
       return pathToDirOrFile;
     }
@@ -155,7 +156,7 @@ export default class Main {
     for (let indexFile of indexFileNames) {
       const fullPath = path.join(pathToDirOrFile, indexFile);
 
-      if (exists(fullPath)) {
+      if (this.io.exists(fullPath)) {
         return fullPath;
       }
     }
