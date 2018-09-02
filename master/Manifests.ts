@@ -133,20 +133,24 @@ export default class Manifests {
 
   private async proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
     manifestType: ManifestsTypeName,
-    preManifest: PreManifest
+    preManifest: PreManifest,
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
-    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
-    const jsMainFileName = this.generateJsMainFileName(pluralType, preManifest.name);
-
-    // build an entity main file
-    await this.buildMainFile(absoluteMainFileName, jsMainFileName);
 
     // collect files
-    this.filesPaths[pluralType][preManifest.name] = [
-      jsMainFileName,
-      ...this.collectFiles(preManifest.baseDir, preManifest.files || []),
-    ];
+    const files: string[] = this.collectFiles(preManifest.baseDir, preManifest.files || []);
+
+    if (preManifest.main) {
+      const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
+      const jsMainFileName = this.generateJsMainFileName(pluralType, preManifest.name);
+
+      // build an entity main file
+      await this.buildMainFile(absoluteMainFileName, jsMainFileName);
+
+      files.push(jsMainFileName);
+    }
+
+    if (files.length) this.filesPaths[pluralType][preManifest.name] = files;
 
     // just save unsorted deps
     if (preManifest.drivers) {
@@ -220,17 +224,15 @@ export default class Manifests {
   }
 
   private sortDriver(pluralType: ManifestsTypePluralName, entityName: string, driverName: string) {
-    // TODO: неправильно смотреть по имени - нужно смотреть тип, но манифест для dev не существует
-
     //if (!driverName.match(/\.dev$/) && !this.drivers.get(driverName)) {
-    if (!driverName.match(/\.dev$/) && !this.drivers.get(driverName)) {
+    if (!this.drivers.get(driverName)) {
       throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
     }
 
     const driverManifest: DriverManifest = this.drivers.get(driverName);
 
-    //if (driverManifest.dev) {
-    if (driverName.match(/\.dev$/)) {
+    if (driverManifest.dev) {
+    //if (driverName.match(/\.dev$/)) {
       // add to devs list
       if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
 

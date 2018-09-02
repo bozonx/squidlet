@@ -1,7 +1,7 @@
 mkdirPLogic = require('../../host/src/helpers/mkdirPLogic').default
 
 
-describe.only 'helpers.mkdirPLogic', ->
+describe 'helpers.mkdirPLogic', ->
   it 'common usage', ->
     fullPath = '/path/to/my/dir'
     existentPath = '/path'

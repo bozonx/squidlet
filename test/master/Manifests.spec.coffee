@@ -1,7 +1,7 @@
 Manifests = require('../../master/Manifests').default
 
 
-describe.only 'master.Manifests', ->
+describe 'master.Manifests', ->
   beforeEach ->
     @preDevicesManifests = [
       {
@@ -14,6 +14,9 @@ describe.only 'master.Manifests', ->
         drivers: [
           'DriverName.driver'
         ]
+        props: {
+          props: 'value'
+        }
         param: 'value'
       }
     ]
@@ -22,9 +25,15 @@ describe.only 'master.Manifests', ->
         name: 'DriverName.driver'
         baseDir: '/myBaseDir'
         main: './main.ts'
+        system: true
         files: [
           'driverFile.json'
         ]
+        param: 'value'
+      }
+      {
+        name: 'DevName.dev'
+        dev: true
         param: 'value'
       }
     ]
@@ -33,6 +42,7 @@ describe.only 'master.Manifests', ->
         name: 'ServiceClass'
         baseDir: '/myBaseDir'
         main: './main.ts'
+        system: true
         files: [
           'serviceFile.json'
         ]
@@ -61,18 +71,28 @@ describe.only 'master.Manifests', ->
       devices: {
         DeviceClass: {
           name: 'DeviceClass'
+          props: {
+            props: 'value'
+          }
           param: 'value'
         }
       },
       drivers: {
         'DriverName.driver': {
           name: 'DriverName.driver'
+          system: true
+          param: 'value'
+        }
+        'DevName.dev': {
+          name: 'DevName.dev'
+          dev: true
           param: 'value'
         }
       },
       services: {
         ServiceClass: {
           name: 'ServiceClass'
+          system: true
           param: 'value'
         }
       },
@@ -81,20 +101,20 @@ describe.only 'master.Manifests', ->
     assert.deepEqual(@manifests.getFiles(), {
       devices: {
         DeviceClass: [
-          '/buildDir/entityBuild/devices_DeviceClass.js'
           '/myBaseDir/deviceFile.json'
+          '/buildDir/entityBuild/devices_DeviceClass.js'
         ]
       }
       drivers: {
         'DriverName.driver': [
-          '/buildDir/entityBuild/drivers_DriverName.driver.js'
           '/myBaseDir/driverFile.json'
+          '/buildDir/entityBuild/drivers_DriverName.driver.js'
         ]
       }
       services: {
         ServiceClass: [
-          '/buildDir/entityBuild/services_ServiceClass.js'
           '/myBaseDir/serviceFile.json'
+          '/buildDir/entityBuild/services_ServiceClass.js'
         ]
       }
     })
@@ -115,6 +135,9 @@ describe.only 'master.Manifests', ->
       },
     })
 
+    assert.deepEqual(@manifests.getSystemDrivers(), [ 'DriverName.driver' ])
+    assert.deepEqual(@manifests.getSystemServices(), [ 'ServiceClass' ])
+
     sinon.assert.calledThrice(@manifests.buildMainFile)
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(0),
       '/myBaseDir/main.ts', '/buildDir/entityBuild/devices_DeviceClass.js')
@@ -122,7 +145,3 @@ describe.only 'master.Manifests', ->
       '/myBaseDir/main.ts', '/buildDir/entityBuild/drivers_DriverName.driver.js')
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(2),
       '/myBaseDir/main.ts', '/buildDir/entityBuild/services_ServiceClass.js')
-
-
-
-    # TODO: test dev deps, system drivers and services
