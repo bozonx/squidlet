@@ -1,5 +1,5 @@
 import * as path from 'path';
-const _omit = require('lodash/omit');
+
 
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
@@ -15,6 +15,8 @@ import * as Io from './IO';
 import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
+import {resolveIndexFile} from './helpers';
+import prepareMasterConfig from './prepareMasterConfig';
 
 
 export default class Main {
@@ -38,8 +40,8 @@ export default class Main {
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    this.masterConfig = this.prepareMasterConfig(masterConfig);
-    this.buildDir = this.makeBuildDir(masterConfigPath);
+    this.masterConfig = prepareMasterConfig(masterConfig);
+    this.buildDir = this.generateBuildDir(masterConfigPath);
     this.register = new Register(this);
     this.manifests = new Manifests(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
@@ -76,7 +78,7 @@ export default class Main {
       throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
     }
 
-    const resolvedPathToManifest: string = await this.resolveIndexFile(
+    const resolvedPathToManifest: string = await resolveIndexFile(
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );
@@ -92,6 +94,9 @@ export default class Main {
     return require(devicePath);
   }
 
+  /**
+   * Start registering step of initialization
+   */
   private async registering(): Promise<void> {
     // register system plugin which registering system devices, drivers and services
     this.register.addPlugin(systemPlugin);
@@ -109,25 +114,8 @@ export default class Main {
     await Promise.all(this.register.getRegisteringPromises());
   }
 
-  private prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
-    let hosts: {[index: string]: PreHostConfig} = {};
 
-    if (this.masterConfig.hosts) {
-      hosts = this.masterConfig.hosts;
-    }
-    else if (this.masterConfig.host) {
-      hosts = {
-        master: this.masterConfig.host,
-      };
-    }
-
-    return {
-      ..._omit(preMasterConfig, 'host', 'hosts'),
-      hosts
-    };
-  }
-
-  private makeBuildDir(masterConfigPath: string): string {
+  private generateBuildDir(masterConfigPath: string): string {
     if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
       // use master's storage dir
       const storageDir = this.masterConfig.hosts.master.host.storageDir;
@@ -144,24 +132,6 @@ export default class Main {
 
     // use default build dir
     return systemConfig.defaultDuildDir;
-  }
-
-  private async resolveIndexFile(pathToDirOrFile: string, indexFileNames: string[]): Promise<string> {
-    if (!(await this.io.stat(pathToDirOrFile)).dir) {
-      // if it's file - return it
-      return pathToDirOrFile;
-    }
-    // else is dir
-
-    for (let indexFile of indexFileNames) {
-      const fullPath = path.join(pathToDirOrFile, indexFile);
-
-      if (this.io.exists(fullPath)) {
-        return fullPath;
-      }
-    }
-
-    throw new Error(`Can't resolve index file "${pathToDirOrFile}"`);
   }
 
 }
