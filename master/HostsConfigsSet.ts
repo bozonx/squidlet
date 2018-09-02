@@ -282,7 +282,7 @@ export default class HostsConfigsSet {
   private collectServicesFromShortcuts(
     rawHostConfig: {[index: string]: any}
   ): {[index: string]: ServiceDefinition} {
-    const rawServices: {[index: string]: PreServiceDefinition} = {};
+    const services: {[index: string]: ServiceDefinition} = {};
 
     // collect services
     for (let serviceId of servicesShortcut) {
@@ -290,15 +290,13 @@ export default class HostsConfigsSet {
 
       if (!definition) continue;
 
-      rawServices[serviceId] = {
-        service: serviceId,
-        ...rawHostConfig[serviceId]
-      };
+      services[serviceId] = this.generateServiceDef(serviceId, {
+        ...definition,
+        service: definition.name,
+      });
     }
 
-    // TODO: remake
-
-    return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
+    return services;
   }
 
   private generateHostConfig(rawHostConfig: PreHostConfig) {
