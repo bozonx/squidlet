@@ -4,16 +4,20 @@
     "checkJs": true,
     "listEmittedFiles": true,
     //"lib": ["ES5"],
-    "module": "system",
+    "module": "commonjs",
     //"moduleResolution": "node",
-    "noEmitOnError": true,
+    //"noEmitOnError": true,
     "noImplicitReturns": true,
-    "outFile": "build/result.js",
+    //"outFile": "build/result.js",
+    "outDir": "build",
     "removeComments": true,
     // for jsons
     //"resolveJsonModule": true,
     "rootDir": "src",
     "strict": true,
     "target": "es5"
-  }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }

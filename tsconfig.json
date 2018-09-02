@@ -1,17 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es6",
     "module": "commonjs",
-    "sourceMap": true,
-    "outDir": "build",
-    "rootDir": "src",
-
-    "strict": true,
-
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true
-
+    "removeComments": true,
+    "rootDir": "src",
+    "strict": true,
+    "sourceMap": true,
+    "target": "es6"
   },
   "include": [
     "src/**/*"
