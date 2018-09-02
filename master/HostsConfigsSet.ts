@@ -83,23 +83,23 @@ export default class HostsConfigsSet {
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
-      const { devices, derivers, services } = this.prepareEntities(rawHostConfig);
+      const { devices, drivers, services } = this.prepareEntities(rawHostConfig);
 
       if (rawHostConfig.devices) {
-        this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(
-          rawHostConfig.devices,
-          rawHostConfig.devicesDefaults
-        );
+        // TODO: merge props with defaults
+        // this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(
+        //   rawHostConfig.devices,
+        //   rawHostConfig.devicesDefaults
+        // );
       }
       if (rawHostConfig.drivers) {
-
-        // TODO: у драйверов id - это name
-
-        this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
+        //this.driversDefinitions[hostId] = this.collectDriversDefinitions(rawHostConfig.drivers);
+        this.driversDefinitions[hostId] = drivers;
       }
       if (rawHostConfig.services) {
         this.servicesDefinitions[hostId] = {
-          ...this.collectServicesDefinitions(rawHostConfig.services),
+          //...this.collectServicesDefinitions(rawHostConfig.services),
+          ...services,
           ...this.collectServicesFromShortcuts(rawHostConfig),
         };
       }
@@ -116,6 +116,7 @@ export default class HostsConfigsSet {
   /**
    * First step of preparing - makes className and id params to all the entities
    * and makes devices plain.
+   * And makes props
    */
   private prepareEntities(
     rawHostConfig: PreHostConfig
@@ -127,18 +128,20 @@ export default class HostsConfigsSet {
 
     for (let entityName of Object.keys(plainDevices.devices)) {
       devices[entityName] = {
-        ..._omit(plainDevices[entityName], 'device'),
+        //..._omit(plainDevices[entityName], 'device'),
         id: entityName,
         className: plainDevices[entityName].device,
+        props: _omit(plainDevices[entityName], 'device'),
       };
     }
 
     if (rawHostConfig.drivers) {
       for (let entityName of Object.keys(rawHostConfig.drivers)) {
         drivers[entityName] = {
-          ...rawHostConfig.drivers[entityName],
+          //...rawHostConfig.drivers[entityName],
           id: entityName,
           className: entityName,
+          props: _omit(rawHostConfig.drivers[entityName], 'driver'),
         };
       }
     }
@@ -146,9 +149,10 @@ export default class HostsConfigsSet {
     if (rawHostConfig.services) {
       for (let entityName of Object.keys(rawHostConfig.services)) {
         services[entityName] = {
-          ..._omit(rawHostConfig.services[entityName], 'service'),
+          //..._omit(rawHostConfig.services[entityName], 'service'),
           id: entityName,
           className: rawHostConfig.services[entityName].service,
+          props: _omit(rawHostConfig.services[entityName], 'service'),
         };
       }
     }
@@ -185,39 +189,39 @@ export default class HostsConfigsSet {
     return result;
   }
 
-  private collectDevicesDefinitions(
-    rawDevices: {[index: string]: PreDeviceDefinition},
-    devicesDefaults?: {[index: string]: any}
-  ): {[index: string]: DeviceDefinition} {
-    return this.generateEntityDefinition<DeviceDefinition>(
-      rawDevices,
-      'device',
-      (entityId: string, entityDef: DeviceDefinition): DeviceDefinition => {
-        return {
-          ...entityDef,
-          // merge default props with entity props
-          props: {
-            ...devicesDefaults,
-            ...entityDef.props,
-          }
-        };
-      }
-    );
-  }
-
-  private collectDriversDefinitions(
-    // TODO: нет поля driver - нужно добавить сначала и назвать - className
-
-    rawDrivers: {[index: string]: PreDriverDefinition}
-  ): {[index: string]: DriverDefinition} {
-    return this.generateEntityDefinition<DriverDefinition>(rawDrivers, 'driver');
-  }
-
-  private collectServicesDefinitions(
-    rawServices: {[index: string]: PreServiceDefinition}
-  ): {[index: string]: ServiceDefinition} {
-    return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
-  }
+  // private collectDevicesDefinitions(
+  //   rawDevices: {[index: string]: PreDeviceDefinition},
+  //   devicesDefaults?: {[index: string]: any}
+  // ): {[index: string]: DeviceDefinition} {
+  //   return this.generateEntityDefinition<DeviceDefinition>(
+  //     rawDevices,
+  //     'device',
+  //     (entityId: string, entityDef: DeviceDefinition): DeviceDefinition => {
+  //       return {
+  //         ...entityDef,
+  //         // merge default props with entity props
+  //         props: {
+  //           ...devicesDefaults,
+  //           ...entityDef.props,
+  //         }
+  //       };
+  //     }
+  //   );
+  // }
+  //
+  // private collectDriversDefinitions(
+  //   // TODO: нет поля driver - нужно добавить сначала и назвать - className
+  //
+  //   rawDrivers: {[index: string]: PreDriverDefinition}
+  // ): {[index: string]: DriverDefinition} {
+  //   return this.generateEntityDefinition<DriverDefinition>(rawDrivers, 'driver');
+  // }
+  //
+  // private collectServicesDefinitions(
+  //   rawServices: {[index: string]: PreServiceDefinition}
+  // ): {[index: string]: ServiceDefinition} {
+  //   return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
+  // }
 
   private generateEntityDefinition<T extends DefinitionBase>(
     rawDefinitions: {[index: string]: any},
