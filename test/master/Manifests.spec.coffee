@@ -1,7 +1,7 @@
 Manifests = require('../../master/Manifests').default
 
 
-describe.only 'master.Manifests', ->
+describe 'master.Manifests', ->
   beforeEach ->
     @preDevicesManifests = [
       {
