@@ -2,7 +2,7 @@ Definitions = require('../../master/Definitions').default
 hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 
-describe.only 'master.Definitions', ->
+describe 'master.Definitions', ->
   beforeEach ->
     @main = {
       masterConfig: {
@@ -78,4 +78,32 @@ describe.only 'master.Definitions', ->
 
     sinon.assert.calledOnce(@definitions.checkDefinitions)
 
-  # TODO: test checkDefinitions
+  describe 'checkDefinitions', ->
+    beforeEach ->
+      @manifests = {
+        # the same for devices and services
+        drivers: {
+          'Some.driver': {
+            name: 'Some.driver'
+          }
+        }
+      }
+      @definitions.main.manifests = {
+        getManifests: => @manifests
+      }
+      @definitions.driversDefinitions = {
+        master: {
+          'Some.driver': {
+            className: 'Some.driver'
+          }
+        }
+      }
+
+    it 'ok', ->
+      assert.doesNotThrow(() =>  @definitions.checkDefinitions())
+
+
+    it 'fail', ->
+      @manifests.drivers = {}
+
+      assert.throws(() => @definitions.checkDefinitions())

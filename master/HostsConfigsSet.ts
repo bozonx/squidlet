@@ -8,7 +8,7 @@ import hostDefaultConfig from './configs/hostDefaultConfig';
 
 
 /**
- * Parse prepare hosts configs.
+ * Prepare hosts configs.
  */
 export default class HostsConfigsSet {
   private readonly main: Main;
