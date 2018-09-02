@@ -219,62 +219,6 @@ export default class HostsConfigsSet {
     return result;
   }
 
-  // private collectDevicesDefinitions(
-  //   rawDevices: {[index: string]: PreDeviceDefinition},
-  //   devicesDefaults?: {[index: string]: any}
-  // ): {[index: string]: DeviceDefinition} {
-  //   return this.generateEntityDefinition<DeviceDefinition>(
-  //     rawDevices,
-  //     'device',
-  //     (entityId: string, entityDef: DeviceDefinition): DeviceDefinition => {
-  //       return {
-  //         ...entityDef,
-  //         // merge default props with entity props
-  //         props: {
-  //           ...devicesDefaults,
-  //           ...entityDef.props,
-  //         }
-  //       };
-  //     }
-  //   );
-  // }
-  //
-  // private collectDriversDefinitions(
-  //   // TODO: нет поля driver - нужно добавить сначала и назвать - className
-  //
-  //   rawDrivers: {[index: string]: PreDriverDefinition}
-  // ): {[index: string]: DriverDefinition} {
-  //   return this.generateEntityDefinition<DriverDefinition>(rawDrivers, 'driver');
-  // }
-  //
-  // private collectServicesDefinitions(
-  //   rawServices: {[index: string]: PreServiceDefinition}
-  // ): {[index: string]: ServiceDefinition} {
-  //   return this.generateEntityDefinition<ServiceDefinition>(rawServices, 'service');
-  // }
-
-  // private generateEntityDefinition<T extends DefinitionBase>(
-  //   rawDefinitions: {[index: string]: any},
-  //   classNameParam: string,
-  //   transform?: (entityId: string, entityDef: T) => T
-  // ): {[index: string]: T} {
-  //   const result: {[index: string]: T} = {};
-  //
-  //   for (let entityId of Object.keys(rawDefinitions)) {
-  //     const entityDef: {[index: string]: any} = rawDefinitions[entityId];
-  //
-  //     result[entityId] = {
-  //       id: entityId,
-  //       className: entityDef[classNameParam],
-  //       props: _omit(entityDef, classNameParam),
-  //     } as T;
-  //
-  //     if (transform) result[entityId] = transform(entityId, result[entityId]);
-  //   }
-  //
-  //   return result;
-  // }
-
   /**
    * Generate service from shortcuts like 'automation', 'logger' etc.
    */

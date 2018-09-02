@@ -57,9 +57,8 @@ describe.only 'master.HostsConfigsSet', ->
     await @hostsConfigsSet.generate()
 
     assert.deepEqual(@hostsConfigsSet.getHostsIds(), [ 'master' ])
-    # TODO: !!!!
-    #assert.deepEqual(@hostsConfigsSet.getHostConfig('master'), @hostConfigsResult.master)
-    #assert.deepEqual(@hostsConfigsSet.getHostsConfigs(), @hostConfigsResult)
+    assert.deepEqual(@hostsConfigsSet.getHostConfig('master'), @hostConfigsResult.master)
+    assert.deepEqual(@hostsConfigsSet.getHostsConfigs(), @hostConfigsResult)
     assert.deepEqual(@hostsConfigsSet.getHostDevicesDefinitions('master'), {
       'room1.relay': {
         id: 'room1.relay'
