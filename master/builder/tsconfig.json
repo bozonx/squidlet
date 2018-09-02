@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "alwaysStrict": true,
+    "checkJs": true,
+    "listEmittedFiles": true,
+    "noEmitOnError": true,
+
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+
+    "outFile": "build/result.js",
+    "removeComments": true,
+    // for jsons
+    "resolveJsonModule": true,
+    "rootDir": "src",
+
+
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "build",
+
+    "strict": true,
+
+
+
+
+
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
