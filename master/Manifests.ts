@@ -178,7 +178,7 @@ export default class Manifests {
     });
   }
 
-  private async prepareManifest<FinalManifest>(preManifest: PreManifestBase): Promise<FinalManifest> {
+  private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {
     const finalManifest: FinalManifest = _omit(
       preManifest,
       'files',
@@ -188,10 +188,9 @@ export default class Manifests {
     );
 
     if (typeof preManifest.props === 'string') {
-      //loadYamlFile();
-      // TODO: props может быть отдельным yaml файлом - подгружать его
+      // TODO: нужно ли запертить выход вверх и абсолютные пути ?
+      finalManifest.props = this.main.io.loadYamlFile(preManifest.props);
     }
-
 
     return finalManifest;
   }
