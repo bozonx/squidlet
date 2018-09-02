@@ -54,13 +54,17 @@ export default class HostsFilesSet {
     return {
       config: this.main.hostsConfigSet.getHostConfig(hostId),
 
-      devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
-      driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
-      servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
+      // TODO: !!!!! add
+      entitiesFiles: {},
 
-      driversFiles: this.collectFiles('devices', devicesClasses),
-      devicesFiles: this.collectFiles('drivers', driversClasses),
-      servicesFiles: this.collectFiles('services', servicesClasses),
+
+      // devicesManifests: this.collectManifests<DeviceManifest>('devices', devicesClasses),
+      // driversManifests: this.collectManifests<DriverManifest>('drivers', driversClasses),
+      // servicesManifests: this.collectManifests<ServiceManifest>('services', servicesClasses),
+      //
+      // driversFiles: this.collectFiles('devices', devicesClasses),
+      // devicesFiles: this.collectFiles('drivers', driversClasses),
+      // servicesFiles: this.collectFiles('services', servicesClasses),
 
       systemDrivers,
       regularDrivers,

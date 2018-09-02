@@ -37,19 +37,23 @@ export default class HostsFilesWriter {
     const fileNames = systemConfig.hostInitCfg.fileNames;
 
     const configDir = path.join(hostDir, hostDirs.config);
-    const devicesPath = path.join(hostDir, hostDirs.devices);
-    const driversPath = path.join(hostDir, hostDirs.drivers);
-    const servicesPath = path.join(hostDir, hostDirs.services);
+    // const devicesPath = path.join(hostDir, hostDirs.devices);
+    // const driversPath = path.join(hostDir, hostDirs.drivers);
+    // const servicesPath = path.join(hostDir, hostDirs.services);
 
     await this.writeHostConfig(configDir, hostFileSet.config);
 
-    await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
-    await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
-    await this.writeManifests<ServiceManifest>(servicesPath, hostFileSet.servicesManifests);
+    // TODO: нет смысла копировать манифесты и entityFiles - их просто брать из папки манифестов
 
-    await this.copyEntityFiles(devicesPath, hostFileSet.devicesFiles);
-    await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
-    await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
+    // await this.writeManifests<DeviceManifest>(devicesPath, hostFileSet.devicesManifests);
+    // await this.writeManifests<DriverManifest>(driversPath, hostFileSet.driversManifests);
+    // await this.writeManifests<ServiceManifest>(servicesPath, hostFileSet.servicesManifests);
+    //
+    // await this.copyEntityFiles(devicesPath, hostFileSet.devicesFiles);
+    // await this.copyEntityFiles(driversPath, hostFileSet.driversFiles);
+    // await this.copyEntityFiles(servicesPath, hostFileSet.servicesFiles);
+
+    await this.writeJson(path.join(configDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
 
     await this.writeJson(path.join(configDir, fileNames.systemDrivers), hostFileSet.systemDrivers);
     await this.writeJson(path.join(configDir, fileNames.regularDrivers), hostFileSet.regularDrivers);

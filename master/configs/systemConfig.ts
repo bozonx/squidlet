@@ -18,7 +18,8 @@ export default {
   defaultDuildDir: '~/.squidlet/build',
   indexManifestFileNames: ['manifest.yaml'],
   // dir in storage where will be generated devices, drivers and services main files
-  entityBuildDir: 'entityBuild',
+  entityBuildDir: 'entities',
+  entitiesFile: 'entitiesFiles.json',
   //pathToSaveHostsFileSet: 'hosts',
   pathToSaveHostsFileSet: `${hostInitCfg.hostDirs.services}/ConfigUpdater/hosts`,
   filesEncode: 'utf8',

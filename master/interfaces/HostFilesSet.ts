@@ -10,14 +10,17 @@ import ServiceDefinition from '../../host/src/app/interfaces/ServiceDefinition';
 export default interface HostFilesSet {
   config: HostConfig;
 
-  devicesManifests: DeviceManifest[];
-  driversManifests: DriverManifest[];
-  servicesManifests: ServiceManifest[];
+  // files of entities like {devices: {deviceId: [...files]}, drivers, services}
+  entitiesFiles: {[index: string]: {[index: string]: string[]}};
 
-  // files by entity name
-  driversFiles: {[index: string]: string[]};
-  devicesFiles: {[index: string]: string[]};
-  servicesFiles: {[index: string]: string[]};
+  // devicesManifests: DeviceManifest[];
+  // driversManifests: DriverManifest[];
+  // servicesManifests: ServiceManifest[];
+  //
+  // // files by entity name
+  // driversFiles: {[index: string]: string[]};
+  // devicesFiles: {[index: string]: string[]};
+  // servicesFiles: {[index: string]: string[]};
 
   systemDrivers: string[];
   regularDrivers: string[];
