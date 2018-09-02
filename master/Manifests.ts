@@ -298,4 +298,33 @@ export default class Manifests {
     }
   }
 
+
+  // /**
+  //  * Collect all the used host manifest of devices, drivers or services
+  //  */
+  // private collectManifests<T>(manifestPluralType: ManifestsTypePluralName, usedEntityNames: string[]): T[] {
+  //   const allManifests = this.main.manifests.getManifests() as any;
+  //   const allManifestsOfType: {[index: string]: T} = allManifests[manifestPluralType];
+  //
+  //   return usedEntityNames.map((usedEntityName: string) => allManifestsOfType[usedEntityName]);
+  // }
+  //
+  // /**
+  //  * Collect all the used host files of devices, drivers or services
+  //  */
+  // private collectFiles(
+  //   manifestPluralType: ManifestsTypePluralName,
+  //   entityNames: string[]
+  // ): {[index: string]: string[]} {
+  //   const files = this.main.manifests.getFiles()[manifestPluralType];
+  //   // files paths by entity name
+  //   const result: {[index: string]: string[]} = {};
+  //
+  //   for (let usedEntityName of entityNames) {
+  //     result[usedEntityName] = files[usedEntityName];
+  //   }
+  //
+  //   return result;
+  // }
+
 }
