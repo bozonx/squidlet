@@ -22,12 +22,12 @@ export default class Register {
   private readonly main: Main;
   private readonly plugins: Plugin[] = [];
   // devices manifest by manifest name
-  private readonly devices: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
+  private devices: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
   // drivers manifest by manifest name
-  private readonly drivers: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
+  private drivers: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
   // services manifest by manifest name
-  private readonly services: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
-  private registeringPromises: Promise<any>[] = [];
+  private services: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
+  private readonly registeringPromises: Promise<any>[] = [];
 
 
   constructor(main: Main) {
@@ -120,7 +120,7 @@ export default class Register {
       throw new Error(`The same ${manifestType} "${parsedManifest.name}" has been already registered!`);
     }
 
-    manifestsOfType.set(parsedManifest.name, parsedManifest);
+    this[pluralManifestType] = manifestsOfType.set(parsedManifest.name, parsedManifest);
   }
 
   private validate(manifestType: ManifestsTypeName, manifest: {[index: string]: any}): string | undefined {
@@ -143,8 +143,10 @@ export default class Register {
       parsedManifest = await this.main.$loadManifest<T>(manifest);
     }
     else if (typeof manifest === 'object') {
+      const manifestObj: T = manifest;
       // it's manifest as a js object
-      if (!(manifest as any).baseDir) {
+      // baseDir is required if "main" or "files" params are specified
+      if ((manifest.main || manifest.files) && !manifestObj.baseDir) {
         throw new Error(`Param "baseDir" has to be specified in manifest ${JSON.stringify(manifest)}`);
       }
 
