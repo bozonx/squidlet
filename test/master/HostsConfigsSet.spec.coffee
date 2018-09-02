@@ -8,9 +8,15 @@ describe.only 'master.HostsConfigsSet', ->
         host: {
           storageDir: '/myDir'
         }
+        hostDefaultParam: 1
       }
     }
     @main = {
+      masterConfig: {
+        hostDefaults: {
+          hostDefaultParam: 1
+        }
+      }
       masterConfigHosts: {
         master: {
           devices: {

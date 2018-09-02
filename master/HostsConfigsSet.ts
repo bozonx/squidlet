@@ -124,7 +124,7 @@ export default class HostsConfigsSet {
     const services: {[index: string]: ServiceDefinition} = {};
     const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
-    for (let entityName of Object.keys(plainDevices.devices)) {
+    for (let entityName of Object.keys(plainDevices)) {
       devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName]);
     }
 
