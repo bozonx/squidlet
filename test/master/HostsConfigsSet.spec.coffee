@@ -1,14 +1,16 @@
 HostsConfigsSet = require('../../master/HostsConfigsSet').default
+hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 
 describe.only 'master.HostsConfigsSet', ->
   beforeEach ->
-    @hostConfigs = {
+    @hostConfigsResult = {
       master: {
         host: {
+          hostDefaultConfig...
           storageDir: '/myDir'
+          hostDefaultParam: 1
         }
-        hostDefaultParam: 1
       }
     }
     @main = {
@@ -19,6 +21,7 @@ describe.only 'master.HostsConfigsSet', ->
       }
       masterConfigHosts: {
         master: {
+          platform: 'rpi'
           devices: {
             room1: {
               relay: {
@@ -49,11 +52,13 @@ describe.only 'master.HostsConfigsSet', ->
     @hostsConfigsSet = new HostsConfigsSet(@main)
 
   it 'generate', ->
+    @hostsConfigsSet.checkDefinitions = sinon.spy()
+
     await @hostsConfigsSet.generate()
 
-    assert.deepEqual(@hostsConfigsSet.getHostsIds() [ 'master' ])
-    assert.deepEqual(@hostsConfigsSet.getHostConfig('master'), @hostConfigs.master)
-    assert.deepEqual(@hostsConfigsSet.getHostsConfigs(), @hostConfigs)
+    assert.deepEqual(@hostsConfigsSet.getHostsIds(), [ 'master' ])
+    assert.deepEqual(@hostsConfigsSet.getHostConfig('master'), @hostConfigsResult.master)
+    assert.deepEqual(@hostsConfigsSet.getHostsConfigs(), @hostConfigsResult)
     assert.deepEqual(@hostsConfigsSet.getHostDevicesDefinitions(), {
       'room1.relay': {
         id: 'room1.relay'
@@ -76,3 +81,7 @@ describe.only 'master.HostsConfigsSet', ->
         param: 1
       }
     })
+
+    sinon.assert.calledOnce(@hostsConfigsSet.checkDefinitions)
+
+  # TODO: test checkDefinitions
