@@ -138,9 +138,11 @@ export default class Manifests {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
 
     // collect files
+    // TODO: навреное можно перенести в register превращение в absolute path
     const files: string[] = this.collectFiles(preManifest.baseDir, preManifest.files || []);
 
     if (preManifest.main) {
+      // TODO: навреное можно перенести в register превращение в absolute path
       const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
       const jsMainFileName = this.generateJsMainFileName(pluralType, preManifest.name);
 
@@ -149,6 +151,9 @@ export default class Manifests {
 
       files.push(jsMainFileName);
     }
+
+    // TODO: сформировать папки манифестов по типам - в каждой папке все необходимое - на них будут указывать пути для копирования
+    // TODO: на них будут указывать пути для копирования
 
     if (files.length) this.filesPaths[pluralType][preManifest.name] = files;
 
@@ -167,6 +172,7 @@ export default class Manifests {
 
   private collectFiles(baseDir: string, paths: string[]): string[] {
     return paths.map((item) => {
+      // TODO: поидее можно это перенести в валидацию во время register.addEntity
       if (path.isAbsolute(item)) {
         throw new Error(`You must not specify an absolute path of "${item}". Only relative is allowed.`);
       }

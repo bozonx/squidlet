@@ -52,4 +52,6 @@ describe.only 'master.Register', ->
     assert.deepEqual(@register.getServicesPreManifests(), [ @entity ])
 
 
+
+
 # TODO: тестировать что уже зарегистрирован
