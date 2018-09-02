@@ -60,6 +60,12 @@ describe.only 'master.Manifests', ->
         getDriversPreManifests: => @prePreDriverManifest
         getServicesPreManifests: => @prePreServiceManifest
       }
+      io: {
+        loadYamlFile: () =>
+          {
+            loadedProp: 'value'
+          }
+      }
     }
     @manifests = new Manifests(@main)
 

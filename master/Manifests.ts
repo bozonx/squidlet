@@ -188,7 +188,6 @@ export default class Manifests {
     );
 
     if (typeof preManifest.props === 'string') {
-      // TODO: нужно ли запертить выход вверх и абсолютные пути ?
       finalManifest.props = this.main.io.loadYamlFile(preManifest.props);
     }
 

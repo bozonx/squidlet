@@ -7,4 +7,7 @@ export default interface ManifestBase {
   name: string;
   // default properties of instance - can be an object or a path to props yal file
   props?: {[index: string]: any} | string;
+
+  // custom values of manifest
+  [index: string]: any;
 }
