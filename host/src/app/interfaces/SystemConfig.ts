@@ -5,4 +5,5 @@ export default interface SystemConfig {
     services: string;
     data: string;
   };
+  deviceIdSeparator: string;
 }

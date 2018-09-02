@@ -18,6 +18,13 @@ import hostDefaultConfig from './configs/hostDefaultConfig';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 
 
+interface PreparedEntity {
+  id: string;
+  className: string;
+  [index: string]: any;
+}
+
+type PreparedEntities = {[index: string]: PreparedEntity};
 
 const servicesShortcut = [
   'automation',
@@ -75,6 +82,7 @@ export default class HostsConfigsSet {
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
+      const { devices, derivers, services } = this.prepareEntities(rawHostConfig);
 
       if (rawHostConfig.devices) {
         this.devicesDefinitions[hostId] = this.collectDevicesDefinitions(
@@ -103,6 +111,76 @@ export default class HostsConfigsSet {
     this.checkDefinitions();
   }
 
+
+  /**
+   * First step of preparing - makes className and id params to all the entities
+   * and makes devices plain.
+   */
+  private prepareEntities(
+    rawHostConfig: PreHostConfig
+  ): { devices: PreparedEntities, drivers: PreparedEntities, services: PreparedEntities } {
+    const devices: PreparedEntities = {};
+    const drivers: PreparedEntities = {};
+    const services: PreparedEntities = {};
+    const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain();
+
+    for (let entityName of Object.keys(plainDevices.devices)) {
+      devices[entityName] = {
+        ..._omit(plainDevices[entityName], 'device'),
+        id: entityName,
+        className: plainDevices[entityName].device,
+      };
+    }
+
+    if (rawHostConfig.drivers) {
+      for (let entityName of Object.keys(rawHostConfig.drivers)) {
+        drivers[entityName] = {
+          ...rawHostConfig.drivers[entityName],
+          id: entityName,
+          className: entityName,
+        };
+      }
+    }
+
+    if (rawHostConfig.services) {
+      for (let entityName of Object.keys(rawHostConfig.services)) {
+        services[entityName] = {
+          ..._omit(rawHostConfig.services[entityName], 'service'),
+          id: entityName,
+          className: rawHostConfig.services[entityName].service,
+        };
+      }
+    }
+
+    return {
+      devices,
+      drivers,
+      services,
+    };
+  }
+
+  private makeDevicesPlain(preDevices: {[index: string]: any}): {[index: string]: PreDeviceDefinition} {
+    const result: {[index: string]: PreDeviceDefinition} = {};
+
+    const recursively = (root: string, preDevicesOrRoom: {[index: string]: any}) => {
+      if (preDevicesOrRoom.device) {
+        // it's device definition
+        result[root] = preDevicesOrRoom as PreDeviceDefinition;
+
+        return;
+      }
+
+      // else it's room - go deeper in room
+      for (let itemName of Object.keys(preDevicesOrRoom)) {
+        const newRoot = [ root, itemName ].join('.');
+        recursively(itemName, preDevicesOrRoom[itemName]);
+      }
+    };
+
+    recursively('', preDevices);
+
+    return result;
+  }
 
   private collectDevicesDefinitions(
     rawDevices: {[index: string]: PreDeviceDefinition},

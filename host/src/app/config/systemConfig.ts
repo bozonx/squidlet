@@ -1,4 +1,5 @@
 import SystemConfig from '../interfaces/SystemConfig';
+import PreDeviceDefinition from '../../../../master/interfaces/PreDeviceDefinition';
 
 
 const systemConfig: SystemConfig = {
@@ -13,6 +14,9 @@ const systemConfig: SystemConfig = {
     // custom data or state of user layer
     data: 'data',
   },
+
+  // separator of
+  deviceIdSeparator: '.',
 };
 
 export default systemConfig;

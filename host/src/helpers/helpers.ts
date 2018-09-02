@@ -5,9 +5,11 @@ import { TextEncoder, TextDecoder } from 'text-encoding';
 import Message from '../messenger/interfaces/Message';
 
 
+// TODO: move to config
+
 export const topicSeparator = '/';
 // delimiter between host id and local device id like "path/to/host$path/to/device"
-export const deviceIdSeparator = '$';
+export const deviceHostSeparator = '$';
 export const eventNameSeparator = '|';
 
 
@@ -84,7 +86,7 @@ export function combineTopic(basePath: string, ...subPaths: Array<string>): stri
 }
 
 export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {
-  const [ hostId, deviceLocalId ] = deviceId.split(deviceIdSeparator);
+  const [ hostId, deviceLocalId ] = deviceId.split(deviceHostSeparator);
 
   if (!hostId || !deviceLocalId) {
     throw new Error(`Can't parse deviceId "${deviceId}"`);
