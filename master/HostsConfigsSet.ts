@@ -125,6 +125,8 @@ export default class HostsConfigsSet {
   }
 
   private collectDriversDefinitions(
+    // TODO: нет поля driver - нужно добавить сначала и назвать - className
+
     rawDrivers: {[index: string]: PreDriverDefinition}
   ): {[index: string]: DriverDefinition} {
     return this.generateEntityDefinition<DriverDefinition>(rawDrivers, 'driver');
