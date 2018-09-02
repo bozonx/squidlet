@@ -1,6 +1,5 @@
-import * as path from 'path';
-
 const _values = require('lodash/values');
+import * as path from 'path';
 
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';

@@ -2,7 +2,7 @@ HostsConfigsSet = require('../../master/HostsConfigsSet').default
 hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 
-describe.only 'master.HostsConfigsSet', ->
+describe 'master.HostsConfigsSet', ->
   beforeEach ->
     @hostConfigsResult = {
       master: {
