@@ -1,6 +1,5 @@
 import * as path from 'path';
 
-
 import MasterConfig from './interfaces/MasterConfig';
 import validateMasterConfig from './validateMasterConfig';
 import Register from './Register';
@@ -16,7 +15,7 @@ import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
-import prepareMasterConfig from './prepareMasterConfig';
+import {prepareMasterConfig, generateBuildDir} from './prepareMasterConfig';
 
 
 export default class Main {
@@ -41,7 +40,7 @@ export default class Main {
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
     this.masterConfig = prepareMasterConfig(masterConfig);
-    this.buildDir = this.generateBuildDir(masterConfigPath);
+    this.buildDir = generateBuildDir(this.masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.manifests = new Manifests(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
@@ -112,26 +111,6 @@ export default class Main {
     await this.register.initPlugins(this.pluginEnv);
     // wait for all the registering processes. It needs if plugin doesn't wait for register promise.
     await Promise.all(this.register.getRegisteringPromises());
-  }
-
-
-  private generateBuildDir(masterConfigPath: string): string {
-    if (this.masterConfig.hosts && this.masterConfig.hosts.master.host.storageDir) {
-      // use master's storage dir
-      const storageDir = this.masterConfig.hosts.master.host.storageDir;
-
-      if (path.isAbsolute(masterConfigPath)) {
-        // it's an absolute path
-        return storageDir;
-      }
-      else {
-        // relative path - make it relative to config file
-        return path.join(path.dirname(masterConfigPath), storageDir);
-      }
-    }
-
-    // use default build dir
-    return systemConfig.defaultDuildDir;
   }
 
 }
