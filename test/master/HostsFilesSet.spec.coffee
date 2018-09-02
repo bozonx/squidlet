@@ -8,6 +8,8 @@ describe.only 'master.HostsFilesSet', ->
     @driversDefinitions = {
       'SysDriver': { id: 'SysDriver', className: 'SysDriver', system: true }
       'RegularDriver': { id: 'RegularDriver', className: 'RegularDriver' }
+      # TODO: !!!!!
+      #'Dev': { id: 'Dev': className: 'Dev', dev: true }
     }
     @servicesDefinitions = {
       'SysService': { id: 'myService', className: 'SysService', system: true }
@@ -53,6 +55,7 @@ describe.only 'master.HostsFilesSet', ->
     assert.deepEqual(@hostsFilesSet.getCollection(), {
       master: {
         config: @hostConfig
+        # TODO: !!!!!
         entitiesFiles: {
           devices: {
 

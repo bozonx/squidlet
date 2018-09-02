@@ -6,16 +6,16 @@ import * as path from 'path';
 import {exists, stat} from './IO';
 
 
-export function sortByIncludeInList(items: string[], searchList: string[]): [string[], string[]] {
+export function sortByIncludeInList(itemsToSearch: string[], listToSearchIn: string[]): [string[], string[]] {
   const included: string[] = [];
   const notIncluded: string[] = [];
 
-  for (let serviceName of searchList) {
-    if (items.indexOf(serviceName) >= 0) {
-      included.push(serviceName);
+  for (let item of itemsToSearch) {
+    if (listToSearchIn.indexOf(item) >= 0) {
+      included.push(item);
     }
     else {
-      notIncluded.push(serviceName);
+      notIncluded.push(item);
     }
   }
 

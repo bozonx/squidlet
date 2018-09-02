@@ -75,7 +75,7 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Generaеe entities manifest names which are used on host
+   * Generate entities manifest names which are used on host
    */
   private generateEntityNames(
     hostId: string
@@ -87,7 +87,9 @@ export default class HostsFilesSet {
     // collect manifest names of used entities
     const devicesClasses = Object.keys(devicesDefinitions)
       .map((id: string) => devicesDefinitions[id].className);
+
     // TODO: могут быть указанны dev в definitions - их не нужно подключать
+
     const onlyDriversClasses = Object.keys(driversDefinitions)
       .map((id: string) => driversDefinitions[id].className);
     const servicesClasses = Object.keys(servicesDefinitions)
