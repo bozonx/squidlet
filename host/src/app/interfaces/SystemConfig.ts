@@ -6,4 +6,7 @@ export default interface SystemConfig {
     data: string;
   };
   deviceIdSeparator: string;
+  deviceHostSeparator: string;
+  topicSeparator: string;
+  eventNameSeparator: string;
 }

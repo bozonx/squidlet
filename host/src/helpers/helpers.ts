@@ -2,15 +2,9 @@ const _isEmpty = require('lodash/isEmpty');
 const _find = require('lodash/find');
 const _trim = require('lodash/trim');
 import { TextEncoder, TextDecoder } from 'text-encoding';
+
+import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
-
-
-// TODO: move to config
-
-export const topicSeparator = '/';
-// delimiter between host id and local device id like "path/to/host$path/to/device"
-export const deviceHostSeparator = '$';
-export const eventNameSeparator = '|';
 
 
 // TODO: move to separate file
@@ -74,19 +68,19 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
 }
 
 export function generateEventName(category: string, topic: string, ...others: Array<string>): string {
-  if (!topic || topic === '*') return [ category, ...others ].join(eventNameSeparator);
+  if (!topic || topic === '*') return [ category, ...others ].join(systemConfig.eventNameSeparator);
 
-  return [ category, topic, ...others ].join(eventNameSeparator);
+  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
 }
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
   if (_isEmpty(subPaths)) return basePath;
 
-  return [ basePath, ...subPaths ].join(topicSeparator);
+  return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
 }
 
 export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {
-  const [ hostId, deviceLocalId ] = deviceId.split(deviceHostSeparator);
+  const [ hostId, deviceLocalId ] = deviceId.split(systemConfig.deviceHostSeparator);
 
   if (!hostId || !deviceLocalId) {
     throw new Error(`Can't parse deviceId "${deviceId}"`);

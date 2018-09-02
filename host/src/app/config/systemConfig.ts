@@ -15,8 +15,12 @@ const systemConfig: SystemConfig = {
     data: 'data',
   },
 
-  // separator of
+  // separator of device id like - room.deviceId
   deviceIdSeparator: '.',
+  // delimiter between host id and local device id like "path/to/host$path/to/device"
+  deviceHostSeparator: '$',
+  topicSeparator: '/',
+  eventNameSeparator: '|',
 };
 
 export default systemConfig;
