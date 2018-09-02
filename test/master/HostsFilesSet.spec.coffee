@@ -29,7 +29,13 @@ describe.only 'master.HostsFilesSet', ->
     }
     @systemDrivers = [ 'SysDriver' ]
     @systemServices = [ 'SysService' ]
-
+    @entitiesFiles = {
+      devices: {}
+      drivers: {
+        'SysDriver': [ '/path/to/file' ]
+      }
+      services: {}
+    }
 
     @main = {
       hostsConfigSet: {
@@ -45,6 +51,7 @@ describe.only 'master.HostsFilesSet', ->
         getDependencies: => @dependencies
         getSystemDrivers: => @systemDrivers
         getSystemServices: => @systemServices
+        getFiles: => @entitiesFiles
       }
     }
     @hostsFilesSet = new HostsFilesSet(@main)
@@ -55,18 +62,8 @@ describe.only 'master.HostsFilesSet', ->
     assert.deepEqual(@hostsFilesSet.getCollection(), {
       master: {
         config: @hostConfig
-        # TODO: !!!!!
-        entitiesFiles: {
-          devices: {
+        entitiesFiles: @entitiesFiles
 
-          }
-          drivers: {
-
-          }
-          services: {
-
-          }
-        }
         systemDrivers: @systemDrivers
         regularDrivers: [ 'RegularDriver' ]
         systemServices: @systemServices

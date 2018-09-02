@@ -17,7 +17,7 @@ import systemConfig from './configs/systemConfig';
 export type ManifestsTypeName = 'device' | 'driver' | 'service';
 export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
-interface FilesPaths {
+export interface FilesPaths {
   // list of devices files by device name
   devices: {[index: string]: string[]};
   // list of drivers files by driver name
@@ -154,6 +154,7 @@ export default class Entities {
 
     // TODO: сформировать папки манифестов по типам - в каждой папке все необходимое - на них будут указывать пути для копирования
     // TODO: на них будут указывать пути для копирования
+    // TODO: добавить сюда пути на сам manifest.json
 
     if (files.length) this.filesPaths[pluralType][preManifest.name] = files;
 
