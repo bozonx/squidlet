@@ -1,7 +1,7 @@
 Manifests = require('../../master/Manifests').default
 
 
-describe 'master.Manifests', ->
+describe.only 'master.Manifests', ->
   beforeEach ->
     @preDevicesManifests = [
       {
@@ -112,19 +112,19 @@ describe 'master.Manifests', ->
       devices: {
         DeviceClass: [
           '/myBaseDir/deviceFile.json'
-          '/buildDir/entityBuild/devices_DeviceClass.js'
+          '/buildDir/entities/devices_DeviceClass.js'
         ]
       }
       drivers: {
         'DriverName.driver': [
           '/myBaseDir/driverFile.json'
-          '/buildDir/entityBuild/drivers_DriverName.driver.js'
+          '/buildDir/entities/drivers_DriverName.driver.js'
         ]
       }
       services: {
         ServiceClass: [
           '/myBaseDir/serviceFile.json'
-          '/buildDir/entityBuild/services_ServiceClass.js'
+          '/buildDir/entities/services_ServiceClass.js'
         ]
       }
     })
@@ -150,8 +150,8 @@ describe 'master.Manifests', ->
 
     sinon.assert.calledThrice(@manifests.buildMainFile)
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(0),
-      '/myBaseDir/main.ts', '/buildDir/entityBuild/devices_DeviceClass.js')
+      '/myBaseDir/main.ts', '/buildDir/entities/devices_DeviceClass.js')
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(1),
-      '/myBaseDir/main.ts', '/buildDir/entityBuild/drivers_DriverName.driver.js')
+      '/myBaseDir/main.ts', '/buildDir/entities/drivers_DriverName.driver.js')
     sinon.assert.calledWith(@manifests.buildMainFile.getCall(2),
-      '/myBaseDir/main.ts', '/buildDir/entityBuild/services_ServiceClass.js')
+      '/myBaseDir/main.ts', '/buildDir/entities/services_ServiceClass.js')

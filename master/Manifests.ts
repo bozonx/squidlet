@@ -270,4 +270,32 @@ export default class Manifests {
     }
   }
 
+  async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
+    for (let manifest of manifests) {
+      const fileName = path.join(
+        entityTypeDirPath,
+        manifest.name,
+        systemConfig.hostInitCfg.fileNames.manifest
+      );
+
+      //await this.writeJson(fileName, manifest);
+    }
+  }
+
+  async copyEntityFiles(entityTypeDirPath: string, fileSet: {[index: string]: string[]}) {
+    for (let entityClassName of Object.keys(fileSet)) {
+      for (let fromFileName of fileSet[entityClassName]) {
+        const toFileName = path.join(
+          entityTypeDirPath,
+          entityClassName,
+          path.basename(fromFileName),
+        );
+
+        await this.main.io.mkdirP(path.dirname(toFileName));
+
+        await this.main.io.copyFile(fromFileName, toFileName);
+      }
+    }
+  }
+
 }

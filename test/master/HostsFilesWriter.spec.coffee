@@ -1,7 +1,7 @@
 HostsFilesWriter = require('../../master/HostsFilesWriter').default
 
 
-describe.only 'master.HostsFilesWriter', ->
+describe 'master.HostsFilesWriter', ->
   beforeEach ->
     @hostFiles = {
       master: {
