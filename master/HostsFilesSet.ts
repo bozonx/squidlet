@@ -73,13 +73,24 @@ export default class HostsFilesSet {
    * @returns [systemServices, regularServices]
    */
   private sortServices(hostId: string): [string[], string[]] {
-    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
-    const servicesClasses: string[] = Object.keys(servicesDefinitions)
-      .map((id: string) => servicesDefinitions[id].className);
-
+    const servicesClasses: string[] = this.getServicesClassNames(hostId);
     const allSystemServices: string[] = this.main.entities.getSystemServices();
 
     return sortByIncludeInList(servicesClasses, allSystemServices);
+  }
+
+  getDevicesClassNames(hostId: string): string[] {
+    const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
+
+    return Object.keys(devicesDefinitions)
+      .map((id: string) => devicesDefinitions[id].className);
+  }
+
+  getServicesClassNames(hostId: string): string[] {
+    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
+
+    return Object.keys(servicesDefinitions)
+      .map((id: string) => servicesDefinitions[id].className);
   }
 
   /**
@@ -88,24 +99,17 @@ export default class HostsFilesSet {
   private collectUsedDriversClasses(
     hostId: string
   ): string[] {
-    const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
-    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
-
     // collect manifest names of used entities
-    const devicesClasses = Object.keys(devicesDefinitions)
-      .map((id: string) => devicesDefinitions[id].className);
+    const devicesClasses = this.getDevicesClassNames(hostId);
     const onlyDriversClasses = this.collectOnlyDrivers(hostId);
-    const servicesClasses = Object.keys(servicesDefinitions)
-      .map((id: string) => servicesDefinitions[id].className);
+    const servicesClasses: string[] = this.getServicesClassNames(hostId);
 
     // collect all the drivers dependencies
-    const driversClasses = this.collectDriverNamesWithDependencies(
+    return this.collectDriverNamesWithDependencies(
       devicesClasses,
       onlyDriversClasses,
       servicesClasses,
     );
-
-    return driversClasses;
   }
 
   /**
