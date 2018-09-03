@@ -1,6 +1,7 @@
 const _values = require('lodash/values');
 
 import Main from './Main';
+import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import {Dependencies, ManifestsTypePluralName} from './Entities';
 import HostFilesSet from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
@@ -31,19 +32,14 @@ export default class HostsFilesSet {
   }
 
   private combineHostFileSet(hostId: string): HostFilesSet {
-    const {
-      devicesClasses,
-      driversClasses,
-      servicesClasses,
-    } = this.generateEntityNames(hostId);
     const [
       systemDrivers,
       regularDrivers,
-    ] = this.sortDrivers(driversClasses);
+    ] = this.sortDrivers();
     const [
       systemServices,
       regularServices,
-    ] = this.sortServices(servicesClasses);
+    ] = this.sortServices();
 
     // TODO: проверить что getDevDependencies есть среди devs платформы
 
@@ -67,17 +63,12 @@ export default class HostsFilesSet {
     hostId: string
   ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
     const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
-    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
     const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
 
     // collect manifest names of used entities
     const devicesClasses = Object.keys(devicesDefinitions)
       .map((id: string) => devicesDefinitions[id].className);
-
-    // TODO: могут быть указанны dev в definitions - их не нужно подключать
-
-    const onlyDriversClasses = Object.keys(driversDefinitions)
-      .map((id: string) => driversDefinitions[id].className);
+    const onlyDriversClasses = this.collectOnlyDrivers(hostId);
     const servicesClasses = Object.keys(servicesDefinitions)
       .map((id: string) => servicesDefinitions[id].className);
 
@@ -93,6 +84,20 @@ export default class HostsFilesSet {
       driversClasses,
       servicesClasses,
     };
+  }
+
+  // TODO: почему удаляем ?????
+
+  private collectOnlyDrivers(hostId: string): string[] {
+    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
+    const devs: string[] = this.main.entities.getDevs();
+    // remove devs from drivers definitions list
+    const filtered = (driversDefinitions as {[index: string]: any})
+      .filter((item: DriverDefinition) => {
+        return devs.indexOf(item.className) >= 0;
+      });
+
+    return filtered.map((id: string) => driversDefinitions[id].className);
   }
 
   /**
@@ -136,7 +141,11 @@ export default class HostsFilesSet {
    * sort drivers to system and regular
    * @returns [systemDrivers, regularDrivers]
    */
-  private sortDrivers(driversClasses: string[]): [string[], string[]] {
+  private sortDrivers(): [string[], string[]] {
+    const {
+      driversClasses,
+    } = this.generateEntityNames(hostId);
+
     const allSystemDrivers: string[] = this.main.entities.getSystemDrivers();
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
@@ -146,7 +155,11 @@ export default class HostsFilesSet {
    * sort services to system and regular
    * @returns [systemServices, regularServices]
    */
-  private sortServices(servicesClasses: string[]) {
+  private sortServices(): [string[], string[]] {
+    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
+    const servicesClasses: string[] = Object.keys(servicesDefinitions)
+      .map((id: string) => servicesDefinitions[id].className);
+
     const allSystemServices: string[] = this.main.entities.getSystemServices();
 
     return sortByIncludeInList(servicesClasses, allSystemServices);

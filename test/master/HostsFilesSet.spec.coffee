@@ -8,14 +8,14 @@ describe.only 'master.HostsFilesSet', ->
     @driversDefinitions = {
       'SysDriver': { id: 'SysDriver', className: 'SysDriver', system: true }
       'RegularDriver': { id: 'RegularDriver', className: 'RegularDriver' }
-      # TODO: !!!!!
-      #'Dev': { id: 'Dev': className: 'Dev', dev: true }
+      'Dev': { id: 'Dev': className: 'Dev', dev: true }
     }
     @servicesDefinitions = {
       'SysService': { id: 'myService', className: 'SysService', system: true }
       'RegularService': { id: 'myService2', className: 'RegularService' }
     }
     # TODO: !!!!!
+    # TODO: !!!!! Могут ли здесь быть dev ???
     @dependencies = {
       devices: {
 

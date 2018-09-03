@@ -74,6 +74,10 @@ export default class Entities {
   private systemDrivers: string[] = [];
   private systemServices: string[] = [];
 
+  // TODO: make it
+  // list of used devs - dependencies or manifests
+  private devs: string[] = [];
+
 
   constructor(main: Main) {
     this.main = main;
@@ -105,6 +109,10 @@ export default class Entities {
 
   getSystemServices(): string[] {
     return this.systemServices;
+  }
+
+  getDevs(): string[] {
+    return this.devs;
   }
 
   async generate() {
