@@ -1,4 +1,5 @@
 const _values = require('lodash/values');
+const _filter = require('lodash/filter');
 
 import Main from './Main';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
@@ -65,8 +66,7 @@ export default class HostsFilesSet {
     const allEntitiesFiles: FilesPaths = this.main.entities.getFiles();
     // collect manifest names of used entities
     const devicesClasses = this.getDevicesClassNames(hostId);
-    // TODO: драйвера с зависимостями, но без dev
-    const onlyDriversClasses = this.collectOnlyDrivers(hostId);
+    const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
     const servicesClasses: string[] = this.getServicesClassNames(hostId);
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
@@ -74,11 +74,9 @@ export default class HostsFilesSet {
         result[pluralType][className] = allEntitiesFiles[pluralType][className];
       }
     };
-    // TODO: проходимся повмем классам типа и добавляем файлы этого типа в result
 
     collect('devices', devicesClasses);
-    // TODO: драйвера с зависимостями но без dev
-    collect('drivers', onlyDriversClasses);
+    collect('drivers', allDriversClasses);
     collect('services', servicesClasses);
 
     return result;
@@ -89,8 +87,7 @@ export default class HostsFilesSet {
    * @returns [systemDrivers, regularDrivers]
    */
   private sortDrivers(hostId: string): [string[], string[]] {
-    const driversClasses: string[] = this.collectUsedDriversClasses(hostId);
-
+    const driversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
     const allSystemDrivers: string[] = this.main.entities.getSystemDrivers();
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
@@ -114,22 +111,15 @@ export default class HostsFilesSet {
       .map((id: string) => devicesDefinitions[id].className);
   }
 
-  getServicesClassNames(hostId: string): string[] {
-    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
-
-    return Object.keys(servicesDefinitions)
-      .map((id: string) => servicesDefinitions[id].className);
-  }
-
   /**
-   * Generate entities manifest names which are used on host
+   * All the used drivers include which are dependencies of other entities bu without devs.
    */
-  private collectUsedDriversClasses(
+  private getAllUsedDriversClassNames(
     hostId: string
   ): string[] {
     // collect manifest names of used entities
     const devicesClasses = this.getDevicesClassNames(hostId);
-    const onlyDriversClasses = this.collectOnlyDrivers(hostId);
+    const onlyDriversClasses = this.getOnlyDrivers(hostId);
     const servicesClasses: string[] = this.getServicesClassNames(hostId);
 
     // collect all the drivers dependencies
@@ -138,6 +128,29 @@ export default class HostsFilesSet {
       onlyDriversClasses,
       servicesClasses,
     );
+  }
+
+  /**
+   * Get list of used drivers on host exclude devs.
+   */
+  private getOnlyDrivers(hostId: string): string[] {
+    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
+    const devs: string[] = this.main.entities.getDevs();
+    // remove devs from drivers definitions list
+
+    const filtered = _filter(
+      driversDefinitions,
+      (item: DriverDefinition) => devs.indexOf(item.className) >= 0
+    );
+
+    return filtered.map((id: string) => driversDefinitions[id].className);
+  }
+
+  getServicesClassNames(hostId: string): string[] {
+    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
+
+    return Object.keys(servicesDefinitions)
+      .map((id: string) => servicesDefinitions[id].className);
   }
 
   /**
@@ -175,20 +188,6 @@ export default class HostsFilesSet {
 
     // get only driver class names
     return Object.keys(depsDriversNames);
-  }
-
-  // TODO: почему удаляем ?????
-
-  private collectOnlyDrivers(hostId: string): string[] {
-    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
-    const devs: string[] = this.main.entities.getDevs();
-    // remove devs from drivers definitions list
-    const filtered = (driversDefinitions as {[index: string]: any})
-      .filter((item: DriverDefinition) => {
-        return devs.indexOf(item.className) >= 0;
-      });
-
-    return filtered.map((id: string) => driversDefinitions[id].className);
   }
 
 }

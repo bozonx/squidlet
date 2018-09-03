@@ -74,11 +74,6 @@ export default class Entities {
   private systemDrivers: string[] = [];
   private systemServices: string[] = [];
 
-  // TODO: make it
-  // list of used devs - dependencies or manifests
-  private devs: string[] = [];
-
-
   constructor(main: Main) {
     this.main = main;
   }
@@ -112,7 +107,9 @@ export default class Entities {
   }
 
   getDevs(): string[] {
-    return this.devs;
+    // TODO: просто собрать все devDependencies в один список
+
+    return [];
   }
 
   async generate() {

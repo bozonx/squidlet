@@ -6,35 +6,37 @@ describe.only 'master.HostsFilesSet', ->
     @hostConfig = { host: 'config' }
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
-      'SysDriver': { id: 'SysDriver', className: 'SysDriver', system: true }
-      'RegularDriver': { id: 'RegularDriver', className: 'RegularDriver' }
-      'Dev': { id: 'Dev': className: 'Dev', dev: true }
+      SysDriver: { id: 'SysDriver', className: 'SysDriver', system: true }
+      RegularDriver: { id: 'RegularDriver', className: 'RegularDriver' }
+      Dev: { id: 'Dev': className: 'Dev', dev: true }
     }
     @servicesDefinitions = {
-      'SysService': { id: 'myService', className: 'SysService', system: true }
-      'RegularService': { id: 'myService2', className: 'RegularService' }
+      sysService: { id: 'myService', className: 'SysService', system: true }
+      regularService: { id: 'myService2', className: 'RegularService' }
     }
-    # TODO: !!!!!
     # TODO: !!!!! Могут ли здесь быть dev ???
     @dependencies = {
       devices: {
-
+        device: [ 'RegularDriver' ]
       }
-      drivers: {
-
-      }
-      services: {
-
-      }
+      drivers: {}
+      services: {}
     }
     @systemDrivers = [ 'SysDriver' ]
     @systemServices = [ 'SysService' ]
     @entitiesFiles = {
-      devices: {}
-      drivers: {
-        'SysDriver': [ '/path/to/file' ]
+      devices: {
+        DeviceClass: [ '/path/to/file' ]
       }
-      services: {}
+      drivers: {
+        SysDriver: [ '/path/to/file' ]
+        RegularDriver: [ '/path/to/file' ]
+        Dev: [ '/path/to/file' ]
+      }
+      services: {
+        SysService: [ '/path/to/file' ]
+        RegularService: [ '/path/to/file' ]
+      }
     }
 
     @main = {
@@ -52,6 +54,7 @@ describe.only 'master.HostsFilesSet', ->
         getSystemDrivers: => @systemDrivers
         getSystemServices: => @systemServices
         getFiles: => @entitiesFiles
+        getDevs: => [ 'Dev' ]
       }
     }
     @hostsFilesSet = new HostsFilesSet(@main)
