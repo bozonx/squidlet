@@ -1,26 +1,23 @@
 import * as path from 'path';
 
 import PreMasterConfig from './interfaces/PreMasterConfig';
-import validateMasterConfig from './validateMasterConfig';
+import PreManifestBase from './interfaces/PreManifestBase';
 import Register from './Register';
 import PluginEnv from './PluginEnv';
 import Entities from './Entities';
-import systemPlugin from './systemPlugin';
+import MasterConfig from './MasterConfig';
 import HostsConfigsSet from './HostsConfigsSet';
 import Definitions from './Definitions';
 import HostsFilesSet from './HostsFilesSet';
 import HostsFilesWriter from './HostsFilesWriter';
-import PreManifestBase from './interfaces/PreManifestBase';
+import systemPlugin from './systemPlugin';
 import * as Io from './IO';
 import systemConfig from './configs/systemConfig';
-import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
-import MasterConfig from './MasterConfig';
 
 
 export default class Main {
-  //readonly masterConfig: PreMasterConfig;
   readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly entities: Entities;
@@ -33,10 +30,6 @@ export default class Main {
   private readonly pluginEnv: PluginEnv;
 
   constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
-    const validateError: string | undefined = validateMasterConfig(masterConfig);
-
-    if (validateError) throw new Error(`Invalid master config: ${validateError}`);
-
     this.masterConfig = new MasterConfig(this, masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
@@ -72,6 +65,7 @@ export default class Main {
   }
 
 
+  // TODO: похоже используется только в Register - перенести туда
   async $loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {
     if (pathToDirOrFile.indexOf('/') !== 0) {
       throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
@@ -88,6 +82,7 @@ export default class Main {
     return parsedManifest;
   }
 
+  // TODO: похоже используется только в Register - перенести туда
   // it needs for test purpose
   $require(devicePath: string) {
     return require(devicePath);

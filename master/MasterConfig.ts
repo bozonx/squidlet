@@ -1,3 +1,4 @@
+const _omit = require('lodash/omit');
 import * as path from 'path';
 
 import Main from './Main';
@@ -5,6 +6,7 @@ import Platforms from './interfaces/Platforms';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
+import validateMasterConfig from './validateMasterConfig';
 
 
 export default class MasterConfig {
@@ -19,6 +21,11 @@ export default class MasterConfig {
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.main = main;
     this.masterConfig = masterConfig;
+
+    const validateError: string | undefined = validateMasterConfig(masterConfig);
+
+    if (validateError) throw new Error(`Invalid master config: ${validateError}`);
+
 
     //this.masterConfig = prepareMasterConfig(masterConfig);
 
