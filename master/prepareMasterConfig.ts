@@ -1,12 +1,14 @@
 import * as path from 'path';
 const _omit = require('lodash/omit');
 
-import MasterConfig from './interfaces/MasterConfig';
+import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 
+// TODO: remake !!!!
 
-export function prepareMasterConfig(preMasterConfig: {[index: string]: any}): MasterConfig {
+
+export function prepareMasterConfig(preMasterConfig: {[index: string]: any}): PreMasterConfig {
   let hosts: {[index: string]: PreHostConfig} = {};
 
   if (preMasterConfig.hosts) {
@@ -24,7 +26,7 @@ export function prepareMasterConfig(preMasterConfig: {[index: string]: any}): Ma
   };
 }
 
-export function generateBuildDir(masterConfig: MasterConfig, masterConfigPath: string): string {
+export function generateBuildDir(masterConfig: PreMasterConfig, masterConfigPath: string): string {
   if (masterConfig.hosts && masterConfig.hosts.master.host.storageDir) {
     // use master's storage dir
     const storageDir = masterConfig.hosts.master.host.storageDir;

@@ -1,4 +1,4 @@
-import MasterConfig from './interfaces/MasterConfig';
+import PreMasterConfig from './interfaces/PreMasterConfig';
 import Register from './Register';
 import Entities, {AllManifests} from './Entities';
 import HostsConfigsSet from './HostsConfigsSet';
@@ -14,14 +14,17 @@ const AFTER_INIT_EVENT = 'afterInit';
  */
 export default class PluginEnv {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly masterConfig: MasterConfig;
+
+  // TODO: remake
+
+  private readonly masterConfig: PreMasterConfig;
   private readonly register: Register;
   private readonly entities: Entities;
   private readonly hostsConfigSet: HostsConfigsSet;
 
 
   constructor(
-    masterConfig: MasterConfig,
+    masterConfig: PreMasterConfig,
     register: Register,
     entities: Entities,
     hostsConfigSet: HostsConfigsSet

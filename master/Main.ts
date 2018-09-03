@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import MasterConfig from './interfaces/MasterConfig';
+import PreMasterConfig from './interfaces/PreMasterConfig';
 import validateMasterConfig from './validateMasterConfig';
 import Register from './Register';
 import PluginEnv from './PluginEnv';
@@ -21,7 +21,7 @@ import MasterConfigManager from './MasterConfigManager';
 
 
 export default class Main {
-  readonly masterConfig: MasterConfig;
+  readonly masterConfig: PreMasterConfig;
   readonly masterConfigManager: MasterConfigManager;
   readonly register: Register;
   readonly entities: Entities;

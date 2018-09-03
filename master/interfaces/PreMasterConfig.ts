@@ -1,7 +1,7 @@
 import PreHostConfig from './PreHostConfig';
 
 
-export default interface MasterConfig {
+export default interface PreMasterConfig {
   plugins?: string[];
   // it is short record of hosts: { master: {...PreHostConfig} }
   host?: PreHostConfig;
