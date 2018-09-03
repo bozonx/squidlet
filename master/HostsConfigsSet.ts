@@ -35,7 +35,7 @@ export default class HostsConfigsSet {
   }
 
   generate() {
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfigHosts;
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfig.hosts;
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];

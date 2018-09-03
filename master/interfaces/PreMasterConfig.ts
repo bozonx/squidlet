@@ -7,5 +7,5 @@ export default interface PreMasterConfig {
   host?: PreHostConfig;
   hosts?: {[index: string]: PreHostConfig};
   // default params of hosts. It merges with "host" param of each host config
-  hostDefaults: {[index: string]: any};
+  hostDefaults?: {[index: string]: any};
 }

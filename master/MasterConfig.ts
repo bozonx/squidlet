@@ -14,8 +14,16 @@ export default class MasterConfig {
   private readonly masterConfig: PreMasterConfig;
   readonly buildDir: string;
 
-  get plugins() {
-    return this.masterConfig.plugins;
+  get plugins(): string[] {
+    return this.masterConfig.plugins || [];
+  }
+
+  get hosts(): {[index: string]: PreHostConfig} {
+    return this.masterConfig.hosts as {[index: string]: PreHostConfig};
+  }
+
+  get hostDefaults(): {[index: string]: any} {
+    return this.masterConfig.hostDefaults || {};
   }
 
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
@@ -32,14 +40,12 @@ export default class MasterConfig {
     this.buildDir = this.generateBuildDir(this.masterConfig, masterConfigPath);
   }
 
-  get masterConfigHosts(): {[index: string]: PreHostConfig} {
-    return this.masterConfig.hosts as {[index: string]: PreHostConfig};
-  }
 
-  getPlatformConfig(platFormName: Platforms) {
+  getPlatformConfig(platformName: Platforms) {
 
   }
 
+  // TODO: use it
   private prepareMasterConfig(preMasterConfig: {[index: string]: any}): PreMasterConfig {
     let hosts: {[index: string]: PreHostConfig} = {};
 

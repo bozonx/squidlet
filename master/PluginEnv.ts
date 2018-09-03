@@ -1,4 +1,3 @@
-import PreMasterConfig from './interfaces/PreMasterConfig';
 import Register from './Register';
 import Entities, {AllManifests} from './Entities';
 import HostsConfigsSet from './HostsConfigsSet';
@@ -14,8 +13,8 @@ const AFTER_INIT_EVENT = 'afterInit';
  * This manager is passed to plugins.
  */
 export default class PluginEnv {
-  private readonly events: EventEmitter = new EventEmitter();
   readonly masterConfig: MasterConfig;
+  private readonly events: EventEmitter = new EventEmitter();
   private readonly register: Register;
   private readonly entities: Entities;
   private readonly hostsConfigSet: HostsConfigsSet;
