@@ -17,10 +17,12 @@ import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
 import {prepareMasterConfig, generateBuildDir} from './prepareMasterConfig';
+import MasterConfigManager from './MasterConfigManager';
 
 
 export default class Main {
   readonly masterConfig: MasterConfig;
+  readonly masterConfigManager: MasterConfigManager;
   readonly register: Register;
   readonly entities: Entities;
   readonly hostsConfigSet: HostsConfigsSet;
@@ -43,6 +45,7 @@ export default class Main {
 
     this.masterConfig = prepareMasterConfig(masterConfig);
     this.buildDir = generateBuildDir(this.masterConfig, masterConfigPath);
+    this.masterConfigManager = new MasterConfigManager(this);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
