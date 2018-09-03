@@ -4,6 +4,7 @@ import Entities, {AllManifests} from './Entities';
 import HostsConfigsSet from './HostsConfigsSet';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import * as EventEmitter from 'events';
+import MasterConfig from './MasterConfig';
 
 
 const AFTER_INIT_EVENT = 'afterInit';
@@ -14,17 +15,14 @@ const AFTER_INIT_EVENT = 'afterInit';
  */
 export default class PluginEnv {
   private readonly events: EventEmitter = new EventEmitter();
-
-  // TODO: remake
-
-  private readonly masterConfig: PreMasterConfig;
+  readonly masterConfig: MasterConfig;
   private readonly register: Register;
   private readonly entities: Entities;
   private readonly hostsConfigSet: HostsConfigsSet;
 
 
   constructor(
-    masterConfig: PreMasterConfig,
+    masterConfig: MasterConfig,
     register: Register,
     entities: Entities,
     hostsConfigSet: HostsConfigsSet
@@ -33,11 +31,6 @@ export default class PluginEnv {
     this.register = register;
     this.entities = entities;
     this.hostsConfigSet = hostsConfigSet;
-  }
-
-  getMasterConfig() {
-    // TODO: клонировать или делать immutable
-    return this.masterConfig;
   }
 
   getManifests(): AllManifests {

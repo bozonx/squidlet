@@ -11,7 +11,7 @@ export default class HostsFilesWriter {
 
   constructor(main: Main) {
     this.main = main;
-    this.baseDir = path.join(this.main.buildDir, systemConfig.pathToSaveHostsFileSet);
+    this.baseDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
   }
 
   /**

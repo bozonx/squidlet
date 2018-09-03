@@ -16,7 +16,6 @@ import systemConfig from './configs/systemConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
-import {prepareMasterConfig, generateBuildDir} from './prepareMasterConfig';
 import MasterConfig from './MasterConfig';
 
 
@@ -28,24 +27,17 @@ export default class Main {
   readonly hostsConfigSet: HostsConfigsSet;
   readonly definitions: Definitions;
   readonly hostsFilesSet: HostsFilesSet;
-  readonly buildDir: string;
   readonly log = defaultLogger;
   readonly io = Io;
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
-  get masterConfigHosts(): {[index: string]: PreHostConfig} {
-    return this.masterConfig.hosts as {[index: string]: PreHostConfig};
-  }
-
-  constructor(masterConfig: {[index: string]: any}, masterConfigPath: string) {
+  constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    //this.masterConfig = prepareMasterConfig(masterConfig);
-    this.buildDir = generateBuildDir(this.masterConfig, masterConfigPath);
-    this.masterConfig = new MasterConfig(this);
+    this.masterConfig = new MasterConfig(this, masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
