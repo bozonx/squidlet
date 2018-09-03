@@ -1,7 +1,7 @@
 HostsFilesSet = require('../../master/HostsFilesSet').default
 
 
-describe.only 'master.HostsFilesSet', ->
+describe 'master.HostsFilesSet', ->
   beforeEach ->
     @hostConfig = { host: 'config' }
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
