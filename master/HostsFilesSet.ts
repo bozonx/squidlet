@@ -137,13 +137,12 @@ export default class HostsFilesSet {
     const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
     const devs: string[] = this.main.entities.getDevs();
     // remove devs from drivers definitions list
-
     const filtered = _filter(
       driversDefinitions,
-      (item: DriverDefinition) => devs.indexOf(item.className) >= 0
+      (item: DriverDefinition) => devs.indexOf(item.className) < 0
     );
 
-    return filtered.map((id: string) => driversDefinitions[id].className);
+    return filtered.map((item: DriverDefinition) => item.className);
   }
 
   getServicesClassNames(hostId: string): string[] {

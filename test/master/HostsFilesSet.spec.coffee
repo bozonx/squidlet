@@ -8,7 +8,7 @@ describe.only 'master.HostsFilesSet', ->
     @driversDefinitions = {
       SysDriver: { id: 'SysDriver', className: 'SysDriver', system: true }
       RegularDriver: { id: 'RegularDriver', className: 'RegularDriver' }
-      Dev: { id: 'Dev': className: 'Dev', dev: true }
+      Dev: { id: 'Dev', className: 'Dev', dev: true }
     }
     @servicesDefinitions = {
       sysService: { id: 'myService', className: 'SysService', system: true }
