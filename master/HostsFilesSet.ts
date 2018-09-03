@@ -2,7 +2,7 @@ const _values = require('lodash/values');
 
 import Main from './Main';
 import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
-import {Dependencies, ManifestsTypePluralName} from './Entities';
+import {Dependencies, FilesPaths, ManifestsTypePluralName} from './Entities';
 import HostFilesSet from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
@@ -45,7 +45,7 @@ export default class HostsFilesSet {
 
     return {
       config: this.main.hostsConfigSet.getHostConfig(hostId),
-      entitiesFiles: this.main.entities.getFiles(),
+      entitiesFiles: this.collectEntitiesFiles(hostId),
       systemDrivers,
       regularDrivers,
       systemServices,
@@ -54,6 +54,34 @@ export default class HostsFilesSet {
       driversDefinitions: this.main.definitions.getHostDriversDefinitions(hostId),
       servicesDefinitions: this.main.definitions.getHostServicesDefinitions(hostId),
     };
+  }
+
+  private collectEntitiesFiles(hostId: string): FilesPaths {
+    const result: FilesPaths = {
+      devices: {},
+      drivers: {},
+      services: {},
+    };
+    const allEntitiesFiles: FilesPaths = this.main.entities.getFiles();
+    // collect manifest names of used entities
+    const devicesClasses = this.getDevicesClassNames(hostId);
+    // TODO: драйвера с зависимостями, но без dev
+    const onlyDriversClasses = this.collectOnlyDrivers(hostId);
+    const servicesClasses: string[] = this.getServicesClassNames(hostId);
+
+    const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+      for (let className of classes) {
+        result[pluralType][className] = allEntitiesFiles[pluralType][className];
+      }
+    };
+    // TODO: проходимся повмем классам типа и добавляем файлы этого типа в result
+
+    collect('devices', devicesClasses);
+    // TODO: драйвера с зависимостями но без dev
+    collect('drivers', onlyDriversClasses);
+    collect('services', servicesClasses);
+
+    return result;
   }
 
   /**
