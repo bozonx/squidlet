@@ -8,16 +8,17 @@ describe.only 'master.HostsFilesSet', ->
     @driversDefinitions = {
       SysDriver: { id: 'SysDriver', className: 'SysDriver', system: true }
       RegularDriver: { id: 'RegularDriver', className: 'RegularDriver' }
+      OtherDriver: { id: 'OtherDriver', className: 'OtherDriver' }
       Dev: { id: 'Dev', className: 'Dev', dev: true }
     }
     @servicesDefinitions = {
       sysService: { id: 'myService', className: 'SysService', system: true }
       regularService: { id: 'myService2', className: 'RegularService' }
     }
-    # TODO: !!!!! Могут ли здесь быть dev ???
+    # without devs
     @dependencies = {
       devices: {
-        device: [ 'RegularDriver' ]
+        device: [ 'OtherDriver' ]
       }
       drivers: {}
       services: {}
@@ -31,6 +32,7 @@ describe.only 'master.HostsFilesSet', ->
       drivers: {
         SysDriver: [ '/path/to/file' ]
         RegularDriver: [ '/path/to/file' ]
+        OtherDriver: [ '/path/to/file' ]
         Dev: [ '/path/to/file' ]
       }
       services: {
@@ -65,10 +67,13 @@ describe.only 'master.HostsFilesSet', ->
     assert.deepEqual(@hostsFilesSet.getCollection(), {
       master: {
         config: @hostConfig
-        entitiesFiles: @entitiesFiles
+        entitiesFiles: {
+          @entitiesFiles...
+          drivers: _.omit(@entitiesFiles.drivers, 'Dev')
+        }
 
         systemDrivers: @systemDrivers
-        regularDrivers: [ 'RegularDriver' ]
+        regularDrivers: [ 'RegularDriver', 'OtherDriver' ]
         systemServices: @systemServices
         regularServices: [ 'RegularService' ]
 
