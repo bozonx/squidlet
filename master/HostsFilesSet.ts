@@ -35,11 +35,11 @@ export default class HostsFilesSet {
     const [
       systemDrivers,
       regularDrivers,
-    ] = this.sortDrivers();
+    ] = this.sortDrivers(hostId);
     const [
       systemServices,
       regularServices,
-    ] = this.sortServices();
+    ] = this.sortServices(hostId);
 
     // TODO: проверить что getDevDependencies есть среди devs платформы
 
@@ -57,11 +57,37 @@ export default class HostsFilesSet {
   }
 
   /**
+   * sort drivers to system and regular
+   * @returns [systemDrivers, regularDrivers]
+   */
+  private sortDrivers(hostId: string): [string[], string[]] {
+    const driversClasses: string[] = this.collectUsedDriversClasses(hostId);
+
+    const allSystemDrivers: string[] = this.main.entities.getSystemDrivers();
+
+    return sortByIncludeInList(driversClasses, allSystemDrivers);
+  }
+
+  /**
+   * sort services to system and regular
+   * @returns [systemServices, regularServices]
+   */
+  private sortServices(hostId: string): [string[], string[]] {
+    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
+    const servicesClasses: string[] = Object.keys(servicesDefinitions)
+      .map((id: string) => servicesDefinitions[id].className);
+
+    const allSystemServices: string[] = this.main.entities.getSystemServices();
+
+    return sortByIncludeInList(servicesClasses, allSystemServices);
+  }
+
+  /**
    * Generate entities manifest names which are used on host
    */
-  private generateEntityNames(
+  private collectUsedDriversClasses(
     hostId: string
-  ): {devicesClasses: string[], driversClasses: string[], servicesClasses: string[]} {
+  ): string[] {
     const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
     const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
 
@@ -79,25 +105,7 @@ export default class HostsFilesSet {
       servicesClasses,
     );
 
-    return {
-      devicesClasses,
-      driversClasses,
-      servicesClasses,
-    };
-  }
-
-  // TODO: почему удаляем ?????
-
-  private collectOnlyDrivers(hostId: string): string[] {
-    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
-    const devs: string[] = this.main.entities.getDevs();
-    // remove devs from drivers definitions list
-    const filtered = (driversDefinitions as {[index: string]: any})
-      .filter((item: DriverDefinition) => {
-        return devs.indexOf(item.className) >= 0;
-      });
-
-    return filtered.map((id: string) => driversDefinitions[id].className);
+    return driversClasses;
   }
 
   /**
@@ -137,32 +145,18 @@ export default class HostsFilesSet {
     return Object.keys(depsDriversNames);
   }
 
-  /**
-   * sort drivers to system and regular
-   * @returns [systemDrivers, regularDrivers]
-   */
-  private sortDrivers(): [string[], string[]] {
-    const {
-      driversClasses,
-    } = this.generateEntityNames(hostId);
+  // TODO: почему удаляем ?????
 
-    const allSystemDrivers: string[] = this.main.entities.getSystemDrivers();
+  private collectOnlyDrivers(hostId: string): string[] {
+    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
+    const devs: string[] = this.main.entities.getDevs();
+    // remove devs from drivers definitions list
+    const filtered = (driversDefinitions as {[index: string]: any})
+      .filter((item: DriverDefinition) => {
+        return devs.indexOf(item.className) >= 0;
+      });
 
-    return sortByIncludeInList(driversClasses, allSystemDrivers);
-  }
-
-  /**
-   * sort services to system and regular
-   * @returns [systemServices, regularServices]
-   */
-  private sortServices(): [string[], string[]] {
-    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
-    const servicesClasses: string[] = Object.keys(servicesDefinitions)
-      .map((id: string) => servicesDefinitions[id].className);
-
-    const allSystemServices: string[] = this.main.entities.getSystemServices();
-
-    return sortByIncludeInList(servicesClasses, allSystemServices);
+    return filtered.map((id: string) => driversDefinitions[id].className);
   }
 
 }

@@ -1,15 +1,22 @@
 {
   "compilerOptions": {
+    //"baseUrl": "src",
     "module": "commonjs",
+    "moduleResolution": "node",
     "noImplicitReturns": true,
+    "noEmitOnError": false,
+    //"noUnusedLocals": true,
     "outDir": "build",
+    "preserveSymlinks": true,
     "removeComments": true,
-    "rootDir": "src",
-    "strict": true,
     "sourceMap": true,
+    //"rootDir": "host",
+    "strict": true,
     "target": "es6"
   },
-  "include": [
-    "src/**/*"
-  ]
+  "exclude": ["build", "node_modules"]
+//  "include": [
+//    "host/**/*",
+//    "master/**/*"
+//  ]
 }

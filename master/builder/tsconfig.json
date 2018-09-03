@@ -5,11 +5,13 @@
     "listEmittedFiles": true,
     //"lib": ["ES5"],
     "module": "commonjs",
-    //"moduleResolution": "node",
-    //"noEmitOnError": true,
+    "moduleResolution": "node",
+    "noEmitOnError": true,
     "noImplicitReturns": true,
+    //"noUnusedLocals": true,
     //"outFile": "build/result.js",
     "outDir": "build",
+    "preserveSymlinks": true,
     "removeComments": true,
     // for jsons
     //"resolveJsonModule": true,
@@ -17,7 +19,8 @@
     "strict": true,
     "target": "es5"
   },
-  "include": [
-    "src/**/*"
-  ]
+  "exclude": ["build", "node_modules"]
+//  "include": [
+//    "src/**/*"
+//  ]
 }
