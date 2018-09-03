@@ -17,12 +17,12 @@ import PreHostConfig from './interfaces/PreHostConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
 import {prepareMasterConfig, generateBuildDir} from './prepareMasterConfig';
-import MasterConfigManager from './MasterConfigManager';
+import MasterConfig from './MasterConfig';
 
 
 export default class Main {
-  readonly masterConfig: PreMasterConfig;
-  readonly masterConfigManager: MasterConfigManager;
+  //readonly masterConfig: PreMasterConfig;
+  readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly entities: Entities;
   readonly hostsConfigSet: HostsConfigsSet;
@@ -43,9 +43,9 @@ export default class Main {
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    this.masterConfig = prepareMasterConfig(masterConfig);
+    //this.masterConfig = prepareMasterConfig(masterConfig);
     this.buildDir = generateBuildDir(this.masterConfig, masterConfigPath);
-    this.masterConfigManager = new MasterConfigManager(this);
+    this.masterConfig = new MasterConfig(this);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.hostsConfigSet = new HostsConfigsSet(this);

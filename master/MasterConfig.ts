@@ -1,7 +1,7 @@
 import Main from './Main';
 import Platforms from './interfaces/Platforms';
 
-export default class MasterConfigManager {
+export default class MasterConfig {
   private readonly main: Main;
 
   constructor(main: Main) {
