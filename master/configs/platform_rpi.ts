@@ -3,8 +3,10 @@ export default {
     'Fs',
     'Gpio',
     'Pwm',
-    'Uart',
+    'Serial',
     'Spi',
+    'Wifi',
+    'Bluetooth',
     'I2cMaster',
 
     //'Adc',

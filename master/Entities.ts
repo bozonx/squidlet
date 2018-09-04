@@ -147,7 +147,7 @@ export default class Entities {
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
     const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
-    const mainJsFile = path.join(preManifest.entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
+    const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
     // collect files of entity which will be placed in storage
     this.filesPaths[pluralType][preManifest.name] = [
@@ -157,7 +157,7 @@ export default class Entities {
       // add path to main in storage
         ...((preManifest.main) ? [mainJsFile] : []),
       // add path to parsed manifest in storage
-      path.join(preManifest.entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
+      path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
     ];
 
     if (preManifest.main) {
@@ -202,6 +202,7 @@ export default class Entities {
     // TODO: !!!!! билдить во временную папку
     // TODO: !!!!! написать в лог что билдится файл
     // TODO: !!!!! поддержка билда js файлов
+    // TODO: !!!!! test
 
   }
 

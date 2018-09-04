@@ -2,14 +2,17 @@ export default {
   devs: [
     'Fs',
     'Gpio',
-    'Touch',
     'Pwm',
-    'Uart',
+    'Serial',
+    'Spi',
+    'Wifi',
+    'Bluetooth',
+    'I2cMaster',
+
+    'I2cSlave',
     'Adc',
     'Dac',
-    'Spi',
-    'I2cMaster',
-    'I2cSlave',
+    'Touch',
   ],
 
   host: {

@@ -54,7 +54,9 @@ describe.only 'master.Entities', ->
       }
     ]
     @main = {
-      buildDir: '/buildDir'
+      masterConfig: {
+        buildDir: '/buildDir'
+      }
       register: {
         getDevicesPreManifests: => @preDevicesManifests
         getDriversPreManifests: => @prePreDriverManifest
@@ -111,20 +113,23 @@ describe.only 'master.Entities', ->
     assert.deepEqual(@entities.getFiles(), {
       devices: {
         DeviceClass: [
-          '/myBaseDir/deviceFile.json'
-          '/buildDir/entities/devices_DeviceClass.js'
+          '/buildDir/entities/devices/DeviceClass/deviceFile.json'
+          '/buildDir/entities/devices/DeviceClass/__main.js'
+          '/buildDir/entities/devices/DeviceClass/manifest.json'
         ]
       }
       drivers: {
         'DriverName.driver': [
-          '/myBaseDir/driverFile.json'
-          '/buildDir/entities/drivers_DriverName.driver.js'
+          '/buildDir/entities/drivers/DriverName.driver/driverFile.json'
+          '/buildDir/entities/drivers/DriverName.driver/__main.js'
+          '/buildDir/entities/drivers/DriverName.driver/manifest.json'
         ]
       }
       services: {
         ServiceClass: [
-          '/myBaseDir/serviceFile.json'
-          '/buildDir/entities/services_ServiceClass.js'
+          '/buildDir/entities/services/ServiceClass/serviceFile.json'
+          '/buildDir/entities/services/ServiceClass/__main.js'
+          '/buildDir/entities/services/ServiceClass/manifest.json'
         ]
       }
     })
