@@ -2,7 +2,7 @@ Definitions = require('../../master/Definitions').default
 hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 
-describe.only 'master.Definitions', ->
+describe 'master.Definitions', ->
   beforeEach ->
     @main = {
       masterConfig: {
@@ -88,7 +88,7 @@ describe.only 'master.Definitions', ->
           }
         }
       }
-      @definitions.main.manifests = {
+      @definitions.main.entities = {
         getManifests: => @manifests
       }
       @definitions.driversDefinitions = {

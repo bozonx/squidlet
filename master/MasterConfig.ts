@@ -11,33 +11,35 @@ import validateMasterConfig from './validateMasterConfig';
 
 export default class MasterConfig {
   private readonly main: Main;
-  private readonly masterConfig: PreMasterConfig;
+  private readonly _plugins: string[] = [];
+  private readonly _hostDefaults: {[index: string]: any} = {};
+  private readonly _hosts: {[index: string]: PreHostConfig} = {};
   readonly buildDir: string;
 
   get plugins(): string[] {
-    return this.masterConfig.plugins || [];
+    return this._plugins;
   }
 
   get hosts(): {[index: string]: PreHostConfig} {
-    return this.masterConfig.hosts as {[index: string]: PreHostConfig};
+    return this._hosts;
   }
 
   get hostDefaults(): {[index: string]: any} {
-    return this.masterConfig.hostDefaults || {};
+    return this._hostDefaults;
   }
 
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.main = main;
-    this.masterConfig = masterConfig;
 
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
+    if (masterConfig.plugins) this._plugins = masterConfig.plugins;
+    if (masterConfig.hostDefaults) this._hostDefaults = masterConfig.hostDefaults;
 
-    //this.masterConfig = prepareMasterConfig(masterConfig);
-
-    this.buildDir = this.generateBuildDir(this.masterConfig, masterConfigPath);
+    this._hosts = this.resolveHosts(masterConfig);
+    this.buildDir = this.generateBuildDir(masterConfigPath);
   }
 
 
@@ -45,8 +47,7 @@ export default class MasterConfig {
 
   }
 
-  // TODO: use it
-  private prepareMasterConfig(preMasterConfig: {[index: string]: any}): PreMasterConfig {
+  private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
     let hosts: {[index: string]: PreHostConfig} = {};
 
     if (preMasterConfig.hosts) {
@@ -58,16 +59,13 @@ export default class MasterConfig {
       };
     }
 
-    return {
-      ..._omit(preMasterConfig, 'host', 'hosts'),
-      hosts
-    };
+    return hosts;
   }
 
-  private generateBuildDir(masterConfig: PreMasterConfig, masterConfigPath: string): string {
-    if (masterConfig.hosts && masterConfig.hosts.master.host.storageDir) {
+  private generateBuildDir(masterConfigPath: string): string {
+    if (this.hosts.master.host.storageDir) {
       // use master's storage dir
-      const storageDir = masterConfig.hosts.master.host.storageDir;
+      const storageDir = this.hosts.master.host.storageDir;
 
       if (path.isAbsolute(masterConfigPath)) {
         // it's an absolute path
