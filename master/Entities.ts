@@ -147,6 +147,7 @@ export default class Entities {
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
     const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
+    const mainJsFile = path.join(preManifest.entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
     // collect files of entity which will be placed in storage
     this.filesPaths[pluralType][preManifest.name] = [
@@ -154,29 +155,15 @@ export default class Entities {
         return path.resolve(entityDirInStorage, path.basename(item));
       }),
       // add path to main in storage
-        ...(preManifest.main) ? [path.join(
-          preManifest.entityDirInStorage,
-          systemConfig.hostInitCfg.fileNames.mainJs
-        )] : [],
+        ...((preManifest.main) ? [mainJsFile] : []),
       // add path to parsed manifest in storage
       path.join(preManifest.entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
     ];
 
     if (preManifest.main) {
-      // TODO: навреное можно перенести в register превращение в absolute path
-      const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
-      const jsMainFileName = this.generateJsMainFileName(pluralType, preManifest.name);
-
       // build an entity main file
-      await this.buildMainFile(absoluteMainFileName, jsMainFileName);
-
-      //files.push(jsMainFileName);
+      await this.buildMainFile(preManifest, mainJsFile);
     }
-
-    // TODO: навреное можно перенести в register превращение в absolute path
-    // TODO: сформировать папки манифестов по типам - в каждой папке все необходимое - на них будут указывать пути для копирования
-    // TODO: на них будут указывать пути для копирования
-    // TODO: добавить сюда пути на сам manifest.json
 
     // just save unsorted deps
     if (preManifest.drivers) {
@@ -191,20 +178,6 @@ export default class Entities {
     this[pluralType] = manifestsSet.set(finalManifest.name, finalManifest);
   }
 
-  private collectFiles(baseDir: string, paths: string[]): string[] {
-    return paths.map((item) => {
-      // TODO: поидее можно это перенести в валидацию во время register.addEntity
-      if (path.isAbsolute(item)) {
-        throw new Error(`You must not specify an absolute path of "${item}". Only relative is allowed.`);
-      }
-      else if (item.match(/\.\./)) {
-        throw new Error(`Path "${item}" has to relative to its manifest base dir`);
-      }
-
-      return path.resolve(baseDir, item);
-    });
-  }
-
   private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {
     const finalManifest: FinalManifest = _omit(
       preManifest,
@@ -214,6 +187,7 @@ export default class Entities {
       'baseDir'
     );
 
+    // load props file
     if (typeof preManifest.props === 'string') {
       finalManifest.props = this.main.io.loadYamlFile(preManifest.props);
     }
@@ -221,15 +195,10 @@ export default class Entities {
     return finalManifest;
   }
 
-  private generateJsMainFileName(pluralType: string, entityName: string): string {
-    return path.join(
-      this.main.masterConfig.buildDir,
-      systemConfig.entityBuildDir,
-      `${pluralType}_${entityName}.js`
-    );
-  }
+  private async buildMainFile(preManifest: PreManifestBase, mainJsFile: string) {
+    // TODO: навреное можно перенести в register превращение в absolute path
+    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
 
-  private async buildMainFile(absoluteMainFileName: string, jsFileName: string) {
     // TODO: !!!!! билдить во временную папку
     // TODO: !!!!! написать в лог что билдится файл
     // TODO: !!!!! поддержка билда js файлов

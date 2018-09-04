@@ -2,3 +2,16 @@ export default function validateDeviceManifest(rawManifest: {[index: string]: an
   // TODO: add
   return undefined;
 }
+
+// private checkFiles(baseDir: string, paths: string[]): string[] {
+//   return paths.map((item) => {
+//     if (path.isAbsolute(item)) {
+//       throw new Error(`You must not specify an absolute path of "${item}". Only relative is allowed.`);
+//     }
+//     else if (item.match(/\.\./)) {
+//       throw new Error(`Path "${item}" has to relative to its manifest base dir`);
+//     }
+//
+//     return path.resolve(baseDir, item);
+//   });
+// }
