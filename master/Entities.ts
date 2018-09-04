@@ -123,15 +123,15 @@ export default class Entities {
     const prePreServiceManifest = this.main.register.getServicesPreManifests();
 
     for (let item of preDevicesManifests) {
-      await this.proceed<PreDeviceManifest, DeviceManifest>('device', item);
+      await this.proceed<DeviceManifest>('device', item);
     }
 
     for (let item of prePreDriverManifest) {
-      await this.proceed<PreDriverManifest, DriverManifest>('driver', item);
+      await this.proceed<DriverManifest>('driver', item);
     }
 
     for (let item of prePreServiceManifest) {
-      await this.proceed<PreServiceManifest, ServiceManifest>('service', item);
+      await this.proceed<ServiceManifest>('service', item);
     }
 
     // sort deps drivers and devs and save they to separate list
@@ -141,28 +141,18 @@ export default class Entities {
   }
 
 
-  private async proceed<PreManifest extends PreManifestBase, FinalManifest extends ManifestBase>(
+  private async proceed<FinalManifest extends ManifestBase>(
     manifestType: ManifestsTypeName,
-    preManifest: PreManifest,
+    preManifest: PreManifestBase,
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
-    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
-    const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
     // collect files of entity which will be placed in storage
-    this.filesPaths[pluralType][preManifest.name] = [
-      ...(preManifest.files || []).map((item) => {
-        return path.resolve(entityDirInStorage, path.basename(item));
-      }),
-      // add path to main in storage
-        ...((preManifest.main) ? [mainJsFile] : []),
-      // add path to parsed manifest in storage
-      path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
-    ];
+    this.collectFiles(pluralType, preManifest);
 
     if (preManifest.main) {
       // build an entity main file
-      await this.buildMainFile(preManifest, mainJsFile);
+      await this.buildMainFile(pluralType, preManifest);
     }
 
     // just save unsorted deps
@@ -170,12 +160,30 @@ export default class Entities {
       this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
     }
 
-    // prepare to add to list of manifests
+    // prepare to entity's manifest
     const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
-    const manifestsSet = this[pluralType] as Map<string, FinalManifest>;
 
     // add to list of manifests
-    this[pluralType] = manifestsSet.set(finalManifest.name, finalManifest);
+    this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
+      .set(finalManifest.name, finalManifest);
+  }
+
+  /**
+   * collect files of entity which will be placed in storage
+   */
+  private collectFiles(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
+    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
+    const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
+
+    this.filesPaths[pluralType][preManifest.name] = [
+      ...(preManifest.files || []).map((item) => {
+        return path.resolve(entityDirInStorage, path.basename(item));
+      }),
+      // add path to main in storage
+      ...((preManifest.main) ? [mainJsFile] : []),
+      // add path to parsed manifest in storage
+      path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
+    ];
   }
 
   private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {
@@ -195,7 +203,10 @@ export default class Entities {
     return finalManifest;
   }
 
-  private async buildMainFile(preManifest: PreManifestBase, mainJsFile: string) {
+  private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
+    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
+    const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
+
     // TODO: навреное можно перенести в register превращение в absolute path
     const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
 
