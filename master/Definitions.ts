@@ -53,7 +53,7 @@ export default class Definitions {
   }
 
   generate() {
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfigHosts;
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfig.hosts;
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
@@ -217,7 +217,6 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
-    // TODO: rename to entities
     const manifests: AllManifests = this.main.entities.getManifests();
     const check = (
       manifests: {[index: string]: ManifestBase},

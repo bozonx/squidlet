@@ -44,10 +44,12 @@ export interface AllManifests {
 
 export default class Entities {
   private readonly main: Main;
+  private readonly entitiesDir: string;
   private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
   private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
   private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
-  // file paths collected from manifests
+
+  // file paths of entities prepared files in storage
   private filesPaths: FilesPaths = {
     devices: {},
     drivers: {},
@@ -76,8 +78,10 @@ export default class Entities {
 
   constructor(main: Main) {
     this.main = main;
+    this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
+  // TODO: зачем это нужно?
   getManifests(): AllManifests {
     return {
       devices: this.devices.toJS(),
@@ -108,6 +112,7 @@ export default class Entities {
 
   getDevs(): string[] {
     // TODO: просто собрать все devDependencies в один список
+    // TODO: сами сущности могут быть dev ???
 
     return [];
   }
@@ -141,10 +146,21 @@ export default class Entities {
     preManifest: PreManifest,
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
+    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
 
-    // collect files
-    // TODO: навреное можно перенести в register превращение в absolute path
-    const files: string[] = this.collectFiles(preManifest.baseDir, preManifest.files || []);
+    // collect files of entity which will be placed in storage
+    this.filesPaths[pluralType][preManifest.name] = [
+      ...(preManifest.files || []).map((item) => {
+        return path.resolve(entityDirInStorage, path.basename(item));
+      }),
+      // add path to main in storage
+        ...(preManifest.main) ? [path.join(
+          preManifest.entityDirInStorage,
+          systemConfig.hostInitCfg.fileNames.mainJs
+        )] : [],
+      // add path to parsed manifest in storage
+      path.join(preManifest.entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
+    ];
 
     if (preManifest.main) {
       // TODO: навреное можно перенести в register превращение в absolute path
@@ -154,14 +170,13 @@ export default class Entities {
       // build an entity main file
       await this.buildMainFile(absoluteMainFileName, jsMainFileName);
 
-      files.push(jsMainFileName);
+      //files.push(jsMainFileName);
     }
 
+    // TODO: навреное можно перенести в register превращение в absolute path
     // TODO: сформировать папки манифестов по типам - в каждой папке все необходимое - на них будут указывать пути для копирования
     // TODO: на них будут указывать пути для копирования
     // TODO: добавить сюда пути на сам manifest.json
-
-    if (files.length) this.filesPaths[pluralType][preManifest.name] = files;
 
     // just save unsorted deps
     if (preManifest.drivers) {
@@ -208,7 +223,7 @@ export default class Entities {
 
   private generateJsMainFileName(pluralType: string, entityName: string): string {
     return path.join(
-      this.main.buildDir,
+      this.main.masterConfig.buildDir,
       systemConfig.entityBuildDir,
       `${pluralType}_${entityName}.js`
     );

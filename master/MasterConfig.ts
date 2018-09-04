@@ -14,6 +14,7 @@ export default class MasterConfig {
   private readonly _plugins: string[] = [];
   private readonly _hostDefaults: {[index: string]: any} = {};
   private readonly _hosts: {[index: string]: PreHostConfig} = {};
+  // storage base dir
   readonly buildDir: string;
 
   get plugins(): string[] {
