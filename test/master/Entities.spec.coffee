@@ -49,7 +49,8 @@ describe.only 'master.Entities', ->
           'serviceFile.json'
         ]
         drivers: [
-          'DevName.dev'
+          # dev of platform without a manifest
+          'PlatformDev.dev'
         ]
         param: 'value'
       }
@@ -151,7 +152,7 @@ describe.only 'master.Entities', ->
       devices: {},
       drivers: {},
       services: {
-        ServiceClass: [ 'DevName.dev' ]
+        ServiceClass: [ 'PlatformDev.dev' ]
       },
     })
 

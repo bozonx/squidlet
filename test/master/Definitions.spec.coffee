@@ -9,32 +9,32 @@ describe 'master.Definitions', ->
         hostDefaults: {
           hostDefaultParam: 1
         }
-      }
-      masterConfigHosts: {
-        master: {
-          platform: 'rpi'
-          devices: {
-            room1: {
-              relay: {
-                device: 'Relay'
-                pin: 1
+        hosts: {
+          master: {
+            platform: 'rpi'
+            devices: {
+              room1: {
+                relay: {
+                  device: 'Relay'
+                  pin: 1
+                }
               }
             }
-          }
-          drivers: {
-            'Gpio.driver': {
-              param: 1
+            drivers: {
+              'Gpio.driver': {
+                param: 1
+              }
             }
-          }
-          services: {
-            backend: {
-              service: 'Backend'
-              param: 1
+            services: {
+              backend: {
+                service: 'Backend'
+                param: 1
+              }
             }
-          }
-          devicesDefaults: {
-            Relay: {
-              baseOne: true
+            devicesDefaults: {
+              Relay: {
+                baseOne: true
+              }
             }
           }
         }

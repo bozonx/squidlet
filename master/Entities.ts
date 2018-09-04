@@ -65,6 +65,7 @@ export default class Entities {
     services: {},
   };
   // list of devs like {EntityType: {EntityId: [...DriverName]}}
+  // they have param "dev" in manifest or if it doesn't have a manifest its name ends with ".dev".
   private devDependencies: Dependencies = {
     devices: {},
     drivers: {},
@@ -160,7 +161,7 @@ export default class Entities {
     // prepare to entity's manifest
     const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
 
-    // TODO: save files to disk
+    // TODO: save files and manifest to disk
 
     // add to list of manifests
     this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
@@ -236,8 +237,16 @@ export default class Entities {
   }
 
   private sortDriver(pluralType: ManifestsTypePluralName, entityName: string, driverName: string) {
-    //if (!driverName.match(/\.dev$/) && !this.drivers.get(driverName)) {
     if (!this.drivers.get(driverName)) {
+      // if it doesn't have a manifest but its name ends with ".dev" - it probably dev is
+      if (driverName.match(/\.dev$/)) {
+        if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
+
+        this.devDependencies[pluralType][entityName].push(driverName);
+
+        return;
+      }
+
       throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
     }
 
