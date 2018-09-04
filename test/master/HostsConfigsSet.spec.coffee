@@ -2,14 +2,44 @@ HostsConfigsSet = require('../../master/HostsConfigsSet').default
 hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 
-describe.only 'master.HostsConfigsSet', ->
+describe 'master.HostsConfigsSet', ->
   beforeEach ->
+    @preMasterConfig = {
+      platform: 'rpi'
+      config: {
+        storageDir: '/myDir'
+      }
+      devices: {
+        room1: {
+          relay: {
+            device: 'Relay'
+            pin: 1
+          }
+        }
+      }
+      drivers: {
+        'Gpio.driver': {
+          param: 1
+        }
+      }
+      services: {
+        backend: {
+          service: 'Backend'
+          param: 1
+        }
+      }
+      devicesDefaults: {
+        Relay: {
+          baseOne: true
+        }
+      }
+    }
     @hostConfigsResult = {
       master: {
-        platform: 'rpi'
+        @preMasterConfig...
         config: {
-          hostDefaultConfig...
-          storageDir: '/myDir'
+          hostDefaultConfig.config...
+          @preMasterConfig.config...
           hostDefaultParam: 1
         }
       }
@@ -18,39 +48,12 @@ describe.only 'master.HostsConfigsSet', ->
     @main = {
       masterConfig: {
         hostDefaults: {
-          hostDefaultParam: 1
+          config: {
+            hostDefaultParam: 1
+          }
         }
         hosts: {
-          master: {
-            platform: 'rpi'
-            config: {
-              storageDir: '/myDir'
-            }
-            devices: {
-              room1: {
-                relay: {
-                  device: 'Relay'
-                  pin: 1
-                }
-              }
-            }
-            drivers: {
-              'Gpio.driver': {
-                param: 1
-              }
-            }
-            services: {
-              backend: {
-                service: 'Backend'
-                param: 1
-              }
-            }
-            devicesDefaults: {
-              Relay: {
-                baseOne: true
-              }
-            }
-          }
+          master: @preMasterConfig
         }
       }
     }

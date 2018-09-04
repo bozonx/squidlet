@@ -45,21 +45,12 @@ export default class HostsConfigsSet {
     }
   }
 
-  private generateHostConfig(rawHostConfig: PreHostConfig) {
-    return {
-      platform: rawHostConfig.platform,
-      host: this.mergeHostParams(rawHostConfig) as HostConfig['host'],
-    };
-  }
+  private generateHostConfig(rawHostConfig: PreHostConfig): HostConfig {
 
-  /**
-   * Merge params of host.
-   */
-  private mergeHostParams(rawHostConfig: PreHostConfig): {[index: string]: any} {
     // TODO: смержить ещё с platform config
 
     return _defaultsDeep(
-      _cloneDeep(rawHostConfig.host),
+      _cloneDeep(rawHostConfig),
       this.main.masterConfig.hostDefaults,
       hostDefaultConfig
     );

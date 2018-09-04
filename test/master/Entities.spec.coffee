@@ -1,7 +1,7 @@
 Entities = require('../../master/Entities').default
 
 
-describe 'master.Entities', ->
+describe.only 'master.Entities', ->
   beforeEach ->
     @preDevicesManifests = [
       {

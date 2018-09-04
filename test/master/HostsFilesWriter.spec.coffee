@@ -17,7 +17,9 @@ describe 'master.HostsFilesWriter', ->
       }
     }
     @main = {
-      buildDir: '/bildDir'
+      masterConfig: {
+        buildDir: '/bildDir'
+      }
       hostsFilesSet: {
         getCollection: => @hostFiles
       }
