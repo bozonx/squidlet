@@ -31,6 +31,7 @@ describe.only 'master.Entities', ->
         ]
         param: 'value'
       }
+      # dev
       {
         name: 'DevName.dev'
         dev: true
@@ -124,6 +125,10 @@ describe.only 'master.Entities', ->
           '/buildDir/entities/drivers/DriverName.driver/__main.js'
           '/buildDir/entities/drivers/DriverName.driver/manifest.json'
         ]
+        # dev which was registered in Register
+        "DevName.dev": [
+          "/buildDir/entities/drivers/DevName.dev/manifest.json"
+        ]
       }
       services: {
         ServiceClass: [
@@ -154,9 +159,6 @@ describe.only 'master.Entities', ->
     assert.deepEqual(@entities.getSystemServices(), [ 'ServiceClass' ])
 
     sinon.assert.calledThrice(@entities.buildMainFile)
-    sinon.assert.calledWith(@entities.buildMainFile.getCall(0),
-      '/myBaseDir/main.ts', '/buildDir/entities/devices_DeviceClass.js')
-    sinon.assert.calledWith(@entities.buildMainFile.getCall(1),
-      '/myBaseDir/main.ts', '/buildDir/entities/drivers_DriverName.driver.js')
-    sinon.assert.calledWith(@entities.buildMainFile.getCall(2),
-      '/myBaseDir/main.ts', '/buildDir/entities/services_ServiceClass.js')
+    sinon.assert.calledWith(@entities.buildMainFile.getCall(0), 'devices', @preDevicesManifests[0])
+    sinon.assert.calledWith(@entities.buildMainFile.getCall(1), 'drivers', @prePreDriverManifest[0])
+    sinon.assert.calledWith(@entities.buildMainFile.getCall(2), 'services', @prePreServiceManifest[0])

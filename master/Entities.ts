@@ -6,9 +6,6 @@ import Main from './Main';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
-import PreDeviceManifest from './interfaces/PreDeviceManifest';
-import PreDriverManifest from './interfaces/PreDriverManifest';
-import PreServiceManifest from './interfaces/PreServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import systemConfig from './configs/systemConfig';
@@ -163,6 +160,8 @@ export default class Entities {
     // prepare to entity's manifest
     const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
 
+    // TODO: save files to disk
+
     // add to list of manifests
     this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
       .set(finalManifest.name, finalManifest);
@@ -217,6 +216,9 @@ export default class Entities {
 
   }
 
+  /**
+   * Sort dependencies to drivers and devs
+   */
   private sortDependencies() {
     const sortType = (pluralType: ManifestsTypePluralName) => {
       const dictByName: {[index: string]: string[]} = this.unsortedDependencies[pluralType];
