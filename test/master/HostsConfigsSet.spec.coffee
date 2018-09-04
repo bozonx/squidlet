@@ -6,44 +6,49 @@ describe.only 'master.HostsConfigsSet', ->
   beforeEach ->
     @hostConfigsResult = {
       master: {
-        host: {
+        platform: 'rpi'
+        config: {
           hostDefaultConfig...
           storageDir: '/myDir'
           hostDefaultParam: 1
         }
       }
     }
+
     @main = {
       masterConfig: {
         hostDefaults: {
           hostDefaultParam: 1
         }
-      }
-      masterConfigHosts: {
-        master: {
-          platform: 'rpi'
-          devices: {
-            room1: {
-              relay: {
-                device: 'Relay'
-                pin: 1
+        hosts: {
+          master: {
+            platform: 'rpi'
+            config: {
+              storageDir: '/myDir'
+            }
+            devices: {
+              room1: {
+                relay: {
+                  device: 'Relay'
+                  pin: 1
+                }
               }
             }
-          }
-          drivers: {
-            'Gpio.driver': {
-              param: 1
+            drivers: {
+              'Gpio.driver': {
+                param: 1
+              }
             }
-          }
-          services: {
-            backend: {
-              service: 'Backend'
-              param: 1
+            services: {
+              backend: {
+                service: 'Backend'
+                param: 1
+              }
             }
-          }
-          devicesDefaults: {
-            Relay: {
-              baseOne: true
+            devicesDefaults: {
+              Relay: {
+                baseOne: true
+              }
             }
           }
         }

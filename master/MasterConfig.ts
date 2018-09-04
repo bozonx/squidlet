@@ -63,9 +63,9 @@ export default class MasterConfig {
   }
 
   private generateBuildDir(masterConfigPath: string): string {
-    if (this.hosts.master.host.storageDir) {
+    if (this.hosts.master.config.storageDir) {
       // use master's storage dir
-      const storageDir = this.hosts.master.host.storageDir;
+      const storageDir = this.hosts.master.config.storageDir;
 
       if (path.isAbsolute(masterConfigPath)) {
         // it's an absolute path

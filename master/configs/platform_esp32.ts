@@ -13,6 +13,8 @@ export default {
   ],
 
   host: {
+    config: {
 
+    }
   }
 };

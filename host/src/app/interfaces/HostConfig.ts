@@ -7,7 +7,7 @@ export default interface HostConfig {
   // TODO: rename host to props ?
 
   // specific config for each host
-  host: {
+  config: {
     // path to dir where will be placed storage of host
     storageDir: string;
     // republish status silently every minute if it hasn't been changed

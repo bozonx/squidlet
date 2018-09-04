@@ -13,6 +13,13 @@ export default {
   ],
 
   host: {
-
+    config: {
+      // TODO: review
+      // connections: {
+      //   i2c: {
+      //     bus: 1,
+      //   }
+      // },
+    }
   }
 };
