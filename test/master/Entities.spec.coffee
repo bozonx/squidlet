@@ -1,7 +1,7 @@
 Entities = require('../../master/Entities').default
 
 
-describe.only 'master.Entities', ->
+describe 'master.Entities', ->
   beforeEach ->
     @preDevicesManifests = [
       {
@@ -191,3 +191,11 @@ describe.only 'master.Entities', ->
     sinon.assert.calledWith(@main.$writeJson,
       '/buildDir/entities/devices/DeviceClass/manifest.json',
       @finalManifests.devices.DeviceClass)
+
+  it 'getDevs', ->
+    await @entities.generate()
+
+    assert.deepEqual(@entities.getDevs(), [
+      'DevName.dev'
+      'PlatformDev.dev'
+    ])

@@ -79,7 +79,6 @@ export default class Entities {
     this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
-  // TODO: зачем это нужно?
   getManifests(): AllManifests {
     return {
       devices: this.devices.toJS(),
@@ -109,10 +108,26 @@ export default class Entities {
   }
 
   getDevs(): string[] {
-    // TODO: просто собрать все devDependencies в один список
-    // TODO: сами сущности могут быть dev ???
+    const result: {[index: string]: true} = {};
+    const collect = (depdOfType: {[index: string]: string[]}) => {
+      for (let entityName of Object.keys(depdOfType)) {
+        for (let itemName of depdOfType[entityName]) {
+          result[itemName] = true;
+        }
+      }
+    };
 
-    return [];
+    // get devs from drivers
+    for (let itemName of Object.keys(this.drivers.toJS())) {
+      if (this.drivers.get(itemName).dev) result[itemName] = true;
+    }
+
+    // dev dependencies of entities
+    collect(this.devDependencies.devices);
+    collect(this.devDependencies.drivers);
+    collect(this.devDependencies.services);
+
+    return Object.keys(result);
   }
 
   async generate() {
