@@ -144,6 +144,7 @@ export default class Entities {
     preManifest: PreManifestBase,
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
+    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
     // prepare to entity's manifest
     const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
 
@@ -157,44 +158,46 @@ export default class Entities {
     }
 
     // collect files of entity which will be placed in storage
-    this.filesPaths[pluralType][preManifest.name] = this.collectFiles(pluralType, preManifest);
+    this.filesPaths[pluralType][preManifest.name] = this.collectFiles(entityDirInStorage, preManifest);
 
-    // TODO: save files and manifest to disk
-    await this.saveEntityToStorage(finalManifest, preManifest.baseDir, preManifest.main, preManifest.files);
+    // Save files and manifest to disk
+    await this.saveEntityToStorage(preManifest, finalManifest, entityDirInStorage);
   }
 
   private async saveEntityToStorage(
+    preManifest: PreManifestBase,
     finalManifest: ManifestBase,
-    manifestBaseDir: string,
-    mainFile: string,
-    files?: string[]
+    entityDirInStorage: string,
   ) {
-    const entityDirInStorage = path.join(this.entitiesDir, pluralType, finalManifest.name);
-    const manifestStorageFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
+    const manifestStorageFileName = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
 
-    if (mainFile) {
+    if (preManifest.main) {
       // build an entity main file
-      await this.buildMainFile(pluralType, preManifest);
+
+      // TODO: !!!!!
+
+      //await this.buildMainFile();
     }
 
-    if (files) {
-      // TODO: нужно ли резовить baseDir ???
-      for (let fileName of files) {
+    if (preManifest.files) {
+      for (let fileName of preManifest.files) {
+        const fromFile = path.resolve(preManifest.baseDir, fileName);
         const toFileName = this.generateEntityFileName(entityDirInStorage, fileName);
-        // TODO: если во вложенной папке??? - создать папку
-        // TODO: copy
+
+        // make inner dirs
+        await this.main.io.mkdirP(path.dirname(toFileName));
+        // copy
+        await this.main.io.copyFile(fromFile, toFileName);
       }
     }
 
-
-    await this.main.$writeJson(manifestStorageFile, finalManifest);
+    await this.main.$writeJson(manifestStorageFileName, finalManifest);
   }
 
   /**
    * collect files of entity which will be placed in storage
    */
-  private collectFiles(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase): string[] {
-    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
+  private collectFiles(entityDirInStorage: string, preManifest: PreManifestBase): string[] {
     const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
     return [
@@ -232,7 +235,6 @@ export default class Entities {
     const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
     const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
-    // TODO: навреное можно перенести в register превращение в absolute path
     const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
 
     // TODO: !!!!! билдить во временную папку

@@ -95,7 +95,6 @@ export default class Main {
     await this.io.writeFile(fileName, content);
   }
 
-
   /**
    * Start registering step of initialization
    */

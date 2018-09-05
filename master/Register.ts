@@ -150,8 +150,6 @@ export default class Register {
         throw new Error(`Param "baseDir" has to be specified in manifest ${JSON.stringify(manifest)}`);
       }
 
-      // TODO: может сразу преобразовать все пути в абсолютные?
-
       parsedManifest = manifest;
     }
     else {

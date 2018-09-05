@@ -55,30 +55,7 @@ describe.only 'master.Entities', ->
         param: 'value'
       }
     ]
-    @main = {
-      masterConfig: {
-        buildDir: '/buildDir'
-      }
-      register: {
-        getDevicesPreManifests: => @preDevicesManifests
-        getDriversPreManifests: => @prePreDriverManifest
-        getServicesPreManifests: => @prePreServiceManifest
-      }
-      io: {
-        loadYamlFile: () =>
-          {
-            loadedProp: 'value'
-          }
-      }
-    }
-    @entities = new Entities(@main)
-
-  it 'generate', ->
-    @entities.buildMainFile = sinon.stub().returns(Promise.resolve())
-
-    await @entities.generate()
-
-    assert.deepEqual(@entities.getManifests(), {
+    @finalManifests = {
       devices: {
         DeviceClass: {
           name: 'DeviceClass'
@@ -110,7 +87,32 @@ describe.only 'master.Entities', ->
           param: 'value'
         }
       },
-    })
+    }
+
+    @main = {
+      masterConfig: {
+        buildDir: '/buildDir'
+      }
+      register: {
+        getDevicesPreManifests: => @preDevicesManifests
+        getDriversPreManifests: => @prePreDriverManifest
+        getServicesPreManifests: => @prePreServiceManifest
+      }
+      io: {
+        loadYamlFile: () =>
+          {
+            loadedProp: 'value'
+          }
+      }
+    }
+    @entities = new Entities(@main)
+
+  it 'generate', ->
+    @entities.saveEntityToStorage = sinon.stub().returns(Promise.resolve())
+
+    await @entities.generate()
+
+    assert.deepEqual(@entities.getManifests(), @finalManifests)
 
     assert.deepEqual(@entities.getFiles(), {
       devices: {
@@ -159,7 +161,13 @@ describe.only 'master.Entities', ->
     assert.deepEqual(@entities.getSystemDrivers(), [ 'DriverName.driver' ])
     assert.deepEqual(@entities.getSystemServices(), [ 'ServiceClass' ])
 
-    sinon.assert.calledThrice(@entities.buildMainFile)
-    sinon.assert.calledWith(@entities.buildMainFile.getCall(0), 'devices', @preDevicesManifests[0])
-    sinon.assert.calledWith(@entities.buildMainFile.getCall(1), 'drivers', @prePreDriverManifest[0])
-    sinon.assert.calledWith(@entities.buildMainFile.getCall(2), 'services', @prePreServiceManifest[0])
+    assert.equal(@entities.saveEntityToStorage.callCount, 4)
+    sinon.assert.calledWith(@entities.saveEntityToStorage.getCall(0),
+      @preDevicesManifests[0], @finalManifests.devices.DeviceClass, '/buildDir/entities/devices/DeviceClass')
+    sinon.assert.calledWith(@entities.saveEntityToStorage.getCall(1),
+      @prePreDriverManifest[0], @finalManifests.drivers['DriverName.driver'], '/buildDir/entities/drivers/DriverName.driver')
+    sinon.assert.calledWith(@entities.saveEntityToStorage.getCall(2),
+      # save new dev to storage
+      @prePreDriverManifest[1], @finalManifests.drivers['DevName.dev'], '/buildDir/entities/drivers/DevName.dev')
+    sinon.assert.calledWith(@entities.saveEntityToStorage.getCall(3),
+      @prePreServiceManifest[0], @finalManifests.services.ServiceClass, '/buildDir/entities/services/ServiceClass')
