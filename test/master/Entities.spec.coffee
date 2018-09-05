@@ -103,7 +103,10 @@ describe.only 'master.Entities', ->
           {
             loadedProp: 'value'
           }
+        mkdirP: sinon.stub().returns(Promise.resolve())
+        copyFile: sinon.stub().returns(Promise.resolve())
       }
+      $writeJson: sinon.stub().returns(Promise.resolve())
     }
     @entities = new Entities(@main)
 
@@ -171,3 +174,20 @@ describe.only 'master.Entities', ->
       @prePreDriverManifest[1], @finalManifests.drivers['DevName.dev'], '/buildDir/entities/drivers/DevName.dev')
     sinon.assert.calledWith(@entities.saveEntityToStorage.getCall(3),
       @prePreServiceManifest[0], @finalManifests.services.ServiceClass, '/buildDir/entities/services/ServiceClass')
+
+  it 'saveEntityToStorage', ->
+    await @entities.saveEntityToStorage(
+      @preDevicesManifests[0],
+      @finalManifests.devices.DeviceClass,
+      '/buildDir/entities/devices/DeviceClass'
+    );
+
+    sinon.assert.calledOnce(@main.io.mkdirP)
+    sinon.assert.calledOnce(@main.io.copyFile)
+    sinon.assert.calledWith(@main.io.mkdirP, '/buildDir/entities/devices/DeviceClass')
+    sinon.assert.calledWith(@main.io.copyFile, '/myBaseDir/deviceFile.json', '/buildDir/entities/devices/DeviceClass/deviceFile.json')
+
+    sinon.assert.calledOnce(@main.$writeJson)
+    sinon.assert.calledWith(@main.$writeJson,
+      '/buildDir/entities/devices/DeviceClass/manifest.json',
+      @finalManifests.devices.DeviceClass)

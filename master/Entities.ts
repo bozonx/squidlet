@@ -175,6 +175,7 @@ export default class Entities {
       // build an entity main file
 
       // TODO: !!!!!
+      // TODO: !!!!! test it
 
       //await this.buildMainFile();
     }
