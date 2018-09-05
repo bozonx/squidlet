@@ -32,29 +32,22 @@ export default class HostsFilesWriter {
     const fileNames = systemConfig.hostInitCfg.fileNames;
 
     const configDir = path.join(hostDir, hostDirs.config);
-    await this.writeJson(
+    await this.main.$writeJson(
       path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
       hostFileSet.config
     );
 
-    await this.writeJson(path.join(configDir, fileNames.systemDrivers), hostFileSet.systemDrivers);
-    await this.writeJson(path.join(configDir, fileNames.regularDrivers), hostFileSet.regularDrivers);
-    await this.writeJson(path.join(configDir, fileNames.systemServices), hostFileSet.systemServices);
-    await this.writeJson(path.join(configDir, fileNames.regularServices), hostFileSet.regularServices);
+    await this.main.$writeJson(path.join(configDir, fileNames.systemDrivers), hostFileSet.systemDrivers);
+    await this.main.$writeJson(path.join(configDir, fileNames.regularDrivers), hostFileSet.regularDrivers);
+    await this.main.$writeJson(path.join(configDir, fileNames.systemServices), hostFileSet.systemServices);
+    await this.main.$writeJson(path.join(configDir, fileNames.regularServices), hostFileSet.regularServices);
 
-    await this.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostFileSet.devicesDefinitions);
-    await this.writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
-    await this.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
+    await this.main.$writeJson(path.join(configDir, fileNames.devicesDefinitions), hostFileSet.devicesDefinitions);
+    await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
+    await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
 
-    await this.writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
+    await this.main.$writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
 
-  }
-
-  private async writeJson(fileName: string, contentJs: any) {
-    const content = JSON.stringify(contentJs);
-
-    await this.main.io.mkdirP(path.dirname(fileName));
-    await this.main.io.writeFile(fileName, content);
   }
 
 }

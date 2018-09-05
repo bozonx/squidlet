@@ -88,6 +88,14 @@ export default class Main {
     return require(devicePath);
   }
 
+  async $writeJson(fileName: string, contentJs: any) {
+    const content = JSON.stringify(contentJs);
+
+    await this.io.mkdirP(path.dirname(fileName));
+    await this.io.writeFile(fileName, content);
+  }
+
+
   /**
    * Start registering step of initialization
    */

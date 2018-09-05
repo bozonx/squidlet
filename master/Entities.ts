@@ -144,38 +144,51 @@ export default class Entities {
     preManifest: PreManifestBase,
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
+    // prepare to entity's manifest
+    const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
 
-    // collect files of entity which will be placed in storage
-    this.collectFiles(pluralType, preManifest);
-
-    if (preManifest.main) {
-      // build an entity main file
-      await this.buildMainFile(pluralType, preManifest);
-    }
+    // add to list of manifests
+    this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
+      .set(finalManifest.name, finalManifest);
 
     // just save unsorted deps
     if (preManifest.drivers) {
       this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
     }
 
-    // prepare to entity's manifest
-    const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
+    // collect files of entity which will be placed in storage
+    this.filesPaths[pluralType][preManifest.name] = this.collectFiles(pluralType, preManifest);
+
+    if (preManifest.main) {
+      // build an entity main file
+      await this.buildMainFile(pluralType, preManifest);
+    }
 
     // TODO: save files and manifest to disk
+    this.saveEntityToStorage(finalManifest, preManifest.baseDir, preManifest.main, preManifest.files);
+  }
 
-    // add to list of manifests
-    this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
-      .set(finalManifest.name, finalManifest);
+  saveEntityToStorage(
+    finalManifest: ManifestBase,
+    manifestBaseDir: string,
+    mainFile: string,
+    files?: string[]
+  ) {
+    // TODO: build main file
+    // TODO: save files
+    // TODO: save manifest
+
+    this.main.$writeJson();
   }
 
   /**
    * collect files of entity which will be placed in storage
    */
-  private collectFiles(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
+  private collectFiles(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase): string[] {
     const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
     const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
-    this.filesPaths[pluralType][preManifest.name] = [
+    return [
       ...(preManifest.files || []).map((item) => {
         return path.resolve(entityDirInStorage, path.basename(item));
       }),
