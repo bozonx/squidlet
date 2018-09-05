@@ -159,26 +159,35 @@ export default class Entities {
     // collect files of entity which will be placed in storage
     this.filesPaths[pluralType][preManifest.name] = this.collectFiles(pluralType, preManifest);
 
-    if (preManifest.main) {
-      // build an entity main file
-      await this.buildMainFile(pluralType, preManifest);
-    }
-
     // TODO: save files and manifest to disk
-    this.saveEntityToStorage(finalManifest, preManifest.baseDir, preManifest.main, preManifest.files);
+    await this.saveEntityToStorage(finalManifest, preManifest.baseDir, preManifest.main, preManifest.files);
   }
 
-  saveEntityToStorage(
+  private async saveEntityToStorage(
     finalManifest: ManifestBase,
     manifestBaseDir: string,
     mainFile: string,
     files?: string[]
   ) {
-    // TODO: build main file
-    // TODO: save files
-    // TODO: save manifest
+    const entityDirInStorage = path.join(this.entitiesDir, pluralType, finalManifest.name);
+    const manifestStorageFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
 
-    this.main.$writeJson();
+    if (mainFile) {
+      // build an entity main file
+      await this.buildMainFile(pluralType, preManifest);
+    }
+
+    if (files) {
+      // TODO: нужно ли резовить baseDir ???
+      for (let fileName of files) {
+        const toFileName = this.generateEntityFileName(entityDirInStorage, fileName);
+        // TODO: если во вложенной папке??? - создать папку
+        // TODO: copy
+      }
+    }
+
+
+    await this.main.$writeJson(manifestStorageFile, finalManifest);
   }
 
   /**
@@ -189,14 +198,17 @@ export default class Entities {
     const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
     return [
-      ...(preManifest.files || []).map((item) => {
-        return path.resolve(entityDirInStorage, path.basename(item));
-      }),
+      ...(preManifest.files || [])
+        .map((fileName: string) => this.generateEntityFileName(entityDirInStorage, fileName)),
       // add path to main in storage
       ...((preManifest.main) ? [mainJsFile] : []),
       // add path to parsed manifest in storage
       path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
     ];
+  }
+
+  private generateEntityFileName(entityDirInStorage: string, fileName: string): string {
+    return path.resolve(entityDirInStorage, fileName);
   }
 
   private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {
