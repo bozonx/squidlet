@@ -67,18 +67,18 @@ export default class ServicesManager {
     }
   }
 
-  private async instantiateService(serviceDefinition: EntityDefinition): Promise<ServiceInstance> {
+  private async instantiateService(definition: EntityDefinition): Promise<ServiceInstance> {
     const manifest = await this.system.loadManifest<ServiceManifest>(
       this.system.initCfg.hostDirs.services,
-      serviceDefinition.className
+      definition.className
     );
     const ServiceClass = await this.system.loadEntityClass<ServiceClassType>(
       this.system.initCfg.hostDirs.services,
-      serviceDefinition.className
+      definition.className
     );
     const props: ServiceProps = {
       // TODO: serviceDefinition тоже имеет props
-      ...serviceDefinition,
+      ...definition,
       manifest,
     };
 
