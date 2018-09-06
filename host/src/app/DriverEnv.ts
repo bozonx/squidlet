@@ -1,4 +1,5 @@
 import System from './System';
+import DriverManifest from './interfaces/DriverManifest';
 
 
 /**
@@ -18,6 +19,13 @@ export default class DriverEnv {
 
   getDriver<T>(driverName: string): T {
     return this.system.driversManager.getDriver<T>(driverName);
+  }
+
+  loadManifest(driverName: string): DriverManifest {
+
+    // TODO: do it
+
+    return { name: '' };
   }
 
 }

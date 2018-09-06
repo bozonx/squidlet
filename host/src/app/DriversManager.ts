@@ -44,8 +44,8 @@ export default class DriversManager {
     return driver as T;
   }
 
-
   async initSystemDrivers(): Promise<void> {
+    // get list of system drivers from json file
     const systemDriversList = await this.system.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemDrivers
     );
@@ -54,6 +54,7 @@ export default class DriversManager {
   }
 
   async initRegularDrivers(): Promise<void> {
+    // get list of regular drivers from json file
     const regularDriversList = await this.system.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularDrivers
     );
@@ -66,6 +67,9 @@ export default class DriversManager {
    * @param devs - like {DeviClassName: DevClass}
    */
   async $setDevs(devs: {[index: string]: DriverClassType}) {
+
+    // TODO: review
+
     const definitions = await this.system.loadConfig<{[index: string]: DriverDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
@@ -87,25 +91,16 @@ export default class DriversManager {
 
 
   private async initDrivers(driverNames: string[]) {
+    // load list of definitions of drivers
     const definitions = await this.system.loadConfig<{[index: string]: DriverDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
 
     for (let driverName of driverNames) {
-      const driverInstance: DriverInstance = await this.instantiateDriver(definitions[driverName]);
-
-      this.instances[driverName] = driverInstance;
+      this.instances[driverName] = await this.instantiateDriver(definitions[driverName]);
     }
 
     await this.initializeAll(driverNames);
-  }
-
-  private async initializeAll(driverNames: string[]) {
-    for (let driverName of driverNames) {
-      const driver: DriverInstance = this.instances[driverName];
-
-      if (driver.init) await driver.init();
-    }
   }
 
   private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
@@ -124,6 +119,14 @@ export default class DriversManager {
     };
 
     return new DriverClass(this.driverEnv, props);
+  }
+
+  private async initializeAll(driverNames: string[]) {
+    for (let driverName of driverNames) {
+      const driver: DriverInstance = this.instances[driverName];
+
+      if (driver.init) await driver.init();
+    }
   }
 
 }

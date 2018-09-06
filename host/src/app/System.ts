@@ -28,6 +28,7 @@ export default class System {
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
+  // only for initialization time - it will be deleted after it
   private initializationConfig?: InitializationConfig;
 
   get initCfg(): InitializationConfig {
@@ -101,6 +102,7 @@ export default class System {
     return JSON.stringify(systemDriversListString);
   }
 
+  // TODO: перенести в Host.ts
   async loadConfig<T>(configFileName: string): Promise<T> {
     const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
