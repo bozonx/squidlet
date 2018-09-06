@@ -3,7 +3,7 @@ import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
-import DeviceDefinition from '../app/interfaces/DeviceDefinition';
+import EntityDefinition from '../app/interfaces/EntityDefinition';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -16,7 +16,7 @@ export default class DeviceBase {
   readonly setConfig?: Config['write'];
   protected readonly system: System;
   // TODO: или это props ???
-  protected readonly deviceConf: DeviceDefinition;
+  protected readonly deviceConf: EntityDefinition;
 
   // better place to do initial requests
   protected onInit?: () => Promise<void>;
@@ -30,7 +30,7 @@ export default class DeviceBase {
   protected actions: {[index: string]: Function} = {};
 
 
-  constructor(system: System, deviceConf: DeviceDefinition) {
+  constructor(system: System, deviceConf: EntityDefinition) {
     this.system = system;
     this.deviceConf = deviceConf;
 

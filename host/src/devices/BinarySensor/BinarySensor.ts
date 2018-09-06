@@ -2,7 +2,7 @@ import System from '../../app/System';
 import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import GpioInputFactory, {GpioInputDriver} from '../../drivers/Gpio/GpioInput.driver';
-import DeviceDefinition from '../../app/interfaces/DeviceDefinition';
+import EntityDefinition from '../../app/interfaces/EntityDefinition';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 
@@ -12,7 +12,7 @@ export default class BinarySensor extends DeviceBase {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
-  constructor(system: System, deviceConf: DeviceDefinition) {
+  constructor(system: System, deviceConf: EntityDefinition) {
     super(system, deviceConf);
 
     // TODO: !!!!????

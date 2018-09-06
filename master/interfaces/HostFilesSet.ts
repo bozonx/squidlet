@@ -1,7 +1,5 @@
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
-import DeviceDefinition from '../../host/src/app/interfaces/DeviceDefinition';
-import DriverDefinition from '../../host/src/app/interfaces/DriverDefinition';
-import ServiceDefinition from '../../host/src/app/interfaces/ServiceDefinition';
+import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
 import {FilesPaths} from '../Entities';
 
 
@@ -16,9 +14,9 @@ export default interface HostFilesSet {
   systemServices: string[];
   regularServices: string[];
 
-  devicesDefinitions: DeviceDefinition[];
+  devicesDefinitions: EntityDefinition[];
   // by driver name
-  driversDefinitions: {[index: string]: DriverDefinition};
+  driversDefinitions: {[index: string]: EntityDefinition};
   // by service id
-  servicesDefinitions: {[index: string]: ServiceDefinition};
+  servicesDefinitions: {[index: string]: EntityDefinition};
 }

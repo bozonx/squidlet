@@ -4,10 +4,7 @@ const _omit = require('lodash/omit');
 const _values = require('lodash/values');
 
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
-import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
-import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import PreHostConfig from './interfaces/PreHostConfig';
-import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
 import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
@@ -31,24 +28,24 @@ const servicesShortcut = [
 export default class Definitions {
   private readonly main: Main;
   // definitions like {hostId: {entityId: Definition}}
-  private devicesDefinitions: {[index: string]: {[index: string]: DeviceDefinition}} = {};
-  private driversDefinitions: {[index: string]: {[index: string]: DriverDefinition}} = {};
-  private servicesDefinitions: {[index: string]: {[index: string]: ServiceDefinition}} = {};
+  private devicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
+  private driversDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
+  private servicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
 
 
   constructor(main: Main) {
     this.main = main;
   }
 
-  getHostDevicesDefinitions(hostId: string): {[index: string]: DeviceDefinition} {
+  getHostDevicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
     return this.devicesDefinitions[hostId];
   }
 
-  getHostDriversDefinitions(hostId: string): {[index: string]: DriverDefinition} {
+  getHostDriversDefinitions(hostId: string): {[index: string]: EntityDefinition} {
     return this.driversDefinitions[hostId];
   }
 
-  getHostServicesDefinitions(hostId: string): {[index: string]: ServiceDefinition} {
+  getHostServicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
     return this.servicesDefinitions[hostId];
   }
 
@@ -86,13 +83,13 @@ export default class Definitions {
   private prepareEntities(
     rawHostConfig: PreHostConfig
   ): {
-    devices: {[index: string]: DeviceDefinition},
-    drivers: {[index: string]: DriverDefinition},
-    services: {[index: string]: ServiceDefinition}
+    devices: {[index: string]: EntityDefinition},
+    drivers: {[index: string]: EntityDefinition},
+    services: {[index: string]: EntityDefinition}
   } {
-    const devices: {[index: string]: DeviceDefinition} = {};
-    const drivers: {[index: string]: DriverDefinition} = {};
-    const services: {[index: string]: ServiceDefinition} = {};
+    const devices: {[index: string]: EntityDefinition} = {};
+    const drivers: {[index: string]: EntityDefinition} = {};
+    const services: {[index: string]: EntityDefinition} = {};
     const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
     for (let entityName of Object.keys(plainDevices)) {
@@ -118,7 +115,7 @@ export default class Definitions {
     };
   }
 
-  private generateDeviceDef(deviceId: string, deviceDef: PreDeviceDefinition): DeviceDefinition {
+  private generateDeviceDef(deviceId: string, deviceDef: PreDeviceDefinition): EntityDefinition {
     return {
       id: deviceId,
       className: deviceDef.device,
@@ -126,7 +123,7 @@ export default class Definitions {
     };
   }
 
-  private generateDriverDef(driverId: string, driverDef: PreDriverDefinition): DriverDefinition {
+  private generateDriverDef(driverId: string, driverDef: PreDriverDefinition): EntityDefinition {
     return {
       id: driverId,
       className: driverId,
@@ -134,7 +131,7 @@ export default class Definitions {
     };
   }
 
-  private generateServiceDef(serviceId: string, serviceDef: PreServiceDefinition): ServiceDefinition {
+  private generateServiceDef(serviceId: string, serviceDef: PreServiceDefinition): EntityDefinition {
     return {
       id: serviceId,
       className: serviceDef.service,
@@ -170,12 +167,12 @@ export default class Definitions {
   }
 
   private mergeDevicesDefaults(
-    devices: {[index: string]: DeviceDefinition},
+    devices: {[index: string]: EntityDefinition},
     devicesDefaults?: {[index: string]: any}
-  ): {[index: string]: DeviceDefinition} {
+  ): {[index: string]: EntityDefinition} {
     if (!devicesDefaults) return devices;
 
-    const result: {[index: string]: DeviceDefinition} = {};
+    const result: {[index: string]: EntityDefinition} = {};
 
     for (let deviceId of Object.keys(devices)) {
       const deviceDefClone = _cloneDeep(devices[deviceId]);
@@ -195,8 +192,8 @@ export default class Definitions {
    */
   private collectServicesFromShortcuts(
     rawHostConfig: {[index: string]: any}
-  ): {[index: string]: ServiceDefinition} {
-    const services: {[index: string]: ServiceDefinition} = {};
+  ): {[index: string]: EntityDefinition} {
+    const services: {[index: string]: EntityDefinition} = {};
 
     // collect services
     for (let serviceId of servicesShortcut) {

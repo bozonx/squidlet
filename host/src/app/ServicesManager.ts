@@ -1,5 +1,5 @@
 import System from './System';
-import ServiceDefinition from './interfaces/ServiceDefinition';
+import EntityDefinition from './interfaces/EntityDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
 //import ServiceProps from './interfaces/ServiceProps';
@@ -46,7 +46,7 @@ export default class ServicesManager {
 
 
   private async initServices(servicesId: string[]) {
-    const definitions = await this.system.loadConfig<{[index: string]: ServiceDefinition}>(
+    const definitions = await this.system.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.servicesDefinitions
     );
 
@@ -67,7 +67,7 @@ export default class ServicesManager {
     }
   }
 
-  private async instantiateService(serviceDefinition: ServiceDefinition): Promise<ServiceInstance> {
+  private async instantiateService(serviceDefinition: EntityDefinition): Promise<ServiceInstance> {
     const manifest = await this.system.loadManifest<ServiceManifest>(
       this.system.initCfg.hostDirs.services,
       serviceDefinition.className

@@ -4,7 +4,6 @@ import EntityDefinition from './interfaces/EntityDefinition';
 import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
-import DriverDefinition from './interfaces/DriverDefinition';
 import DriverEnv from './DriverEnv';
 
 
@@ -70,7 +69,7 @@ export default class DriversManager {
 
     // TODO: review
 
-    const definitions = await this.system.loadConfig<{[index: string]: DriverDefinition}>(
+    const definitions = await this.system.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
 
@@ -92,7 +91,7 @@ export default class DriversManager {
 
   private async initDrivers(driverNames: string[]) {
     // load list of definitions of drivers
-    const definitions = await this.system.loadConfig<{[index: string]: DriverDefinition}>(
+    const definitions = await this.system.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
 
@@ -103,7 +102,7 @@ export default class DriversManager {
     await this.initializeAll(driverNames);
   }
 
-  private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
+  private async instantiateDriver(driverDefinition: EntityDefinition): Promise<DriverInstance> {
     // const manifest = await this.system.loadManifest<DriverManifest>(
     //   this.system.initCfg.hostDirs.drivers,
     //   driverDefinition.className

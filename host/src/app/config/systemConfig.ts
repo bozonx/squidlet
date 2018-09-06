@@ -1,5 +1,4 @@
 import SystemConfig from '../interfaces/SystemConfig';
-import PreDeviceDefinition from '../../../../master/interfaces/PreDeviceDefinition';
 
 
 const systemConfig: SystemConfig = {
