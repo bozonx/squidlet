@@ -83,16 +83,18 @@ export default class System {
     await this.servicesManager.initRegularServices();
   }
 
-
-  // it needs for test purpose
-  require(pathToFile: string) {
-
-    // TODO: если на epspuino не будет рабоать с файлами из storage то загрузить файл и сделать eval
-
-    return require(pathToFile);
+  private riseEvent(eventName: string) {
+    // TODO: это общие события или чисто для System?
   }
 
+
+
+
+
+
   async loadJson(filePath: string): Promise<any> {
+
+    // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
 
     // TODO: может будет работать через require на espurino?
 
@@ -104,6 +106,9 @@ export default class System {
 
   // TODO: перенести в Host.ts
   async loadConfig<T>(configFileName: string): Promise<T> {
+
+    // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
+
     const definitionsJsonFile = path.join(
       systemConfig.rootDirs.host,
       this.initCfg.hostDirs.config,
@@ -113,7 +118,11 @@ export default class System {
     return await this.loadJson(definitionsJsonFile);
   }
 
+  // TODO: перенести в Host.ts
   async loadManifest<T>(typeDir: string, entityDir: string) : Promise<T> {
+
+    // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
+
     const manifestPath = path.join(
       systemConfig.rootDirs.host,
       typeDir,
@@ -125,6 +134,10 @@ export default class System {
   }
 
   async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
+
+    // TODO: rename to loadEntityMainFile
+    // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
+
     const manifestPath = path.join(
       systemConfig.rootDirs.host,
       typeDir,
@@ -135,8 +148,15 @@ export default class System {
     return this.require(manifestPath).default;
   }
 
-  private riseEvent(eventName: string) {
-    // TODO: это общие события или чисто для System?
+
+  // it needs for test purpose
+  private require(pathToFile: string) {
+
+    // TODO: если на epspuino не будет рабоать с файлами из storage то загрузить файл и сделать eval
+
+    // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
+
+    return require(pathToFile);
   }
 
 }

@@ -1,14 +1,14 @@
 const _capitalize = require('lodash/capitalize');
 
+import DefinitionBase from './interfaces/DefinitionBase';
 import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverDefinition from './interfaces/DriverDefinition';
 import DriverEnv from './DriverEnv';
-import DriverProps from './interfaces/DriverProps';
 
 
-type DriverClassType = new (driverEnv: DriverEnv, props: DriverProps) => DriverInstance;
+type DriverClassType = new (props: DefinitionBase['props'], driverEnv: DriverEnv) => DriverInstance;
 
 
 /**
@@ -104,21 +104,20 @@ export default class DriversManager {
   }
 
   private async instantiateDriver(driverDefinition: DriverDefinition): Promise<DriverInstance> {
-    const manifest = await this.system.loadManifest<DriverManifest>(
-      this.system.initCfg.hostDirs.drivers,
-      driverDefinition.className
-    );
+    // const manifest = await this.system.loadManifest<DriverManifest>(
+    //   this.system.initCfg.hostDirs.drivers,
+    //   driverDefinition.className
+    // );
     const DriverClass = await this.system.loadEntityClass<DriverClassType>(
       this.system.initCfg.hostDirs.drivers,
       driverDefinition.className
     );
-    const props: DriverProps = {
-      // TODO: driverDefinition тоже имеет props
-      ...driverDefinition,
-      manifest,
-    };
+    // const props: DriverProps = {
+    //   // TODO: driverDefinition тоже имеет props
+    //   ...driverDefinition,
+    // };
 
-    return new DriverClass(this.driverEnv, props);
+    return new DriverClass(driverDefinition.props, this.driverEnv);
   }
 
   private async initializeAll(driverNames: string[]) {

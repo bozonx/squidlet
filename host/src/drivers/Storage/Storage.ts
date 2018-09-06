@@ -36,6 +36,8 @@ export class Storage {
     return this.fsDev.readdir(pathToDir);
   }
 
+  // TODO: add loadJson
+
   // /**
   //  * Read the only files of dir
   //  */
