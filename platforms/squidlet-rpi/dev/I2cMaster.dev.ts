@@ -3,6 +3,8 @@
 import * as i2cBusModule from 'i2c-bus';
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/DriverEnv';
+import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
+import {I2cSlaveDev} from '../../squidlet-esp32/dev/I2cSlave.dev';
 //import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 
 
@@ -15,7 +17,7 @@ import DriverEnv from '../../../host/src/app/DriverEnv';
 export class I2cMasterDev {
   private readonly bus: i2cBusModule.I2cBus;
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: number) {
+  constructor(props: EntityProps, env: DriverEnv, bus: number) {
     this.bus = i2cBusModule.openSync(Number(bus));
   }
 
@@ -70,8 +72,8 @@ export class I2cMasterDev {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
       bus: number
-    ): I2cMasterDev } = I2cMasterDev;
+    ): I2cSlaveDev } = I2cSlaveDev;
 }

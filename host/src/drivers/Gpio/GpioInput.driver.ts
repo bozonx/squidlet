@@ -3,6 +3,7 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import DriverEnv from '../../app/DriverEnv';
 import {BinaryLevel} from '../../app/CommonTypes';
+import {EntityProps} from '../../app/interfaces/EntityDefinition';
 //import DriverProps from '../../app/interfaces/DriverProps';
 
 
@@ -10,13 +11,13 @@ type Handler = (level: BinaryLevel) => void;
 
 
 export class GpioInputDriver {
-  private readonly driverEnv: DriverEnv;
-  private readonly driverProps: DriverProps;
+  private readonly props: EntityProps;
+  private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps) {
-    this.driverEnv = driverEnv;
-    this.driverProps = driverProps;
+  constructor(props: EntityProps, env: DriverEnv) {
+    this.props = props;
+    this.env = env;
   }
 
   async getLevel(): Promise<BinaryLevel> {
@@ -40,12 +41,12 @@ export class GpioInputDriver {
 
 export default class GpioInputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
     ): GpioInputDriver } = GpioInputDriver;
   private instances: {[index: string]: GpioInputDriver} = {};
 
-  getInstance(deviceParams: {[index: string]: any}): GpioInputDriver {
+  getInstance(props: EntityProps): GpioInputDriver {
 
     // TODO: validate params
     // TODO: validate specific for certain driver params

@@ -4,6 +4,7 @@ import I2cSlaveDev from '../../app/interfaces/dev/I2cSlave.dev';
 import DriverEnv from '../../app/DriverEnv';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
+import {EntityProps} from '../../app/interfaces/EntityDefinition';
 //import DriverProps from '../../app/interfaces/DriverProps';
 
 
@@ -14,20 +15,20 @@ type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cSlaveDriver {
-  private readonly driverEnv: DriverEnv;
+  private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cSlaveDev: I2cSlaveDev;
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: string | number) {
-    this.driverEnv = driverEnv;
+  constructor(props: EntityProps, env: DriverEnv, bus: string | number) {
+    this.env = env;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
       : parseInt(bus as any);
 
     if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
 
-    const i2cSlaveDev = this.driverEnv.getDriver<DriverFactoryBase>('I2cSlave.dev');
+    const i2cSlaveDev = this.env.getDriver<DriverFactoryBase>('I2cSlave.dev');
 
     this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlaveDev;
     // listen all the income data
@@ -130,8 +131,8 @@ export class I2cSlaveDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
       bus: string | number,
     ): I2cSlaveDriver } = I2cSlaveDriver;
   private instances: {[index: string]: I2cSlaveDriver} = {};

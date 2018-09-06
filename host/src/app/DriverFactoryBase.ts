@@ -1,28 +1,25 @@
 import DriverEnv from './DriverEnv';
-//import DriverProps from './interfaces/DriverProps';
+import {EntityProps} from './interfaces/EntityDefinition';
+import DriverInstance from './interfaces/DriverInstance';
 
 
 export default abstract class DriverFactoryBase {
   protected abstract DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
       ...params: Array<any>
     ): object };
-  protected readonly driverEnv: DriverEnv;
-  protected readonly driverProps: DriverProps;
+  protected readonly env: DriverEnv;
+  protected readonly props: EntityProps;
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps) {
-
-    // TODO: reveiw driverProps - значение по умолчанию
-
-    this.driverEnv = driverEnv;
-    this.driverProps = driverProps;
+  constructor(props: EntityProps, env: DriverEnv) {
+    this.props = props;
+    this.env = env;
   }
 
-  // TODO: возвращать обобщение
-
+  // TODO: придумать что-то с обобщением
   getInstance(...params: Array<any>) {
-    return new this.DriverClass(this.driverEnv, this.driverProps, ...params);
+    return new this.DriverClass(this.props, this.env, ...params);
   }
 
 }

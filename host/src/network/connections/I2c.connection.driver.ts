@@ -4,6 +4,7 @@ import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
+import {EntityProps} from '../../app/interfaces/EntityDefinition';
 //import DriverProps from '../../app/interfaces/DriverProps';
 
 
@@ -16,24 +17,24 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
  * It packs data to send it via i2c.
  */
 export class I2cConnectionDriver {
-  private readonly driverEnv: DriverEnv;
-  private readonly driverProps: DriverProps;
+  private readonly env: DriverEnv;
+  private readonly props: EntityProps;
   private readonly myAddress: MyAddress;
   private readonly i2cDataDriver: I2cDataDriver;
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps, myAddress: MyAddress) {
-    this.driverEnv = driverEnv;
-    this.driverProps = driverProps;
+  constructor(props: EntityProps, env: DriverEnv, myAddress: MyAddress) {
+    this.env = env;
+    this.props = props;
     this.myAddress = myAddress;
 
     const isMaster = typeof this.myAddress.address === 'undefined';
-    const dataDriver = this.driverEnv.getDriver<DriverFactoryBase>('I2cData.driver');
+    const dataDriver = this.env.getDriver<DriverFactoryBase>('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
     // get low level i2c driver
-    const i2cDriver: I2cDriverClass = this.driverEnv.getDriver<I2cDriverClass>(i2cDriverName);
+    const i2cDriver: I2cDriverClass = this.env.getDriver<I2cDriverClass>(i2cDriverName);
 
     this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus) as I2cDataDriver;
   }
@@ -73,8 +74,8 @@ export class I2cConnectionDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
       myAddress: MyAddress,
     ): I2cConnectionDriver } = I2cConnectionDriver;
 }

@@ -1,5 +1,7 @@
 //import DriverProps from '../../app/interfaces/DriverProps';
 
+import {EntityProps} from '../../app/interfaces/EntityDefinition';
+
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
@@ -17,22 +19,22 @@ type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 
 export class I2cMasterDriver {
-  private readonly driverEnv: DriverEnv;
+  private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
   private readonly i2cMasterDev: I2cMasterDev;
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
-  constructor(driverEnv: DriverEnv, driverProps: DriverProps, bus: string | number) {
-    this.driverEnv = driverEnv;
+  constructor(props: EntityProps, env: DriverEnv, bus: string | number) {
+    this.env = env;
     this.bus = (Number.isInteger(bus as any))
       ? bus as number
       : parseInt(bus as any);
 
     if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
 
-    const i2cDevDriver = this.driverEnv.getDriver<DriverFactoryBase>('I2cMaster.dev');
+    const i2cDevDriver = this.env.getDriver<DriverFactoryBase>('I2cMaster.dev');
 
     this.i2cMasterDev = i2cDevDriver.getInstance(this.bus) as I2cMasterDev;
   }
@@ -204,8 +206,8 @@ export class I2cMasterDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
       bus: string | number,
     ): I2cMasterDriver } = I2cMasterDriver;
   private instances: {[index: string]: I2cMasterDriver} = {};

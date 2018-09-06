@@ -2,6 +2,7 @@
 
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/DriverEnv';
+import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
 //import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 
 export class GpioDev {
@@ -11,7 +12,7 @@ export class GpioDev {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
     ): GpioDev } = GpioDev;
 }

@@ -2,6 +2,7 @@ import DriverEnv from '../../app/DriverEnv';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
+import {EntityProps} from '../../app/interfaces/EntityDefinition';
 //import DriverProps from '../../app/interfaces/DriverProps';
 
 
@@ -40,9 +41,10 @@ export class I2cDataDriver {
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
   constructor(
-    driverEnv: DriverEnv,
-    driverProps: DriverProps,
+    props: EntityProps,
+    env: DriverEnv,
     i2cDriver: DriverFactoryBase,
+    // TODO: почему не в props???
     // bus to use
     bus: string | number,
   ) {
@@ -158,8 +160,8 @@ export class I2cDataDriver {
 
 export default class Factory extends DriverFactoryBase {
   protected DriverClass: { new (
-      driverEnv: DriverEnv,
-      driverProps: DriverProps,
+      props: EntityProps,
+      env: DriverEnv,
       i2cDriver: DriverFactoryBase,
       bus: string
     ): I2cDataDriver } = I2cDataDriver;
