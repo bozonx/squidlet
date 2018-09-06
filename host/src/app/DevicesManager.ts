@@ -98,7 +98,7 @@ export default class DevicesManager {
       manifest,
     };
 
-    return new DeviceClass(this.system.env, props);
+    return new DeviceClass(props, this.system.env);
   }
 
   destroy() {

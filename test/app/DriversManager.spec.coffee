@@ -2,7 +2,7 @@ DriversManager = require('../../host/src/app/DriversManager').default
 initializationConfig = require('../../host/src/app/config/initializationConfig').default
 
 
-describe.only 'app.DriversManager', ->
+describe 'app.DriversManager', ->
   beforeEach ->
     @props = undefined
     @driver = class
@@ -27,11 +27,11 @@ describe.only 'app.DriversManager', ->
           otherParam: 1
         }
       }
-      'Device.dev': {
-        id: 'Device.dev'
-        className: 'Device.dev'
+      'Dev.dev': {
+        id: 'Dev.dev'
+        className: 'Dev.dev'
         props: {
-          id: 'Device.dev'
+          id: 'Dev.dev'
           otherParam: 1
         }
       }
@@ -63,12 +63,13 @@ describe.only 'app.DriversManager', ->
     sinon.assert.calledOnce(@driversManager.getDriver('Regular.driver').init)
 
 
-  it '$setDevs', ->
+  it '$setDevs and getDev()', ->
     devs = {
-      'Device.dev': @driver
+      'Dev.dev': @driver
     }
 
     await @driversManager.$setDevs(devs)
 
-    assert.equal(@driversManager.getDriver('Device.dev').props, @definitions['Device.dev'].props)
-    sinon.assert.calledOnce(@driversManager.getDriver('Device.dev').init)
+    assert.equal(@driversManager.getDriver('Dev.dev').props, @definitions['Dev.dev'].props)
+    assert.equal(@driversManager.getDev('Dev').props, @definitions['Dev.dev'].props)
+    sinon.assert.calledOnce(@driversManager.getDriver('Dev.dev').init)
