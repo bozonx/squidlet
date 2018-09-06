@@ -124,7 +124,7 @@ export default class DriversManager {
    * load list of definitions of drivers
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
-    return await this.system.loadConfig<{[index: string]: EntityDefinition}>(
+    return await this.system.host.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
   }

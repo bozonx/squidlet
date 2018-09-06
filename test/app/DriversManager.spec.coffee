@@ -1,36 +1,59 @@
 DriversManager = require('../../host/src/app/DriversManager').default
+initializationConfig = require('../../host/src/app/config/initializationConfig').default
 
 
 describe.only 'app.DriversManager', ->
   beforeEach ->
-#    @MyDriver = class
-#      config: undefined
-#      constructor: (drivers, config) ->
-#        @config = config
-#      init: sinon.spy()
-#
-#    @driversPaths = new Map({
-#      'MyDriver': '/path/to/MyDriver',
-#    })
-#    @driversConfig = {
-#      'MyDriver': {
-#        param1: 'value1'
-#      }
-#    }
+    @props = undefined
+    @driver = class
+      constructor: (props) ->
+        @props = props
+      init: sinon.spy()
 
-    @system = {}
+    @definitions = {
+      'System.driver': {
+        id: 'System.driver'
+        className: 'System.driver'
+        props: {
+          id: 'System.driver'
+          otherParam: 1
+        }
+      }
+      'Regular.driver': {
+        id: 'Regular.driver'
+        className: 'Regular.driver'
+        props: {
+          id: 'Regular.driver'
+          otherParam: 1
+        }
+      }
+    }
+
+    @system = {
+      initCfg: initializationConfig()
+      host: {
+        loadEntityClass: => @driver
+      }
+    }
     @driversManager = new DriversManager(@system)
-    #@drivers.require = sinon.stub().returns(@MyDriver)
+    @driversManager.loadDriversDefinitions = => @definitions
 
   it 'initSystemDrivers() and getDriver', ->
-    @drivers.initSystemDrivers()
+    @system.host.loadConfig = => [ 'System.driver' ];
 
-    sinon.assert.calledWith(@drivers.require, '/path/to/MyDriver')
-    assert.equal(@drivers.getDriver('MyDriver').config, @driversConfig['MyDriver'])
-    sinon.assert.calledOnce(@drivers.getDriver('MyDriver').init)
+    await @driversManager.initSystemDrivers()
+
+    assert.equal(@driversManager.getDriver('System.driver').props, @definitions['System.driver'].props)
+    sinon.assert.calledOnce(@driversManager.getDriver('System.driver').init)
 
   it 'initRegularDrivers() and getDriver', ->
-    # TODO: !!!!
+    @system.host.loadConfig = => [ 'Regular.driver' ];
+
+    await @driversManager.initRegularDrivers()
+
+    assert.equal(@driversManager.getDriver('Regular.driver').props, @definitions['Regular.driver'].props)
+    sinon.assert.calledOnce(@driversManager.getDriver('Regular.driver').init)
+
 
   it '$setDevs', ->
     # TODO: !!!!
