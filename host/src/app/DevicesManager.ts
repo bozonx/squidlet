@@ -2,7 +2,6 @@ import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
 import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
-//import DeviceProps from './interfaces/DeviceProps';
 import Env from './Env';
 
 
@@ -92,7 +91,8 @@ export default class DevicesManager {
       this.system.initCfg.hostDirs.devices,
       definition.id
     );
-    const props: DeviceProps = {
+    // TODO: remake
+    const props: EntityProps = {
       // TODO: definition тоже имеет props
       ...definition,
       manifest,

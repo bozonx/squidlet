@@ -75,14 +75,14 @@ export default class DriversManager {
 
     for (let driverName of Object.keys(devs)) {
       const DriverClass: DriverClassType = devs[driverName];
-      const driverProps: DriverProps = {
+      const driverProps: EntityProps = {
         ...definitions[driverName],
         manifest: {
           name: driverName,
           type: 'dev',
         },
       };
-      const driverInstance: DriverInstance = new DriverClass(this.driverEnv, driverProps);
+      const driverInstance: DriverInstance = new DriverClass(driverProps, this.driverEnv);
 
       this.instances[driverName] = driverInstance;
     }

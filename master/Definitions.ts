@@ -119,7 +119,11 @@ export default class Definitions {
     return {
       id: deviceId,
       className: deviceDef.device,
-      props: _omit(deviceDef, 'device'),
+      props: {
+        ..._omit(deviceDef, 'device'),
+        // double of id
+        id: deviceId,
+      },
     };
   }
 
@@ -127,7 +131,11 @@ export default class Definitions {
     return {
       id: driverId,
       className: driverId,
-      props: driverDef,
+      props: {
+        ...driverDef,
+        // double of id
+        id: driverId,
+      },
     };
   }
 
@@ -135,7 +143,11 @@ export default class Definitions {
     return {
       id: serviceId,
       className: serviceDef.service,
-      props: _omit(serviceDef, 'service'),
+      props: {
+        ..._omit(serviceDef, 'service'),
+        // double of id
+        id: serviceId,
+      },
     };
   }
 

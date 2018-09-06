@@ -1,12 +1,11 @@
 import System from './System';
-import EntityDefinition from './interfaces/EntityDefinition';
+import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
-//import ServiceProps from './interfaces/ServiceProps';
 import Env from './Env';
 
 
-type ServiceClassType = new (env: Env, props: ServiceProps) => ServiceInstance;
+type ServiceClassType = new (props: EntityProps, env: Env) => ServiceInstance;
 
 
 export default class ServicesManager {
@@ -76,7 +75,7 @@ export default class ServicesManager {
       this.system.initCfg.hostDirs.services,
       definition.className
     );
-    const props: ServiceProps = {
+    const props: EntityProps = {
       // TODO: serviceDefinition тоже имеет props
       ...definition,
       manifest,

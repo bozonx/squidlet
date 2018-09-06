@@ -3,7 +3,6 @@ import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUin
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-//import DriverProps from '../../app/interfaces/DriverProps';
 
 
 const MAX_BLOCK_LENGTH = 65535;

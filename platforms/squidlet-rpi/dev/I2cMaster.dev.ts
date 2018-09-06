@@ -5,7 +5,6 @@ import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/DriverEnv';
 import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
 import {I2cSlaveDev} from '../../squidlet-esp32/dev/I2cSlave.dev';
-//import DriverProps from '../../../host/src/app/interfaces/DriverProps';
 
 
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле

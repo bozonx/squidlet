@@ -4,7 +4,6 @@ import DriverFactoryBase from '../../app/DriverFactoryBase';
 import DriverEnv from '../../app/DriverEnv';
 import {BinaryLevel} from '../../app/CommonTypes';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-//import DriverProps from '../../app/interfaces/DriverProps';
 
 
 type Handler = (level: BinaryLevel) => void;

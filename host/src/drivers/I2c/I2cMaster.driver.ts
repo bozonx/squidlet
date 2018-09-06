@@ -1,10 +1,7 @@
-//import DriverProps from '../../app/interfaces/DriverProps';
-
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
-
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
+import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import I2cMasterDev from '../../app/interfaces/dev/I2cMaster.dev';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';

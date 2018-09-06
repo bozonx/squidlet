@@ -5,7 +5,6 @@ import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-//import DriverProps from '../../app/interfaces/DriverProps';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;

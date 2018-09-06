@@ -3,7 +3,7 @@
 import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/DriverEnv';
 import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
-//import DriverProps from '../../../host/src/app/interfaces/DriverProps';
+
 
 export class GpioDev {
 

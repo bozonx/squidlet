@@ -5,7 +5,6 @@ import DriverEnv from '../../app/DriverEnv';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-//import DriverProps from '../../app/interfaces/DriverProps';
 
 
 const NO_DATA_ADDRESS = 'null';

@@ -1,11 +1,9 @@
 // See interface in squidlet/host/src/app/interfaces/dev/Fs.dev.ts
 
 import * as fs from 'fs';
-
-import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
-import DriverEnv from '../../../host/src/app/DriverEnv';
-import {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
 import {promises as fsPromises} from 'fs';
+
+import {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
 
 
 export default class FsDev {
@@ -121,11 +119,3 @@ export default class FsDev {
 
 
 }
-
-//
-// export default class Factory extends DriverFactoryBase {
-//   protected DriverClass: { new (
-//       driverEnv: DriverEnv,
-//       driverProps: DriverProps,
-//     ): FsDev } = FsDev;
-// }
