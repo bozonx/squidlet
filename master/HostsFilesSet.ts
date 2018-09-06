@@ -2,7 +2,7 @@ const _values = require('lodash/values');
 const _filter = require('lodash/filter');
 
 import Main from './Main';
-import DriverDefinition from '../host/src/app/interfaces/DriverDefinition';
+import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, FilesPaths, ManifestsTypePluralName} from './Entities';
 import HostFilesSet from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
@@ -139,10 +139,10 @@ export default class HostsFilesSet {
     // remove devs from drivers definitions list
     const filtered = _filter(
       driversDefinitions,
-      (item: DriverDefinition) => devs.indexOf(item.className) < 0
+      (item: EntityDefinition) => devs.indexOf(item.className) < 0
     );
 
-    return filtered.map((item: DriverDefinition) => item.className);
+    return filtered.map((item: EntityDefinition) => item.className);
   }
 
   getServicesClassNames(hostId: string): string[] {

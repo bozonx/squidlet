@@ -102,21 +102,21 @@ export default class DriversManager {
     await this.initializeAll(driverNames);
   }
 
-  private async instantiateDriver(driverDefinition: EntityDefinition): Promise<DriverInstance> {
+  private async instantiateDriver(definition: EntityDefinition): Promise<DriverInstance> {
     // const manifest = await this.system.loadManifest<DriverManifest>(
     //   this.system.initCfg.hostDirs.drivers,
     //   driverDefinition.className
     // );
     const DriverClass = await this.system.loadEntityClass<DriverClassType>(
       this.system.initCfg.hostDirs.drivers,
-      driverDefinition.className
+      definition.className
     );
     // const props: DriverProps = {
     //   // TODO: driverDefinition тоже имеет props
     //   ...driverDefinition,
     // };
 
-    return new DriverClass(driverDefinition.props, this.driverEnv);
+    return new DriverClass(definition.props, this.driverEnv);
   }
 
   private async initializeAll(driverNames: string[]) {
