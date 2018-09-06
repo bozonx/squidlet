@@ -1,6 +1,6 @@
 const _capitalize = require('lodash/capitalize');
 
-import DefinitionBase from './interfaces/DefinitionBase';
+import EntityDefinition from './interfaces/EntityDefinition';
 import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
@@ -8,7 +8,7 @@ import DriverDefinition from './interfaces/DriverDefinition';
 import DriverEnv from './DriverEnv';
 
 
-type DriverClassType = new (props: DefinitionBase['props'], driverEnv: DriverEnv) => DriverInstance;
+type DriverClassType = new (props: EntityDefinition['props'], driverEnv: DriverEnv) => DriverInstance;
 
 
 /**

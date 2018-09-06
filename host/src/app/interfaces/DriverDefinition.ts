@@ -1,6 +1,6 @@
-import DefinitionBase from './DefinitionBase';
+import EntityDefinition from './EntityDefinition';
 
 
 // prepared definition of driver of host
-export default interface DriverDefinition extends DefinitionBase {
+export default interface DriverDefinition extends EntityDefinition {
 }

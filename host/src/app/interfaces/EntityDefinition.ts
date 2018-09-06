@@ -1,4 +1,4 @@
-export default interface DefinitionBase {
+export default interface EntityDefinition {
   // unique id of item in group
   id: string;
   // name of class which will be used

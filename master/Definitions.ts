@@ -3,7 +3,7 @@ const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 const _values = require('lodash/values');
 
-import DefinitionBase from '../host/src/app/interfaces/DefinitionBase';
+import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import DeviceDefinition from '../host/src/app/interfaces/DeviceDefinition';
 import ServiceDefinition from '../host/src/app/interfaces/ServiceDefinition';
 import PreHostConfig from './interfaces/PreHostConfig';
@@ -220,7 +220,7 @@ export default class Definitions {
     const manifests: AllManifests = this.main.entities.getManifests();
     const check = (
       manifests: {[index: string]: ManifestBase},
-      definitions: {[index: string]: {[index: string]:DefinitionBase}}
+      definitions: {[index: string]: {[index: string]: EntityDefinition}}
     ) => {
       for(let hostId of Object.keys(definitions)) {
         for (let entityDef of _values(definitions[hostId])) {
