@@ -1,12 +1,12 @@
 import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
-import EntityDefinition from './interfaces/EntityDefinition';
+import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
 //import DeviceProps from './interfaces/DeviceProps';
 import Env from './Env';
 
 
-type DeviceClassType = new (env: Env, props: DeviceProps) => DeviceInstance;
+type DeviceClassType = new (env: Env, props: EntityProps) => DeviceInstance;
 
 
 /**
