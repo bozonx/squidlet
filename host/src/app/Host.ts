@@ -167,6 +167,13 @@ export default class Host {
     return await this.loadJson(manifestPath);
   }
 
+
+  // const manifest = await this.system.loadManifest<DriverManifest>(
+  //   this.system.initCfg.hostDirs.drivers,
+  //   driverDefinition.className
+  // );
+
+
   async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
 
     // TODO: rename to loadEntityMainFile

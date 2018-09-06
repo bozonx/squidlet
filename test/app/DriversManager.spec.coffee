@@ -27,6 +27,14 @@ describe.only 'app.DriversManager', ->
           otherParam: 1
         }
       }
+      'Device.dev': {
+        id: 'Device.dev'
+        className: 'Device.dev'
+        props: {
+          id: 'Device.dev'
+          otherParam: 1
+        }
+      }
     }
 
     @system = {
@@ -56,5 +64,11 @@ describe.only 'app.DriversManager', ->
 
 
   it '$setDevs', ->
-    # TODO: !!!!
+    devs = {
+      'Device.dev': @driver
+    }
 
+    await @driversManager.$setDevs(devs)
+
+    assert.equal(@driversManager.getDriver('Device.dev').props, @definitions['Device.dev'].props)
+    sinon.assert.calledOnce(@driversManager.getDriver('Device.dev').init)

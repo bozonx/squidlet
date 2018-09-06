@@ -66,29 +66,18 @@ export default class DriversManager {
    * @param devs - like {DeviClassName: DevClass}
    */
   async $setDevs(devs: {[index: string]: DriverClassType}) {
-
-    // TODO: нужно создать сущность и смержить props из манифеста dev и definition
-
-    // TODO: манифест загрузить из хранилища системных манифестов или получить на вход это ф-и ?????
-
-    // const manifest = await this.system.loadManifest<DriverManifest>(
-    //   this.system.initCfg.hostDirs.drivers,
-    //   driverDefinition.className
-    // );
-
     // load list of definitions of drivers
     const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of Object.keys(devs)) {
       const DriverClass: DriverClassType = devs[driverName];
-      const driverProps: EntityProps = {
-        ...definitions[driverName],
-        // TODO: взять props из манифеста этого dev
-      };
-      const driverInstance: DriverInstance = new DriverClass(driverProps, this.driverEnv);
+      // if there is a definition for dev - use it or just use an empty props
+      const props: EntityProps = (definitions[driverName] && definitions[driverName].props) || { id: driverName };
 
-      this.instances[driverName] = driverInstance;
+      this.instances[driverName] = new DriverClass(props, this.driverEnv);
     }
+
+    await this.initializeAll(Object.keys(devs));
   }
 
 
