@@ -67,20 +67,23 @@ export default class DriversManager {
    */
   async $setDevs(devs: {[index: string]: DriverClassType}) {
 
-    // TODO: review
+    // TODO: нужно создать сущность и смержить props из манифеста dev и definition
 
-    const definitions = await this.system.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initCfg.fileNames.driversDefinitions
-    );
+    // TODO: манифест загрузить из хранилища системных манифестов или получить на вход это ф-и ?????
+
+    // const manifest = await this.system.loadManifest<DriverManifest>(
+    //   this.system.initCfg.hostDirs.drivers,
+    //   driverDefinition.className
+    // );
+
+    // load list of definitions of drivers
+    const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of Object.keys(devs)) {
       const DriverClass: DriverClassType = devs[driverName];
       const driverProps: EntityProps = {
         ...definitions[driverName],
-        manifest: {
-          name: driverName,
-          type: 'dev',
-        },
+        // TODO: взять props из манифеста этого dev
       };
       const driverInstance: DriverInstance = new DriverClass(driverProps, this.driverEnv);
 
@@ -91,9 +94,7 @@ export default class DriversManager {
 
   private async initDrivers(driverNames: string[]) {
     // load list of definitions of drivers
-    const definitions = await this.system.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initCfg.fileNames.driversDefinitions
-    );
+    const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of driverNames) {
       this.instances[driverName] = await this.instantiateDriver(definitions[driverName]);
@@ -103,18 +104,10 @@ export default class DriversManager {
   }
 
   private async instantiateDriver(definition: EntityDefinition): Promise<DriverInstance> {
-    // const manifest = await this.system.loadManifest<DriverManifest>(
-    //   this.system.initCfg.hostDirs.drivers,
-    //   driverDefinition.className
-    // );
-    const DriverClass = await this.system.loadEntityClass<DriverClassType>(
+    const DriverClass: DriverClassType = await this.system.loadEntityClass<DriverClassType>(
       this.system.initCfg.hostDirs.drivers,
       definition.className
     );
-    // const props: DriverProps = {
-    //   // TODO: driverDefinition тоже имеет props
-    //   ...driverDefinition,
-    // };
 
     return new DriverClass(definition.props, this.driverEnv);
   }
@@ -125,6 +118,15 @@ export default class DriversManager {
 
       if (driver.init) await driver.init();
     }
+  }
+
+  /**
+   * load list of definitions of drivers
+   */
+  private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
+    return await this.system.loadConfig<{[index: string]: EntityDefinition}>(
+      this.system.initCfg.fileNames.driversDefinitions
+    );
   }
 
 }
