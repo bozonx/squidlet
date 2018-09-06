@@ -1,5 +1,5 @@
 import DriverEnv from './DriverEnv';
-import DriverProps from './interfaces/DriverProps';
+//import DriverProps from './interfaces/DriverProps';
 
 
 export default abstract class DriverFactoryBase {

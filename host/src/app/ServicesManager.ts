@@ -2,7 +2,7 @@ import System from './System';
 import ServiceDefinition from './interfaces/ServiceDefinition';
 import ServiceManifest from './interfaces/ServiceManifest';
 import ServiceInstance from './interfaces/ServiceInstance';
-import ServiceProps from './interfaces/ServiceProps';
+//import ServiceProps from './interfaces/ServiceProps';
 import Env from './Env';
 
 

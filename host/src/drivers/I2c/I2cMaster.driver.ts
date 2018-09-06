@@ -1,4 +1,4 @@
-import DriverProps from '../../app/interfaces/DriverProps';
+//import DriverProps from '../../app/interfaces/DriverProps';
 
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';

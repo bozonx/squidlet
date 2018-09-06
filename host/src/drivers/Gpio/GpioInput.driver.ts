@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import DriverEnv from '../../app/DriverEnv';
 import {BinaryLevel} from '../../app/CommonTypes';
-import DriverProps from '../../app/interfaces/DriverProps';
+//import DriverProps from '../../app/interfaces/DriverProps';
 
 
 type Handler = (level: BinaryLevel) => void;

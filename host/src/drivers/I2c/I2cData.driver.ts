@@ -2,7 +2,7 @@ import DriverEnv from '../../app/DriverEnv';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
-import DriverProps from '../../app/interfaces/DriverProps';
+//import DriverProps from '../../app/interfaces/DriverProps';
 
 
 const MAX_BLOCK_LENGTH = 65535;

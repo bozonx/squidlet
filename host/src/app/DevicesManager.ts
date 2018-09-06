@@ -2,7 +2,7 @@ import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
 import DeviceManifest from './interfaces/DeviceManifest';
 import DeviceDefinition from './interfaces/DeviceDefinition';
-import DeviceProps from './interfaces/DeviceProps';
+//import DeviceProps from './interfaces/DeviceProps';
 import Env from './Env';
 
 
