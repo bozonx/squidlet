@@ -24,7 +24,7 @@ export default class DevicesManager {
    * Initialize all the devices on current host specified by its definitions in config
    */
   async init(): Promise<void> {
-    const definitions = await this.system.loadConfig<EntityDefinition[]>(
+    const definitions = await this.system.host.loadConfig<EntityDefinition[]>(
       this.system.initCfg.fileNames.devicesDefinitions
     );
 
@@ -32,7 +32,7 @@ export default class DevicesManager {
     const groupedByManifests: {[index: string]: EntityDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
 
     for (let className of Object.keys(groupedByManifests)) {
-      const manifest = await this.system.loadManifest<DeviceManifest>(
+      const manifest = await this.system.host.loadManifest<DeviceManifest>(
         this.system.initCfg.hostDirs.devices,
         className,
       );
@@ -87,7 +87,7 @@ export default class DevicesManager {
     definition: EntityDefinition,
     manifest: DeviceManifest
   ): Promise<DeviceInstance> {
-    const DeviceClass = await this.system.loadEntityClass<DeviceClassType>(
+    const DeviceClass = await this.system.host.loadEntityClass<DeviceClassType>(
       this.system.initCfg.hostDirs.devices,
       definition.id
     );

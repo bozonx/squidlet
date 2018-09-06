@@ -45,7 +45,7 @@ export default class DriversManager {
 
   async initSystemDrivers(): Promise<void> {
     // get list of system drivers from json file
-    const systemDriversList = await this.system.loadConfig<string[]>(
+    const systemDriversList = await this.system.host.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemDrivers
     );
 
@@ -54,7 +54,7 @@ export default class DriversManager {
 
   async initRegularDrivers(): Promise<void> {
     // get list of regular drivers from json file
-    const regularDriversList = await this.system.loadConfig<string[]>(
+    const regularDriversList = await this.system.host.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularDrivers
     );
 
@@ -104,7 +104,7 @@ export default class DriversManager {
   }
 
   private async instantiateDriver(definition: EntityDefinition): Promise<DriverInstance> {
-    const DriverClass: DriverClassType = await this.system.loadEntityClass<DriverClassType>(
+    const DriverClass: DriverClassType = await this.system.host.loadEntityClass<DriverClassType>(
       this.system.initCfg.hostDirs.drivers,
       definition.className
     );

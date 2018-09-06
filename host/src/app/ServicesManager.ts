@@ -26,7 +26,7 @@ export default class ServicesManager {
   }
 
   async initSystemServices() {
-    const systemServicesList = await this.system.loadConfig<string[]>(
+    const systemServicesList = await this.system.host.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
     );
 
@@ -36,7 +36,7 @@ export default class ServicesManager {
   }
 
   async initRegularServices() {
-    const regularServicesList = await this.system.loadConfig<string[]>(
+    const regularServicesList = await this.system.host.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularServices
     );
 
@@ -45,7 +45,7 @@ export default class ServicesManager {
 
 
   private async initServices(servicesId: string[]) {
-    const definitions = await this.system.loadConfig<{[index: string]: EntityDefinition}>(
+    const definitions = await this.system.host.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.servicesDefinitions
     );
 
@@ -67,11 +67,11 @@ export default class ServicesManager {
   }
 
   private async instantiateService(definition: EntityDefinition): Promise<ServiceInstance> {
-    const manifest = await this.system.loadManifest<ServiceManifest>(
+    const manifest = await this.system.host.loadManifest<ServiceManifest>(
       this.system.initCfg.hostDirs.services,
       definition.className
     );
-    const ServiceClass = await this.system.loadEntityClass<ServiceClassType>(
+    const ServiceClass = await this.system.host.loadEntityClass<ServiceClassType>(
       this.system.initCfg.hostDirs.services,
       definition.className
     );
