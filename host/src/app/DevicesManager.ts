@@ -1,6 +1,5 @@
 import System from './System';
 import DeviceInstance from './interfaces/DeviceInstance';
-import DeviceManifest from './interfaces/DeviceManifest';
 import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
 import Env from './Env';
 
@@ -28,19 +27,8 @@ export default class DevicesManager {
       this.system.initCfg.fileNames.devicesDefinitions
     );
 
-    // it's need to load one manifest file for group of devices which are used it
-    const groupedByManifests: {[index: string]: EntityDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
-
-    for (let className of Object.keys(groupedByManifests)) {
-      const manifest = await this.system.host.loadManifest<DeviceManifest>(
-        this.system.initCfg.hostDirs.devices,
-        className,
-      );
-
-      // each definition of manifest
-      for (let definition of groupedByManifests[className]) {
-        this.instances[definition.id] = await this.instantiateDevice(definition, manifest);
-      }
+    for (let definition of definitions) {
+      this.instances[definition.id] = await this.makeInstance(definition);
     }
 
     await this.initializeAll();
@@ -58,47 +46,21 @@ export default class DevicesManager {
     return device as T;
   }
 
-
-  private async initializeAll() {
-    for (let driverId of Object.keys(this.instances)) {
-      const device: DeviceInstance = this.instances[driverId];
-
-      await device.init();
-    }
-  }
-
-  private groupDevicesDefinitionsByClass(
-    definitions: EntityDefinition[]
-  ): {[index: string]: EntityDefinition[]} {
-    const result: {[index: string]: EntityDefinition[]} = {};
-
-    for (let definition of definitions) {
-      const {className} = definition;
-
-      if (!result[className]) result[className] = [];
-
-      result[className].push(definition);
-    }
-
-    return result;
-  }
-
-  private async instantiateDevice (
-    definition: EntityDefinition,
-    manifest: DeviceManifest
-  ): Promise<DeviceInstance> {
+  private async makeInstance (definition: EntityDefinition): Promise<DeviceInstance> {
     const DeviceClass = await this.system.host.loadEntityClass<DeviceClassType>(
       this.system.initCfg.hostDirs.devices,
       definition.id
     );
-    // TODO: remake
-    const props: EntityProps = {
-      // TODO: definition тоже имеет props
-      ...definition,
-      manifest,
-    };
 
-    return new DeviceClass(props, this.system.env);
+    return new DeviceClass(definition.props, this.system.env);
+  }
+
+  private async initializeAll() {
+    for (let deviceId of Object.keys(this.instances)) {
+      const device: DeviceInstance = this.instances[deviceId];
+
+      await device.init();
+    }
   }
 
   destroy() {
@@ -117,3 +79,35 @@ export default class DevicesManager {
 
 
 }
+
+
+// private groupDevicesDefinitionsByClass(
+//   definitions: EntityDefinition[]
+// ): {[index: string]: EntityDefinition[]} {
+//   const result: {[index: string]: EntityDefinition[]} = {};
+//
+//   for (let definition of definitions) {
+//     const {className} = definition;
+//
+//     if (!result[className]) result[className] = [];
+//
+//     result[className].push(definition);
+//   }
+//
+//   return result;
+// }
+
+// // it's need to load one manifest file for group of devices which are used it
+// const groupedByManifests: {[index: string]: EntityDefinition[]} = this.groupDevicesDefinitionsByClass(definitions);
+//
+// for (let className of Object.keys(groupedByManifests)) {
+//   const manifest = await this.system.host.loadManifest<DeviceManifest>(
+//     this.system.initCfg.hostDirs.devices,
+//     className,
+//   );
+//
+//   // each definition of manifest
+//   for (let definition of groupedByManifests[className]) {
+//     this.instances[definition.id] = await this.instantiateDevice(definition);
+//   }
+// }

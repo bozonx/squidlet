@@ -4,45 +4,34 @@ initializationConfig = require('../../host/src/app/config/initializationConfig')
 
 describe.only 'app.DevicesManager', ->
   beforeEach ->
-#    @props = undefined
-#    @driver = class
-#      constructor: (props) ->
-#        @props = props
-#      init: sinon.spy()
+    @props = undefined
+    @device = class
+      constructor: (props) ->
+        @props = props
+      init: sinon.spy()
 
-#    @definitions = {
-#      'System.driver': {
-#        id: 'System.driver'
-#        className: 'System.driver'
-#        props: {
-#          id: 'System.driver'
-#          otherParam: 1
-#        }
-#      }
-#      'Regular.driver': {
-#        id: 'Regular.driver'
-#        className: 'Regular.driver'
-#        props: {
-#          id: 'Regular.driver'
-#          otherParam: 1
-#        }
-#      }
-#      'Device.dev': {
-#        id: 'Device.dev'
-#        className: 'Device.dev'
-#        props: {
-#          id: 'Device.dev'
-#          otherParam: 1
-#        }
-#      }
-#    }
+    @definitions = [
+      {
+        id: 'room.device1'
+        className: 'Relay'
+        props: {
+          id: 'room.device1'
+          otherParam: 1
+        }
+      }
+    ]
 
     @system = {
       initCfg: initializationConfig()
-#      host: {
-#        loadEntityClass: => @driver
-#      }
+      host: {
+        loadEntityClass: => @device
+        loadConfig: => @definitions
+      }
     }
     @devicesManager = new DevicesManager(@system)
 
   it 'init() and getDevice', ->
+    await @devicesManager.init()
+
+    assert.equal(@devicesManager.getDevice('room.device1').props, @definitions[0].props)
+    sinon.assert.calledOnce(@devicesManager.getDevice('room.device1').init)

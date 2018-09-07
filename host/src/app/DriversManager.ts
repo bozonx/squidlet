@@ -22,6 +22,24 @@ export default class DriversManager {
     this.driverEnv = new DriverEnv(this.system);
   }
 
+  async initSystemDrivers(): Promise<void> {
+    // get list of system drivers from json file
+    const systemDriversList = await this.system.host.loadConfig<string[]>(
+      this.system.initCfg.fileNames.systemDrivers
+    );
+
+    await this.initDrivers(systemDriversList);
+  }
+
+  async initRegularDrivers(): Promise<void> {
+    // get list of regular drivers from json file
+    const regularDriversList = await this.system.host.loadConfig<string[]>(
+      this.system.initCfg.fileNames.regularDrivers
+    );
+
+    await this.initDrivers(regularDriversList);
+  }
+
   /**
    * Get dev by short name line 'fs', 'gpio' etc
    */
@@ -40,24 +58,6 @@ export default class DriversManager {
     if (!driver) throw new Error(`Can't find driver "${driverName}"`);
 
     return driver as T;
-  }
-
-  async initSystemDrivers(): Promise<void> {
-    // get list of system drivers from json file
-    const systemDriversList = await this.system.host.loadConfig<string[]>(
-      this.system.initCfg.fileNames.systemDrivers
-    );
-
-    await this.initDrivers(systemDriversList);
-  }
-
-  async initRegularDrivers(): Promise<void> {
-    // get list of regular drivers from json file
-    const regularDriversList = await this.system.host.loadConfig<string[]>(
-      this.system.initCfg.fileNames.regularDrivers
-    );
-
-    await this.initDrivers(regularDriversList);
   }
 
   /**
@@ -85,13 +85,13 @@ export default class DriversManager {
     const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of driverNames) {
-      this.instances[driverName] = await this.instantiateDriver(definitions[driverName]);
+      this.instances[driverName] = await this.makeInstance(definitions[driverName]);
     }
 
     await this.initializeAll(driverNames);
   }
 
-  private async instantiateDriver(definition: EntityDefinition): Promise<DriverInstance> {
+  private async makeInstance(definition: EntityDefinition): Promise<DriverInstance> {
     const DriverClass: DriverClassType = await this.system.host.loadEntityClass<DriverClassType>(
       this.system.initCfg.hostDirs.drivers,
       definition.className
