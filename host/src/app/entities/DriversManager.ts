@@ -4,6 +4,7 @@ import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import System from '../System';
 import DriverEnv from './DriverEnv';
+import EntityManagerBase from './EntityManagerBase';
 
 
 type DriverClassType = new (props: EntityProps, env: DriverEnv) => DriverInstance;
@@ -12,13 +13,11 @@ type DriverClassType = new (props: EntityProps, env: DriverEnv) => DriverInstanc
 /**
  * Driver manager
  */
-export default class DriversManager {
-  readonly system: System;
+export default class DriversManager extends EntityManagerBase<DriverInstance> {
   readonly driverEnv: DriverEnv;
-  private instances: {[index: string]: DriverInstance} = {};
 
   constructor(system: System) {
-    this.system = system;
+    super(system);
     this.driverEnv = new DriverEnv(this.system);
   }
 
@@ -89,23 +88,6 @@ export default class DriversManager {
     }
 
     await this.initializeAll(driverNames);
-  }
-
-  private async makeInstance(definition: EntityDefinition): Promise<DriverInstance> {
-    const DriverClass: DriverClassType = await this.system.host.loadEntityClass<DriverClassType>(
-      this.system.initCfg.hostDirs.drivers,
-      definition.className
-    );
-
-    return new DriverClass(definition.props, this.driverEnv);
-  }
-
-  private async initializeAll(driverNames: string[]) {
-    for (let driverName of driverNames) {
-      const driver: DriverInstance = this.instances[driverName];
-
-      if (driver.init) await driver.init();
-    }
   }
 
   /**

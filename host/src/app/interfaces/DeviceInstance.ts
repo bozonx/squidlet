@@ -1,5 +1,5 @@
 export default interface DeviceInstance {
-  init: () => Promise<void>;
+  init?: () => Promise<void>;
   listenStatus: () => void;
   listenConfig: () => void;
   setConfig: (partialConfig: object) => void;

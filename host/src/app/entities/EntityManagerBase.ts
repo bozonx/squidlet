@@ -4,7 +4,7 @@ import Env from './Env';
 
 
 interface BaseEntityInstance {
-  init: () => Promise<void>;
+  init?: () => Promise<void>;
 }
 
 type EntityClassType = new (props: EntityProps, env: Env) => BaseEntityInstance;
@@ -28,11 +28,15 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
     return new EntityClass(definition.props, this.system.env) as EntityInstance;
   }
 
-  protected async initializeAll() {
-    for (let entityId of Object.keys(this.instances)) {
+  protected async initializeAll(entitiesIds: string[]) {
+    for (let entityId of entitiesIds) {
+      if (typeof this.instances[entityId] === 'undefined') {
+        throw new Error(`Can't find an entity to init`);
+      }
+
       const entity: EntityInstance = this.instances[entityId];
 
-      await entity.init();
+      if (entity.init) await entity.init();
     }
   }
 
