@@ -1,4 +1,3 @@
-import System from '../System';
 import DeviceInstance from '../interfaces/DeviceInstance';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import Env from './Env';
@@ -11,10 +10,7 @@ type DeviceClassType = new (props: EntityProps, env: Env) => DeviceInstance;
 /**
  * Creates instances of local devices and prepare config for them.
  */
-export default class DevicesManager extends EntityManagerBase {
-  // devices instances by ids
-  private readonly instances: {[index: string]: DeviceInstance} = {};
-
+export default class DevicesManager extends EntityManagerBase<DeviceInstance> {
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */
@@ -40,23 +36,6 @@ export default class DevicesManager extends EntityManagerBase {
     if (!device) throw new Error(`Can't find device "${deviceId}"`);
 
     return device as T;
-  }
-
-  private async makeInstance (definition: EntityDefinition): Promise<DeviceInstance> {
-    const DeviceClass = await this.system.host.loadEntityClass<DeviceClassType>(
-      this.system.initCfg.hostDirs.devices,
-      definition.id
-    );
-
-    return new DeviceClass(definition.props, this.system.env);
-  }
-
-  private async initializeAll() {
-    for (let deviceId of Object.keys(this.instances)) {
-      const device: DeviceInstance = this.instances[deviceId];
-
-      await device.init();
-    }
   }
 
   destroy() {
