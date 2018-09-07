@@ -2,6 +2,7 @@ import * as EventEmitter from 'eventemitter3';
 
 import { generateEventName } from '../helpers/helpers';
 
+
 export const ALL_TOPIC_MASK = '*';
 
 interface TopicListener {
@@ -11,6 +12,7 @@ interface TopicListener {
   wrapper: (...args: Array<any>) => any;
 }
 
+
 export default class Events {
   private readonly events: EventEmitter = new EventEmitter();
 
@@ -19,7 +21,7 @@ export default class Events {
   private readonly topicListeners: Array<TopicListener> = [];
 
 
-  emit(category: string, topic: string = '*', payload: any): void {
+  emit(category: string, topic: string = '*', payload?: any): void {
     const eventName = generateEventName(category, topic);
 
     this.events.emit(eventName, category, topic, payload);

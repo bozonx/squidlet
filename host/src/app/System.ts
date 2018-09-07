@@ -1,4 +1,3 @@
-
 import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
@@ -9,11 +8,11 @@ import DriversManager from './DriversManager';
 import ServicesManager from './ServicesManager';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
-import FsDev from './interfaces/dev/Fs.dev';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
+import eventNames from './dict/eventNames';
+import categories from './dict/categories';
 import Env from './Env';
-import systemConfig from './config/systemConfig';
 
 
 export default class System {
@@ -53,19 +52,19 @@ export default class System {
     // runtime config
     await this.host.init();
     await this.driversManager.initSystemDrivers();
-    this.riseEvent('system.systemDriversInitialized');
+    this.riseEvent(eventNames.system.systemDriversInitialized);
 
     this.network.init();
-    this.riseEvent('system.networkInitialized');
+    this.riseEvent(eventNames.system.networkInitialized);
 
     this.messenger.init();
-    this.riseEvent('system.messengerInitialized');
+    this.riseEvent(eventNames.system.messengerInitialized);
 
     await this.servicesManager.initSystemServices();
-    this.riseEvent('system.systemServicesInitialized');
+    this.riseEvent(eventNames.system.systemServicesInitialized);
 
     await this.initApp();
-    this.riseEvent('system.appInitialized');
+    this.riseEvent(eventNames.system.appInitialized);
 
     // remove initialization config
     delete this.initializationConfig;
@@ -83,7 +82,7 @@ export default class System {
   }
 
   private riseEvent(eventName: string) {
-    // TODO: это общие события или чисто для System?
+    this.events.emit(categories.system, eventName);
   }
 
 }

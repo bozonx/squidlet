@@ -1,7 +1,6 @@
 const _capitalize = require('lodash/capitalize');
 
 import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
-import DriverManifest from './interfaces/DriverManifest';
 import DriverInstance from './interfaces/DriverInstance';
 import System from './System';
 import DriverEnv from './DriverEnv';

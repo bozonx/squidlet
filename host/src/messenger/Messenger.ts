@@ -144,6 +144,9 @@ export default class Messenger {
    * Rise all the income messages as local events.
    */
   private handleIncomeMessages = (error: Error | null, message: Message): void => {
+
+    // TODO: может network должен сначала публиковать события в Events, а здесь уже слушать эти события?
+
     // put error to log
     if (error) return this.system.log.error(error.toString());
 
