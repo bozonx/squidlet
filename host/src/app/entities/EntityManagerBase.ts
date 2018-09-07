@@ -1,16 +1,17 @@
 import System from '../System';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
-import EntityEnv from './EntityEnv';
+import Env from '../interfaces/Env';
 
 
 interface BaseEntityInstance {
   init?: () => Promise<void>;
 }
 
-type EntityClassType = new (props: EntityProps, env: EntityEnv) => BaseEntityInstance;
+type EntityClassType = new (props: EntityProps, env: Env) => BaseEntityInstance;
 
 
 export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance> {
+  protected readonly abstract env: Env;
   protected readonly system: System;
   protected readonly instances: {[index: string]: EntityInstance} = {};
 

@@ -5,12 +5,13 @@ import Host from '../Host';
 import Messenger from '../../messenger/Messenger';
 import Devices from '../Devices';
 import DriverInstance from '../interfaces/DriverInstance';
+import Env from '../interfaces/Env';
 
 
 /**
  * It is environment for devices and services
  */
-export default class EntityEnv {
+export default class EntityEnv implements Env {
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;

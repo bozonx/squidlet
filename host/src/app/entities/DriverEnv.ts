@@ -1,12 +1,13 @@
 import System from '../System';
 import DriverManifest from '../interfaces/DriverManifest';
 import DriverInstance from '../interfaces/DriverInstance';
+import Env from '../interfaces/Env';
 
 
 /**
  * It is singleton which is passed to all the drivers
  */
-export default class DriverEnv {
+export default class DriverEnv implements Env {
   readonly system: System;
 
   constructor(system: System) {

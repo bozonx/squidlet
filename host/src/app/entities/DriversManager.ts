@@ -1,3 +1,5 @@
+import Env from '../interfaces/Env';
+
 const _capitalize = require('lodash/capitalize');
 
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
@@ -18,11 +20,11 @@ type DriverClassType = new (props: EntityProps, env: DriverEnv) => DriverInstanc
  * Driver manager
  */
 export default class DriversManager extends EntityManagerBase<DriverInstance> {
-  readonly env: DriverEnv;
+  protected readonly env: Env;
 
   constructor(system: System) {
     super(system);
-    this.driverEnv = new DriverEnv(this.system);
+    this.env = new DriverEnv(this.system);
   }
 
   async initSystemDrivers(): Promise<void> {
