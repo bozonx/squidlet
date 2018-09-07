@@ -2,17 +2,17 @@ import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
 import Messenger from '../messenger/Messenger';
-import DevicesManager from './DevicesManager';
+import DevicesManager from './entities/DevicesManager';
 import Devices from './Devices';
-import DriversManager from './DriversManager';
-import ServicesManager from './ServicesManager';
+import DriversManager from './entities/DriversManager';
+import ServicesManager from './entities/ServicesManager';
 import Logger from './interfaces/Logger';
 import * as defaultLogger from './defaultLogger';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
-import Env from './Env';
+import Env from './entities/Env';
 
 
 export default class System {

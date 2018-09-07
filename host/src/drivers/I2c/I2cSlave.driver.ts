@@ -1,8 +1,8 @@
 import * as EventEmitter from 'events';
 
 import I2cSlaveDev from '../../app/interfaces/dev/I2cSlave.dev';
-import DriverEnv from '../../app/DriverEnv';
-import DriverFactoryBase from '../../app/DriverFactoryBase';
+import DriverEnv from '../../app/entities/DriverEnv';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 

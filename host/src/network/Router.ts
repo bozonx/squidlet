@@ -2,7 +2,7 @@ const _last = require('lodash/last');
 import * as EventEmitter from 'events';
 
 import Network from './Network';
-import DriverEnv from '../app/DriverEnv';
+import DriverEnv from '../app/entities/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';

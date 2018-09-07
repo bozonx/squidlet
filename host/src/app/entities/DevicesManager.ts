@@ -1,6 +1,6 @@
-import System from './System';
-import DeviceInstance from './interfaces/DeviceInstance';
-import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
+import System from '../System';
+import DeviceInstance from '../interfaces/DeviceInstance';
+import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import Env from './Env';
 import EntityManagerBase from './EntityManagerBase';
 
@@ -12,13 +12,8 @@ type DeviceClassType = new (props: EntityProps, env: Env) => DeviceInstance;
  * Creates instances of local devices and prepare config for them.
  */
 export default class DevicesManager extends EntityManagerBase {
-  private readonly system: System;
   // devices instances by ids
   private readonly instances: {[index: string]: DeviceInstance} = {};
-
-  constructor(system: System) {
-    this.system = system;
-  }
 
   /**
    * Initialize all the devices on current host specified by its definitions in config

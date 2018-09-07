@@ -1,5 +1,5 @@
-import System from './System';
-import DriverManifest from './interfaces/DriverManifest';
+import System from '../System';
+import DriverManifest from '../interfaces/DriverManifest';
 
 
 /**

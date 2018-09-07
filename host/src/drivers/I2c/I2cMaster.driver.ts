@@ -2,10 +2,10 @@ const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-import DriverFactoryBase from '../../app/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMasterDev from '../../app/interfaces/dev/I2cMaster.dev';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
-import DriverEnv from '../../app/DriverEnv';
+import DriverEnv from '../../app/entities/DriverEnv';
 import Poling from '../../helpers/Poling';
 
 

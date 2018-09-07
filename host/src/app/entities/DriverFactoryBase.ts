@@ -1,6 +1,6 @@
 import DriverEnv from './DriverEnv';
-import {EntityProps} from './interfaces/EntityDefinition';
-import DriverInstance from './interfaces/DriverInstance';
+import {EntityProps} from '../interfaces/EntityDefinition';
+import DriverInstance from '../interfaces/DriverInstance';
 
 
 export default abstract class DriverFactoryBase {

@@ -1,7 +1,7 @@
-import System from './System';
-import EntityDefinition, {EntityProps} from './interfaces/EntityDefinition';
-import ServiceManifest from './interfaces/ServiceManifest';
-import ServiceInstance from './interfaces/ServiceInstance';
+import System from '../System';
+import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
+import ServiceManifest from '../interfaces/ServiceManifest';
+import ServiceInstance from '../interfaces/ServiceInstance';
 import Env from './Env';
 
 

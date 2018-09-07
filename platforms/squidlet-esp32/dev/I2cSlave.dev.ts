@@ -1,7 +1,7 @@
 // See interface in squidlet/host/src/app/interfaces/dev/I2cSlave.dev.ts
 
-import DriverFactoryBase from '../../../host/src/app/DriverFactoryBase';
-import DriverEnv from '../../../host/src/app/DriverEnv';
+import DriverFactoryBase from '../../../host/src/app/entities/DriverFactoryBase';
+import DriverEnv from '../../../host/src/app/entities/DriverEnv';
 import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
 
 

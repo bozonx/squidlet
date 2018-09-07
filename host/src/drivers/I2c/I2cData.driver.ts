@@ -1,6 +1,6 @@
-import DriverEnv from '../../app/DriverEnv';
+import DriverEnv from '../../app/entities/DriverEnv';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
-import DriverFactoryBase from '../../app/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 

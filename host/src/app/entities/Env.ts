@@ -1,9 +1,9 @@
-import System from './System';
-import Logger from './interfaces/Logger';
-import Events from './Events';
-import Host from './Host';
-import Messenger from '../messenger/Messenger';
-import Devices from './Devices';
+import System from '../System';
+import Logger from '../interfaces/Logger';
+import Events from '../Events';
+import Host from '../Host';
+import Messenger from '../../messenger/Messenger';
+import Devices from '../Devices';
 
 
 /**

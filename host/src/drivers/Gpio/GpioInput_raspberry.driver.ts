@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
-import DriverFactoryBase from '../../app/DriverFactoryBase';
-import DriverEnv from '../../app/DriverEnv';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverEnv from '../../app/entities/DriverEnv';
 import Poling from '../../helpers/Poling';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 

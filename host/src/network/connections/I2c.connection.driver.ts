@@ -1,6 +1,6 @@
-import DriverEnv from '../../app/DriverEnv';
+import DriverEnv from '../../app/entities/DriverEnv';
 import MyAddress from '../../app/interfaces/MyAddress';
-import DriverFactoryBase from '../../app/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';

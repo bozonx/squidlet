@@ -1,5 +1,5 @@
 import Router from './Router';
-import DriverEnv from '../app/DriverEnv';
+import DriverEnv from '../app/entities/DriverEnv';
 import HostNetworkConfig from './interfaces/HostNetworkConfig';
 
 
