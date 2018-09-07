@@ -5,6 +5,8 @@ import EntityManagerBase from './EntityManagerBase';
 
 export default class ServicesManager extends EntityManagerBase<ServiceInstance> {
 
+  //this.system.env
+
   async initSystemServices() {
     const systemServicesList = await this.system.host.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices

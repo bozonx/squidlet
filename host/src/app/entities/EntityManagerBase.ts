@@ -1,13 +1,13 @@
 import System from '../System';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
-import Env from './Env';
+import EntityEnv from './EntityEnv';
 
 
 interface BaseEntityInstance {
   init?: () => Promise<void>;
 }
 
-type EntityClassType = new (props: EntityProps, env: Env) => BaseEntityInstance;
+type EntityClassType = new (props: EntityProps, env: EntityEnv) => BaseEntityInstance;
 
 
 export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance> {
@@ -25,7 +25,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
       definition.id
     );
 
-    return new EntityClass(definition.props, this.system.env) as EntityInstance;
+    return new EntityClass(definition.props, this.env) as EntityInstance;
   }
 
   protected async initializeAll(entitiesIds: string[]) {

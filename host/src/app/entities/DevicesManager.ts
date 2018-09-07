@@ -1,10 +1,10 @@
 import DeviceInstance from '../interfaces/DeviceInstance';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
-import Env from './Env';
+import EntityEnv from './EntityEnv';
 import EntityManagerBase from './EntityManagerBase';
 
 
-type DeviceClassType = new (props: EntityProps, env: Env) => DeviceInstance;
+type DeviceClassType = new (props: EntityProps, env: EntityEnv) => DeviceInstance;
 
 
 /**

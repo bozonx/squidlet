@@ -18,7 +18,7 @@ type DriverClassType = new (props: EntityProps, env: DriverEnv) => DriverInstanc
  * Driver manager
  */
 export default class DriversManager extends EntityManagerBase<DriverInstance> {
-  readonly driverEnv: DriverEnv;
+  readonly env: DriverEnv;
 
   constructor(system: System) {
     super(system);

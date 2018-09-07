@@ -1,5 +1,6 @@
 import System from '../System';
 import DriverManifest from '../interfaces/DriverManifest';
+import DriverInstance from '../interfaces/DriverInstance';
 
 
 /**
@@ -13,11 +14,11 @@ export default class DriverEnv {
   }
 
 
-  getDev<T>(shortDevName: string): T {
+  getDev<T extends DriverInstance>(shortDevName: string): T {
     return this.system.driversManager.getDev<T>(shortDevName);
   }
 
-  getDriver<T>(driverName: string): T {
+  getDriver<T extends DriverInstance>(driverName: string): T {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 

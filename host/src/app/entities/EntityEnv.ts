@@ -4,12 +4,13 @@ import Events from '../Events';
 import Host from '../Host';
 import Messenger from '../../messenger/Messenger';
 import Devices from '../Devices';
+import DriverInstance from '../interfaces/DriverInstance';
 
 
 /**
  * It is environment for devices and services
  */
-export default class Env {
+export default class EntityEnv {
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
@@ -26,11 +27,11 @@ export default class Env {
     this.devices = system.devices;
   }
 
-  getDev<T>(shortDevName: string): T {
+  getDev<T extends DriverInstance>(shortDevName: string): T {
     return this.system.driversManager.getDev<T>(shortDevName);
   }
 
-  getDriver<T>(driverName: string): T {
+  getDriver<T extends DriverInstance>(driverName: string): T {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 
