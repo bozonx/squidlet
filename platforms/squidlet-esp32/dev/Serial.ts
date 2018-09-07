@@ -201,43 +201,6 @@ LoopbackA.setConsole();
 
 //save();
 
-/////////// !!!!!!!!!! works from 8266 to 32
-/////////////// 8366
-
-var ledPin = 4;
-var ledValue = true;
-pinMode(ledPin, 'output');
-
-var uart1 = Serial1;
-
-console.log('-----start');
-
-uart1.setup(115200); // baud
-
-setInterval(() => {
-  uart1.println('22222');
-  //console.log('--printed');
-  digitalWrite(ledPin, ledValue);
-  ledValue = !ledValue;
-}, 2000);
-
-//LoopbackA.setConsole();
-
-save();
-
-
-//////////// esp32
-
-var uart1 = Serial3;
-
-console.log('-----start');
-
-uart1.setup(115200); // baud
-
-uart1.on('data', function (data) {
-  console.log('received-----', data);
-});
-
 
 
 //////////// from 32 to 8266
@@ -272,3 +235,123 @@ uart1.on('data', function (data) {
 });
 
 LoopbackA.setConsole();
+
+
+/////////// !!!!!!!!!! works from 8266 to 32
+/////////////// 8366
+
+var ledPin = 5;
+var ledValue = true;
+pinMode(ledPin, 'output');
+
+var uart1 = Serial1;
+
+console.log('-----start');
+
+uart1.setup(115200); // baud
+
+setInterval(() => {
+  uart1.println('22222');
+  //console.log('--printed');
+  digitalWrite(ledPin, ledValue);
+  ledValue = !ledValue;
+}, 2000);
+
+save();
+
+
+//////////// esp32 - serial3 - pin 16, 17
+
+var ledPin = 2;
+var ledValue = true;
+pinMode(ledPin, 'output');
+
+var uart1 = Serial3;
+
+console.log('-----start');
+
+uart1.setup(115200); // baud
+
+uart1.on('data', function (data) {
+  console.log('received-----', data);
+  digitalWrite(ledPin, ledValue);
+  ledValue = !ledValue;
+});
+
+////////////// esp 32 serial 2 - 33, 32
+var ledPin = 2;
+var ledValue = true;
+pinMode(ledPin, 'output');
+
+var uart1 = Serial2;
+
+console.log('-----start');
+
+uart1.setup(115200, { tx: 32, rx: 35 }); // baud
+
+uart1.on('data', function (data) {
+  console.log('received-----', data);
+  digitalWrite(ledPin, ledValue);
+  ledValue = !ledValue;
+});
+
+
+
+
+//////////////// на одном контроллере
+var uart1 = Serial3;
+var uart2 = Serial2;
+
+console.log('-----start');
+
+uart1.setup(115200, { tx: 17, rx: 16 }); // baud
+uart2.setup(115200, { tx: 32, rx: 33 }); // baud
+
+uart1.on('data', function (data) {
+  //print(JSON.stringify(data));
+  console.log('received-----1', JSON.stringify(data));
+});
+
+setInterval(() => {
+  uart2.println('333');
+}, 2000);
+
+
+
+///////////// 485
+///// 8266
+var ledPin = 5;
+var ledValue = true;
+pinMode(ledPin, 'output');
+
+var uart1 = Serial1;
+
+console.log('-----start');
+
+uart1.setup(115200); // baud
+
+setInterval(() => {
+  uart1.println('22222');
+  //console.log('--printed');
+  digitalWrite(ledPin, ledValue);
+  ledValue = !ledValue;
+}, 2000);
+
+save();
+
+
+//// 32
+var ledPin = 2;
+var ledValue = true;
+
+var uart1 = Serial3;
+
+console.log('-----start');
+
+uart1.setup(115200, { tx: 17, rx: 16 }); // baud
+
+uart1.on('data', function (data) {
+  console.log('received-----1', JSON.stringify(data));
+  digitalWrite(ledPin, ledValue);
+  ledValue = !ledValue;
+});
