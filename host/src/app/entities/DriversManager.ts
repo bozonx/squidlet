@@ -7,7 +7,11 @@ import DriverEnv from './DriverEnv';
 import EntityManagerBase from './EntityManagerBase';
 
 
+// TODO: remove
 type DriverClassType = new (props: EntityProps, env: DriverEnv) => DriverInstance;
+
+
+// TODO: в инстанс передавать driverEnv
 
 
 /**

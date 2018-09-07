@@ -1,19 +1,24 @@
-import System from '../System';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
-import ServiceManifest from '../interfaces/ServiceManifest';
 import ServiceInstance from '../interfaces/ServiceInstance';
-import Env from './Env';
+import EntityManagerBase from './EntityManagerBase';
 
 
-type ServiceClassType = new (props: EntityProps, env: Env) => ServiceInstance;
+export default class ServicesManager extends EntityManagerBase<ServiceInstance> {
 
+  async initSystemServices() {
+    const systemServicesList = await this.system.host.loadConfig<string[]>(
+      this.system.initCfg.fileNames.systemServices
+    );
 
-export default class ServicesManager {
-  private readonly system: System;
-  private instances: {[index: string]: ServiceInstance} = {};
+    await this.initServices(systemServicesList);
+  }
 
-  constructor(system: System) {
-    this.system = system;
+  async initRegularServices() {
+    const regularServicesList = await this.system.host.loadConfig<string[]>(
+      this.system.initCfg.fileNames.regularServices
+    );
+
+    await this.initServices(regularServicesList);
   }
 
   getService<T extends ServiceInstance>(serviceId: string): T {
@@ -25,63 +30,17 @@ export default class ServicesManager {
     return service as T;
   }
 
-  async initSystemServices() {
-    const systemServicesList = await this.system.host.loadConfig<string[]>(
-      this.system.initCfg.fileNames.systemServices
-    );
 
-    await this.initServices(systemServicesList);
-
-    // TODO: после загрузки новой версии или конфига - перезагружаться
-  }
-
-  async initRegularServices() {
-    const regularServicesList = await this.system.host.loadConfig<string[]>(
-      this.system.initCfg.fileNames.regularServices
-    );
-
-    await this.initServices(regularServicesList);
-  }
-
-
-  private async initServices(servicesId: string[]) {
+  private async initServices(servicesIds: string[]) {
     const definitions = await this.system.host.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.servicesDefinitions
     );
 
-    for (let serviceId of servicesId) {
-      const serviceInstance: ServiceInstance = await this.instantiateService(definitions[serviceId]);
-
-      this.instances[serviceId] = serviceInstance;
+    for (let serviceId of servicesIds) {
+      this.instances[serviceId] = await this.makeInstance(definitions[serviceId]);
     }
 
-    await this.initializeAll(servicesId);
-  }
-
-  private async initializeAll(servicesId: string[]) {
-    for (let serviceId of servicesId) {
-      const serviceInstance: ServiceInstance = this.instances[serviceId];
-
-      if (serviceInstance.init) await serviceInstance.init();
-    }
-  }
-
-  private async instantiateService(definition: EntityDefinition): Promise<ServiceInstance> {
-    const manifest = await this.system.host.loadManifest<ServiceManifest>(
-      this.system.initCfg.hostDirs.services,
-      definition.className
-    );
-    const ServiceClass = await this.system.host.loadEntityClass<ServiceClassType>(
-      this.system.initCfg.hostDirs.services,
-      definition.className
-    );
-    const props: EntityProps = {
-      // TODO: serviceDefinition тоже имеет props
-      ...definition,
-      manifest,
-    };
-
-    return new ServiceClass(this.system.env, props);
+    await this.initializeAll(servicesIds);
   }
 
 }
