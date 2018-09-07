@@ -12,11 +12,9 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
-import EntityEnv from './entities/EntityEnv';
 
 
 export default class System {
-  readonly env: EntityEnv;
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
@@ -34,14 +32,13 @@ export default class System {
   }
 
   constructor() {
-    this.env = new EntityEnv(this);
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.log = defaultLogger;
     this.events = new Events();
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
-    this.network = new Network(this.driversManager.driverEnv, this.host.id, this.host.networkConfig);
+    this.network = new Network(this.driversManager.env, this.host.id, this.host.networkConfig);
     this.servicesManager = new ServicesManager(this);
     this.messenger = new Messenger(this);
     this.devicesManager = new DevicesManager(this);

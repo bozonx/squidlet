@@ -1,11 +1,19 @@
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
+import Env from '../interfaces/Env';
+import System from '../System';
+import EntityEnv from './EntityEnv';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceInstance> {
+  protected readonly env: Env;
 
-  //this.system.env
+  constructor(system: System) {
+    super(system);
+    this.env = new EntityEnv(this.system);
+  }
+
 
   async initSystemServices() {
     const systemServicesList = await this.system.host.loadConfig<string[]>(

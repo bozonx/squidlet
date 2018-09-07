@@ -1,26 +1,17 @@
-import Env from '../interfaces/Env';
-
 const _capitalize = require('lodash/capitalize');
 
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import System from '../System';
 import DriverEnv from './DriverEnv';
-import EntityManagerBase from './EntityManagerBase';
-
-
-// TODO: remove
-type DriverClassType = new (props: EntityProps, env: DriverEnv) => DriverInstance;
-
-
-// TODO: в инстанс передавать driverEnv
+import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
 
 
 /**
  * Driver manager
  */
 export default class DriversManager extends EntityManagerBase<DriverInstance> {
-  protected readonly env: Env;
+  readonly env: DriverEnv;
 
   constructor(system: System) {
     super(system);
@@ -69,16 +60,16 @@ export default class DriversManager extends EntityManagerBase<DriverInstance> {
    * Set platform specific devs
    * @param devs - like {DeviClassName: DevClass}
    */
-  async $setDevs(devs: {[index: string]: DriverClassType}) {
+  async $setDevs(devs: {[index: string]: EntityClassType}) {
     // load list of definitions of drivers
     const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of Object.keys(devs)) {
-      const DriverClass: DriverClassType = devs[driverName];
+      const DriverClass: EntityClassType = devs[driverName];
       // if there is a definition for dev - use it or just use an empty props
       const props: EntityProps = (definitions[driverName] && definitions[driverName].props) || { id: driverName };
 
-      this.instances[driverName] = new DriverClass(props, this.driverEnv);
+      this.instances[driverName] = new DriverClass(props, this.env);
     }
 
     await this.initializeAll(Object.keys(devs));

@@ -7,7 +7,7 @@ interface BaseEntityInstance {
   init?: () => Promise<void>;
 }
 
-type EntityClassType = new (props: EntityProps, env: Env) => BaseEntityInstance;
+export type EntityClassType = new (props: EntityProps, env: Env) => BaseEntityInstance;
 
 
 export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance> {
