@@ -2,17 +2,18 @@
   "compilerOptions": {
     //"allowJs": true,
     //"checkJs": true,
-    "listEmittedFiles": true,
-    //"lib": ["ES5"],
-    "module": "commonjs",
+    //"listEmittedFiles": true,
+    "lib": ["ES2015"],
+    "module": "commonjs",  // commonjs
     "moduleResolution": "node",
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "noImplicitReturns": true,
     //"noUnusedLocals": true,
     //"outFile": "build/result.js",
     "outDir": "build",
     "preserveSymlinks": true,
     "removeComments": true,
+    //"sourceMap": true,
     // for jsons
     //"resolveJsonModule": true,
     "rootDir": "src",

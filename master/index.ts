@@ -15,7 +15,9 @@ suqidlet-build --config ./path-to-my-config
 
 async function init() {
   if (!yargs.argv.config) {
-    throw new Error(`You have to specify a "--config" param`);
+    console.error(`You have to specify a "--config" param`);
+
+    process.exit(3);
   }
 
   const resolvedPath = path.resolve(yargs.argv.config);
@@ -27,5 +29,10 @@ async function init() {
 
 init()
   .catch((err) => {
-    throw new Error(err);
+    // TODO: наверное лучше просто console.error
+    //throw new Error(err);
+
+    console.error(err.toString())
+
+    process.exit(2);
   });
