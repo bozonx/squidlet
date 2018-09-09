@@ -9,9 +9,16 @@ import buildHostsConfigs from '../buildSet/buildHostsConfigs';
 import generateMasterSet from '../buildSet/generateMasterSet';
 
 
-const tsProject = ts.createProject('tsconfig.json');
 
 
+// build system with platform
+// * slave_x86
+// * slave_rpi
+// * slave_esp8266
+// * slave_esp32
+gulp.task('dist', function () {
+
+});
 
 // slave
 // * receives hostId, master config
@@ -19,6 +26,9 @@ const tsProject = ts.createProject('tsconfig.json');
 // * generate minimum network config
 // * make build of platform specified in config and build network config into
 gulp.task('slave', function () {
+
+  // TODO: самая минимальная прошивка - сама система будет загружаться с мастера
+
   // return tsProject.src()
   //   .pipe(tsProject())
   //   .js
@@ -38,7 +48,29 @@ gulp.task('slave', function () {
 // * if passed "master" - будут дббавленны соответствующие сервисы
 // * it generates host configs set and put it to build
 gulp.task('solid', function () {
-  // return tsProject.src()
+  if (!yargs.argv.config) {
+    throw new Error(`You have to specify a "--config" params`);
+  }
+  if (!yargs.argv.name) {
+    throw new Error(`You have to specify a "--name" params`);
+  }
+
+  const hostId: string = yargs.argv.name || 'master';
+  const hostConfigFile: string = yargs.argv.config;
+
+  // TODO: загружить конфиг и получить параметр - platform
+  // TODO: сгенерировать js объект с конфигами хоста и entitites
+  // TODO: сбилдить запускательный файл
+  // TODO: склеить запускательный файл, систему(уже сбилженную), конфиги и файлы entities
+  // TODO: ??? как сбилдить файлы entitites??? они должны браться из файлов, но вставляться в структуру
+
+
+
+  const tsProject = ts.createProject('tsconfig.json');
+
+
+  // return tsProject.src()  // TODO: не билдить мастер
+
   //   .pipe(tsProject())
   //   .js
   //   .pipe(concat('all.js'))
@@ -59,9 +91,7 @@ gulp.task('solid', function () {
 // * pass it to platform build
 // * run host system as is, without building
 (gulp.task as any)('master', ['generate-hosts-files'], function () {
-  // if (!yargs.argv.config) {
-  //   throw new Error(`You have to specify a "--config" params`);
-  // }
+
 
   const configFile = yargs.argv.config;
   const masterSet = generateMasterSet(configFile);
