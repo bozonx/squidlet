@@ -3,6 +3,7 @@
     //"allowJs": true,
     //"checkJs": true,
     //"listEmittedFiles": true,
+    "experimentalDecorators": true,
     "lib": ["ES2015"],
     "module": "commonjs",  // commonjs
     "moduleResolution": "node",

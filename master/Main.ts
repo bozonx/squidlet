@@ -29,7 +29,7 @@ export default class Main {
   private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
-  constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
+  constructor(masterConfig: PreMasterConfig, masterConfigPath: string, buildMaster: boolean = false) {
     this.masterConfig = new MasterConfig(this, masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
@@ -38,6 +38,9 @@ export default class Main {
     this.hostsFilesSet = new HostsFilesSet(this);
     this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities, this.hostsConfigSet);
+
+    // TODO: не билдить мастер
+
   }
 
   async start() {

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     //"baseUrl": "src",
+    "experimentalDecorators": true,
     "lib": ["ES2015"],
     "module": "commonjs",
     "moduleResolution": "node",
