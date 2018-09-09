@@ -1,6 +1,9 @@
 import * as yargs from 'yargs';
 
 
+// TODO: review
+
+
 // TODO: может не host config а какой-то свой
 export type PlatformIndex = (hostConfig: {[index: string]: any}) => void;
 

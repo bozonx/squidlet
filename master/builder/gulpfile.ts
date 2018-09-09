@@ -5,7 +5,6 @@ import * as ts from 'gulp-typescript';
 import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
-import masterIndex from '../buildSet/masterIndex';
 import {loadYamlFile} from '../IO';
 import MasterConfig from '../MasterConfig';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
@@ -44,7 +43,8 @@ async function readConfig<T> (resolvedPath: string): Promise<T> {
 // * slave_esp8266
 // * slave_esp32
 gulp.task('dist', function () {
-
+  // TODO: сделать slave билд под каждую платформу
+  // TODO: интегрировать config set manager для слейва
 });
 
 
@@ -85,32 +85,6 @@ gulp.task('solid', async function () {
 
 });
 
-
-// master:
-// * receives master config
-// * generate all the host files
-// * generate master config set include parsed config, paths to entities and configs and platform config
-// * passes it to platform index file and runs host system as is, without building
-gulp.task('master', async function () {
-
-  // TODO: сбилдить систему чтобы рассылать ее потом слейвам
-
-  const resolvedPath: string = resolveConfigPath(yargs.argv.config);
-  const config: MasterConfig = await readConfig<MasterConfig>(resolvedPath);
-
-  await masterIndex(config);
-
-  // make config and entity files of hosts
-  await buildHostsConfigs(config);
-  // generate master config js object with paths of master host configs and entities files
-  const masterSet = await generateMasterSet(config);
-  const platformName: string = masterSet.platform;
-  const platformIndex: PlatformIndex = platforms[platformName];
-
-  // TODO: добавить config set manager
-
-  platformIndex(masterSet);
-});
 
 
 // // generates hosts files exclude master
