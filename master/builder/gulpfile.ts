@@ -7,8 +7,25 @@ import * as uglify from 'gulp-uglify';
 
 import buildHostsConfigs from '../buildSet/buildHostsConfigs';
 import generateMasterSet from '../buildSet/generateMasterSet';
+import masterIndex from '../buildSet/masterIndex';
+import slaveIndex from '../buildSet/slaveIndex';
+import solidIndex from '../buildSet/solidIndex';
+import {loadYamlFile} from '../IO';
+import MasterConfig from '../MasterConfig';
 
 
+
+async function readConfig<T> (pathToYamlFile?: string): Promise<T> {
+  if (!pathToYamlFile) {
+    console.error(`You have to specify a "--config" param`);
+
+    process.exit(3);
+  }
+
+  const resolvedPath = path.resolve(process.cwd(), (pathToYamlFile as string));
+
+  return await loadYamlFile(resolvedPath) as T;
+}
 
 
 // build system with platform
@@ -83,27 +100,14 @@ gulp.task('solid', function () {
 });
 
 
-// master:
-// * receives master config
-// * generate all the host files exclude master (these files will be sent to hosts)
-// * generate files paths and configs to js object in memory
-// * pass it to platform build
-// * run host system as is, without building
-(gulp.task as any)('master', ['generate-hosts-files'], function () {
+(gulp.task as any)('master', ['generate-hosts-files'], async function () {
+  const config: MasterConfig = await readConfig<MasterConfig>(yargs.argv.config);
 
-
-  const configFile = yargs.argv.config;
-  const masterSet = generateMasterSet(configFile);
-  // TODO: проверить
-  const platformName: string = masterSet.platform;
-
-  // TODO: pass it to platform build
-  // TODO: run master host as typescript without building
-
-
+  await masterIndex(config);
 });
 
 
+// generates hosts files exclude master
 gulp.task('generate-hosts-files', async function () {
   return buildHostsConfigs(yargs.argv.config);
 });

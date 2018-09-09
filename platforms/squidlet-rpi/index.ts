@@ -5,7 +5,7 @@ import I2cMasterDev from './dev/I2cMaster.dev';
 import FsDev from './dev/Fs.dev';
 
 
-async function init() {
+export default async function init() {
   const system = new System();
 
   // TODO: может вынести в отдельный файлы чтобы можно было подключать в своем проекте
@@ -19,9 +19,9 @@ async function init() {
   await system.start();
 }
 
-init()
-  .catch((err) => {
-    console.error(err.toString());
-
-    throw err;
-  });
+// init()
+//   .catch((err) => {
+//     console.error(err.toString());
+//
+//     throw err;
+//   });
