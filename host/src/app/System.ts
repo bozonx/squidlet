@@ -67,11 +67,15 @@ export default class System {
     delete this.initializationConfig;
   }
 
+  registerConfigSetManager() {
+    // TODO: !!!
+  }
+
   /**
    * Init user layer - device representeur, devices, device's drivers and services
    * @return {Promise<void>}
    */
-  async initApp(): Promise<void> {
+  private async initApp(): Promise<void> {
     await this.driversManager.initRegularDrivers();
     await this.devicesManager.init();
     this.devices.init();

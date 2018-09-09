@@ -11,6 +11,7 @@ import solidIndex from '../buildSet/solidIndex';
 import {loadYamlFile} from '../IO';
 import MasterConfig from '../MasterConfig';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
+import generateHostSet from '../buildSet/generateHostSet';
 
 
 function resolveConfigPath(pathToYamlFile?: string): string {
@@ -48,6 +49,9 @@ gulp.task('slave', function () {
 });
 
 
+// solid - build all in one file (system, host config, platform devs and config, entities files)
+// * it receives name of host(default is master), host config(includes platform name)
+// * it generates host configs set and put it to build
 gulp.task('solid', async function () {
 
   // TODO: сбилдить систему чтобы чтобы иметь последнюю версию
@@ -56,10 +60,20 @@ gulp.task('solid', async function () {
     throw new Error(`You have to specify a "--name" params`);
   }
 
+  const hostId: string = yargs.argv.name || 'master';
   const resolvedPath: string = resolveConfigPath(yargs.argv.config);
   const hostConfig: HostConfig = await readConfig<HostConfig>(resolvedPath);
+  const hostSet = generateHostSet(hostConfig);
+  const platformName: string = hostSet.platform;
 
-  await solidIndex(hostConfig);
+  // TODO: global.__HOST_CONFIG_SET
+  // TODO: сбилдить запускательный файл
+  // TODO: global.__HOST_CONFIG_SET_MANAGER
+  // TODO: global.__SYSTEM_CLASS
+
+  // TODO: склеить запускательный файл, систему(уже сбилженную), конфиги и файлы entities
+  // TODO: ??? как сбилдить файлы entitites??? они должны браться из файлов, но вставляться в структуру
+
 });
 
 
@@ -94,8 +108,8 @@ gulp.task('master', async function () {
 
 
 
+//  const tsProject = ts.createProject('tsconfig.json');
 // return tsProject.src()  // TODO: не билдить мастер
-
 //   .pipe(tsProject())
 //   .js
 //   .pipe(concat('all.js'))

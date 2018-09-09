@@ -24,5 +24,7 @@ export default async function (config: MasterConfig) {
   const platformName: string = masterSet.platform;
   const platformIndex: PlatformIndex = platforms[platformName];
 
+  // TODO: добавить config set manager
+
   platformIndex(masterSet);
 }
