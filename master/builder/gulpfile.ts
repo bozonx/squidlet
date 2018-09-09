@@ -14,16 +14,17 @@ import {loadYamlFile} from '../IO';
 import MasterConfig from '../MasterConfig';
 
 
-
-async function readConfig<T> (pathToYamlFile?: string): Promise<T> {
+function resolveConfigPath(pathToYamlFile?: string): string {
   if (!pathToYamlFile) {
     console.error(`You have to specify a "--config" param`);
 
     process.exit(3);
   }
 
-  const resolvedPath = path.resolve(process.cwd(), (pathToYamlFile as string));
+  return path.resolve(process.cwd(), (pathToYamlFile as string));
+}
 
+async function readConfig<T> (resolvedPath: string): Promise<T> {
   return await loadYamlFile(resolvedPath) as T;
 }
 
@@ -100,17 +101,18 @@ gulp.task('solid', function () {
 });
 
 
-(gulp.task as any)('master', ['generate-hosts-files'], async function () {
-  const config: MasterConfig = await readConfig<MasterConfig>(yargs.argv.config);
+gulp.task('master', async function () {
+  const resolvedPath: string = resolveConfigPath(yargs.argv.config);
+  const config: MasterConfig = await readConfig<MasterConfig>(resolvedPath);
 
   await masterIndex(config);
 });
 
 
-// generates hosts files exclude master
-gulp.task('generate-hosts-files', async function () {
-  return buildHostsConfigs(yargs.argv.config);
-});
+// // generates hosts files exclude master
+// gulp.task('generate-hosts-files', async function () {
+//   return buildHostsConfigs(yargs.argv.config);
+// });
 
 
 // const cmd = `ts-node ${path.resolve(__dirname, '../index.ts')} --config ${yargs.argv.config}`;

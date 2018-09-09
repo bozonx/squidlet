@@ -3,6 +3,7 @@ import generateMasterSet from './generateMasterSet';
 import x86 from '../../platforms/squidlet-x86';
 import rpi from '../../platforms/squidlet-rpi';
 import {PlatformIndex} from './_helper';
+import buildHostsConfigs from './buildHostsConfigs';
 
 
 const platforms: {[index: string]: PlatformIndex} = {
@@ -18,6 +19,10 @@ const platforms: {[index: string]: PlatformIndex} = {
 // * run host system as is, without building
 
 export default async function (config: MasterConfig) {
+  await buildHostsConfigs(config);
+
+  // TODO: конфиг должен валидироваться в том числе и имя платформы
+
   const masterSet = await generateMasterSet(config);
   // TODO: объединить master config с master config set
   const preparedConfig = {};
@@ -25,10 +30,8 @@ export default async function (config: MasterConfig) {
   const platformName: string = masterSet.platform;
   const platformIndex: PlatformIndex = platforms[platformName];
 
-  platformIndex(preparedConfig);
-
   // TODO: get platform config
-  // TODO: pass it to platform build
-  // TODO: run master (on platform) host as typescript without building
+
+  platformIndex(preparedConfig);
 
 }
