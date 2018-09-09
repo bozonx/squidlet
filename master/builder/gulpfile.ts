@@ -44,20 +44,7 @@ gulp.task('dist', function () {
 // * generate minimum network config
 // * make build of platform specified in config and build network config into
 gulp.task('slave', function () {
-
   // TODO: самая минимальная прошивка - сама система будет загружаться с мастера
-
-  // return tsProject.src()
-  //   .pipe(tsProject())
-  //   .js
-  //   .pipe(concat('all.js'))
-  //   //.pipe(uglify())
-  //   .pipe(gulp.dest('build'));
-
-  // return gulp.src('./build/main.js')
-  //   .pipe(concat('all.js'))
-  //   //.pipe(uglify())
-  //   .pipe(gulp.dest('build'));
 });
 
 

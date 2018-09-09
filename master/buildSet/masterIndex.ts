@@ -19,14 +19,11 @@ const platforms: {[index: string]: PlatformIndex} = {
 // * run host system as is, without building
 
 export default async function (config: MasterConfig) {
+  // make config and entity files of hosts
   await buildHostsConfigs(config);
-
-  // TODO: конфиг должен валидироваться в том числе и имя платформы
-
+  // generate master config js object with paths of master host configs and entities files
   const masterSet = await generateMasterSet(config);
-  // TODO: объединить master config с master config set
   const preparedConfig = {};
-  // TODO: проверить
   const platformName: string = masterSet.platform;
   const platformIndex: PlatformIndex = platforms[platformName];
 

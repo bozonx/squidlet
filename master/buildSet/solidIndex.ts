@@ -5,6 +5,10 @@ import HostConfig from '../../host/src/app/interfaces/HostConfig';
 
 
 export default async function (hostConfig: HostConfig) {
+
+  // TODO: конфиг должен валидироваться в том числе и имя платформы
+
+
 }
 
 // import {getPlatformIndex, PlatformIndex} from './_helper';

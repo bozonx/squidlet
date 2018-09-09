@@ -3,9 +3,7 @@ import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
 import {FilesPaths} from '../Entities';
 
 
-export default interface HostFilesSet {
-  config: HostConfig;
-
+export interface FilesSet {
   // files of entities like {devices: {deviceId: [...files]}, drivers, services}
   entitiesFiles: FilesPaths;
 
@@ -19,4 +17,9 @@ export default interface HostFilesSet {
   driversDefinitions: {[index: string]: EntityDefinition};
   // by service id
   servicesDefinitions: {[index: string]: EntityDefinition};
+}
+
+
+export default interface HostFilesSet extends FilesSet {
+  config: HostConfig;
 }
