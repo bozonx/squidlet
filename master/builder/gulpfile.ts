@@ -45,7 +45,6 @@ gulp.task('slave', function () {
 
 // solid - build all in one file (system, host config, platform devs and config, entities files)
 // * it receives name of host(default is master), host config(includes platform name)
-// * if passed "master" - будут дббавленны соответствующие сервисы
 // * it generates host configs set and put it to build
 gulp.task('solid', function () {
   if (!yargs.argv.config) {
