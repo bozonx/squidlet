@@ -1,5 +1,4 @@
 import MasterConfig from '../MasterConfig';
-import Platforms from '../interfaces/Platforms';
 import HostConfig, {HostConfigConfig} from '../../host/src/app/interfaces/HostConfig';
 import {FilesSet} from '../interfaces/HostFilesSet';
 
@@ -13,6 +12,9 @@ export interface MasterSet extends HostConfig {
 }
 
 
-export default function (config: MasterConfig): {[index: string]: any} {
+export default function (config: MasterConfig): MasterSet {
   // TODO: generate files paths and configs to js object in memory
+
+  // TODO: get platform config
+
 }

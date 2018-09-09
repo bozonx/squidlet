@@ -5,13 +5,12 @@ import * as ts from 'gulp-typescript';
 import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
-import buildHostsConfigs from '../buildSet/buildHostsConfigs';
-import generateMasterSet from '../buildSet/generateMasterSet';
 import masterIndex from '../buildSet/masterIndex';
 import slaveIndex from '../buildSet/slaveIndex';
 import solidIndex from '../buildSet/solidIndex';
 import {loadYamlFile} from '../IO';
 import MasterConfig from '../MasterConfig';
+import HostConfig from '../../host/src/app/interfaces/HostConfig';
 
 
 function resolveConfigPath(pathToYamlFile?: string): string {
@@ -38,6 +37,7 @@ gulp.task('dist', function () {
 
 });
 
+
 // slave
 // * receives hostId, master config
 // * get its own network config from master config
@@ -48,47 +48,25 @@ gulp.task('slave', function () {
 });
 
 
-// solid - build all in one file (system, host config, platform devs and config, entities files)
-// * it receives name of host(default is master), host config(includes platform name)
-// * it generates host configs set and put it to build
-gulp.task('solid', function () {
-  if (!yargs.argv.config) {
-    throw new Error(`You have to specify a "--config" params`);
-  }
+gulp.task('solid', async function () {
+
+  // TODO: сбилдить систему чтобы чтобы иметь последнюю версию
+
   if (!yargs.argv.name) {
     throw new Error(`You have to specify a "--name" params`);
   }
 
-  const hostId: string = yargs.argv.name || 'master';
-  const hostConfigFile: string = yargs.argv.config;
+  const resolvedPath: string = resolveConfigPath(yargs.argv.config);
+  const hostConfig: HostConfig = await readConfig<HostConfig>(resolvedPath);
 
-  // TODO: загружить конфиг и получить параметр - platform
-  // TODO: сгенерировать js объект с конфигами хоста и entitites
-  // TODO: сбилдить запускательный файл
-  // TODO: склеить запускательный файл, систему(уже сбилженную), конфиги и файлы entities
-  // TODO: ??? как сбилдить файлы entitites??? они должны браться из файлов, но вставляться в структуру
-
-
-
-  const tsProject = ts.createProject('tsconfig.json');
-
-
-  // return tsProject.src()  // TODO: не билдить мастер
-
-  //   .pipe(tsProject())
-  //   .js
-  //   .pipe(concat('all.js'))
-  //   //.pipe(uglify())
-  //   .pipe(gulp.dest('build'));
-
-  // return gulp.src('./build/main.js')
-  //   .pipe(concat('all.js'))
-  //   //.pipe(uglify())
-  //   .pipe(gulp.dest('build'));
+  await solidIndex(hostConfig);
 });
 
 
 gulp.task('master', async function () {
+
+  // TODO: сбилдить систему чтобы рассылать ее потом слейвам
+
   const resolvedPath: string = resolveConfigPath(yargs.argv.config);
   const config: MasterConfig = await readConfig<MasterConfig>(resolvedPath);
 
@@ -112,3 +90,19 @@ gulp.task('master', async function () {
 //   if (error) return cb(error); // return error
 //   cb(); // finished task
 // });
+
+
+
+
+// return tsProject.src()  // TODO: не билдить мастер
+
+//   .pipe(tsProject())
+//   .js
+//   .pipe(concat('all.js'))
+//   //.pipe(uglify())
+//   .pipe(gulp.dest('build'));
+
+// return gulp.src('./build/main.js')
+//   .pipe(concat('all.js'))
+//   //.pipe(uglify())
+//   .pipe(gulp.dest('build'));

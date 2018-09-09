@@ -13,22 +13,16 @@ const platforms: {[index: string]: PlatformIndex} = {
 
 // master:
 // * receives master config
-// * generate all the host files exclude master (these files will be sent to hosts)
-// * generate files paths and configs to js object in memory
-// * pass it to platform build
-// * run host system as is, without building
-
+// * generate all the host files
+// * generate master config set include parsed config, paths to entities and configs and platform config
+// * passes it to platform index file and runs host system as is, without building
 export default async function (config: MasterConfig) {
   // make config and entity files of hosts
   await buildHostsConfigs(config);
   // generate master config js object with paths of master host configs and entities files
   const masterSet = await generateMasterSet(config);
-  const preparedConfig = {};
   const platformName: string = masterSet.platform;
   const platformIndex: PlatformIndex = platforms[platformName];
 
-  // TODO: get platform config
-
-  platformIndex(preparedConfig);
-
+  platformIndex(masterSet);
 }
