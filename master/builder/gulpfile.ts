@@ -6,12 +6,21 @@ import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
 import masterIndex from '../buildSet/masterIndex';
-import slaveIndex from '../buildSet/slaveIndex';
-import solidIndex from '../buildSet/solidIndex';
 import {loadYamlFile} from '../IO';
 import MasterConfig from '../MasterConfig';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import generateHostSet from '../buildSet/generateHostSet';
+import buildHostsConfigs from '../buildSet/buildHostsConfigs';
+import generateMasterSet from '../buildSet/generateMasterSet';
+import {PlatformIndex} from '../buildSet/_helper';
+import x86 from '../../platforms/squidlet-x86';
+import rpi from '../../platforms/squidlet-rpi';
+
+
+const platforms: {[index: string]: PlatformIndex} = {
+  x86,
+  rpi,
+};
 
 
 function resolveConfigPath(pathToYamlFile?: string): string {
@@ -77,6 +86,11 @@ gulp.task('solid', async function () {
 });
 
 
+// master:
+// * receives master config
+// * generate all the host files
+// * generate master config set include parsed config, paths to entities and configs and platform config
+// * passes it to platform index file and runs host system as is, without building
 gulp.task('master', async function () {
 
   // TODO: сбилдить систему чтобы рассылать ее потом слейвам
@@ -85,6 +99,17 @@ gulp.task('master', async function () {
   const config: MasterConfig = await readConfig<MasterConfig>(resolvedPath);
 
   await masterIndex(config);
+
+  // make config and entity files of hosts
+  await buildHostsConfigs(config);
+  // generate master config js object with paths of master host configs and entities files
+  const masterSet = await generateMasterSet(config);
+  const platformName: string = masterSet.platform;
+  const platformIndex: PlatformIndex = platforms[platformName];
+
+  // TODO: добавить config set manager
+
+  platformIndex(masterSet);
 });
 
 
