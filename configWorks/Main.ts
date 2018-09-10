@@ -11,9 +11,9 @@ import Definitions from './Definitions';
 import HostsFilesSet from './HostsFilesSet';
 import systemPlugin from './systemPlugin';
 import * as Io from './IO';
-import systemConfig from './configs/systemConfig';
+import systemConfig from '../master/configs/systemConfig';
 import * as defaultLogger from './defaultLogger';
-import {resolveIndexFile} from './helpers';
+import {resolveIndexFile} from '../host/src/helpers';
 
 
 export default class Main {

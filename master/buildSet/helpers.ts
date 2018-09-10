@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import x86 from '../../platforms/squidlet-x86';
 import rpi from '../../platforms/squidlet-rpi';
-import {loadYamlFile} from '../IO';
+import {loadYamlFile} from '../../configWorks/IO';
 import System from '../../host/src/app/System';
 
 

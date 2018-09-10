@@ -1,4 +1,4 @@
-Register = require('../../master/Register').default
+Register = require('../../configWorks/Register').default
 
 
 describe 'master.Register', ->

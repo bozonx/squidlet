@@ -1,4 +1,4 @@
-HostsConfigsSet = require('../../master/HostsConfigsSet').default
+HostsConfigsSet = require('../../configWorks/HostsConfigsSet').default
 hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 

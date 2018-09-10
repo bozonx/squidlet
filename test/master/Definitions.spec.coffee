@@ -1,4 +1,4 @@
-Definitions = require('../../master/Definitions').default
+Definitions = require('../../configWorks/Definitions').default
 hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
 
 

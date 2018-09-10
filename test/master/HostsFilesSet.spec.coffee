@@ -1,4 +1,4 @@
-HostsFilesSet = require('../../master/HostsFilesSet').default
+HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
 describe 'master.HostsFilesSet', ->

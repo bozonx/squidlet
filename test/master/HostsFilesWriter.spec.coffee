@@ -1,4 +1,4 @@
-HostsFilesWriter = require('../../master/HostsFilesWriter').default
+HostsFilesWriter = require('../../configWorks/HostsFilesWriter').default
 
 
 describe 'master.HostsFilesWriter', ->

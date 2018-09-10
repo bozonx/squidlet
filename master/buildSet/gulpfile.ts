@@ -5,8 +5,8 @@ import * as ts from 'gulp-typescript';
 import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
-import {loadYamlFile} from '../IO';
-import MasterConfig from '../MasterConfig';
+import {loadYamlFile} from '../../configWorks/IO';
+import MasterConfig from '../../configWorks/MasterConfig';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import generateHostSet from './generateHostSet';
 import buildHostsConfigs from './buildHostsConfigs';

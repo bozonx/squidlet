@@ -1,6 +1,6 @@
 import * as yargs from 'yargs';
 
-import MasterConfig from '../MasterConfig';
+import MasterConfig from '../../configWorks/MasterConfig';
 import generateMasterSet from './generateMasterSet';
 import {getPlatformSystem, readConfig, resolveConfigPath} from './helpers';
 import buildHostsConfigs from './buildHostsConfigs';

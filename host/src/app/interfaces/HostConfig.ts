@@ -1,4 +1,4 @@
-import Platforms from '../../../../master/interfaces/Platforms';
+import Platforms from '../../../../configWorks/interfaces/Platforms';
 
 
 export interface HostConfigConfig {

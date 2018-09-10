@@ -1,6 +1,6 @@
-import MasterConfig from '../MasterConfig';
+import MasterConfig from '../../configWorks/MasterConfig';
 import HostConfig, {HostConfigConfig} from '../../host/src/app/interfaces/HostConfig';
-import {FilesSet} from '../interfaces/HostFilesSet';
+import {FilesSet} from '../../configWorks/interfaces/HostFilesSet';
 
 
 interface MasterSetConfig extends HostConfigConfig {

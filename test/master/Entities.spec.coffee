@@ -1,4 +1,4 @@
-Entities = require('../../master/Entities').default
+Entities = require('../../configWorks/Entities').default
 
 
 describe 'master.Entities', ->

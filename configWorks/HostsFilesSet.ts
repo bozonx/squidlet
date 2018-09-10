@@ -5,7 +5,7 @@ import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, FilesPaths, ManifestsTypePluralName} from './Entities';
 import HostFilesSet from './interfaces/HostFilesSet';
-import {sortByIncludeInList} from './helpers';
+import {sortByIncludeInList} from '../host/src/helpers';
 
 
 export default class HostsFilesSet {

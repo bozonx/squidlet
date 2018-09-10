@@ -1,9 +1,9 @@
 import * as path from 'path';
 
-import Main from '../Main';
-import { loadYamlFile } from '../IO';
-import MasterConfig from '../MasterConfig';
-import HostsFilesWriter from '../HostsFilesWriter';
+import Main from '../../configWorks/Main';
+import { loadYamlFile } from '../../configWorks/IO';
+import MasterConfig from '../../configWorks/MasterConfig';
+import HostsFilesWriter from '../../configWorks/HostsFilesWriter';
 
 
 // TODO: сбилдить все файлы хостов
