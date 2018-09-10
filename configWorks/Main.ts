@@ -14,6 +14,7 @@ import * as Io from './IO';
 import systemConfig from './configs/systemConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
+import HostsFilesWriter from './HostsFilesWriter';
 
 
 export default class Main {
@@ -23,6 +24,7 @@ export default class Main {
   readonly hostsConfigSet: HostsConfigsSet;
   readonly definitions: Definitions;
   readonly hostsFilesSet: HostsFilesSet;
+  readonly hostsFilesWriter: HostsFilesWriter;
   readonly log = defaultLogger;
   readonly io = Io;
   private readonly pluginEnv: PluginEnv;
@@ -35,6 +37,7 @@ export default class Main {
     this.hostsConfigSet = new HostsConfigsSet(this);
     this.definitions = new Definitions(this);
     this.hostsFilesSet = new HostsFilesSet(this);
+    this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities, this.hostsConfigSet);
   }
 
@@ -56,6 +59,18 @@ export default class Main {
 
     this.log.info(`Collecting files set`);
     this.hostsFilesSet.collect();
+  }
+
+  /**
+   * Write all the hosts and entities files to storage
+   */
+  async writeAll() {
+    this.log.info(`Write hosts files`);
+    await this.hostsFilesWriter.writeToStorage();
+  }
+
+  async generateMasterSet() {
+    // TODO: !!!!
   }
 
 

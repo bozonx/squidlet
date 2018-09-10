@@ -1,11 +1,10 @@
 import * as yargs from 'yargs';
 
 import MasterConfig from '../configWorks/MasterConfig';
-import generateMasterSet from './generateMasterSet';
 import {getPlatformSystem, readConfig, resolveConfigPath} from '../host/src/helpers';
-import buildHostsConfigs from './buildHostsConfigs';
 import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
+import Main from '../configWorks/Main';
 
 
 // master:
@@ -14,13 +13,32 @@ import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 // * generate master config set include parsed config, paths to entities and configs and platform config
 // * passes it to platform index file and runs host system as is, without building
 export default async function () {
-  const resolvedPath: string = resolveConfigPath(yargs.argv.config);
-  const config: MasterConfig = await readConfig<MasterConfig>(resolvedPath);
+  const debug: boolean = Boolean(yargs.argv.debug);
+  const resolvedConfigPath: string = resolveConfigPath(yargs.argv.config);
+  const config: MasterConfig = await readConfig<MasterConfig>(resolvedConfigPath);
+  const configWorks: Main = new Main(config, resolvedConfigPath);
 
-  console.info(`===> Making configs and entities files of all the hosts`);
-  await buildHostsConfigs(config);
+  console.info(`===> Collecting configs and entities files of all the hosts`);
+
+  try {
+    await configWorks.collect();
+  }
+  catch (err) {
+    if (debug) {
+      throw err;
+    }
+    else {
+      console.error(err.toString());
+
+      process.exit(3);
+    }
+  }
+
+  // write all the hosts and entities files
+  await configWorks.writeAll();
+
   // generate master config js object with paths of master host configs and entities files
-  const masterSet = await generateMasterSet(config);
+  const masterSet = await configWorks.generateMasterSet(config);
   const platformName: string = masterSet.platform;
   const hostSystem: System = getPlatformSystem(platformName);
   const configSetManager = new ConfigSetMaster(masterSet);

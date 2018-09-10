@@ -10,16 +10,19 @@ import HostsFilesWriter from '../configWorks/HostsFilesWriter';
 // TODO: запусить запись всех файлов на диск
 
 
-export default async function (config: MasterConfig, buildMaster: boolean = false) {
-  const configurator = new Main(config, resolvedPath, buildMaster);
+export default async function (config: MasterConfig, resolvedConfigPath: string, debug?: boolean) {
+  const configWorks: Main = new Main(config, resolvedConfigPath);
 
   try {
-    await configurator.start();
+    await configWorks.collect();
   }
   catch (err) {
+
+    // TODO: если degug - то делать throw
+
     console.error(err.toString());
 
-    process.exit(2);
+    process.exit(3);
   }
 
   const resolvedPath = path.resolve(yargs.argv.config);
@@ -28,9 +31,7 @@ export default async function (config: MasterConfig, buildMaster: boolean = fals
 
   await configurator.start();
 
-  this.hostsFilesWriter = new HostsFilesWriter(this);
-  this.log.info(`Write hosts files`);
-  await this.hostsFilesWriter.writeToStorage();
+
 
   this.log.info(`Done!`);
 }
