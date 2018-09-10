@@ -23,7 +23,7 @@ describe 'app.DevicesManager', ->
 
     @system = {
       initCfg: initializationConfig()
-      host: {
+      configSet: {
         loadEntityClass: => @device
         loadConfig: => @definitions
       }

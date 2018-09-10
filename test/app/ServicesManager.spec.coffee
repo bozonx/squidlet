@@ -31,16 +31,16 @@ describe.only 'app.ServicesManager', ->
 
     @system = {
       initCfg: initializationConfig()
-      host: {
+      configSet: {
         loadEntityClass: => @service
         loadConfig: sinon.stub()
       }
     }
     @servicesManager = new ServicesManager(@system)
-    @system.host.loadConfig.onCall(1).returns(@definitions)
+    @system.configSet.loadConfig.onCall(1).returns(@definitions)
 
   it 'initSystemServices() and getDriver', ->
-    @system.host.loadConfig.onCall(0).returns([ 'systemService' ])
+    @system.configSet.loadConfig.onCall(0).returns([ 'systemService' ])
 
     await @servicesManager.initSystemServices()
 
@@ -48,7 +48,7 @@ describe.only 'app.ServicesManager', ->
     sinon.assert.calledOnce(@servicesManager.getService('systemService').init)
 
   it 'initRegularServices() and getDriver', ->
-    @system.host.loadConfig.onCall(0).returns([ 'customService' ])
+    @system.configSet.loadConfig.onCall(0).returns([ 'customService' ])
 
     await @servicesManager.initRegularServices()
 

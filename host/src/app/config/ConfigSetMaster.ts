@@ -17,7 +17,7 @@ export default class ConfigSetMaster implements ConfigSetManager {
     this._system = system;
   }
 
-  async loadConfig(configName: string): Promise<any> {
+  async loadConfig<T>(configFileName: string): Promise<T> {
 
   }
 

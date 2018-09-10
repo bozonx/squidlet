@@ -39,7 +39,7 @@ describe 'app.DriversManager', ->
 
     @system = {
       initCfg: initializationConfig()
-      host: {
+      configSet: {
         loadEntityClass: => @driver
       }
     }
@@ -47,7 +47,7 @@ describe 'app.DriversManager', ->
     @driversManager.loadDriversDefinitions = => @definitions
 
   it 'initSystemDrivers() and getDriver', ->
-    @system.host.loadConfig = => [ 'System.driver' ];
+    @system.configSet.loadConfig = => [ 'System.driver' ];
 
     await @driversManager.initSystemDrivers()
 
@@ -55,7 +55,7 @@ describe 'app.DriversManager', ->
     sinon.assert.calledOnce(@driversManager.getDriver('System.driver').init)
 
   it 'initRegularDrivers() and getDriver', ->
-    @system.host.loadConfig = => [ 'Regular.driver' ];
+    @system.configSet.loadConfig = => [ 'Regular.driver' ];
 
     await @driversManager.initRegularDrivers()
 
