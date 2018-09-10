@@ -12,7 +12,7 @@
     "dist": "gulp dist",
     "slave": "gulp slave",
     "solid": "gulp solid",
-    "master": "ts-node ./master",
+    "master": "ts-node ./master/buildSet/masterIndex.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },

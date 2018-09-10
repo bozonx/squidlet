@@ -1,9 +1,9 @@
 import * as yargs from 'yargs';
 
-import MasterConfig from './MasterConfig';
-import generateMasterSet from './buildSet/generateMasterSet';
-import {getPlatformIndex, PlatformIndex, readConfig, resolveConfigPath} from './buildSet/helpers';
-import buildHostsConfigs from './buildSet/buildHostsConfigs';
+import MasterConfig from '../MasterConfig';
+import generateMasterSet from './generateMasterSet';
+import {getPlatformIndex, PlatformIndex, readConfig, resolveConfigPath} from './helpers';
+import buildHostsConfigs from './buildHostsConfigs';
 
 
 // master:
