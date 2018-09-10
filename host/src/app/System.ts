@@ -75,6 +75,7 @@ export default class System {
 
   registerConfigSetManager(configSetManager: ConfigSetManager) {
     this.configSetManager = configSetManager;
+    this.configSetManager.init(this);
   }
 
   /**
