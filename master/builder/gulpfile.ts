@@ -11,30 +11,10 @@ import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import generateHostSet from '../buildSet/generateHostSet';
 import buildHostsConfigs from '../buildSet/buildHostsConfigs';
 import generateMasterSet from '../buildSet/generateMasterSet';
-import {PlatformIndex} from '../buildSet/_helper';
+import {PlatformIndex, readConfig, resolveConfigPath} from '../buildSet/helpers';
 import x86 from '../../platforms/squidlet-x86';
 import rpi from '../../platforms/squidlet-rpi';
 
-
-const platforms: {[index: string]: PlatformIndex} = {
-  x86,
-  rpi,
-};
-
-
-function resolveConfigPath(pathToYamlFile?: string): string {
-  if (!pathToYamlFile) {
-    console.error(`You have to specify a "--config" param`);
-
-    process.exit(3);
-  }
-
-  return path.resolve(process.cwd(), (pathToYamlFile as string));
-}
-
-async function readConfig<T> (resolvedPath: string): Promise<T> {
-  return await loadYamlFile(resolvedPath) as T;
-}
 
 
 // build system with platform
