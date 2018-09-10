@@ -12,6 +12,7 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
+import ConfigSetManager from './interfaces/ConfigSetManager';
 
 
 export default class System {
@@ -24,11 +25,16 @@ export default class System {
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
+  private configSetManager?: ConfigSetManager;
   // only for initialization time - it will be deleted after it
   private initializationConfig?: InitializationConfig;
 
   get initCfg(): InitializationConfig {
     return this.initializationConfig as InitializationConfig;
+  }
+
+  get configSet(): ConfigSetManager {
+    return this.configSetManager as ConfigSetManager;
   }
 
   constructor() {
@@ -67,8 +73,8 @@ export default class System {
     delete this.initializationConfig;
   }
 
-  registerConfigSetManager() {
-    // TODO: !!!
+  registerConfigSetManager(configSetManager: ConfigSetManager) {
+    this.configSetManager = configSetManager;
   }
 
   /**

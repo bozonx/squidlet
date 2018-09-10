@@ -3,18 +3,20 @@ import * as path from 'path';
 import x86 from '../../platforms/squidlet-x86';
 import rpi from '../../platforms/squidlet-rpi';
 import {loadYamlFile} from '../IO';
+import System from '../../host/src/app/System';
 
+
+// TODO: может не host config а какой-то свой
+export type PlatformIndex = (hostConfig: {[index: string]: any}) => System;
 
 export const platforms: {[index: string]: PlatformIndex} = {
   x86,
   rpi,
 };
 
-// TODO: может не host config а какой-то свой
-export type PlatformIndex = (hostConfig: {[index: string]: any}) => void;
 
 
-export function getPlatformIndex(platformName: string): PlatformIndex {
+export function getPlatformSystem(platformName: string): System {
   if (!platforms[platformName]) {
     console.error(`You have to specify a "platform" params`);
 

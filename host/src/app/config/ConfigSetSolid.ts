@@ -1,6 +1,6 @@
-import ConfigSet from '../interfaces/ConfigSet';
+import ConfigSetManager from '../interfaces/ConfigSetManager';
 
 
-export default class ConfigSetSolid implements ConfigSet {
+export default class ConfigSetSolid implements ConfigSetManager {
 
 }

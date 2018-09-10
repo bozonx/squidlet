@@ -1,6 +1,3 @@
-// index file of slave build
-
-
 async function index () {
   const updaterConfig = global.__UPDATER_CONFIG;
   const UpdaterClass = global.__UPDATER_CLASS;

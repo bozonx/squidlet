@@ -1,6 +1,8 @@
-import ConfigSet from '../interfaces/ConfigSet';
+import ConfigSetManager from '../interfaces/ConfigSetManager';
 
 
-export default class ConfigSetMaster implements ConfigSet {
-  
+export default class ConfigSetMaster implements ConfigSetManager {
+  constructor(masterSet) {
+
+  }
 }

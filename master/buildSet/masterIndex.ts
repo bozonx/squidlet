@@ -2,8 +2,10 @@ import * as yargs from 'yargs';
 
 import MasterConfig from '../MasterConfig';
 import generateMasterSet from './generateMasterSet';
-import {getPlatformIndex, PlatformIndex, readConfig, resolveConfigPath} from './helpers';
+import {getPlatformSystem, readConfig, resolveConfigPath} from './helpers';
 import buildHostsConfigs from './buildHostsConfigs';
+import System from '../../host/src/app/System';
+import ConfigSetMaster from '../../host/src/app/config/ConfigSetMaster';
 
 
 // master:
@@ -20,9 +22,11 @@ export default async function () {
   // generate master config js object with paths of master host configs and entities files
   const masterSet = await generateMasterSet(config);
   const platformName: string = masterSet.platform;
-  const platformIndex: PlatformIndex = getPlatformIndex(platformName);
+  const hostSystem: System = getPlatformSystem(platformName);
 
-  // TODO: добавить config set manager
+  const configSetManager = new ConfigSetMaster(masterSet);
 
-  platformIndex(masterSet);
+  hostSystem.registerConfigSetManager(configSetManager);
+  // start master host system
+  hostSystem.start();
 }
