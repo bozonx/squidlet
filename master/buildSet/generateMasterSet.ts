@@ -8,8 +8,12 @@ interface MasterSetConfig extends HostConfigConfig {
 }
 
 export interface MasterSet extends HostConfig {
+  // TODO: наверное это просто ссылка на файл который потом загрузится по запросу уже в host system
   config: MasterSetConfig;
 }
+
+
+// TODO: список путей на сбилженные конфиги и на original enitity main and other files мастера
 
 
 export default function (config: MasterConfig): MasterSet {

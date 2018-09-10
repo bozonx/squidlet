@@ -9,7 +9,6 @@ import MasterConfig from './MasterConfig';
 import HostsConfigsSet from './HostsConfigsSet';
 import Definitions from './Definitions';
 import HostsFilesSet from './HostsFilesSet';
-import HostsFilesWriter from './HostsFilesWriter';
 import systemPlugin from './systemPlugin';
 import * as Io from './IO';
 import systemConfig from './configs/systemConfig';
@@ -26,24 +25,20 @@ export default class Main {
   readonly hostsFilesSet: HostsFilesSet;
   readonly log = defaultLogger;
   readonly io = Io;
-  private readonly hostsFilesWriter: HostsFilesWriter;
   private readonly pluginEnv: PluginEnv;
 
-  constructor(masterConfig: PreMasterConfig, masterConfigPath: string, buildMaster: boolean = false) {
+
+  constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.masterConfig = new MasterConfig(this, masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.hostsConfigSet = new HostsConfigsSet(this);
     this.definitions = new Definitions(this);
     this.hostsFilesSet = new HostsFilesSet(this);
-    this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities, this.hostsConfigSet);
-
-    // TODO: не билдить мастер
-
   }
 
-  async start() {
+  async collect() {
     this.log.info(`Registering plugins, devices, drivers and services`);
     await this.registering();
 
@@ -61,10 +56,6 @@ export default class Main {
 
     this.log.info(`Collecting files set`);
     this.hostsFilesSet.collect();
-    this.log.info(`Write hosts files`);
-    await this.hostsFilesWriter.writeToStorage();
-
-    this.log.info(`Done!`);
   }
 
 

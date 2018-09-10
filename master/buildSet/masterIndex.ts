@@ -17,15 +17,14 @@ export default async function () {
   const resolvedPath: string = resolveConfigPath(yargs.argv.config);
   const config: MasterConfig = await readConfig<MasterConfig>(resolvedPath);
 
-  // make config and entity files of hosts
+  console.info(`===> Making configs and entities files of all the hosts`);
   await buildHostsConfigs(config);
   // generate master config js object with paths of master host configs and entities files
   const masterSet = await generateMasterSet(config);
   const platformName: string = masterSet.platform;
   const hostSystem: System = getPlatformSystem(platformName);
-
   const configSetManager = new ConfigSetMaster(masterSet);
-
+  // register config set manager
   hostSystem.$registerConfigSetManager(configSetManager);
   // start master host system
   hostSystem.start();

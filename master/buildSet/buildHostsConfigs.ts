@@ -3,6 +3,11 @@ import * as path from 'path';
 import Main from '../Main';
 import { loadYamlFile } from '../IO';
 import MasterConfig from '../MasterConfig';
+import HostsFilesWriter from '../HostsFilesWriter';
+
+
+// TODO: сбилдить все файлы хостов
+// TODO: запусить запись всех файлов на диск
 
 
 export default async function (config: MasterConfig, buildMaster: boolean = false) {
@@ -17,6 +22,17 @@ export default async function (config: MasterConfig, buildMaster: boolean = fals
     process.exit(2);
   }
 
+  const resolvedPath = path.resolve(yargs.argv.config);
+  const configJs = await loadYamlFile(resolvedPath);
+  const configurator = new Main(configJs, resolvedPath);
+
+  await configurator.start();
+
+  this.hostsFilesWriter = new HostsFilesWriter(this);
+  this.log.info(`Write hosts files`);
+  await this.hostsFilesWriter.writeToStorage();
+
+  this.log.info(`Done!`);
 }
 
 
