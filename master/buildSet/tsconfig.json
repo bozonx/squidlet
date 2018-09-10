@@ -11,7 +11,7 @@
     "noImplicitReturns": true,
     //"noUnusedLocals": true,
     //"outFile": "build/result.js",
-    "outDir": "../builder/build",
+    "outDir": "./builder/build",
     "preserveSymlinks": true,
     "removeComments": true,
     //"sourceMap": true,
@@ -22,7 +22,7 @@
     "target": "es5"
   },
   "exclude": [
-    "../builder/build", "node_modules"]
+    "./builder/build", "node_modules"]
 //  "include": [
 //    "src/**/*"
 //  ]
