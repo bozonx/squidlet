@@ -6,8 +6,7 @@ import {loadYamlFile} from '../configWorks/IO';
 import System from '../host/src/app/System';
 
 
-// TODO: может не host config а какой-то свой
-export type PlatformIndex = (hostConfig: {[index: string]: any}) => System;
+export type PlatformIndex = () => System;
 
 export const platforms: {[index: string]: PlatformIndex} = {
   x86,
@@ -15,22 +14,17 @@ export const platforms: {[index: string]: PlatformIndex} = {
 };
 
 
-
 export function getPlatformSystem(platformName: string): System {
   if (!platforms[platformName]) {
-    console.error(`You have to specify a "platform" params`);
-
-    process.exit(3);
+    throw new Error(`Platform "${platformName}" haven't been found`);
   }
 
-  return platforms[platformName];
+  return platforms[platformName]();
 }
 
 export function resolveConfigPath(pathToYamlFile?: string): string {
   if (!pathToYamlFile) {
-    console.error(`You have to specify a "--config" param`);
-
-    process.exit(3);
+    throw new Error(`You have to specify a "--config" param`);
   }
 
   return path.resolve(process.cwd(), (pathToYamlFile as string));

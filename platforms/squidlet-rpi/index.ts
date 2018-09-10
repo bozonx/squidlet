@@ -1,12 +1,11 @@
 import System from '../../host/src/app/System';
-
 import GpioDev from './dev/Gpio.dev';
 import I2cMasterDev from './dev/I2cMaster.dev';
 import FsDev from './dev/Fs.dev';
 
 
-export default async function init() {
-  const system = new System();
+export default async function (): Promise<System> {
+  const system: System = new System();
 
   // TODO: может вынести в отдельный файлы чтобы можно было подключать в своем проекте
 
@@ -16,12 +15,5 @@ export default async function init() {
     'Fs.dev': FsDev,
   });
 
-  await system.start();
+  return system;
 }
-
-// init()
-//   .catch((err) => {
-//     console.error(err.toString());
-//
-//     throw err;
-//   });
