@@ -8,12 +8,12 @@ import * as uglify from 'gulp-uglify';
 import {loadYamlFile} from '../IO';
 import MasterConfig from '../MasterConfig';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
-import generateHostSet from '../buildSet/generateHostSet';
-import buildHostsConfigs from '../buildSet/buildHostsConfigs';
-import generateMasterSet from '../buildSet/generateMasterSet';
-import {PlatformIndex, readConfig, resolveConfigPath} from '../buildSet/helpers';
-import x86 from '../../platforms/squidlet-x86';
-import rpi from '../../platforms/squidlet-rpi';
+import generateHostSet from './generateHostSet';
+import buildHostsConfigs from './buildHostsConfigs';
+import generateMasterSet from './generateMasterSet';
+import {PlatformIndex, readConfig, resolveConfigPath} from './helpers';
+import x86 from '../../platforms/squidlet-x86/index';
+import rpi from '../../platforms/squidlet-rpi/index';
 
 
 
