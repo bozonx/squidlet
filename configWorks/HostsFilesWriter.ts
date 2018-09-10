@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import Main from './Main';
 import HostFilesSet from './interfaces/HostFilesSet';
-import systemConfig from '../master/configs/systemConfig';
+import systemConfig from './configs/systemConfig';
 
 
 export default class HostsFilesWriter {

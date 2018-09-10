@@ -5,7 +5,7 @@ import Main from './Main';
 import Platforms from './interfaces/Platforms';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
-import systemConfig from '../master/configs/systemConfig';
+import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
 
 

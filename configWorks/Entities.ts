@@ -8,7 +8,7 @@ import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
-import systemConfig from '../master/configs/systemConfig';
+import systemConfig from './configs/systemConfig';
 
 
 export type ManifestsTypeName = 'device' | 'driver' | 'service';

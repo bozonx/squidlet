@@ -1,4 +1,4 @@
-import HostConfig from '../../host/src/app/interfaces/HostConfig';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 
 
 // TODO: задать тип

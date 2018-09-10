@@ -5,15 +5,15 @@ import * as ts from 'gulp-typescript';
 import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
-import {loadYamlFile} from '../../configWorks/IO';
-import MasterConfig from '../../configWorks/MasterConfig';
-import HostConfig from '../../host/src/app/interfaces/HostConfig';
+import {loadYamlFile} from '../configWorks/IO';
+import MasterConfig from '../configWorks/MasterConfig';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 import generateHostSet from './generateHostSet';
 import buildHostsConfigs from './buildHostsConfigs';
 import generateMasterSet from './generateMasterSet';
-import {PlatformIndex, readConfig, resolveConfigPath} from './helpers';
-import x86 from '../../platforms/squidlet-x86/index';
-import rpi from '../../platforms/squidlet-rpi/index';
+import {PlatformIndex, readConfig, resolveConfigPath} from '../host/src/helpers';
+import x86 from '../platforms/squidlet-x86/index';
+import rpi from '../platforms/squidlet-rpi/index';
 
 
 

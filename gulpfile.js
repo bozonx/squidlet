@@ -1,2 +1,2 @@
 require('ts-node/register');
-require('./master/buildSet/gulpfile.ts');
+require('./buildSet/gulpfile.ts');

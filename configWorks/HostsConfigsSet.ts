@@ -4,7 +4,7 @@ const _cloneDeep = require('lodash/cloneDeep');
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import Main from './Main';
-import hostDefaultConfig from '../master/configs/hostDefaultConfig';
+import hostDefaultConfig from './configs/hostDefaultConfig';
 
 
 /**

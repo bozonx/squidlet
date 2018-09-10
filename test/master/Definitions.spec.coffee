@@ -1,5 +1,5 @@
 Definitions = require('../../configWorks/Definitions').default
-hostDefaultConfig = require('../../master/configs/hostDefaultConfig').default
+hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').default
 
 
 describe 'master.Definitions', ->

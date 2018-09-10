@@ -10,7 +10,7 @@ import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
-import systemConfig from '../master/configs/systemConfig';
+import systemConfig from './configs/systemConfig';
 import {AllManifests} from './Entities';
 
 
