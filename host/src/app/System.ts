@@ -13,6 +13,7 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
 import ConfigSetManager from './interfaces/ConfigSetManager';
+import {EntityClassType} from './entities/EntityManagerBase';
 
 
 export default class System {
@@ -73,9 +74,13 @@ export default class System {
     delete this.initializationConfig;
   }
 
-  registerConfigSetManager(configSetManager: ConfigSetManager) {
+  $registerConfigSetManager(configSetManager: ConfigSetManager) {
     this.configSetManager = configSetManager;
     this.configSetManager.init(this);
+  }
+
+  async $registerDevs(devs: {[index: string]: EntityClassType}) {
+    await this.driversManager.$registerDevs(devs);
   }
 
   /**

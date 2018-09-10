@@ -26,7 +26,7 @@ export default async function () {
 
   const configSetManager = new ConfigSetMaster(masterSet);
 
-  hostSystem.registerConfigSetManager(configSetManager);
+  hostSystem.$registerConfigSetManager(configSetManager);
   // start master host system
   hostSystem.start();
 }

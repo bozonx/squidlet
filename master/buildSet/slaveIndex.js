@@ -15,7 +15,7 @@ async function index () {
   const system = new SystemClass();
   //const configSetManager = new ConfigSetManagerClass();
 
-  //system.registerConfigSetManager(configSetManager);
+  //system.$registerConfigSetManager(configSetManager);
 
   system.start();
 }

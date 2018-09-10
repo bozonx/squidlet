@@ -10,7 +10,7 @@ export default async function init() {
 
   // TODO: может вынести в отдельный файлы чтобы можно было подключать в своем проекте
 
-  await system.driversManager.$setDevs({
+  await system.$registerDevs({
     'Gpio.dev': GpioDev,
     'I2cMaster.dev': I2cMasterDev,
     'Fs.dev': FsDev,

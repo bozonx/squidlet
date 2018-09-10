@@ -60,7 +60,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance> {
    * Set platform specific devs
    * @param devs - like {DeviClassName: DevClass}
    */
-  async $setDevs(devs: {[index: string]: EntityClassType}) {
+  async $registerDevs(devs: {[index: string]: EntityClassType}) {
     // load list of definitions of drivers
     const definitions = await this.loadDriversDefinitions();
 
