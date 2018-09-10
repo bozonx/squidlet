@@ -9,8 +9,6 @@ import {loadYamlFile} from '../configWorks/IO';
 import MasterConfig from '../configWorks/MasterConfig';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import generateHostSet from './generateHostSet';
-import buildHostsConfigs from './buildHostsConfigs';
-import generateMasterSet from './generateMasterSet';
 import {PlatformIndex, readConfig, resolveConfigPath} from '../host/src/helpers';
 import x86 from '../platforms/squidlet-x86/index';
 import rpi from '../platforms/squidlet-rpi/index';

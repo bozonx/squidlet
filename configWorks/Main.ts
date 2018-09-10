@@ -69,8 +69,15 @@ export default class Main {
     await this.hostsFilesWriter.writeToStorage();
   }
 
-  async generateMasterSet() {
+  async generateMasterSet(): {[index: string]: any} {
     // TODO: !!!!
+  }
+
+  async generateHostSet(): {[index: string]: any} {
+    // TODO: задать тип
+    // TODO: !!!!
+    // TODO: конфиг должен валидироваться в том числе и имя платформы
+    // TODO: сгенерировать js объект с конфигами хоста и entitites
   }
 
 

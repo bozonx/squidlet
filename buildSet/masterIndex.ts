@@ -1,10 +1,13 @@
 import * as yargs from 'yargs';
 
 import MasterConfig from '../configWorks/MasterConfig';
-import {getPlatformSystem, readConfig, resolveConfigPath} from '../host/src/helpers';
+import {getPlatformSystem, readConfig, resolveConfigPath} from './helpers';
 import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
+
+
+const debug: boolean = Boolean(yargs.argv.debug);
 
 
 // master:
@@ -12,28 +15,13 @@ import Main from '../configWorks/Main';
 // * generate all the host files
 // * generate master config set include parsed config, paths to entities and configs and platform config
 // * passes it to platform index file and runs host system as is, without building
-export default async function () {
-  const debug: boolean = Boolean(yargs.argv.debug);
+async function init () {
   const resolvedConfigPath: string = resolveConfigPath(yargs.argv.config);
   const config: MasterConfig = await readConfig<MasterConfig>(resolvedConfigPath);
   const configWorks: Main = new Main(config, resolvedConfigPath);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
-
-  try {
-    await configWorks.collect();
-  }
-  catch (err) {
-    if (debug) {
-      throw err;
-    }
-    else {
-      console.error(err.toString());
-
-      process.exit(3);
-    }
-  }
-
+  await configWorks.collect();
   // write all the hosts and entities files
   await configWorks.writeAll();
 
@@ -45,5 +33,17 @@ export default async function () {
   // register config set manager
   hostSystem.$registerConfigSetManager(configSetManager);
   // start master host system
-  hostSystem.start();
+  await hostSystem.start();
 }
+
+init()
+  .catch((err) => {
+    if (debug) {
+      throw err;
+    }
+    else {
+      console.error(err.toString());
+
+      process.exit(3);
+    }
+  });
