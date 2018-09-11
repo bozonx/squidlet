@@ -1,10 +1,12 @@
+import HostConfig from '../host/src/app/interfaces/HostConfig';
+
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
 
 import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, FilesPaths, ManifestsTypePluralName} from './Entities';
-import HostFilesSet from './interfaces/HostFilesSet';
+import HostFilesSet, {DefinitionsSet} from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
 
@@ -21,18 +23,49 @@ export default class HostsFilesSet {
     return this.files;
   }
 
-  /**
-   * Generate file set for each host
-   */
-  collect() {
-    const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
+  async generateMasterSet(): Promise<HostConfig> {
+    const masterHostConfig = this.main.getHostConfig('master');
 
-    for (let hostId of hostIds) {
-      this.files[hostId] = this.combineHostFileSet(hostId);
-    }
+    return {
+      ...masterHostConfig,
+      config: {
+        ...masterHostConfig.config,
+        params: {
+          ...masterHostConfig.config.params,
+          configSet: {
+            // TODO: без config
+            // TODO: entitiesFiles -
+          }
+        }
+      }
+    };
+
+
+    // TODO: это мастер конфиг с интегрированными ссылками на файлы для
+
+    // return {
+    //   config: '',
+    //   entitiesFiles: {},
+    //   systemDrivers: '',
+    //   regularDrivers: '',
+    //   systemServices: '',
+    //   regularServices: '',
+    //   devicesDefinitions: '',
+    //   driversDefinitions: '',
+    //   servicesDefinitions: '',
+    // };
   }
 
-  private combineHostFileSet(hostId: string): HostFilesSet {
+  async generateHostSet(hostId: string): {[index: string]: any} {
+    // TODO: задать тип
+    // TODO: возвращает только пути файлов
+    // TODO: !!!!
+    // TODO: конфиг должен валидироваться в том числе и имя платформы
+    // TODO: сгенерировать js объект с конфигами хоста и entitites
+  }
+
+
+  private getDefinitionsSet(hostId: string): DefinitionsSet {
     const [
       systemDrivers,
       regularDrivers,
@@ -45,8 +78,6 @@ export default class HostsFilesSet {
     // TODO: проверить что getDevDependencies есть среди devs платформы
 
     return {
-      config: this.main.hostsConfigSet.getHostConfig(hostId),
-      entitiesFiles: this.collectEntitiesFiles(hostId),
       systemDrivers,
       regularDrivers,
       systemServices,
@@ -55,6 +86,24 @@ export default class HostsFilesSet {
       driversDefinitions: this.main.definitions.getHostDriversDefinitions(hostId),
       servicesDefinitions: this.main.definitions.getHostServicesDefinitions(hostId),
     };
+  }
+
+  /**
+   * Generate file set for each host
+   */
+  collect() {
+    const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
+
+    for (let hostId of hostIds) {
+
+      // TODO: проверить что getDevDependencies есть среди devs платформы
+
+      this.files[hostId] = {
+        config: this.main.hostsConfigSet.getHostConfig(hostId),
+        entitiesFiles: this.collectEntitiesFiles(hostId),
+        ...this.getDefinitionsSet(hostId),
+      };
+    }
   }
 
   private collectEntitiesFiles(hostId: string): FilesPaths {

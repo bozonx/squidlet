@@ -71,44 +71,11 @@ export default class Main {
   }
 
   async generateMasterSet(): Promise<HostConfig> {
-    const masterHostConfig = this.hostsConfigSet.getHostConfig('master');
-    const masterHostFilesSet = this.hostsFilesSet.getCollection();
-
-    return {
-      ...masterHostConfig,
-      config: {
-        ...masterHostConfig.config,
-        params: {
-          ...masterHostConfig.config.params,
-          configSet: {
-            // TODO: без config
-            // TODO: entitiesFiles -
-          }
-        }
-      }
-    };
-
-
-    // TODO: это мастер конфиг с интегрированными ссылками на файлы для
-
-    return {
-      config: '',
-      entitiesFiles: {},
-      systemDrivers: '',
-      regularDrivers: '',
-      systemServices: '',
-      regularServices: '',
-      devicesDefinitions: '',
-      driversDefinitions: '',
-      servicesDefinitions: '',
-    };
+    return this.hostsFilesSet.generateMasterSet();
   }
 
-  async generateHostSet(): {[index: string]: any} {
-    // TODO: задать тип
-    // TODO: !!!!
-    // TODO: конфиг должен валидироваться в том числе и имя платформы
-    // TODO: сгенерировать js объект с конфигами хоста и entitites
+  async generateHostSet(hostId: string): Promise<{[index: string]: any}> {
+    return this.hostsFilesSet.generateHostSet(hostId);
   }
 
 

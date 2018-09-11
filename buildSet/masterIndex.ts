@@ -5,6 +5,7 @@ import {getPlatformSystem, readConfig, resolveConfigPath} from './helpers';
 import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
@@ -26,7 +27,7 @@ async function init () {
   await configWorks.writeAll();
 
   // generate master config js object with paths of master host configs and entities files
-  const masterSet = await configWorks.generateMasterSet(config);
+  const masterSet: HostConfig = await configWorks.generateMasterSet();
   const platformName: string = masterSet.platform;
   const hostSystem: System = getPlatformSystem(platformName);
   const configSetManager = new ConfigSetMaster(masterSet);
