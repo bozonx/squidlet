@@ -37,17 +37,17 @@ export default class HostsFilesSet {
   //   };
   // }
 
-  /**
-   *
-   * @param hostId
-   */
-  generateHostSet(hostId: string): HostsFilesSet {
-    // TODO: задать тип
-    // TODO: возвращает только пути файлов относительно хранилища
-    // TODO: !!!!
-    // TODO: конфиг должен валидироваться в том числе и имя платформы
-    // TODO: сгенерировать js объект с конфигами хоста и entitites
-  }
+  // /**
+  //  *
+  //  * @param hostId
+  //  */
+  // generateHostSet(hostId: string): HostsFilesSet {
+  //   // TODO: задать тип
+  //   // TODO: возвращает только пути файлов относительно хранилища
+  //   // TODO: !!!!
+  //   // TODO: конфиг должен валидироваться в том числе и имя платформы
+  //   // TODO: сгенерировать js объект с конфигами хоста и entitites
+  // }
 
   getDefinitionsSet(hostId: string): DefinitionsSet {
     const [
@@ -105,6 +105,10 @@ export default class HostsFilesSet {
     collect('services', servicesClasses);
 
     return result;
+  }
+
+  getDestEntitiesSet(hostId: string): EntitiesSet {
+    // TODO: !!!
   }
 
   // /**
