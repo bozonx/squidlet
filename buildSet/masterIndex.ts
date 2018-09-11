@@ -6,6 +6,7 @@ import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
+import HostFilesSet from '../configWorks/interfaces/HostFilesSet';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
@@ -17,6 +18,10 @@ const debug: boolean = Boolean(yargs.argv.debug);
 function generateMasterConfig(main: Main): HostConfig {
   const hostId = 'master';
   const hostConfig = main.hostsConfigSet.getHostConfig(hostId);
+  const configSet: HostFilesSet = {
+    ...main.hostsFilesSet.getDefinitionsSet(hostId),
+    entities: main.hostsFilesSet.getEntitiesSet(hostId),
+  };
 
   return {
     ...hostConfig,
@@ -24,10 +29,7 @@ function generateMasterConfig(main: Main): HostConfig {
       ...hostConfig.config,
       params: {
         ...hostConfig.config.params,
-        configSet: {
-          ...main.hostsFilesSet.getDefinitionsSet(hostId),
-          ...main.hostsFilesSet.getOriginalEntitiesSet(hostId),
-        }
+        configSet,
       }
     }
   };

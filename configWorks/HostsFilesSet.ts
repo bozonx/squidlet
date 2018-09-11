@@ -72,7 +72,10 @@ export default class HostsFilesSet {
     };
   }
 
-  getOriginalEntitiesSet(hostId: string): EntitiesSet {
+  getEntitiesSet(hostId: string): EntitiesSet {
+
+    // TODO: remake
+
     const result: EntitiesSet = {
       // parsed manifests
       entitiesManifests: { devices: {}, drivers: {}, services: {} },
@@ -82,7 +85,6 @@ export default class HostsFilesSet {
       entitiesFiles: { devices: {}, drivers: {}, services: {} },
     };
 
-    // TODO: use only original
     const allManifests: AllManifests = this.main.entities.getManifests();
     const allMains: FilesPaths = this.main.entities.getMainFiles();
     const allEntitiesFiles: FilesPaths = this.main.entities.getEntitiesFiles();
@@ -107,10 +109,6 @@ export default class HostsFilesSet {
     return result;
   }
 
-  getDestEntitiesSet(hostId: string): EntitiesSet {
-    // TODO: !!!
-  }
-
   // /**
   //  * Generate file set for each host
   //  */
@@ -131,42 +129,34 @@ export default class HostsFilesSet {
   // }
 
 
-  private collectEntitiesManifests() {
-
-  }
-
-  private collectEntitiesOriginalFiles() {
-
-  }
-
   // TODO: зачем это нужно????
-  private collectEntitiesFiles(hostId: string): FilesPaths {
-
-    // TODO: remake - только файлы - ссылка на оргинальный файл и куда запиывать
-
-    const result: FilesPaths = {
-      devices: {},
-      drivers: {},
-      services: {},
-    };
-    const allEntitiesFiles: FilesPaths = this.main.entities.getFiles();
-    // collect manifest names of used entities
-    const devicesClasses = this.getDevicesClassNames(hostId);
-    const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
-    const servicesClasses: string[] = this.getServicesClassNames(hostId);
-
-    const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
-      for (let className of classes) {
-        result[pluralType][className] = allEntitiesFiles[pluralType][className];
-      }
-    };
-
-    collect('devices', devicesClasses);
-    collect('drivers', allDriversClasses);
-    collect('services', servicesClasses);
-
-    return result;
-  }
+  // private collectEntitiesFiles(hostId: string): FilesPaths {
+  //
+  //   // TODO: remake - только файлы - ссылка на оргинальный файл и куда запиывать
+  //
+  //   const result: FilesPaths = {
+  //     devices: {},
+  //     drivers: {},
+  //     services: {},
+  //   };
+  //   const allEntitiesFiles: FilesPaths = this.main.entities.getFiles();
+  //   // collect manifest names of used entities
+  //   const devicesClasses = this.getDevicesClassNames(hostId);
+  //   const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
+  //   const servicesClasses: string[] = this.getServicesClassNames(hostId);
+  //
+  //   const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+  //     for (let className of classes) {
+  //       result[pluralType][className] = allEntitiesFiles[pluralType][className];
+  //     }
+  //   };
+  //
+  //   collect('devices', devicesClasses);
+  //   collect('drivers', allDriversClasses);
+  //   collect('services', servicesClasses);
+  //
+  //   return result;
+  // }
 
   /**
    * sort drivers to system and regular
