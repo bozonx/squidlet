@@ -11,6 +11,29 @@ import HostConfig from '../host/src/app/interfaces/HostConfig';
 const debug: boolean = Boolean(yargs.argv.debug);
 
 
+/**
+ * Generate master host config with integrated files set which points to original (ts or js) files
+ */
+function generateMasterConfig(main: Main): HostConfig {
+  const hostId = 'master';
+  const hostConfig = main.hostsConfigSet.getHostConfig(hostId);
+
+  return {
+    ...hostConfig,
+    config: {
+      ...hostConfig.config,
+      params: {
+        ...hostConfig.config.params,
+        configSet: {
+          ...main.hostsFilesSet.getDefinitionsSet(hostId),
+          ...main.hostsFilesSet.getOriginalEntitiesSet(hostId),
+        }
+      }
+    }
+  };
+}
+
+
 // master:
 // * receives master config
 // * generate all the host files
@@ -27,10 +50,10 @@ async function init () {
   await configWorks.writeAll();
 
   // generate master config js object with paths of master host configs and entities files
-  const masterSet: HostConfig = await configWorks.generateMasterSet();
-  const platformName: string = masterSet.platform;
+  const masterHostConfig: HostConfig = generateMasterConfig(configWorks);
+  const platformName: string = masterHostConfig.platform;
   const hostSystem: System = getPlatformSystem(platformName);
-  const configSetManager = new ConfigSetMaster(masterSet);
+  const configSetManager = new ConfigSetMaster(masterHostConfig);
   // register config set manager
   hostSystem.$registerConfigSetManager(configSetManager);
   // start master host system

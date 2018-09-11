@@ -13,40 +13,35 @@ import {sortByIncludeInList} from './helpers';
 export default class HostsFilesSet {
   private readonly main: Main;
   // file sets by hostId
-  private files: {[index: string]: HostFilesSet} = {};
+  //private files: {[index: string]: HostFilesSet} = {};
 
   constructor(main: Main) {
     this.main = main;
   }
 
-  getCollection(): {[index: string]: HostFilesSet} {
-    // TODO: наверное генерировать на месте - метод collect()
-    return this.files;
-  }
+  // getCollection(): {[index: string]: HostFilesSet} {
+  //   // TODO: наверное генерировать на месте - метод collect()
+  //   return this.files;
+  // }
+  //
+  // /**
+  //  * Generates config set for master
+  //  */
+  // generateMasterSet(): HostsFilesSet {
+  //   const hostId = 'master';
+  //
+  //   return {
+  //     config: this.main.hostsConfigSet.getHostConfig(hostId),
+  //     ...this.getDefinitionsSet(hostId),
+  //     ...this.getOriginalEntitiesSet(hostId),
+  //   };
+  // }
 
   /**
-   * Generate master config with integrated files set which points to original (ts or js) files
+   *
+   * @param hostId
    */
-  async generateMasterSet(): Promise<HostConfig> {
-    const hostId = 'master';
-    const masterHostConfig = this.main.hostsConfigSet.getHostConfig(hostId);
-
-    return {
-      ...masterHostConfig,
-      config: {
-        ...masterHostConfig.config,
-        params: {
-          ...masterHostConfig.config.params,
-          configSet: {
-            ...this.getDefinitionsSet(hostId),
-            ...this.getOriginalEntitiesSet(hostId),
-          }
-        }
-      }
-    };
-  }
-
-  async generateHostSet(hostId: string): {[index: string]: any} {
+  generateHostSet(hostId: string): HostsFilesSet {
     // TODO: задать тип
     // TODO: возвращает только пути файлов относительно хранилища
     // TODO: !!!!
@@ -54,8 +49,7 @@ export default class HostsFilesSet {
     // TODO: сгенерировать js объект с конфигами хоста и entitites
   }
 
-
-  private getDefinitionsSet(hostId: string): DefinitionsSet {
+  getDefinitionsSet(hostId: string): DefinitionsSet {
     const [
       systemDrivers,
       regularDrivers,
@@ -78,7 +72,7 @@ export default class HostsFilesSet {
     };
   }
 
-  private getOriginalEntitiesSet(hostId: string): EntitiesSet {
+  getOriginalEntitiesSet(hostId: string): EntitiesSet {
     const result: EntitiesSet = {
       // parsed manifests
       entitiesManifests: { devices: {}, drivers: {}, services: {} },
@@ -113,24 +107,24 @@ export default class HostsFilesSet {
     return result;
   }
 
-  /**
-   * Generate file set for each host
-   */
-  collect() {
-    const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
-
-    for (let hostId of hostIds) {
-
-      // TODO: проверить что getDevDependencies есть среди devs платформы
-
-      this.files[hostId] = {
-        config: this.main.hostsConfigSet.getHostConfig(hostId),
-        entitiesFiles: this.collectEntitiesFiles(hostId),
-        entitiesManifests: this.collectEntitiesManifests(),
-        ...this.getDefinitionsSet(hostId),
-      };
-    }
-  }
+  // /**
+  //  * Generate file set for each host
+  //  */
+  // collect() {
+  //   const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
+  //
+  //   for (let hostId of hostIds) {
+  //
+  //     // TODO: проверить что getDevDependencies есть среди devs платформы
+  //
+  //     this.files[hostId] = {
+  //       config: this.main.hostsConfigSet.getHostConfig(hostId),
+  //       entitiesFiles: this.collectEntitiesFiles(hostId),
+  //       entitiesManifests: this.collectEntitiesManifests(),
+  //       ...this.getDefinitionsSet(hostId),
+  //     };
+  //   }
+  // }
 
 
   private collectEntitiesManifests() {
