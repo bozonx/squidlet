@@ -88,8 +88,17 @@ export default class Entities {
     };
   }
 
+  // TODO: remove
   getFiles(): FilesPaths {
     return this.filesPaths;
+  }
+
+  getEntitiesFiles(): FilesPaths {
+    // TODO: без манифестов и main файлов
+  }
+
+  getMainFiles(): FilesPaths {
+    // TODO: do it
   }
 
   getDependencies(): Dependencies {

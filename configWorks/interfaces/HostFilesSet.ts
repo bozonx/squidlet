@@ -1,7 +1,6 @@
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
-import {FilesPaths} from '../Entities';
-import ManifestBase from '../../host/src/app/interfaces/ManifestBase';
+import {AllManifests, FilesPaths} from '../Entities';
 
 
 export interface DefinitionsSet {
@@ -22,19 +21,19 @@ export interface DefinitionsSet {
   servicesDefinitions: {[index: string]: EntityDefinition};
 }
 
-export interface EntitiesSet extends DefinitionsSet {
+export interface EntitiesSet {
   // TODO: review
-  entitiesManifests: {[index: string]: {[index: string]: ManifestBase}};
-  entitiesMains: {};
-  // original files of entities like {devices: {deviceId: [...files]}, drivers, services}
-  srcEntitiesFiles: FilesPaths;
-  // files of entities in storage like {devices: {deviceId: [...files]}, drivers, services}
-  dstEntitiesFiles: FilesPaths;
   // js manifests of entities
+  entitiesManifests: AllManifests;
+  // paths to main files of entities
+  entitiesMains: FilesPaths;
+  // original files of entities like {devices: {deviceId: [...files]}, drivers, services}
+  //srcEntitiesFiles: FilesPaths;
+  // files of entities in storage like {devices: {deviceId: [...files]}, drivers, services}
+  entitiesFiles: FilesPaths;
 }
 
 
-export default interface HostFilesSet extends EntitiesSet {
+export default interface HostFilesSet extends EntitiesSet, DefinitionsSet {
   config: HostConfig;
-
 }

@@ -27,6 +27,7 @@ export default class HostsFilesWriter {
     }
   }
 
+  // TODO: запрашивать getDefinitionsSet и getEntitiesSet и конфиг на каждый хост и соответственно их обрабатывать
 
   private async proceedHost(hostId: string, hostFileSet: HostFilesSet) {
     const hostDir = path.join(this.baseDir, hostId);
