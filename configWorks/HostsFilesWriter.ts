@@ -48,7 +48,12 @@ export default class HostsFilesWriter {
     await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
     await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
 
+    // TODO: !!! ????
     await this.main.$writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
+
+    // TODO: write manifests
+    // TODO: write entities files
+
 
   }
 

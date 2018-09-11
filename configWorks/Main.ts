@@ -70,11 +70,19 @@ export default class Main {
     await this.hostsFilesWriter.writeToStorage();
   }
 
+  /**
+   * Generates js object of master config
+   * and integrated to it master host config and path original entities files.
+   */
   async generateMasterSet(): Promise<HostConfig> {
     return this.hostsFilesSet.generateMasterSet();
   }
 
-  async generateHostSet(hostId: string): Promise<{[index: string]: any}> {
+  /**
+   * Generates js object of specifies host's config.
+   * It contents config with integrated host configs as js object and entities files as is.
+   */
+  async generateSolidHostSet(hostId: string): Promise<{[index: string]: any}> {
     return this.hostsFilesSet.generateHostSet(hostId);
   }
 

@@ -14,6 +14,7 @@ import systemConfig from './configs/systemConfig';
 export type ManifestsTypeName = 'device' | 'driver' | 'service';
 export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
+// original or destination files
 export interface FilesPaths {
   // list of devices files by device name
   devices: {[index: string]: string[]};

@@ -19,7 +19,7 @@ export default {
   indexManifestFileNames: ['manifest.yaml'],
   // dir in storage where will be generated devices, drivers and services main files
   entityBuildDir: 'entities',
-  entitiesFile: 'entitiesFiles.json',
+  //entitiesFile: 'entitiesFiles.json',
   pathToSaveHostsFileSet: 'hosts',
   //pathToSaveHostsFileSet: `${hostInitCfg.hostDirs.services}/ConfigUpdater/hosts`,
   filesEncode: 'utf8',

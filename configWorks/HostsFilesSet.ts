@@ -24,7 +24,8 @@ export default class HostsFilesSet {
   }
 
   async generateMasterSet(): Promise<HostConfig> {
-    const masterHostConfig = this.main.getHostConfig('master');
+    const hostId = 'master';
+    const masterHostConfig = this.main.hostsConfigSet.getHostConfig(hostId);
 
     return {
       ...masterHostConfig,
@@ -33,27 +34,12 @@ export default class HostsFilesSet {
         params: {
           ...masterHostConfig.config.params,
           configSet: {
-            // TODO: без config
-            // TODO: entitiesFiles -
+            ...this.getDefinitionsSet(hostId),
+            ...this.getEntitiesSet(hostId),
           }
         }
       }
     };
-
-
-    // TODO: это мастер конфиг с интегрированными ссылками на файлы для
-
-    // return {
-    //   config: '',
-    //   entitiesFiles: {},
-    //   systemDrivers: '',
-    //   regularDrivers: '',
-    //   systemServices: '',
-    //   regularServices: '',
-    //   devicesDefinitions: '',
-    //   driversDefinitions: '',
-    //   servicesDefinitions: '',
-    // };
   }
 
   async generateHostSet(hostId: string): {[index: string]: any} {
@@ -88,6 +74,14 @@ export default class HostsFilesSet {
     };
   }
 
+  private getEntitiesSet() {
+    return {
+      entitiesManifests: this.collectEntitiesManifests(),
+      entitiesMains: this.collectEntitiesMains(),
+      entitiesFiles: this.collectEntitiesOriginalFiles(),
+    };
+  }
+
   /**
    * Generate file set for each host
    */
@@ -101,12 +95,26 @@ export default class HostsFilesSet {
       this.files[hostId] = {
         config: this.main.hostsConfigSet.getHostConfig(hostId),
         entitiesFiles: this.collectEntitiesFiles(hostId),
+        entitiesManifests: this.collectEntitiesManifests(),
         ...this.getDefinitionsSet(hostId),
       };
     }
   }
 
+
+  private collectEntitiesManifests() {
+
+  }
+
+  private collectEntitiesOriginalFiles() {
+
+  }
+
+  // TODO: зачем это нужно????
   private collectEntitiesFiles(hostId: string): FilesPaths {
+
+    // TODO: remake - только файлы - ссылка на оргинальный файл и куда запиывать
+
     const result: FilesPaths = {
       devices: {},
       drivers: {},
