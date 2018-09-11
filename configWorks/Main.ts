@@ -15,6 +15,7 @@ import systemConfig from './configs/systemConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
 import HostsFilesWriter from './HostsFilesWriter';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 
 
 export default class Main {
@@ -69,8 +70,38 @@ export default class Main {
     await this.hostsFilesWriter.writeToStorage();
   }
 
-  async generateMasterSet(): {[index: string]: any} {
-    // TODO: !!!!
+  async generateMasterSet(): Promise<HostConfig> {
+    const masterHostConfig = this.hostsConfigSet.getHostConfig('master');
+    const masterHostFilesSet = this.hostsFilesSet.getCollection();
+
+    return {
+      ...masterHostConfig,
+      config: {
+        ...masterHostConfig.config,
+        params: {
+          ...masterHostConfig.config.params,
+          configSet: {
+            // TODO: без config
+            // TODO: entitiesFiles -
+          }
+        }
+      }
+    };
+
+
+    // TODO: это мастер конфиг с интегрированными ссылками на файлы для
+
+    return {
+      config: '',
+      entitiesFiles: {},
+      systemDrivers: '',
+      regularDrivers: '',
+      systemServices: '',
+      regularServices: '',
+      devicesDefinitions: '',
+      driversDefinitions: '',
+      servicesDefinitions: '',
+    };
   }
 
   async generateHostSet(): {[index: string]: any} {

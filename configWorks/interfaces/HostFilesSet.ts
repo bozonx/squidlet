@@ -7,15 +7,20 @@ export interface FilesSet {
   // files of entities like {devices: {deviceId: [...files]}, drivers, services}
   entitiesFiles: FilesPaths;
 
+  // list of system drivers
   systemDrivers: string[];
+  // list of regular drivers
   regularDrivers: string[];
+  // list of system services
   systemServices: string[];
+  // list of regular services
   regularServices: string[];
 
+  // list of devices definitions
   devicesDefinitions: EntityDefinition[];
-  // by driver name
+  // list of drivers definitions
   driversDefinitions: {[index: string]: EntityDefinition};
-  // by service id
+  // list of services definitions
   servicesDefinitions: {[index: string]: EntityDefinition};
 }
 

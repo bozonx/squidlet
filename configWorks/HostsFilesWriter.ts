@@ -20,6 +20,8 @@ export default class HostsFilesWriter {
   async writeToStorage() {
     const filesCollection: {[index: string]: HostFilesSet} = this.main.hostsFilesSet.getCollection();
 
+    // TODO: мастер можно пропустить если указанно
+
     for (let hostId of Object.keys(filesCollection)) {
       await this.proceedHost(hostId, filesCollection[hostId]);
     }
