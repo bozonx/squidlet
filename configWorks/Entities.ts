@@ -203,39 +203,39 @@ export default class Entities {
     //await this.saveEntityToStorage(preManifest, finalManifest, entityDirInStorage);
   }
 
-  private async saveEntityToStorage(
-    preManifest: PreManifestBase,
-    finalManifest: ManifestBase,
-    entityDirInStorage: string,
-  ) {
-
-    // TODO: move to hosts files writer
-
-    const manifestStorageFileName = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
-
-    if (preManifest.main) {
-      // build an entity main file
-
-      // TODO: !!!!!
-      // TODO: !!!!! test it
-
-      //await this.buildMainFile();
-    }
-
-    if (preManifest.files) {
-      for (let fileName of preManifest.files) {
-        const fromFile = path.resolve(preManifest.baseDir, fileName);
-        const toFileName = this.generateEntityFileName(entityDirInStorage, fileName);
-
-        // make inner dirs
-        await this.main.io.mkdirP(path.dirname(toFileName));
-        // copy
-        await this.main.io.copyFile(fromFile, toFileName);
-      }
-    }
-
-    await this.main.$writeJson(manifestStorageFileName, finalManifest);
-  }
+  // private async saveEntityToStorage(
+  //   preManifest: PreManifestBase,
+  //   finalManifest: ManifestBase,
+  //   entityDirInStorage: string,
+  // ) {
+  //
+  //   // TODO: move to hosts files writer
+  //
+  //   const manifestStorageFileName = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
+  //
+  //   if (preManifest.main) {
+  //     // build an entity main file
+  //
+  //     // TODO: !!!!!
+  //     // TODO: !!!!! test it
+  //
+  //     //await this.buildMainFile();
+  //   }
+  //
+  //   if (preManifest.files) {
+  //     for (let fileName of preManifest.files) {
+  //       const fromFile = path.resolve(preManifest.baseDir, fileName);
+  //       const toFileName = this.generateEntityFileName(entityDirInStorage, fileName);
+  //
+  //       // make inner dirs
+  //       await this.main.io.mkdirP(path.dirname(toFileName));
+  //       // copy
+  //       await this.main.io.copyFile(fromFile, toFileName);
+  //     }
+  //   }
+  //
+  //   await this.main.$writeJson(manifestStorageFileName, finalManifest);
+  // }
 
   /**
    * collect files of entity which will be placed in storage
@@ -253,6 +253,7 @@ export default class Entities {
     ];
   }
 
+  // TODO: WTF ????
   private generateEntityFileName(entityDirInStorage: string, fileName: string): string {
     return path.resolve(entityDirInStorage, fileName);
   }

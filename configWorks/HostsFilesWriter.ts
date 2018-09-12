@@ -14,12 +14,13 @@ import PreManifestBase from './interfaces/PreManifestBase';
 export default class HostsFilesWriter {
   private readonly main: Main;
   private readonly hostsDir: string;
-  private readonly entitiesDir: string;
+  // entities dir in storage
+  private readonly entitiesDstDir: string;
 
   constructor(main: Main) {
     this.main = main;
     this.hostsDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
-    this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
+    this.entitiesDstDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
   /**
@@ -45,23 +46,33 @@ export default class HostsFilesWriter {
   }
   
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
-    const entityDirInStorage = path.join(this.entitiesDir, pluralType, entityName);
+    const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
+    const entitySrcDir = this.main.entities.getSrcDir(pluralType, entityName);
 
     // write manifest
     await this.main.$writeJson(
-      path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
+      path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
       this.main.entities.getManifest(pluralType, entityName)
     );
 
     // TODO: build and write main files if exists
 
+    const files: string[] = this.main.entities.getFiles(pluralType, entityName);
 
-    // TODO: write entities files if exists
+    for (let relativeFileName of files) {
+      const fromFile = path.resolve(entitySrcDir, relativeFileName);
+      const toFileName = path.resolve(entityDstDir, relativeFileName);
+
+      // make inner dirs
+      await this.main.io.mkdirP(path.dirname(toFileName));
+      // copy
+      await this.main.io.copyFile(fromFile, toFileName);
+    }
   }
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
-    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
-    const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
+    const entityDstDir = path.join(this.entitiesDstDir, pluralType, preManifest.name);
+    const mainJsFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
     const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
 
