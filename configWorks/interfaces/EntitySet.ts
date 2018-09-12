@@ -10,11 +10,14 @@ export interface EntitiesSet {
   services: {[index: string]: EntitySet};
 }
 
-export default interface EntitySet {
-  //srcDir: string;
+export interface EntitySet {
   manifest: DeviceManifest | DriverManifest | ServiceManifest;
   // relative path to main file
   main?: string;
   // relative paths to entity files
   files: string[];
+}
+
+export interface SrcEntitySet extends EntitySet {
+  srcDir: string;
 }

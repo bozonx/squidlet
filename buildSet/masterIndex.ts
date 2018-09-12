@@ -1,4 +1,5 @@
 import * as yargs from 'yargs';
+import * as path from 'path';
 
 import MasterConfig from '../configWorks/MasterConfig';
 import {getPlatformSystem, readConfig, resolveConfigPath} from './helpers';
@@ -7,54 +8,47 @@ import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
-import {ManifestsTypePluralName} from '../configWorks/Entities';
+import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
 import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
+import DefinitionsSet from '../configWorks/interfaces/DefinitionsSet';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
 
+interface HostFilesSet extends DefinitionsSet {
+  entitiesSet: EntitiesSet;
+}
+
 
 /**
  * Get set of entities of specified host
- * @param hostId
  */
-function getEntitiesSet(hostId: string): EntitiesSet {
+function generateEntitiesSet(main: Main, hostId: string): EntitiesSet {
   const result: EntitiesSet = {
     devices: {},
     drivers: {},
     services: {},
-
-    // // parsed manifests
-    // entitiesManifests: { devices: {}, drivers: {}, services: {} },
-    // // paths to original main files
-    // entitiesMains: { devices: {}, drivers: {}, services: {} },
-    // // paths to original files
-    // entitiesFiles: { devices: {}, drivers: {}, services: {} },
   };
 
-  //const allManifests: AllManifests = this.main.entities.getManifests();
-  //const allMains: FilesPaths = this.main.entities.getMainFiles();
-  //const allEntitiesFiles: FilesPaths = this.main.entities.getEntitiesFiles();
-
-  // collect manifest names of used entities
-  const devicesClasses = this.getDevicesClassNames(hostId);
-  const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
-  const servicesClasses: string[] = this.getServicesClassNames(hostId);
+  const usedEntitiesNames: EntitiesNames = main.hostsFilesSet.getEntitiesNames(hostId);
 
   const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
     for (let className of classes) {
+      const srcDir = main.entities.getSrcDir(pluralType, className);
+      const relativeMain: string | undefined = main.entities.getMainFilePath(pluralType, className);
+      const relativeFiles: string[] = main.entities.getFiles(pluralType, className);
+
       result[pluralType][className] = {
-        srcDir: this.main.entities.getSrcDir(pluralType, className),
-        manifest: this.main.entities.getManifest(pluralType, className),
-        main: this.main.entities.getMainFilePath(pluralType, className),
-        files: this.main.entities.getFiles(pluralType, className),
+        manifest: main.entities.getManifest(pluralType, className),
+        main: relativeMain && path.resolve(srcDir, relativeMain),
+        files: relativeFiles.map((relativeFileName: string) => path.resolve(srcDir, relativeFileName)),
       };
     }
   };
 
-  collect('devices', devicesClasses);
-  collect('drivers', allDriversClasses);
-  collect('services', servicesClasses);
+  collect('devices', usedEntitiesNames.devices);
+  collect('drivers', usedEntitiesNames.drivers);
+  collect('services', usedEntitiesNames.services);
 
   return result;
 }
@@ -65,10 +59,9 @@ function getEntitiesSet(hostId: string): EntitiesSet {
 function generateMasterConfig(main: Main): HostConfig {
   const hostId = 'master';
   const hostConfig = main.hostsConfigSet.getHostConfig(hostId);
-  // TODO: review - use getEntitiesSet
   const configSet: HostFilesSet = {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
-    //entities: main.hostsFilesSet.getEntitiesSet(hostId),
+    entitiesSet: generateEntitiesSet(main, hostId),
   };
 
   return {
