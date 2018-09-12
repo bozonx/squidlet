@@ -105,13 +105,14 @@ export default class Entities {
     // TODO:
   }
 
-  getMainFilePath(pluralType: ManifestsTypePluralName, name: string): string {
+  getMainFilePath(pluralType: ManifestsTypePluralName, name: string): string | undefined {
     // TODO: вернуть относительный путь к main файлу
   }
 
   getFiles(pluralType: ManifestsTypePluralName, name: string): string[] {
     //return this.filesPaths;
     // TODO: вернуть список дополнительных файлов сущности
+    // TODO: если нет то пустой список
   }
 
   getDependencies(): Dependencies {
@@ -199,7 +200,7 @@ export default class Entities {
     this.filesPaths[pluralType][preManifest.name] = this.collectFiles(entityDirInStorage, preManifest);
 
     // Save files and manifest to disk
-    await this.saveEntityToStorage(preManifest, finalManifest, entityDirInStorage);
+    //await this.saveEntityToStorage(preManifest, finalManifest, entityDirInStorage);
   }
 
   private async saveEntityToStorage(
@@ -207,6 +208,9 @@ export default class Entities {
     finalManifest: ManifestBase,
     entityDirInStorage: string,
   ) {
+
+    // TODO: move to hosts files writer
+
     const manifestStorageFileName = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
 
     if (preManifest.main) {
@@ -268,19 +272,6 @@ export default class Entities {
     }
 
     return finalManifest;
-  }
-
-  private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
-    const entityDirInStorage = path.join(this.entitiesDir, pluralType, preManifest.name);
-    const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
-
-    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
-
-    // TODO: !!!!! билдить во временную папку
-    // TODO: !!!!! написать в лог что билдится файл
-    // TODO: !!!!! поддержка билда js файлов
-    // TODO: !!!!! test
-
   }
 
   /**

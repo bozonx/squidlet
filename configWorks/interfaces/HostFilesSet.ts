@@ -26,7 +26,7 @@ export interface EntitySet {
   srcDir: string;
   manifest: ManifestBase;
   // relative path to main file
-  main: string;
+  main?: string;
   // relative paths to entity files
   files: string[];
 }
