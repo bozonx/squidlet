@@ -3,7 +3,7 @@ import * as path from 'path';
 import Main from './Main';
 import {DefinitionsSet} from './interfaces/HostFilesSet';
 import systemConfig from './configs/systemConfig';
-import {AllManifests, EntitiesNames, ManifestsTypePluralName} from './Entities';
+import {EntitiesNames, ManifestsTypePluralName} from './Entities';
 import PreManifestBase from './interfaces/PreManifestBase';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 
@@ -24,16 +24,18 @@ export default class HostsFilesWriter {
     this.entitiesDstDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
+  // /**
+  //  * Copy files of entities and hosts to storage
+  //  */
+  // async writeToStorage() {
+  //   await this.writeEntitiesFiles();
+  //   await this.writeHostsFiles();
+  // }
+
   /**
-   * Copy files of entities and hosts to storage
+   * Copy files of entities to storage
    */
-  async writeToStorage() {
-    await this.writeEntitiesFiles();
-    await this.writeHostsFiles();
-  }
-
-
-  private async writeEntitiesFiles() {
+  async writeEntitiesFiles() {
     const allEntities: EntitiesNames = this.main.entities.getAllEntitiesNames();
     
     for (let typeName of Object.keys(allEntities)) {
@@ -45,11 +47,14 @@ export default class HostsFilesWriter {
     }
   }
 
-  private async writeHostsFiles() {
-
-    // TODO: мастер можно пропустить если указанно
-
+  /**
+   * Copy files of hosts to storage
+   * @param skipMaster - don't write master's files
+   */
+  async writeHostsFiles(skipMaster: boolean = false) {
     for (let hostId of this.main.hostsConfigSet.getHostsIds()) {
+      if (hostId === 'master') return;
+
       await this.proceedHost(hostId);
     }
   }

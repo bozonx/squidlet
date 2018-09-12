@@ -15,7 +15,6 @@ import systemConfig from './configs/systemConfig';
 import * as defaultLogger from './defaultLogger';
 import {resolveIndexFile} from './helpers';
 import HostsFilesWriter from './HostsFilesWriter';
-import HostConfig from '../host/src/app/interfaces/HostConfig';
 
 
 export default class Main {
@@ -58,16 +57,17 @@ export default class Main {
     // call handlers after init
     this.pluginEnv.$riseAfterInit();
 
-    this.log.info(`Collecting files set`);
-    this.hostsFilesSet.collect();
+    //this.log.info(`Collecting files set`);
+    //this.hostsFilesSet.collect();
   }
 
   /**
    * Write all the hosts and entities files to storage
    */
-  async writeAll() {
+  async writeToStorage(skipMaster?: boolean) {
     this.log.info(`Write hosts files`);
-    await this.hostsFilesWriter.writeToStorage();
+    await this.hostsFilesWriter.writeEntitiesFiles();
+    await this.hostsFilesWriter.writeHostsFiles(skipMaster);
   }
 
   // /**

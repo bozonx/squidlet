@@ -7,6 +7,9 @@ import Main from './Main';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 
 
+// TODO: поидее можно перенести в master config???
+
+
 /**
  * Prepare hosts configs.
  */

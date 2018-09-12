@@ -1,53 +1,19 @@
-import HostConfig from '../host/src/app/interfaces/HostConfig';
-
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
 
 import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
-import {AllManifests, Dependencies, EntitiesNames, FilesPaths, ManifestsTypePluralName} from './Entities';
-import HostFilesSet, {DefinitionsSet, EntitiesSet} from './interfaces/HostFilesSet';
+import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
+import {DefinitionsSet} from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
 
 export default class HostsFilesSet {
   private readonly main: Main;
-  // file sets by hostId
-  //private files: {[index: string]: HostFilesSet} = {};
 
   constructor(main: Main) {
     this.main = main;
   }
-
-  // getCollection(): {[index: string]: HostFilesSet} {
-  //   // TODO: наверное генерировать на месте - метод collect()
-  //   return this.files;
-  // }
-  //
-  // /**
-  //  * Generates config set for master
-  //  */
-  // generateMasterSet(): HostsFilesSet {
-  //   const hostId = 'master';
-  //
-  //   return {
-  //     config: this.main.hostsConfigSet.getHostConfig(hostId),
-  //     ...this.getDefinitionsSet(hostId),
-  //     ...this.getOriginalEntitiesSet(hostId),
-  //   };
-  // }
-
-  // /**
-  //  *
-  //  * @param hostId
-  //  */
-  // generateHostSet(hostId: string): HostsFilesSet {
-  //   // TODO: задать тип
-  //   // TODO: возвращает только пути файлов относительно хранилища
-  //   // TODO: !!!!
-  //   // TODO: конфиг должен валидироваться в том числе и имя платформы
-  //   // TODO: сгенерировать js объект с конфигами хоста и entitites
-  // }
 
   getDefinitionsSet(hostId: string): DefinitionsSet {
     const [
@@ -73,30 +39,11 @@ export default class HostsFilesSet {
   }
 
   getEntitiesNames(hostId: string): EntitiesNames {
-    // TODO: add
-  }
-
-  /**
-   * Get set of entities of specified host
-   * @param hostId
-   */
-  getEntitiesSet(hostId: string): EntitiesSet {
-    const result: EntitiesSet = {
-      devices: {},
-      drivers: {},
-      services: {},
-
-      // // parsed manifests
-      // entitiesManifests: { devices: {}, drivers: {}, services: {} },
-      // // paths to original main files
-      // entitiesMains: { devices: {}, drivers: {}, services: {} },
-      // // paths to original files
-      // entitiesFiles: { devices: {}, drivers: {}, services: {} },
+    const result: EntitiesNames = {
+      devices: [],
+      drivers: [],
+      services: [],
     };
-
-    //const allManifests: AllManifests = this.main.entities.getManifests();
-    //const allMains: FilesPaths = this.main.entities.getMainFiles();
-    //const allEntitiesFiles: FilesPaths = this.main.entities.getEntitiesFiles();
 
     // collect manifest names of used entities
     const devicesClasses = this.getDevicesClassNames(hostId);
@@ -105,12 +52,7 @@ export default class HostsFilesSet {
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
       for (let className of classes) {
-        result[pluralType][className] = {
-          srcDir: this.main.entities.getSrcDir(pluralType, className),
-          manifest: this.main.entities.getManifest(pluralType, className),
-          main: this.main.entities.getMainFilePath(pluralType, className),
-          files: this.main.entities.getFiles(pluralType, className),
-        };
+        result[pluralType].push(className);
       }
     };
 

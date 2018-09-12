@@ -44,9 +44,9 @@ export default class MasterConfig {
   }
 
 
-  getPlatformConfig(platformName: Platforms) {
-
-  }
+  // getPlatformConfig(platformName: Platforms) {
+  //
+  // }
 
   private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
     let hosts: {[index: string]: PreHostConfig} = {};
