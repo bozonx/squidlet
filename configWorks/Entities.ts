@@ -39,6 +39,12 @@ export interface AllManifests {
   services: {[index: string]: ServiceManifest};
 }
 
+export interface EntitiesNames {
+  devices: string[];
+  drivers: string[];
+  services: string[];
+}
+
 
 export default class Entities {
   private readonly main: Main;
@@ -88,6 +94,9 @@ export default class Entities {
     };
   }
 
+  getAllEntitiesNames(): EntitiesNames {
+    // TODO: !!!!
+  }
 
   // getEntitiesFiles(): FilesPaths {
   //   // TODO: без манифестов и main файлов

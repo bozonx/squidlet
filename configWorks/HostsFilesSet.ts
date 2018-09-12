@@ -5,7 +5,7 @@ const _filter = require('lodash/filter');
 
 import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
-import {AllManifests, Dependencies, FilesPaths, ManifestsTypePluralName} from './Entities';
+import {AllManifests, Dependencies, EntitiesNames, FilesPaths, ManifestsTypePluralName} from './Entities';
 import HostFilesSet, {DefinitionsSet, EntitiesSet} from './interfaces/HostFilesSet';
 import {sortByIncludeInList} from './helpers';
 
@@ -70,6 +70,10 @@ export default class HostsFilesSet {
       driversDefinitions: this.main.definitions.getHostDriversDefinitions(hostId),
       servicesDefinitions: this.main.definitions.getHostServicesDefinitions(hostId),
     };
+  }
+
+  getEntitiesNames(hostId: string): EntitiesNames {
+    // TODO: add
   }
 
   /**

@@ -50,7 +50,7 @@ export interface EntitiesSet {
 
 
 export default interface HostFilesSet extends DefinitionsSet {
-  // TODO: review
+  // TODO: не нужно
   config?: HostConfig;
   entities: EntitiesSet;
 }

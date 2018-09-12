@@ -1,9 +1,9 @@
 import * as path from 'path';
 
 import Main from './Main';
-import HostFilesSet, {DefinitionsSet} from './interfaces/HostFilesSet';
+import {DefinitionsSet} from './interfaces/HostFilesSet';
 import systemConfig from './configs/systemConfig';
-import {AllManifests, ManifestsTypePluralName} from './Entities';
+import {AllManifests, EntitiesNames, ManifestsTypePluralName} from './Entities';
 import PreManifestBase from './interfaces/PreManifestBase';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 
@@ -25,7 +25,7 @@ export default class HostsFilesWriter {
   }
 
   /**
-   * Copy files for hosts to storage to store of master
+   * Copy files of entities and hosts to storage
    */
   async writeToStorage() {
     await this.writeEntitiesFiles();
@@ -34,13 +34,12 @@ export default class HostsFilesWriter {
 
 
   private async writeEntitiesFiles() {
-    // TODO: логичней использовать просто список сущностей
-    const allManifests: AllManifests = this.main.entities.getManifests();
+    const allEntities: EntitiesNames = this.main.entities.getAllEntitiesNames();
     
-    for (let typeName of Object.keys(allManifests)) {
+    for (let typeName of Object.keys(allEntities)) {
       const pluralType: ManifestsTypePluralName = typeName as ManifestsTypePluralName;
-      
-      for (let entityName of Object.keys(allManifests[pluralType])) {
+
+      for (let entityName of allEntities[pluralType]) {
         await this.proceedEntity(pluralType, entityName);
       }
     }
@@ -96,6 +95,7 @@ export default class HostsFilesWriter {
   private async proceedHost(hostId: string) {
     const hostConfig: HostConfig = this.main.hostsConfigSet.getHostConfig(hostId);
     const definitionsSet: DefinitionsSet = this.main.hostsFilesSet.getDefinitionsSet(hostId);
+    const hostsUsedEntitiesNames: EntitiesNames = this.main.hostsFilesSet.getEntitiesNames(hostId);
     const hostDir = path.join(this.hostsDir, hostId);
     const hostDirs = systemConfig.hostInitCfg.hostDirs;
     const fileNames = systemConfig.hostInitCfg.fileNames;
@@ -107,8 +107,8 @@ export default class HostsFilesWriter {
       hostConfig
     );
 
-    // TODO: !!! used entities names
-    //await this.main.$writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
+    // write list of entities names
+    await this.main.$writeJson(path.join(hostDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
 
     // write host's definitions
     await this.main.$writeJson(path.join(configDir, fileNames.systemDrivers), definitionsSet.systemDrivers);
