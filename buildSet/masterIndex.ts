@@ -8,6 +8,7 @@ import Main from '../configWorks/Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import HostFilesSet, {EntitiesSet} from '../configWorks/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../configWorks/Entities';
+import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
@@ -64,6 +65,7 @@ function getEntitiesSet(hostId: string): EntitiesSet {
 function generateMasterConfig(main: Main): HostConfig {
   const hostId = 'master';
   const hostConfig = main.hostsConfigSet.getHostConfig(hostId);
+  // TODO: review - use getEntitiesSet
   const configSet: HostFilesSet = {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
     //entities: main.hostsFilesSet.getEntitiesSet(hostId),
@@ -90,18 +92,18 @@ function generateMasterConfig(main: Main): HostConfig {
 async function init () {
   const resolvedConfigPath: string = resolveConfigPath(yargs.argv.config);
   const config: MasterConfig = await readConfig<MasterConfig>(resolvedConfigPath);
-  const configWorks: Main = new Main(config, resolvedConfigPath);
+  const main: Main = new Main(config, resolvedConfigPath);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
-  await configWorks.collect();
+  await main.collect();
   // write all the hosts and entities files exclude master's host files
-  await configWorks.writeToStorage(true);
+  await main.writeToStorage(true);
 
   // generate master config js object with paths of master host configs and entities files
-  const masterHostConfig: HostConfig = generateMasterConfig(configWorks);
+  const masterHostConfig: HostConfig = generateMasterConfig(main);
   const platformName: string = masterHostConfig.platform;
   const hostSystem: System = getPlatformSystem(platformName);
-  const configSetManager = new ConfigSetMaster(masterHostConfig);
+  const configSetManager: ConfigSetManager = new ConfigSetMaster(masterHostConfig);
   // register config set manager
   hostSystem.$registerConfigSetManager(configSetManager);
   // start master host system
