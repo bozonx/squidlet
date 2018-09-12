@@ -22,6 +22,7 @@ export interface DefinitionsSet {
   servicesDefinitions: {[index: string]: EntityDefinition};
 }
 
+// TODO: это специализированная для solid и master сборок
 export interface EntitySet {
   srcDir: string;
   manifest: ManifestBase;

@@ -1,10 +1,11 @@
 import * as path from 'path';
 
 import Main from './Main';
-import HostFilesSet from './interfaces/HostFilesSet';
+import HostFilesSet, {DefinitionsSet} from './interfaces/HostFilesSet';
 import systemConfig from './configs/systemConfig';
 import {AllManifests, ManifestsTypePluralName} from './Entities';
 import PreManifestBase from './interfaces/PreManifestBase';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
 
 
 /**
@@ -44,7 +45,16 @@ export default class HostsFilesWriter {
       }
     }
   }
-  
+
+  private async writeHostsFiles() {
+
+    // TODO: мастер можно пропустить если указанно
+
+    for (let hostId of this.main.hostsConfigSet.getHostsIds()) {
+      await this.proceedHost(hostId);
+    }
+  }
+
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
     const entitySrcDir = this.main.entities.getSrcDir(pluralType, entityName);
@@ -83,26 +93,9 @@ export default class HostsFilesWriter {
 
   }
 
-  private async writeHostsFiles() {
-
-    // TODO: мастер можно пропустить если указанно
-
-    for (let hostId of this.main.hostsConfigSet.getHostsIds()) {
-      
-      // TODO: review
-      
-      const filesSet: HostFilesSet = {
-        config: this.main.hostsConfigSet.getHostConfig(hostId),
-        entities: this.main.hostsFilesSet.getEntitiesSet(hostId),
-        ...this.main.hostsFilesSet.getDefinitionsSet(hostId),
-        //...this.main.hostsFilesSet.getDestEntitiesSet(hostId),
-      };
-
-      await this.proceedHost(hostId, filesSet);
-    }
-  }
-
-  private async proceedHost(hostId: string, hostFileSet: HostFilesSet) {
+  private async proceedHost(hostId: string) {
+    const hostConfig: HostConfig = this.main.hostsConfigSet.getHostConfig(hostId);
+    const definitionsSet: DefinitionsSet = this.main.hostsFilesSet.getDefinitionsSet(hostId);
     const hostDir = path.join(this.hostsDir, hostId);
     const hostDirs = systemConfig.hostInitCfg.hostDirs;
     const fileNames = systemConfig.hostInitCfg.fileNames;
@@ -111,21 +104,20 @@ export default class HostsFilesWriter {
     // write host's config
     await this.main.$writeJson(
       path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
-      hostFileSet.config
+      hostConfig
     );
 
-    // write host's definitions
-    await this.main.$writeJson(path.join(configDir, fileNames.systemDrivers), hostFileSet.systemDrivers);
-    await this.main.$writeJson(path.join(configDir, fileNames.regularDrivers), hostFileSet.regularDrivers);
-    await this.main.$writeJson(path.join(configDir, fileNames.systemServices), hostFileSet.systemServices);
-    await this.main.$writeJson(path.join(configDir, fileNames.regularServices), hostFileSet.regularServices);
-    await this.main.$writeJson(path.join(configDir, fileNames.devicesDefinitions), hostFileSet.devicesDefinitions);
-    await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
-    await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
-
-    // TODO: !!! entities
-    // TODO: !!! ????
+    // TODO: !!! used entities names
     //await this.main.$writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
+
+    // write host's definitions
+    await this.main.$writeJson(path.join(configDir, fileNames.systemDrivers), definitionsSet.systemDrivers);
+    await this.main.$writeJson(path.join(configDir, fileNames.regularDrivers), definitionsSet.regularDrivers);
+    await this.main.$writeJson(path.join(configDir, fileNames.systemServices), definitionsSet.systemServices);
+    await this.main.$writeJson(path.join(configDir, fileNames.regularServices), definitionsSet.regularServices);
+    await this.main.$writeJson(path.join(configDir, fileNames.devicesDefinitions), definitionsSet.devicesDefinitions);
+    await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), definitionsSet.driversDefinitions);
+    await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), definitionsSet.servicesDefinitions);
   }
 
 }
