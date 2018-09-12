@@ -45,6 +45,18 @@ export interface EntitiesNames {
   services: string[];
 }
 
+export interface EntitiesSrcDirs {
+  devices: {[index: string]: string};
+  drivers: {[index: string]: string};
+  services: {[index: string]: string};
+}
+
+export interface EntitiesMainFiles {
+  devices: {[index: string]: string};
+  drivers: {[index: string]: string};
+  services: {[index: string]: string};
+}
+
 
 export default class Entities {
   private readonly main: Main;
@@ -53,7 +65,19 @@ export default class Entities {
   private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
   private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
 
-  // file paths of entities prepared files in storage
+  // base dirs of entities
+  private srcDirs: EntitiesSrcDirs = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
+  // relative main files of entities
+  private mainFiles: EntitiesMainFiles = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
+  // relative paths of entities files
   private filesPaths: FilesPaths = {
     devices: {},
     drivers: {},
@@ -81,6 +105,7 @@ export default class Entities {
   private systemDrivers: string[] = [];
   private systemServices: string[] = [];
 
+
   constructor(main: Main) {
     this.main = main;
     this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
@@ -95,33 +120,29 @@ export default class Entities {
   }
 
   getAllEntitiesNames(): EntitiesNames {
-    // TODO: !!!!
+    const allManifests: AllManifests = this.getManifests();
+
+    return {
+      devices: Object.keys(allManifests.devices),
+      drivers: Object.keys(allManifests.drivers),
+      services: Object.keys(allManifests.services),
+    };
   }
 
-  // getEntitiesFiles(): FilesPaths {
-  //   // TODO: без манифестов и main файлов
-  // }
-
-  // getMainFiles(): FilesPaths {
-  //   // TODO: do it - вернуть список относительных путей к main файлам
-  // }
-
   getSrcDir(pluralType: ManifestsTypePluralName, name: string): string {
-    // TODO: вернуть абсолютный путь к src dir сущности
+    return this.srcDirs[pluralType][name];
   }
 
   getManifest(pluralType: ManifestsTypePluralName, name: string): ManifestBase {
-    // TODO:
+    return (this[pluralType] as Map<string, ManifestBase>).get(name);
   }
 
   getMainFilePath(pluralType: ManifestsTypePluralName, name: string): string | undefined {
-    // TODO: вернуть относительный путь к main файлу
+    return this.mainFiles[pluralType][name];
   }
 
   getFiles(pluralType: ManifestsTypePluralName, name: string): string[] {
-    //return this.filesPaths;
-    // TODO: вернуть список дополнительных файлов сущности
-    // TODO: если нет то пустой список
+    return this.filesPaths[pluralType][name] || [];
   }
 
   getDependencies(): Dependencies {
@@ -140,6 +161,10 @@ export default class Entities {
     return this.systemServices;
   }
 
+  /**
+   * Get all the devs.
+   * Collect they from drivers and all the dependencies
+   */
   getDevs(): string[] {
     const result: {[index: string]: true} = {};
     const collect = (depdOfType: {[index: string]: string[]}) => {
@@ -200,6 +225,9 @@ export default class Entities {
     this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
       .set(finalManifest.name, finalManifest);
 
+    this.srcDirs[pluralType][finalManifest.name] = preManifest.baseDir;
+    this.mainFiles[pluralType][finalManifest.name] = preManifest.main;
+
     // just save unsorted deps
     if (preManifest.drivers) {
       this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
@@ -207,9 +235,6 @@ export default class Entities {
 
     // collect files of entity which will be placed in storage
     this.filesPaths[pluralType][preManifest.name] = this.collectFiles(entityDirInStorage, preManifest);
-
-    // Save files and manifest to disk
-    //await this.saveEntityToStorage(preManifest, finalManifest, entityDirInStorage);
   }
 
   // private async saveEntityToStorage(
@@ -250,6 +275,9 @@ export default class Entities {
    * collect files of entity which will be placed in storage
    */
   private collectFiles(entityDirInStorage: string, preManifest: PreManifestBase): string[] {
+
+    // TODO: только files убрать main и manifest
+
     const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
 
     return [

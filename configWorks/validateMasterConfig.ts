@@ -9,6 +9,9 @@ export default function validateMasterConfig(rawConfig: {[index: string]: any}):
 
   return undefined;
 }
+
+// TODO: main files and files of entities должны быть относительные пути
+
 // const recursive = (container, curPath) => {
 //   _.each(container, (item, name) => {
 //     const itemPath = _.trimStart(`${curPath}.${name}`, '.');
