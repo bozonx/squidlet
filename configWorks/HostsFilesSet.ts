@@ -4,7 +4,7 @@ const _filter = require('lodash/filter');
 import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
-import {DefinitionsSet} from './interfaces/HostFilesSet';
+import DefinitionsSet from './interfaces/DefinitionsSet';
 import {sortByIncludeInList} from './helpers';
 
 

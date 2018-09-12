@@ -4,7 +4,7 @@
 
 import MasterConfig from '../configWorks/MasterConfig';
 import HostConfig, {HostConfigConfig} from '../host/src/app/interfaces/HostConfig';
-import {FilesSet} from '../configWorks/interfaces/HostFilesSet';
+import {FilesSet} from '../configWorks/interfaces/DefinitionsSet';
 
 
 interface MasterSetConfig extends HostConfigConfig {

@@ -6,7 +6,7 @@ import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
-import HostFilesSet, {EntitiesSet} from '../configWorks/interfaces/HostFilesSet';
+import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {ManifestsTypePluralName} from '../configWorks/Entities';
 import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
 
