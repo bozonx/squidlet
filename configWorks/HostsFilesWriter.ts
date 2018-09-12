@@ -40,8 +40,9 @@ export default class HostsFilesWriter {
     for (let hostId of this.main.hostsConfigSet.getHostsIds()) {
       const filesSet: HostFilesSet = {
         config: this.main.hostsConfigSet.getHostConfig(hostId),
+        entities: this.main.hostsFilesSet.getEntitiesSet(hostId),
         ...this.main.hostsFilesSet.getDefinitionsSet(hostId),
-        ...this.main.hostsFilesSet.getDestEntitiesSet(hostId),
+        //...this.main.hostsFilesSet.getDestEntitiesSet(hostId),
       };
 
       await this.proceedHost(hostId, filesSet);
@@ -69,6 +70,7 @@ export default class HostsFilesWriter {
     await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), hostFileSet.driversDefinitions);
     await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), hostFileSet.servicesDefinitions);
 
+    // TODO: !!! entities
     // TODO: !!! ????
     //await this.main.$writeJson(path.join(hostDir, systemConfig.entitiesFile), hostFileSet.entitiesFiles);
   }

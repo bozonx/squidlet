@@ -77,12 +77,16 @@ export default class HostsFilesSet {
     // TODO: remake
 
     const result: EntitiesSet = {
-      // parsed manifests
-      entitiesManifests: { devices: {}, drivers: {}, services: {} },
-      // paths to original main files
-      entitiesMains: { devices: {}, drivers: {}, services: {} },
-      // paths to original files
-      entitiesFiles: { devices: {}, drivers: {}, services: {} },
+      devices: {},
+      drivers: {},
+      services: {},
+
+      // // parsed manifests
+      // entitiesManifests: { devices: {}, drivers: {}, services: {} },
+      // // paths to original main files
+      // entitiesMains: { devices: {}, drivers: {}, services: {} },
+      // // paths to original files
+      // entitiesFiles: { devices: {}, drivers: {}, services: {} },
     };
 
     const allManifests: AllManifests = this.main.entities.getManifests();
@@ -96,9 +100,14 @@ export default class HostsFilesSet {
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
       for (let className of classes) {
-        result.entitiesManifests[pluralType][className] = allManifests[pluralType][className];
-        result.entitiesMains[pluralType][className] = allMains[pluralType][className];
-        result.entitiesFiles[pluralType][className] = allEntitiesFiles[pluralType][className];
+        result[pluralType][className] = {
+          srcDir: '',
+          manifest: allManifests[pluralType][className],
+          // TODO: должен быть относительный путь
+          main: allMains[pluralType][className],
+          // TODO: должены быть относительный путь
+          files: allEntitiesFiles[pluralType][className],
+        };
       }
     };
 

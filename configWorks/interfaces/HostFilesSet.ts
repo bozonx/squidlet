@@ -33,7 +33,9 @@ export interface EntitySet {
 
 // entities set by type and name like {driver: {Name: {...EntitySet}}}
 export interface EntitiesSet {
-  [index: string]: {[index: string]: EntitySet};
+  devices: {[index: string]: EntitySet};
+  drivers: {[index: string]: EntitySet};
+  services: {[index: string]: EntitySet}
 
   // // js manifests of entities
   // entitiesManifests: AllManifests;
