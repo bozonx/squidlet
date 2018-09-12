@@ -72,10 +72,11 @@ export default class HostsFilesSet {
     };
   }
 
+  /**
+   * Get set of entities of specified host
+   * @param hostId
+   */
   getEntitiesSet(hostId: string): EntitiesSet {
-
-    // TODO: remake
-
     const result: EntitiesSet = {
       devices: {},
       drivers: {},
@@ -89,9 +90,9 @@ export default class HostsFilesSet {
       // entitiesFiles: { devices: {}, drivers: {}, services: {} },
     };
 
-    const allManifests: AllManifests = this.main.entities.getManifests();
-    const allMains: FilesPaths = this.main.entities.getMainFiles();
-    const allEntitiesFiles: FilesPaths = this.main.entities.getEntitiesFiles();
+    //const allManifests: AllManifests = this.main.entities.getManifests();
+    //const allMains: FilesPaths = this.main.entities.getMainFiles();
+    //const allEntitiesFiles: FilesPaths = this.main.entities.getEntitiesFiles();
 
     // collect manifest names of used entities
     const devicesClasses = this.getDevicesClassNames(hostId);
@@ -101,12 +102,10 @@ export default class HostsFilesSet {
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
       for (let className of classes) {
         result[pluralType][className] = {
-          srcDir: '',
-          manifest: allManifests[pluralType][className],
-          // TODO: должен быть относительный путь
-          main: allMains[pluralType][className],
-          // TODO: должены быть относительный путь
-          files: allEntitiesFiles[pluralType][className],
+          srcDir: this.main.entities.getSrcDir(pluralType, className),
+          manifest: this.main.entities.getManifest(pluralType, className),
+          main: this.main.entities.getMainFilePath(pluralType, className),
+          files: this.main.entities.getFiles(pluralType, className),
         };
       }
     };

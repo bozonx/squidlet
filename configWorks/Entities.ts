@@ -88,17 +88,30 @@ export default class Entities {
     };
   }
 
-  // TODO: remove
-  getFiles(): FilesPaths {
-    return this.filesPaths;
+
+  // getEntitiesFiles(): FilesPaths {
+  //   // TODO: без манифестов и main файлов
+  // }
+
+  // getMainFiles(): FilesPaths {
+  //   // TODO: do it - вернуть список относительных путей к main файлам
+  // }
+
+  getSrcDir(pluralType: ManifestsTypePluralName, name: string): string {
+    // TODO: вернуть абсолютный путь к src dir сущности
   }
 
-  getEntitiesFiles(): FilesPaths {
-    // TODO: без манифестов и main файлов
+  getManifest(pluralType: ManifestsTypePluralName, name: string): ManifestBase {
+    // TODO:
   }
 
-  getMainFiles(): FilesPaths {
-    // TODO: do it
+  getMainFilePath(pluralType: ManifestsTypePluralName, name: string): string {
+    // TODO: вернуть относительный путь к main файлу
+  }
+
+  getFiles(pluralType: ManifestsTypePluralName, name: string): string[] {
+    //return this.filesPaths;
+    // TODO: вернуть список дополнительных файлов сущности
   }
 
   getDependencies(): Dependencies {
