@@ -74,9 +74,8 @@ export default class System {
     delete this.initializationConfig;
   }
 
-  $registerConfigSetManager(configSetManager: ConfigSetManager) {
-    this.configSetManager = configSetManager;
-    this.configSetManager.init(this);
+  $registerConfigSetManager(ConfigSetManager: new (system: System) => ConfigSetManager) {
+    this.configSetManager = new ConfigSetManager(this);
   }
 
   async $registerDevs(devs: {[index: string]: EntityClassType}) {

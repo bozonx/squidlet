@@ -12,6 +12,19 @@ import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
 const debug: boolean = Boolean(yargs.argv.debug);
 
 
+function prepareHostSystem (main: Main): System {
+  // generate master config js object with paths of master host configs and entities files
+  const masterHostConfig: HostConfig = generateMasterConfig(main);
+  const platformName: string = masterHostConfig.platform;
+  const hostSystem: System = getPlatformSystem(platformName);
+
+  // register config set manager
+  hostSystem.$registerConfigSetManager(ConfigSetMaster);
+
+  return hostSystem;
+}
+
+
 // master:
 // * receives master config
 // * generate all the host files
@@ -28,13 +41,8 @@ async function init () {
   // write all the hosts and entities files exclude master's host files
   await main.writeToStorage(true);
 
-  // generate master config js object with paths of master host configs and entities files
-  const masterHostConfig: HostConfig = generateMasterConfig(main);
-  const platformName: string = masterHostConfig.platform;
-  const hostSystem: System = getPlatformSystem(platformName);
-  const configSetManager: ConfigSetManager = new ConfigSetMaster(masterHostConfig);
-  // register config set manager
-  hostSystem.$registerConfigSetManager(configSetManager);
+  const hostSystem = prepareHostSystem(main);
+
   // start master host system
   await hostSystem.start();
 }

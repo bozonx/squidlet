@@ -1,20 +1,16 @@
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
+import HostConfig from '../interfaces/HostConfig';
 
 
 export default class ConfigSetMaster implements ConfigSetManager {
-  private _system?: System;
+  // host config which is integrated at index files init time
+  static hostConfig: HostConfig;
 
-  private get system(): System {
-    return this._system as System;
-  }
+  private readonly system: System;
 
-  constructor(masterSet) {
-
-  }
-
-  init(system: System) {
-    this._system = system;
+  constructor(system: System) {
+    this.system = system;
   }
 
   async loadConfig<T>(configFileName: string): Promise<T> {
