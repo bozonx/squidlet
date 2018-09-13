@@ -37,6 +37,9 @@ describe.only 'master.HostsFilesWriter', ->
   it 'writeEntitiesFiles', ->
     # TODO: !!!!
 
+    await @hostsFilesWriter.proceedEntity()
+
+
   it 'writeHostsFiles', ->
     configDir = '/buildDir/hosts/master/config'
 
