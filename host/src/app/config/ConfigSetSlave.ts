@@ -4,6 +4,8 @@ import ConfigSetManager from '../interfaces/ConfigSetManager';
 import systemConfig from './systemConfig';
 import FsDev from '../interfaces/dev/Fs.dev';
 import System from '../System';
+import ManifestBase from '../interfaces/ManifestBase';
+import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 
 
 export default class ConfigSetSlave implements ConfigSetManager {
@@ -35,7 +37,7 @@ export default class ConfigSetSlave implements ConfigSetManager {
     return await this.loadJson(definitionsJsonFile);
   }
 
-  async loadManifest<T>(typeDir: string, entityDir: string) : Promise<T> {
+  async loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
 
     // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
 
@@ -56,7 +58,7 @@ export default class ConfigSetSlave implements ConfigSetManager {
   // );
 
 
-  async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
+  async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
 
     // TODO: rename to loadEntityMainFile
     // TODO: запрашивать сервис - он либо подгрузит из флеша либо отдаст вбилженный
@@ -77,7 +79,7 @@ export default class ConfigSetSlave implements ConfigSetManager {
    * @param entityName
    * @param fileName - relative file name
    */
-  async loadEntityFile(entityType: string, entityName: string, fileName: string): Promise<string> {
+  async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
     // TODO: load local entity file from flash
   }
 

@@ -32,7 +32,7 @@ describe 'app.ServicesManager', ->
     @system = {
       initCfg: initializationConfig()
       configSet: {
-        loadEntityClass: => @service
+        loadMain: => @service
         loadConfig: sinon.stub()
       }
     }

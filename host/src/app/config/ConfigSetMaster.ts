@@ -59,7 +59,7 @@ export default class ConfigSetMaster implements ConfigSetManager {
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
    */
-  async loadEntityClass<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
+  async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
     const entitySet: SrcEntitySet = this.configSet.entitiesSet[pluralType][entityName];
 
     if (!entitySet.main) {
@@ -75,7 +75,7 @@ export default class ConfigSetMaster implements ConfigSetManager {
     return require(fileName);
   }
 
-  async loadEntityFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
+  async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
 
   }
 

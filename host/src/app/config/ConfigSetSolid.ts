@@ -1,5 +1,7 @@
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
+import ManifestBase from '../interfaces/ManifestBase';
+import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 
 
 export default class ConfigSetSolid implements ConfigSetManager {
@@ -21,15 +23,15 @@ export default class ConfigSetSolid implements ConfigSetManager {
 
   }
 
-  async loadManifest<T>(typeDir: string, entityDir: string) : Promise<T> {
+  async loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
 
   }
 
-  async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
+  async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
 
   }
 
-  async loadEntityFile(entityType: string, entityName: string, fileName: string): Promise<string> {
+  async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
 
   }
 

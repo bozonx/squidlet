@@ -40,7 +40,7 @@ describe 'app.DriversManager', ->
     @system = {
       initCfg: initializationConfig()
       configSet: {
-        loadEntityClass: => @driver
+        loadMain: => @driver
       }
     }
     @driversManager = new DriversManager(@system)
