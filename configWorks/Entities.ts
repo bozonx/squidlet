@@ -1,4 +1,4 @@
-import {SrcEntitiesSet} from './interfaces/EntitySet';
+import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
 
 const _omit = require('lodash/omit');
 import * as path from 'path';
@@ -15,15 +15,6 @@ import systemConfig from './configs/systemConfig';
 export type ManifestsTypeName = 'device' | 'driver' | 'service';
 export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
-// original or destination files
-export interface FilesPaths {
-  // list of devices files by device name
-  devices: {[index: string]: string[]};
-  // list of drivers files by driver name
-  drivers: {[index: string]: string[]};
-  // list of services files by service name
-  services: {[index: string]: string[]};
-}
 
 export interface Dependencies {
   // list of dependencies of devices by device name
@@ -46,19 +37,6 @@ export interface EntitiesNames {
   services: string[];
 }
 
-// export interface EntitiesSrcDirs {
-//   devices: {[index: string]: string};
-//   drivers: {[index: string]: string};
-//   services: {[index: string]: string};
-// }
-//
-// export interface EntitiesMainFiles {
-//   devices: {[index: string]: string};
-//   drivers: {[index: string]: string};
-//   services: {[index: string]: string};
-// }
-
-
 export default class Entities {
   private readonly main: Main;
   private readonly entitiesDir: string;
@@ -67,31 +45,6 @@ export default class Entities {
     drivers: {},
     services: {},
   };
-
-  // private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
-  // private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
-  // private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
-
-
-  // // base dirs of entities
-  // private srcDirs: EntitiesSrcDirs = {
-  //   devices: {},
-  //   drivers: {},
-  //   services: {},
-  // };
-  // // relative main files of entities
-  // private mainFiles: EntitiesMainFiles = {
-  //   devices: {},
-  //   drivers: {},
-  //   services: {},
-  // };
-  // // relative paths of entities files
-  // private filesPaths: FilesPaths = {
-  //   devices: {},
-  //   drivers: {},
-  //   services: {},
-  // };
-
   // temporary driver and devs deps list like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
   private unsortedDependencies: Dependencies = {
     devices: {},
@@ -172,6 +125,8 @@ export default class Entities {
    */
   getDevs(): string[] {
     const result: {[index: string]: true} = {};
+    const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
+
     const collect = (depdOfType: {[index: string]: string[]}) => {
       for (let entityName of Object.keys(depdOfType)) {
         for (let itemName of depdOfType[entityName]) {
@@ -181,8 +136,8 @@ export default class Entities {
     };
 
     // get devs from drivers
-    for (let itemName of Object.keys(this.drivers.toJS())) {
-      if (this.drivers.get(itemName).dev) result[itemName] = true;
+    for (let itemName of Object.keys(drivers)) {
+      if (drivers[itemName].manifest.dev) result[itemName] = true;
     }
 
     // dev dependencies of entities
@@ -231,25 +186,10 @@ export default class Entities {
       files: preManifest.files || [],
     };
 
-    //this.srcDirs[pluralType][finalManifest.name] = preManifest.baseDir;
-
-    // // add to list of manifests
-    // this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
-    //   .set(finalManifest.name, finalManifest);
-
-    // if (preManifest.main) {
-    //   this.mainFiles[pluralType][finalManifest.name] = preManifest.main;
-    // }
-
     // just save unsorted deps
     if (preManifest.drivers) {
       this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
     }
-
-    // // collect files of entity which will be placed in storage
-    // if (preManifest.files) {
-    //   this.filesPaths[pluralType][preManifest.name] = preManifest.files;
-    // }
   }
 
   private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {
@@ -289,7 +229,9 @@ export default class Entities {
   }
 
   private sortDriver(pluralType: ManifestsTypePluralName, entityName: string, driverName: string) {
-    if (!this.drivers.get(driverName)) {
+    const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
+
+    if (!drivers[driverName]) {
       // if it doesn't have a manifest but its name ends with ".dev" - it probably dev is
       if (driverName.match(/\.dev$/)) {
         if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
@@ -302,7 +244,7 @@ export default class Entities {
       throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
     }
 
-    const driverManifest: DriverManifest = this.drivers.get(driverName);
+    const driverManifest: DriverManifest = drivers[driverName].manifest;
 
     if (driverManifest.dev) {
     //if (driverName.match(/\.dev$/)) {
@@ -320,18 +262,18 @@ export default class Entities {
   }
 
   private generateSystemDriversList() {
-    const drivers: {[index: string]: DriverManifest} = this.drivers.toJS();
+    const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
 
     for (let driverName of Object.keys(drivers)) {
-      if (drivers[driverName].system) this.systemDrivers.push(driverName);
+      if (drivers[driverName].manifest.system) this.systemDrivers.push(driverName);
     }
   }
 
   private generateSystemServicesList() {
-    const services: {[index: string]: ServiceManifest} = this.services.toJS();
+    const services: {[index: string]: SrcEntitySet} = this.getEntitiesSet().services;
 
     for (let serviceName of Object.keys(services)) {
-      if (services[serviceName].system) this.systemServices.push(serviceName);
+      if (services[serviceName].manifest.system) this.systemServices.push(serviceName);
     }
   }
 

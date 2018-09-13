@@ -1,4 +1,4 @@
-import {SrcEntitiesSet} from './interfaces/EntitySet';
+import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
 
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
@@ -230,7 +230,7 @@ export default class Definitions {
   private checkDefinitions() {
     const entities: SrcEntitiesSet = this.main.entities.getEntitiesSet();
     const check = (
-      entitiesOfType: {[index: string]: SrcEntitiesSet},
+      entitiesOfType: {[index: string]: SrcEntitySet},
       definitions: {[index: string]: {[index: string]: EntityDefinition}}
     ) => {
       for(let hostId of Object.keys(definitions)) {
