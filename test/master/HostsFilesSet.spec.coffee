@@ -3,7 +3,6 @@ HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 describe.only 'master.HostsFilesSet', ->
   beforeEach ->
-    @hostConfig = { host: 'config' }
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
       SysDriver: { id: 'SysDriver', className: 'SysDriver', system: true }
@@ -25,27 +24,8 @@ describe.only 'master.HostsFilesSet', ->
     }
     @systemDrivers = [ 'SysDriver' ]
     @systemServices = [ 'SysService' ]
-    @entitiesFiles = {
-      devices: {
-        DeviceClass: [ '/path/to/file' ]
-      }
-      drivers: {
-        SysDriver: [ '/path/to/file' ]
-        RegularDriver: [ '/path/to/file' ]
-        OtherDriver: [ '/path/to/file' ]
-        Dev: [ '/path/to/file' ]
-      }
-      services: {
-        SysService: [ '/path/to/file' ]
-        RegularService: [ '/path/to/file' ]
-      }
-    }
 
     @main = {
-      hostsConfigSet: {
-        getHostsIds: => [ 'master' ]
-        getHostConfig: => @hostConfig
-      }
       definitions: {
         getHostDevicesDefinitions: () => @devicesDefinitions
         getHostDriversDefinitions: () => @driversDefinitions
@@ -55,7 +35,6 @@ describe.only 'master.HostsFilesSet', ->
         getDependencies: => @dependencies
         getSystemDrivers: => @systemDrivers
         getSystemServices: => @systemServices
-        getFiles: => @entitiesFiles
         getDevs: => [ 'Dev' ]
       }
     }
