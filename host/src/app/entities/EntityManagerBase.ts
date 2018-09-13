@@ -1,6 +1,7 @@
 import System from '../System';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import Env from '../interfaces/Env';
+import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 
 
 interface BaseEntityInstance {
@@ -22,7 +23,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
 
   protected async makeInstance (definition: EntityDefinition): Promise<EntityInstance> {
     const EntityClass = await this.system.configSet.loadMain<EntityClassType>(
-      this.system.initCfg.hostDirs.devices,
+      this.system.initCfg.hostDirs.devices as ManifestsTypePluralName,
       definition.id
     );
 

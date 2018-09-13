@@ -6,6 +6,7 @@ import Messenger from '../../messenger/Messenger';
 import Devices from '../Devices';
 import DriverInstance from '../interfaces/DriverInstance';
 import Env from '../interfaces/Env';
+import DriverManifest from '../interfaces/DriverManifest';
 
 
 /**
@@ -35,5 +36,10 @@ export default class EntityEnv implements Env {
   getDriver<T extends DriverInstance>(driverName: string): T {
     return this.system.driversManager.getDriver<T>(driverName);
   }
+
+  // TODO: наверное лучше разделить env для services и devices
+  // async loadManifest(driverName: string): Promise<DriverManifest> {
+  //   return this.system.configSet.loadManifest('drivers', driverName);
+  // }
 
 }

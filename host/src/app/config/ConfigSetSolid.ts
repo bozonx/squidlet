@@ -1,38 +1,11 @@
-import ConfigSetManager from '../interfaces/ConfigSetManager';
-import System from '../System';
-import ManifestBase from '../interfaces/ManifestBase';
-import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import {HostFilesSet} from '../interfaces/HostFilesSet';
-import FsDev from '../interfaces/dev/Fs.dev';
+import ConfigSetBase from './ConfigSetBase';
 
 
-export default class ConfigSetSolid implements ConfigSetManager {
-  private readonly system: System;
-  private readonly fs: FsDev;
-
-  private get configSet(): HostFilesSet {
-    // TODO: get it from global
-  }
-
-  constructor(system: System) {
-    this.system = system;
-    this.fs = this.system.driversManager.getDev('Fs');
-  }
-
-  async loadConfig<T>(configFileName: string): Promise<T> {
-
-  }
-
-  async loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-
-  }
-
-  async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-
-  }
-
-  async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
-
+export default class ConfigSetSolid extends ConfigSetBase {
+  protected get configSet(): HostFilesSet {
+    // TODO: может лучше использовать requireJs?
+    return (global as any).__HOST_CONFIG_SET as HostFilesSet;
   }
 
 }
