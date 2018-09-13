@@ -2,10 +2,16 @@ const _isEmpty = require('lodash/isEmpty');
 const _find = require('lodash/find');
 const _trim = require('lodash/trim');
 import { TextEncoder, TextDecoder } from 'text-encoding';
+import * as uniqid from 'uniqid';
 
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
 
+
+export function generateUniqId(): string {
+  // TODO: почему не используется из helpers ???
+  return uniqid();
+}
 
 // TODO: move to separate file
 export function validateMessage(message: Message) {

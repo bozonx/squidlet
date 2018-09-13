@@ -14,6 +14,8 @@ export interface HostConfigConfig {
 
 
 export default interface HostConfig {
+  // id of host e.g master
+  id: string;
   platform: Platforms;
 
   // TODO: rename host to props ?

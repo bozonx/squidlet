@@ -1,36 +1,16 @@
-import * as path from 'path';
-const _defaultsDeep = require('lodash/defaultsDeep');
-import * as uniqid from 'uniqid';
-
-import FsDev from './interfaces/dev/Fs.dev';
-import DeviceManifest from './interfaces/DeviceManifest';
 import System from './System';
 import HostConfig from './interfaces/HostConfig';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
-import DriverManifest from './interfaces/DriverManifest';
-import ServiceManifest from './interfaces/ServiceManifest';
-import systemConfig from './config/systemConfig';
+import {generateUniqId} from '../helpers/helpers';
 
-
-// TODO: ??? use immutable
 
 export default class Host {
   private readonly system: System;
   private hostConfig?: HostConfig;
   private readonly hostNetworkConfig: HostNetworkConfig;
 
-  // TODO: config - почему бы не брать общий конфиг в таком виде как передан в приложение ?
-
   get id(): string {
-
-    // TODO: review
-    // TODO: может использовать network.hostId
-
-    //return this.hostConfig.address.host;
-
-    // if (this.hostConfig.slave) return this.hostConfig.address.host;
-    //
-    return 'master';
+    return this.config.id;
   }
 
   get config(): HostConfig {
@@ -44,15 +24,9 @@ export default class Host {
   constructor(system: System) {
     this.system = system;
 
-
-    // TODO: откуда его взять
+    // TODO: review - put into main config
 
     this.hostNetworkConfig = {} as HostNetworkConfig;
-  }
-
-  generateUniqId(): string {
-    // TODO: почему не используется из helpers ???
-    return uniqid();
   }
 
 
@@ -65,6 +39,14 @@ export default class Host {
     );
   }
 
+
+  /**
+   * Generate unique id.
+   * It places here for easy testing and mocking.
+   */
+  generateUniqId(): string {
+    return generateUniqId();
+  }
 
   // getAddress(type: string, bus: string): string | undefined {
   //   const addrConfig = this.config.address;
