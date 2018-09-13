@@ -9,15 +9,15 @@ describe.only 'master.Entities', ->
         baseDir: '/myBaseDir'
         main: './main.ts'
         files: [
-          'deviceFile.json'
+          './deviceFile.json'
         ]
         drivers: [
           'DriverName.driver'
         ]
         props: {
-          props: 'value'
+          propsParam: 'value'
         }
-        param: 'value'
+        extParam: 'value'
       }
     ]
     @prePreDriverManifest = [
@@ -115,35 +115,69 @@ describe.only 'master.Entities', ->
 
     await @entities.generate()
 
-    assert.deepEqual(@entities.getManifests(), @finalManifests)
+    #assert.deepEqual(@entities.getManifests(), @finalManifests)
 
-    assert.deepEqual(@entities.getFiles(), {
+    assert.deepEqual(@entities.getEntitiesSet(), {
       devices: {
-        DeviceClass: [
-          '/buildDir/entities/devices/DeviceClass/deviceFile.json'
-          '/buildDir/entities/devices/DeviceClass/__main.js'
-          '/buildDir/entities/devices/DeviceClass/manifest.json'
-        ]
+        DeviceClass: {
+          srcDir: '/myBaseDir'
+          main: './main.ts'
+          files: [
+            './deviceFile.json'
+          ]
+          manifest: {
+            name: "DeviceClass"
+            props: {
+              propsParam: 'value'
+            }
+            extParam: "value"
+          }
+        }
       }
       drivers: {
-        'DriverName.driver': [
-          '/buildDir/entities/drivers/DriverName.driver/driverFile.json'
-          '/buildDir/entities/drivers/DriverName.driver/__main.js'
-          '/buildDir/entities/drivers/DriverName.driver/manifest.json'
-        ]
-        # dev which was registered in Register
-        "DevName.dev": [
-          "/buildDir/entities/drivers/DevName.dev/manifest.json"
-        ]
+        'DevName.dev': {
+          srcDir: undefined
+          main: undefined
+          files: []
+          manifest: {
+            name: 'DevName.dev'
+            dev: true
+            param: 'value'
+          }
+        }
       }
       services: {
-        ServiceClass: [
-          '/buildDir/entities/services/ServiceClass/serviceFile.json'
-          '/buildDir/entities/services/ServiceClass/__main.js'
-          '/buildDir/entities/services/ServiceClass/manifest.json'
-        ]
+
       }
     })
+
+#    assert.deepEqual(@entities.getFiles(), {
+#      devices: {
+#        DeviceClass: [
+#          '/buildDir/entities/devices/DeviceClass/deviceFile.json'
+#          '/buildDir/entities/devices/DeviceClass/__main.js'
+#          '/buildDir/entities/devices/DeviceClass/manifest.json'
+#        ]
+#      }
+#      drivers: {
+#        'DriverName.driver': [
+#          '/buildDir/entities/drivers/DriverName.driver/driverFile.json'
+#          '/buildDir/entities/drivers/DriverName.driver/__main.js'
+#          '/buildDir/entities/drivers/DriverName.driver/manifest.json'
+#        ]
+#        # dev which was registered in Register
+#        "DevName.dev": [
+#          "/buildDir/entities/drivers/DevName.dev/manifest.json"
+#        ]
+#      }
+#      services: {
+#        ServiceClass: [
+#          '/buildDir/entities/services/ServiceClass/serviceFile.json'
+#          '/buildDir/entities/services/ServiceClass/__main.js'
+#          '/buildDir/entities/services/ServiceClass/manifest.json'
+#        ]
+#      }
+#    })
 
     assert.deepEqual(@entities.getDependencies(), {
       devices: {
