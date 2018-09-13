@@ -4,6 +4,7 @@ import HostsConfigsSet from './HostsConfigsSet';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import * as EventEmitter from 'events';
 import MasterConfig from './MasterConfig';
+import {SrcEntitiesSet} from './interfaces/EntitySet';
 
 
 const AFTER_INIT_EVENT = 'afterInit';
@@ -32,8 +33,8 @@ export default class PluginEnv {
     this.hostsConfigSet = hostsConfigSet;
   }
 
-  getManifests(): AllManifests {
-    return this.entities.getManifests();
+  getEntitiesSet(): SrcEntitiesSet {
+    return this.entities.getEntitiesSet();
   }
 
   getHostsConfigs(): {[index: string]: HostConfig} {

@@ -1,3 +1,5 @@
+import {SrcEntitiesSet} from './interfaces/EntitySet';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
@@ -226,23 +228,23 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
-    const manifests: AllManifests = this.main.entities.getManifests();
+    const entities: SrcEntitiesSet = this.main.entities.getEntitiesSet();
     const check = (
-      manifests: {[index: string]: ManifestBase},
+      entitiesOfType: {[index: string]: SrcEntitiesSet},
       definitions: {[index: string]: {[index: string]: EntityDefinition}}
     ) => {
       for(let hostId of Object.keys(definitions)) {
         for (let entityDef of _values(definitions[hostId])) {
-          if (!manifests[entityDef.className]) {
-            throw new Error(`Can't find a manifest "${entityDef.className}" of definition ${JSON.stringify(entityDef)}`);
+          if (!entitiesOfType[entityDef.className]) {
+            throw new Error(`Can't find an entity "${entityDef.className}" of definition ${JSON.stringify(entityDef)}`);
           }
         }
       }
     };
 
-    check(manifests.devices, this.devicesDefinitions);
-    check(manifests.drivers, this.driversDefinitions);
-    check(manifests.services, this.servicesDefinitions);
+    check(entities.devices, this.devicesDefinitions);
+    check(entities.drivers, this.driversDefinitions);
+    check(entities.services, this.servicesDefinitions);
   }
 
 }

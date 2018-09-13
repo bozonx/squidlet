@@ -1,6 +1,7 @@
+import {SrcEntitiesSet} from './interfaces/EntitySet';
+
 const _omit = require('lodash/omit');
 import * as path from 'path';
-import {Map} from 'immutable';
 
 import Main from './Main';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
@@ -45,44 +46,52 @@ export interface EntitiesNames {
   services: string[];
 }
 
-export interface EntitiesSrcDirs {
-  devices: {[index: string]: string};
-  drivers: {[index: string]: string};
-  services: {[index: string]: string};
-}
-
-export interface EntitiesMainFiles {
-  devices: {[index: string]: string};
-  drivers: {[index: string]: string};
-  services: {[index: string]: string};
-}
+// export interface EntitiesSrcDirs {
+//   devices: {[index: string]: string};
+//   drivers: {[index: string]: string};
+//   services: {[index: string]: string};
+// }
+//
+// export interface EntitiesMainFiles {
+//   devices: {[index: string]: string};
+//   drivers: {[index: string]: string};
+//   services: {[index: string]: string};
+// }
 
 
 export default class Entities {
   private readonly main: Main;
   private readonly entitiesDir: string;
-  private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
-  private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
-  private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
+  private entitiesSet: SrcEntitiesSet = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
 
-  // base dirs of entities
-  private srcDirs: EntitiesSrcDirs = {
-    devices: {},
-    drivers: {},
-    services: {},
-  };
-  // relative main files of entities
-  private mainFiles: EntitiesMainFiles = {
-    devices: {},
-    drivers: {},
-    services: {},
-  };
-  // relative paths of entities files
-  private filesPaths: FilesPaths = {
-    devices: {},
-    drivers: {},
-    services: {},
-  };
+  // private devices: Map<string, DeviceManifest> = Map<string, DeviceManifest>();
+  // private drivers: Map<string, DriverManifest> = Map<string, DriverManifest>();
+  // private services: Map<string, ServiceManifest> = Map<string, ServiceManifest>();
+
+
+  // // base dirs of entities
+  // private srcDirs: EntitiesSrcDirs = {
+  //   devices: {},
+  //   drivers: {},
+  //   services: {},
+  // };
+  // // relative main files of entities
+  // private mainFiles: EntitiesMainFiles = {
+  //   devices: {},
+  //   drivers: {},
+  //   services: {},
+  // };
+  // // relative paths of entities files
+  // private filesPaths: FilesPaths = {
+  //   devices: {},
+  //   drivers: {},
+  //   services: {},
+  // };
+
   // temporary driver and devs deps list like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
   private unsortedDependencies: Dependencies = {
     devices: {},
@@ -111,38 +120,34 @@ export default class Entities {
     this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
-  getManifests(): AllManifests {
-    return {
-      devices: this.devices.toJS(),
-      drivers: this.drivers.toJS(),
-      services: this.services.toJS(),
-    };
+  getEntitiesSet(): SrcEntitiesSet {
+    return this.entitiesSet;
   }
 
   getAllEntitiesNames(): EntitiesNames {
-    const allManifests: AllManifests = this.getManifests();
+    const allEntities: SrcEntitiesSet = this.getEntitiesSet();
 
     return {
-      devices: Object.keys(allManifests.devices),
-      drivers: Object.keys(allManifests.drivers),
-      services: Object.keys(allManifests.services),
+      devices: Object.keys(allEntities.devices),
+      drivers: Object.keys(allEntities.drivers),
+      services: Object.keys(allEntities.services),
     };
   }
 
   getSrcDir(pluralType: ManifestsTypePluralName, name: string): string {
-    return this.srcDirs[pluralType][name];
+    return this.entitiesSet[pluralType][name].srcDir;
   }
 
   getManifest(pluralType: ManifestsTypePluralName, name: string): ManifestBase {
-    return (this[pluralType] as Map<string, ManifestBase>).get(name);
+    return this.entitiesSet[pluralType][name].manifest;
   }
 
   getMainFilePath(pluralType: ManifestsTypePluralName, name: string): string | undefined {
-    return this.mainFiles[pluralType][name];
+    return this.entitiesSet[pluralType][name].main;
   }
 
   getFiles(pluralType: ManifestsTypePluralName, name: string): string[] {
-    return this.filesPaths[pluralType][name] || [];
+    return this.entitiesSet[pluralType][name].files;
   }
 
   getDependencies(): Dependencies {
@@ -219,25 +224,32 @@ export default class Entities {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
     const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
 
-    this.srcDirs[pluralType][finalManifest.name] = preManifest.baseDir;
+    this.entitiesSet[pluralType][preManifest.name] = {
+      srcDir: preManifest.baseDir,
+      manifest: finalManifest,
+      main: preManifest.main,
+      files: preManifest.files || [],
+    };
 
-    // add to list of manifests
-    this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
-      .set(finalManifest.name, finalManifest);
+    //this.srcDirs[pluralType][finalManifest.name] = preManifest.baseDir;
 
-    if (preManifest.main) {
-      this.mainFiles[pluralType][finalManifest.name] = preManifest.main;
-    }
+    // // add to list of manifests
+    // this[pluralType] = (this[pluralType] as Map<string, FinalManifest>)
+    //   .set(finalManifest.name, finalManifest);
+
+    // if (preManifest.main) {
+    //   this.mainFiles[pluralType][finalManifest.name] = preManifest.main;
+    // }
 
     // just save unsorted deps
     if (preManifest.drivers) {
       this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
     }
 
-    // collect files of entity which will be placed in storage
-    if (preManifest.files) {
-      this.filesPaths[pluralType][preManifest.name] = preManifest.files;
-    }
+    // // collect files of entity which will be placed in storage
+    // if (preManifest.files) {
+    //   this.filesPaths[pluralType][preManifest.name] = preManifest.files;
+    // }
   }
 
   private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {

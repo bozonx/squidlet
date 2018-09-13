@@ -18,6 +18,12 @@ export interface EntitySet {
   files: string[];
 }
 
+export interface SrcEntitiesSet {
+  devices: {[index: string]: SrcEntitySet};
+  drivers: {[index: string]: SrcEntitySet};
+  services: {[index: string]: SrcEntitySet};
+}
+
 export interface SrcEntitySet extends EntitySet {
   srcDir: string;
 }
