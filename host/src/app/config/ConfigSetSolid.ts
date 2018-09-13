@@ -2,7 +2,7 @@ import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
-import {SrcHostFilesSet} from '../interfaces/HostFilesSet';
+import {HostFilesSet} from '../interfaces/HostFilesSet';
 import FsDev from '../interfaces/dev/Fs.dev';
 
 
@@ -10,7 +10,7 @@ export default class ConfigSetSolid implements ConfigSetManager {
   private readonly system: System;
   private readonly fs: FsDev;
 
-  private get configSet(): SrcHostFilesSet {
+  private get configSet(): HostFilesSet {
     // TODO: get it from global
   }
 

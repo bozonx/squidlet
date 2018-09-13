@@ -12,7 +12,7 @@ import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
-import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
@@ -21,7 +21,7 @@ const debug: boolean = Boolean(yargs.argv.debug);
 /**
  * Generate master host config with integrated files set which points to original (ts or js) files
  */
-export function generateMasterConfigSet(main: Main): SrcHostFilesSet {
+export function generateMasterConfigSet(main: Main): HostFilesSet {
   const hostId = 'master';
   return {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),

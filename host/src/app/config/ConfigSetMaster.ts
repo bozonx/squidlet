@@ -3,10 +3,10 @@ import * as path from 'path';
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
 import HostConfig from '../interfaces/HostConfig';
-import {SrcHostFilesSet} from '../interfaces/HostFilesSet';
+import {HostFilesSet} from '../interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ManifestBase from '../interfaces/ManifestBase';
-import {SrcEntitySet} from '../../../../configWorks/interfaces/EntitySet';
+import {EntitySet} from '../../../../configWorks/interfaces/EntitySet';
 import FsDev from '../interfaces/dev/Fs.dev';
 
 
@@ -17,7 +17,7 @@ export default class ConfigSetMaster implements ConfigSetManager {
   private readonly system: System;
   private readonly fs: FsDev;
 
-  private get configSet(): SrcHostFilesSet {
+  private get configSet(): HostFilesSet {
     return ConfigSetMaster.hostConfig.config.params.configSet;
   }
 
@@ -63,7 +63,7 @@ export default class ConfigSetMaster implements ConfigSetManager {
 
     // TODO: путь уже зарезолвен
 
-    const entitySet: SrcEntitySet = this.configSet.entitiesSet[pluralType][entityName];
+    const entitySet: EntitySet = this.configSet.entitiesSet[pluralType][entityName];
 
     if (!entitySet.main) {
       throw new Error(`Entity "${pluralType}, ${entityName}" does not have a main file`);
