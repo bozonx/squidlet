@@ -60,9 +60,9 @@ export function hexToBytes(hex: string): Uint8Array {
 export function bytesToHexString(bytesArr: Uint8Array): string {
   let result = '';
 
-  for(let byte of bytesArr) {
+  bytesArr.forEach((byte: number) => {
     result += hexNumToHexString(Number(byte));
-  }
+  });
 
   return result;
 }

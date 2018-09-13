@@ -34,7 +34,7 @@ export default class Poling {
     }
 
     const id = this.resolveId(uniqId);
-    const polingCbWrapper: Function = () => {
+    const polingCbWrapper = () => {
       methodWhichWillPoll()
         .then((result) => this.events.emit(id, null, result))
         .catch((err) => this.events.emit(id, err));
@@ -43,7 +43,7 @@ export default class Poling {
     // start first time immediately
     polingCbWrapper();
 
-    this.intervals[id] = setInterval(polingCbWrapper, pollInterval);
+    this.intervals[id] = setInterval(polingCbWrapper, pollInterval) as any;
   }
 
   addListener(handler: (err: Error, result: any) => void, uniqId: string | undefined) {
@@ -62,7 +62,7 @@ export default class Poling {
   stopPoling(uniqId: string | undefined) {
     const id = this.resolveId(uniqId);
 
-    clearInterval(this.intervals[id]);
+    clearInterval(this.intervals[id] as any);
     delete this.intervals[id];
   }
 
