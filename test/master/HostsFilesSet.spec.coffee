@@ -1,7 +1,7 @@
 HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
-describe 'master.HostsFilesSet', ->
+describe.only 'master.HostsFilesSet', ->
   beforeEach ->
     @hostConfig = { host: 'config' }
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
@@ -61,24 +61,22 @@ describe 'master.HostsFilesSet', ->
     }
     @hostsFilesSet = new HostsFilesSet(@main)
 
-  it 'collect', ->
-    @hostsFilesSet.collect()
 
-    assert.deepEqual(@hostsFilesSet.getCollection(), {
-      master: {
-        config: @hostConfig
-        entitiesFiles: {
-          @entitiesFiles...
-          drivers: _.omit(@entitiesFiles.drivers, 'Dev')
-        }
+  it 'getDefinitionsSet', ->
+    assert.deepEqual @hostsFilesSet.getDefinitionsSet('master'), {
+      systemDrivers: @systemDrivers
+      regularDrivers: [ 'RegularDriver', 'OtherDriver' ]
+      systemServices: @systemServices
+      regularServices: [ 'RegularService' ]
 
-        systemDrivers: @systemDrivers
-        regularDrivers: [ 'RegularDriver', 'OtherDriver' ]
-        systemServices: @systemServices
-        regularServices: [ 'RegularService' ]
+      devicesDefinitions: Object.values(@devicesDefinitions)
+      driversDefinitions: @driversDefinitions
+      servicesDefinitions: @servicesDefinitions
+    }
 
-        devicesDefinitions: Object.values(@devicesDefinitions)
-        driversDefinitions: @driversDefinitions
-        servicesDefinitions: @servicesDefinitions
-      }
-    })
+  it 'getEntitiesNames', ->
+    assert.deepEqual @hostsFilesSet.getEntitiesNames('master'), {
+      devices: [ 'DeviceClass' ]
+      drivers: [ 'SysDriver', 'RegularDriver', 'OtherDriver' ]
+      services: [ 'SysService', 'RegularService' ]
+    }

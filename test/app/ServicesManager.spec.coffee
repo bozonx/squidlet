@@ -2,7 +2,7 @@ ServicesManager = require('../../host/src/app/entities/ServicesManager').default
 initializationConfig = require('../../host/src/app/config/initializationConfig').default
 
 
-describe.only 'app.ServicesManager', ->
+describe 'app.ServicesManager', ->
   beforeEach ->
     @props = undefined
     @service = class

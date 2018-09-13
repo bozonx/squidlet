@@ -63,55 +63,6 @@ export default class HostsFilesSet {
     return result;
   }
 
-  // /**
-  //  * Generate file set for each host
-  //  */
-  // collect() {
-  //   const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
-  //
-  //   for (let hostId of hostIds) {
-  //
-  //     // TODO: проверить что getDevDependencies есть среди devs платформы
-  //
-  //     this.files[hostId] = {
-  //       config: this.main.hostsConfigSet.getHostConfig(hostId),
-  //       entitiesFiles: this.collectEntitiesFiles(hostId),
-  //       entitiesManifests: this.collectEntitiesManifests(),
-  //       ...this.getDefinitionsSet(hostId),
-  //     };
-  //   }
-  // }
-
-
-  // TODO: зачем это нужно????
-  // private collectEntitiesFiles(hostId: string): FilesPaths {
-  //
-  //   // TODO: remake - только файлы - ссылка на оргинальный файл и куда запиывать
-  //
-  //   const result: FilesPaths = {
-  //     devices: {},
-  //     drivers: {},
-  //     services: {},
-  //   };
-  //   const allEntitiesFiles: FilesPaths = this.main.entities.getFiles();
-  //   // collect manifest names of used entities
-  //   const devicesClasses = this.getDevicesClassNames(hostId);
-  //   const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
-  //   const servicesClasses: string[] = this.getServicesClassNames(hostId);
-  //
-  //   const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
-  //     for (let className of classes) {
-  //       result[pluralType][className] = allEntitiesFiles[pluralType][className];
-  //     }
-  //   };
-  //
-  //   collect('devices', devicesClasses);
-  //   collect('drivers', allDriversClasses);
-  //   collect('services', servicesClasses);
-  //
-  //   return result;
-  // }
-
   /**
    * sort drivers to system and regular
    * @returns [systemDrivers, regularDrivers]
@@ -134,7 +85,7 @@ export default class HostsFilesSet {
     return sortByIncludeInList(servicesClasses, allSystemServices);
   }
 
-  getDevicesClassNames(hostId: string): string[] {
+  private getDevicesClassNames(hostId: string): string[] {
     const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
 
     return Object.keys(devicesDefinitions)
@@ -175,7 +126,7 @@ export default class HostsFilesSet {
     return filtered.map((item: EntityDefinition) => item.className);
   }
 
-  getServicesClassNames(hostId: string): string[] {
+  private getServicesClassNames(hostId: string): string[] {
     const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
 
     return Object.keys(servicesDefinitions)
@@ -220,3 +171,53 @@ export default class HostsFilesSet {
   }
 
 }
+
+
+// /**
+//  * Generate file set for each host
+//  */
+// collect() {
+//   const hostIds: string[] = this.main.hostsConfigSet.getHostsIds();
+//
+//   for (let hostId of hostIds) {
+//
+//     // TODO: проверить что getDevDependencies есть среди devs платформы
+//
+//     this.files[hostId] = {
+//       config: this.main.hostsConfigSet.getHostConfig(hostId),
+//       entitiesFiles: this.collectEntitiesFiles(hostId),
+//       entitiesManifests: this.collectEntitiesManifests(),
+//       ...this.getDefinitionsSet(hostId),
+//     };
+//   }
+// }
+
+
+// TODO: зачем это нужно????
+// private collectEntitiesFiles(hostId: string): FilesPaths {
+//
+//   // TODO: remake - только файлы - ссылка на оргинальный файл и куда запиывать
+//
+//   const result: FilesPaths = {
+//     devices: {},
+//     drivers: {},
+//     services: {},
+//   };
+//   const allEntitiesFiles: FilesPaths = this.main.entities.getFiles();
+//   // collect manifest names of used entities
+//   const devicesClasses = this.getDevicesClassNames(hostId);
+//   const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
+//   const servicesClasses: string[] = this.getServicesClassNames(hostId);
+//
+//   const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+//     for (let className of classes) {
+//       result[pluralType][className] = allEntitiesFiles[pluralType][className];
+//     }
+//   };
+//
+//   collect('devices', devicesClasses);
+//   collect('drivers', allDriversClasses);
+//   collect('services', servicesClasses);
+//
+//   return result;
+// }
