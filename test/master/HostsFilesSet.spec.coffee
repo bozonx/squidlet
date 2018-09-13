@@ -1,7 +1,7 @@
 HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
-describe.only 'master.HostsFilesSet', ->
+describe 'master.HostsFilesSet', ->
   beforeEach ->
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {

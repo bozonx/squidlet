@@ -1,70 +1,81 @@
 HostsFilesWriter = require('../../configWorks/HostsFilesWriter').default
 
 
-describe 'master.HostsFilesWriter', ->
+describe.only 'master.HostsFilesWriter', ->
   beforeEach ->
-    @hostFiles = {
-      master: {
-        config: 'config'
-        systemDrivers: 'systemDrivers'
-        regularDrivers: 'regularDrivers'
-        systemServices: 'systemServices'
-        regularServices: 'regularServices'
-        devicesDefinitions: 'devicesDefinitions'
-        driversDefinitions: 'driversDefinitions'
-        servicesDefinitions: 'servicesDefinitions'
-        entitiesFiles: 'entitiesFiles'
-      }
+    @definitionsSet = {
+      systemDrivers: 'systemDrivers'
+      regularDrivers: 'regularDrivers'
+      systemServices: 'systemServices'
+      regularServices: 'regularServices'
+      devicesDefinitions: 'devicesDefinitions'
+      driversDefinitions: 'driversDefinitions'
+      servicesDefinitions: 'servicesDefinitions'
+      entitiesFiles: 'entitiesFiles'
+    }
+    @entitiesNames = {
+      devices: [ 'device1' ]
+      drivers: [ 'Driver1' ]
+      services: [ 'service1' ]
     }
     @main = {
       masterConfig: {
-        buildDir: '/bildDir'
+        buildDir: '/buildDir'
+      }
+      hostsConfigSet: {
+        getHostsIds: => [ 'master' ]
+        getHostConfig: => 'config'
       }
       hostsFilesSet: {
-        getCollection: => @hostFiles
+        getDefinitionsSet: => @definitionsSet
+        getEntitiesNames: => @entitiesNames
       }
       $writeJson: sinon.spy()
     }
     @hostsFilesWriter = new HostsFilesWriter(@main)
 
-  it 'writeToStorage', ->
-    configDir = '/bildDir/hosts/master/config'
+  it 'writeEntitiesFiles', ->
+    # TODO: !!!!
 
-    await @hostsFilesWriter.writeToStorage()
+  it 'writeHostsFiles', ->
+    configDir = '/buildDir/hosts/master/config'
+
+    await @hostsFilesWriter.writeHostsFiles()
 
     sinon.assert.calledWith(@main.$writeJson.getCall(0),
       "#{configDir}/hostConfig.json",
-      @hostFiles.master.config
+      'config'
     )
+
     sinon.assert.calledWith(@main.$writeJson.getCall(1),
       "#{configDir}/systemDrivers.json",
-      @hostFiles.master.systemDrivers
+      @definitionsSet.systemDrivers
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(2),
       "#{configDir}/regularDrivers.json",
-      @hostFiles.master.regularDrivers
+      @definitionsSet.regularDrivers
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(3),
       "#{configDir}/systemServices.json",
-      @hostFiles.master.systemServices
+      @definitionsSet.systemServices
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(4),
       "#{configDir}/regularServices.json",
-      @hostFiles.master.regularServices
+      @definitionsSet.regularServices
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(5),
       "#{configDir}/devicesDefinitions.json",
-      @hostFiles.master.devicesDefinitions
+      @definitionsSet.devicesDefinitions
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(6),
       "#{configDir}/driversDefinitions.json",
-      @hostFiles.master.driversDefinitions
+      @definitionsSet.driversDefinitions
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(7),
       "#{configDir}/servicesDefinitions.json",
-      @hostFiles.master.servicesDefinitions
+      @definitionsSet.servicesDefinitions
     )
     sinon.assert.calledWith(@main.$writeJson.getCall(8),
-      "/bildDir/hosts/master/entitiesFiles.json",
-      @hostFiles.master.entitiesFiles
+      "/buildDir/hosts/master/usedEntities.json",
+      @entitiesNames
     )

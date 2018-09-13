@@ -24,14 +24,6 @@ export default class HostsFilesWriter {
     this.entitiesDstDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
-  // /**
-  //  * Copy files of entities and hosts to storage
-  //  */
-  // async writeToStorage() {
-  //   await this.writeEntitiesFiles();
-  //   await this.writeHostsFiles();
-  // }
-
   /**
    * Copy files of entities to storage
    */
@@ -53,7 +45,7 @@ export default class HostsFilesWriter {
    */
   async writeHostsFiles(skipMaster: boolean = false) {
     for (let hostId of this.main.hostsConfigSet.getHostsIds()) {
-      if (hostId === 'master') return;
+      if (skipMaster && hostId === 'master') return;
 
       await this.proceedHost(hostId);
     }
@@ -112,9 +104,6 @@ export default class HostsFilesWriter {
       hostConfig
     );
 
-    // write list of entities names
-    await this.main.$writeJson(path.join(hostDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
-
     // write host's definitions
     await this.main.$writeJson(path.join(configDir, fileNames.systemDrivers), definitionsSet.systemDrivers);
     await this.main.$writeJson(path.join(configDir, fileNames.regularDrivers), definitionsSet.regularDrivers);
@@ -123,6 +112,9 @@ export default class HostsFilesWriter {
     await this.main.$writeJson(path.join(configDir, fileNames.devicesDefinitions), definitionsSet.devicesDefinitions);
     await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), definitionsSet.driversDefinitions);
     await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), definitionsSet.servicesDefinitions);
+    // write list of entities names
+    await this.main.$writeJson(path.join(hostDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
+
   }
 
 }
