@@ -5,10 +5,8 @@ import rpi from '../platforms/squidlet-rpi/index';
 import {loadYamlFile} from '../configWorks/IO';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
-import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
+import {SrcEntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
-import HostConfig from '../host/src/app/interfaces/HostConfig';
-import HostFilesSet from '../host/src/app/interfaces/HostFilesSet';
 
 
 export type PlatformIndex = () => System;
@@ -39,37 +37,12 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
   return await loadYamlFile(resolvedPath) as T;
 }
 
-/**
- * Generate master host config with integrated files set which points to original (ts or js) files
- */
-export function generateMasterConfig(main: Main): HostConfig {
-  const hostId = 'master';
-  const hostConfig = main.hostsConfigSet.getHostConfig(hostId);
-  const configSet: HostFilesSet = {
-    ...main.hostsFilesSet.getDefinitionsSet(hostId),
-    entitiesSet: generateSrcEntitiesSet(main, hostId),
-  };
-
-  return {
-    ...hostConfig,
-    config: {
-      ...hostConfig.config,
-      params: {
-        ...hostConfig.config.params,
-        configSet,
-      }
-    }
-  };
-}
-
-
-////// Private
 
 /**
  * Get set of entities of specified host
  */
-function generateSrcEntitiesSet(main: Main, hostId: string): EntitiesSet {
-  const result: EntitiesSet = {
+export function generateSrcEntitiesSet(main: Main, hostId: string): SrcEntitiesSet {
+  const result: SrcEntitiesSet = {
     devices: {},
     drivers: {},
     services: {},

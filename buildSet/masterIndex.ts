@@ -1,16 +1,46 @@
 import * as yargs from 'yargs';
 
 import MasterConfig from '../configWorks/MasterConfig';
-import {generateMasterConfig, getPlatformSystem, readConfig, resolveConfigPath} from './helpers';
+import {
+  generateSrcEntitiesSet,
+  getPlatformSystem,
+  readConfig,
+  resolveConfigPath
+} from './helpers';
 import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
 import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
+import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
 
+
+/**
+ * Generate master host config with integrated files set which points to original (ts or js) files
+ */
+export function generateMasterConfigSet(main: Main): SrcHostFilesSet {
+  const hostId = 'master';
+  return {
+    ...main.hostsFilesSet.getDefinitionsSet(hostId),
+    config: main.hostsConfigSet.getHostConfig(hostId),
+    entitiesSet: generateSrcEntitiesSet(main, hostId),
+  };
+
+  //
+  // return {
+  //   ...hostConfig,
+  //   config: {
+  //     ...hostConfig.config,
+  //     params: {
+  //       ...hostConfig.config.params,
+  //       configSet,
+  //     }
+  //   }
+  // };
+}
 
 function prepareHostSystem (main: Main): System {
   // generate master config js object with paths of master host configs and entities files

@@ -3,7 +3,7 @@ import * as path from 'path';
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
 import HostConfig from '../interfaces/HostConfig';
-import SrcHostFilesSet from '../interfaces/HostFilesSet';
+import {SrcHostFilesSet} from '../interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ManifestBase from '../interfaces/ManifestBase';
 import {SrcEntitySet} from '../../../../configWorks/interfaces/EntitySet';
@@ -60,6 +60,9 @@ export default class ConfigSetMaster implements ConfigSetManager {
    * @param entityName - name of entity
    */
   async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
+
+    // TODO: путь уже зарезолвен
+
     const entitySet: SrcEntitySet = this.configSet.entitiesSet[pluralType][entityName];
 
     if (!entitySet.main) {
@@ -76,7 +79,8 @@ export default class ConfigSetMaster implements ConfigSetManager {
   }
 
   async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
-
+    // TODO: add
+    return '';
   }
 
 }
