@@ -33,3 +33,9 @@ export default function validateMasterConfig(rawConfig: {[index: string]: any}):
 // };
 //
 // recursive(schema.params, '');
+
+// TODO: проверить существование файлов из манифеста
+
+// if (!await this.fs.exists(entitySet.main)) {
+//   throw new Error(`Can't find main file "${entitySet.main}"`);
+// }

@@ -60,22 +60,14 @@ export default class ConfigSetMaster implements ConfigSetManager {
    * @param entityName - name of entity
    */
   async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-
-    // TODO: путь уже зарезолвен
-
     const entitySet: EntitySet = this.configSet.entitiesSet[pluralType][entityName];
 
     if (!entitySet.main) {
       throw new Error(`Entity "${pluralType}, ${entityName}" does not have a main file`);
     }
 
-    const fileName = path.join(entitySet.srcDir, entitySet.main);
-
-    if (!await this.fs.exists(fileName)) {
-      throw new Error(`Can't find main file "${fileName}"`);
-    }
-
-    return require(fileName);
+    // the main file is already resolved
+    return require(entitySet.main);
   }
 
   async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
