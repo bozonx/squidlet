@@ -8,12 +8,8 @@ import Main from '../configWorks/Main';
 import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
-import DefinitionsSet from '../configWorks/interfaces/DefinitionsSet';
+import HostFilesSet from '../host/src/app/interfaces/HostFilesSet';
 
-
-interface HostFilesSet extends DefinitionsSet {
-  entitiesSet: EntitiesSet;
-}
 
 export type PlatformIndex = () => System;
 
