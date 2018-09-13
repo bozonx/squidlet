@@ -1,7 +1,11 @@
 import DefinitionsSet from '../../../../configWorks/interfaces/DefinitionsSet';
-import {EntitiesSet} from '../../../../configWorks/interfaces/EntitySet';
+import {SrcEntitiesSet, EntitiesSet} from '../../../../configWorks/interfaces/EntitySet';
 
 
-export default interface HostFilesSet extends DefinitionsSet {
+export interface SrcHostFilesSet extends DefinitionsSet {
+  entitiesSet: SrcEntitiesSet;
+}
+
+export interface HostFilesSet extends DefinitionsSet {
   entitiesSet: EntitiesSet;
 }

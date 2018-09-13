@@ -1,4 +1,3 @@
-import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
 
 
@@ -19,13 +18,3 @@ export default interface DefinitionsSet {
   // list of services definitions
   servicesDefinitions: {[index: string]: EntityDefinition};
 }
-
-
-
-
-
-// export default interface HostFilesSet extends DefinitionsSet {
-//   // TODO: не нужно
-//   config?: HostConfig;
-//   entities: EntitiesSet;
-// }

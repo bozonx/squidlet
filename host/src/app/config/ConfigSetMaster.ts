@@ -3,9 +3,11 @@ import * as path from 'path';
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
 import HostConfig from '../interfaces/HostConfig';
-import HostFilesSet from '../interfaces/HostFilesSet';
+import SrcHostFilesSet from '../interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ManifestBase from '../interfaces/ManifestBase';
+import {SrcEntitySet} from '../../../../configWorks/interfaces/EntitySet';
+import FsDev from '../interfaces/dev/Fs.dev';
 
 
 export default class ConfigSetMaster implements ConfigSetManager {
@@ -13,13 +15,15 @@ export default class ConfigSetMaster implements ConfigSetManager {
   static hostConfig: HostConfig;
 
   private readonly system: System;
+  private readonly fs: FsDev;
 
-  private get configSet(): HostFilesSet {
+  private get configSet(): SrcHostFilesSet {
     return ConfigSetMaster.hostConfig.config.params.configSet;
   }
 
   constructor(system: System) {
     this.system = system;
+    this.fs = this.system.driversManager.getDev('Fs');
   }
 
   /**
@@ -50,11 +54,28 @@ export default class ConfigSetMaster implements ConfigSetManager {
    return this.configSet.entitiesSet[pluralType][entityName].manifest as T;
   }
 
-  async loadEntityClass<T>(typeDir: string, entityDir: string) : Promise<T> {
+  /**
+   * Require for a main file as is without building.
+   * @param pluralType - devices, drivers or services
+   * @param entityName - name of entity
+   */
+  async loadEntityClass<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
+    const entitySet: SrcEntitySet = this.configSet.entitiesSet[pluralType][entityName];
 
+    if (!entitySet.main) {
+      throw new Error(`Entity "${pluralType}, ${entityName}" does not have a main file`);
+    }
+
+    const fileName = path.join(entitySet.srcDir, entitySet.main);
+
+    if (!await this.fs.exists(fileName)) {
+      throw new Error(`Can't find main file "${fileName}"`);
+    }
+
+    return require(fileName);
   }
 
-  async loadEntityFile(entityType: string, entityName: string, fileName: string): Promise<string> {
+  async loadEntityFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
 
   }
 
