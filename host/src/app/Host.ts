@@ -16,7 +16,7 @@ import systemConfig from './config/systemConfig';
 
 export default class Host {
   private readonly system: System;
-  private readonly hostConfig: HostConfig;
+  private hostConfig?: HostConfig;
   private readonly hostNetworkConfig: HostNetworkConfig;
 
   // TODO: config - почему бы не брать общий конфиг в таком виде как передан в приложение ?
@@ -33,56 +33,17 @@ export default class Host {
     return 'master';
   }
 
-  // /**
-  //  * Manifests by device class name
-  //  */
-  // get devicesManifests(): {[index: string]: DeviceManifest} {
-  //   return this.hostConfig.devicesManifests;
-  // }
-
-  // /**
-  //  * DevicesManager config by ids
-  //  */
-  // get devicesConfigs(): {[index: string]: DeviceConf} {
-  //   return this.hostConfig.devicesConfigs;
-  // }
-
-  // get driversList(): Array<string> {
-  //   return this.hostConfig.drivers;
-  // }
-
-  /**
-   * Full host config
-   */
   get config(): HostConfig {
-    return this.hostConfig;
+    return this.hostConfig as HostConfig;
   }
 
   get networkConfig(): HostNetworkConfig {
     return this.hostNetworkConfig;
   }
 
-  // parsed devices manifests by device's class name
-  get devicesManifests(): {[index: string]: DeviceManifest} {
-
-  }
-
-  // TODO: почему тут список а в других местах объект?
-  // parsed and sorted drivers manifests
-  get driversManifests(): DriverManifest[] {
-
-  }
-
-  // parsed manifests of services
-  get servicesManifests(): {[index: string]: ServiceManifest} {
-
-  }
-
   constructor(system: System) {
     this.system = system;
 
-    // TODO: прочитать разово с диска и удалить из памяти
-    this.hostConfig = this.mergeConfigs(hostConfig);
 
     // TODO: откуда его взять
 
@@ -99,7 +60,9 @@ export default class Host {
    * load config from storage
    */
   async init(): Promise<void> {
-    // TODO: !!! hostConfig: HostConfig
+    this.hostConfig = await this.system.configSet.loadConfig<HostConfig>(
+      this.system.initCfg.fileNames.hostConfig
+    );
   }
 
 
@@ -121,22 +84,5 @@ export default class Host {
   //     address: this.getAddress(type, bus),
   //   }
   // }
-
-
-  private mergeConfigs(specifiedConfig: HostConfig): HostConfig {
-    // TODO: не нужно
-
-    // return {
-    //   ...specifiedConfig,
-    //   host: {
-    //     ..._defaultsDeep({ ...specifiedConfig.host }, configHostPlatform, configHostDefault),
-    //   }
-    // }
-  }
-
-
-
-
-
 
 }
