@@ -3,6 +3,8 @@ import {SrcEntitiesSet, EntitiesSet} from '../../../../configWorks/interfaces/En
 import HostConfig from './HostConfig';
 
 
+// TODO: rename to HostConfigSet
+
 export interface SrcHostFilesSet extends DefinitionsSet {
   entitiesSet: SrcEntitiesSet;
   config: HostConfig;

@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
-import HostConfig from '../interfaces/HostConfig';
 import {HostFilesSet} from '../interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ManifestBase from '../interfaces/ManifestBase';
@@ -12,13 +11,13 @@ import FsDev from '../interfaces/dev/Fs.dev';
 
 export default class ConfigSetMaster implements ConfigSetManager {
   // host config which is integrated at index files init time
-  static hostConfig: HostConfig;
+  static hostConfigSet: HostFilesSet;
 
   private readonly system: System;
   private readonly fs: FsDev;
 
   private get configSet(): HostFilesSet {
-    return ConfigSetMaster.hostConfig.config.params.configSet;
+    return ConfigSetMaster.hostConfigSet;
   }
 
   constructor(system: System) {

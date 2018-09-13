@@ -10,8 +10,6 @@ import {
 import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
-import HostConfig from '../host/src/app/interfaces/HostConfig';
-import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
 
@@ -28,25 +26,16 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
     config: main.hostsConfigSet.getHostConfig(hostId),
     entitiesSet: generateSrcEntitiesSet(main, hostId),
   };
-
-  //
-  // return {
-  //   ...hostConfig,
-  //   config: {
-  //     ...hostConfig.config,
-  //     params: {
-  //       ...hostConfig.config.params,
-  //       configSet,
-  //     }
-  //   }
-  // };
 }
 
 function prepareHostSystem (main: Main): System {
   // generate master config js object with paths of master host configs and entities files
-  const masterHostConfig: HostConfig = generateMasterConfig(main);
-  const platformName: string = masterHostConfig.platform;
+  const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
+  const platformName: string = hostConfigSet.config.platform;
   const hostSystem: System = getPlatformSystem(platformName);
+
+  // integrate a config set
+  ConfigSetMaster.hostConfigSet = hostConfigSet;
 
   // register config set manager
   hostSystem.$registerConfigSetManager(ConfigSetMaster);

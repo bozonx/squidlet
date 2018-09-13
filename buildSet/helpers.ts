@@ -5,7 +5,7 @@ import rpi from '../platforms/squidlet-rpi/index';
 import {loadYamlFile} from '../configWorks/IO';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
-import {SrcEntitiesSet} from '../configWorks/interfaces/EntitySet';
+import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
 
 
@@ -41,8 +41,8 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
 /**
  * Get set of entities of specified host
  */
-export function generateSrcEntitiesSet(main: Main, hostId: string): SrcEntitiesSet {
-  const result: SrcEntitiesSet = {
+export function generateSrcEntitiesSet(main: Main, hostId: string): EntitiesSet {
+  const result: EntitiesSet = {
     devices: {},
     drivers: {},
     services: {},
