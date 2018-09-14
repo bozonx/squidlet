@@ -9,15 +9,16 @@ import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
 
 
-export type PlatformIndex = () => System;
+export type PlatformIndex = () => Promise<System>;
 
+// TODO: не очень правильно потомучто нужно иметь возможность добавить платформу как плагин
 export const platforms: {[index: string]: PlatformIndex} = {
   x86,
   rpi,
 };
 
 
-export function getPlatformSystem(platformName: string): System {
+export function getPlatformSystem(platformName: string): Promise<System> {
   if (!platforms[platformName]) {
     throw new Error(`Platform "${platformName}" haven't been found`);
   }
@@ -67,6 +68,18 @@ export function generateSrcEntitiesSet(main: Main, hostId: string): EntitiesSet 
   collect('devices', usedEntitiesNames.devices);
   collect('drivers', usedEntitiesNames.drivers);
   collect('services', usedEntitiesNames.services);
+
+  return result;
+}
+
+export function generateDstEntitiesSet(main: Main, hostId: string): EntitiesSet {
+  const result: EntitiesSet = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
+
+  // TODO: make requireJs paths
 
   return result;
 }

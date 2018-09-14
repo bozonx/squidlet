@@ -28,11 +28,11 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
   };
 }
 
-function prepareHostSystem (main: Main): System {
+async function prepareHostSystem (main: Main): Promise<System> {
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
   const platformName: string = hostConfigSet.config.platform;
-  const hostSystem: System = getPlatformSystem(platformName);
+  const hostSystem: System = await getPlatformSystem(platformName);
 
   // integrate a config set
   ConfigSetMaster.hostConfigSet = hostConfigSet;
@@ -60,7 +60,7 @@ async function init () {
   // write all the hosts and entities files exclude master's host files
   await main.writeToStorage(true);
 
-  const hostSystem = prepareHostSystem(main);
+  const hostSystem = await prepareHostSystem(main);
 
   // start master host system
   await hostSystem.start();

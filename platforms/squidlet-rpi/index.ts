@@ -7,8 +7,6 @@ import FsDev from './dev/Fs.dev';
 export default async function (): Promise<System> {
   const system: System = new System();
 
-  // TODO: может вынести в отдельный файлы чтобы можно было подключать в своем проекте
-
   await system.$registerDevs({
     'Gpio.dev': GpioDev,
     'I2cMaster.dev': I2cMasterDev,

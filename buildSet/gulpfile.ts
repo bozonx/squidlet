@@ -5,13 +5,12 @@ import * as ts from 'gulp-typescript';
 import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
-import {loadYamlFile} from '../configWorks/IO';
-import MasterConfig from '../configWorks/MasterConfig';
-import HostConfig from '../host/src/app/interfaces/HostConfig';
-import generateHostSet from './generateHostSet';
-import {PlatformIndex, readConfig, resolveConfigPath} from '../host/src/helpers';
+import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
+import {generateDstEntitiesSet, generateSrcEntitiesSet, PlatformIndex, readConfig, resolveConfigPath} from './helpers';
 import x86 from '../platforms/squidlet-x86/index';
 import rpi from '../platforms/squidlet-rpi/index';
+import Main from '../configWorks/Main';
+import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
 
 
@@ -37,30 +36,38 @@ gulp.task('slave', function () {
 
 
 // solid - build all in one file (system, host config, platform devs and config, entities files)
-// * it receives name of host(default is master), host config(includes platform name)
+// * it receives name of host(default is master), host config like { host: ...hostParams }
 // * it generates host configs set and put it to build
 gulp.task('solid', async function () {
-
-  // TODO: сбилдить систему чтобы чтобы иметь последнюю версию
-
   if (!yargs.argv.name) {
     throw new Error(`You have to specify a "--name" params`);
   }
 
   const hostId: string = yargs.argv.name || 'master';
   const resolvedPath: string = resolveConfigPath(yargs.argv.config);
-  const hostConfig: HostConfig = await readConfig<HostConfig>(resolvedPath);
-  const hostSet = generateHostSet(hostConfig);
-  const platformName: string = hostSet.platform;
+  const hostConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedPath);
 
+  const main: Main = new Main(hostConfig, resolvedPath);
+
+  console.info(`===> Collecting configs and entities files of all the host`);
+  await main.collect();
+
+  const hostConfigSet: HostFilesSet = {
+    ...main.hostsFilesSet.getDefinitionsSet(hostId),
+    config: main.hostsConfigSet.getHostConfig(hostId),
+    entitiesSet: generateDstEntitiesSet(main, hostId),
+  };
+
+  const platformName: string = hostConfigSet.config.platform;
+
+  // TODO: global.__DEBUG
+  // TODO: global.__SYSTEM_CLASS - use platform wrapper (возвращает промис)
   // TODO: global.__HOST_CONFIG_SET
-  // TODO: сбилдить запускательный файл
   // TODO: global.__HOST_CONFIG_SET_MANAGER
-  // TODO: global.__SYSTEM_CLASS
+  // TODO: build silidIndex.js
 
-  // TODO: склеить запускательный файл, систему(уже сбилженную), конфиги и файлы entities
-  // TODO: ??? как сбилдить файлы entitites??? они должны браться из файлов, но вставляться в структуру
-
+  // TODO: все эти файлоы сделать через requireJs и склеить в один
+  // TODO: так же сбилдить файлы entitites
 });
 
 
