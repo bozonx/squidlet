@@ -1,10 +1,8 @@
-// See interface in squidlet/host/src/app/interfaces/dev/I2cMaster.dev.ts
-
 import * as i2cBusModule from 'i2c-bus';
 import DriverFactoryBase from '../../../host/src/app/entities/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/entities/DriverEnv';
 import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
-import {I2cSlaveDev} from '../../squidlet-esp32/dev/I2cSlave.dev';
+import I2cMaster from '../../../host/src/app/interfaces/dev/I2cMaster.dev';
 
 
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
@@ -13,7 +11,7 @@ import {I2cSlaveDev} from '../../squidlet-esp32/dev/I2cSlave.dev';
 /**
  * It's raspberry pi implementation of I2C master.
  */
-export class I2cMasterDev {
+export class I2cMasterDev implements I2cMaster {
   private readonly bus: i2cBusModule.I2cBus;
 
   constructor(props: EntityProps, env: DriverEnv, bus: number) {
@@ -74,5 +72,5 @@ export default class Factory extends DriverFactoryBase {
       props: EntityProps,
       env: DriverEnv,
       bus: number
-    ): I2cSlaveDev } = I2cSlaveDev;
+    ): I2cMasterDev } = I2cMasterDev;
 }

@@ -1,5 +1,3 @@
-// See interface in squidlet/host/src/app/interfaces/dev/Fs.dev.ts
-
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
