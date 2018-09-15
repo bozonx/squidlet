@@ -7,6 +7,9 @@ import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
+import GpioDev from '../platforms/squidlet-rpi/dev/Gpio.dev';
+import I2cMasterDev from '../platforms/squidlet-rpi/dev/I2cMaster.dev';
+import FsDev from '../platforms/squidlet-rpi/dev/Fs.dev';
 
 
 export type PlatformIndex = () => Promise<System>;
@@ -82,4 +85,17 @@ export function generateDstEntitiesSet(main: Main, hostId: string): EntitiesSet 
   // TODO: make requireJs paths
 
   return result;
+}
+
+
+export async function platformWrapper(): Promise<System> {
+  const system: System = new System();
+
+  await system.$registerDevs({
+    'Gpio.dev': GpioDev,
+    'I2cMaster.dev': I2cMasterDev,
+    'Fs.dev': FsDev,
+  });
+
+  return system;
 }
