@@ -4,7 +4,7 @@ import PlatformConfig from '../../configWorks/interfaces/PlatformConfig';
 const platformConfig: PlatformConfig = {
   devs: [
     'Fs',
-    'Gpio',
+    'Digital',
     //'Pwm',
     'Serial',
     //'Spi',

@@ -5,7 +5,7 @@ import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
 import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
-import GpioDev from '../platforms/squidlet-rpi/dev/Gpio.dev';
+import GpioDev from '../platforms/squidlet-rpi/dev/Digital.dev';
 import I2cMasterDev from '../platforms/squidlet-rpi/dev/I2cMaster.dev';
 import FsDev from '../platforms/squidlet-rpi/dev/Fs.dev';
 
