@@ -6,6 +6,7 @@ export default function validateMasterConfig(rawConfig: {[index: string]: any}):
   //   throw new Error(`Master config doesn't have "host" or "hosts" params`);
   // }
 
+  // TODO: platform is requred
 
   return undefined;
 }

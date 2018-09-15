@@ -9,7 +9,7 @@ import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
-import {PLATFORM_ESP32, PLATFORM_ESP8266, PLATFORM_RPI, PLATFORM_X86} from './interfaces/Platforms';
+import Platforms, {PLATFORM_ESP32, PLATFORM_ESP8266, PLATFORM_RPI, PLATFORM_X86} from './interfaces/Platforms';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
@@ -63,7 +63,9 @@ export default class MasterConfig {
     const result: {[index: string]: PreHostConfig} = {};
 
     for (let hostId of Object.keys(hosts)) {
-      const platformConfig: PlatformConfig = {};
+      // platform is validated at the moment
+      const hostPlatform: Platforms = hosts[hostId].platform as Platforms;
+      const platformConfig: PlatformConfig = platforms[hostPlatform];
 
       result[hostId] = _defaultsDeep(_cloneDeep(hosts[hostId]), platformConfig.hostConfig);
     }
