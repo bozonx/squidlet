@@ -12,7 +12,7 @@ import FsDev from '../platforms/squidlet-rpi/dev/Fs.dev';
 
 export type PlatformIndex = () => Promise<System>;
 
-// TODO: не очень правильно потомучто нужно иметь возможность добавить платформу как плагин
+
 export const platforms: {[index: string]: PlatformIndex} = {
   x86,
   rpi,

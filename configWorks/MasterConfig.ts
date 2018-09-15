@@ -1,12 +1,27 @@
-const _omit = require('lodash/omit');
+import PlatformConfig from './interfaces/PlatformConfig';
+
+const _defaultsDeep = require('lodash/defaultsDeep');
+const _cloneDeep = require('lodash/cloneDeep');
 import * as path from 'path';
 
 import Main from './Main';
-import Platforms from './interfaces/Platforms';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
+import {PLATFORM_ESP32, PLATFORM_ESP8266, PLATFORM_RPI, PLATFORM_X86} from './interfaces/Platforms';
+import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
+import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
+import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
+import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
+
+
+const platforms: {[index: string]: PlatformConfig} = {
+  [PLATFORM_ESP32]: platform_esp32,
+  [PLATFORM_ESP8266]: platform_esp8266,
+  [PLATFORM_RPI]: platform_rpi,
+  [PLATFORM_X86]: platform_x86_linux,
+};
 
 
 export default class MasterConfig {
@@ -39,14 +54,22 @@ export default class MasterConfig {
     if (masterConfig.plugins) this._plugins = masterConfig.plugins;
     if (masterConfig.hostDefaults) this._hostDefaults = masterConfig.hostDefaults;
 
-    this._hosts = this.resolveHosts(masterConfig);
+    this._hosts = this.mergeHostsWithPlatformConfig(this.resolveHosts(masterConfig));
     this.buildDir = this.generateBuildDir(masterConfigPath);
   }
 
 
-  // getPlatformConfig(platformName: Platforms) {
-  //
-  // }
+  private mergeHostsWithPlatformConfig(hosts: {[index: string]: PreHostConfig}): {[index: string]: PreHostConfig} {
+    const result: {[index: string]: PreHostConfig} = {};
+
+    for (let hostId of Object.keys(hosts)) {
+      const platformConfig: PlatformConfig = {};
+
+      result[hostId] = _defaultsDeep(_cloneDeep(hosts[hostId]), platformConfig.hostConfig);
+    }
+
+    return result;
+  }
 
   private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
     let hosts: {[index: string]: PreHostConfig} = {};

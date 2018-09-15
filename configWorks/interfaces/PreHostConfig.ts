@@ -6,7 +6,7 @@ import Platforms from './Platforms';
 
 // raw host config specified in master config
 export default interface PreHostConfig {
-  platform: Platforms;
+  platform?: Platforms;
 
   // specific config for each host
   config: {

@@ -1,4 +1,7 @@
-export default {
+import PlatformConfig from '../../configWorks/interfaces/PlatformConfig';
+
+
+const platformConfig: PlatformConfig = {
   devs: [
     'Fs',
     'Gpio',
@@ -19,3 +22,5 @@ export default {
     }
   }
 };
+
+export default platformConfig;

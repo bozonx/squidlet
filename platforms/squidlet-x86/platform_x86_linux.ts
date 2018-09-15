@@ -1,4 +1,7 @@
-export default {
+import PlatformConfig from '../../configWorks/interfaces/PlatformConfig';
+
+
+const platformConfig: PlatformConfig = {
   devs: [
     'Fs',
     'Wifi',
@@ -20,3 +23,5 @@ export default {
     }
   }
 };
+
+export default platformConfig;
