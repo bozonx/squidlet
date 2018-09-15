@@ -15,7 +15,7 @@ export default {
     'Touch',
   ],
 
-  host: {
+  hostConfig: {
     config: {
 
     }

@@ -14,7 +14,7 @@ export default {
     //'Dac',
   ],
 
-  host: {
+  hostConfig: {
     config: {
 
     }

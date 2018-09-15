@@ -14,7 +14,7 @@ export default {
     //'I2cSlave',
   ],
 
-  host: {
+  hostConfig: {
     config: {
       // TODO: review
       // connections: {
