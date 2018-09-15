@@ -4,8 +4,8 @@ import PlatformConfig from '../../configWorks/interfaces/PlatformConfig';
 const platformConfig: PlatformConfig = {
   devs: [
     'Fs',
-    'Wifi',
-    'Bluetooth',
+    //'Wifi',
+    //'Bluetooth',
 
     // via usb
     //'Gpio',

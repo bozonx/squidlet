@@ -5,11 +5,11 @@ const platformConfig: PlatformConfig = {
   devs: [
     'Fs',
     'Gpio',
-    'Pwm',
+    //'Pwm',
     'Serial',
-    'Spi',
-    'Wifi',
-    'Bluetooth',
+    //'Spi',
+    //'Wifi',
+    //'Bluetooth',
     'I2cMaster',
 
     //'Adc',
