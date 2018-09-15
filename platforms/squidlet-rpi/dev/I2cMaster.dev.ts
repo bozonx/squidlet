@@ -2,7 +2,7 @@ import * as i2cBusModule from 'i2c-bus';
 import DriverFactoryBase from '../../../host/src/app/entities/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/entities/DriverEnv';
 import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
-import I2cMaster from '../../../host/src/app/interfaces/dev/I2cMaster.dev';
+import I2cMaster from '../../../host/src/app/interfaces/dev/I2cMaster';
 
 
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле

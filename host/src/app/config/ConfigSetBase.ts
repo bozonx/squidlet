@@ -6,7 +6,7 @@ import {HostFilesSet} from '../interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ManifestBase from '../interfaces/ManifestBase';
 import {EntitySet} from '../../../../configWorks/interfaces/EntitySet';
-import FsDev from '../interfaces/dev/Fs.dev';
+import FsDev from '../interfaces/dev/Fs';
 
 
 /**

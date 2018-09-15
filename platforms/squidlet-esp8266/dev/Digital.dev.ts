@@ -1,4 +1,4 @@
-import Digital from '../../../host/src/app/interfaces/dev/Digital.dev';
+import Digital from '../../../host/src/app/interfaces/dev/Digital';
 
 
 // TODO: copy from esp32

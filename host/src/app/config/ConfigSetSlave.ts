@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import systemConfig from './systemConfig';
-import FsDev from '../interfaces/dev/Fs.dev';
+import FsDev from '../interfaces/dev/Fs';
 import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';

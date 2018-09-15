@@ -1,5 +1,5 @@
 import DriverEnv from '../../app/entities/DriverEnv';
-import FsDev, {Stats} from '../../app/interfaces/dev/Fs.dev';
+import FsDev, {Stats} from '../../app/interfaces/dev/Fs';
 
 
 export class Storage {

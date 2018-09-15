@@ -1,4 +1,4 @@
-export default interface I2cSlaveDev {
+export default interface I2cSlave {
   send(data: Uint8Array): Promise<void>;
   listenIncome(handler: (data: Uint8Array) => void): void;
   removeListener(handler: (data: Uint8Array) => void): void;

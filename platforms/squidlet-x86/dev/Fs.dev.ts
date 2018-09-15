@@ -1,4 +1,4 @@
-import Fs from '../../../host/src/app/interfaces/dev/Fs.dev';
+import Fs from '../../../host/src/app/interfaces/dev/Fs';
 
 
 // TODO: copy from rpi

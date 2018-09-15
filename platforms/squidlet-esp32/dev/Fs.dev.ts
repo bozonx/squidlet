@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
-import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs.dev';
+import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
 
 
 export default class FsDev implements Fs {

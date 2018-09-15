@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import I2cMasterDev from '../../app/interfaces/dev/I2cMaster.dev';
+import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverEnv from '../../app/entities/DriverEnv';
 import Poling from '../../helpers/Poling';
@@ -19,7 +19,7 @@ export class I2cMasterDriver {
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
-  private readonly i2cMasterDev: I2cMasterDev;
+  private readonly i2cMasterDev: I2cMaster;
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
@@ -33,7 +33,7 @@ export class I2cMasterDriver {
 
     const i2cDevDriver = this.env.getDriver<DriverFactoryBase>('I2cMaster.dev');
 
-    this.i2cMasterDev = i2cDevDriver.getInstance(this.bus) as I2cMasterDev;
+    this.i2cMasterDev = i2cDevDriver.getInstance(this.bus) as I2cMaster;
   }
 
   startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {

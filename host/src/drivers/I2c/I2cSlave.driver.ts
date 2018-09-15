@@ -1,6 +1,6 @@
 import * as EventEmitter from 'events';
 
-import I2cSlaveDev from '../../app/interfaces/dev/I2cSlave.dev';
+import I2cSlave from '../../app/interfaces/dev/I2cSlave';
 import DriverEnv from '../../app/entities/DriverEnv';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
@@ -17,7 +17,7 @@ export class I2cSlaveDriver {
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly bus: number;
-  private readonly i2cSlaveDev: I2cSlaveDev;
+  private readonly i2cSlaveDev: I2cSlave;
 
   constructor(props: EntityProps, env: DriverEnv, bus: string | number) {
     this.env = env;
@@ -29,7 +29,7 @@ export class I2cSlaveDriver {
 
     const i2cSlaveDev = this.env.getDriver<DriverFactoryBase>('I2cSlave.dev');
 
-    this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlaveDev;
+    this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlave;
     // listen all the income data
     this.i2cSlaveDev.listenIncome(this.handleIncomeData);
   }
