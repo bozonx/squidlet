@@ -9,6 +9,9 @@ import {EntityProps} from '../../app/interfaces/EntityDefinition';
 type Handler = (level: BinaryLevel) => void;
 
 
+// TODO: add watchOnce
+// TODO: инициализировать output значение - 1 или 0
+
 export class GpioInputDriver {
   private readonly props: EntityProps;
   private readonly env: DriverEnv;
