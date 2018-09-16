@@ -12,10 +12,14 @@
     "start": "ts-node ./index.ts"
   },
   "dependencies": {
-    "i2c-bus": "^4.0.1"
+    "i2c-bus": "^4.0.1",
+    "onoff": "^3.2.1",
+    "serialport": "^7.0.2"
   },
   "devDependencies": {
     "@types/node": "^10.9.2",
+    "@types/onoff": "^0.0.28",
+    "@types/serialport": "^6.0.4",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.1"
   }
