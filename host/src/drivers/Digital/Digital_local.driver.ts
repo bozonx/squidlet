@@ -5,17 +5,17 @@ import DriverEnv from '../../app/entities/DriverEnv';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 
 
-interface GpioInputDriverProps extends EntityProps {
-
+interface DigitalLocalDriverProps extends EntityProps {
+  pin: number;
 }
 
 
 export class DigitalLocalDriver {
-  private readonly props: GpioInputDriverProps;
+  private readonly props: DigitalLocalDriverProps;
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
 
-  constructor(props: GpioInputDriverProps, env: DriverEnv) {
+  constructor(props: DigitalLocalDriverProps, env: DriverEnv) {
     this.props = props;
     this.env = env;
   }
@@ -23,11 +23,8 @@ export class DigitalLocalDriver {
 }
 
 
-export default class GpioInputFactory extends DriverFactoryBase<DigitalLocalDriver> {
-  protected instanceIdName: string | number = 'pin';
+export default class GpioInputFactory extends DriverFactoryBase<DigitalLocalDriver, DigitalLocalDriverProps> {
+  // TODO: поидее всегда будет один инстанс
+  protected instanceIdName: string = 'pin';
   protected DriverClass = DigitalLocalDriver;
-
-  getInstance(additionalProps: { pin: number }): DigitalLocalDriver {
-    return super.getInstance(additionalProps);
-  }
 }
