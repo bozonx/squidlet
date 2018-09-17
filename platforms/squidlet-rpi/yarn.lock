@@ -63,9 +63,9 @@
   version "10.9.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.4.tgz#0f4cb2dc7c1de6096055357f70179043c33e9897"
 
-"@types/onoff@^0.0.28":
-  version "0.0.28"
-  resolved "https://registry.yarnpkg.com/@types/onoff/-/onoff-0.0.28.tgz#7d380870c5bed9f5c9ed1b7efea57204630100f5"
+"@types/pigpio@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@types/pigpio/-/pigpio-0.4.2.tgz#608c2fd188598bb78d31e5c40a0103d70d1ce7a2"
   dependencies:
     "@types/node" "*"
 
@@ -448,13 +448,6 @@ end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-epoll@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/epoll/-/epoll-2.0.3.tgz#6b18f2b66b5e4df568ac55414a925c3bf0d71a36"
-  dependencies:
-    bindings "^1.3.0"
-    nan "^2.10.0"
-
 error-symbol@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/error-symbol/-/error-symbol-0.1.0.tgz#0a4dae37d600d15a29ba453d8ef920f1844333f6"
@@ -637,10 +630,6 @@ lazy-cache@^2.0.1:
   dependencies:
     set-getter "^0.1.0"
 
-lodash.debounce@^4.0.8:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
-
 log-ok@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/log-ok/-/log-ok-0.1.1.tgz#bea3dd36acd0b8a7240d78736b5b97c65444a334"
@@ -757,13 +746,6 @@ once@^1.3.1, once@^1.4.0:
   resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
   dependencies:
     wrappy "1"
-
-onoff@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/onoff/-/onoff-3.2.1.tgz#aba0811846c22fcacceec462afb24aa0d96aaa6d"
-  dependencies:
-    epoll "^2.0.3"
-    lodash.debounce "^4.0.8"
 
 os-homedir@^1.0.1:
   version "1.0.2"
