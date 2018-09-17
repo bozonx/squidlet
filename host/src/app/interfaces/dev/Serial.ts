@@ -18,6 +18,7 @@ export default interface Serial {
   on(uartName: string, eventsName: 'data', handler: (data: string | Uint8Array) => void): void;
 
   // TODO: add error event - framing и parity - наверное это и есть ошибки???
+  // TODO: add open event
 
   on(uartName: string, eventsName: EventName, handler: () => void): void;
 

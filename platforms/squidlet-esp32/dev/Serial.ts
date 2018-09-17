@@ -18,20 +18,15 @@ interface EspOptions extends Options {
   tx?: number;                           // Transmit pin (data out of Espruino)
   ck?: number;                           // (default none) Clock Pin
   cts?: number;                          // (default none) Clear to Send Pin
-  flow?: null | undefined | 'none' | 'xon'; // (default none) software flow control
-  path?: null | undefined | string;      // Linux Only - the path to the Serial device to use
-  errors?: boolean;                      // (default false) whether to forward framing/parity errors
+
+  // TODO: нужно ли???
+  // flow?: null | undefined | 'none' | 'xon'; // (default none) software flow control
+  // path?: null | undefined | string;      // Linux Only - the path to the Serial device to use
+  // errors?: boolean;                      // (default false) whether to forward framing/parity errors
 }
 
 
 class SerialDev implements Serial {
-  getSerial(uartName: Uart): any {
-
-    // TODO: проверить будет ли работать
-
-    return (global as any)[uartName];
-  }
-
   on(uartName: Uart, eventsName: EventName, handler: (...params: any[]) => void): void {
     this.getSerial(uartName).on(eventsName, handler);
   }
@@ -54,6 +49,13 @@ class SerialDev implements Serial {
 
   async write(uartName: Uart, data: Uint8Array | string[] | { data: any, count: number }, ): Promise<void> {
     return this.getSerial(uartName).write(data);
+  }
+
+  private getSerial(uartName: Uart): any {
+
+    // TODO: проверить будет ли работать
+
+    return (global as any)[uartName];
   }
 
 }

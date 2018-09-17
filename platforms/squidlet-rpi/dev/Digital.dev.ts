@@ -108,8 +108,6 @@ class DigitalDev implements Digital {
       throw new Error(`You have to do setup of pin "${pin}" before manipulating it`);
     }
 
-    this.pinInstances[pin] = new Gpio(pin);
-
     return this.pinInstances[pin];
   }
 
