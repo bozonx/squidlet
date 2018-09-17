@@ -44,6 +44,11 @@ export default class MasterConfig {
     return this._hostDefaults;
   }
 
+  getHostsIds(): string[] {
+    return Object.keys(this.hosts);
+  }
+
+
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.main = main;
 

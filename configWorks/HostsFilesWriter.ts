@@ -44,7 +44,7 @@ export default class HostsFilesWriter {
    * @param skipMaster - don't write master's files
    */
   async writeHostsFiles(skipMaster: boolean = false) {
-    for (let hostId of this.main.hostsConfigSet.getHostsIds()) {
+    for (let hostId of this.main.masterConfig.getHostsIds()) {
       if (skipMaster && hostId === 'master') return;
 
       await this.proceedHost(hostId);

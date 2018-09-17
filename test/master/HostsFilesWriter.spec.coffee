@@ -21,9 +21,9 @@ describe.only 'master.HostsFilesWriter', ->
     @main = {
       masterConfig: {
         buildDir: '/buildDir'
+        getHostsIds: => [ 'master' ]
       }
       hostsConfigSet: {
-        getHostsIds: => [ 'master' ]
         getHostConfig: => 'config'
       }
       hostsFilesSet: {

@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import Register from './Register';
 import PluginEnv from './PluginEnv';
