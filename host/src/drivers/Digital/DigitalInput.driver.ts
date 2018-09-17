@@ -12,7 +12,7 @@ type Handler = (level: BinaryLevel) => void;
 // TODO: add watchOnce
 // TODO: инициализировать output значение - 1 или 0
 
-export class GpioInputDriver {
+export class DigitalInputDriver {
   private readonly props: EntityProps;
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
@@ -45,10 +45,10 @@ export default class GpioInputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
       props: EntityProps,
       env: DriverEnv,
-    ): GpioInputDriver } = GpioInputDriver;
-  private instances: {[index: string]: GpioInputDriver} = {};
+    ): DigitalInputDriver } = DigitalInputDriver;
+  private instances: {[index: string]: DigitalInputDriver} = {};
 
-  getInstance(props: EntityProps): GpioInputDriver {
+  getInstance(props: EntityProps): DigitalInputDriver {
 
     // TODO: validate params
     // TODO: validate specific for certain driver params
@@ -57,7 +57,7 @@ export default class GpioInputFactory extends DriverFactoryBase {
     const instanceId = '1';
 
     if (!this.instances[instanceId]) {
-      this.instances[instanceId] = super.getInstance(instanceId) as GpioInputDriver;
+      this.instances[instanceId] = super.getInstance(instanceId) as DigitalInputDriver;
     }
 
     return this.instances[instanceId];

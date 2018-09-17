@@ -1,6 +1,6 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioInputFactory, {GpioInputDriver} from '../../drivers/Digital/GpioInput.driver';
+import GpioInputFactory, {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import DeviceEnv from '../../app/entities/DeviceEnv';
@@ -17,7 +17,7 @@ interface BinarySensorDrivers {
 
 
 export default class BinarySensor extends DeviceBase<BinarySensorProps> {
-  private readonly gpioInputDriver: GpioInputDriver;
+  private readonly gpioInputDriver: DigitalInputDriver;
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
@@ -36,9 +36,9 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
   constructor(props: BinarySensorProps, env: DeviceEnv) {
     super(props, env);
 
-    //const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('GpioInputDriver.driver');
+    //const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('DigitalInputDriver.driver');
 
-    this.gpioInputDriver = this.drivers['GpioInputDriver.driver'].getInstance(this.props);
+    this.gpioInputDriver = this.drivers['DigitalInputDriver.driver'].getInstance(this.props);
   }
 
   protected afterInit = (): void => {

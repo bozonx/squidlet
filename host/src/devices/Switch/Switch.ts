@@ -1,7 +1,7 @@
 import System from '../../app/System';
 import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioOutputFactory, {GpioOutputDriver} from '../../drivers/Digital/GpioOutput.driver';
+import GpioOutputFactory, {DigitalOutputDriver} from '../../drivers/Digital/DigitalOutput.driver';
 import EntityDefinition from '../../app/interfaces/EntityDefinition';
 import {convertToLevel} from '../../helpers/helpers';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
@@ -9,14 +9,14 @@ import {DEFAULT_STATUS} from '../../baseDevice/Status';
 
 
 export default class Switch extends DeviceBase {
-  private readonly gpioOutputDriver: GpioOutputDriver;
+  private readonly gpioOutputDriver: DigitalOutputDriver;
   private deadTimeInProgress: boolean = false;
 
   constructor(system: System, deviceConf: EntityDefinition) {
     super(system, deviceConf);
 
     // TODO: !!!!???
-    const gpioOutputDriverFactory = this.system.drivers.getDriver<GpioOutputFactory>('GpioOutputDriver.driver');
+    const gpioOutputDriverFactory = this.system.drivers.getDriver<GpioOutputFactory>('DigitalOutputDriver.driver');
 
     this.gpioOutputDriver = gpioOutputDriverFactory.getInstance(this.deviceConf.props);
   }

@@ -1,4 +1,4 @@
 name: GpioOutput.driver
-main: GpioOutput.driver.ts
+main: DigitalOutput.driver.ts
 type: system
 

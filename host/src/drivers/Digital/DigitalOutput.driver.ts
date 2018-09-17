@@ -13,7 +13,7 @@ interface GpioOutputDriverProps extends EntityProps {
 }
 
 
-export class GpioOutputDriver {
+export class DigitalOutputDriver {
   private readonly props: GpioOutputDriverProps;
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
@@ -52,10 +52,10 @@ export default class GpioOutputFactory extends DriverFactoryBase {
   protected DriverClass: { new (
       props: GpioOutputDriverProps,
       env: DriverEnv,
-    ): GpioOutputDriver } = GpioOutputDriver;
-  private instances: {[index: string]: GpioOutputDriver} = {};
+    ): DigitalOutputDriver } = DigitalOutputDriver;
+  private instances: {[index: string]: DigitalOutputDriver} = {};
 
-  getInstance(deviceParams: {[index: string]: any}): GpioOutputDriver {
+  getInstance(deviceParams: {[index: string]: any}): DigitalOutputDriver {
 
     // TODO: validate params
     // TODO: validate specific for certain driver params
@@ -64,7 +64,7 @@ export default class GpioOutputFactory extends DriverFactoryBase {
     const instanceId = '1';
 
     if (!this.instances[instanceId]) {
-      this.instances[instanceId] = super.getInstance(instanceId) as GpioOutputDriver;
+      this.instances[instanceId] = super.getInstance(instanceId) as DigitalOutputDriver;
     }
 
     return this.instances[instanceId];
