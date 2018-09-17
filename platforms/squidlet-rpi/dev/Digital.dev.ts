@@ -1,81 +1,112 @@
-import {Gpio} from 'onoff';
+import {Gpio} from 'pigpio';
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
 
 // it supports also 'high' | 'low'
-type GpioMode = 'in' | 'out';
+//type GpioMode = 'in' | 'out';
+
+type GpioHanler = (level: number) => void;
+
+interface Listener {
+  pin: number;
+  handler: GpioHanler;
+}
 
 
-// TODO: add unexport
+// TODO: установить первичное значение на output пине
 
 
 class DigitalDev implements Digital {
   private pinInstances: {[index: string]: Gpio} = {};
+  private alertListeners: Listener[] = [];
+
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
-    this.pinInstances[pin] = new Gpio(pin, this.convertMode());
+    const convertedMode: {[index: string]: any} = this.convertMode(pinMode);
+    const pinInstance = this.getPinInstance(pin);
 
-    // TODO: установить первичное значение на output пине
-    // TODO: установить pullup / pulldown резистор
+    // TODO: set mode and resistoras
+    // enableInterrupt(edge[, timeout])
+    // pullUpDown(pud)
 
-  }
+    //pinInstance.
 
-  read(pin: number): Promise<boolean> {
-    const pinInstance = this.getPinInstance(pin, 'in');
-
-    return new Promise((resolve, reject) => {
-      pinInstance.read((err: Error, value) => {
-        if (err) return reject(err);
-
-        resolve(Boolean(value));
-      });
+    this.pinInstances[pin] = new Gpio(pin, {
+      ...convertedMode,
     });
   }
 
-  write(pin: number, value: boolean): Promise<void> {
-    const pinInstance = this.getPinInstance(pin, 'out');
+  async read(pin: number): Promise<boolean> {
+    const pinInstance = this.getPinInstance(pin);
+
+    return Boolean(pinInstance.digitalRead());
+  }
+
+  async write(pin: number, value: boolean): Promise<void> {
+    const pinInstance = this.getPinInstance(pin);
     const numValue = (value) ? 1 : 0;
 
-    return new Promise((resolve, reject) => {
-      pinInstance.write(numValue, (err: Error) => {
-        if (err) return reject(err);
-
-        resolve();
-      });
-    });
+    pinInstance.digitalWrite(numValue);
   }
 
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
-    const pinInstance = this.getPinInstance(pin, 'in');
-    // TODO: debounce и endge сделать программно
+    const pinInstance = this.getPinInstance(pin);
+    const handlerWrapper: GpioHanler = (level: number) => {
+      handler(Boolean(level));
+    };
 
-    pinInstance.watch((err, value) => {
-      if (err) {
-        throw err;
-      }
+    // TODO: ??? debounce и endge сделать программно
 
-    });
+    // register
+    this.alertListeners.push({ pin, handler: handlerWrapper });
+    // start listen
+    pinInstance.on('alert', handlerWrapper);
+    // return an index
+    return this.alertListeners.length - 1;
   }
 
   clearWatch(id: number): void {
-    // unwatch
+    const {pin, handler} = this.alertListeners[id];
+    const pinInstance = this.getPinInstance(pin);
+
+    pinInstance.off('alert', handler);
   }
 
   clearAllWatches(): void {
-
-    // TODO: get any pin
-
-    //new Gpio().unwatchAll();
+    this.alertListeners.map((item, index: number) => {
+      this.clearWatch(index);
+    });
   }
 
-  private convertMode(): GpioMode {
+  private convertMode(pinMode: PinMode): {[index: string]: any} {
+    switch (pinMode) {
+      case ('input'):
+        return {
+          mode: Gpio.INPUT,
+          pullUpDown: Gpio.PUD_OFF,
+        };
+      case ('input_pullup'):
+        return {
+          mode: Gpio.INPUT,
+          pullUpDown: Gpio.PUD_UP,
+        };
+      case ('input_pulldown'):
+        return {
+          mode: Gpio.INPUT,
+          pullUpDown: Gpio.PUD_DOWN,
+        };
+      case ('output'):
+        return { mode: Gpio.OUTPUT };
+      default:
+        throw new Error(`Unknown mode "${pinMode}"`);
+    }
 
   }
 
-  private getPinInstance(pin: number, mode: GpioMode): Gpio {
+  private getPinInstance(pin: number): Gpio {
     if (!this.pinInstances[pin]) return this.pinInstances[pin];
 
-    this.pinInstances[pin] = new Gpio(pin, mode);
+    this.pinInstances[pin] = new Gpio(pin);
 
     return this.pinInstances[pin];
   }
