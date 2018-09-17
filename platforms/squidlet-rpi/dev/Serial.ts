@@ -1,6 +1,6 @@
 import * as SerialPort from 'serialport';
 
-import SerialFactory, {Serial, BaudRate, Options, EventName} from '../../../host/src/app/interfaces/dev/Serial';
+import Serial, {BaudRate, Options, EventName} from '../../../host/src/app/interfaces/dev/Serial';
 
 
 interface RpiOptions extends Options {
@@ -9,48 +9,50 @@ interface RpiOptions extends Options {
 
 
 class SerialDev implements Serial {
-  private readonly uartDev: string;
+  private readonly instances: {[index: string]: any};
 
-  get serial(): any {
-
-    // TODO: вернеть serial
-
-    //return (global as any)[this.uartName];
+  getSerial(uartName: string): any {
+    return this.instances[uartName];
   }
 
-  constructor(uartDev: string) {
-    this.uartDev = uartDev;
-  }
-
-  on(eventsName: EventName, handler: (...params: any[]) => void): void {
+  on(uartName: string, eventsName: EventName, handler: (...params: any[]) => void): void {
     this.serial.on(eventsName, handler);
   }
 
-  async print(data: string): Promise<void> {
+  async print(uartName: string, data: string): Promise<void> {
     this.serial.print(data);
   }
 
-  async println(data: string): Promise<void> {
+  async println(uartName: string, data: string): Promise<void> {
     this.serial.println(data);
   }
 
-  async read(chars?: number): Promise<string> {
+  async read(uartName: string, chars?: number): Promise<string> {
     return this.serial.read(chars);
   }
 
-  setup(baudrate?: BaudRate, options?: RpiOptions): void {
-    this.serial.setup(baudrate, options);
+  setup(uartName: string, baudRate?: BaudRate, options?: RpiOptions): void {
+    let portOptions: {[index: string]: any} = {
+      baudRate,
+    };
+
+    if (options) {
+      portOptions = {
+        ...portOptions,
+        databits: options.bytesize,
+        // TODO: какие значения принимает ???
+        parity: options.parity,
+        stopbits: options.stopbits,
+      };
+    }
+
+    this.instances[uartName] = new SerialPort(uartName, portOptions);
   }
 
-  async write(data: Uint8Array | string[] | { data: any, count: number }, ): Promise<void> {
+  async write(uartName: string, data: Uint8Array | string[] | { data: any, count: number }, ): Promise<void> {
     return this.serial.write(data);
   }
 
 }
 
-const serialFactory: SerialFactory = (uartDev: string): SerialDev => {
-  return new SerialDev(uartDev);
-};
-
-export default serialFactory;
-
+export default new SerialDev();

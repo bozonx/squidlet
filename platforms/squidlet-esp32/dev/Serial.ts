@@ -1,4 +1,4 @@
-import SerialFactory, {Serial, BaudRate, Options, EventName} from '../../../host/src/app/interfaces/dev/Serial';
+import Serial, {BaudRate, Options, EventName} from '../../../host/src/app/interfaces/dev/Serial';
 
 
 type Uart = 'Bluetooth'
@@ -25,50 +25,41 @@ interface EspOptions extends Options {
 
 
 class SerialDev implements Serial {
-  private readonly uartName: Uart;
-
-  get serial(): any {
+  getSerial(uartName: Uart): any {
 
     // TODO: проверить будет ли работать
 
-    return (global as any)[this.uartName];
+    return (global as any)[uartName];
   }
 
-  constructor(uartName: Uart) {
-    this.uartName = uartName;
+  on(uartName: Uart, eventsName: EventName, handler: (...params: any[]) => void): void {
+    this.getSerial(uartName).on(eventsName, handler);
   }
 
-  on(eventsName: EventName, handler: (...params: any[]) => void): void {
-    this.serial.on(eventsName, handler);
+  async print(uartName: Uart, data: string): Promise<void> {
+    this.getSerial(uartName).print(data);
   }
 
-  async print(data: string): Promise<void> {
-    this.serial.print(data);
+  async println(uartName: Uart, data: string): Promise<void> {
+    this.getSerial(uartName).println(data);
   }
 
-  async println(data: string): Promise<void> {
-    this.serial.println(data);
+  async read(uartName: Uart, chars?: number): Promise<string> {
+    return this.getSerial(uartName).read(chars);
   }
 
-  async read(chars?: number): Promise<string> {
-    return this.serial.read(chars);
+  setup(uartName: Uart, baudRate?: BaudRate, options?: EspOptions): void {
+    this.getSerial(uartName).setup(baudRate, options);
   }
 
-  setup(baudrate?: BaudRate, options?: EspOptions): void {
-    this.serial.setup(baudrate, options);
-  }
-
-  async write(data: Uint8Array | string[] | { data: any, count: number }, ): Promise<void> {
-    return this.serial.write(data);
+  async write(uartName: Uart, data: Uint8Array | string[] | { data: any, count: number }, ): Promise<void> {
+    return this.getSerial(uartName).write(data);
   }
 
 }
 
-const serialFactory: SerialFactory = (uart: Uart): SerialDev => {
-  return new SerialDev(uart);
-};
 
-export default serialFactory;
+export default new SerialDev();
 
 
 
