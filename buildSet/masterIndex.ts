@@ -23,7 +23,7 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
   const hostId = 'master';
   return {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
-    config: main.hostsConfigSet.getHostConfig(hostId),
+    config: main.masterConfig.getHostConfig(hostId),
     entitiesSet: generateSrcEntitiesSet(main, hostId),
   };
 }

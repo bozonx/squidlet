@@ -61,8 +61,25 @@ export default class MasterConfig {
     return Object.keys(this.hosts);
   }
 
+  getHostConfig(hostId: string): HostConfig {
+
+    // TODO: отдать готовый
+
+    if (!this.hosts[hostId]) throw new Error(`Host "${hostId}" not found`);
+
+    return this.hosts[hostId];
+  }
+
   generate() {
     // TODO: !!!!
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfig.hosts;
+
+    for (let hostId of Object.keys(rawHostsConfigs)) {
+      const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
+
+      // final host config
+      this.hostsConfigs[hostId] = this.generateHostConfig(rawHostConfig);
+    }
   }
 
 
