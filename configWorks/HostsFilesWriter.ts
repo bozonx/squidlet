@@ -56,7 +56,7 @@ export default class HostsFilesWriter {
     const entitySrcDir = this.main.entities.getSrcDir(pluralType, entityName);
 
     // write manifest
-    await this.main.$writeJson(
+    await this.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
       this.main.entities.getManifest(pluralType, entityName)
     );
@@ -99,22 +99,29 @@ export default class HostsFilesWriter {
     const configDir = path.join(hostDir, hostDirs.config);
 
     // write host's config
-    await this.main.$writeJson(
+    await this.writeJson(
       path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
       hostConfig
     );
 
     // write host's definitions
-    await this.main.$writeJson(path.join(configDir, fileNames.systemDrivers), definitionsSet.systemDrivers);
-    await this.main.$writeJson(path.join(configDir, fileNames.regularDrivers), definitionsSet.regularDrivers);
-    await this.main.$writeJson(path.join(configDir, fileNames.systemServices), definitionsSet.systemServices);
-    await this.main.$writeJson(path.join(configDir, fileNames.regularServices), definitionsSet.regularServices);
-    await this.main.$writeJson(path.join(configDir, fileNames.devicesDefinitions), definitionsSet.devicesDefinitions);
-    await this.main.$writeJson(path.join(configDir, fileNames.driversDefinitions), definitionsSet.driversDefinitions);
-    await this.main.$writeJson(path.join(configDir, fileNames.servicesDefinitions), definitionsSet.servicesDefinitions);
+    await this.writeJson(path.join(configDir, fileNames.systemDrivers), definitionsSet.systemDrivers);
+    await this.writeJson(path.join(configDir, fileNames.regularDrivers), definitionsSet.regularDrivers);
+    await this.writeJson(path.join(configDir, fileNames.systemServices), definitionsSet.systemServices);
+    await this.writeJson(path.join(configDir, fileNames.regularServices), definitionsSet.regularServices);
+    await this.writeJson(path.join(configDir, fileNames.devicesDefinitions), definitionsSet.devicesDefinitions);
+    await this.writeJson(path.join(configDir, fileNames.driversDefinitions), definitionsSet.driversDefinitions);
+    await this.writeJson(path.join(configDir, fileNames.servicesDefinitions), definitionsSet.servicesDefinitions);
     // write list of entities names
-    await this.main.$writeJson(path.join(hostDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
+    await this.writeJson(path.join(hostDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
 
+  }
+
+  private async writeJson(fileName: string, contentJs: any) {
+    const content = JSON.stringify(contentJs);
+
+    await this.main.io.mkdirP(path.dirname(fileName));
+    await this.main.io.writeFile(fileName, content);
   }
 
 }

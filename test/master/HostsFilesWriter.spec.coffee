@@ -30,9 +30,10 @@ describe.only 'master.HostsFilesWriter', ->
         getDefinitionsSet: => @definitionsSet
         getEntitiesNames: => @entitiesNames
       }
-      $writeJson: sinon.spy()
     }
     @hostsFilesWriter = new HostsFilesWriter(@main)
+
+    @hostsFilesWriter.writeJson = sinon.spy()
 
   it 'writeEntitiesFiles', ->
     # TODO: !!!!
@@ -45,40 +46,40 @@ describe.only 'master.HostsFilesWriter', ->
 
     await @hostsFilesWriter.writeHostsFiles()
 
-    sinon.assert.calledWith(@main.$writeJson.getCall(0),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(0),
       "#{configDir}/hostConfig.json",
       'config'
     )
 
-    sinon.assert.calledWith(@main.$writeJson.getCall(1),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(1),
       "#{configDir}/systemDrivers.json",
       @definitionsSet.systemDrivers
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(2),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(2),
       "#{configDir}/regularDrivers.json",
       @definitionsSet.regularDrivers
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(3),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(3),
       "#{configDir}/systemServices.json",
       @definitionsSet.systemServices
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(4),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(4),
       "#{configDir}/regularServices.json",
       @definitionsSet.regularServices
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(5),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(5),
       "#{configDir}/devicesDefinitions.json",
       @definitionsSet.devicesDefinitions
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(6),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(6),
       "#{configDir}/driversDefinitions.json",
       @definitionsSet.driversDefinitions
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(7),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(7),
       "#{configDir}/servicesDefinitions.json",
       @definitionsSet.servicesDefinitions
     )
-    sinon.assert.calledWith(@main.$writeJson.getCall(8),
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(8),
       "/buildDir/hosts/master/usedEntities.json",
       @entitiesNames
     )

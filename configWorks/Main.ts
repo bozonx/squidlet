@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import PreMasterConfig from './interfaces/PreMasterConfig';
-import PreManifestBase from './interfaces/PreManifestBase';
 import Register from './Register';
 import PluginEnv from './PluginEnv';
 import Entities from './Entities';
@@ -11,9 +10,7 @@ import Definitions from './Definitions';
 import HostsFilesSet from './HostsFilesSet';
 import systemPlugin from './systemPlugin';
 import * as Io from './IO';
-import systemConfig from './configs/systemConfig';
 import * as defaultLogger from './defaultLogger';
-import {resolveIndexFile} from './helpers';
 import HostsFilesWriter from './HostsFilesWriter';
 
 
@@ -65,13 +62,6 @@ export default class Main {
     this.log.info(`Write hosts files`);
     await this.hostsFilesWriter.writeEntitiesFiles();
     await this.hostsFilesWriter.writeHostsFiles(skipMaster);
-  }
-
-  async $writeJson(fileName: string, contentJs: any) {
-    const content = JSON.stringify(contentJs);
-
-    await this.io.mkdirP(path.dirname(fileName));
-    await this.io.writeFile(fileName, content);
   }
 
 

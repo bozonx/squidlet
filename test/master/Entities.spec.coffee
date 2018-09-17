@@ -106,7 +106,7 @@ describe 'master.Entities', ->
         mkdirP: sinon.stub().returns(Promise.resolve())
         copyFile: sinon.stub().returns(Promise.resolve())
       }
-      $writeJson: sinon.stub().returns(Promise.resolve())
+      #$writeJson: sinon.stub().returns(Promise.resolve())
     }
     @entities = new Entities(@main)
 
