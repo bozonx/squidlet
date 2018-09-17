@@ -196,7 +196,6 @@ export default class Entities {
     const finalManifest: FinalManifest = _omit(
       preManifest,
       'files',
-      'drivers',
       'main',
       'baseDir'
     );
