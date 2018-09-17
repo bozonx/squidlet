@@ -2,7 +2,7 @@ import {ChangeHandler, Data, Getter, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import PublishParams from '../app/interfaces/PublishParams';
-import EntityDefinition, {EntityProps} from '../app/interfaces/EntityDefinition';
+import {EntityProps} from '../app/interfaces/EntityDefinition';
 import DeviceEnv from '../app/entities/DeviceEnv';
 
 
@@ -15,12 +15,12 @@ export interface DeviceBaseProps extends EntityProps {
 
 
 export default class DeviceBase<T extends DeviceBaseProps> {
-  readonly status: Status;
-  readonly config?: Config;
-  readonly getConfig?: Config['read'];
-  readonly setConfig?: Config['write'];
+  private _status?: Status;
+  private _config?: Config;
+  // readonly getConfig?: Config['read'];
+  // readonly setConfig?: Config['write'];
   protected readonly env: DeviceEnv;
-  protected readonly props: T;
+  protected readonly _props: T;
 
   // better place to do initial requests
   protected onInit?: () => Promise<void>;
@@ -33,12 +33,34 @@ export default class DeviceBase<T extends DeviceBaseProps> {
   protected configSetter?: Setter;
   protected actions: {[index: string]: Function} = {};
 
+  get props(): T {
+    return this._props;
+  }
+
+  get status(): Status {
+    return this._status as Status;
+  }
+
+  get config(): Config | undefined {
+    return this._config;
+  }
+
+  get getConfig(): Config['read'] | undefined {
+    return this.config && this.config.read;
+  }
+
+  get setConfig(): Config['write'] | undefined {
+    return this.config && this.config.write;
+  }
+
 
   constructor(props: T, env: DeviceEnv) {
     this.env = env;
-    this.props = props;
+    this._props = props;
+  }
 
-    this.status = new Status(
+  async init(): Promise<void> {
+    this._status = new Status(
       this.props.id,
       this.env.system,
       this.deviceConf.manifest.status || {},
@@ -47,20 +69,15 @@ export default class DeviceBase<T extends DeviceBaseProps> {
     );
 
     if (this.deviceConf.manifest.config) {
-      this.config = new Config(
+      this._config = new Config(
         this.props.id,
         this.env.system,
         this.deviceConf.manifest.config || {},
         (...params) => this.publish(...params),
         this.props.configRepublishInterval,
       );
-
-      this.getConfig = this.config.read;
-      this.setConfig = this.config.write;
     }
-  }
 
-  async init(): Promise<void> {
     await Promise.all([
       this.status && this.status.init(this.statusGetter, this.statusSetter),
       this.config && this.config.init(this.configGetter, this.configSetter),
