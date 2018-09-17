@@ -26,11 +26,4 @@ export class I2cSlaveDev {
 
 }
 
-
-export default class Factory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: EntityProps,
-      env: DriverEnv,
-      bus: number
-    ): I2cSlaveDev } = I2cSlaveDev;
-}
+export default new I2cSlaveDev();

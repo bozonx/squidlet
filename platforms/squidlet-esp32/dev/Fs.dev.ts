@@ -4,7 +4,7 @@ import {promises as fsPromises} from 'fs';
 import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
 
 
-class FsDev implements Fs {
+export class FsDev implements Fs {
   appendFile(path: string, data: string | Uint8Array): Promise<void> {
     return new Promise((resolve, reject) => {
       const fn = fs.appendFileSync as (path: string, data: string | Uint8Array) => boolean;

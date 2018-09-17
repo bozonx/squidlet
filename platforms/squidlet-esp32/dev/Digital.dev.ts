@@ -17,7 +17,7 @@ declare function clearWatch(): void;
 // TODO: какое будет значение по умолчанию для output пинов ??? поидее нужно сразу выставлять 0 или 1
 
 
-class DigitalDev implements Digital {
+export class DigitalDev implements Digital {
   async setup(pin: number, mode: PinMode): Promise<void> {
     pinMode(pin, mode);
   }

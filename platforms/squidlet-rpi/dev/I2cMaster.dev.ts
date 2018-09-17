@@ -67,10 +67,4 @@ export class I2cMasterDev implements I2cMaster {
 }
 
 
-export default class Factory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: EntityProps,
-      env: DriverEnv,
-      bus: number
-    ): I2cMasterDev } = I2cMasterDev;
-}
+export default new I2cMasterDev();
