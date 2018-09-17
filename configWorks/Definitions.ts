@@ -12,6 +12,7 @@ import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import systemConfig from './configs/systemConfig';
+import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 
 
 const servicesShortcut = [
@@ -115,27 +116,45 @@ export default class Definitions {
     };
   }
 
-  private generateDeviceDef(deviceId: string, deviceDef: PreDeviceDefinition): EntityDefinition {
+  private generateDeviceDef(id: string, deviceDef: PreDeviceDefinition): EntityDefinition {
+    const className = deviceDef.device;
+    const manifest = this.main.entities.getManifest('devices', className);
+
     return {
-      id: deviceId,
-      className: deviceDef.device,
-      props: _omit(deviceDef, 'device'),
+      id,
+      className,
+      props: _defaultsDeep(
+        _cloneDeep(_omit(deviceDef, 'device')),
+        manifest.props,
+      ),
     };
   }
 
-  private generateDriverDef(driverId: string, driverDef: PreDriverDefinition): EntityDefinition {
+  private generateDriverDef(id: string, driverDef: PreDriverDefinition): EntityDefinition {
+    const className = driverDef.driver;
+    const manifest = this.main.entities.getManifest('drivers', className);
+
     return {
-      id: driverId,
-      className: driverId,
-      props: _omit(driverDef, 'driver'),
+      id,
+      className,
+      props: _defaultsDeep(
+        _cloneDeep(_omit(driverDef, 'driver')),
+        manifest.props,
+      ),
     };
   }
 
-  private generateServiceDef(serviceId: string, serviceDef: PreServiceDefinition): EntityDefinition {
+  private generateServiceDef(id: string, serviceDef: PreServiceDefinition): EntityDefinition {
+    const className = serviceDef.service;
+    const manifest = this.main.entities.getManifest('services', className);
+
     return {
-      id: serviceId,
-      className: serviceDef.service,
-      props: _omit(serviceDef, 'service'),
+      id,
+      className,
+      props: _defaultsDeep(
+        _cloneDeep(_omit(serviceDef, 'service')),
+        manifest.props,
+      ),
     };
   }
 

@@ -12,6 +12,7 @@ export default function validateMasterConfig(rawConfig: {[index: string]: any}):
 }
 
 // TODO: main files and files of entities должны быть относительные пути
+// TODO: id драйвера должно совпадать с полем driver у definition
 
 // const recursive = (container, curPath) => {
 //   _.each(container, (item, name) => {
