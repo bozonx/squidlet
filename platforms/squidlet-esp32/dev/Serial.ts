@@ -26,7 +26,7 @@ interface EspOptions extends Options {
 }
 
 
-class SerialDev implements Serial {
+export default class SerialDev implements Serial {
   on(uartName: Uart, eventsName: EventName, handler: (...params: any[]) => void): void {
     this.getSerial(uartName).on(eventsName, handler);
   }
@@ -59,9 +59,6 @@ class SerialDev implements Serial {
   }
 
 }
-
-
-export default new SerialDev();
 
 
 

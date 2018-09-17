@@ -1,18 +1,17 @@
 import * as i2cBusModule from 'i2c-bus';
-import DriverFactoryBase from '../../../host/src/app/entities/DriverFactoryBase';
 import DriverEnv from '../../../host/src/app/entities/DriverEnv';
 import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
 import I2cMaster from '../../../host/src/app/interfaces/dev/I2cMaster';
 
 
-// TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
-
-
 /**
  * It's raspberry pi implementation of I2C master.
  */
-export class I2cMasterDev implements I2cMaster {
-  private readonly bus: i2cBusModule.I2cBus;
+export default class I2cMasterDev implements I2cMaster {
+  //private readonly bus: i2cBusModule.I2cBus;
+
+
+
 
   constructor(props: EntityProps, env: DriverEnv, bus: number) {
     this.bus = i2cBusModule.openSync(Number(bus));
@@ -65,6 +64,3 @@ export class I2cMasterDev implements I2cMaster {
   }
 
 }
-
-
-export default new I2cMasterDev();

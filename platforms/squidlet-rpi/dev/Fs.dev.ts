@@ -5,7 +5,8 @@ import {promises as fsPromises} from 'fs';
 import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
 
 
-class FsDev implements Fs {
+export default class FsDev implements Fs {
+  // TODO: use constant
   private defaultEncode = 'utf8';
 
   // TODO: сделать конструктор который может заменить кодировку
@@ -74,5 +75,3 @@ class FsDev implements Fs {
   }
 
 }
-
-export default new FsDev();

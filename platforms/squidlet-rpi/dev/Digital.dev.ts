@@ -14,9 +14,9 @@ interface Listener {
 // TODO: установить первичное значение на output пине
 
 
-class DigitalDev implements Digital {
-  private pinInstances: {[index: string]: Gpio} = {};
-  private alertListeners: Listener[] = [];
+export default class DigitalDev implements Digital {
+  private readonly pinInstances: {[index: string]: Gpio} = {};
+  private readonly alertListeners: Listener[] = [];
 
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
@@ -112,6 +112,3 @@ class DigitalDev implements Digital {
   }
 
 }
-
-
-export default new DigitalDev();

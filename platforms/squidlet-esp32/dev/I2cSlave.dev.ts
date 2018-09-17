@@ -6,7 +6,7 @@ import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
 
 
-export class I2cSlaveDev {
+export default class I2cSlaveDev {
   constructor(props: EntityProps, env: DriverEnv, bus: number) {
   }
 
@@ -25,5 +25,3 @@ export class I2cSlaveDev {
   }
 
 }
-
-export default new I2cSlaveDev();

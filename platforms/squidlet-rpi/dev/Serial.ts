@@ -3,7 +3,7 @@ import * as SerialPort from 'serialport';
 import Serial, {BaudRate, Options, EventName} from '../../../host/src/app/interfaces/dev/Serial';
 
 
-class SerialDev implements Serial {
+export default class SerialDev implements Serial {
   private readonly instances: {[index: string]: SerialPort} = {};
 
   on(uartName: string, eventsName: EventName, handler: (...params: any[]) => void): void {
@@ -80,5 +80,3 @@ class SerialDev implements Serial {
   }
 
 }
-
-export default new SerialDev();
