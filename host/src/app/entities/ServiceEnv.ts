@@ -18,7 +18,7 @@ export default class ServiceEnv implements Env {
   readonly host: Host;
   readonly messenger: Messenger;
   readonly devices: Devices;
-  private system: System;
+  readonly system: System;
 
   constructor(system: System) {
     this.system = system;

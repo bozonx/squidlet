@@ -12,13 +12,13 @@ import DriverManifest from '../interfaces/DriverManifest';
 /**
  * It is environment for devices and services
  */
-export default class EntityEnv implements Env {
+export default class DeviceEnv implements Env {
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
   readonly messenger: Messenger;
   readonly devices: Devices;
-  private system: System;
+  readonly system: System;
 
   constructor(system: System) {
     this.system = system;

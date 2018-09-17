@@ -1,22 +1,26 @@
 import {ChangeHandler, Data, Getter, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
-import System from '../app/System';
 import PublishParams from '../app/interfaces/PublishParams';
-import EntityDefinition from '../app/interfaces/EntityDefinition';
+import EntityDefinition, {EntityProps} from '../app/interfaces/EntityDefinition';
+import DeviceEnv from '../app/entities/DeviceEnv';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
 
+export interface DeviceBaseProps extends EntityProps {
+  statusRepublishInterval?: number;
+  configRepublishInterval?: number;
+}
 
-export default class DeviceBase {
+
+export default class DeviceBase<T extends DeviceBaseProps> {
   readonly status: Status;
   readonly config?: Config;
   readonly getConfig?: Config['read'];
   readonly setConfig?: Config['write'];
-  protected readonly system: System;
-  // TODO: или это props ???
-  protected readonly deviceConf: EntityDefinition;
+  protected readonly env: DeviceEnv;
+  protected readonly props: T;
 
   // better place to do initial requests
   protected onInit?: () => Promise<void>;
@@ -30,26 +34,25 @@ export default class DeviceBase {
   protected actions: {[index: string]: Function} = {};
 
 
-  // TODO: definition.props, this.env
-  constructor(system: System, deviceConf: EntityDefinition) {
-    this.system = system;
-    this.deviceConf = deviceConf;
+  constructor(props: T, env: DeviceEnv) {
+    this.env = env;
+    this.props = props;
 
     this.status = new Status(
-      this.deviceConf.deviceId,
-      this.system,
+      this.props.id,
+      this.env.system,
       this.deviceConf.manifest.status || {},
       (...params) => this.publish(...params),
-      this.deviceConf.props.statusRepublishInterval,
+      this.props.statusRepublishInterval,
     );
 
     if (this.deviceConf.manifest.config) {
       this.config = new Config(
-        this.deviceConf.deviceId,
-        this.system,
+        this.props.id,
+        this.env.system,
         this.deviceConf.manifest.config || {},
         (...params) => this.publish(...params),
-        this.deviceConf.props.configRepublishInterval,
+        this.props.configRepublishInterval,
       );
 
       this.getConfig = this.config.read;
@@ -58,16 +61,11 @@ export default class DeviceBase {
   }
 
   async init(): Promise<void> {
-    try {
-      await Promise.all([
-        this.status && this.status.init(this.statusGetter, this.statusSetter),
-        this.config && this.config.init(this.configGetter, this.configSetter),
-        this.onInit && this.onInit(),
-      ]);
-    }
-    catch (err) {
-      throw new Error(err);
-    }
+    await Promise.all([
+      this.status && this.status.init(this.statusGetter, this.statusSetter),
+      this.config && this.config.init(this.configGetter, this.configSetter),
+      this.onInit && this.onInit(),
+    ]);
 
     if (this.afterInit) this.afterInit();
   }
@@ -106,7 +104,6 @@ export default class DeviceBase {
     // TODO: может делаться на удаленное устройство
   }
 
-  // TODO: как сделать чтобы props имел тип???
   // TODO: валидация конфига + дополнительный метод валидации девайса
   // TODO: destroy
 
