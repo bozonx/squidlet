@@ -11,9 +11,7 @@ import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
-import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import systemConfig from './configs/systemConfig';
-import {AllManifests} from './Entities';
 
 
 const servicesShortcut = [
@@ -121,11 +119,7 @@ export default class Definitions {
     return {
       id: deviceId,
       className: deviceDef.device,
-      props: {
-        ..._omit(deviceDef, 'device'),
-        // double of id
-        id: deviceId,
-      },
+      props: _omit(deviceDef, 'device'),
     };
   }
 
@@ -133,11 +127,7 @@ export default class Definitions {
     return {
       id: driverId,
       className: driverId,
-      props: {
-        ...driverDef,
-        // double of id
-        id: driverId,
-      },
+      props: _omit(driverDef, 'driver'),
     };
   }
 
@@ -145,11 +135,7 @@ export default class Definitions {
     return {
       id: serviceId,
       className: serviceDef.service,
-      props: {
-        ..._omit(serviceDef, 'service'),
-        // double of id
-        id: serviceId,
-      },
+      props: _omit(serviceDef, 'service'),
     };
   }
 

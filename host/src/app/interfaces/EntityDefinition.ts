@@ -1,6 +1,4 @@
 export interface EntityProps {
-  // double of id of entity
-  id: string;
   [index: string]: any;
 }
 
