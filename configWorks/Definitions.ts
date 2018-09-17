@@ -56,8 +56,7 @@ export default class Definitions {
       const { devices, drivers, services } = this.prepareEntities(rawHostConfig);
 
       if (rawHostConfig.devices) {
-        // TODO: device defaults должно быть главней чем manifest props
-        this.devicesDefinitions[hostId] = this.mergeDevicesDefaults(devices, rawHostConfig.devicesDefaults);
+        this.devicesDefinitions[hostId] = devices;
       }
       if (rawHostConfig.drivers) {
         this.driversDefinitions[hostId] = drivers;
@@ -93,7 +92,7 @@ export default class Definitions {
     const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
     for (let entityName of Object.keys(plainDevices)) {
-      devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName]);
+      devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName], rawHostConfig.devicesDefaults);
     }
 
     if (rawHostConfig.drivers) {
@@ -115,7 +114,11 @@ export default class Definitions {
     };
   }
 
-  private generateDeviceDef(id: string, deviceDef: PreDeviceDefinition): EntityDefinition {
+  private generateDeviceDef(
+    id: string,
+    deviceDef: PreDeviceDefinition,
+    hostDeviceDefaultProps: {[index: string]: any} | undefined
+  ): EntityDefinition {
     const className = deviceDef.device;
     const manifest = this.main.entities.getManifest('devices', className);
 
@@ -124,6 +127,7 @@ export default class Definitions {
       className,
       props: _defaultsDeep(
         _cloneDeep(_omit(deviceDef, 'device')),
+        hostDeviceDefaultProps,
         manifest.props,
       ),
     };
@@ -180,27 +184,6 @@ export default class Definitions {
     };
 
     recursively('', preDevices);
-
-    return result;
-  }
-
-  private mergeDevicesDefaults(
-    devices: {[index: string]: EntityDefinition},
-    devicesDefaults?: {[index: string]: any}
-  ): {[index: string]: EntityDefinition} {
-    if (!devicesDefaults) return devices;
-
-    const result: {[index: string]: EntityDefinition} = {};
-
-    for (let deviceId of Object.keys(devices)) {
-      const deviceDefClone = _cloneDeep(devices[deviceId]);
-
-      result[deviceId] = {
-        ...deviceDefClone,
-        // merge default props with entity props
-        props: _defaultsDeep(deviceDefClone.props, devicesDefaults[deviceDefClone.className]),
-      };
-    }
 
     return result;
   }
