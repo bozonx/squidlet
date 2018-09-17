@@ -30,6 +30,7 @@ export default class DeviceBase {
   protected actions: {[index: string]: Function} = {};
 
 
+  // TODO: definition.props, this.env
   constructor(system: System, deviceConf: EntityDefinition) {
     this.system = system;
     this.deviceConf = deviceConf;

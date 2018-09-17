@@ -12,6 +12,7 @@ export default class BinarySensor extends DeviceBase {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
+  // TODO: definition.props, this.env
   constructor(system: System, deviceConf: EntityDefinition) {
     super(system, deviceConf);
 

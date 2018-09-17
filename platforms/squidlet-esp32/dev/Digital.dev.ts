@@ -31,6 +31,9 @@ export default class DigitalDev implements Digital {
   }
 
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+
+    // TODO: на пинах которые не поддерживают прерывания - делать полинг
+
     const handlerWrapper = ({ state }: { state: boolean }) => {
       handler(state);
     };
