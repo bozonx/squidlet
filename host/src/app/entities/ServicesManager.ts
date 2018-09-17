@@ -3,7 +3,7 @@ import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
 import Env from '../interfaces/Env';
 import System from '../System';
-import EntityEnv from './EntityEnv';
+import ServiceEnv from './ServiceEnv';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceInstance> {
@@ -11,7 +11,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance> 
 
   constructor(system: System) {
     super(system);
-    this.env = new EntityEnv(this.system);
+    this.env = new ServiceEnv(this.system);
   }
 
 

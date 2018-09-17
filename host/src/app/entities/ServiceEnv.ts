@@ -12,7 +12,7 @@ import DriverManifest from '../interfaces/DriverManifest';
 /**
  * It is environment for devices and services
  */
-export default class EntityEnv implements Env {
+export default class ServiceEnv implements Env {
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;

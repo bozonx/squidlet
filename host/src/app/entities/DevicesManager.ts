@@ -1,6 +1,6 @@
 import DeviceInstance from '../interfaces/DeviceInstance';
 import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
-import EntityEnv from './EntityEnv';
+import DeviceEnv from './DeviceEnv';
 import EntityManagerBase from './EntityManagerBase';
 import Env from '../interfaces/Env';
 import System from '../System';
@@ -14,7 +14,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance> {
 
   constructor(system: System) {
     super(system);
-    this.env = new EntityEnv(this.system);
+    this.env = new DeviceEnv(this.system);
   }
 
   /**
