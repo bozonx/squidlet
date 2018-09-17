@@ -11,7 +11,7 @@ interface GpioInputDriverProps extends EntityProps {
 }
 
 
-export class GpioInputRaspberryDriver {
+export class DigitalInputLocalDriver {
   private readonly props: GpioInputDriverProps;
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
@@ -24,12 +24,11 @@ export class GpioInputRaspberryDriver {
 }
 
 
-export default class GpioInputFactory extends DriverFactoryBase {
-  private instances: {[index: string]: GpioInputRaspberryDriver} = {};
+export default class GpioInputFactory extends DriverFactoryBase<DigitalInputLocalDriver> {
+  protected instanceIdName: string | number = 'pin';
+  protected DriverClass = DigitalInputLocalDriver;
 
-  getInstance(): GpioInputRaspberryDriver {
-    this.instances[bus] = super.getInstance(bus) as GpioInputRaspberryDriver;
-
-    return this.instances[bus];
+  getInstance(additionalProps: { pin: number }): DigitalInputLocalDriver {
+    return super.getInstance(additionalProps);
   }
 }

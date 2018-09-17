@@ -76,6 +76,8 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
   async init(): Promise<void> {
     const manifest: DeviceManifest = await this.loadManifest();
 
+    // TODO: получить ссылки на зависимые драйвера
+
     this._status = new Status(
       this.props.id,
       this.env.system,
