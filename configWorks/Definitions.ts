@@ -1,5 +1,3 @@
-import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
-
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
@@ -12,7 +10,7 @@ import PreDriverDefinition from './interfaces/PreDriverDefinition';
 import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import systemConfig from './configs/systemConfig';
-import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
+import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
 
 
 const servicesShortcut = [
@@ -58,6 +56,7 @@ export default class Definitions {
       const { devices, drivers, services } = this.prepareEntities(rawHostConfig);
 
       if (rawHostConfig.devices) {
+        // TODO: device defaults должно быть главней чем manifest props
         this.devicesDefinitions[hostId] = this.mergeDevicesDefaults(devices, rawHostConfig.devicesDefaults);
       }
       if (rawHostConfig.drivers) {

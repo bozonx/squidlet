@@ -40,6 +40,7 @@ export interface EntitiesNames {
 export default class Entities {
   private readonly main: Main;
   private readonly entitiesDir: string;
+  // entities set which contains a srcDir which point to dir where original manifest places
   private entitiesSet: SrcEntitiesSet = {
     devices: {},
     drivers: {},
@@ -275,121 +276,5 @@ export default class Entities {
       if (services[serviceName].manifest.system) this.systemServices.push(serviceName);
     }
   }
-
-
-  // private async saveEntityToStorage(
-  //   preManifest: PreManifestBase,
-  //   finalManifest: ManifestBase,
-  //   entityDirInStorage: string,
-  // ) {
-  //
-  //   // TODO: move to hosts files writer
-  //
-  //   const manifestStorageFileName = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest);
-  //
-  //   if (preManifest.main) {
-  //     // build an entity main file
-  //
-  //     // TODO: !!!!!
-  //     // TODO: !!!!! test it
-  //
-  //     //await this.buildMainFile();
-  //   }
-  //
-  //   if (preManifest.files) {
-  //     for (let fileName of preManifest.files) {
-  //       const fromFile = path.resolve(preManifest.baseDir, fileName);
-  //       const toFileName = this.generateEntityFileName(entityDirInStorage, fileName);
-  //
-  //       // make inner dirs
-  //       await this.main.io.mkdirP(path.dirname(toFileName));
-  //       // copy
-  //       await this.main.io.copyFile(fromFile, toFileName);
-  //     }
-  //   }
-  //
-  //   await this.main.$writeJson(manifestStorageFileName, finalManifest);
-  // }
-
-  // /**
-  //  * collect files of entity which will be placed in storage
-  //  */
-  // private collectFiles(entityDirInStorage: string, preManifest: PreManifestBase): string[] {
-  //
-  //   // TODO: только files убрать main и manifest
-  //
-  //   const mainJsFile = path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.mainJs);
-  //
-  //   return [
-  //     ...(preManifest.files || [])
-  //       .map((fileName: string) => this.generateEntityFileName(entityDirInStorage, fileName)),
-  //     // add path to main in storage
-  //     ...((preManifest.main) ? [mainJsFile] : []),
-  //     // add path to parsed manifest in storage
-  //     path.join(entityDirInStorage, systemConfig.hostInitCfg.fileNames.manifest),
-  //   ];
-  // }
-
-  // private generateEntityFileName(entityDirInStorage: string, fileName: string): string {
-  //   return path.resolve(entityDirInStorage, fileName);
-  // }
-
-
-  // async writeManifests<T extends ManifestBase>(entityTypeDirPath: string, manifests: T[]) {
-  //   for (let manifest of manifests) {
-  //     const fileName = path.join(
-  //       entityTypeDirPath,
-  //       manifest.name,
-  //       systemConfig.hostInitCfg.fileNames.manifest
-  //     );
-  //
-  //     //await this.writeJson(fileName, manifest);
-  //   }
-  // }
-  //
-  // async copyEntityFiles(entityTypeDirPath: string, fileSet: {[index: string]: string[]}) {
-  //   for (let entityClassName of Object.keys(fileSet)) {
-  //     for (let fromFileName of fileSet[entityClassName]) {
-  //       const toFileName = path.join(
-  //         entityTypeDirPath,
-  //         entityClassName,
-  //         path.basename(fromFileName),
-  //       );
-  //
-  //       await this.main.io.mkdirP(path.dirname(toFileName));
-  //
-  //       await this.main.io.copyFile(fromFileName, toFileName);
-  //     }
-  //   }
-  // }
-
-
-  // /**
-  //  * Collect all the used host manifest of devices, drivers or services
-  //  */
-  // private collectManifests<T>(manifestPluralType: ManifestsTypePluralName, usedEntityNames: string[]): T[] {
-  //   const allManifests = this.main.manifests.getManifests() as any;
-  //   const allManifestsOfType: {[index: string]: T} = allManifests[manifestPluralType];
-  //
-  //   return usedEntityNames.map((usedEntityName: string) => allManifestsOfType[usedEntityName]);
-  // }
-  //
-  // /**
-  //  * Collect all the used host files of devices, drivers or services
-  //  */
-  // private collectFiles(
-  //   manifestPluralType: ManifestsTypePluralName,
-  //   entityNames: string[]
-  // ): {[index: string]: string[]} {
-  //   const files = this.main.manifests.getFiles()[manifestPluralType];
-  //   // files paths by entity name
-  //   const result: {[index: string]: string[]} = {};
-  //
-  //   for (let usedEntityName of entityNames) {
-  //     result[usedEntityName] = files[usedEntityName];
-  //   }
-  //
-  //   return result;
-  // }
 
 }
