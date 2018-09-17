@@ -47,6 +47,7 @@ export default class HostsConfigsSet {
 
   private generateHostConfig(rawHostConfig: PreHostConfig): HostConfig {
 
+    // TODO: почему получается HostConfig если не вычищаются drivers, services и тд ???
     // TODO: смержить ещё с platform config
 
     return _defaultsDeep(

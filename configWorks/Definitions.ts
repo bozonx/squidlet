@@ -49,6 +49,10 @@ export default class Definitions {
   }
 
   generate() {
+
+    // TODO: почему используется сырой конфиг а не обработанный?
+    // TODO: для итерации просто получить список хостов и запрашивать потом его конфиг
+
     const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfig.hosts;
 
     for (let hostId of Object.keys(rawHostsConfigs)) {

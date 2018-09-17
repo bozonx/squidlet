@@ -14,6 +14,8 @@ import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
+import HostConfig from '../host/src/app/interfaces/HostConfig';
+import hostDefaultConfig from './configs/hostDefaultConfig';
 
 
 const platforms: {[index: string]: PlatformConfig} = {
@@ -27,7 +29,7 @@ const platforms: {[index: string]: PlatformConfig} = {
 export default class MasterConfig {
   private readonly main: Main;
   private readonly _plugins: string[] = [];
-  private readonly _hostDefaults: {[index: string]: any} = {};
+  private readonly hostDefaults: {[index: string]: any} = {};
   private readonly _hosts: {[index: string]: PreHostConfig} = {};
   // storage base dir
   readonly buildDir: string;
@@ -40,14 +42,6 @@ export default class MasterConfig {
     return this._hosts;
   }
 
-  get hostDefaults(): {[index: string]: any} {
-    return this._hostDefaults;
-  }
-
-  getHostsIds(): string[] {
-    return Object.keys(this.hosts);
-  }
-
 
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.main = main;
@@ -57,10 +51,18 @@ export default class MasterConfig {
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
     if (masterConfig.plugins) this._plugins = masterConfig.plugins;
-    if (masterConfig.hostDefaults) this._hostDefaults = masterConfig.hostDefaults;
+    if (masterConfig.hostDefaults) this.hostDefaults = masterConfig.hostDefaults;
 
     this._hosts = this.mergeHostsWithPlatformConfig(this.resolveHosts(masterConfig));
     this.buildDir = this.generateBuildDir(masterConfigPath);
+  }
+
+  getHostsIds(): string[] {
+    return Object.keys(this.hosts);
+  }
+
+  generate() {
+    // TODO: !!!!
   }
 
 
@@ -110,6 +112,18 @@ export default class MasterConfig {
 
     // use default build dir
     return systemConfig.defaultDuildDir;
+  }
+
+  private mergePreHostConfig(rawHostConfig: PreHostConfig): HostConfig {
+
+    // TODO: почему получается HostConfig если не вычищаются drivers, services и тд ???
+    // TODO: смержить ещё с platform config
+
+    return _defaultsDeep(
+      _cloneDeep(rawHostConfig),
+      this.hostDefaults,
+      hostDefaultConfig
+    );
   }
 
 }

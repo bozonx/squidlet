@@ -1,7 +1,5 @@
 import Register from './Register';
-import Entities, {AllManifests} from './Entities';
-import HostsConfigsSet from './HostsConfigsSet';
-import HostConfig from '../host/src/app/interfaces/HostConfig';
+import Entities from './Entities';
 import * as EventEmitter from 'events';
 import MasterConfig from './MasterConfig';
 import {SrcEntitiesSet} from './interfaces/EntitySet';
@@ -18,27 +16,19 @@ export default class PluginEnv {
   private readonly events: EventEmitter = new EventEmitter();
   private readonly register: Register;
   private readonly entities: Entities;
-  private readonly hostsConfigSet: HostsConfigsSet;
-
 
   constructor(
     masterConfig: MasterConfig,
     register: Register,
     entities: Entities,
-    hostsConfigSet: HostsConfigsSet
   ) {
     this.masterConfig = masterConfig;
     this.register = register;
     this.entities = entities;
-    this.hostsConfigSet = hostsConfigSet;
   }
 
   getEntitiesSet(): SrcEntitiesSet {
     return this.entities.getEntitiesSet();
-  }
-
-  getHostsConfigs(): {[index: string]: HostConfig} {
-    return this.hostsConfigSet.getHostsConfigs();
   }
 
   addPlugin: Register['addPlugin'] = (plugin) => {
