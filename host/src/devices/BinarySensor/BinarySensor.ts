@@ -1,14 +1,18 @@
-import System from '../../app/System';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import GpioInputFactory, {GpioInputDriver} from '../../drivers/Gpio/GpioInput.driver';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
+import DeviceEnv from '../../app/entities/DeviceEnv';
 
 
-interface BinarySensorProps extends DeviceBaseProps {
+export interface BinarySensorProps extends DeviceBaseProps {
+  debounce?: number;
+  deadTime?: number;
+}
 
+interface BinarySensorDrivers {
+  'GpioInputDriver.driver': GpioInputFactory;
 }
 
 
@@ -17,19 +21,24 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
-  get props(): BinarySensorProps {
-    return this._props;
+  /**
+   * Get driver which is dependency of device
+   */
+  get drivers(): BinarySensorDrivers {
+
+    // TODO: review - может всетаки делать generic???
+
+    return this.driversInstances as any;
   }
 
 
   // TODO: definition.props, this.env
-  constructor(system: System, deviceConf: EntityDefinition) {
-    super(system, deviceConf);
+  constructor(props: BinarySensorProps, env: DeviceEnv) {
+    super(props, env);
 
-    // TODO: !!!!????
-    const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('GpioInputDriver.driver');
+    //const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('GpioInputDriver.driver');
 
-    this.gpioInputDriver = gpioInputDriverFactory.getInstance(this.deviceConf.props);
+    this.gpioInputDriver = this.drivers['GpioInputDriver.driver'].getInstance(this.props);
   }
 
   protected afterInit = (): void => {
@@ -51,7 +60,7 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
     setTimeout(() => {
       this.debounceInProgress = false;
       this.startValueLogic();
-    }, this.deviceConf.props.debounceTime);
+    }, this.props.debounceTime);
   }
 
   private async startValueLogic(): Promise<void> {
@@ -61,7 +70,7 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
     let currentLevel: BinaryLevel = false;
     const waitDeadTime = () => setTimeout(() => {
       this.deadTimeInProgress = false;
-    }, this.deviceConf.props.deadTime);
+    }, this.props.deadTime);
 
     try {
       currentLevel = await this.gpioInputDriver.getLevel();

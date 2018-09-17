@@ -4,6 +4,8 @@ import Config from './Config';
 import PublishParams from '../app/interfaces/PublishParams';
 import {EntityProps} from '../app/interfaces/EntityDefinition';
 import DeviceEnv from '../app/entities/DeviceEnv';
+import DriverInstance from '../app/interfaces/DriverInstance';
+import DeviceManifest from '../app/interfaces/DeviceManifest';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -13,14 +15,14 @@ export interface DeviceBaseProps extends EntityProps {
   configRepublishInterval?: number;
 }
 
+export interface DriversBase {
+  [index: string]: DriverInstance;
+}
 
-export default class DeviceBase<T extends DeviceBaseProps> {
-  private _status?: Status;
-  private _config?: Config;
-  // readonly getConfig?: Config['read'];
-  // readonly setConfig?: Config['write'];
+
+export default class DeviceBase<Props extends DeviceBaseProps> {
   protected readonly env: DeviceEnv;
-  protected readonly _props: T;
+  protected readonly _props: Props;
 
   // better place to do initial requests
   protected onInit?: () => Promise<void>;
@@ -32,8 +34,13 @@ export default class DeviceBase<T extends DeviceBaseProps> {
   protected configGetter?: Getter;
   protected configSetter?: Setter;
   protected actions: {[index: string]: Function} = {};
+  protected driversInstances: DriversBase = {};
+  private _status?: Status;
+  private _config?: Config;
 
-  get props(): T {
+
+  // TODO: поидее не нужен тогда геттер
+  get props(): Props {
     return this._props;
   }
 
@@ -53,26 +60,35 @@ export default class DeviceBase<T extends DeviceBaseProps> {
     return this.config && this.config.write;
   }
 
+  // /**
+  //  * Get driver which is dependency of device
+  //  */
+  // get drivers(): {[index: string]: DriverInstance} {
+  //   return this.driversInstances;
+  // }
 
-  constructor(props: T, env: DeviceEnv) {
+
+  constructor(props: Props, env: DeviceEnv) {
     this.env = env;
     this._props = props;
   }
 
   async init(): Promise<void> {
+    const manifest: DeviceManifest = await this.loadManifest();
+
     this._status = new Status(
       this.props.id,
       this.env.system,
-      this.deviceConf.manifest.status || {},
+      manifest.status || {},
       (...params) => this.publish(...params),
       this.props.statusRepublishInterval,
     );
 
-    if (this.deviceConf.manifest.config) {
+    if (manifest.config) {
       this._config = new Config(
         this.props.id,
         this.env.system,
-        this.deviceConf.manifest.config || {},
+        manifest.config || {},
         (...params) => this.publish(...params),
         this.props.configRepublishInterval,
       );
@@ -97,6 +113,16 @@ export default class DeviceBase<T extends DeviceBaseProps> {
 
   onChange(cb: ChangeHandler): void {
     this.status.onChange(cb);
+  }
+
+  /**
+   * Load manifest of this device
+   */
+  async loadManifest(): Promise<DeviceManifest> {
+
+    // TODO: где взять className
+
+    return this.env.loadDeviceManifest(this.className);
   }
 
   /**

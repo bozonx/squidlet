@@ -23,8 +23,11 @@ export default class DriverEnv implements Env {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 
-  async loadManifest(driverName: string): Promise<DriverManifest> {
-    return this.system.configSet.loadManifest('drivers', driverName);
+  async loadDriverManifest(driverName: string): Promise<DriverManifest> {
+
+    // TODO: cache manifest for 1 minute
+
+    return this.system.configSet.loadManifest<DriverManifest>('drivers', driverName);
   }
 
 }

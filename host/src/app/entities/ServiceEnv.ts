@@ -7,6 +7,8 @@ import Devices from '../Devices';
 import DriverInstance from '../interfaces/DriverInstance';
 import Env from '../interfaces/Env';
 import DriverManifest from '../interfaces/DriverManifest';
+import DeviceManifest from '../interfaces/DeviceManifest';
+import ServiceManifest from '../interfaces/ServiceManifest';
 
 
 /**
@@ -37,9 +39,10 @@ export default class ServiceEnv implements Env {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 
-  // TODO: наверное лучше разделить env для services и devices
-  // async loadManifest(driverName: string): Promise<DriverManifest> {
-  //   return this.system.configSet.loadManifest('drivers', driverName);
-  // }
+  async loadServiceManifest(className: string): Promise<ServiceManifest> {
 
+    // TODO: cache manifest for 1 minute
+
+    return this.system.configSet.loadManifest<ServiceManifest>('services', className);
+  }
 }
