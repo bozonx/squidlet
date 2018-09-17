@@ -25,6 +25,6 @@ export class DigitalLocalDriver {
 
 export default class GpioInputFactory extends DriverFactoryBase<DigitalLocalDriver, DigitalLocalDriverProps> {
   // TODO: поидее всегда будет один инстанс
-  protected instanceIdName: string = 'pin';
+  protected instanceIdName: string = 'local';
   protected DriverClass = DigitalLocalDriver;
 }
