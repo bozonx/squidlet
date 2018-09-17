@@ -2,7 +2,6 @@ import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverEnv from '../../app/entities/DriverEnv';
-import Poling from '../../helpers/Poling';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 
 
@@ -11,7 +10,7 @@ interface GpioInputDriverProps extends EntityProps {
 }
 
 
-export class DigitalInputLocalDriver {
+export class DigitalLocalDriver {
   private readonly props: GpioInputDriverProps;
   private readonly env: DriverEnv;
   private readonly events: EventEmitter = new EventEmitter();
@@ -24,11 +23,11 @@ export class DigitalInputLocalDriver {
 }
 
 
-export default class GpioInputFactory extends DriverFactoryBase<DigitalInputLocalDriver> {
+export default class GpioInputFactory extends DriverFactoryBase<DigitalLocalDriver> {
   protected instanceIdName: string | number = 'pin';
-  protected DriverClass = DigitalInputLocalDriver;
+  protected DriverClass = DigitalLocalDriver;
 
-  getInstance(additionalProps: { pin: number }): DigitalInputLocalDriver {
+  getInstance(additionalProps: { pin: number }): DigitalLocalDriver {
     return super.getInstance(additionalProps);
   }
 }

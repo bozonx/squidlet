@@ -1,3 +1,0 @@
-name: DigitalInput_local.driver
-main: DigitalInput_local.driver.ts
-type: system

@@ -1,3 +1,0 @@
-name: DigitalInput_pcf8574.driver
-main: DigitalInput_pcf8574.driver.ts
-type: system
