@@ -67,35 +67,13 @@ export default class Main {
     await this.hostsFilesWriter.writeHostsFiles(skipMaster);
   }
 
-  // TODO: похоже используется только в Register - перенести туда
-  async $loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {
-    if (pathToDirOrFile.indexOf('/') !== 0) {
-      throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
-    }
-
-    const resolvedPathToManifest: string = await resolveIndexFile(
-      pathToDirOrFile,
-      systemConfig.indexManifestFileNames
-    );
-    const parsedManifest = (await this.io.loadYamlFile(resolvedPathToManifest)) as T;
-
-    parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
-
-    return parsedManifest;
-  }
-
-  // TODO: похоже используется только в Register - перенести туда
-  // it needs for test purpose
-  $require(devicePath: string) {
-    return require(devicePath);
-  }
-
   async $writeJson(fileName: string, contentJs: any) {
     const content = JSON.stringify(contentJs);
 
     await this.io.mkdirP(path.dirname(fileName));
     await this.io.writeFile(fileName, content);
   }
+
 
   /**
    * Start registering step of initialization

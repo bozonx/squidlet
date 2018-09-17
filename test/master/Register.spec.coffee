@@ -23,7 +23,7 @@ describe 'master.Register', ->
     sinon.assert.calledWith(@plugin, pluginEnv)
 
   it 'addPlugin as a path', ->
-    @main.$require = () => @plugin
+    @register.require = () => @plugin
     @register.addPlugin('/path/to/plugin')
 
     assert.deepEqual(@register.plugins, [@plugin])
@@ -39,7 +39,7 @@ describe 'master.Register', ->
     assert.deepEqual(@register.getServicesPreManifests(), [ @entity ])
 
   it 'addDevice, addDriver, addService as a path', ->
-    @main.$loadManifest = () => @entity
+    @register.loadManifest = () => @entity
     pathTo = '/path/to/entity'
 
     await @register.addDevice(pathTo)

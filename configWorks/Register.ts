@@ -1,3 +1,5 @@
+import {resolveIndexFile} from './helpers';
+
 const _values = require('lodash/values');
 import * as path from 'path';
 
@@ -13,6 +15,7 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
 import {ManifestsTypeName, ManifestsTypePluralName} from './Entities';
+import systemConfig from './configs/systemConfig';
 
 
 /**
@@ -57,7 +60,7 @@ export default class Register {
         throw new Error(`You have to specify an absolute path of "${plugin}"`);
       }
 
-      const pluginFunction: Plugin = this.main.$require(plugin);
+      const pluginFunction: Plugin = this.require(plugin);
 
       this.plugins.push(pluginFunction);
     }
@@ -140,7 +143,7 @@ export default class Register {
     if (typeof manifest === 'string') {
       // it's path to manifest - let's load it
       // it adds a baseDir param
-      parsedManifest = await this.main.$loadManifest<T>(manifest);
+      parsedManifest = await this.loadManifest<T>(manifest);
     }
     else if (typeof manifest === 'object') {
       const manifestObj: T = manifest;
@@ -157,6 +160,27 @@ export default class Register {
     }
 
     return parsedManifest;
+  }
+
+  private async loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {
+    if (pathToDirOrFile.indexOf('/') !== 0) {
+      throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
+    }
+
+    const resolvedPathToManifest: string = await resolveIndexFile(
+      pathToDirOrFile,
+      systemConfig.indexManifestFileNames
+    );
+    const parsedManifest = (await this.main.io.loadYamlFile(resolvedPathToManifest)) as T;
+
+    parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
+
+    return parsedManifest;
+  }
+
+  // it needs for test purpose
+  private require(devicePath: string) {
+    return require(devicePath);
   }
 
 }
