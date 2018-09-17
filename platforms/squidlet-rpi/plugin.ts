@@ -5,7 +5,7 @@
 //
 //
 // export default async function (manager: Manager) {
-//   await manager.addDriver(path.join(rootDir, 'Gpio.dev'));
+//   await manager.addDriver(path.join(rootDir, 'Digital.dev'));
 //   await manager.addDriver(path.join(rootDir, 'I2cMaster.dev'));
 //   await manager.addDriver(path.join(rootDir, 'I2cSlave.dev'));
 //   await manager.addDriver(path.join(rootDir, 'Storage.dev'));

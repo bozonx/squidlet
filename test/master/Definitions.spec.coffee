@@ -58,9 +58,9 @@ describe 'master.Definitions', ->
       }
     })
     assert.deepEqual(@definitions.getHostDriversDefinitions('master'), {
-      'Gpio.driver': {
-        id: 'Gpio.driver'
-        className: 'Gpio.driver'
+      'Digital.driver': {
+        id: 'Digital.driver'
+        className: 'Digital.driver'
         props: {
           param: 1
         }

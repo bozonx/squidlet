@@ -1,6 +1,6 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioInputFactory, {GpioInputDriver} from '../../drivers/Gpio/GpioInput.driver';
+import GpioInputFactory, {GpioInputDriver} from '../../drivers/Digital/GpioInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import DeviceEnv from '../../app/entities/DeviceEnv';
@@ -12,7 +12,7 @@ export interface BinarySensorProps extends DeviceBaseProps {
 }
 
 interface BinarySensorDrivers {
-  'GpioInputDriver.driver': GpioInputFactory;
+  'DigitalInput.driver': GpioInputFactory;
 }
 
 

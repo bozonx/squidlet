@@ -1,7 +1,7 @@
 import System from '../../app/System';
 import DeviceBase from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioOutputFactory, {GpioOutputDriver} from '../../drivers/Gpio/GpioOutput.driver';
+import GpioOutputFactory, {GpioOutputDriver} from '../../drivers/Digital/GpioOutput.driver';
 import EntityDefinition from '../../app/interfaces/EntityDefinition';
 import {convertToLevel} from '../../helpers/helpers';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';

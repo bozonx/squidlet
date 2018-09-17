@@ -8,7 +8,7 @@ const platformConfig: PlatformConfig = {
     //'Bluetooth',
 
     // via usb
-    //'Gpio',
+    //'Digital',
     //'Serial',
     //'I2cMaster',
 
