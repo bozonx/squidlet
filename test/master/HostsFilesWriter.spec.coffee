@@ -24,7 +24,7 @@ describe.only 'master.HostsFilesWriter', ->
         getHostsIds: => [ 'master' ]
       }
       hostsConfigSet: {
-        getHostConfig: => 'config'
+        getFinalHostConfig: => 'config'
       }
       hostsFilesSet: {
         getDefinitionsSet: => @definitionsSet

@@ -184,7 +184,7 @@ export default class HostsFilesSet {
 //     // TODO: проверить что getDevDependencies есть среди devs платформы
 //
 //     this.files[hostId] = {
-//       config: this.main.hostsConfigSet.getHostConfig(hostId),
+//       config: this.main.hostsConfigSet.getFinalHostConfig(hostId),
 //       entitiesFiles: this.collectEntitiesFiles(hostId),
 //       entitiesManifests: this.collectEntitiesManifests(),
 //       ...this.getDefinitionsSet(hostId),

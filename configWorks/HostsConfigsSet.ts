@@ -24,7 +24,7 @@ export default class HostsConfigsSet {
   }
 
 
-  getHostConfig(hostId: string): HostConfig {
+  getFinalHostConfig(hostId: string): HostConfig {
     if (!this.hostsConfigs[hostId]) throw new Error(`Host "${hostId}" not found`);
 
     return this.hostsConfigs[hostId];

@@ -63,5 +63,5 @@ describe 'master.HostsConfigsSet', ->
     await @hostsConfigsSet.generate()
 
     #assert.deepEqual(@hostsConfigsSet.getHostsIds(), [ 'master' ])
-    assert.deepEqual(@hostsConfigsSet.getHostConfig('master'), @hostConfigsResult.master)
+    assert.deepEqual(@hostsConfigsSet.getFinalHostConfig('master'), @hostConfigsResult.master)
     assert.deepEqual(@hostsConfigsSet.getHostsConfigs(), @hostConfigsResult)

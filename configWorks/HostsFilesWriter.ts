@@ -90,7 +90,7 @@ export default class HostsFilesWriter {
   }
 
   private async proceedHost(hostId: string) {
-    const hostConfig: HostConfig = this.main.masterConfig.getHostConfig(hostId);
+    const hostConfig: HostConfig = this.main.masterConfig.getFinalHostConfig(hostId);
     const definitionsSet: DefinitionsSet = this.main.hostsFilesSet.getDefinitionsSet(hostId);
     const hostsUsedEntitiesNames: EntitiesNames = this.main.hostsFilesSet.getEntitiesNames(hostId);
     const hostDir = path.join(this.hostsDir, hostId);

@@ -61,7 +61,7 @@ export default class MasterConfig {
     return Object.keys(this.hosts);
   }
 
-  getHostConfig(hostId: string): HostConfig {
+  getFinalHostConfig(hostId: string): HostConfig {
 
     // TODO: отдать готовый
 

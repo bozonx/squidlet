@@ -54,7 +54,7 @@ gulp.task('solid', async function () {
 
   const hostConfigSet: HostFilesSet = {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
-    config: main.masterConfig.getHostConfig(hostId),
+    config: main.masterConfig.getFinalHostConfig(hostId),
     entitiesSet: generateDstEntitiesSet(main, hostId),
   };
 
