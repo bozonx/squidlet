@@ -7,6 +7,11 @@ enum I2Cs {
   I2C3,
 }
 
+interface EspruinoI2cBus {
+  writeTo(address: number, data: Uint8Array): void;
+  readFrom(address: number, quantity: number): Uint8Array;
+}
+
 // TODO: поддержка i2c на любом пине - new I2C() -  use I2C.setup
 // TODO; All addresses are in 7 bit format. If you have an 8 bit address then you need to shift it one bit to the right.
 
@@ -26,7 +31,7 @@ export default class I2cMasterDev implements I2cMaster {
   }
 
 
-  private getI2cBus(bus: I2Cs): any {
+  private getI2cBus(bus: I2Cs): EspruinoI2cBus {
     // TODO: проверить что будет работать
     return (global as any)[`I2C${bus}`];
   }
