@@ -6,6 +6,7 @@ import {EntityProps} from '../app/interfaces/EntityDefinition';
 import DeviceEnv from '../app/entities/DeviceEnv';
 import DriverInstance from '../app/interfaces/DriverInstance';
 import DeviceManifest from '../app/interfaces/DeviceManifest';
+import EntityDefinition from '../app/interfaces/EntityDefinition';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -21,11 +22,11 @@ export interface DriversBase {
 
 
 export default class DeviceBase<Props extends DeviceBaseProps> {
+  readonly id: string;
+  readonly className: string;
+  readonly props: Props;
   protected readonly env: DeviceEnv;
-  protected readonly _props: Props;
 
-  // better place to do initial requests
-  protected onInit?: () => Promise<void>;
   // it calls after device init, status and config init have been finished
   protected afterInit?: () => void;
   protected destroy?: () => void;
@@ -38,11 +39,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
   private _status?: Status;
   private _config?: Config;
 
-
-  // TODO: поидее не нужен тогда геттер
-  get props(): Props {
-    return this._props;
-  }
 
   get status(): Status {
     return this._status as Status;
@@ -68,9 +64,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
   // }
 
 
-  constructor(props: Props, env: DeviceEnv) {
+  constructor(definition: EntityDefinition, env: DeviceEnv) {
     this.env = env;
-    this._props = props;
+    this.id = definition.id;
+    this.className = definition.className;
+    this.props = definition.props as Props;
   }
 
   async init(): Promise<void> {
@@ -99,7 +97,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
     await Promise.all([
       this.status && this.status.init(this.statusGetter, this.statusSetter),
       this.config && this.config.init(this.configGetter, this.configSetter),
-      this.onInit && this.onInit(),
     ]);
 
     if (this.afterInit) this.afterInit();
@@ -121,9 +118,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
    * Load manifest of this device
    */
   async loadManifest(): Promise<DeviceManifest> {
-
-    // TODO: где взять className
-
     return this.env.loadDeviceManifest(this.className);
   }
 
@@ -150,6 +144,5 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
   }
 
   // TODO: валидация конфига + дополнительный метод валидации девайса
-  // TODO: destroy
 
 }
