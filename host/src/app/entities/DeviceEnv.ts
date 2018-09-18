@@ -37,7 +37,7 @@ export default class DeviceEnv implements Env {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 
-  async loadDeviceManifest(className: string): Promise<DeviceManifest> {
+  async loadManifest(className: string): Promise<DeviceManifest> {
 
     // TODO: cache manifest for 1 minute
 

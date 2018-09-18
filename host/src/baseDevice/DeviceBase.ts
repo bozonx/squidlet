@@ -21,7 +21,7 @@ export interface DriversBase {
 }
 
 
-export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props, DeviceEnv> {
+export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props> {
   protected statusGetter?: Getter;
   protected statusSetter?: Setter;
   protected configGetter?: Getter;

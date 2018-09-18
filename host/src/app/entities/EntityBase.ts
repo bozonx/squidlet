@@ -1,10 +1,10 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverManifest from '../interfaces/DriverManifest';
 import {DriversBase} from '../../baseDevice/DeviceBase';
 import ManifestBase from '../interfaces/ManifestBase';
+import Env from '../interfaces/Env';
 
 
-export default class EntityBase<Props, Env> {
+export default class EntityBase<Props> {
   readonly id: string;
   readonly className: string;
   readonly props: Props;
@@ -40,8 +40,8 @@ export default class EntityBase<Props, Env> {
   /**
    * Load manifest of this entity
    */
-  async getManifest<T>(): Promise<T> {
-    return this.env.loadManifest(this.className);
+  async getManifest<T extends ManifestBase>(): Promise<T> {
+    return await this.env.loadManifest(this.className) as T;
   }
 
 }

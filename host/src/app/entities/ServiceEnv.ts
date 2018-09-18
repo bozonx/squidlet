@@ -39,7 +39,7 @@ export default class ServiceEnv implements Env {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 
-  async loadServiceManifest(className: string): Promise<ServiceManifest> {
+  async loadManifest(className: string): Promise<ServiceManifest> {
 
     // TODO: cache manifest for 1 minute
 
