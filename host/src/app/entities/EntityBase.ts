@@ -50,11 +50,10 @@ export default class EntityBase<Props> {
     }
   }
 
-
   /**
    * Load manifest of this entity
    */
-  async getManifest<T extends ManifestBase>(): Promise<T> {
+  protected async getManifest<T extends ManifestBase>(): Promise<T> {
     return await this.env.loadManifest(this.className) as T;
   }
 
