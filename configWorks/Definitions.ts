@@ -49,14 +49,10 @@ export default class Definitions {
   }
 
   generate() {
+    const hostIds: string[] = this.main.masterConfig.getHostsIds();
 
-    // TODO: почему используется сырой конфиг а не обработанный?
-    // TODO: для итерации просто получить список хостов и запрашивать потом его конфиг
-
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfig.hosts;
-
-    for (let hostId of Object.keys(rawHostsConfigs)) {
-      const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
+    for (let hostId of hostIds) {
+      const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
       const { devices, drivers, services } = this.prepareEntities(rawHostConfig);
 
       if (rawHostConfig.devices) {
@@ -83,9 +79,8 @@ export default class Definitions {
    * and makes devices plain.
    * And makes props
    */
-  private prepareEntities(
-    rawHostConfig: PreHostConfig
-  ): {
+  private prepareEntities(rawHostConfig: PreHostConfig):
+  {
     devices: {[index: string]: EntityDefinition},
     drivers: {[index: string]: EntityDefinition},
     services: {[index: string]: EntityDefinition}

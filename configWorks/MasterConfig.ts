@@ -9,7 +9,12 @@ import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
-import Platforms, {PLATFORM_ESP32, PLATFORM_ESP8266, PLATFORM_RPI, PLATFORM_X86} from './interfaces/Platforms';
+import Platforms, {
+  PLATFORM_ESP32,
+  PLATFORM_ESP8266,
+  PLATFORM_RPI,
+  PLATFORM_X86
+} from './interfaces/Platforms';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
@@ -30,7 +35,8 @@ export default class MasterConfig {
   private readonly main: Main;
   private readonly _plugins: string[] = [];
   private readonly hostDefaults: {[index: string]: any} = {};
-  private readonly _hosts: {[index: string]: PreHostConfig} = {};
+  private readonly preHosts: {[index: string]: PreHostConfig} = {};
+  private readonly finalHosts: {[index: string]: HostConfig} = {};
   // storage base dir
   readonly buildDir: string;
 
@@ -38,13 +44,11 @@ export default class MasterConfig {
     return this._plugins;
   }
 
-  get hosts(): {[index: string]: PreHostConfig} {
-    return this._hosts;
-  }
-
 
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.main = main;
+
+    // TODO: move to generate
 
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
@@ -53,26 +57,32 @@ export default class MasterConfig {
     if (masterConfig.plugins) this._plugins = masterConfig.plugins;
     if (masterConfig.hostDefaults) this.hostDefaults = masterConfig.hostDefaults;
 
-    this._hosts = this.mergeHostsWithPlatformConfig(this.resolveHosts(masterConfig));
+
+    // TODO: отдать готовый - нужно убрать drivers, services, devices
+
+    this.preHosts = this.mergeHostsWithPlatformConfig(this.resolveHosts(masterConfig));
     this.buildDir = this.generateBuildDir(masterConfigPath);
   }
 
   getHostsIds(): string[] {
-    return Object.keys(this.hosts);
+    return Object.keys(this.preHosts);
+  }
+
+  getPreHostConfig(hostId: string): PreHostConfig {
+    if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
+
+    return this.preHosts[hostId];
   }
 
   getFinalHostConfig(hostId: string): HostConfig {
+    if (!this.finalHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
 
-    // TODO: отдать готовый
-
-    if (!this.hosts[hostId]) throw new Error(`Host "${hostId}" not found`);
-
-    return this.hosts[hostId];
+    return this.finalHosts[hostId];
   }
 
   generate() {
     // TODO: !!!!
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.main.masterConfig.hosts;
+    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.hosts;
 
     for (let hostId of Object.keys(rawHostsConfigs)) {
       const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
@@ -83,6 +93,7 @@ export default class MasterConfig {
   }
 
 
+  // TODO: review
   private mergeHostsWithPlatformConfig(hosts: {[index: string]: PreHostConfig}): {[index: string]: PreHostConfig} {
     const result: {[index: string]: PreHostConfig} = {};
 
@@ -113,9 +124,11 @@ export default class MasterConfig {
   }
 
   private generateBuildDir(masterConfigPath: string): string {
-    if (this.hosts.master.config.storageDir) {
+    const masterHostConfig: PreHostConfig = this.getPreHostConfig('master');
+
+    if (masterHostConfig.config.storageDir) {
       // use master's storage dir
-      const storageDir = this.hosts.master.config.storageDir;
+      const storageDir = masterHostConfig.config.storageDir;
 
       if (path.isAbsolute(masterConfigPath)) {
         // it's an absolute path
@@ -135,6 +148,7 @@ export default class MasterConfig {
 
     // TODO: почему получается HostConfig если не вычищаются drivers, services и тд ???
     // TODO: смержить ещё с platform config
+    // TODO: смержить ещё с build config
 
     return _defaultsDeep(
       _cloneDeep(rawHostConfig),
