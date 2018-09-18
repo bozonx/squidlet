@@ -1,25 +1,13 @@
-import * as EventEmitter from 'events';
-
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import DriverEnv from '../../app/entities/DriverEnv';
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
+import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
 
 
-interface DigitalLocalDriverProps extends EntityProps {
+interface DigitalLocalDriverProps extends DriverBaseProps {
   pin: number;
 }
 
 
-export class DigitalLocalDriver {
-  private readonly props: DigitalLocalDriverProps;
-  private readonly env: DriverEnv;
-  private readonly events: EventEmitter = new EventEmitter();
-
-  constructor(props: DigitalLocalDriverProps, env: DriverEnv) {
-    this.props = props;
-    this.env = env;
-  }
-
+export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
 }
 
 

@@ -1,3 +1,5 @@
+import {DriverBaseProps} from '../../app/entities/DriverBase';
+
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
@@ -7,6 +9,9 @@ import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverEnv from '../../app/entities/DriverEnv';
 import Poling from '../../helpers/Poling';
+import DriverBase from '../../app/entities/DriverBase';
+import EntityDefinition from '../../app/interfaces/EntityDefinition';
+import Env from '../../app/interfaces/Env';
 
 
 const REGISTER_POSITION = 0;
@@ -14,26 +19,27 @@ const REGISTER_LENGTH = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
+interface I2cMasterDriverProps extends DriverBaseProps {
+  bus: number;
+}
 
-export class I2cMasterDriver {
-  private readonly env: DriverEnv;
+
+export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly bus: number;
   private readonly i2cMasterDev: I2cMaster;
+  // TODO: review poling
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
-  constructor(props: EntityProps, env: DriverEnv, bus: string | number) {
-    this.env = env;
-    this.bus = (Number.isInteger(bus as any))
-      ? bus as number
-      : parseInt(bus as any);
+  constructor(definition: EntityDefinition, env: Env) {
+    super(definition, env);
 
-    if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
+    // TODO: move to onInit()
 
-    const i2cDevDriver = this.env.getDriver<DriverFactoryBase>('I2cMaster.dev');
+    // TODO: call from base init
+    this.validateProps(this.props);
 
-    this.i2cMasterDev = i2cDevDriver.getInstance(this.bus) as I2cMaster;
+    this.i2cMasterDev = this.drivers['I2cMaster.dev'] as I2cMaster;
   }
 
   startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
@@ -155,7 +161,7 @@ export class I2cMasterDriver {
       await this.writeEmpty(addressHex, dataAddress);
     }
     // read from bus
-    return this.i2cMasterDev.readFrom(addressHex, length);
+    return this.i2cMasterDev.readFrom(this.props.bus, addressHex, length);
   }
 
   async write(i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
@@ -166,7 +172,7 @@ export class I2cMasterDriver {
       dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
 
-    await this.i2cMasterDev.writeTo(addressHex, dataToWrite);
+    await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
   }
 
   /**
@@ -178,7 +184,7 @@ export class I2cMasterDriver {
 
     dataToWrite[0] = dataAddress;
 
-    return this.i2cMasterDev.writeTo(addressHex, dataToWrite);
+    return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
   }
 
 
@@ -198,24 +204,14 @@ export class I2cMasterDriver {
     // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль
   }
 
+  private validateProps(props: I2cMasterDriverProps) {
+    if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+  }
+
 }
 
 
-export default class Factory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: EntityProps,
-      env: DriverEnv,
-      bus: string | number,
-    ): I2cMasterDriver } = I2cMasterDriver;
-  private instances: {[index: string]: I2cMasterDriver} = {};
-
-  getInstance(bus: string) {
-
-    // TODO: возвращать тип I2cMasterDriver
-    // TODO: если есть инстанс наверное нужно возвращать его а не создавать новый - проверить в других драйверах
-
-    this.instances[bus] = super.getInstance(bus) as I2cMasterDriver;
-
-    return this.instances[bus];
-  }
+export default class I2cMasterFactory extends DriverFactoryBase<I2cMasterDriver, I2cMasterDriverProps> {
+  protected instanceIdName: string = 'bus';
+  protected DriverClass = I2cMasterDriver;
 }

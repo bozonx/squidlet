@@ -3,6 +3,8 @@ import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUin
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
+import {DriverBaseProps} from '../../app/entities/DriverBase';
+import DriverBase from '../../app/entities/DriverBase';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -30,8 +32,12 @@ export interface I2cDriverClass {
   ) => void;
 }
 
+interface I2cDataDriverProps extends DriverBaseProps {
+  bus: number;
+}
 
-export class I2cDataDriver {
+
+export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
   private readonly bus: string | number;
   private readonly i2cDriver: I2cDriverClass;
   private readonly defaultDataMark: number = 0x00;
@@ -157,11 +163,8 @@ export class I2cDataDriver {
 }
 
 
-export default class Factory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: EntityProps,
-      env: DriverEnv,
-      i2cDriver: DriverFactoryBase,
-      bus: string
-    ): I2cDataDriver } = I2cDataDriver;
+export default class Factory extends DriverFactoryBase<I2cDataDriver, I2cDataDriverProps> {
+  // TODO: review
+  protected instanceIdName: string = 'bus';
+  protected DriverClass = I2cDataDriver;
 }

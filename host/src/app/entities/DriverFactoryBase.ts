@@ -2,14 +2,18 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 
 import DriverEnv from './DriverEnv';
-import {EntityProps} from '../interfaces/EntityDefinition';
+import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 
 
+/**
+ * This factory creates instances and keeps them.
+ * After the next request of instance it returns previously created one.
+ */
 export default abstract class DriverFactoryBase<Instance, Props extends EntityProps> {
   protected instances: {[index: string]: Instance} = {};
   // name of instance id in props
   protected abstract instanceIdName: string;
-  protected abstract DriverClass: new (props: Props, env: DriverEnv) => Instance;
+  protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
   protected readonly env: DriverEnv;
   protected readonly props: Props;
 
