@@ -7,7 +7,7 @@ import EntityManagerBase from './EntityManagerBase';
 /**
  * Creates instances of local devices and prepare config for them.
  */
-export default class DevicesManager extends EntityManagerBase<DeviceInstance> {
+export default class DevicesManager extends EntityManagerBase<DeviceInstance, DeviceEnv> {
   protected readonly EnvClass = DeviceEnv;
 
   /**

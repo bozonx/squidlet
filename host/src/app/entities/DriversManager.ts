@@ -9,7 +9,7 @@ import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
 /**
  * Driver manager
  */
-export default class DriversManager extends EntityManagerBase<DriverInstance> {
+export default class DriversManager extends EntityManagerBase<DriverInstance, DriverEnv> {
   protected readonly EnvClass = DriverEnv;
 
   async initSystemDrivers(): Promise<void> {

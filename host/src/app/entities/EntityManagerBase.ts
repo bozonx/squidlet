@@ -11,14 +11,14 @@ interface BaseEntityInstance {
 export type EntityClassType = new (definition: EntityDefinition, env: Env) => BaseEntityInstance;
 
 
-export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance> {
-  protected readonly abstract EnvClass: new (system: System) => Env;
-  protected readonly env: Env;
+export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance, EntityEnv extends Env> {
+  readonly env: EntityEnv;
+  protected readonly abstract EnvClass: new (system: System) => EntityEnv;
   protected readonly system: System;
   protected readonly instances: {[index: string]: EntityInstance} = {};
 
 
-  protected get RealEnvClass(): new (system: System) => Env {
+  protected get RealEnvClass(): new (system: System) => EntityEnv {
     return this.EnvClass;
   }
 

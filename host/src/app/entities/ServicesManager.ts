@@ -4,7 +4,7 @@ import EntityManagerBase from './EntityManagerBase';
 import ServiceEnv from './ServiceEnv';
 
 
-export default class ServicesManager extends EntityManagerBase<ServiceInstance> {
+export default class ServicesManager extends EntityManagerBase<ServiceInstance, ServiceEnv> {
   protected readonly EnvClass = ServiceEnv;
 
   async initSystemServices() {
