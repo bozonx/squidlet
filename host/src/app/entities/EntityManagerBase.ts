@@ -8,16 +8,24 @@ interface BaseEntityInstance {
   init?: () => Promise<void>;
 }
 
-export type EntityClassType = new (props: EntityProps, env: Env) => BaseEntityInstance;
+export type EntityClassType = new (definition: EntityDefinition, env: Env) => BaseEntityInstance;
 
 
 export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance> {
-  protected readonly abstract env: Env;
+  protected readonly abstract EnvClass: new (system: System) => Env;
+  protected readonly env: Env;
   protected readonly system: System;
   protected readonly instances: {[index: string]: EntityInstance} = {};
 
+
+  protected get RealEnvClass(): new (system: System) => Env {
+    return this.EnvClass;
+  }
+
+
   constructor(system: System) {
     this.system = system;
+    this.env = new this.RealEnvClass(this.system);
   }
 
 
@@ -27,7 +35,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
       definition.id
     );
 
-    return new EntityClass(definition.props, this.env) as EntityInstance;
+    return new EntityClass(definition, this.env) as EntityInstance;
   }
 
   protected async initializeAll(entitiesIds: string[]) {
