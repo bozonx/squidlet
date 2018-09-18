@@ -6,7 +6,7 @@ import {EntityProps} from '../app/interfaces/EntityDefinition';
 import DeviceEnv from '../app/entities/DeviceEnv';
 import DriverInstance from '../app/interfaces/DriverInstance';
 import DeviceManifest from '../app/interfaces/DeviceManifest';
-import EntityDefinition from '../app/interfaces/EntityDefinition';
+import EntityBase from '../app/entities/EntityBase';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -21,21 +21,12 @@ export interface DriversBase {
 }
 
 
-export default class DeviceBase<Props extends DeviceBaseProps> {
-  readonly id: string;
-  readonly className: string;
-  readonly props: Props;
-  protected readonly env: DeviceEnv;
-
-  // it calls after device init, status and config init have been finished
-  protected afterInit?: () => void;
-  protected destroy?: () => void;
+export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props, DeviceEnv> {
   protected statusGetter?: Getter;
   protected statusSetter?: Setter;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
   protected actions: {[index: string]: Function} = {};
-  protected driversInstances: DriversBase = {};
   private _status?: Status;
   private _config?: Config;
 
@@ -56,25 +47,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
     return this.config && this.config.write;
   }
 
-  // /**
-  //  * Get driver which is dependency of device
-  //  */
-  // get drivers(): {[index: string]: DriverInstance} {
-  //   return this.driversInstances;
-  // }
-
-
-  constructor(definition: EntityDefinition, env: DeviceEnv) {
-    this.env = env;
-    this.id = definition.id;
-    this.className = definition.className;
-    this.props = definition.props as Props;
-  }
 
   async init(): Promise<void> {
-    const manifest: DeviceManifest = await this.loadManifest();
+    const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
-    // TODO: получить ссылки на зависимые драйвера
+    await this.initDependencies(manifest);
 
     this._status = new Status(
       this.props.id,
@@ -112,13 +89,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> {
 
   onChange(cb: ChangeHandler): void {
     this.status.onChange(cb);
-  }
-
-  /**
-   * Load manifest of this device
-   */
-  async loadManifest(): Promise<DeviceManifest> {
-    return this.env.loadDeviceManifest(this.className);
   }
 
   /**
