@@ -17,9 +17,6 @@ export default interface HostConfig {
   // id of host e.g master
   id: string;
   platform: Platforms;
-
-  // TODO: rename host to props ?
-
   // specific config for each host
   config: HostConfigConfig;
 
