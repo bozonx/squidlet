@@ -1,6 +1,5 @@
 import * as yargs from 'yargs';
 
-import MasterConfig from '../configWorks/MasterConfig';
 import {
   generateSrcEntitiesSet,
   getPlatformSystem,
@@ -11,6 +10,7 @@ import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
@@ -32,9 +32,10 @@ async function prepareHostSystem (main: Main): Promise<System> {
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
   const platformName: string = hostConfigSet.config.platform;
+  // TODO: reveiw
   const hostSystem: System = await getPlatformSystem(platformName);
 
-  // integrate a config set
+  // integrate a config set as a static prop
   ConfigSetMaster.hostConfigSet = hostConfigSet;
 
   // register config set manager
@@ -51,7 +52,7 @@ async function prepareHostSystem (main: Main): Promise<System> {
 // * passes it to platform index file and runs host system as is, without building
 async function init () {
   const resolvedConfigPath: string = resolveConfigPath(yargs.argv.config);
-  const config: MasterConfig = await readConfig<MasterConfig>(resolvedConfigPath);
+  const config: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedConfigPath);
   const main: Main = new Main(config, resolvedConfigPath);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
@@ -60,11 +61,12 @@ async function init () {
   // write all the hosts and entities files exclude master's host files
   await main.writeToStorage(true);
 
-  const hostSystem = await prepareHostSystem(main);
+  const hostSystem: System = await prepareHostSystem(main);
 
   // start master host system
   await hostSystem.start();
 }
+
 
 init()
   .catch((err) => {

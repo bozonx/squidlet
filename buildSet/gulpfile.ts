@@ -6,7 +6,7 @@ import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-import {generateDstEntitiesSet, generateSrcEntitiesSet, PlatformIndex, readConfig, resolveConfigPath} from './helpers';
+import {generateDstEntitiesSet, PlatformIndex, readConfig, resolveConfigPath} from './helpers';
 import x86 from '../platforms/squidlet-x86/index';
 import rpi from '../platforms/squidlet-rpi/index';
 import Main from '../configWorks/Main';
