@@ -31,31 +31,24 @@ const platforms: {[index: string]: PlatformConfig} = {
 
 
 export default class MasterConfig {
+  readonly plugins: string[];
   private readonly main: Main;
-  private readonly _plugins: string[] = [];
-  private readonly hostDefaults: {[index: string]: any} = {};
-  private readonly preHosts: {[index: string]: PreHostConfig} = {};
+  private readonly hostDefaults: {[index: string]: any};
+  private readonly preHosts: {[index: string]: PreHostConfig};
   // storage base dir
   readonly buildDir: string;
-
-  get plugins(): string[] {
-    return this._plugins;
-  }
 
 
   constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
     this.main = main;
 
-    // TODO: move to generate
-
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    if (masterConfig.plugins) this._plugins = masterConfig.plugins;
-    if (masterConfig.hostDefaults) this.hostDefaults = masterConfig.hostDefaults;
-
-    this.preHosts = this.mergeHostsWithPlatformConfig(this.resolveHosts(masterConfig));
+    this.plugins = masterConfig.plugins || [];
+    this.hostDefaults = masterConfig.hostDefaults || {};
+    this.preHosts = this.generatePreHosts(this.resolveHosts(masterConfig));
     this.buildDir = this.generateBuildDir(masterConfigPath);
   }
 
@@ -75,18 +68,18 @@ export default class MasterConfig {
     return this.prepareHostConfig(hostId);
   }
 
-  generate() {
-    // TODO: !!!!
-    const rawHostsConfigs: {[index: string]: PreHostConfig} = this.hosts;
 
-    for (let hostId of Object.keys(rawHostsConfigs)) {
-      const rawHostConfig: PreHostConfig = rawHostsConfigs[hostId];
+  private generatePreHosts(preHosts: {[index: string]: PreHostConfig}): {[index: string]: PreHostConfig} {
+    const result: {[index: string]: PreHostConfig} = {};
 
-      // final host config
-      this.hostsConfigs[hostId] = this.generateHostConfig(rawHostConfig);
+    for (let hostId of Object.keys(preHosts)) {
+      const preHostConfig: PreHostConfig = preHosts[hostId];
+
+      result[hostId] = this.mergePreHostConfig(preHostConfig);
     }
-  }
 
+    return result;
+  }
 
   private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
     let hosts: {[index: string]: PreHostConfig} = {};
@@ -132,33 +125,16 @@ export default class MasterConfig {
     };
   }
 
-  private mergePreHostConfig(rawHostConfig: PreHostConfig): HostConfig {
-
-    // TODO: почему получается HostConfig если не вычищаются drivers, services и тд ???
-    // TODO: смержить ещё с platform config
-    // TODO: смержить ещё с build config
+  private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
+    const platformConfig: PlatformConfig = platforms[hostPlatform];
 
     return _defaultsDeep(
-      _cloneDeep(rawHostConfig),
+      _cloneDeep(preHostConfig),
       this.hostDefaults,
-      hostDefaultConfig
+      hostDefaultConfig,
+      platformConfig,
     );
-  }
-
-
-  // TODO: review
-  private mergeHostsWithPlatformConfig(hosts: {[index: string]: PreHostConfig}): {[index: string]: PreHostConfig} {
-    const result: {[index: string]: PreHostConfig} = {};
-
-    for (let hostId of Object.keys(hosts)) {
-      // platform is validated at the moment
-      const hostPlatform: Platforms = hosts[hostId].platform as Platforms;
-      const platformConfig: PlatformConfig = platforms[hostPlatform];
-
-      result[hostId] = _defaultsDeep(_cloneDeep(hosts[hostId]), platformConfig.hostConfig);
-    }
-
-    return result;
   }
 
 }

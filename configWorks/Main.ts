@@ -34,9 +34,6 @@ export default class Main {
   }
 
   async collect() {
-    this.log.info(`preparing configs`);
-    this.masterConfig.generate();
-
     this.log.info(`Registering plugins, devices, drivers and services`);
     await this.registering();
 
