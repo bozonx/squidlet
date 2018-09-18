@@ -1,5 +1,6 @@
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
+const _difference = require('lodash/difference');
 
 import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
@@ -71,7 +72,12 @@ export default class HostsFilesSet {
       const platformDevs: string[] = this.main.masterConfig.getHostPlatformDevs(hostId);
 
       // TODO: сверяем что все зависимости есть в платформе
+      const notRegisteredHostDevs: string[] = _difference(hostDevs, platformDevs);
 
+      if (notRegisteredHostDevs.length) {
+        throw new Error(`Not registered dev dependencies "${JSON.stringify(notRegisteredHostDevs)}"
+         of host "${hostId}" have been found.`);
+      }
     }
   }
 
