@@ -33,9 +33,9 @@ export class I2cConnectionDriver {
     const dataDriver = this.env.getDriver<DriverFactoryBase>('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
     // get low level i2c driver
-    const i2cDriver: I2cDriverClass = this.env.getDriver<I2cDriverClass>(i2cDriverName);
+    //const i2cDriver: I2cDriverClass = this.env.getDriver<I2cDriverClass>(i2cDriverName);
 
-    this.i2cDataDriver = dataDriver.getInstance(i2cDriver, this.myAddress.bus) as I2cDataDriver;
+    this.i2cDataDriver = dataDriver.getInstance({ i2cDriverName, bus: this.myAddress.bus }) as I2cDataDriver;
   }
 
   async send(remoteAddress: string, payload: any): Promise<void> {

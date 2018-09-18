@@ -5,6 +5,9 @@ import HandlersManager from '../../helpers/HandlersManager';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
+import EntityDefinition from '../../app/interfaces/EntityDefinition';
+import Env from '../../app/interfaces/Env';
+import DriverInstance from '../../app/interfaces/DriverInstance';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -34,28 +37,21 @@ export interface I2cDriverClass {
 
 interface I2cDataDriverProps extends DriverBaseProps {
   bus: number;
+  // name of i2c master or slave driver to use
+  i2cDriverName: string;
 }
 
 
 export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
-  private readonly bus: string | number;
   private readonly i2cDriver: I2cDriverClass;
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
-  constructor(
-    props: EntityProps,
-    env: DriverEnv,
-    i2cDriver: DriverFactoryBase,
-    // TODO: почему не в props???
-    // bus to use
-    bus: string | number,
-  ) {
-    this.bus = bus;
-    // TODO: можно же самому запросить из drivers
-    this.i2cDriver = i2cDriver.getInstance(this.bus) as I2cDriverClass;
+  constructor(definition: EntityDefinition, env: Env) {
+    super(definition, env);
+    this.i2cDriver = this.env.getDriver<DriverInstance>(this.props.i2cDriverName).getInstance(this.props.bus);
   }
 
   async send(i2cAddress: string | number | undefined, dataMark: number | undefined, data: Uint8Array): Promise<void> {
@@ -165,6 +161,7 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
 
 export default class Factory extends DriverFactoryBase<I2cDataDriver, I2cDataDriverProps> {
   // TODO: review
+  // TODO: наверное всегда выдавать новый экземпляр
   protected instanceIdName: string = 'bus';
   protected DriverClass = I2cDataDriver;
 }

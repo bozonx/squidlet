@@ -3,11 +3,9 @@ import {DriverBaseProps} from '../../app/entities/DriverBase';
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
-import DriverEnv from '../../app/entities/DriverEnv';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import EntityDefinition from '../../app/interfaces/EntityDefinition';
@@ -205,7 +203,8 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
   private validateProps(props: I2cMasterDriverProps) {
-    if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+    if (Number.isInteger(props.bus)) throw new Error(`Incorrect type bus number "${props.bus}"`);
+    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
   }
 
 }
