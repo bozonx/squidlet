@@ -40,6 +40,9 @@ export default class Main {
     this.log.info(`Resolving and preparing entities`);
     await this.entities.generate();
 
+    this.log.info(`Checking platform dev dependencies`);
+    await this.hostsFilesSet.checkPlatformDevDeps();
+
     this.log.info(`Generating hosts entities definitions`);
     this.definitions.generate();
 

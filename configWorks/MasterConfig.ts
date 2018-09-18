@@ -68,6 +68,13 @@ export default class MasterConfig {
     return this.prepareHostConfig(hostId);
   }
 
+  getHostPlatformDevs(hostId: string): string[] {
+    const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
+    const platformConfig: PlatformConfig = platforms[platformName];
+
+    return platformConfig.devs;
+  }
+
 
   private generatePreHosts(preHosts: {[index: string]: PreHostConfig}): {[index: string]: PreHostConfig} {
     const result: {[index: string]: PreHostConfig} = {};

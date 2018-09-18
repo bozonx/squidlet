@@ -25,8 +25,6 @@ export default class HostsFilesSet {
       regularServices,
     ] = this.sortServices(hostId);
 
-    // TODO: проверить что getDevDependencies есть среди devs платформы
-
     return {
       systemDrivers,
       regularDrivers,
@@ -61,6 +59,43 @@ export default class HostsFilesSet {
     collect('services', servicesClasses);
 
     return result;
+  }
+
+  /**
+   * Check than all the host's dev dependencies exist in platform deps list.
+   */
+  checkPlatformDevDeps() {
+    for (let hostId of this.main.masterConfig.getHostsIds()) {
+      const hostEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
+      const hostDevs: string[] = this.getHostDevs(hostEntitiesNames);
+      const platformDevs: string[] = this.main.masterConfig.getHostPlatformDevs(hostId);
+
+      // TODO: сверяем что все зависимости есть в платформе
+
+    }
+  }
+
+
+  private getHostDevs(hostEntitiesNames: EntitiesNames): string[] {
+
+    // TODO: test
+
+    const devDeps: Dependencies = this.main.entities.getDevDependencies();
+    const result: {[index: string]: true} = {};
+
+    for (let pluralName of Object.keys(hostEntitiesNames)) {
+      for (let entityName of Object.keys(hostEntitiesNames[pluralName as ManifestsTypePluralName])) {
+        const deps: string[] | undefined = devDeps[pluralName as ManifestsTypePluralName][entityName];
+
+        if (deps) {
+          for (let dep of deps) {
+            result[dep] = true;
+          }
+        }
+      }
+    }
+
+    return Object.keys(result);
   }
 
   /**
