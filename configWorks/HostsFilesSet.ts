@@ -1,8 +1,10 @@
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
 const _difference = require('lodash/difference');
+import * as path from 'path';
 
 import Main from './Main';
+import {EntitiesSet} from './interfaces/EntitySet';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
 import DefinitionsSet from './interfaces/DefinitionsSet';
@@ -79,6 +81,55 @@ export default class HostsFilesSet {
          of host "${hostId}" have been found.`);
       }
     }
+  }
+
+  /**
+   * Get set of entities of specified host
+   */
+  generateSrcEntitiesSet(hostId: string): EntitiesSet {
+    const result: EntitiesSet = {
+      devices: {},
+      drivers: {},
+      services: {},
+    };
+
+    // TODO: test it
+
+    const usedEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
+
+    const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+      for (let className of classes) {
+        const srcDir = this.main.entities.getSrcDir(pluralType, className);
+        const relativeMain: string | undefined = this.main.entities.getMainFilePath(pluralType, className);
+        const relativeFiles: string[] = this.main.entities.getFiles(pluralType, className);
+
+        result[pluralType][className] = {
+          manifest: this.main.entities.getManifest(pluralType, className),
+          main: relativeMain && path.resolve(srcDir, relativeMain),
+          files: relativeFiles.map((relativeFileName: string) => path.resolve(srcDir, relativeFileName)),
+        };
+      }
+    };
+
+    collect('devices', usedEntitiesNames.devices);
+    collect('drivers', usedEntitiesNames.drivers);
+    collect('services', usedEntitiesNames.services);
+
+    return result;
+  }
+
+  generateDstEntitiesSet(main: Main, hostId: string): EntitiesSet {
+    const result: EntitiesSet = {
+      devices: {},
+      drivers: {},
+      services: {},
+    };
+
+    // TODO: move to HostsFilesSet
+    // TODO: make requireJs paths
+    // TODO: test it
+
+    return result;
   }
 
 

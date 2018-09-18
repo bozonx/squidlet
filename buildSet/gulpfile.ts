@@ -6,9 +6,7 @@ import * as concat from 'gulp-concat';
 import * as uglify from 'gulp-uglify';
 
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-import {generateDstEntitiesSet, PlatformIndex, readConfig, resolveConfigPath} from './helpers';
-import x86 from '../platforms/squidlet-x86/index';
-import rpi from '../platforms/squidlet-rpi/index';
+import {readConfig, resolveConfigPath} from './helpers';
 import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
@@ -55,7 +53,7 @@ gulp.task('solid', async function () {
   const hostConfigSet: HostFilesSet = {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
     config: main.masterConfig.getFinalHostConfig(hostId),
-    entitiesSet: generateDstEntitiesSet(main, hostId),
+    entitiesSet: main.hostsFilesSet.generateDstEntitiesSet(main, hostId),
   };
 
   const platformName: string = hostConfigSet.config.platform;

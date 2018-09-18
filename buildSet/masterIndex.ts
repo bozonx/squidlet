@@ -1,7 +1,6 @@
 import * as yargs from 'yargs';
 
 import {
-  generateSrcEntitiesSet,
   getPlatformSystem,
   readConfig,
   resolveConfigPath
@@ -24,7 +23,7 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
   return {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
     config: main.masterConfig.getFinalHostConfig(hostId),
-    entitiesSet: generateSrcEntitiesSet(main, hostId),
+    entitiesSet: main.hostsFilesSet.generateSrcEntitiesSet(hostId),
   };
 }
 
@@ -32,7 +31,6 @@ async function prepareHostSystem (main: Main): Promise<System> {
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
   const platformName: string = hostConfigSet.config.platform;
-  // TODO: reveiw
   const hostSystem: System = await getPlatformSystem(platformName);
 
   // integrate a config set as a static prop
@@ -63,7 +61,7 @@ async function init () {
 
   const hostSystem: System = await prepareHostSystem(main);
 
-  // start master host system
+  console.info(`===> Starting master host system`);
   await hostSystem.start();
 }
 

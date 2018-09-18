@@ -2,9 +2,6 @@ import * as path from 'path';
 
 import {loadYamlFile} from '../configWorks/IO';
 import System from '../host/src/app/System';
-import Main from '../configWorks/Main';
-import {EntitiesSet} from '../configWorks/interfaces/EntitySet';
-import {EntitiesNames, ManifestsTypePluralName} from '../configWorks/Entities';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
@@ -51,56 +48,6 @@ export function resolveConfigPath(pathToYamlFile?: string): string {
 
 export async function readConfig<T> (resolvedPath: string): Promise<T> {
   return await loadYamlFile(resolvedPath) as T;
-}
-
-
-/**
- * Get set of entities of specified host
- */
-export function generateSrcEntitiesSet(main: Main, hostId: string): EntitiesSet {
-
-  // TODO: move to HostsFilesSet
-
-  const result: EntitiesSet = {
-    devices: {},
-    drivers: {},
-    services: {},
-  };
-
-  const usedEntitiesNames: EntitiesNames = main.hostsFilesSet.getEntitiesNames(hostId);
-
-  const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
-    for (let className of classes) {
-      const srcDir = main.entities.getSrcDir(pluralType, className);
-      const relativeMain: string | undefined = main.entities.getMainFilePath(pluralType, className);
-      const relativeFiles: string[] = main.entities.getFiles(pluralType, className);
-
-      result[pluralType][className] = {
-        manifest: main.entities.getManifest(pluralType, className),
-        main: relativeMain && path.resolve(srcDir, relativeMain),
-        files: relativeFiles.map((relativeFileName: string) => path.resolve(srcDir, relativeFileName)),
-      };
-    }
-  };
-
-  collect('devices', usedEntitiesNames.devices);
-  collect('drivers', usedEntitiesNames.drivers);
-  collect('services', usedEntitiesNames.services);
-
-  return result;
-}
-
-export function generateDstEntitiesSet(main: Main, hostId: string): EntitiesSet {
-  const result: EntitiesSet = {
-    devices: {},
-    drivers: {},
-    services: {},
-  };
-
-  // TODO: move to HostsFilesSet
-  // TODO: make requireJs paths
-
-  return result;
 }
 
 
