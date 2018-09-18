@@ -3,8 +3,6 @@ import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import PublishParams from '../app/interfaces/PublishParams';
 import {EntityProps} from '../app/interfaces/EntityDefinition';
-import DeviceEnv from '../app/entities/DeviceEnv';
-import DriverInstance from '../app/interfaces/DriverInstance';
 import DeviceManifest from '../app/interfaces/DeviceManifest';
 import EntityBase from '../app/entities/EntityBase';
 
@@ -14,10 +12,6 @@ export type Publisher = (subtopic: string, value: any, params?: PublishParams) =
 export interface DeviceBaseProps extends EntityProps {
   statusRepublishInterval?: number;
   configRepublishInterval?: number;
-}
-
-export interface DriversBase {
-  [index: string]: DriverInstance;
 }
 
 
@@ -48,7 +42,10 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
 
-  async init(): Promise<void> {
+  async init() {
+
+    // TODO: reveiw
+
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     await this.initDependencies(manifest);

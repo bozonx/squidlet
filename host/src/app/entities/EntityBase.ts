@@ -1,7 +1,13 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import {DriversBase} from '../../baseDevice/DeviceBase';
 import ManifestBase from '../interfaces/ManifestBase';
 import Env from '../interfaces/Env';
+import DriverInstance from '../interfaces/DriverInstance';
+import DeviceManifest from '../interfaces/DeviceManifest';
+
+
+export interface DriversInstances {
+  [index: string]: DriverInstance;
+}
 
 
 export default class EntityBase<Props> {
@@ -12,14 +18,14 @@ export default class EntityBase<Props> {
   // it calls after device init, status and config init have been finished
   protected afterInit?: () => void;
   protected destroy?: () => void;
-  protected driversInstances: DriversBase = {};
+  private driversInstances: DriversInstances = {};
 
-  // /**
-  //  * Get driver which is dependency of device
-  //  */
-  // get drivers(): {[index: string]: DriverInstance} {
-  //   return this.driversInstances;
-  // }
+  /**
+   * Get driver which is dependency of device
+   */
+  protected get drivers(): DriversInstances {
+    return this.driversInstances;
+  }
 
   constructor(definition: EntityDefinition, env: Env) {
     this.env = env;
@@ -28,12 +34,20 @@ export default class EntityBase<Props> {
     this.props = definition.props as Props;
   }
 
-  protected async initDependencies(manifest: ManifestBase): Promise<void> {
-    //const manifest: DeviceManifest = await this.getManifest();
+  async init() {
+    const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
-    // TODO: получить ссылки на зависимые драйвера
+    await this.initDependencies(manifest);
 
     if (this.afterInit) this.afterInit();
+  }
+
+  protected async initDependencies(manifest: ManifestBase): Promise<void> {
+    if (!manifest.drivers) return;
+
+    for (let driverName of manifest.drivers) {
+      this.driversInstances[driverName] = this.env.getDriver(driverName);
+    }
   }
 
 
