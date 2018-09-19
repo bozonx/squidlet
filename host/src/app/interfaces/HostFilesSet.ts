@@ -5,6 +5,18 @@ import HostConfig from './HostConfig';
 
 // TODO: rename to HostConfigSet
 
+
+export type SetConfigName = 'config'
+  | 'entitiesSet'
+  | 'systemDrivers'
+  | 'regularDrivers'
+  | 'systemServices'
+  | 'regularServices'
+  | 'devicesDefinitions'
+  | 'driversDefinitions'
+  | 'servicesDefinitions';
+
+
 export interface SrcHostFilesSet extends DefinitionsSet {
   entitiesSet: SrcEntitiesSet;
   config: HostConfig;

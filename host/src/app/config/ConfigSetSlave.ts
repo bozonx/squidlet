@@ -6,8 +6,10 @@ import FsDev from '../interfaces/dev/Fs';
 import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
+import ConfigSetBase from './ConfigSetBase';
 
 
+// TODO: extends ConfigSetBase
 export default class ConfigSetSlave implements ConfigSetManager {
   private _system?: System;
 
