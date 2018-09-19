@@ -91,16 +91,20 @@ describe.only 'master.Definitions', ->
 
   describe 'checkDefinitions', ->
     beforeEach ->
-      @manifests = {
+      @entitiesSet = {
         # the same for devices and services
         drivers: {
           'Some.driver': {
-            name: 'Some.driver'
+            manifest: {
+              name: 'Some.driver'
+            }
+            main: './main.ts'
+            files: []
           }
         }
       }
       @definitions.main.entities = {
-        getManifests: => @manifests
+        getEntitiesSet: => @entitiesSet
       }
       @definitions.driversDefinitions = {
         master: {
@@ -115,6 +119,6 @@ describe.only 'master.Definitions', ->
 
 
     it 'fail', ->
-      @manifests.drivers = {}
+      @entitiesSet.drivers = {}
 
       assert.throws(() => @definitions.checkDefinitions())
