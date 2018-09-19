@@ -5,9 +5,9 @@ import DriverInstance from '../interfaces/DriverInstance';
 import DeviceManifest from '../interfaces/DeviceManifest';
 
 
-export interface DriversInstances {
-  [index: string]: DriverInstance;
-}
+// export interface DriversInstances {
+//   [index: string]: DriverInstance;
+// }
 
 
 export default class EntityBase<Props> {
@@ -22,14 +22,14 @@ export default class EntityBase<Props> {
   // it calls after device init, status and config init have been finished
   protected didInit?: () => Promise<void>;
   protected destroy?: () => void;
-  private driversInstances: DriversInstances = {};
+  protected driversInstances: {[index: string]: DriverInstance} = {};
 
-  /**
-   * Get driver which is dependency of device
-   */
-  protected get drivers(): DriversInstances {
-    return this.driversInstances;
-  }
+  // /**
+  //  * Get driver which is dependency of device
+  //  */
+  // protected get drivers(): DriversInstances {
+  //   return this.driversInstances;
+  // }
 
   constructor(definition: EntityDefinition, env: Env) {
     this.env = env;

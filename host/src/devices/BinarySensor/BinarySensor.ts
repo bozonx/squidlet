@@ -24,16 +24,13 @@ export default class BinarySensor extends DeviceBase<Props> {
   /**
    * Get driver which is dependency of device
    */
-  get myDrivers(driverName: string): DepsDrivers {
-
-    // TODO: review - может всетаки делать generic???
-
-    return this.driversInstances as any;
+  protected get drivers(): DepsDrivers {
+    return this.driversInstances as DepsDrivers;
   }
 
 
   protected willInit = async () => {
-    this.digitalInputDriver = this.myDrivers['DigitalInput.driver'].getInstance(this.props);
+    this.digitalInputDriver = this.drivers['DigitalInput.driver'].getInstance(this.props);
 
     // this.digitalInputDriver = this.getDriverDep<DriverFactory<DigitalInputDriver>>(
     //   'DigitalInputDriver.driver'
