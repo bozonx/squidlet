@@ -1,7 +1,9 @@
+path = require('path')
+
 HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
-describe 'master.HostsFilesSet', ->
+describe.only 'master.HostsFilesSet', ->
   beforeEach ->
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
@@ -24,6 +26,16 @@ describe 'master.HostsFilesSet', ->
     }
     @systemDrivers = [ 'SysDriver' ]
     @systemServices = [ 'SysService' ]
+    @entitySet = {
+      main: './main.ts'
+      files: ['./otherFile']
+      manifest: {manifestParam: 'value'}
+    }
+    @entitySetResult = {
+      main: path.resolve('srcDir', './main.ts')
+      files: [path.resolve('srcDir', './otherFile')]
+      manifest: {manifestParam: 'value'}
+    }
 
     @main = {
       definitions: {
@@ -36,6 +48,10 @@ describe 'master.HostsFilesSet', ->
         getSystemDrivers: => @systemDrivers
         getSystemServices: => @systemServices
         getDevs: => [ 'Dev' ]
+        getSrcDir: => 'srcDir'
+        getMainFilePath: => @entitySet.main
+        getFiles: => @entitySet.files
+        getManifest: => @entitySet.manifest
       }
     }
     @hostsFilesSet = new HostsFilesSet(@main)
@@ -59,3 +75,42 @@ describe 'master.HostsFilesSet', ->
       drivers: [ 'SysDriver', 'RegularDriver', 'OtherDriver' ]
       services: [ 'SysService', 'RegularService' ]
     }
+
+  it 'generateSrcEntitiesSet', ->
+    assert.deepEqual @hostsFilesSet.generateSrcEntitiesSet('master'), {
+      devices: {
+        DeviceClass: {
+          @entitySetResult...,
+        }
+      }
+      drivers: {
+        OtherDriver: {
+          @entitySetResult...,
+        }
+        RegularDriver: {
+          @entitySetResult...,
+        }
+        SysDriver: {
+          @entitySetResult...,
+        }
+      }
+      services: {
+        RegularService: {
+          @entitySetResult...,
+        }
+        SysService: {
+          @entitySetResult...,
+        }
+      }
+    }
+
+  it 'getHostDevs', ->
+    hostEntitiesNames = {
+      devices: {
+        DeviceClass: {
+          @entitySetResult...,
+        }
+      }
+    }
+
+    assert.deepEqual @hostsFilesSet.getHostDevs(hostEntitiesNames), []
