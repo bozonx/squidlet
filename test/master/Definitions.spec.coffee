@@ -22,7 +22,7 @@ describe.only 'master.Definitions', ->
               }
             }
             drivers: {
-              'Gpio.driver': {
+              'Digital.driver': {
                 param: 1
               }
             }
@@ -66,26 +66,28 @@ describe.only 'master.Definitions', ->
         }
       }
     })
-#    assert.deepEqual(@definitions.getHostDriversDefinitions('master'), {
-#      'Digital.driver': {
-#        id: 'Digital.driver'
-#        className: 'Digital.driver'
-#        props: {
-#          param: 1
-#        }
-#      }
-#    })
-#    assert.deepEqual(@definitions.getHostServicesDefinitions('master'), {
-#      backend: {
-#        id: 'backend'
-#        className: 'Backend'
-#        props: {
-#          param: 1
-#        }
-#      }
-#    })
-#
-#    sinon.assert.calledOnce(@definitions.checkDefinitions)
+    assert.deepEqual(@definitions.getHostDriversDefinitions('master'), {
+      'Digital.driver': {
+        id: 'Digital.driver'
+        className: 'Digital.driver'
+        props: {
+          param: 1
+          manifestProp: 'value'
+        }
+      }
+    })
+    assert.deepEqual(@definitions.getHostServicesDefinitions('master'), {
+      backend: {
+        id: 'backend'
+        className: 'Backend'
+        props: {
+          param: 1
+          manifestProp: 'value'
+        }
+      }
+    })
+
+    sinon.assert.calledOnce(@definitions.checkDefinitions)
 
   describe 'checkDefinitions', ->
     beforeEach ->

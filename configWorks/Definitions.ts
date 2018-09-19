@@ -139,7 +139,7 @@ export default class Definitions {
 
     return {
       id,
-      className,
+      className: id,
       props: _defaultsDeep(
         _cloneDeep(_omit(driverDef, 'driver')),
         manifest.props,
