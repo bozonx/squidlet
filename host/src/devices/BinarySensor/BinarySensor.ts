@@ -1,30 +1,30 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioInputFactory, {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
+import {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import DeviceEnv from '../../app/entities/DeviceEnv';
+import DriverFactory from '../../app/interfaces/DriverFactory';
 
 
-export interface BinarySensorProps extends DeviceBaseProps {
+interface Props extends DeviceBaseProps {
   debounce?: number;
   deadTime?: number;
 }
 
-interface BinarySensorDrivers {
-  'DigitalInput.driver': GpioInputFactory;
+interface DepsDrivers {
+  'DigitalInput.driver': DriverFactory<DigitalInputDriver>;
 }
 
 
-export default class BinarySensor extends DeviceBase<BinarySensorProps> {
-  private readonly gpioInputDriver: DigitalInputDriver;
+export default class BinarySensor extends DeviceBase<Props> {
+  private digitalInputDriver?: DigitalInputDriver;
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
   /**
    * Get driver which is dependency of device
    */
-  get drivers(): BinarySensorDrivers {
+  get myDrivers(driverName: string): DepsDrivers {
 
     // TODO: review - может всетаки делать generic???
 
@@ -33,8 +33,11 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
 
 
   protected willInit = async () => {
-    //const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('DigitalInputDriver.driver');
-    this.gpioInputDriver = this.drivers['DigitalInputDriver.driver'].getInstance(this.props);
+    this.digitalInputDriver = this.myDrivers['DigitalInput.driver'].getInstance(this.props);
+
+    // this.digitalInputDriver = this.getDriverDep<DriverFactory<DigitalInputDriver>>(
+    //   'DigitalInputDriver.driver'
+    // ).getInstance(this.props);
   }
 
   protected didInit = async () => {
@@ -84,7 +87,7 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
   }
 
 
-  validateProps(props: BinarySensorProps) {
+  validateProps(props: Props) {
     // TODO: !!!!
   }
 

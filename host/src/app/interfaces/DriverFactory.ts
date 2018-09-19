@@ -1,10 +1,4 @@
-import DriverInstance from './DriverInstance';
-
-
-// TODO: remove
-
-export default interface DriverFactory {
-  // TODO: use DriverInstance
-  getInstance: (...params: Array<any>) => any;
+export default interface DriverFactory<T> {
+  getInstance(...params: Array<any>): T;
   [index: string]: any;
 }
