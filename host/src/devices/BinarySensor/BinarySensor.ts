@@ -32,18 +32,14 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
   }
 
 
-  // TODO: definition.props, this.env
-  constructor(props: BinarySensorProps, env: DeviceEnv) {
-    super(props, env);
-
+  protected willInit = async () => {
     //const gpioInputDriverFactory = this.system.drivers.getDriver<GpioInputFactory>('DigitalInputDriver.driver');
-
     this.gpioInputDriver = this.drivers['DigitalInputDriver.driver'].getInstance(this.props);
   }
 
-  protected afterInit = (): void => {
+  protected didInit = async () => {
     this.gpioInputDriver.onChange(this.onInputChange);
-  }
+  };
 
   protected statusGetter = async (): Promise<Data> => {
     return { [DEFAULT_STATUS]: await this.gpioInputDriver.getLevel() };
@@ -85,6 +81,11 @@ export default class BinarySensor extends DeviceBase<BinarySensorProps> {
     this.setStatus(currentLevel);
 
     waitDeadTime();
+  }
+
+
+  validateProps(props: BinarySensorProps) {
+    // TODO: !!!!
   }
 
 }

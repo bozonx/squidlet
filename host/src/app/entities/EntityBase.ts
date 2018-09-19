@@ -15,8 +15,12 @@ export default class EntityBase<Props> {
   readonly className: string;
   readonly props: Props;
   protected readonly env: Env;
+  // it calls before init propcess but after init dependencies
+  protected willInit?: () => Promise<void>;
+  // init process
+  protected doInit?: () => Promise<void>;
   // it calls after device init, status and config init have been finished
-  protected afterInit?: () => void;
+  protected didInit?: () => Promise<void>;
   protected destroy?: () => void;
   private driversInstances: DriversInstances = {};
 
@@ -39,7 +43,9 @@ export default class EntityBase<Props> {
 
     await this.initDependencies(manifest);
 
-    if (this.afterInit) this.afterInit();
+    if (this.willInit) await this.willInit();
+    if (this.doInit) await this.doInit();
+    if (this.didInit) await this.didInit();
   }
 
   /**

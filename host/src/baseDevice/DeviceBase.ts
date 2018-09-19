@@ -42,13 +42,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
 
-  async init() {
+  protected doInit = async () => {
 
     // TODO: reveiw
 
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
-
-    await this.initDependencies(manifest);
 
     this._status = new Status(
       this.props.id,
@@ -72,8 +70,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       this.status && this.status.init(this.statusGetter, this.statusSetter),
       this.config && this.config.init(this.configGetter, this.configSetter),
     ]);
-
-    if (this.afterInit) this.afterInit();
   }
 
   getStatus = (statusName?: string): Promise<any> => {
