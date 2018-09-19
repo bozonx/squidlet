@@ -90,8 +90,8 @@ export default class Definitions {
     const services: {[index: string]: EntityDefinition} = {};
     const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(rawHostConfig.devices);
 
-    for (let entityName of Object.keys(plainDevices)) {
-      devices[entityName] = this.generateDeviceDef(entityName, plainDevices[entityName], rawHostConfig.devicesDefaults);
+    for (let id of Object.keys(plainDevices)) {
+      devices[id] = this.generateDeviceDef(id, plainDevices[id], rawHostConfig.devicesDefaults);
     }
 
     if (rawHostConfig.drivers) {
@@ -120,13 +120,14 @@ export default class Definitions {
   ): EntityDefinition {
     const className = deviceDef.device;
     const manifest = this.main.entities.getManifest('devices', className);
+    const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps && hostDeviceDefaultProps[className];
 
     return {
       id,
       className,
       props: _defaultsDeep(
         _cloneDeep(_omit(deviceDef, 'device')),
-        hostDeviceDefaultProps,
+        deviceHostDefaults,
         manifest.props,
       ),
     };
