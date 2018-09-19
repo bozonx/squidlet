@@ -1,10 +1,22 @@
-# TODO: use one of raspberry | pcf8574
-# which driver use: 'raspberry' or 'pcf8574' etc
-gpio: string
-# i2c bus 1 or 0. By default is 1.
-bus: number
-# address of device on I2C bus
-i2c: string
+
+# TODO: почему не интерфейс ?????
+
+## which driver use: 'local' or 'pcf8574' etc
+#gpio: string
+## i2c bus 1 or 0. By default is 1.
+#i2cBus: number
+## address of device on I2C bus
+#i2cAddress: string
+
+
+# Use special driver. By default "local" is used.
+driver:
+  # short name of gpio digital driver like "pcf8574"
+  name: string
+  # driver specific params below
+  #bus: number
+  #address: string
+
 # GPIO pin number
 pin: number
 # log level of changes of value. e.g. verbose
