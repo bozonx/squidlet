@@ -88,7 +88,8 @@ export default class Destinations {
     const driverName = this.generateDriverName(myAddress.type);
     const connectionDriver = this.driverEnv.getDriver(driverName);
 
-    this.connections[connectionId] = connectionDriver.getInstance(myAddress) as Connection;
+    // TODO: сделать по нормальному
+    this.connections[connectionId] = (connectionDriver as any).getInstance(myAddress) as Connection;
   }
 
   private listenToAllDestinations(): void {

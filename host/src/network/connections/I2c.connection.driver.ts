@@ -1,3 +1,5 @@
+const _cloneDeep = require('lodash/cloneDeep');
+
 import DriverEnv from '../../app/entities/DriverEnv';
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
@@ -15,6 +17,7 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
 
 interface I2cConnectionDriverProps extends DriverBaseProps {
   bus: number;
+  myAddress: MyAddress;
 }
 
 
@@ -24,7 +27,6 @@ interface I2cConnectionDriverProps extends DriverBaseProps {
  * It packs data to send it via i2c.
  */
 export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
-  private readonly myAddress: MyAddress;
   private readonly i2cDataDriver: I2cDataDriver;
 
   // TODO: почему не константа???
@@ -34,15 +36,15 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
 
   constructor(definition: EntityDefinition, env: Env) {
     super(definition, env);
-    this.myAddress = myAddress;
 
-    const isMaster = typeof this.myAddress.address === 'undefined';
+    const isMaster = typeof this.props.myAddress.address === 'undefined';
     const dataDriver = this.env.getDriver('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
     // get low level i2c driver
     //const i2cDriver: I2cDriverClass = this.env.getDriver<I2cDriverClass>(i2cDriverName);
 
-    this.i2cDataDriver = dataDriver.getInstance({ i2cDriverName, bus: this.myAddress.bus }) as I2cDataDriver;
+    // TODO: сделать по нормальному
+    this.i2cDataDriver = (dataDriver as any).getInstance({ i2cDriverName, bus: this.props.myAddress.bus }) as I2cDataDriver;
   }
 
   async send(remoteAddress: string, payload: any): Promise<void> {

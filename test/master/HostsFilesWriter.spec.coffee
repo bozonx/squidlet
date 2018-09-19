@@ -1,7 +1,7 @@
 HostsFilesWriter = require('../../configWorks/HostsFilesWriter').default
 
 
-describe.only 'master.HostsFilesWriter', ->
+describe 'master.HostsFilesWriter', ->
   beforeEach ->
     @definitionsSet = {
       systemDrivers: 'systemDrivers'
