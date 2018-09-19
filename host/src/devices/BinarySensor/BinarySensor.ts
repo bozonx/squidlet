@@ -6,6 +6,8 @@ import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import DriverFactory from '../../app/interfaces/DriverFactory';
 
 
+// TODO: наследовать ещё digital base props
+
 interface Props extends DeviceBaseProps {
   debounce?: number;
   deadTime?: number;
@@ -25,24 +27,42 @@ export default class BinarySensor extends DeviceBase<Props> {
    * Get driver which is dependency of device
    */
   protected get drivers(): DepsDrivers {
-    return this.driversInstances as DepsDrivers;
+    return this.driversInstances as any;
   }
 
+  private get inputDriver(): DigitalInputDriver {
 
+  }
+
+  private get debounceTime(): number {
+    if (typeof this.props.debounce === 'undefined') {
+      // TODO: default value ????
+      return 1;
+    }
+
+    return this.props.debounce;
+  }
+
+  private get deadTime(): number {
+    if (typeof this.props.deadTime === 'undefined') {
+      // TODO: default value ????
+      return 1;
+    }
+
+    return this.props.deadTime;
+  }
+
+  
   protected willInit = async () => {
     this.digitalInputDriver = this.drivers['DigitalInput.driver'].getInstance(this.props);
-
-    // this.digitalInputDriver = this.getDriverDep<DriverFactory<DigitalInputDriver>>(
-    //   'DigitalInputDriver.driver'
-    // ).getInstance(this.props);
   }
 
   protected didInit = async () => {
-    this.gpioInputDriver.onChange(this.onInputChange);
-  };
+    this.inputDriver.onChange(this.onInputChange);
+  }
 
   protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.gpioInputDriver.getLevel() };
+    return { [DEFAULT_STATUS]: await this.inputDriver.getLevel() };
   }
 
 
@@ -56,7 +76,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     setTimeout(() => {
       this.debounceInProgress = false;
       this.startValueLogic();
-    }, this.props.debounceTime);
+    }, this.debounceTime);
   }
 
   private async startValueLogic(): Promise<void> {
@@ -66,10 +86,10 @@ export default class BinarySensor extends DeviceBase<Props> {
     let currentLevel: BinaryLevel = false;
     const waitDeadTime = () => setTimeout(() => {
       this.deadTimeInProgress = false;
-    }, this.props.deadTime);
+    }, this.deadTime);
 
     try {
-      currentLevel = await this.gpioInputDriver.getLevel();
+      currentLevel = await this.inputDriver.getLevel();
     }
     catch (err) {
       waitDeadTime();

@@ -25,7 +25,7 @@ export default class EntityBase<Props> {
   protected driversInstances: {[index: string]: DriverInstance} = {};
 
   // /**
-  //  * Get driver which is dependency of device
+  //  * Get driver which is dependency of entity
   //  */
   // protected get drivers(): DriversInstances {
   //   return this.driversInstances;
