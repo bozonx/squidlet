@@ -29,11 +29,10 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
     // TODO: call from base init
     this.validateProps(this.props);
 
-    const i2cSlaveDev = this.env.getDriver<DriverFactoryBase>('I2cSlave.dev');
-
-    this.i2cSlaveDev = i2cSlaveDev.getInstance(this.bus) as I2cSlave;
+    // TODO: рефакторить - нужно как-то убедиться что он есть. Либо создать локальные свойства класса
+    this.i2cSlaveDev = this.getDriverDep<I2cSlave>('I2cSlave.dev');
     // listen all the income data
-    this.i2cSlaveDev.listenIncome(this.handleIncomeData);
+    this.i2cSlaveDev.listenIncome(this.props.bus, this.handleIncomeData);
   }
 
   // TODO: поддержка int
@@ -45,7 +44,7 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
       dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
 
-    await this.i2cSlaveDev.send(dataToWrite);
+    await this.i2cSlaveDev.send(this.props.bus, dataToWrite);
 
     // TODO: !!!! ??? сделать очередь чтобы мастер считал при полинге
     // TODO: !!!! ??? последние данные будут удаляться или висеть ???
@@ -64,10 +63,10 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
           resolve(withoutFirstItemUint8Arr(data));
         }
 
-        this.i2cSlaveDev.removeListener(handler);
+        this.i2cSlaveDev.removeListener(this.props.bus, handler);
       };
 
-      this.i2cSlaveDev.listenIncome(handler);
+      this.i2cSlaveDev.listenIncome(this.props.bus, handler);
 
       // TODO: по таймауту 60 сек отписаться и поднять ошибку - reject
 

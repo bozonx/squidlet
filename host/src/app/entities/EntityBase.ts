@@ -42,6 +42,19 @@ export default class EntityBase<Props> {
     if (this.afterInit) this.afterInit();
   }
 
+  /**
+   * Get driver dependency.
+   * You have to shore that dependency is exists.
+   * @param driverName
+   */
+  protected getDriverDep<T>(driverName: string): T {
+    if (!this.driversInstances[driverName]) {
+      throw new Error(`Can't find driver "${driverName}"`);
+    }
+
+    return this.driversInstances[driverName] as T;
+  }
+
   protected async initDependencies(manifest: ManifestBase): Promise<void> {
     if (!manifest.drivers) return;
 
