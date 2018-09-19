@@ -125,6 +125,9 @@ describe 'master.Entities', ->
           ]
           manifest: {
             name: "DeviceClass"
+            drivers: [
+              'DriverName.driver'
+            ]
             props: {
               propsParam: 'value'
             }
@@ -166,6 +169,9 @@ describe 'master.Entities', ->
           manifest: {
             name: 'ServiceClass'
             system: true
+            drivers: [
+              'PlatformDev.dev'
+            ]
             props: {
               loadedProp: 'value'
             }
