@@ -1,12 +1,22 @@
-import DriverEnv from '../../app/entities/DriverEnv';
 import FsDev, {Stats} from '../../app/interfaces/dev/Fs';
+import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
+import EntityDefinition from '../../app/interfaces/EntityDefinition';
+import Env from '../../app/interfaces/Env';
 
 
-export class Storage {
+interface StorageProps extends DriverBaseProps {
+}
+
+
+export class Storage extends DriverBase<StorageProps> {
   private fsDev: FsDev;
 
-  constructor(driverEnv: DriverEnv) {
-    this.fsDev = driverEnv.getDev<FsDev>('Fs');
+  constructor(definition: EntityDefinition, env: Env) {
+    super(definition, env);
+
+    // TODO: move to onInit()
+    // TODO: use dependency
+    this.fsDev = this.env.getDev<FsDev>('Fs');
   }
 
   async isDir(pathToDir: string): Promise<boolean> {

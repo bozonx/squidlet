@@ -1,10 +1,12 @@
 import * as EventEmitter from 'events';
 
 import I2cSlave from '../../app/interfaces/dev/I2cSlave';
-import DriverEnv from '../../app/entities/DriverEnv';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
+import {DriverBaseProps} from '../../app/entities/DriverBase';
+import DriverBase from '../../app/entities/DriverBase';
+import EntityDefinition from '../../app/interfaces/EntityDefinition';
+import Env from '../../app/interfaces/Env';
 
 
 const NO_DATA_ADDRESS = 'null';
@@ -12,20 +14,20 @@ const REGISTER_LENGTH = 1;
 
 type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
+interface I2cSlaveDriverProps extends DriverBaseProps {
+  bus: number;
+}
 
-export class I2cSlaveDriver {
-  private readonly env: DriverEnv;
+
+export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly bus: number;
   private readonly i2cSlaveDev: I2cSlave;
 
-  constructor(props: EntityProps, env: DriverEnv, bus: string | number) {
-    this.env = env;
-    this.bus = (Number.isInteger(bus as any))
-      ? bus as number
-      : parseInt(bus as any);
+  constructor(definition: EntityDefinition, env: Env) {
+    super(definition, env);
 
-    if (Number.isNaN(this.bus)) throw new Error(`Incorrect bus number "${this.bus}"`);
+    // TODO: call from base init
+    this.validateProps(this.props);
 
     const i2cSlaveDev = this.env.getDriver<DriverFactoryBase>('I2cSlave.dev');
 
@@ -125,20 +127,15 @@ export class I2cSlaveDriver {
     return dataAddress.toString();
   }
 
+  private validateProps(props: I2cSlaveDriverProps) {
+    if (Number.isInteger(props.bus)) throw new Error(`Incorrect type bus number "${props.bus}"`);
+    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+  }
+
 }
 
 
-export default class Factory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: EntityProps,
-      env: DriverEnv,
-      bus: string | number,
-    ): I2cSlaveDriver } = I2cSlaveDriver;
-  private instances: {[index: string]: I2cSlaveDriver} = {};
-
-  getInstance(bus: string) {
-    this.instances[bus] = super.getInstance(bus) as I2cSlaveDriver;
-
-    return this.instances[bus];
-  }
+export default class I2cSlaveFactory extends DriverFactoryBase<I2cSlaveDriver, I2cSlaveDriverProps> {
+  protected instanceIdName: string = 'bus';
+  protected DriverClass = I2cSlaveDriver;
 }
