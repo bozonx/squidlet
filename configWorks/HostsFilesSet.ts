@@ -84,7 +84,7 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Get set of entities of specified host
+   * Get set of entities of specified host with absolute path to source files.
    */
   generateSrcEntitiesSet(hostId: string): EntitiesSet {
     const result: EntitiesSet = {
@@ -92,8 +92,6 @@ export default class HostsFilesSet {
       drivers: {},
       services: {},
     };
-
-    // TODO: test it
 
     const usedEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
 
