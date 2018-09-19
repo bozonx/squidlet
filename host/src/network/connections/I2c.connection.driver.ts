@@ -5,9 +5,17 @@ import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
+import {DriverBaseProps} from '../../app/entities/DriverBase';
+import DriverBase from '../../app/entities/DriverBase';
+import EntityDefinition from '../../app/interfaces/EntityDefinition';
+import Env from '../../app/interfaces/Env';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
+
+interface I2cConnectionDriverProps extends DriverBaseProps {
+  bus: number;
+}
 
 
 /**
@@ -15,18 +23,17 @@ type ConnectionHandler = (error: Error | null, payload?: any) => void;
  * It works as master or slave according to address
  * It packs data to send it via i2c.
  */
-export class I2cConnectionDriver {
-  private readonly env: DriverEnv;
-  private readonly props: EntityProps;
+export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
   private readonly myAddress: MyAddress;
   private readonly i2cDataDriver: I2cDataDriver;
+
+  // TODO: почему не константа???
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
-  constructor(props: EntityProps, env: DriverEnv, myAddress: MyAddress) {
-    this.env = env;
-    this.props = props;
+  constructor(definition: EntityDefinition, env: Env) {
+    super(definition, env);
     this.myAddress = myAddress;
 
     const isMaster = typeof this.myAddress.address === 'undefined';
@@ -71,10 +78,10 @@ export class I2cConnectionDriver {
 }
 
 
-export default class Factory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: EntityProps,
-      env: DriverEnv,
-      myAddress: MyAddress,
-    ): I2cConnectionDriver } = I2cConnectionDriver;
+export default class Factory extends DriverFactoryBase<I2cConnectionDriver, I2cConnectionDriverProps> {
+
+  // TODO: решить нужно ли отдавать инстасны и их сохранять
+
+  protected instanceIdName: string = 'bus';
+  protected DriverClass = I2cConnectionDriver;
 }
