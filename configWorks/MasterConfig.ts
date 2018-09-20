@@ -49,7 +49,10 @@ export default class MasterConfig {
     this.plugins = masterConfig.plugins || [];
     this.hostDefaults = masterConfig.hostDefaults || {};
     this.preHosts = this.generatePreHosts(this.resolveHosts(masterConfig));
-    this.buildDir = this.generateBuildDir(masterConfigPath);
+
+    // TODO: do it
+    //this.buildDir = this.generateBuildDir(masterConfigPath);
+    this.buildDir = '';
   }
 
   getHostsIds(): string[] {
@@ -140,7 +143,7 @@ export default class MasterConfig {
       _cloneDeep(preHostConfig),
       this.hostDefaults,
       hostDefaultConfig,
-      platformConfig,
+      platformConfig.hostConfig,
     );
   }
 

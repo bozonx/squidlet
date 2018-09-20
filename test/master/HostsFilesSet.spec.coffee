@@ -80,26 +80,26 @@ describe 'master.HostsFilesSet', ->
     assert.deepEqual @hostsFilesSet.generateSrcEntitiesSet('master'), {
       devices: {
         DeviceClass: {
-          @entitySetResult...,
+          @entitySetResult...
         }
       }
       drivers: {
         OtherDriver: {
-          @entitySetResult...,
+          @entitySetResult...
         }
         RegularDriver: {
-          @entitySetResult...,
+          @entitySetResult...
         }
         SysDriver: {
-          @entitySetResult...,
+          @entitySetResult...
         }
       }
       services: {
         RegularService: {
-          @entitySetResult...,
+          @entitySetResult...
         }
         SysService: {
-          @entitySetResult...,
+          @entitySetResult...
         }
       }
     }
@@ -108,7 +108,7 @@ describe 'master.HostsFilesSet', ->
     hostEntitiesNames = {
       devices: {
         DeviceClass: {
-          @entitySetResult...,
+          @entitySetResult...
         }
       }
     }

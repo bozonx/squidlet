@@ -4,7 +4,7 @@ hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').defau
 
 describe.only 'master.MasterConfig', ->
   beforeEach ->
-    @preMasterConfig = {
+    @preMasterHostConfig = {
       platform: 'rpi'
       config: {
         storageDir: '/myDir'
@@ -34,17 +34,25 @@ describe.only 'master.MasterConfig', ->
         }
       }
     }
-    pathToMasterConfig = '/masterCfgPath'
-    @hostConfigsResult = {
-      master: {
-        @preMasterConfig...
-        config: {
-          hostDefaultConfig.config...
-          @preMasterConfig.config...
-          hostDefaultParam: 1
-        }
+    @masterConfig = {
+      host: @preMasterHostConfig
+      hostDefaults: {
+        hostDefaultParam: 'value'
       }
     }
+
+    @pathToMasterConfig = '/masterCfgPath'
+
+#    @hostConfigsResult = {
+#      master: {
+#        @preMasterConfig...
+#        config: {
+#          hostDefaultConfig.config...
+#          @preMasterConfig.config...
+#          hostDefaultParam: 1
+#        }
+#      }
+#    }
 
     @main = {
 #      masterConfig: {
@@ -58,11 +66,39 @@ describe.only 'master.MasterConfig', ->
 #        }
 #      }
     }
-    @masterConfig = new MasterConfig(@main, @preMasterConfig, @pathToMasterConfig)
+    @masterConfig = new MasterConfig(@main, @masterConfig, @pathToMasterConfig)
 
-  it 'generate', ->
-    await @masterConfig.generate()
+  it 'buildDir', ->
+    # TODO: !!!!
+
+  it 'getHostsIds', ->
+    assert.deepEqual(@masterConfig.getHostsIds(), [ 'master' ])
+
+  it 'getPreHostConfig', ->
+
+    # TODO: test platformConfig
+
+    assert.deepEqual @masterConfig.getPreHostConfig('master'), {
+      @preMasterHostConfig...
+      hostDefaultConfig...
+      config: {
+        @preMasterHostConfig.config...
+        hostDefaultConfig.config...
+      }
+      hostDefaultParam: 'value'
+    }
+
+  it 'getFinalHostConfig', ->
+    # TODO: !!!!
+
+  it 'getHostPlatformDevs', ->
+    # TODO: !!!!
+
+  it 'generatePreHosts', ->
+    # TODO: !!!!
+
+    #await @masterConfig.generate()
 
     #assert.deepEqual(@masterConfig.getHostsIds(), [ 'master' ])
-    assert.deepEqual(@masterConfig.getFinalHostConfig('master'), @hostConfigsResult.master)
-    assert.deepEqual(@masterConfig.getHostsConfigs(), @hostConfigsResult)
+#    assert.deepEqual(@masterConfig.getFinalHostConfig('master'), @hostConfigsResult.master)
+#    assert.deepEqual(@masterConfig.getHostsConfigs(), @hostConfigsResult)
