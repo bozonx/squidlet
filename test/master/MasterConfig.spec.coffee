@@ -66,7 +66,12 @@ describe.only 'master.MasterConfig', ->
 #        }
 #      }
     }
+
+    # TODO: not safe - may be make new class with cloned prototype
+    MasterConfig.prototype.getPlatformConfig = => { hostConfig: { platformParam: 'value' } }
+
     @masterConfig = new MasterConfig(@main, @masterConfig, @pathToMasterConfig)
+
 
   it 'buildDir', ->
     # TODO: !!!!
@@ -75,9 +80,6 @@ describe.only 'master.MasterConfig', ->
     assert.deepEqual(@masterConfig.getHostsIds(), [ 'master' ])
 
   it 'getPreHostConfig', ->
-
-    # TODO: test platformConfig
-
     assert.deepEqual @masterConfig.getPreHostConfig('master'), {
       @preMasterHostConfig...
       hostDefaultConfig...
@@ -86,6 +88,7 @@ describe.only 'master.MasterConfig', ->
         hostDefaultConfig.config...
       }
       hostDefaultParam: 'value'
+      platformParam: 'value'
     }
 
   it 'getFinalHostConfig', ->

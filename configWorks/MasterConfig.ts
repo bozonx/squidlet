@@ -73,9 +73,8 @@ export default class MasterConfig {
 
   getHostPlatformDevs(hostId: string): string[] {
     const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
-    const platformConfig: PlatformConfig = platforms[platformName];
 
-    return platformConfig.devs;
+    return this.getPlatformConfig(platformName).devs;
   }
 
 
@@ -137,14 +136,17 @@ export default class MasterConfig {
 
   private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
     const hostPlatform: Platforms = preHostConfig.platform as Platforms;
-    const platformConfig: PlatformConfig = platforms[hostPlatform];
 
     return _defaultsDeep(
       _cloneDeep(preHostConfig),
       this.hostDefaults,
       hostDefaultConfig,
-      platformConfig.hostConfig,
+      this.getPlatformConfig(hostPlatform).hostConfig,
     );
+  }
+
+  private getPlatformConfig(hostPlatform: Platforms): PlatformConfig {
+    return platforms[hostPlatform];
   }
 
 }
