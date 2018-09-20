@@ -43,9 +43,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
 
   protected doInit = async () => {
-
-    // TODO: reveiw
-
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     this._status = new Status(

@@ -14,21 +14,14 @@ interface Props extends DeviceBaseProps {
   deadTime?: number;
 }
 
-interface DepsDrivers {
-  'DigitalInput.driver': DriverFactory<DigitalInputDriver>;
-}
+// interface DepsDrivers {
+//   'DigitalInput.driver': DriverFactory<DigitalInputDriver>;
+// }
 
 
-export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
+export default class BinarySensor extends DeviceBase<Props> {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
-
-  // /**
-  //  * Get driver which is dependency of device
-  //  */
-  // protected get drivers(): DepsDrivers {
-  //   return this.driversInstances as any;
-  // }
 
   private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
@@ -55,9 +48,9 @@ export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
   }
 
   
-  protected willInit = async (depsDrivers: DepsDrivers) => {
-    this.depsInstances.digitalInput = this.getDep('DigitalInput.driver').getInstance(this.props);
-    //this.depsInstances.digitalInput = depsDrivers['DigitalInput.driver'].getInstance(this.props);
+  protected willInit = async () => {
+    this.depsInstances.digitalInput = (await this.getDriverDep('DigitalInput.driver'))
+      .getInstance(this.props);
   }
 
   protected didInit = async () => {
