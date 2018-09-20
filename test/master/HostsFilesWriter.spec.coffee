@@ -1,3 +1,5 @@
+path = require('path')
+
 HostsFilesWriter = require('../../configWorks/HostsFilesWriter').default
 
 
@@ -28,16 +30,40 @@ describe.only 'master.HostsFilesWriter', ->
         getDefinitionsSet: => @definitionsSet
         getEntitiesNames: => @entitiesNames
       }
+      entities: {
+        getAllEntitiesNames: =>
+          {
+            devices: [ 'device1' ]
+          }
+        getSrcDir: => 'srcDir'
+        getManifest: => {manifestParam: 'value'}
+        getFiles: => ['./someFile']
+      }
+      io: {
+        mkdirP: sinon.spy()
+        copyFile: sinon.spy()
+      }
     }
     @hostsFilesWriter = new HostsFilesWriter(@main)
 
     @hostsFilesWriter.writeJson = sinon.spy()
 
   it 'writeEntitiesFiles', ->
-    # TODO: !!!!
+    await @hostsFilesWriter.writeEntitiesFiles()
 
-    await @hostsFilesWriter.proceedEntity()
+    sinon.assert.calledOnce(@hostsFilesWriter.writeJson)
+    sinon.assert.calledOnce(@main.io.mkdirP)
+    sinon.assert.calledOnce(@main.io.copyFile)
 
+    sinon.assert.calledWith(@hostsFilesWriter.writeJson,
+      '/buildDir/entities/devices/device1/manifest.json',
+      {manifestParam: 'value'}
+    )
+    sinon.assert.calledWith(@main.io.mkdirP, '/buildDir/entities/devices/device1')
+    sinon.assert.calledWith(@main.io.copyFile,
+      path.resolve('srcDir', 'someFile'),
+      '/buildDir/entities/devices/device1/someFile'
+    )
 
   it 'writeHostsFiles', ->
     configDir = '/buildDir/hosts/master/config'

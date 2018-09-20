@@ -52,7 +52,6 @@ export default class HostsFilesWriter {
   }
 
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
-    console.log(11111111, this.entitiesDstDir, pluralType, entityName)
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
     const entitySrcDir = this.main.entities.getSrcDir(pluralType, entityName);
 
@@ -63,6 +62,7 @@ export default class HostsFilesWriter {
     );
 
     // TODO: build and write main files if exists
+    // TODO: test running of build
 
     const files: string[] = this.main.entities.getFiles(pluralType, entityName);
 
