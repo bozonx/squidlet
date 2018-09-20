@@ -21,6 +21,8 @@ export default class EntityBase<Props> {
   protected doInit?: () => Promise<void>;
   // it calls after init. Better place to setup listeners
   protected didInit?: () => Promise<void>;
+  // If you have props you can validate it in this method
+  protected validateProps?: (props: Props) => string | undefined;
   protected destroy?: () => void;
 
 
@@ -32,6 +34,12 @@ export default class EntityBase<Props> {
   }
 
   async init() {
+    if (this.validateProps) {
+      const errorMsg: string | undefined = this.validateProps(this.props);
+
+      if (errorMsg) throw new Error(errorMsg);
+    }
+
     if (this.willInit) await this.willInit();
     if (this.doInit) await this.doInit();
     if (this.didInit) await this.didInit();

@@ -100,8 +100,9 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
 
-  validateProps(props: Props) {
-    // TODO: !!!!
+  protected validateProps = (props: Props): string | undefined => {
+    // TODO: !!!! validate debounce and deadTime
+    return;
   }
 
 }
