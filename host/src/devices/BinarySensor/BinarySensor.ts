@@ -10,8 +10,8 @@ import DriverInstance from '../../app/interfaces/DriverInstance';
 // TODO: наследовать ещё digital base props
 
 interface Props extends DeviceBaseProps {
-  debounce?: number;
-  deadTime?: number;
+  debounce: number;
+  deadTime: number;
 }
 
 // interface DepsDrivers {
@@ -27,27 +27,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     return this.depsInstances.digitalInput as DigitalInputDriver;
   }
 
-  // TODO: review
-  private get debounceTime(): number {
-    if (typeof this.props.debounce === 'undefined') {
-      // TODO: default value ????
-      return 1;
-    }
 
-    return this.props.debounce;
-  }
-
-  // TODO: review
-  private get deadTime(): number {
-    if (typeof this.props.deadTime === 'undefined') {
-      // TODO: default value ????
-      return 1;
-    }
-
-    return this.props.deadTime;
-  }
-
-  
   protected willInit = async () => {
     this.depsInstances.digitalInput = (await this.getDriverDep('DigitalInput.driver'))
       .getInstance(this.props);
@@ -72,7 +52,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     setTimeout(() => {
       this.debounceInProgress = false;
       this.startValueLogic();
-    }, this.debounceTime);
+    }, this.props.debounce);
   }
 
   private async startValueLogic(): Promise<void> {
@@ -82,7 +62,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     let currentLevel: BinaryLevel = false;
     const waitDeadTime = () => setTimeout(() => {
       this.deadTimeInProgress = false;
-    }, this.deadTime);
+    }, this.props.deadTime);
 
     try {
       currentLevel = await this.digitalInput.getLevel();
