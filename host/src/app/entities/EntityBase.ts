@@ -11,7 +11,7 @@ import DriverFactory from '../interfaces/DriverFactory';
 // }
 
 
-export default class EntityBase<Props, DepsDrivers> {
+export default class EntityBase<Props> {
   readonly id: string;
   readonly className: string;
   readonly props: Props;
@@ -42,14 +42,11 @@ export default class EntityBase<Props, DepsDrivers> {
 
   async init() {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
+    const depsDrivers: DepsDrivers = await this.initDependencies(manifest);
 
-    await this.initDependencies(manifest);
-
-    // TODO: лучше передавать ссылки на deps, но не хранить их
-
-    if (this.willInit) await this.willInit();
-    if (this.doInit) await this.doInit();
-    if (this.didInit) await this.didInit();
+    if (this.willInit) await this.willInit(depsDrivers);
+    if (this.doInit) await this.doInit(depsDrivers);
+    if (this.didInit) await this.didInit(depsDrivers);
   }
 
   /**
@@ -57,20 +54,23 @@ export default class EntityBase<Props, DepsDrivers> {
    * You have to shore that dependency is exists.
    * @param driverName
    */
-  protected getDriverDep<T>(driverName: string): T {
+  protected getDep(driverName: string): DriverFactory<DriverInstance> {
     if (!this.driversInstances[driverName]) {
       throw new Error(`Can't find driver "${driverName}"`);
     }
 
-    return this.driversInstances[driverName] as T;
+    return this.driversInstances[driverName] as DriverFactory<DriverInstance>;
   }
 
-  protected async initDependencies(manifest: ManifestBase): Promise<void> {
-    if (!manifest.drivers) return;
+  protected async initDependencies(manifest: ManifestBase): Promise<DepsDrivers> {
+    //if (!manifest.drivers) return;
+    const result: DepsDrivers = {};
 
-    for (let driverName of manifest.drivers) {
-      this.driversInstances[driverName] = this.env.getDriver(driverName);
+    for (let driverName of manifest.drivers || []) {
+      result[driverName] = this.env.getDriver(driverName);
     }
+
+    return result;
   }
 
   /**

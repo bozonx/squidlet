@@ -23,17 +23,18 @@ export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
-  /**
-   * Get driver which is dependency of device
-   */
-  protected get drivers(): DepsDrivers {
-    return this.driversInstances as any;
-  }
+  // /**
+  //  * Get driver which is dependency of device
+  //  */
+  // protected get drivers(): DepsDrivers {
+  //   return this.driversInstances as any;
+  // }
 
-  private get digitalIinput(): DigitalInputDriver {
+  private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
   }
 
+  // TODO: review
   private get debounceTime(): number {
     if (typeof this.props.debounce === 'undefined') {
       // TODO: default value ????
@@ -43,6 +44,7 @@ export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
     return this.props.debounce;
   }
 
+  // TODO: review
   private get deadTime(): number {
     if (typeof this.props.deadTime === 'undefined') {
       // TODO: default value ????
@@ -54,15 +56,16 @@ export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
 
   
   protected willInit = async (depsDrivers: DepsDrivers) => {
-    this.depsInstances.digitalInput = depsDrivers['DigitalInput.driver'].getInstance(this.props);
+    this.depsInstances.digitalInput = this.getDep('DigitalInput.driver').getInstance(this.props);
+    //this.depsInstances.digitalInput = depsDrivers['DigitalInput.driver'].getInstance(this.props);
   }
 
   protected didInit = async () => {
-    this.digitalIinput.onChange(this.onInputChange);
+    this.digitalInput.onChange(this.onInputChange);
   }
 
   protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.digitalIinput.getLevel() };
+    return { [DEFAULT_STATUS]: await this.digitalInput.getLevel() };
   }
 
 
@@ -89,7 +92,7 @@ export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
     }, this.deadTime);
 
     try {
-      currentLevel = await this.digitalIinput.getLevel();
+      currentLevel = await this.digitalInput.getLevel();
     }
     catch (err) {
       waitDeadTime();
