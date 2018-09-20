@@ -113,4 +113,11 @@ describe.only 'master.HostsFilesSet', ->
       }
     }
 
-    assert.deepEqual @hostsFilesSet.getHostDevs(hostEntitiesNames), []
+    @main.entities.getDevDependencies = =>
+      {
+        devices: {
+          DeviceClass: [ 'MyDev.dev' ]
+        }
+      }
+
+    assert.deepEqual @hostsFilesSet.getHostDevs(hostEntitiesNames), [ 'MyDev.dev' ]
