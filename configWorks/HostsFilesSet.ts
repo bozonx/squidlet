@@ -68,6 +68,9 @@ export default class HostsFilesSet {
    * Check than all the host's dev dependencies exist in platform deps list.
    */
   checkPlatformDevDeps() {
+
+    // TODO test
+
     for (let hostId of this.main.masterConfig.getHostsIds()) {
       const hostEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
       const hostDevs: string[] = this.getHostDevs(hostEntitiesNames);

@@ -13,7 +13,9 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */
-  async init(): Promise<void> {
+  async init() {
+    super.init();
+
     const definitions = await this.system.configSet.loadConfig<EntityDefinition[]>(
       this.system.initCfg.fileNames.devicesDefinitions
     );
