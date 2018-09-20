@@ -52,6 +52,7 @@ export default class HostsFilesWriter {
   }
 
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
+    console.log(11111111, this.entitiesDstDir, pluralType, entityName)
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
     const entitySrcDir = this.main.entities.getSrcDir(pluralType, entityName);
 

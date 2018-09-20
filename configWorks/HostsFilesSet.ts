@@ -135,9 +135,6 @@ export default class HostsFilesSet {
    * Get list of devs used on host
    */
   private getHostDevs(hostEntitiesNames: EntitiesNames): string[] {
-
-    // TODO: test
-
     const devDeps: Dependencies = this.main.entities.getDevDependencies();
     const result: {[index: string]: true} = {};
 

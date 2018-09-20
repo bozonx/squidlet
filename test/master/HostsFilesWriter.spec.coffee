@@ -1,7 +1,7 @@
 HostsFilesWriter = require('../../configWorks/HostsFilesWriter').default
 
 
-describe 'master.HostsFilesWriter', ->
+describe.only 'master.HostsFilesWriter', ->
   beforeEach ->
     @definitionsSet = {
       systemDrivers: 'systemDrivers'
@@ -22,8 +22,6 @@ describe 'master.HostsFilesWriter', ->
       masterConfig: {
         buildDir: '/buildDir'
         getHostsIds: => [ 'master' ]
-      }
-      hostsConfigSet: {
         getFinalHostConfig: => 'config'
       }
       hostsFilesSet: {
