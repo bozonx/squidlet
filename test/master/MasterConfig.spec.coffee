@@ -1,5 +1,6 @@
 MasterConfig = require('../../configWorks/MasterConfig').default
 hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').default
+systemConfig = require('../../configWorks/configs/systemConfig').default
 
 
 describe.only 'master.MasterConfig', ->
@@ -43,38 +44,17 @@ describe.only 'master.MasterConfig', ->
 
     @pathToMasterConfig = '/masterCfgPath'
 
-#    @hostConfigsResult = {
-#      master: {
-#        @preMasterConfig...
-#        config: {
-#          hostDefaultConfig.config...
-#          @preMasterConfig.config...
-#          hostDefaultParam: 1
-#        }
-#      }
-#    }
-
-    @main = {
-#      masterConfig: {
-#        hostDefaults: {
-#          config: {
-#            hostDefaultParam: 1
-#          }
-#        }
-#        hosts: {
-#          master: @preMasterConfig
-#        }
-#      }
+    # TODO: not safe - may be make new class with cloned prototype
+    MasterConfig.prototype.getPlatformConfig = => {
+      devs: ['Fs']
+      hostConfig: { platformParam: 'value' }
     }
 
-    # TODO: not safe - may be make new class with cloned prototype
-    MasterConfig.prototype.getPlatformConfig = => { hostConfig: { platformParam: 'value' } }
-
-    @masterConfig = new MasterConfig(@main, @masterConfig, @pathToMasterConfig)
+    @masterConfig = new MasterConfig(@masterConfig, @pathToMasterConfig)
 
 
-  it 'buildDir', ->
-    # TODO: !!!!
+  it 'buildDir on init', ->
+    assert.equal(@masterConfig.buildDir, '/myDir')
 
   it 'getHostsIds', ->
     assert.deepEqual(@masterConfig.getHostsIds(), [ 'master' ])
@@ -83,25 +63,40 @@ describe.only 'master.MasterConfig', ->
     assert.deepEqual @masterConfig.getPreHostConfig('master'), {
       @preMasterHostConfig...
       hostDefaultConfig...
+      @masterConfig.hostDefaults...
+      @masterConfig.getPlatformConfig().hostConfig...
       config: {
         @preMasterHostConfig.config...
         hostDefaultConfig.config...
+        @masterConfig.hostDefaults.config...
+        @masterConfig.getPlatformConfig().hostConfig.config...
       }
-      hostDefaultParam: 'value'
-      platformParam: 'value'
     }
 
   it 'getFinalHostConfig', ->
-    # TODO: !!!!
+    assert.deepEqual @masterConfig.getFinalHostConfig('master'), {
+      id: 'master'
+      platform: 'rpi'
+      config: {
+        @preMasterHostConfig.config...
+        hostDefaultConfig.config...
+        @masterConfig.hostDefaults.config...
+        @masterConfig.getPlatformConfig().hostConfig.config...
+      }
+    }
 
   it 'getHostPlatformDevs', ->
-    # TODO: !!!!
+    assert.deepEqual @masterConfig.getHostPlatformDevs('master'), ['Fs']
 
-  it 'generatePreHosts', ->
-    # TODO: !!!!
+  it 'buildDir - use defaults if there is not storage dir of master config', ->
+    @masterConfig.preHosts.master.config.storageDir = undefined
 
-    #await @masterConfig.generate()
+    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), systemConfig.defaultDuildDir)
 
-    #assert.deepEqual(@masterConfig.getHostsIds(), [ 'master' ])
-#    assert.deepEqual(@masterConfig.getFinalHostConfig('master'), @hostConfigsResult.master)
-#    assert.deepEqual(@masterConfig.getHostsConfigs(), @hostConfigsResult)
+  it 'buildDir - use master\'s absolute storageDir', ->
+    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)
+
+#  it 'buildDir - use master\'s relative storageDir', ->
+#    @masterConfig.preHosts.master.config.storageDir = './myDir'
+#
+#    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), '/masterCfgPath/myDir')

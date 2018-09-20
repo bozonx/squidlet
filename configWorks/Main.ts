@@ -24,7 +24,7 @@ export default class Main {
 
 
   constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
-    this.masterConfig = new MasterConfig(this, masterConfig, masterConfigPath);
+    this.masterConfig = new MasterConfig(masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.definitions = new Definitions(this);

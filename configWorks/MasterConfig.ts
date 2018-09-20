@@ -2,7 +2,6 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as path from 'path';
 
-import Main from './Main';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
@@ -32,16 +31,13 @@ const platforms: {[index: string]: PlatformConfig} = {
 
 export default class MasterConfig {
   readonly plugins: string[];
-  private readonly main: Main;
   private readonly hostDefaults: {[index: string]: any};
   private readonly preHosts: {[index: string]: PreHostConfig};
   // storage base dir
   readonly buildDir: string;
 
 
-  constructor(main: Main, masterConfig: PreMasterConfig, masterConfigPath: string) {
-    this.main = main;
-
+  constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
@@ -50,9 +46,7 @@ export default class MasterConfig {
     this.hostDefaults = masterConfig.hostDefaults || {};
     this.preHosts = this.generatePreHosts(this.resolveHosts(masterConfig));
 
-    // TODO: do it
-    //this.buildDir = this.generateBuildDir(masterConfigPath);
-    this.buildDir = '';
+    this.buildDir = this.generateBuildDir(masterConfigPath);
   }
 
   getHostsIds(): string[] {
@@ -112,7 +106,8 @@ export default class MasterConfig {
       // use master's storage dir
       const storageDir = masterHostConfig.config.storageDir;
 
-      if (path.isAbsolute(masterConfigPath)) {
+      // TODO: why???
+      if (path.isAbsolute(storageDir)) {
         // it's an absolute path
         return storageDir;
       }
