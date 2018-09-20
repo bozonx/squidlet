@@ -3,6 +3,7 @@ import ManifestBase from '../interfaces/ManifestBase';
 import Env from '../interfaces/Env';
 import DriverInstance from '../interfaces/DriverInstance';
 import DeviceManifest from '../interfaces/DeviceManifest';
+import DriverFactory from '../interfaces/DriverFactory';
 
 
 // export interface DriversInstances {
@@ -10,17 +11,18 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 // }
 
 
-export default class EntityBase<Props> {
+export default class EntityBase<Props, DepsDrivers> {
   readonly id: string;
   readonly className: string;
   readonly props: Props;
   protected readonly env: Env;
+  protected depsInstances: {[index: string]: DriverInstance} = {};
   // it calls before init propcess but after init dependencies
-  protected willInit?: () => Promise<void>;
+  protected willInit?: (depsDrivers: DepsDrivers) => Promise<void>;
   // init process
-  protected doInit?: () => Promise<void>;
+  protected doInit?: (depsDrivers: DepsDrivers) => Promise<void>;
   // it calls after device init, status and config init have been finished
-  protected didInit?: () => Promise<void>;
+  protected didInit?: (depsDrivers: DepsDrivers) => Promise<void>;
   protected destroy?: () => void;
   protected driversInstances: {[index: string]: DriverInstance} = {};
 
@@ -42,6 +44,8 @@ export default class EntityBase<Props> {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     await this.initDependencies(manifest);
+
+    // TODO: лучше передавать ссылки на deps, но не хранить их
 
     if (this.willInit) await this.willInit();
     if (this.doInit) await this.doInit();

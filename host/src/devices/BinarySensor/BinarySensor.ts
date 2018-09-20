@@ -4,6 +4,7 @@ import {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import DriverFactory from '../../app/interfaces/DriverFactory';
+import DriverInstance from '../../app/interfaces/DriverInstance';
 
 
 // TODO: наследовать ещё digital base props
@@ -18,8 +19,7 @@ interface DepsDrivers {
 }
 
 
-export default class BinarySensor extends DeviceBase<Props> {
-  private digitalInputDriver?: DigitalInputDriver;
+export default class BinarySensor extends DeviceBase<Props, DepsDrivers> {
   private debounceInProgress: boolean = false;
   private deadTimeInProgress: boolean = false;
 
@@ -30,8 +30,8 @@ export default class BinarySensor extends DeviceBase<Props> {
     return this.driversInstances as any;
   }
 
-  private get inputDriver(): DigitalInputDriver {
-
+  private get digitalIinput(): DigitalInputDriver {
+    return this.depsInstances.digitalInput as DigitalInputDriver;
   }
 
   private get debounceTime(): number {
@@ -53,16 +53,16 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
   
-  protected willInit = async () => {
-    this.digitalInputDriver = this.drivers['DigitalInput.driver'].getInstance(this.props);
+  protected willInit = async (depsDrivers: DepsDrivers) => {
+    this.depsInstances.digitalInput = depsDrivers['DigitalInput.driver'].getInstance(this.props);
   }
 
   protected didInit = async () => {
-    this.inputDriver.onChange(this.onInputChange);
+    this.digitalIinput.onChange(this.onInputChange);
   }
 
   protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.inputDriver.getLevel() };
+    return { [DEFAULT_STATUS]: await this.digitalIinput.getLevel() };
   }
 
 
@@ -89,7 +89,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     }, this.deadTime);
 
     try {
-      currentLevel = await this.inputDriver.getLevel();
+      currentLevel = await this.digitalIinput.getLevel();
     }
     catch (err) {
       waitDeadTime();
