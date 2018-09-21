@@ -22,7 +22,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
     return this.EnvClass;
   }
 
-  protected get env(): EntityEnv {
+  get env(): EntityEnv {
     return this._env as EntityEnv;
   }
 
