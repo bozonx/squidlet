@@ -8,6 +8,9 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import DriverFactory from '../interfaces/DriverFactory';
 
 
+type GetDriverDep = (driverName: string) => DriverInstance;
+
+
 export default class EntityBase<Props> {
   readonly id: string;
   readonly className: string;
@@ -16,11 +19,11 @@ export default class EntityBase<Props> {
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: DriverInstance} = {};
   // better place to instantiate dependencies if need
-  protected willInit?: () => Promise<void>;
+  protected willInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // init process
-  protected doInit?: () => Promise<void>;
+  protected doInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // it calls after init. Better place to setup listeners
-  protected didInit?: () => Promise<void>;
+  protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
   protected destroy?: () => void;
@@ -40,24 +43,18 @@ export default class EntityBase<Props> {
       if (errorMsg) throw new Error(errorMsg);
     }
 
-    if (this.willInit) await this.willInit();
-    if (this.doInit) await this.doInit();
-    if (this.didInit) await this.didInit();
-  }
-
-  /**
-   * Get driver dependency.
-   * You have to shore that dependency is exists.
-   * @param driverName
-   */
-  protected async getDriverDep(driverName: string): Promise<DriverFactory<DriverInstance>> {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
+    const getDriverDep: GetDriverDep = (driverName: string) => {
+      if (!_includes(manifest.drivers, driverName)) {
+        throw new Error(`Can't find driver "${driverName}"`);
+      }
 
-    if (!_includes(manifest.drivers, driverName)) {
-      throw new Error(`Can't find driver "${driverName}"`);
-    }
+      return this.depsInstances[driverName] as DriverFactory<DriverInstance>;
+    };
 
-    return this.depsInstances[driverName] as DriverFactory<DriverInstance>;
+    if (this.willInit) await this.willInit(getDriverDep);
+    if (this.doInit) await this.doInit(getDriverDep);
+    if (this.didInit) await this.didInit(getDriverDep);
   }
 
   /**

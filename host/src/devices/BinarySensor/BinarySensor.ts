@@ -3,20 +3,14 @@ import {BinaryLevel} from '../../app/CommonTypes';
 import {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import DriverFactory from '../../app/interfaces/DriverFactory';
 import DriverInstance from '../../app/interfaces/DriverInstance';
 
 
 // TODO: наследовать ещё digital base props
-
 interface Props extends DeviceBaseProps {
   debounce: number;
   deadTime: number;
 }
-
-// interface DepsDrivers {
-//   'DigitalInput.driver': DriverFactory<DigitalInputDriver>;
-// }
 
 
 export default class BinarySensor extends DeviceBase<Props> {
@@ -28,8 +22,8 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
 
-  protected willInit = async () => {
-    this.depsInstances.digitalInput = (await this.getDriverDep('DigitalInput.driver'))
+  protected willInit = async (getDriverDep: (driverName: string) => DriverInstance) => {
+    this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
       .getInstance(this.props);
   }
 
