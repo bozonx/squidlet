@@ -1,7 +1,6 @@
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {BinaryLevel} from '../../app/CommonTypes';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -9,7 +8,7 @@ import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 
 
-type Handler = (level: BinaryLevel) => void;
+type Handler = (level: boolean) => void;
 
 interface DigitalOutputDriverProps extends DigitalBaseProps {
   initial?: 'low' | 'high';
@@ -32,14 +31,15 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   }
 
 
-  async getLevel(): Promise<BinaryLevel> {
-    // TODO: add
-    // TODO: трансформировать левел
+  async getLevel(): Promise<boolean> {
+    const realLevel: boolean = await this.digital.getLevel(this.props.pin);
 
-    return true;
+    if (this.props.invert) return !realLevel;
+
+    return realLevel;
   }
 
-  async setLevel(newLevel: BinaryLevel): Promise<void> {
+  async setLevel(newLevel: boolean): Promise<void> {
     // TODO: add
     // TODO: трансформировать левел
 

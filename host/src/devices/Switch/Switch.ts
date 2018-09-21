@@ -1,5 +1,4 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {BinaryLevel} from '../../app/CommonTypes';
 import {DigitalOutputDriver} from '../../drivers/Digital/DigitalOutput.driver';
 import {convertToLevel} from '../../helpers/helpers';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
@@ -33,7 +32,7 @@ export default class Switch extends DeviceBase<Props> {
   }
 
   protected actions = {
-    turn: async (onOrOff: any): Promise<BinaryLevel> => {
+    turn: async (onOrOff: any): Promise<boolean> => {
       // skip while switch at dead time
       if (this.deadTimeInProgress) return this.status.getLocal().default;
 
@@ -47,7 +46,7 @@ export default class Switch extends DeviceBase<Props> {
       return level;
     },
 
-    toggle: async (): Promise<BinaryLevel> => {
+    toggle: async (): Promise<boolean> => {
       // skip while switch at dead time
       if (this.deadTimeInProgress) return this.getStatus();
 

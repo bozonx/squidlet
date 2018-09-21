@@ -1,5 +1,4 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {BinaryLevel} from '../../app/CommonTypes';
 import {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
@@ -53,7 +52,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     // start dead time - ignore all the signals
     this.deadTimeInProgress = true;
 
-    let currentLevel: BinaryLevel = false;
+    let currentLevel: boolean = false;
     const waitDeadTime = () => setTimeout(() => {
       this.deadTimeInProgress = false;
     }, this.props.deadTime);

@@ -1,7 +1,6 @@
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {BinaryLevel} from '../../app/CommonTypes';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
@@ -9,7 +8,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 
 
-type Handler = (level: BinaryLevel) => void;
+type Handler = (level: boolean) => void;
 
 interface DigitalInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
@@ -40,11 +39,12 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   // TODO: если используется pullup нужно ли делать negative|invert ????
 
 
-  async getLevel(): Promise<BinaryLevel> {
-    // TODO: add
-    // TODO: трансформировать левел
+  async getLevel(): Promise<boolean> {
+    const realLevel: boolean = await this.digital.getLevel(this.props.pin);
 
-    return true;
+    if (this.props.invert) return !realLevel;
+
+    return realLevel;
   }
 
   onChange(handler: Handler): void {

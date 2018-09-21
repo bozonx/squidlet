@@ -1,3 +1,3 @@
 export default interface GpioDigitalDriver {
-  // TODO: !!!
+  getLevel(pin: number): Promise<boolean>;
 }
