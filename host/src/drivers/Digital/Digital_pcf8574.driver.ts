@@ -1,14 +1,16 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-import {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
+import {GpioDigitalDriverHandler, GpioDigitalDriverPinParams} from './interfaces/GpioDigitalDriver';
+import DriverBase from '../../app/entities/DriverBase';
 
 
 interface DigitalPcf8574DriverProps extends EntityProps {
-
+  bus: number;
+  address: number;
 }
 
 
-export class DigitalPcf8574Driver {
+export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> {
   async getLevel(pin: number): Promise<boolean> {
     // TODO: !!!
   }
@@ -39,7 +41,8 @@ export class DigitalPcf8574Driver {
 
 export default class GpioInputFactory extends DriverFactoryBase<DigitalPcf8574Driver, DigitalPcf8574DriverProps> {
 
-  // TODO: i2c and bus
+  // TODO: сразу валидировать address and bus
+  // TODO: инстанс будет на совмещенном параметре address and bus
 
   protected instanceIdName: string = 'i2c';
   protected DriverClass = DigitalPcf8574Driver;

@@ -1,9 +1,10 @@
+const _omit = require('lodash/omit');
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
-import GpioDigitalDriver, {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
+import GpioDigitalDriver, {GpioDigitalDriverHandler, GpioDigitalDriverPinParams} from './interfaces/GpioDigitalDriver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
@@ -17,8 +18,6 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
   pulldown?: boolean;
 }
 
-// TODO: pin setup
-// TODO: add watchOnce
 
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
@@ -30,7 +29,16 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
-    this.depsInstances.digital = getDriverDep(driverName).getInstance(this.props);
+    this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
+
+    // setup this pin
+    const pinParams: GpioDigitalDriverPinParams = {
+      direction: 'input',
+      pullup: this.props.pullup,
+      pulldown: this.props.pulldown,
+    };
+
+    await this.digital.setup(this.props.pin, pinParams);
   }
 
 
@@ -49,6 +57,11 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
    * Listen to interruption of pin.
    */
   addListener(handler: GpioDigitalDriverHandler): void {
+    // TODO: add
+    // TODO: трансформировать левел
+  }
+
+  listenOnce(handler: GpioDigitalDriverHandler): void {
     // TODO: add
     // TODO: трансформировать левел
   }

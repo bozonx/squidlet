@@ -1,15 +1,13 @@
-import * as EventEmitter from 'events';
+const _omit = require('lodash/omit');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
+import GpioDigitalDriver, {GpioDigitalDriverPinParams} from './interfaces/GpioDigitalDriver';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 
-
-type Handler = (level: boolean) => void;
 
 interface DigitalOutputDriverProps extends DigitalBaseProps {
   initial?: 'low' | 'high';
@@ -17,17 +15,22 @@ interface DigitalOutputDriverProps extends DigitalBaseProps {
 
 
 export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
-  private readonly events: EventEmitter = new EventEmitter();
-
   private get digital(): GpioDigitalDriver {
     return this.depsInstances.digital as GpioDigitalDriver;
   }
 
-  // TODO: pin setup
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
-    this.depsInstances.digital = getDriverDep(driverName).getInstance(this.props);
+    this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
+
+    // setup this pin
+    const pinParams: GpioDigitalDriverPinParams = {
+      direction: 'output',
+      initial: this.calcInitial(),
+    };
+
+    await this.digital.setup(this.props.pin, pinParams);
   }
 
 

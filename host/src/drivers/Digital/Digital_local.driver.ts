@@ -4,8 +4,6 @@ import {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
 
 
 export interface DigitalLocalDriverProps extends DriverBaseProps {
-  pin: number;
-  direction: 'in' | 'out';
 }
 
 
