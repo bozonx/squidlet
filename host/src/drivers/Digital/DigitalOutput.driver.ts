@@ -1,27 +1,21 @@
 import * as EventEmitter from 'events';
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import DriverEnv from '../../app/entities/DriverEnv';
 import {BinaryLevel} from '../../app/CommonTypes';
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
+import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
+import {DriverBaseProps} from '../../app/entities/DriverBase';
+import DriverBase from '../../app/entities/DriverBase';
 
 
 type Handler = (level: BinaryLevel) => void;
 
-interface GpioOutputDriverProps extends EntityProps {
+interface DigitalOutputDriverProps extends DriverBaseProps {
   // TODO: !!!!
 }
 
 
-export class DigitalOutputDriver {
-  private readonly props: GpioOutputDriverProps;
-  private readonly env: DriverEnv;
+export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-
-  constructor(props: GpioOutputDriverProps, env: DriverEnv) {
-    this.props = props;
-    this.env = env;
-  }
 
   async getLevel(): Promise<BinaryLevel> {
     // TODO: add
@@ -47,27 +41,12 @@ export class DigitalOutputDriver {
 
 }
 
+// TODO: validate params
+// TODO: validate specific for certain driver params
+// TODO: make uniq string for driver - raspberry-1-5a
 
-export default class GpioOutputFactory extends DriverFactoryBase {
-  protected DriverClass: { new (
-      props: GpioOutputDriverProps,
-      env: DriverEnv,
-    ): DigitalOutputDriver } = DigitalOutputDriver;
-  private instances: {[index: string]: DigitalOutputDriver} = {};
 
-  getInstance(deviceParams: {[index: string]: any}): DigitalOutputDriver {
-
-    // TODO: validate params
-    // TODO: validate specific for certain driver params
-    // TODO: make uniq string for driver - raspberry-1-5a
-
-    const instanceId = '1';
-
-    if (!this.instances[instanceId]) {
-      this.instances[instanceId] = super.getInstance(instanceId) as DigitalOutputDriver;
-    }
-
-    return this.instances[instanceId];
-  }
-
+export default class Factory extends DriverFactoryBase<I2cConnectionDriver, DigitalOutputDriverProps> {
+  protected instanceIdName: string = 'pin';
+  protected DriverClass = I2cConnectionDriver;
 }
