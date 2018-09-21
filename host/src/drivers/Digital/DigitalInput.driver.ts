@@ -6,6 +6,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import GpioDigitalDriver, {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
+import {resolveDriverName} from './digitalHelpers';
 
 
 interface DigitalInputDriverProps extends DigitalBaseProps {
@@ -18,7 +19,6 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
 
 // TODO: pin setup
 // TODO: add watchOnce
-// TODO: инициализировать output значение - 1 или 0
 
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
@@ -29,9 +29,8 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    // TODO: get driver name
-    this.depsInstances.digital = getDriverDep('I2cSlave.dev')
-      .getInstance(this.props);
+    const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
+    this.depsInstances.digital = getDriverDep(driverName).getInstance(this.props);
   }
 
 

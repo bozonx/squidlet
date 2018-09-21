@@ -6,6 +6,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
+import {resolveDriverName} from './digitalHelpers';
 
 
 type Handler = (level: boolean) => void;
@@ -25,10 +26,8 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   // TODO: pin setup
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    const driverName = ``;
-    // TODO: get driver name
-    this.depsInstances.digital = getDriverDep('I2cSlave.dev')
-      .getInstance(this.props);
+    const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
+    this.depsInstances.digital = getDriverDep(driverName).getInstance(this.props);
   }
 
 
@@ -63,15 +62,12 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
   validateProps = (): string | undefined => {
     // TODO: validate params
+    // TODO: validate props.driver
     // TODO: validate specific for certain driver params
     return;
   }
 
 }
-
-
-
-// TODO: make uniq string for driver - raspberry-1-5a
 
 
 export default class Factory extends DriverFactoryBase<I2cConnectionDriver, DigitalOutputDriverProps> {
