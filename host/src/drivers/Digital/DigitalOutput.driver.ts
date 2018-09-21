@@ -22,6 +22,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
     return this.depsInstances.digital as GpioDigitalDriver;
   }
 
+  // TODO: pin setup
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = ``;
@@ -31,6 +32,9 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   }
 
 
+  /**
+   * Get current level of pin.
+   */
   async getLevel(): Promise<boolean> {
     const realLevel: boolean = await this.digital.getLevel(this.props.pin);
 
@@ -40,18 +44,9 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   }
 
   async setLevel(newLevel: boolean): Promise<void> {
-    // TODO: add
-    // TODO: трансформировать левел
+    const realLevel: boolean = (this.props.invert) ? !newLevel : newLevel;
 
-  }
-
-  onChange(handler: Handler): void {
-    // TODO: add
-    // TODO: трансформировать левел
-  }
-
-  removeListener(handler: Handler): void {
-    // TODO: add
+    await this.digital.setLevel(this.props.pin, realLevel);
   }
 
 

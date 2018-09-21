@@ -18,7 +18,7 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
   pulldown?: boolean;
 }
 
-
+// TODO: pin setup
 // TODO: add watchOnce
 // TODO: инициализировать output значение - 1 или 0
 
@@ -36,9 +36,10 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       .getInstance(this.props);
   }
 
-  // TODO: если используется pullup нужно ли делать negative|invert ????
 
-
+  /**
+   * Get current level of pin.
+   */
   async getLevel(): Promise<boolean> {
     const realLevel: boolean = await this.digital.getLevel(this.props.pin);
 
@@ -47,7 +48,10 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     return realLevel;
   }
 
-  onChange(handler: Handler): void {
+  /**
+   * Listen to interruption of pin.
+   */
+  addListener(handler: Handler): void {
     // TODO: add
     // TODO: трансформировать левел
   }

@@ -9,6 +9,18 @@ export interface DigitalLocalDriverProps extends DriverBaseProps {
 
 
 export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
+  async getLevel(pin: number): Promise<boolean> {
+    // TODO: !!!
+  }
+
+  /**
+   * Set level to output pin
+   */
+  async setLevel(pin: number, level: boolean): Promise<void> {
+    // TODO: если пин сконфигурирован на input - ругаться
+    // TODO: !!!
+  }
+
 }
 
 
