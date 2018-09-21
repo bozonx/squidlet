@@ -5,8 +5,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
-import Env from '../../app/interfaces/Env';
+import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 const NO_DATA_ADDRESS = 'null';
@@ -21,16 +20,17 @@ interface I2cSlaveDriverProps extends DriverBaseProps {
 
 export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly i2cSlaveDev: I2cSlave;
+  private get i2cSlaveDev(): I2cSlave {
+    return this.depsInstances.i2cSlave as I2cSlave;
+  }
 
-  constructor(definition: EntityDefinition, env: Env) {
-    super(definition, env);
 
-    // TODO: call from base init
-    this.validateProps(this.props);
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.i2cSlave = getDriverDep('I2cSlave.dev')
+      .getInstance(this.props);
+  }
 
-    // TODO: рефакторить - нужно как-то убедиться что он есть. Либо создать локальные свойства класса
-    this.i2cSlaveDev = this.getDriverDep<I2cSlave>('I2cSlave.dev');
+  protected didMount = () => {
     // listen all the income data
     this.i2cSlaveDev.listenIncome(this.props.bus, this.handleIncomeData);
   }
@@ -126,9 +126,11 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
     return dataAddress.toString();
   }
 
-  private validateProps(props: I2cSlaveDriverProps) {
-    if (Number.isInteger(props.bus)) throw new Error(`Incorrect type bus number "${props.bus}"`);
+  protected validateProps = (props: I2cSlaveDriverProps): string | undefined => {
+    if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
     //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+
+    return;
   }
 
 }

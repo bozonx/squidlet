@@ -1,16 +1,13 @@
 const _cloneDeep = require('lodash/cloneDeep');
 
-import DriverEnv from '../../app/entities/DriverEnv';
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import { I2cDataDriver, I2cDriverClass, DataHandler } from '../../drivers/I2c/I2cData.driver';
+import { I2cDataDriver, DataHandler } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
-import Env from '../../app/interfaces/Env';
+import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
@@ -27,24 +24,22 @@ interface I2cConnectionDriverProps extends DriverBaseProps {
  * It packs data to send it via i2c.
  */
 export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
-  private readonly i2cDataDriver: I2cDataDriver;
-
   // TODO: почему не константа???
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
-  constructor(definition: EntityDefinition, env: Env) {
-    super(definition, env);
+  private get i2cDataDriver(): I2cDataDriver {
+    return this.depsInstances.i2cDataDriver as I2cDataDriver;
+  }
 
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
     const isMaster = typeof this.props.myAddress.address === 'undefined';
-    const dataDriver = this.env.getDriver('I2cData.driver');
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
-    // get low level i2c driver
-    //const i2cDriver: I2cDriverClass = this.env.getDriver<I2cDriverClass>(i2cDriverName);
 
-    // TODO: сделать по нормальному
-    this.i2cDataDriver = (dataDriver as any).getInstance({ i2cDriverName, bus: this.props.myAddress.bus }) as I2cDataDriver;
+    this.depsInstances.i2cDataDriver = getDriverDep('I2cData.driver')
+      .getInstance({ i2cDriverName, bus: this.props.myAddress.bus });
   }
 
   async send(remoteAddress: string, payload: any): Promise<void> {

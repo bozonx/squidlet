@@ -1,13 +1,9 @@
-import DriverEnv from '../../app/entities/DriverEnv';
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
-import Env from '../../app/interfaces/Env';
-import DriverInstance from '../../app/interfaces/DriverInstance';
+import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -43,15 +39,19 @@ interface I2cDataDriverProps extends DriverBaseProps {
 
 
 export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
-  private readonly i2cDriver: I2cDriverClass;
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
-  constructor(definition: EntityDefinition, env: Env) {
-    super(definition, env);
-    this.i2cDriver = this.env.getDriver<DriverInstance>(this.props.i2cDriverName).getInstance(this.props.bus);
+  private get i2cDriver(): I2cDriverClass {
+    return this.depsInstances.i2cDriver as I2cDriverClass;
+  }
+
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.i2cDriver = getDriverDep(this.props.i2cDriverName)
+      .getInstance(this.props);
   }
 
   async send(i2cAddress: string | number | undefined, dataMark: number | undefined, data: Uint8Array): Promise<void> {

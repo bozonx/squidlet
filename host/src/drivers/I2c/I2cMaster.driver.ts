@@ -32,7 +32,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = getDriverDep('I2cMaster.dev')
+    this.depsInstances.i2cMaster = getDriverDep('I2cMaster.dev')
       .getInstance(this.props);
   }
 
