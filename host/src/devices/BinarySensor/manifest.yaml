@@ -3,5 +3,8 @@ type: binary-sensor
 
 main: ./BinarySensor.ts
 props: ./props.yaml
+drivers:
+  DigitalInput.driver
+
 status:
   default: boolean

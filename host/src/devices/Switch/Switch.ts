@@ -1,32 +1,35 @@
-import System from '../../app/System';
-import DeviceBase from '../../baseDevice/DeviceBase';
+import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {BinaryLevel} from '../../app/CommonTypes';
-import GpioOutputFactory, {DigitalOutputDriver} from '../../drivers/Digital/DigitalOutput.driver';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
+import {DigitalOutputDriver} from '../../drivers/Digital/DigitalOutput.driver';
 import {convertToLevel} from '../../helpers/helpers';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 
 
-export default class Switch extends DeviceBase {
-  private readonly gpioOutputDriver: DigitalOutputDriver;
+interface Props extends DeviceBaseProps {
+  deadTime: number;
+}
+
+
+export default class Switch extends DeviceBase<Props> {
   private deadTimeInProgress: boolean = false;
 
-  constructor(system: System, deviceConf: EntityDefinition) {
-    super(system, deviceConf);
+  private get digitalOutput(): DigitalOutputDriver {
+    return this.depsInstances.digitalOutput as DigitalOutputDriver;
+  }
 
-    // TODO: !!!!???
-    const gpioOutputDriverFactory = this.system.drivers.getDriver<GpioOutputFactory>('DigitalOutputDriver.driver');
 
-    this.gpioOutputDriver = gpioOutputDriverFactory.getInstance(this.deviceConf.props);
+  protected willInit = async () => {
+    this.depsInstances.digitalOutput = (await this.getDriverDep('DigitalOutput.driver'))
+      .getInstance(this.props);
   }
 
   protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.gpioOutputDriver.getLevel() };
+    return { [DEFAULT_STATUS]: await this.digitalOutput.getLevel() };
   }
 
   protected statusSetter = (partialData: Data): Promise<void> => {
-    return this.gpioOutputDriver.setLevel(partialData[DEFAULT_STATUS]);
+    return this.digitalOutput.setLevel(partialData[DEFAULT_STATUS]);
   }
 
   protected actions = {
@@ -35,7 +38,7 @@ export default class Switch extends DeviceBase {
       if (this.deadTimeInProgress) return this.status.getLocal().default;
 
       this.deadTimeInProgress = true;
-      setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
+      setTimeout(() => this.deadTimeInProgress = false, this.props.deadTime);
 
       const level: boolean = convertToLevel(onOrOff);
 
@@ -49,7 +52,7 @@ export default class Switch extends DeviceBase {
       if (this.deadTimeInProgress) return this.getStatus();
 
       this.deadTimeInProgress = true;
-      setTimeout(() => this.deadTimeInProgress = false, this.deviceConf.props.deadTime);
+      setTimeout(() => this.deadTimeInProgress = false, this.props.deadTime);
 
       const currentLevel: boolean = await this.getStatus();
 

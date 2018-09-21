@@ -3,5 +3,8 @@ type: switch
 
 main: ./Switch.ts
 props: ./props.yaml
+drivers:
+  DigitalOutput.driver
+
 status:
   default: boolean
