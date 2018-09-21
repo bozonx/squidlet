@@ -12,8 +12,22 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 type Handler = (level: BinaryLevel) => void;
 
 interface DigitalInputDriverProps extends DriverBaseProps {
+  // if no one of pullup and pulldown are set then both resistors will off
+  // use pullup resistor
   pullup?: boolean;
+  // use pulldown resistor
   pulldown?: boolean;
+  // when receives 1 actually returned 0 and otherwise
+  invert: boolean;
+  // by default is local driver used
+  driver?: {
+    name: string;
+    // Physical driver's params
+    [index: string]: any;
+  };
+
+  // TODO: add base - pin, statusRepublishInterval, configRepublishInterval
+  // TODO: ??? valueLogLevel
 }
 
 

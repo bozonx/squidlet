@@ -13,8 +13,17 @@ type Handler = (level: BinaryLevel) => void;
 
 interface DigitalOutputDriverProps extends DriverBaseProps {
   initial?: 'low' | 'high';
-  // TODO: may be rename to invert | negative
-  baseOne?: boolean;
+  // when sends 1 actually sends 0 and otherwise
+  invert?: boolean;
+  // by default is local driver used
+  driver?: {
+    name: string;
+    // Physical driver's params
+    [index: string]: any;
+  };
+
+  // TODO: add base - pin, statusRepublishInterval, configRepublishInterval
+  // TODO: ??? valueLogLevel
 }
 
 
@@ -58,7 +67,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
 
   private calcInitial(): boolean {
-    if (this.props.baseOne) {
+    if (this.props.invert) {
       // if initial === 'high' it'll be logical 0 if undefines of low - 1
       return typeof this.props.initial === 'undefined' || this.props.initial === 'low';
     }
