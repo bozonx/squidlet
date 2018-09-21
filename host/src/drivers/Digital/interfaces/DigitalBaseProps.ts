@@ -1,4 +1,4 @@
-import {DriverBaseProps} from '../entities/DriverBase';
+import {DriverBaseProps} from '../../../app/entities/DriverBase';
 
 
 export default interface DigitalBaseProps extends DriverBaseProps {

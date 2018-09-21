@@ -5,8 +5,8 @@ import {BinaryLevel} from '../../app/CommonTypes';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import GpioDigitalDriver from '../../app/interfaces/GpioDigitalDriver';
-import DigitalBaseProps from '../../app/interfaces/DigitalBaseProps';
+import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
+import DigitalBaseProps from './interfaces/DigitalBaseProps';
 
 
 type Handler = (level: BinaryLevel) => void;
