@@ -3,31 +3,20 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
-import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
 import GpioDigitalDriver from '../../app/interfaces/GpioDigitalDriver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import DigitalBaseProps from '../../app/interfaces/DigitalBaseProps';
 
 
 type Handler = (level: BinaryLevel) => void;
 
-interface DigitalInputDriverProps extends DriverBaseProps {
+interface DigitalInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
   pullup?: boolean;
   // use pulldown resistor
   pulldown?: boolean;
-  // when receives 1 actually returned 0 and otherwise
-  invert: boolean;
-  // by default is local driver used
-  driver?: {
-    name: string;
-    // Physical driver's params
-    [index: string]: any;
-  };
-
-  // TODO: add base - pin, statusRepublishInterval, configRepublishInterval
-  // TODO: ??? valueLogLevel
 }
 
 

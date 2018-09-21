@@ -24,8 +24,8 @@ valueLogLevel:
   # TODO: use one of error | warn | info | verbose
   type: string
   default: info
-statusRepublishInterval: number
-configRepublishInterval: number
+#statusRepublishInterval: number
+#configRepublishInterval: number
 
 # Invert logic before it will be processing
 negative:

@@ -3,27 +3,16 @@ import * as EventEmitter from 'events';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {BinaryLevel} from '../../app/CommonTypes';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
-import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import GpioDigitalDriver from '../../app/interfaces/GpioDigitalDriver';
+import DigitalBaseProps from '../../app/interfaces/DigitalBaseProps';
 
 
 type Handler = (level: BinaryLevel) => void;
 
-interface DigitalOutputDriverProps extends DriverBaseProps {
+interface DigitalOutputDriverProps extends DigitalBaseProps {
   initial?: 'low' | 'high';
-  // when sends 1 actually sends 0 and otherwise
-  invert?: boolean;
-  // by default is local driver used
-  driver?: {
-    name: string;
-    // Physical driver's params
-    [index: string]: any;
-  };
-
-  // TODO: add base - pin, statusRepublishInterval, configRepublishInterval
-  // TODO: ??? valueLogLevel
 }
 
 
