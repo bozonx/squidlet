@@ -8,7 +8,7 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import DriverFactory from '../interfaces/DriverFactory';
 
 
-type GetDriverDep = (driverName: string) => DriverInstance;
+export type GetDriverDep = (driverName: string) => DriverInstance;
 
 
 export default class EntityBase<Props> {

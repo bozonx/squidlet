@@ -3,7 +3,7 @@ import {BinaryLevel} from '../../app/CommonTypes';
 import {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import DriverInstance from '../../app/interfaces/DriverInstance';
+import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 // TODO: наследовать ещё digital base props
@@ -22,7 +22,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
 
-  protected willInit = async (getDriverDep: (driverName: string) => DriverInstance) => {
+  protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
       .getInstance(this.props);
   }

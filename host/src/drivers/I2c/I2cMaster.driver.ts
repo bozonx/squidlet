@@ -1,5 +1,3 @@
-import {DriverBaseProps} from '../../app/entities/DriverBase';
-
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
@@ -8,8 +6,8 @@ import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
-import Env from '../../app/interfaces/Env';
+import {GetDriverDep} from '../../app/entities/EntityBase';
+import {DriverBaseProps} from '../../app/entities/DriverBase';
 
 
 const REGISTER_POSITION = 0;
@@ -24,21 +22,20 @@ interface I2cMasterDriverProps extends DriverBaseProps {
 
 export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-  private readonly i2cMasterDev: I2cMaster;
   // TODO: review poling
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
 
-  constructor(definition: EntityDefinition, env: Env) {
-    super(definition, env);
-
-    // TODO: move to onInit()
-
-    // TODO: call from base init
-    this.validateProps(this.props);
-
-    this.i2cMasterDev = this.drivers['I2cMaster.dev'] as I2cMaster;
+  private get i2cMasterDev(): I2cMaster {
+    return this.depsInstances.i2cMaster as I2cMaster;
   }
+
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.digitalInput = getDriverDep('I2cMaster.dev')
+      .getInstance(this.props);
+  }
+
 
   startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
     const addressHex: number = this.normilizeAddr(i2cAddress);
@@ -202,9 +199,11 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
     // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль
   }
 
-  private validateProps(props: I2cMasterDriverProps) {
-    if (Number.isInteger(props.bus)) throw new Error(`Incorrect type bus number "${props.bus}"`);
+  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
+    if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
     //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+
+    return;
   }
 
 }
