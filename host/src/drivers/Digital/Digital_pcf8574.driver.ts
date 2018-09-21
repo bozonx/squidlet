@@ -13,6 +13,9 @@ export class DigitalPcf8574Driver {
 
 
 export default class GpioInputFactory extends DriverFactoryBase<DigitalPcf8574Driver, DigitalPcf8574DriverProps> {
+
+  // TODO: i2c and bus
+
   protected instanceIdName: string = 'i2c';
   protected DriverClass = DigitalPcf8574Driver;
 }
