@@ -12,6 +12,7 @@ interface Listener {
 
 
 // TODO: установить первичное значение на output пине
+// TODO: проверить getPinMode и что вернет если пин не сконфигурирован
 
 
 export default class DigitalDev implements Digital {
@@ -27,6 +28,23 @@ export default class DigitalDev implements Digital {
       // listen both and skip unnecessary in setWatch
       edge: (convertedMode.mode === Gpio.INPUT) ? Gpio.EITHER_EDGE : undefined,
     });
+  }
+
+  getPinMode(pin: number): PinMode | undefined {
+    const pinInstance = this.getPinInstance(pin);
+
+    const modeConst: number = pinInstance.getMode();
+
+    if (modeConst === Gpio.INPUT) {
+      return 'input';
+
+      // TODO: add support of input_pullup and input_pulldown
+    }
+    else if (modeConst === Gpio.OUTPUT) {
+      return 'output';
+    }
+
+    return;
   }
 
   async read(pin: number): Promise<boolean> {

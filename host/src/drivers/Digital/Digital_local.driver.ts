@@ -19,6 +19,10 @@ export class DigitalLocalDriver {
     return this.digitalDev.setup(pin, pinMode);
   }
 
+  getPinMode(pin: number): PinMode | undefined {
+    return this.digitalDev.getPinMode(pin);
+  }
+
   read(pin: number): Promise<boolean> {
     return this.digitalDev.read(pin);
   }
@@ -27,10 +31,11 @@ export class DigitalLocalDriver {
    * Write to output pin
    */
   write(pin: number, level: boolean): Promise<void> {
-    // TODO: добавить проверку direction пина чтобы ругаться
-    // if (!this.outputPins[pin]) {
-    //   throw new Error(`Can't set level. The local digital gpio GPIO "${pin}" wasn't set up as an output pin.`);
-    // }
+    const pinMode: PinMode | undefined = this.getPinMode(pin);
+
+    if (!pinMode || !pinMode.match(/output/)) {
+      throw new Error(`Can't set level. The local digital gpio GPIO "${pin}" wasn't set up as an output pin.`);
+    }
 
     return this.digitalDev.write(pin, level);
   }
@@ -39,9 +44,11 @@ export class DigitalLocalDriver {
    * Listen to interruption of input pin
    */
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
-    // if (!this.inputPins[pin]) {
-    //   throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
-    // }
+    const pinMode: PinMode | undefined = this.getPinMode(pin);
+
+    if (!pinMode || !pinMode.match(/input/)) {
+      throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
+    }
 
     return this.digitalDev.setWatch(pin, handler, debounce, edge);
   }

@@ -1,6 +1,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import DriverBase from '../../app/entities/DriverBase';
+import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
 interface DigitalPcf8574DriverProps extends EntityProps {
@@ -10,6 +11,10 @@ interface DigitalPcf8574DriverProps extends EntityProps {
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> {
+  getPinMode(pin: number): PinMode | undefined {
+    // TODO: !!!
+  }
+
   async read(pin: number): Promise<boolean> {
     // TODO: !!!
   }

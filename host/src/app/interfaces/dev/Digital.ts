@@ -9,6 +9,7 @@ export type Edge = 'rising' | 'falling' | 'both';
 
 export default interface Digital {
   setup(pin: number, pinMode: PinMode): Promise<void>;
+  getPinMode(pin: number): PinMode | undefined;
   read(pin: number): Promise<boolean>;
   write(pin: number, value: boolean): Promise<void>;
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number;

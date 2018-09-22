@@ -1,6 +1,7 @@
 import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
 
 
+declare function getPinMode(pin: number): PinMode | undefined;
 declare function digitalRead(pin: number): boolean;
 declare function digitalWrite(pin: number, value: boolean): void;
 declare function pinMode(pin: number, mode: string, automatic?: boolean): void;
@@ -9,6 +10,7 @@ declare function clearWatch(id: number): void;
 declare function clearWatch(): void;
 
 
+// TODO: проверить что возвращает getPinMode если ещё пин не скорфигурирован
 // TODO: проверить чтобы возвращался boolean
 // TODO: проверить чтобы принимался boolean
 // TODO: нужен ли automatic параметр в espruino ?
@@ -20,6 +22,10 @@ declare function clearWatch(): void;
 export default class DigitalDev implements Digital {
   async setup(pin: number, mode: PinMode): Promise<void> {
     pinMode(pin, mode);
+  }
+
+  getPinMode(pin: number): PinMode | undefined {
+    return getPinMode(pin);
   }
 
   async read(pin: number): Promise<boolean> {
