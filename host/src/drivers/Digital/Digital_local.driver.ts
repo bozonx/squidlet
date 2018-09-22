@@ -1,3 +1,5 @@
+const _find = require('lodash/find');
+
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
 import Digital, {WatchHandler} from '../../app/interfaces/dev/Digital';
@@ -49,13 +51,21 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
       throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
     }
 
-    this.digitalDev.setWatch(pin, handler, this.props.debounce, this.props.edge);
+    const listenerId: number = this.digitalDev.setWatch(pin, handler, this.props.debounce, this.props.edge);
 
-    // TODO: !!!
+    this.listeners[listenerId] = handler;
   }
 
   removeListener(handler: WatchHandler): void {
-    // TODO: !!!
+    _find(this.listeners, (handlerItem: WatchHandler, listenerId: number) => {
+      if (handlerItem === handler) {
+        this.digitalDev.clearWatch(listenerId);
+
+        return true;
+      }
+
+      return;
+    });
   }
 
 }
