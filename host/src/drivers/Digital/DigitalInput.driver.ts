@@ -1,6 +1,6 @@
 const _omit = require('lodash/omit');
-import * as EventEmitter from 'events';
 
+import HandlerWrappers from '../../helpers/HandlerWrappers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
@@ -20,7 +20,7 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
 
 
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
-  private readonly events: EventEmitter = new EventEmitter();
+  private handlerWrappers = new HandlerWrappers<GpioDigitalDriverHandler, GpioDigitalDriverHandler>();
 
   private get digital(): GpioDigitalDriver {
     return this.depsInstances.digital as GpioDigitalDriver;
@@ -57,17 +57,30 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
    * Listen to interruption of pin.
    */
   addListener(handler: GpioDigitalDriverHandler): void {
-    // TODO: add
-    // TODO: трансформировать левел
+    const wrapper: GpioDigitalDriverHandler = (level: boolean) => {
+      const realLevel: boolean = (this.props.invert) ? !level : level;
+
+      handler(realLevel);
+    };
+
+    this.handlerWrappers.addHandler(handler, wrapper);
   }
 
   listenOnce(handler: GpioDigitalDriverHandler): void {
-    // TODO: add
-    // TODO: трансформировать левел
+    const wrapper: GpioDigitalDriverHandler = (level: boolean) => {
+      const realLevel: boolean = (this.props.invert) ? !level : level;
+
+      // remove listener and don't listen any more
+      this.removeListener(handler);
+
+      handler(realLevel);
+    };
+
+    this.handlerWrappers.addHandler(handler, wrapper);
   }
 
   removeListener(handler: GpioDigitalDriverHandler): void {
-    // TODO: add
+    this.handlerWrappers.removeByHandler(handler);
   }
 
   validateProps = (): string | undefined => {
