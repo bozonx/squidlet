@@ -8,6 +8,10 @@ export interface HostConfigConfig {
   defaultStatusRepublishIntervalMs: number;
   // republish config silently every 10 minutes if it hasn't been changed
   defaultConfigRepublishIntervalMs: number;
+  drivers: {
+    // debounce of digital input in ms
+    defaultDigitalInputDebounce: number;
+  };
   // custom params
   params: {[index: string]: any};
 }

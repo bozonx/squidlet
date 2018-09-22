@@ -6,7 +6,7 @@ import HandlerWrappers from '../../helpers/HandlerWrappers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
-import GpioDigitalDriver, {GpioDigitalDriverHandler, GpioDigitalDriverPinParams} from './interfaces/GpioDigitalDriver';
+import GpioDigitalDriver, {GpioDigitalDriverHandler, PullResistor} from './interfaces/GpioDigitalDriver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
@@ -37,19 +37,22 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
     this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
 
-    // setup this pin
-    const pinParams: GpioDigitalDriverPinParams = {
-      direction: 'input',
-      pullup: this.props.pullup,
-      pulldown: this.props.pulldown,
+    // // setup this pin
+    // const pinParams: GpioDigitalDriverPinParams = {
+    //   direction: 'input',
+    //   pullup: this.props.pullup,
+    //   pulldown: this.props.pulldown,
+    //
+    //
+    //   debounce: this.props.debounce,
+    //   // default edge is both
+    //   edge: this.props.edge || 'both',
+    // };
 
-      // TODO: получить дефолтное значение - 20ms
-      debounce: this.props.debounce,
-      // default edge is both
-      edge: this.props.edge || 'both',
-    };
+    const pullResistor: PullResistor = this.resolvePullResistor();
+    const debounce: number = this.props.debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce;
 
-    await this.digital.setup(this.props.pin, pinParams);
+    await this.digital.setupInput(this.props.pin, pullResistor, debounce, this.props.edge);
   }
 
 
@@ -92,6 +95,12 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
   removeListener(handler: GpioDigitalDriverHandler): void {
     this.handlerWrappers.removeByHandler(handler);
+  }
+
+  resolvePullResistor(): PullResistor {
+    if (this.props.pullup) return 'pullup';
+    else if (this.props.pulldown) return 'pulldown';
+    else return 'none';
   }
 
   validateProps = (): string | undefined => {

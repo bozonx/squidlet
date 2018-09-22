@@ -4,7 +4,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import GpioDigitalDriver, {GpioDigitalDriverPinParams} from './interfaces/GpioDigitalDriver';
+import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 
@@ -24,13 +24,13 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
     this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
 
-    // setup this pin
-    const pinParams: GpioDigitalDriverPinParams = {
-      direction: 'output',
-      initial: this.calcInitial(),
-    };
+    // // setup this pin
+    // const pinParams: GpioDigitalDriverPinParams = {
+    //   direction: 'output',
+    //   initial: this.calcInitial(),
+    // };
 
-    await this.digital.setup(this.props.pin, pinParams);
+    await this.digital.setupOutput(this.props.pin, this.calcInitial());
   }
 
 

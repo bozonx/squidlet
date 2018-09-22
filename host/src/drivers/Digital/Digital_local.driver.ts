@@ -1,8 +1,10 @@
+import {PullResistor} from './interfaces/GpioDigitalDriver';
+
 const _find = require('lodash/find');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
-import Digital, {WatchHandler} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
@@ -13,6 +15,8 @@ export interface DigitalLocalDriverProps extends DriverBaseProps {
 export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
   private inputPins: {[index: string]: true} = {};
   private outputPins: {[index: string]: true} = {};
+  private debaunceValues: {[index: string]: number} = {};
+  private edgeValues: {[index: string]: Edge} = {};
   private listeners: {[index: string]: WatchHandler} = {};
 
 
@@ -26,7 +30,14 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
   }
 
 
-  // TODO: setup !!!!
+  async setupInput(pin: number, pullResistor: PullResistor, debounce: number, edge?: Edge) {
+    // TODO: setup !!!!
+  }
+
+  async setupOutput(pin: number, initial?: boolean) {
+    // TODO: setup !!!!
+  }
+
 
   getLevel(pin: number): Promise<boolean> {
     return this.digitalDev.read(pin);
@@ -50,6 +61,8 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
     if (!this.inputPins[pin]) {
       throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
     }
+
+    // TODO: get debounce and edge
 
     const listenerId: number = this.digitalDev.setWatch(pin, handler, this.props.debounce, this.props.edge);
 
