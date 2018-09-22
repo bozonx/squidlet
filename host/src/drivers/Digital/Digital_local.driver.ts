@@ -1,6 +1,9 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
 import {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
+import Digital from '../../app/interfaces/dev/Digital';
+import {GetDriverDep} from '../../app/entities/EntityBase';
+import {resolveDriverName} from './digitalHelpers';
 
 
 export interface DigitalLocalDriverProps extends DriverBaseProps {
@@ -8,16 +11,29 @@ export interface DigitalLocalDriverProps extends DriverBaseProps {
 
 
 export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
-  async getLevel(pin: number): Promise<boolean> {
-    // TODO: !!!
+  private get digitalDev(): Digital {
+    return this.depsInstances.digitalDev as Digital;
+  }
+
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.digital = getDriverDep('Digital.dev');
+  }
+
+
+  // TODO: setup !!!!
+
+  getLevel(pin: number): Promise<boolean> {
+    return this.digitalDev.read(pin);
   }
 
   /**
    * Set level to output pin
    */
-  async setLevel(pin: number, level: boolean): Promise<void> {
+  setLevel(pin: number, level: boolean): Promise<void> {
     // TODO: если пин сконфигурирован на input - ругаться
-    // TODO: !!!
+
+    return this.digitalDev.write(pin, level);
   }
 
   /**
