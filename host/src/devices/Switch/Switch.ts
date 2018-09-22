@@ -6,12 +6,12 @@ import {DEFAULT_STATUS} from '../../baseDevice/Status';
 
 
 interface Props extends DeviceBaseProps {
-  deadTime: number;
+  blockTime: number;
 }
 
 
 export default class Switch extends DeviceBase<Props> {
-  private deadTimeInProgress: boolean = false;
+  private blockTimeInProgress: boolean = false;
 
   private get digitalOutput(): DigitalOutputDriver {
     return this.depsInstances.digitalOutput as DigitalOutputDriver;
@@ -34,10 +34,10 @@ export default class Switch extends DeviceBase<Props> {
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
       // skip while switch at dead time
-      if (this.deadTimeInProgress) return this.status.getLocal().default;
+      if (this.blockTimeInProgress) return this.status.getLocal().default;
 
-      this.deadTimeInProgress = true;
-      setTimeout(() => this.deadTimeInProgress = false, this.props.deadTime);
+      this.blockTimeInProgress = true;
+      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
 
       const level: boolean = convertToLevel(onOrOff);
 
@@ -48,10 +48,10 @@ export default class Switch extends DeviceBase<Props> {
 
     toggle: async (): Promise<boolean> => {
       // skip while switch at dead time
-      if (this.deadTimeInProgress) return this.getStatus();
+      if (this.blockTimeInProgress) return this.getStatus();
 
-      this.deadTimeInProgress = true;
-      setTimeout(() => this.deadTimeInProgress = false, this.props.deadTime);
+      this.blockTimeInProgress = true;
+      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
 
       const currentLevel: boolean = await this.getStatus();
 

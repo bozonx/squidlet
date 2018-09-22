@@ -34,7 +34,7 @@
 #      }
 #      props: {
 #        debounceTime: 20
-#        deadTime: 50
+#        blockTime: 50
 #      }
 #    }
 #    @handleStatusChange = sinon.spy()
@@ -55,13 +55,13 @@
 #    @binarySensor.onInputChange()
 #
 #    assert.isTrue(@binarySensor.debounceInProgress)
-#    assert.isFalse(@binarySensor.deadTimeInProgress)
+#    assert.isFalse(@binarySensor.blockTimeInProgress)
 #
 #    # wait for debounce time has finished and startValueLogic has started
 #    clock.tick(20)
 #
 #    assert.isFalse(@binarySensor.debounceInProgress)
-#    assert.isTrue(@binarySensor.deadTimeInProgress)
+#    assert.isTrue(@binarySensor.blockTimeInProgress)
 #
 #    await @getLevelResult
 #
@@ -74,7 +74,7 @@
 #    clock.tick(50)
 #
 #    assert.isFalse(@binarySensor.debounceInProgress)
-#    assert.isFalse(@binarySensor.deadTimeInProgress)
+#    assert.isFalse(@binarySensor.blockTimeInProgress)
 #
 #    clock.restore()
 #

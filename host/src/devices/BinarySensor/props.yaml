@@ -5,6 +5,6 @@ debounce:
   type: number
   default: 20
 # timeout after received signal. At this time it doesn't receive any signals.
-deadTime:
+blockTime:
   type: number
   default: 50

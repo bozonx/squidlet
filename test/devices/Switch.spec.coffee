@@ -33,7 +33,7 @@
 #        }
 #      }
 #      props: {
-#        deadTime: 50
+#        blockTime: 50
 #      }
 #    }
 #    @handleStatusChange = sinon.spy()
@@ -63,7 +63,7 @@
 #    # after call action
 #    sinon.assert.calledWith(@switch.publish.getCall(2), 'turn', false)
 #
-#  it "turn - deadTime", () ->
+#  it "turn - blockTime", () ->
 #    clock = sinon.useFakeTimers()
 #
 #    await @switch.action('turn', 1)
@@ -96,7 +96,7 @@
 #    sinon.assert.calledOnce(@switch.actions.turn)
 #    sinon.assert.calledWith(@switch.actions.turn, true)
 #
-#  it "toggle - deadTime", () ->
+#  it "toggle - blockTime", () ->
 #    clock = sinon.useFakeTimers()
 #
 #    @getLevelResult = Promise.resolve(true)

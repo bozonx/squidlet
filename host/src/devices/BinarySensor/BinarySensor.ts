@@ -7,13 +7,13 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 
 interface Props extends DeviceBaseProps, DigitalInputDriverProps {
   debounce: number;
-  deadTime: number;
+  blockTime: number;
 }
 
 
 export default class BinarySensor extends DeviceBase<Props> {
   private debounceInProgress: boolean = false;
-  private deadTimeInProgress: boolean = false;
+  private blockTimeInProgress: boolean = false;
 
   private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
@@ -36,7 +36,7 @@ export default class BinarySensor extends DeviceBase<Props> {
 
   private onInputChange = (): void => {
     // do nothing if there is debounce or dead time
-    if (this.debounceInProgress || this.deadTimeInProgress) return;
+    if (this.debounceInProgress || this.blockTimeInProgress) return;
 
     this.debounceInProgress = true;
 
@@ -51,18 +51,18 @@ export default class BinarySensor extends DeviceBase<Props> {
 
   private async startValueLogic(): Promise<void> {
     // start dead time - ignore all the signals
-    this.deadTimeInProgress = true;
+    this.blockTimeInProgress = true;
 
     let currentLevel: boolean = false;
-    const waitDeadTime = () => setTimeout(() => {
-      this.deadTimeInProgress = false;
-    }, this.props.deadTime);
+    const waitBlockTime = () => setTimeout(() => {
+      this.blockTimeInProgress = false;
+    }, this.props.blockTime);
 
     try {
       currentLevel = await this.digitalInput.read();
     }
     catch (err) {
-      waitDeadTime();
+      waitBlockTime();
 
       return;
     }
@@ -70,12 +70,12 @@ export default class BinarySensor extends DeviceBase<Props> {
     // TODO: wait for promise ???
     this.setStatus(currentLevel);
 
-    waitDeadTime();
+    waitBlockTime();
   }
 
 
   protected validateProps = (props: Props): string | undefined => {
-    // TODO: !!!! validate debounce and deadTime
+    // TODO: !!!! validate debounce and blockTime
     return;
   }
 
