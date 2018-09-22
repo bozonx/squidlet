@@ -18,12 +18,6 @@ export interface DigitalInputDriverProps extends DigitalBaseProps {
   pullup?: boolean;
   // use pulldown resistor
   pulldown?: boolean;
-
-  // TODO: может всетаки перенести в addListener ???
-  // debounce time in ms only for input pins. If not set system defaults will be used.
-  debounce?: number;
-  // Listen to low, high or both levels. By default is both.
-  edge?: Edge;
 }
 
 
@@ -52,16 +46,26 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
   /**
    * Listen to interruption of pin.
+   * @param handler
+   * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
+   * @param edge - Listen to low, high or both levels. By default is both.
    */
-  addListener(handler: ListenHandler): void {
+  addListener(handler: ListenHandler, debounce?: number, edge?: Edge): void {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    this.registerListener(handler, wrapper);
+    const listenerId: number = this.digital.setWatch(
+      this.props.pin,
+      handler,
+      debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
+      edge
+    );
+
+    this.listeners[listenerId] = [wrapper, handler];
   }
 
-  listenOnce(handler: ListenHandler): void {
+  listenOnce(handler: ListenHandler, edge?: Edge): void {
     const wrapper: WatchHandler = (level: boolean) => {
       // remove listener and don't listen any more
       this.removeListener(handler);
@@ -69,7 +73,14 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    this.registerListener(handler, wrapper);
+    const listenerId: number = this.digital.setWatch(
+      this.props.pin,
+      handler,
+      this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
+      edge
+    );
+
+    this.listeners[listenerId] = [wrapper, handler];
   }
 
   removeListener(handler: ListenHandler): void {
@@ -95,14 +106,6 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     // TODO: validate params
     // TODO: validate specific for certain driver params
     return;
-  }
-
-
-  private registerListener(handler: ListenHandler, wrapper: WatchHandler) {
-    const debounce: number = this.props.debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce;
-    const listenerId: number = this.digital.setWatch(this.props.pin, handler, debounce, this.props.edge);
-
-    this.listeners[listenerId] = [wrapper, handler];
   }
 
 }

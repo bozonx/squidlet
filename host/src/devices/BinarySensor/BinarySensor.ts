@@ -40,6 +40,8 @@ export default class BinarySensor extends DeviceBase<Props> {
 
     this.debounceInProgress = true;
 
+    // TODO: use debounce of driver
+
     // waiting for debounce
     setTimeout(() => {
       this.debounceInProgress = false;
