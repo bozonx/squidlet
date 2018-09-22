@@ -2,15 +2,15 @@ const _find = require('lodash/find');
 const _omit = require('lodash/omit');
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import HandlerWrappers from '../../helpers/HandlerWrappers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
-import {GpioDigitalDriverHandler, PullResistor} from './interfaces/GpioDigitalDriver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 
+
+export type ListenHandler = (level: boolean) => void;
 
 interface DigitalInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
@@ -25,13 +25,8 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
 }
 
 
-// TODO: remake to use digital Dev interface
-
-
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
-  private listeners: {[index: string]: [WatchHandler, WatchHandler]} = {};
-
-  //private handlerWrappers = new HandlerWrappers<GpioDigitalDriverHandler, GpioDigitalDriverHandler>();
+  private listeners: {[index: string]: [ListenHandler, WatchHandler]} = {};
 
   private get digital(): Digital {
     return this.depsInstances.digital as Digital;
@@ -41,21 +36,6 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
     this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
-
-    // // setup this pin
-    // const pinParams: GpioDigitalDriverPinParams = {
-    //   direction: 'input',
-    //   pullup: this.props.pullup,
-    //   pulldown: this.props.pulldown,
-    //
-    //
-    //   debounce: this.props.debounce,
-    //   // default edge is both
-    //   edge: this.props.edge || 'both',
-    // };
-
-    //const pullResistor: PullResistor = this.resolvePullResistor();
-    const debounce: number = this.props.debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce;
 
     await this.digital.setup(this.props.pin, this.resolvePinMode());
   }
@@ -71,31 +51,27 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   /**
    * Listen to interruption of pin.
    */
-  addListener(handler: GpioDigitalDriverHandler): void {
-    const wrapper: GpioDigitalDriverHandler = (level: boolean) => {
+  addListener(handler: ListenHandler): void {
+    const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    const listenerId: number = this.digital.setWatch(this.props.pin, handler);
-
-    this.listeners[listenerId] = [wrapper, handler];
+    this.registerListener(handler, wrapper);
   }
 
-  listenOnce(handler: GpioDigitalDriverHandler): void {
-    const wrapper: GpioDigitalDriverHandler = (level: boolean) => {
+  listenOnce(handler: ListenHandler): void {
+    const wrapper: WatchHandler = (level: boolean) => {
       // remove listener and don't listen any more
       this.removeListener(handler);
 
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    const listenerId: number = this.digital.setWatch(this.props.pin, handler);
-
-    this.listeners[listenerId] = [wrapper, handler];
+    this.registerListener(handler, wrapper);
   }
 
-  removeListener(handler: GpioDigitalDriverHandler): void {
-    _find(this.listeners, (handlerItem: [WatchHandler, WatchHandler], listenerId: number) => {
+  removeListener(handler: ListenHandler): void {
+    _find(this.listeners, (handlerItem: [ListenHandler, WatchHandler], listenerId: number) => {
       if (handlerItem[0] === handler) {
         delete this.listeners[listenerId];
         this.digital.clearWatch(listenerId);
@@ -113,16 +89,18 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     else return 'input';
   }
 
-  // resolvePullResistor(): PullResistor {
-  //   if (this.props.pullup) return 'pullup';
-  //   else if (this.props.pulldown) return 'pulldown';
-  //   else return 'none';
-  // }
-
-  validateProps = (): string | undefined => {
+  protected validateProps = (): string | undefined => {
     // TODO: validate params
     // TODO: validate specific for certain driver params
     return;
+  }
+
+
+  private registerListener(handler: ListenHandler, wrapper: WatchHandler) {
+    const debounce: number = this.props.debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce;
+    const listenerId: number = this.digital.setWatch(this.props.pin, handler, debounce, this.props.edge);
+
+    this.listeners[listenerId] = [wrapper, handler];
   }
 
 }

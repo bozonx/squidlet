@@ -1,7 +1,6 @@
-import Digital from '../../app/interfaces/dev/Digital';
-
 const _omit = require('lodash/omit');
 
+import Digital from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
@@ -24,12 +23,6 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
     this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
-
-    // // setup this pin
-    // const pinParams: GpioDigitalDriverPinParams = {
-    //   direction: 'output',
-    //   initial: this.calcInitial(),
-    // };
 
     await this.digital.setup(this.props.pin, 'output');
 

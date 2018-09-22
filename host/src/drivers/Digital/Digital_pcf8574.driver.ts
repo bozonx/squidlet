@@ -1,6 +1,5 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
-import {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
 import DriverBase from '../../app/entities/DriverBase';
 
 

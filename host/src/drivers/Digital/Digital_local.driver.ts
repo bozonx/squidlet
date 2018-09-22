@@ -1,5 +1,3 @@
-import {PullResistor} from './interfaces/GpioDigitalDriver';
-
 const _find = require('lodash/find');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
