@@ -1,7 +1,7 @@
 DigitalOutput = require('../../host/src/drivers/I2c/DigitalOutput.driver').default
 
 
-describe 'DigitalOutput.driver', ->
+describe.only 'DigitalOutput.driver', ->
   beforeEach ->
 
     @driver = new DigitalOutput()

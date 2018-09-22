@@ -44,10 +44,27 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
 
 export default class GpioInputFactory extends DriverFactoryBase<DigitalPcf8574Driver, DigitalPcf8574DriverProps> {
+  protected combinedInstanceIdName = (instanceProps?: {[index: string]: any}): string => {
 
-  // TODO: сразу валидировать address and bus
-  // TODO: инстанс будет на совмещенном параметре address and bus
+    // TODO: использовать правила валидации
+    // TODO: может использовать какую-то автоматическую валидацию props
 
-  protected instanceIdName: string = 'i2c';
+    if (!instanceProps) {
+      throw new Error(`You have to specify props for instance of driver DigitalPcf8574`);
+    }
+    else if (!Number.isInteger(instanceProps.bus)) {
+      throw new Error(`The bus param has to be a number of driver DigitalPcf8574`);
+    }
+    else if (!Number.isInteger(instanceProps.address)) {
+      throw new Error(`The address param has to be a number of driver DigitalPcf8574`);
+    }
+
+    if (!Number.isInteger(instanceProps.bus)) {
+      throw new Error(``);
+    }
+
+    return `${instanceProps.bus}-${instanceProps.address}`;
+  }
+
   protected DriverClass = DigitalPcf8574Driver;
 }
