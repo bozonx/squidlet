@@ -19,10 +19,7 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
   // use pulldown resistor
   pulldown?: boolean;
   // debounce time in ms only for input pins. If not set system defaults will be used.
-
-  // TODO: где устанавливается дефолтное значение ???
   debounce?: number;
-  // TODO: где устанавливается дефолтное значение ???
   // Listen to low, high or both levels. By default is both.
   edge?: Edge;
 }
@@ -45,6 +42,11 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       direction: 'input',
       pullup: this.props.pullup,
       pulldown: this.props.pulldown,
+
+      // TODO: получить дефолтное значение - 20ms
+      debounce: this.props.debounce,
+      // default edge is both
+      edge: this.props.edge || 'both',
     };
 
     await this.digital.setup(this.props.pin, pinParams);

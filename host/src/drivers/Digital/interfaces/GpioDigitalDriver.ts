@@ -26,7 +26,7 @@ export default interface GpioDigitalDriver {
   // only for output pin
   setLevel(pin: number, level: boolean): Promise<void>;
   // only for input pin
-  addListener(handler: GpioDigitalDriverHandler): void;
+  addListener(pin: number, handler: GpioDigitalDriverHandler): void;
   // only for input pin
-  removeListener(handler: GpioDigitalDriverHandler): void;
+  removeListener(pin: number, handler: GpioDigitalDriverHandler): void;
 }

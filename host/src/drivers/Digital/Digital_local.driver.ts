@@ -1,9 +1,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
-import {GpioDigitalDriverHandler} from './interfaces/GpioDigitalDriver';
-import Digital from '../../app/interfaces/dev/Digital';
+import Digital, {WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {resolveDriverName} from './digitalHelpers';
 
 
 export interface DigitalLocalDriverProps extends DriverBaseProps {
@@ -11,6 +9,11 @@ export interface DigitalLocalDriverProps extends DriverBaseProps {
 
 
 export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
+  private inputPins: {[index: string]: true} = {};
+  private outputPins: {[index: string]: true} = {};
+  private listeners: {[index: string]: WatchHandler} = {};
+
+
   private get digitalDev(): Digital {
     return this.depsInstances.digitalDev as Digital;
   }
@@ -31,7 +34,9 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
    * Set level to output pin
    */
   setLevel(pin: number, level: boolean): Promise<void> {
-    // TODO: если пин сконфигурирован на input - ругаться
+    if (!this.outputPins[pin]) {
+      throw new Error(`Can't set level. The local digital gpio GPIO "${pin}" wasn't set up as an output pin.`);
+    }
 
     return this.digitalDev.write(pin, level);
   }
@@ -39,13 +44,17 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
   /**
    * Listen to interruption of input pin
    */
-  addListener(handler: GpioDigitalDriverHandler): void {
-    // TODO: если пин сконфигурирован на output - ругаться
+  addListener(pin: number, handler: WatchHandler): void {
+    if (!this.inputPins[pin]) {
+      throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
+    }
+
+    this.digitalDev.setWatch(pin, handler, this.props.debounce, this.props.edge);
 
     // TODO: !!!
   }
 
-  removeListener(handler: GpioDigitalDriverHandler): void {
+  removeListener(handler: WatchHandler): void {
     // TODO: !!!
   }
 
