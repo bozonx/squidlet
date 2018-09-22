@@ -1,15 +1,15 @@
-import {Edge} from '../../app/interfaces/dev/Digital';
-
+const _find = require('lodash/find');
 const _omit = require('lodash/omit');
 
+import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import HandlerWrappers from '../../helpers/HandlerWrappers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
-import GpioDigitalDriver, {GpioDigitalDriverHandler, PullResistor} from './interfaces/GpioDigitalDriver';
+import {GpioDigitalDriverHandler, PullResistor} from './interfaces/GpioDigitalDriver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
-import {resolveDriverName} from './digitalHelpers';
+import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 
 
 interface DigitalInputDriverProps extends DigitalBaseProps {
@@ -25,11 +25,16 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
 }
 
 
-export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
-  private handlerWrappers = new HandlerWrappers<GpioDigitalDriverHandler, GpioDigitalDriverHandler>();
+// TODO: remake to use digital Dev interface
 
-  private get digital(): GpioDigitalDriver {
-    return this.depsInstances.digital as GpioDigitalDriver;
+
+export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
+  private listeners: {[index: string]: [WatchHandler, WatchHandler]} = {};
+
+  //private handlerWrappers = new HandlerWrappers<GpioDigitalDriverHandler, GpioDigitalDriverHandler>();
+
+  private get digital(): Digital {
+    return this.depsInstances.digital as Digital;
   }
 
 
@@ -49,10 +54,10 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     //   edge: this.props.edge || 'both',
     // };
 
-    const pullResistor: PullResistor = this.resolvePullResistor();
+    //const pullResistor: PullResistor = this.resolvePullResistor();
     const debounce: number = this.props.debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce;
 
-    await this.digital.setupInput(this.props.pin, pullResistor, debounce, this.props.edge);
+    await this.digital.setup(this.props.pin, this.resolvePinMode());
   }
 
 
@@ -60,11 +65,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
    * Get current level of pin.
    */
   async getLevel(): Promise<boolean> {
-    const realLevel: boolean = await this.digital.getLevel(this.props.pin);
-
-    if (this.props.invert) return !realLevel;
-
-    return realLevel;
+    return invertIfNeed(await this.digital.read(this.props.pin), this.props.invert);
   }
 
   /**
@@ -72,36 +73,51 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
    */
   addListener(handler: GpioDigitalDriverHandler): void {
     const wrapper: GpioDigitalDriverHandler = (level: boolean) => {
-      const realLevel: boolean = (this.props.invert) ? !level : level;
-
-      handler(realLevel);
+      handler(invertIfNeed(level, this.props.invert));
     };
 
-    this.handlerWrappers.addHandler(handler, wrapper);
+    const listenerId: number = this.digital.setWatch(this.props.pin, handler);
+
+    this.listeners[listenerId] = [wrapper, handler];
   }
 
   listenOnce(handler: GpioDigitalDriverHandler): void {
     const wrapper: GpioDigitalDriverHandler = (level: boolean) => {
-      const realLevel: boolean = (this.props.invert) ? !level : level;
-
       // remove listener and don't listen any more
       this.removeListener(handler);
 
-      handler(realLevel);
+      handler(invertIfNeed(level, this.props.invert));
     };
 
-    this.handlerWrappers.addHandler(handler, wrapper);
+    const listenerId: number = this.digital.setWatch(this.props.pin, handler);
+
+    this.listeners[listenerId] = [wrapper, handler];
   }
 
   removeListener(handler: GpioDigitalDriverHandler): void {
-    this.handlerWrappers.removeByHandler(handler);
+    _find(this.listeners, (handlerItem: [WatchHandler, WatchHandler], listenerId: number) => {
+      if (handlerItem[0] === handler) {
+        delete this.listeners[listenerId];
+        this.digital.clearWatch(listenerId);
+
+        return true;
+      }
+
+      return;
+    });
   }
 
-  resolvePullResistor(): PullResistor {
-    if (this.props.pullup) return 'pullup';
-    else if (this.props.pulldown) return 'pulldown';
-    else return 'none';
+  resolvePinMode(): PinMode {
+    if (this.props.pullup) return 'input_pullup';
+    else if (this.props.pulldown) return 'input_pulldown';
+    else return 'input';
   }
+
+  // resolvePullResistor(): PullResistor {
+  //   if (this.props.pullup) return 'pullup';
+  //   else if (this.props.pulldown) return 'pulldown';
+  //   else return 'none';
+  // }
 
   validateProps = (): string | undefined => {
     // TODO: validate params

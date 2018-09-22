@@ -19,18 +19,19 @@ export type PullResistor = 'pullup' | 'pulldown' | 'none';
 //   edge?: Edge;
 // }
 
+// TODO: remove
 
-export default interface GpioDigitalDriver {
-  //setup(pin: number, params: GpioDigitalDriverPinParams): Promise<void>;
-
-  setupInput(pin: number, pullResistor: PullResistor, debounce: number, edge?: Edge): Promise<void>;
-  setupOutput(pin: number, initial?: boolean): Promise<void>;
-
-  getLevel(pin: number): Promise<boolean>;
-  // only for output pin
-  setLevel(pin: number, level: boolean): Promise<void>;
-  // only for input pin
-  addListener(pin: number, handler: GpioDigitalDriverHandler): void;
-  // only for input pin
-  removeListener(pin: number, handler: GpioDigitalDriverHandler): void;
-}
+// export default interface GpioDigitalDriver {
+//   //setup(pin: number, params: GpioDigitalDriverPinParams): Promise<void>;
+//
+//   setupInput(pin: number, pullResistor: PullResistor, debounce: number, edge?: Edge): Promise<void>;
+//   setupOutput(pin: number, initial?: boolean): Promise<void>;
+//
+//   getLevel(pin: number): Promise<boolean>;
+//   // only for output pin
+//   setLevel(pin: number, level: boolean): Promise<void>;
+//   // only for input pin
+//   addListener(pin: number, handler: GpioDigitalDriverHandler): void;
+//   // only for input pin
+//   removeListener(pin: number, handler: GpioDigitalDriverHandler): void;
+// }

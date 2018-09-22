@@ -4,7 +4,7 @@ const _find = require('lodash/find');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
-import Digital, {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
@@ -13,13 +13,6 @@ export interface DigitalLocalDriverProps extends DriverBaseProps {
 
 
 export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
-  private inputPins: {[index: string]: true} = {};
-  private outputPins: {[index: string]: true} = {};
-  private debaunceValues: {[index: string]: number} = {};
-  private edgeValues: {[index: string]: Edge} = {};
-  private listeners: {[index: string]: WatchHandler} = {};
-
-
   private get digitalDev(): Digital {
     return this.depsInstances.digitalDev as Digital;
   }
@@ -30,26 +23,22 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
   }
 
 
-  async setupInput(pin: number, pullResistor: PullResistor, debounce: number, edge?: Edge) {
-    // TODO: setup !!!!
+  async setup(pin: number, pinMode: PinMode) {
+    return this.digitalDev.setup(pin, pinMode);
   }
 
-  async setupOutput(pin: number, initial?: boolean) {
-    // TODO: setup !!!!
-  }
-
-
-  getLevel(pin: number): Promise<boolean> {
+  read(pin: number): Promise<boolean> {
     return this.digitalDev.read(pin);
   }
 
   /**
-   * Set level to output pin
+   * Write to output pin
    */
-  setLevel(pin: number, level: boolean): Promise<void> {
-    if (!this.outputPins[pin]) {
-      throw new Error(`Can't set level. The local digital gpio GPIO "${pin}" wasn't set up as an output pin.`);
-    }
+  write(pin: number, level: boolean): Promise<void> {
+    // TODO: добавить проверку direction пина чтобы ругаться
+    // if (!this.outputPins[pin]) {
+    //   throw new Error(`Can't set level. The local digital gpio GPIO "${pin}" wasn't set up as an output pin.`);
+    // }
 
     return this.digitalDev.write(pin, level);
   }
@@ -57,28 +46,20 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
   /**
    * Listen to interruption of input pin
    */
-  addListener(pin: number, handler: WatchHandler): void {
-    if (!this.inputPins[pin]) {
-      throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
-    }
+  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+    // if (!this.inputPins[pin]) {
+    //   throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
+    // }
 
-    // TODO: get debounce and edge
-
-    const listenerId: number = this.digitalDev.setWatch(pin, handler, this.props.debounce, this.props.edge);
-
-    this.listeners[listenerId] = handler;
+    return this.digitalDev.setWatch(pin, handler, debounce, edge);
   }
 
-  removeListener(handler: WatchHandler): void {
-    _find(this.listeners, (handlerItem: WatchHandler, listenerId: number) => {
-      if (handlerItem === handler) {
-        this.digitalDev.clearWatch(listenerId);
+  clearWatch(id: number): void {
+    this.digitalDev.clearWatch(id);
+  }
 
-        return true;
-      }
-
-      return;
-    });
+  clearAllWatches() {
+    this.digitalDev.clearAllWatches();
   }
 
 }
