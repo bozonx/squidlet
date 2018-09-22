@@ -12,12 +12,14 @@ import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 
 export type ListenHandler = (level: boolean) => void;
 
-interface DigitalInputDriverProps extends DigitalBaseProps {
+export interface DigitalInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
   pullup?: boolean;
   // use pulldown resistor
   pulldown?: boolean;
+
+  // TODO: может всетаки перенести в addListener ???
   // debounce time in ms only for input pins. If not set system defaults will be used.
   debounce?: number;
   // Listen to low, high or both levels. By default is both.
@@ -44,7 +46,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   /**
    * Get current level of pin.
    */
-  async getLevel(): Promise<boolean> {
+  async read(): Promise<boolean> {
     return invertIfNeed(await this.digital.read(this.props.pin), this.props.invert);
   }
 

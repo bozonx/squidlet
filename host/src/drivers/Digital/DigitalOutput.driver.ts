@@ -34,11 +34,11 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   /**
    * Get current level of pin.
    */
-  async getLevel(): Promise<boolean> {
+  async read(): Promise<boolean> {
     return invertIfNeed(await this.digital.read(this.props.pin), this.props.invert);
   }
 
-  async setLevel(newLevel: boolean): Promise<void> {
+  async write(newLevel: boolean): Promise<void> {
     const realLevel: boolean = invertIfNeed(newLevel, this.props.invert);
 
     await this.digital.write(this.props.pin, realLevel);

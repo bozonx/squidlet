@@ -1,12 +1,11 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {DigitalInputDriver} from '../../drivers/Digital/DigitalInput.driver';
+import {DigitalInputDriver, DigitalInputDriverProps} from '../../drivers/Digital/DigitalInput.driver';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-// TODO: наследовать ещё digital base props
-interface Props extends DeviceBaseProps {
+interface Props extends DeviceBaseProps, DigitalInputDriverProps {
   debounce: number;
   deadTime: number;
 }
@@ -31,7 +30,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
   protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.digitalInput.getLevel() };
+    return { [DEFAULT_STATUS]: await this.digitalInput.read() };
   }
 
 
@@ -58,7 +57,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     }, this.props.deadTime);
 
     try {
-      currentLevel = await this.digitalInput.getLevel();
+      currentLevel = await this.digitalInput.read();
     }
     catch (err) {
       waitDeadTime();

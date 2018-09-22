@@ -24,11 +24,11 @@ export default class Switch extends DeviceBase<Props> {
   }
 
   protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.digitalOutput.getLevel() };
+    return { [DEFAULT_STATUS]: await this.digitalOutput.read() };
   }
 
   protected statusSetter = (partialData: Data): Promise<void> => {
-    return this.digitalOutput.setLevel(partialData[DEFAULT_STATUS]);
+    return this.digitalOutput.write(partialData[DEFAULT_STATUS]);
   }
 
   protected actions = {

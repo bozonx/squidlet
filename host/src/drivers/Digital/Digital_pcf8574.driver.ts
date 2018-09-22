@@ -10,14 +10,14 @@ interface DigitalPcf8574DriverProps extends EntityProps {
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> {
-  async getLevel(pin: number): Promise<boolean> {
+  async read(pin: number): Promise<boolean> {
     // TODO: !!!
   }
 
   /**
    * Set level to output pin
    */
-  async setLevel(pin: number, level: boolean): Promise<void> {
+  async write(pin: number, level: boolean): Promise<void> {
     // TODO: если пин сконфигурирован на input - ругаться
     // TODO: !!!
   }
