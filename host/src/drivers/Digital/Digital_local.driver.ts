@@ -1,6 +1,3 @@
-const _find = require('lodash/find');
-
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -10,14 +7,11 @@ export interface DigitalLocalDriverProps extends DriverBaseProps {
 }
 
 
-export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
-  private get digitalDev(): Digital {
-    return this.depsInstances.digitalDev as Digital;
-  }
+export class DigitalLocalDriver {
+  private readonly digitalDev: Digital;
 
-
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digital = getDriverDep('Digital.dev');
+  constructor(digitalDev: Digital) {
+    this.digitalDev = digitalDev;
   }
 
 
@@ -63,8 +57,12 @@ export class DigitalLocalDriver extends DriverBase<DigitalLocalDriverProps> {
 }
 
 
-export default class GpioInputFactory extends DriverFactoryBase<DigitalLocalDriver, DigitalLocalDriverProps> {
-  // TODO: поидее всегда будет один инстанс
-  protected instanceIdName: string = 'local';
-  protected DriverClass = DigitalLocalDriver;
+export default class Factory extends DriverBase<DigitalLocalDriverProps> {
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.digital = getDriverDep('Digital.dev');
+  }
+
+  getInstance(): DigitalLocalDriver {
+    return new DigitalLocalDriver(this.depsInstances.digital as Digital);
+  }
 }

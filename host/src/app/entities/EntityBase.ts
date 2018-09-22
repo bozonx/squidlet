@@ -28,6 +28,16 @@ export default class EntityBase<Props> {
   protected validateProps?: (props: Props) => string | undefined;
   protected destroy?: () => void;
 
+  protected get definition(): EntityDefinition {
+    const {id, className, props} = this;
+
+    return {
+      id,
+      className,
+      props,
+    };
+  }
+
 
   constructor(definition: EntityDefinition, env: Env) {
     this.env = env;

@@ -8,6 +8,7 @@
 ## address of device on I2C bus
 #i2cAddress: string
 
+# TODO: ??? why it is here ???
 
 # Use special driver. By default "local" is used.
 driver:

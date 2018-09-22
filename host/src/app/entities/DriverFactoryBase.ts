@@ -18,6 +18,9 @@ export default abstract class DriverFactoryBase<Instance, Props extends EntityPr
   protected readonly props: Props;
 
   constructor(props: Props, env: DriverEnv) {
+
+    // TODO: почему props а не definition ????
+
     this.props = props;
     this.env = env;
   }
@@ -26,6 +29,8 @@ export default abstract class DriverFactoryBase<Instance, Props extends EntityPr
     if (this.instances[this.instanceIdName]) return this.instances[this.instanceIdName];
 
     const props = _defaultsDeep(_cloneDeep(additionalProps), this.props);
+
+    // TODO: почему props а не definition ????
 
     this.instances[this.instanceIdName] = new this.DriverClass(props, this.env);
 
