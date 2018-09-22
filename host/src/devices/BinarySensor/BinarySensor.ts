@@ -27,7 +27,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
   protected didInit = async () => {
-    this.digitalInput.onChange(this.onInputChange);
+    this.digitalInput.addListener(this.onInputChange);
   }
 
   protected statusGetter = async (): Promise<Data> => {

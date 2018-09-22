@@ -1,3 +1,5 @@
+import {Edge} from '../../app/interfaces/dev/Digital';
+
 const _omit = require('lodash/omit');
 
 import HandlerWrappers from '../../helpers/HandlerWrappers';
@@ -16,6 +18,13 @@ interface DigitalInputDriverProps extends DigitalBaseProps {
   pullup?: boolean;
   // use pulldown resistor
   pulldown?: boolean;
+  // debounce time in ms only for input pins. If not set system defaults will be used.
+
+  // TODO: где устанавливается дефолтное значение ???
+  debounce?: number;
+  // TODO: где устанавливается дефолтное значение ???
+  // Listen to low, high or both levels. By default is both.
+  edge?: Edge;
 }
 
 

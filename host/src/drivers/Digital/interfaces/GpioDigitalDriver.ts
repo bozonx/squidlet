@@ -1,15 +1,22 @@
 import {DriverBaseProps} from '../../../app/entities/DriverBase';
+import {Edge} from '../../../app/interfaces/dev/Digital';
 
 export type GpioDigitalDriverHandler = (level: boolean) => void;
 
 export interface GpioDigitalDriverPinParams extends DriverBaseProps {
   direction: 'input' | 'output';
+
+  // initial value for output pin
+  initial?: boolean;
+
   // use pullup resistor. Only for input pin
   pullup?: boolean;
   // use pulldown resistor. Only for input pin
   pulldown?: boolean;
-  // initial value for output pin
-  initial?: boolean;
+  // debounce time in ms only for input pins. If not set system defaults will be used.
+  debounce?: number;
+  // Listen to low, high or both levels. By default is both.
+  edge?: Edge;
 }
 
 
