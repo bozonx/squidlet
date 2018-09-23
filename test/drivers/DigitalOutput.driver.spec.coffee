@@ -70,18 +70,38 @@ describe.only 'DigitalOutput.driver', ->
 
     sinon.assert.calledWith(@localDriver.write, 1, false)
 
-
   it 'read', ->
     await @instantiate()
 
     result = await @driver.read()
 
     assert.isTrue(result)
-
     sinon.assert.calledOnce(@localDriver.read)
 
   it 'read invert', ->
+    @props.invert = true
+    await @instantiate()
+
+    result = await @driver.read()
+
+    assert.isFalse(result)
+    sinon.assert.calledOnce(@localDriver.read)
 
   it 'write', ->
+    await @instantiate()
+
+    await @driver.write(true)
+
+    # called first on init and on write
+    sinon.assert.calledTwice(@localDriver.write)
+    sinon.assert.calledWith(@localDriver.write.getCall(1), 1, true)
 
   it 'write invert', ->
+    @props.invert = true
+    await @instantiate()
+
+    await @driver.write(true)
+
+    # called first on init and on write
+    sinon.assert.calledTwice(@localDriver.write)
+    sinon.assert.calledWith(@localDriver.write.getCall(1), 1, false)

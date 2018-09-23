@@ -40,11 +40,21 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   }
 
   async write(newLevel: boolean): Promise<void> {
+
+    // TODO: валидировать что значение boolean
+
     const realLevel: boolean = invertIfNeed(newLevel, this.props.invert);
 
     await this.digital.write(this.props.pin, realLevel);
   }
 
+
+  protected validateProps = (): string | undefined => {
+    // TODO: validate params
+    // TODO: validate props.driver
+    // TODO: validate specific for certain driver params
+    return;
+  }
 
   private calcInitial(): boolean {
     if (this.props.invert) {
@@ -55,13 +65,6 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
       // if initial === high it's logical 1, otherwise 0;
       return this.props.initial === 'high';
     }
-  }
-
-  validateProps = (): string | undefined => {
-    // TODO: validate params
-    // TODO: validate props.driver
-    // TODO: validate specific for certain driver params
-    return;
   }
 
 }
