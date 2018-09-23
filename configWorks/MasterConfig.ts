@@ -106,13 +106,12 @@ export default class MasterConfig {
       // use master's storage dir
       const storageDir = masterHostConfig.config.storageDir;
 
-      // TODO: why???
       if (path.isAbsolute(storageDir)) {
         // it's an absolute path
         return storageDir;
       }
       else {
-        // relative path - make it relative to config file
+        // storageDir is relative path - make it absolute, use config file dir as a root
         return path.join(path.dirname(masterConfigPath), storageDir);
       }
     }

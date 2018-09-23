@@ -3,7 +3,7 @@ hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').defau
 systemConfig = require('../../configWorks/configs/systemConfig').default
 
 
-describe 'master.MasterConfig', ->
+describe.only 'master.MasterConfig', ->
   beforeEach ->
     @preMasterHostConfig = {
       platform: 'rpi'
@@ -42,7 +42,7 @@ describe 'master.MasterConfig', ->
       }
     }
 
-    @pathToMasterConfig = '/masterCfgPath'
+    @pathToMasterConfig = '/path/to/master.yaml'
 
     # TODO: not safe - may be make new class with cloned prototype
     MasterConfig.prototype.getPlatformConfig = => {
@@ -96,7 +96,7 @@ describe 'master.MasterConfig', ->
   it 'buildDir - use master\'s absolute storageDir', ->
     assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)
 
-#  it 'buildDir - use master\'s relative storageDir', ->
-#    @masterConfig.preHosts.master.config.storageDir = './myDir'
-#
-#    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), '/masterCfgPath/myDir')
+  it 'buildDir - use master\'s relative storageDir', ->
+    @masterConfig.preHosts.master.config.storageDir = './myDir'
+
+    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), '/path/to/myDir')
