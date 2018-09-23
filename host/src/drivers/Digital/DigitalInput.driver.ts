@@ -56,7 +56,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
     const listenerId: number = this.digital.setWatch(
       this.props.pin,
-      handler,
+      wrapper,
       debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
       edge
     );
@@ -95,16 +95,17 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     });
   }
 
-  resolvePinMode(): PinMode {
-    if (this.props.pullup) return 'input_pullup';
-    else if (this.props.pulldown) return 'input_pulldown';
-    else return 'input';
-  }
 
   protected validateProps = (): string | undefined => {
     // TODO: validate params
     // TODO: validate specific for certain driver params
     return;
+  }
+
+  private resolvePinMode(): PinMode {
+    if (this.props.pullup) return 'input_pullup';
+    else if (this.props.pulldown) return 'input_pulldown';
+    else return 'input';
   }
 
 }

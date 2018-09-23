@@ -3,9 +3,11 @@ DigitalInput = require('../../host/src/drivers/Digital/DigitalInput.driver').def
 
 describe.only 'DigitalInput.driver', ->
   beforeEach ->
+    @watchHandler = undefined
     @localDriver = {
       setup: sinon.stub().returns(Promise.resolve())
       read: sinon.stub().returns(Promise.resolve(true))
+      setWatch: (pin, handler) => @watchHandler = handler
     }
 
     @definition = {
@@ -64,3 +66,23 @@ describe.only 'DigitalInput.driver', ->
 
     assert.isFalse(result)
     sinon.assert.calledOnce(@localDriver.read)
+
+  it 'addListener', ->
+    await @instantiate()
+    handler = sinon.spy()
+
+    @driver.addListener(handler, 30)
+    @watchHandler(true)
+
+    sinon.assert.calledOnce(handler)
+    sinon.assert.calledWith(handler, true)
+
+  it 'addListener - invert', ->
+    @props.invert = true
+    await @instantiate()
+    handler = sinon.spy()
+
+    @driver.addListener(handler, 30)
+    @watchHandler(true)
+
+    sinon.assert.calledWith(handler, false)
