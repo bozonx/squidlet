@@ -19,7 +19,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
   protected combinedInstanceIdName?: (instanceProps?: {[index: string]: any}) => string;
 
 
-  getInstance(instanceProps?: Props): Instance {
+  async getInstance(instanceProps?: Props): Promise<Instance> {
     if (!this.instanceIdName && !this.combinedInstanceIdName) {
       throw new Error(`You have to specify at least "instanceIdName" or "combinedInstanceIdName()"`);
     }
@@ -35,7 +35,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
 
     this.instances[instanceIdName] = new this.DriverClass(definition, this.env);
 
-    //if (this.instances[instanceIdName].init) await (this.instances[instanceIdName].init as any)();
+    if (this.instances[instanceIdName].init) await (this.instances[instanceIdName].init as any)();
 
     return this.instances[instanceIdName];
   }

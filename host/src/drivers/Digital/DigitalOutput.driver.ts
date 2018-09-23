@@ -1,6 +1,7 @@
+import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
+
 const _omit = require('lodash/omit');
 
-import Digital from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -14,17 +15,16 @@ interface DigitalOutputDriverProps extends DigitalBaseProps {
 
 
 export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
-  private get digital(): Digital {
-    return this.depsInstances.digital as Digital;
+  private get digital(): GpioDigitalDriver {
+    return this.depsInstances.digital as GpioDigitalDriver;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
+
     this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
 
-    // TODO: do it !!!! наверное нужно наследоваться от digital
-    await this.digital.init();
     await this.digital.setup(this.props.pin, 'output');
 
     // set initial level
