@@ -3,11 +3,10 @@ BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').defau
 
 describe.only 'devices.BinarySensor', ->
   beforeEach ->
-    @getLevelResult = Promise.resolve(0)
+    @getLevelResult = Promise.resolve(false)
     @inputDriver = {
-      getLevel: => @getLevelResult
-      onChange: =>
-      #getLevel: sinon.stub().returns(Promise.resolve(1))
+      read: sinon.stub().returns(@getLevelResult)
+      addListener: sinon.spy()
     }
     @env = {
       system: {
@@ -46,6 +45,11 @@ describe.only 'devices.BinarySensor', ->
     await @binarySensor.init()
 
     @binarySensor.onChange(@handleStatusChange)
+
+  it 'init', ->
+    assert.deepEqual(@binarySensor.status.localData, { default: false })
+    sinon.assert.calledOnce(@inputDriver.read)
+    sinon.assert.calledOnce(@inputDriver.addListener)
 
 
   it "main logic", ->
