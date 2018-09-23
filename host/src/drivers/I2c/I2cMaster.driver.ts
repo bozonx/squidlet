@@ -7,7 +7,6 @@ import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {DriverBaseProps} from '../../app/entities/DriverBase';
 
 
 const REGISTER_POSITION = 0;
@@ -15,7 +14,7 @@ const REGISTER_LENGTH = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cMasterDriverProps extends DriverBaseProps {
+interface I2cMasterDriverProps {
   bus: number;
 }
 

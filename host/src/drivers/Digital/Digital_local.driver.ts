@@ -1,13 +1,9 @@
-import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
+import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-export interface DigitalLocalDriverProps extends DriverBaseProps {
-}
-
-
-export class DigitalLocalDriver {
+export class DigitalLocalDriver implements Digital {
   private readonly digitalDev: Digital;
 
   constructor(digitalDev: Digital) {
@@ -64,7 +60,7 @@ export class DigitalLocalDriver {
 }
 
 
-export default class Factory extends DriverBase<DigitalLocalDriverProps> {
+export default class Factory extends DriverBase {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digital = getDriverDep('Digital.dev');
   }

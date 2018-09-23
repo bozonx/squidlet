@@ -1,7 +1,6 @@
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
-import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
@@ -31,7 +30,7 @@ export interface I2cDriverClass {
   ) => void;
 }
 
-interface I2cDataDriverProps extends DriverBaseProps {
+interface I2cDataDriverProps {
   bus: number;
   // name of i2c master or slave driver to use
   i2cDriverName: string;

@@ -1,14 +1,10 @@
 import FsDev, {Stats} from '../../app/interfaces/dev/Fs';
-import DriverBase, {DriverBaseProps} from '../../app/entities/DriverBase';
+import DriverBase from '../../app/entities/DriverBase';
 import EntityDefinition from '../../app/interfaces/EntityDefinition';
 import Env from '../../app/interfaces/Env';
 
 
-interface StorageProps extends DriverBaseProps {
-}
-
-
-export class Storage extends DriverBase<StorageProps> {
+export class Storage extends DriverBase {
   private fsDev: FsDev;
 
   constructor(definition: EntityDefinition, env: Env) {

@@ -3,7 +3,6 @@ import * as EventEmitter from 'events';
 import I2cSlave from '../../app/interfaces/dev/I2cSlave';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
-import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
@@ -13,7 +12,7 @@ const REGISTER_LENGTH = 1;
 
 type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cSlaveDriverProps extends DriverBaseProps {
+interface I2cSlaveDriverProps {
   bus: number;
 }
 

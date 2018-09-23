@@ -5,14 +5,13 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { I2cDataDriver, DataHandler } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
-import {DriverBaseProps} from '../../app/entities/DriverBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
 
-interface I2cConnectionDriverProps extends DriverBaseProps {
+interface I2cConnectionDriverProps {
   bus: number;
   myAddress: MyAddress;
 }
