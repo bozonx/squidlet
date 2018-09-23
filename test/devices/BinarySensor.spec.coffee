@@ -1,14 +1,14 @@
 BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').default
 
 
-describe.only 'devices.BinarySensor', ->
+describe 'devices.BinarySensor', ->
   beforeEach ->
-    @getLevelResult = Promise.resolve(false)
+    @readResult = Promise.resolve(false)
     @readSpy = sinon.spy()
     @inputDriver = {
       read: () =>
         @readSpy()
-        return @getLevelResult
+        return @readResult
       addListener: sinon.spy()
     }
     @env = {
@@ -64,7 +64,7 @@ describe.only 'devices.BinarySensor', ->
 
     assert.isTrue(@binarySensor.blockTimeInProgress)
 
-    await @getLevelResult
+    await @readResult
 
     # after setStatus
     assert.equal(@binarySensor.status.getLocal().default, true)
@@ -86,7 +86,7 @@ describe.only 'devices.BinarySensor', ->
     @definition.props.debounceType = 'throttle'
     assert.equal(@binarySensor.status.getLocal().default, false)
 
-    @getLevelResult = Promise.resolve(true)
+    @readResult = Promise.resolve(true)
     clock = sinon.useFakeTimers()
 
     # like driver has risen an event
@@ -101,7 +101,7 @@ describe.only 'devices.BinarySensor', ->
     assert.isFalse(@binarySensor.throttleInProgress)
     assert.isTrue(@binarySensor.blockTimeInProgress)
 
-    await @getLevelResult
+    await @readResult
 
     # after setStatus
     assert.equal(@binarySensor.status.getLocal().default, true)

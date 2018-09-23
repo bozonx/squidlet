@@ -3,6 +3,7 @@ import {DigitalOutputDriver} from '../../drivers/Digital/DigitalOutput.driver';
 import {convertToLevel} from '../../helpers/helpers';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
+import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 interface Props extends DeviceBaseProps {
@@ -18,10 +19,11 @@ export default class Switch extends DeviceBase<Props> {
   }
 
 
-  protected willInit = async () => {
-    this.depsInstances.digitalOutput = (await this.getDriverDep('DigitalOutput.driver'))
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.digitalOutput = getDriverDep('DigitalOutput.driver')
       .getInstance(this.props);
   }
+
 
   protected statusGetter = async (): Promise<Data> => {
     return { [DEFAULT_STATUS]: await this.digitalOutput.read() };
