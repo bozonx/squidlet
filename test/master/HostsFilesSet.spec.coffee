@@ -114,24 +114,24 @@ describe.only 'master.HostsFilesSet', ->
         devices: {
           DeviceClass: [ 'MyDev.dev' ]
         }
+        drivers: {}
+        services: {}
       }
 
     assert.doesNotThrow(() => @hostsFilesSet.checkPlatformDevDeps())
 
   it 'checkPlatformDevDeps - Fail situation', ->
-    # TODO: !!!!
-
-
-  it 'private getHostDevs', ->
-    hostEntitiesNames = {
-      devices: [ 'DeviceClass' ]
-    }
-
     @main.entities.getDevDependencies = =>
       {
         devices: {
-          DeviceClass: [ 'MyDev.dev' ]
+          DeviceClass: [ 'OtherDev.dev' ]
         }
+        drivers: {}
+        services: {}
       }
 
-    assert.deepEqual @hostsFilesSet.getHostDevs(hostEntitiesNames), [ 'MyDev.dev' ]
+    assert.throws(
+      () =>
+        @hostsFilesSet.checkPlatformDevDeps()
+      'Not registered dev dependencies'
+    )
