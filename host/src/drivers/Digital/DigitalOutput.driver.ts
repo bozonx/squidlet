@@ -23,6 +23,8 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
     this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
 
+    // TODO: do it !!!!
+    await this.digital.init();
     await this.digital.setup(this.props.pin, 'output');
 
     // set initial level

@@ -19,14 +19,14 @@ describe.only 'DigitalOutput.driver', ->
       }
     }
     @env = {
-      getManifest: => Promise.resolve({ drivers: ['local'] })
+      loadManifest: => Promise.resolve({ drivers: ['local'] })
       getDriver: => {
         getInstance: => @localDriver
       }
     }
 
     @driver = (new DigitalOutput(@definition, @env)).getInstance(@props)
-    console.log(111111, @driver)
+    #await @driver.init();
 
   it 'read', ->
     result = await @driver.read()
