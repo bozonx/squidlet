@@ -1,49 +1,54 @@
-#BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').default
-#
-#
-#describe 'devices.BinarySensor', ->
-#  beforeEach ->
-#    @getLevelResult = Promise.resolve(0)
-#    @driver = {
-#      getLevel: => @getLevelResult
-#      onChange: =>
-#      #getLevel: sinon.stub().returns(Promise.resolve(1))
-#    }
-#    @system = {
-#      drivers: {
-#        getDriver: => {
-#          getInstance: => @driver
-#        }
-#      }
-#      host: {
-#        config: {
-#          host: {
-#            defaultStatusRepublishIntervalMs: 0
-#          }
-#        }
-#      }
-#    }
-#    @deviceConf = {
-#      deviceId: 'room1.device1'
-#      manifest: {
-#        status: {
-#          default: {
-#            type: 'number'
-#          }
-#        }
-#      }
-#      props: {
-#        debounceTime: 20
-#        blockTime: 50
-#      }
-#    }
-#    @handleStatusChange = sinon.spy()
-#    @binarySensor = new BinarySensor(@system, @deviceConf)
-#    @binarySensor.publish = sinon.spy()
-#    @binarySensor.onChange(@handleStatusChange)
-#    @binarySensor.init()
-#
-#  it "main logic", ->
+BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').default
+
+
+describe.only 'devices.BinarySensor', ->
+  beforeEach ->
+    @getLevelResult = Promise.resolve(0)
+    @inputDriver = {
+      getLevel: => @getLevelResult
+      onChange: =>
+      #getLevel: sinon.stub().returns(Promise.resolve(1))
+    }
+    @env = {
+      system: {
+        host: {
+          config: {
+            config: {
+              defaultStatusRepublishIntervalMs: 0
+            }
+          }
+        }
+      }
+      loadManifest: => Promise.resolve({
+        status: {
+          default: {
+            type: 'number'
+          }
+        }
+        drivers: ['DigitalInput.driver']
+      })
+      getDriver: => {
+        getInstance: => @inputDriver
+      }
+    }
+    @definition = {
+      id: 'room1.device1'
+      className: 'BinarySensor'
+      props: {
+        debounce: 30
+        blockTime: 50
+      }
+    }
+    @handleStatusChange = sinon.spy()
+    @binarySensor = new BinarySensor(@definition, @env)
+    @binarySensor.publish = sinon.spy()
+
+    await @binarySensor.init()
+
+    @binarySensor.onChange(@handleStatusChange)
+
+
+  it "main logic", ->
 #    assert.equal(@binarySensor.status.getLocal().default, 0)
 #
 #    @getLevelResult = Promise.resolve(1)

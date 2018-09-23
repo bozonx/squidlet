@@ -1,12 +1,12 @@
 Config = require('../../host/src/baseDevice/Config').default
 
 
-describe 'baseDevice.Config', ->
+describe.only 'baseDevice.Config', ->
   beforeEach ->
     @system = {
       host: {
         config: {
-          host: {
+          config: {
             defaultStatusRepublishIntervalMs: 1000
           }
         }
