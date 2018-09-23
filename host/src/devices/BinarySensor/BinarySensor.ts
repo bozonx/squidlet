@@ -15,7 +15,7 @@ interface Props extends DeviceBaseProps, DigitalInputDriverProps {
 
 
 export default class BinarySensor extends DeviceBase<Props> {
-  //private debounceInProgress: boolean = false;
+  private throttleInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
   private get digitalInput(): DigitalInputDriver {
@@ -29,6 +29,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
   protected didInit = async () => {
+    // TODO: если throttle то наверное debounce 0 по умолчанию
     this.digitalInput.addListener(this.onInputChange, this.props.debounce);
   }
 
@@ -42,10 +43,35 @@ export default class BinarySensor extends DeviceBase<Props> {
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
-    // start dead time - ignore all the signals
+    if (this.props.debounceType === 'throttle') {
+      // throttle logic
+      this.throttle();
+    }
+    else {
+      // debounce logic
+      await this.startBlockTime(async () => level);
+    }
+  }
+
+  private throttle() {
+    // do nothing if there is debounce or dead time
+    if (this.throttleInProgress) return;
+
+    this.throttleInProgress = true;
+
+    // waiting for debounce
+    setTimeout(() => {
+      this.throttleInProgress = false;
+      this.startBlockTime(() => this.digitalInput.read());
+    }, this.props.debounce);
+  }
+
+  private async startBlockTime(getLevel: () => Promise<boolean>): Promise<void> {
+    // start block time - ignore all the signals
     this.blockTimeInProgress = true;
 
     try {
+      const level: boolean = await getLevel();
       // set it to status
       // TODO: wait for promise ???
       this.setStatus(level);
@@ -60,43 +86,7 @@ export default class BinarySensor extends DeviceBase<Props> {
     setTimeout(() => {
       this.blockTimeInProgress = false;
     }, this.props.blockTime);
-
-
-    // // do nothing if there is debounce or dead time
-    // if (this.debounceInProgress || this.blockTimeInProgress) return;
-    //
-    // this.debounceInProgress = true;
-    //
-    // // waiting for debounce
-    // setTimeout(() => {
-    //   this.debounceInProgress = false;
-    //   this.startValueLogic();
-    // }, this.props.debounce);
   }
-
-  // private async startValueLogic(): Promise<void> {
-  //   // start dead time - ignore all the signals
-  //   this.blockTimeInProgress = true;
-  //
-  //   let currentLevel: boolean = false;
-  //   const waitBlockTime = () => setTimeout(() => {
-  //     this.blockTimeInProgress = false;
-  //   }, this.props.blockTime);
-  //
-  //   try {
-  //     currentLevel = await this.digitalInput.read();
-  //   }
-  //   catch (err) {
-  //     waitBlockTime();
-  //
-  //     return;
-  //   }
-  //
-  //   // TODO: wait for promise ???
-  //   this.setStatus(currentLevel);
-  //
-  //   waitBlockTime();
-  // }
 
 
   protected validateProps = (props: Props): string | undefined => {
