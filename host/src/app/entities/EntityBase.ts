@@ -5,7 +5,6 @@ import ManifestBase from '../interfaces/ManifestBase';
 import Env from '../interfaces/Env';
 import DriverInstance from '../interfaces/DriverInstance';
 import DeviceManifest from '../interfaces/DeviceManifest';
-import DriverFactory from '../interfaces/DriverFactory';
 
 
 export type GetDriverDep = (driverName: string) => DriverInstance;
@@ -54,12 +53,12 @@ export default class EntityBase<Props> {
     }
 
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
-    const getDriverDep: GetDriverDep = (driverName: string) => {
+    const getDriverDep: GetDriverDep = (driverName: string): DriverInstance => {
       if (!_includes(manifest.drivers, driverName)) {
         throw new Error(`Can't find driver "${driverName}"`);
       }
 
-      return this.depsInstances[driverName] as DriverFactory<DriverInstance>;
+      return this.env.getDriver(driverName);
     };
 
     if (this.willInit) await this.willInit(getDriverDep);
