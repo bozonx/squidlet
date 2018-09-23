@@ -1,7 +1,7 @@
 BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').default
 
 
-describe.only 'devices.BinarySensor', ->
+describe 'devices.BinarySensor', ->
   beforeEach ->
     @readResult = Promise.resolve(false)
     @readSpy = sinon.spy()

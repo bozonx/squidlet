@@ -65,28 +65,6 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Check than all the host's dev dependencies exist in platform deps list.
-   */
-  checkPlatformDevDeps() {
-
-    // TODO test
-
-    for (let hostId of this.main.masterConfig.getHostsIds()) {
-      const hostEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
-      const hostDevs: string[] = this.getHostDevs(hostEntitiesNames);
-      const platformDevs: string[] = this.main.masterConfig.getHostPlatformDevs(hostId);
-
-      // TODO: сверяем что все зависимости есть в платформе
-      const notRegisteredHostDevs: string[] = _difference(hostDevs, platformDevs);
-
-      if (notRegisteredHostDevs.length) {
-        throw new Error(`Not registered dev dependencies "${JSON.stringify(notRegisteredHostDevs)}"
-         of host "${hostId}" have been found.`);
-      }
-    }
-  }
-
-  /**
    * Get set of entities of specified host with absolute path to source files.
    */
   generateSrcEntitiesSet(hostId: string): EntitiesSet {
@@ -133,6 +111,28 @@ export default class HostsFilesSet {
     return result;
   }
 
+  /**
+   * Check than all the host's dev dependencies exist in platform deps list.
+   */
+  checkPlatformDevDeps() {
+
+    // TODO test
+
+    for (let hostId of this.main.masterConfig.getHostsIds()) {
+      const hostEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
+      const hostDevs: string[] = this.getHostDevs(hostEntitiesNames);
+      const platformDevs: string[] = this.main.masterConfig.getHostPlatformDevs(hostId);
+
+
+      const notRegisteredHostDevs: string[] = _difference(hostDevs, platformDevs);
+
+      if (notRegisteredHostDevs.length) {
+        throw new Error(`Not registered dev dependencies "${JSON.stringify(notRegisteredHostDevs)}"
+         of host "${hostId}" have been found.`);
+      }
+    }
+  }
+
 
   /**
    * Get list of devs used on host
@@ -142,7 +142,7 @@ export default class HostsFilesSet {
     const result: {[index: string]: true} = {};
 
     for (let pluralName of Object.keys(hostEntitiesNames)) {
-      for (let entityName of Object.keys(hostEntitiesNames[pluralName as ManifestsTypePluralName])) {
+      for (let entityName of hostEntitiesNames[pluralName as ManifestsTypePluralName]) {
         const deps: string[] | undefined = devDeps[pluralName as ManifestsTypePluralName][entityName];
 
         if (deps) {

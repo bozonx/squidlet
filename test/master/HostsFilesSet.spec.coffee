@@ -3,7 +3,7 @@ path = require('path')
 HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
-describe 'master.HostsFilesSet', ->
+describe.only 'master.HostsFilesSet', ->
   beforeEach ->
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
@@ -38,6 +38,10 @@ describe 'master.HostsFilesSet', ->
     }
 
     @main = {
+      masterConfig: {
+        getHostsIds: => ['master']
+        getHostPlatformDevs: => ['MyDev.dev']
+      }
       definitions: {
         getHostDevicesDefinitions: () => @devicesDefinitions
         getHostDriversDefinitions: () => @driversDefinitions
@@ -104,13 +108,23 @@ describe 'master.HostsFilesSet', ->
       }
     }
 
-  it 'getHostDevs', ->
-    hostEntitiesNames = {
-      devices: {
-        DeviceClass: {
-          @entitySetResult...
+  it 'checkPlatformDevDeps - OK situation', ->
+    @main.entities.getDevDependencies = =>
+      {
+        devices: {
+          DeviceClass: [ 'MyDev.dev' ]
         }
       }
+
+    assert.doesNotThrow(() => @hostsFilesSet.checkPlatformDevDeps())
+
+  it 'checkPlatformDevDeps - Fail situation', ->
+    # TODO: !!!!
+
+
+  it 'private getHostDevs', ->
+    hostEntitiesNames = {
+      devices: [ 'DeviceClass' ]
     }
 
     @main.entities.getDevDependencies = =>
