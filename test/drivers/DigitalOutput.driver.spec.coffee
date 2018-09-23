@@ -4,9 +4,9 @@ DigitalOutput = require('../../host/src/drivers/Digital/DigitalOutput.driver').d
 describe.only 'DigitalOutput.driver', ->
   beforeEach ->
     @localDriver = {
+      setup: sinon.stub().returns(Promise.resolve())
       read: sinon.stub().returns(Promise.resolve(true))
       write: sinon.stub().returns(Promise.resolve())
-      setup: sinon.stub().returns(Promise.resolve())
     }
 
     @definition = {
