@@ -2,6 +2,7 @@ import System from '../System';
 import DriverInstance from '../interfaces/DriverInstance';
 import Env from '../interfaces/Env';
 import ManifestBase from '../interfaces/ManifestBase';
+import Logger from '../interfaces/Logger';
 
 
 /**
@@ -9,9 +10,11 @@ import ManifestBase from '../interfaces/ManifestBase';
  */
 export default abstract class EnvBase implements Env {
   readonly system: System;
+  readonly log: Logger;
 
   constructor(system: System) {
     this.system = system;
+    this.log = system.log;
   }
 
   getDev<T extends DriverInstance>(shortDevName: string): T {

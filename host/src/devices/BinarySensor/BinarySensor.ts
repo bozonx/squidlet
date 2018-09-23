@@ -43,27 +43,36 @@ export default class BinarySensor extends DeviceBase<Props> {
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
-    if (this.props.debounceType === 'throttle') {
-      // throttle logic
-      this.throttle();
+    try {
+      if (this.props.debounceType === 'throttle') {
+        // throttle logic
+        await this.throttle();
+      }
+      else {
+        // debounce logic
+        await this.startBlockTime(async () => level);
+      }
     }
-    else {
-      // debounce logic
-      await this.startBlockTime(async () => level);
+    catch (err) {
+      this.env.log.error(err);
     }
   }
 
-  private throttle() {
+  private async throttle() {
     // do nothing if there is debounce or dead time
     if (this.throttleInProgress) return;
 
     this.throttleInProgress = true;
 
     // waiting for debounce
-    setTimeout(() => {
-      this.throttleInProgress = false;
-      this.startBlockTime(() => this.digitalInput.read());
-    }, this.props.debounce);
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        this.throttleInProgress = false;
+        this.startBlockTime(() => this.digitalInput.read())
+          .then(resolve)
+          .catch(reject);
+      }, this.props.debounce);
+    });
   }
 
   private async startBlockTime(getLevel: () => Promise<boolean>): Promise<void> {
@@ -77,15 +86,17 @@ export default class BinarySensor extends DeviceBase<Props> {
       this.setStatus(level);
     }
     catch (err) {
-      // TODO: наверное написать в лог об ошибке
       this.blockTimeInProgress = false;
 
-      return;
+      throw err;
     }
 
-    setTimeout(() => {
-      this.blockTimeInProgress = false;
-    }, this.props.blockTime);
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.blockTimeInProgress = false;
+        resolve();
+      }, this.props.blockTime);
+    });
   }
 
 

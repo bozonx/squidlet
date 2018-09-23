@@ -12,7 +12,6 @@ import System from '../System';
  * It is environment for devices and services
  */
 export default class DeviceEnv extends EnvBase {
-  readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
   readonly messenger: Messenger;
@@ -20,7 +19,6 @@ export default class DeviceEnv extends EnvBase {
 
   constructor(system: System) {
     super(system);
-    this.log = system.log;
     this.events = system.events;
     this.host = system.host;
     this.messenger = system.messenger;
