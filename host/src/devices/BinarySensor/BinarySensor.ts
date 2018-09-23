@@ -45,12 +45,14 @@ export default class BinarySensor extends DeviceBase<Props> {
     let currentLevel: boolean = false;
 
     try {
+      // read current value
       currentLevel = await this.digitalInput.read();
-      await this.setStatus(currentLevel);
+      // set it to status
+      // TODO: wait for promise ???
+      this.setStatus(currentLevel);
     }
     catch (err) {
       // TODO: наверное написать в лог об ошибке
-      //waitBlockTime();
       this.blockTimeInProgress = false;
 
       return;

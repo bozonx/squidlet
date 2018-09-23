@@ -4,8 +4,11 @@ BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').defau
 describe.only 'devices.BinarySensor', ->
   beforeEach ->
     @getLevelResult = Promise.resolve(false)
+    @readSpy = sinon.spy()
     @inputDriver = {
-      read: sinon.stub().returns(@getLevelResult)
+      read: () =>
+        @readSpy()
+        return @getLevelResult
       addListener: sinon.spy()
     }
     @env = {
@@ -48,11 +51,43 @@ describe.only 'devices.BinarySensor', ->
 
   it 'init', ->
     assert.deepEqual(@binarySensor.status.localData, { default: false })
-    sinon.assert.calledOnce(@inputDriver.read)
+    sinon.assert.calledOnce(@readSpy)
     sinon.assert.calledOnce(@inputDriver.addListener)
 
 
   it "main logic", ->
+    @getLevelResult = Promise.resolve(true)
+    clock = sinon.useFakeTimers()
+
+    # like driver has risen an event
+    @binarySensor.onInputChange()
+
+    assert.isTrue(@binarySensor.blockTimeInProgress)
+
+    await @getLevelResult
+
+    # first on init and the second at the moment
+    sinon.assert.calledTwice(@readSpy)
+
+    # after setStatus
+    assert.equal(@binarySensor.status.getLocal().default, true)
+
+    sinon.assert.calledOnce(@handleStatusChange);
+    sinon.assert.calledWith(@handleStatusChange, ['default']);
+
+    clock.tick(50)
+
+    assert.isFalse(@binarySensor.blockTimeInProgress)
+
+    clock.restore()
+
+
+
+#    sinon.assert.calledTwice(@binarySensor.publish)
+#    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
+#    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
+#
+
 #    assert.equal(@binarySensor.status.getLocal().default, 0)
 #
 #    @getLevelResult = Promise.resolve(1)
