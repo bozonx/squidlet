@@ -55,19 +55,16 @@ describe.only 'devices.BinarySensor', ->
     sinon.assert.calledOnce(@inputDriver.addListener)
 
 
-  it "main logic", ->
-    @getLevelResult = Promise.resolve(true)
+  it "main logic - debounceType = debounce", ->
+
     clock = sinon.useFakeTimers()
 
     # like driver has risen an event
-    @binarySensor.onInputChange()
+    @binarySensor.onInputChange(true)
 
     assert.isTrue(@binarySensor.blockTimeInProgress)
 
     await @getLevelResult
-
-    # first on init and the second at the moment
-    sinon.assert.calledTwice(@readSpy)
 
     # after setStatus
     assert.equal(@binarySensor.status.getLocal().default, true)
@@ -81,16 +78,14 @@ describe.only 'devices.BinarySensor', ->
 
     clock.restore()
 
+    sinon.assert.calledTwice(@binarySensor.publish)
+    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
+    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
 
-
-#    sinon.assert.calledTwice(@binarySensor.publish)
-#    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
-#    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
-#
-
+#  it "main logic - debounceType = throttle", ->
 #    assert.equal(@binarySensor.status.getLocal().default, 0)
 #
-#    @getLevelResult = Promise.resolve(1)
+#    @getLevelResult = Promise.resolve(true)
 #    clock = sinon.useFakeTimers()
 #
 #

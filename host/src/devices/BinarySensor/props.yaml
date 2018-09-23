@@ -4,6 +4,9 @@ $extends: gpioBaseProps
 debounce:
   type: number
   default: 20
+DebounceType:
+  type: debounce | throttle
+  default: debounce
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   type: number

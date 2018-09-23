@@ -5,8 +5,11 @@ import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
+type DebounceType = 'debounce' | 'throttle';
+
 interface Props extends DeviceBaseProps, DigitalInputDriverProps {
   debounce: number;
+  debounceType: DebounceType;
   blockTime: number;
 }
 
@@ -35,21 +38,17 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
 
-  private onInputChange = async () => {
+  private onInputChange = async (level: boolean) => {
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
     // start dead time - ignore all the signals
     this.blockTimeInProgress = true;
 
-    let currentLevel: boolean = false;
-
     try {
-      // read current value
-      currentLevel = await this.digitalInput.read();
       // set it to status
       // TODO: wait for promise ???
-      this.setStatus(currentLevel);
+      this.setStatus(level);
     }
     catch (err) {
       // TODO: наверное написать в лог об ошибке

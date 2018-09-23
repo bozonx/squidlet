@@ -1,7 +1,7 @@
 Config = require('../../host/src/baseDevice/Config').default
 
 
-describe.only 'baseDevice.Config', ->
+describe 'baseDevice.Config', ->
   beforeEach ->
     @system = {
       host: {
