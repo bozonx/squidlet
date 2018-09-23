@@ -1,7 +1,7 @@
 Switch = require('../../host/src/devices/Switch/Switch').default
 
 
-describe 'devices.Switch', ->
+describe.only 'devices.Switch', ->
   beforeEach ->
     @readResult = Promise.resolve(true)
     @writePromise = Promise.resolve()

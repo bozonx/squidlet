@@ -50,19 +50,17 @@ export default class Switch extends DeviceBase<Props> {
 
     toggle: async (): Promise<boolean> => {
       // skip while switch at dead time
-      if (this.blockTimeInProgress) return this.getStatus();
+      if (this.blockTimeInProgress) return this.status.getLocal().default;
 
       this.blockTimeInProgress = true;
       setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
 
       const currentLevel: boolean = await this.getStatus();
+      const resultLevel: boolean = !currentLevel;
 
-      if (currentLevel) {
-        return this.actions.turn(false);
-      }
-      else {
-        return this.actions.turn(true);
-      }
+      await this.setStatus(resultLevel);
+
+      return resultLevel;
     }
   };
 
