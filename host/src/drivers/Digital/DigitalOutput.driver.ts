@@ -2,7 +2,6 @@ const _omit = require('lodash/omit');
 
 import Digital from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -66,7 +65,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cConnectionDriver, DigitalOutputDriverProps> {
+export default class Factory extends DriverFactoryBase<DigitalOutputDriver, DigitalOutputDriverProps> {
   protected instanceIdName: string = 'pin';
-  protected DriverClass = I2cConnectionDriver;
+  protected DriverClass = DigitalOutputDriver;
 }

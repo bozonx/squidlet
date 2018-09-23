@@ -3,7 +3,6 @@ const _omit = require('lodash/omit');
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {I2cConnectionDriver} from '../../network/connections/I2c.connection.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -111,7 +110,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cConnectionDriver, DigitalInputDriverProps> {
+export default class Factory extends DriverFactoryBase<DigitalInputDriver, DigitalInputDriverProps> {
   protected instanceIdName: string = 'pin';
-  protected DriverClass = I2cConnectionDriver;
+  protected DriverClass = DigitalInputDriver;
 }

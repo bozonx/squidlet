@@ -10,6 +10,8 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 export type GetDriverDep = (driverName: string) => DriverInstance;
 
 
+// TODO: Props сделать необязательным
+
 export default class EntityBase<Props> {
   readonly id: string;
   readonly className: string;
