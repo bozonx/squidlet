@@ -1,7 +1,7 @@
 DigitalOutput = require('../../host/src/drivers/Digital/DigitalOutput.driver').default
 
 
-describe.only 'DigitalOutput.driver', ->
+describe 'DigitalOutput.driver', ->
   beforeEach ->
     @localDriver = {
       setup: sinon.stub().returns(Promise.resolve())

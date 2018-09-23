@@ -37,7 +37,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
 
   /**
-   * Get current level of pin.
+   * Get current binary value of pin.
    */
   async read(): Promise<boolean> {
     return invertIfNeed(await this.digital.read(this.props.pin), this.props.invert);
