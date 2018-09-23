@@ -1,13 +1,16 @@
 DigitalInput = require('../../host/src/drivers/Digital/DigitalInput.driver').default
 
 
-describe.only 'DigitalInput.driver', ->
+describe 'DigitalInput.driver', ->
   beforeEach ->
     @watchHandler = undefined
     @localDriver = {
       setup: sinon.stub().returns(Promise.resolve())
       read: sinon.stub().returns(Promise.resolve(true))
-      setWatch: (pin, handler) => @watchHandler = handler
+      setWatch: (pin, handler) =>
+        @watchHandler = handler
+        return 5
+      clearWatch: sinon.spy()
     }
 
     @definition = {
@@ -24,6 +27,17 @@ describe.only 'DigitalInput.driver', ->
       loadManifest: => Promise.resolve({ drivers: ['Digital_local.driver'] })
       getDriver: => {
         getInstance: => @localDriver
+      }
+      system: {
+        host: {
+          config: {
+            config: {
+              drivers: {
+                defaultDigitalInputDebounce: 20
+              }
+            }
+          }
+        }
       }
     }
 
@@ -82,7 +96,51 @@ describe.only 'DigitalInput.driver', ->
     await @instantiate()
     handler = sinon.spy()
 
-    @driver.addListener(handler, 30)
+    @driver.addListener(handler)
     @watchHandler(true)
 
     sinon.assert.calledWith(handler, false)
+
+  it 'listenOnce', ->
+    await @instantiate()
+    handler = sinon.spy()
+
+    @driver.listenOnce(handler)
+
+    assert.equal(Object.keys(@driver.listeners).length, 1)
+
+    @watchHandler(true)
+
+    sinon.assert.calledOnce(handler)
+    sinon.assert.calledWith(handler, true)
+    assert.equal(Object.keys(@driver.listeners).length, 0)
+
+
+  it 'listenOnce - invert', ->
+    @props.invert = true
+    await @instantiate()
+    handler = sinon.spy()
+
+    @driver.listenOnce(handler)
+
+    assert.equal(Object.keys(@driver.listeners).length, 1)
+
+    @watchHandler(true)
+
+    sinon.assert.calledOnce(handler)
+    sinon.assert.calledWith(handler, false)
+    assert.equal(Object.keys(@driver.listeners).length, 0)
+
+  it 'removeListener', ->
+    await @instantiate()
+    handler = sinon.spy()
+
+    @driver.addListener(handler)
+
+    assert.equal(Object.keys(@driver.listeners).length, 1)
+
+    @driver.removeListener(handler)
+
+    assert.equal(Object.keys(@driver.listeners).length, 0)
+    sinon.assert.calledOnce(@localDriver.clearWatch)
+    sinon.assert.calledWith(@localDriver.clearWatch, 5)

@@ -61,7 +61,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       edge
     );
 
-    this.listeners[listenerId] = [wrapper, handler];
+    this.listeners[listenerId] = [handler, wrapper];
   }
 
   listenOnce(handler: ListenHandler, edge?: Edge): void {
@@ -74,19 +74,19 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
     const listenerId: number = this.digital.setWatch(
       this.props.pin,
-      handler,
+      wrapper,
       this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
       edge
     );
 
-    this.listeners[listenerId] = [wrapper, handler];
+    this.listeners[listenerId] = [handler, wrapper];
   }
 
   removeListener(handler: ListenHandler): void {
     _find(this.listeners, (handlerItem: [ListenHandler, WatchHandler], listenerId: number) => {
       if (handlerItem[0] === handler) {
         delete this.listeners[listenerId];
-        this.digital.clearWatch(listenerId);
+        this.digital.clearWatch(Number(listenerId));
 
         return true;
       }
