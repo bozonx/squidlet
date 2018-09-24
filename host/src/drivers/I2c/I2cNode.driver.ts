@@ -12,8 +12,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-//const REGISTER_POSITION = 0;
-const REGISTER_LENGTH = 1;
+const HANDLER_POSITION = 0;
 const LENGTH_POSITION = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
@@ -38,24 +37,12 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
 
-
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
 
     //const addressHex: number = this.normilizeAddr(i2cAddress);
   }
-
-  protected didInit = async () => {
-    // TODO: поидее их нужно указывать на dataAddress
-    // if (this.props.feedback === 'poll') {
-    //   this.startPolling();
-    // }
-    // else if (this.props.feedback === 'int') {
-    //   this.startListenInt();
-    // }
-  }
-
 
 
   getLastData(dataAddress: number | undefined): Uint8Array {
@@ -101,38 +88,21 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * You have to specify length of data which will be received.
    */
   listenIncome(dataAddress: number | undefined, length: number, handler: Handler): void {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
-    // TODO: что если dataAddress = undefined - тогда повешать дефолтный листенер наверное
-
-    this.listeners[dataAddress] = [handler, length];
-
-    // const eventName = this.generateId(this.addressHex, dataAddress);
-    //
-    // // start poling/int if need
-    // this.startListen(addressHex, dataAddress, length);
-    // // listen to events of this address and dataAddress
-    // this.events.addListener(eventName, handler);
+    this.listeners[dataAddressStr] = [handler, length];
   }
 
   removeListener(dataAddress: number | undefined, handler: Handler): void {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: найти и удалить из this.listeners
-    // TODO: test
-
-    // const addressHex: number = this.normilizeAddr(i2cAddress);
-    // const id = this.generateId(addressHex, dataAddress);
-    //
-    // // TODO: останавливает полинг если уже нет ни одного слушателя
-    //
-    // this.events.removeListener(id, handler);
+    delete this.listeners[dataAddressStr];
   }
 
 
   private async pollDataAddresses() {
     for (let dataAddressStr of Object.keys(this.listeners)) {
-      // TODO: что делать с дефолтным ????
-      const dataAddress: number = Number(dataAddressStr);
+      const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
 
       await this.doPoll(dataAddress, this.listeners[dataAddressStr][LENGTH_POSITION]);
     }
@@ -142,41 +112,44 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * Read data once and rise data event
    */
   private async doPoll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    //const id = this.generateId(addressHex, dataAddress);
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
+    if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
+      throw new Error(`You can't do poll using another length that previously registered poll handler`);
+    }
 
-    // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
+    // TODO: если произошла ошибка то наверное лучше вызвать handler(error) ???
 
     const data: Uint8Array = await this.i2cMaster.read(this.addressHex, dataAddress, length);
 
-    // try {
-    //   data = await this.i2cMaster.read(this.addressHex, dataAddress, length);
-    // }
-    // catch (err) {
-    //
-    //   // this.events.emit(id, err);
-    //   //
-    //   // return;
-    // }
-
     // if data is equal to previous data - do nothing
     if (
-      typeof this.pollLastData[id] !== 'undefined'
-      && _isEqual(this.pollLastData[id], data)
+      typeof this.pollLastData[dataAddressStr] !== 'undefined'
+      && _isEqual(this.pollLastData[dataAddressStr], data)
     ) return data;
 
     // save previous data
-    this.pollLastData[dataAddress] = data;
+    this.pollLastData[dataAddressStr] = data;
     // finally rise an event
+    const handler: Handler = this.listeners[dataAddressStr][HANDLER_POSITION];
 
-    // TODO: just call handler of this.listeners[dataAddress]
-    //this.events.emit(id, null, data);
+    handler(null, data);
 
     return data;
   }
 
 
+  /**
+   * Convert number to string of undefined to "undefined"
+   */
+  private dataAddressToString(dataAddress: number | undefined): string {
+    return String(dataAddress);
+  }
 
+  private parseDataAddress(dataAddressStr: string): number | undefined {
+    if (dataAddressStr === 'undefined') return undefined;
 
+    return Number(dataAddressStr);
+  }
 
 
 
@@ -193,6 +166,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     const id = this.generateId(addressHex, dataAddress);
 
     // TODO: test
+    // TODO: если нет листенеров - то не опрашивать
 
     if (this.poling.isInProgress(id)) {
       // TODO: если запущен то проверить длинну и ничего не делать
@@ -212,6 +186,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private startListenInt(i2cAddress: string | number, dataAddress: number | undefined, length: number, gpioInput: number) {
 
     // TODO: test
+    // TODO: если нет листенеров - то не опрашивать
 
     const addressHex: number = this.normilizeAddr(i2cAddress);
     // TODO: запустить, если запущен то проверить длинну и ничего не делать
