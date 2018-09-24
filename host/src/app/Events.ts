@@ -58,13 +58,13 @@ export default class Events {
     });
 
     // don't rise error - just exit if hasn't found any
-    if (index <= 0) return;
+    if (index < 0) return;
 
     const topicListener: TopicListener = this.topicListeners[index];
+
     // remove it
     this.topicListeners.splice(index, 1);
-
-    this.events.removeListener(category, topicListener.wrapper);
+    this.events.removeListener(eventName, topicListener.wrapper);
   }
 
 }

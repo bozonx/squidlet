@@ -10,8 +10,6 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
     super(system, ServiceEnv);
   }
 
-  // TODO: что по части supter.init()
-
   async initSystemServices() {
     const systemServicesList = await this.system.configSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
