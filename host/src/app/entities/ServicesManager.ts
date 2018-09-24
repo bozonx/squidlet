@@ -1,11 +1,14 @@
-import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
+import EntityDefinition from '../interfaces/EntityDefinition';
 import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
 import ServiceEnv from './ServiceEnv';
+import System from '../System';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceInstance, ServiceEnv> {
-  protected readonly EnvClass = ServiceEnv;
+  constructor(system: System) {
+    super(system, ServiceEnv);
+  }
 
   // TODO: что по части supter.init()
 

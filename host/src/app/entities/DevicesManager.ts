@@ -2,21 +2,21 @@ import DeviceInstance from '../interfaces/DeviceInstance';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DeviceEnv from './DeviceEnv';
 import EntityManagerBase from './EntityManagerBase';
+import System from '../System';
 
 
 /**
  * Creates instances of local devices and prepare config for them.
  */
 export default class DevicesManager extends EntityManagerBase<DeviceInstance, DeviceEnv> {
-  protected readonly EnvClass = DeviceEnv;
+  constructor(system: System) {
+    super(system, DeviceEnv);
+  }
 
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */
   async init() {
-    // TODO: review
-    super.init();
-
     const definitions = await this.system.configSet.loadConfig<EntityDefinition[]>(
       this.system.initCfg.fileNames.devicesDefinitions
     );

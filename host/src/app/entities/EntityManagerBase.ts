@@ -12,30 +12,21 @@ export type EntityClassType = new (definition: EntityDefinition, env: Env) => Ba
 
 
 export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance, EntityEnv extends Env> {
-  protected readonly abstract EnvClass: new (system: System) => EntityEnv;
+  //protected readonly abstract EnvClass: new (system: System) => EntityEnv;
   protected readonly system: System;
   protected readonly instances: {[index: string]: EntityInstance} = {};
   private _env?: EntityEnv;
-
-
-  // TODO: review
-  protected get RealEnvClass(): new (system: System) => EntityEnv {
-    return this.EnvClass;
-  }
 
   get env(): EntityEnv {
     return this._env as EntityEnv;
   }
 
 
-  constructor(system: System) {
+  constructor(system: System, EnvClass: new (system: System) => EntityEnv) {
     this.system = system;
+    this._env = new EnvClass(this.system);
   }
 
-  // TODO: review
-  init() {
-    this._env = new this.RealEnvClass(this.system);
-  }
 
   protected async makeInstance (definition: EntityDefinition): Promise<EntityInstance> {
     const EntityClass = await this.system.configSet.loadMain<EntityClassType>(

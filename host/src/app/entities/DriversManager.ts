@@ -1,6 +1,7 @@
 const _capitalize = require('lodash/capitalize');
 
-import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
+import System from '../System';
+import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import DriverEnv from './DriverEnv';
 import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
@@ -10,7 +11,9 @@ import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
  * Driver manager
  */
 export default class DriversManager extends EntityManagerBase<DriverInstance, DriverEnv> {
-  protected readonly EnvClass = DriverEnv;
+  constructor(system: System) {
+    super(system, DriverEnv);
+  }
 
   // TODO: что по части supter.init()
 
