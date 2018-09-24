@@ -2,7 +2,7 @@ DriversManager = require('../../host/src/app/entities/DriversManager').default
 initializationConfig = require('../../host/src/app/config/initializationConfig').default
 
 
-describe.only 'app.DriversManager', ->
+describe 'app.DriversManager', ->
   beforeEach ->
     @driver = class
       constructor: (defintion) ->

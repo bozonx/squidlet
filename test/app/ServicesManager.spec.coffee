@@ -4,10 +4,9 @@ initializationConfig = require('../../host/src/app/config/initializationConfig')
 
 describe 'app.ServicesManager', ->
   beforeEach ->
-    @props = undefined
     @service = class
-      constructor: (props) ->
-        @props = props
+      constructor: (definition) ->
+        @definition = definition
       init: sinon.spy()
 
     @definitions = {
@@ -15,7 +14,6 @@ describe 'app.ServicesManager', ->
         id: 'systemService'
         className: 'SystemServiceClass'
         props: {
-          id: 'systemService'
           otherParam: 1
         }
       }
@@ -23,7 +21,6 @@ describe 'app.ServicesManager', ->
         id: 'customService'
         className: 'CustomServiceClass'
         props: {
-          id: 'customService'
           otherParam: 1
         }
       }
@@ -44,7 +41,7 @@ describe 'app.ServicesManager', ->
 
     await @servicesManager.initSystemServices()
 
-    assert.equal(@servicesManager.getService('systemService').props, @definitions['systemService'].props)
+    assert.equal(@servicesManager.getService('systemService').definition, @definitions['systemService'])
     sinon.assert.calledOnce(@servicesManager.getService('systemService').init)
 
   it 'initRegularServices() and getDriver', ->
@@ -52,5 +49,5 @@ describe 'app.ServicesManager', ->
 
     await @servicesManager.initRegularServices()
 
-    assert.equal(@servicesManager.getService('customService').props, @definitions['customService'].props)
+    assert.equal(@servicesManager.getService('customService').definition, @definitions['customService'])
     sinon.assert.calledOnce(@servicesManager.getService('customService').init)
