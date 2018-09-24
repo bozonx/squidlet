@@ -1,6 +1,7 @@
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
+import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
@@ -14,7 +15,7 @@ const REGISTER_LENGTH = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cMasterDriverProps {
+interface I2cMasterDriverProps extends MasterSlaveBusProps {
   bus: number;
 }
 
@@ -35,35 +36,13 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
       .getInstance(this.props);
   }
 
-
-  startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
-
-    // TODO: test
-
-    if (this.poling.isInProgress(id)) {
-      // TODO: если запущен то проверить длинну и ничего не делать
-      // TODO: если длина не совпадает то не фатальная ошибка
-
-      return;
-    }
-
-    const cbWhichPoll = (): Promise<void> => {
-      return this.poll(addressHex, dataAddress, length);
-    };
-
-    // TODO: где взять poll interval ???
-    this.poling.startPoling(cbWhichPoll, 1000, id);
-  }
-
-  startInt(i2cAddress: string | number, dataAddress: number | undefined, length: number, gpioInput: number) {
-
-    // TODO: test
-
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    // TODO: запустить, если запущен то проверить длинну и ничего не делать
-    // TODO: если длина не совпадает то не фатальная ошибка
+  protected didInit = async () => {
+    // if (this.props.feedback === 'poll') {
+    //   this.startPolling();
+    // }
+    // else if (this.props.feedback === 'int') {
+    //   this.startInt();
+    // }
   }
 
   listenIncome(
@@ -182,6 +161,36 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
 
+  private startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
+    const addressHex: number = this.normilizeAddr(i2cAddress);
+    const id = this.generateId(addressHex, dataAddress);
+
+    // TODO: test
+
+    if (this.poling.isInProgress(id)) {
+      // TODO: если запущен то проверить длинну и ничего не делать
+      // TODO: если длина не совпадает то не фатальная ошибка
+
+      return;
+    }
+
+    const cbWhichPoll = (): Promise<void> => {
+      return this.poll(addressHex, dataAddress, length);
+    };
+
+    // TODO: где взять poll interval ???
+    this.poling.startPoling(cbWhichPoll, 1000, id);
+  }
+
+  private startInt(i2cAddress: string | number, dataAddress: number | undefined, length: number, gpioInput: number) {
+
+    // TODO: test
+
+    const addressHex: number = this.normilizeAddr(i2cAddress);
+    // TODO: запустить, если запущен то проверить длинну и ничего не делать
+    // TODO: если длина не совпадает то не фатальная ошибка
+  }
+
   private normilizeAddr(addressHex: string | number): number {
     return (Number.isInteger(addressHex as any))
       ? addressHex as number
@@ -208,7 +217,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 }
 
 
-export default class I2cMasterFactory extends DriverFactoryBase<I2cMasterDriver, I2cMasterDriverProps> {
+export default class Factory extends DriverFactoryBase<I2cMasterDriver, I2cMasterDriverProps> {
   protected instanceIdName: string = 'bus';
   protected DriverClass = I2cMasterDriver;
 }
