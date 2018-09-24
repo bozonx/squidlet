@@ -4,10 +4,9 @@ initializationConfig = require('../../host/src/app/config/initializationConfig')
 
 describe.only 'app.DevicesManager', ->
   beforeEach ->
-    @props = undefined
     @device = class
-      constructor: (props) ->
-        @props = props
+      constructor: (definition) ->
+        @definition = definition
       init: sinon.spy()
 
     @definitions = [
@@ -15,7 +14,6 @@ describe.only 'app.DevicesManager', ->
         id: 'room.device1'
         className: 'Relay'
         props: {
-          id: 'room.device1'
           otherParam: 1
         }
       }
@@ -33,5 +31,5 @@ describe.only 'app.DevicesManager', ->
   it 'init() and getDevice', ->
     await @devicesManager.init()
 
-    assert.equal(@devicesManager.getDevice('room.device1').props, @definitions[0].props)
+    assert.equal(@devicesManager.getDevice('room.device1').definition, @definitions[0])
     sinon.assert.calledOnce(@devicesManager.getDevice('room.device1').init)
