@@ -3,3 +3,13 @@ main: I2cMaster.driver.ts
 type: system
 drivers:
   I2cMaster.dev
+props:
+  feedback:
+    type: poll | int
+    default: poll
+  # poling interval in ms
+  polingInterval:
+    type: number
+    degault: 300
+  bus:
+    type: number
