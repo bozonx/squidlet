@@ -10,7 +10,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-const REGISTER_POSITION = 0;
+//const REGISTER_POSITION = 0;
 const REGISTER_LENGTH = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
@@ -20,7 +20,7 @@ interface I2cMasterDriverProps extends MasterSlaveBusProps {
 }
 
 
-export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
+export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
   // TODO: review poling
   private readonly poling: Poling = new Poling();
@@ -217,7 +217,23 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cMasterDriver, I2cMasterDriverProps> {
-  protected instanceIdName: string = 'bus';
-  protected DriverClass = I2cMasterDriver;
+export default class Factory extends DriverFactoryBase<I2cNodeDriver, I2cMasterDriverProps> {
+  protected combinedInstanceIdName = (instanceProps?: {[index: string]: any}): string => {
+
+    // TODO: использовать правила валидации
+    // TODO: может использовать какую-то автоматическую валидацию props
+
+    if (!instanceProps) {
+      throw new Error(`You have to specify props for instance of driver DigitalPcf8574`);
+    }
+    else if (!Number.isInteger(instanceProps.bus)) {
+      throw new Error(`The bus param has to be a number of driver DigitalPcf8574`);
+    }
+    else if (!Number.isInteger(instanceProps.address)) {
+      throw new Error(`The address param has to be a number of driver DigitalPcf8574`);
+    }
+
+    return `${instanceProps.bus}-${instanceProps.address}`;
+  }
+  protected DriverClass = I2cNodeDriver;
 }

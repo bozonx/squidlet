@@ -59,10 +59,6 @@ export default class GpioInputFactory extends DriverFactoryBase<DigitalPcf8574Dr
       throw new Error(`The address param has to be a number of driver DigitalPcf8574`);
     }
 
-    if (!Number.isInteger(instanceProps.bus)) {
-      throw new Error(``);
-    }
-
     return `${instanceProps.bus}-${instanceProps.address}`;
   }
 
