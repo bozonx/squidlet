@@ -1,7 +1,7 @@
 Events = require('../../host/src/app/Events').default
 
 
-describe.only 'app.Events', ->
+describe 'app.Events', ->
   beforeEach ->
     @events = new Events()
 

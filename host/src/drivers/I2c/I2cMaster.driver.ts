@@ -1,6 +1,7 @@
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
+import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
@@ -14,8 +15,9 @@ const REGISTER_LENGTH = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cMasterDriverProps {
+interface I2cMasterDriverProps extends MasterSlaveBusProps {
   bus: number;
+
 }
 
 
@@ -208,7 +210,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 }
 
 
-export default class I2cMasterFactory extends DriverFactoryBase<I2cMasterDriver, I2cMasterDriverProps> {
+export default class Factory extends DriverFactoryBase<I2cMasterDriver, I2cMasterDriverProps> {
   protected instanceIdName: string = 'bus';
   protected DriverClass = I2cMasterDriver;
 }

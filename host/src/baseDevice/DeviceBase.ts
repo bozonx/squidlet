@@ -99,8 +99,9 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
+    console.log(1111111111, 'publish', subtopic, value, params);
+    // TODO: сформировать publish и поднять локальное событие - publish, topic, params
     // TODO: передать deviceConf.deviceId, subtopic, value, params
-    // TODO: может делаться на удаленное устройство
   }
 
   // TODO: валидация конфига + дополнительный метод валидации девайса
