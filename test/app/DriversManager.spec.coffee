@@ -2,12 +2,11 @@ DriversManager = require('../../host/src/app/entities/DriversManager').default
 initializationConfig = require('../../host/src/app/config/initializationConfig').default
 
 
-describe 'app.DriversManager', ->
+describe.only 'app.DriversManager', ->
   beforeEach ->
-    @props = undefined
     @driver = class
-      constructor: (props) ->
-        @props = props
+      constructor: (defintion) ->
+        @defintion = defintion
       init: sinon.spy()
 
     @definitions = {
@@ -15,7 +14,6 @@ describe 'app.DriversManager', ->
         id: 'System.driver'
         className: 'System.driver'
         props: {
-          id: 'System.driver'
           otherParam: 1
         }
       }
@@ -23,7 +21,6 @@ describe 'app.DriversManager', ->
         id: 'Regular.driver'
         className: 'Regular.driver'
         props: {
-          id: 'Regular.driver'
           otherParam: 1
         }
       }
@@ -31,7 +28,6 @@ describe 'app.DriversManager', ->
         id: 'Dev.dev'
         className: 'Dev.dev'
         props: {
-          id: 'Dev.dev'
           otherParam: 1
         }
       }
@@ -51,7 +47,7 @@ describe 'app.DriversManager', ->
 
     await @driversManager.initSystemDrivers()
 
-    assert.equal(@driversManager.getDriver('System.driver').props, @definitions['System.driver'].props)
+    assert.equal(@driversManager.getDriver('System.driver').defintion, @definitions['System.driver'])
     sinon.assert.calledOnce(@driversManager.getDriver('System.driver').init)
 
   it 'initRegularDrivers() and getDriver', ->
@@ -59,7 +55,7 @@ describe 'app.DriversManager', ->
 
     await @driversManager.initRegularDrivers()
 
-    assert.equal(@driversManager.getDriver('Regular.driver').props, @definitions['Regular.driver'].props)
+    assert.equal(@driversManager.getDriver('Regular.driver').defintion, @definitions['Regular.driver'])
     sinon.assert.calledOnce(@driversManager.getDriver('Regular.driver').init)
 
 
@@ -68,8 +64,8 @@ describe 'app.DriversManager', ->
       'Dev.dev': @driver
     }
 
-    await @driversManager.$setDevs(devs)
+    await @driversManager.$registerDevs(devs)
 
-    assert.equal(@driversManager.getDriver('Dev.dev').props, @definitions['Dev.dev'].props)
-    assert.equal(@driversManager.getDev('Dev').props, @definitions['Dev.dev'].props)
+    assert.equal(@driversManager.getDriver('Dev.dev').defintion, @definitions['Dev.dev'])
+    assert.equal(@driversManager.getDev('Dev').defintion, @definitions['Dev.dev'])
     sinon.assert.calledOnce(@driversManager.getDriver('Dev.dev').init)

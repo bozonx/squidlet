@@ -2,7 +2,7 @@ DevicesManager = require('../../host/src/app/entities/DevicesManager').default
 initializationConfig = require('../../host/src/app/config/initializationConfig').default
 
 
-describe.only 'app.DevicesManager', ->
+describe 'app.DevicesManager', ->
   beforeEach ->
     @device = class
       constructor: (definition) ->
