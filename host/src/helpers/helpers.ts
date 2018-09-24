@@ -74,7 +74,7 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
 }
 
 export function generateEventName(category: string, topic: string, ...others: Array<string>): string {
-  if (!topic || topic === '*') return [ category, ...others ].join(systemConfig.eventNameSeparator);
+  //if (!topic || topic === '*') return [ category, ...others ].join(systemConfig.eventNameSeparator);
 
   return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
 }

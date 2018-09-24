@@ -1,4 +1,3 @@
-import {ALL_TOPIC_MASK} from '../app/Events';
 import Messenger, {REQUEST_RESPONSE_CATEGORY} from './Messenger';
 import System from '../app/System';
 import Request from './interfaces/Request';
@@ -26,7 +25,7 @@ export default class RequestResponse {
    * It wait for 60 seconds and after that or if message hasn't delivered a promise will rejected.
    */
   request(toHost: string, topic: string, payload: any): Promise<Response> {
-    if (!topic || topic === ALL_TOPIC_MASK) {
+    if (!topic) {
       throw new Error(`You have to specify a topic`);
     }
 
@@ -81,7 +80,7 @@ export default class RequestResponse {
       if (response.requestId !== requestId) return;
 
       // remove listener because we already have got a message
-      this.system.events.removeListener(REQUEST_RESPONSE_CATEGORY, undefined, wrapper);
+      this.system.events.removeCategoryListener(REQUEST_RESPONSE_CATEGORY, wrapper);
       handler(null, response);
     };
 
@@ -93,13 +92,13 @@ export default class RequestResponse {
     this.handlers[requestId] = wrapper;
 
     // listen for all the topics of request category
-    this.system.events.addListener(REQUEST_RESPONSE_CATEGORY, undefined, wrapper);
+    this.system.events.addCategoryListener(REQUEST_RESPONSE_CATEGORY, wrapper);
   }
 
   private stopWaitForResponse(requestId: string): void {
     clearTimeout(this.timeouts[requestId]);
     delete this.timeouts[requestId];
-    this.system.events.removeListener(REQUEST_RESPONSE_CATEGORY, undefined, this.handlers[requestId]);
+    this.system.events.removeCategoryListener(REQUEST_RESPONSE_CATEGORY, this.handlers[requestId]);
     delete this.handlers[requestId];
   }
 

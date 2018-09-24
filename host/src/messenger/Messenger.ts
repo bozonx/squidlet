@@ -1,5 +1,4 @@
 import System from '../app/System';
-import {ALL_TOPIC_MASK} from '../app/Events';
 import BridgeSubscriber from './BridgeSubscriber';
 import BridgeResponder from './BridgeResponder';
 import RequestResponse from './RequestResponse';
@@ -51,7 +50,7 @@ export default class Messenger {
    * It doesn't wait for respond. But it wait for delivering of message.
    */
   async publish(toHost: string, topic: string, payload?: any): Promise<void> {
-    if (!topic || topic === ALL_TOPIC_MASK) {
+    if (!topic) {
       throw new Error(`You have to specify a topic`);
     }
 
@@ -71,7 +70,7 @@ export default class Messenger {
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
   subscribe(toHost: string, topic: string, handler: (payload: any, message: Message) => void): void {
-    if (!topic || topic === ALL_TOPIC_MASK) {
+    if (!topic) {
       throw new Error(`You have to specify a topic`);
     }
 

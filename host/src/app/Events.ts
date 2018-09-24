@@ -28,7 +28,7 @@ export default class Events {
   /**
    * Listen all the topics of category
    */
-  listenCategory(category: string, handler: (payload: any) => void): void {
+  addCategoryListener(category: string, handler: (payload: any) => void): void {
     // listen to local events
     this.events.addListener(category, handler);
   }

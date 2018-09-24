@@ -16,9 +16,9 @@ describe.only 'app.Events', ->
     sinon.assert.calledOnce(handler)
     sinon.assert.calledWith(handler, 'payload')
 
-  it 'listenCategory', ->
+  it 'addCategoryListener', ->
     handler = sinon.spy()
-    @events.listenCategory('cat', handler)
+    @events.addCategoryListener('cat', handler)
 
     @events.emit('cat', 'topic', 'payload')
     @events.removeCategoryListener('cat', handler)
@@ -37,7 +37,7 @@ describe.only 'app.Events', ->
 
   it 'don\t listen other category', ->
     handler = sinon.spy()
-    @events.listenCategory('cat', handler)
+    @events.addCategoryListener('cat', handler)
 
     @events.emit('otherCat', 'payload')
 
