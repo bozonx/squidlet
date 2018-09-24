@@ -46,20 +46,17 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
 
   getLastData(dataAddress: number | undefined): Uint8Array {
-    // TODO: что делать с дефолтным ????
-    return this.pollLastData[dataAddress];
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
+
+    return this.pollLastData[dataAddressStr];
   }
 
-  // /**
-  //  * Read once from bus.
-  //  * If dataAddress is specified, it do request to data address(dataAddress) first.
-  //  */
-  // async read(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-  //   return this.i2cMaster.read(this.addressHex, dataAddress, length);
-  // }
-
+  /**
+   * Poll once immediately.
+   * If there is previously registered listener, the length param have to be the same.
+   */
   async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    // TODO: разово опросить с подъемом события и вернуть значение
+    return this.doPoll(dataAddress, length);
   }
 
   async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
@@ -89,6 +86,8 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    */
   listenIncome(dataAddress: number | undefined, length: number, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
+
+    // TODO: можно ли вешать более 1го хэндлера??? иначе они будут перебивать друг друга
 
     this.listeners[dataAddressStr] = [handler, length];
   }

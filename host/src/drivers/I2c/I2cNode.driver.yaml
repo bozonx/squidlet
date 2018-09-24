@@ -5,8 +5,8 @@ drivers:
   I2cMaster.dev
 props:
   feedback:
-    type: poll | int
-    default: poll
+    type: poll | int | none
+    default: none
   # poling interval in ms
   polingInterval:
     type: number
