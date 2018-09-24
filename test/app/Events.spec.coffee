@@ -26,3 +26,19 @@ describe.only 'app.Events', ->
 
     sinon.assert.calledOnce(handler)
     sinon.assert.calledWith(handler, 'payload')
+
+  it 'don\t listen other events', ->
+    handler = sinon.spy()
+    @events.addListener('cat', 'topic', handler)
+
+    @events.emit('cat', 'otherTopic', 'payload')
+
+    sinon.assert.notCalled(handler)
+
+  it 'don\t listen other category', ->
+    handler = sinon.spy()
+    @events.listenCategory('cat', handler)
+
+    @events.emit('otherCat', 'payload')
+
+    sinon.assert.notCalled(handler)
