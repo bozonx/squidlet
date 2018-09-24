@@ -1,5 +1,5 @@
 import System from '../System';
-import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
+import EntityDefinition from '../interfaces/EntityDefinition';
 import Env from '../interfaces/Env';
 import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 
@@ -18,6 +18,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
   private _env?: EntityEnv;
 
 
+  // TODO: review
   protected get RealEnvClass(): new (system: System) => EntityEnv {
     return this.EnvClass;
   }
@@ -31,7 +32,8 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
     this.system = system;
   }
 
-  async init() {
+  // TODO: review
+  init() {
     this._env = new this.RealEnvClass(this.system);
   }
 

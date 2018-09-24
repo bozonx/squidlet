@@ -12,6 +12,8 @@ import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
 export default class DriversManager extends EntityManagerBase<DriverInstance, DriverEnv> {
   protected readonly EnvClass = DriverEnv;
 
+  // TODO: что по части supter.init()
+
   async initSystemDrivers(): Promise<void> {
     // get list of system drivers from json file
     const systemDriversList = await this.system.configSet.loadConfig<string[]>(

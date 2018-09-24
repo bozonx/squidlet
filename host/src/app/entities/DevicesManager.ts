@@ -1,5 +1,5 @@
 import DeviceInstance from '../interfaces/DeviceInstance';
-import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
+import EntityDefinition from '../interfaces/EntityDefinition';
 import DeviceEnv from './DeviceEnv';
 import EntityManagerBase from './EntityManagerBase';
 
@@ -14,6 +14,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
    * Initialize all the devices on current host specified by its definitions in config
    */
   async init() {
+    // TODO: review
     super.init();
 
     const definitions = await this.system.configSet.loadConfig<EntityDefinition[]>(

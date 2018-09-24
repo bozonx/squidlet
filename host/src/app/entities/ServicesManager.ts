@@ -7,6 +7,8 @@ import ServiceEnv from './ServiceEnv';
 export default class ServicesManager extends EntityManagerBase<ServiceInstance, ServiceEnv> {
   protected readonly EnvClass = ServiceEnv;
 
+  // TODO: что по части supter.init()
+
   async initSystemServices() {
     const systemServicesList = await this.system.configSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
