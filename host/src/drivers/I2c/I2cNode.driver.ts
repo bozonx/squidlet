@@ -1,3 +1,5 @@
+import {I2cMasterDriver} from './I2cMaster.driver';
+
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'events';
 
@@ -12,153 +14,178 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 
 //const REGISTER_POSITION = 0;
 const REGISTER_LENGTH = 1;
+const LENGTH_POSITION = 1;
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cMasterDriverProps extends MasterSlaveBusProps {
   bus: number;
+  address: number;
 }
 
 
 export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
+  private addressHex: number = -1;
   private readonly events: EventEmitter = new EventEmitter();
   // TODO: review poling
   private readonly poling: Poling = new Poling();
   private pollLastData: {[index: string]: Uint8Array} = {};
+  // listeners and lengths by data address (number as string) like {128: [handler, 2]}
+  private listeners: {[index: string]: [Handler, number]} = {};
 
-  private get i2cMasterDev(): I2cMaster {
-    return this.depsInstances.i2cMaster as I2cMaster;
+  private get i2cMaster(): I2cMasterDriver {
+    return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
+
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cMaster = getDriverDep('I2cMaster.dev')
-      .getInstance(this.props);
+    this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
+      .getInstance({ bus: this.props.bus });
+
+    //const addressHex: number = this.normilizeAddr(i2cAddress);
   }
 
   protected didInit = async () => {
+    // TODO: поидее их нужно указывать на dataAddress
     // if (this.props.feedback === 'poll') {
     //   this.startPolling();
     // }
     // else if (this.props.feedback === 'int') {
-    //   this.startInt();
+    //   this.startListenInt();
     // }
   }
 
-  listenIncome(
-    i2cAddress: string | number,
-    dataAddress: number | undefined,
-    length: number,
-    handler: Handler
-  ): void {
 
-    // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
 
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
-
-    // start poling/int if need
-    this.startListen(addressHex, dataAddress, length);
-    // listen to events of this address and dataAddress
-    this.events.addListener(id, handler);
+  getLastData(dataAddress: number | undefined): Uint8Array {
+    // TODO: что делать с дефолтным ????
+    return this.pollLastData[dataAddress];
   }
 
-  removeListener(
-    i2cAddress: string | number,
-    dataAddress: number | undefined,
-    handler: Handler
-  ): void {
+  // /**
+  //  * Read once from bus.
+  //  * If dataAddress is specified, it do request to data address(dataAddress) first.
+  //  */
+  // async read(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+  //   return this.i2cMaster.read(this.addressHex, dataAddress, length);
+  // }
 
-    // TODO: test
-
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
-
-    // TODO: останавливает полинг если уже нет ни одного слушателя
-
-    this.events.removeListener(id, handler);
+  async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+    // TODO: разово опросить с подъемом события и вернуть значение
   }
 
-  /**
-   * Read data once and rise data event
-   */
-  async poll(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<void> {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
-
-    // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
-
-    let data: Uint8Array;
-
-    try {
-      data = await this.read(addressHex, dataAddress, length);
-    }
-    catch (err) {
-      this.events.emit(id, err);
-
-      return;
-    }
-
-    // if data is equal to previous data - do nothing
-    if (
-      typeof this.pollLastData[id] !== 'undefined'
-      && _isEqual(this.pollLastData[id], data)
-    ) return;
-
-    // save previous data
-    this.pollLastData[id] = data;
-    // finally rise an event
-    this.events.emit(id, null, data);
-  }
-
-  /**
-   * Write and read from the same data address.
-   */
-  async request(i2cAddress: string | number, dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-
-    await this.write(addressHex, dataAddress, dataToSend);
-
-    return this.read(addressHex, dataAddress, readLength);
-  }
-
-  /**
-   * Read once from bus.
-   * If dataAddress is specified, it do request to data address(dataAddress) first.
-   */
-  async read(i2cAddress: string | number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-
-    // write command
-    if (typeof dataAddress !== 'undefined') {
-      await this.writeEmpty(addressHex, dataAddress);
-    }
-    // read from bus
-    return this.i2cMasterDev.readFrom(this.props.bus, addressHex, length);
-  }
-
-  async write(i2cAddress: string | number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    let dataToWrite = data;
-
-    if (typeof dataAddress !== 'undefined') {
-      dataToWrite = addFirstItemUint8Arr(data, dataAddress);
-    }
-
-    await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+  async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+    await this.i2cMaster.write(this.addressHex, dataAddress, data);
   }
 
   /**
    * Write only a dataAddress to bus
    */
-  writeEmpty(i2cAddress: string | number, dataAddress: number): Promise<void> {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    const dataToWrite = new Uint8Array(REGISTER_LENGTH);
-
-    dataToWrite[0] = dataAddress;
-
-    return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+  writeEmpty(dataAddress: number): Promise<void> {
+    return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
   }
+
+  /**
+   * Write and read from the same data address.
+   */
+  async request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
+
+    // TODO: наверное должен обновить lastPoll ????
+
+    return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);
+  }
+
+  /**
+   * Listen to data which received by polling or interruption.
+   * You have to specify length of data which will be received.
+   */
+  listenIncome(dataAddress: number | undefined, length: number, handler: Handler): void {
+
+    // TODO: если уже есть полинг/int - то проверять чтобы длина была та же иначе throw
+    // TODO: что если dataAddress = undefined - тогда повешать дефолтный листенер наверное
+
+    this.listeners[dataAddress] = [handler, length];
+
+    // const eventName = this.generateId(this.addressHex, dataAddress);
+    //
+    // // start poling/int if need
+    // this.startListen(addressHex, dataAddress, length);
+    // // listen to events of this address and dataAddress
+    // this.events.addListener(eventName, handler);
+  }
+
+  removeListener(dataAddress: number | undefined, handler: Handler): void {
+
+    // TODO: найти и удалить из this.listeners
+    // TODO: test
+
+    // const addressHex: number = this.normilizeAddr(i2cAddress);
+    // const id = this.generateId(addressHex, dataAddress);
+    //
+    // // TODO: останавливает полинг если уже нет ни одного слушателя
+    //
+    // this.events.removeListener(id, handler);
+  }
+
+
+  private async pollDataAddresses() {
+    for (let dataAddressStr of Object.keys(this.listeners)) {
+      // TODO: что делать с дефолтным ????
+      const dataAddress: number = Number(dataAddressStr);
+
+      await this.doPoll(dataAddress, this.listeners[dataAddressStr][LENGTH_POSITION]);
+    }
+  }
+
+  /**
+   * Read data once and rise data event
+   */
+  private async doPoll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+    //const id = this.generateId(addressHex, dataAddress);
+
+    // TODO: проверить длинну - если есть полинг или листенеры - то должна соответствовать ????
+
+    const data: Uint8Array = await this.i2cMaster.read(this.addressHex, dataAddress, length);
+
+    // try {
+    //   data = await this.i2cMaster.read(this.addressHex, dataAddress, length);
+    // }
+    // catch (err) {
+    //
+    //   // this.events.emit(id, err);
+    //   //
+    //   // return;
+    // }
+
+    // if data is equal to previous data - do nothing
+    if (
+      typeof this.pollLastData[id] !== 'undefined'
+      && _isEqual(this.pollLastData[id], data)
+    ) return data;
+
+    // save previous data
+    this.pollLastData[dataAddress] = data;
+    // finally rise an event
+
+    // TODO: just call handler of this.listeners[dataAddress]
+    //this.events.emit(id, null, data);
+
+    return data;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   private startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
@@ -182,7 +209,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     this.poling.startPoling(cbWhichPoll, 1000, id);
   }
 
-  private startInt(i2cAddress: string | number, dataAddress: number | undefined, length: number, gpioInput: number) {
+  private startListenInt(i2cAddress: string | number, dataAddress: number | undefined, length: number, gpioInput: number) {
 
     // TODO: test
 
@@ -191,6 +218,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     // TODO: если длина не совпадает то не фатальная ошибка
   }
 
+  // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number
   private normilizeAddr(addressHex: string | number): number {
     return (Number.isInteger(addressHex as any))
       ? addressHex as number
@@ -198,6 +226,8 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
   private generateId(addressHex: number, dataAddress: number | undefined): string {
+    if (typeof dataAddress === 'undefined') return addressHex.toString();
+
     return [ addressHex.toString(), dataAddress ].join('-');
   }
 
