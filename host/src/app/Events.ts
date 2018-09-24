@@ -24,10 +24,11 @@ export default class Events {
 
   emit(category: string, topic: string = WHOLE_CATEGORY_MASK, payload?: any): void {
     const eventName = generateEventName(category, topic);
-    const wholeCateventName = generateEventName(category, WHOLE_CATEGORY_MASK);
+    const wholeCatEventName = generateEventName(category, WHOLE_CATEGORY_MASK);
 
-    this.events.emit(eventName, category, topic, payload);
-    this.events.emit(wholeCateventName, category, topic, payload);
+    this.events.emit(eventName, payload);
+    // emit category listeners
+    this.events.emit(wholeCatEventName, payload);
   }
 
   /**
@@ -35,11 +36,7 @@ export default class Events {
    */
   addListener(category: string, topic: string, handler: (payload: any) => void): void {
     const eventName = generateEventName(category, topic);
-    const wrapper = (msgCategory: string, msgTopic: string, payload: any): void => {
-      // if (msgCategory === category && msgTopic === topic) {
-      //   handler(payload);
-      // }
-
+    const wrapper = (payload: any): void => {
       handler(payload);
     };
 
@@ -58,9 +55,7 @@ export default class Events {
   listenCategory(category: string, handler: (payload: any) => void): void {
     // TODO: зачем формировать????
     const eventName = generateEventName(category, WHOLE_CATEGORY_MASK);
-    const wrapper = (msgCategory: string, msgTopic: string, payload: any): void => {
-      //if (msgCategory !== category) return;
-
+    const wrapper = (payload: any): void => {
       handler(payload);
     };
 
