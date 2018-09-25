@@ -106,17 +106,19 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   removeListener(dataAddress: number | undefined, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
+    // TODO: remove poling or int listener
+
     delete this.listeners[dataAddressStr];
   }
 
 
-  private async pollDataAddresses() {
-    for (let dataAddressStr of Object.keys(this.listeners)) {
-      const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
-
-      await this.doPoll(dataAddress, this.listeners[dataAddressStr][LENGTH_POSITION]);
-    }
-  }
+  // private async pollDataAddresses() {
+  //   for (let dataAddressStr of Object.keys(this.listeners)) {
+  //     const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
+  //
+  //     await this.doPoll(dataAddress, this.listeners[dataAddressStr][LENGTH_POSITION]);
+  //   }
+  // }
 
   /**
    * Read data once and rise an data event
@@ -160,19 +162,14 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     else if (this.props.feedback === 'int') {
       this.startListenInt(dataAddress, length);
     }
-    // TODO: если уже запущенно - ничего не делаем
-    // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль
   }
 
   private startPolling(dataAddress: number | undefined, length: number): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: если нет листенеров - то не опрашивать
-
+    // do nothing if there is poling of this address
     if (this.poling.isInProgress(dataAddressStr)) {
-      // TODO: если запущен то проверить длинну и ничего не делать
-      // TODO: если длина не совпадает то не фатальная ошибка
-
+      // TODO: может лучше отменить старый полинг и начать новый ???
       return;
     }
 
@@ -184,13 +181,14 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
   private startListenInt(dataAddress: number | undefined, length: number) {
-    const dataAddressStr: string = this.dataAddressToString(dataAddress);
+    const handler = async (value: boolean) => {
+      await this.doPoll(dataAddress, length);
+    };
 
-    // TODO: test
-    // TODO: если нет листенеров - то не опрашивать
+    // TODO: нужно гдето-взять параметры пина - pullup, invert, debounce и тд
+    // TODO: если запущен то ничего не делать - или удалить старый листенер
 
-    // TODO: запустить, если запущен то проверить длинну и ничего не делать
-    // TODO: если длина не совпадает то не фатальная ошибка
+    this.impulseInput.addListener(handler);
   }
 
   // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number
