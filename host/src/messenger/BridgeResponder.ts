@@ -4,7 +4,7 @@ import Message from './interfaces/Message';
 import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscriber';
 
 
-type Hanвler = (payload: any) => void;
+type Handler = (payload: any) => void;
 
 
 /**
@@ -14,7 +14,7 @@ export default class Bridge {
   private readonly system: System;
   private readonly messenger: Messenger;
   // handlers of local events by handleId
-  private readonly handlers: {[index: string]: Hanвler} = {};
+  private readonly handlers: {[index: string]: Handler} = {};
 
   constructor(system: System, messenger: Messenger) {
     this.system = system;
@@ -22,7 +22,7 @@ export default class Bridge {
   }
 
   init(): void {
-    this.system.events.addListener(SYSTEM_CATEGORY, undefined, this.handleSystemEvents);
+    this.system.events.addCategoryListener(SYSTEM_CATEGORY, this.handleSystemEvents);
   }
 
   private handleSystemEvents = (message: Message): void => {

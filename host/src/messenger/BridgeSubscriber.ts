@@ -32,7 +32,7 @@ export default class BridgeSubscriber {
   }
 
   init(): void {
-    this.system.events.addListener(SYSTEM_CATEGORY, undefined, this.handleSystemEvents);
+    this.system.events.addCategoryListener(SYSTEM_CATEGORY, this.handleSystemEvents);
   }
 
   /**

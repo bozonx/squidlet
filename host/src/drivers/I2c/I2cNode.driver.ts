@@ -12,6 +12,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 
 const HANDLER_POSITION = 0;
 const LENGTH_POSITION = 1;
+const DEFAULT_DATA_ADDRESS = 'default';
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
@@ -168,19 +169,18 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
     // TODO: если нет листенеров - то не опрашивать
 
-    if (this.poling.isInProgress(id)) {
+    if (this.poling.isInProgress(dataAddressStr)) {
       // TODO: если запущен то проверить длинну и ничего не делать
       // TODO: если длина не совпадает то не фатальная ошибка
 
       return;
     }
 
-    const cbWhichPoll = (): Promise<void> => {
-      return this.poll(addressHex, dataAddress, length);
+    const cbWhichPoll = async (): Promise<void> => {
+      await this.doPoll(dataAddress, length);
     };
 
-    // TODO: где взять poll interval ???
-    this.poling.startPoling(cbWhichPoll, 1000, id);
+    this.poling.startPoling(cbWhichPoll, this.props.polingInterval as number, dataAddressStr);
   }
 
   private startListenInt(dataAddress: number | undefined, length: number) {
@@ -200,21 +200,17 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
       : hexStringToHexNum(addressHex as string);
   }
 
-  private generateId(addressHex: number, dataAddress: number | undefined): string {
-    if (typeof dataAddress === 'undefined') return addressHex.toString();
-
-    return [ addressHex.toString(), dataAddress ].join('-');
-  }
-
   /**
-   * Convert number to string or undefined to "undefined"
+   * Convert number to string or undefined to "DEFAULT_DATA_ADDRESS"
    */
   private dataAddressToString(dataAddress: number | undefined): string {
+    if (typeof dataAddress === 'undefined') return DEFAULT_DATA_ADDRESS;
+
     return String(dataAddress);
   }
 
   private parseDataAddress(dataAddressStr: string): number | undefined {
-    if (dataAddressStr === 'undefined') return undefined;
+    if (dataAddressStr === DEFAULT_DATA_ADDRESS) return undefined;
 
     return Number(dataAddressStr);
   }
