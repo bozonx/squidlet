@@ -1,8 +1,6 @@
-import {I2cMasterDriver} from './I2cMaster.driver';
-
 const _isEqual = require('lodash/isEqual');
-import * as EventEmitter from 'events';
 
+import {I2cMasterDriver} from './I2cMaster.driver';
 import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
@@ -19,18 +17,18 @@ type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cMasterDriverProps extends MasterSlaveBusProps {
   bus: number;
-  address: number;
+  // it can be i2c address as a string like '5a' or number equivalent - 90
+  address: string | number;
 }
 
 
 export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
-  private addressHex: number = -1;
-  private readonly events: EventEmitter = new EventEmitter();
-  // TODO: review poling
   private readonly poling: Poling = new Poling();
-  private pollLastData: {[index: string]: Uint8Array} = {};
+  private addressHex: number = -1;
   // listeners and lengths by data address (number as string) like {128: [handler, 2]}
   private listeners: {[index: string]: [Handler, number]} = {};
+  // last received data by data address
+  private pollLastData: {[index: string]: Uint8Array} = {};
 
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
@@ -41,11 +39,11 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
 
-    //const addressHex: number = this.normilizeAddr(i2cAddress);
+    this.addressHex = this.normilizeAddr(this.props.address);
   }
 
 
-  getLastData(dataAddress: number | undefined): Uint8Array {
+  getLastData(dataAddress: number | undefined): Uint8Array | undefined {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     return this.pollLastData[dataAddressStr];
@@ -56,6 +54,12 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * If there is previously registered listener, the length param have to be the same.
    */
   async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
+
+    if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
+      throw new Error(`You can't do poll using another length that previously registered poll handler`);
+    }
+
     return this.doPoll(dataAddress, length);
   }
 
@@ -83,11 +87,16 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   /**
    * Listen to data which received by polling or interruption.
    * You have to specify length of data which will be received.
+   * Only one listener of data address can be specified.
    */
   listenIncome(dataAddress: number | undefined, length: number, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: можно ли вешать более 1го хэндлера??? иначе они будут перебивать друг друга
+    if (this.listeners[dataAddressStr]) {
+      throw new Error(`You can't specify another one listener
+       to i2c bus "${this.props.bus}" address "${this.props.address}" data address "${dataAddressStr}".
+       Another one was specified with length "${this.listeners[dataAddressStr][LENGTH_POSITION]}"`);
+    }
 
     this.listeners[dataAddressStr] = [handler, length];
   }
@@ -108,13 +117,10 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
   /**
-   * Read data once and rise data event
+   * Read data once and rise an data event
    */
   private async doPoll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
-    if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
-      throw new Error(`You can't do poll using another length that previously registered poll handler`);
-    }
 
     // TODO: если произошла ошибка то наверное лучше вызвать handler(error) ???
 
@@ -138,7 +144,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
 
   /**
-   * Convert number to string of undefined to "undefined"
+   * Convert number to string or undefined to "undefined"
    */
   private dataAddressToString(dataAddress: number | undefined): string {
     return String(dataAddress);
