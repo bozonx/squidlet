@@ -31,6 +31,8 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private listeners: {[index: string]: [Handler, number]} = {};
   // last received data by data address
   private pollLastData: {[index: string]: Uint8Array} = {};
+  private pollLengths: {[index: string]: number} = {};
+  private intListenersLengths: {[index: string]: number} = {};
 
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
@@ -55,6 +57,19 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     return this.pollLastData[dataAddressStr];
+  }
+
+  // TODO: use feedback params
+  setupFeedback(dataAddress: number | undefined, length: number): void {
+
+    // TODO: длина слушателя этого адреса должна совпадать с длиной полинга
+
+    if (this.props.feedback === 'poll') {
+      this.startPolling(dataAddress, length);
+    }
+    else if (this.props.feedback === 'int') {
+      this.startListenInt(dataAddress, length);
+    }
   }
 
   /**
@@ -107,7 +122,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     }
 
     this.listeners[dataAddressStr] = [handler, length];
-    this.startListenFeedback(dataAddress, length);
+    //this.startListenFeedback(dataAddress, length);
   }
 
   removeListener(dataAddress: number | undefined, handler: Handler): void {
@@ -162,14 +177,6 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
 
-  private startListenFeedback(dataAddress: number | undefined, length: number): void {
-    if (this.props.feedback === 'poll') {
-      this.startPolling(dataAddress, length);
-    }
-    else if (this.props.feedback === 'int') {
-      this.startListenInt(dataAddress, length);
-    }
-  }
 
   private startPolling(dataAddress: number | undefined, length: number): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
@@ -180,22 +187,39 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
       return;
     }
 
+    this.pollLengths[dataAddressStr] = length;
+
     const cbWhichPoll = async (): Promise<void> => {
       await this.doPoll(dataAddress, length);
     };
+
+    // TODO: сохранить длинну чтобы потом сравнивать
 
     this.poling.startPoling(cbWhichPoll, this.props.polingInterval as number, dataAddressStr);
   }
 
   private startListenInt(dataAddress: number | undefined, length: number) {
-    const handler = async (value: boolean) => {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
+    const handler = async () => {
       await this.doPoll(dataAddress, length);
     };
 
+    this.intListenersLengths[dataAddressStr] = length;
+
     // TODO: нужно гдето-взять параметры пина - pullup, invert, debounce и тд
     // TODO: если запущен то ничего не делать - или удалить старый листенер
+    // TODO: использовать простой импульс - пришла 1 - сразу blockTime - ничего не принимаем
+    // TODO: сравнивать длинну ???
 
     this.impulseInput.addListener(handler);
+  }
+
+  private stopPoling() {
+    // TODO: удалить из pollLengths, Polling
+  }
+
+  private removeIntListener() {
+    // TODO: удалить из intListenersLengths, unlisten of driver
   }
 
   // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number

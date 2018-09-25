@@ -1,6 +1,6 @@
 interface Props {
   // listen for impulse
-  addListener: () => void;
+  //addListener: () => void;
 
 }
 
@@ -14,6 +14,10 @@ export class ImpulseInputLogic {
    * Put this handler to your DigitalInput.driver's listener.
    */
   changeHandler = (value: boolean) => {
+
+  }
+
+  addListener(handler: () => void) {
 
   }
 
