@@ -8,6 +8,7 @@ import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import {ImpulseInputLogic} from '../Digital/ImpulseInput.logic';
 
 
 const HANDLER_POSITION = 0;
@@ -35,10 +36,16 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
 
+  private get impulseInput(): ImpulseInputLogic {
+    return this.depsInstances.impulseInput as ImpulseInputLogic;
+  }
+
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
+
+    // TODO: initialize ImpulseInputLogic
 
     this.addressHex = this.normilizeAddr(this.props.address);
   }
