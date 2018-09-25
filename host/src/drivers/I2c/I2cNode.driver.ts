@@ -99,6 +99,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     }
 
     this.listeners[dataAddressStr] = [handler, length];
+    this.startListenFeedback(dataAddress, length);
   }
 
   removeListener(dataAddress: number | undefined, handler: Handler): void {
@@ -143,34 +144,28 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
 
-  /**
-   * Convert number to string or undefined to "undefined"
-   */
-  private dataAddressToString(dataAddress: number | undefined): string {
-    return String(dataAddress);
-  }
+  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
+    //if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
+    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
 
-  private parseDataAddress(dataAddressStr: string): number | undefined {
-    if (dataAddressStr === 'undefined') return undefined;
-
-    return Number(dataAddressStr);
+    return;
   }
 
 
+  private startListenFeedback(dataAddress: number | undefined, length: number): void {
+    if (this.props.feedback === 'poll') {
+      this.startPolling(dataAddress, length);
+    }
+    else if (this.props.feedback === 'int') {
+      this.startListenInt(dataAddress, length);
+    }
+    // TODO: если уже запущенно - ничего не делаем
+    // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль
+  }
 
+  private startPolling(dataAddress: number | undefined, length: number): void {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-
-
-
-
-
-
-
-  private startPolling(i2cAddress: string | number, dataAddress: number | undefined, length: number): void {
-    const addressHex: number = this.normilizeAddr(i2cAddress);
-    const id = this.generateId(addressHex, dataAddress);
-
-    // TODO: test
     // TODO: если нет листенеров - то не опрашивать
 
     if (this.poling.isInProgress(id)) {
@@ -188,12 +183,12 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     this.poling.startPoling(cbWhichPoll, 1000, id);
   }
 
-  private startListenInt(i2cAddress: string | number, dataAddress: number | undefined, length: number, gpioInput: number) {
+  private startListenInt(dataAddress: number | undefined, length: number) {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     // TODO: test
     // TODO: если нет листенеров - то не опрашивать
 
-    const addressHex: number = this.normilizeAddr(i2cAddress);
     // TODO: запустить, если запущен то проверить длинну и ничего не делать
     // TODO: если длина не совпадает то не фатальная ошибка
   }
@@ -211,19 +206,18 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     return [ addressHex.toString(), dataAddress ].join('-');
   }
 
-  private startListen(addressHex: number, dataAddress: number | undefined, length: number): void {
-    // TODO: в соответсвии с конфигом запустить poling или int
-    // TODO: если уже запущенно - ничего не делаем
-    // TODO: если уже запущенно - и длинна не совпадает - ругаться в консоль
+  /**
+   * Convert number to string or undefined to "undefined"
+   */
+  private dataAddressToString(dataAddress: number | undefined): string {
+    return String(dataAddress);
   }
 
-  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
-    if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
-    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+  private parseDataAddress(dataAddressStr: string): number | undefined {
+    if (dataAddressStr === 'undefined') return undefined;
 
-    return;
+    return Number(dataAddressStr);
   }
-
 }
 
 
