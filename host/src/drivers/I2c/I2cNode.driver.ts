@@ -6,7 +6,7 @@ import * as EventEmitter from 'events';
 import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
-import { hexStringToHexNum, addFirstItemUint8Arr } from '../../helpers/helpers';
+import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
