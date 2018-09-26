@@ -1,0 +1,3 @@
+name: ImpulseOutput.driver
+main: ImpulseOutput.driver.ts
+type: system
