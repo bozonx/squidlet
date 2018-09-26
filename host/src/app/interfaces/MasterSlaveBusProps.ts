@@ -4,5 +4,6 @@ export type FeedbackType = 'poll' | 'int' | 'none';
 export default interface MasterSlaveBusProps {
   feedback: FeedbackType;
   polingInterval?: number;
-  interruptionPin?: number;
+  // name of interruption
+  intName?: string;
 }

@@ -8,7 +8,7 @@ import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ImpulseInputDriver} from '../Digital/ImpulseInput.driver';
+import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Digital/ImpulseInput.driver';
 
 
 const HANDLER_POSITION = 0;
@@ -17,10 +17,21 @@ const DEFAULT_DATA_ADDRESS = 'default';
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cMasterDriverProps extends MasterSlaveBusProps {
+interface Feedback extends MasterSlaveBusProps {
+  // length of data which will be requested
+  dataLength: number;
+}
+
+interface I2cMasterDriverProps {
   bus: number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
+  // if you have one interrupt pin you can specify in there
+  int?: ImpulseInputDriverProps;
+  // or if you use several pins you can give them unique names.
+  ints?: {[index: string]: ImpulseInputDriverProps};
+  // setup how to get feedback of device's data address, by polling or interrupt
+  feedback: {[index: string]: Feedback};
 }
 
 

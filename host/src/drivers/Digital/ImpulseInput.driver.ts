@@ -1,7 +1,10 @@
-interface Props {
+import DigitalBaseProps from './interfaces/DigitalBaseProps';
+
+
+export interface ImpulseInputDriverProps extends DigitalBaseProps {
   // listen for impulse
   //addListener: () => void;
-
+  impulseLength: number;
 }
 
 
