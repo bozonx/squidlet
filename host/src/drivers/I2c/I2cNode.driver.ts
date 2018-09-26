@@ -8,7 +8,7 @@ import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ImpulseInputLogic} from '../Digital/ImpulseInput.logic';
+import {ImpulseInputDriver} from '../Digital/ImpulseInput.driver';
 
 
 const HANDLER_POSITION = 0;
@@ -38,8 +38,8 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
 
-  private get impulseInput(): ImpulseInputLogic {
-    return this.depsInstances.impulseInput as ImpulseInputLogic;
+  private get impulseInput(): ImpulseInputDriver {
+    return this.depsInstances.impulseInput as ImpulseInputDriver;
   }
 
 
@@ -47,7 +47,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
 
-    // TODO: initialize ImpulseInputLogic
+    // TODO: initialize ImpulseInputDriver
 
     this.addressHex = this.normilizeAddr(this.props.address);
   }
@@ -200,6 +200,8 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
   private startListenInt(dataAddress: number | undefined, length: number) {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
+    // TODO: может сделать общий хэндлер и запускать doPoll на все зарегистрированные хэндлеры???
+    // TODO: что если int будет на каждый data address ?????
     const handler = async () => {
       await this.doPoll(dataAddress, length);
     };

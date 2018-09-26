@@ -5,7 +5,7 @@ interface Props {
 }
 
 
-export class ImpulseInputLogic {
+export class ImpulseInputDriver {
   constructor(props: Props) {
 
   }
@@ -24,8 +24,8 @@ export class ImpulseInputLogic {
 }
 
 export default class Factory {
-  async getInstance(instanceProps?: Props): Promise<ImpulseInputLogic> {
+  async getInstance(instanceProps?: Props): Promise<ImpulseInputDriver> {
     // TODO: merge props
-    return new ImpulseInputLogic();
+    return new ImpulseInputDriver();
   }
 }
