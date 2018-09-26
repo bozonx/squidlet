@@ -1,3 +1,5 @@
+import {DEFAULT_INT} from '../../app/interfaces/MasterSlaveBusProps';
+
 const _isEqual = require('lodash/isEqual');
 
 import {I2cFeedback} from './interfaces/I2cFeedback';
@@ -25,7 +27,8 @@ interface I2cMasterDriverProps {
   int?: ImpulseInputDriverProps;
   // or if you use several pins you can give them unique names.
   ints?: {[index: string]: ImpulseInputDriverProps};
-  // setup how to get feedback of device's data address, by polling or interrupt
+  // setup how to get feedback of device's data address, by polling or interrupt.
+  // If you want to get feedback without data address, use "default" as a key.
   feedback: {[index: string]: I2cFeedback};
 }
 
@@ -39,6 +42,18 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private pollLastData: {[index: string]: Uint8Array} = {};
   private pollLengths: {[index: string]: number} = {};
   private intListenersLengths: {[index: string]: number} = {};
+
+  private get intsProps(): {[index: string]: ImpulseInputDriverProps} {
+    const result: {[index: string]: ImpulseInputDriverProps} = {
+      ...this.props.ints,
+    };
+
+    if (this.props.int) {
+      result[DEFAULT_INT] = this.props.int;
+    }
+
+    return result;
+  }
 
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
