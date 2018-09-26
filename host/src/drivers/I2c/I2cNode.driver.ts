@@ -40,6 +40,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private listeners: {[index: string]: [Handler, number]} = {};
   // last received data by data address
   private pollLastData: {[index: string]: Uint8Array} = {};
+  private intDrivers: {[index: string]: ImpulseInputDriver} = {};
 
   private get intsProps(): {[index: string]: ImpulseInputDriverProps} {
     const result: {[index: string]: ImpulseInputDriverProps} = {
@@ -57,16 +58,19 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
 
-  private get impulseInput(): ImpulseInputDriver {
-    return this.depsInstances.impulseInput as ImpulseInputDriver;
-  }
+  // private get impulseInputs(): {[index: string]: ImpulseInputDriver} {
+  //   return this.depsInstances.impulseInput as ImpulseInputDriver;
+  // }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
 
-    // TODO: initialize ImpulseInputDriver
+    for (let dataAddressStr of Object.keys(this.intsProps)) {
+      this.intDrivers[dataAddressStr] = getDriverDep('ImpulseInput.driver')
+        .getInstance(this.intsProps[dataAddressStr]);
+    }
 
     this.addressHex = this.normilizeAddr(this.props.address);
   }
@@ -114,8 +118,6 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: review length
-
     if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
       throw new Error(`You can't do poll using another length that previously registered poll handler`);
     }
@@ -150,18 +152,9 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   removeListener(dataAddress: number | undefined, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: remove poling or int listener
-
     delete this.listeners[dataAddressStr];
   }
 
-  // private async pollDataAddresses() {
-  //   for (let dataAddressStr of Object.keys(this.listeners)) {
-  //     const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
-  //
-  //     await this.doPoll(dataAddress, this.listeners[dataAddressStr][LENGTH_POSITION]);
-  //   }
-  // }
 
   private setupFeedback(dataAddressStr: string, feedBackProps: I2cFeedback): void {
     const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
@@ -172,9 +165,9 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
       this.startPolling(dataAddress, feedBackProps.dataLength, polingInterval);
     }
     else if (feedBackProps.feedback === 'int') {
-      const intProps: ImpulseInputDriverProps = this.intsProps[feedBackProps.intName || DEFAULT_INT];
+      //const intProps: ImpulseInputDriverProps = this.intsProps[feedBackProps.intName || DEFAULT_INT];
 
-      this.startListenInt(dataAddress, feedBackProps.dataLength, intProps);
+      this.startListenInt(dataAddress, feedBackProps.dataLength);
     }
   }
 
@@ -182,14 +175,18 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * Read data once and rise an data event
    */
   private async doPoll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-
-    // TODO: reveiw
-
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
+    const handler: Handler = this.listeners[dataAddressStr][HANDLER_POSITION];
+    let data: Uint8Array;
 
-    // TODO: если произошла ошибка то наверное лучше вызвать handler(error) ???
+    try {
+      data = await this.i2cMaster.read(this.addressHex, dataAddress, length);
+    }
+    catch (err) {
+      handler(err);
 
-    const data: Uint8Array = await this.i2cMaster.read(this.addressHex, dataAddress, length);
+      throw err;
+    }
 
     // if data is equal to previous data - do nothing
     if (
@@ -200,8 +197,6 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     // save previous data
     this.pollLastData[dataAddressStr] = data;
     // finally rise an event
-    const handler: Handler = this.listeners[dataAddressStr][HANDLER_POSITION];
-
     handler(null, data);
 
     return data;
@@ -234,20 +229,14 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     this.poling.startPoling(cbWhichPoll, pollInterval, dataAddressStr);
   }
 
-  private startListenInt(dataAddress: number | undefined, length: number, intProps: ImpulseInputDriverProps) {
+  private startListenInt(dataAddress: number | undefined, length: number) {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
-    // TODO: может сделать общий хэндлер и запускать doPoll на все зарегистрированные хэндлеры???
-    // TODO: что если int будет на каждый data address ?????
+
     const handler = async () => {
       await this.doPoll(dataAddress, length);
     };
 
-    // TODO: нужно гдето-взять параметры пина - pullup, invert, debounce и тд
-    // TODO: если запущен то ничего не делать - или удалить старый листенер
-    // TODO: использовать простой импульс - пришла 1 - сразу blockTime - ничего не принимаем
-    // TODO: сравнивать длинну ???
-
-    this.impulseInput.addListener(handler);
+    this.intDrivers[dataAddressStr].addListener(handler);
   }
 
   // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number
