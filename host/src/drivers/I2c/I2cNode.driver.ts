@@ -73,24 +73,18 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     this.addressHex = this.normilizeAddr(this.props.address);
   }
 
+  protected didInit = async () => {
+    for (let dataAddressStr of Object.keys(this.props.feedback)) {
+      const feedBackProps: I2cFeedback = this.props.feedback[dataAddressStr];
+      this.setupFeedback(dataAddressStr, feedBackProps);
+    }
+  }
+
 
   getLastData(dataAddress: number | undefined): Uint8Array | undefined {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     return this.pollLastData[dataAddressStr];
-  }
-
-  // TODO: use feedback params
-  setupFeedback(dataAddress: number | undefined, length: number): void {
-
-    // TODO: длина слушателя этого адреса должна совпадать с длиной полинга
-
-    if (this.props.feedback === 'poll') {
-      this.startPolling(dataAddress, length);
-    }
-    else if (this.props.feedback === 'int') {
-      this.startListenInt(dataAddress, length);
-    }
   }
 
   /**
@@ -163,6 +157,20 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   //   }
   // }
 
+  private setupFeedback(dataAddressStr: string, feedBackProps: I2cFeedback): void {
+    const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
+
+    if (feedBackProps.feedback === 'poll') {
+      // TODO: смержить poll interval с дефолтными props
+      this.startPolling(dataAddress, feedBackProps.dataLength, feedBackProps.polingInterval);
+    }
+    else if (feedBackProps.feedback === 'int') {
+      const intProps: ImpulseInputDriverProps = this.intsProps[feedBackProps.intName || DEFAULT_INT];
+
+      this.startListenInt(dataAddress, feedBackProps.dataLength, intProps);
+    }
+  }
+
   /**
    * Read data once and rise an data event
    */
@@ -199,7 +207,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
 
 
-  private startPolling(dataAddress: number | undefined, length: number): void {
+  private startPolling(dataAddress: number | undefined, length: number, pollInterval: number): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     // do nothing if there is poling of this address
@@ -216,10 +224,10 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
     // TODO: сохранить длинну чтобы потом сравнивать
 
-    this.poling.startPoling(cbWhichPoll, this.props.polingInterval as number, dataAddressStr);
+    this.poling.startPoling(cbWhichPoll, pollInterval, dataAddressStr);
   }
 
-  private startListenInt(dataAddress: number | undefined, length: number) {
+  private startListenInt(dataAddress: number | undefined, length: number, intProps: ImpulseInputDriverProps) {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
     // TODO: может сделать общий хэндлер и запускать doPoll на все зарегистрированные хэндлеры???
     // TODO: что если int будет на каждый data address ?????
@@ -258,13 +266,13 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private dataAddressToString(dataAddress: number | undefined): string {
     if (typeof dataAddress === 'undefined') return DEFAULT_DATA_ADDRESS;
 
-    return String(dataAddress);
+    return dataAddress.toString(16);
   }
 
   private parseDataAddress(dataAddressStr: string): number | undefined {
     if (dataAddressStr === DEFAULT_DATA_ADDRESS) return undefined;
 
-    return Number(dataAddressStr);
+    return parseInt(dataAddressStr, 16);
   }
 }
 
