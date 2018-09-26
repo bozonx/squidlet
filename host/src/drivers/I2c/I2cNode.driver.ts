@@ -40,8 +40,6 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private listeners: {[index: string]: [Handler, number]} = {};
   // last received data by data address
   private pollLastData: {[index: string]: Uint8Array} = {};
-  private pollLengths: {[index: string]: number} = {};
-  private intListenersLengths: {[index: string]: number} = {};
 
   private get intsProps(): {[index: string]: ImpulseInputDriverProps} {
     const result: {[index: string]: ImpulseInputDriverProps} = {
@@ -80,29 +78,16 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     }
   }
 
+  destroy = () => {
+    // TODO: удалить из pollLengths, Polling
+    // TODO: удалить из intListenersLengths, unlisten of driver
+  }
+
 
   getLastData(dataAddress: number | undefined): Uint8Array | undefined {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     return this.pollLastData[dataAddressStr];
-  }
-
-  /**
-   * Poll once immediately.
-   * If there is previously registered listener, the length param have to be the same.
-   */
-  async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    const dataAddressStr: string = this.dataAddressToString(dataAddress);
-
-    if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
-      throw new Error(`You can't do poll using another length that previously registered poll handler`);
-    }
-
-    return this.doPoll(dataAddress, length);
-  }
-
-  async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    await this.i2cMaster.write(this.addressHex, dataAddress, data);
   }
 
   /**
@@ -123,12 +108,34 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
   /**
+   * Poll once immediately.
+   * If there is previously registered listener, the length param have to be the same.
+   */
+  async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+    const dataAddressStr: string = this.dataAddressToString(dataAddress);
+
+    // TODO: review length
+
+    if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
+      throw new Error(`You can't do poll using another length that previously registered poll handler`);
+    }
+
+    return this.doPoll(dataAddress, length);
+  }
+
+  async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+    await this.i2cMaster.write(this.addressHex, dataAddress, data);
+  }
+
+  /**
    * Listen to data which received by polling or interruption.
    * You have to specify length of data which will be received.
    * Only one listener of data address can be specified.
    */
   listenIncome(dataAddress: number | undefined, length: number, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
+
+    // TODO: разрешить добавлять несколько лисненеров, но проверять длину
 
     if (this.listeners[dataAddressStr]) {
       throw new Error(`You can't specify another one listener
@@ -148,7 +155,6 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     delete this.listeners[dataAddressStr];
   }
 
-
   // private async pollDataAddresses() {
   //   for (let dataAddressStr of Object.keys(this.listeners)) {
   //     const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
@@ -161,8 +167,9 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     const dataAddress: number | undefined = this.parseDataAddress(dataAddressStr);
 
     if (feedBackProps.feedback === 'poll') {
-      // TODO: смержить poll interval с дефолтными props
-      this.startPolling(dataAddress, feedBackProps.dataLength, feedBackProps.polingInterval);
+      const polingInterval: number = feedBackProps.polingInterval || this.env.config.config.drivers.defaultPollInterval;
+
+      this.startPolling(dataAddress, feedBackProps.dataLength, polingInterval);
     }
     else if (feedBackProps.feedback === 'int') {
       const intProps: ImpulseInputDriverProps = this.intsProps[feedBackProps.intName || DEFAULT_INT];
@@ -175,6 +182,9 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * Read data once and rise an data event
    */
   private async doPoll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+
+    // TODO: reveiw
+
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
     // TODO: если произошла ошибка то наверное лучше вызвать handler(error) ???
@@ -202,6 +212,8 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     //if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
     //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
 
+    // TODO: хотябы int или ints должны быть заданны
+
     return;
   }
 
@@ -212,17 +224,12 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 
     // do nothing if there is poling of this address
     if (this.poling.isInProgress(dataAddressStr)) {
-      // TODO: может лучше отменить старый полинг и начать новый ???
-      return;
+      throw new Error(`Another poll of data address "${dataAddress}" was previously specified.`);
     }
-
-    this.pollLengths[dataAddressStr] = length;
 
     const cbWhichPoll = async (): Promise<void> => {
       await this.doPoll(dataAddress, length);
     };
-
-    // TODO: сохранить длинну чтобы потом сравнивать
 
     this.poling.startPoling(cbWhichPoll, pollInterval, dataAddressStr);
   }
@@ -235,22 +242,12 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
       await this.doPoll(dataAddress, length);
     };
 
-    this.intListenersLengths[dataAddressStr] = length;
-
     // TODO: нужно гдето-взять параметры пина - pullup, invert, debounce и тд
     // TODO: если запущен то ничего не делать - или удалить старый листенер
     // TODO: использовать простой импульс - пришла 1 - сразу blockTime - ничего не принимаем
     // TODO: сравнивать длинну ???
 
     this.impulseInput.addListener(handler);
-  }
-
-  private stopPoling() {
-    // TODO: удалить из pollLengths, Polling
-  }
-
-  private removeIntListener() {
-    // TODO: удалить из intListenersLengths, unlisten of driver
   }
 
   // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number

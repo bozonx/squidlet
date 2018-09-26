@@ -2,11 +2,13 @@ import DriverInstance from './DriverInstance';
 import ManifestBase from './ManifestBase';
 import System from '../System';
 import Logger from './Logger';
+import HostConfig from './HostConfig';
 
 
 export default interface Env {
   readonly system: System;
   readonly log: Logger;
+  readonly config: HostConfig;
 
   getDev<T extends DriverInstance>(shortDevName: string): T;
 
