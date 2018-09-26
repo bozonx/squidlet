@@ -1,7 +1,7 @@
 const _isEqual = require('lodash/isEqual');
 
+import {I2cFeedback} from './interfaces/I2cFeedback';
 import {I2cMasterDriver} from './I2cMaster.driver';
-import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum } from '../../helpers/helpers';
@@ -17,11 +17,6 @@ const DEFAULT_DATA_ADDRESS = 'default';
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface Feedback extends MasterSlaveBusProps {
-  // length of data which will be requested
-  dataLength: number;
-}
-
 interface I2cMasterDriverProps {
   bus: number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
@@ -31,7 +26,7 @@ interface I2cMasterDriverProps {
   // or if you use several pins you can give them unique names.
   ints?: {[index: string]: ImpulseInputDriverProps};
   // setup how to get feedback of device's data address, by polling or interrupt
-  feedback: {[index: string]: Feedback};
+  feedback: {[index: string]: I2cFeedback};
 }
 
 
