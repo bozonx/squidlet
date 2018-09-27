@@ -1,6 +1,7 @@
+import * as EventEmitter from 'events';
+
 import Register from './Register';
 import Entities from './Entities';
-import * as EventEmitter from 'events';
 import MasterConfig from './MasterConfig';
 import {SrcEntitiesSet} from './interfaces/EntitySet';
 

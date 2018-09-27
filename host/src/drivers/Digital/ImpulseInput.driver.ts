@@ -1,18 +1,26 @@
-import DigitalBaseProps from './interfaces/DigitalBaseProps';
+import * as EventEmitter from 'eventemitter3';
+
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from './DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {resolveDriverName} from './digitalHelpers';
-import Digital from '../../app/interfaces/dev/Digital';
+import DebounceType from './interfaces/DebounceType';
+
+
+const eventName = 'change';
 
 
 export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
-  // listen for impulse
   impulseLength: number;
+  debounceType: DebounceType;
+  blockTime: number;
 }
 
 
 export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
+  private readonly events: EventEmitter = new EventEmitter();
+  private throttleInProgress: boolean = false;
+  private blockTimeInProgress: boolean = false;
+
   private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
   }
@@ -23,7 +31,8 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   }
 
   protected didInit = async () => {
-    const debounce: number = Math.ceil(this.props.impulseLength / 2);
+    //const debounce: number = Math.ceil(this.props.impulseLength / 2);
+    const debounce: number = this.props.impulseLength;
 
     this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
   }
@@ -33,14 +42,17 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
   addListener(handler: DigitalInputListenHandler) {
     // TODO: !!!!
+    // TODO: !!!! может добавить параметр risingOnly ??? и не поднимать 0
+
+    this.events.addListener(eventName, handler);
   }
 
-  listenOnce() {
-    // TODO: !!!!
+  listenOnce(handler: DigitalInputListenHandler) {
+    this.events.once(eventName, handler);
   }
 
-  removeListener() {
-    // TODO: !!!!
+  removeListener(handler: DigitalInputListenHandler) {
+    this.events.removeListener(eventName, handler);
   }
 
   destroy = () => {
@@ -50,11 +62,30 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
   protected validateProps = (): string | undefined => {
     // TODO: impulseLength не может быть 0 или меньше
+    return;
   }
 
 
   private listenHandler = () => {
+    // TODO: throttle если указан
 
+  }
+
+  private async throttle() {
+    // do nothing if there is debounce or dead time
+    if (this.throttleInProgress) return;
+
+    this.throttleInProgress = true;
+
+    // waiting for debounce
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        this.throttleInProgress = false;
+        this.startBlockTime(() => this.digitalInput.read())
+          .then(resolve)
+          .catch(reject);
+      }, this.props.debounce);
+    });
   }
 
 }

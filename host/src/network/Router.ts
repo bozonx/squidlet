@@ -1,5 +1,5 @@
 const _last = require('lodash/last');
-import * as EventEmitter from 'events';
+import * as EventEmitter from 'eventemitter3';
 
 import Network from './Network';
 import DriverEnv from '../app/entities/DriverEnv';

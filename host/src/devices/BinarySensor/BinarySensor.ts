@@ -3,9 +3,8 @@ import {DigitalInputDriver, DigitalInputDriverProps} from '../../drivers/Digital
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import DebounceType from '../../drivers/Digital/interfaces/DebounceType';
 
-
-type DebounceType = 'debounce' | 'throttle';
 
 interface Props extends DeviceBaseProps, DigitalInputDriverProps {
   debounce: number;

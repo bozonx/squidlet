@@ -1,4 +1,4 @@
-import * as EventEmitter from 'events';
+import * as EventEmitter from 'eventemitter3';
 
 import I2cSlave from '../../app/interfaces/dev/I2cSlave';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
