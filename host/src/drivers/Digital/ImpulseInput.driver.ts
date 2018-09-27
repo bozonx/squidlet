@@ -1,37 +1,59 @@
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalInputDriver, DigitalInputDriverProps} from './DigitalInput.driver';
+import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from './DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {resolveDriverName} from './digitalHelpers';
 import Digital from '../../app/interfaces/dev/Digital';
 
 
-export interface ImpulseInputDriverProps extends DigitalBaseProps {
+export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
   // listen for impulse
   impulseLength: number;
 }
 
 
-export class ImpulseInputDriver extends DriverBase<DigitalInputDriverProps> {
+export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
+    this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
+      .getInstance(this.props);
+  }
 
-    await this.digitalInput.setup(this.props.pin, this.resolvePinMode());
+  protected didInit = async () => {
+    const debounce: number = Math.ceil(this.props.impulseLength / 2);
+
+    this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
+  }
+
+  // TODO: read - считывает физически или отдает текущее значение???
+  // TODO:  еси физически то нужно ли обновить статуст???
+
+  addListener(handler: DigitalInputListenHandler) {
+    // TODO: !!!!
+  }
+
+  listenOnce() {
+    // TODO: !!!!
+  }
+
+  removeListener() {
+    // TODO: !!!!
+  }
+
+  destroy = () => {
+    this.digitalInput.removeListener(this.listenHandler);
   }
 
 
-  /**
-   * Put this handler to your DigitalInput.driver's listener.
-   */
-  changeHandler = (value: boolean) => {
-
+  protected validateProps = (): string | undefined => {
+    // TODO: impulseLength не может быть 0 или меньше
   }
 
-  addListener(handler: () => void) {
+
+  private listenHandler = () => {
 
   }
 

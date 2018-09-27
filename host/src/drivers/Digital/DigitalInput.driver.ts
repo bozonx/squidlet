@@ -9,7 +9,7 @@ import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 
 
-export type ListenHandler = (level: boolean) => void;
+export type DigitalInputListenHandler = (level: boolean) => void;
 
 export interface DigitalInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
@@ -22,7 +22,7 @@ export interface DigitalInputDriverProps extends DigitalBaseProps {
 
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   // listener and its wrapper by listener id which gets from setWatch method of dev
-  private listeners: {[index: string]: [ListenHandler, WatchHandler]} = {};
+  private listeners: {[index: string]: [DigitalInputListenHandler, WatchHandler]} = {};
 
   private get digital(): Digital {
     return this.depsInstances.digital as Digital;
@@ -50,7 +50,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
    * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
    * @param edge - Listen to low, high or both levels. By default is both.
    */
-  addListener(handler: ListenHandler, debounce?: number, edge?: Edge): void {
+  addListener(handler: DigitalInputListenHandler, debounce?: number, edge?: Edge): void {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.props.invert));
     };
@@ -65,7 +65,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     this.listeners[listenerId] = [handler, wrapper];
   }
 
-  listenOnce(handler: ListenHandler, edge?: Edge): void {
+  listenOnce(handler: DigitalInputListenHandler, edge?: Edge): void {
     const wrapper: WatchHandler = (level: boolean) => {
       // remove listener and don't listen any more
       this.removeListener(handler);
@@ -83,8 +83,8 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     this.listeners[listenerId] = [handler, wrapper];
   }
 
-  removeListener(handler: ListenHandler): void {
-    _find(this.listeners, (handlerItem: [ListenHandler, WatchHandler], listenerId: number) => {
+  removeListener(handler: DigitalInputListenHandler): void {
+    _find(this.listeners, (handlerItem: [DigitalInputListenHandler, WatchHandler], listenerId: number) => {
       if (handlerItem[0] === handler) {
         delete this.listeners[listenerId];
         this.digital.clearWatch(Number(listenerId));
@@ -95,6 +95,9 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       return;
     });
   }
+
+
+  // TODO: add destroy ???
 
 
   protected validateProps = (): string | undefined => {
