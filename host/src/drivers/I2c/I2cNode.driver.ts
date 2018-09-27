@@ -17,7 +17,7 @@ const DEFAULT_DATA_ADDRESS = 'default';
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cMasterDriverProps {
+interface I2cNodeDriverProps {
   bus: number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
@@ -31,7 +31,7 @@ interface I2cMasterDriverProps {
 }
 
 
-export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
+export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   private events: EventEmitter = new EventEmitter();
   private readonly poling: Poling = new Poling();
   private addressHex: number = -1;
@@ -41,6 +41,9 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private intDrivers: {[index: string]: ImpulseInputDriver} = {};
 
   private get intsProps(): {[index: string]: ImpulseInputDriverProps} {
+
+    // TODO: ??? нужно смержить с дефолтными значениями - impulseLength или оно само смержится в драйвере???
+
     const result: {[index: string]: ImpulseInputDriverProps} = {
       ...this.props.ints,
     };
@@ -144,7 +147,7 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
 
-  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
+  protected validateProps = (props: I2cNodeDriverProps): string | undefined => {
     //if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
     //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
 
@@ -248,20 +251,20 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cNodeDriver, I2cMasterDriverProps> {
+export default class Factory extends DriverFactoryBase<I2cNodeDriver, I2cNodeDriverProps> {
   protected combinedInstanceIdName = (instanceProps?: {[index: string]: any}): string => {
 
     // TODO: использовать правила валидации
     // TODO: может использовать какую-то автоматическую валидацию props
 
     if (!instanceProps) {
-      throw new Error(`You have to specify props for instance of driver DigitalPcf8574`);
+      throw new Error(`You have to specify props for instance of driver I2cNodeDriver`);
     }
     else if (!Number.isInteger(instanceProps.bus)) {
-      throw new Error(`The bus param has to be a number of driver DigitalPcf8574`);
+      throw new Error(`The bus param has to be a number of driver I2cNodeDriver`);
     }
-    else if (!Number.isInteger(instanceProps.address)) {
-      throw new Error(`The address param has to be a number of driver DigitalPcf8574`);
+    else if (typeof instanceProps.address !== 'string' && !Number.isInteger(instanceProps.address)) {
+      throw new Error(`The address param has to be a number of driver I2cNodeDriver`);
     }
 
     return `${instanceProps.bus}-${instanceProps.address}`;
