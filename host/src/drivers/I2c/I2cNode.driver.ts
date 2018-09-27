@@ -1,7 +1,7 @@
-import {DEFAULT_INT} from '../../app/interfaces/MasterSlaveBusProps';
-
 const _isEqual = require('lodash/isEqual');
+import * as EventEmitter from 'eventemitter3';
 
+import {DEFAULT_INT} from '../../app/interfaces/MasterSlaveBusProps';
 import {I2cFeedback} from './interfaces/I2cFeedback';
 import {I2cMasterDriver} from './I2cMaster.driver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
@@ -13,8 +13,6 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Digital/ImpulseInput.driver';
 
 
-const HANDLER_POSITION = 0;
-const LENGTH_POSITION = 1;
 const DEFAULT_DATA_ADDRESS = 'default';
 
 type Handler = (error: Error | null, data?: Uint8Array) => void;
@@ -34,10 +32,10 @@ interface I2cMasterDriverProps {
 
 
 export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
+  private events: EventEmitter = new EventEmitter();
   private readonly poling: Poling = new Poling();
   private addressHex: number = -1;
-  // listeners and lengths by data address (number as string) like {128: [handler, 2]}
-  private listeners: {[index: string]: [Handler, number]} = {};
+
   // last received data by data address
   private pollLastData: {[index: string]: Uint8Array} = {};
   private intDrivers: {[index: string]: ImpulseInputDriver} = {};
@@ -57,10 +55,6 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
-
-  // private get impulseInputs(): {[index: string]: ImpulseInputDriver} {
-  //   return this.depsInstances.impulseInput as ImpulseInputDriver;
-  // }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
@@ -115,12 +109,15 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * Poll once immediately.
    * If there is previously registered listener, the length param have to be the same.
    */
-  async poll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+  async poll(dataAddress: number | undefined): Promise<Uint8Array> {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    if (this.listeners[dataAddressStr] && this.listeners[dataAddressStr][LENGTH_POSITION] !== length) {
-      throw new Error(`You can't do poll using another length that previously registered poll handler`);
+    if (!this.props.feedback[dataAddressStr]) {
+      throw new Error(`data address "${dataAddressStr}" don't defined in props of I2cNode.driver
+       of i2c bus "${this.props.bus}" i2c address "${this.props.address}"`);
     }
+
+    const length: number = this.props.feedback[dataAddressStr].dataLength;
 
     return this.doPoll(dataAddress, length);
   }
@@ -134,25 +131,26 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    * You have to specify length of data which will be received.
    * Only one listener of data address can be specified.
    */
-  listenIncome(dataAddress: number | undefined, length: number, handler: Handler): void {
+  addListener(dataAddress: number | undefined, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    // TODO: разрешить добавлять несколько лисненеров, но проверять длину
-
-    if (this.listeners[dataAddressStr]) {
-      throw new Error(`You can't specify another one listener
-       to i2c bus "${this.props.bus}" address "${this.props.address}" data address "${dataAddressStr}".
-       Another one was specified with length "${this.listeners[dataAddressStr][LENGTH_POSITION]}"`);
-    }
-
-    this.listeners[dataAddressStr] = [handler, length];
-    //this.startListenFeedback(dataAddress, length);
+    this.events.addListener(dataAddressStr, handler);
   }
 
   removeListener(dataAddress: number | undefined, handler: Handler): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
 
-    delete this.listeners[dataAddressStr];
+    this.events.removeListener(dataAddressStr);
+  }
+
+
+  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
+    //if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
+    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
+
+    // TODO: хотябы int или ints должны быть заданны
+
+    return;
   }
 
 
@@ -176,14 +174,13 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
    */
   private async doPoll(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
-    const handler: Handler = this.listeners[dataAddressStr][HANDLER_POSITION];
     let data: Uint8Array;
 
     try {
       data = await this.i2cMaster.read(this.addressHex, dataAddress, length);
     }
     catch (err) {
-      handler(err);
+      this.events.emit(dataAddressStr, err);
 
       throw err;
     }
@@ -197,22 +194,10 @@ export class I2cNodeDriver extends DriverBase<I2cMasterDriverProps> {
     // save previous data
     this.pollLastData[dataAddressStr] = data;
     // finally rise an event
-    handler(null, data);
+    this.events.emit(dataAddressStr, null, data);
 
     return data;
   }
-
-
-  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
-    //if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
-    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
-
-    // TODO: хотябы int или ints должны быть заданны
-
-    return;
-  }
-
-
 
   private startPolling(dataAddress: number | undefined, length: number, pollInterval: number): void {
     const dataAddressStr: string = this.dataAddressToString(dataAddress);
