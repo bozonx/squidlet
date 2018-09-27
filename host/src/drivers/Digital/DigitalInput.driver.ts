@@ -21,6 +21,7 @@ export interface DigitalInputDriverProps extends DigitalBaseProps {
 
 
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
+  // listener and its wrapper by listener id which gets from setWatch method of dev
   private listeners: {[index: string]: [ListenHandler, WatchHandler]} = {};
 
   private get digital(): Digital {

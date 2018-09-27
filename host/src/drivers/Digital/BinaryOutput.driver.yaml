@@ -1,3 +1,5 @@
 name: BinaryOutput.driver
 main: BinaryOutput.driver.ts
 type: system
+drivers:
+  DigitalOutput.driver

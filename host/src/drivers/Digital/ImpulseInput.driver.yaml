@@ -1,3 +1,5 @@
 name: ImpulseInput.driver
 main: ImpulseInput.driver.ts
 type: system
+drivers:
+  DigitalInput.driver
