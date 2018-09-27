@@ -26,6 +26,7 @@ export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
 export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
   private throttleInProgress: boolean = false;
+  private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
   private get digitalInput(): DigitalInputDriver {
@@ -47,13 +48,18 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   // TODO: read - считывает физически или отдает текущее значение???
   // TODO:  еси физически то нужно ли обновить статуст???
 
-  addListener(handler: DigitalInputListenHandler, risingOnly: boolean) {
-    if (risingOnly) {
-      this.events.addListener(risingEventName, handler);
-    }
-    else {
-      this.events.addListener(bothEventName, handler);
-    }
+  /**
+   * Listen only to rising of impulse, not falling.
+   */
+  addRisingListener(handler: DigitalInputListenHandler) {
+    this.events.addListener(risingEventName, handler);
+  }
+
+  /**
+   * Listen to rising and faling of impulse (1 and 0 levels)
+   */
+  addListener(handler: DigitalInputListenHandler) {
+    this.events.addListener(bothEventName, handler);
   }
 
   listenOnce(handler: DigitalInputListenHandler) {
@@ -78,34 +84,70 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
 
   private listenHandler = async () => {
-    if (typeof this.props.throttle === 'undefined') {
+    // don't process new impulse while current is in progress
+    if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
 
-      // TODO: simple
+    if (typeof this.props.throttle === 'undefined') {
+      await this.startImpulse();
     }
     else {
       await this.throttle();
     }
   }
 
-  private async throttle() {
-    // do nothing throttle is in progress
-    if (this.throttleInProgress) return;
-
+  private async throttle(): Promise<void> {
     this.throttleInProgress = true;
 
-    // waiting for debounce
+    // waiting and then read level
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      setTimeout(async () => {
+        const currentValue: boolean = await this.digitalInput.read();
+
         this.throttleInProgress = false;
-        this.startImpulse(() => this.digitalInput.read())
+
+        // if level is 0 - it isn't an impulse - do nothing
+        if (!currentValue) return;
+
+        this.startImpulse()
           .then(resolve)
           .catch(reject);
       }, Number(this.props.throttle));
     });
   }
 
-  private async startImpulse(getLevel: () => Promise<boolean>): Promise<void> {
+  private async startImpulse(): Promise<void> {
+    this.impulseInProgress = true;
 
+    this.events.emit(risingEventName);
+    this.events.emit(bothEventName, 1);
+
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        this.events.emit(bothEventName, 0);
+        this.impulseInProgress = false;
+
+        if (this.props.blockTime) {
+          this.startBlockTime()
+            .then(resolve)
+            .catch(reject);
+        }
+        else {
+          resolve();
+        }
+      }, this.props.impulseLength);
+    });
+  }
+
+  private async startBlockTime(): Promise<void> {
+    this.blockTimeInProgress = true;
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.blockTimeInProgress = false;
+
+        resolve();
+      }, this.props.blockTime);
+    });
   }
 
 }
