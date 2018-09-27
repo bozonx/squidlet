@@ -58,7 +58,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
   private async throttle() {
-    // do nothing if there is debounce or dead time
+    // do nothing throttle is in progress
     if (this.throttleInProgress) return;
 
     this.throttleInProgress = true;

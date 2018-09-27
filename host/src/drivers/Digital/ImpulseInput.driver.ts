@@ -6,13 +6,20 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DebounceType from './interfaces/DebounceType';
 
 
-const eventName = 'change';
+const risingEventName = 'rising';
+const bothEventName = 'both';
 
 
 export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
   impulseLength: number;
-  debounceType: DebounceType;
+  // TODO: по умолчанию debounce
+  //debounceType: DebounceType;
+  // TODO: по умолчанию 0
   blockTime: number;
+
+  // if specified - it will wait for specified time
+  // and after that read level and start impulse if level is 1
+  throttle?: number;
 }
 
 
@@ -40,19 +47,22 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   // TODO: read - считывает физически или отдает текущее значение???
   // TODO:  еси физически то нужно ли обновить статуст???
 
-  addListener(handler: DigitalInputListenHandler) {
-    // TODO: !!!!
-    // TODO: !!!! может добавить параметр risingOnly ??? и не поднимать 0
-
-    this.events.addListener(eventName, handler);
+  addListener(handler: DigitalInputListenHandler, risingOnly: boolean) {
+    if (risingOnly) {
+      this.events.addListener(risingEventName, handler);
+    }
+    else {
+      this.events.addListener(bothEventName, handler);
+    }
   }
 
   listenOnce(handler: DigitalInputListenHandler) {
-    this.events.once(eventName, handler);
+    this.events.once(risingEventName, handler);
   }
 
   removeListener(handler: DigitalInputListenHandler) {
-    this.events.removeListener(eventName, handler);
+    this.events.removeListener(risingEventName, handler);
+    this.events.removeListener(bothEventName, handler);
   }
 
   destroy = () => {
@@ -62,17 +72,23 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
   protected validateProps = (): string | undefined => {
     // TODO: impulseLength не может быть 0 или меньше
+    // TODO: throttle не может быть 0 или меньше
     return;
   }
 
 
-  private listenHandler = () => {
-    // TODO: throttle если указан
+  private listenHandler = async () => {
+    if (typeof this.props.throttle === 'undefined') {
 
+      // TODO: simple
+    }
+    else {
+      await this.throttle();
+    }
   }
 
   private async throttle() {
-    // do nothing if there is debounce or dead time
+    // do nothing throttle is in progress
     if (this.throttleInProgress) return;
 
     this.throttleInProgress = true;
@@ -81,11 +97,15 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         this.throttleInProgress = false;
-        this.startBlockTime(() => this.digitalInput.read())
+        this.startImpulse(() => this.digitalInput.read())
           .then(resolve)
           .catch(reject);
-      }, this.props.debounce);
+      }, Number(this.props.throttle));
     });
+  }
+
+  private async startImpulse(getLevel: () => Promise<boolean>): Promise<void> {
+
   }
 
 }
