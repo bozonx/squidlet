@@ -1,9 +1,10 @@
+const _defaultsDeep = require('lodash/defaultsDeep');
+const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
 
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from './DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import DebounceType from './interfaces/DebounceType';
 
 
 const risingEventName = 'rising';
@@ -11,12 +12,10 @@ const bothEventName = 'both';
 
 
 export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
+  // time between 1 and 0
   impulseLength: number;
-  // TODO: по умолчанию debounce
-  //debounceType: DebounceType;
-  // TODO: по умолчанию 0
+  // in this time driver doesn't receive any data
   blockTime: number;
-
   // if specified - it will wait for specified time
   // and after that read level and start impulse if level is 1
   throttle?: number;
@@ -152,9 +151,13 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
 }
 
-export default class Factory {
+export default class Factory extends DriverBase<ImpulseInputDriverProps> {
   async getInstance(instanceProps?: ImpulseInputDriverProps): Promise<ImpulseInputDriver> {
-    // TODO: merge props
-    return new ImpulseInputDriver();
+    const definition = {
+      ...this.definition,
+      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
+    };
+
+    return new ImpulseInputDriver(definition, this.env);
   }
 }
