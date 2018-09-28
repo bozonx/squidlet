@@ -2,6 +2,7 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
 
+import DebounceType from './interfaces/DebounceType';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from './DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -11,6 +12,8 @@ const eventName = 'change';
 
 
 export interface BinaryInputDriverProps extends DigitalInputDriverProps {
+  debounce: number;
+  debounceType: DebounceType;
   // in this time driver doesn't receive any data
   blockTime: number;
 }
@@ -26,6 +29,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+    // TODO: если throttle то наверное debounce 0 по умолчанию
     this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
       .getInstance(this.props);
   }
@@ -37,8 +41,11 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     // this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
   }
 
-  // TODO: read - считывает физически или отдает текущее значение???
-  // TODO:  еси физически то нужно ли обновить статуст???
+
+  read() {
+    // TODO: read - считывает физически или отдает текущее значение???
+    // TODO:  еси физически то нужно ли обновить статуст???
+  }
 
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
@@ -65,8 +72,64 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
 
-  private listenHandler = async () => {
+  private listenHandler = async (level: boolean) => {
+    // do nothing if there is block time
+    if (this.blockTimeInProgress) return;
 
+    try {
+      if (this.props.debounceType === 'throttle') {
+        // throttle logic
+        await this.throttle();
+      }
+      else {
+        // debounce logic
+        await this.startBlockTime(async () => level);
+      }
+    }
+    catch (err) {
+      this.env.log.error(err);
+    }
+  }
+
+  private async throttle() {
+    // do nothing throttle is in progress
+    if (this.throttleInProgress) return;
+
+    this.throttleInProgress = true;
+
+    // waiting for debounce
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        this.throttleInProgress = false;
+        this.startBlockTime(() => this.digitalInput.read())
+          .then(resolve)
+          .catch(reject);
+      }, this.props.debounce);
+    });
+  }
+
+  private async startBlockTime(getLevel: () => Promise<boolean>): Promise<void> {
+    // start block time - ignore all the signals
+    this.blockTimeInProgress = true;
+
+    try {
+      const level: boolean = await getLevel();
+      // set it to status
+      // TODO: wait for promise ???
+      this.setStatus(level);
+    }
+    catch (err) {
+      this.blockTimeInProgress = false;
+
+      throw err;
+    }
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        this.blockTimeInProgress = false;
+        resolve();
+      }, this.props.blockTime);
+    });
   }
 
 }

@@ -2,4 +2,4 @@ name: BinaryInput.driver
 main: BinaryInput.driver.ts
 type: system
 drivers:
-  DigitalInput.driver
+  BinaryInput.driver
