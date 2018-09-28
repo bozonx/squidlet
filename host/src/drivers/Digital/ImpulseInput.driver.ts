@@ -44,8 +44,10 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
   }
 
-  // TODO: read - считывает физически или отдает текущее значение???
-  // TODO:  еси физически то нужно ли обновить статуст???
+
+  async read(): Promise<boolean> {
+    return this.digitalInput.read();
+  }
 
   /**
    * Listen only to rising of impulse, not falling.

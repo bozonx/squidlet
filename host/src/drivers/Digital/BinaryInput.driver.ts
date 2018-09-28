@@ -35,15 +35,12 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   protected didInit = async () => {
-    // TODO: если throttle то наверное debounce 0 по умолчанию
-    // TODO: !!!!! debounce должен мержиться с поумолчанию в props
     this.digitalInput.addListener(this.listenHandler, this.props.debounce);
   }
 
 
-  read() {
-    // TODO: read - считывает физически или отдает текущее значение???
-    // TODO:  еси физически то нужно ли обновить статуст???
+  async read(): Promise<boolean> {
+    return this.digitalInput.read();
   }
 
   /**
