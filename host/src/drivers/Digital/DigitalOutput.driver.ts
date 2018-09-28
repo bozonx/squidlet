@@ -9,7 +9,7 @@ import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 
 
-interface DigitalOutputDriverProps extends DigitalBaseProps {
+export interface DigitalOutputDriverProps extends DigitalBaseProps {
   initial?: 'low' | 'high';
 }
 

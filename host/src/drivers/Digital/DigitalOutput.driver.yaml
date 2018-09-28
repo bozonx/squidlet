@@ -1,3 +1,5 @@
 name: DigitalOutput.driver
 main: DigitalOutput.driver.ts
 type: system
+drivers:
+  DigitalOutput.driver
