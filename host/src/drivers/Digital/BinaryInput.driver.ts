@@ -1,5 +1,6 @@
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
+const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
 import DebounceType from './interfaces/DebounceType';
@@ -29,16 +30,14 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    // TODO: если throttle то наверное debounce 0 по умолчанию
     this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
-      .getInstance(this.props);
+      .getInstance(_omit(this.props, 'debounce', 'debounceType', 'blockTime'));
   }
 
   protected didInit = async () => {
-    // TODO: !!!!!
-    // const debounce: number = this.props.impulseLength;
-    //
-    // this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
+    // TODO: если throttle то наверное debounce 0 по умолчанию
+    // TODO: !!!!! debounce должен мержиться с поумолчанию в props
+    this.digitalInput.addListener(this.listenHandler, this.props.debounce);
   }
 
 
@@ -68,13 +67,14 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
 
   protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
     return;
   }
 
 
   private listenHandler = async (level: boolean) => {
-    // do nothing if there is block time
-    if (this.blockTimeInProgress) return;
+    // do nothing if there are block time or throttle
+    if (this.blockTimeInProgress || this.throttleInProgress) return;
 
     try {
       if (this.props.debounceType === 'throttle') {
@@ -92,9 +92,6 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   private async throttle() {
-    // do nothing throttle is in progress
-    if (this.throttleInProgress) return;
-
     this.throttleInProgress = true;
 
     // waiting for debounce
@@ -114,9 +111,8 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
     try {
       const level: boolean = await getLevel();
-      // set it to status
-      // TODO: wait for promise ???
-      this.setStatus(level);
+      // emit an event
+      this.events.emit(eventName, level);
     }
     catch (err) {
       this.blockTimeInProgress = false;

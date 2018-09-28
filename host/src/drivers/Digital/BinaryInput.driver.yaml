@@ -3,3 +3,14 @@ main: BinaryInput.driver.ts
 type: system
 drivers:
   BinaryInput.driver
+props:
+  debounce:
+    type: number
+    # it's default for debounce, not for throttle
+    default: 20
+  debounceType:
+    type: debounce | throttle
+    default: debounce
+  blockTime:
+    type: number
+    default: 50
