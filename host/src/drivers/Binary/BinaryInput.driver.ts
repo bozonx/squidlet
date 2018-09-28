@@ -3,9 +3,9 @@ const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
-import DebounceType from './interfaces/DebounceType';
+import DebounceType from '../Digital/interfaces/DebounceType';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from './DigitalInput.driver';
+import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 

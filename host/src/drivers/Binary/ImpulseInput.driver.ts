@@ -3,7 +3,7 @@ const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
 
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from './DigitalInput.driver';
+import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
