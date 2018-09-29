@@ -12,10 +12,13 @@ import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} 
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-const eventName = 'change';
+// const risingEventName = 'rising';
+// const bothEventName = 'both';
 
 
 export interface ImpulseOutputDriverProps extends DigitalOutputDriverProps {
+  // time between 1 and 0
+  impulseLength: number;
   blockTime: number;
 }
 
@@ -46,45 +49,30 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   async impulse() {
     // TODO: use block mode
     // skip while switch at block time or impulse is in progress
-    if (this.blockTimeInProgress) return;
+    if (this.impulseInProgress || this.blockTimeInProgress) return;
 
     this.impulseInProgress = true;
 
-
+    await this.digitalOutput.write(true);
 
     return new Promise<void>((resolve, reject) => {
-      setTimeout();
+      setTimeout(() => {
+        this.impulseFinished()
+          .then(resolve)
+          .catch(reject);
+      }, this.props.impulseLength);
     });
   }
 
-  // /**
-  //  * Listen to rising and faling of impulse (1 and 0 levels)
-  //  */
-  // addListener(handler: DigitalInputListenHandler) {
-  //   this.events.addListener(eventName, handler);
-  // }
-  //
-  // listenOnce(handler: DigitalInputListenHandler) {
-  //   this.events.once(eventName, handler);
-  // }
-  //
-  // removeListener(handler: DigitalInputListenHandler) {
-  //   this.events.removeListener(eventName, handler);
-  // }
-  //
-  // destroy = () => {
-  //   this.digitalInput.removeListener(this.listenHandler);
-  // }
+  async impulseFinished() {
+    this.digitalOutput.write(false);
+    this.impulseInProgress = true;
+  }
 
 
   protected validateProps = (): string | undefined => {
     // TODO: ???!!!!
     return;
-  }
-
-
-  private listenHandler = async (level: boolean) => {
-
   }
 
 }
