@@ -1,4 +1,4 @@
-DigitalInput = require('../../host/src/drivers/Digital/DigitalInput.driver').default
+DigitalInput = require('../../../host/src/drivers/Digital/DigitalInput.driver').default
 
 
 describe 'DigitalInput.driver', ->

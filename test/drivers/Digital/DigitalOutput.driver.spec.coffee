@@ -1,4 +1,4 @@
-DigitalOutput = require('../../host/src/drivers/Digital/DigitalOutput.driver').default
+DigitalOutput = require('../../../host/src/drivers/Digital/DigitalOutput.driver').default
 
 
 describe 'DigitalOutput.driver', ->
