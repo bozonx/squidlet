@@ -22,6 +22,7 @@ export interface ImpulseOutputDriverProps extends DigitalOutputDriverProps {
 
 export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
+  private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
   private get digitalOutput(): DigitalOutputDriver {
@@ -42,16 +43,18 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
     return this.digitalOutput.read();
   }
 
-  impulse() {
-    // skip while switch at dead time
-    if (this.blockTimeInProgress) return this.status.getLocal().default;
+  async impulse() {
+    // TODO: use block mode
+    // skip while switch at block time or impulse is in progress
+    if (this.blockTimeInProgress) return;
 
-    this.blockTimeInProgress = true;
-    setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+    this.impulseInProgress = true;
 
-    await this.setStatus(level);
 
-    return level;
+
+    return new Promise<void>((resolve, reject) => {
+      setTimeout();
+    });
   }
 
   // /**

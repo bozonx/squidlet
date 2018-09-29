@@ -10,7 +10,7 @@ import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
+import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Impulse/ImpulseInput.driver';
 
 
 const DEFAULT_DATA_ADDRESS = 'default';
