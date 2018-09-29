@@ -3,3 +3,10 @@ main: BinaryOutput.driver.ts
 type: system
 drivers:
   DigitalOutput.driver
+props:
+  blockTime:
+    type: number
+    default: 50
+  blockMode:
+    type: refuse | defer
+    default: defer

@@ -1,34 +1,34 @@
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
-import * as EventEmitter from 'eventemitter3';
 
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
-import DebounceType from '../Digital/interfaces/DebounceType';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-const eventName = 'change';
-
+export type BlockMode = 'refuse' | 'defer';
 
 export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {
+  blockTime: number;
+  // if "refuse" - it doesn't write while block time.
+  // If "defer" it waits for block time finished and write last write request
+  blockMode: BlockMode;
 }
 
 
 export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
+  private blockTimeInProgress: boolean = false;
+  private lastDeferredValue?: boolean;
+
   private get digitalOutput(): DigitalOutputDriver {
     return this.depsInstances.digitalOutput as DigitalOutputDriver;
   }
 
+
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalOutput = getDriverDep('DigitalOutput.driver')
-      .getInstance(this.props);
-  }
-
-  protected didInit = async () => {
-    //this.digitalInput.addListener(this.listenHandler, this.props.debounce);
+      .getInstance(_omit(this.props, 'blockTime', 'blockMode'));
   }
 
 
@@ -36,34 +36,42 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     return this.digitalOutput.read();
   }
 
-  // /**
-  //  * Listen to rising and faling of impulse (1 and 0 levels)
-  //  */
-  // addListener(handler: DigitalInputListenHandler) {
-  //   this.events.addListener(eventName, handler);
-  // }
-  //
-  // listenOnce(handler: DigitalInputListenHandler) {
-  //   this.events.once(eventName, handler);
-  // }
-  //
-  // removeListener(handler: DigitalInputListenHandler) {
-  //   this.events.removeListener(eventName, handler);
-  // }
-  //
-  // destroy = () => {
-  //   this.digitalInput.removeListener(this.listenHandler);
-  // }
+  async write(level: boolean) {
+    if (this.blockTimeInProgress) {
+      if (this.props.blockMode === 'refuse') {
+        // don't write while block time
+        return;
+      }
+      else {
+        // store that level which delayed
+        this.lastDeferredValue = level;
+
+        return;
+      }
+    }
+
+    this.blockTimeInProgress = true;
+    setTimeout(this.blockTimeFinished, this.props.blockTime);
+
+    await this.digitalOutput.write(level);
+  }
+
+  blockTimeFinished = async () => {
+    this.blockTimeInProgress = false;
+
+    if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
+      const lastDeferredValue = this.lastDeferredValue;
+      // clear deferred value
+      this.lastDeferredValue = undefined;
+      // write deffered value
+      await this.write(lastDeferredValue);
+    }
+  }
 
 
   protected validateProps = (): string | undefined => {
     // TODO: ???!!!!
     return;
-  }
-
-
-  private listenHandler = async (level: boolean) => {
-
   }
 
 }

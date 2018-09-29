@@ -1,3 +1,5 @@
+import {convertToLevel} from '../../helpers/helpers';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
@@ -14,10 +16,14 @@ const eventName = 'change';
 
 
 export interface ImpulseOutputDriverProps extends DigitalOutputDriverProps {
+  blockTime: number;
 }
 
 
 export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
+  private readonly events: EventEmitter = new EventEmitter();
+  private blockTimeInProgress: boolean = false;
+
   private get digitalOutput(): DigitalOutputDriver {
     return this.depsInstances.digitalOutput as DigitalOutputDriver;
   }
@@ -34,6 +40,18 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
 
   async read(): Promise<boolean> {
     return this.digitalOutput.read();
+  }
+
+  impulse() {
+    // skip while switch at dead time
+    if (this.blockTimeInProgress) return this.status.getLocal().default;
+
+    this.blockTimeInProgress = true;
+    setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+
+    await this.setStatus(level);
+
+    return level;
   }
 
   // /**
