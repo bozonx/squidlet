@@ -9,4 +9,4 @@ props:
     default: 50
   blockMode:
     type: refuse | defer
-    default: defer
+    default: refuse

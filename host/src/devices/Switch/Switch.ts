@@ -34,11 +34,8 @@ export default class Switch extends DeviceBase<Props> {
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
-      // skip while switch at dead time
-      if (this.blockTimeInProgress) return this.status.getLocal().default;
-
-      this.blockTimeInProgress = true;
-      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+      // skip while switch at block time
+      if (this.binaryOutput.isBlocked()) return this.status.getLocal().default;
 
       const level: boolean = convertToLevel(onOrOff);
 
@@ -48,11 +45,8 @@ export default class Switch extends DeviceBase<Props> {
     },
 
     toggle: async (): Promise<boolean> => {
-      // skip while switch at dead time
-      if (this.blockTimeInProgress) return this.status.getLocal().default;
-
-      this.blockTimeInProgress = true;
-      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+      // skip while switch at block time
+      if (this.binaryOutput.isBlocked()) return this.status.getLocal().default;
 
       const currentLevel: boolean = await this.getStatus();
       const resultLevel: boolean = !currentLevel;

@@ -32,6 +32,10 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   }
 
 
+  isBlocked(): boolean {
+    return this.blockTimeInProgress;
+  }
+
   async read(): Promise<boolean> {
     return this.digitalOutput.read();
   }
