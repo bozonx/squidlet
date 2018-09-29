@@ -5,7 +5,7 @@ const _omit = require('lodash/omit');
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import BlockMode from '../Impulse/interfaces/BlockMode';
+import BlockMode from './interfaces/BlockMode';
 
 
 export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {
