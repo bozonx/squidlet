@@ -66,7 +66,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       const lastDeferredValue = this.lastDeferredValue;
       // clear deferred value
       this.lastDeferredValue = undefined;
-      // write deffered value
+      // write deferred value
       await this.write(lastDeferredValue);
     }
   }
