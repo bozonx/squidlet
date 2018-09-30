@@ -54,9 +54,16 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     }
 
     this.blockTimeInProgress = true;
-    setTimeout(this.blockTimeFinished, this.props.blockTime);
 
     await this.digitalOutput.write(level);
+
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        this.blockTimeFinished()
+          .then(resolve)
+          .catch(reject);
+      }, this.props.blockTime);
+    });
   }
 
 

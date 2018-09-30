@@ -33,6 +33,10 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   }
 
 
+  isBlocked(): boolean {
+    return this.blockTimeInProgress;
+  }
+
   async read(): Promise<boolean> {
     return this.digitalOutput.read();
   }

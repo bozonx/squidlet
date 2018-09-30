@@ -1,7 +1,7 @@
 ImpulseOutput = require('../../../host/src/drivers/Binary/ImpulseOutput.driver').default
 
 
-describe.only 'ImpulseOutput.driver', ->
+describe 'ImpulseOutput.driver', ->
   beforeEach ->
     @digitalOutput = {
       setup: sinon.stub().returns(Promise.resolve())
