@@ -1,7 +1,7 @@
 BinaryOutput = require('../../../host/src/drivers/Binary/BinaryOutput.driver').default
 
 
-describe.only 'BinaryOutput.driver', ->
+describe 'BinaryOutput.driver', ->
   beforeEach ->
     @digitalOutput = {
       setup: sinon.stub().returns(Promise.resolve())
