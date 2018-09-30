@@ -65,8 +65,15 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
     });
   }
 
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
+  }
+
+
   private impulseFinished = async () => {
-    this.digitalOutput.write(false);
+    await this.digitalOutput.write(false);
     this.impulseInProgress = false;
     this.blockTimeInProgress = true;
 
@@ -77,12 +84,6 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
           .catch(reject);
       }, this.props.blockTime);
     });
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 
