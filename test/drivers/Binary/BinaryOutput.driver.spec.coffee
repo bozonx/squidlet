@@ -57,3 +57,26 @@ describe.only 'BinaryOutput.driver', ->
     sinon.assert.calledWith(@digitalOutput.write, true)
     sinon.assert.calledOnce(@driver.blockTimeFinished)
 
+  it 'blockTimeFinished with refuse', ->
+    await @instantiate()
+    @driver.write = sinon.stub().returns(Promise.resolve())
+    await @driver.init()
+
+    await @driver.blockTimeFinished()
+
+    assert.isFalse(@driver.blockTimeInProgress)
+    sinon.assert.notCalled(@driver.write)
+
+  it 'blockTimeFinished with defer', ->
+    @props.blockMode = 'defer'
+    await @instantiate()
+    @driver.write = sinon.stub().returns(Promise.resolve())
+    await @driver.init()
+    @driver.lastDeferredValue = true
+
+    await @driver.blockTimeFinished()
+
+    assert.isFalse(@driver.blockTimeInProgress)
+    assert.isUndefined(@driver.lastDeferredValue)
+    sinon.assert.calledOnce(@driver.write)
+    sinon.assert.calledWith(@driver.write, true)
