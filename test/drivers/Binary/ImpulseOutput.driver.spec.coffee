@@ -1,9 +1,9 @@
-ImpulseOutput = require('../../../host/src/drivers/Digital/ImpulseOutput.driver').default
+ImpulseOutput = require('../../../host/src/drivers/Binary/ImpulseOutput.driver').default
 
 
-describe 'ImpulseOutput.driver', ->
+describe.only 'ImpulseOutput.driver', ->
   beforeEach ->
-    @localDriver = {
+    @digitalOutput = {
       setup: sinon.stub().returns(Promise.resolve())
       read: sinon.stub().returns(Promise.resolve(true))
       write: sinon.stub().returns(Promise.resolve())
@@ -15,19 +15,34 @@ describe 'ImpulseOutput.driver', ->
     }
     @props = {
       pin: 1
-      driver: {
-        name: 'local'
-      }
+      impulseLength: 100
+      blockTime: 50
     }
     @env = {
-      loadManifest: => Promise.resolve({ drivers: ['Digital_local.driver'] })
+      loadManifest: => Promise.resolve({ drivers: ['DigitalOutput.driver'] })
       getDriver: => {
-        getInstance: => @localDriver
+        getInstance: => @digitalOutput
       }
     }
 
     @instantiate = =>
       @driver = await (new ImpulseOutput(@definition, @env)).getInstance(@props)
 
-  it 'init without initial', ->
+  it 'impulse', ->
     await @instantiate()
+
+    clock = sinon.useFakeTimers()
+
+    impulsePromise = @driver.impulse()
+
+    assert.isTrue(@driver.impulseInProgress)
+    sinon.assert.calledOnce(@digitalOutput.write)
+    sinon.assert.calledWith(@digitalOutput.write, true)
+
+    clock.tick(100)
+
+    clock.restore()
+
+
+
+# TODO: test block modes

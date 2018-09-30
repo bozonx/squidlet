@@ -59,7 +59,14 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     await this.digitalOutput.write(level);
   }
 
-  blockTimeFinished = async () => {
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
+  }
+
+
+  private blockTimeFinished = async () => {
     this.blockTimeInProgress = false;
 
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
@@ -69,12 +76,6 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       // write deferred value
       await this.write(lastDeferredValue);
     }
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 }

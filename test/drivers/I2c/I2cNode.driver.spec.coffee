@@ -1,7 +1,7 @@
 I2cNode = require('../../../host/src/drivers/I2c/I2cNode.driver').default
 
 
-describe.only 'I2cNode.driver', ->
+describe 'I2cNode.driver', ->
   beforeEach ->
 #    @readResult = new Uint8Array(1)
 #    @readResult[0] = 10

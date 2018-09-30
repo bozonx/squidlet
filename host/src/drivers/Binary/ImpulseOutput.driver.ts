@@ -32,10 +32,6 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
       .getInstance(_omit(this.props, 'impulseLength', 'blockTime', 'blockMode'));
   }
 
-  protected didInit = async () => {
-    //this.digitalInput.addListener(this.listenHandler, this.props.debounce);
-  }
-
 
   async read(): Promise<boolean> {
     return this.digitalOutput.read();
@@ -69,7 +65,7 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
     });
   }
 
-  async impulseFinished() {
+  private impulseFinished = async () => {
     this.digitalOutput.write(false);
     this.impulseInProgress = false;
     this.blockTimeInProgress = true;
@@ -83,7 +79,14 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
     });
   }
 
-  blockTimeFinished = async () => {
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
+  }
+
+
+  private blockTimeFinished = async () => {
     this.blockTimeInProgress = false;
 
     if (this.props.blockMode === 'defer' && typeof this.deferredImpulse !== 'undefined') {
@@ -92,12 +95,6 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
       // make deferred impulse
       await this.impulse();
     }
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 }
