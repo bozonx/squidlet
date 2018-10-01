@@ -34,19 +34,19 @@ export default class Main {
   }
 
   async collect() {
-    this.log.info(`Registering plugins, devices, drivers and services`);
+    this.log.info(`--> Registering plugins, devices, drivers and services`);
     await this.registering();
 
-    this.log.info(`Resolving and preparing entities`);
+    this.log.info(`--> Resolving and preparing entities`);
     await this.entities.generate();
 
-    this.log.info(`Checking platform dev dependencies`);
+    this.log.info(`--> Checking platform dev dependencies`);
     await this.hostsFilesSet.checkPlatformDevDeps();
 
-    this.log.info(`Generating hosts entities definitions`);
+    this.log.info(`--> Generating hosts entities definitions`);
     this.definitions.generate();
 
-    this.log.info(`Initialization has finished`);
+    this.log.info(`--> Initialization has finished`);
     // call handlers after init
     this.pluginEnv.$riseAfterInit();
   }
