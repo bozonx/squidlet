@@ -40,11 +40,11 @@ export default class Main {
     this.log.info(`--> Resolving and preparing entities`);
     await this.entities.generate();
 
-    this.log.info(`--> Checking platform dev dependencies`);
-    await this.hostsFilesSet.checkPlatformDevDeps();
-
     this.log.info(`--> Generating hosts entities definitions`);
     this.definitions.generate();
+
+    this.log.info(`--> Checking platform dev dependencies`);
+    await this.hostsFilesSet.checkPlatformDevDeps();
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
@@ -55,7 +55,7 @@ export default class Main {
    * Write all the hosts and entities files to storage
    */
   async writeToStorage(skipMaster?: boolean) {
-    this.log.info(`Write hosts files`);
+    this.log.info(`--> Write hosts files`);
     await this.hostsFilesWriter.writeEntitiesFiles();
     await this.hostsFilesWriter.writeHostsFiles(skipMaster);
   }

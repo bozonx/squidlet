@@ -1,9 +1,8 @@
-import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
-
 const _omit = require('lodash/omit');
 import * as path from 'path';
 
 import Main from './Main';
+import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
 import DeviceManifest from '../host/src/app/interfaces/DeviceManifest';
 import DriverManifest from '../host/src/app/interfaces/DriverManifest';
 import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';

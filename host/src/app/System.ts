@@ -45,6 +45,9 @@ export default class System {
     this.events = new Events();
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
+
+    // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
+
     this.network = new Network(this.driversManager.env, this.host.id, this.host.networkConfig);
     this.servicesManager = new ServicesManager(this);
     this.messenger = new Messenger(this);

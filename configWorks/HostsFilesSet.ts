@@ -218,6 +218,9 @@ export default class HostsFilesSet {
   private getServicesClassNames(hostId: string): string[] {
     const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
 
+    // TODO: поидее такого не должно быть, так как должен быть хоть один сервис
+    if (!servicesDefinitions) return [];
+
     return Object.keys(servicesDefinitions)
       .map((id: string) => servicesDefinitions[id].className);
   }
