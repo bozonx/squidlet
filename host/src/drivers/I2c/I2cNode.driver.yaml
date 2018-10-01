@@ -2,8 +2,8 @@ name: I2cNode.driver
 main: I2cNode.driver.ts
 type: system
 drivers:
-  I2cMaster.dev
-  ImpulseInput.driver
+  - I2cMaster.dev
+  - ImpulseInput.driver
 props:
   feedback:
     type: poll | int | none

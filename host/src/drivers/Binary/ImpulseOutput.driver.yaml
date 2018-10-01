@@ -2,4 +2,4 @@ name: ImpulseOutput.driver
 main: ImpulseOutput.driver.ts
 type: system
 drivers:
-  DigitalOutput.driver
+  - DigitalOutput.driver

@@ -2,7 +2,7 @@ name: BinaryInput.driver
 main: BinaryInput.driver.ts
 type: system
 drivers:
-  BinaryInput.driver
+  - BinaryInput.driver
 props:
   debounce:
     type: number

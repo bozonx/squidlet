@@ -2,7 +2,7 @@ name: BinaryOutput.driver
 main: BinaryOutput.driver.ts
 type: system
 drivers:
-  DigitalOutput.driver
+  - DigitalOutput.driver
 props:
   blockTime:
     type: number

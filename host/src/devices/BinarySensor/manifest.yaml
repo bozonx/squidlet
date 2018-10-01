@@ -4,7 +4,7 @@ type: binary-sensor
 main: ./BinarySensor.ts
 props: ./props.yaml
 drivers:
-  BinaryInput.driver
+  - BinaryInput.driver
 
 status:
   default: boolean
