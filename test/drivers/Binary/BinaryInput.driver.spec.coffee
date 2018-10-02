@@ -75,3 +75,16 @@ describe.only 'BinaryInput.driver', ->
 
     assert.isFalse(@driver.throttleInProgress)
     sinon.assert.calledOnce(@driver.startBlockTime)
+
+  it 'startBlockTime', ->
+    getLevel = sinon.stub().returns(Promise.resolve(true))
+    await @instantiate()
+    await @driver.init()
+
+    startBlockTimePromise = @driver.startBlockTime(getLevel)
+
+    assert.isTrue(@driver.blockTimeInProgress)
+
+    await startBlockTimePromise
+
+    assert.isFalse(@driver.blockTimeInProgress)
