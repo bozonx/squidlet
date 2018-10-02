@@ -1,7 +1,7 @@
 BinaryInput = require('../../../host/src/drivers/Binary/BinaryInput.driver').default
 
 
-describe.only 'BinaryInput.driver', ->
+describe 'BinaryInput.driver', ->
   beforeEach ->
     @digitalListenHandler = undefined
     @digitalOutput = {
