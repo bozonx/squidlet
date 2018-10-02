@@ -17,12 +17,12 @@ describe.only 'BinaryInput.driver', ->
     }
     @props = {
       pin: 1
-      debounce: 50
+      debounce: 0
       debounceType: 'debounce'
       blockTime: 0
     }
     @env = {
-      loadManifest: => Promise.resolve({ drivers: ['DigitalOutput.driver'] })
+      loadManifest: => Promise.resolve({ drivers: ['DigitalInput.driver'] })
       getDriver: => {
         getInstance: => @digitalOutput
       }
@@ -32,11 +32,46 @@ describe.only 'BinaryInput.driver', ->
     @instantiate = =>
       @driver = await (new BinaryInput(@definition, @env)).getInstance(@props)
 
-  it 'listen', ->
+  it 'listen - simple debounce', ->
     await @instantiate()
+    @driver.throttle = sinon.stub().returns(Promise.resolve())
+    @driver.startBlockTime = sinon.stub().returns(Promise.resolve())
     @driver.blockTimeFinished = sinon.stub().returns(Promise.resolve())
     await @driver.init()
 
     @driver.addListener(@handler)
 
     await @digitalListenHandler(true)
+
+    sinon.assert.calledOnce(@driver.startBlockTime)
+    sinon.assert.notCalled(@driver.throttle)
+
+  it 'listen - throttle', ->
+    @props.debounceType = 'throttle'
+    await @instantiate()
+    @driver.throttle = sinon.stub().returns(Promise.resolve())
+    @driver.startBlockTime = sinon.stub().returns(Promise.resolve())
+    @driver.blockTimeFinished = sinon.stub().returns(Promise.resolve())
+    await @driver.init()
+
+    @driver.addListener(@handler)
+
+    await @digitalListenHandler(true)
+
+    sinon.assert.notCalled(@driver.startBlockTime)
+    sinon.assert.calledOnce(@driver.throttle)
+
+  it 'throttle', ->
+    @props.debounceType = 'throttle'
+    await @instantiate()
+    @driver.startBlockTime = sinon.stub().returns(Promise.resolve())
+    await @driver.init()
+
+    throttlePromise = @driver.throttle()
+
+    assert.isTrue(@driver.throttleInProgress)
+
+    await throttlePromise
+
+    assert.isFalse(@driver.throttleInProgress)
+    sinon.assert.calledOnce(@driver.startBlockTime)
