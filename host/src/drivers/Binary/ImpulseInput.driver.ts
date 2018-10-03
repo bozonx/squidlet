@@ -120,11 +120,11 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     this.impulseInProgress = true;
 
     this.events.emit(risingEventName);
-    this.events.emit(bothEventName, 1);
+    this.events.emit(bothEventName, true);
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
-        this.events.emit(bothEventName, 0);
+        this.events.emit(bothEventName, false);
         this.impulseInProgress = false;
 
         if (this.props.blockTime) {
