@@ -1,7 +1,7 @@
 Switch = require('../../host/src/devices/Switch/Switch').default
 
 
-describe.only 'devices.Switch', ->
+describe 'devices.Switch', ->
   beforeEach ->
     @readResult = Promise.resolve(true)
     @writePromise = Promise.resolve()
@@ -11,6 +11,7 @@ describe.only 'devices.Switch', ->
         @readSpy()
         return @readResult
       write: sinon.stub().returns(@writePromise)
+      isBlocked: => false
     }
     @env = {
       system: {
@@ -39,7 +40,7 @@ describe.only 'devices.Switch', ->
       deviceId: 'room1.device1'
       className: 'Switch'
       props: {
-        blockTime: 50
+        blockTime: 0
       }
     }
     @handleStatusChange = sinon.spy()
@@ -72,22 +73,6 @@ describe.only 'devices.Switch', ->
     # after call action
     sinon.assert.calledWith(@switch.publish.getCall(2), 'turn', false)
 
-  it "turn - blockTime", () ->
-    clock = sinon.useFakeTimers()
-
-    await @switch.action('turn', 1)
-    sinon.assert.calledOnce(@outputDriver.write)
-
-    await @switch.action('turn', 0)
-    sinon.assert.calledOnce(@outputDriver.write)
-
-    clock.tick(100)
-
-    await @switch.action('turn', 1)
-    sinon.assert.calledTwice(@outputDriver.write)
-
-    clock.restore()
-
   it "toggle 1=>0", ->
     @switch.actions.turn = sinon.spy()
 
@@ -107,21 +92,38 @@ describe.only 'devices.Switch', ->
     sinon.assert.calledOnce(@outputDriver.write)
     sinon.assert.calledWith(@outputDriver.write, true)
 
-  it "toggle - blockTime", () ->
-    clock = sinon.useFakeTimers()
 
-    @readResult = Promise.resolve(true)
-    @switch.actions.turn = sinon.stub().returns(Promise.resolve());
-
-    await @switch.action('toggle')
-    sinon.assert.calledOnce(@outputDriver.write)
-
-    await @switch.action('toggle')
-    sinon.assert.calledOnce(@outputDriver.write)
-
-    clock.tick(100)
-
-    await @switch.action('toggle')
-    sinon.assert.calledTwice(@outputDriver.write)
-
-    clock.restore()
+#  it "turn - blockTime", () ->
+#    clock = sinon.useFakeTimers()
+#
+#    await @switch.action('turn', 1)
+#    sinon.assert.calledOnce(@outputDriver.write)
+#
+#    await @switch.action('turn', 0)
+#    sinon.assert.calledOnce(@outputDriver.write)
+#
+#    clock.tick(100)
+#
+#    await @switch.action('turn', 1)
+#    sinon.assert.calledTwice(@outputDriver.write)
+#
+#    clock.restore()
+#
+#  it "toggle - blockTime", () ->
+#    clock = sinon.useFakeTimers()
+#
+#    @readResult = Promise.resolve(true)
+#    @switch.actions.turn = sinon.stub().returns(Promise.resolve());
+#
+#    await @switch.action('toggle')
+#    sinon.assert.calledOnce(@outputDriver.write)
+#
+#    await @switch.action('toggle')
+#    sinon.assert.calledOnce(@outputDriver.write)
+#
+#    clock.tick(100)
+#
+#    await @switch.action('toggle')
+#    sinon.assert.calledTwice(@outputDriver.write)
+#
+#    clock.restore()
