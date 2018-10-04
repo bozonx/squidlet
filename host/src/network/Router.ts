@@ -19,21 +19,26 @@ type RouterHandler = (error: Error | null, payload?: any) => void;
 export default class Router {
   private readonly network: Network;
   private readonly driverEnv: DriverEnv;
-  private readonly destinations: Destinations;
+  private _destinations?: Destinations;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly eventName: string = 'msg';
+
+  private get destinations(): Destinations {
+    return this._destinations as Destinations;
+  }
 
   constructor(network: Network, driverEnv: DriverEnv) {
     this.network = network;
     this.driverEnv = driverEnv;
-    this.destinations = new Destinations(
+  }
+
+  init(): void {
+    this._destinations = new Destinations(
       this.driverEnv,
       this.network.config.connections,
       this.network.config.neighbors
     );
-  }
 
-  init(): void {
     this.destinations.init();
     // listen for income messages from all the hosts
     this.destinations.listenIncome(this.handleIncomeMessages);

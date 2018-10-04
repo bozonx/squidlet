@@ -8,20 +8,28 @@ import HostNetworkConfig from './interfaces/HostNetworkConfig';
  * It works independent.
  */
 export default class Network {
-  readonly hostId: string;
-  readonly config: HostNetworkConfig;
+  _hostId?: string;
+  _config?: HostNetworkConfig;
+
+  get hostId(): string {
+    return this._hostId as string;
+  }
+
+  get config(): HostNetworkConfig {
+    return this._config as HostNetworkConfig;
+  }
 
   private readonly driverEnv: DriverEnv;
   private readonly router: Router;
 
-  constructor(driverEnv: DriverEnv, hostId: string, config: HostNetworkConfig) {
-    this.hostId = hostId;
-    this.config = config;
+  constructor(driverEnv: DriverEnv) {
     this.driverEnv = driverEnv;
     this.router = new Router(this, this.driverEnv);
   }
 
-  init(): void {
+  init(hostId: string, config: HostNetworkConfig): void {
+    this._hostId = hostId;
+    this._config = config;
     this.router.init();
   }
 
