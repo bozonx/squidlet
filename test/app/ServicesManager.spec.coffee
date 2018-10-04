@@ -28,6 +28,9 @@ describe 'app.ServicesManager', ->
 
     @system = {
       initCfg: initializationConfig()
+      host: {
+        config: {}
+      }
       configSet: {
         loadMain: => @service
         loadConfig: sinon.stub()

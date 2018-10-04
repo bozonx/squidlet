@@ -35,6 +35,9 @@ describe 'app.DriversManager', ->
 
     @system = {
       initCfg: initializationConfig()
+      host: {
+        config: {}
+      }
       configSet: {
         loadMain: => @driver
       }

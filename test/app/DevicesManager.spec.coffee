@@ -21,6 +21,9 @@ describe 'app.DevicesManager', ->
 
     @system = {
       initCfg: initializationConfig()
+      host: {
+        config: {}
+      }
       configSet: {
         loadMain: => @device
         loadConfig: => @definitions
