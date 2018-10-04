@@ -33,6 +33,7 @@ export async function getPlatformSystem(platformName: string): Promise<System> {
   const system: System = new System();
   const devsSet: {[index: string]: new (...params: any[]) => any} = collectDevs(platformName);
 
+  console.info(`--> register platform's devs`);
   await system.$registerDevs(devsSet);
 
   return system;

@@ -58,13 +58,15 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
    * @param devs - like {DeviClassName: DevClass}
    */
   async $registerDevs(devs: {[index: string]: EntityClassType}) {
+    // TODO: ещё нет configSet
     // load list of definitions of drivers
-    const definitions: {[index: string]: EntityDefinition} = await this.loadDriversDefinitions();
+    //const definitions: {[index: string]: EntityDefinition} = await this.loadDriversDefinitions();
 
     for (let driverName of Object.keys(devs)) {
       const DriverClass: EntityClassType = devs[driverName];
 
-      this.instances[driverName] = new DriverClass(definitions[driverName], this.env);
+      //this.instances[driverName] = new DriverClass(definitions[driverName], this.env);
+      this.instances[driverName] = new DriverClass({id: driverName, className: driverName, props: {}}, this.env);
     }
 
     await this.initializeAll(Object.keys(devs));

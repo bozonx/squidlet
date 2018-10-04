@@ -22,9 +22,12 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
 }
 
 async function prepareHostSystem (main: Main): Promise<System> {
+  console.info(`===> Initialize host system of platform`);
+  console.info(`--> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
   const platformName: string = hostConfigSet.config.platform;
+  console.info(`--> getting host system of platform`);
   const hostSystem: System = await getPlatformSystem(platformName);
 
   // integrate a config set as a static prop
