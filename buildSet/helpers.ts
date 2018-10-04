@@ -61,7 +61,7 @@ function collectDevs(platformName: string) {
     const fullDevName = `${devName}.dev`;
     const devPath = path.join(platformsDir, platformDirName, 'dev', fullDevName);
 
-    devsSet[fullDevName] = require(devPath);
+    devsSet[fullDevName] = require(devPath).default;
   }
 
   return devsSet;
