@@ -27,7 +27,7 @@ describe 'devices.BinarySensor', ->
             type: 'number'
           }
         }
-        drivers: ['DigitalInput.driver']
+        drivers: ['BinaryInput.driver']
       })
       getDriver: => {
         getInstance: => @inputDriver
@@ -37,8 +37,8 @@ describe 'devices.BinarySensor', ->
       id: 'room1.device1'
       className: 'BinarySensor'
       props: {
-        debounce: 30
-        blockTime: 50
+        debounce: 0
+        blockTime: 0
       }
     }
     @handleStatusChange = sinon.spy()
@@ -54,68 +54,74 @@ describe 'devices.BinarySensor', ->
     sinon.assert.calledOnce(@readSpy)
     sinon.assert.calledOnce(@inputDriver.addListener)
 
-
-  it "main logic - debounceType = debounce", ->
-
-    clock = sinon.useFakeTimers()
-
+  it 'check status', ->
     # like driver has risen an event
-    @binarySensor.onInputChange(true)
+    await @binarySensor.onInputChange(true)
 
-    assert.isTrue(@binarySensor.blockTimeInProgress)
+    assert.deepEqual(@binarySensor.status.localData, { default: true })
 
-    await @readResult
 
-    # after setStatus
-    assert.equal(@binarySensor.status.getLocal().default, true)
 
-    sinon.assert.calledOnce(@handleStatusChange);
-    sinon.assert.calledWith(@handleStatusChange, ['default']);
-
-    clock.tick(50)
-
-    assert.isFalse(@binarySensor.blockTimeInProgress)
-
-    clock.restore()
-
-    sinon.assert.calledTwice(@binarySensor.publish)
-    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
-    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
-
-  it "main logic - debounceType = throttle", ->
-    @definition.props.debounceType = 'throttle'
-    assert.equal(@binarySensor.status.getLocal().default, false)
-
-    @readResult = Promise.resolve(true)
-    clock = sinon.useFakeTimers()
-
-    # like driver has risen an event
-    @binarySensor.onInputChange()
-
-    assert.isTrue(@binarySensor.throttleInProgress)
-    assert.isFalse(@binarySensor.blockTimeInProgress)
-
-    # wait for debounce time has finished and startValueLogic has started
-    clock.tick(30)
-
-    assert.isFalse(@binarySensor.throttleInProgress)
-    assert.isTrue(@binarySensor.blockTimeInProgress)
-
-    await @readResult
-
-    # after setStatus
-    assert.equal(@binarySensor.status.getLocal().default, true)
-
-    sinon.assert.calledOnce(@handleStatusChange);
-    sinon.assert.calledWith(@handleStatusChange, ['default']);
-
-    clock.tick(50)
-
-    assert.isFalse(@binarySensor.throttleInProgress)
-    assert.isFalse(@binarySensor.blockTimeInProgress)
-
-    clock.restore()
-
-    sinon.assert.calledTwice(@binarySensor.publish)
-    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
-    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
+#  it "main logic - debounceType = debounce", ->
+#    clock = sinon.useFakeTimers()
+#
+#    # like driver has risen an event
+#    @binarySensor.onInputChange(true)
+#
+#    assert.isTrue(@binarySensor.blockTimeInProgress)
+#
+#    await @readResult
+#
+#    # after setStatus
+#    assert.equal(@binarySensor.status.getLocal().default, true)
+#
+#    sinon.assert.calledOnce(@handleStatusChange);
+#    sinon.assert.calledWith(@handleStatusChange, ['default']);
+#
+#    clock.tick(50)
+#
+#    assert.isFalse(@binarySensor.blockTimeInProgress)
+#
+#    clock.restore()
+#
+#    sinon.assert.calledTwice(@binarySensor.publish)
+#    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
+#    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
+#
+#  it "main logic - debounceType = throttle", ->
+#    @definition.props.debounceType = 'throttle'
+#    assert.equal(@binarySensor.status.getLocal().default, false)
+#
+#    @readResult = Promise.resolve(true)
+#    clock = sinon.useFakeTimers()
+#
+#    # like driver has risen an event
+#    @binarySensor.onInputChange()
+#
+#    assert.isTrue(@binarySensor.throttleInProgress)
+#    assert.isFalse(@binarySensor.blockTimeInProgress)
+#
+#    # wait for debounce time has finished and startValueLogic has started
+#    clock.tick(30)
+#
+#    assert.isFalse(@binarySensor.throttleInProgress)
+#    assert.isTrue(@binarySensor.blockTimeInProgress)
+#
+#    await @readResult
+#
+#    # after setStatus
+#    assert.equal(@binarySensor.status.getLocal().default, true)
+#
+#    sinon.assert.calledOnce(@handleStatusChange);
+#    sinon.assert.calledWith(@handleStatusChange, ['default']);
+#
+#    clock.tick(50)
+#
+#    assert.isFalse(@binarySensor.throttleInProgress)
+#    assert.isFalse(@binarySensor.blockTimeInProgress)
+#
+#    clock.restore()
+#
+#    sinon.assert.calledTwice(@binarySensor.publish)
+#    sinon.assert.calledWith(@binarySensor.publish, 'status', false)
+#    sinon.assert.calledWith(@binarySensor.publish, 'status', true)
