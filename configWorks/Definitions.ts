@@ -37,15 +37,15 @@ export default class Definitions {
   }
 
   getHostDevicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
-    return this.devicesDefinitions[hostId];
+    return this.devicesDefinitions[hostId] || {};
   }
 
   getHostDriversDefinitions(hostId: string): {[index: string]: EntityDefinition} {
-    return this.driversDefinitions[hostId];
+    return this.driversDefinitions[hostId] || {};
   }
 
   getHostServicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
-    return this.servicesDefinitions[hostId];
+    return this.servicesDefinitions[hostId] || {};
   }
 
   generate() {

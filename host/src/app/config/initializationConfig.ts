@@ -12,7 +12,7 @@ export default function initializationConfig(): InitializationConfig {
       services: 'services',
     },
     fileNames: {
-      hostConfig: 'hostConfig.json',
+      hostConfig: 'config.json',
       manifest: 'manifest.json',
       // name of built main file of entity
       mainJs: '__main.js',

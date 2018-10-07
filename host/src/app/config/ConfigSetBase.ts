@@ -30,7 +30,7 @@ export default abstract class ConfigSetBase implements ConfigSetManager {
    * @param configFileName - config name like "config.json"
    */
   async loadConfig<T>(configFileName: string): Promise<T> {
-    const baseName: string = path.basename(configFileName, 'json');
+    const baseName: string = path.basename(configFileName, '.json');
     const config: T | undefined = (this.configSet as any)[baseName];
 
     if (!config) {
