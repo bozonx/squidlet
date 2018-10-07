@@ -42,7 +42,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
     );
 
     for (let serviceId of servicesIds) {
-      this.instances[serviceId] = await this.makeInstance(definitions[serviceId]);
+      this.instances[serviceId] = await this.makeInstance('services', definitions[serviceId]);
     }
 
     await this.initializeAll(servicesIds);

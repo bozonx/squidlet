@@ -79,7 +79,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
 
     for (let driverName of driverNames) {
       const driverDefinition = definitions[driverName] || { id: driverName, className: driverName }
-      this.instances[driverName] = await this.makeInstance(driverDefinition);
+      this.instances[driverName] = await this.makeInstance('drivers', driverDefinition);
     }
 
     await this.initializeAll(driverNames);
@@ -89,7 +89,6 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
    * load list of definitions of drivers
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
-    console.log(55555555, this.system.initCfg.fileNames.driversDefinitions, (this.system.configSet as any).configSet)
     return await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
