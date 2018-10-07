@@ -16,7 +16,8 @@ export default abstract class ConfigSetBase implements ConfigSetManager {
   // host config which is integrated at index files init time
   static hostConfigSet: HostFilesSet;
 
-  protected abstract get configSet(): HostFilesSet;
+  abstract get configSet(): HostFilesSet;
+
   private readonly system: System;
   private readonly fs: FsDev;
 
