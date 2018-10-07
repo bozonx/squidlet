@@ -132,6 +132,9 @@ export default class BridgeSubscriber {
    * Proceed responds
    */
   private handleSystemEvents = (message: Message): void => {
+    // it isn't a message - do nothing
+    if (!message || typeof message !== 'object' || !message.from) return;
+
     const {
       topic,
       from: remoteHost,
