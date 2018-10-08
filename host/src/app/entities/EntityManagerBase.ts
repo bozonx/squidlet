@@ -31,7 +31,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
   protected async makeInstance(pluralName: ManifestsTypePluralName, definition: EntityDefinition): Promise<EntityInstance> {
     const EntityClass = await this.system.configSet.loadMain<EntityClassType>(
       pluralName,
-      definition.id
+      definition.className
     );
 
     return new EntityClass(definition, this.env) as EntityInstance;

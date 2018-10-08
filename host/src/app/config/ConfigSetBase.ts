@@ -69,7 +69,7 @@ export default abstract class ConfigSetBase implements ConfigSetManager {
     // TODO: в requireJs возможно вернется промис
 
     // the main file is already resolved
-    return require(entitySet.main);
+    return require(entitySet.main).default;
   }
 
   async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
