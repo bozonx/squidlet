@@ -34,7 +34,6 @@ export default class Status extends DeviceDataManagerBase {
     if (!this.getter) return this.localData[statusName];
     // else fetch status if getter is defined
 
-
     const result: {[index: string]: any} = await this.load(
       () => this.getter && this.getter([statusName]),
       `Can't fetch status "${statusName}" of device "${this.deviceId}"`

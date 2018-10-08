@@ -30,7 +30,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
+    this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
       .getInstance(_omit(this.props, 'debounce', 'debounceType', 'blockTime'));
   }
 

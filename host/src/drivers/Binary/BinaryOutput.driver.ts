@@ -26,7 +26,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalOutput = getDriverDep('DigitalOutput.driver')
+    this.depsInstances.digitalOutput = await getDriverDep('DigitalOutput.driver')
       .getInstance(_omit(this.props, 'blockTime', 'blockMode'));
   }
 

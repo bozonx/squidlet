@@ -154,7 +154,7 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
-  protected async load(fetcher: () => void, errorMsg: string): Promise<any> {
+  protected async load(fetcher: () => any, errorMsg: string): Promise<any> {
     let result;
 
     // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов

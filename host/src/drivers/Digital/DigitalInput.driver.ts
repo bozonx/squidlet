@@ -31,7 +31,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
-    this.depsInstances.digital = getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
+    this.depsInstances.digital = await getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
 
     await this.digital.setup(this.props.pin, this.resolvePinMode());
   }

@@ -89,6 +89,7 @@ export default class Destinations {
     const connectionDriver = this.driverEnv.getDriver(driverName);
 
     // TODO: сделать по нормальному
+    // TODO: использовать await
     this.connections[connectionId] = (connectionDriver as any).getInstance(myAddress) as Connection;
   }
 

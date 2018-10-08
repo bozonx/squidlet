@@ -33,7 +33,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = getDriverDep('DigitalInput.driver')
+    this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
       .getInstance(this.props);
   }
 
