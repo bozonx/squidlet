@@ -134,6 +134,9 @@ export default class Factory extends DriverBase<BinaryInputDriverProps> {
       props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
     };
 
-    return new BinaryInputDriver(definition, this.env);
+    const driver = new BinaryInputDriver(definition, this.env);
+    await driver.init();
+
+    return driver;
   }
 }
