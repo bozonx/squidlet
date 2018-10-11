@@ -165,6 +165,7 @@ export default class Entities {
       await this.proceed<ServiceManifest>('service', item);
     }
 
+    this.resolveDeps();
     // sort deps drivers and devs and save they to separate list
     this.sortDependencies();
     this.generateSystemDriversList();
@@ -206,6 +207,13 @@ export default class Entities {
     }
 
     return finalManifest;
+  }
+
+  private resolveDeps() {
+    // TODO: зарезолвить все зависимости рекурсивно
+    // проходимся по всем зависимостям - загружаем манифест каждой зависимости
+    // если там тоже есть зависимость - то добавляем ее в this.unsortedDependencies
+    // далее рекурсивно
   }
 
   /**
