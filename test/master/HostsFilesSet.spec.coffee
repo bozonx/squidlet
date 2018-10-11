@@ -3,7 +3,7 @@ path = require('path')
 HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
-describe 'master.HostsFilesSet', ->
+describe.only 'master.HostsFilesSet', ->
   beforeEach ->
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
@@ -135,3 +135,51 @@ describe 'master.HostsFilesSet', ->
         @hostsFilesSet.checkPlatformDevDeps()
       'Not registered dev dependencies'
     )
+
+
+  describe 'recursive dependencies', ->
+    beforeEach ->
+      @devicesDefinitions = { deviceId: { id: 'deviceId', className: 'DeviceClass', drivers: [ 'Dep1Driver' ] } }
+      @driversDefinitions = {
+        Dep1Driver: { id: 'Dep1Driver', className: 'Dep1Driver', drivers: [ 'Dep2Driver' ] }
+        Dep2Driver: { id: 'Dep2Driver', className: 'Dep2Driver' }
+      }
+      @dependencies = {
+        devices: {
+          device: [ 'Dep1Driver' ]
+        }
+        drivers: {
+          Dep1Driver: [ 'Dep2Driver' ]
+        }
+        services: {}
+      }
+
+      @main = {
+        masterConfig: {
+          getHostsIds: => ['master']
+          getHostPlatformDevs: => []
+        }
+        definitions: {
+          getHostDevicesDefinitions: () => @devicesDefinitions
+          getHostDriversDefinitions: () => @driversDefinitions
+          getHostServicesDefinitions: () => {}
+        }
+        entities: {
+          getDependencies: => @dependencies
+          getSystemDrivers: => []
+          getSystemServices: => []
+          getDevs: => []
+          getSrcDir: => 'srcDir'
+          getMainFilePath: => @entitySet.main
+          getFiles: => @entitySet.files
+          getManifest: => @entitySet.manifest
+        }
+      }
+      @hostsFilesSet = new HostsFilesSet(@main)
+
+    it 'getEntitiesNames', ->
+      assert.deepEqual @hostsFilesSet.getEntitiesNames('master'), {
+        devices: [ 'DeviceClass' ]
+        drivers: [ 'Dep1Driver', 'Dep2Driver' ]
+        services: []
+      }

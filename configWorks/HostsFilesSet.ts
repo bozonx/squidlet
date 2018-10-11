@@ -192,8 +192,6 @@ export default class HostsFilesSet {
     const onlyDriversClasses = this.getOnlyDrivers(hostId);
     const servicesClasses: string[] = this.getServicesClassNames(hostId);
 
-    // TODO: драйвера нужно проходить рекурсивно
-
     // collect all the drivers dependencies
     return this.collectDriverNamesWithDependencies(
       devicesClasses,
