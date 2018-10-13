@@ -15,6 +15,7 @@ export type ManifestsTypeName = 'device' | 'driver' | 'service';
 export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
 
+// dependencies of item
 export interface Dependencies {
   // list of dependencies of devices by device name
   devices: {[index: string]: string[]};
@@ -24,12 +25,7 @@ export interface Dependencies {
   services: {[index: string]: string[]};
 }
 
-export interface AllManifests {
-  devices: {[index: string]: DeviceManifest};
-  drivers: {[index: string]: DriverManifest};
-  services: {[index: string]: ServiceManifest};
-}
-
+// lists of names of all the entities
 export interface EntitiesNames {
   devices: string[];
   drivers: string[];
@@ -165,7 +161,7 @@ export default class Entities {
       await this.proceed<ServiceManifest>('service', item);
     }
 
-    this.resolveDeps();
+    //this.resolveDriversDeps();
     // sort deps drivers and devs and save they to separate list
     this.sortDependencies();
     this.generateSystemDriversList();
@@ -193,7 +189,9 @@ export default class Entities {
     }
   }
 
-  private async prepareManifest<FinalManifest extends ManifestBase>(preManifest: PreManifestBase): Promise<FinalManifest> {
+  private async prepareManifest<FinalManifest extends ManifestBase>(
+    preManifest: PreManifestBase
+  ): Promise<FinalManifest> {
     const finalManifest: FinalManifest = _omit(
       preManifest,
       'files',
@@ -209,11 +207,23 @@ export default class Entities {
     return finalManifest;
   }
 
-  private resolveDeps() {
-    // TODO: зарезолвить все зависимости рекурсивно
-    // проходимся по всем зависимостям - загружаем манифест каждой зависимости
-    // если там тоже есть зависимость - то добавляем ее в this.unsortedDependencies
-    // далее рекурсивно
+  private resolveDriversDeps() {
+    // TODO: наверное лучше сначала подготовить список???
+
+    const recursively = (deps: {[index: string]: string[] }) => {
+      for (let driverClassName of Object.keys(deps)) {
+        //const driverDeps: string[] = deps[driverClassName];
+
+        for (let subDependency of deps[driverClassName]) {
+          // TODO: загрузить preManifest
+        }
+      }
+      // загружаем манифест каждой зависимости
+      // если там тоже есть зависимость - то добавляем ее в this.unsortedDependencies
+      // далее рекурсивно
+    };
+
+    recursively(this.unsortedDependencies['drivers']);
   }
 
   /**

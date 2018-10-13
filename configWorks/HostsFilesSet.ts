@@ -184,9 +184,7 @@ export default class HostsFilesSet {
   /**
    * All the used drivers include which are dependencies of other entities bu without devs.
    */
-  private getAllUsedDriversClassNames(
-    hostId: string
-  ): string[] {
+  private getAllUsedDriversClassNames(hostId: string): string[] {
     // collect manifest names of used entities
     const devicesClasses = this.getDevicesClassNames(hostId);
     const onlyDriversClasses = this.getOnlyDrivers(hostId);

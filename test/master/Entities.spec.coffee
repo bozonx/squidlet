@@ -221,23 +221,19 @@ describe.only 'master.Entities', ->
     assert.deepEqual(@entities.getSystemDrivers(), [ 'DriverName.driver' ])
     assert.deepEqual(@entities.getSystemServices(), [ 'ServiceClass' ])
 
-  it 'resolveDeps', ->
+  it 'resolveDriversDeps', ->
     @entities.unsortedDependencies = {
-      devices: {
-        device1: [ 'Driver1' ]
-      }
+      devices: {}
       drivers: {
         Driver1: [ 'Driver2' ]
       }
       services: {}
     }
 
-    @entities.resolveDeps()
+    @entities.resolveDriversDeps()
 
     assert.deepEqual(@entities.unsortedDependencies, {
-      devices: {
-        device1: [ 'Driver1' ]
-      }
+      devices: {}
       drivers: {
         Driver1: [ 'Driver2' ]
         Driver2: [ 'Driver3' ]
