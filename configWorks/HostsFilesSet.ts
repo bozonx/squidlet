@@ -174,15 +174,8 @@ export default class HostsFilesSet {
     return sortByIncludeInList(servicesClasses, allSystemServices);
   }
 
-  private getDevicesClassNames(hostId: string): string[] {
-    const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
-
-    return Object.keys(devicesDefinitions)
-      .map((id: string) => devicesDefinitions[id].className);
-  }
-
   /**
-   * All the used drivers include which are dependencies of other entities bu without devs.
+   * All the used drivers include which are dependencies of other entities but without devs.
    */
   private getAllUsedDriversClassNames(hostId: string): string[] {
     // collect manifest names of used entities
@@ -198,8 +191,15 @@ export default class HostsFilesSet {
     );
   }
 
+  private getDevicesClassNames(hostId: string): string[] {
+    const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
+
+    return Object.keys(devicesDefinitions)
+      .map((id: string) => devicesDefinitions[id].className);
+  }
+
   /**
-   * Get list of used drivers on host exclude devs.
+   * Get list of used drivers of host (which has definitions) exclude devs.
    */
   private getOnlyDrivers(hostId: string): string[] {
     const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
@@ -230,13 +230,14 @@ export default class HostsFilesSet {
     driversClasses: string[],
     servicesClasses: string[]
   ): string[] {
+    // dependencies of all the registered entities
     const dependencies: Dependencies = this.main.entities.getDependencies();
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
     function addDeps(pluralType: ManifestsTypePluralName, names: string[]) {
       for (let entityName of names) {
-        // do nothing id entity doesn't have a dependencies
+        // do nothing if entity doesn't have a dependencies
         if (!dependencies[pluralType][entityName]) return;
 
         dependencies[pluralType][entityName]
@@ -244,7 +245,7 @@ export default class HostsFilesSet {
       }
     }
 
-    // first add all the driver names
+    // first add all the host's driver names
     for (let className of driversClasses) {
       depsDriversNames[className] = true;
     }

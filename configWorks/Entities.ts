@@ -32,10 +32,12 @@ export interface EntitiesNames {
   services: string[];
 }
 
+
 export default class Entities {
   private readonly main: Main;
   private readonly entitiesDir: string;
-  // entities set which contains a srcDir which point to dir where original manifest places
+  // Entities set which contains a srcDir which point to dir where original manifest places.
+  // There are all the entities which was registered in the system.
   private entitiesSet: SrcEntitiesSet = {
     devices: {},
     drivers: {},
@@ -123,9 +125,11 @@ export default class Entities {
     const result: {[index: string]: true} = {};
     const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
 
-    const collect = (depdOfType: {[index: string]: string[]}) => {
-      for (let entityName of Object.keys(depdOfType)) {
-        for (let itemName of depdOfType[entityName]) {
+    // TODO: почему бы просто не взять из драйверов ???
+
+    const collect = (depsOfType: {[index: string]: string[]}) => {
+      for (let entityName of Object.keys(depsOfType)) {
+        for (let itemName of depsOfType[entityName]) {
           result[itemName] = true;
         }
       }
@@ -146,22 +150,21 @@ export default class Entities {
 
   async generate() {
     const preDevicesManifests = this.main.register.getDevicesPreManifests();
-    const prePreDriverManifest = this.main.register.getDriversPreManifests();
-    const prePreServiceManifest = this.main.register.getServicesPreManifests();
+    const preDriverManifests = this.main.register.getDriversPreManifests();
+    const preServiceManifests = this.main.register.getServicesPreManifests();
 
     for (let item of preDevicesManifests) {
       await this.proceed<DeviceManifest>('device', item);
     }
 
-    for (let item of prePreDriverManifest) {
+    for (let item of preDriverManifests) {
       await this.proceed<DriverManifest>('driver', item);
     }
 
-    for (let item of prePreServiceManifest) {
+    for (let item of preServiceManifests) {
       await this.proceed<ServiceManifest>('service', item);
     }
 
-    //this.resolveDriversDeps();
     // sort deps drivers and devs and save they to separate list
     this.sortDependencies();
     this.generateSystemDriversList();
@@ -169,6 +172,9 @@ export default class Entities {
   }
 
 
+  /**
+   * Proceed device, driver or service. It makes EntitySet and saves dependencies of entity.
+   */
   private async proceed<FinalManifest extends ManifestBase>(
     manifestType: ManifestsTypeName,
     preManifest: PreManifestBase,
@@ -205,25 +211,6 @@ export default class Entities {
     }
 
     return finalManifest;
-  }
-
-  private resolveDriversDeps() {
-    // TODO: наверное лучше сначала подготовить список???
-
-    const recursively = (deps: {[index: string]: string[] }) => {
-      for (let driverClassName of Object.keys(deps)) {
-        //const driverDeps: string[] = deps[driverClassName];
-
-        for (let subDependency of deps[driverClassName]) {
-          // TODO: загрузить preManifest
-        }
-      }
-      // загружаем манифест каждой зависимости
-      // если там тоже есть зависимость - то добавляем ее в this.unsortedDependencies
-      // далее рекурсивно
-    };
-
-    recursively(this.unsortedDependencies['drivers']);
   }
 
   /**

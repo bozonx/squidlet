@@ -1,7 +1,7 @@
 Entities = require('../../configWorks/Entities').default
 
 
-describe.only 'master.Entities', ->
+describe 'master.Entities', ->
   beforeEach ->
     @preDevicesManifests = [
       {
@@ -221,22 +221,22 @@ describe.only 'master.Entities', ->
     assert.deepEqual(@entities.getSystemDrivers(), [ 'DriverName.driver' ])
     assert.deepEqual(@entities.getSystemServices(), [ 'ServiceClass' ])
 
-  it 'resolveDriversDeps', ->
-    @entities.unsortedDependencies = {
-      devices: {}
-      drivers: {
-        Driver1: [ 'Driver2' ]
-      }
-      services: {}
-    }
-
-    @entities.resolveDriversDeps()
-
-    assert.deepEqual(@entities.unsortedDependencies, {
-      devices: {}
-      drivers: {
-        Driver1: [ 'Driver2' ]
-        Driver2: [ 'Driver3' ]
-      }
-      services: {}
-    })
+#  it 'resolveDriversDeps', ->
+#    @entities.unsortedDependencies = {
+#      devices: {}
+#      drivers: {
+#        Driver1: [ 'Driver2' ]
+#      }
+#      services: {}
+#    }
+#
+#    @entities.resolveDriversDeps()
+#
+#    assert.deepEqual(@entities.unsortedDependencies, {
+#      devices: {}
+#      drivers: {
+#        Driver1: [ 'Driver2' ]
+#        Driver2: [ 'Driver3' ]
+#      }
+#      services: {}
+#    })
