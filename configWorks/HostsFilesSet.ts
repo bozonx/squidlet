@@ -238,25 +238,27 @@ export default class HostsFilesSet {
     const depsDriversNames: {[index: string]: true} = {};
 
     const addDeps = (pluralType: ManifestsTypePluralName, names: string[]) => {
-      for (let entityName of names) {
+      for (let entityClassName of names) {
+
         // do nothing if entity doesn't have a dependencies
-        if (!dependencies[pluralType][entityName]) return;
+        if (!dependencies[pluralType][entityClassName]) return;
 
-        // TODO: test recursion
+        for (let depDriverName of dependencies[pluralType][entityClassName]) {
+          depsDriversNames[depDriverName] = true;
 
-        dependencies[pluralType][entityName]
-          .forEach((depDriverName: string) => {
-            depsDriversNames[depDriverName] = true;
+          // get manifest
+          const manifest: ManifestBase = this.main.entities.getManifest(pluralType, depDriverName);
 
-            // get manifest
-            const manifest: ManifestBase = this.main.entities.getManifest(pluralType, entityName);
+          if (!manifest.drivers) return;
 
-            if (!manifest.drivers) return;
+          for (let item of manifest.drivers) {
+            depsDriversNames[item] = true;
+          }
 
-            addDeps('drivers', manifest.drivers);
-          });
+          addDeps('drivers', manifest.drivers);
+        }
       }
-    }
+    };
 
     // first add all the host's driver names
     for (let className of driversClasses) {

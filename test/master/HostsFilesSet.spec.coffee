@@ -139,14 +139,15 @@ describe.only 'master.HostsFilesSet', ->
 
   describe 'recursive dependencies', ->
     beforeEach ->
-      @devicesDefinitions = { deviceId: { id: 'deviceId', className: 'DeviceClass', drivers: [ 'Dep1Driver' ] } }
+      @devicesDefinitions = {
+        device1: { id: 'device1', className: 'DeviceClass' }
+      }
       @driversDefinitions = {
-        Dep1Driver: { id: 'Dep1Driver', className: 'Dep1Driver', drivers: [ 'Dep2Driver' ] }
-        Dep2Driver: { id: 'Dep2Driver', className: 'Dep2Driver' }
+        #Dep1Driver: { id: 'Dep1Driver', className: 'Dep1Driver' }
       }
       @dependencies = {
         devices: {
-          device: [ 'Dep1Driver' ]
+          DeviceClass: [ 'Dep1Driver' ]
         }
         drivers: {
           Dep1Driver: [ 'Dep2Driver' ]
@@ -172,7 +173,9 @@ describe.only 'master.HostsFilesSet', ->
           getSrcDir: => 'srcDir'
           getMainFilePath: => @entitySet.main
           getFiles: => @entitySet.files
-          getManifest: => @entitySet.manifest
+          getManifest: => {
+            drivers: [ 'Dep2Driver' ]
+          }
         }
       }
       @hostsFilesSet = new HostsFilesSet(@main)
