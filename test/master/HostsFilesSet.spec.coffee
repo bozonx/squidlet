@@ -167,15 +167,7 @@ describe.only 'master.HostsFilesSet', ->
         }
         entities: {
           getDependencies: => @dependencies
-          getSystemDrivers: => []
-          getSystemServices: => []
           getDevs: => []
-          getSrcDir: => 'srcDir'
-          getMainFilePath: => @entitySet.main
-          getFiles: => @entitySet.files
-          getManifest: => {
-            drivers: [ 'Dep2Driver' ]
-          }
         }
       }
       @hostsFilesSet = new HostsFilesSet(@main)

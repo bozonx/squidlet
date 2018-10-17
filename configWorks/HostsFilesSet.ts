@@ -237,26 +237,25 @@ export default class HostsFilesSet {
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
+    const resolveDeps = (pluralType: ManifestsTypePluralName, typeDependencies: string[]) => {
+      for (let depDriverName of typeDependencies) {
+        depsDriversNames[depDriverName] = true;
+
+        const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
+
+        if (!subDeps) return;
+
+        resolveDeps('drivers', subDeps);
+      }
+    }
+
     const addDeps = (pluralType: ManifestsTypePluralName, names: string[]) => {
       for (let entityClassName of names) {
 
         // do nothing if entity doesn't have a dependencies
         if (!dependencies[pluralType][entityClassName]) return;
 
-        for (let depDriverName of dependencies[pluralType][entityClassName]) {
-          depsDriversNames[depDriverName] = true;
-
-          // get manifest
-          const manifest: ManifestBase = this.main.entities.getManifest(pluralType, depDriverName);
-
-          if (!manifest.drivers) return;
-
-          for (let item of manifest.drivers) {
-            depsDriversNames[item] = true;
-          }
-
-          addDeps('drivers', manifest.drivers);
-        }
+        resolveDeps(pluralType, dependencies[pluralType][entityClassName]);
       }
     };
 
