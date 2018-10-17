@@ -1,3 +1,5 @@
+import ManifestBase from '../host/src/app/interfaces/ManifestBase';
+
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
 const _difference = require('lodash/difference');
@@ -235,13 +237,24 @@ export default class HostsFilesSet {
     // there is an object for deduplicate purpose
     const depsDriversNames: {[index: string]: true} = {};
 
-    function addDeps(pluralType: ManifestsTypePluralName, names: string[]) {
+    const addDeps = (pluralType: ManifestsTypePluralName, names: string[]) => {
       for (let entityName of names) {
         // do nothing if entity doesn't have a dependencies
         if (!dependencies[pluralType][entityName]) return;
 
+        // TODO: test recursion
+
         dependencies[pluralType][entityName]
-          .forEach((depDriverName: string) => depsDriversNames[depDriverName] = true);
+          .forEach((depDriverName: string) => {
+            depsDriversNames[depDriverName] = true;
+
+            // get manifest
+            const manifest: ManifestBase = this.main.entities.getManifest(pluralType, entityName);
+
+            if (!manifest.drivers) return;
+
+            addDeps('drivers', manifest.drivers);
+          });
       }
     }
 
