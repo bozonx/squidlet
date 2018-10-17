@@ -1,8 +1,8 @@
-import ManifestBase from '../host/src/app/interfaces/ManifestBase';
-
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
 const _difference = require('lodash/difference');
+const _uniq = require('lodash/uniq');
+const _flatten = require('lodash/flatten');
 import * as path from 'path';
 
 import Main from './Main';
@@ -232,46 +232,53 @@ export default class HostsFilesSet {
     driversClasses: string[],
     servicesClasses: string[]
   ): string[] {
+    let result: string[][] = [
+      driversClasses,
+      // add deps of devices
+      this.addDeps('devices', devicesClasses),
+      // add deps of drivers
+      this.addDeps('drivers', driversClasses),
+      // add deps of services
+      this.addDeps('services', servicesClasses),
+    ];
+
+    return _uniq(_flatten(result));
+  }
+
+  private addDeps(pluralType: ManifestsTypePluralName, names: string[]): string[] {
     // dependencies of all the registered entities
     const dependencies: Dependencies = this.main.entities.getDependencies();
-    // there is an object for deduplicate purpose
-    const depsDriversNames: {[index: string]: true} = {};
+    let result: string[] = [];
 
-    const resolveDeps = (pluralType: ManifestsTypePluralName, typeDependencies: string[]) => {
-      for (let depDriverName of typeDependencies) {
-        depsDriversNames[depDriverName] = true;
+    for (let entityClassName of names) {
+      if (dependencies[pluralType][entityClassName]) {
+        const resolvedDriverDeps: string[] = this.resolveDeps(dependencies[pluralType][entityClassName]);
 
-        const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
-
-        if (!subDeps) return;
-
-        resolveDeps('drivers', subDeps);
+        result = result.concat(resolvedDriverDeps);
       }
     }
 
-    const addDeps = (pluralType: ManifestsTypePluralName, names: string[]) => {
-      for (let entityClassName of names) {
+    return result;
+  }
 
-        // do nothing if entity doesn't have a dependencies
-        if (!dependencies[pluralType][entityClassName]) return;
+  private resolveDeps(typeDependencies: string[]): string[] {
+    // dependencies of all the registered entities
+    const dependencies: Dependencies = this.main.entities.getDependencies();
+    let result: string[] = [];
 
-        resolveDeps(pluralType, dependencies[pluralType][entityClassName]);
+    for (let depDriverName of typeDependencies) {
+      result.push(depDriverName);
+
+      const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
+
+      if (subDeps) {
+        const resolvedDriverDeps: string[] = this.resolveDeps(subDeps);
+
+        result = result.concat(resolvedDriverDeps);
       }
-    };
-
-    // first add all the host's driver names
-    for (let className of driversClasses) {
-      depsDriversNames[className] = true;
     }
-    // add deps of devices
-    addDeps('devices', devicesClasses);
-    // add deps of drivers
-    addDeps('drivers', driversClasses);
-    // add deps of services
-    addDeps('services', servicesClasses);
 
-    // get only driver class names
-    return Object.keys(depsDriversNames);
+    return result;
   }
 
 }
