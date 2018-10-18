@@ -15,13 +15,10 @@ export type ManifestsTypeName = 'device' | 'driver' | 'service';
 export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
 
 
-// dependencies of item
+// dependencies of entities by class name
 export interface Dependencies {
-  // list of dependencies of devices by device name
   devices: {[index: string]: string[]};
-  // list of dependencies of drivers by driver name
   drivers: {[index: string]: string[]};
-  // list of dependencies of services by service name
   services: {[index: string]: string[]};
 }
 
@@ -43,20 +40,20 @@ export default class Entities {
     drivers: {},
     services: {},
   };
-  // temporary driver and devs deps list like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
+  // temporary driver and devs deps list like {type: {ClassName: [...DriverName]}}
   private unsortedDependencies: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // driver deps like {EntityType: {EntityId: [...DriverName]}}. Exclude devs
+  // driver deps like {type: {ClassName: [...DriverName]}}. Exclude devs
   private dependencies: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // list of devs like {EntityType: {EntityId: [...DriverName]}}
-  // they have param "dev" in manifest or if it doesn't have a manifest its name ends with ".dev".
+  // list of devs like {type: {ClassName: [...DriverName]}}
+  // they have param "dev" in a manifest or if it doesn't have a manifest its name ends with ".dev".
   private devDependencies: Dependencies = {
     devices: {},
     drivers: {},

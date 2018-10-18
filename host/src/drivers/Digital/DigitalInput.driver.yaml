@@ -6,3 +6,7 @@ props:
     type: boolean?
   pulldown:
     type: boolean?
+
+# TODO: remove
+drivers:
+  - Digital_local.driver
