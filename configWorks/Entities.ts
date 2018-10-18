@@ -41,6 +41,7 @@ export default class Entities {
     services: {},
   };
   // temporary driver and devs deps list like {type: {ClassName: [...DriverName]}}
+  // there is just content of "drivers" param of manifest
   private unsortedDependencies: Dependencies = {
     devices: {},
     drivers: {},
@@ -52,6 +53,7 @@ export default class Entities {
     drivers: {},
     services: {},
   };
+  // TODO: поидее не нужно
   // list of devs like {type: {ClassName: [...DriverName]}}
   // they have param "dev" in a manifest or if it doesn't have a manifest its name ends with ".dev".
   private devDependencies: Dependencies = {
@@ -115,7 +117,7 @@ export default class Entities {
   }
 
   /**
-   * Get all the devs.
+   * Get all the devs class names.
    * Collect they from drivers and all the dependencies
    */
   getDevs(): string[] {

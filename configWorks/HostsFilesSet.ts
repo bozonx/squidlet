@@ -114,7 +114,7 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Check than all the host's dev dependencies exist in platform deps list.
+   * Check that all the host's dev dependencies exist in platform devs list.
    */
   checkPlatformDevDeps() {
     for (let hostId of this.main.masterConfig.getHostsIds()) {
@@ -136,6 +136,8 @@ export default class HostsFilesSet {
    * Get list of devs used on host
    */
   private getHostDevs(hostEntitiesNames: EntitiesNames): string[] {
+    // TODO: зачем вообще эта ф-я ???
+    // TODO: это же не список зависимостей а manifest.drivers
     const devDeps: Dependencies = this.main.entities.getDevDependencies();
     const result: {[index: string]: true} = {};
 
@@ -205,11 +207,11 @@ export default class HostsFilesSet {
    */
   private getOnlyDrivers(hostId: string): string[] {
     const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
-    const devs: string[] = this.main.entities.getDevs();
+    const allDevs: string[] = this.main.entities.getDevs();
     // remove devs from drivers definitions list
     const filtered = _filter(
       driversDefinitions,
-      (item: EntityDefinition) => devs.indexOf(item.className) < 0
+      (item: EntityDefinition) => allDevs.indexOf(item.className) < 0
     );
 
     return filtered.map((item: EntityDefinition) => item.className);
