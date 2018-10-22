@@ -129,8 +129,6 @@ export default class Entities {
     const result: {[index: string]: true} = {};
     const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
 
-    // TODO: почему бы просто не взять из драйверов ???
-
     const collect = (depsOfType: {[index: string]: string[]}) => {
       for (let entityName of Object.keys(depsOfType)) {
         for (let itemName of depsOfType[entityName]) {
@@ -251,17 +249,13 @@ export default class Entities {
     }
   }
 
-  isDev(pluralType: ManifestsTypePluralName, entityName: string, driverName: string) {
+  isDev(pluralType: ManifestsTypePluralName, entityName: string, driverName: string): boolean {
     const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
 
     if (!drivers[driverName]) {
       // if it doesn't have a manifest but its name ends with ".dev" - it is probably dev
       if (driverName.match(/\.dev$/)) {
-        if (!this.devDependencies[pluralType][entityName]) this.devDependencies[pluralType][entityName] = [];
-
-        this.devDependencies[pluralType][entityName].push(driverName);
-
-        return;
+        return true;
       }
 
       throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
@@ -269,14 +263,9 @@ export default class Entities {
 
     const driverManifest: DriverManifest = drivers[driverName].manifest;
 
-    if (driverManifest.dev) {
-      //if (driverName.match(/\.dev$/)) {
+    //if (driverName.match(/\.dev$/)) {
 
-      return true;
-    }
-    else {
-      return false;
-    }
+    return Boolean(driverManifest.dev);
   }
 
   private generateSystemDriversList() {
