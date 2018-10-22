@@ -3,18 +3,18 @@ import PlatformConfig from '../../configWorks/interfaces/PlatformConfig';
 
 const platformConfig: PlatformConfig = {
   devs: [
-    'Fs',
-    //'Wifi',
-    //'Bluetooth',
+    'Fs.dev',
+    //'Wifi.dev',
+    //'Bluetooth.dev',
 
     // via usb
-    //'Digital',
-    //'Serial',
-    //'I2cMaster',
+    //'Digital.dev',
+    //'Serial.dev',
+    //'I2cMaster.dev',
 
-    //'I2cSlave',
-    //'Adc',
-    //'Dac',
+    //'I2cSlave.dev',
+    //'Adc.dev',
+    //'Dac.dev',
   ],
 
   hostConfig: {

@@ -58,7 +58,7 @@ function collectDevs(platformName: string) {
   const platformDirName = `squidlet-${platformName}`;
 
   for (let devName of platformDevs) {
-    const fullDevName = `${devName}.dev`;
+    const fullDevName = `${devName}`;
     const devPath = path.join(platformsDir, platformDirName, 'dev', fullDevName);
 
     devsSet[fullDevName] = require(devPath).default;
