@@ -42,18 +42,19 @@ export default class Entities {
   };
   // temporary driver and devs deps list like {type: {ClassName: [...DriverName]}}
   // there is just content of "drivers" param of manifest
-  private unsortedDependencies: Dependencies = {
+  private manifestsDriversParams: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
+  // TODO: поидее это тоже что и manifestsDriversParams
   // driver deps like {type: {ClassName: [...DriverName]}}. Exclude devs
   private dependencies: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // TODO: поидее не нужно
+  // TODO: поидее не нужно - dev не могут иметь drivers
   // list of devs like {type: {ClassName: [...DriverName]}}
   // they have param "dev" in a manifest or if it doesn't have a manifest its name ends with ".dev".
   private devDependencies: Dependencies = {
@@ -190,7 +191,7 @@ export default class Entities {
 
     // just save unsorted deps
     if (preManifest.drivers) {
-      this.unsortedDependencies[pluralType][preManifest.name] = preManifest.drivers;
+      this.manifestsDriversParams[pluralType][preManifest.name] = preManifest.drivers;
     }
   }
 
@@ -217,7 +218,7 @@ export default class Entities {
    */
   private sortDependencies() {
     const sortType = (pluralType: ManifestsTypePluralName) => {
-      const dictByName: {[index: string]: string[]} = this.unsortedDependencies[pluralType];
+      const dictByName: {[index: string]: string[]} = this.manifestsDriversParams[pluralType];
 
       for (let entityName of Object.keys(dictByName)) {
         for (let driverName of dictByName[entityName]) {

@@ -1,6 +1,5 @@
 const _values = require('lodash/values');
 const _filter = require('lodash/filter');
-const _difference = require('lodash/difference');
 const _uniq = require('lodash/uniq');
 const _flatten = require('lodash/flatten');
 import * as path from 'path';
@@ -112,25 +111,6 @@ export default class HostsFilesSet {
 
     return result;
   }
-
-  /**
-   * Check that all the host's dev dependencies exist in platform devs list.
-   */
-  checkPlatformDevDeps() {
-    for (let hostId of this.main.masterConfig.getHostsIds()) {
-      const hostEntitiesNames: EntitiesNames = this.getEntitiesNames(hostId);
-      const hostDevs: string[] = this.getHostDevs(hostEntitiesNames);
-      const platformDevs: string[] = this.main.masterConfig.getHostPlatformDevs(hostId);
-
-      const notRegisteredHostDevs: string[] = _difference(hostDevs, platformDevs);
-
-      if (notRegisteredHostDevs.length) {
-        throw new Error(`Not registered dev dependencies "${JSON.stringify(notRegisteredHostDevs)}"
-         of host "${hostId}" have been found.`);
-      }
-    }
-  }
-
 
   /**
    * Get list of devs used on host

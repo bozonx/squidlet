@@ -9,6 +9,7 @@ import systemPlugin from './systemPlugin';
 import * as Io from './IO';
 import * as defaultLogger from './defaultLogger';
 import HostsFilesWriter from './HostsFilesWriter';
+import validatePlatformDevs from './validatePlatformDevs';
 
 
 export default class Main {
@@ -44,7 +45,7 @@ export default class Main {
     this.definitions.generate();
 
     this.log.info(`--> Checking platform dev dependencies`);
-    await this.hostsFilesSet.checkPlatformDevDeps();
+    validatePlatformDevs(this);
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
