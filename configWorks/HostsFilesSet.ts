@@ -113,30 +113,6 @@ export default class HostsFilesSet {
   }
 
   /**
-   * Get list of devs used on host
-   */
-  private getHostDevs(hostEntitiesNames: EntitiesNames): string[] {
-    // TODO: зачем вообще эта ф-я ???
-    // TODO: это же не список зависимостей а manifest.drivers
-    const devDeps: Dependencies = this.main.entities.getDevDependencies();
-    const result: {[index: string]: true} = {};
-
-    for (let pluralName of Object.keys(hostEntitiesNames)) {
-      for (let entityName of hostEntitiesNames[pluralName as ManifestsTypePluralName]) {
-        const deps: string[] | undefined = devDeps[pluralName as ManifestsTypePluralName][entityName];
-
-        if (deps) {
-          for (let dep of deps) {
-            result[dep] = true;
-          }
-        }
-      }
-    }
-
-    return Object.keys(result);
-  }
-
-  /**
    * sort drivers to system and regular
    * @returns [systemDrivers, regularDrivers]
    */

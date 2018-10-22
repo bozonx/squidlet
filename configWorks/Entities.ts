@@ -47,14 +47,12 @@ export default class Entities {
     drivers: {},
     services: {},
   };
-  // TODO: поидее это тоже что и manifestsDriversParams
   // driver deps like {type: {ClassName: [...DriverName]}}. Exclude devs
   private dependencies: Dependencies = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // TODO: поидее не нужно - dev не могут иметь drivers
   // list of devs like {type: {ClassName: [...DriverName]}}
   // they have param "dev" in a manifest or if it doesn't have a manifest its name ends with ".dev".
   private devDependencies: Dependencies = {
@@ -101,10 +99,16 @@ export default class Entities {
     return this.entitiesSet[pluralType][name].files;
   }
 
+  /**
+   * Get drivers dependencies. Without devs
+   */
   getDependencies(): Dependencies {
     return this.dependencies;
   }
 
+  /**
+   * Get only devs dependencies
+   */
   getDevDependencies(): Dependencies {
     return this.devDependencies;
   }
