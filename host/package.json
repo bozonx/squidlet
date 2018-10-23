@@ -1,6 +1,6 @@
 {
   "name": "squidlet-host",
-  "version": "0.0.4",
+  "version": "0.2.0",
   "description": "Squidlet host",
   "main": "build/index.js",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",

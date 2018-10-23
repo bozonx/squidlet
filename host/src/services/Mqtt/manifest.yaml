@@ -1,0 +1,4 @@
+name: Mqtt
+main: ./Mqtt.ts
+drivers:
+  - Mqtt.driver
