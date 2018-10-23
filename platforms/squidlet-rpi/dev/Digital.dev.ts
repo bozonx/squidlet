@@ -61,17 +61,25 @@ export default class DigitalDev implements Digital {
   }
 
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
-    const pinInstance = this.getPinInstance(pin);
-    const handlerWrapper: GpioHanler = (level: number) => {
-      handler(Boolean(level));
+    const handlerWrapper: GpioHanler = () => {
+      handler( Boolean(rpio.read(pin)) );
     };
+    let convertedEdge = rpio.POLL_BOTH;
+
+    if (edge === 'rising') {
+      convertedEdge = rpio.POLL_HIGH;
+    }
+    else if (edge === 'falling') {
+      convertedEdge = rpio.POLL_LOW;
+    }
 
     // TODO: debounce и edge сделать программно
+    // TODO: ставится единственный хэндлет - а поидее нужно ставить много
 
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
     // start listen
-    pinInstance.on('interrupt', handlerWrapper);
+    rpio.poll(pin, handlerWrapper, convertedEdge);
     // return an index
     return this.alertListeners.length - 1;
   }
@@ -82,9 +90,12 @@ export default class DigitalDev implements Digital {
     }
 
     const {pin, handler} = this.alertListeners[id];
-    const pinInstance = this.getPinInstance(pin);
 
-    pinInstance.off('interrupt', handler);
+    // TODO: отключается один единственный хэндлер, а может быть много
+
+    rpio.poll(pin, null);
+
+    //pinInstance.off('interrupt', handler);
   }
 
   clearAllWatches(): void {

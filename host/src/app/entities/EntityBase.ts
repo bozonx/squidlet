@@ -54,8 +54,6 @@ export default class EntityBase<Props = {}> {
 
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
     const getDriverDep: GetDriverDep = (driverName: string): DriverInstance => {
-      console.log(33333333333, manifest, driverName)
-
       if (!_includes(manifest.drivers, driverName)) {
         throw new Error(`Can't find driver "${driverName}"`);
       }
