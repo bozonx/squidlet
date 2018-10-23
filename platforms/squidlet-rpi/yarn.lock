@@ -75,6 +75,12 @@
   dependencies:
     "@types/node" "*"
 
+"@types/rpio@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@types/rpio/-/rpio-0.0.2.tgz#7c860bb09ed4150260ef734e1ca866f542346d33"
+  dependencies:
+    "@types/node" "*"
+
 "@types/serialport@^6.0.4":
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/@types/serialport/-/serialport-6.0.4.tgz#916d8e1a40c6efa08bd8d0365dbbab735e1b7f82"
@@ -306,7 +312,7 @@ arrify@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
 
-bindings@^1.3.0:
+bindings@*, bindings@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.3.0.tgz#b346f6ecf6a95f5a815c5839fc7cdb22502f1ed7"
 
@@ -702,6 +708,10 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
+nan@*:
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.11.1.tgz#90e22bccb8ca57ea4cd37cc83d3819b52eea6766"
+
 nan@^2.10.0, nan@^2.9.2:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.11.0.tgz#574e360e4d954ab16966ec102c0c049fd961a099"
@@ -930,6 +940,13 @@ readline-utils@^2.2.1, readline-utils@^2.2.3:
     mute-stream "0.0.7"
     strip-color "^0.1.0"
     window-size "^1.1.0"
+
+rpio@^0.9.23:
+  version "0.9.23"
+  resolved "https://registry.yarnpkg.com/rpio/-/rpio-0.9.23.tgz#2eef05e57471eafa4f0cc8472fca50541d554702"
+  dependencies:
+    bindings "*"
+    nan "*"
 
 safe-buffer@^5.0.1, safe-buffer@^5.1.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"

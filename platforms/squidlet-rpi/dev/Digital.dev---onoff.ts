@@ -1,8 +1,9 @@
-import * as rpio from 'rpio';
+import {Gpio} from 'onoff';
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
 
 
+type DIRECTION = 'in' | 'out';
 type GpioHanler = (level: number) => void;
 
 interface Listener {
@@ -10,40 +11,42 @@ interface Listener {
   handler: GpioHanler;
 }
 
+const INPUT_DIRECTION = 'in';
+const OUTPUT_DIRECTION = 'out';
+
 
 // TODO: установить первичное значение на output пине
 // TODO: проверить getPinMode и что вернет если пин не сконфигурирован
-// TODO: отследить что пин был сконфигурирован прежде чем сделан запрос - может сам rpio ругается
 
 
 export default class DigitalDev implements Digital {
-  private pinModes: {[index: string]: number} = {};
+  private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly alertListeners: Listener[] = [];
 
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
     const { mode, pullUpDown } = this.convertMode(pinMode);
 
-    // if (mode === rpio.INPUT) {
-    //   rpio.open(pin, mode, pullUpDown);
-    // }
-    // else {
-    //   // output
-    //   rpio.open(pin, mode);
-    // }
+    this.pinInstances[pin] = new Gpio(pin),
 
-    rpio.open(pin, mode, pullUpDown);
-
-    this.pinModes[pin] = mode;
+    // this.pinInstances[pin] = new Gpio(pin, {
+    //   ...convertedMode,
+    //   // listen both and skip unnecessary in setWatch
+    //   edge: (convertedMode.mode === Gpio.INPUT) ? Gpio.EITHER_EDGE : undefined,
+    // });
   }
 
   getPinMode(pin: number): PinMode | undefined {
-    if (this.pinModes[pin] === rpio.INPUT) {
+    const pinInstance = this.getPinInstance(pin);
+
+    const modeConst: number = pinInstance.getMode();
+
+    if (modeConst === Gpio.INPUT) {
       return 'input';
 
       // TODO: add support of input_pullup and input_pulldown
     }
-    else if (this.pinModes[pin] === rpio.OUTPUT) {
+    else if (modeConst === Gpio.OUTPUT) {
       return 'output';
     }
 
@@ -51,13 +54,16 @@ export default class DigitalDev implements Digital {
   }
 
   async read(pin: number): Promise<boolean> {
-    return Boolean(rpio.read(pin));
+    const pinInstance = this.getPinInstance(pin);
+
+    return Boolean(pinInstance.digitalRead());
   }
 
   async write(pin: number, value: boolean): Promise<void> {
-    const numValue = (value) ? rpio.HIGH : rpio.LOW;
+    const pinInstance = this.getPinInstance(pin);
+    const numValue = (value) ? 1 : 0;
 
-    rpio.write(pin, numValue);
+    pinInstance.digitalWrite(numValue);
   }
 
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
@@ -93,27 +99,27 @@ export default class DigitalDev implements Digital {
     });
   }
 
-  private convertMode(pinMode: PinMode): {mode: number, pullUpDown?: number} {
+  private convertMode(pinMode: PinMode): {[index: string]: any} {
     switch (pinMode) {
       case ('input'):
         return {
-          mode: rpio.INPUT,
-          pullUpDown: rpio.PULL_OFF,
+          mode: INPUT_DIRECTION,
+          pullUpDown: Gpio.PUD_OFF,
         };
       case ('input_pullup'):
         return {
-          mode: rpio.INPUT,
-          pullUpDown: rpio.PULL_UP,
+          mode: INPUT_DIRECTION,
+          pullUpDown: Gpio.PUD_UP,
         };
       case ('input_pulldown'):
         return {
-          mode: rpio.INPUT,
-          pullUpDown: rpio.PULL_DOWN,
+          mode: INPUT_DIRECTION,
+          pullUpDown: Gpio.PUD_DOWN,
         };
       case ('output'):
         return {
-          mode: rpio.OUTPUT,
-          pullUpDown: undefined,
+          mode: OUTPUT_DIRECTION,
+          pullUpDown: Gpio.PUD_OFF,
         };
       default:
         throw new Error(`Unknown mode "${pinMode}"`);
@@ -121,6 +127,12 @@ export default class DigitalDev implements Digital {
 
   }
 
-  // TODO: add close()
+  private getPinInstance(pin: number): Gpio {
+    if (!this.pinInstances[pin]) {
+      throw new Error(`You have to do setup of pin "${pin}" before manipulating it`);
+    }
+
+    return this.pinInstances[pin];
+  }
 
 }
