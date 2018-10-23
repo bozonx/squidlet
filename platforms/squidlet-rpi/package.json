@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "i2c-bus": "^4.0.1",
-    "rpio": "^0.9.23",
+    "pigpio": "^1.1.4",
     "serialport": "^7.0.2"
   },
   "devDependencies": {
