@@ -4,7 +4,9 @@ import {MqttDriver} from './Mqtt.driver';
 
 
 interface Props {
-
+  protocol?: string;
+  host?: string;
+  port?: string;
 }
 
 export default class Mqtt extends ServiceBase<Props> {
