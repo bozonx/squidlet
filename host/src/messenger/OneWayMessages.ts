@@ -15,15 +15,15 @@ export default class OneWayMessages {
   }
 
   init() {
+
+    // TODO: может network должен сначала публиковать события в Events, а здесь уже слушать эти события?
+
     // listen income messages from remote host and rise them on a local host as local messages
     this.system.network.listenIncome(this.handleIncomeMessages);
   }
 
 
   async send(toHost: string, category: string, topic: string, payload?: any): Promise<void> {
-
-    // TODO: review
-
     if (!topic) {
       throw new Error(`You have to specify a topic`);
     }
@@ -43,9 +43,6 @@ export default class OneWayMessages {
    * Rise all the income messages as local events.
    */
   private handleIncomeMessages = (error: Error | null, message: Message): void => {
-
-    // TODO: может network должен сначала публиковать события в Events, а здесь уже слушать эти события?
-
     // put error to log
     if (error) return this.system.log.error(error.toString());
 

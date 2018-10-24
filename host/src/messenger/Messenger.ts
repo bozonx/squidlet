@@ -4,7 +4,6 @@ import BridgeResponder from './BridgeResponder';
 import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
-import {validateMessage} from '../helpers/helpers';
 import HandlerWrappers from '../helpers/HandlerWrappers';
 import OneWayMessages from './OneWayMessages';
 
