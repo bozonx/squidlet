@@ -3,6 +3,7 @@ import Request from '../messenger/interfaces/Request';
 import HandlerWrappers from '../helpers/HandlerWrappers';
 import { parseDeviceId } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
+import Message from '../messenger/interfaces/Message';
 
 
 const CALL_ACTION_TOPIC = 'deviceCallAction';
@@ -78,7 +79,9 @@ export default class Devices {
    */
   listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const wrapper = (payload: StatusPayload) => {
+    const wrapper = (message: Message) => {
+      const payload: StatusPayload = message.payload;
+
       if (
         payload.deviceId !== deviceId
         || payload.actionName !== STATUS_ACTION
@@ -100,7 +103,9 @@ export default class Devices {
    */
   listenConfig(deviceId: string, handler: (config: {[index: string]: any}) => void) {
     const toHost: string = this.resolveDestinationHost(deviceId);
-    const wrapper = (payload: ConfigPayload) => {
+    const wrapper = (message: Message) => {
+      const payload: ConfigPayload = message.payload;
+
       if (payload.deviceId !== deviceId || payload.actionName !== CONFIG_ACTION) return;
 
       handler(payload.config);
