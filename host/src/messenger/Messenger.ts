@@ -4,16 +4,10 @@ import BridgeResponder from './BridgeResponder';
 import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
-//import HandlerWrappers from '../helpers/HandlerWrappers';
 import OneWayMessages from './OneWayMessages';
 
 
-export const PUBLISH_CATEGORY = 'publish';
-export const REQUEST_RESPONSE_CATEGORY = 'request-response';
-export const SYSTEM_CATEGORY = 'system';
-
 type Handler = (message: Message) => void;
-//type HandlerWrapper = (message: Message) => void;
 
 
 /**
@@ -26,7 +20,6 @@ export default class Messenger {
   private readonly bridgeResponder: BridgeResponder;
   private readonly requestResponse: RequestResponse;
   private readonly oneWayMessages: OneWayMessages;
-  //private handlerWrappers: HandlerWrappers<Handler, HandlerWrapper> = new HandlerWrappers<Handler, HandlerWrapper>();
 
   constructor(system: System) {
     this.system = system;
@@ -53,83 +46,49 @@ export default class Messenger {
     return this.oneWayMessages.send(toHost, category, topic, payload);
   }
 
-  // /**
-  //  * Send message to specified host by hostId.
-  //  * This message will rise on remote host as local message
-  //  * It doesn't wait for respond. But it wait for delivering of message.
-  //  */
-  // async publish(toHost: string, topic: string, payload?: any): Promise<void> {
-  //
-  //   // TODO: не совсем понятно назначение ф-и. Может сделать чисто для девайсов???
-  //
-  //   if (!topic) {
-  //     throw new Error(`You have to specify a topic`);
-  //   }
-  //
-  //   const message: Message = {
-  //     category: PUBLISH_CATEGORY,
-  //     topic,
-  //     from: this.system.network.hostId,
-  //     to: toHost,
-  //     payload,
-  //   };
-  //
-  //   await this.$sendMessage(message);
-  // }
-
   /**
    * Listen to events of current or remote host.
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
-  subscribe(toHost: string, topic: string, handler: Handler): void {
-
-    // TODO: review
-
-    if (!topic) {
-      throw new Error(`You have to specify a topic`);
+  subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
+    if (!category) {
+      throw new Error(`You have to specify the category`);
     }
-
-    // // TODO: зачем это???? можно же просто использовать {payload} в получателе
-    // const wrapper = (message: Message) => {
-    //   handler(message.payload, message);
-    // };
-    // // TODO: тогда и это не нужно
-    // this.handlerWrappers.addHandler(handler, wrapper);
-
-    // TODO: use specified category
+    else if (!topic) {
+      throw new Error(`You have to specify the topic`);
+    }
 
     if (this.isLocalHost(toHost)) {
       // subscribe to local events
-      return this.system.events.addListener(PUBLISH_CATEGORY, topic, handler);
+      return this.system.events.addListener(category, topic, handler);
     }
 
     // else subscribe to remote host's events
-    this.bridgeSubscriber.subscribe(toHost, PUBLISH_CATEGORY, topic, handler);
+    this.bridgeSubscriber.subscribe(toHost, category, topic, handler);
   }
 
   /**
    * Unsubscribe from events of remote or local host.
    * Handler has to be the same as has been specified to "subscribe" method previously.
    */
-  unsubscribe(toHost: string, topic: string, handler: Handler): void {
-
-    // TODO: review
-
-    // TODO: use specified category
-
-    //const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
+  unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+    else if (!topic) {
+      throw new Error(`You have to specify the topic`);
+    }
 
     if (this.isLocalHost(toHost)) {
       // subscribe to local events
-      this.system.events.removeListener(PUBLISH_CATEGORY, topic, handler);
+      this.system.events.removeListener(category, topic, handler);
     }
     else {
       // unsubscribe from remote host's events
-      this.bridgeSubscriber.unsubscribe(toHost, PUBLISH_CATEGORY, topic, handler);
+      this.bridgeSubscriber.unsubscribe(toHost, category, topic, handler);
     }
-
-    //this.handlerWrappers.removeByHandler(handler);
   }
+
 
   request(toHost: string, topic: string, payload: any): Promise<any> {
     return this.requestResponse.request(toHost, topic, payload);
@@ -161,6 +120,7 @@ export default class Messenger {
 
     await this.system.network.send(message.to, message);
   }
+
 
   private isLocalHost(toHost?: string) {
     return !toHost || toHost === this.system.host.id;

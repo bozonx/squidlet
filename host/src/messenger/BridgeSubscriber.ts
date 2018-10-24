@@ -1,7 +1,9 @@
+import categories from '../app/dict/categories';
+
 const _find = require('lodash/find');
 
 import System from '../app/System';
-import Messenger, {SYSTEM_CATEGORY} from './Messenger';
+import Messenger from './Messenger';
 import Message from './interfaces/Message';
 import { generateEventName } from '../helpers/helpers';
 
@@ -32,7 +34,7 @@ export default class BridgeSubscriber {
   }
 
   init(): void {
-    this.system.events.addCategoryListener(SYSTEM_CATEGORY, this.handleSystemEvents);
+    this.system.events.addCategoryListener(categories.system, this.handleSystemEvents);
   }
 
   /**
@@ -73,13 +75,7 @@ export default class BridgeSubscriber {
   }
 
 
-  private addHandler(
-    toHost: string,
-    category: string,
-    topic: string,
-    handlerId: string,
-    handler: Handler
-  ): void {
+  private addHandler(toHost: string, category: string, topic: string, handlerId: string, handler: Handler) {
     const eventName = generateEventName(category, topic, toHost);
     const handlerItem: HandlerItem = [ handlerId, handler ];
 
@@ -159,7 +155,7 @@ export default class BridgeSubscriber {
 
   private generateMessage(toHost: string, category: string, topic: string, specialTopic: string, handlerId: string): Message {
     return {
-      category: SYSTEM_CATEGORY,
+      category: categories.system,
       topic: specialTopic,
       from: this.system.network.hostId,
       to: toHost,

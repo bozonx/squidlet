@@ -29,7 +29,7 @@ export default class OneWayMessages {
     }
 
     const message: Message = {
-      category: category,
+      category,
       topic,
       from: this.system.network.hostId,
       to: toHost,

@@ -1,7 +1,8 @@
 import System from '../app/System';
-import Messenger, {SYSTEM_CATEGORY} from './Messenger';
+import Messenger from './Messenger';
 import Message from './interfaces/Message';
 import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscriber';
+import categories from '../app/dict/categories';
 
 
 type Handler = (payload: any) => void;
@@ -23,7 +24,7 @@ export default class Bridge {
   }
 
   init(): void {
-    this.system.events.addCategoryListener(SYSTEM_CATEGORY, this.handleSystemEvents);
+    this.system.events.addCategoryListener(categories.system, this.handleSystemEvents);
   }
 
   private handleSystemEvents = (message: Message): void => {
@@ -78,7 +79,7 @@ export default class Bridge {
     payload: any
   ): void {
     const message: Message = {
-      category: SYSTEM_CATEGORY,
+      category: categories.system,
       topic: RESPOND_TOPIC,
       from: this.system.network.hostId,
       to: subscriberHost,
