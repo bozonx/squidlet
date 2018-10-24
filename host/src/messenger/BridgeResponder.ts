@@ -16,6 +16,7 @@ export default class Bridge {
   // handlers of local events by handleId
   private readonly handlers: {[index: string]: Handler} = {};
 
+
   constructor(system: System, messenger: Messenger) {
     this.system = system;
     this.messenger = messenger;

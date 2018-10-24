@@ -4,6 +4,7 @@ import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
 
 
+// TODO: add param hosts - список хостов которые слушать
 interface Props {
   protocol: string;
   host: string;
@@ -24,6 +25,7 @@ export default class Mqtt extends ServiceBase<Props> {
 
   protected didInit = async () => {
     this.mqttDev.onMessage(this.messagesHandler);
+    this.listenHosts();
   }
 
   protected destroy = () => {
@@ -31,6 +33,16 @@ export default class Mqtt extends ServiceBase<Props> {
   }
 
 
+  /**
+   * Start listen all the hosts
+   */
+  private listenHosts() {
+    // TODO: listen event of all the hosts
+  }
+
+  /**
+   * Process income messages
+   */
   private messagesHandler = (topic: string, data: string) => {
     // TODO: может ли быть data - undefined???
     // TODO: определить хост по id девайса
