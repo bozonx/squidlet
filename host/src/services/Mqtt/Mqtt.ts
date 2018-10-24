@@ -1,6 +1,7 @@
 import ServiceBase from '../../app/entities/ServiceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
+import categories from '../../app/dict/categories';
 
 
 interface Props {
@@ -31,8 +32,11 @@ export default class Mqtt extends ServiceBase<Props> {
 
 
   private messagesHandler = (topic: string, data: string) => {
-    // TODO: ! формируем специальное сообщение в messanger
+    // TODO: может ли быть data - undefined???
+    // TODO: определить хост по id девайса
+    const toHost = 'master';
 
+    this.env.messenger.send(toHost, categories.mqttIncome, topic, data);
   }
 
 }

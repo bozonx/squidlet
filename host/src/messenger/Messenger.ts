@@ -49,7 +49,34 @@ export default class Messenger {
    * This message will rise on remote host as local message
    * It doesn't wait for respond. But it wait for delivering of message.
    */
+  async send(toHost: string, category: string, topic: string, payload?: any): Promise<void> {
+
+    // TODO: не совсем понятно назначение ф-и
+
+    if (!topic) {
+      throw new Error(`You have to specify a topic`);
+    }
+
+    const message: Message = {
+      category: category,
+      topic,
+      from: this.system.network.hostId,
+      to: toHost,
+      payload,
+    };
+
+    await this.$sendMessage(message);
+  }
+
+  /**
+   * Send message to specified host by hostId.
+   * This message will rise on remote host as local message
+   * It doesn't wait for respond. But it wait for delivering of message.
+   */
   async publish(toHost: string, topic: string, payload?: any): Promise<void> {
+
+    // TODO: не совсем понятно назначение ф-и. Может сделать чисто для девайсов???
+
     if (!topic) {
       throw new Error(`You have to specify a topic`);
     }
