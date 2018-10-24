@@ -34,12 +34,12 @@ export class MqttDev {
       .then(() => this.client.publish(topic, data));
   }
 
-  onMessage(handler: (data: string) => void) {
-    const handlerWrapper = (data: Buffer) => {
-      return data.toString();
+  onMessage(handler: (topic: string, data: string) => void) {
+    const handlerWrapper = (topic: string, data: Buffer) => {
+      handler(topic, data.toString());
     };
 
-    this.client.on('message', handler);
+    this.client.on('message', handlerWrapper);
   }
 
   /**

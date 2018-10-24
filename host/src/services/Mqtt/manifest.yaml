@@ -1,7 +1,8 @@
 name: Mqtt
 main: ./Mqtt.ts
 drivers:
-  - Mqtt.driver
+  - Mqtt.dev
+#  - Mqtt.driver
 props:
   protocol:
     type: http|https
