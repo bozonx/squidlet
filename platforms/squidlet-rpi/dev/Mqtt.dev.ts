@@ -34,16 +34,22 @@ export class MqttDev {
       .then(() => this.client.publish(topic, data));
   }
 
-  subscribe() {
+  onMessage(handler: (data: string) => void) {
+    const handlerWrapper = (data: Buffer) => {
+      return data.toString();
+    };
 
+    this.client.on('message', handler);
   }
 
   /**
    * Subscribe to binary data
    */
-  subscribeBin() {
-
+  onMessageBin() {
+    // TODO: convert to Uint8Array
   }
+
+  // TODO: сделать offMessage и тд
 
 }
 
