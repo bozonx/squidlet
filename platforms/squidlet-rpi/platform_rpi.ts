@@ -12,6 +12,8 @@ const platformConfig: PlatformConfig = {
     //'Bluetooth.dev',
     'I2cMaster.dev',
 
+    'Mqtt.dev',
+
     //'Adc.dev',
     //'Dac.dev',
     //'I2cSlave.dev',
