@@ -1,7 +1,6 @@
-import categories from '../app/dict/categories';
-
 const _find = require('lodash/find');
 
+import categories from '../app/dict/categories';
 import System from '../app/System';
 import Messenger from './Messenger';
 import Message from './interfaces/Message';
@@ -34,10 +33,7 @@ export default class BridgeSubscriber {
   }
 
   init(): void {
-
-    // TODO: почему system а не свою какую-то ???
-
-    this.system.events.addCategoryListener(categories.system, this.handleSystemEvents);
+    this.system.events.addCategoryListener(categories.messengerBridge, this.handleSpecialEvents);
   }
 
   /**
@@ -130,21 +126,22 @@ export default class BridgeSubscriber {
   /**
    * Proceed responds
    */
-  private handleSystemEvents = (message: Message): void => {
+  private handleSpecialEvents = (message: Message): void => {
 
-    // TODO: почему слушаем все system messages ????
+    // TODO: review
 
-    // it isn't a message - do nothing
-    if (!message || typeof message !== 'object' || !message.from) return;
+    // TODO: use message validator
+    // it isn't a respond message - do nothing
+    if (!message
+      || typeof message !== 'object'
+      || !message.from
+      || message.topic !== RESPOND_TOPIC
+    ) return;
 
     const {
-      topic,
       from: remoteHost,
       payload,
     } = message;
-
-    if (!remoteHost) return;
-    if (topic !== RESPOND_TOPIC) return;
 
     // TODO: rise an error to error collector
     if (!this.checkIncomeMsgPayload(payload)) return;
@@ -155,13 +152,16 @@ export default class BridgeSubscriber {
 
     // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
 
+    // TODO: почему payload а не message ???
+
     // call handler
     handler(payload.payload);
   }
 
   private generateSpecialMessage(toHost: string, eventCategory: string, topic: string, specialTopic: string, handlerId: string): Message {
     return {
-      category: categories.system,
+      // special category
+      category: categories.messengerBridge,
       topic: specialTopic,
       from: this.system.network.hostId,
       to: toHost,

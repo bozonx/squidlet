@@ -3,4 +3,5 @@ export default {
   mqttIncome: 'mqttIncome',
   mqttOutcome: 'mqttOutcome',
   messengerRequestResponse: 'messengerRequestResponse',
+  messengerBridge: 'messengerBridge',
 };
