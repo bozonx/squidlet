@@ -34,6 +34,9 @@ export default class BridgeSubscriber {
   }
 
   init(): void {
+
+    // TODO: почему system а не свою какую-то ???
+
     this.system.events.addCategoryListener(categories.system, this.handleSystemEvents);
   }
 
@@ -44,7 +47,7 @@ export default class BridgeSubscriber {
    */
   subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
     const handlerId: string = this.system.host.generateUniqId();
-    const message: Message = this.generateMessage(toHost, category, topic, SUBSCRIBE_TOPIC, handlerId);
+    const message: Message = this.generateSpecialMessage(toHost, category, topic, SUBSCRIBE_TOPIC, handlerId);
 
     // listen to messages from remote host
     this.addHandler(toHost, category, topic, handlerId, handler);
@@ -62,7 +65,7 @@ export default class BridgeSubscriber {
 
     if (!handlerId) return;
 
-    const message: Message = this.generateMessage(toHost, category, topic, UNSUBSCRIBE_TOPIC, handlerId);
+    const message: Message = this.generateSpecialMessage(toHost, category, topic, UNSUBSCRIBE_TOPIC, handlerId);
 
     // remove local handler
     this.removeHandler(eventName, handler);
@@ -128,6 +131,9 @@ export default class BridgeSubscriber {
    * Proceed responds
    */
   private handleSystemEvents = (message: Message): void => {
+
+    // TODO: почему слушаем все system messages ????
+
     // it isn't a message - do nothing
     if (!message || typeof message !== 'object' || !message.from) return;
 
@@ -153,14 +159,14 @@ export default class BridgeSubscriber {
     handler(payload.payload);
   }
 
-  private generateMessage(toHost: string, category: string, topic: string, specialTopic: string, handlerId: string): Message {
+  private generateSpecialMessage(toHost: string, eventCategory: string, topic: string, specialTopic: string, handlerId: string): Message {
     return {
       category: categories.system,
       topic: specialTopic,
       from: this.system.network.hostId,
       to: toHost,
       payload: {
-        category,
+        category: eventCategory,
         topic,
         handlerId,
       },
