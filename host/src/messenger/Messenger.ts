@@ -5,9 +5,11 @@ import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
 import OneWayMessages from './OneWayMessages';
+import HandlerWrappers from '../helpers/HandlerWrappers';
 
 
-type Handler = (message: Message) => void;
+type Handler = (payload: any, message: Message) => void;
+type HandlerWrapper = (message: Message) => void;
 
 
 /**
@@ -20,6 +22,7 @@ export default class Messenger {
   private readonly bridgeResponder: BridgeResponder;
   private readonly requestResponse: RequestResponse;
   private readonly oneWayMessages: OneWayMessages;
+  private handlerWrappers: HandlerWrappers<Handler, HandlerWrapper> = new HandlerWrappers<Handler, HandlerWrapper>();
 
   constructor(system: System) {
     this.system = system;
@@ -58,13 +61,20 @@ export default class Messenger {
       throw new Error(`You have to specify the topic`);
     }
 
+    const wrapper = (message: Message) => {
+      handler(message.payload, message);
+    };
+
+    this.handlerWrappers.addHandler(handler, wrapper);
+
     if (this.isLocalHost(toHost)) {
+      // TODO: wrapper or handler ????
       // subscribe to local events
-      return this.system.events.addListener(category, topic, handler);
+      return this.system.events.addListener(category, topic, wrapper);
     }
 
     // else subscribe to remote host's events
-    this.bridgeSubscriber.subscribe(toHost, category, topic, handler);
+    this.bridgeSubscriber.subscribe(toHost, category, topic, wrapper);
   }
 
   /**
@@ -72,6 +82,8 @@ export default class Messenger {
    * Handler has to be the same as has been specified to "subscribe" method previously.
    */
   unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
+    const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
+
     if (!category) {
       throw new Error(`You have to specify the category`);
     }
@@ -80,13 +92,16 @@ export default class Messenger {
     }
 
     if (this.isLocalHost(toHost)) {
+      // TODO: wrapper or handler ????
       // subscribe to local events
-      this.system.events.removeListener(category, topic, handler);
+      this.system.events.removeListener(category, topic, wrapper);
     }
     else {
       // unsubscribe from remote host's events
-      this.bridgeSubscriber.unsubscribe(toHost, category, topic, handler);
+      this.bridgeSubscriber.unsubscribe(toHost, category, topic, wrapper);
     }
+
+    this.handlerWrappers.removeByHandler(handler);
   }
 
 
