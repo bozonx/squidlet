@@ -27,7 +27,7 @@ export default class RequestResponse {
    */
   request(toHost: string, topic: string, payload: any): Promise<Response> {
     if (!topic) {
-      throw new Error(`You have to specify a topic`);
+      throw new Error(`You have to specify the topic`);
     }
 
     return new Promise((resolve, reject) => {

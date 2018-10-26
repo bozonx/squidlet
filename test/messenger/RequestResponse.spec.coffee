@@ -1,7 +1,7 @@
 RequestResponse = require('../../host/src/messenger/RequestResponse').default
 
 
-describe 'messenger.RequestResponse', ->
+describe.only 'messenger.RequestResponse', ->
   beforeEach ->
     @toHost = 'remoteHost'
     @topic = 'topic'
@@ -19,8 +19,10 @@ describe 'messenger.RequestResponse', ->
         generateUniqId: => @requestId
       }
       events: {
-        addListener: (category, topic, handler) => @incomeHandler = handler
+        addListener: sinon.spy()
+        addCategoryListener: (category, handler) => @incomeHandler = handler
         removeListener: sinon.spy()
+        removeCategoryListener: sinon.spy()
       }
     }
     @messenger = {
@@ -55,7 +57,7 @@ describe 'messenger.RequestResponse', ->
     await @requestResponse.response(request, undefined, undefined, @payload)
 
     sinon.assert.calledWith(@messenger.$sendMessage, {
-      category: 'request-response'
+      category: 'messengerRequestResponse'
       code: undefined
       error: undefined
       from: 'master'
