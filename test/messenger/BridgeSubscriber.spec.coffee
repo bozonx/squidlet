@@ -16,7 +16,7 @@ describe 'messenger.BridgeSubscriber', ->
         send: sinon.stub().returns(Promise.resolve())
       }
       events: {
-        addListener: (category, topic, handler) => @incomeHandler = handler
+        addCategoryListener: (category, handler) => @incomeHandler = handler
       }
     }
 
@@ -33,7 +33,7 @@ describe 'messenger.BridgeSubscriber', ->
       ]
     ])
     sinon.assert.calledWith(@system.network.send, @toHost, {
-      category: 'system'
+      category: 'messengerBridge'
       topic: 'subscribeToRemoteEvent'
       from: 'master'
       to: 'remoteHost'
@@ -45,17 +45,19 @@ describe 'messenger.BridgeSubscriber', ->
     })
 
   it 'income respond', ->
+    msgPayload = {
+      category: 'cat'
+      topic: 'topic'
+      handlerId: '123'
+      payload: 'payload'
+    }
+
     @respondMessage = {
-      category: 'system'
+      category: 'messengerBridge'
       topic: 'respondOfRemoteEvent'
       from: 'remoteHost'
       to: 'master'
-      payload: {
-        category: 'cat'
-        topic: 'topic'
-        handlerId: '123'
-        payload: 'payload'
-      }
+      payload: msgPayload
     }
     handler = sinon.spy()
     @bridgeSubscriber.handlers = {
@@ -70,7 +72,7 @@ describe 'messenger.BridgeSubscriber', ->
 
     @incomeHandler(@respondMessage)
 
-    sinon.assert.calledWith(handler, 'payload')
+    sinon.assert.calledWith(handler, msgPayload)
 
   it 'unsubscribe', ->
     handlerToRemove = ->
@@ -98,7 +100,7 @@ describe 'messenger.BridgeSubscriber', ->
     })
 
     sinon.assert.calledWith(@system.network.send, @toHost, {
-      category: 'system'
+      category: 'messengerBridge'
       topic: 'unsubscribeFromRemoteEvent'
       from: 'master'
       to: 'remoteHost'
