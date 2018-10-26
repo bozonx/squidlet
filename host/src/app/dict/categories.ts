@@ -4,4 +4,5 @@ export default {
   mqttOutcome: 'mqttOutcome',
   messengerRequestResponse: 'messengerRequestResponse',
   messengerBridge: 'messengerBridge',
+  devicesChannel: 'devicesChannel',
 };

@@ -4,6 +4,7 @@ import HandlerWrappers from '../helpers/HandlerWrappers';
 import { parseDeviceId } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
 import Message from '../messenger/interfaces/Message';
+import categories from './dict/categories';
 
 
 const CALL_ACTION_TOPIC = 'deviceCallAction';
@@ -93,7 +94,7 @@ export default class Devices {
 
     //combineTopic(deviceId, 'status', statusName)
     this.handlerWrappers.addHandler(handler, wrapper);
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, wrapper);
+    this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
   /**
@@ -112,7 +113,7 @@ export default class Devices {
     };
 
     this.handlerWrappers.addHandler(handler, wrapper);
-    this.system.messenger.subscribe(toHost, DEVICE_FEEDBACK_TOPIC, wrapper);
+    this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
   removeListener(handler: (value: any) => void) {
@@ -136,7 +137,7 @@ export default class Devices {
       value,
     };
 
-    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, payload);
+    return this.system.messenger.send(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, payload);
   }
 
   /**
@@ -151,7 +152,7 @@ export default class Devices {
       config: partialConfig,
     };
 
-    return this.system.messenger.publish(toHost, DEVICE_FEEDBACK_TOPIC, payload);
+    return this.system.messenger.send(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, payload);
   }
 
 
