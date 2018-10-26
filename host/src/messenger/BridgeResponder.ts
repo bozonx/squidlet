@@ -5,11 +5,11 @@ import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscri
 import categories from '../app/dict/categories';
 
 
-type Handler = (payload: any) => void;
+type Handler = (message: Message) => void;
 
 
 /**
- * Subscribe to remote host's events
+ * Respond to request from remote host which subscribes to local event.
  */
 export default class Bridge {
   private readonly system: System;
@@ -24,20 +24,23 @@ export default class Bridge {
   }
 
   init(): void {
-    this.system.events.addCategoryListener(categories.system, this.handleSystemEvents);
+    this.system.events.addCategoryListener(categories.messengerBridge, this.handleSpecialEvents);
   }
 
-  private handleSystemEvents = (message: Message): void => {
-    // it isn't a message - do nothing
-    if (!message || typeof message !== 'object' || !message.from) return;
+  private handleSpecialEvents = (message: Message): void => {
+    // TODO: use message validator
+    // it isn't a respond message - do nothing
+    if (
+      !message
+      || typeof message !== 'object'
+      || !message.from
+    ) return;
 
     const {
       topic,
       from: subscriberHost,
       payload,
     } = message;
-
-    if (!subscriberHost) return;
 
     if (topic === SUBSCRIBE_TOPIC) {
       // TODO: rise an error to error collector
@@ -57,7 +60,7 @@ export default class Bridge {
    */
   private addLocalListener(category: string, topic: string, handlerId: string, subscriberHost: string) {
     this.handlers[handlerId] = (payload: any): void => {
-      this.response(category, topic, subscriberHost, handlerId, payload);
+      this.response(subscriberHost, category, topic, handlerId, payload);
     };
 
     this.system.events.addListener(category, topic, this.handlers[handlerId]);
@@ -72,14 +75,14 @@ export default class Bridge {
   }
 
   private response(
+    subscriberHost: string,
     category: string,
     topic: string,
-    subscriberHost: string,
     handlerId: string,
     payload: any
   ): void {
     const message: Message = {
-      category: categories.system,
+      category: categories.messengerBridge,
       topic: RESPOND_TOPIC,
       from: this.system.network.hostId,
       to: subscriberHost,

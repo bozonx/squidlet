@@ -14,7 +14,7 @@ export const SUBSCRIBE_TOPIC = 'subscribeToRemoteEvent';
 export const UNSUBSCRIBE_TOPIC = 'unsubscribeFromRemoteEvent';
 export const RESPOND_TOPIC = 'respondOfRemoteEvent';
 
-type Handler = (payload: any) => void;
+type Handler = (message: Message) => void;
 type HandlerItem = [ string, Handler ];
 
 
@@ -74,6 +74,9 @@ export default class BridgeSubscriber {
   }
 
 
+  /**
+   * Register handler which will be risen on remote event
+   */
   private addHandler(toHost: string, category: string, topic: string, handlerId: string, handler: Handler) {
     const eventName = generateEventName(category, topic, toHost);
     const handlerItem: HandlerItem = [ handlerId, handler ];
@@ -132,7 +135,8 @@ export default class BridgeSubscriber {
 
     // TODO: use message validator
     // it isn't a respond message - do nothing
-    if (!message
+    if (
+      !message
       || typeof message !== 'object'
       || !message.from
       || message.topic !== RESPOND_TOPIC
@@ -158,6 +162,9 @@ export default class BridgeSubscriber {
     handler(payload.payload);
   }
 
+  /**
+   * Generate message to subscribe to event or unsubscribe
+   */
   private generateSpecialMessage(toHost: string, eventCategory: string, topic: string, specialTopic: string, handlerId: string): Message {
     return {
       // special category
