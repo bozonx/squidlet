@@ -1,7 +1,7 @@
 Messenger = require('../../host/src/messenger/Messenger.ts').default
 
 
-describe 'app.Messenger', ->
+describe.only 'app.Messenger', ->
   beforeEach ->
     @routerSubscribeHanler = undefined
     @system = {

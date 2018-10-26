@@ -1,7 +1,7 @@
 BridgeResponder = require('../../host/src/messenger/BridgeResponder').default
 
 
-describe.only 'messenger.BridgeResponder', ->
+describe 'messenger.BridgeResponder', ->
   beforeEach ->
     @subscriberHost = 'master'
     @category = 'cat'
@@ -14,11 +14,11 @@ describe.only 'messenger.BridgeResponder', ->
         send: sinon.stub().returns(Promise.resolve())
       }
       events: {
+        addCategoryListener: (category, handler) =>
+          @incomeHandler = handler
+
         addListener: (category, topic, handler) =>
-          if (category == 'system')
-            @incomeHandler = handler
-          else
-            @addLocalHandler(category, topic, handler)
+          @addLocalHandler(category, topic, handler)
 
         removeListener: sinon.spy()
       }
@@ -28,7 +28,7 @@ describe.only 'messenger.BridgeResponder', ->
 
   it 'receive request to subscribe to event', ->
     @incomeMessage = {
-      category: 'system'
+      category: 'messengerBridge'
       topic: 'subscribeToRemoteEvent'
       from: 'master'
       to: 'remoteHost'
@@ -45,10 +45,10 @@ describe.only 'messenger.BridgeResponder', ->
     sinon.assert.calledWith(@addLocalHandler, @category, @topic, @bridgeResponder.handlers['123'])
 
   it 'response', ->
-    @bridgeResponder.response(@category, @topic, @subscriberHost, '123', 'payload')
+    @bridgeResponder.response(@subscriberHost, @category, @topic, '123', 'payload')
 
     sinon.assert.calledWith(@system.network.send, @subscriberHost, {
-      category: 'system'
+      category: 'messengerBridge'
       topic: 'respondOfRemoteEvent'
       from: 'remoteHost'
       to: 'master'
@@ -67,7 +67,7 @@ describe.only 'messenger.BridgeResponder', ->
     }
 
     @unsubscribeMessage = {
-      category: 'system'
+      category: 'messengerBridge'
       topic: 'unsubscribeFromRemoteEvent'
       from: 'master'
       to: 'remoteHost'
