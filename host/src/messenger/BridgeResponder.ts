@@ -29,6 +29,7 @@ export default class Bridge {
 
   private handleSpecialEvents = (message: Message): void => {
     // TODO: use message validator
+    // TODO: rise a warning
     // it isn't a respond message - do nothing
     if (
       !message

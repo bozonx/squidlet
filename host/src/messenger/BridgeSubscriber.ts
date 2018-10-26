@@ -130,10 +130,8 @@ export default class BridgeSubscriber {
    * Proceed responds
    */
   private handleSpecialEvents = (message: Message): void => {
-
-    // TODO: review
-
     // TODO: use message validator
+    // TODO: rise a warning
     // it isn't a respond message - do nothing
     if (
       !message
@@ -156,10 +154,10 @@ export default class BridgeSubscriber {
 
     // TODO: если пришло сообщение на которое нет подписки - вызвать unsubscribe и писать в лог
 
-    // TODO: почему payload а не message ???
+    // TODO: на самом деле handler ожидает сообщение, а тут не совсем сообщение {category, topic, handlerId, payload}
 
     // call handler
-    handler(payload.payload);
+    handler(payload);
   }
 
   /**
