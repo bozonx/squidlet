@@ -97,6 +97,7 @@ export default class System {
   }
 
   private riseEvent(eventName: string) {
+    // TODO: лучше поднять события через мессенджер или сэмитировать Message. Но непонятно откуда взять hostid
     this.events.emit(categories.system, eventName);
   }
 

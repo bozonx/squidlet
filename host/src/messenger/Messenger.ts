@@ -62,13 +62,12 @@ export default class Messenger {
     }
 
     const wrapper = (message: Message) => {
-      handler(message.payload, message);
+      handler(message && message.payload, message);
     };
 
     this.handlerWrappers.addHandler(handler, wrapper);
 
     if (this.isLocalHost(toHost)) {
-      // TODO: wrapper or handler ????
       // subscribe to local events
       return this.system.events.addListener(category, topic, wrapper);
     }
@@ -92,7 +91,6 @@ export default class Messenger {
     }
 
     if (this.isLocalHost(toHost)) {
-      // TODO: wrapper or handler ????
       // subscribe to local events
       this.system.events.removeListener(category, topic, wrapper);
     }
