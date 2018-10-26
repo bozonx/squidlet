@@ -7,18 +7,18 @@ export default class Events {
   private readonly events: EventEmitter = new EventEmitter();
 
 
-  emit(category: string, topic: string, payload?: any): void {
+  emit(category: string, topic: string, data?: any): void {
     const eventName = generateEventName(category, topic);
 
-    this.events.emit(eventName, payload);
+    this.events.emit(eventName, data);
     // emit category listeners
-    this.events.emit(category, payload);
+    this.events.emit(category, data);
   }
 
   /**
    * Listen for local messages of certain category.
    */
-  addListener(category: string, topic: string, handler: (payload: any) => void): void {
+  addListener(category: string, topic: string, handler: (data: any) => void): void {
     const eventName = generateEventName(category, topic);
 
     // listen to local events
@@ -28,18 +28,18 @@ export default class Events {
   /**
    * Listen all the topics of category
    */
-  addCategoryListener(category: string, handler: (payload: any) => void): void {
+  addCategoryListener(category: string, handler: (data: any) => void): void {
     // listen to local events
     this.events.addListener(category, handler);
   }
 
-  removeListener(category: string, topic: string, handler: (payload: any) => void): void {
+  removeListener(category: string, topic: string, handler: (data: any) => void): void {
     const eventName = generateEventName(category, topic);
 
     this.events.removeListener(eventName, handler);
   }
 
-  removeCategoryListener(category: string, handler: (payload: any) => void): void {
+  removeCategoryListener(category: string, handler: (data: any) => void): void {
     this.events.removeListener(category, handler);
   }
 
