@@ -55,6 +55,10 @@ export default class BridgeSubscriber {
       });
   }
 
+  subscribeCategory(toHost: string, category: string, handler: Handler) {
+    // TODO: !!!!!
+  }
+
   unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
     const eventName = generateEventName(category, topic, toHost);
     const handlerId = this.findHandlerIdByHandler(eventName, handler);
@@ -73,6 +77,9 @@ export default class BridgeSubscriber {
       });
   }
 
+  unsubscribeCategory(toHost: string, category: string, handler: Handler) {
+    // TODO: !!!!!
+  }
 
   /**
    * Register handler which will be risen on remote event

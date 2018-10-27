@@ -5,6 +5,10 @@ import PublishParams from '../app/interfaces/PublishParams';
 import {EntityProps} from '../app/interfaces/EntityDefinition';
 import DeviceManifest from '../app/interfaces/DeviceManifest';
 import EntityBase from '../app/entities/EntityBase';
+import DeviceEnv from '../app/entities/DeviceEnv';
+import EntityDefinition from '../app/interfaces/EntityDefinition';
+import categories from '../app/dict/categories';
+import {DevicePublishData} from '../app/interfaces/DevicePublishData';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -16,6 +20,7 @@ export interface DeviceBaseProps extends EntityProps {
 
 
 export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props> {
+  protected readonly env: DeviceEnv;
   protected statusGetter?: Getter;
   protected statusSetter?: Setter;
   protected configGetter?: Getter;
@@ -41,6 +46,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     return this.config && this.config.write;
   }
 
+
+  constructor(definition: EntityDefinition, env: DeviceEnv) {
+    super(definition, env);
+    this.env = env;
+  }
 
   protected doInit = async () => {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
@@ -99,6 +109,13 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
+    const topic = '';
+    const data: DevicePublishData = {
+      value,
+      params,
+    };
+
+    this.env.messenger.send(this.env.host.id, categories.devicesPublish, topic, data);
     console.log(1111111111, 'publish', subtopic, value, params);
     // TODO: сформировать publish и поднять локальное событие - publish, topic, params
     // TODO: передать deviceConf.deviceId, subtopic, value, params

@@ -25,7 +25,7 @@ export default class Mqtt extends ServiceBase<Props> {
 
   protected didInit = async () => {
     this.mqttDev.onMessage(this.messagesHandler);
-    this.listenHosts();
+    this.listenHostsPublishes();
   }
 
   protected destroy = () => {
@@ -36,8 +36,11 @@ export default class Mqtt extends ServiceBase<Props> {
   /**
    * Start listen all the hosts
    */
-  private listenHosts() {
+  private listenHostsPublishes() {
     // TODO: listen event of all the hosts
+
+    // listen to publish of devices
+    this.env.messenger.subscribeCategory('master', categories.devicesPublish);
   }
 
   /**

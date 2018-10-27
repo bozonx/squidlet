@@ -76,6 +76,26 @@ export default class Messenger {
     this.bridgeSubscriber.subscribe(toHost, category, topic, wrapper);
   }
 
+  subscribeCategory(toHost: string, category: string, handler: Handler) {
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+
+    const wrapper = (message: Message) => {
+      handler(message && message.payload, message);
+    };
+
+    this.handlerWrappers.addHandler(handler, wrapper);
+
+    if (this.isLocalHost(toHost)) {
+      // subscribe to local events
+      return this.system.events.addCategoryListener(category, wrapper);
+    }
+
+    // else subscribe to remote host's events
+    this.bridgeSubscriber.subscribeCategory(toHost, category, wrapper);
+  }
+
   /**
    * Unsubscribe from events of remote or local host.
    * Handler has to be the same as has been specified to "subscribe" method previously.
@@ -97,6 +117,25 @@ export default class Messenger {
     else {
       // unsubscribe from remote host's events
       this.bridgeSubscriber.unsubscribe(toHost, category, topic, wrapper);
+    }
+
+    this.handlerWrappers.removeByHandler(handler);
+  }
+
+  unsubscribeCategory(toHost: string, category: string, handler: Handler): void {
+    const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
+
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+
+    if (this.isLocalHost(toHost)) {
+      // subscribe to local events
+      this.system.events.removeCategoryListener(category, wrapper);
+    }
+    else {
+      // unsubscribe from remote host's events
+      this.bridgeSubscriber.unsubscribeCategory(toHost, category, wrapper);
     }
 
     this.handlerWrappers.removeByHandler(handler);

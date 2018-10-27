@@ -5,4 +5,5 @@ export default {
   messengerRequestResponse: 'messengerRequestResponse',
   messengerBridge: 'messengerBridge',
   devicesChannel: 'devicesChannel',
+  devicesPublish: 'devicesPublish',
 };
