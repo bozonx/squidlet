@@ -2,6 +2,7 @@ import ServiceBase from '../../app/entities/ServiceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
+import Message from '../../messenger/interfaces/Message';
 
 
 // TODO: add param hosts - список хостов которые слушать
@@ -39,8 +40,15 @@ export default class Mqtt extends ServiceBase<Props> {
   private listenHostsPublishes() {
     // TODO: listen event of all the hosts
 
+    const hostId = 'master';
+
+    // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
+    const handler = (payload: any) => {
+      this.hostPublishHandler(hostId, payload);
+    };
+
     // listen to publish of devices
-    this.env.messenger.subscribeCategory('master', categories.devicesPublish);
+    this.env.messenger.subscribeCategory(hostId, categories.devicesPublish, handler);
   }
 
   /**
@@ -52,6 +60,10 @@ export default class Mqtt extends ServiceBase<Props> {
     const toHost = 'master';
 
     this.env.messenger.send(toHost, categories.mqttIncome, topic, data);
+  }
+
+  private hostPublishHandler = (hostId: string, payload: any) => {
+    // TODO: !!!!
   }
 
 }

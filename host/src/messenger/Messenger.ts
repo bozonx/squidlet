@@ -61,6 +61,7 @@ export default class Messenger {
       throw new Error(`You have to specify the topic`);
     }
 
+    // TODO: непрпвильно - если будет один хэндлер на разные категории то он удалиться везде
     const wrapper = (message: Message) => {
       handler(message && message.payload, message);
     };
@@ -77,6 +78,9 @@ export default class Messenger {
   }
 
   subscribeCategory(toHost: string, category: string, handler: Handler) {
+
+    // TODO: test
+
     if (!category) {
       throw new Error(`You have to specify the category`);
     }
@@ -123,6 +127,9 @@ export default class Messenger {
   }
 
   unsubscribeCategory(toHost: string, category: string, handler: Handler): void {
+
+    // TODO: test
+
     const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
 
     if (!category) {

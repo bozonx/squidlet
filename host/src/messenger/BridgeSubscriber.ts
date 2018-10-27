@@ -57,6 +57,7 @@ export default class BridgeSubscriber {
 
   subscribeCategory(toHost: string, category: string, handler: Handler) {
     // TODO: !!!!!
+    // TODO: test
   }
 
   unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
@@ -79,6 +80,7 @@ export default class BridgeSubscriber {
 
   unsubscribeCategory(toHost: string, category: string, handler: Handler) {
     // TODO: !!!!!
+    // TODO: test
   }
 
   /**
