@@ -2,14 +2,13 @@ import ServiceBase from '../../app/entities/ServiceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
-import Message from '../../messenger/interfaces/Message';
 
 
-// TODO: add param hosts - список хостов которые слушать
 interface Props {
   protocol: string;
   host: string;
   port: string;
+  hosts: string[];
 }
 
 export default class Mqtt extends ServiceBase<Props> {
