@@ -2,6 +2,7 @@ import ServiceBase from '../../app/entities/ServiceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
+import IncomeDeviceData from '../../app/interfaces/IncomeDeviceData';
 
 
 interface Props {
@@ -34,7 +35,7 @@ export default class Mqtt extends ServiceBase<Props> {
 
 
   /**
-   * Start listen all the hosts
+   * Start listen to publish messages of all the hosts.
    */
   private listenHostsPublishes() {
     // TODO: listen event of all the hosts
@@ -55,10 +56,16 @@ export default class Mqtt extends ServiceBase<Props> {
    */
   private messagesHandler = (topic: string, data: string) => {
     // TODO: может ли быть data - undefined???
-    // TODO: определить хост по id девайса
-    const toHost = 'master';
+    // TODO: если data - binary???
+    const { deviceId, subTopic } = splitDeviceTopic(topic);
+    const toHost = this.env.host.getHostIdByDeviceId();
+    const incomeData: IncomeDeviceData = {
+      subTopic,
+      // parse number, boolean etc
+      data: parseData(data),
+    };
 
-    this.env.messenger.send(toHost, categories.mqttIncome, topic, data);
+    this.env.messenger.send(toHost, categories.devicesIncome, deviceId, incomeData);
   }
 
   private hostPublishHandler = (hostId: string, payload: any) => {

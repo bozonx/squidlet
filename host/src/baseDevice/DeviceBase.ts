@@ -9,6 +9,7 @@ import DeviceEnv from '../app/entities/DeviceEnv';
 import EntityDefinition from '../app/interfaces/EntityDefinition';
 import categories from '../app/dict/categories';
 import {DevicePublishData} from '../app/interfaces/DevicePublishData';
+import IncomeDeviceData from '../app/interfaces/IncomeDeviceData';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -73,6 +74,16 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       );
     }
 
+    // handle actions call
+    if (this.actions) {
+      this.env.messenger.subscribe(
+        this.env.host.id,
+        categories.devicesIncome,
+        this.props.id,
+        this.handleIncomeData
+      );
+    }
+
     await Promise.all([
       this.status && this.status.init(this.statusGetter, this.statusSetter),
       this.config && this.config.init(this.configGetter, this.configSetter),
@@ -119,6 +130,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     console.log(1111111111, 'publish', subtopic, value, params);
     // TODO: сформировать publish и поднять локальное событие - publish, topic, params
     // TODO: передать deviceConf.deviceId, subtopic, value, params
+  }
+
+
+  private handleIncomeData = (incomeData: IncomeDeviceData) => {
+    // TODO: если subTopic - не action - ругаться
   }
 
   // TODO: валидация конфига + дополнительный метод валидации девайса
