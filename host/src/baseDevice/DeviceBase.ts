@@ -9,7 +9,7 @@ import DeviceEnv from '../app/entities/DeviceEnv';
 import EntityDefinition from '../app/interfaces/EntityDefinition';
 import categories from '../app/dict/categories';
 import {DevicePublishData} from '../app/interfaces/DevicePublishData';
-import IncomeDeviceData from '../app/interfaces/IncomeDeviceData';
+import DeviceData from '../app/interfaces/DeviceData';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
@@ -133,7 +133,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
 
-  private handleIncomeData = (incomeData: IncomeDeviceData) => {
+  private handleIncomeData = (incomeData: DeviceData) => {
     // TODO: если subTopic - не action - ругаться
   }
 

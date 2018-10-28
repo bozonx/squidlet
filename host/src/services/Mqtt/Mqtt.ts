@@ -2,7 +2,7 @@ import ServiceBase from '../../app/entities/ServiceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
-import IncomeDeviceData from '../../app/interfaces/IncomeDeviceData';
+import DeviceData from '../../app/interfaces/DeviceData';
 
 
 interface Props {
@@ -47,7 +47,7 @@ export default class Mqtt extends ServiceBase<Props> {
       this.hostPublishHandler(hostId, payload);
     };
 
-    // listen to publish of devices
+    // listen to publish messages
     this.env.messenger.subscribeCategory(hostId, categories.devicesPublish, handler);
   }
 
@@ -57,19 +57,25 @@ export default class Mqtt extends ServiceBase<Props> {
   private messagesHandler = (topic: string, data: string) => {
     // TODO: может ли быть data - undefined???
     // TODO: если data - binary???
-    const { deviceId, subTopic } = splitDeviceTopic(topic);
+    const { id, subTopic } = this.splitTopic(topic);
     const toHost = this.env.host.getHostIdByDeviceId();
-    const incomeData: IncomeDeviceData = {
+    const incomeData: DeviceData = {
       subTopic,
       // parse number, boolean etc
       data: parseData(data),
     };
 
-    this.env.messenger.send(toHost, categories.devicesIncome, deviceId, incomeData);
+    this.env.messenger.send(toHost, categories.devicesIncome, id, incomeData);
   }
 
   private hostPublishHandler = (hostId: string, payload: any) => {
-    // TODO: !!!!
+    const topic: string = this.combineTopic();
+
+    this.mqttDev.publish();
+  }
+
+  private combineTopic() {
+    // TODO: add
   }
 
 }
