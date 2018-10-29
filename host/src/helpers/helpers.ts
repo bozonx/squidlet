@@ -85,7 +85,19 @@ export function combineTopic(basePath: string, ...subPaths: Array<string>): stri
   return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
 }
 
+export function splitTopic(topic: string): { id: string, subTopic: string } {
+  const { first, rest } = splitFirstElement(topic, systemConfig.topicSeparator);
+
+  return {
+    id: first,
+    subTopic: rest,
+  };
+}
+
 export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {
+
+  // TODO: remove
+
   const [ hostId, deviceLocalId ] = deviceId.split(systemConfig.deviceHostSeparator);
 
   if (!hostId || !deviceLocalId) {
@@ -95,6 +107,21 @@ export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId
   return {
     hostId,
     deviceLocalId,
+  };
+}
+
+export function splitFirstElement(
+  fullPath: string,
+  separator: string
+): { first: string, rest: string } {
+  if (!fullPath) throw new Error(`fullPath param is empty`);
+
+  const split: string[] = fullPath.split(separator);
+  const first: string = split[0];
+
+  return {
+    first,
+    rest: split.slice(1).join(separator),
   };
 }
 
@@ -201,4 +228,48 @@ export function convertToLevel(value: any): boolean {
   return value === '1' || value === 1
     || value === 'ON' || value === 'on' || value === 'On'
     || value === 'true' || value === true;
+}
+
+export function parseValue(rawValue: any): any {
+  if (typeof rawValue === 'undefined') {
+    return;
+  }
+  if (rawValue === null) {
+    return null;
+  }
+  else if (typeof rawValue === 'boolean') {
+    return rawValue;
+  }
+  else if (rawValue === 'true') {
+    return true;
+  }
+  else if (rawValue === 'false') {
+    return false;
+  }
+  else if (rawValue === 'undefined') {
+    return undefined;
+  }
+  else if (rawValue === 'null') {
+    return null;
+  }
+  else if (rawValue === 'NaN') {
+    return NaN;
+  }
+  else if (rawValue === '') {
+    return '';
+  }
+
+  const toNumber = Number(rawValue);
+
+  if (!Number.isNaN(toNumber)) {
+    // it's number
+    return toNumber;
+  }
+
+  if (typeof rawValue === 'string') {
+    return rawValue;
+  }
+
+  // array or object - as is
+  return rawValue;
 }
