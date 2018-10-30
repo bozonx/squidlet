@@ -68,10 +68,10 @@ export default class Mqtt extends ServiceBase<Props> {
     this.env.messenger.send(toHost, categories.devicesIncome, id, incomeData);
   }
 
-  private hostPublishHandler = (hostId: string, data: DeviceData) => {
+  private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
     const topic: string = combineTopic(data.id, data.subTopic);
 
-    this.mqttDev.publish();
+    await this.mqttDev.publish(topic, data.data);
   }
 
 }

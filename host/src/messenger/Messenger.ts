@@ -60,6 +60,45 @@ export default class Messenger {
    * Listen to events of current or remote host.
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
+  subscribeLocal(category: string, topic: string, handler: Handler): void {
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+    else if (!topic) {
+      throw new Error(`You have to specify the topic`);
+    }
+
+    // TODO: непрпвильно - если будет один хэндлер на разные категории то он удалиться везде
+    const wrapper = (message: Message) => {
+      handler(message && message.payload, message);
+    };
+
+    this.handlerWrappers.addHandler(handler, wrapper);
+
+    this.system.events.addListener(category, topic, wrapper);
+  }
+
+  subscribeCategoryLocal(category: string, handler: Handler) {
+
+    // TODO: test
+
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+
+    const wrapper = (message: Message) => {
+      handler(message && message.payload, message);
+    };
+
+    this.handlerWrappers.addHandler(handler, wrapper);
+
+    this.system.events.addCategoryListener(category, wrapper);
+  }
+
+  /**
+   * Listen to events of current or remote host.
+   * If toHost isn't equal to current host - it will subscribe to events of remote host.
+   */
   subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
     if (!category) {
       throw new Error(`You have to specify the category`);

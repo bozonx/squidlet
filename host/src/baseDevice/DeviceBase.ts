@@ -75,12 +75,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // handle actions call
     if (this.actions) {
-      this.env.messenger.subscribe(
-        this.env.host.id,
-        categories.devicesIncome,
-        this.props.id,
-        this.handleIncomeData
-      );
+      this.env.messenger.subscribeLocal(categories.devicesIncome, this.props.id, this.handleIncomeData);
     }
 
     await Promise.all([
@@ -113,6 +108,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // TODO: если произобша ошибка наверное лучше записать в лог здесь?
     // TODO: нужны ли параметры паблиша?
+    // TODO: нужно ли ждать пока пройдет запрос?
     this.publish(actionName, result);
 
     return result;
@@ -126,14 +122,16 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       params,
     };
 
-    this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
+    await this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
   }
 
 
   private handleIncomeData = (incomeData: DeviceData) => {
-    // TODO: если subTopic - не action - ругаться
-  }
+    if (!this.actions[incomeData.subTopic]) {
+      this.env.log.error(`Not found an action "${incomeData.subTopic}" of device "${this.props.id}"`);
+    }
 
-  // TODO: валидация конфига + дополнительный метод валидации девайса
+    return this.action(incomeData.subTopic, [incomeData.data]);
+  }
 
 }
