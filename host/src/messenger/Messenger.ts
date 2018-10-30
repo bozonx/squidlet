@@ -41,6 +41,13 @@ export default class Messenger {
   }
 
   /**
+   * Emit local message
+   */
+  emit(category: string, topic: string, payload?: any): Promise<void> {
+    return this.oneWayMessages.emit(category, topic, payload);
+  }
+
+  /**
    * Send one way message to specified host by hostId.
    * This message will rise on remote host as local event.
    * The promise will be fulfilled after message is delivered.

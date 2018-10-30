@@ -22,12 +22,33 @@ export default class OneWayMessages {
     this.system.network.listenIncome(this.handleIncomeMessages);
   }
 
-
-  async send(toHost: string, category: string, topic: string, payload?: any): Promise<void> {
-    if (!topic) {
-      throw new Error(`You have to specify a topic`);
+  async emit(category: string, topic: string, payload?: any): Promise<void> {
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+    else if (!topic) {
+      throw new Error(`You have to specify the topic`);
     }
 
+    const message: Message = {
+      category,
+      topic,
+      from: this.system.network.hostId,
+      // send to local host
+      to: this.system.host.id,
+      payload,
+    };
+
+    this.system.events.emit(category, topic, message);
+  }
+
+  async send(toHost: string, category: string, topic: string, payload?: any): Promise<void> {
+    if (!category) {
+      throw new Error(`You have to specify the category`);
+    }
+    else if (!topic) {
+      throw new Error(`You have to specify the topic`);
+    }
     const message: Message = {
       category,
       topic,

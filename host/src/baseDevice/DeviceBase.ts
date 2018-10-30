@@ -118,16 +118,15 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     return result;
   }
 
-  protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
+  protected publish = async (subTopic: string, value: any, params?: PublishParams): Promise<void> => {
     const data: DeviceData = {
-      value,
+      id: this.props.id,
+      subTopic,
+      data: value,
       params,
     };
 
-    this.env.messenger.send(this.env.host.id, categories.devicesPublish, this.props.id, data);
-    console.log(1111111111, 'publish', subtopic, value, params);
-    // TODO: сформировать publish и поднять локальное событие - publish, topic, params
-    // TODO: передать deviceConf.deviceId, subtopic, value, params
+    this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
   }
 
 
