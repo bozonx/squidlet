@@ -43,8 +43,8 @@ export default class Messenger {
   /**
    * Emit local message
    */
-  emit(category: string, topic: string, payload?: any): Promise<void> {
-    return this.oneWayMessages.emit(category, topic, payload);
+  emit(category: string, topic: string, payload?: any) {
+    this.oneWayMessages.emit(category, topic, payload);
   }
 
   /**

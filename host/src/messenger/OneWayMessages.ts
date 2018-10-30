@@ -22,7 +22,7 @@ export default class OneWayMessages {
     this.system.network.listenIncome(this.handleIncomeMessages);
   }
 
-  async emit(category: string, topic: string, payload?: any): Promise<void> {
+  emit(category: string, topic: string, payload?: any) {
     if (!category) {
       throw new Error(`You have to specify the category`);
     }

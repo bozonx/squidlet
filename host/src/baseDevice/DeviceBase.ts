@@ -100,7 +100,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
    * Call action and publish it's result.
    */
   async action(actionName: string, ...params: any[]): Promise<any> {
-    if (!this.actions[actionName]) throw new Error(`Unknown action ${actionName}`);
+    if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.props.id}"`);
 
     // TODO: ??? валидация входных параметров действия
 
@@ -108,13 +108,12 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // TODO: если произобша ошибка наверное лучше записать в лог здесь?
     // TODO: нужны ли параметры паблиша?
-    // TODO: нужно ли ждать пока пройдет запрос?
     this.publish(actionName, result);
 
     return result;
   }
 
-  protected publish = async (subTopic: string, value: any, params?: PublishParams): Promise<void> => {
+  protected publish = (subTopic: string, value: any, params?: PublishParams) => {
     const data: DeviceData = {
       id: this.props.id,
       subTopic,
@@ -122,15 +121,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       params,
     };
 
-    await this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
+    this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
   }
 
 
   private handleIncomeData = (incomeData: DeviceData) => {
-    if (!this.actions[incomeData.subTopic]) {
-      this.env.log.error(`Not found an action "${incomeData.subTopic}" of device "${this.props.id}"`);
-    }
-
     return this.action(incomeData.subTopic, [incomeData.data]);
   }
 
