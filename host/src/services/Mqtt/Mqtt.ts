@@ -3,14 +3,14 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
 import DeviceData from '../../app/interfaces/DeviceData';
-import {combineTopic, parseValue, splitFirstElement, splitTopic} from '../../helpers/helpers';
+import {combineTopic, parseValue, splitTopic} from '../../helpers/helpers';
 
 
 interface Props {
   protocol: string;
   host: string;
   port: string;
-  hosts: string[];
+  listenHosts: string[];
 }
 
 export default class Mqtt extends ServiceBase<Props> {
@@ -39,17 +39,15 @@ export default class Mqtt extends ServiceBase<Props> {
    * Start listen to publish messages of all the hosts.
    */
   private listenHostsPublishes() {
-    // TODO: listen event of all the hosts
+    for (let hostId of this.props.listenHosts) {
+      // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
+      const handler = (payload: any) => {
+        this.hostPublishHandler(hostId, payload);
+      };
 
-    const hostId = 'master';
-
-    // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
-    const handler = (payload: any) => {
-      this.hostPublishHandler(hostId, payload);
-    };
-
-    // listen to publish messages
-    this.env.messenger.subscribeCategory(hostId, categories.devicesPublish, handler);
+      // listen to publish messages
+      this.env.messenger.subscribeCategory(hostId, categories.devicesPublish, handler);
+    }
   }
 
   /**
