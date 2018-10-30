@@ -8,7 +8,6 @@ import EntityBase from '../app/entities/EntityBase';
 import DeviceEnv from '../app/entities/DeviceEnv';
 import EntityDefinition from '../app/interfaces/EntityDefinition';
 import categories from '../app/dict/categories';
-import {DevicePublishData} from '../app/interfaces/DevicePublishData';
 import DeviceData from '../app/interfaces/DeviceData';
 
 
@@ -120,13 +119,12 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
   protected publish = async (subtopic: string, value: any, params?: PublishParams): Promise<void> => {
-    const topic = '';
-    const data: DevicePublishData = {
+    const data: DeviceData = {
       value,
       params,
     };
 
-    this.env.messenger.send(this.env.host.id, categories.devicesPublish, topic, data);
+    this.env.messenger.send(this.env.host.id, categories.devicesPublish, this.props.id, data);
     console.log(1111111111, 'publish', subtopic, value, params);
     // TODO: сформировать publish и поднять локальное событие - publish, topic, params
     // TODO: передать deviceConf.deviceId, subtopic, value, params
