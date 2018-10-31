@@ -61,7 +61,7 @@ export default class Status extends DeviceDataManagerBase {
     });
   }
 
-  private publishStatus(statusName: string, value: any): Promise<void> {
+  private publishStatus(statusName: string, value: any): void {
     // TODO: нужно ли устанавливать параметры publish?
     if (statusName === DEFAULT_STATUS) {
       return this.publish('status', value);
