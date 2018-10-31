@@ -39,10 +39,12 @@ export default class Mqtt extends ServiceBase<Props> {
    * Start listen to publish messages of all the hosts.
    */
   private listenHostsPublishes() {
+    // get hosts list from props or use all the hosts
+    const hosts: string[] = (this.props.listenHosts.length)
+      ? this.props.listenHosts
+      : this.env.host.getAllTheHostsIds();
 
-    // TODO: если пустой массив -то юзаем все хосты
-
-    for (let hostId of this.props.listenHosts) {
+    for (let hostId of hosts) {
       // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
       const handler = (payload: any) => {
         this.hostPublishHandler(hostId, payload);
@@ -56,7 +58,7 @@ export default class Mqtt extends ServiceBase<Props> {
   /**
    * Process income messages
    */
-  private messagesHandler = (topic: string, data: string) => {
+  private messagesHandler = (topic: string, data: string): Promise<void> => {
 
     // TODO: если data - binary???
 
@@ -65,11 +67,12 @@ export default class Mqtt extends ServiceBase<Props> {
     const incomeData: DeviceData = {
       id,
       subTopic,
+      // TODO: а если json ????
       // parse number, boolean etc
       data: parseValue(data),
     };
 
-    this.env.messenger.send(toHost, categories.externalDataIncome, id, incomeData);
+    return this.env.messenger.send(toHost, categories.externalDataIncome, id, incomeData);
   }
 
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {

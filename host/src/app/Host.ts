@@ -56,6 +56,11 @@ export default class Host {
     return 'master';
   }
 
+  getAllTheHostsIds(): string[] {
+    // TODO: get from config
+    return ['master'];
+  }
+
   // getAddress(type: string, bus: string): string | undefined {
   //   const addrConfig = this.config.address;
   //
