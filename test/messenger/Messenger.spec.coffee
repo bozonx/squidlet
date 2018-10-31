@@ -1,7 +1,7 @@
 Messenger = require('../../host/src/messenger/Messenger.ts').default
 
 
-describe 'app.Messenger', ->
+describe.only 'app.Messenger', ->
   beforeEach ->
     @routerSubscribeHanler = undefined
     @system = {
@@ -18,7 +18,8 @@ describe 'app.Messenger', ->
         emit: sinon.spy()
       }
     }
-    @to = 'room1.host1'
+    @to = 'host1'
+    @category = 'category'
     @topic = 'deviceCallAction'
     @messenger = new Messenger(@system);
     @messenger.network = {
@@ -30,18 +31,18 @@ describe 'app.Messenger', ->
     @messenger.bridgeSubscriber.subscribe = sinon.spy()
     handler = sinon.spy()
 
-    @messenger.subscribe(@to, @topic, handler)
+    @messenger.subscribe(@to, @category, @topic, handler)
 
-    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe, @to, 'publish', @topic)
+    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe, @to, @category, @topic)
     sinon.assert.notCalled(@system.events.addListener)
 
   it 'subscribe  to local', ->
     @messenger.bridgeSubscriber.subscribe = sinon.spy()
     handler = sinon.spy()
 
-    @messenger.subscribe('master', @topic, handler)
+    @messenger.subscribe('master', @category, @topic, handler)
 
-    sinon.assert.calledWith(@system.events.addListener, 'publish', @topic)
+    sinon.assert.calledWith(@system.events.addListener, @category, @topic)
     sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
 
   it 'unsubscribe from remote', ->
@@ -49,10 +50,10 @@ describe 'app.Messenger', ->
     @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
     handler = sinon.spy()
 
-    @messenger.subscribe(@to, @topic, handler)
-    @messenger.unsubscribe(@to, @topic, handler)
+    @messenger.subscribe(@to, @category, @topic, handler)
+    @messenger.unsubscribe(@to, @category, @topic, handler)
 
-    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe, @to, 'publish', @topic)
+    sinon.assert.calledWith(@messenger.bridgeSubscriber.subscribe, @to, @category, @topic)
     sinon.assert.notCalled(@system.events.removeListener)
     assert.deepEqual(@messenger.handlerWrappers.handlers, [])
 
@@ -61,39 +62,37 @@ describe 'app.Messenger', ->
     @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
     handler = sinon.spy()
 
-    @messenger.subscribe('master', @topic, handler)
-    @messenger.unsubscribe('master', @topic, handler)
+    @messenger.subscribe('master', @category, @topic, handler)
+    @messenger.unsubscribe('master', @category, @topic, handler)
 
-    sinon.assert.calledWith(@system.events.removeListener, 'publish', @topic)
+    sinon.assert.calledWith(@system.events.removeListener, @category, @topic)
     sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
     assert.deepEqual(@messenger.handlerWrappers.handlers, [])
 
-  # TODO: test $sendMessage
-
-  it 'send', ->
+  it '$sendMessage', ->
     message = {
-      category: 'publish'
+      category: @category
       topic: @topic
       from: 'master'
       to: @to
       payload: @payload
     }
 
-    await @oneWay.send(@to, @topic, @payload)
+    await @messenger.$sendMessage(message)
 
     sinon.assert.notCalled(@system.events.emit)
     sinon.assert.calledWith(@system.network.send, @to, message)
 
-  it 'send to local', ->
+  it '$sendMessage to local', ->
     message = {
-      category: 'publish'
+      category: @category
       topic: @topic
       from: 'master'
       to: 'master'
       payload: @payload
     }
 
-    await @oneWay.send('master', @topic, @payload)
+    await @messenger.$sendMessage(message)
 
-    sinon.assert.calledWith(@system.events.emit, 'publish', @topic, message)
+    sinon.assert.calledWith(@system.events.emit, @category, @topic, message)
     sinon.assert.notCalled(@system.network.send)

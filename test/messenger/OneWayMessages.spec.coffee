@@ -1,7 +1,7 @@
 OneWayMessages = require('../../host/src/messenger/OneWayMessages').default
 
 
-describe.only 'messenger.OneWayMessages', ->
+describe 'messenger.OneWayMessages', ->
   beforeEach ->
     @toHost = 'remoteHost'
     @category = 'category'
