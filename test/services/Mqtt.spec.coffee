@@ -3,6 +3,12 @@ Mqtt = require('../../host/src/services/Mqtt/Mqtt.ts').default
 
 describe.only 'app.Messenger', ->
   beforeEach ->
+    @mqttDevConnection = {
+      onMessage: sinon.spy()
+    }
+    @mqttDev = {
+      connect: sinon.stub().returns(@mqttDevConnection)
+    }
     @props = {
       protocol: 'http'
       host: 'localhost'
@@ -15,13 +21,15 @@ describe.only 'app.Messenger', ->
       props: @props
     }
     @env = {
-#      loadManifest: => Promise.resolve({ drivers: ['DigitalInput.driver'] })
-#      getDriver: => {
-#        getInstance: => @digitalOutput
-#      }
+      loadManifest: => Promise.resolve({ drivers: ['Mqtt.dev'] })
+      getDriver: => @mqttDev
     }
 
     @mqtt = new Mqtt(@definition, @env)
 
   it 'init', ->
+    await @mqtt.init()
 
+    sinon.assert.calledOnce(@mqttDev.connect)
+    sinon.assert.calledWith(@mqttDev.connect, @props)
+    sinon.assert.calledOnce(@mqttDevConnection.onMessage)
