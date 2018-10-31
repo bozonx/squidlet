@@ -39,6 +39,9 @@ export default class Mqtt extends ServiceBase<Props> {
    * Start listen to publish messages of all the hosts.
    */
   private listenHostsPublishes() {
+
+    // TODO: если пустой массив -то юзаем все хосты
+
     for (let hostId of this.props.listenHosts) {
       // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
       const handler = (payload: any) => {
