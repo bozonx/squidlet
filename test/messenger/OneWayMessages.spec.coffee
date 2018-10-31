@@ -13,7 +13,7 @@ describe.only 'messenger.OneWayMessages', ->
         id: 'master'
       }
       network: {
-        listenIncome: (handler) @incomeHandler = handler
+        listenIncome: (handler) => @incomeHandler = handler
       }
       events: {
         #addListener: sinon.spy()
@@ -28,15 +28,18 @@ describe.only 'messenger.OneWayMessages', ->
     @oneWay = new OneWayMessages(@system, @messenger)
 
   it 'handleIncomeMessages', ->
-    resultMessage = {
-
+    messageToSend = {
+      category: @category
+      topic: @topic
+      from: 'otherHost'
+      to: 'master'
     }
 
     @oneWay.init()
 
-    @incomeHandler()
+    @incomeHandler(null, messageToSend)
 
-    sinon.assert.calledWith(@system.events.emit, @category, @topic, resultMessage)
+    sinon.assert.calledWith(@system.events.emit, @category, @topic, messageToSend)
 
   it 'emit', ->
     resultMessage = {
