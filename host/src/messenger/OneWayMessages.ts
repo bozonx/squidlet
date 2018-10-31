@@ -33,7 +33,7 @@ export default class OneWayMessages {
     const message: Message = {
       category,
       topic,
-      from: this.system.network.hostId,
+      from: this.system.host.id,
       // send to local host
       to: this.system.host.id,
       payload,
@@ -52,7 +52,7 @@ export default class OneWayMessages {
     const message: Message = {
       category,
       topic,
-      from: this.system.network.hostId,
+      from: this.system.host.id,
       to: toHost,
       payload,
     };

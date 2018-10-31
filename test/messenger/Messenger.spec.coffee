@@ -26,34 +26,6 @@ describe 'app.Messenger', ->
       listenIncome: (handler) => @routerSubscribeHanler = handler
     }
 
-  it 'publish', ->
-    message = {
-      category: 'publish'
-      topic: @topic
-      from: 'master'
-      to: @to
-      payload: { deviceId: 'room1.device1' }
-    }
-
-    await @messenger.publish(@to, @topic, { deviceId: 'room1.device1' })
-
-    sinon.assert.notCalled(@system.events.emit)
-    sinon.assert.calledWith(@system.network.send, @to, message)
-
-  it 'publish to local', ->
-    message = {
-      category: 'publish'
-      topic: @topic
-      from: 'master'
-      to: 'master'
-      payload: { deviceId: 'room1.device1' }
-    }
-
-    await @messenger.publish('master', @topic, { deviceId: 'room1.device1' })
-
-    sinon.assert.calledWith(@system.events.emit, 'publish', @topic, message)
-    sinon.assert.notCalled(@system.network.send)
-
   it 'subscribe  to remote', ->
     @messenger.bridgeSubscriber.subscribe = sinon.spy()
     handler = sinon.spy()
@@ -95,3 +67,33 @@ describe 'app.Messenger', ->
     sinon.assert.calledWith(@system.events.removeListener, 'publish', @topic)
     sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
     assert.deepEqual(@messenger.handlerWrappers.handlers, [])
+
+  # TODO: test $sendMessage
+
+  it 'send', ->
+    message = {
+      category: 'publish'
+      topic: @topic
+      from: 'master'
+      to: @to
+      payload: @payload
+    }
+
+    await @oneWay.send(@to, @topic, @payload)
+
+    sinon.assert.notCalled(@system.events.emit)
+    sinon.assert.calledWith(@system.network.send, @to, message)
+
+  it 'send to local', ->
+    message = {
+      category: 'publish'
+      topic: @topic
+      from: 'master'
+      to: 'master'
+      payload: @payload
+    }
+
+    await @oneWay.send('master', @topic, @payload)
+
+    sinon.assert.calledWith(@system.events.emit, 'publish', @topic, message)
+    sinon.assert.notCalled(@system.network.send)
