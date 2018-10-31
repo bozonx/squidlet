@@ -80,12 +80,18 @@ export function generateEventName(category: string, topic: string, ...others: Ar
 }
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
+
+  // TODO: test
+
   if (_isEmpty(subPaths)) return basePath;
 
   return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
 }
 
 export function splitTopic(topic: string): { id: string, subTopic: string } {
+
+  // TODO: test
+
   const { first, rest } = splitFirstElement(topic, systemConfig.topicSeparator);
 
   return {
@@ -94,26 +100,13 @@ export function splitTopic(topic: string): { id: string, subTopic: string } {
   };
 }
 
-export function parseDeviceId(deviceId: string): { hostId: string, deviceLocalId: string } {
-
-  // TODO: remove
-
-  const [ hostId, deviceLocalId ] = deviceId.split(systemConfig.deviceHostSeparator);
-
-  if (!hostId || !deviceLocalId) {
-    throw new Error(`Can't parse deviceId "${deviceId}"`);
-  }
-
-  return {
-    hostId,
-    deviceLocalId,
-  };
-}
-
 export function splitFirstElement(
   fullPath: string,
   separator: string
 ): { first: string, rest: string } {
+
+  // TODO: test
+
   if (!fullPath) throw new Error(`fullPath param is empty`);
 
   const split: string[] = fullPath.split(separator);
@@ -130,6 +123,7 @@ export function splitLastElement(
   separator: string
 ): { last: string, rest: string | undefined } {
 
+  // TODO: review
   // TODO: test
 
   if (!fullPath) throw new Error(`fullPath param is empty`);

@@ -1,7 +1,6 @@
 import System from './System';
 import Request from '../messenger/interfaces/Request';
 import HandlerWrappers from '../helpers/HandlerWrappers';
-import { parseDeviceId } from '../helpers/helpers';
 import Response from '../messenger/interfaces/Response';
 import Message from '../messenger/interfaces/Message';
 import categories from './dict/categories';
@@ -55,7 +54,7 @@ export default class Devices {
    * Call device's action and receive a response
    */
   callAction(deviceId: string, actionName: string, ...params: Array<any>): Promise<Response> {
-    const toHost: string = this.resolveDestinationHost(deviceId);
+    const toHost: string = this.system.host.resolveHostIdByEntityId(deviceId);
     const payload: CallActionPayload = {
       deviceId,
       actionName,
@@ -79,7 +78,7 @@ export default class Devices {
    * Handler have to be a new function each time.
    */
   listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
-    const toHost: string = this.resolveDestinationHost(deviceId);
+    const toHost: string = this.system.host.resolveHostIdByEntityId(deviceId);
     const wrapper = (message: Message) => {
       const payload: StatusPayload = message.payload;
 
@@ -103,7 +102,7 @@ export default class Devices {
    * Handler have to be a new function each time.
    */
   listenConfig(deviceId: string, handler: (config: {[index: string]: any}) => void) {
-    const toHost: string = this.resolveDestinationHost(deviceId);
+    const toHost: string = this.system.host.resolveHostIdByEntityId(deviceId);
     const wrapper = (message: Message) => {
       const payload: ConfigPayload = message.payload;
 
@@ -210,12 +209,6 @@ export default class Devices {
         Request: ${JSON.stringify(request)}
       `);
     }
-  }
-
-  private resolveDestinationHost(deviceId: string): string {
-    const { hostId } = parseDeviceId(deviceId);
-
-    return hostId;
   }
 
 }
