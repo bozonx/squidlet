@@ -54,10 +54,11 @@ export default class Mqtt extends ServiceBase<Props> {
    * Process income messages
    */
   private messagesHandler = (topic: string, data: string) => {
-    // TODO: может ли быть data - undefined???
+
     // TODO: если data - binary???
+
     const { id, subTopic } = splitTopic(topic);
-    const toHost = this.env.host.getHostIdByDeviceId();
+    const toHost = this.env.host.resolveHostIdByEntityId(id);
     const incomeData: DeviceData = {
       id,
       subTopic,

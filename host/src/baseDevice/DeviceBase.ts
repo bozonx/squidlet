@@ -118,6 +118,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     return result;
   }
 
+
   protected publish = (subTopic: string, value: any, params?: PublishParams) => {
     const data: DeviceData = {
       id: this.props.id,
@@ -128,7 +129,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
   }
-
 
   private handleIncomeData = (incomeData: DeviceData) => {
     return this.action(incomeData.subTopic, [incomeData.data]);

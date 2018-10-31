@@ -258,6 +258,10 @@ export function parseValue(rawValue: any): any {
   else if (rawValue === '') {
     return '';
   }
+  // it is for - 2. strings
+  else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
+    return rawValue;
+  }
 
   const toNumber = Number(rawValue);
 

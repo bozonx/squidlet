@@ -48,6 +48,14 @@ export default class Host {
     return generateUniqId();
   }
 
+  /**
+   * Resolve hostId by looking for device or service id in the master config.
+   */
+  resolveHostIdByEntityId(entityId: string): string {
+    // TODO: get from config
+    return 'master';
+  }
+
   // getAddress(type: string, bus: string): string | undefined {
   //   const addrConfig = this.config.address;
   //
