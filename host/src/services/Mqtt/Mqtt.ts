@@ -46,7 +46,7 @@ export default class Mqtt extends ServiceBase<Props> {
       };
 
       // listen to publish messages
-      this.env.messenger.subscribeCategory(hostId, categories.devicesPublish, handler);
+      this.env.messenger.subscribeCategory(hostId, categories.externalDataOutcome, handler);
     }
   }
 
@@ -66,7 +66,7 @@ export default class Mqtt extends ServiceBase<Props> {
       data: parseValue(data),
     };
 
-    this.env.messenger.send(toHost, categories.devicesIncome, id, incomeData);
+    this.env.messenger.send(toHost, categories.externalDataIncome, id, incomeData);
   }
 
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {

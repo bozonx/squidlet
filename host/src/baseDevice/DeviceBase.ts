@@ -75,7 +75,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // handle actions call
     if (this.actions) {
-      this.env.messenger.subscribeLocal(categories.devicesIncome, this.props.id, this.handleIncomeData);
+      this.env.messenger.subscribeLocal(categories.externalDataIncome, this.props.id, this.handleIncomeData);
     }
 
     await Promise.all([
@@ -127,7 +127,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       params,
     };
 
-    this.env.messenger.emit(categories.devicesPublish, this.props.id, data);
+    this.env.messenger.emit(categories.externalDataOutcome, this.props.id, data);
   }
 
   private handleIncomeData = (incomeData: DeviceData) => {
