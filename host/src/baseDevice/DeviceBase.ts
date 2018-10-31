@@ -11,7 +11,7 @@ import categories from '../app/dict/categories';
 import DeviceData from '../app/interfaces/DeviceData';
 
 
-export type Publisher = (subtopic: string, value: any, params?: PublishParams) => Promise<void>;
+export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
 
 export interface DeviceBaseProps extends EntityProps {
   statusRepublishInterval?: number;
@@ -104,10 +104,15 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // TODO: ??? валидация входных параметров действия
 
-    const result = await this.actions[actionName](...params);
+    let result: any;
 
-    // TODO: если произобша ошибка наверное лучше записать в лог здесь?
-    // TODO: нужны ли параметры паблиша?
+    try {
+      result = await this.actions[actionName](...params);
+    }
+    catch (err) {
+      this.env.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
+    }
+
     this.publish(actionName, result);
 
     return result;
