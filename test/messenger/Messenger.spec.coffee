@@ -45,6 +45,8 @@ describe.only 'app.Messenger', ->
     sinon.assert.calledWith(@system.events.addListener, @category, @topic)
     sinon.assert.notCalled(@messenger.bridgeSubscriber.subscribe)
 
+  # TODO: subscribe / unsubscribe category
+
   it 'unsubscribe from remote', ->
     @messenger.bridgeSubscriber.subscribe = sinon.spy()
     @messenger.bridgeSubscriber.unsubscribe = sinon.spy()
