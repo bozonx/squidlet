@@ -56,7 +56,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     this._status = new Status(
-      this.props.id,
+      this.id,
       this.env.system,
       manifest.status || {},
       (...params) => this.publish(...params),
@@ -65,7 +65,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     if (manifest.config) {
       this._config = new Config(
-        this.props.id,
+        this.id,
         this.env.system,
         manifest.config || {},
         (...params) => this.publish(...params),
@@ -75,7 +75,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // handle actions call
     if (this.actions) {
-      this.env.messenger.subscribeLocal(categories.externalDataIncome, this.props.id, this.handleIncomeData);
+      this.env.messenger.subscribeLocal(categories.externalDataIncome, this.id, this.handleIncomeData);
     }
 
     await Promise.all([
@@ -100,7 +100,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
    * Call action and publish it's result.
    */
   async action(actionName: string, ...params: any[]): Promise<any> {
-    if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.props.id}"`);
+    if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
 
     // TODO: ??? валидация входных параметров действия
 
@@ -121,13 +121,13 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
   protected publish = (subTopic: string, value: any, params?: PublishParams) => {
     const data: DeviceData = {
-      id: this.props.id,
+      id: this.id,
       subTopic,
       data: value,
       params,
     };
 
-    this.env.messenger.emit(categories.externalDataOutcome, this.props.id, data);
+    this.env.messenger.emit(categories.externalDataOutcome, this.id, data);
   }
 
   private handleIncomeData = (incomeData: DeviceData) => {

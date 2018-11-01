@@ -21,7 +21,6 @@
     "@types/i2c-bus": "^1.0.18",
     "@types/node": "^10.9.2",
     "@types/pigpio": "^0.4.2",
-    "@types/rpio": "^0.0.2",
     "@types/serialport": "^6.0.4",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.1"

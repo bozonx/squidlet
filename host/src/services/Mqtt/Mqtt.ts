@@ -1,6 +1,6 @@
 import ServiceBase from '../../app/entities/ServiceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {MqttDev} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
+import {MqttDevConnection} from '../../../../platforms/squidlet-rpi/dev/Mqtt.dev';
 import categories from '../../app/dict/categories';
 import DeviceData from '../../app/interfaces/DeviceData';
 import {combineTopic, parseValue, splitTopic} from '../../helpers/helpers';
@@ -14,8 +14,8 @@ interface Props {
 }
 
 export default class Mqtt extends ServiceBase<Props> {
-  private get mqttDev(): MqttDev {
-    return this.depsInstances.mqttDev as MqttDev;
+  private get mqttDev(): MqttDevConnection {
+    return this.depsInstances.mqttDev as MqttDevConnection;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
