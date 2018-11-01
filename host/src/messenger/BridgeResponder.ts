@@ -1,8 +1,15 @@
 import System from '../app/System';
 import Messenger from './Messenger';
 import Message from './interfaces/Message';
-import {SUBSCRIBE_TOPIC, UNSUBSCRIBE_TOPIC, RESPOND_TOPIC} from './BridgeSubscriber';
+import {
+  SUBSCRIBE_TOPIC,
+  UNSUBSCRIBE_TOPIC,
+  RESPOND_TOPIC,
+  SUBSCRIBE_CATEGORY,
+  UNSUBSCRIBE_CATEGORY
+} from './BridgeSubscriber';
 import categories from '../app/dict/categories';
+import {ALL_TOPICS} from '../app/dict/constants';
 
 
 type Handler = (message: Message) => void;
@@ -54,6 +61,16 @@ export default class Bridge {
       if (!this.checkIncomeMsgPayload(payload)) return;
       this.removeLocalListener(payload.category, payload.topic, payload.handlerId);
     }
+    else if (topic === SUBSCRIBE_CATEGORY) {
+      // TODO: rise an error to error collector
+      if (!this.checkIncomeMsgPayload(payload)) return;
+      this.addLocalCategoryListener(payload.category, payload.handlerId, subscriberHost);
+    }
+    else if (topic === UNSUBSCRIBE_CATEGORY) {
+      // TODO: rise an error to error collector
+      if (!this.checkIncomeMsgPayload(payload)) return;
+      this.removeLocalCategoryListener(payload.category, payload.handlerId);
+    }
   }
 
   /**
@@ -61,7 +78,7 @@ export default class Bridge {
    */
   private addLocalListener(category: string, topic: string, handlerId: string, subscriberHost: string) {
     this.handlers[handlerId] = (payload: any): void => {
-      this.response(subscriberHost, category, topic, handlerId, payload);
+      this.response(handlerId, subscriberHost, category, topic, payload);
     };
 
     this.system.events.addListener(category, topic, this.handlers[handlerId]);
@@ -75,12 +92,31 @@ export default class Bridge {
     delete this.handlers[handlerId];
   }
 
+  /**
+   * Subscribe to local event and send message to remote subscriber
+   */
+  private addLocalCategoryListener(category: string, handlerId: string, subscriberHost: string) {
+    this.handlers[handlerId] = (payload: any): void => {
+      this.response(handlerId, subscriberHost, category, undefined, payload);
+    };
+
+    this.system.events.addCategoryListener(category, this.handlers[handlerId]);
+  }
+
+  /**
+   * Unsubscribe from local event
+   */
+  private removeLocalCategoryListener(category: string, handlerId: string) {
+    this.system.events.removeCategoryListener(category, this.handlers[handlerId]);
+    delete this.handlers[handlerId];
+  }
+
   private response(
+    handlerId: string,
     subscriberHost: string,
     category: string,
-    topic: string,
-    handlerId: string,
-    payload: any
+    topic: string = ALL_TOPICS,
+    payload?: any
   ): void {
     const message: Message = {
       category: categories.messengerBridge,
@@ -89,7 +125,7 @@ export default class Bridge {
       to: subscriberHost,
       payload: {
         category,
-        topic,
+        topic: topic,
         handlerId,
         payload,
       },

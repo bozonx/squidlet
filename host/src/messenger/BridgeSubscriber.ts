@@ -1,3 +1,5 @@
+import {ALL_TOPICS} from '../app/dict/constants';
+
 const _find = require('lodash/find');
 
 import categories from '../app/dict/categories';
@@ -211,7 +213,7 @@ export default class BridgeSubscriber {
     specialTopic: string,
     toHost: string,
     eventCategory: string,
-    eventTopic?: string,
+    eventTopic: string = ALL_TOPICS,
   ): Message {
     return {
       // special category

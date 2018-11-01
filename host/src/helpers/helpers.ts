@@ -75,13 +75,11 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
   return result;
 }
 
-export function generateEventName(category: string, topic?: string, ...others: Array<string>): string {
+export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
 
   // TODO: test
 
-  const preparedTopic = topic || ALL_TOPICS;
-
-  return [ category, preparedTopic, ...others ].join(systemConfig.eventNameSeparator);
+  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
 }
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
