@@ -56,7 +56,6 @@ export default class Bridge {
       this.addLocalListener(payload.category, payload.topic, payload.handlerId, subscriberHost);
     }
     else if (topic === UNSUBSCRIBE_TOPIC) {
-
       // TODO: rise an error to error collector
       if (!this.checkIncomeMsgPayload(payload)) return;
       this.removeLocalListener(payload.category, payload.topic, payload.handlerId);

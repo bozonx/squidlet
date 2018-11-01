@@ -45,7 +45,7 @@ describe 'messenger.BridgeResponder', ->
     sinon.assert.calledWith(@addLocalHandler, @category, @topic, @bridgeResponder.handlers['123'])
 
   it 'response', ->
-    @bridgeResponder.response(@subscriberHost, @category, @topic, '123', 'payload')
+    @bridgeResponder.response('123', @subscriberHost, @category, @topic, 'payload')
 
     sinon.assert.calledWith(@system.network.send, @subscriberHost, {
       category: 'messengerBridge'
