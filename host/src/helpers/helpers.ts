@@ -1,3 +1,5 @@
+import {ALL_TOPICS} from '../app/dict/constants';
+
 const _isEmpty = require('lodash/isEmpty');
 const _find = require('lodash/find');
 const _trim = require('lodash/trim');
@@ -73,10 +75,13 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
   return result;
 }
 
-export function generateEventName(category: string, topic: string, ...others: Array<string>): string {
-  //if (!topic || topic === '*') return [ category, ...others ].join(systemConfig.eventNameSeparator);
+export function generateEventName(category: string, topic?: string, ...others: Array<string>): string {
 
-  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
+  // TODO: test
+
+  const preparedTopic = topic || ALL_TOPICS;
+
+  return [ category, preparedTopic, ...others ].join(systemConfig.eventNameSeparator);
 }
 
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {

@@ -12,6 +12,8 @@ const HANDLER_ID_POSITION = 0;
 const HANDLER_POSITION = 1;
 export const SUBSCRIBE_TOPIC = 'subscribeToRemoteEvent';
 export const UNSUBSCRIBE_TOPIC = 'unsubscribeFromRemoteEvent';
+export const SUBSCRIBE_CATEGORY = 'subscribeToRemoteCategoryEvent';
+export const UNSUBSCRIBE_CATEGORY = 'unsubscribeFromRemoteCategoryEvent';
 export const RESPOND_TOPIC = 'respondOfRemoteEvent';
 
 type Handler = (message: Message) => void;
@@ -43,7 +45,7 @@ export default class BridgeSubscriber {
    */
   subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
     const handlerId: string = this.system.host.generateUniqId();
-    const message: Message = this.generateSpecialMessage(toHost, category, topic, SUBSCRIBE_TOPIC, handlerId);
+    const message: Message = this.generateSpecialMessage(handlerId, SUBSCRIBE_TOPIC, toHost, category, topic);
 
     // listen to messages from remote host
     this.addHandler(toHost, category, topic, handlerId, handler);
@@ -56,8 +58,19 @@ export default class BridgeSubscriber {
   }
 
   subscribeCategory(toHost: string, category: string, handler: Handler) {
-    // TODO: !!!!!
     // TODO: test
+
+    const handlerId: string = this.system.host.generateUniqId();
+    const message: Message = this.generateSpecialMessage(handlerId, SUBSCRIBE_CATEGORY, toHost, category);
+
+    // listen to messages from remote host
+    this.addHandler(toHost, category, undefined, handlerId, handler);
+
+    // add handler of events of remote host
+    this.system.network.send(toHost, message)
+      .catch((err) => {
+        // TODO: ожидать ответа - если не дошло - наверное повторить
+      });
   }
 
   unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
@@ -66,7 +79,7 @@ export default class BridgeSubscriber {
 
     if (!handlerId) return;
 
-    const message: Message = this.generateSpecialMessage(toHost, category, topic, UNSUBSCRIBE_TOPIC, handlerId);
+    const message: Message = this.generateSpecialMessage(handlerId, UNSUBSCRIBE_TOPIC, toHost, category, topic);
 
     // remove local handler
     this.removeHandler(eventName, handler);
@@ -79,14 +92,35 @@ export default class BridgeSubscriber {
   }
 
   unsubscribeCategory(toHost: string, category: string, handler: Handler) {
-    // TODO: !!!!!
     // TODO: test
+
+    const eventName = generateEventName(category, undefined, toHost);
+    const handlerId = this.findHandlerIdByHandler(eventName, handler);
+
+    if (!handlerId) return;
+
+    const message: Message = this.generateSpecialMessage(handlerId, UNSUBSCRIBE_CATEGORY, toHost, category);
+
+    // remove local handler
+    this.removeHandler(eventName, handler);
+
+    // send message to remove remote emitter
+    this.system.network.send(toHost, message)
+      .catch((err) => {
+        // TODO: ожидать ответа - если не дошло - наверное повторить
+      });
   }
 
   /**
    * Register handler which will be risen on remote event
    */
-  private addHandler(toHost: string, category: string, topic: string, handlerId: string, handler: Handler) {
+  private addHandler(
+    toHost: string,
+    category: string,
+    topic: string | undefined,
+    handlerId: string,
+    handler: Handler
+  ) {
     const eventName = generateEventName(category, topic, toHost);
     const handlerItem: HandlerItem = [ handlerId, handler ];
 
@@ -172,7 +206,13 @@ export default class BridgeSubscriber {
   /**
    * Generate message to subscribe to event or unsubscribe
    */
-  private generateSpecialMessage(toHost: string, eventCategory: string, topic: string, specialTopic: string, handlerId: string): Message {
+  private generateSpecialMessage(
+    handlerId: string,
+    specialTopic: string,
+    toHost: string,
+    eventCategory: string,
+    eventTopic?: string,
+  ): Message {
     return {
       // special category
       category: categories.messengerBridge,
@@ -181,7 +221,7 @@ export default class BridgeSubscriber {
       to: toHost,
       payload: {
         category: eventCategory,
-        topic,
+        topic: eventTopic,
         handlerId,
       },
     };
