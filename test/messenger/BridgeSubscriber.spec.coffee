@@ -44,35 +44,27 @@ describe 'messenger.BridgeSubscriber', ->
       }
     })
 
-  it 'income respond', ->
-    msgPayload = {
-      category: 'cat'
-      topic: 'topic'
-      handlerId: '123'
-      payload: 'payload'
-    }
+  it 'subscribeCategory', ->
+    handler = ->
+    @bridgeSubscriber.subscribeCategory(@toHost, @category, handler)
 
-    @respondMessage = {
-      category: 'messengerBridge'
-      topic: 'respondOfRemoteEvent'
-      from: 'remoteHost'
-      to: 'master'
-      payload: msgPayload
-    }
-    handler = sinon.spy()
-    @bridgeSubscriber.handlers = {
-      'cat|topic|remoteHost': [
-        [
-          @handlerId
-          handler
-        ]
+    assert.deepEqual(@bridgeSubscriber.handlers['cat|*|remoteHost'], [
+      [
+        '123'
+        handler
       ]
-    }
-    @bridgeSubscriber.init()
-
-    @incomeHandler(@respondMessage)
-
-    sinon.assert.calledWith(handler, msgPayload)
+    ])
+    sinon.assert.calledWith(@system.network.send, @toHost, {
+      category: 'messengerBridge'
+      topic: 'subscribeToRemoteCategoryEvent'
+      from: 'master'
+      to: 'remoteHost'
+      payload: {
+        category: 'cat'
+        topic: '*'
+        handlerId: '123'
+      }
+    })
 
   it 'unsubscribe', ->
     handlerToRemove = ->
@@ -110,3 +102,70 @@ describe 'messenger.BridgeSubscriber', ->
         handlerId: '123'
       }
     })
+
+  it 'unsubscribeCategory', ->
+    handlerToRemove = ->
+    otherHandler = ->
+    @bridgeSubscriber.handlers['cat|*|remoteHost'] = [
+      [
+        '123'
+        handlerToRemove,
+      ]
+      [
+        '345'
+        otherHandler,
+      ]
+    ]
+
+    @bridgeSubscriber.unsubscribeCategory(@toHost, @category, handlerToRemove)
+
+    assert.deepEqual(@bridgeSubscriber.handlers, {
+      'cat|*|remoteHost': [
+        [
+          '345'
+          otherHandler,
+        ]
+      ]
+    })
+
+    sinon.assert.calledWith(@system.network.send, @toHost, {
+      category: 'messengerBridge'
+      topic: 'unsubscribeFromRemoteCategoryEvent'
+      from: 'master'
+      to: 'remoteHost'
+      payload: {
+        category: 'cat'
+        topic: '*'
+        handlerId: '123'
+      }
+    })
+
+  it 'income respond', ->
+    msgPayload = {
+      category: 'cat'
+      topic: 'topic'
+      handlerId: '123'
+      payload: 'payload'
+    }
+
+    @respondMessage = {
+      category: 'messengerBridge'
+      topic: 'respondOfRemoteEvent'
+      from: 'remoteHost'
+      to: 'master'
+      payload: msgPayload
+    }
+    handler = sinon.spy()
+    @bridgeSubscriber.handlers = {
+      'cat|topic|remoteHost': [
+        [
+          @handlerId
+          handler
+        ]
+      ]
+    }
+    @bridgeSubscriber.init()
+
+    @incomeHandler(@respondMessage)
+
+    sinon.assert.calledWith(handler, msgPayload)

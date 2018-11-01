@@ -60,8 +60,6 @@ export default class BridgeSubscriber {
   }
 
   subscribeCategory(toHost: string, category: string, handler: Handler) {
-    // TODO: test
-
     const handlerId: string = this.system.host.generateUniqId();
     const message: Message = this.generateSpecialMessage(handlerId, SUBSCRIBE_CATEGORY, toHost, category);
 
@@ -94,8 +92,6 @@ export default class BridgeSubscriber {
   }
 
   unsubscribeCategory(toHost: string, category: string, handler: Handler) {
-    // TODO: test
-
     const eventName = generateEventName(category, undefined, toHost);
     const handlerId = this.findHandlerIdByHandler(eventName, handler);
 
