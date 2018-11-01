@@ -30,5 +30,5 @@ export default async function systemPlugin (env: PluginEnv) {
   //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection.driver'));
 
   // services
-  //await env.addService(path.join(servicesRoot, 'Mqtt'));
+  await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
 }

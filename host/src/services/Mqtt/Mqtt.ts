@@ -19,6 +19,9 @@ export default class Mqtt extends ServiceBase<Props> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+
+    console.log(1111111, this.props)
+
     this.depsInstances.mqttDev = await getDriverDep('Mqtt.dev')
       .connect(this.props);
     // this.depsInstances.mqttDriver = await getDriverDep('Mqtt.driver')
@@ -59,9 +62,10 @@ export default class Mqtt extends ServiceBase<Props> {
    * Process income messages
    */
   private messagesHandler = (topic: string, data: string): Promise<void> => {
-    this.env.log.info(`Income message: ${topic}. ${data}`);
+    this.env.log.info(`MQTT income: ${topic}. ${data}`);
 
     // TODO: если data - binary???
+    // TODO: что если неизвестный формат или хоста не существует ???
 
     const { id, subTopic } = splitTopic(topic);
     const toHost = this.env.host.resolveHostIdByEntityId(id);
@@ -79,7 +83,7 @@ export default class Mqtt extends ServiceBase<Props> {
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
     const topic: string = combineTopic(data.id, data.subTopic);
 
-    this.env.log.info(`Outcome message: ${topic}. ${JSON.stringify(data)}`);
+    this.env.log.info(`MQTT outcome: ${topic}. ${JSON.stringify(data)}`);
 
     await this.mqttDev.publish(topic, data.data);
   }
