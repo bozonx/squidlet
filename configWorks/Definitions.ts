@@ -128,7 +128,7 @@ export default class Definitions {
       props: _defaultsDeep(
         _cloneDeep(_omit(deviceDef, 'device')),
         deviceHostDefaults,
-        manifest.props,
+        this.collectManifestPropsDefaults(manifest.props),
       ),
     };
   }
@@ -142,7 +142,7 @@ export default class Definitions {
       className: id,
       props: _defaultsDeep(
         _cloneDeep(_omit(driverDef, 'driver')),
-        manifest.props,
+        this.collectManifestPropsDefaults(manifest.props),
       ),
     };
   }
@@ -156,7 +156,7 @@ export default class Definitions {
       className,
       props: _defaultsDeep(
         _cloneDeep(_omit(serviceDef, 'service')),
-        manifest.props,
+        this.collectManifestPropsDefaults(manifest.props),
       ),
     };
   }
@@ -232,6 +232,23 @@ export default class Definitions {
     check(entities.devices, this.devicesDefinitions);
     check(entities.drivers, this.driversDefinitions);
     check(entities.services, this.servicesDefinitions);
+  }
+
+  private collectManifestPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
+    const result: {[index: string]: any} = {};
+
+    if (!manifestProps) return result;
+
+    for (let propName of Object.keys(manifestProps)) {
+      if (typeof manifestProps[propName] === 'object') {
+        result[propName] = manifestProps[propName].default;
+      }
+      else {
+        // TODO: поддержка короткой записи props
+      }
+    }
+
+    return result;
   }
 
 }
