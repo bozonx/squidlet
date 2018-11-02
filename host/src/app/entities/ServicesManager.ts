@@ -1,3 +1,5 @@
+const _includes = require('lodash/includes');
+
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
@@ -11,19 +13,39 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
   }
 
   async initSystemServices() {
-    const systemServicesList = await this.system.configSet.loadConfig<string[]>(
+    const servicesIds: string[] = [];
+    const systemServicesList: string[] = await this.system.configSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
     );
+    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+      this.system.initCfg.fileNames.servicesDefinitions
+    );
 
-    await this.initServices(systemServicesList);
+    for (let serviceId of Object.keys(definitions)) {
+      if (_includes(systemServicesList, definitions[serviceId].className)) {
+        servicesIds.push(serviceId);
+      }
+    }
+
+    await this.initServices(servicesIds);
   }
 
   async initRegularServices() {
+    const servicesIds: string[] = [];
     const regularServicesList = await this.system.configSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularServices
     );
+    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+      this.system.initCfg.fileNames.servicesDefinitions
+    );
 
-    await this.initServices(regularServicesList);
+    for (let serviceId of Object.keys(definitions)) {
+      if (_includes(regularServicesList, definitions[serviceId].className)) {
+        servicesIds.push(serviceId);
+      }
+    }
+
+    await this.initServices(servicesIds);
   }
 
   getService<T extends ServiceInstance>(serviceId: string): T {
