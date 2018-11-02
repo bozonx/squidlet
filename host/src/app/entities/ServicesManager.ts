@@ -13,37 +13,19 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
   }
 
   async initSystemServices() {
-    const servicesIds: string[] = [];
     const systemServicesList: string[] = await this.system.configSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
     );
-    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initCfg.fileNames.servicesDefinitions
-    );
-
-    for (let serviceId of Object.keys(definitions)) {
-      if (_includes(systemServicesList, definitions[serviceId].className)) {
-        servicesIds.push(serviceId);
-      }
-    }
+    const servicesIds: string[] = await this.generateServiceIdsList(systemServicesList);
 
     await this.initServices(servicesIds);
   }
 
   async initRegularServices() {
-    const servicesIds: string[] = [];
     const regularServicesList = await this.system.configSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularServices
     );
-    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initCfg.fileNames.servicesDefinitions
-    );
-
-    for (let serviceId of Object.keys(definitions)) {
-      if (_includes(regularServicesList, definitions[serviceId].className)) {
-        servicesIds.push(serviceId);
-      }
-    }
+    const servicesIds: string[] = await this.generateServiceIdsList(regularServicesList);
 
     await this.initServices(servicesIds);
   }
@@ -68,6 +50,21 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
     }
 
     await this.initializeAll(servicesIds);
+  }
+
+  private async generateServiceIdsList(allowedClassNames: string[]): Promise<string[]> {
+    const servicesIds: string[] = [];
+    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+      this.system.initCfg.fileNames.servicesDefinitions
+    );
+
+    for (let serviceId of Object.keys(definitions)) {
+      if (_includes(allowedClassNames, definitions[serviceId].className)) {
+        servicesIds.push(serviceId);
+      }
+    }
+
+    return servicesIds;
   }
 
 }
