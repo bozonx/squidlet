@@ -1,0 +1,10 @@
+name: Relay
+type: relay
+
+main: ./Relay.ts
+#props: ./props.yaml
+drivers:
+  - BinaryOutput.driver
+
+status:
+  default: boolean

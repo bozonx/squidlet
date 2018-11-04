@@ -1,0 +1,10 @@
+name: BinaryClick
+type: binary-click
+
+main: ./BinaryClick.ts
+#props: ./props.yaml
+drivers:
+  - BinaryInput.driver
+
+status:
+  default: boolean
