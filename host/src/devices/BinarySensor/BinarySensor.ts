@@ -29,6 +29,9 @@ export default class BinarySensor extends DeviceBase<Props> {
     return { [DEFAULT_STATUS]: await this.binaryInput.read() };
   }
 
+  protected transformPublishValue = (value: boolean): number => {
+    return Number(value);
+  }
 
   protected validateProps = (props: Props): string | undefined => {
     // TODO: !!!! validate debounce and blockTime

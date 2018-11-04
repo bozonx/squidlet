@@ -46,9 +46,9 @@ export default class Mqtt extends ServiceBase<Props> {
 
     for (let hostId of hosts) {
       // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
-      const handler = (payload: any) => {
+      const handler = (data: DeviceData) => {
         // TODO: обработка ошибки промиса
-        this.hostPublishHandler(hostId, payload);
+        this.hostPublishHandler(hostId, data);
       };
 
       // listen to publish messages
@@ -81,9 +81,9 @@ export default class Mqtt extends ServiceBase<Props> {
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
     const topic: string = combineTopic(data.id, data.subTopic);
 
-    this.env.log.info(`MQTT outcome: ${topic}. ${JSON.stringify(data)}`);
+    this.env.log.info(`MQTT outcome: ${topic}. ${JSON.stringify(data.data)}`);
 
-    await this.mqttDev.publish(topic, data.data);
+    await this.mqttDev.publish(topic, String(data.data));
   }
 
 }

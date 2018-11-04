@@ -25,6 +25,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   protected statusSetter?: Setter;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
+  protected transformPublishValue?: (value: any) => any;
   protected actions: {[index: string]: Function} = {};
   private _status?: Status;
   private _config?: Config;
@@ -123,7 +124,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     const data: DeviceData = {
       id: this.id,
       subTopic,
-      data: value,
+      data: (this.transformPublishValue) ? this.transformPublishValue(value) : value,
       params,
     };
 
