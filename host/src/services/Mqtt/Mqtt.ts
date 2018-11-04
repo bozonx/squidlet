@@ -60,7 +60,7 @@ export default class Mqtt extends ServiceBase<Props> {
    * Process income messages
    */
   private messagesHandler = (topic: string, data: string): Promise<void> => {
-    this.env.log.info(`MQTT income: ${topic}. ${data}`);
+    this.env.log.info(`MQTT income: ${topic} - ${data}`);
 
     // TODO: если data - binary???
     // TODO: что если неизвестный формат или хоста не существует ???
@@ -81,7 +81,7 @@ export default class Mqtt extends ServiceBase<Props> {
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
     const topic: string = combineTopic(data.id, data.subTopic);
 
-    this.env.log.info(`MQTT outcome: ${topic}. ${JSON.stringify(data.data)}`);
+    this.env.log.info(`MQTT outcome: ${topic} - ${JSON.stringify(data.data)}`);
 
     await this.mqttDev.publish(topic, String(data.data));
   }

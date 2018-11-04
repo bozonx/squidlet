@@ -75,6 +75,8 @@ export default class System {
 
     // remove initialization config
     delete this.initializationConfig;
+
+    this.log.info(`===> Host initialization has finished`);
   }
 
   $registerConfigSetManager(ConfigSetManager: new (system: System) => ConfigSetManager) {
@@ -91,9 +93,9 @@ export default class System {
    */
   private async initApp(): Promise<void> {
     await this.driversManager.initRegularDrivers();
+    await this.servicesManager.initRegularServices();
     await this.devicesManager.init();
     this.devices.init();
-    await this.servicesManager.initRegularServices();
   }
 
   private riseEvent(eventName: string) {

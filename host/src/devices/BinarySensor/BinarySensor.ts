@@ -21,6 +21,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
   protected didInit = async () => {
+    // listen driver's change and set status
     this.binaryInput.addListener(this.onInputChange);
   }
 

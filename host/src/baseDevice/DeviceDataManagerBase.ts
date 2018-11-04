@@ -51,6 +51,7 @@ export default abstract class DeviceDataManagerBase {
     this.setter = setter;
 
     if (this.getter) {
+      // initialize status
       await this.read();
 
       // TODO: если не получилось прочитать - установить значение по умолчанию
