@@ -19,9 +19,6 @@ export default class Mqtt extends ServiceBase<Props> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-
-    console.log(1111111, this.props)
-
     this.depsInstances.mqttDev = await getDriverDep('Mqtt.dev')
       .connect(this.props);
     // this.depsInstances.mqttDriver = await getDriverDep('Mqtt.driver')
@@ -50,6 +47,7 @@ export default class Mqtt extends ServiceBase<Props> {
     for (let hostId of hosts) {
       // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
       const handler = (payload: any) => {
+        // TODO: обработка ошибки промиса
         this.hostPublishHandler(hostId, payload);
       };
 

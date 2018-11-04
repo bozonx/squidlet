@@ -49,8 +49,8 @@ export default class System {
     // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
 
     this.network = new Network(this.driversManager.env);
-    this.servicesManager = new ServicesManager(this);
     this.messenger = new Messenger(this);
+    this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
     this.devices = new Devices(this);
   }
