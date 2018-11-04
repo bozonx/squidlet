@@ -9,7 +9,7 @@ interface Props extends DeviceBaseProps, BinaryInputDriverProps {
 }
 
 
-export default class BinaryToggle extends DeviceBase<Props> {
+export default class BinaryImpulse extends DeviceBase<Props> {
   private get binaryInput(): BinaryInputDriver {
     return this.depsInstances.binaryInput as BinaryInputDriver;
   }
