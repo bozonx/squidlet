@@ -6,6 +6,7 @@ import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/Bi
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
+  impulseLength?: number;
 }
 
 
@@ -21,12 +22,15 @@ export default class BinaryImpulse extends DeviceBase<Props> {
   }
 
   protected didInit = async () => {
-    // listen driver's change and set status
+    // listen driver's change
     this.binaryInput.addListener(this.onInputChange);
   }
 
 
   protected statusGetter = async (): Promise<Data> => {
+
+    // TODO: review - может использовать локальный статус ???
+
     return { [DEFAULT_STATUS]: await this.binaryInput.read() };
   }
 

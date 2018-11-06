@@ -1,5 +1,8 @@
 #$extends: gpioBaseProps
 
+impulseLength:
+  type: number
+  default: 300
 # debounce time in ms
 debounce:
   type: number

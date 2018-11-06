@@ -2,7 +2,7 @@ name: BinaryImpulse
 type: binary-impulse
 
 main: ./BinaryImpulse.ts
-#props: ./props.yaml
+props: ./props.yaml
 drivers:
   - BinaryInput.driver
 

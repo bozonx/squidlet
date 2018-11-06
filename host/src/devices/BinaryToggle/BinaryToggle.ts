@@ -21,7 +21,7 @@ export default class BinaryToggle extends DeviceBase<Props> {
   }
 
   protected didInit = async () => {
-    // listen driver's change and set status
+    // listen driver's change
     this.binaryInput.addListener(this.onInputChange);
   }
 
