@@ -2,7 +2,7 @@ name: Relay
 type: relay
 
 main: ./Relay.ts
-#props: ./props.yaml
+props: ./props.yaml
 drivers:
   - BinaryOutput.driver
 

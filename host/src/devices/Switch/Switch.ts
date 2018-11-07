@@ -11,8 +11,6 @@ interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
 
 
 export default class Switch extends DeviceBase<Props> {
-  private blockTimeInProgress: boolean = false;
-
   private get binaryOutput(): BinaryOutputDriver {
     return this.depsInstances.binaryOutput as BinaryOutputDriver;
   }
