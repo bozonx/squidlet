@@ -2,7 +2,7 @@ name: BinarySwitch
 type: binary-switch
 
 main: ./BinarySwitch.ts
-#props: ./props.yaml
+props: ./props.yaml
 drivers:
   - BinaryInput.driver
 
