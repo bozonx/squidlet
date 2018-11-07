@@ -1,7 +1,7 @@
-name: BinarySwitch
-type: binary-switch
+name: SwitchSensor
+type: switch-sensor
 
-main: ./BinarySwitch.ts
+main: ./SwitchSensor.ts
 props: ./props.yaml
 drivers:
   - BinaryInput.driver
