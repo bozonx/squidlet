@@ -1,16 +1,22 @@
+const _omit = require('lodash/omit');
+
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {Data} from '../../baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
-  impulseLength?: number;
+  // impulse block time
+  blockTime: number;
+  impulseLength: number;
 }
 
 
 export default class BinaryImpulse extends DeviceBase<Props> {
+  private impulseInProgress: boolean = false;
+  private blockTimeInProgress: boolean = false;
+
+
   private get binaryInput(): BinaryInputDriver {
     return this.depsInstances.binaryInput as BinaryInputDriver;
   }
@@ -18,7 +24,11 @@ export default class BinaryImpulse extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(this.props);
+      .getInstance({
+        ..._omit(this.props, 'impulseLength'),
+        // don't use driver's block time
+        blockTime: 0,
+      });
   }
 
   protected didInit = async () => {
@@ -26,26 +36,36 @@ export default class BinaryImpulse extends DeviceBase<Props> {
     this.binaryInput.addListener(this.onInputChange);
   }
 
-
-  protected statusGetter = async (): Promise<Data> => {
-
-    // TODO: review - может использовать локальный статус ???
-
-    return { [DEFAULT_STATUS]: await this.binaryInput.read() };
-  }
-
   protected transformPublishValue = (value: boolean): number => {
     return Number(value);
   }
 
   protected validateProps = (props: Props): string | undefined => {
-    // TODO: !!!! validate debounce and blockTime
+    // TODO: !!!!
     return;
   }
 
 
   private onInputChange = async (level: boolean) => {
-    await this.setStatus(level);
+    if (this.impulseInProgress || this.blockTimeInProgress) return;
+    // receive only level 1
+    if (!level) return;
+
+    this.impulseInProgress = true;
+
+    // set impulse with level 1
+    await this.setStatus(true);
+
+    // waiting for impulse end
+    setTimeout(async () => {
+      this.impulseInProgress = false;
+      // start dead time - ignore all the signals
+      this.blockTimeInProgress = true;
+
+      await this.setStatus(false);
+
+      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+    }, this.props.impulseLength);
   }
 
 }
