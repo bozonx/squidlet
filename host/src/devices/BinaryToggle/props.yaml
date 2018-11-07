@@ -1,0 +1,14 @@
+#$extends: gpioBaseProps
+
+# debounce time in ms
+debounce:
+  type: number
+  # it's default for debounce, not for throttle
+  default: 20
+debounceType:
+  type: debounce | throttle
+  default: debounce
+# timeout after received signal. At this time it doesn't receive any signals.
+blockTime:
+  type: number
+  default: 50

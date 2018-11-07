@@ -1,6 +1,4 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {Data} from '../../baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 
@@ -23,11 +21,6 @@ export default class BinaryToggle extends DeviceBase<Props> {
   protected didInit = async () => {
     // listen driver's change
     this.binaryInput.addListener(this.onInputChange);
-  }
-
-
-  protected statusGetter = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: await this.binaryInput.read() };
   }
 
   protected transformPublishValue = (value: boolean): number => {
