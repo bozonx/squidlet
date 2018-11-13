@@ -18,6 +18,7 @@ interface Listener {
 export default class DigitalDev implements Digital {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly alertListeners: Listener[] = [];
+  private debounceTimeouts: {[index: string]: any} = {};
 
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
@@ -63,10 +64,13 @@ export default class DigitalDev implements Digital {
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
     const pinInstance = this.getPinInstance(pin);
     const handlerWrapper: GpioHanler = (level: number) => {
-      handler(Boolean(level));
+      this.debounceCall( async () => {
+        const realLevel = await this.read(pin);
+        handler(realLevel);
+      }, pin, debounce);
     };
 
-    // TODO: debounce и edge сделать программно
+    // TODO: edge сделать программно
 
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
@@ -127,6 +131,21 @@ export default class DigitalDev implements Digital {
     }
 
     return this.pinInstances[pin];
+  }
+
+  private debounceCall(cb: () => void, pin: number, debounce?: number) {
+    // if there isn't debounce - call immediately
+    if (!debounce) return cb();
+
+    // if debounce is in progress - do nothing
+    if (typeof this.debounceTimeouts[pin] === 'undefined') return;
+
+    const wrapper = () => {
+      delete this.debounceTimeouts[pin];
+      cb();
+    };
+
+    this.debounceTimeouts[pin] = setTimeout(wrapper, debounce);
   }
 
 }
