@@ -25,19 +25,20 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
     }
     
     const instanceIdName: string = this.instanceIdName || (this.combinedInstanceIdName as any)(instanceProps);
-    
-    if (this.instances[instanceIdName]) return this.instances[instanceIdName];
+    const instanceId = (instanceProps) ? instanceProps[instanceIdName] : 'default';
+
+    if (this.instances[instanceId]) return this.instances[instanceId];
 
     const definition = {
       ...this.definition,
       props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
     };
 
-    this.instances[instanceIdName] = new this.DriverClass(definition, this.env);
+    this.instances[instanceId] = new this.DriverClass(definition, this.env);
 
-    if (this.instances[instanceIdName].init) await (this.instances[instanceIdName].init as any)();
+    if (this.instances[instanceId].init) await (this.instances[instanceId].init as any)();
 
-    return this.instances[instanceIdName];
+    return this.instances[instanceId];
   }
 
 }
