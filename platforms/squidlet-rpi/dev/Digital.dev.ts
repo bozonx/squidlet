@@ -64,10 +64,16 @@ export default class DigitalDev implements Digital {
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
     const pinInstance = this.getPinInstance(pin);
     const handlerWrapper: GpioHanler = (level: number) => {
-      this.debounceCall( async () => {
-        const realLevel = await this.read(pin);
-        handler(realLevel);
-      }, pin, debounce);
+      if (!debounce) {
+        handler(Boolean(level));
+      }
+      else {
+        // wait for debounce and read current level
+        this.debounceCall( async () => {
+          const realLevel = await this.read(pin);
+          handler(realLevel);
+        }, pin, debounce);
+      }
     };
 
     // TODO: edge сделать программно
@@ -138,8 +144,9 @@ export default class DigitalDev implements Digital {
     if (!debounce) return cb();
 
     // if debounce is in progress - do nothing
-    if (typeof this.debounceTimeouts[pin] === 'undefined') return;
+    if (typeof this.debounceTimeouts[pin] !== 'undefined') return;
 
+    // making new debounce timeout
     const wrapper = () => {
       delete this.debounceTimeouts[pin];
       cb();
