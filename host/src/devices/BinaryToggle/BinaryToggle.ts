@@ -15,7 +15,11 @@ export default class BinaryToggle extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(this.props);
+      .getInstance({
+        ...this.props,
+        // don't use driver's block time
+        blockTime: 0,
+      });
   }
 
   protected didInit = async () => {
@@ -34,7 +38,12 @@ export default class BinaryToggle extends DeviceBase<Props> {
 
 
   private onInputChange = async (level: boolean) => {
-    await this.setStatus(level);
+    //await this.setStatus(level);
+    this.doToggle();
+  }
+
+  private doToggle() {
+    // TODO: use dead time
   }
 
 }
