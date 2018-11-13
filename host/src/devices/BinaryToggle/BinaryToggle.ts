@@ -8,6 +8,9 @@ interface Props extends DeviceBaseProps, BinaryInputDriverProps {
 
 
 export default class BinaryToggle extends DeviceBase<Props> {
+  private blockTimeInProgress: boolean = false;
+
+
   private get binaryInput(): BinaryInputDriver {
     return this.depsInstances.binaryInput as BinaryInputDriver;
   }
@@ -39,11 +42,23 @@ export default class BinaryToggle extends DeviceBase<Props> {
 
   private onInputChange = async (level: boolean) => {
     //await this.setStatus(level);
-    this.doToggle();
+    await this.doToggle();
   }
 
-  private doToggle() {
-    // TODO: use dead time
+  private async doToggle() {
+    if (this.blockTimeInProgress) return;
+
+    this.blockTimeInProgress = true;
+
+    // just change state
+    if (await this.getStatus()) {
+      await this.setStatus(false);
+    }
+    else {
+      await this.setStatus(true);
+    }
+
+    setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
   }
 
 }
