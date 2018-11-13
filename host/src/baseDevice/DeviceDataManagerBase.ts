@@ -10,7 +10,7 @@ export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
-export type ChangeHandler = (changedParams: string[]) => void;
+export type ChangeHandler = (changedParams: string[], isRepublish: boolean) => void;
 
 export const changeEventName = 'change';
 
@@ -78,8 +78,8 @@ export default abstract class DeviceDataManagerBase {
   protected async readAllData(
     typeNameOfData: string,
     getter: () => Promise<Data>,
-    onUpdate: (updatedParams: string[]
-  ) => void): Promise<Data> {
+    onUpdate: (updatedParams: string[]) => void
+  ): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!getter) return this.localData;
     // else fetch config if getter is defined
@@ -200,7 +200,7 @@ export default abstract class DeviceDataManagerBase {
     if (this.localData[paramName] === value) return false;
 
     this.localData[paramName] = value;
-    this.events.emit(changeEventName, [paramName]);
+    this.events.emit(changeEventName, [paramName], false);
     this.republish.start(this.republishCb);
 
     return true;
@@ -225,7 +225,7 @@ export default abstract class DeviceDataManagerBase {
       ...partialData,
     };
 
-    this.events.emit(changeEventName, updatedParams);
+    this.events.emit(changeEventName, updatedParams, false);
     this.republish.start(this.republishCb);
 
     return updatedParams;
@@ -249,11 +249,13 @@ export default abstract class DeviceDataManagerBase {
 
 
   private republishCb = () => {
-    const data: Data = this.getLocal();
+    this.events.emit(changeEventName, Object.keys(this.getLocal()), true);
 
-    for (let name of Object.keys(data)) {
-      //this.events.emit(changeEventName, [paramName]);
-    }
+    // const data: Data = this.getLocal();
+    //
+    // for (let name of Object.keys(data)) {
+    //   //this.events.emit(changeEventName, [paramName]);
+    // }
   }
 
 }
