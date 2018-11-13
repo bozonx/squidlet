@@ -1,9 +1,11 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
+import {convertToLevel} from '../../helpers/helpers';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
+  actionDebounce: number;
 }
 
 
@@ -39,26 +41,46 @@ export default class BinaryToggle extends DeviceBase<Props> {
     return;
   }
 
+  protected actions = {
+    turn: async (onOrOff: any): Promise<boolean> => {
+      if (this.blockTimeInProgress) this.getStatus();
+
+      this.blockTimeInProgress = true;
+
+      const level: boolean = convertToLevel(onOrOff);
+
+      await this.setStatus(level);
+
+      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+
+      return level;
+    },
+
+    toggle: async (): Promise<boolean> => {
+      return await this.doToggle();
+    }
+  };
+
 
   private onInputChange = async (level: boolean) => {
-    //await this.setStatus(level);
+    // listen only for 1
+    if (!level) return;
+
     await this.doToggle();
   }
 
-  private async doToggle() {
-    if (this.blockTimeInProgress) return;
+  private async doToggle(): Promise<boolean> {
+    if (this.blockTimeInProgress) return this.getStatus();
 
     this.blockTimeInProgress = true;
 
-    // just change state
-    if (await this.getStatus()) {
-      await this.setStatus(false);
-    }
-    else {
-      await this.setStatus(true);
-    }
+    const level: boolean = !await this.getStatus();
+
+    await this.setStatus(level);
 
     setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+
+    return level;
   }
 
 }

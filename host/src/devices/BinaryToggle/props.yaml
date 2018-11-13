@@ -1,5 +1,9 @@
 #$extends: gpioBaseProps
 
+# debounce which is used on turn or toggle actions
+actionDebounce:
+  type: number
+  default: 20
 # debounce time in ms
 debounce:
   type: number
