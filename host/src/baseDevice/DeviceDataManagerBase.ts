@@ -61,6 +61,7 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
+
   getLocal(): Data {
     return this.localData;
   }
@@ -200,7 +201,7 @@ export default abstract class DeviceDataManagerBase {
 
     this.localData[paramName] = value;
     this.events.emit(changeEventName, [paramName]);
-    // TODO: call republish
+    this.republish.start(this.republishCb);
 
     return true;
   }
@@ -225,7 +226,7 @@ export default abstract class DeviceDataManagerBase {
     };
 
     this.events.emit(changeEventName, updatedParams);
-    // TODO: call republish
+    this.republish.start(this.republishCb);
 
     return updatedParams;
   }
@@ -243,6 +244,15 @@ export default abstract class DeviceDataManagerBase {
       ) {
         this.localData[name] = this.schema[name].default;
       }
+    }
+  }
+
+
+  private republishCb = () => {
+    const data: Data = this.getLocal();
+
+    for (let name of Object.keys(data)) {
+      //this.events.emit(changeEventName, [paramName]);
     }
   }
 
