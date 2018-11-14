@@ -15,7 +15,7 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
   //protected readonly abstract EnvClass: new (system: System) => EntityEnv;
   protected readonly system: System;
   protected readonly instances: {[index: string]: EntityInstance} = {};
-  private _env?: EntityEnv;
+  private readonly _env?: EntityEnv;
 
   get env(): EntityEnv {
     return this._env as EntityEnv;
@@ -37,6 +37,9 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
     return new EntityClass(definition, this.env) as EntityInstance;
   }
 
+  /**
+   * Call init function of all the instances.
+   */
   protected async initializeAll(entitiesIds: string[]) {
     for (let entityId of entitiesIds) {
       if (typeof this.instances[entityId] === 'undefined') {
