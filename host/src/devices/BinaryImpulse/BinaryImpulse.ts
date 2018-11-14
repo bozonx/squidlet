@@ -24,9 +24,7 @@ export default class BinaryImpulse extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance({
-        ..._omit(this.props, 'impulseLength'),
-      });
+      .getInstance(_omit(this.props, 'impulseLength', 'blockTime'));
   }
 
   protected didInit = async () => {

@@ -11,6 +11,3 @@ props:
   debounceType:
     type: debounce | throttle
     default: debounce
-  blockTime:
-    type: number
-    default: 50

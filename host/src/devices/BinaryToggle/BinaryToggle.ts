@@ -1,3 +1,5 @@
+const _omit = require('lodash/omit');
+
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
@@ -6,6 +8,8 @@ import {convertToLevel} from '../../helpers/helpers';
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
   actionDebounce: number;
+  // in this time driver doesn't receive any data
+  blockTime: number;
 }
 
 
@@ -20,11 +24,7 @@ export default class BinaryToggle extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance({
-        ...this.props,
-        // don't use driver's block time
-        blockTime: 0,
-      });
+      .getInstance(_omit(this.props, 'actionDebounce', 'blockTime'));
   }
 
   protected didInit = async () => {

@@ -15,15 +15,12 @@ const eventName = 'change';
 export interface BinaryInputDriverProps extends DigitalInputDriverProps {
   debounce: number;
   debounceType: DebounceType;
-  // in this time driver doesn't receive any data
-  blockTime: number;
 }
 
 
 export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
   private throttleInProgress: boolean = false;
-  private blockTimeInProgress: boolean = false;
 
   private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
@@ -31,7 +28,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
-      .getInstance(_omit(this.props, 'debounce', 'debounceType', 'blockTime'));
+      .getInstance(_omit(this.props, 'debounce', 'debounceType'));
   }
 
   protected didInit = async () => {
@@ -70,8 +67,8 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
 
   private listenHandler = async (level: boolean) => {
-    // do nothing if there are block time or throttle
-    if (this.blockTimeInProgress || this.throttleInProgress) return;
+    // do nothing if there is throttle
+    if (this.throttleInProgress) return;
 
     try {
       if (this.props.debounceType === 'throttle') {
@@ -80,7 +77,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
       }
       else {
         // debounce logic
-        await this.startBlockTime(async () => level);
+        this.events.emit(eventName, level);
       }
     }
     catch (err) {
@@ -93,35 +90,22 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
     // waiting for debounce
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      setTimeout(async () => {
         this.throttleInProgress = false;
-        this.startBlockTime(() => this.digitalInput.read())
-          .then(resolve)
-          .catch(reject);
-      }, this.props.debounce);
-    });
-  }
 
-  private async startBlockTime(getLevel: () => Promise<boolean>): Promise<void> {
-    // start block time - ignore all the signals
-    this.blockTimeInProgress = true;
+        let level: boolean | undefined;
 
-    try {
-      const level: boolean = await getLevel();
-      // emit an event
-      this.events.emit(eventName, level);
-    }
-    catch (err) {
-      this.blockTimeInProgress = false;
+        try {
+          level = await this.digitalInput.read();
+        }
+        catch (err) {
+          return reject(err);
+        }
+        // emit an event
+        this.events.emit(eventName, level);
 
-      throw err;
-    }
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        this.blockTimeInProgress = false;
         resolve();
-      }, this.props.blockTime);
+      }, this.props.debounce);
     });
   }
 
