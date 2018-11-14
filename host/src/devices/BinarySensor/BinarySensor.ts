@@ -8,14 +8,10 @@ import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/Bi
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
-  // in this time driver doesn't receive any data
-  blockTime: number;
 }
 
 
 export default class BinarySensor extends DeviceBase<Props> {
-  private blockTimeInProgress: boolean = false;
-
   private get binaryInput(): BinaryInputDriver {
     return this.depsInstances.binaryInput as BinaryInputDriver;
   }
@@ -23,7 +19,7 @@ export default class BinarySensor extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(_omit(this.props, 'blockTime'));
+      .getInstance(this.props);
   }
 
   protected didInit = async () => {
@@ -40,25 +36,13 @@ export default class BinarySensor extends DeviceBase<Props> {
     return Number(value);
   }
 
-  protected validateProps = (props: Props): string | undefined => {
-    // TODO: !!!! validate debounce and blockTime
-    return;
-  }
+  // protected validateProps = (props: Props): string | undefined => {
+  //   return;
+  // }
 
 
   private onInputChange = async (level: boolean) => {
-    // do nothing if there is block time
-    //if (this.blockTimeInProgress) return;
-    // TODO: add block time
-
     await this.setStatus(level);
-
-    // return new Promise<void>((resolve) => {
-    //   setTimeout(() => {
-    //     this.blockTimeInProgress = false;
-    //     resolve();
-    //   }, this.props.blockTime);
-    // });
   }
 
 }

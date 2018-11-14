@@ -3,7 +3,6 @@ const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
-import DebounceType from '../Digital/interfaces/DebounceType';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -14,14 +13,14 @@ const eventName = 'change';
 
 export interface BinaryInputDriverProps extends DigitalInputDriverProps {
   debounce: number;
-  // devounce (default) or throttle (it emit event after timeout which set in debounce prop)
-  debounceType: DebounceType;
+  // in this time driver doesn't receive any data
+  blockTime: number;
 }
 
 
 export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-  private throttleInProgress: boolean = false;
+  private blockTimeInProgress: boolean = false;
 
   private get digitalInput(): DigitalInputDriver {
     return this.depsInstances.digitalInput as DigitalInputDriver;
@@ -29,10 +28,13 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
-      .getInstance(_omit(this.props, 'debounce', 'debounceType'));
+      .getInstance(_omit(this.props, 'debounce', 'blockTime'));
   }
 
   protected didInit = async () => {
+
+    // TODO: pass edge
+
     this.digitalInput.addListener(this.listenHandler, this.props.debounce);
   }
 
@@ -68,46 +70,19 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
 
   private listenHandler = async (level: boolean) => {
-    // do nothing if there is throttle
-    if (this.throttleInProgress) return;
+    // do nothing if there is block time
+    if (this.blockTimeInProgress) return;
 
-    try {
-      if (this.props.debounceType === 'throttle') {
-        // throttle logic
-        await this.throttle();
-      }
-      else {
-        // just emit if a simple debounce
-        this.events.emit(eventName, level);
-      }
-    }
-    catch (err) {
-      this.env.log.error(err);
-    }
-  }
+    this.events.emit(eventName, level);
 
-  private async throttle() {
-    this.throttleInProgress = true;
+    if (!this.props.blockTime) return;
 
-    // waiting for timeout and after that read a value and emit an event
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(async () => {
-        this.throttleInProgress = false;
+    // start block time
+    this.blockTimeInProgress = true;
 
-        let level: boolean | undefined;
-
-        try {
-          level = await this.digitalInput.read();
-        }
-        catch (err) {
-          return reject(err);
-        }
-        // emit an event
-        this.events.emit(eventName, level);
-
-        resolve();
-      }, this.props.debounce);
-    });
+    setTimeout(() => {
+      this.blockTimeInProgress = false;
+    }, this.props.blockTime);
   }
 
 }
