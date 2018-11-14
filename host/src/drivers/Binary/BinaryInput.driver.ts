@@ -14,6 +14,7 @@ const eventName = 'change';
 
 export interface BinaryInputDriverProps extends DigitalInputDriverProps {
   debounce: number;
+  // devounce (default) or throttle (it emit event after timeout which set in debounce prop)
   debounceType: DebounceType;
 }
 
@@ -76,7 +77,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
         await this.throttle();
       }
       else {
-        // debounce logic
+        // just emit if a simple debounce
         this.events.emit(eventName, level);
       }
     }
@@ -88,7 +89,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private async throttle() {
     this.throttleInProgress = true;
 
-    // waiting for debounce
+    // waiting for timeout and after that read a value and emit an event
     return new Promise<void>((resolve, reject) => {
       setTimeout(async () => {
         this.throttleInProgress = false;
@@ -112,6 +113,9 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 }
 
 export default class Factory extends DriverBase<BinaryInputDriverProps> {
+
+  // TODO: всегда новый инстанс чтоли??? или по pin ???
+
   async getInstance(instanceProps?: BinaryInputDriverProps): Promise<BinaryInputDriver> {
     const definition = {
       ...this.definition,
