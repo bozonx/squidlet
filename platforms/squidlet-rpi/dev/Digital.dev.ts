@@ -67,8 +67,12 @@ export default class DigitalDev implements Digital {
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
     const pinInstance = this.getPinInstance(pin);
     const handlerWrapper: GpioHandler = (level: number) => {
+      const value: boolean = Boolean(level);
+
+      if (!this.isCorrectEdge(value, edge)) return;
+
       if (!debounce) {
-        handler(Boolean(level));
+        handler(value);
       }
       else {
         // wait for debounce and read current level
@@ -78,8 +82,6 @@ export default class DigitalDev implements Digital {
         }, pin, debounce);
       }
     };
-
-    // TODO: edge сделать программно
 
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
@@ -156,6 +158,14 @@ export default class DigitalDev implements Digital {
     };
 
     this.debounceTimeouts[pin] = setTimeout(wrapper, debounce);
+  }
+
+  private isCorrectEdge(value: boolean, edge?: Edge): boolean {
+    if (!edge || edge === 'both') return true;
+    else if (value && edge === 'rising') return true;
+    else if (!value && edge === 'falling') return true;
+
+    return false;
   }
 
 }
