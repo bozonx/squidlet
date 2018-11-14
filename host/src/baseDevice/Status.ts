@@ -1,5 +1,6 @@
 import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
+import PublishParams from '../app/interfaces/PublishParams';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -18,7 +19,7 @@ export default class Status extends DeviceDataManagerBase {
     return this.readAllData('status', getter, (changedParams: string[]) => {
       // publish all the statuses
       for (let statusName of changedParams) {
-        this.publishStatus(statusName, this.localData[statusName]);
+        this.publishStatus(statusName, this.localData[statusName], false);
       }
     });
   }
@@ -44,7 +45,7 @@ export default class Status extends DeviceDataManagerBase {
     const wasSet = this.setLocalDataParam(statusName, result[statusName]);
 
     if (wasSet) {
-      this.publishStatus(statusName, this.localData[statusName]);
+      this.publishStatus(statusName, this.localData[statusName], false);
     }
 
     return this.localData[statusName];
@@ -56,20 +57,24 @@ export default class Status extends DeviceDataManagerBase {
   write = async (partialData: Data): Promise<void> => {
     return this.writeData('status', partialData, (changedParams: string[]) => {
       for (let statusName of changedParams) {
-        this.publishStatus(statusName, this.localData[statusName]);
+        this.publishStatus(statusName, this.localData[statusName], false);
       }
     });
   }
 
-  private publishStatus(statusName: string, value: any): void {
-    // TODO: нужно ли устанавливать параметры publish?
+  private publishStatus(statusName: string, value: any, isRepeat: boolean): void {
+    const params: PublishParams = {
+      isRepeat,
+    };
+
     if (statusName === DEFAULT_STATUS) {
-      return this.publish('status', value);
+      return this.publish('status', value, params);
     }
 
     const subStatus = combineTopic('status', statusName);
 
-    return this.publish(subStatus, value);
+
+    return this.publish(subStatus, value, params);
   }
 
 }

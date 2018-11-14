@@ -10,7 +10,7 @@ export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
-export type ChangeHandler = (changedParams: string[], isRepublish: boolean) => void;
+export type ChangeHandler = (changedParams: string[], isRepeat: boolean) => void;
 
 export const changeEventName = 'change';
 
@@ -94,6 +94,7 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(result);
 
     if (updatedParams.length) {
+      // TODO: может лучше поднять событие ?????
       onUpdate(updatedParams);
     }
 
