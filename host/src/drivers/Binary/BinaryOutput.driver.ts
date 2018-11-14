@@ -53,6 +53,8 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       }
     }
 
+    // normal write
+
     this.blockTimeInProgress = true;
 
     await this.digitalOutput.write(level);

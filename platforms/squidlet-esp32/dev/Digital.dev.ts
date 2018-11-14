@@ -36,7 +36,11 @@ export default class DigitalDev implements Digital {
     digitalWrite(pin, value);
   }
 
-  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+  /**
+   * Start listen.
+   * By default debounce set to 0 because some pins with buttons set by default 25ms and other to 0.
+   */
+  setWatch(pin: number, handler: WatchHandler, debounce: number = 0, edge?: Edge): number {
 
     // TODO: на пинах которые не поддерживают прерывания - делать полинг
 

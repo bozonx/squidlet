@@ -39,6 +39,10 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
 
+  isBlocked(): boolean {
+    return this.blockTimeInProgress;
+  }
+
   async read(): Promise<boolean> {
     return this.digitalInput.read();
   }

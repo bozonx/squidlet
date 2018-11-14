@@ -4,7 +4,7 @@
 debounce:
   type: number
   # it's default for debounce, not for throttle
-  default: 20
+  default: 25
 debounceType:
   type: debounce | throttle
   default: debounce
