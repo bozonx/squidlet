@@ -7,6 +7,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {invertIfNeed, resolveDriverName} from './digitalHelpers';
+import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
 export interface DigitalOutputDriverProps extends DigitalBaseProps {
@@ -32,7 +33,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
     await this.digital.setup(this.props.pin, 'output');
 
     // set initial level
-    this.digital.write(this.props.pin, this.calcInitial());
+    await this.digitalWrite(this.calcInitial());
   }
 
 
@@ -49,7 +50,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
     const realLevel: boolean = invertIfNeed(newLevel, this.props.invert);
 
-    await this.digital.write(this.props.pin, realLevel);
+    await this.digitalWrite(realLevel);
   }
 
 
@@ -69,6 +70,16 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
       // if initial === high it's logical 1, otherwise 0;
       return this.props.initial === 'high';
     }
+  }
+
+  private digitalWrite(value: boolean) {
+    const pinMode: PinMode | undefined = this.digital.getPinMode(this.props.pin);
+
+    if (!pinMode || !pinMode.match(/output/)) {
+      throw new Error(`Can't set level. The GPIO pin "${this.props.pin}" wasn't set up as an output pin.`);
+    }
+
+    return this.digital.write(this.props.pin, value);
   }
 
 }

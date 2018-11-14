@@ -3,16 +3,12 @@ import {Gpio} from 'pigpio';
 import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
 
 
-type GpioHanler = (level: number) => void;
+type GpioHandler = (level: number) => void;
 
 interface Listener {
   pin: number;
-  handler: GpioHanler;
+  handler: GpioHandler;
 }
-
-
-// TODO: установить первичное значение на output пине
-// TODO: проверить getPinMode и что вернет если пин не сконфигурирован
 
 
 export default class DigitalDev implements Digital {
@@ -21,8 +17,12 @@ export default class DigitalDev implements Digital {
   private debounceTimeouts: {[index: string]: any} = {};
 
 
+  /**
+   * Setup pin before using.
+   * It doesn't set an initial value on output pin because a driver have to use it.
+   */
   async setup(pin: number, pinMode: PinMode): Promise<void> {
-    const convertedMode: {[index: string]: any} = this.convertMode(pinMode);
+    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(pinMode);
 
     this.pinInstances[pin] = new Gpio(pin, {
       ...convertedMode,
@@ -31,9 +31,12 @@ export default class DigitalDev implements Digital {
     });
   }
 
+  /**
+   * Get pin mode.
+   * It throws an error if pin hasn't configured before
+   */
   getPinMode(pin: number): PinMode | undefined {
     const pinInstance = this.getPinInstance(pin);
-
     const modeConst: number = pinInstance.getMode();
 
     if (modeConst === Gpio.INPUT) {
@@ -63,7 +66,7 @@ export default class DigitalDev implements Digital {
 
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
     const pinInstance = this.getPinInstance(pin);
-    const handlerWrapper: GpioHanler = (level: number) => {
+    const handlerWrapper: GpioHandler = (level: number) => {
       if (!debounce) {
         handler(Boolean(level));
       }
@@ -103,7 +106,7 @@ export default class DigitalDev implements Digital {
     });
   }
 
-  private convertMode(pinMode: PinMode): {[index: string]: any} {
+  private convertMode(pinMode: PinMode): {mode: number, pullUpDown: number} {
     switch (pinMode) {
       case ('input'):
         return {
@@ -133,7 +136,7 @@ export default class DigitalDev implements Digital {
 
   private getPinInstance(pin: number): Gpio {
     if (!this.pinInstances[pin]) {
-      throw new Error(`You have to do setup of pin "${pin}" before manipulating it`);
+      throw new Error(`You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
 
     return this.pinInstances[pin];

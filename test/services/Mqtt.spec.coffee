@@ -1,7 +1,7 @@
 Mqtt = require('../../host/src/services/Mqtt/Mqtt.ts').default
 
 
-describe 'app.Messenger', ->
+describe 'services.Mqtt', ->
   beforeEach ->
     @mqttDevConnection = {
       onMessage: sinon.spy()

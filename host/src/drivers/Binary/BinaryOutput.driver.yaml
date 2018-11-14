@@ -6,7 +6,7 @@ drivers:
 props:
   blockTime:
     type: number
-    default: 50
+    default: 0
   blockMode:
     type: refuse | defer
     default: refuse

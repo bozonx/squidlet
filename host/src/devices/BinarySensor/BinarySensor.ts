@@ -48,17 +48,17 @@ export default class BinarySensor extends DeviceBase<Props> {
 
   private onInputChange = async (level: boolean) => {
     // do nothing if there is block time
-    if (this.blockTimeInProgress) return;
+    //if (this.blockTimeInProgress) return;
     // TODO: add block time
 
     await this.setStatus(level);
 
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        this.blockTimeInProgress = false;
-        resolve();
-      }, this.props.blockTime);
-    });
+    // return new Promise<void>((resolve) => {
+    //   setTimeout(() => {
+    //     this.blockTimeInProgress = false;
+    //     resolve();
+    //   }, this.props.blockTime);
+    // });
   }
 
 }
