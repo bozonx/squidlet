@@ -43,15 +43,6 @@ export class DigitalLocalDriver implements Digital {
    * Listen to interruption of input pin
    */
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
-
-    // TODO: проверку наверное лучше вынести в Digital input output
-
-    const pinMode: PinMode | undefined = this.getPinMode(pin);
-
-    if (!pinMode || !pinMode.match(/input/)) {
-      throw new Error(`Can't add listener. The local digital GPIO pin "${pin}" wasn't set up as an input pin.`);
-    }
-
     return this.digitalDev.setWatch(pin, handler, debounce, edge);
   }
 

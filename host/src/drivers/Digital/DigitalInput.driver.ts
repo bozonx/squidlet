@@ -60,12 +60,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    const listenerId: number = this.digital.setWatch(
-      this.props.pin,
-      wrapper,
-      debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
-      edge
-    );
+    const listenerId: number = this.setWatch(wrapper, edge, debounce);
 
     this.listeners[listenerId] = [handler, wrapper];
   }
@@ -78,12 +73,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    const listenerId: number = this.digital.setWatch(
-      this.props.pin,
-      wrapper,
-      this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
-      edge
-    );
+    const listenerId: number = this.setWatch(wrapper, edge);
 
     this.listeners[listenerId] = [handler, wrapper];
   }
@@ -115,6 +105,21 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     if (this.props.pullup) return 'input_pullup';
     else if (this.props.pulldown) return 'input_pulldown';
     else return 'input';
+  }
+
+  private setWatch(wrapper: WatchHandler, edge?: Edge, debounce?: number): number {
+    const pinMode: PinMode | undefined = this.digital.getPinMode(this.props.pin);
+
+    if (!pinMode || !pinMode.match(/input/)) {
+      throw new Error(`Can't add listener. The GPIO pin "${this.props.pin}" wasn't set up as an input pin.`);
+    }
+
+    return this.digital.setWatch(
+      this.props.pin,
+      wrapper,
+      debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
+      edge
+    );
   }
 
 }
