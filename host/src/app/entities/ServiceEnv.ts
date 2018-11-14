@@ -1,6 +1,5 @@
 import ServiceManifest from '../interfaces/ServiceManifest';
 import EnvBase from './EnvBase';
-import Logger from '../interfaces/Logger';
 import Events from '../Events';
 import Host from '../Host';
 import Messenger from '../../messenger/Messenger';
@@ -12,7 +11,6 @@ import System from '../System';
  * It is environment for devices and services
  */
 export default class ServiceEnv extends EnvBase {
-  readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
   readonly messenger: Messenger;
@@ -20,7 +18,6 @@ export default class ServiceEnv extends EnvBase {
 
   constructor(system: System) {
     super(system);
-    this.log = system.log;
     this.events = system.events;
     this.host = system.host;
     this.messenger = system.messenger;
@@ -28,9 +25,7 @@ export default class ServiceEnv extends EnvBase {
   }
 
   async loadManifest(className: string): Promise<ServiceManifest> {
-
-    // TODO: cache manifest for 1 minute
-
     return this.system.configSet.loadManifest<ServiceManifest>('services', className);
   }
+
 }

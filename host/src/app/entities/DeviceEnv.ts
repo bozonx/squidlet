@@ -26,9 +26,6 @@ export default class DeviceEnv extends EnvBase {
   }
 
   async loadManifest(className: string): Promise<DeviceManifest> {
-
-    // TODO: cache manifest for 1 minute
-
     return this.system.configSet.loadManifest<DeviceManifest>('devices', className);
   }
 

@@ -13,9 +13,6 @@ export default class DriverEnv  extends EnvBase {
   }
 
   async loadManifest(driverName: string): Promise<DriverManifest> {
-
-    // TODO: cache manifest for 1 minute
-
     return this.system.configSet.loadManifest<DriverManifest>('drivers', driverName);
   }
 
