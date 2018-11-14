@@ -10,8 +10,8 @@ import BlockMode from './interfaces/BlockMode';
 
 export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {
   blockTime: number;
-  // if "refuse" - it doesn't write while block time.
-  // If "defer" it waits for block time finished and write last write request
+  // if "refuse" - it doesn't write while block time. It is on default.
+  // If "defer" it waits for block time finished and write last last value which was tried to set
   blockMode: BlockMode;
 }
 

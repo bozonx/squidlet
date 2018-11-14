@@ -6,7 +6,7 @@ import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/Bi
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
-  // impulse block time
+  // in this time driver doesn't receive any data
   blockTime: number;
   impulseLength: number;
 }
@@ -26,8 +26,6 @@ export default class BinaryImpulse extends DeviceBase<Props> {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
       .getInstance({
         ..._omit(this.props, 'impulseLength'),
-        // don't use driver's block time
-        blockTime: 0,
       });
   }
 
