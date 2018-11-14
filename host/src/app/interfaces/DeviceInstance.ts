@@ -3,6 +3,6 @@ export default interface DeviceInstance {
   listenStatus: () => void;
   listenConfig: () => void;
   setConfig: (partialConfig: object) => void;
-  //validate: (definition: EntityDefinition) => string | undefined;
+  //validate?: (definition: EntityDefinition) => string | undefined;
   [index: string]: any;
 }
