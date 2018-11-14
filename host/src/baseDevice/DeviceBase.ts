@@ -1,4 +1,4 @@
-import {ChangeHandler, Data, Getter, Setter} from './DeviceDataManagerBase';
+import {ChangeHandler, Getter, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import PublishParams from '../app/interfaces/PublishParams';
@@ -76,6 +76,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // handle actions call
     if (this.actions) {
+      // subscribe to external messages where topic is this device id to call action
       this.env.messenger.subscribeLocal(categories.externalDataIncome, this.id, this.handleIncomeData);
     }
 
@@ -93,6 +94,9 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     return this.status.write({[statusName]: newValue});
   }
 
+  /**
+   * Listen status change
+   */
   onChange(cb: ChangeHandler): void {
     this.status.onChange(cb);
   }
@@ -112,6 +116,8 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     }
     catch (err) {
       this.env.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
+
+      return;
     }
 
     this.publish(actionName, result);
