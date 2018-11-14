@@ -1,3 +1,5 @@
+import {Edge} from '../../app/interfaces/dev/Digital';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
@@ -12,6 +14,7 @@ const eventName = 'change';
 
 
 export interface BinaryInputDriverProps extends DigitalInputDriverProps {
+  edge: Edge;
   debounce: number;
   // in this time driver doesn't receive any data
   blockTime: number;
@@ -32,10 +35,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   protected didInit = async () => {
-
-    // TODO: pass edge
-
-    this.digitalInput.addListener(this.listenHandler, this.props.debounce);
+    this.digitalInput.addListener(this.listenHandler, this.props.debounce, this.props.edge);
   }
 
 
