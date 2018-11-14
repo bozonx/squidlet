@@ -14,6 +14,9 @@ export interface DigitalOutputDriverProps extends DigitalBaseProps {
 }
 
 
+/**
+ * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
+ */
 export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   private get digital(): GpioDigitalDriver {
     return this.depsInstances.digital as GpioDigitalDriver;
@@ -23,7 +26,8 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
 
-    this.depsInstances.digital = await getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
+    this.depsInstances.digital = await getDriverDep(driverName)
+      .getInstance(_omit(this.props.driver, 'name'));
 
     await this.digital.setup(this.props.pin, 'output');
 

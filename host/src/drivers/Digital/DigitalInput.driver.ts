@@ -20,6 +20,9 @@ export interface DigitalInputDriverProps extends DigitalBaseProps {
 }
 
 
+/**
+ * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
+ */
 export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   // listener and its wrapper by listener id which gets from setWatch method of dev
   private listeners: {[index: string]: [DigitalInputListenHandler, WatchHandler]} = {};
@@ -31,7 +34,9 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.driver && this.props.driver.name);
-    this.depsInstances.digital = await getDriverDep(driverName).getInstance(_omit(this.props.driver, 'name'));
+
+    this.depsInstances.digital = await getDriverDep(driverName)
+      .getInstance(_omit(this.props.driver, 'name'));
 
     await this.digital.setup(this.props.pin, this.resolvePinMode());
   }

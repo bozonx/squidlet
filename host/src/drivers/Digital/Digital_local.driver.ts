@@ -27,6 +27,9 @@ export class DigitalLocalDriver implements Digital {
    * Write to output pin
    */
   write(pin: number, level: boolean): Promise<void> {
+
+    // TODO: проверку наверное лучше вынести в Digital input output
+
     const pinMode: PinMode | undefined = this.getPinMode(pin);
 
     if (!pinMode || !pinMode.match(/output/)) {
@@ -40,6 +43,9 @@ export class DigitalLocalDriver implements Digital {
    * Listen to interruption of input pin
    */
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+
+    // TODO: проверку наверное лучше вынести в Digital input output
+
     const pinMode: PinMode | undefined = this.getPinMode(pin);
 
     if (!pinMode || !pinMode.match(/input/)) {
