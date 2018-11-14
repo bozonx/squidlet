@@ -179,7 +179,6 @@ export default class Devices {
 
     const payload: CallActionPayload = request.payload;
     const deviceId = payload.deviceId;
-
     const device: {[index: string]: any} = this.system.devicesManager.getDevice(deviceId);
 
     if (!device.actions[payload.actionName]) {

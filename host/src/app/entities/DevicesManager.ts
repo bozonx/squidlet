@@ -29,13 +29,16 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
   }
 
   /**
-   * Get device instance
+   * Get device instance.
+   * It rises an error if device hasn't found.
    */
   getDevice<T extends DeviceInstance>(deviceId: string): T {
     const device: DeviceInstance | undefined = this.instances[deviceId];
 
-    // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
-    if (!device) throw new Error(`Can't find device "${deviceId}"`);
+    if (!device) {
+      this.env.log.error(`DevicesManager.getDevice: Can't find the device "${deviceId}"`);
+      throw new Error(`Can't find the device "${deviceId}"`);
+    }
 
     return device as T;
   }

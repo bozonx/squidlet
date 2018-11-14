@@ -33,8 +33,10 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
   getService<T extends ServiceInstance>(serviceId: string): T {
     const service: ServiceInstance | undefined = this.instances[serviceId];
 
-    // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
-    if (!service) throw new Error(`Can't find service "${serviceId}"`);
+    if (!service) {
+      this.env.log.error(`ServicesManager.getService: Can't find the service "${serviceId}"`);
+      throw new Error(`Can't find the service "${serviceId}"`);
+    }
 
     return service as T;
   }

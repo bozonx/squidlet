@@ -34,21 +34,26 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
   }
 
   /**
-   * Get dev by short name line 'fs', 'gpio' etc
+   * Get dev by short name line 'fs', 'gpio' etc.
+   * It rises an error if dev hasn't found.
    */
   getDev<T>(shortDevName: string): T {
     const driverName = `${_capitalize(shortDevName)}.dev`;
 
-    // TODO: использовать try ???
-
     return this.getDriver<T>(driverName);
   }
 
+  /**
+   * Get driver instance.
+   * It rises an error if dev hasn't found.
+   */
   getDriver<T extends DriverInstance>(driverName: string): T {
     const driver: DriverInstance | undefined = this.instances[driverName];
 
-    // TODO: эта ошибка в рантайме нужно залогировать ее но не вызывать исключение, либо делать try везде
-    if (!driver) throw new Error(`Can't find driver "${driverName}"`);
+    if (!driver) {
+      this.env.log.error(`DriversManager.getDriver: Can't find the driver "${driverName}"`);
+      throw new Error(`Can't find the driver "${driverName}"`);
+    }
 
     return driver as T;
   }
