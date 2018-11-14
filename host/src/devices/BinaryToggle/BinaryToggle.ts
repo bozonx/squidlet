@@ -36,10 +36,6 @@ export default class BinaryToggle extends DeviceBase<Props> {
     return Number(value);
   }
 
-  protected validateProps = (props: Props): string | undefined => {
-    // TODO: !!!! validate debounce and blockTime
-    return;
-  }
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {

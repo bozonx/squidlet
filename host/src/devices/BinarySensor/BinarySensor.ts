@@ -36,10 +36,6 @@ export default class BinarySensor extends DeviceBase<Props> {
     return Number(value);
   }
 
-  // protected validateProps = (props: Props): string | undefined => {
-  //   return;
-  // }
-
 
   private onInputChange = async (level: boolean) => {
     await this.setStatus(level);

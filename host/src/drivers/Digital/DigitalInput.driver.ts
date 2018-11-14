@@ -60,7 +60,8 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    const listenerId: number = this.setWatch(wrapper, edge, debounce);
+    const normalEdge: Edge = this.normalizeEdge(edge);
+    const listenerId: number = this.setWatch(wrapper, normalEdge, debounce);
 
     this.listeners[listenerId] = [handler, wrapper];
   }
@@ -73,7 +74,8 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       handler(invertIfNeed(level, this.props.invert));
     };
 
-    const listenerId: number = this.setWatch(wrapper, edge);
+    const normalEdge: Edge = this.normalizeEdge(edge);
+    const listenerId: number = this.setWatch(wrapper, normalEdge);
 
     this.listeners[listenerId] = [handler, wrapper];
   }
@@ -107,7 +109,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     else return 'input';
   }
 
-  private setWatch(wrapper: WatchHandler, edge?: Edge, debounce?: number): number {
+  private setWatch(wrapper: WatchHandler, edge: Edge, debounce?: number): number {
     const pinMode: PinMode | undefined = this.digital.getPinMode(this.props.pin);
 
     if (!pinMode || !pinMode.match(/input/)) {
@@ -120,6 +122,27 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
       debounce || this.env.system.host.config.config.drivers.defaultDigitalInputDebounce,
       edge
     );
+  }
+
+  /**
+   * It is set invert param - then invert edge
+   * @param edge
+   */
+  private normalizeEdge(edge?: Edge): Edge {
+
+    // TODO: test
+
+    if (!edge) {
+      return 'both';
+    }
+    else if (this.props.invert && edge === 'rising') {
+      return 'falling';
+    }
+    else if (this.props.invert && edge === 'falling') {
+      return 'rising';
+    }
+
+    return edge;
   }
 
 }
