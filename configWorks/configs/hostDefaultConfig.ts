@@ -1,8 +1,7 @@
 export default {
   config: {
     logLevel: 'info',
-    // TODO: set 60000
-    defaultStatusRepublishIntervalMs: 10000,
+    defaultStatusRepublishIntervalMs: 60000,
     defaultConfigRepublishIntervalMs: 600000,
     drivers: {
       defaultDigitalInputDebounce: 20,

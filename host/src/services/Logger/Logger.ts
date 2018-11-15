@@ -35,7 +35,7 @@ export default class Logger extends ServiceBase<Props> {
       // TODO: listen only to allowed log level
 
       // listen to publish messages
-      this.env.messenger.subscribe(hostId, categories.logger, 'debug', handler);
+      //this.env.messenger.subscribe(hostId, categories.logger, 'debug', handler);
       this.env.messenger.subscribe(hostId, categories.logger, 'verbose', handler);
       this.env.messenger.subscribe(hostId, categories.logger, 'info', handler);
       this.env.messenger.subscribe(hostId, categories.logger, 'warn', handler);
