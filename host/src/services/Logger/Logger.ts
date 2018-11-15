@@ -3,6 +3,7 @@ import categories from '../../app/dict/categories';
 import Message from '../../messenger/interfaces/Message';
 import LogLevel from '../../app/interfaces/LogLevel';
 import * as defaultLogger from './defaultLogger';
+import {LOG_LEVELS} from '../../app/dict/constants';
 
 
 interface Props {
@@ -32,20 +33,23 @@ export default class Logger extends ServiceBase<Props> {
         this.hostPublishHandler(hostId, message.topic as LogLevel, logMessage);
       };
 
-      // TODO: listen only to allowed log level
+      const allowedLogLevels: string[] = this.calcLogLevel(this.env.host.config.config.logLevel);
 
-      // listen to publish messages
-      //this.env.messenger.subscribe(hostId, categories.logger, 'debug', handler);
-      this.env.messenger.subscribe(hostId, categories.logger, 'verbose', handler);
-      this.env.messenger.subscribe(hostId, categories.logger, 'info', handler);
-      this.env.messenger.subscribe(hostId, categories.logger, 'warn', handler);
-      this.env.messenger.subscribe(hostId, categories.logger, 'error', handler);
-      this.env.messenger.subscribe(hostId, categories.logger, 'fatal', handler);
+      // listen to allowed levels
+      for (let level of allowedLogLevels) {
+        this.env.messenger.subscribe(hostId, categories.logger, level, handler);
+      }
     }
   }
 
   private hostPublishHandler = async (hostId: string, level: LogLevel, message: string): Promise<void> => {
     defaultLogger[level](message);
+  }
+
+  private calcLogLevel(logLevel: LogLevel): string[] {
+    const currentLevelIndex: number = LOG_LEVELS.indexOf(logLevel);
+
+    return LOG_LEVELS.slice(currentLevelIndex);
   }
 
 }
