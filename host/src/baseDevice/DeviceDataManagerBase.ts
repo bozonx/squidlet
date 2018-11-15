@@ -8,6 +8,7 @@ import PublishParams from '../app/interfaces/PublishParams';
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
 export type PublishState = (changedParams: string[], isRepeat: boolean) => void;
+export type Initialize = () => Promise<Data>;
 export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
@@ -29,6 +30,7 @@ export default abstract class DeviceDataManagerBase {
   protected readonly system: System;
   protected readonly schema: Schema;
   protected readonly republish: Republish;
+  protected initialize?: Initialize;
   protected getter?: Getter;
   protected setter?: Setter;
   protected readonly events: EventEmitter = new EventEmitter();
@@ -52,19 +54,29 @@ export default abstract class DeviceDataManagerBase {
     this.republish = new Republish(realRepublishInterval);
   }
 
-  async init(getter?: Getter, setter?: Setter): Promise<void> {
+  async init(initialize?: Initialize, getter?: Getter, setter?: Setter): Promise<void> {
+    this.initialize = initialize;
     this.getter = getter;
     this.setter = setter;
 
-    if (this.getter) {
-      // initialize status
-      await this.read();
+    let result: Data;
 
-      // TODO: если не получилось прочитать - установить значение по умолчанию
+    if (this.initialize) {
+      result = await this.initialize();
+    }
+    if (this.getter) {
+      result = await this.getter();
+      //await this.read();
     }
     else {
-      this.setDefaultValues();
+      result = this.setDefaultValues();
     }
+
+
+    // TODO: поднять publish
+
+    // TODO: что дальше делать ???? - нужно установить
+
   }
 
 

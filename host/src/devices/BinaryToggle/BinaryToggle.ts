@@ -1,9 +1,12 @@
+import {Data} from '../../baseDevice/DeviceDataManagerBase';
+
 const _omit = require('lodash/omit');
 
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {convertToLevel} from '../../helpers/helpers';
+import {DEFAULT_STATUS} from '../../baseDevice/Status';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
@@ -34,6 +37,13 @@ export default class BinaryToggle extends DeviceBase<Props> {
 
   protected transformPublishValue = (value: boolean): number => {
     return Number(value);
+  }
+
+  protected initialStatus = async (): Promise<Data> => {
+
+    // TODO: учитывать invert and pullup
+
+    return { [DEFAULT_STATUS]: 0 };
   }
 
 

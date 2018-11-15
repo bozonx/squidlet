@@ -1,4 +1,4 @@
-import {ChangeHandler, Getter, Setter} from './DeviceDataManagerBase';
+import {ChangeHandler, Getter, Initialize, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
 import PublishParams from '../app/interfaces/PublishParams';
@@ -19,8 +19,10 @@ export interface DeviceBaseProps extends EntityProps {
 
 export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props> {
   protected readonly env: DeviceEnv;
+  protected initialStatus?: Initialize;
   protected statusGetter?: Getter;
   protected statusSetter?: Setter;
+  protected initialConfig?: Initialize;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
   protected transformPublishValue?: (value: any) => any;
@@ -81,8 +83,8 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     }
 
     await Promise.all([
-      this.status && this.status.init(this.statusGetter, this.statusSetter),
-      this.config && this.config.init(this.configGetter, this.configSetter),
+      this.status && this.status.init(this.initialStatus, this.statusGetter, this.statusSetter),
+      this.config && this.config.init(this.initialConfig, this.configGetter, this.configSetter),
     ]);
   }
 
