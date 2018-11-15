@@ -23,28 +23,9 @@ export default class Status extends DeviceDataManagerBase {
    * Get status from device.
    */
   readParam = async (statusName: string = DEFAULT_STATUS): Promise<any> => {
+    const getter = async () => this.getter && await this.getter() || {};
 
-    // TODO: move to base class
-
-    // if there isn't a data getter - just return local status
-    if (!this.getter) return this.localData[statusName];
-    // else fetch status if getter is defined
-
-    const result: {[index: string]: any} = await this.load(
-      () => this.getter && this.getter([statusName]),
-      `Can't fetch status "${statusName}" of device "${this.deviceId}"`
-    );
-
-    this.validateParam(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
-
-    const wasSet = this.setLocalDataParam(statusName, result[statusName]);
-
-    if (wasSet) {
-      // TODO: review
-      this.publishOneStatus(statusName, this.localData[statusName], false);
-    }
-
-    return this.localData[statusName];
+    return this.readJustParam('status', statusName, getter);
   }
 
   /**
@@ -64,6 +45,7 @@ export default class Status extends DeviceDataManagerBase {
       this.publishOneStatus(statusName, this.localData[statusName], isRepeat);
     }
   }
+
 
   private publishOneStatus(statusName: string, value: any, isRepeat: boolean) {
     const params: PublishParams = {
