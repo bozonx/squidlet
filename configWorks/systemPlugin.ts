@@ -36,4 +36,5 @@ export default async function systemPlugin (env: PluginEnv) {
 
   // services
   await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'Logger/manifest.yaml'));
 }

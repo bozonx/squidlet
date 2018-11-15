@@ -1,13 +1,13 @@
 import Network from '../network/Network';
 import Host from './Host';
 import Events from './Events';
+import LogPublisher from './LogPublisher';
 import Messenger from '../messenger/Messenger';
 import DevicesManager from './entities/DevicesManager';
 import Devices from './Devices';
 import DriversManager from './entities/DriversManager';
 import ServicesManager from './entities/ServicesManager';
 import Logger from './interfaces/Logger';
-import * as defaultLogger from './defaultLogger';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
@@ -41,7 +41,7 @@ export default class System {
   constructor() {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.log = defaultLogger;
+    this.log = new LogPublisher(this);
     this.events = new Events();
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
