@@ -1,4 +1,4 @@
-import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, publishEventName} from './DeviceDataManagerBase';
 import PublishParams from '../app/interfaces/PublishParams';
 
 
@@ -35,7 +35,7 @@ export default class Config extends DeviceDataManagerBase {
     };
 
     // publish all the statuses
-    this.publish('config', this.localData, params);
+    this.events.emit(publishEventName, 'config', this.localData, params);
   }
 
 }

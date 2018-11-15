@@ -15,6 +15,7 @@ export type Data = {[index: string]: any};
 export type ChangeHandler = (changedParams: string[], isRepeat: boolean) => void;
 
 export const changeEventName = 'change';
+export const publishEventName = 'publish';
 
 
 /**
@@ -24,7 +25,6 @@ export default abstract class DeviceDataManagerBase {
   protected readonly deviceId: string;
   protected readonly system: System;
   protected readonly schema: Schema;
-  protected readonly publish: Publisher;
   protected readonly republish: Republish;
   protected publishState?: PublishState;
   protected getter?: Getter;
@@ -33,11 +33,10 @@ export default abstract class DeviceDataManagerBase {
 
   protected localData: Data = {};
 
-  constructor(deviceId: string, system: System, schema: Schema, publish: Publisher, republishInterval?: number) {
+  constructor(deviceId: string, system: System, schema: Schema, republishInterval?: number) {
     this.deviceId = deviceId;
     this.system = system;
     this.schema = schema;
-    this.publish = publish;
 
     const realRepublishInterval = (typeof republishInterval === 'undefined')
       ? this.system.host.config.config.defaultStatusRepublishIntervalMs
@@ -71,6 +70,10 @@ export default abstract class DeviceDataManagerBase {
 
   onChange(cb: ChangeHandler) {
     this.events.addListener(changeEventName, cb);
+  }
+
+  onPublish(cb: Publisher) {
+    this.events.addListener(publishEventName, cb);
   }
 
   removeListener(cb: ChangeHandler) {

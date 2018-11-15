@@ -58,7 +58,6 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       this.id,
       this.env.system,
       manifest.status || {},
-      (...params) => this.publish(...params),
       this.props.statusRepublishInterval,
     );
 
@@ -67,10 +66,13 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
         this.id,
         this.env.system,
         manifest.config || {},
-        (...params) => this.publish(...params),
         this.props.configRepublishInterval,
       );
     }
+
+    // listen publish events and call publish
+    this.status.onPublish(this.publish);
+    this.config && this.config.onPublish(this.publish);
 
     // handle actions call
     if (this.actions) {

@@ -1,4 +1,4 @@
-import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
+import DeviceDataManagerBase, {Data, publishEventName} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 import PublishParams from '../app/interfaces/PublishParams';
 
@@ -70,19 +70,20 @@ export default class Status extends DeviceDataManagerBase {
     }
   }
 
-  private publishOneStatus(statusName: string, value: any, isRepeat: boolean): void {
+  private publishOneStatus(statusName: string, value: any, isRepeat: boolean) {
     const params: PublishParams = {
       isRepeat,
     };
 
     if (statusName === DEFAULT_STATUS) {
-      return this.publish('status', value, params);
+      this.events.emit(publishEventName, 'status', value, params);
+
+      return;
     }
 
     const subStatus = combineTopic('status', statusName);
 
-
-    return this.publish(subStatus, value, params);
+    this.events.emit(publishEventName, subStatus, value, params);
   }
 
 }
