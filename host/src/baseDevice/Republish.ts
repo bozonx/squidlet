@@ -8,13 +8,14 @@ export default class Republish {
 
 
   start(cb: () => void) {
+    // if it doesn't set - do nothing
     if (!this.republishInterval) return;
 
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
 
-    setInterval(() => {
+    this.intervalId = setInterval(() => {
       cb();
     }, this.republishInterval);
   }

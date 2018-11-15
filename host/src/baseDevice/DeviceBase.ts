@@ -120,7 +120,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       return;
     }
 
-    // TODO: зачем тут publish ?????
+    // publish action's result where subtopic is action name
     this.publish(actionName, result);
 
     return result;
