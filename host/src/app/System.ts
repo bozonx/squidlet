@@ -41,7 +41,6 @@ export default class System {
   constructor() {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.log = new LogPublisher(this);
     this.events = new Events();
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
@@ -50,6 +49,10 @@ export default class System {
 
     this.network = new Network(this.driversManager.env);
     this.messenger = new Messenger(this);
+
+    // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
+
+    this.log = new LogPublisher(this);
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
     this.devices = new Devices(this);
