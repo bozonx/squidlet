@@ -26,13 +26,16 @@ export default abstract class DeviceDataManagerBase {
   protected readonly system: System;
   protected readonly schema: Schema;
   protected readonly republish: Republish;
-  // TODO: должно быть обязательно
-  protected publishState?: PublishState;
   protected getter?: Getter;
   protected setter?: Setter;
   protected readonly events: EventEmitter = new EventEmitter();
 
+  protected abstract publishState: PublishState;
+  abstract read: () => Promise<Data>;
+  abstract write: (partialData: Data) => Promise<void>;
+
   protected localData: Data = {};
+
 
   constructor(deviceId: string, system: System, schema: Schema, republishInterval?: number) {
     this.deviceId = deviceId;
@@ -45,9 +48,6 @@ export default abstract class DeviceDataManagerBase {
 
     this.republish = new Republish(realRepublishInterval);
   }
-
-  abstract read: () => Promise<Data>;
-  abstract write: (partialData: Data) => Promise<void>;
 
   async init(getter?: Getter, setter?: Setter): Promise<void> {
     this.getter = getter;
