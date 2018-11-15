@@ -1,5 +1,6 @@
 export default {
   config: {
+    logLevel: 'info',
     // TODO: set 60000
     defaultStatusRepublishIntervalMs: 10000,
     defaultConfigRepublishIntervalMs: 600000,

@@ -1,9 +1,11 @@
 import Platforms from '../../../../configWorks/interfaces/Platforms';
+import LogLevel from './LogLevel';
 
 
 export interface HostConfigConfig {
   // path to dir where will be placed storage of host
   storageDir: string;
+  logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
   defaultStatusRepublishIntervalMs: number;
   // republish config silently every 10 minutes if it hasn't been changed
