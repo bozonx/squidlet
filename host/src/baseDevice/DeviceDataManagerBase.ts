@@ -7,6 +7,7 @@ import PublishParams from '../app/interfaces/PublishParams';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
+export type PublishState = (changedParams: string[], isRepeat: boolean) => void;
 export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
@@ -25,6 +26,7 @@ export default abstract class DeviceDataManagerBase {
   protected readonly schema: Schema;
   protected readonly publish: Publisher;
   protected readonly republish: Republish;
+  protected publishState?: PublishState;
   protected getter?: Getter;
   protected setter?: Setter;
   protected readonly events: EventEmitter = new EventEmitter();

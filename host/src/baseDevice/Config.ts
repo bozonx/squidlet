@@ -13,7 +13,7 @@ export default class Config extends DeviceDataManagerBase {
     const getter = async () => this.getter && await this.getter() || {};
 
     return this.readAllData('config', getter, () => {
-      this.publishData(undefined, false);
+      this.publishState(Object.keys(this.localData), false);
     });
   }
 
@@ -22,14 +22,14 @@ export default class Config extends DeviceDataManagerBase {
    */
   write = async (partialData: Data): Promise<void> => {
     return this.writeData('status', partialData, () => {
-      this.publishData(undefined, false);
+      this.publishState(Object.keys(this.localData), false);
     });
   }
 
   /**
    * Publish whole config on each change
    */
-  protected publishData(changedParams: undefined, isRepeat: boolean) {
+  protected publishState = (changedParams: string[], isRepeat: boolean) => {
     const params: PublishParams = {
       isRepeat,
     };

@@ -18,7 +18,7 @@ export default class Status extends DeviceDataManagerBase {
 
     return this.readAllData('status', getter, (changedParams: string[]) => {
       // publish all the statuses
-      this.publishData(changedParams, false);
+      this.publishState(changedParams, false);
     });
   }
 
@@ -55,7 +55,7 @@ export default class Status extends DeviceDataManagerBase {
    */
   write = async (partialData: Data): Promise<void> => {
     return this.writeData('status', partialData, (changedParams: string[]) => {
-      this.publishData(changedParams, false);
+      this.publishState(changedParams, false);
     });
   }
 
@@ -63,7 +63,7 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Publish all the statuses by separate message.
    */
-  protected publishData(changedParams: string[], isRepeat: boolean) {
+  protected publishState = (changedParams: string[], isRepeat: boolean) => {
     // publish all the statuses
     for (let statusName of changedParams) {
       this.publishOneStatus(statusName, this.localData[statusName], isRepeat);
