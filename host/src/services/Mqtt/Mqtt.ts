@@ -81,7 +81,12 @@ export default class Mqtt extends ServiceBase<Props> {
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
     const topic: string = combineTopic(data.id, data.subTopic);
 
-    this.env.log.info(`MQTT outcome: ${topic} - ${JSON.stringify(data.data)}`);
+    if (data.params && data.params.isRepeat) {
+      this.env.log.debug(`MQTT outcome (republish): ${topic} - ${JSON.stringify(data.data)}`);
+    }
+    else {
+      this.env.log.info(`MQTT outcome: ${topic} - ${JSON.stringify(data.data)}`);
+    }
 
     await this.mqttDev.publish(topic, String(data.data));
   }
