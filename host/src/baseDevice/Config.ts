@@ -6,20 +6,22 @@ import PublishParams from '../app/interfaces/PublishParams';
  * Manage config of device
  */
 export default class Config extends DeviceDataManagerBase {
+  protected readonly typeNameOfData: string = 'config';
+
   /**
    * Get whole config from device.
    */
   read = async (): Promise<Data> => {
     const getter = async () => this.getter && await this.getter() || {};
 
-    return this.readAllData('config', getter);
+    return this.readAllData(getter);
   }
 
   /**
    * Set config to device
    */
   write = async (partialData: Data): Promise<void> => {
-    return this.writeData('status', partialData);
+    return this.writeData(partialData);
   }
 
   /**
@@ -31,7 +33,7 @@ export default class Config extends DeviceDataManagerBase {
     };
 
     // publish all the statuses
-    this.events.emit(publishEventName, 'config', this.localData, params);
+    this.events.emit(publishEventName, this.typeNameOfData, this.localData, params);
   }
 
 }

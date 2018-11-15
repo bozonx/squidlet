@@ -26,6 +26,7 @@ export const publishEventName = 'publish';
  * * publish - it emits on changes and on republish
  */
 export default abstract class DeviceDataManagerBase {
+  protected abstract readonly typeNameOfData: string;
   protected readonly deviceId: string;
   protected readonly system: System;
   protected readonly schema: Schema;
@@ -97,17 +98,17 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
-  protected async readAllData(typeNameOfData: string, getter: () => Promise<Data>): Promise<Data> {
+  protected async readAllData(getter: () => Promise<Data>): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!getter) return this.localData;
     // else fetch config if getter is defined
 
     const result: Data = await this.load(
       getter,
-      `Can't fetch ${typeNameOfData} of device "${this.deviceId}"`
+      `Can't fetch ${this.typeNameOfData} of device "${this.deviceId}"`
     );
 
-    this.validateDict(result, `Invalid fetched ${typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data and rise events
     this.setLocalData(result);
 
@@ -117,25 +118,25 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Get certain param value from device.
    */
-  protected async readJustParam(typeNameOfData: string, statusName: string, getter: () => Promise<Data>): Promise<any> {
+  protected async readJustParam(statusName: string, getter: () => Promise<Data>): Promise<any> {
     // if there isn't a data getter - just return local status
     if (!getter) return this.localData[statusName];
     // else fetch status if getter is defined
 
     const result: Data = await this.load(
       () => this.getter && this.getter([statusName]),
-      `Can't fetch "${typeNameOfData}" "${statusName}" of device "${this.deviceId}"`
+      `Can't fetch "${this.typeNameOfData}" "${statusName}" of device "${this.deviceId}"`
     );
 
-    this.validateParam(statusName, result[statusName], `Invalid "${typeNameOfData}" "${statusName}" of device "${this.deviceId}"`);
+    this.validateParam(statusName, result[statusName], `Invalid "${this.typeNameOfData}" "${statusName}" of device "${this.deviceId}"`);
     this.setLocalDataParam(statusName, result[statusName]);
 
     return this.localData[statusName];
   }
 
-  protected async writeData(typeNameOfData: string, partialData: Data): Promise<void> {
+  protected async writeData(partialData: Data): Promise<void> {
     this.validateDict(partialData,
-      `Invalid ${typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
+      `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
@@ -147,7 +148,7 @@ export default abstract class DeviceDataManagerBase {
 
     await this.save(
       () => this.setter && this.setter(partialData),
-      `Can't save ${typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`
+      `Can't save ${this.typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`
     );
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
