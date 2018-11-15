@@ -41,7 +41,7 @@ export default class Messenger {
   }
 
   /**
-   * Emit local message
+   * Emit local message (send local)
    */
   emit(category: string, topic: string, payload?: any) {
     this.oneWayMessages.emit(category, topic, payload);

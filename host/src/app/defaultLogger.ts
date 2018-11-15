@@ -1,3 +1,5 @@
+// TODO: remove
+
 export function debug(message: string) {
   console.info(message);
 }
