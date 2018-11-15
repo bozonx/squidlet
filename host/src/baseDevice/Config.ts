@@ -12,18 +12,14 @@ export default class Config extends DeviceDataManagerBase {
   read = async (): Promise<Data> => {
     const getter = async () => this.getter && await this.getter() || {};
 
-    return this.readAllData('config', getter, () => {
-      this.publishState(Object.keys(this.localData), false);
-    });
+    return this.readAllData('config', getter);
   }
 
   /**
    * Set config to device
    */
   write = async (partialData: Data): Promise<void> => {
-    return this.writeData('status', partialData, () => {
-      this.publishState(Object.keys(this.localData), false);
-    });
+    return this.writeData('status', partialData);
   }
 
   /**

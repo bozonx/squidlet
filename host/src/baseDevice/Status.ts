@@ -16,10 +16,7 @@ export default class Status extends DeviceDataManagerBase {
   read = async (): Promise<Data> => {
     const getter = async () => this.getter && await this.getter() || {};
 
-    return this.readAllData('status', getter, (changedParams: string[]) => {
-      // publish all the statuses
-      this.publishState(changedParams, false);
-    });
+    return this.readAllData('status', getter);
   }
 
   /**
@@ -54,9 +51,7 @@ export default class Status extends DeviceDataManagerBase {
    * Set status of device.
    */
   write = async (partialData: Data): Promise<void> => {
-    return this.writeData('status', partialData, (changedParams: string[]) => {
-      this.publishState(changedParams, false);
-    });
+    return this.writeData('status', partialData);
   }
 
 

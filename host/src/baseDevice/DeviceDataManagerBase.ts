@@ -26,6 +26,7 @@ export default abstract class DeviceDataManagerBase {
   protected readonly system: System;
   protected readonly schema: Schema;
   protected readonly republish: Republish;
+  // TODO: должно быть обязательно
   protected publishState?: PublishState;
   protected getter?: Getter;
   protected setter?: Setter;
@@ -81,11 +82,7 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
-  protected async readAllData(
-    typeNameOfData: string,
-    getter: () => Promise<Data>,
-    onUpdate: (updatedParams: string[]) => void
-  ): Promise<Data> {
+  protected async readAllData(typeNameOfData: string, getter: () => Promise<Data>): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!getter) return this.localData;
     // else fetch config if getter is defined
@@ -100,18 +97,13 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(result);
 
     if (updatedParams.length) {
-      // TODO: может лучше поднять событие ?????
-      onUpdate(updatedParams);
+      this.publishState && this.publishState(updatedParams, false);
     }
 
     return this.localData;
   }
 
-  protected async writeData(
-    typeNameOfData: string,
-    partialData: Data,
-    onUpdate: (updatedParams: string[]
-  ) => void): Promise<void> {
+  protected async writeData(typeNameOfData: string, partialData: Data): Promise<void> {
     this.validateDict(partialData,
       `Invalid ${typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
@@ -120,7 +112,7 @@ export default abstract class DeviceDataManagerBase {
       const updatedParams: string[] = this.setLocalData(partialData);
 
       if (updatedParams.length) {
-        onUpdate(updatedParams);
+        this.publishState && this.publishState(updatedParams, false);
       }
 
       return;
@@ -137,7 +129,7 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(partialData);
 
     if (updatedParams.length) {
-      onUpdate(updatedParams);
+      this.publishState && this.publishState(updatedParams, false);
     }
   }
 
@@ -255,14 +247,14 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
+  /**
+   * Republish current state
+   */
   private republishCb = () => {
-    this.events.emit(changeEventName, Object.keys(this.getLocal()), true);
 
-    // const data: Data = this.getLocal();
-    //
-    // for (let name of Object.keys(data)) {
-    //   //this.events.emit(changeEventName, [paramName]);
-    // }
+    // TODO: считать стейт заново
+
+    this.publishState && this.publishState(Object.keys(this.getLocal()), true);
   }
 
 }
