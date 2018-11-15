@@ -120,6 +120,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       return;
     }
 
+    // TODO: зачем тут publish ?????
     this.publish(actionName, result);
 
     return result;

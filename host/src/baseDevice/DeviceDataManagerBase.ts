@@ -93,12 +93,8 @@ export default abstract class DeviceDataManagerBase {
     );
 
     this.validateDict(result, `Invalid fetched ${typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-
-    const updatedParams: string[] = this.setLocalData(result);
-
-    if (updatedParams.length) {
-      this.publishState(updatedParams, false);
-    }
+    // set to local data and rise events
+    this.setLocalData(result);
 
     return this.localData;
   }
@@ -113,16 +109,11 @@ export default abstract class DeviceDataManagerBase {
 
     const result: Data = await this.load(
       () => this.getter && this.getter([statusName]),
-      `Can't fetch status "${statusName}" of device "${this.deviceId}"`
+      `Can't fetch "${typeNameOfData}" "${statusName}" of device "${this.deviceId}"`
     );
 
-    this.validateParam(statusName, result[statusName], `Invalid status "${statusName}" of device "${this.deviceId}"`);
-
-    const wasSet = this.setLocalDataParam(statusName, result[statusName]);
-
-    if (wasSet) {
-      this.publishState([statusName], false);
-    }
+    this.validateParam(statusName, result[statusName], `Invalid "${typeNameOfData}" "${statusName}" of device "${this.deviceId}"`);
+    this.setLocalDataParam(statusName, result[statusName]);
 
     return this.localData[statusName];
   }
@@ -133,11 +124,7 @@ export default abstract class DeviceDataManagerBase {
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
-      const updatedParams: string[] = this.setLocalData(partialData);
-
-      if (updatedParams.length) {
-        this.publishState(updatedParams, false);
-      }
+      this.setLocalData(partialData);
 
       return;
     }
@@ -150,11 +137,7 @@ export default abstract class DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    const updatedParams: string[] = this.setLocalData(partialData);
-
-    if (updatedParams.length) {
-      this.publishState(updatedParams, false);
-    }
+    this.setLocalData(partialData);
   }
 
   protected validateParam(statusName: string, value: any, errorMsg: string) {
@@ -224,6 +207,9 @@ export default abstract class DeviceDataManagerBase {
 
     this.localData[paramName] = value;
     this.events.emit(changeEventName, [paramName], false);
+
+    this.publishState([paramName], false);
+
     this.republish.start(this.republishCb);
 
     return true;
@@ -249,6 +235,11 @@ export default abstract class DeviceDataManagerBase {
     };
 
     this.events.emit(changeEventName, updatedParams, false);
+
+    if (updatedParams.length) {
+      this.publishState(updatedParams, false);
+    }
+
     this.republish.start(this.republishCb);
 
     return updatedParams;
