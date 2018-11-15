@@ -4,7 +4,6 @@ import System from '../app/System';
 import Republish from './Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
-import {DEFAULT_STATUS} from './Status';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -31,7 +30,8 @@ export default abstract class DeviceDataManagerBase {
   protected setter?: Setter;
   protected readonly events: EventEmitter = new EventEmitter();
 
-  protected abstract publishState: PublishState;
+  //protected abstract publishState: PublishState;
+  protected abstract publishState?: PublishState;
   abstract read: () => Promise<Data>;
   abstract write: (partialData: Data) => Promise<void>;
 
@@ -98,7 +98,7 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(result);
 
     if (updatedParams.length) {
-      this.publishState(updatedParams, false);
+      this.publishState && this.publishState(updatedParams, false);
     }
 
     return this.localData;
@@ -107,7 +107,7 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Get certain param value from device.
    */
-  protected async readJustParam(typeNameOfData: string, statusName: string = DEFAULT_STATUS, getter: () => Promise<Data>): Promise<any> {
+  protected async readJustParam(typeNameOfData: string, statusName: string, getter: () => Promise<Data>): Promise<any> {
     // if there isn't a data getter - just return local status
     if (!getter) return this.localData[statusName];
     // else fetch status if getter is defined
@@ -122,7 +122,7 @@ export default abstract class DeviceDataManagerBase {
     const wasSet = this.setLocalDataParam(statusName, result[statusName]);
 
     if (wasSet) {
-      this.publishState([statusName], false);
+      this.publishState && this.publishState([statusName], false);
     }
 
     return this.localData[statusName];
@@ -137,7 +137,7 @@ export default abstract class DeviceDataManagerBase {
       const updatedParams: string[] = this.setLocalData(partialData);
 
       if (updatedParams.length) {
-        this.publishState(updatedParams, false);
+        this.publishState && this.publishState(updatedParams, false);
       }
 
       return;
@@ -154,7 +154,7 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(partialData);
 
     if (updatedParams.length) {
-      this.publishState(updatedParams, false);
+      this.publishState && this.publishState(updatedParams, false);
     }
   }
 
@@ -279,7 +279,7 @@ export default abstract class DeviceDataManagerBase {
 
     // TODO: считать стейт заново
 
-    this.publishState(Object.keys(this.getLocal()), true);
+    this.publishState && this.publishState(Object.keys(this.getLocal()), true);
   }
 
 }
