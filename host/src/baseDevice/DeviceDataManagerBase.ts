@@ -12,7 +12,7 @@ export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
-export type ChangeHandler = (changedParams: string[], isRepeat: boolean) => void;
+export type ChangeHandler = (changedParams: string[]) => void;
 
 export const changeEventName = 'change';
 export const publishEventName = 'publish';
@@ -20,6 +20,9 @@ export const publishEventName = 'publish';
 
 /**
  * Manage status of device
+ * Events:
+ * * change - it emits only if parameter is changed
+ * * publish - it emits on changes and on republish
  */
 export default abstract class DeviceDataManagerBase {
   protected readonly deviceId: string;
@@ -206,10 +209,8 @@ export default abstract class DeviceDataManagerBase {
     if (this.localData[paramName] === value) return false;
 
     this.localData[paramName] = value;
-    this.events.emit(changeEventName, [paramName], false);
-
+    this.events.emit(changeEventName, [paramName]);
     this.publishState([paramName], false);
-
     this.republish.start(this.republishCb);
 
     return true;
@@ -234,7 +235,7 @@ export default abstract class DeviceDataManagerBase {
       ...partialData,
     };
 
-    this.events.emit(changeEventName, updatedParams, false);
+    this.events.emit(changeEventName, updatedParams);
 
     if (updatedParams.length) {
       this.publishState(updatedParams, false);

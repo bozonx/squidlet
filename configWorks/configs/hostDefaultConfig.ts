@@ -1,6 +1,7 @@
 export default {
   config: {
-    defaultStatusRepublishIntervalMs: 60000,
+    // TODO: set 60000
+    defaultStatusRepublishIntervalMs: 10000,
     defaultConfigRepublishIntervalMs: 600000,
     drivers: {
       defaultDigitalInputDebounce: 20,
