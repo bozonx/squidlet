@@ -30,8 +30,7 @@ export default abstract class DeviceDataManagerBase {
   protected setter?: Setter;
   protected readonly events: EventEmitter = new EventEmitter();
 
-  //protected abstract publishState: PublishState;
-  protected abstract publishState?: PublishState;
+  protected abstract publishState: PublishState;
   abstract read: () => Promise<Data>;
   abstract write: (partialData: Data) => Promise<void>;
 
@@ -98,7 +97,7 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(result);
 
     if (updatedParams.length) {
-      this.publishState && this.publishState(updatedParams, false);
+      this.publishState(updatedParams, false);
     }
 
     return this.localData;
@@ -122,7 +121,7 @@ export default abstract class DeviceDataManagerBase {
     const wasSet = this.setLocalDataParam(statusName, result[statusName]);
 
     if (wasSet) {
-      this.publishState && this.publishState([statusName], false);
+      this.publishState([statusName], false);
     }
 
     return this.localData[statusName];
@@ -137,7 +136,7 @@ export default abstract class DeviceDataManagerBase {
       const updatedParams: string[] = this.setLocalData(partialData);
 
       if (updatedParams.length) {
-        this.publishState && this.publishState(updatedParams, false);
+        this.publishState(updatedParams, false);
       }
 
       return;
@@ -154,7 +153,7 @@ export default abstract class DeviceDataManagerBase {
     const updatedParams: string[] = this.setLocalData(partialData);
 
     if (updatedParams.length) {
-      this.publishState && this.publishState(updatedParams, false);
+      this.publishState(updatedParams, false);
     }
   }
 
@@ -279,7 +278,7 @@ export default abstract class DeviceDataManagerBase {
 
     // TODO: считать стейт заново
 
-    this.publishState && this.publishState(Object.keys(this.getLocal()), true);
+    this.publishState(Object.keys(this.getLocal()), true);
   }
 
 }
