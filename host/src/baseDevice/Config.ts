@@ -1,4 +1,5 @@
 import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
+import PublishParams from '../app/interfaces/PublishParams';
 
 
 /**
@@ -12,8 +13,7 @@ export default class Config extends DeviceDataManagerBase {
     const getter = async () => this.getter && await this.getter() || {};
 
     return this.readAllData('config', getter, () => {
-      // TODO: нужно ли устанавливать параметры publish?
-      this.publish('config', this.localData);
+      this.publishData(undefined, false);
     });
   }
 
@@ -22,9 +22,20 @@ export default class Config extends DeviceDataManagerBase {
    */
   write = async (partialData: Data): Promise<void> => {
     return this.writeData('status', partialData, () => {
-      // TODO: нужно ли устанавливать параметры publish?
-      this.publish('config', this.localData);
+      this.publishData(undefined, false);
     });
+  }
+
+  /**
+   * Publish whole config on each change
+   */
+  protected publishData(changedParams: undefined, isRepeat: boolean) {
+    const params: PublishParams = {
+      isRepeat,
+    };
+
+    // publish all the statuses
+    this.publish('config', this.localData, params);
   }
 
 }

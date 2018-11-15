@@ -2,10 +2,11 @@ import * as EventEmitter from 'eventemitter3';
 
 import System from '../app/System';
 import Republish from './Republish';
-import {Publisher} from './DeviceBase';
 import {validateParam, validateDict} from '../helpers/validateSchema';
+import PublishParams from '../app/interfaces/PublishParams';
 
 
+export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
 export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
 export type Schema = {[index: string]: any};

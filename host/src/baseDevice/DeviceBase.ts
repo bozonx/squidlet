@@ -11,8 +11,6 @@ import categories from '../app/dict/categories';
 import DeviceData from '../app/interfaces/DeviceData';
 
 
-export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
-
 export interface DeviceBaseProps extends EntityProps {
   statusRepublishInterval?: number;
   configRepublishInterval?: number;
