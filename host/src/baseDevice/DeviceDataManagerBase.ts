@@ -91,8 +91,10 @@ export default abstract class DeviceDataManagerBase {
     );
 
     this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-    // set to local data and rise events
-    this.setLocalData(result);
+    // set to local data
+    const updatedParams = this.setLocalData(result);
+    //  rise events change event and publish
+    this.emitOnChange(updatedParams);
 
     return this.localData;
   }
@@ -111,8 +113,14 @@ export default abstract class DeviceDataManagerBase {
     );
 
     this.validateParam(statusName, result[statusName], `Invalid "${this.typeNameOfData}" "${statusName}" of device "${this.deviceId}"`);
+
     // set to local data and rise events
-    this.setLocalDataParam(statusName, result[statusName]);
+    const wasSet = this.setLocalDataParam(statusName, result[statusName]);
+
+    if (wasSet) {
+      //  rise events change event and publish
+      this.emitOnChange([statusName]);
+    }
 
     return this.localData[statusName];
   }
@@ -123,7 +131,10 @@ export default abstract class DeviceDataManagerBase {
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
-      this.setLocalData(partialData);
+      // set to local data
+      const updatedParams = this.setLocalData(partialData);
+      //  rise events change event and publish
+      this.emitOnChange(updatedParams);
 
       return;
     }
@@ -136,7 +147,10 @@ export default abstract class DeviceDataManagerBase {
 
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    this.setLocalData(partialData);
+    // set to local data
+    const updatedParams = this.setLocalData(partialData);
+    //  rise events change event and publish
+    this.emitOnChange(updatedParams);
   }
 
   protected validateParam(statusName: string, value: any, errorMsg: string) {
@@ -240,8 +254,10 @@ export default abstract class DeviceDataManagerBase {
     }
 
     this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-    // set to local data and rise events
-    this.setLocalData(result);
+    // set to local data
+    const updatedParams = this.setLocalData(result);
+    //  rise events change event and publish
+    this.emitOnChange(updatedParams);
   }
 
   /**
@@ -252,9 +268,6 @@ export default abstract class DeviceDataManagerBase {
     if (this.localData[paramName] === value) return false;
 
     this.localData[paramName] = value;
-    this.events.emit(changeEventName, [paramName]);
-    this.publishState([paramName], false);
-    this.republish.start(this.republishCb);
 
     return true;
   }
@@ -271,23 +284,27 @@ export default abstract class DeviceDataManagerBase {
       if (partialData[name] !== this.localData[name]) updatedParams.push(name);
     }
 
+    // do nothing if there isn't changed data
     if (!updatedParams.length) return updatedParams;
 
+    // update local data
     this.localData = {
       ...this.localData,
       ...partialData,
     };
 
-    // TODO: почему не проверяется есть ли изменение ????
-    this.events.emit(changeEventName, updatedParams);
+    return updatedParams;
+  }
 
+  emitOnChange(updatedParams: string[]) {
     if (updatedParams.length) {
-      this.publishState(updatedParams, false);
+      // emit change event
+      this.events.emit(changeEventName, updatedParams);
+      this.republish.start(this.republishCb);
     }
 
-    this.republish.start(this.republishCb);
-
-    return updatedParams;
+    // emit publish event
+    this.publishState(updatedParams, false);
   }
 
   /**
@@ -296,6 +313,7 @@ export default abstract class DeviceDataManagerBase {
   private republishCb = () => {
 
     // TODO: считать стейт заново
+    // TODO: тоже что и в readAllData - но паблиш сделать обязательно
 
     this.publishState(Object.keys(this.getLocal()), true);
   }
