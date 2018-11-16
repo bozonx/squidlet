@@ -42,7 +42,7 @@ export default class Main {
     await this.entities.generate();
 
     this.log.info(`--> Generating hosts entities definitions`);
-    this.definitions.generate();
+    await this.definitions.generate();
 
     this.log.info(`--> Checking platform dev dependencies`);
     validatePlatformDevs(this);

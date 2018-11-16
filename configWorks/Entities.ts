@@ -210,7 +210,7 @@ export default class Entities {
     // load props file
     if (typeof preManifest.props === 'string') {
       const propPath = path.join(preManifest.baseDir, preManifest.props);
-      finalManifest.props = this.main.io.loadYamlFile(propPath);
+      finalManifest.props = await this.main.io.loadYamlFile(propPath);
     }
 
     return finalManifest;
