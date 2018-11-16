@@ -111,6 +111,7 @@ export default abstract class DeviceDataManagerBase {
     );
 
     this.validateParam(statusName, result[statusName], `Invalid "${this.typeNameOfData}" "${statusName}" of device "${this.deviceId}"`);
+    // set to local data and rise events
     this.setLocalDataParam(statusName, result[statusName]);
 
     return this.localData[statusName];
@@ -231,6 +232,7 @@ export default abstract class DeviceDataManagerBase {
       ...partialData,
     };
 
+    // TODO: почему не проверяется есть ли изменение ????
     this.events.emit(changeEventName, updatedParams);
 
     if (updatedParams.length) {
@@ -268,16 +270,22 @@ export default abstract class DeviceDataManagerBase {
     let result: Data;
 
     if (this.initialize) {
-      result = await this.initialize();
+      result = await this.load(
+        this.initialize,
+        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via initialize`
+      );
     }
     else if (this.getter) {
-      result = await this.getter();
+      result = await this.load(
+        this.getter,
+        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via getter`
+      );
     }
     else {
       result = this.getDefaultValues();
     }
 
-    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+    this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data and rise events
     this.setLocalData(result);
   }
