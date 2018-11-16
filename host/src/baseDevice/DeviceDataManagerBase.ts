@@ -199,52 +199,6 @@ export default abstract class DeviceDataManagerBase {
 
 
   /**
-   * Set param to local data.
-   * If param was set it returns true else false
-   */
-  private setLocalDataParam(paramName: string, value: any): boolean {
-    if (this.localData[paramName] === value) return false;
-
-    this.localData[paramName] = value;
-    this.events.emit(changeEventName, [paramName]);
-    this.publishState([paramName], false);
-    this.republish.start(this.republishCb);
-
-    return true;
-  }
-
-  /**
-   * Set whole structure to local data.
-   * If structure was set it returns true else false.
-   * @returns {string} List of params names which was updated
-   */
-  private setLocalData(partialData: Data): string[] {
-    const updatedParams: string[] = [];
-
-    for (let name of Object.keys(partialData)) {
-      if (partialData[name] !== this.localData[name]) updatedParams.push(name);
-    }
-
-    if (!updatedParams.length) return updatedParams;
-
-    this.localData = {
-      ...this.localData,
-      ...partialData,
-    };
-
-    // TODO: почему не проверяется есть ли изменение ????
-    this.events.emit(changeEventName, updatedParams);
-
-    if (updatedParams.length) {
-      this.publishState(updatedParams, false);
-    }
-
-    this.republish.start(this.republishCb);
-
-    return updatedParams;
-  }
-
-  /**
    * Set default values to local data
    */
   private getDefaultValues(): Data {
@@ -288,6 +242,52 @@ export default abstract class DeviceDataManagerBase {
     this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data and rise events
     this.setLocalData(result);
+  }
+
+  /**
+   * Set param to local data.
+   * If param was set it returns true else false
+   */
+  private setLocalDataParam(paramName: string, value: any): boolean {
+    if (this.localData[paramName] === value) return false;
+
+    this.localData[paramName] = value;
+    this.events.emit(changeEventName, [paramName]);
+    this.publishState([paramName], false);
+    this.republish.start(this.republishCb);
+
+    return true;
+  }
+
+  /**
+   * Set whole structure to local data.
+   * If structure was set it returns true else false.
+   * @returns {string} List of params names which was updated
+   */
+  private setLocalData(partialData: Data): string[] {
+    const updatedParams: string[] = [];
+
+    for (let name of Object.keys(partialData)) {
+      if (partialData[name] !== this.localData[name]) updatedParams.push(name);
+    }
+
+    if (!updatedParams.length) return updatedParams;
+
+    this.localData = {
+      ...this.localData,
+      ...partialData,
+    };
+
+    // TODO: почему не проверяется есть ли изменение ????
+    this.events.emit(changeEventName, updatedParams);
+
+    if (updatedParams.length) {
+      this.publishState(updatedParams, false);
+    }
+
+    this.republish.start(this.republishCb);
+
+    return updatedParams;
   }
 
   /**
