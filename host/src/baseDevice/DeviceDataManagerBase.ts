@@ -196,11 +196,12 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
+
   /**
    * Set param to local data.
    * If param was set it returns true else false
    */
-  protected setLocalDataParam(paramName: string, value: any): boolean {
+  private setLocalDataParam(paramName: string, value: any): boolean {
     if (this.localData[paramName] === value) return false;
 
     this.localData[paramName] = value;
@@ -216,7 +217,7 @@ export default abstract class DeviceDataManagerBase {
    * If structure was set it returns true else false.
    * @returns {string} List of params names which was updated
    */
-  protected setLocalData(partialData: Data): string[] {
+  private setLocalData(partialData: Data): string[] {
     const updatedParams: string[] = [];
 
     for (let name of Object.keys(partialData)) {
@@ -244,7 +245,7 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Set default values to local data
    */
-  protected setDefaultValues(): Data {
+  private getDefaultValues(): Data {
     const result: Data = {};
 
     for (let name of Object.keys(this.schema)) {
@@ -263,7 +264,6 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-
   private async initFirstValue() {
     let result: Data;
 
@@ -272,10 +272,9 @@ export default abstract class DeviceDataManagerBase {
     }
     if (this.getter) {
       result = await this.getter();
-      //await this.read();
     }
     else {
-      result = this.setDefaultValues();
+      result = this.getDefaultValues();
     }
 
     this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);

@@ -6,6 +6,7 @@ import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
+import {invertIfNeed} from '../../drivers/Digital/digitalHelpers';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
@@ -45,10 +46,7 @@ export default class BinaryImpulse extends DeviceBase<Props> {
   }
 
   protected initialStatus = async (): Promise<Data> => {
-
-    // TODO: учитывать invert and pullup
-
-    return { [DEFAULT_STATUS]: 0 };
+    return { [DEFAULT_STATUS]: invertIfNeed(false, this.props.invert) };
   }
 
 
