@@ -223,28 +223,6 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  /**
-   * Set default values to local data
-   */
-  private getDefaultValues(): Data {
-    const result: Data = {};
-
-    for (let name of Object.keys(this.schema)) {
-
-      // TODO: наверное поддерживать короткую запись значения по умаолчанию
-
-      if (
-        typeof this.schema[name] === 'object'
-        && this.schema[name].type
-        && typeof this.schema[name].default !== 'undefined'
-      ) {
-        result[name] = this.schema[name].default;
-      }
-    }
-
-    return result;
-  }
-
   private async initFirstValue() {
     let result: Data;
 
@@ -272,15 +250,25 @@ export default abstract class DeviceDataManagerBase {
   }
 
   /**
-   * Set param to local data.
-   * If param was set it returns true else false
+   * Set default values to local data
    */
-  private setLocalDataParam(paramName: string, value: any): boolean {
-    if (this.localData[paramName] === value) return false;
+  private getDefaultValues(): Data {
+    const result: Data = {};
 
-    this.localData[paramName] = value;
+    for (let name of Object.keys(this.schema)) {
 
-    return true;
+      // TODO: наверное поддерживать короткую запись значения по умаолчанию
+
+      if (
+        typeof this.schema[name] === 'object'
+        && this.schema[name].type
+        && typeof this.schema[name].default !== 'undefined'
+      ) {
+        result[name] = this.schema[name].default;
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -307,7 +295,19 @@ export default abstract class DeviceDataManagerBase {
     return updatedParams;
   }
 
-  emitOnChange(updatedParams: string[]) {
+  /**
+   * Set param to local data.
+   * If param was set it returns true else false
+   */
+  private setLocalDataParam(paramName: string, value: any): boolean {
+    if (this.localData[paramName] === value) return false;
+
+    this.localData[paramName] = value;
+
+    return true;
+  }
+
+  private emitOnChange(updatedParams: string[]) {
     if (updatedParams.length) {
       // emit change event
       this.events.emit(changeEventName, updatedParams);
