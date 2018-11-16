@@ -85,12 +85,8 @@ export default abstract class DeviceDataManagerBase {
     if (!this.getter) return this.localData;
     // else fetch config if getter is defined
 
-    const result: Data = await this.load(
-      this.getter,
-      `Can't fetch ${this.typeNameOfData} of device "${this.deviceId}"`
-    );
+    const result: Data = await this.justReadAllData();
 
-    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data
     const updatedParams = this.setLocalData(result);
     //  rise events change event and publish
@@ -212,6 +208,21 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
+  private async justReadAllData(): Promise<Data> {
+    // if there isn't a data getter - just return local config
+    if (!this.getter) return this.localData;
+    // else fetch config if getter is defined
+
+    const result: Data = await this.load(
+      this.getter,
+      `Can't fetch ${this.typeNameOfData} of device "${this.deviceId}"`
+    );
+
+    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+
+    return result;
+  }
+
   /**
    * Set default values to local data
    */
@@ -310,10 +321,17 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Republish current state
    */
-  private republishCb = () => {
+  private republishCb = async () => {
+    const result: Data = await this.justReadAllData();
 
-    // TODO: считать стейт заново
-    // TODO: тоже что и в readAllData - но паблиш сделать обязательно
+    // set to local data
+    const updatedParams = this.setLocalData(result);
+
+    // rise events change event
+    if (updatedParams.length) {
+      // emit change event
+      this.events.emit(changeEventName, updatedParams);
+    }
 
     this.publishState(Object.keys(this.getLocal()), true);
   }
