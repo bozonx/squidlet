@@ -80,7 +80,7 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
-  protected async readAllData(getter: () => Promise<Data>): Promise<Data> {
+  protected async readAllData(getter?: () => Promise<Data>): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!getter) return this.localData;
     // else fetch config if getter is defined
@@ -100,7 +100,7 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Get certain param value from device.
    */
-  protected async readJustParam(statusName: string, getter: () => Promise<Data>): Promise<any> {
+  protected async readJustParam(statusName: string, getter?: () => Promise<Data>): Promise<any> {
     // if there isn't a data getter - just return local status
     if (!getter) return this.localData[statusName];
     // else fetch status if getter is defined
@@ -270,7 +270,7 @@ export default abstract class DeviceDataManagerBase {
     if (this.initialize) {
       result = await this.initialize();
     }
-    if (this.getter) {
+    else if (this.getter) {
       result = await this.getter();
     }
     else {
