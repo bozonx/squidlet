@@ -13,7 +13,7 @@ export default interface PreHostConfig {
   config: {
     // path to dir where will be placed storage of host. It can be absolute or relative of master config file
     storageDir?: string;
-    logLevel: LogLevel;
+    logLevel?: LogLevel;
     // republish status silently every minute if it hasn't been changed
     defaultStatusRepublishIntervalMs?: number;
     // republish config silently every 10 minutes if it hasn't been changed
