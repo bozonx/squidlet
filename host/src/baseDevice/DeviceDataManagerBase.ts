@@ -60,26 +60,8 @@ export default abstract class DeviceDataManagerBase {
     this.getter = getter;
     this.setter = setter;
 
-    let result: Data;
-
-    if (this.initialize) {
-      result = await this.initialize();
-    }
-    if (this.getter) {
-      result = await this.getter();
-      //await this.read();
-    }
-    else {
-      result = this.setDefaultValues();
-    }
-
-
-    // TODO: поднять publish
-
-    // TODO: что дальше делать ???? - нужно установить
-
+    await this.initFirstValue();
   }
-
 
   getLocal(): Data {
     return this.localData;
@@ -262,19 +244,44 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Set default values to local data
    */
-  protected setDefaultValues() {
+  protected setDefaultValues(): Data {
+    const result: Data = {};
+
     for (let name of Object.keys(this.schema)) {
+
       // TODO: наверное поддерживать короткую запись значения по умаолчанию
+
       if (
         typeof this.schema[name] === 'object'
         && this.schema[name].type
         && typeof this.schema[name].default !== 'undefined'
       ) {
-        this.localData[name] = this.schema[name].default;
+        result[name] = this.schema[name].default;
       }
     }
+
+    return result;
   }
 
+
+  private async initFirstValue() {
+    let result: Data;
+
+    if (this.initialize) {
+      result = await this.initialize();
+    }
+    if (this.getter) {
+      result = await this.getter();
+      //await this.read();
+    }
+    else {
+      result = this.setDefaultValues();
+    }
+
+    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+    // set to local data and rise events
+    this.setLocalData(result);
+  }
 
   /**
    * Republish current state
