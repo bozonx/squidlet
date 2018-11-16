@@ -1,5 +1,5 @@
-import BinaryImpulse from '../BinaryImpulse/BinaryImpulse';
+import BinarySensor from '../BinarySensor/BinarySensor';
 
 
-export default class BinaryClick extends BinaryImpulse {
+export default class BinaryClick extends BinarySensor {
 }
