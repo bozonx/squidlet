@@ -1,3 +1,6 @@
+import {isDigitalInverted} from '../../helpers/helpers';
+
+const _omit = require('lodash/omit');
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
@@ -19,6 +22,8 @@ export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
   // if specified - it will wait for specified time
   // and after that read level and start impulse if level is 1
   throttle?: number;
+  // auto invert if pullup resistor is set. Default is true
+  invertOnPullup: boolean;
 }
 
 
@@ -34,7 +39,10 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
-      .getInstance(this.props);
+      .getInstance({
+        ..._omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
+        invert: this.isInverted(),
+      });
   }
 
   protected didInit = async () => {
@@ -44,6 +52,9 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
   }
 
+  isInverted(): boolean {
+    return isDigitalInverted(this.props.invertOnPullup, this.props.pullup, this.props.invert);
+  }
 
   async read(): Promise<boolean> {
     return this.digitalInput.read();

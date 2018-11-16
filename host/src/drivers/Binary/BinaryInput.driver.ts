@@ -1,13 +1,15 @@
-import {Edge} from '../../app/interfaces/dev/Digital';
+import {isDigitalInverted} from '../../helpers/helpers';
 
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
+import {Edge} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import {invertIfNeed} from '../Digital/digitalHelpers';
 
 
 const eventName = 'change';
@@ -18,6 +20,8 @@ export interface BinaryInputDriverProps extends DigitalInputDriverProps {
   debounce: number;
   // in this time driver doesn't receive any data
   blockTime: number;
+  // auto invert if pullup resistor is set. Default is true
+  invertOnPullup: boolean;
 }
 
 
@@ -31,7 +35,10 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
-      .getInstance(_omit(this.props, 'debounce', 'blockTime'));
+      .getInstance({
+          ..._omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup'),
+        invert: this.isInverted(),
+      });
   }
 
   protected didInit = async () => {
@@ -41,6 +48,10 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   isBlocked(): boolean {
     return this.blockTimeInProgress;
+  }
+
+  isInverted(): boolean {
+    return isDigitalInverted(this.props.invertOnPullup, this.props.pullup, this.props.invert);
   }
 
   async read(): Promise<boolean> {

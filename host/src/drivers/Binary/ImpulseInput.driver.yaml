@@ -12,3 +12,6 @@ props:
     default: 0
   throttle:
     type: number?
+  invertOnPullup:
+    type: boolean
+    default: true

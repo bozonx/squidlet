@@ -274,3 +274,17 @@ export function parseValue(rawValue: any): any {
   // array or object - as is
   return rawValue;
 }
+
+export function isDigitalInverted(invertOnPullup: boolean, pullup?: boolean, invert?: boolean): boolean {
+  // // if is set pullup and isn't set invert = invert
+  // if (this.props.pullup && typeof this.props.invert === 'undefined') {
+  //   return true;
+  // }
+
+  if (pullup && invertOnPullup) {
+    return !invert;
+  }
+
+  // in other cases - use invert prop
+  return Boolean(invert);
+}
