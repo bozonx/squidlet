@@ -57,5 +57,11 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
     // this._app.events.emit(`app.afterDestroy`);
   }
 
+  /**
+   * Get object like {deviceId: [actionName, ...]}
+   */
+  getDevicesActions() {
+    // TODO: add
+  }
 
 }

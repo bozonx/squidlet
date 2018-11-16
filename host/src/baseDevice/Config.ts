@@ -12,9 +12,7 @@ export default class Config extends DeviceDataManagerBase {
    * Get whole config from device.
    */
   read = async (): Promise<Data> => {
-    const getter = async () => this.getter && await this.getter() || {};
-
-    return this.readAllData(getter);
+    return this.readAllData();
   }
 
   /**

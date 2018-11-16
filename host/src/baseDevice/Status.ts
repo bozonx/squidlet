@@ -16,17 +16,13 @@ export default class Status extends DeviceDataManagerBase {
    * Get all the statuses
    */
   read = async (): Promise<Data> => {
-    const getter = async () => this.getter && await this.getter() || {};
-
-    return this.readAllData(getter);
+    return this.readAllData();
   }
 
   /**
    * Get status from device.
    */
   readParam = async (statusName: string = DEFAULT_STATUS): Promise<any> => {
-    //const getter = async () => this.getter && await this.getter() || {};
-
     return this.readJustParam(statusName);
   }
 
