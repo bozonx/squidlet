@@ -112,6 +112,24 @@ export default class HostsFilesSet {
     return result;
   }
 
+
+  /**
+   * All the used drivers include which are dependencies of other entities but without devs.
+   */
+  getAllUsedDriversClassNames(hostId: string): string[] {
+    // collect manifest names of used entities
+    const devicesClasses = this.getDevicesClassNames(hostId);
+    const onlyDriversClasses = this.getOnlyDrivers(hostId);
+    const servicesClasses: string[] = this.getServicesClassNames(hostId);
+
+    // collect all the drivers dependencies
+    return this.collectDriverNamesWithDependencies(
+      devicesClasses,
+      onlyDriversClasses,
+      servicesClasses,
+    );
+  }
+
   /**
    * sort drivers to system and regular
    * @returns [systemDrivers, regularDrivers]
@@ -132,23 +150,6 @@ export default class HostsFilesSet {
     const allSystemServices: string[] = this.main.entities.getSystemServices();
 
     return sortByIncludeInList(servicesClasses, allSystemServices);
-  }
-
-  /**
-   * All the used drivers include which are dependencies of other entities but without devs.
-   */
-  private getAllUsedDriversClassNames(hostId: string): string[] {
-    // collect manifest names of used entities
-    const devicesClasses = this.getDevicesClassNames(hostId);
-    const onlyDriversClasses = this.getOnlyDrivers(hostId);
-    const servicesClasses: string[] = this.getServicesClassNames(hostId);
-
-    // collect all the drivers dependencies
-    return this.collectDriverNamesWithDependencies(
-      devicesClasses,
-      onlyDriversClasses,
-      servicesClasses,
-    );
   }
 
   private getDevicesClassNames(hostId: string): string[] {
