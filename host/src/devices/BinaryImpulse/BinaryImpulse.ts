@@ -46,7 +46,7 @@ export default class BinaryImpulse extends DeviceBase<Props> {
   }
 
   protected initialStatus = async (): Promise<Data> => {
-    return { [DEFAULT_STATUS]: invertIfNeed(false, this.binaryInput.isInverted()) };
+    return { [DEFAULT_STATUS]: invertIfNeed(false, this.props.invert) };
   }
 
 
