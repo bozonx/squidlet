@@ -256,14 +256,11 @@ export default abstract class DeviceDataManagerBase {
     const result: Data = {};
 
     for (let name of Object.keys(this.schema)) {
+      if (typeof this.schema[name] !== 'object') {
+        throw new Error(`Invalid schema "${JSON.stringify(this.schema.name)}" of "${name}"`);
+      }
 
-      // TODO: наверное поддерживать короткую запись значения по умаолчанию
-
-      if (
-        typeof this.schema[name] === 'object'
-        && this.schema[name].type
-        && typeof this.schema[name].default !== 'undefined'
-      ) {
+      if (typeof this.schema[name].default !== 'undefined') {
         result[name] = this.schema[name].default;
       }
     }

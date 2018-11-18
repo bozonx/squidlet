@@ -218,12 +218,7 @@ export default class Definitions {
     if (!manifestProps) return result;
 
     for (let propName of Object.keys(manifestProps)) {
-      if (typeof manifestProps[propName] === 'object') {
-        result[propName] = manifestProps[propName].default;
-      }
-      else {
-        // TODO: поддержка короткой записи props
-      }
+      result[propName] = manifestProps[propName].default;
     }
 
     return result;
