@@ -10,12 +10,14 @@ import * as Io from './IO';
 import * as defaultLogger from './defaultLogger';
 import HostsFilesWriter from './HostsFilesWriter';
 import validatePlatformDevs from './validatePlatformDevs';
+import HostClassNames from './HostClassNames';
 
 
 export default class Main {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly entities: Entities;
+  readonly hostClassNames: HostClassNames;
   readonly definitions: Definitions;
   readonly hostsFilesSet: HostsFilesSet;
   readonly hostsFilesWriter: HostsFilesWriter;
@@ -28,6 +30,7 @@ export default class Main {
     this.masterConfig = new MasterConfig(masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
+    this.hostClassNames = new HostClassNames(this);
     this.definitions = new Definitions(this);
     this.hostsFilesSet = new HostsFilesSet(this);
     this.hostsFilesWriter = new HostsFilesWriter(this);

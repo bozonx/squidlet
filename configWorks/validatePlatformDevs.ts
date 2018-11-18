@@ -32,7 +32,7 @@ function getHostDevs(hostEntitiesNames: EntitiesNames, devDeps: Dependencies): s
  */
 export default function validatePlatformDevs (main: Main) {
   for (let hostId of main.masterConfig.getHostsIds()) {
-    const hostEntitiesNames: EntitiesNames = main.hostsFilesSet.getEntitiesNames(hostId);
+    const hostEntitiesNames: EntitiesNames = main.hostClassNames.getEntitiesNames(hostId);
     const hostDevs: string[] = getHostDevs(hostEntitiesNames, main.entities.getDevDependencies());
     const platformDevs: string[] = main.masterConfig.getHostPlatformDevs(hostId);
 
