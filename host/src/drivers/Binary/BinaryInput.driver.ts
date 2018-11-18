@@ -9,7 +9,6 @@ import {Edge} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {invertIfNeed} from '../Digital/digitalHelpers';
 
 
 const eventName = 'change';

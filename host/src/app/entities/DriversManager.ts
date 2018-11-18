@@ -70,6 +70,8 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
     for (let driverName of Object.keys(devs)) {
       const DriverClass: EntityClassType = devs[driverName];
 
+      // TODO: не надо подставлять ложный definition
+
       //this.instances[driverName] = new DriverClass(definitions[driverName], this.env);
       this.instances[driverName] = new DriverClass({id: driverName, className: driverName, props: {}}, this.env);
     }
@@ -83,8 +85,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
     const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of driverNames) {
-      const driverDefinition = definitions[driverName] || { id: driverName, className: driverName }
-      this.instances[driverName] = await this.makeInstance('drivers', driverDefinition);
+      this.instances[driverName] = await this.makeInstance('drivers', definitions[driverName]);
     }
 
     await this.initializeAll(driverNames);
