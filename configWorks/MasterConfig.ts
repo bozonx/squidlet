@@ -2,6 +2,7 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as path from 'path';
 
+import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
@@ -78,7 +79,8 @@ export default class MasterConfig {
     for (let hostId of Object.keys(preHosts)) {
       const preHostConfig: PreHostConfig = preHosts[hostId];
 
-      result[hostId] = this.mergePreHostConfig(preHostConfig);
+      const mergedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
+      result[hostId] = this.normalizeHostConfig(mergedConfig);
     }
 
     return result;
@@ -128,6 +130,10 @@ export default class MasterConfig {
     };
   }
 
+  /**
+   * Merge host config with platform config
+   * @param preHostConfig
+   */
   private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
     const hostPlatform: Platforms = preHostConfig.platform as Platforms;
 
@@ -141,6 +147,48 @@ export default class MasterConfig {
 
   private getPlatformConfig(hostPlatform: Platforms): PlatformConfig {
     return platforms[hostPlatform];
+  }
+
+  /**
+   * Make devices plain
+   */
+  private normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(preHostConfig.devices);
+
+    return {
+      ...preHostConfig,
+      devices: plainDevices,
+    };
+  }
+
+  /**
+   * Make devices plain
+   */
+  private makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: PreDeviceDefinition} {
+    if (!preDevices) return {};
+
+    const result: {[index: string]: PreDeviceDefinition} = {};
+
+    const recursively = (root: string, preDevicesOrRoom: {[index: string]: any}) => {
+      if (preDevicesOrRoom.device) {
+        // it's device definition
+        result[root] = preDevicesOrRoom as PreDeviceDefinition;
+
+        return;
+      }
+
+      // else it's room - go deeper in room
+      for (let itemName of Object.keys(preDevicesOrRoom)) {
+        const newRoot = (root)
+          ? [ root, itemName ].join(systemConfig.hostSysCfg.deviceIdSeparator)
+          : itemName;
+        recursively(newRoot, preDevicesOrRoom[itemName]);
+      }
+    };
+
+    recursively('', preDevices);
+
+    return result;
   }
 
 }

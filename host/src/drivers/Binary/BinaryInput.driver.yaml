@@ -6,7 +6,7 @@ drivers:
 props:
   edge:
     type: rising | falling | both
-    degault: both
+    default: both
   debounce:
     type: number
     # it's default for debounce, not for throttle

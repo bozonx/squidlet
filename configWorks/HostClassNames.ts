@@ -5,6 +5,7 @@ const _flatten = require('lodash/flatten');
 import Main from './Main';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
+import PreHostConfig from './interfaces/PreHostConfig';
 
 
 export default class HostClassNames {
@@ -58,49 +59,52 @@ export default class HostClassNames {
   }
 
   getServicesClassNames(hostId: string): string[] {
-    // const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
-    //
-    // if (!rawHostConfig.services) return [];
-    //
-    // // TODO: проверить что на данный момент уже сервисы переложенны из shortcut
-    //
-    // console.log(111111111, rawHostConfig)
-    //
-    // return Object.keys(rawHostConfig.services)
-    //   .map((id: string) => (rawHostConfig.services as any)[id].service);
+    const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
 
-    const servicesDefinitions = this.main.definitions.getHostServicesDefinitions(hostId);
+    if (!rawHostConfig.services) return [];
 
-    if (!servicesDefinitions) return [];
+    const entities: {[index: string]: any} = rawHostConfig.services;
 
-    return Object.keys(servicesDefinitions)
-      .map((id: string) => servicesDefinitions[id].className);
+    return Object.keys(entities)
+      .map((id: string) => entities[id].service);
   }
 
 
   private getDevicesClassNames(hostId: string): string[] {
-    // const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
-    //
-    // if (!rawHostConfig.devices) return [];
-    //
-    // return Object.keys(rawHostConfig.devices);
+    const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
 
-    const devicesDefinitions = this.main.definitions.getHostDevicesDefinitions(hostId);
+    if (!rawHostConfig.devices) return [];
 
-    return Object.keys(devicesDefinitions)
-      .map((id: string) => devicesDefinitions[id].className);
+    const entities: {[index: string]: any} = rawHostConfig.devices;
+
+    return Object.keys(entities)
+      .map((id: string) => entities[id].device);
+  }
+
+  /**
+   * Get drivers and devs class names of host.
+   */
+  private getDriversClassNames(hostId: string): string[] {
+    const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
+
+    if (!rawHostConfig.drivers) return [];
+
+    const entities: {[index: string]: any} = rawHostConfig.drivers;
+
+    return Object.keys(entities)
+      .map((id: string) => entities[id].driver);
   }
 
   /**
    * Get list of used drivers of host (which has definitions) exclude devs.
    */
   private getOnlyDrivers(hostId: string): string[] {
-    const driversDefinitions = this.main.definitions.getHostDriversDefinitions(hostId);
+    const driversDefinitions = this.getDriversClassNames(hostId);
     const allDevs: string[] = this.main.entities.getDevs();
     // remove devs from drivers definitions list
     const filtered = _filter(
       driversDefinitions,
-      (item: EntityDefinition) => allDevs.indexOf(item.className) < 0
+      (driverClassName: string) => allDevs.indexOf(driverClassName) < 0
     );
 
     return filtered.map((item: EntityDefinition) => item.className);
