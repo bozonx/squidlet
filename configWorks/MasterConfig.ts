@@ -1,3 +1,5 @@
+import {ManifestsTypeName} from './Entities';
+
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as path from 'path';
@@ -20,6 +22,7 @@ import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
+import PreEntityDefinition from './interfaces/PreEntityDefinition';
 
 
 const platforms: {[index: string]: PlatformConfig} = {
@@ -27,6 +30,13 @@ const platforms: {[index: string]: PlatformConfig} = {
   [PLATFORM_ESP8266]: platform_esp8266,
   [PLATFORM_RPI]: platform_rpi,
   [PLATFORM_X86]: platform_x86_linux,
+};
+
+const servicesShortcut: {[index: string]: string} = {
+  automation: 'Automation',
+  mqtt: 'Mqtt',
+  logger: 'Logger',
+  webApi: 'WebApi',
 };
 
 
@@ -157,7 +167,13 @@ export default class MasterConfig {
 
     return {
       ...preHostConfig,
-      devices: plainDevices,
+      devices: this.convertDefinitions('device', plainDevices),
+      drivers: this.convertDefinitions('driver', preHostConfig.drivers || {}),
+      services: {
+        ...this.convertDefinitions('service', preHostConfig.services || {}),
+        // make services from shortcut
+        ...this.collectServicesFromShortcuts(preHostConfig),
+      },
     };
   }
 
@@ -189,6 +205,46 @@ export default class MasterConfig {
     recursively('', preDevices);
 
     return result;
+  }
+
+  /**
+   * Convert definition line { device: MyClass, ... } to { id: id, className: MyClass, ... }
+   */
+  private convertDefinitions(type: ManifestsTypeName,preDefinitions: {[index: string]: any}): {[index: string]: PreEntityDefinition} {
+    const definitions: {[index: string]: PreEntityDefinition} = {};
+
+    for (let id of Object.keys(preDefinitions)) {
+      definitions[id] = {
+        ...preDefinitions[id],
+        id,
+        className: preDefinitions[type],
+      };
+    }
+
+    return definitions;
+  }
+
+  /**
+   * Generate service from shortcuts like 'automation', 'logger' etc.
+   */
+  private collectServicesFromShortcuts(
+    preHostConfig: {[index: string]: any}
+  ): {[index: string]: PreEntityDefinition} {
+    const services: {[index: string]: PreEntityDefinition} = {};
+
+    // collect services
+    for (let serviceId of Object.keys(servicesShortcut)) {
+      if (!preHostConfig[serviceId]) continue;
+
+      const definition: PreEntityDefinition = preHostConfig[serviceId];
+
+      services[serviceId] = {
+        ...definition,
+        className: servicesShortcut[serviceId],
+      };
+    }
+
+    return services;
   }
 
 }

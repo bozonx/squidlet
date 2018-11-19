@@ -13,13 +13,6 @@ import Main from './Main';
 import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
 
 
-const servicesShortcut = [
-  'automation',
-  'mqtt',
-  'logger',
-  'webApi',
-];
-
 
 /**
  * Prepare hosts devices, drivers and services definitions.
@@ -62,10 +55,7 @@ export default class Definitions {
         this.driversDefinitions[hostId] = drivers;
       }
       if (!_isEmpty(services)) {
-        this.servicesDefinitions[hostId] = {
-          ...services,
-          ...this.collectServicesFromShortcuts(rawHostConfig),
-        };
+        this.servicesDefinitions[hostId] = services;
       }
     }
 
@@ -157,6 +147,7 @@ export default class Definitions {
     const manifest = this.main.entities.getManifest('services', className);
 
     return {
+      // TODO: id и className не нужны, только props
       id,
       className,
       props: _defaultsDeep(
@@ -164,29 +155,6 @@ export default class Definitions {
         this.collectManifestPropsDefaults(manifest.props),
       ),
     };
-  }
-
-  /**
-   * Generate service from shortcuts like 'automation', 'logger' etc.
-   */
-  private collectServicesFromShortcuts(
-    rawHostConfig: {[index: string]: any}
-  ): {[index: string]: EntityDefinition} {
-    const services: {[index: string]: EntityDefinition} = {};
-
-    // collect services
-    for (let serviceId of servicesShortcut) {
-      const definition: PreServiceDefinition = rawHostConfig[serviceId];
-
-      if (!definition) continue;
-
-      services[serviceId] = this.generateServiceDef(serviceId, {
-        ...definition,
-        service: definition.name,
-      });
-    }
-
-    return services;
   }
 
   /**

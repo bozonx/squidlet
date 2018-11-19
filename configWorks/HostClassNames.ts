@@ -66,7 +66,7 @@ export default class HostClassNames {
     const entities: {[index: string]: any} = rawHostConfig.services;
 
     return Object.keys(entities)
-      .map((id: string) => entities[id].service);
+      .map((id: string) => entities[id].className);
   }
 
 
@@ -78,7 +78,7 @@ export default class HostClassNames {
     const entities: {[index: string]: any} = rawHostConfig.devices;
 
     return Object.keys(entities)
-      .map((id: string) => entities[id].device);
+      .map((id: string) => entities[id].className);
   }
 
   /**
@@ -92,7 +92,7 @@ export default class HostClassNames {
     const entities: {[index: string]: any} = rawHostConfig.drivers;
 
     return Object.keys(entities)
-      .map((id: string) => entities[id].driver);
+      .map((id: string) => entities[id].className);
   }
 
   /**
