@@ -63,9 +63,9 @@ export default class HostClassNames {
 
     if (!rawHostConfig.services) return [];
 
-    const entities: {[index: string]: any} = rawHostConfig.services;
+    const entities: {[index: string]: any} | undefined = rawHostConfig.services;
 
-    return Object.keys(entities)
+    return Object.keys(entities || {})
       .map((id: string) => entities[id].className);
   }
 
@@ -75,9 +75,9 @@ export default class HostClassNames {
 
     if (!rawHostConfig.devices) return [];
 
-    const entities: {[index: string]: any} = rawHostConfig.devices;
+    const entities: {[index: string]: any} | undefined = rawHostConfig.devices;
 
-    return Object.keys(entities)
+    return Object.keys(entities || {})
       .map((id: string) => entities[id].className);
   }
 
@@ -89,9 +89,9 @@ export default class HostClassNames {
 
     if (!rawHostConfig.drivers) return [];
 
-    const entities: {[index: string]: any} = rawHostConfig.drivers;
+    const entities: {[index: string]: any} | undefined = rawHostConfig.drivers;
 
-    return Object.keys(entities)
+    return Object.keys(entities || {})
       .map((id: string) => entities[id].className);
   }
 

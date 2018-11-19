@@ -109,21 +109,24 @@ export default class Definitions {
     deviceDef: PreEntityDefinition,
     hostDeviceDefaultProps?: {[index: string]: any}
   ): EntityDefinition {
-    const className = deviceDef.device;
-    const manifest = this.main.entities.getManifest('devices', className);
-    const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps && hostDeviceDefaultProps[className];
+    const manifest = this.main.entities.getManifest('devices', deviceDef.className);
+    const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
+      && hostDeviceDefaultProps[deviceDef.className];
 
     return {
       id,
-      className,
+      className: deviceDef.className,
       props: _defaultsDeep(
-        _cloneDeep(_omit(deviceDef, 'device')),
+        _cloneDeep(_omit(deviceDef, 'className')),
         deviceHostDefaults,
         this.collectManifestPropsDefaults(manifest.props),
       ),
     };
   }
 
+  /**
+   * Generate definitions for all the used drivers event it doesn't have a definition.
+   */
   private generateDriverDef(id: string, driverDef?: PreEntityDefinition): EntityDefinition {
     // id and className is the same for drivers
     const className = id;
@@ -131,23 +134,22 @@ export default class Definitions {
 
     return {
       id,
-      className: id,
+      className: className,
       props: _defaultsDeep(
-        _cloneDeep(_omit(driverDef, 'driver')),
+        _cloneDeep(_omit(driverDef, 'className')),
         this.collectManifestPropsDefaults(manifest.props),
       ),
     };
   }
 
   private generateServiceDef(id: string, serviceDef: PreEntityDefinition): EntityDefinition {
-    const className = serviceDef.service;
-    const manifest = this.main.entities.getManifest('services', className);
+    const manifest = this.main.entities.getManifest('services', serviceDef.className);
 
     return {
       id,
-      className,
+      className: serviceDef.className,
       props: _defaultsDeep(
-        _cloneDeep(_omit(serviceDef, 'service')),
+        _cloneDeep(_omit(serviceDef, 'className')),
         this.collectManifestPropsDefaults(manifest.props),
       ),
     };

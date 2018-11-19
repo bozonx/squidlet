@@ -1,9 +1,9 @@
-import {ManifestsTypeName} from './Entities';
-
+const _omit = require('lodash/omit');
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as path from 'path';
 
+import {ManifestsTypeName} from './Entities';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
@@ -217,8 +217,8 @@ export default class MasterConfig {
 
     for (let id of Object.keys(preDefinitions)) {
       definitions[id] = {
-        ...preDefinitions[id],
-        className: preDefinitions[type],
+        ..._omit(preDefinitions[id], type),
+        className: preDefinitions[id][type],
       };
     }
 
