@@ -4,14 +4,11 @@ const _omit = require('lodash/omit');
 const _values = require('lodash/values');
 const _isEmpty = require('lodash/isEmpty');
 
+import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import PreHostConfig from './interfaces/PreHostConfig';
-import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
-import PreDriverDefinition from './interfaces/PreDriverDefinition';
-import PreServiceDefinition from './interfaces/PreServiceDefinition';
 import Main from './Main';
 import {SrcEntitiesSet, SrcEntitySet} from './interfaces/EntitySet';
-
 
 
 /**
@@ -109,7 +106,7 @@ export default class Definitions {
 
   private generateDeviceDef(
     id: string,
-    deviceDef: PreDeviceDefinition,
+    deviceDef: PreEntityDefinition,
     hostDeviceDefaultProps?: {[index: string]: any}
   ): EntityDefinition {
     const className = deviceDef.device;
@@ -127,7 +124,7 @@ export default class Definitions {
     };
   }
 
-  private generateDriverDef(id: string, driverDef?: PreDriverDefinition): EntityDefinition {
+  private generateDriverDef(id: string, driverDef?: PreEntityDefinition): EntityDefinition {
     // id and className is the same for drivers
     const className = id;
     const manifest = this.main.entities.getManifest('drivers', className);
@@ -142,12 +139,11 @@ export default class Definitions {
     };
   }
 
-  private generateServiceDef(id: string, serviceDef: PreServiceDefinition): EntityDefinition {
+  private generateServiceDef(id: string, serviceDef: PreEntityDefinition): EntityDefinition {
     const className = serviceDef.service;
     const manifest = this.main.entities.getManifest('services', className);
 
     return {
-      // TODO: id и className не нужны, только props
       id,
       className,
       props: _defaultsDeep(

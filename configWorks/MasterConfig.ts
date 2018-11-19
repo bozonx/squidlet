@@ -4,7 +4,6 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 import * as path from 'path';
 
-import PreDeviceDefinition from './interfaces/PreDeviceDefinition';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
@@ -163,7 +162,7 @@ export default class MasterConfig {
    * Make devices plain
    */
   private normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const plainDevices: {[index: string]: PreDeviceDefinition} = this.makeDevicesPlain(preHostConfig.devices);
+    const plainDevices: {[index: string]: any} = this.makeDevicesPlain(preHostConfig.devices);
 
     return {
       ...preHostConfig,
@@ -180,15 +179,15 @@ export default class MasterConfig {
   /**
    * Make devices plain
    */
-  private makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: PreDeviceDefinition} {
+  private makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: any} {
     if (!preDevices) return {};
 
-    const result: {[index: string]: PreDeviceDefinition} = {};
+    const result: {[index: string]: any} = {};
 
     const recursively = (root: string, preDevicesOrRoom: {[index: string]: any}) => {
       if (preDevicesOrRoom.device) {
         // it's device definition
-        result[root] = preDevicesOrRoom as PreDeviceDefinition;
+        result[root] = preDevicesOrRoom;
 
         return;
       }
@@ -208,15 +207,17 @@ export default class MasterConfig {
   }
 
   /**
-   * Convert definition line { device: MyClass, ... } to { id: id, className: MyClass, ... }
+   * Convert definition line { device: MyClass, ... } to { iclassName: MyClass, ... }
    */
-  private convertDefinitions(type: ManifestsTypeName,preDefinitions: {[index: string]: any}): {[index: string]: PreEntityDefinition} {
+  private convertDefinitions(
+    type: ManifestsTypeName,
+    preDefinitions: {[index: string]: any}
+  ): {[index: string]: PreEntityDefinition} {
     const definitions: {[index: string]: PreEntityDefinition} = {};
 
     for (let id of Object.keys(preDefinitions)) {
       definitions[id] = {
         ...preDefinitions[id],
-        id,
         className: preDefinitions[type],
       };
     }

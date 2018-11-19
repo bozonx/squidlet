@@ -1,6 +1,3 @@
-import PreDeviceDefinition from './PreDeviceDefinition';
-import PreDriverDefinition from './PreDriverDefinition';
-import PreServiceDefinition from './PreServiceDefinition';
 import Platforms from './Platforms';
 import LogLevel from '../../host/src/app/interfaces/LogLevel';
 
@@ -23,21 +20,21 @@ export default interface PreHostConfig {
   };
 
   // devices definitions by deviceId
-  devices?: {[index: string]: PreDeviceDefinition};
+  devices?: {[index: string]: any};
   // drivers definitions by driver name
-  drivers?: {[index: string]: PreDriverDefinition};
+  drivers?: {[index: string]: any};
   // services definitions by service id
-  services?: {[index: string]: PreServiceDefinition};
+  services?: {[index: string]: any};
 
   // override default props of devices by device class name
   devicesDefaults?: {[index: string]: any};
 
   // shortcut for automation service
-  automation?: PreServiceDefinition;
+  automation?: {[index: string]: any};
   // shortcut for mqtt service
-  mqtt?: PreServiceDefinition;
+  mqtt?: {[index: string]: any};
   // shortcut for logger service
-  logger?: PreServiceDefinition;
+  logger?: {[index: string]: any};
   // shortcut for webApi service
-  webApi?: PreServiceDefinition;
+  webApi?: {[index: string]: any};
 }
