@@ -1,13 +1,15 @@
 /*
  * Port of https://www.npmjs.com/package/pcf8574 module
  */
+
+const _defaultsDeep = require('lodash/defaultsDeep');
+const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
-import {I2cBus} from 'i2c-bus';
-import {Gpio} from 'onoff';
+
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {BinaryInputDriver, BinaryInputDriverProps} from '../Binary/BinaryInput.driver';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import DriverBase from '../../app/entities/DriverBase';
+import {BinaryInputDriver, BinaryInputDriverProps} from '../Binary/BinaryInput.driver';
 
 
 type PinNumber = number;
@@ -39,8 +41,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Object containing all GPIOs used by any PCF8574 instance. */
   private static _allInstancesUsedGpios: {[index: string]: any} = {};
 
-  /** The instance of the i2c-bus, which is used for the I2C communication. */
-  private _i2cBus:I2cBus;
+  // TODO: get from props
+  private bus: number = 1;
 
   /** The address of the PCF8574/PCF8574A IC. */
   private _address:number;
@@ -66,6 +68,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Instance of the used GPIO to detect interrupts, or null if no interrupt is used. */
   private _gpio:Gpio = null;
 
+  private get i2cMaster(): I2cMaster {
+    return this.depsInstances.i2cMaster as I2cMaster;
+  }
+
+
   /**
    * Constructor for a new PCF8574/PCF8574A instance.
    * If you use this IC with one or more input pins, you have to call ...
@@ -75,7 +82,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number}         address      The address of the PCF8574/PCF8574A IC.
    * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
    */
-  constructor(i2cBus:I2cBus, address:number, initialState:boolean|number){
+  constructor(address: number, initialState:boolean|number){
     //super();
 
     // bind the _handleInterrupt method strictly to this instance
@@ -104,9 +111,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  private get binaryInput(): I2cMaster {
-    return this.depsInstances.i2cMaster as I2cMaster;
-  }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
@@ -181,27 +185,43 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number}  newState (optional) The new state which will be set. If omitted the current state will be used.
    * @return {Promise}          Promise which gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private _setNewState(newState?:number): Promise<void>{
-    return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
+  private async _setNewState(newState?:number) {
+    if(typeof(newState) === 'number'){
+      this._currentState = newState;
+    }
 
-      if(typeof(newState) === 'number'){
-        this._currentState = newState;
-      }
+    // repect inverted with bitmask using XOR
+    let newIcState = this._currentState ^ this._inverted;
 
-      // repect inverted with bitmask using XOR
-      let newIcState = this._currentState ^ this._inverted;
+    // set all input pins to high
+    newIcState = newIcState | this._inputPinBitmask;
 
-      // set all input pins to high
-      newIcState = newIcState | this._inputPinBitmask;
+    const dataToSend: Uint8Array = new Uint8Array(1);
 
-      this._i2cBus.sendByte(this._address, newIcState, (err:Error)=>{
-        if(err){
-          reject(err);
-        }else{
-          resolve();
-        }
-      });
-    });
+    dataToSend[0] = newIcState;
+
+    await this.i2cMaster.writeTo(this.bus, this._address, dataToSend);
+
+    // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
+    //
+    //   if(typeof(newState) === 'number'){
+    //     this._currentState = newState;
+    //   }
+    //
+    //   // repect inverted with bitmask using XOR
+    //   let newIcState = this._currentState ^ this._inverted;
+    //
+    //   // set all input pins to high
+    //   newIcState = newIcState | this._inputPinBitmask;
+    //
+    //   this._i2cBus.sendByte(this._address, newIcState, (err:Error)=>{
+    //     if(err){
+    //       reject(err);
+    //     }else{
+    //       resolve();
+    //     }
+    //   });
+    // });
   }
 
   /**
@@ -223,43 +243,66 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param {PCF8574.PinNumber} noEmit (optional) Pin number of a pin which should not trigger an event. (used for getting the current state while defining a pin as input)
    * @return {Promise}
    */
-  private _poll(noEmit?: PinNumber):Promise<void>{
+  private async _poll(noEmit?: PinNumber) {
     if(this._currentlyPolling){
       return Promise.reject('An other poll is in progress');
     }
 
     this._currentlyPolling = true;
 
-    return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
-      // read from the IC
-      this._i2cBus.receiveByte(this._address,(err:Error, readState:number)=>{
-        this._currentlyPolling = false;
-        if(err){
-          reject(err);
-          return;
+    // read a byte
+    const result: Uint8Array = await this.i2cMaster.readFrom(this.bus, this._address, 1);
+
+    this._currentlyPolling = false;
+
+    // repect inverted with bitmask using XOR
+    const readState = result[0] ^ this._inverted;
+
+    // check each input for changes
+    for(let pin = 0; pin < 8; pin++){
+      if(this._directions[pin] !== PCF8574Driver.DIR_IN){
+        continue; // isn't an input pin
+      }
+      if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
+        // pin changed
+        let value: boolean = ((readState>>pin) % 2 !== 0);
+        this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
+        if(noEmit !== pin){
+          this.events.emit('input', <InputData>{pin: pin, value: value});
         }
+      }
+    }
 
-        // repect inverted with bitmask using XOR
-        readState = readState ^ this._inverted;
-
-        // check each input for changes
-        for(let pin = 0; pin < 8; pin++){
-          if(this._directions[pin] !== PCF8574Driver.DIR_IN){
-            continue; // isn't an input pin
-          }
-          if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
-            // pin changed
-            let value: boolean = ((readState>>pin) % 2 !== 0);
-            this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
-            if(noEmit !== pin){
-              this.events.emit('input', <InputData>{pin: pin, value: value});
-            }
-          }
-        }
-
-        resolve();
-      });
-    });
+    // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
+    //   // read from the IC
+    //   this._i2cBus.receiveByte(this._address, (err:Error, readState:number)=>{
+    //     this._currentlyPolling = false;
+    //     if(err){
+    //       reject(err);
+    //       return;
+    //     }
+    //
+    //     // repect inverted with bitmask using XOR
+    //     readState = readState ^ this._inverted;
+    //
+    //     // check each input for changes
+    //     for(let pin = 0; pin < 8; pin++){
+    //       if(this._directions[pin] !== PCF8574Driver.DIR_IN){
+    //         continue; // isn't an input pin
+    //       }
+    //       if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
+    //         // pin changed
+    //         let value: boolean = ((readState>>pin) % 2 !== 0);
+    //         this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
+    //         if(noEmit !== pin){
+    //           this.events.emit('input', <InputData>{pin: pin, value: value});
+    //         }
+    //       }
+    //     }
+    //
+    //     resolve();
+    //   });
+    // });
   }
 
   /**
@@ -341,7 +384,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
   /**
    * Internal function to set the state of a pin, regardless its direction.
-   * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
+   * @param  {PinNumber} pin   The pin number. (0 to 7)
    * @param  {boolean}           value The new value.
    * @return {Promise}
    */
@@ -373,7 +416,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Returns the current value of a pin.
    * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
    * To get the current value call doPoll() first, if you're not using interrupts.
-   * @param  {PCF8574.PinNumber} pin The pin number. (0 to 7)
+   * @param  {PinNumber} pin The pin number. (0 to 7)
    * @return {boolean}               The current value.
    */
   public getPinValue(pin: PinNumber):boolean{
@@ -383,4 +426,22 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return ((this._currentState>>pin) % 2 !== 0);
   }
 
+}
+
+
+export default class Factory extends DriverBase<BinaryInputDriverProps> {
+
+  // TODO: всегда новый инстанс чтоли??? или по pin ???
+
+  async getInstance(instanceProps?: BinaryInputDriverProps): Promise<BinaryInputDriver> {
+    const definition = {
+      ...this.definition,
+      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
+    };
+
+    const driver = new BinaryInputDriver(definition, this.env);
+    await driver.init();
+
+    return driver;
+  }
 }
