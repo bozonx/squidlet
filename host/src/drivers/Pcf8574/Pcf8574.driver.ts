@@ -75,7 +75,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number}         address      The address of the PCF8574/PCF8574A IC.
    * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
    */
-  constructor(){
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
+
     if(initialState === true){
       initialState = 255;
     }else if(initialState === false){
@@ -86,12 +89,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // save the inital state as current sate and write it to the IC
     this._currentState = initialState;
     this._i2cBus.sendByteSync( this.props.address, this._currentState);
-  }
-
-
-
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
   }
 
   // /**
