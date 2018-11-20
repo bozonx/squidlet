@@ -235,9 +235,10 @@ export default class MasterConfig {
 
     // collect services
     for (let serviceId of Object.keys(servicesShortcut)) {
-      if (!preHostConfig[serviceId]) continue;
+      if (typeof preHostConfig[serviceId] === 'undefined') continue;
 
-      const definition: PreEntityDefinition = preHostConfig[serviceId];
+      // if it is empty then yaml parser will return null
+      const definition: PreEntityDefinition = preHostConfig[serviceId] || {};
 
       services[serviceId] = {
         ...definition,
