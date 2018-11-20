@@ -19,7 +19,9 @@ interface InputData {
 }
 
 export interface ExpanderDriverProps {
-
+  bus: number;
+  address: number;
+  initialState: boolean | number;
 }
 
 
@@ -41,12 +43,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Object containing all GPIOs used by any PCF8574 instance. */
   private static _allInstancesUsedGpios: {[index: string]: any} = {};
 
-  // TODO: get from props
-  private bus: number = 1;
-
-  /** The address of the PCF8574/PCF8574A IC. */
-  private _address:number;
-
   /** Direction of each pin. By default all pin directions are undefined. */
   private _directions:Array<number> = [
     PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF,
@@ -57,16 +53,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private _inputPinBitmask:number = 0;
 
   /** Bitmask for inverted pins. */
-  private _inverted:number;
+  private _inverted:number = 0;
 
   /** Bitmask representing the current state of the pins. */
   private _currentState:number;
 
   /** Flag if we are currently polling changes from the PCF8574/PCF8574A IC. */
   private _currentlyPolling:boolean = false;
-
-  /** Instance of the used GPIO to detect interrupts, or null if no interrupt is used. */
-  private _gpio:Gpio = null;
 
   private get i2cMaster(): I2cMaster {
     return this.depsInstances.i2cMaster as I2cMaster;
@@ -82,22 +75,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number}         address      The address of the PCF8574/PCF8574A IC.
    * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
    */
-  constructor(address: number, initialState:boolean|number){
-    //super();
-
-    // bind the _handleInterrupt method strictly to this instance
-    this._handleInterrupt = this._handleInterrupt.bind(this);
-
-    this._i2cBus = i2cBus;
-
-    if(address < 0 || address > 255){
-      throw new Error('Address out of range');
-    }
-    this._address = address;
-
-    // nothing inverted by default
-    this._inverted = 0;
-
+  constructor(){
     if(initialState === true){
       initialState = 255;
     }else if(initialState === false){
@@ -107,7 +85,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     }
     // save the inital state as current sate and write it to the IC
     this._currentState = initialState;
-    this._i2cBus.sendByteSync(this._address, this._currentState);
+    this._i2cBus.sendByteSync( this.props.address, this._currentState);
   }
 
 
@@ -116,52 +94,52 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
   }
 
-  /**
-   * Enable the interrupt detection on the specified GPIO pin.
-   * You can use one GPIO pin for multiple instances of the PCF8574 class.
-   * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
-   */
-  public enableInterrupt(gpioPin:number):void{
-    if(PCF8574Driver._allInstancesUsedGpios[gpioPin] != null){
-      // use already initalized GPIO
-      this._gpio = PCF8574Driver._allInstancesUsedGpios[gpioPin];
-      this._gpio['pcf8574UseCount']++;
-    }else{
-      // init the GPIO as input with falling edge,
-      // because the PCF8574/PCF8574A will lower the interrupt line on changes
-      this._gpio = new Gpio(gpioPin, 'in', 'falling');
-      this._gpio['pcf8574UseCount'] = 1;
-    }
-    this._gpio.watch(this._handleInterrupt);
-  }
+  // /**
+  //  * Enable the interrupt detection on the specified GPIO pin.
+  //  * You can use one GPIO pin for multiple instances of the PCF8574 class.
+  //  * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
+  //  */
+  // public enableInterrupt(gpioPin:number):void{
+  //   if(PCF8574Driver._allInstancesUsedGpios[gpioPin] != null){
+  //     // use already initalized GPIO
+  //     this._gpio = PCF8574Driver._allInstancesUsedGpios[gpioPin];
+  //     this._gpio['pcf8574UseCount']++;
+  //   }else{
+  //     // init the GPIO as input with falling edge,
+  //     // because the PCF8574/PCF8574A will lower the interrupt line on changes
+  //     this._gpio = new Gpio(gpioPin, 'in', 'falling');
+  //     this._gpio['pcf8574UseCount'] = 1;
+  //   }
+  //   this._gpio.watch(this._handleInterrupt);
+  // }
 
-  /**
-   * Internal function to handle a GPIO interrupt.
-   */
-  private _handleInterrupt():void{
-    // poll the current state and ignore any rejected promise
-    this._poll().catch(()=>{ });
-  }
+  // /**
+  //  * Internal function to handle a GPIO interrupt.
+  //  */
+  // private _handleInterrupt():void{
+  //   // poll the current state and ignore any rejected promise
+  //   this._poll().catch(()=>{ });
+  // }
 
-  /**
-   * Disable the interrupt detection.
-   * This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
-   */
-  public disableInterrupt():void{
-    // release the used GPIO
-    if(this._gpio !== null){
-      // remove the interrupt handling
-      this._gpio.unwatch(this._handleInterrupt);
-
-      // decrease the use count of the GPIO and unexport it if not used anymore
-      this._gpio['pcf8574UseCount']--;
-      if(this._gpio['pcf8574UseCount'] === 0){
-        this._gpio.unexport();
-      }
-
-      this._gpio = null;
-    }
-  }
+  // /**
+  //  * Disable the interrupt detection.
+  //  * This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
+  //  */
+  // public disableInterrupt():void{
+  //   // release the used GPIO
+  //   if(this._gpio !== null){
+  //     // remove the interrupt handling
+  //     this._gpio.unwatch(this._handleInterrupt);
+  //
+  //     // decrease the use count of the GPIO and unexport it if not used anymore
+  //     this._gpio['pcf8574UseCount']--;
+  //     if(this._gpio['pcf8574UseCount'] === 0){
+  //       this._gpio.unexport();
+  //     }
+  //
+  //     this._gpio = null;
+  //   }
+  // }
 
   /**
    * Helper function to set/clear one bit in a bitmask.
@@ -200,7 +178,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     dataToSend[0] = newIcState;
 
-    await this.i2cMaster.writeTo(this.bus, this._address, dataToSend);
+    await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
 
     // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
     //
@@ -214,7 +192,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //   // set all input pins to high
     //   newIcState = newIcState | this._inputPinBitmask;
     //
-    //   this._i2cBus.sendByte(this._address, newIcState, (err:Error)=>{
+    //   this._i2cBus.sendByte( this.props.address, newIcState, (err:Error)=>{
     //     if(err){
     //       reject(err);
     //     }else{
@@ -243,7 +221,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param {PCF8574.PinNumber} noEmit (optional) Pin number of a pin which should not trigger an event. (used for getting the current state while defining a pin as input)
    * @return {Promise}
    */
-  private async _poll(noEmit?: PinNumber) {
+  private async _poll(noEmit?: PinNumber): Promise<void> {
     if(this._currentlyPolling){
       return Promise.reject('An other poll is in progress');
     }
@@ -251,7 +229,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this._currentlyPolling = true;
 
     // read a byte
-    const result: Uint8Array = await this.i2cMaster.readFrom(this.bus, this._address, 1);
+    const result: Uint8Array = await this.i2cMaster.readFrom(this.props.bus, this.props.address, 1);
 
     this._currentlyPolling = false;
 
@@ -275,7 +253,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
     //   // read from the IC
-    //   this._i2cBus.receiveByte(this._address, (err:Error, readState:number)=>{
+    //   this._i2cBus.receiveByte( this.props.address, (err:Error, readState:number)=>{
     //     this._currentlyPolling = false;
     //     if(err){
     //       reject(err);
@@ -426,6 +404,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return ((this._currentState>>pin) % 2 !== 0);
   }
 
+
+  protected validateProps = (props: ExpanderDriverProps): string | undefined => {
+
+    // if(address < 0 || address > 255){
+    //   throw new Error('Address out of range');
+    // }
+
+    return;
+  }
 }
 
 
