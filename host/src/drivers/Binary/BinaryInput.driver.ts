@@ -1,5 +1,3 @@
-import {isDigitalInverted} from '../../helpers/helpers';
-
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
@@ -9,6 +7,7 @@ import {Edge} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import {isDigitalInverted} from '../../helpers/helpers';
 
 
 const eventName = 'change';

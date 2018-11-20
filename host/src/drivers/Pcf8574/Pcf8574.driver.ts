@@ -1,15 +1,23 @@
 /*
  * Port of https://www.npmjs.com/package/pcf8574 module
  */
-import {EventEmitter} from 'events';
-import * as Promise from 'bluebird';
+import * as EventEmitter from 'eventemitter3';
 import {I2cBus} from 'i2c-bus';
 import {Gpio} from 'onoff';
+
+
+type PinNumber = number;
+interface InputData {
+  pin: number;
+  value: boolean;
+}
+
 
 /**
  * Class for handling a PCF8574/PCF8574A IC.
  */
-export class PCF8574 extends EventEmitter {
+export class PCF8574 {
+  private readonly events: EventEmitter = new EventEmitter();
 
   /** Constant for undefined pin direction (unused pin). */
   public static readonly DIR_UNDEF = -1;
@@ -21,7 +29,7 @@ export class PCF8574 extends EventEmitter {
   public static readonly DIR_OUT = 0;
 
   /** Object containing all GPIOs used by any PCF8574 instance. */
-  private static _allInstancesUsedGpios = {};
+  private static _allInstancesUsedGpios: {[index: string]: any} = {};
 
   /** The instance of the i2c-bus, which is used for the I2C communication. */
   private _i2cBus:I2cBus;
@@ -60,7 +68,7 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
    */
   constructor(i2cBus:I2cBus, address:number, initialState:boolean|number){
-    super();
+    //super();
 
     // bind the _handleInterrupt method strictly to this instance
     this._handleInterrupt = this._handleInterrupt.bind(this);
@@ -141,7 +149,7 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
    * @return {number}                    The new (modified) bitmask.
    */
-  private _setStatePin(current:number, pin:PCF8574.PinNumber, value:boolean):number{
+  private _setStatePin(current:number, pin: PinNumber, value:boolean):number{
     if(value){
       // set the bit
       return current | 1 << pin;
@@ -156,7 +164,7 @@ export class PCF8574 extends EventEmitter {
    * @param  {number}  newState (optional) The new state which will be set. If omitted the current state will be used.
    * @return {Promise}          Promise which gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private _setNewState(newState?:number):Promise<{}>{
+  private _setNewState(newState?:number): Promise<void>{
     return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
 
       if(typeof(newState) === 'number'){
@@ -186,7 +194,7 @@ export class PCF8574 extends EventEmitter {
    * If you poll again before the last poll was completed, the promise will be rejected with an error.
    * @return {Promise}
    */
-  public doPoll():Promise<{}>{
+  public doPoll():Promise<void>{
     return this._poll();
   }
 
@@ -198,7 +206,7 @@ export class PCF8574 extends EventEmitter {
    * @param {PCF8574.PinNumber} noEmit (optional) Pin number of a pin which should not trigger an event. (used for getting the current state while defining a pin as input)
    * @return {Promise}
    */
-  private _poll(noEmit?:PCF8574.PinNumber):Promise<{}>{
+  private _poll(noEmit?: PinNumber):Promise<void>{
     if(this._currentlyPolling){
       return Promise.reject('An other poll is in progress');
     }
@@ -224,10 +232,10 @@ export class PCF8574 extends EventEmitter {
           }
           if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
             // pin changed
-            let value:boolean = ((readState>>pin) % 2 !== 0);
-            this._currentState = this._setStatePin(this._currentState, <PCF8574.PinNumber>pin, value);
+            let value: boolean = ((readState>>pin) % 2 !== 0);
+            this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
             if(noEmit !== pin){
-              this.emit('input', <PCF8574.InputData>{pin: pin, value: value});
+              this.events.emit('input', <InputData>{pin: pin, value: value});
             }
           }
         }
@@ -245,9 +253,9 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediatly.
    * @return {Promise}
    */
-  public outputPin(pin:PCF8574.PinNumber, inverted:boolean, initialValue?:boolean):Promise<{}>{
+  public async outputPin(pin: PinNumber, inverted:boolean, initialValue?:boolean) {
     if(pin < 0 || pin > 7){
-      return Promise.reject(new Error('Pin out of range'));
+      throw new Error('Pin out of range');
     }
 
     this._inverted = this._setStatePin(this._inverted, pin, inverted);
@@ -258,7 +266,7 @@ export class PCF8574 extends EventEmitter {
 
     // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
     if(typeof(initialValue) === 'undefined'){
-      return Promise.resolve(null);
+      return;
     }else{
       return this._setPinInternal(pin, initialValue);
     }
@@ -271,7 +279,7 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
    * @return {Promise}
    */
-  public inputPin(pin:PCF8574.PinNumber, inverted:boolean):Promise<{}>{
+  public inputPin(pin: PinNumber, inverted:boolean): Promise<void> {
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -285,7 +293,7 @@ export class PCF8574 extends EventEmitter {
     // call _setNewState() to activate the high level on the input pin ...
     return this._setNewState()
     // ... and then poll all current inputs with noEmit on this pin to suspress the event
-      .then(()=>{
+      .then(() => {
         return this._poll(pin);
       });
   }
@@ -297,7 +305,7 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean}           value The new value for this pin.
    * @return {Promise}
    */
-  public setPin(pin:PCF8574.PinNumber, value?:boolean):Promise<{}>{
+  public setPin(pin: PinNumber, value?:boolean): Promise<void>{
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -308,7 +316,7 @@ export class PCF8574 extends EventEmitter {
 
     if(typeof(value) == 'undefined'){
       // set value dependend on current state to toggle
-      value = !((this._currentState>>pin) % 2 !== 0)
+      value = !((this._currentState>>pin) % 2 !== 0);
     }
 
     return this._setPinInternal(pin, value);
@@ -320,7 +328,7 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean}           value The new value.
    * @return {Promise}
    */
-  private _setPinInternal(pin:PCF8574.PinNumber, value:boolean):Promise<{}>{
+  private _setPinInternal(pin: PinNumber, value:boolean): Promise<void>{
     let newState:number = this._setStatePin(this._currentState, pin, value);
 
     return this._setNewState(newState);
@@ -331,14 +339,14 @@ export class PCF8574 extends EventEmitter {
    * @param  {boolean} value The new value for all output pins.
    * @return {Promise}
    */
-  private setAllPins(value:boolean):Promise<{}>{
+  private setAllPins(value:boolean): Promise<void>{
     let newState:number = this._currentState;
 
     for(let pin = 0; pin < 8; pin++){
       if(this._directions[pin] !== PCF8574.DIR_OUT){
         continue; // isn't an output pin
       }
-      newState = this._setStatePin(newState, <PCF8574.PinNumber>pin, value);
+      newState = this._setStatePin(newState, <PinNumber>pin, value);
     }
 
     return this._setNewState(newState);
@@ -351,10 +359,11 @@ export class PCF8574 extends EventEmitter {
    * @param  {PCF8574.PinNumber} pin The pin number. (0 to 7)
    * @return {boolean}               The current value.
    */
-  public getPinValue(pin:PCF8574.PinNumber):boolean{
+  public getPinValue(pin: PinNumber):boolean{
     if(pin < 0 || pin > 7){
       return false;
     }
-    return ((this._currentState>>pin) % 2 !== 0)
+    return ((this._currentState>>pin) % 2 !== 0);
   }
+
 }
