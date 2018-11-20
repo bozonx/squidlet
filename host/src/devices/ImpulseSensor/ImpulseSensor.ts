@@ -5,19 +5,19 @@ const _omit = require('lodash/omit');
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
-import {convertToLevel} from '../../helpers/helpers';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {invertIfNeed} from '../../drivers/Digital/digitalHelpers';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
-  actionDebounce: number;
   // in this time driver doesn't receive any data
   blockTime: number;
+  impulseLength: number;
 }
 
 
-export default class BinaryToggle extends DeviceBase<Props> {
+export default class ImpulseSensor extends DeviceBase<Props> {
+  private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
 
@@ -28,7 +28,7 @@ export default class BinaryToggle extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(_omit(this.props, 'actionDebounce', 'blockTime'));
+      .getInstance(_omit(this.props, 'impulseLength', 'blockTime'));
   }
 
   protected didInit = async () => {
@@ -40,51 +40,36 @@ export default class BinaryToggle extends DeviceBase<Props> {
     return Number(value);
   }
 
+  protected validateProps = (props: Props): string | undefined => {
+    // TODO: !!!!
+    return;
+  }
+
   protected initialStatus = async (): Promise<Data> => {
     return { [DEFAULT_STATUS]: invertIfNeed(false, this.props.invert) };
   }
 
 
-  protected actions = {
-    turn: async (onOrOff: any): Promise<boolean> => {
-      if (this.blockTimeInProgress) this.getStatus();
-
-      this.blockTimeInProgress = true;
-
-      const level: boolean = convertToLevel(onOrOff);
-
-      await this.setStatus(level);
-
-      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
-
-      return level;
-    },
-
-    toggle: async (): Promise<boolean> => {
-      return await this.doToggle();
-    }
-  };
-
-
   private onInputChange = async (level: boolean) => {
-    // listen only for 1
+    if (this.impulseInProgress || this.blockTimeInProgress) return;
+    // receive only level 1
     if (!level) return;
 
-    await this.doToggle();
-  }
+    this.impulseInProgress = true;
 
-  private async doToggle(): Promise<boolean> {
-    if (this.blockTimeInProgress) return this.getStatus();
+    // set impulse with level 1
+    await this.setStatus(true);
 
-    this.blockTimeInProgress = true;
+    // waiting for impulse end
+    setTimeout(async () => {
+      this.impulseInProgress = false;
+      // start dead time - ignore all the signals
+      this.blockTimeInProgress = true;
 
-    const level: boolean = !await this.getStatus();
+      await this.setStatus(false);
 
-    await this.setStatus(level);
-
-    setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
-
-    return level;
+      setTimeout(() => this.blockTimeInProgress = false, this.props.blockTime);
+    }, this.props.impulseLength);
   }
 
 }

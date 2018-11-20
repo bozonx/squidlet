@@ -1,5 +1,5 @@
 import BinarySensor from '../BinarySensor/BinarySensor';
 
 
-export default class BinaryClick extends BinarySensor {
+export default class ClickSensor extends BinarySensor {
 }
