@@ -11,7 +11,7 @@ const networkConnectionDriversRoot = path.resolve(__dirname, hostSrcRoot, 'netwo
 export default async function systemPlugin (env: PluginEnv) {
   // devices
   await env.addDevice(path.join(devicesRoot, 'BinaryClick/manifest.yaml'));
-  await env.addDevice(path.join(devicesRoot, 'BinaryImpulse/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'ImpulseSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'BinarySensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'BinaryToggle/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));

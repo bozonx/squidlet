@@ -1,7 +1,7 @@
-name: BinaryImpulse
+name: ImpulseSensor
 type: binary-impulse
 
-main: ./BinaryImpulse.ts
+main: ./ImpulseSensor.ts
 props: ./props.yaml
 drivers:
   - BinaryInput.driver
