@@ -4,6 +4,10 @@
 import * as EventEmitter from 'eventemitter3';
 import {I2cBus} from 'i2c-bus';
 import {Gpio} from 'onoff';
+import {GetDriverDep} from '../../app/entities/EntityBase';
+import {BinaryInputDriver, BinaryInputDriverProps} from '../Binary/BinaryInput.driver';
+import I2cMaster from '../../app/interfaces/dev/I2cMaster';
+import DriverBase from '../../app/entities/DriverBase';
 
 
 type PinNumber = number;
@@ -12,11 +16,15 @@ interface InputData {
   value: boolean;
 }
 
+export interface ExpanderDriverProps {
+
+}
+
 
 /**
  * Class for handling a PCF8574/PCF8574A IC.
  */
-export class PCF8574 {
+export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
 
   /** Constant for undefined pin direction (unused pin). */
@@ -39,8 +47,8 @@ export class PCF8574 {
 
   /** Direction of each pin. By default all pin directions are undefined. */
   private _directions:Array<number> = [
-    PCF8574.DIR_UNDEF, PCF8574.DIR_UNDEF, PCF8574.DIR_UNDEF, PCF8574.DIR_UNDEF,
-    PCF8574.DIR_UNDEF, PCF8574.DIR_UNDEF, PCF8574.DIR_UNDEF, PCF8574.DIR_UNDEF
+    PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF,
+    PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF
   ];
 
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
@@ -95,15 +103,24 @@ export class PCF8574 {
     this._i2cBus.sendByteSync(this._address, this._currentState);
   }
 
+
+  private get binaryInput(): I2cMaster {
+    return this.depsInstances.i2cMaster as I2cMaster;
+  }
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
+  }
+
   /**
    * Enable the interrupt detection on the specified GPIO pin.
    * You can use one GPIO pin for multiple instances of the PCF8574 class.
    * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
    */
   public enableInterrupt(gpioPin:number):void{
-    if(PCF8574._allInstancesUsedGpios[gpioPin] != null){
+    if(PCF8574Driver._allInstancesUsedGpios[gpioPin] != null){
       // use already initalized GPIO
-      this._gpio = PCF8574._allInstancesUsedGpios[gpioPin];
+      this._gpio = PCF8574Driver._allInstancesUsedGpios[gpioPin];
       this._gpio['pcf8574UseCount']++;
     }else{
       // init the GPIO as input with falling edge,
@@ -227,7 +244,7 @@ export class PCF8574 {
 
         // check each input for changes
         for(let pin = 0; pin < 8; pin++){
-          if(this._directions[pin] !== PCF8574.DIR_IN){
+          if(this._directions[pin] !== PCF8574Driver.DIR_IN){
             continue; // isn't an input pin
           }
           if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
@@ -262,7 +279,7 @@ export class PCF8574 {
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
 
-    this._directions[pin] = PCF8574.DIR_OUT;
+    this._directions[pin] = PCF8574Driver.DIR_OUT;
 
     // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
     if(typeof(initialValue) === 'undefined'){
@@ -288,7 +305,7 @@ export class PCF8574 {
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
 
-    this._directions[pin] = PCF8574.DIR_IN;
+    this._directions[pin] = PCF8574Driver.DIR_IN;
 
     // call _setNewState() to activate the high level on the input pin ...
     return this._setNewState()
@@ -310,7 +327,7 @@ export class PCF8574 {
       return Promise.reject(new Error('Pin out of range'));
     }
 
-    if(this._directions[pin] !== PCF8574.DIR_OUT){
+    if(this._directions[pin] !== PCF8574Driver.DIR_OUT){
       return Promise.reject(new Error('Pin is not defined as output'));
     }
 
@@ -343,7 +360,7 @@ export class PCF8574 {
     let newState:number = this._currentState;
 
     for(let pin = 0; pin < 8; pin++){
-      if(this._directions[pin] !== PCF8574.DIR_OUT){
+      if(this._directions[pin] !== PCF8574Driver.DIR_OUT){
         continue; // isn't an output pin
       }
       newState = this._setStatePin(newState, <PinNumber>pin, value);
