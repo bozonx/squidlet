@@ -1,5 +1,5 @@
 name: ImpulseSensor
-type: binary-impulse
+type: impulse-sensor
 
 main: ./ImpulseSensor.ts
 props: ./props.yaml

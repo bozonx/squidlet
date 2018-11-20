@@ -13,7 +13,7 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'BinaryClick/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'ImpulseSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'BinarySensor/manifest.yaml'));
-  await env.addDevice(path.join(devicesRoot, 'BinaryToggle/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'Toggle/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Switch/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'SwitchSensor/manifest.yaml'));

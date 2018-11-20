@@ -1,7 +1,7 @@
-name: BinaryToggle
-type: binary-toggle
+name: Toggle
+type: toggle
 
-main: ./BinaryToggle.ts
+main: ./Toggle.ts
 props: ./props.yaml
 drivers:
   - BinaryInput.driver
