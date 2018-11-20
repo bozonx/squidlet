@@ -1,0 +1,19 @@
+name: Pcf8574.driver
+main: Pcf8574.ts
+drivers:
+  - Digital.driver
+props:
+#  edge:
+#    type: rising | falling | both
+#    default: both
+#  debounce:
+#    type: number
+#    # it's default for debounce, not for throttle
+#    default: 0
+#  # timeout after received signal. At this time it doesn't receive any signals.
+#  blockTime:
+#    type: number
+#    default: 0
+#  invertOnPullup:
+#    type: boolean
+#    default: true
