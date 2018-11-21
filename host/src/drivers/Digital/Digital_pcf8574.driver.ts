@@ -1,7 +1,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import DriverBase from '../../app/entities/DriverBase';
-import Digital, {PinMode} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 
 
 interface DigitalPcf8574DriverProps extends EntityProps {
@@ -11,6 +11,10 @@ interface DigitalPcf8574DriverProps extends EntityProps {
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
+  async setup(pin: number, pinMode: PinMode): Promise<void> {
+
+  };
+
   getPinMode(pin: number): PinMode | undefined {
     // TODO: !!!
   }
@@ -22,7 +26,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   /**
    * Set level to output pin
    */
-  async write(pin: number, level: boolean): Promise<void> {
+  async write(pin: number, value: boolean): Promise<void> {
     // TODO: если пин сконфигурирован на input - ругаться
     // TODO: !!!
   }
@@ -30,14 +34,18 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   /**
    * Listen to interruption of input pin
    */
-  addListener(handler: GpioDigitalDriverHandler): void {
+  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
     // TODO: если пин сконфигурирован на output - ругаться
 
     // TODO: !!!
   }
 
-  removeListener(handler: GpioDigitalDriverHandler): void {
+  clearWatch(id: number): void {
     // TODO: !!!
+  }
+
+  clearAllWatches(): void {
+
   }
 
 }

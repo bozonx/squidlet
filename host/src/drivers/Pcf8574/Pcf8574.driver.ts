@@ -12,7 +12,9 @@ import DriverBase from '../../app/entities/DriverBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../Binary/BinaryInput.driver';
 
 
+type Handler = (data: InputData) => void;
 type PinNumber = number;
+
 interface InputData {
   pin: number;
   value: boolean;
@@ -89,7 +91,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
   }
 
+  addEventListener(eventName: string, cb: Handler) {
+    this.events.addListener(eventName, cb);
+  }
 
+  removeEventListener(eventName: string, cb: Handler) {
+    this.events.removeListener(eventName, cb);
+  }
 
   // /**
   //  * Enable the interrupt detection on the specified GPIO pin.
@@ -175,7 +183,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     dataToSend[0] = newIcState;
 
-    await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
+    await this.i2cMaster.writeTo(this.props.bus, this.props.address, dataToSend);
 
     // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
     //
