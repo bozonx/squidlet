@@ -56,7 +56,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private _inverted:number = 0;
 
   /** Bitmask representing the current state of the pins. */
-  private _currentState:number;
+  private _currentState: number = 0;
 
   /** Flag if we are currently polling changes from the PCF8574/PCF8574A IC. */
   private _currentlyPolling:boolean = false;
@@ -79,17 +79,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
 
-    if(initialState === true){
-      initialState = 255;
-    }else if(initialState === false){
-      initialState = 0;
-    }else if(typeof(initialState) !== 'number' || initialState < 0 || initialState > 255){
-      throw new Error('InitalState bitmask out of range');
-    }
     // save the inital state as current sate and write it to the IC
-    this._currentState = initialState;
-    this._i2cBus.sendByteSync( this.props.address, this._currentState);
+    this._currentState = this.resolveInitialState();
+
+    const dataToSend: Uint8Array = new Uint8Array(1);
+
+    dataToSend[0] = this._currentState;
+
+    await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
   }
+
+
 
   // /**
   //  * Enable the interrupt detection on the specified GPIO pin.
@@ -410,6 +410,26 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     return;
   }
+
+
+  private resolveInitialState(): number {
+    if (this.props.initialState === true) {
+      return 255;
+    }
+    else if (this.props.initialState === false) {
+      return 0;
+    }
+    else if (
+      typeof(this.props.initialState) !== 'number'
+      || this.props.initialState < 0
+      || this.props.initialState > 255
+    ) {
+      throw new Error('InitalState bitmask out of range');
+    }
+
+    return this.props.initialState;
+  }
+
 }
 
 
