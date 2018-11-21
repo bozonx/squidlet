@@ -27,28 +27,27 @@ export interface ExpanderDriverProps {
 }
 
 
+/** Constant for undefined pin direction (unused pin). */
+export const DIR_UNDEF = -1;
+/** Constant for input pin direction. */
+export const DIR_IN = 1;
+/** Constant for output pin direction. */
+export const DIR_OUT = 0;
+
+
 /**
  * Class for handling a PCF8574/PCF8574A IC.
  */
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
 
-  /** Constant for undefined pin direction (unused pin). */
-  public static readonly DIR_UNDEF = -1;
-
-  /** Constant for input pin direction. */
-  public static readonly DIR_IN = 1;
-
-  /** Constant for output pin direction. */
-  public static readonly DIR_OUT = 0;
-
   /** Object containing all GPIOs used by any PCF8574 instance. */
-  private static _allInstancesUsedGpios: {[index: string]: any} = {};
+  //private static _allInstancesUsedGpios: {[index: string]: any} = {};
 
   /** Direction of each pin. By default all pin directions are undefined. */
   private _directions:Array<number> = [
-    PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF,
-    PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF, PCF8574Driver.DIR_UNDEF
+    DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
+    DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
   ];
 
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
@@ -243,7 +242,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // check each input for changes
     for(let pin = 0; pin < 8; pin++){
-      if(this._directions[pin] !== PCF8574Driver.DIR_IN){
+      if(this._directions[pin] !== DIR_IN){
         continue; // isn't an input pin
       }
       if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
@@ -305,7 +304,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
 
-    this._directions[pin] = PCF8574Driver.DIR_OUT;
+    this._directions[pin] = DIR_OUT;
 
     // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
     if(typeof(initialValue) === 'undefined'){
@@ -331,7 +330,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
 
-    this._directions[pin] = PCF8574Driver.DIR_IN;
+    this._directions[pin] = DIR_IN;
 
     // call _setNewState() to activate the high level on the input pin ...
     return this._setNewState()
@@ -353,7 +352,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return Promise.reject(new Error('Pin out of range'));
     }
 
-    if(this._directions[pin] !== PCF8574Driver.DIR_OUT){
+    if(this._directions[pin] !== DIR_OUT){
       return Promise.reject(new Error('Pin is not defined as output'));
     }
 
@@ -386,7 +385,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     let newState:number = this._currentState;
 
     for(let pin = 0; pin < 8; pin++){
-      if(this._directions[pin] !== PCF8574Driver.DIR_OUT){
+      if(this._directions[pin] !== DIR_OUT){
         continue; // isn't an output pin
       }
       newState = this._setStatePin(newState, <PinNumber>pin, value);
