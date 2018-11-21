@@ -2,27 +2,25 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {EntityProps} from '../../app/interfaces/EntityDefinition';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import {DigitalInputDriver} from './DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import {PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 
 
 interface DigitalPcf8574DriverProps extends EntityProps {
   bus: number;
   address: number;
+  //outputInitial: boolean[];
 }
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
-  private get digitalInput(): DigitalInputDriver {
-    return this.depsInstances.digitalInput as DigitalInputDriver;
+  private get expander(): PCF8574Driver {
+    return this.depsInstances.expander as PCF8574Driver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
-      .getInstance({
-        ..._omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
-        invert: this.isInverted(),
-      });
+    this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
+      .getInstance();
   }
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
