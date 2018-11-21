@@ -443,7 +443,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 export default class Factory extends DriverBase<BinaryInputDriverProps> {
 
-  // TODO: всегда новый инстанс чтоли??? или по pin ???
+  // TODO: инстансы по одному address and bus - сохранять и выдавать одни и теже
 
   async getInstance(instanceProps?: BinaryInputDriverProps): Promise<BinaryInputDriver> {
     const definition = {
