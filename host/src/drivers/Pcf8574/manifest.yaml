@@ -1,7 +1,7 @@
 name: Pcf8574.driver
 main: Pcf8574.ts
 drivers:
-  - Digital.driver
+  - I2cMaster.driver
 props:
 #  edge:
 #    type: rising | falling | both

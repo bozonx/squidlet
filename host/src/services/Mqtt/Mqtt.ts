@@ -107,7 +107,7 @@ export default class Mqtt extends ServiceBase<Props> {
 
   private subscribeToDevices() {
     // TODO: collect actions of devices
-    const devicesActions: {[index: string]: string[]} = this.env.system.devicesManager.getDevicesActions();
+    const devicesActions: {[index: string]: string[]} = this.env.host.getDevicesActions();
 
     for (let deviceId of Object.keys(devicesActions)) {
       for (let action of devicesActions[deviceId]) {

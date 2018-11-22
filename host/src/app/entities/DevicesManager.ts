@@ -57,12 +57,4 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
     // this._app.events.emit(`app.afterDestroy`);
   }
 
-  /**
-   * Get object like {deviceId: [actionName, ...]}
-   */
-  getDevicesActions(): {[index: string]: string[]} {
-    // TODO: add
-    // TODO: поидее все девайсы из мастер конфига а не из хоста
-  }
-
 }

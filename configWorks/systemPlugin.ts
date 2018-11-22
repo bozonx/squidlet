@@ -23,7 +23,6 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryOutput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Binary/ImpulseInput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Binary/ImpulseOutput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Digital/Digital_pcf8574.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital/DigitalInput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital/DigitalOutput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2c/I2cData.driver.yaml'));

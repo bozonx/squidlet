@@ -80,4 +80,16 @@ export default class Host {
   //   }
   // }
 
+  /**
+   * Get object like {deviceId: [actionName, ...]}
+   */
+  getDevicesActions(): {[index: string]: string[]} {
+    // TODO: get all the hosts from master config
+
+    console.log(111111, this.config);
+
+
+    return {};
+  }
+
 }
