@@ -1,7 +1,6 @@
-import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
-
 const _omit = require('lodash/omit');
 
+import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -85,7 +84,13 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalOutputDriver, DigitalOutputDriverProps> {
-  protected instanceIdName: string = 'pin';
+export default class Factory extends DriverFactoryBase<DigitalOutputDriver> {
   protected DriverClass = DigitalOutputDriver;
+  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+    const driverName: string = (instanceProps.driver && instanceProps.driver.name)
+      ? instanceProps.driver.name
+      : 'local';
+
+    return `${driverName}-${instanceProps.pin}`;
+  }
 }
