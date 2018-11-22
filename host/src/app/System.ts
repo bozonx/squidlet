@@ -96,8 +96,8 @@ export default class System {
    */
   private async initApp(): Promise<void> {
     await this.driversManager.initRegularDrivers();
-    await this.servicesManager.initRegularServices();
     await this.devicesManager.init();
+    await this.servicesManager.initRegularServices();
     this.devices.init();
   }
 
