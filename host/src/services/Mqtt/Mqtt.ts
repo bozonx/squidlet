@@ -115,9 +115,13 @@ export default class Mqtt extends ServiceBase<Props> {
 
         this.env.log.info(`MQTT subscribe: ${topic}`);
 
+
+        console.log(222222, topic);
+
+
         // TODO: обработать ошибку промиса
 
-        this.subscribe(topic);
+        //this.subscribe(topic);
       }
     }
   }

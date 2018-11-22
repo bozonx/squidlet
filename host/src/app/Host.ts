@@ -1,3 +1,5 @@
+const _isEmpty = require('lodash/isEmpty');
+
 import System from './System';
 import HostConfig from './interfaces/HostConfig';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
@@ -84,22 +86,20 @@ export default class Host {
    * Get object like {deviceId: [actionName, ...]}
    */
   getDevicesActions(): {[index: string]: string[]} {
+
     // TODO: get all the hosts from master config
+
     const result: {[index: string]: string[]} = {};
 
     const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
 
-    console.log(111111, devicesIds);
-
     for (let devicesId of devicesIds) {
       const device = this.system.devicesManager.getDevice(devicesId);
 
-      if (!device.actions) continue;
+      if (_isEmpty(device.actions)) continue;
 
       result[devicesId] = Object.keys(device.actions);
     }
-
-    console.log(222222, result);
 
     return result;
   }

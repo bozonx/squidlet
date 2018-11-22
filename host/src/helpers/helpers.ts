@@ -1,11 +1,10 @@
-import {ALL_TOPICS} from '../app/dict/constants';
-
 const _isEmpty = require('lodash/isEmpty');
 const _find = require('lodash/find');
 const _trim = require('lodash/trim');
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import * as uniqid from 'uniqid';
 
+import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
 
