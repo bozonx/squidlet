@@ -1,13 +1,11 @@
-import {isDigitalInverted} from '../../helpers/helpers';
-
 const _omit = require('lodash/omit');
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
 
+import {isDigitalInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 
 
 const risingEventName = 'rising';
@@ -164,13 +162,8 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
 }
 
-export default class Factory extends DriverBase<ImpulseInputDriverProps> {
-  async getInstance(instanceProps?: ImpulseInputDriverProps): Promise<ImpulseInputDriver> {
-    const definition = {
-      ...this.definition,
-      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
-    };
 
-    return new ImpulseInputDriver(definition, this.env);
-  }
+export default class Factory extends DriverFactoryBase<ImpulseInputDriver> {
+  protected DriverClass = ImpulseInputDriver;
+  protected instanceType: InstanceType = 'alwaysNew';
 }

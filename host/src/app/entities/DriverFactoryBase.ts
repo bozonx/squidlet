@@ -7,7 +7,7 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 
 
-type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
+export type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
 
 
 /**

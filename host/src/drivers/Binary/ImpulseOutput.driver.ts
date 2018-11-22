@@ -1,11 +1,10 @@
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import BlockMode from './interfaces/BlockMode';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 
 
 export interface ImpulseOutputDriverProps extends DigitalOutputDriverProps {
@@ -104,13 +103,8 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
 
 }
 
-export default class Factory extends DriverBase<ImpulseOutputDriverProps> {
-  async getInstance(instanceProps?: ImpulseOutputDriverProps): Promise<ImpulseOutputDriver> {
-    const definition = {
-      ...this.definition,
-      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
-    };
 
-    return new ImpulseOutputDriver(definition, this.env);
-  }
+export default class Factory extends DriverFactoryBase<ImpulseOutputDriver> {
+  protected DriverClass = ImpulseOutputDriver;
+  protected instanceType: InstanceType = 'alwaysNew';
 }
