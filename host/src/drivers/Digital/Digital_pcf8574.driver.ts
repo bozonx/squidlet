@@ -24,7 +24,18 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
+    if (pinMode === 'output') {
+      // output pin
+      await this.expander.outputPin(pin, false);
+    }
+    else {
+      // input pin
+      if (pinMode !== 'input') {
+        this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
+      }
 
+      await this.expander.inputPin(pin, false);
+    }
   }
 
   getPinMode(pin: number): PinMode | undefined {
@@ -57,7 +68,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   clearAllWatches(): void {
-
+    // TODO: !!!
   }
 
 }

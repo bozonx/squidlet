@@ -85,7 +85,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     dataToSend[0] = this._currentState;
 
-    await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
+    // TODO: remove
+    //await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
   }
 
   addEventListener(eventName: string, cb: Handler) {
