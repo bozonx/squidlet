@@ -1,5 +1,8 @@
 name: DigitalOutput.driver
 main: DigitalOutput.driver.ts
 type: system
+
+# TODO: remove
 drivers:
-  - DigitalOutput.driver
+  - Digital_local.driver
+  - Digital_pcf8574.driver
