@@ -1,7 +1,5 @@
-const _cloneDeep = require('lodash/cloneDeep');
-
 import MyAddress from '../../app/interfaces/MyAddress';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import { I2cDataDriver, DataHandler } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
 import HandlersManager from '../../helpers/HandlersManager';
@@ -74,10 +72,8 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cConnectionDriver, I2cConnectionDriverProps> {
-
-  // TODO: решить нужно ли отдавать инстасны и их сохранять
-
-  protected instanceIdName: string = 'bus';
+export default class Factory extends DriverFactoryBase<I2cConnectionDriver> {
+  protected instanceType: InstanceType = 'propName';
+  protected instanceByPropName = 'bus';
   protected DriverClass = I2cConnectionDriver;
 }

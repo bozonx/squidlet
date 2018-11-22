@@ -80,7 +80,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 }
 
 
-export default class I2cMasterFactory extends DriverFactoryBase<I2cMasterDriver> {
+export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
   protected instanceType: InstanceType = 'propName';
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;

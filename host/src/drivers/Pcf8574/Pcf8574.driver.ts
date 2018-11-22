@@ -2,14 +2,12 @@
  * Port of https://www.npmjs.com/package/pcf8574 module
  */
 
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
 import * as EventEmitter from 'eventemitter3';
 
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import DriverBase from '../../app/entities/DriverBase';
-import {BinaryInputDriver, BinaryInputDriverProps} from '../Binary/BinaryInput.driver';
 
 
 type Handler = (data: InputData) => void;
@@ -440,19 +438,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 }
 
 
-export default class Factory extends DriverBase<BinaryInputDriverProps> {
-
-  // TODO: инстансы по одному address and bus - сохранять и выдавать одни и теже
-
-  async getInstance(instanceProps?: BinaryInputDriverProps): Promise<BinaryInputDriver> {
-    const definition = {
-      ...this.definition,
-      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
-    };
-
-    const driver = new BinaryInputDriver(definition, this.env);
-    await driver.init();
-
-    return driver;
+export default class Factory extends DriverFactoryBase<PCF8574Driver> {
+  protected DriverClass = PCF8574Driver;
+  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+    return `${instanceProps.bus}-${instanceProps.address}`;
   }
 }
