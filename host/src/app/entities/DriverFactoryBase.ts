@@ -3,7 +3,7 @@ const _cloneDeep = require('lodash/cloneDeep');
 
 import DriverBase from './DriverBase';
 import DriverEnv from './DriverEnv';
-import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
+import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 
 
@@ -19,7 +19,7 @@ type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
  *   * propName - you need to set protected property instanceByPropName
  *   * calc - you need to set protected method calcInstanceId which has to return unique instance name
  */
-export default abstract class DriverFactoryBase<Instance extends DriverInstance, Props extends EntityProps> extends DriverBase<Props> {
+export default abstract class DriverFactoryBase<Instance extends DriverInstance> extends DriverBase {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
   protected instanceType: InstanceType = 'propName';
@@ -28,7 +28,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
   protected calcInstanceId?: (instanceProps: {[index: string]: any}) => string;
 
 
-  async getInstance(instanceProps?: Props): Promise<Instance> {
+  async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     const instanceId: string | undefined = this.getInstanceId(instanceProps);
 
     if (typeof instanceId === 'undefined') {
@@ -45,7 +45,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
   }
 
 
-  private getInstanceId(instanceProps: {[index: string]: any} = {}): string | undefined {
+  private getInstanceId(instanceProps: {[index: string]: any}): string | undefined {
     if (this.instanceType === 'alwaysNew') {
       return;
     }
@@ -67,7 +67,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
     }
   }
 
-  private async makeInstance(instanceProps?: Props): Promise<Instance> {
+  private async makeInstance(instanceProps: {[index: string]: any}): Promise<Instance> {
     const definition = {
       ...this.definition,
       props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),

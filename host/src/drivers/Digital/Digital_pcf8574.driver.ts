@@ -63,7 +63,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 }
 
 
-export default class GpioInputFactory extends DriverFactoryBase<DigitalPcf8574Driver, DigitalPcf8574DriverProps> {
+export default class GpioInputFactory extends DriverFactoryBase<DigitalPcf8574Driver> {
   protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
     return `${instanceProps.bus}-${instanceProps.address}`;
   }
