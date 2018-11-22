@@ -1,6 +1,7 @@
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 
 
 export class DigitalLocalDriver implements Digital {
@@ -48,12 +49,21 @@ export class DigitalLocalDriver implements Digital {
 }
 
 
-export default class Factory extends DriverBase {
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digital = getDriverDep('Digital.dev');
-  }
+// export default class Factory extends DriverBase {
+//   protected willInit = async (getDriverDep: GetDriverDep) => {
+//     this.depsInstances.digital = getDriverDep('Digital.dev');
+//   }
+//
+//   getInstance(): DigitalLocalDriver {
+//     return new DigitalLocalDriver(this.depsInstances.digital as Digital);
+//   }
+// }
 
-  getInstance(): DigitalLocalDriver {
-    return new DigitalLocalDriver(this.depsInstances.digital as Digital);
-  }
+export default class Factory extends DriverFactoryBase<DigitalLocalDriver> {
+
+  // TODO: может по pin ???
+
+  protected instanceType = 'alwaysNew';
+
+  protected DriverClass = DigitalLocalDriver;
 }

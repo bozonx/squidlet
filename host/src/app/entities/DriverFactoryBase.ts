@@ -22,7 +22,7 @@ type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
 export default abstract class DriverFactoryBase<Instance extends DriverInstance> extends DriverBase {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
-  protected instanceType: InstanceType = 'propName';
+  protected instanceType: InstanceType = 'calc';
   // name of instance id in props
   protected instanceByPropName?: string;
   protected calcInstanceId?: (instanceProps: {[index: string]: any}) => string;

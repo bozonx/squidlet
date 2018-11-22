@@ -148,7 +148,13 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalInputDriver, DigitalInputDriverProps> {
-  protected instanceIdName: string = 'pin';
+export default class Factory extends DriverFactoryBase<DigitalInputDriver> {
   protected DriverClass = DigitalInputDriver;
+  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+    const driverName: string = (instanceProps.driver && instanceProps.driver.name)
+      ? instanceProps.driver.name
+      : 'local';
+
+    return `${driverName}-${instanceProps.pin}`;
+  }
 }
