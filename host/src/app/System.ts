@@ -82,6 +82,10 @@ export default class System {
     this.log.info(`===> Host initialization has finished`);
   }
 
+  onAppInit(cb: () => void) {
+    this.events.once(categories.system, eventNames.system.appInitialized, cb);
+  }
+
   $registerConfigSetManager(ConfigSetManager: new (system: System) => ConfigSetManager) {
     this.configSetManager = new ConfigSetManager(this);
   }
@@ -96,8 +100,8 @@ export default class System {
    */
   private async initApp(): Promise<void> {
     await this.driversManager.initRegularDrivers();
-    await this.devicesManager.init();
     await this.servicesManager.initRegularServices();
+    await this.devicesManager.init();
     this.devices.init();
   }
 

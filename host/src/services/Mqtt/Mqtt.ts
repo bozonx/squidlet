@@ -26,7 +26,11 @@ export default class Mqtt extends ServiceBase<Props> {
   protected didInit = async () => {
     this.mqttDev.onMessage(this.messagesHandler);
     this.listenHostsPublishes();
-    this.subscribeToDevices();
+    // register subscribers after app init
+    this.env.system.onAppInit(() => {
+      this.env.log.info(`--> Register MQTT subscribers of devices actions`);
+      this.subscribeToDevices();
+    });
   }
 
   /**
@@ -106,7 +110,6 @@ export default class Mqtt extends ServiceBase<Props> {
   }
 
   private subscribeToDevices() {
-    // TODO: collect actions of devices
     const devicesActions: {[index: string]: string[]} = this.env.host.getDevicesActions();
 
     for (let deviceId of Object.keys(devicesActions)) {
@@ -115,13 +118,9 @@ export default class Mqtt extends ServiceBase<Props> {
 
         this.env.log.info(`MQTT subscribe: ${topic}`);
 
-
-        console.log(222222, topic);
-
-
         // TODO: обработать ошибку промиса
 
-        //this.subscribe(topic);
+        this.subscribe(topic);
       }
     }
   }

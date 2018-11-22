@@ -25,6 +25,13 @@ export default class Events {
     this.events.addListener(eventName, handler);
   }
 
+  once(category: string, topic: string, handler: (data: any) => void): void {
+    const eventName = generateEventName(category, topic);
+
+    // listen to local event once
+    this.events.once(eventName, handler);
+  }
+
   /**
    * Listen all the topics of category
    */
