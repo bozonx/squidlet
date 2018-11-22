@@ -17,36 +17,57 @@ type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
  *   * alwaysNew
  *   * alwaysSame
  *   * propName - you need to set protected property instanceByPropName
- *   * calc - you need to set protected method which has to return unique instance name
+ *   * calc - you need to set protected method calcInstanceId which has to return unique instance name
  */
 export default abstract class DriverFactoryBase<Instance extends DriverInstance, Props extends EntityProps> extends DriverBase<Props> {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
+  protected abstract instanceType: InstanceType = 'propName';
   // name of instance id in props
-  protected instanceIdName?: string;
-  protected combinedInstanceIdName?: (instanceProps?: {[index: string]: any}) => string;
+  protected instanceByPropName?: string;
+  protected calcInstanceId?: (instanceProps?: {[index: string]: any}) => string;
 
 
   async getInstance(instanceProps?: Props): Promise<Instance> {
-    if (!this.instanceIdName && !this.combinedInstanceIdName) {
-      throw new Error(`You have to specify at least "instanceIdName" or "combinedInstanceIdName()"`);
+    const instanceId: string | undefined = this.getInstanceId();
+
+    if (typeof instanceId === 'undefined') {
+      // just create always new instance and don't save
+      return await this.makeInstance();
     }
-    
+
+    // return previously saved instance if it is
+    if (this.instances[instanceId]) return this.instances[instanceId];
+    // create and save instance
+    this.instances[instanceId] = await this.makeInstance();
+    // return created instance
+    return this.instances[instanceId];
+  }
+
+  private getInstanceId(): string | undefined {
+    if (this.instanceType === 'propName' && !this.instanceByPropName) {
+      throw new Error(`You have to specify "instanceByPropName"`);
+    }
+    else if (this.instanceType === 'propName' && !this.calcInstanceId) {
+      throw new Error(`You have to specify "calcInstanceId"`);
+    }
+
     const instanceIdName: string = this.instanceIdName || (this.combinedInstanceIdName as any)(instanceProps);
     const instanceId = (instanceProps) ? instanceProps[instanceIdName] : 'default';
+  }
 
-    if (this.instances[instanceId]) return this.instances[instanceId];
-
+  private async makeInstance(): Promise<Instance> {
     const definition = {
       ...this.definition,
       props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
     };
 
-    this.instances[instanceId] = new this.DriverClass(definition, this.env);
+    const instance: Instance = new this.DriverClass(definition, this.env);
 
-    if (this.instances[instanceId].init) await (this.instances[instanceId].init as any)();
+    // init it
+    if (instance.init) await instance.init();
 
-    return this.instances[instanceId];
+    return instance;
   }
 
 }
