@@ -7,9 +7,17 @@ import EntityDefinition, {EntityProps} from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 
 
+type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
+
+
 /**
  * This factory creates instances and keeps them.
  * After the next request of instance it returns previously created one.
+ * Getting/setting instance politics has the next types:
+ *   * alwaysNew
+ *   * alwaysSame
+ *   * propName - you need to set protected property instanceByPropName
+ *   * calc - you need to set protected method which has to return unique instance name
  */
 export default abstract class DriverFactoryBase<Instance extends DriverInstance, Props extends EntityProps> extends DriverBase<Props> {
   protected instances: {[index: string]: Instance} = {};
