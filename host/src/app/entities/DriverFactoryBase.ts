@@ -29,34 +29,45 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance,
 
 
   async getInstance(instanceProps?: Props): Promise<Instance> {
-    const instanceId: string | undefined = this.getInstanceId();
+    const instanceId: string | undefined = this.getInstanceId(instanceProps);
 
     if (typeof instanceId === 'undefined') {
       // just create always new instance and don't save
-      return await this.makeInstance();
+      return await this.makeInstance(instanceProps);
     }
 
     // return previously saved instance if it is
     if (this.instances[instanceId]) return this.instances[instanceId];
     // create and save instance
-    this.instances[instanceId] = await this.makeInstance();
+    this.instances[instanceId] = await this.makeInstance(instanceProps);
     // return created instance
     return this.instances[instanceId];
   }
 
-  private getInstanceId(): string | undefined {
-    if (this.instanceType === 'propName' && !this.instanceByPropName) {
-      throw new Error(`You have to specify "instanceByPropName"`);
-    }
-    else if (this.instanceType === 'propName' && !this.calcInstanceId) {
-      throw new Error(`You have to specify "calcInstanceId"`);
-    }
 
-    const instanceIdName: string = this.instanceIdName || (this.combinedInstanceIdName as any)(instanceProps);
-    const instanceId = (instanceProps) ? instanceProps[instanceIdName] : 'default';
+  private getInstanceId(instanceProps: {[index: string]: any} = {}): string | undefined {
+    if (this.instanceType === 'alwaysNew') {
+      return;
+    }
+    else if (this.instanceType === 'alwaysSame') {
+      return 'new';
+    }
+    else if (this.instanceType === 'propName') {
+      if (typeof this.instanceByPropName === 'undefined') throw new Error(`You have to specify "instanceByPropName"`);
+
+      return instanceProps[this.instanceByPropName];
+    }
+    else if (this.instanceType === 'calc') {
+      if (typeof this.calcInstanceId === 'undefined') throw new Error(`You have to specify "calcInstanceId"`);
+
+      return this.calcInstanceId(instanceProps);
+    }
+    else{
+      throw new Error(`Unknown value of "instanceType" property`);
+    }
   }
 
-  private async makeInstance(): Promise<Instance> {
+  private async makeInstance(instanceProps?: Props): Promise<Instance> {
     const definition = {
       ...this.definition,
       props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
