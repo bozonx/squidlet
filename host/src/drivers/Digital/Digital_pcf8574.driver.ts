@@ -39,19 +39,18 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   getPinMode(pin: number): PinMode | undefined {
-    // TODO: !!!
+    return this.expander.getPinMode(pin);
   }
 
   async read(pin: number): Promise<boolean> {
-    // TODO: !!!
+    return await this.expander.getPinValue(pin);
   }
 
   /**
    * Set level to output pin
    */
   async write(pin: number, value: boolean): Promise<void> {
-    // TODO: если пин сконфигурирован на input - ругаться
-    // TODO: !!!
+    await this.expander.setPin(pin, value);
   }
 
   /**
@@ -61,6 +60,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     // TODO: если пин сконфигурирован на output - ругаться
 
     // TODO: !!!
+
+    return 0;
   }
 
   clearWatch(id: number): void {

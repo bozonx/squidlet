@@ -8,6 +8,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import DriverBase from '../../app/entities/DriverBase';
+import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
 type Handler = (data: InputData) => void;
@@ -214,6 +215,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
   public doPoll():Promise<void>{
     return this._poll();
+  }
+
+  getPinMode(pin: PinNumber): 'input' | 'output' | undefined {
+    if (this._directions[pin] === DIR_IN) {
+      return 'input';
+    }
+    else if (this._directions[pin] === DIR_OUT) {
+      return 'output';
+    }
+
+    return;
   }
 
   /**
