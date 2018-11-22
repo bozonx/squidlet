@@ -99,15 +99,14 @@ export default class HostClassNames {
    * Get list of used drivers of host (which has definitions) exclude devs.
    */
   private getOnlyDrivers(hostId: string): string[] {
-    const driversDefinitions = this.getDriversClassNames(hostId);
+    const driversDefinitions: string[] = this.getDriversClassNames(hostId);
     const allDevs: string[] = this.main.entities.getDevs();
     // remove devs from drivers definitions list
-    const filtered = _filter(
+
+    return _filter(
       driversDefinitions,
       (driverClassName: string) => allDevs.indexOf(driverClassName) < 0
     );
-
-    return filtered.map((item: EntityDefinition) => item.className);
   }
 
   /**
