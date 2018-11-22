@@ -1,14 +1,17 @@
-import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverBase from '../../app/entities/DriverBase';
 
 
-export class DigitalLocalDriver implements Digital {
-  private readonly digitalDev: Digital;
+export class DigitalLocalDriver extends DriverBase implements Digital {
+  private get digitalDev(): Digital {
+    return this.depsInstances.digitalDev as Digital;
+  }
 
-  constructor(digitalDev: Digital) {
-    this.digitalDev = digitalDev;
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.digital = await getDriverDep('Digital.dev');
   }
 
 
@@ -49,21 +52,10 @@ export class DigitalLocalDriver implements Digital {
 }
 
 
-// export default class Factory extends DriverBase {
-//   protected willInit = async (getDriverDep: GetDriverDep) => {
-//     this.depsInstances.digital = getDriverDep('Digital.dev');
-//   }
-//
-//   getInstance(): DigitalLocalDriver {
-//     return new DigitalLocalDriver(this.depsInstances.digital as Digital);
-//   }
-// }
-
 export default class Factory extends DriverFactoryBase<DigitalLocalDriver> {
 
-  // TODO: может по pin ???
+  // TODO: по pin - это же локальное
 
-  protected instanceType = 'alwaysNew';
-
+  protected instanceType: InstanceType = 'alwaysNew';
   protected DriverClass = DigitalLocalDriver;
 }
