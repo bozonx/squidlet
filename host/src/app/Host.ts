@@ -85,11 +85,23 @@ export default class Host {
    */
   getDevicesActions(): {[index: string]: string[]} {
     // TODO: get all the hosts from master config
+    const result: {[index: string]: string[]} = {};
 
-    console.log(111111, this.config);
+    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
 
+    console.log(111111, devicesIds);
 
-    return {};
+    for (let devicesId of devicesIds) {
+      const device = this.system.devicesManager.getDevice(devicesId);
+
+      if (!device.actions) continue;
+
+      result[devicesId] = Object.keys(device.actions);
+    }
+
+    console.log(222222, result);
+
+    return result;
   }
 
 }

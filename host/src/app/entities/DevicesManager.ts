@@ -28,6 +28,10 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
     await this.initializeAll(Object.keys(this.instances));
   }
 
+  getInstantiatedDevicesIds(): string[] {
+    return Object.keys(this.instances);
+  }
+
   /**
    * Get device instance.
    * It rises an error if device hasn't found.

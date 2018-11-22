@@ -113,6 +113,10 @@ export default class Mqtt extends ServiceBase<Props> {
       for (let action of devicesActions[deviceId]) {
         const topic: string = combineTopic(deviceId, action);
 
+        this.env.log.info(`MQTT subscribe: ${topic}`);
+
+        // TODO: обработать ошибку промиса
+
         this.subscribe(topic);
       }
     }
