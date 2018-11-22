@@ -136,7 +136,9 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
 }
 
 
-export default class I2cSlaveFactory extends DriverFactoryBase<I2cSlaveDriver, I2cSlaveDriverProps> {
-  protected instanceIdName: string = 'bus';
+export default class I2cSlaveFactory extends DriverFactoryBase<I2cSlaveDriver> {
   protected DriverClass = I2cSlaveDriver;
+  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+    return `${instanceProps.bus}-${instanceProps.address}`;
+  }
 }

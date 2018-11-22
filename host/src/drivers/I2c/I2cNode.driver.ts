@@ -251,23 +251,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cNodeDriver, I2cNodeDriverProps> {
-  protected combinedInstanceIdName = (instanceProps?: {[index: string]: any}): string => {
-
-    // TODO: использовать правила валидации
-    // TODO: может использовать какую-то автоматическую валидацию props
-
-    if (!instanceProps) {
-      throw new Error(`You have to specify props for instance of driver I2cNodeDriver`);
-    }
-    else if (!Number.isInteger(instanceProps.bus)) {
-      throw new Error(`The bus param has to be a number of driver I2cNodeDriver`);
-    }
-    else if (typeof instanceProps.address !== 'string' && !Number.isInteger(instanceProps.address)) {
-      throw new Error(`The address param has to be a number of driver I2cNodeDriver`);
-    }
-
+export default class Factory extends DriverFactoryBase<I2cNodeDriver> {
+  protected DriverClass = I2cNodeDriver;
+  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
     return `${instanceProps.bus}-${instanceProps.address}`;
   }
-  protected DriverClass = I2cNodeDriver;
 }

@@ -1,5 +1,5 @@
 import { hexToBytes, bytesToHexString, numToWord, wordToNum, withoutFirstItemUint8Arr } from '../../helpers/helpers';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import HandlersManager from '../../helpers/HandlersManager';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -158,9 +158,8 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cDataDriver, I2cDataDriverProps> {
-  // TODO: review
-  // TODO: наверное всегда выдавать новый экземпляр
-  protected instanceIdName: string = 'bus';
+export default class Factory extends DriverFactoryBase<I2cDataDriver> {
+  // TODO: review - может компоновать driverName and bus >
   protected DriverClass = I2cDataDriver;
+  protected instanceType: InstanceType = 'alwaysNew';
 }
