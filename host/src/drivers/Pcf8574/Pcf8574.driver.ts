@@ -6,9 +6,8 @@ import * as EventEmitter from 'eventemitter3';
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import DriverBase from '../../app/entities/DriverBase';
-import {PinMode} from '../../app/interfaces/dev/Digital';
+import {I2cMasterDriver} from '../I2c/I2cMaster.driver';
 
 
 type Handler = (data: InputData) => void;
@@ -22,7 +21,7 @@ interface InputData {
 export interface ExpanderDriverProps {
   bus: number;
   address: number;
-  initialState: boolean | number;
+  //initialState: boolean | number;
 }
 
 
@@ -61,8 +60,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Flag if we are currently polling changes from the PCF8574/PCF8574A IC. */
   private _currentlyPolling:boolean = false;
 
-  private get i2cMaster(): I2cMaster {
-    return this.depsInstances.i2cMaster as I2cMaster;
+  private get i2cMaster(): I2cMasterDriver {
+    return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
 
 
@@ -77,17 +76,25 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver');
 
-    // save the inital state as current sate and write it to the IC
-    this._currentState = this.resolveInitialState();
+    console.log(111111111, this.props);
 
-    const dataToSend: Uint8Array = new Uint8Array(1);
+    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
+      .getInstance({
+        // TODO: почему не передался ????
+        bus: 1
+      });
 
-    dataToSend[0] = this._currentState;
+
+    // // save the inital state as current sate and write it to the IC
+    // this._currentState = this.resolveInitialState();
+    //
+    // const dataToSend: Uint8Array = new Uint8Array(1);
+    //
+    // dataToSend[0] = this._currentState;
 
     // TODO: remove
-    //await this.i2cMaster.writeTo( this.props.bus,  this.props.address, dataToSend);
+    //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
   addEventListener(eventName: string, cb: Handler) {
@@ -182,7 +189,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     dataToSend[0] = newIcState;
 
-    await this.i2cMaster.writeTo(this.props.bus, this.props.address, dataToSend);
+    await this.i2cMaster.write(this.props.address, undefined, dataToSend);
 
     // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
     //
@@ -244,7 +251,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this._currentlyPolling = true;
 
     // read a byte
-    const result: Uint8Array = await this.i2cMaster.readFrom(this.props.bus, this.props.address, 1);
+    const result: Uint8Array = await this.i2cMaster.read(this.props.address, undefined, 1);
 
     this._currentlyPolling = false;
 
@@ -430,23 +437,23 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  private resolveInitialState(): number {
-    if (this.props.initialState === true) {
-      return 255;
-    }
-    else if (this.props.initialState === false) {
-      return 0;
-    }
-    else if (
-      typeof(this.props.initialState) !== 'number'
-      || this.props.initialState < 0
-      || this.props.initialState > 255
-    ) {
-      throw new Error('InitalState bitmask out of range');
-    }
-
-    return this.props.initialState;
-  }
+  // private resolveInitialState(): number {
+  //   if (this.props.initialState === true) {
+  //     return 255;
+  //   }
+  //   else if (this.props.initialState === false) {
+  //     return 0;
+  //   }
+  //   else if (
+  //     typeof(this.props.initialState) !== 'number'
+  //     || this.props.initialState < 0
+  //     || this.props.initialState > 255
+  //   ) {
+  //     throw new Error('InitalState bitmask out of range');
+  //   }
+  //
+  //   return this.props.initialState;
+  // }
 
 }
 

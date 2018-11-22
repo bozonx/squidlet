@@ -1,6 +1,8 @@
 name: Digital_pcf8574.driver
 main: Digital_pcf8574.driver.ts
 type: system
+drivers:
+  - Pcf8574.driver
 props:
   bus:
     type: string | number
