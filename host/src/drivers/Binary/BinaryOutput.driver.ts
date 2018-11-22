@@ -1,7 +1,6 @@
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
 const _omit = require('lodash/omit');
 
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -89,13 +88,8 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
 }
 
-export default class Factory extends DriverBase<BinaryOutputDriverProps> {
-  async getInstance(instanceProps?: BinaryOutputDriverProps): Promise<BinaryOutputDriver> {
-    const definition = {
-      ...this.definition,
-      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
-    };
 
-    return new BinaryOutputDriver(definition, this.env);
-  }
+export default class Factory extends DriverFactoryBase<BinaryOutputDriver> {
+  protected DriverClass = BinaryOutputDriver;
+  protected instanceType: InstanceType = 'alwaysNew';
 }
