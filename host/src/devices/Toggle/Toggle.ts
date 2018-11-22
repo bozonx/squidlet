@@ -47,7 +47,7 @@ export default class Toggle extends DeviceBase<Props> {
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
-      if (this.blockTimeInProgress) this.getStatus();
+      if (this.blockTimeInProgress) return this.getStatus();
 
       this.blockTimeInProgress = true;
 

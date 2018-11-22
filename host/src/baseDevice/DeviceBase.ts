@@ -122,8 +122,10 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       return;
     }
 
+    // TODO: если публиковать результат действия то происходит зацикливание
+
     // publish action's result where subtopic is action name
-    this.publish(actionName, result);
+    //this.publish(actionName, result);
 
     return result;
   }
@@ -141,7 +143,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   }
 
   private handleIncomeData = (incomeData: DeviceData) => {
-    return this.action(incomeData.subTopic, [incomeData.data]);
+    return this.action(incomeData.subTopic, incomeData.data);
   }
 
 }
