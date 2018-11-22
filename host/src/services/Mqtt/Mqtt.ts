@@ -30,6 +30,21 @@ export default class Mqtt extends ServiceBase<Props> {
     this.listenHostsPublishes();
   }
 
+  /**
+   * Publish custom topic
+   */
+  async publish(topic: string, data: string | Uint8Array | undefined) {
+    await this.mqttDev.publish(topic, data);
+  }
+
+  /**
+   * Subscribe on suctom topic
+   */
+  async subscribe(topic: string) {
+    await this.mqttDev.subscribe(topic);
+  }
+
+
   protected destroy = () => {
     // TODO: remove listener
   }

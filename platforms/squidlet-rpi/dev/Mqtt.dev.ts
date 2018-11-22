@@ -30,8 +30,37 @@ export class MqttDevConnection {
   }
 
   publish(topic: string, data: string | Uint8Array | undefined): Promise<void> {
-    return this.connectPromise
-      .then(() => this.client.publish(topic, data));
+    // TODO: support of options
+
+    return new Promise((resolve, reject) => {
+      this.connectPromise
+        .then(() => {
+          this.client.publish(topic, data, {}, (err: string): void => {
+            if (err) {
+              return reject(err);
+            }
+
+            resolve();
+          });
+        });
+    });
+  }
+
+  subscribe(topic: string) {
+    // TODO: support of options
+
+    return new Promise((resolve, reject) => {
+      this.connectPromise
+        .then(() => {
+          this.client.subscribe(topic, {}, (err: string, granted: {topic: string, qos: number}) => {
+            if (err) {
+              return reject(err);
+            }
+
+            resolve();
+          });
+        });
+    });
   }
 
   onMessage(handler: (topic: string, data: string) => void) {
@@ -58,4 +87,4 @@ export default class MqttDev {
   connect(params: Props): MqttDevConnection {
     return new MqttDevConnection(params);
   }
-};
+}

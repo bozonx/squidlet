@@ -2,7 +2,6 @@ name: Mqtt
 main: ./Mqtt.ts
 drivers:
   - Mqtt.dev
-#  - Mqtt.driver
 props:
   # protocol which is used to connect to mqtt broker (http|https)
   protocol:
