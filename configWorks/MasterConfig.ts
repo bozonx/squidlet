@@ -218,7 +218,7 @@ export default class MasterConfig {
     for (let id of Object.keys(preDefinitions)) {
       definitions[id] = {
         ..._omit(preDefinitions[id], type),
-        className: preDefinitions[id][type],
+        className: this.getDefinitionClassName(type, id, preDefinitions[id]),
       };
     }
 
@@ -247,6 +247,14 @@ export default class MasterConfig {
     }
 
     return services;
+  }
+
+  getDefinitionClassName(type: ManifestsTypeName, id: string, preDefinitions: PreEntityDefinition): string {
+    if (type === 'driver') {
+      return id;
+    }
+
+    return preDefinitions[type];
   }
 
 }
