@@ -62,9 +62,8 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
       return this.calcInstanceId(instanceProps);
     }
-    else{
-      throw new Error(`Unknown value of "instanceType" property`);
-    }
+
+    throw new Error(`Unknown value of "instanceType" property`);
   }
 
   private async makeInstance(instanceProps: {[index: string]: any}): Promise<Instance> {

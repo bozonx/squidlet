@@ -2,9 +2,10 @@
  * Port of https://www.npmjs.com/package/pcf8574 module
  */
 
+const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cMasterDriver} from '../I2c/I2cMaster.driver';
@@ -80,10 +81,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     console.log(111111111, this.props);
 
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
-      .getInstance({
-        // TODO: почему не передался ????
-        bus: 1
-      });
+      .getInstance(_omit(this.props, 'address'));
 
 
     // // save the inital state as current sate and write it to the IC
@@ -188,6 +186,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     const dataToSend: Uint8Array = new Uint8Array(1);
 
     dataToSend[0] = newIcState;
+
+    console.log(66666666, this.props.address, dataToSend)
 
     await this.i2cMaster.write(this.props.address, undefined, dataToSend);
 
