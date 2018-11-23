@@ -7,3 +7,7 @@ drivers:
   - Digital_local.driver
   - Digital_pcf8574.driver
   - Pcf8574.driver
+
+props:
+  initial:
+    type: low | high

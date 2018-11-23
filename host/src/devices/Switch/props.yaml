@@ -1,4 +1,4 @@
-$extends: gpioBaseProps
+#$extends: gpioBaseProps
 
 # timeout after switching. At this time it doesn't receive any signals.
 blockTime:

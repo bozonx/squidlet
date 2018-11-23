@@ -15,10 +15,10 @@ export function warn(message: string) {
 }
 
 export function error(message: string) {
-  console.error(`ERROR: ${message}`);
+  console.error(message);
 }
 
 export function fatal(message: string) {
-  console.error(`ERROR: ${message}`);
+  console.error(message);
   process.exit(2);
 }

@@ -3,9 +3,9 @@ main: DigitalInput.driver.ts
 type: system
 props:
   pullup:
-    type: boolean?
+    type: boolean
   pulldown:
-    type: boolean?
+    type: boolean
 
 # TODO: remove
 drivers:
