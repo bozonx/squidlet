@@ -81,6 +81,9 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
   protected DriverClass = DigitalPcf8574Driver;
   protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+
+    console.log(99999999, `${instanceProps.bus}-${instanceProps.address}`)
+
     return `${instanceProps.bus}-${instanceProps.address}`;
   }
 }

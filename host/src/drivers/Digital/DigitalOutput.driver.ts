@@ -1,7 +1,7 @@
 const _omit = require('lodash/omit');
 
 import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -31,7 +31,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
     this.depsInstances.digital = await getDriverDep(driverName)
       .getInstance({
-        ..._omit(this.props, 'gpio', 'initial'),
+        ..._omit(this.props, 'pin', 'invert', 'gpio', 'initial'),
         ..._omit(this.props.gpio, 'name'),
       });
 
@@ -99,11 +99,15 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
 export default class Factory extends DriverFactoryBase<DigitalOutputDriver> {
   protected DriverClass = DigitalOutputDriver;
-  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
-    const driverName: string = (instanceProps.driver && instanceProps.driver.name)
-      ? instanceProps.driver.name
-      : 'local';
 
-    return `${driverName}-${instanceProps.pin}`;
-  }
+  // TODO: remove
+  protected instanceType: InstanceType = 'alwaysNew';
+
+  // protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+  //   const driverName: string = (instanceProps.driver && instanceProps.driver.name)
+  //     ? instanceProps.driver.name
+  //     : 'local';
+  //
+  //   return `${driverName}-${instanceProps.pin}`;
+  // }
 }

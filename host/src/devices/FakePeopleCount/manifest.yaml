@@ -1,0 +1,10 @@
+name: FakePeopleCount
+type: none
+
+main: ./FakePeopleCount.ts
+
+status:
+  default:
+    type: number
+    default: 0
+

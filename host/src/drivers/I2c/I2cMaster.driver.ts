@@ -42,6 +42,9 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   }
 
   async write(addressHex: number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+
+    console.log(88888888, this.props, addressHex, dataAddress, data)
+
     let dataToWrite = data;
 
     if (typeof dataAddress !== 'undefined') {
