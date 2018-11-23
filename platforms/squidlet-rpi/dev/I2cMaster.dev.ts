@@ -9,7 +9,11 @@ export default class I2cMasterDev implements I2cMaster {
   private readonly instances: {[index: string]: I2cBus} = {};
 
 
-  writeTo(bus: number, addrHex: number, data: Uint8Array): Promise<void> {
+  writeTo(bus: number, addrNum: number, data: Uint8Array): Promise<void> {
+
+    // TODO: разве здесь должно быть???
+    const addrHex: number = parseInt(addrNum as any, 16);
+
     const buffer = Buffer.from(data);
 
     return new Promise((resolve, reject) => {
@@ -25,7 +29,7 @@ export default class I2cMasterDev implements I2cMaster {
         resolve();
       };
 
-      this.getI2cBus(bus).i2cWrite(addrHex, data.length, buffer, callback);
+      this.getI2cBus(bus).i2cWrite(addrHex, buffer.length, buffer, callback);
     });
   }
 

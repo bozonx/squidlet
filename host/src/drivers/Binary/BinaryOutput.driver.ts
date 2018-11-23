@@ -25,6 +25,9 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+
+    console.log(555555555, this.props);
+
     this.depsInstances.digitalOutput = await getDriverDep('DigitalOutput.driver')
       .getInstance(_omit(this.props, 'blockTime', 'blockMode'));
   }
@@ -56,7 +59,18 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     this.blockTimeInProgress = true;
 
-    await this.digitalOutput.write(level);
+    try {
+      await this.digitalOutput.write(level);
+    }
+    catch (err) {
+      // TODO: не использовать system
+      this.env.system.log.error(`BinaryOutputDriver: Can't write "${level}",
+        props: "${JSON.stringify(this.props)}". ${err.toString()}`);
+
+      this.blockTimeInProgress = false;
+
+      return;
+    }
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {

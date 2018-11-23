@@ -11,3 +11,6 @@ drivers:
 props:
   initial:
     type: low | high
+#  invert:
+#    type: boolean
+#    default: false

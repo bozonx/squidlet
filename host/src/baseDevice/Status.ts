@@ -29,8 +29,8 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Set status of device.
    */
-  write = async (partialData: Data): Promise<void> => {
-    return this.writeData(partialData);
+  write = async (partialData: Data) => {
+    await this.writeData(partialData);
   }
 
 

@@ -24,15 +24,28 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+
+    console.log(4444444444, this.props);
+
     const driverName = resolveDriverName(this.props.gpio && this.props.gpio.name);
 
     this.depsInstances.digital = await getDriverDep(driverName)
-      .getInstance(_omit(this.props.gpio, 'name'));
+      .getInstance({
+        ..._omit(this.props, 'gpio', 'initial'),
+        ..._omit(this.props.gpio, 'name'),
+      });
 
     await this.digital.setup(this.props.pin, 'output');
 
     // set initial level
-    await this.digitalWrite(this.calcInitial());
+    try {
+      await this.digitalWrite(this.calcInitial());
+    }
+    catch (err) {
+      // TODO: почему не работает env.log ???
+      this.env.system.log.error(`DigitalOutputDriver: Can't set initial value
+       of "${JSON.stringify(this.props)}": ${err.toString()}`);
+    }
   }
 
 

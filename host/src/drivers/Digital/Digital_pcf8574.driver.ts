@@ -19,8 +19,11 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+
+    console.log(333333333, this.props);
+
     this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
-      .getInstance();
+      .getInstance(this.props);
   }
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {

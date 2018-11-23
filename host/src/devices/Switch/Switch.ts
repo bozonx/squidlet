@@ -26,8 +26,12 @@ export default class Switch extends DeviceBase<Props> {
     return { [DEFAULT_STATUS]: await this.binaryOutput.read() };
   }
 
-  protected statusSetter = (partialData: Data): Promise<void> => {
-    return this.binaryOutput.write(partialData[DEFAULT_STATUS]);
+  protected statusSetter = async (partialData: Data) => {
+    await this.binaryOutput.write(partialData[DEFAULT_STATUS]);
+  }
+
+  protected transformPublishValue = (value: boolean): number => {
+    return Number(value);
   }
 
   protected actions = {
