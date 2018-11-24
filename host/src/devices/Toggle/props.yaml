@@ -1,18 +1,27 @@
-#$extends: gpioBaseProps
-
 # debounce which is used on turn or toggle actions
 actionDebounce:
   type: number
   default: 20
-# debounce time in ms
-debounce:
-  type: number
-  # it's default for debounce, not for throttle
-  default: 20
-debounceType:
-  type: debounce | throttle
-  default: debounce
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
-  type: number
   default: 50
+invert:
+
+### BinaryInput driver props
+# debounce time in ms
+debounce:
+  default: 25
+edge:
+invertOnPullup:
+
+### DigitalInput driver props
+pullup:
+pulldown:
+
+### Digital base props
+pin:
+gpio:
+
+### Device base props
+statusRepublishInterval:
+configRepublishInterval:

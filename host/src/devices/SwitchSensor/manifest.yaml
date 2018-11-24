@@ -1,10 +1,10 @@
 name: SwitchSensor
 type: switch-sensor
-
 main: ./SwitchSensor.ts
-props: ./props.yaml
 drivers:
   - BinaryInput.driver
+
+props: ./props.yaml
 
 status:
   default:

@@ -1,10 +1,10 @@
 name: Toggle
 type: toggle
-
 main: ./Toggle.ts
-props: ./props.yaml
 drivers:
   - BinaryInput.driver
+
+props: ./props.yaml
 
 status:
   default:

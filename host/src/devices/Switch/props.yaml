@@ -1,9 +1,7 @@
+### DigitalOutput driver props
 # timeout after switching. At this time it doesn't receive any signals.
 blockTime:
-  type: number
   default: 100
-
-### other DigitalOutput driver props
 blockMode:
 
 ### DigitalOutput driver props
