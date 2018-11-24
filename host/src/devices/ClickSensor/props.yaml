@@ -1,5 +1,3 @@
-#$extends: gpioBaseProps
-
 # debounce time in ms
 debounce:
   type: number
@@ -11,3 +9,19 @@ edge:
 blockTime:
   type: number
   default: 300
+
+### other BinaryInput driver props
+invertOnPullup:
+
+### DigitalInput driver props
+pullup:
+pulldown:
+
+### Digital base props
+pin:
+invert:
+gpio:
+
+### Device base props
+statusRepublishInterval:
+configRepublishInterval:
