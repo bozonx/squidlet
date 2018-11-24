@@ -7,4 +7,6 @@ drivers:
   - BinaryInput.driver
 
 status:
-  default: boolean
+  default:
+    type: boolean
+

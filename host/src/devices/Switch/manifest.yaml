@@ -7,4 +7,5 @@ drivers:
   - BinaryOutput.driver
 
 status:
-  default: boolean
+  default:
+    type: boolean

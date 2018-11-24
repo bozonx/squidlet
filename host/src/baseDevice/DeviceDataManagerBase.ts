@@ -150,6 +150,9 @@ export default abstract class DeviceDataManagerBase {
   }
 
   protected validateParam(statusName: string, value: any, errorMsg: string) {
+
+    // TODO: review
+
     const validateError: string | undefined = validateParam(this.schema, statusName, value);
 
     if (validateError) {
@@ -161,6 +164,9 @@ export default abstract class DeviceDataManagerBase {
   }
 
   protected validateDict(dict: {[index: string]: any}, errorMsg: string) {
+
+    // TODO: review
+
     const validateError: string | undefined = validateDict(this.schema, dict);
 
     if (validateError) {
@@ -256,10 +262,6 @@ export default abstract class DeviceDataManagerBase {
     const result: Data = {};
 
     for (let name of Object.keys(this.schema)) {
-      if (typeof this.schema[name] !== 'object') {
-        throw new Error(`Invalid schema "${JSON.stringify(this.schema.name)}" of "${name}"`);
-      }
-
       if (typeof this.schema[name].default !== 'undefined') {
         result[name] = this.schema[name].default;
       }
