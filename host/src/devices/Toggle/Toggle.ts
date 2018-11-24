@@ -14,7 +14,6 @@ interface Props extends DeviceBaseProps, BinaryInputDriverProps {
   actionDebounce: number;
   // in this time driver doesn't receive any data
   blockTime: number;
-  invert: boolean;
 }
 
 

@@ -33,7 +33,7 @@ describe 'DigitalInput.driver', ->
           config: {
             config: {
               drivers: {
-                defaultDigitalInputDebounce: 20
+                #defaultDigitalInputDebounce: 25
               }
             }
           }

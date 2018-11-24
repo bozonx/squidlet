@@ -19,7 +19,6 @@ export interface BinaryInputDriverProps extends DigitalInputDriverProps {
   blockTime: number;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
-  invert: boolean;
 }
 
 

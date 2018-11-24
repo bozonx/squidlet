@@ -4,7 +4,7 @@ export default {
     defaultStatusRepublishIntervalMs: 60000,
     defaultConfigRepublishIntervalMs: 600000,
     drivers: {
-      defaultDigitalInputDebounce: 20,
+      //defaultDigitalInputDebounce: 25,
       defaultPollInterval: 300,
     },
 
