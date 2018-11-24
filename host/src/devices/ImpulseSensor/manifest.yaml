@@ -1,10 +1,10 @@
 name: ImpulseSensor
 type: impulse-sensor
-
 main: ./ImpulseSensor.ts
-props: ./props.yaml
 drivers:
   - BinaryInput.driver
+
+props: ./props.yaml
 
 status:
   default:

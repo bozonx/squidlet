@@ -1,6 +1,19 @@
-#$extends: gpioBaseProps
-
 # timeout after switching. At this time it doesn't receive any signals.
 blockTime:
   type: number
   default: 100
+
+### other DigitalOutput driver props
+blockMode:
+
+### DigitalOutput driver props
+initial:
+
+### Digital base props
+pin:
+invert:
+gpio:
+
+### Device base props
+statusRepublishInterval:
+configRepublishInterval:

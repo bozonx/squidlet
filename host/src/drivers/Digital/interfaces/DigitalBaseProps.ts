@@ -5,6 +5,4 @@ export default interface DigitalBaseProps {
   invert?: boolean;
   // by default is local driver used
   gpio?: string;
-
-  // TODO: ??? valueLogLevel
 }
