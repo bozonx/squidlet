@@ -41,6 +41,9 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     return this.digitalOutput.read();
   }
 
+
+  // TODO: что будет при последующих запросаз ???
+
   async write(level: boolean) {
     if (this.blockTimeInProgress) {
       if (this.props.blockMode === 'refuse') {
@@ -63,14 +66,13 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       await this.digitalOutput.write(level);
     }
     catch (err) {
-      // TODO: не использовать system
-      this.env.system.log.error(`BinaryOutputDriver: Can't write "${level}",
-        props: "${JSON.stringify(this.props)}". ${err.toString()}`);
-
       this.blockTimeInProgress = false;
 
-      return;
+      throw(new Error(`BinaryOutputDriver: Can't write "${level}",
+        props: "${JSON.stringify(this.props)}". ${err.toString()}`));
     }
+
+    // starting block time
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
@@ -91,6 +93,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   private blockTimeFinished = async () => {
     this.blockTimeInProgress = false;
 
+    // setting last delayed value
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
       const lastDeferredValue = this.lastDeferredValue;
       // clear deferred value

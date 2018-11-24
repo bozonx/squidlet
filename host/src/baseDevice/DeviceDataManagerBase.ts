@@ -136,6 +136,8 @@ export default abstract class DeviceDataManagerBase {
     }
     // else do request to device if getter is defined
 
+    // TODO: обраотать ошибку
+
     await this.save(
       () => this.setter && this.setter(partialData),
       `Can't save ${this.typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`

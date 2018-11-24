@@ -3,6 +3,7 @@ main: BinaryOutput.driver.ts
 type: system
 drivers:
   - DigitalOutput.driver
+
 props:
   blockTime:
     type: number
@@ -10,3 +11,11 @@ props:
   blockMode:
     type: refuse | defer
     default: refuse
+
+  ### DigitalOutput driver props
+  initial:
+
+  ### Digital base props
+  pin:
+  invert:
+  gpio:
