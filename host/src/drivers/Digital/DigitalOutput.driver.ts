@@ -27,13 +27,10 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
     console.log(4444444444, this.props);
 
-    const driverName = resolveDriverName(this.props.gpio && this.props.gpio.name);
+    const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.digital = await getDriverDep(driverName)
-      .getInstance({
-        ..._omit(this.props, 'pin', 'invert', 'gpio', 'initial'),
-        ..._omit(this.props.gpio, 'name'),
-      });
+      .getInstance(_omit(this.props, 'pin', 'invert', 'gpio', 'initial'));
 
     await this.digital.setup(this.props.pin, 'output');
 

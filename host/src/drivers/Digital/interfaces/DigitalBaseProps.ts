@@ -4,11 +4,7 @@ export default interface DigitalBaseProps {
   // for output: when sends 1 actually sends 0 and otherwise
   invert?: boolean;
   // by default is local driver used
-  gpio?: {
-    name: string;
-    // Physical driver's params
-    [index: string]: any;
-  };
+  gpio?: string;
 
   // TODO: ??? valueLogLevel
 }
