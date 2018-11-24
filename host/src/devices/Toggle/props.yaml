@@ -21,6 +21,7 @@ pulldown:
 ### Digital base props
 pin:
 gpio:
+#invert
 
 ### Device base props
 statusRepublishInterval:

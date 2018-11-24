@@ -3,18 +3,29 @@ main: BinaryInput.driver.ts
 type: system
 drivers:
   - DigitalInput.driver
+
 props:
   edge:
     type: rising | falling | both
     default: both
   debounce:
     type: number
-    # it's default for debounce, not for throttle
     default: 0
   # timeout after received signal. At this time it doesn't receive any signals.
   blockTime:
     type: number
     default: 0
+  # Do invert value if pullup resistor is on or not
   invertOnPullup:
     type: boolean
     default: true
+  invert:
+
+  ### DigitalInput driver props
+  pullup:
+  pulldown:
+
+  ### Digital base props
+  pin:
+  #invert:
+  gpio:
