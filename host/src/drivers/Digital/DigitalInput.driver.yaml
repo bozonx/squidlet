@@ -1,12 +1,20 @@
 name: DigitalInput.driver
 main: DigitalInput.driver.ts
 type: system
-props:
-  pullup:
-    type: boolean
-  pulldown:
-    type: boolean
 
 # TODO: remove
 drivers:
   - Digital_local.driver
+
+props:
+  pullup:
+    type: boolean
+    default: false
+  pulldown:
+    type: boolean
+    default: false
+
+  ### Digital base props
+  pin:
+  #invert:
+  gpio:

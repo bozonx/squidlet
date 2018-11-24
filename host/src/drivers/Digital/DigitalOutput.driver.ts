@@ -100,6 +100,8 @@ export default class Factory extends DriverFactoryBase<DigitalOutputDriver> {
   // TODO: remove
   protected instanceType: InstanceType = 'alwaysNew';
 
+  // TODO: не правильно!!!! может быть наложение если брать экспандеры
+
   // protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
   //   const driverName: string = (instanceProps.driver && instanceProps.driver.name)
   //     ? instanceProps.driver.name

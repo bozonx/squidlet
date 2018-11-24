@@ -1,4 +1,5 @@
 const _omit = require('lodash/omit');
+import * as EventEmitter from 'eventemitter3';
 
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
@@ -14,8 +15,11 @@ export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {
   blockMode: BlockMode;
 }
 
+const delayedResultEventName = 'delayedResult';
+
 
 export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
+  private readonly events: EventEmitter = new EventEmitter();
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;
 
@@ -54,7 +58,16 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
         // store that level which delayed
         this.lastDeferredValue = level;
 
-        return;
+        // wait while delayed value is set
+        return new Promise<void>((resolve, reject) => {
+          this.events.addListener(delayedResultEventName, (err) => {
+            if (err) {
+              return reject(err);
+            }
+
+            resolve();
+          });
+        });
       }
     }
 
@@ -76,9 +89,8 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
-        this.blockTimeFinished()
-          .then(resolve)
-          .catch(reject);
+        this.blockTimeFinished();
+        resolve();
       }, this.props.blockTime);
     });
   }
@@ -90,7 +102,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   }
 
 
-  private blockTimeFinished = async () => {
+  private blockTimeFinished = () => {
     this.blockTimeInProgress = false;
 
     // setting last delayed value
@@ -99,7 +111,11 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       // clear deferred value
       this.lastDeferredValue = undefined;
       // write deferred value
-      await this.write(lastDeferredValue);
+
+      // don't wait in normal way
+      this.write(lastDeferredValue)
+        .then(() => this.events.emit(delayedResultEventName))
+        .catch((err) => this.events.emit(delayedResultEventName, err));
     }
   }
 

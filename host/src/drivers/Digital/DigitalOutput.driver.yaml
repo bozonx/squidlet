@@ -9,8 +9,16 @@ drivers:
   - Pcf8574.driver
 
 props:
-  initial:
-    type: low | high
+#  initial:
+#    type: low | high
 #  invert:
 #    type: boolean
 #    default: false
+
+  ### DigitalOutput driver props
+  initial:
+
+  ### Digital base props
+  pin:
+  invert:
+  gpio:

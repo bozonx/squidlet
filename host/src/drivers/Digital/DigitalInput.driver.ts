@@ -2,7 +2,7 @@ const _find = require('lodash/find');
 const _omit = require('lodash/omit');
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -100,6 +100,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
   protected validateProps = (): string | undefined => {
     // TODO: validate params
     // TODO: validate specific for certain driver params
+    // TODO: только pullup или pulldown может быть установлен
     return;
   }
 
@@ -150,11 +151,19 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
 export default class Factory extends DriverFactoryBase<DigitalInputDriver> {
   protected DriverClass = DigitalInputDriver;
-  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
-    const driverName: string = (instanceProps.driver && instanceProps.driver.name)
-      ? instanceProps.driver.name
-      : 'local';
+  // TODO: remove
+  protected instanceType: InstanceType = 'alwaysNew';
 
-    return `${driverName}-${instanceProps.pin}`;
-  }
+  // TODO: спросить bus и address у нижележащего драйвера
+
+  // protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+  //
+  //   // TODO: не правильно!!!! может быть наложение если брать экспандеры
+  //
+  //   const driverName: string = (instanceProps.driver && instanceProps.driver.name)
+  //     ? instanceProps.driver.name
+  //     : 'local';
+  //
+  //   return `${driverName}-${instanceProps.pin}`;
+  // }
 }
