@@ -9,8 +9,10 @@ import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
+type InitialLevel = 1 | 0 | 'low' | 'high';
+
 export interface DigitalOutputDriverProps extends DigitalBaseProps {
-  initial?: 'low' | 'high';
+  initial: InitialLevel;
 }
 
 
@@ -30,8 +32,12 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
     const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.digital = await getDriverDep(driverName)
-      .getInstance(_omit(this.props, 'pin', 'invert', 'gpio', 'initial'));
+      .getInstance(_omit(this.props, 'initial', 'pin', 'invert', 'gpio'));
 
+  }
+
+  protected didInit = async () => {
+    // if setup fails it will be critical error
     await this.digital.setup(this.props.pin, 'output');
 
     // set initial level
@@ -40,6 +46,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
     }
     catch (err) {
       // TODO: почему не работает env.log ???
+      // not critical error
       this.env.system.log.error(`DigitalOutputDriver: Can't set initial value
        of "${JSON.stringify(this.props)}": ${err.toString()}`);
     }
@@ -72,6 +79,9 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 
   private calcInitial(): boolean {
     if (this.props.invert) {
+
+      // TODO: зачем undefined ????
+
       // if initial === 'high' it'll be logical 0 if undefines of low - 1
       return typeof this.props.initial === 'undefined' || this.props.initial === 'low';
     }

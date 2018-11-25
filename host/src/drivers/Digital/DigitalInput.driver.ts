@@ -39,11 +39,13 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
     this.depsInstances.digital = await getDriverDep(driverName)
       .getInstance(_omit(this.props, 'pullup', 'pulldown', 'pin', 'invert', 'gpio'));
-
-    // setup pin as an input with resistor if specified
-    await this.digital.setup(this.props.pin, this.resolvePinMode());
   }
 
+  protected didInit = async () => {
+    // setup pin as an input with resistor if specified
+    // if setup fails it will be critical error
+    await this.digital.setup(this.props.pin, this.resolvePinMode());
+  }
 
   /**
    * Get current binary value of pin.
