@@ -9,6 +9,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {isDigitalInverted} from '../../helpers/helpers';
+import HandlerWrappers from '../../helpers/HandlerWrappers';
 
 
 const eventName = 'change';
@@ -29,6 +30,7 @@ export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
 
 export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
+  private handlerWrappers: HandlerWrappers<WatchHandler, WatchHandler> = new HandlerWrappers<WatchHandler, WatchHandler>();
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;
 
@@ -68,26 +70,24 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
       handler(invertIfNeed(level, this.isInverted()));
     };
 
-    // TODO: save handler
-
-    this.events.addListener(eventName, handler);
+    this.handlerWrappers.addHandler(handler, wrapper);
+    this.events.addListener(eventName, wrapper);
   }
 
   listenOnce(handler: WatchHandler) {
     const wrapper: WatchHandler = (level: boolean) => {
+      this.handlerWrappers.removeByHandler(handler);
       handler(invertIfNeed(level, this.isInverted()));
     };
 
-    // TODO: save handler
+    this.handlerWrappers.addHandler(handler, wrapper);
 
-    this.events.once(eventName, handler);
+    this.events.once(eventName, wrapper);
   }
 
   removeListener(handler: WatchHandler) {
-
-    // TODO: remke - use wrapper
-
     this.events.removeListener(eventName, handler);
+    this.handlerWrappers.removeByHandler(handler);
   }
 
   destroy = () => {

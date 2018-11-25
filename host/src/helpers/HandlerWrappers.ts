@@ -27,6 +27,10 @@ export default class HandlerWrappers<HandlerType, WrapperType> {
     const handlerIndex: number = this.handlers.findIndex((item) => {
       return item[HANDLER_POSITION] === handler;
     });
+
+    // do nothing if it hasn't found
+    if (handlerIndex < 0) return;
+
     // remove item
     this.handlers.splice(handlerIndex, 1);
   }
