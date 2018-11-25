@@ -12,7 +12,7 @@ export interface HostConfigConfig {
   defaultConfigRepublishIntervalMs: number;
   drivers: {
     // debounce of digital input in ms
-    //defaultDigitalInputDebounce: number;
+    //defaultDigitalPinInputDebounce: number;
     // default poll interval for master-slave connections
     defaultPollInterval: number;
   };

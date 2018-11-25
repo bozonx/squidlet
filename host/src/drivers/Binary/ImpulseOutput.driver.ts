@@ -1,13 +1,13 @@
 const _omit = require('lodash/omit');
 
-import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
+import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode} from './interfaces/Types';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 
 
-export interface ImpulseOutputDriverProps extends DigitalOutputDriverProps {
+export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
   // time between 1 and 0
   impulseLength: number;
   blockTime: number;
@@ -25,12 +25,12 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
-  private get digitalOutput(): DigitalOutputDriver {
-    return this.depsInstances.digitalOutput as DigitalOutputDriver;
+  private get digitalOutput(): DigitalPinOutputDriver {
+    return this.depsInstances.digitalOutput as DigitalPinOutputDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalOutput = await getDriverDep('DigitalOutput.driver')
+    this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
       .getInstance(_omit(this.props, 'impulseLength', 'blockTime', 'blockMode'));
   }
 

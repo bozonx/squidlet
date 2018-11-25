@@ -3,7 +3,7 @@ import * as EventEmitter from 'eventemitter3';
 
 import {isDigitalInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
+import {DigitalPinInputDriver, DigitalPinInputDriverProps, DigitalPinInputListenHandler} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 
@@ -12,7 +12,7 @@ const risingEventName = 'rising';
 const bothEventName = 'both';
 
 
-export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
+export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
   // time between 1 and 0
   impulseLength: number;
   // in this time driver doesn't receive any data
@@ -34,12 +34,12 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
-  private get digitalInput(): DigitalInputDriver {
-    return this.depsInstances.digitalInput as DigitalInputDriver;
+  private get digitalInput(): DigitalPinInputDriver {
+    return this.depsInstances.digitalInput as DigitalPinInputDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
+    this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance({
         ..._omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
         invert: this.isInverted(),
@@ -65,22 +65,22 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   /**
    * Listen only to rising of impulse, not falling.
    */
-  addRisingListener(handler: DigitalInputListenHandler) {
+  addRisingListener(handler: DigitalPinInputListenHandler) {
     this.events.addListener(risingEventName, handler);
   }
 
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
-  addListener(handler: DigitalInputListenHandler) {
+  addListener(handler: DigitalPinInputListenHandler) {
     this.events.addListener(bothEventName, handler);
   }
 
-  listenOnce(handler: DigitalInputListenHandler) {
+  listenOnce(handler: DigitalPinInputListenHandler) {
     this.events.once(risingEventName, handler);
   }
 
-  removeListener(handler: DigitalInputListenHandler) {
+  removeListener(handler: DigitalPinInputListenHandler) {
     this.events.removeListener(risingEventName, handler);
     this.events.removeListener(bothEventName, handler);
   }

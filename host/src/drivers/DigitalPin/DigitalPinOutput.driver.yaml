@@ -1,5 +1,5 @@
-name: DigitalOutput.driver
-main: DigitalOutput.driver.ts
+name: DigitalPinOutput.driver
+main: DigitalPinOutput.driver.ts
 type: system
 
 # TODO: remove
@@ -13,6 +13,6 @@ props:
     type: 1 | 0 | low | high
     default: 0
 
-  ### Digital base props
+  ### DigitalPin base props
   pin:
   gpio:

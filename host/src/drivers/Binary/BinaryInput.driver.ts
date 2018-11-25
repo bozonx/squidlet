@@ -4,7 +4,7 @@ import * as EventEmitter from 'eventemitter3';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import {Edge} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalInputDriver, DigitalInputDriverProps, DigitalInputListenHandler} from '../Digital/DigitalInput.driver';
+import {DigitalPinInputDriver, DigitalPinInputDriverProps, DigitalPinInputListenHandler} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {isDigitalInverted} from '../../helpers/helpers';
 
@@ -12,7 +12,7 @@ import {isDigitalInverted} from '../../helpers/helpers';
 const eventName = 'change';
 
 
-export interface BinaryInputDriverProps extends DigitalInputDriverProps {
+export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
   edge: Edge;
   debounce: number;
   // in this time driver doesn't receive any data
@@ -29,12 +29,12 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
   private blockTimeInProgress: boolean = false;
 
-  private get digitalInput(): DigitalInputDriver {
-    return this.depsInstances.digitalInput as DigitalInputDriver;
+  private get digitalInput(): DigitalPinInputDriver {
+    return this.depsInstances.digitalInput as DigitalPinInputDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalInput = await getDriverDep('DigitalInput.driver')
+    this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance({
         ..._omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup'),
         invert: this.isInverted(),
@@ -61,15 +61,15 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
-  addListener(handler: DigitalInputListenHandler) {
+  addListener(handler: DigitalPinInputListenHandler) {
     this.events.addListener(eventName, handler);
   }
 
-  listenOnce(handler: DigitalInputListenHandler) {
+  listenOnce(handler: DigitalPinInputListenHandler) {
     this.events.once(eventName, handler);
   }
 
-  removeListener(handler: DigitalInputListenHandler) {
+  removeListener(handler: DigitalPinInputListenHandler) {
     this.events.removeListener(eventName, handler);
   }
 

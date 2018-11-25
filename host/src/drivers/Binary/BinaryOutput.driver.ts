@@ -2,13 +2,13 @@ const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
-import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
+import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode, InitialLevel} from './interfaces/Types';
 
 
-export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {
+export interface BinaryOutputDriverProps extends DigitalPinOutputDriverProps {
   blockTime: number;
   // if "refuse" - it doesn't write while block time. It is on default.
   // If "defer" it waits for block time finished and write last last value which was tried to set
@@ -27,8 +27,8 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;
 
-  private get digitalOutput(): DigitalOutputDriver {
-    return this.depsInstances.digitalOutput as DigitalOutputDriver;
+  private get digitalOutput(): DigitalPinOutputDriver {
+    return this.depsInstances.digitalOutput as DigitalPinOutputDriver;
   }
 
 
@@ -36,7 +36,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     console.log(555555555, this.props);
 
-    this.depsInstances.digitalOutput = await getDriverDep('DigitalOutput.driver')
+    this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
       .getInstance(_omit(this.props, 'blockTime', 'blockMode'));
   }
 

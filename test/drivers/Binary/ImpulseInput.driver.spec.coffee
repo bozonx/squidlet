@@ -21,7 +21,7 @@ describe 'ImpulseInput.driver', ->
       blockTime: 1
     }
     @env = {
-      loadManifest: => Promise.resolve({ drivers: ['DigitalInput.driver'] })
+      loadManifest: => Promise.resolve({ drivers: ['DigitalPinInput.driver'] })
       getDriver: => {
         getInstance: => @digitalOutput
       }

@@ -1,7 +1,7 @@
-DigitalInput = require('../../../host/src/drivers/Digital/DigitalInput.driver').default
+DigitalPinInput = require('../../../host/src/drivers/DigitalPin/DigitalPinInput.driver').default
 
 
-describe 'DigitalInput.driver', ->
+describe 'DigitalPinInput.driver', ->
   beforeEach ->
     @watchHandler = undefined
     @localDriver = {
@@ -14,8 +14,8 @@ describe 'DigitalInput.driver', ->
     }
 
     @definition = {
-      id: 'DigitalInput.driver'
-      className: 'DigitalInput.driver'
+      id: 'DigitalPinInput.driver'
+      className: 'DigitalPinInput.driver'
     }
     @props = {
       pin: 1
@@ -33,7 +33,7 @@ describe 'DigitalInput.driver', ->
           config: {
             config: {
               drivers: {
-                #defaultDigitalInputDebounce: 25
+                #defaultDigitalPinInputDebounce: 25
               }
             }
           }
@@ -42,7 +42,7 @@ describe 'DigitalInput.driver', ->
     }
 
     @instantiate = =>
-      @driver = await (new DigitalInput(@definition, @env)).getInstance(@props)
+      @driver = await (new DigitalPinInput(@definition, @env)).getInstance(@props)
 
   it 'init', ->
     await @instantiate()

@@ -9,9 +9,9 @@ import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 
 
-export type DigitalInputListenHandler = (level: boolean) => void;
+export type DigitalPinInputListenHandler = (level: boolean) => void;
 
-export interface DigitalInputDriverProps extends DigitalBaseProps {
+export interface DigitalPinInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
   pullup?: boolean;
@@ -25,9 +25,9 @@ const NO_DEBOUNCE_VALUE = 0;
 /**
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
-export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
+export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
   // listener and its wrapper by listener id which gets from setWatch method of dev
-  private listeners: {[index: string]: [DigitalInputListenHandler, WatchHandler]} = {};
+  private listeners: {[index: string]: [DigitalPinInputListenHandler, WatchHandler]} = {};
 
   private get digital(): Digital {
     return this.depsInstances.digital as Digital;
@@ -60,7 +60,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
    * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
    * @param edge - Listen to low, high or both levels. By default is both.
    */
-  addListener(handler: DigitalInputListenHandler, debounce?: number, edge?: Edge): void {
+  addListener(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.props.invert));
     };
@@ -70,7 +70,7 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     this.listeners[listenerId] = [handler, wrapper];
   }
 
-  listenOnce(handler: DigitalInputListenHandler, debounce?: number, edge?: Edge): void {
+  listenOnce(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
     const wrapper: WatchHandler = (level: boolean) => {
       // remove listener and don't listen any more
       this.removeListener(handler);
@@ -83,8 +83,8 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
     this.listeners[listenerId] = [handler, wrapper];
   }
 
-  removeListener(handler: DigitalInputListenHandler): void {
-    _find(this.listeners, (handlerItem: [DigitalInputListenHandler, WatchHandler], listenerId: number) => {
+  removeListener(handler: DigitalPinInputListenHandler): void {
+    _find(this.listeners, (handlerItem: [DigitalPinInputListenHandler, WatchHandler], listenerId: number) => {
       if (handlerItem[0] === handler) {
         delete this.listeners[listenerId];
         this.digital.clearWatch(Number(listenerId));
@@ -153,8 +153,8 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalInputDriver> {
-  protected DriverClass = DigitalInputDriver;
+export default class Factory extends DriverFactoryBase<DigitalPinInputDriver> {
+  protected DriverClass = DigitalPinInputDriver;
   // TODO: remove
   protected instanceType: InstanceType = 'alwaysNew';
 

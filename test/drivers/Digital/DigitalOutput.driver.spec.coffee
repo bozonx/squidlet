@@ -1,7 +1,7 @@
-DigitalOutput = require('../../../host/src/drivers/Digital/DigitalOutput.driver').default
+DigitalPinOutput = require('../../../host/src/drivers/DigitalPin/DigitalPinOutput.driver').default
 
 
-describe 'DigitalOutput.driver', ->
+describe 'DigitalPinOutput.driver', ->
   beforeEach ->
     @localDriver = {
       setup: sinon.stub().returns(Promise.resolve())
@@ -10,8 +10,8 @@ describe 'DigitalOutput.driver', ->
     }
 
     @definition = {
-      id: 'DigitalOutput.driver'
-      className: 'DigitalOutput.driver'
+      id: 'DigitalPinOutput.driver'
+      className: 'DigitalPinOutput.driver'
     }
     @props = {
       pin: 1
@@ -27,7 +27,7 @@ describe 'DigitalOutput.driver', ->
     }
 
     @instantiate = =>
-      @driver = await (new DigitalOutput(@definition, @env)).getInstance(@props)
+      @driver = await (new DigitalPinOutput(@definition, @env)).getInstance(@props)
 
   it 'init without initial', ->
     await @instantiate()

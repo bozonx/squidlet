@@ -2,7 +2,7 @@ name: BinaryInput.driver
 main: BinaryInput.driver.ts
 type: system
 drivers:
-  - DigitalInput.driver
+  - DigitalPinInput.driver
 
 props:
   edge:
@@ -23,10 +23,10 @@ props:
     type: boolean
     default: false
 
-  ### DigitalInput driver props
+  ### DigitalPinInput driver props
   pullup:
   pulldown:
 
-  ### Digital base props
+  ### DigitalPin base props
   pin:
   gpio:

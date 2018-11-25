@@ -6,7 +6,7 @@ import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import {invertIfNeed} from '../../drivers/Digital/digitalHelpers';
+import {invertIfNeed} from '../../drivers/DigitalPin/digitalHelpers';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {

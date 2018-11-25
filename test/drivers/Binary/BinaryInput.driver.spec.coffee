@@ -22,7 +22,7 @@ describe 'BinaryInput.driver', ->
       blockTime: 0
     }
     @env = {
-      loadManifest: => Promise.resolve({ drivers: ['DigitalInput.driver'] })
+      loadManifest: => Promise.resolve({ drivers: ['DigitalPinInput.driver'] })
       getDriver: => {
         getInstance: => @digitalOutput
       }

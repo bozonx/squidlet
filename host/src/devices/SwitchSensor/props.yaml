@@ -4,12 +4,12 @@ blockTime:
 edge:
 invertOnPullup:
 
-### DigitalInput driver props
+### DigitalPinInput driver props
 pullup:
 pulldown:
 invert:
 
-### Digital base props
+### DigitalPin base props
 pin:
 gpio:
 

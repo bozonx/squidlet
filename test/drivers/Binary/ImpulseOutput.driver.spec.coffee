@@ -20,7 +20,7 @@ describe 'ImpulseOutput.driver', ->
       blockMode: 'refuse'
     }
     @env = {
-      loadManifest: => Promise.resolve({ drivers: ['DigitalOutput.driver'] })
+      loadManifest: => Promise.resolve({ drivers: ['DigitalPinOutput.driver'] })
       getDriver: => {
         getInstance: => @digitalOutput
       }

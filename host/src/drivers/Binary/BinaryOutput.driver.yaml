@@ -2,7 +2,7 @@ name: BinaryOutput.driver
 main: BinaryOutput.driver.ts
 type: system
 drivers:
-  - DigitalOutput.driver
+  - DigitalPinOutput.driver
 
 props:
   blockTime:
@@ -18,9 +18,9 @@ props:
     type: boolean
     default: false
 
-  # DigitalOutputDriverProps
+  # DigitalPinOutputDriverProps
   #initial:
 
-  ### Digital base props
+  ### DigitalPin base props
   pin:
   gpio:

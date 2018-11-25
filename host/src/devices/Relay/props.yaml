@@ -1,14 +1,14 @@
-### DigitalOutput driver props
+### DigitalPinOutput driver props
 # timeout after switching. At this time it doesn't receive any signals.
 blockTime:
   default: 100
 blockMode:
 
-### DigitalOutput driver props
+### DigitalPinOutput driver props
 initial:
 invert:
 
-### Digital base props
+### DigitalPin base props
 pin:
 gpio:
 

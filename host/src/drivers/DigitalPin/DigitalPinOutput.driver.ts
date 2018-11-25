@@ -9,7 +9,7 @@ import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
-export interface DigitalOutputDriverProps extends DigitalBaseProps {
+export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
   _resolvedInitialLevel: boolean;
 }
 
@@ -17,7 +17,7 @@ export interface DigitalOutputDriverProps extends DigitalBaseProps {
 /**
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
-export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
+export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverProps> {
   private get digital(): GpioDigitalDriver {
     return this.depsInstances.digital as GpioDigitalDriver;
   }
@@ -42,7 +42,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
       await this.digitalWrite(this.calcInitial());
     }
     catch (err) {
-      throw new Error(`DigitalOutputDriver: Can't set initial value
+      throw new Error(`DigitalPinOutputDriver: Can't set initial value
        of "${JSON.stringify(this.props)}": ${err.toString()}`);
     }
   }
@@ -98,8 +98,8 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalOutputDriver> {
-  protected DriverClass = DigitalOutputDriver;
+export default class Factory extends DriverFactoryBase<DigitalPinOutputDriver> {
+  protected DriverClass = DigitalPinOutputDriver;
 
   // TODO: remove
   protected instanceType: InstanceType = 'alwaysNew';
