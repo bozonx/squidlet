@@ -3,7 +3,7 @@ import {WatchHandler} from '../../app/interfaces/dev/Digital';
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
-import {isDigitalInverted} from '../../helpers/helpers';
+import {isDigitalInputInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -57,7 +57,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
 
   isInverted(): boolean {
-    return isDigitalInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
+    return isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
   }
 
   async read(): Promise<boolean> {

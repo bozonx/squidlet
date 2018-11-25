@@ -274,7 +274,7 @@ export function parseValue(rawValue: any): any {
   return rawValue;
 }
 
-export function isDigitalInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
+export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
   // twice inverting on pullup if allowed
   if (pullup && invertOnPullup) {
     return !invert;

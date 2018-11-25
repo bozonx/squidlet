@@ -8,7 +8,7 @@ import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {isDigitalInverted} from '../../helpers/helpers';
+import {isDigitalInputInverted} from '../../helpers/helpers';
 import HandlerWrappers from '../../helpers/HandlerWrappers';
 
 
@@ -39,7 +39,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this._isInverted = isDigitalInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
+    this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance(_omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'));
