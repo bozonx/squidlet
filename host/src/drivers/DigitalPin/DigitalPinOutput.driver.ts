@@ -18,8 +18,8 @@ export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverProps> {
-  private get digital(): GpioDigitalDriver {
-    return this.depsInstances.digital as GpioDigitalDriver;
+  private get gpio(): GpioDigitalDriver {
+    return this.depsInstances.gpio as GpioDigitalDriver;
   }
 
 
@@ -29,13 +29,13 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
     const driverName = resolveDriverName(this.props.gpio);
 
-    this.depsInstances.digital = await getDriverDep(driverName)
+    this.depsInstances.gpio = await getDriverDep(driverName)
       .getInstance(_omit(this.props, 'initial', 'pin', 'invert', 'gpio'));
 
   }
 
   protected didInit = async () => {
-    await this.digital.setup(this.props.pin, 'output');
+    await this.gpio.setup(this.props.pin, 'output');
 
     // set initial level
     try {
@@ -52,7 +52,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
    * Get current level of pin.
    */
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.digital.read(this.props.pin), this.props.invert);
+    return invertIfNeed(await this.gpio.read(this.props.pin), this.props.invert);
   }
 
   async write(newLevel: boolean): Promise<void> {
@@ -86,13 +86,13 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   }
 
   private digitalWrite(value: boolean) {
-    const pinMode: PinMode | undefined = this.digital.getPinMode(this.props.pin);
+    const pinMode: PinMode | undefined = this.gpio.getPinMode(this.props.pin);
 
     if (!pinMode || !pinMode.match(/output/)) {
       throw new Error(`Can't set level. The GPIO pin "${this.props.pin}" wasn't set up as an output pin.`);
     }
 
-    return this.digital.write(this.props.pin, value);
+    return this.gpio.write(this.props.pin, value);
   }
 
 }

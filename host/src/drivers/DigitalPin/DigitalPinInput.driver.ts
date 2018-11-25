@@ -29,29 +29,29 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
   // listener and its wrapper by listener id which gets from setWatch method of dev
   private listeners: {[index: string]: [DigitalPinInputListenHandler, WatchHandler]} = {};
 
-  private get digital(): Digital {
-    return this.depsInstances.digital as Digital;
+  private get gpio(): Digital {
+    return this.depsInstances.gpio as Digital;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.gpio);
 
-    this.depsInstances.digital = await getDriverDep(driverName)
+    this.depsInstances.gpio = await getDriverDep(driverName)
       .getInstance(_omit(this.props, 'pullup', 'pulldown', 'pin', 'gpio'));
   }
 
   protected didInit = async () => {
     // setup pin as an input with resistor if specified
-    await this.digital.setup(this.props.pin, this.resolvePinMode());
+    await this.gpio.setup(this.props.pin, this.resolvePinMode());
   }
 
 
   /**
    * Get current binary value of pin.
    */
-  async read(): Promise<boolean> {
-    return await this.digital.read(this.props.pin);
+  read(): Promise<boolean> {
+    return this.gpio.read(this.props.pin);
   }
 
   /**
@@ -90,7 +90,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     _find(this.listeners, (handlerItem: [DigitalPinInputListenHandler, WatchHandler], listenerId: number) => {
       if (handlerItem[0] === handler) {
         delete this.listeners[listenerId];
-        this.digital.clearWatch(Number(listenerId));
+        this.gpio.clearWatch(Number(listenerId));
 
         return true;
       }
@@ -117,14 +117,14 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
   }
 
   private setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): number {
-    const pinMode: PinMode | undefined = this.digital.getPinMode(this.props.pin);
+    const pinMode: PinMode | undefined = this.gpio.getPinMode(this.props.pin);
     const normalEdge: Edge = edge || 'both';
 
     if (!pinMode || !pinMode.match(/input/)) {
       throw new Error(`Can't add listener. The GPIO pin "${this.props.pin}" wasn't set up as an input pin.`);
     }
 
-    return this.digital.setWatch(
+    return this.gpio.setWatch(
       this.props.pin,
       wrapper,
       debounce,
