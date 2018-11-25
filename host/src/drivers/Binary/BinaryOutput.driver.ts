@@ -5,7 +5,7 @@ import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryB
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import BlockMode from './interfaces/BlockMode';
+import {BlockMode, InitialLevel} from './interfaces/Types';
 
 
 export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {

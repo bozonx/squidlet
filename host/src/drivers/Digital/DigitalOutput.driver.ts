@@ -9,10 +9,8 @@ import {invertIfNeed, resolveDriverName} from './digitalHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
-type InitialLevel = 1 | 0 | 'low' | 'high';
-
 export interface DigitalOutputDriverProps extends DigitalBaseProps {
-  initial: InitialLevel;
+  _resolvedInitialLevel: boolean;
 }
 
 

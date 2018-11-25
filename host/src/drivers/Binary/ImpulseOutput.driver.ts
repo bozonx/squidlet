@@ -3,7 +3,7 @@ const _omit = require('lodash/omit');
 import {DigitalOutputDriver, DigitalOutputDriverProps} from '../Digital/DigitalOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import BlockMode from './interfaces/BlockMode';
+import {BlockMode} from './interfaces/Types';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 
 
