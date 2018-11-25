@@ -6,7 +6,7 @@ import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryB
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
-import {invertIfNeed, resolveDriverName} from './digitalHelpers';
+import {resolveDriverName} from './digitalHelpers';
 
 
 export type DigitalPinInputListenHandler = (level: boolean) => void;
@@ -38,7 +38,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.digital = await getDriverDep(driverName)
-      .getInstance(_omit(this.props, 'pullup', 'pulldown', 'pin', 'invert', 'gpio'));
+      .getInstance(_omit(this.props, 'pullup', 'pulldown', 'pin', 'gpio'));
   }
 
   protected didInit = async () => {
@@ -51,7 +51,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * Get current binary value of pin.
    */
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.digital.read(this.props.pin), this.props.invert);
+    return await this.digital.read(this.props.pin);
   }
 
   /**
@@ -61,8 +61,11 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * @param edge - Listen to low, high or both levels. By default is both.
    */
   addListener(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
+
+    // TODO: не использовать wrapper
+
     const wrapper: WatchHandler = (level: boolean) => {
-      handler(invertIfNeed(level, this.props.invert));
+      handler(level);
     };
 
     const listenerId: number = this.setWatch(wrapper, edge, debounce);
@@ -75,7 +78,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       // remove listener and don't listen any more
       this.removeListener(handler);
 
-      handler(invertIfNeed(level, this.props.invert));
+      handler(level);
     };
 
     const listenerId: number = this.setWatch(wrapper, edge, debounce);
@@ -115,7 +118,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
   private setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): number {
     const pinMode: PinMode | undefined = this.digital.getPinMode(this.props.pin);
-    const normalEdge: Edge = this.normalizeEdge(edge);
+    const normalEdge: Edge = edge || 'both';
 
     if (!pinMode || !pinMode.match(/input/)) {
       throw new Error(`Can't add listener. The GPIO pin "${this.props.pin}" wasn't set up as an input pin.`);
@@ -127,27 +130,6 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       debounce,
       normalEdge
     );
-  }
-
-  /**
-   * It is set invert param - then invert edge
-   * @param edge
-   */
-  private normalizeEdge(edge?: Edge): Edge {
-
-    // TODO: test
-
-    if (!edge) {
-      return 'both';
-    }
-    else if (this.props.invert && edge === 'rising') {
-      return 'falling';
-    }
-    else if (this.props.invert && edge === 'falling') {
-      return 'rising';
-    }
-
-    return edge;
   }
 
 }

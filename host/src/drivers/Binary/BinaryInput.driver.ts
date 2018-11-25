@@ -1,8 +1,10 @@
+import {invertIfNeed} from '../DigitalPin/digitalHelpers';
+
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
-import {Edge} from '../../app/interfaces/dev/Digital';
+import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps, DigitalPinInputListenHandler} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -36,8 +38,8 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance({
-        ..._omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup'),
-        invert: this.isInverted(),
+        ..._omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'),
+        //invert: this.isInverted(),
       });
   }
 
@@ -55,17 +57,30 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   async read(): Promise<boolean> {
-    return this.digitalInput.read();
+    return invertIfNeed(await this.digitalInput.read(), this.props.invert);
+    //return this.digitalInput.read();
   }
 
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
   addListener(handler: DigitalPinInputListenHandler) {
+    const wrapper: WatchHandler = (level: boolean) => {
+      handler(invertIfNeed(level, this.props.invert));
+    };
+
+    // TODO: save handler
+
     this.events.addListener(eventName, handler);
   }
 
   listenOnce(handler: DigitalPinInputListenHandler) {
+    const wrapper: WatchHandler = (level: boolean) => {
+      handler(invertIfNeed(level, this.props.invert));
+    };
+
+    // TODO: save handler
+
     this.events.once(eventName, handler);
   }
 
@@ -98,6 +113,28 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     setTimeout(() => {
       this.blockTimeInProgress = false;
     }, this.props.blockTime);
+  }
+
+
+  /**
+   * It is set invert param - then invert edge
+   * @param edge
+   */
+  private normalizeEdge(edge?: Edge): Edge {
+
+    // TODO: test
+
+    if (!edge) {
+      return 'both';
+    }
+    else if (this.props.invert && edge === 'rising') {
+      return 'falling';
+    }
+    else if (this.props.invert && edge === 'falling') {
+      return 'rising';
+    }
+
+    return edge;
   }
 
 }
