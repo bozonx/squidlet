@@ -27,7 +27,7 @@ const NO_DEBOUNCE_VALUE = 0;
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
   // listener and its wrapper by listener id which gets from setWatch method of dev
-  private listeners: {[index: string]: [DigitalPinInputListenHandler, WatchHandler]} = {};
+  private listeners: {[index: string]: [DigitalPinInputListenHandler, WatchHandler?]} = {};
 
   private get gpio(): Digital {
     return this.depsInstances.gpio as Digital;
@@ -61,16 +61,9 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * @param edge - Listen to low, high or both levels. By default is both.
    */
   addListener(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
-
-    // TODO: не использовать wrapper
-
-    const wrapper: WatchHandler = (level: boolean) => {
-      handler(level);
-    };
-
-    const listenerId: number = this.setWatch(wrapper, edge, debounce);
+    const listenerId: number = this.setWatch(handler, edge, debounce);
     // save listener id
-    this.listeners[listenerId] = [handler, wrapper];
+    this.listeners[listenerId] = [handler, undefined];
   }
 
   listenOnce(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
@@ -87,7 +80,10 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
   }
 
   removeListener(handler: DigitalPinInputListenHandler): void {
-    _find(this.listeners, (handlerItem: [DigitalPinInputListenHandler, WatchHandler], listenerId: number) => {
+
+    // TODO: зачем тогда сохранять wrapper ???
+
+    _find(this.listeners, (handlerItem: [DigitalPinInputListenHandler, WatchHandler?], listenerId: number) => {
       if (handlerItem[0] === handler) {
         delete this.listeners[listenerId];
         this.gpio.clearWatch(Number(listenerId));
