@@ -9,9 +9,9 @@ drivers:
   - Pcf8574.driver
 
 props:
-  initial:
-    type: 1 | 0 | low | high
-    default: 0
+  initialLevel:
+    type: boolean
+    default: false
 
   ### DigitalPin base props
   pin:

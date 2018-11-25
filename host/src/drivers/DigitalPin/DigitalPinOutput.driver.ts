@@ -5,12 +5,12 @@ import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryB
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
-import {invertIfNeed, resolveDriverName} from './digitalHelpers';
+import {resolveDriverName} from './digitalHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
 export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
-  _resolvedInitialLevel: boolean;
+  initialLevel: boolean;
 }
 
 
@@ -30,7 +30,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
     const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.gpio = await getDriverDep(driverName)
-      .getInstance(_omit(this.props, 'initial', 'pin', 'invert', 'gpio'));
+      .getInstance(_omit(this.props, 'initialLevel', 'pin', 'gpio'));
 
   }
 
@@ -39,7 +39,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
     // set initial level
     try {
-      await this.digitalWrite(this.calcInitial());
+      await this.digitalWrite(this.props.initialLevel);
     }
     catch (err) {
       throw new Error(`DigitalPinOutputDriver: Can't set initial value
@@ -51,16 +51,14 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   /**
    * Get current level of pin.
    */
-  async read(): Promise<boolean> {
-    return invertIfNeed(await this.gpio.read(this.props.pin), this.props.invert);
+  read(): Promise<boolean> {
+    return this.gpio.read(this.props.pin);
   }
 
   async write(newLevel: boolean): Promise<void> {
     if (typeof newLevel !== 'boolean') throw new Error(`Invalid type of level`);
 
-    const realLevel: boolean = invertIfNeed(newLevel, this.props.invert);
-
-    await this.digitalWrite(realLevel);
+    await this.digitalWrite(newLevel);
   }
 
 
@@ -69,20 +67,6 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
     // TODO: validate props.driver
     // TODO: validate specific for certain driver params
     return;
-  }
-
-  private calcInitial(): boolean {
-    if (this.props.invert) {
-
-      // TODO: зачем undefined ????
-
-      // if initial === 'high' it'll be logical 0 if undefines of low - 1
-      return typeof this.props.initial === 'undefined' || this.props.initial === 'low';
-    }
-    else {
-      // if initial === high it's logical 1, otherwise 0;
-      return this.props.initial === 'high';
-    }
   }
 
   private digitalWrite(value: boolean) {

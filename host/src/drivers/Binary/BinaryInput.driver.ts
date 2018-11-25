@@ -23,7 +23,7 @@ export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
   invertOnPullup: boolean;
   // for input: when receives 1 actually returned 0 and otherwise
   // for output: when sends 1 actually sends 0 and otherwise
-  invert?: boolean;
+  invert: boolean;
 }
 
 
@@ -37,10 +37,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
-      .getInstance({
-        ..._omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'),
-        //invert: this.isInverted(),
-      });
+      .getInstance(_omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'));
   }
 
   protected didInit = async () => {

@@ -1,21 +1,24 @@
+import {invertIfNeed} from '../DigitalPin/digitalHelpers';
+
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
-import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput.driver';
+import {DigitalPinOutputDriver} from '../DigitalPin/DigitalPinOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode, InitialLevel} from './interfaces/Types';
+import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
 
 
-export interface BinaryOutputDriverProps extends DigitalPinOutputDriverProps {
+export interface BinaryOutputDriverProps extends DigitalBaseProps {
   blockTime: number;
   // if "refuse" - it doesn't write while block time. It is on default.
   // If "defer" it waits for block time finished and write last last value which was tried to set
   blockMode: BlockMode;
   // for input: when receives 1 actually returned 0 and otherwise
   // for output: when sends 1 actually sends 0 and otherwise
-  invert?: boolean;
+  invert: boolean;
   initial: InitialLevel;
 }
 
@@ -37,7 +40,10 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     console.log(555555555, this.props);
 
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
-      .getInstance(_omit(this.props, 'blockTime', 'blockMode'));
+      .getInstance({
+        ..._omit(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
+        initialLevel: this.resolveInitial(),
+      });
   }
 
 
@@ -46,7 +52,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   }
 
   async read(): Promise<boolean> {
-    return this.digitalOutput.read();
+    return invertIfNeed(await this.digitalOutput.read(), this.props.invert);
   }
 
 
@@ -120,6 +126,21 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       this.write(lastDeferredValue)
         .then(() => this.events.emit(delayedResultEventName))
         .catch((err) => this.events.emit(delayedResultEventName, err));
+    }
+  }
+
+  private resolveInitial(): boolean {
+    // TODO: !!!!
+    if (this.props.invert) {
+
+      // TODO: зачем undefined ????
+
+      // if initial === 'high' it'll be logical 0 if undefines of low - 1
+      return typeof this.props.initial === 'undefined' || this.props.initial === 'low';
+    }
+    else {
+      // if initial === high it's logical 1, otherwise 0;
+      return this.props.initial === 'high';
     }
   }
 
