@@ -59,6 +59,10 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   // TODO: что будет при последующих запросаз ???
 
   async write(level: boolean) {
+
+    // TODO: refactor
+    // TODO: use invert
+
     if (this.blockTimeInProgress) {
       if (this.props.blockMode === 'refuse') {
         // don't write while block time
@@ -70,13 +74,16 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
         // wait while delayed value is set
         return new Promise<void>((resolve, reject) => {
-          this.events.addListener(delayedResultEventName, (err) => {
+          const listenHandler: (err: Error) => void = (err: Error) => {
+            this.events.removeListener(delayedResultEventName, listenHandler);
             if (err) {
               return reject(err);
             }
 
             resolve();
-          });
+          };
+
+          this.events.addListener(delayedResultEventName, listenHandler);
         });
       }
     }
@@ -117,6 +124,9 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     // setting last delayed value
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
+
+      // TODO: use inverted
+
       const lastDeferredValue = this.lastDeferredValue;
       // clear deferred value
       this.lastDeferredValue = undefined;
