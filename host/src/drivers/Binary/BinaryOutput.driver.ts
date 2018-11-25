@@ -55,14 +55,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     return invertIfNeed(await this.digitalOutput.read(), this.props.invert);
   }
 
-
-  // TODO: что будет при последующих запросаз ???
-
   async write(level: boolean) {
-
-    // TODO: refactor
-    // TODO: use invert
-
     if (this.blockTimeInProgress) {
       if (this.props.blockMode === 'refuse') {
         // don't write while block time
@@ -89,17 +82,27 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     }
 
     // normal write
+    await this.doWrite(level);
+  }
 
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
+  }
+
+
+  private async doWrite(level: boolean) {
     this.blockTimeInProgress = true;
 
     try {
-      await this.digitalOutput.write(level);
+      await this.digitalOutput.write(invertIfNeed(level, this.props.invert));
     }
     catch (err) {
       this.blockTimeInProgress = false;
 
-      throw(new Error(`BinaryOutputDriver: Can't write "${level}",
-        props: "${JSON.stringify(this.props)}". ${err.toString()}`));
+      throw new Error(`BinaryOutputDriver: Can't write "${level}",
+        props: "${JSON.stringify(this.props)}". ${err.toString()}`);
     }
 
     // starting block time
@@ -112,28 +115,18 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     });
   }
 
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
-  }
-
-
   private blockTimeFinished = () => {
     this.blockTimeInProgress = false;
 
     // setting last delayed value
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
-
-      // TODO: use inverted
-
       const lastDeferredValue = this.lastDeferredValue;
       // clear deferred value
       this.lastDeferredValue = undefined;
       // write deferred value
 
       // don't wait in normal way
-      this.write(lastDeferredValue)
+      this.write(invertIfNeed(lastDeferredValue, this.props.invert))
         .then(() => this.events.emit(delayedResultEventName))
         .catch((err) => this.events.emit(delayedResultEventName, err));
     }
