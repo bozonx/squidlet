@@ -130,18 +130,14 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   }
 
   private resolveInitial(): boolean {
-    // TODO: !!!!
     if (this.props.invert) {
-
-      // TODO: зачем undefined ????
-
-      // if initial === 'high' it'll be logical 0 if undefines of low - 1
-      return typeof this.props.initial === 'undefined' || this.props.initial === 'low';
+      // Inverted. initial 0 | low = true. Else false.
+      return !this.props.initial || this.props.initial === 'low';
     }
-    else {
-      // if initial === high it's logical 1, otherwise 0;
-      return this.props.initial === 'high';
-    }
+
+    // not inverted - initial 1 | high = true. Else false
+    // if initial === high it's logical 1, otherwise 0;
+    return this.props.initial === 1 || this.props.initial === 'high';
   }
 
 }

@@ -31,7 +31,6 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
     this.depsInstances.gpio = await getDriverDep(driverName)
       .getInstance(_omit(this.props, 'initialLevel', 'pin', 'gpio'));
-
   }
 
   protected didInit = async () => {
