@@ -13,6 +13,10 @@ export interface BinaryOutputDriverProps extends DigitalOutputDriverProps {
   // if "refuse" - it doesn't write while block time. It is on default.
   // If "defer" it waits for block time finished and write last last value which was tried to set
   blockMode: BlockMode;
+  // for input: when receives 1 actually returned 0 and otherwise
+  // for output: when sends 1 actually sends 0 and otherwise
+  invert?: boolean;
+  initial: InitialLevel;
 }
 
 const delayedResultEventName = 'delayedResult';

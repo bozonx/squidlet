@@ -20,6 +20,8 @@ props:
     type: boolean
     default: true
   invert:
+    type: boolean
+    default: false
 
   ### DigitalInput driver props
   pullup:
@@ -27,5 +29,4 @@ props:
 
   ### Digital base props
   pin:
-  #invert:
   gpio:

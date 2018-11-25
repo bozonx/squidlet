@@ -16,5 +16,4 @@ props:
 
   ### Digital base props
   pin:
-  #invert:
   gpio:

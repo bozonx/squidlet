@@ -14,6 +14,9 @@ export interface ImpulseOutputDriverProps extends DigitalOutputDriverProps {
   // if "refuse" - it doesn't write while block time.
   // If "defer" it waits for block time finished and write last write request
   blockMode: BlockMode;
+  // for input: when receives 1 actually returned 0 and otherwise
+  // for output: when sends 1 actually sends 0 and otherwise
+  invert?: boolean;
 }
 
 

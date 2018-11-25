@@ -6,10 +6,10 @@ blockMode:
 
 ### DigitalOutput driver props
 initial:
+invert:
 
 ### Digital base props
 pin:
-invert:
 gpio:
 
 ### Device base props

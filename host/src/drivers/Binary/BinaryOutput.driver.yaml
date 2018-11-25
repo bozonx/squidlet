@@ -11,11 +11,16 @@ props:
   blockMode:
     type: refuse | defer
     default: refuse
-
-  ### DigitalOutput driver props
   initial:
+    type: 1 | 0 | low | high
+    default: 0
+  invert:
+    type: boolean
+    default: false
+
+  # DigitalOutputDriverProps
+  #initial:
 
   ### Digital base props
   pin:
-  invert:
   gpio:

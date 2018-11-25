@@ -22,6 +22,9 @@ export interface ImpulseInputDriverProps extends DigitalInputDriverProps {
   throttle?: number;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
+  // for input: when receives 1 actually returned 0 and otherwise
+  // for output: when sends 1 actually sends 0 and otherwise
+  invert?: boolean;
 }
 
 

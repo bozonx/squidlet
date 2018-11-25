@@ -12,10 +12,10 @@ invertOnPullup:
 ### DigitalInput driver props
 pullup:
 pulldown:
+invert:
 
 ### Digital base props
 pin:
-invert:
 gpio:
 
 ### Device base props
