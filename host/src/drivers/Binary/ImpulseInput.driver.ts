@@ -26,7 +26,7 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
   invertOnPullup: boolean;
   // for input: when receives 1 actually returned 0 and otherwise
   // for output: when sends 1 actually sends 0 and otherwise
-  invert?: boolean;
+  invert: boolean;
 }
 
 
@@ -57,7 +57,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
 
   isInverted(): boolean {
-    return isDigitalInverted(this.props.invertOnPullup, this.props.pullup, this.props.invert);
+    return isDigitalInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
   }
 
   async read(): Promise<boolean> {

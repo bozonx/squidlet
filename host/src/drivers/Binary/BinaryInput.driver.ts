@@ -30,18 +30,21 @@ export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
 export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
   private blockTimeInProgress: boolean = false;
+  private _isInverted: boolean = false;
 
   private get digitalInput(): DigitalPinInputDriver {
     return this.depsInstances.digitalInput as DigitalPinInputDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+    this._isInverted = isDigitalInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
+
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance(_omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'));
   }
 
   protected didInit = async () => {
-    this.digitalInput.addListener(this.listenHandler, this.props.debounce, this.props.edge);
+    this.digitalInput.addListener(this.listenHandler, this.props.debounce, this.resolveEdge());
   }
 
 
@@ -50,12 +53,11 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   isInverted(): boolean {
-    return isDigitalInverted(this.props.invertOnPullup, this.props.pullup, this.props.invert);
+    return this._isInverted;
   }
 
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.digitalInput.read(), this.props.invert);
-    //return this.digitalInput.read();
+    return invertIfNeed(await this.digitalInput.read(), this.isInverted());
   }
 
   /**
@@ -63,7 +65,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
    */
   addListener(handler: WatchHandler) {
     const wrapper: WatchHandler = (level: boolean) => {
-      handler(invertIfNeed(level, this.props.invert));
+      handler(invertIfNeed(level, this.isInverted()));
     };
 
     // TODO: save handler
@@ -73,7 +75,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   listenOnce(handler: WatchHandler) {
     const wrapper: WatchHandler = (level: boolean) => {
-      handler(invertIfNeed(level, this.props.invert));
+      handler(invertIfNeed(level, this.isInverted()));
     };
 
     // TODO: save handler
@@ -82,6 +84,9 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   removeListener(handler: WatchHandler) {
+
+    // TODO: remke - use wrapper
+
     this.events.removeListener(eventName, handler);
   }
 
@@ -117,17 +122,17 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
    * It is set invert param - then invert edge
    * @param edge
    */
-  private normalizeEdge(edge?: Edge): Edge {
+  private resolveEdge(edge?: Edge): Edge {
 
     // TODO: test
 
     if (!edge) {
       return 'both';
     }
-    else if (this.props.invert && edge === 'rising') {
+    else if (this.isInverted() && edge === 'rising') {
       return 'falling';
     }
-    else if (this.props.invert && edge === 'falling') {
+    else if (this.isInverted() && edge === 'falling') {
       return 'rising';
     }
 
