@@ -63,7 +63,15 @@ export default class EntityBase<Props = {}> {
 
     if (this.willInit) await this.willInit(getDriverDep);
     if (this.doInit) await this.doInit(getDriverDep);
-    if (this.didInit) await this.didInit(getDriverDep);
+    // not critical error
+    if (this.didInit) {
+      try {
+        await this.didInit(getDriverDep);
+      }
+      catch (err) {
+        this.env.log.error(err);
+      }
+    }
   }
 
   /**

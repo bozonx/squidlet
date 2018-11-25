@@ -50,6 +50,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
   }
 
+
   isInverted(): boolean {
     return isDigitalInverted(this.props.invertOnPullup, this.props.pullup, this.props.invert);
   }

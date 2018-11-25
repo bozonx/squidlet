@@ -37,7 +37,6 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   }
 
   protected didInit = async () => {
-    // if setup fails it will be critical error
     await this.digital.setup(this.props.pin, 'output');
 
     // set initial level
@@ -45,9 +44,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
       await this.digitalWrite(this.calcInitial());
     }
     catch (err) {
-      // TODO: почему не работает env.log ???
-      // not critical error
-      this.env.system.log.error(`DigitalOutputDriver: Can't set initial value
+      throw new Error(`DigitalOutputDriver: Can't set initial value
        of "${JSON.stringify(this.props)}": ${err.toString()}`);
     }
   }
@@ -61,8 +58,7 @@ export class DigitalOutputDriver extends DriverBase<DigitalOutputDriverProps> {
   }
 
   async write(newLevel: boolean): Promise<void> {
-
-    // TODO: валидировать что значение boolean
+    if (typeof newLevel !== 'boolean') throw new Error(`Invalid type of level`);
 
     const realLevel: boolean = invertIfNeed(newLevel, this.props.invert);
 

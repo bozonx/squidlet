@@ -43,9 +43,9 @@ export class DigitalInputDriver extends DriverBase<DigitalInputDriverProps> {
 
   protected didInit = async () => {
     // setup pin as an input with resistor if specified
-    // if setup fails it will be critical error
     await this.digital.setup(this.props.pin, this.resolvePinMode());
   }
+
 
   /**
    * Get current binary value of pin.
