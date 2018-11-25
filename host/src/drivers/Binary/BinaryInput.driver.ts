@@ -6,7 +6,7 @@ import * as EventEmitter from 'eventemitter3';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalPinInputDriver, DigitalPinInputDriverProps, DigitalPinInputListenHandler} from '../DigitalPin/DigitalPinInput.driver';
+import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {isDigitalInverted} from '../../helpers/helpers';
 
@@ -61,7 +61,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
-  addListener(handler: DigitalPinInputListenHandler) {
+  addListener(handler: WatchHandler) {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.props.invert));
     };
@@ -71,7 +71,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     this.events.addListener(eventName, handler);
   }
 
-  listenOnce(handler: DigitalPinInputListenHandler) {
+  listenOnce(handler: WatchHandler) {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.props.invert));
     };
@@ -81,7 +81,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     this.events.once(eventName, handler);
   }
 
-  removeListener(handler: DigitalPinInputListenHandler) {
+  removeListener(handler: WatchHandler) {
     this.events.removeListener(eventName, handler);
   }
 

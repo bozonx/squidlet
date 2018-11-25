@@ -9,9 +9,6 @@ import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 
 
-// TODO: не нужно поидее
-export type DigitalPinInputListenHandler = WatchHandler;
-
 export interface DigitalPinInputDriverProps extends DigitalBaseProps {
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
@@ -28,7 +25,7 @@ const NO_DEBOUNCE_VALUE = 0;
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
   // listener and its wrapper by listener id which gets from setWatch method of dev
-  private listeners: {[index: string]: DigitalPinInputListenHandler} = {};
+  private listeners: {[index: string]: WatchHandler} = {};
 
   private get gpio(): Digital {
     return this.depsInstances.gpio as Digital;
@@ -61,14 +58,14 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
    * @param edge - Listen to low, high or both levels. By default is both.
    */
-  addListener(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
+  addListener(handler: WatchHandler, debounce?: number, edge?: Edge): void {
     const listenerId: number = this.setWatch(handler, edge, debounce);
     // save listener id
     this.listeners[listenerId] = handler;
   }
 
-  listenOnce(handler: DigitalPinInputListenHandler, debounce?: number, edge?: Edge): void {
-    const wrapper: DigitalPinInputListenHandler = (level: boolean) => {
+  listenOnce(handler: WatchHandler, debounce?: number, edge?: Edge): void {
+    const wrapper: WatchHandler = (level: boolean) => {
       // remove listener and don't listen any more
       this.removeListener(handler);
 
@@ -80,8 +77,8 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     this.listeners[listenerId] = handler;
   }
 
-  removeListener(handler: DigitalPinInputListenHandler): void {
-    _find(this.listeners, (handlerItem: DigitalPinInputListenHandler, listenerId: string) => {
+  removeListener(handler: WatchHandler): void {
+    _find(this.listeners, (handlerItem: WatchHandler, listenerId: string) => {
       if (handlerItem === handler) {
         delete this.listeners[listenerId];
         this.gpio.clearWatch(Number(listenerId));
@@ -110,7 +107,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     else return 'input';
   }
 
-  private setWatch(wrapper: DigitalPinInputListenHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): number {
+  private setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): number {
     const pinMode: PinMode | undefined = this.gpio.getPinMode(this.props.pin);
     const normalEdge: Edge = edge || 'both';
 

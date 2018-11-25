@@ -1,9 +1,11 @@
+import {WatchHandler} from '../../app/interfaces/dev/Digital';
+
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
 import {isDigitalInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalPinInputDriver, DigitalPinInputDriverProps, DigitalPinInputListenHandler} from '../DigitalPin/DigitalPinInput.driver';
+import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 
@@ -65,22 +67,22 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   /**
    * Listen only to rising of impulse, not falling.
    */
-  addRisingListener(handler: DigitalPinInputListenHandler) {
+  addRisingListener(handler: WatchHandler) {
     this.events.addListener(risingEventName, handler);
   }
 
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
-  addListener(handler: DigitalPinInputListenHandler) {
+  addListener(handler: WatchHandler) {
     this.events.addListener(bothEventName, handler);
   }
 
-  listenOnce(handler: DigitalPinInputListenHandler) {
+  listenOnce(handler: WatchHandler) {
     this.events.once(risingEventName, handler);
   }
 
-  removeListener(handler: DigitalPinInputListenHandler) {
+  removeListener(handler: WatchHandler) {
     this.events.removeListener(risingEventName, handler);
     this.events.removeListener(bothEventName, handler);
   }
