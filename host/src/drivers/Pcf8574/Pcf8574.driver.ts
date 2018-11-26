@@ -79,9 +79,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-
-    console.log(111111111, this.props);
-
     // TODO: I2cNode
 
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')

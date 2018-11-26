@@ -43,6 +43,11 @@ export default class System {
     this.initializationConfig = initializationConfig();
     this.events = new Events();
     this.host = new Host(this);
+
+    // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
+
+    this.log = new LogPublisher(this);
+
     this.driversManager = new DriversManager(this);
 
     // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
@@ -50,9 +55,6 @@ export default class System {
     this.network = new Network(this.driversManager.env);
     this.messenger = new Messenger(this);
 
-    // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
-
-    this.log = new LogPublisher(this);
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
     this.devices = new Devices(this);

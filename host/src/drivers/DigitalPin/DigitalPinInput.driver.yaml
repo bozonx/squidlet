@@ -5,6 +5,7 @@ type: system
 # TODO: remove
 drivers:
   - Digital_local.driver
+  - Digital_pcf8574.driver
 
 props:
   pullup:

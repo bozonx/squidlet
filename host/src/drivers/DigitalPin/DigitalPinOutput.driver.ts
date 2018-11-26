@@ -24,9 +24,6 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-
-    console.log(4444444444, this.props);
-
     const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.gpio = await getDriverDep(driverName)
