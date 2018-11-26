@@ -19,6 +19,7 @@ type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cNodeDriverProps {
   // TODO: может быть и строкой
+  // TODO: не обязателен
   bus: number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
@@ -62,13 +63,15 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cMaster = getDriverDep('I2cMaster.driver')
+    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
 
-    for (let dataAddressStr of Object.keys(this.intsProps)) {
-      this.intDrivers[dataAddressStr] = getDriverDep('ImpulseInput.driver')
-        .getInstance(this.intsProps[dataAddressStr]);
-    }
+    // TODO: вернуть
+
+    // for (let dataAddressStr of Object.keys(this.intsProps)) {
+    //   this.intDrivers[dataAddressStr] = getDriverDep('ImpulseInput.driver')
+    //     .getInstance(this.intsProps[dataAddressStr]);
+    // }
 
     this.addressHex = this.normilizeAddr(this.props.address);
   }
@@ -99,6 +102,10 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
   }
 
+  async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+    await this.i2cMaster.write(this.addressHex, dataAddress, data);
+  }
+
   /**
    * Write and read from the same data address.
    */
@@ -124,10 +131,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     const length: number = this.props.feedback[dataAddressStr].dataLength;
 
     return this.doPoll(dataAddress, length);
-  }
-
-  async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    await this.i2cMaster.write(this.addressHex, dataAddress, data);
   }
 
   /**
@@ -229,10 +232,14 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   }
 
   // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number
-  private normilizeAddr(addressHex: string | number): number {
-    return (Number.isInteger(addressHex as any))
-      ? addressHex as number
-      : hexStringToHexNum(addressHex as string);
+  private normilizeAddr(address: string | number): number {
+    return hexStringToHexNum(String(address));
+
+    // TODO; review
+
+    // return (Number.isInteger(addressHex as any))
+    //   ? addressHex as number
+    //   : hexStringToHexNum(addressHex as string);
   }
 
   /**
@@ -254,6 +261,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
 export default class Factory extends DriverFactoryBase<I2cNodeDriver> {
   protected DriverClass = I2cNodeDriver;
+
+  // TODO: review
+
   protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
     return `${instanceProps.bus}-${instanceProps.address}`;
   }

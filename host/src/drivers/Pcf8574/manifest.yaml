@@ -1,7 +1,7 @@
 name: Pcf8574.driver
 main: Pcf8574.driver.ts
 drivers:
-  - I2cMaster.driver
+  - I2cNode.driver
 
 props:
   bus:

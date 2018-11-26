@@ -151,6 +151,8 @@ export default class HostClassNames {
     const dependencies: Dependencies = this.main.entities.getDependencies();
     let result: string[] = [];
 
+    // TODO: если встретил ту же зависимость - остановиться
+
     for (let depDriverName of typeDependencies) {
       result.push(depDriverName);
 

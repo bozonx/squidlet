@@ -26,7 +26,7 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cSlave = getDriverDep('I2cSlave.dev')
+    this.depsInstances.i2cSlave = await getDriverDep('I2cSlave.dev')
       .getInstance(this.props);
   }
 
