@@ -23,9 +23,6 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-
-    console.log(22222222, this.props);
-
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.dev');
   }
 
