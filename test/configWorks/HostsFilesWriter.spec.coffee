@@ -66,7 +66,7 @@ describe 'master.HostsFilesWriter', ->
     )
 
   it 'writeHostsFiles', ->
-    configDir = '/buildDir/hosts/master/config'
+    configDir = '/buildDir/hosts/configWorks/config'
 
     await @hostsFilesWriter.writeHostsFiles()
 
@@ -104,6 +104,6 @@ describe 'master.HostsFilesWriter', ->
       @definitionsSet.servicesDefinitions
     )
     sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(8),
-      "/buildDir/hosts/master/usedEntities.json",
+      "/buildDir/hosts/configWorks/usedEntities.json",
       @entitiesNames
     )

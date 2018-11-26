@@ -42,7 +42,7 @@ describe 'master.MasterConfig', ->
       }
     }
 
-    @pathToMasterConfig = '/path/to/master.yaml'
+    @pathToMasterConfig = '/path/to/configWorks.yaml'
 
     # TODO: not safe - may be make new class with cloned prototype
     MasterConfig.prototype.getPlatformConfig = => {
@@ -88,15 +88,15 @@ describe 'master.MasterConfig', ->
   it 'getHostPlatformDevs', ->
     assert.deepEqual @masterConfig.getHostPlatformDevs('master'), ['Fs']
 
-  it 'buildDir - use defaults if there is not storage dir of master config', ->
+  it 'buildDir - use defaults if there is not storage dir of configWorks config', ->
     @masterConfig.preHosts.master.config.storageDir = undefined
 
     assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), systemConfig.defaultDuildDir)
 
-  it 'buildDir - use master\'s absolute storageDir', ->
+  it 'buildDir - use configWorks\'s absolute storageDir', ->
     assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)
 
-  it 'buildDir - use master\'s relative storageDir', ->
+  it 'buildDir - use configWorks\'s relative storageDir', ->
     @masterConfig.preHosts.master.config.storageDir = './myDir'
 
     assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), '/path/to/myDir')
