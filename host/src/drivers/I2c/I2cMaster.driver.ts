@@ -7,8 +7,12 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 
 const DATA_ADDRESS_LENGTH = 1;
 
-interface I2cMasterDriverProps {
+export interface I2cMasterDriverProps {
+
+  // TODO: может быть и строкой
+
   bus: number;
+  //bus: string | number;
 }
 
 
@@ -20,7 +24,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
 
-    console.log(22222222, this.props)
+    console.log(22222222, this.props);
 
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.dev');
   }
@@ -43,7 +47,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 
   async write(addressHex: number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
 
-    console.log(88888888, this.props, addressHex, dataAddress, data)
+    console.log(88888888, this.props, addressHex, dataAddress, data);
 
     let dataToWrite = data;
 

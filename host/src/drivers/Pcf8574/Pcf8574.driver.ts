@@ -8,7 +8,7 @@ import * as EventEmitter from 'eventemitter3';
 import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {I2cMasterDriver} from '../I2c/I2cMaster.driver';
+import {I2cMasterDriver, I2cMasterDriverProps} from '../I2c/I2cMaster.driver';
 
 
 type Handler = (data: InputData) => void;
@@ -19,10 +19,12 @@ interface InputData {
   value: boolean;
 }
 
-// TODO: extend I2cMaster
-export interface ExpanderDriverProps {
-  bus?: string | number;
-  address: string | number;
+export interface ExpanderDriverProps extends I2cMasterDriverProps {
+
+  // TODO: use props from I2cNode
+
+  //address: string | number;
+  address: number;
 }
 
 
@@ -79,6 +81,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
 
     console.log(111111111, this.props);
+
+    // TODO: I2cNode
 
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
       .getInstance(_omit(this.props, 'address'));

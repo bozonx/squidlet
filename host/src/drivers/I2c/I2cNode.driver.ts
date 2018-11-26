@@ -18,6 +18,7 @@ const DEFAULT_DATA_ADDRESS = 'default';
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cNodeDriverProps {
+  // TODO: может быть и строкой
   bus: number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;

@@ -3,6 +3,7 @@ main: I2cMaster.driver.ts
 type: system
 drivers:
   - I2cMaster.dev
+
 props:
   bus:
     type: string | number

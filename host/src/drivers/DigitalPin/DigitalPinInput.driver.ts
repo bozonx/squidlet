@@ -131,7 +131,7 @@ export default class Factory extends DriverFactoryBase<DigitalPinInputDriver> {
   // TODO: remove
   protected instanceType: InstanceType = 'alwaysNew';
 
-  // TODO: спросить bus и address у нижележащего драйвера
+  // TODO: спросить bus и address у нижележащего драйвера - выполнить generateUniqId()
 
   // protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
   //
