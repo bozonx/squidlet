@@ -184,6 +184,8 @@ export default class Definitions {
     if (!manifestProps) return result;
 
     for (let propName of Object.keys(manifestProps)) {
+      if (!manifestProps[propName] || typeof manifestProps[propName].default === 'undefined') continue;
+
       result[propName] = manifestProps[propName].default;
     }
 
