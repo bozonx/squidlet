@@ -1,14 +1,11 @@
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {EntityProps} from '../../app/interfaces/EntityDefinition';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
+import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 
 
-interface DigitalPcf8574DriverProps extends EntityProps {
-  bus?: string | number;
-  address: string | number;
+interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 }
 
 
@@ -26,9 +23,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
-
-    // TODO: накопить инициализацию пинов и потом установить одним запросом. Но только перед установкой первичного знчения
-
     if (pinMode === 'output') {
       // output pin
       await this.expander.outputPin(pin, false);
@@ -48,14 +42,14 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async read(pin: number): Promise<boolean> {
-    return await this.expander.getPinValue(pin);
+    return this.expander.getPinValue(pin);
   }
 
   /**
    * Set level to output pin
    */
-  async write(pin: number, value: boolean): Promise<void> {
-    await this.expander.setPin(pin, value);
+  write(pin: number, value: boolean): Promise<void> {
+    return this.expander.setPin(pin, value);
   }
 
   /**
@@ -81,13 +75,12 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
+  protected instanceType: InstanceType = 'alwaysNew';
   protected DriverClass = DigitalPcf8574Driver;
-  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
 
-    // TODO: bus может быть undefined = default
+  generateUniqId(instanceProps: {[index: string]: any}): string {
+    const bus: string = (instanceProps.bus) ? String(instanceProps.bus) : 'default';
 
-    console.log(99999999, `${instanceProps.bus}-${instanceProps.address}`)
-
-    return `${instanceProps.bus}-${instanceProps.address}`;
+    return `${bus}-${instanceProps.address}`;
   }
 }

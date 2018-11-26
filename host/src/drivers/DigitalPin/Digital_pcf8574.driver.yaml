@@ -5,8 +5,4 @@ drivers:
   - Pcf8574.driver
 props:
   bus:
-    type: string | number
-  # i2c address like "5a" or 22. Not converted to hex
   address:
-    type: string | number
-    required: true

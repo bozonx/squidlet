@@ -19,10 +19,10 @@ interface InputData {
   value: boolean;
 }
 
+// TODO: extend I2cMaster
 export interface ExpanderDriverProps {
-  bus: number;
-  address: number;
-  //initialState: boolean | number;
+  bus?: string | number;
+  address: string | number;
 }
 
 
@@ -186,8 +186,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     const dataToSend: Uint8Array = new Uint8Array(1);
 
     dataToSend[0] = newIcState;
-
-    console.log(66666666, this.props.address, dataToSend)
 
     await this.i2cMaster.write(this.props.address, undefined, dataToSend);
 
@@ -419,7 +417,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {PinNumber} pin The pin number. (0 to 7)
    * @return {boolean}               The current value.
    */
-  public getPinValue(pin: PinNumber):boolean{
+  public getPinValue(pin: PinNumber): boolean {
     if(pin < 0 || pin > 7){
       return false;
     }
