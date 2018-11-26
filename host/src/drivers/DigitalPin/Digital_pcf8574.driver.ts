@@ -7,9 +7,8 @@ import {PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 
 
 interface DigitalPcf8574DriverProps extends EntityProps {
-  bus: number;
-  address: number;
-  //outputInitial: boolean[];
+  bus?: string | number;
+  address: string | number;
 }
 
 
@@ -27,6 +26,9 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async setup(pin: number, pinMode: PinMode): Promise<void> {
+
+    // TODO: накопить инициализацию пинов и потом установить одним запросом. Но только перед установкой первичного знчения
+
     if (pinMode === 'output') {
       // output pin
       await this.expander.outputPin(pin, false);
@@ -81,6 +83,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
   protected DriverClass = DigitalPcf8574Driver;
   protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+
+    // TODO: bus может быть undefined = default
 
     console.log(99999999, `${instanceProps.bus}-${instanceProps.address}`)
 

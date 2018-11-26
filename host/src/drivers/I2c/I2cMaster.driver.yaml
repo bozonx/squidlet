@@ -5,4 +5,5 @@ drivers:
   - I2cMaster.dev
 props:
   bus:
-    type: number
+    type: string | number
+    required: true
