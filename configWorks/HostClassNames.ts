@@ -153,7 +153,7 @@ export default class HostClassNames {
     const processedItems: string[] = [];
 
     const recursively = (processingPluralType: ManifestsTypePluralName, processingName: string) => {
-      processedItems.push(processingName);
+      processedItems.push(`${processingPluralType}-${processingName}`);
 
       const typeDependencies: string[] = dependencies[processingPluralType][processingName];
 
@@ -162,7 +162,7 @@ export default class HostClassNames {
 
         const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
 
-        if (subDeps && !_includes(processedItems, depDriverName)) {
+        if (subDeps && !_includes(processedItems, `drivers-${depDriverName}`)) {
           recursively('drivers', depDriverName);
         }
       }
