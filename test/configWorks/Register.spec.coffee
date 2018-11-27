@@ -1,7 +1,7 @@
 Register = require('../../configWorks/Register').default
 
 
-describe 'master.Register', ->
+describe 'configWorks.Register', ->
   beforeEach ->
     @plugin = sinon.spy()
     @entity = {

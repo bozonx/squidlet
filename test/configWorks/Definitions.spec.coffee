@@ -2,7 +2,7 @@ Definitions = require('../../configWorks/Definitions').default
 hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').default
 
 
-describe 'master.Definitions', ->
+describe 'configWorks.Definitions', ->
   beforeEach ->
     @main = {
       masterConfig: {

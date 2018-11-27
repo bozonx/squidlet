@@ -3,7 +3,6 @@ const _uniq = require('lodash/uniq');
 const _flatten = require('lodash/flatten');
 
 import Main from './Main';
-import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
 import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
 import PreHostConfig from './interfaces/PreHostConfig';
 

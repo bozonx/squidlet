@@ -3,7 +3,7 @@ path = require('path')
 HostsFilesWriter = require('../../configWorks/HostsFilesWriter').default
 
 
-describe 'master.HostsFilesWriter', ->
+describe 'configWorks.HostsFilesWriter', ->
   beforeEach ->
     @definitionsSet = {
       systemDrivers: 'systemDrivers'

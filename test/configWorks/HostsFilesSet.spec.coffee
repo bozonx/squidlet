@@ -3,7 +3,7 @@ path = require('path')
 HostsFilesSet = require('../../configWorks/HostsFilesSet').default
 
 
-describe 'master.HostsFilesSet', ->
+describe 'configWorks.HostsFilesSet', ->
   beforeEach ->
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {

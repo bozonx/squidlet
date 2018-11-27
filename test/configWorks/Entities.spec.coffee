@@ -1,7 +1,7 @@
 Entities = require('../../configWorks/Entities').default
 
 
-describe 'master.Entities', ->
+describe 'configWorks.Entities', ->
   beforeEach ->
     @preDevicesManifests = [
       {

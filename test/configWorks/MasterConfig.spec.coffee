@@ -3,7 +3,7 @@ hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').defau
 systemConfig = require('../../configWorks/configs/systemConfig').default
 
 
-describe 'master.MasterConfig', ->
+describe 'configWorks.MasterConfig', ->
   beforeEach ->
     @preMasterHostConfig = {
       platform: 'rpi'
