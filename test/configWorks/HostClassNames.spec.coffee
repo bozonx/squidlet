@@ -4,7 +4,7 @@ HostClassNames = require('../../configWorks/HostClassNames').default
 
 describe.only 'configWorks.HostClassNames', ->
   beforeEach ->
-    @driversClasses = ['Top.driver', 'Bottom.driver', 'Other.driver']
+    @driversClasses = ['Top.driver', 'Middle.driver', 'Bottom.driver', 'Other.driver']
     @main = {
       masterConfig: {
         hostDefaults: {
@@ -45,8 +45,9 @@ describe.only 'configWorks.HostClassNames', ->
         getDependencies: =>
           {
             drivers: {
-              'Top.driver': ['Bottom.driver', 'Other.driver'],
-              'Other.driver': ['Top.driver'],
+              'Top.driver': ['Middle.driver'],
+              'Middle.driver': ['Bottom.driver'],
+              'Bottom.driver': ['Top.driver'],
             }
           }
       }
@@ -56,4 +57,4 @@ describe.only 'configWorks.HostClassNames', ->
   it 'addDeps - check recursion', ->
     result = @hostClassNames.addDeps('drivers', @driversClasses)
 
-    assert.deepEqual(result, @driversClasses)
+    assert.deepEqual(result, ['Top.driver', 'Middle.driver', 'Bottom.driver'])

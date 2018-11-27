@@ -152,9 +152,11 @@ export default class HostClassNames {
 
     // TODO: если встретил ту же зависимость - остановиться
 
+    // --- ['Bottom.driver']
     for (let depDriverName of typeDependencies) {
       result.push(depDriverName);
 
+      // --- ['Top.driver']
       const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
 
       if (subDeps) {
