@@ -3,8 +3,7 @@ main: I2cNode.driver.ts
 type: system
 drivers:
   - I2cMaster.driver
-  # TODO: вернуть
-  #- ImpulseInput.driver
+  - ImpulseInput.driver
 props:
   feedback:
     type: poll | int | none

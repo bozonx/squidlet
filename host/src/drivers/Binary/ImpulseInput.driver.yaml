@@ -3,6 +3,7 @@ main: ImpulseInput.driver.ts
 type: system
 drivers:
   - DigitalPinInput.driver
+
 props:
   impulseLength:
     type: number

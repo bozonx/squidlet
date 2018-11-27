@@ -2,7 +2,7 @@ HostClassNames = require('../../configWorks/HostClassNames').default
 #hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').default
 
 
-describe.only 'configWorks.HostClassNames', ->
+describe 'configWorks.HostClassNames', ->
   beforeEach ->
     @driversClasses = ['Top.driver', 'Middle.driver', 'Bottom.driver', 'Other.driver']
     @main = {

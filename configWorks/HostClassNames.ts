@@ -152,10 +152,10 @@ export default class HostClassNames {
     // items which were processed to avoid infinity recursion
     const processedItems: string[] = [];
 
-    const recursively = (processingName: string) => {
+    const recursively = (processingPluralType: ManifestsTypePluralName, processingName: string) => {
       processedItems.push(processingName);
 
-      const typeDependencies: string[] = dependencies[pluralType][processingName];
+      const typeDependencies: string[] = dependencies[processingPluralType][processingName];
 
       for (let depDriverName of typeDependencies) {
         result.push(depDriverName);
@@ -163,12 +163,12 @@ export default class HostClassNames {
         const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
 
         if (subDeps && !_includes(processedItems, depDriverName)) {
-          recursively(depDriverName);
+          recursively('drivers', depDriverName);
         }
       }
     };
 
-    recursively(name);
+    recursively(pluralType, name);
 
     return result;
   }
