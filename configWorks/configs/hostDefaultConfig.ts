@@ -5,7 +5,7 @@ export default {
     defaultConfigRepublishIntervalMs: 600000,
     drivers: {
       //defaultDigitalPinInputDebounce: 25,
-      defaultPollInterval: 300,
+      //defaultPollInterval: 300,
     },
 
     // TODO: review

@@ -9,18 +9,22 @@ props:
     type: poll | int | none
     default: none
   # poling interval in ms
-  polingInterval:
+  pollInterval:
     type: number
-    degault: 300
-
+    default: 300
+  # length of data which will be requested by poling or interruption
+  pollDataLength:
+    type: number
+    default: 1
+  # data address (first byte) which will be used in poling or interruption if it is specified
+  pollDataAddress:
+    type: number | string
   # props of ImpulseInput driver which will be used for listen to interruption
   int:
     type: object
 
-  # TODO: review
-  ints:
-    type: object
   bus:
     type: number
   address:
     type: number
+    required: true

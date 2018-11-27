@@ -14,7 +14,7 @@ export interface HostConfigConfig {
     // debounce of digital input in ms
     //defaultDigitalPinInputDebounce: number;
     // default poll interval for master-slave connections
-    defaultPollInterval: number;
+    //defaultPollInterval: number;
   };
   // custom params
   params: {[index: string]: any};
