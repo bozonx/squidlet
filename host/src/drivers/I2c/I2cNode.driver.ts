@@ -13,18 +13,16 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 
 
-const DEFAULT_DATA_ADDRESS = 'default';
-
 type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cNodeDriverProps {
-  // TODO: может быть и строкой
-  // TODO: не обязателен
-  bus: number;
+  bus?: string | number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
   // if you have one interrupt pin you can specify in there
   int?: ImpulseInputDriverProps;
+
+  // TODO: review
   // or if you use several pins you can give them unique names.
   ints?: {[index: string]: ImpulseInputDriverProps};
   // setup how to get feedback of device's data address, by polling or interrupt.
@@ -32,16 +30,22 @@ interface I2cNodeDriverProps {
   feedback: {[index: string]: I2cFeedback};
 }
 
+const DEFAULT_DATA_ADDRESS = 'default';
+
 
 export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   private events: EventEmitter = new EventEmitter();
   private readonly poling: Poling = new Poling();
+  // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
 
   // last received data by data address
   private pollLastData: {[index: string]: Uint8Array} = {};
+
+  // TODO: зачем несколько ???
   private intDrivers: {[index: string]: ImpulseInputDriver} = {};
 
+  // TODO: review
   private get intsProps(): {[index: string]: ImpulseInputDriverProps} {
 
     // TODO: ??? нужно смержить с дефолтными значениями - impulseLength или оно само смержится в драйвере???
@@ -66,12 +70,11 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
       .getInstance({ bus: this.props.bus });
 
-    // TODO: вернуть
-
-    // for (let dataAddressStr of Object.keys(this.intsProps)) {
-    //   this.intDrivers[dataAddressStr] = getDriverDep('ImpulseInput.driver')
-    //     .getInstance(this.intsProps[dataAddressStr]);
-    // }
+    // TODO: зачем несколько ???
+    for (let dataAddressStr of Object.keys(this.intsProps)) {
+      this.intDrivers[dataAddressStr] = getDriverDep('ImpulseInput.driver')
+        .getInstance(this.intsProps[dataAddressStr]);
+    }
 
     this.addressHex = this.normilizeAddr(this.props.address);
   }

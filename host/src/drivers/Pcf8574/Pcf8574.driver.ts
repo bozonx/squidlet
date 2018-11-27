@@ -82,7 +82,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    // TODO: I2cNode
+    // TODO: send feedback props
 
     this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
       .getInstance(this.props);

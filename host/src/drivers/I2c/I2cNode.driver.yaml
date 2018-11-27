@@ -12,6 +12,14 @@ props:
   polingInterval:
     type: number
     degault: 300
+
+  # props of ImpulseInput driver which will be used for listen to interruption
+  int:
+    type: object
+
+  # TODO: review
+  ints:
+    type: object
   bus:
     type: number
   address:
