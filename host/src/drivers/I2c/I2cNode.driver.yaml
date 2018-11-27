@@ -24,7 +24,7 @@ props:
     type: object
 
   bus:
-    type: number
+    type: string | number
   address:
-    type: number
+    type: string | number
     required: true

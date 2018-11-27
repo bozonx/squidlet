@@ -4,7 +4,7 @@ const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'eventemitter3';
 
 import {I2cMasterDriver} from './I2cMaster.driver';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
@@ -61,11 +61,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
       .getInstance(this.props.int || {});
 
-    // for (let dataAddressStr of Object.keys(this.intsProps)) {
-    //   this.intDrivers[dataAddressStr] = getDriverDep('ImpulseInput.driver')
-    //     .getInstance(this.intsProps[dataAddressStr]);
-    // }
-
     this.addressHex = hexStringToHexNum(String(this.props.address));
     this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
     this.pollDataAddressString = this.dataAddressToString(this.props.pollDataAddress);
@@ -73,11 +68,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   protected didInit = async () => {
     this.setupFeedback();
-
-    // for (let dataAddressStr of Object.keys(this.props.feedback)) {
-    //   const feedBackProps: I2cFeedback = this.props.feedback[dataAddressStr];
-    //   this.setupFeedback(dataAddressStr, feedBackProps);
-    // }
   }
 
   destroy = () => {
@@ -102,16 +92,28 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   }
 
   async read(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    return this.i2cMaster.read(this.addressHex, dataAddress, length);
-  }
+    const result: Uint8Array = await this.i2cMaster.read(this.addressHex, dataAddress, length);
 
-  // TODO: может всетаки read и request обновляют последний poling если совпадает dataAddress ???
+    // update last poll data if data address the same
+    if (this.props.feedback && dataAddress === this.props.pollDataAddress) {
+      this.updateLastPollData(result);
+    }
+
+    return result;
+  }
 
   /**
    * Write and read from the same data address.
    */
   async request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);
+    const result: Uint8Array = await this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);
+
+    // update last poll data if data address the same
+    if (this.props.feedback && dataAddress === this.props.pollDataAddress) {
+      this.updateLastPollData(result);
+    }
+
+    return result;
   }
 
   /**
@@ -120,7 +122,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    */
   async poll(): Promise<Uint8Array> {
     if (typeof this.props.pollDataAddress === 'undefined') {
-      throw new Error(`You have to define a "pollDataAddress" prop to do poling`);
+      throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
     }
 
     // TODO: рестартануть полинг чтобы он начался опять с этого момента
@@ -151,18 +153,11 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   private setupFeedback(): void {
     if (this.props.feedback === 'poll') {
-      //const pollInterval: number = this.props.pollInterval || this.env.config.config.drivers.defaultPollInterval;
-
-      //this.startPolling();
       this.poling.startPoling(this.doPoll, this.props.pollInterval, this.pollDataAddressString);
     }
     else if (this.props.feedback === 'int') {
-      //const intProps: ImpulseInputDriverProps = this.intsProps[feedBackProps.intName || DEFAULT_INT];
-
-      //this.startListenInt();
       this.impulseInput.addListener(this.doPoll);
     }
-
     // else don't use feedback
   }
 
@@ -184,15 +179,19 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
       throw err;
     }
 
-    // if data is equal to previous data - do nothing
-    if (typeof this.pollLastData !== 'undefined' && _isEqual(this.pollLastData, data)) return data;
+    this.updateLastPollData(data);
 
-    // save previous data
+    return data;
+  }
+
+  private updateLastPollData(data: Uint8Array) {
+    // if data is equal to previous data - do nothing
+    if (typeof this.pollLastData !== 'undefined' && _isEqual(this.pollLastData, data)) return;
+
+    // save data
     this.pollLastData = data;
     // finally rise an event
     this.events.emit(POLL_EVENT_NAME, null, data);
-
-    return data;
   }
 
   /**
@@ -216,35 +215,10 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return parseInt(String(dataAddressStr), 16);
   }
 
-
-  // private startPolling(): void {
-  //   this.poling.startPoling(this.doPoll, this.props.pollInterval, this.pollDataAddressString);
-  // }
-  //
-  // private startListenInt() {
-  //   this.impulseInput.addListener(this.doPoll);
-  // }
-
-  // // TODO: разве это нужно здесь ???? лучше всегда принимать в качестве number
-  // private normilizeAddr(address: string | number): number {
-  //   return hexStringToHexNum(String(address));
-  //
-  //   // TODO; review
-  //
-  //   // return (Number.isInteger(addressHex as any))
-  //   //   ? addressHex as number
-  //   //   : hexStringToHexNum(addressHex as string);
-  // }
-
 }
 
 
 export default class Factory extends DriverFactoryBase<I2cNodeDriver> {
   protected DriverClass = I2cNodeDriver;
-
-  // TODO: review
-
-  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
-    return `${instanceProps.bus}-${instanceProps.address}`;
-  }
+  protected instanceType: InstanceType = 'alwaysNew';
 }
