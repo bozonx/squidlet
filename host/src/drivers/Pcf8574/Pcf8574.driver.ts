@@ -107,52 +107,119 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.events.removeListener(eventName, cb);
   }
 
-  // /**
-  //  * Enable the interrupt detection on the specified GPIO pin.
-  //  * You can use one GPIO pin for multiple instances of the PCF8574 class.
-  //  * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
-  //  */
-  // public enableInterrupt(gpioPin:number):void{
-  //   if(PCF8574Driver._allInstancesUsedGpios[gpioPin] != null){
-  //     // use already initalized GPIO
-  //     this._gpio = PCF8574Driver._allInstancesUsedGpios[gpioPin];
-  //     this._gpio['pcf8574UseCount']++;
-  //   }else{
-  //     // init the GPIO as input with falling edge,
-  //     // because the PCF8574/PCF8574A will lower the interrupt line on changes
-  //     this._gpio = new Gpio(gpioPin, 'in', 'falling');
-  //     this._gpio['pcf8574UseCount'] = 1;
-  //   }
-  //   this._gpio.watch(this._handleInterrupt);
-  // }
+  /**
+   * Manually poll changed inputs from the PCF8574/PCF8574A IC.
+   * If a change on an input is detected, an "input" Event will be emitted with a data object containing the "pin" and the new "value".
+   * This have to be called frequently enough if you don't use a GPIO for interrupt detection.
+   * If you poll again before the last poll was completed, the promise will be rejected with an error.
+   * @return {Promise}
+   */
+  doPoll():Promise<void>{
+    return this._poll();
+  }
 
-  // /**
-  //  * Internal function to handle a GPIO interrupt.
-  //  */
-  // private _handleInterrupt():void{
-  //   // poll the current state and ignore any rejected promise
-  //   this._poll().catch(()=>{ });
-  // }
+  getPinMode(pin: PinNumber): 'input' | 'output' | undefined {
+    if (this._directions[pin] === DIR_IN) {
+      return 'input';
+    }
+    else if (this._directions[pin] === DIR_OUT) {
+      return 'output';
+    }
 
-  // /**
-  //  * Disable the interrupt detection.
-  //  * This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
-  //  */
-  // public disableInterrupt():void{
-  //   // release the used GPIO
-  //   if(this._gpio !== null){
-  //     // remove the interrupt handling
-  //     this._gpio.unwatch(this._handleInterrupt);
-  //
-  //     // decrease the use count of the GPIO and unexport it if not used anymore
-  //     this._gpio['pcf8574UseCount']--;
-  //     if(this._gpio['pcf8574UseCount'] === 0){
-  //       this._gpio.unexport();
-  //     }
-  //
-  //     this._gpio = null;
-  //   }
-  // }
+    return;
+  }
+
+  /**
+   * Returns the current value of a pin.
+   * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
+   * To get the current value call doPoll() first, if you're not using interrupts.
+   * @param  {PinNumber} pin The pin number. (0 to 7)
+   * @return {boolean}               The current value.
+   */
+  getPinValue(pin: PinNumber): boolean {
+    if(pin < 0 || pin > 7){
+      return false;
+    }
+    return ((this._currentState>>pin) % 2 !== 0);
+  }
+
+  /**
+   * Define a pin as an output.
+   * This marks the pin to be used as an output pin.
+   * @param  {PCF8574.PinNumber} pin          The pin number. (0 to 7)
+   * @param  {boolean}           inverted     true if this pin should be handled inverted (true=low, false=high)
+   * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediatly.
+   * @return {Promise}
+   */
+  async outputPin(pin: PinNumber, inverted:boolean, initialValue?:boolean) {
+    if(pin < 0 || pin > 7){
+      throw new Error('Pin out of range');
+    }
+
+    this._inverted = this._setStatePin(this._inverted, pin, inverted);
+
+    this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
+
+    this._directions[pin] = DIR_OUT;
+
+    // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
+    if(typeof(initialValue) === 'undefined'){
+      return;
+    }else{
+      return this._setPinInternal(pin, initialValue);
+    }
+  }
+
+  /**
+   * Define a pin as an input.
+   * This marks the pin for input processing and activates the high level on this pin.
+   * @param  {PCF8574.PinNumber} pin      The pin number. (0 to 7)
+   * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
+   * @return {Promise}
+   */
+  inputPin(pin: PinNumber, inverted:boolean): Promise<void> {
+    if(pin < 0 || pin > 7){
+      return Promise.reject(new Error('Pin out of range'));
+    }
+
+    this._inverted = this._setStatePin(this._inverted, pin, inverted);
+
+    this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
+
+    this._directions[pin] = DIR_IN;
+
+    // call _setNewState() to activate the high level on the input pin ...
+    return this._setNewState()
+    // ... and then poll all current inputs with noEmit on this pin to suspress the event
+      .then(() => {
+        return this._poll(pin);
+      });
+  }
+
+  /**
+   * Set the value of an output pin.
+   * If no value is given, the pin will be toggled.
+   * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
+   * @param  {boolean}           value The new value for this pin.
+   * @return {Promise}
+   */
+  setPin(pin: PinNumber, value?:boolean): Promise<void>{
+    if(pin < 0 || pin > 7){
+      return Promise.reject(new Error('Pin out of range'));
+    }
+
+    if(this._directions[pin] !== DIR_OUT){
+      return Promise.reject(new Error('Pin is not defined as output'));
+    }
+
+    if(typeof(value) == 'undefined'){
+      // set value dependend on current state to toggle
+      value = !((this._currentState>>pin) % 2 !== 0);
+    }
+
+    return this._setPinInternal(pin, value);
+  }
+
 
   /**
    * Helper function to set/clear one bit in a bitmask.
@@ -213,28 +280,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //     }
     //   });
     // });
-  }
-
-  /**
-   * Manually poll changed inputs from the PCF8574/PCF8574A IC.
-   * If a change on an input is detected, an "input" Event will be emitted with a data object containing the "pin" and the new "value".
-   * This have to be called frequently enough if you don't use a GPIO for interrupt detection.
-   * If you poll again before the last poll was completed, the promise will be rejected with an error.
-   * @return {Promise}
-   */
-  public doPoll():Promise<void>{
-    return this._poll();
-  }
-
-  getPinMode(pin: PinNumber): 'input' | 'output' | undefined {
-    if (this._directions[pin] === DIR_IN) {
-      return 'input';
-    }
-    else if (this._directions[pin] === DIR_OUT) {
-      return 'output';
-    }
-
-    return;
   }
 
   /**
@@ -316,83 +361,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Define a pin as an output.
-   * This marks the pin to be used as an output pin.
-   * @param  {PCF8574.PinNumber} pin          The pin number. (0 to 7)
-   * @param  {boolean}           inverted     true if this pin should be handled inverted (true=low, false=high)
-   * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediatly.
-   * @return {Promise}
-   */
-  public async outputPin(pin: PinNumber, inverted:boolean, initialValue?:boolean) {
-    if(pin < 0 || pin > 7){
-      throw new Error('Pin out of range');
-    }
-
-    this._inverted = this._setStatePin(this._inverted, pin, inverted);
-
-    this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
-
-    this._directions[pin] = DIR_OUT;
-
-    // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
-    if(typeof(initialValue) === 'undefined'){
-      return;
-    }else{
-      return this._setPinInternal(pin, initialValue);
-    }
-  }
-
-  /**
-   * Define a pin as an input.
-   * This marks the pin for input processing and activates the high level on this pin.
-   * @param  {PCF8574.PinNumber} pin      The pin number. (0 to 7)
-   * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
-   * @return {Promise}
-   */
-  public inputPin(pin: PinNumber, inverted:boolean): Promise<void> {
-    if(pin < 0 || pin > 7){
-      return Promise.reject(new Error('Pin out of range'));
-    }
-
-    this._inverted = this._setStatePin(this._inverted, pin, inverted);
-
-    this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
-
-    this._directions[pin] = DIR_IN;
-
-    // call _setNewState() to activate the high level on the input pin ...
-    return this._setNewState()
-    // ... and then poll all current inputs with noEmit on this pin to suspress the event
-      .then(() => {
-        return this._poll(pin);
-      });
-  }
-
-  /**
-   * Set the value of an output pin.
-   * If no value is given, the pin will be toggled.
-   * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
-   * @param  {boolean}           value The new value for this pin.
-   * @return {Promise}
-   */
-  public setPin(pin: PinNumber, value?:boolean): Promise<void>{
-    if(pin < 0 || pin > 7){
-      return Promise.reject(new Error('Pin out of range'));
-    }
-
-    if(this._directions[pin] !== DIR_OUT){
-      return Promise.reject(new Error('Pin is not defined as output'));
-    }
-
-    if(typeof(value) == 'undefined'){
-      // set value dependend on current state to toggle
-      value = !((this._currentState>>pin) % 2 !== 0);
-    }
-
-    return this._setPinInternal(pin, value);
-  }
-
-  /**
    * Internal function to set the state of a pin, regardless its direction.
    * @param  {PinNumber} pin   The pin number. (0 to 7)
    * @param  {boolean}           value The new value.
@@ -422,20 +390,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return this._setNewState(newState);
   }
 
-  /**
-   * Returns the current value of a pin.
-   * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
-   * To get the current value call doPoll() first, if you're not using interrupts.
-   * @param  {PinNumber} pin The pin number. (0 to 7)
-   * @return {boolean}               The current value.
-   */
-  public getPinValue(pin: PinNumber): boolean {
-    if(pin < 0 || pin > 7){
-      return false;
-    }
-    return ((this._currentState>>pin) % 2 !== 0);
-  }
-
 
   protected validateProps = (props: ExpanderDriverProps): string | undefined => {
 
@@ -463,6 +417,53 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   //   }
   //
   //   return this.props.initialState;
+  // }
+
+  // /**
+  //  * Enable the interrupt detection on the specified GPIO pin.
+  //  * You can use one GPIO pin for multiple instances of the PCF8574 class.
+  //  * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
+  //  */
+  // public enableInterrupt(gpioPin:number):void{
+  //   if(PCF8574Driver._allInstancesUsedGpios[gpioPin] != null){
+  //     // use already initalized GPIO
+  //     this._gpio = PCF8574Driver._allInstancesUsedGpios[gpioPin];
+  //     this._gpio['pcf8574UseCount']++;
+  //   }else{
+  //     // init the GPIO as input with falling edge,
+  //     // because the PCF8574/PCF8574A will lower the interrupt line on changes
+  //     this._gpio = new Gpio(gpioPin, 'in', 'falling');
+  //     this._gpio['pcf8574UseCount'] = 1;
+  //   }
+  //   this._gpio.watch(this._handleInterrupt);
+  // }
+
+  // /**
+  //  * Internal function to handle a GPIO interrupt.
+  //  */
+  // private _handleInterrupt():void{
+  //   // poll the current state and ignore any rejected promise
+  //   this._poll().catch(()=>{ });
+  // }
+
+  // /**
+  //  * Disable the interrupt detection.
+  //  * This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
+  //  */
+  // public disableInterrupt():void{
+  //   // release the used GPIO
+  //   if(this._gpio !== null){
+  //     // remove the interrupt handling
+  //     this._gpio.unwatch(this._handleInterrupt);
+  //
+  //     // decrease the use count of the GPIO and unexport it if not used anymore
+  //     this._gpio['pcf8574UseCount']--;
+  //     if(this._gpio['pcf8574UseCount'] === 0){
+  //       this._gpio.unexport();
+  //     }
+  //
+  //     this._gpio = null;
+  //   }
   // }
 
 }

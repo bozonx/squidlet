@@ -3,7 +3,6 @@ import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'eventemitter3';
 
-//import {DEFAULT_INT} from '../../app/interfaces/MasterSlaveBusProps';
 import {I2cMasterDriver} from './I2cMaster.driver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
@@ -26,13 +25,6 @@ interface I2cNodeDriverProps extends MasterSlaveBusProps {
   bus?: string | number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
-
-  // // or if you use several pins you can give them unique names.
-  // ints?: {[index: string]: ImpulseInputDriverProps};
-  // // setup how to get feedback of device's data address, by polling or interrupt.
-  // // If you want to get feedback without data address, use "default" as a key.
-  // feedback: {[index: string]: I2cFeedback};
-
 }
 
 // TODO: why ???? better to use undefined
@@ -45,31 +37,13 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   private readonly poling: Poling = new Poling();
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
-  // data addr to use in poling.
+  // data addr in hex to use in poling.
   private pollDataAddressHex?: number;
   private pollDataAddressString: string = DEFAULT_DATA_ADDRESS;
 
-  // last received data by data address
+  // last received data by poling
+  // it needs to decide to rise change event or not
   private pollLastData?: Uint8Array;
-
-  // TODO: зачем несколько ???
-  //private intDrivers: {[index: string]: ImpulseInputDriver} = {};
-  //
-  // // TODO: review
-  // private get intsProps(): ImpulseInputDriverProps {
-  //
-  //   // TODO: ??? нужно смержить с дефолтными значениями - impulseLength или оно само смержится в драйвере???
-  //
-  //   const result: {[index: string]: ImpulseInputDriverProps} = {
-  //     ...this.props.ints,
-  //   };
-  //
-  //   if (this.props.int) {
-  //     result[DEFAULT_INT] = this.props.int;
-  //   }
-  //
-  //   return result;
-  // }
 
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
