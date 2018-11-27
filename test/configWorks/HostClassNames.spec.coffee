@@ -46,8 +46,8 @@ describe.only 'configWorks.HostClassNames', ->
           {
             drivers: {
               'Top.driver': ['Middle.driver'],
-              'Middle.driver': ['Bottom.driver'],
-              'Bottom.driver': ['Top.driver'],
+              'Middle.driver': ['Bottom.driver', 'Top.driver'],
+              'Bottom.driver': ['Top.driver', 'Middle.driver'],
             }
           }
       }
@@ -57,4 +57,4 @@ describe.only 'configWorks.HostClassNames', ->
   it 'addDeps - check recursion', ->
     result = @hostClassNames.addDeps('drivers', @driversClasses)
 
-    assert.deepEqual(result, ['Top.driver', 'Middle.driver', 'Bottom.driver'])
+    assert.deepEqual(result, ['Middle.driver', 'Bottom.driver', 'Top.driver'])

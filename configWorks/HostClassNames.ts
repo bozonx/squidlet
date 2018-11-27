@@ -1,6 +1,7 @@
 const _filter = require('lodash/filter');
 const _uniq = require('lodash/uniq');
 const _flatten = require('lodash/flatten');
+const _includes = require('lodash/includes');
 
 import Main from './Main';
 import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
@@ -136,37 +137,64 @@ export default class HostClassNames {
 
     for (let entityClassName of names) {
       if (dependencies[pluralType][entityClassName]) {
-        const resolvedDriverDeps: string[] = this.resolveDeps(dependencies[pluralType][entityClassName]);
+        const resolvedDriverDeps: string[] = this.resolveDeps(pluralType, entityClassName);
 
         result = result.concat(resolvedDriverDeps);
       }
     }
 
-    return result;
+    return _uniq(result);
   }
 
-  private resolveDeps(typeDependencies: string[]): string[] {
-    // dependencies of all the registered entities
+  private resolveDeps(pluralType: ManifestsTypePluralName, name: string): string[] {
     const dependencies: Dependencies = this.main.entities.getDependencies();
     let result: string[] = [];
+    // items which were processed to avoid infinity recursion
+    const processedItems: string[] = [];
 
-    // TODO: если встретил ту же зависимость - остановиться
+    const recursively = (processingName: string) => {
+      processedItems.push(processingName);
 
-    // --- ['Bottom.driver']
-    for (let depDriverName of typeDependencies) {
-      result.push(depDriverName);
+      const typeDependencies: string[] = dependencies[pluralType][processingName];
 
-      // --- ['Top.driver']
-      const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
+      for (let depDriverName of typeDependencies) {
+        result.push(depDriverName);
 
-      if (subDeps) {
-        const resolvedDriverDeps: string[] = this.resolveDeps(subDeps);
+        const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
 
-        result = result.concat(resolvedDriverDeps);
+        if (subDeps && !_includes(processedItems, depDriverName)) {
+          recursively(depDriverName);
+        }
       }
-    }
+    };
+
+    recursively(name);
 
     return result;
   }
+
+  // private resolveDeps111(typeDependencies: string[]): string[] {
+  //   // dependencies of all the registered entities
+  //   const dependencies: Dependencies = this.main.entities.getDependencies();
+  //   let result: string[] = [];
+  //
+  //   // TODO: если встретил ту же зависимость - остановиться
+  //
+  //   // --- ['Middle.driver']
+  //   for (let depDriverName of typeDependencies) {
+  //     result.push(depDriverName);
+  //
+  //     // --- ['Top.driver']
+  //     const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
+  //
+  //     if (subDeps) {
+  //       const resolvedDriverDeps: string[] = this.resolveDeps(subDeps);
+  //
+  //       result = result.concat(resolvedDriverDeps);
+  //     }
+  //   }
+  //
+  //   return result;
+  // }
 
 }
