@@ -25,51 +25,53 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
   // name of instance id in props
   protected instanceByPropName?: string;
   // calculate instance id by calling a function
-  protected instanceIdCalc?: (instanceProps: {[index: string]: any}) => string;
+  protected instanceIdCalc?: (props: {[index: string]: any}) => string;
 
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
-    const instanceId: string | undefined = this.getInstanceId(instanceProps);
+    // combined instance and definition props
+    const props: {[index: string]: any} = _defaultsDeep(_cloneDeep(instanceProps), this.definition.props);
+    const instanceId: string | undefined = this.getInstanceId(props);
 
     if (typeof instanceId === 'undefined') {
       // just create always new instance and don't save
-      return await this.makeInstance(instanceProps);
+      return await this.makeInstance(props);
     }
 
     // return previously saved instance if it is
     if (this.instances[instanceId]) return this.instances[instanceId];
     // create and save instance
-    this.instances[instanceId] = await this.makeInstance(instanceProps);
+    this.instances[instanceId] = await this.makeInstance(props);
     // return created instance
     return this.instances[instanceId];
   }
 
 
-  private getInstanceId(instanceProps: {[index: string]: any}): string | undefined {
+  private getInstanceId(props: {[index: string]: any}): string | undefined {
     if (this.instanceAlwaysSame) {
       return 'new';
     }
     else if (this.instanceByPropName) {
       if (typeof this.instanceByPropName === 'undefined') throw new Error(`You have to specify "instanceByPropName"`);
 
-      return instanceProps[this.instanceByPropName];
+      return props[this.instanceByPropName];
     }
     else if (this.instanceIdCalc) {
       if (typeof this.instanceIdCalc !== 'function') {
         throw new Error(`You have to specify "instanceIdCalc"`);
       }
 
-      return this.instanceIdCalc(instanceProps);
+      return this.instanceIdCalc(props);
     }
 
     // undefined means always new instance
     return;
   }
 
-  private async makeInstance(instanceProps: {[index: string]: any}): Promise<Instance> {
+  private async makeInstance(props: {[index: string]: any}): Promise<Instance> {
     const definition = {
       ...this.definition,
-      props: _defaultsDeep(_cloneDeep(instanceProps), this.definition.props),
+      props,
     };
 
     const instance: Instance = new this.DriverClass(definition, this.env);

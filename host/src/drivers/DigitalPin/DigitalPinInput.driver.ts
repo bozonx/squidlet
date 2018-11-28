@@ -131,14 +131,14 @@ export default class Factory extends DriverFactoryBase<DigitalPinInputDriver> {
 
   // TODO: спросить bus и address у нижележащего драйвера - выполнить generateUniqId()
 
-  // protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+  // protected calcInstanceId = (props: {[index: string]: any}): string => {
   //
   //   // TODO: не правильно!!!! может быть наложение если брать экспандеры
   //
-  //   const driverName: string = (instanceProps.driver && instanceProps.driver.name)
-  //     ? instanceProps.driver.name
+  //   const driverName: string = (props.driver && props.driver.name)
+  //     ? props.driver.name
   //     : 'local';
   //
-  //   return `${driverName}-${instanceProps.pin}`;
+  //   return `${driverName}-${props.pin}`;
   // }
 }

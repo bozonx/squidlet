@@ -77,9 +77,9 @@ export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
   /**
    * It generates unique id for DigitalPin input and output driver
    */
-  generateUniqId(instanceProps: {[index: string]: any}): string {
-    const bus: string = (instanceProps.bus) ? String(instanceProps.bus) : 'default';
+  generateUniqId(props: {[index: string]: any}): string {
+    const bus: string = (props.bus) ? String(props.bus) : 'default';
 
-    return `${bus}-${instanceProps.address}`;
+    return `${bus}-${props.address}`;
   }
 }

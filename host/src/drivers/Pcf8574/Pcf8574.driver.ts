@@ -474,7 +474,7 @@ export default class Factory extends DriverFactoryBase<PCF8574Driver> {
 
   // TODO: review
 
-  protected instanceIdCalc = (instanceProps: {[index: string]: any}): string => {
-    return `${instanceProps.bus}-${instanceProps.address}`;
+  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+    return `${props.bus}-${props.address}`;
   }
 }

@@ -83,11 +83,11 @@ export default class Factory extends DriverFactoryBase<DigitalPinOutputDriver> {
 
   // TODO: не правильно!!!! может быть наложение если брать экспандеры
 
-  // protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
-  //   const driverName: string = (instanceProps.driver && instanceProps.driver.name)
-  //     ? instanceProps.driver.name
+  // protected calcInstanceId = (props: {[index: string]: any}): string => {
+  //   const driverName: string = (props.driver && props.driver.name)
+  //     ? props.driver.name
   //     : 'local';
   //
-  //   return `${driverName}-${instanceProps.pin}`;
+  //   return `${driverName}-${props.pin}`;
   // }
 }
