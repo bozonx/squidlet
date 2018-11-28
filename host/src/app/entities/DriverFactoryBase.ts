@@ -7,25 +7,25 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 
 
-export type InstanceType = 'alwaysNew' | 'alwaysSame' | 'propName' | 'calc';
-
-
 /**
- * This factory creates instances and keeps them.
+ * This factory creates instances and keeps them in memory if they will be reused.
  * After the next request of instance it returns previously created one.
  * Getting/setting instance politics has the next types:
- *   * alwaysNew
- *   * alwaysSame
- *   * propName - you need to set protected property instanceByPropName
- *   * calc - you need to set protected method calcInstanceId which has to return unique instance name
+ * * if instanceAlwaysSame is set method getInstance will return the same instance all the time
+ * * if instanceByPropName is set method getInstance will return instances by unique id which
+ *   gets from props. E.g instanceByPropName = 'pin' and props is {pin: 1} then
+ *   "1" is unique id for instances
+ * * if instanceIdCalc is set method getInstance will call this function to get unique id
  */
 export default abstract class DriverFactoryBase<Instance extends DriverInstance> extends DriverBase {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
-  protected instanceType: InstanceType = 'calc';
+  //protected instanceType: InstanceType = 'calc';
+  protected instanceAlwaysSame: boolean = false;
   // name of instance id in props
   protected instanceByPropName?: string;
-  protected calcInstanceId?: (instanceProps: {[index: string]: any}) => string;
+  // calculate instance id by calling a function
+  protected instanceIdCalc?: (instanceProps: {[index: string]: any}) => string;
 
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
@@ -46,24 +46,24 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
 
   private getInstanceId(instanceProps: {[index: string]: any}): string | undefined {
-    if (this.instanceType === 'alwaysNew') {
-      return;
-    }
-    else if (this.instanceType === 'alwaysSame') {
+    if (this.instanceAlwaysSame) {
       return 'new';
     }
-    else if (this.instanceType === 'propName') {
+    else if (this.instanceByPropName) {
       if (typeof this.instanceByPropName === 'undefined') throw new Error(`You have to specify "instanceByPropName"`);
 
       return instanceProps[this.instanceByPropName];
     }
-    else if (this.instanceType === 'calc') {
-      if (typeof this.calcInstanceId === 'undefined') throw new Error(`You have to specify "calcInstanceId"`);
+    else if (this.instanceIdCalc) {
+      if (typeof this.instanceIdCalc !== 'function') {
+        throw new Error(`You have to specify "instanceIdCalc"`);
+      }
 
-      return this.calcInstanceId(instanceProps);
+      return this.instanceIdCalc(instanceProps);
     }
 
-    throw new Error(`Unknown value of "instanceType" property`);
+    // undefined means always new instance
+    return;
   }
 
   private async makeInstance(instanceProps: {[index: string]: any}): Promise<Instance> {

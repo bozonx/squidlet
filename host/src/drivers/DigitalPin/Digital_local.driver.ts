@@ -1,6 +1,6 @@
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 
 
@@ -53,6 +53,5 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
 
 
 export default class Factory extends DriverFactoryBase<DigitalLocalDriver> {
-  protected instanceType: InstanceType = 'alwaysNew';
   protected DriverClass = DigitalLocalDriver;
 }

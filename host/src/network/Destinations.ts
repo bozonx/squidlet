@@ -4,7 +4,6 @@ import * as EventEmitter from 'events';
 
 import DriverEnv from '../app/entities/DriverEnv';
 import Connection from './interfaces/Connection';
-import DriverFactoryBase from '../app/entities/DriverFactoryBase';
 import MyAddress from '../app/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
 

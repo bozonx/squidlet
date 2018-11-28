@@ -1,4 +1,4 @@
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { addFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
@@ -78,7 +78,6 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 
 
 export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
-  protected instanceType: InstanceType = 'propName';
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;
 

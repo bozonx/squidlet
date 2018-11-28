@@ -1,4 +1,4 @@
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -72,9 +72,11 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
-  protected instanceType: InstanceType = 'alwaysNew';
   protected DriverClass = DigitalPcf8574Driver;
 
+  /**
+   * It generates unique id for DigitalPin input and output driver
+   */
   generateUniqId(instanceProps: {[index: string]: any}): string {
     const bus: string = (instanceProps.bus) ? String(instanceProps.bus) : 'default';
 

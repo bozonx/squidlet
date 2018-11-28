@@ -5,7 +5,7 @@
 import * as EventEmitter from 'eventemitter3';
 const _omit = require('lodash/omit');
 
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver} from '../I2c/I2cNode.driver';
@@ -471,7 +471,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 export default class Factory extends DriverFactoryBase<PCF8574Driver> {
   protected DriverClass = PCF8574Driver;
-  protected calcInstanceId = (instanceProps: {[index: string]: any}): string => {
+
+  // TODO: review
+
+  protected instanceIdCalc = (instanceProps: {[index: string]: any}): string => {
     return `${instanceProps.bus}-${instanceProps.address}`;
   }
 }

@@ -2,7 +2,7 @@ const _find = require('lodash/find');
 const _omit = require('lodash/omit');
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -128,8 +128,6 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
 export default class Factory extends DriverFactoryBase<DigitalPinInputDriver> {
   protected DriverClass = DigitalPinInputDriver;
-  // TODO: remove
-  protected instanceType: InstanceType = 'alwaysNew';
 
   // TODO: спросить bus и address у нижележащего драйвера - выполнить generateUniqId()
 

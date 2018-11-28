@@ -1,7 +1,7 @@
 const _omit = require('lodash/omit');
 
 import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -80,9 +80,6 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
 export default class Factory extends DriverFactoryBase<DigitalPinOutputDriver> {
   protected DriverClass = DigitalPinOutputDriver;
-
-  // TODO: remove
-  protected instanceType: InstanceType = 'alwaysNew';
 
   // TODO: не правильно!!!! может быть наложение если брать экспандеры
 

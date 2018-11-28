@@ -1,7 +1,7 @@
 import * as EventEmitter from 'eventemitter3';
 
 import I2cSlave from '../../app/interfaces/dev/I2cSlave';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -137,7 +137,6 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
 
 
 export default class Factory extends DriverFactoryBase<I2cSlaveDriver> {
-  protected instanceType: InstanceType = 'propName';
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cSlaveDriver;
 }

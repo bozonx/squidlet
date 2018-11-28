@@ -4,7 +4,7 @@ const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'eventemitter3';
 
 import {I2cMasterDriver} from './I2cMaster.driver';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { hexStringToHexNum } from '../../helpers/helpers';
 import Poling from '../../helpers/Poling';
@@ -247,5 +247,4 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
 export default class Factory extends DriverFactoryBase<I2cNodeDriver> {
   protected DriverClass = I2cNodeDriver;
-  protected instanceType: InstanceType = 'alwaysNew';
 }

@@ -4,7 +4,7 @@ import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode} from './interfaces/Types';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 
 
 export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
@@ -109,5 +109,4 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
 
 export default class Factory extends DriverFactoryBase<ImpulseOutputDriver> {
   protected DriverClass = ImpulseOutputDriver;
-  protected instanceType: InstanceType = 'alwaysNew';
 }

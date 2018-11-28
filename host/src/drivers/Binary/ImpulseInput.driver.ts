@@ -7,7 +7,7 @@ import {isDigitalInputInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 
 
 const risingEventName = 'rising';
@@ -171,5 +171,4 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
 export default class Factory extends DriverFactoryBase<ImpulseInputDriver> {
   protected DriverClass = ImpulseInputDriver;
-  protected instanceType: InstanceType = 'alwaysNew';
 }

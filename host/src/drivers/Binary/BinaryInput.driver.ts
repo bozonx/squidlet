@@ -3,7 +3,7 @@ import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
-import DriverFactoryBase, {InstanceType} from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
@@ -144,5 +144,4 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryInputDriver> {
   protected DriverClass = BinaryInputDriver;
-  protected instanceType: InstanceType = 'alwaysNew';
 }
