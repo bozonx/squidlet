@@ -9,7 +9,7 @@ export default class I2cMasterDev implements I2cMaster {
   private readonly instances: {[index: string]: I2cBus} = {};
 
 
-  writeTo(bus: number, addrHex: number, data: Uint8Array): Promise<void> {
+  writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void> {
     const buffer = Buffer.from(data);
 
     return new Promise((resolve, reject) => {
@@ -29,7 +29,7 @@ export default class I2cMasterDev implements I2cMaster {
     });
   }
 
-  readFrom(bus: number, addrHex: number, quantity: number): Promise<Uint8Array> {
+  readFrom(bus: string, addrHex: number, quantity: number): Promise<Uint8Array> {
     const bufferToRead = new Buffer(quantity);
 
     return new Promise((resolve, reject) => {
@@ -53,10 +53,10 @@ export default class I2cMasterDev implements I2cMaster {
   }
 
 
-  private getI2cBus(bus: number): I2cBus {
+  private getI2cBus(bus: string): I2cBus {
     if (this.instances[bus]) return this.instances[bus];
 
-    this.instances[bus] = openSync(bus);
+    this.instances[bus] = openSync(parseInt(bus));
 
     return this.instances[bus];
   }

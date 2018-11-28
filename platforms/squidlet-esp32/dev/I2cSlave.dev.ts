@@ -10,17 +10,17 @@ export default class I2cSlaveDev {
   constructor(props: EntityProps, env: DriverEnv, bus: number) {
   }
 
-  async send(bus: number, data: Uint8Array): Promise<void> {
+  async send(bus: string, data: Uint8Array): Promise<void> {
     // TODO: отправляем данные мастеру, можно указать длину
   }
 
-  listenIncome(bus: number, handler: (data: Uint8Array) => void): void {
+  listenIncome(bus: string, handler: (data: Uint8Array) => void): void {
     // TODO: слушать все входящие запросы
     // TODO: ошбку наверное тоже надо отдавать ???
     // TODO: дается длинна и можно считать данные этой длинны и поднять хэндлер
   }
 
-  removeListener(bus: number, handler: (data: Uint8Array) => void): void {
+  removeListener(bus: string, handler: (data: Uint8Array) => void): void {
 
   }
 

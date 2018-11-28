@@ -8,11 +8,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 const DATA_ADDRESS_LENGTH = 1;
 
 export interface I2cMasterDriverProps {
-
-  // TODO: может быть и строкой
-
-  bus: number;
-  //bus: string | number;
+  bus: string;
 }
 
 
@@ -26,12 +22,14 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.dev');
   }
 
+  // TODO: получить список адресов на шине
 
   /**
    * Read once from bus.
    * If dataAddress is specified, it do request to data address(dataAddress) first.
    */
   async read(addressHex: number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+
     // TODO: ??? разве это нужно ???
     // write command
     if (typeof dataAddress !== 'undefined') {
@@ -90,4 +88,7 @@ export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
   protected instanceType: InstanceType = 'propName';
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;
+
+  // TODO: зарезолвить bus
+
 }

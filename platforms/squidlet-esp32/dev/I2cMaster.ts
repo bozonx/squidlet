@@ -17,17 +17,17 @@ interface EspruinoI2cBus {
 
 
 export default class I2cMasterDev implements I2cMaster {
-  async writeTo(bus: number, addrHex: number, data: Uint8Array): Promise<void> {
+  async writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void> {
     if (!(typeof data === 'object' && data.constructor.name === 'Uint8Array')) {
       throw new Error(`Supports only a Uint8Array. Your data is ${JSON.stringify(data)}`);
     }
 
-    this.getI2cBus(bus).writeTo(addrHex, data);
+    this.getI2cBus(parseInt(bus)).writeTo(addrHex, data);
   }
 
-  async readFrom(bus: number, addrHex: number, quantity: number): Promise<Uint8Array> {
+  async readFrom(bus: string, addrHex: number, quantity: number): Promise<Uint8Array> {
     // TODO: add
-    return this.getI2cBus(bus).readFrom(addrHex, quantity);
+    return this.getI2cBus(parseInt(bus)).readFrom(addrHex, quantity);
   }
 
 
