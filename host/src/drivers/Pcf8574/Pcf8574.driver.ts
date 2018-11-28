@@ -34,6 +34,7 @@ export const DIR_UNDEF = -1;
 export const DIR_IN = 1;
 /** Constant for output pin direction. */
 export const DIR_OUT = 0;
+const INPUT_EVENT_NAME = 'input';
 
 
 /**
@@ -41,30 +42,15 @@ export const DIR_OUT = 0;
  */
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private readonly events: EventEmitter = new EventEmitter();
-
-  /** Object containing all GPIOs used by any PCF8574 instance. */
-  //private static _allInstancesUsedGpios: {[index: string]: any} = {};
-
   /** Direction of each pin. By default all pin directions are undefined. */
   private _directions:Array<number> = [
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
   ];
-
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
   private _inputPinBitmask:number = 0;
-
-  // TODO: remove
-  /** Bitmask for inverted pins. */
-  //private _inverted:number = 0;
-
   /** Bitmask representing the current state of the pins. */
   private _currentState: number = 0;
-
-  // TODO: remove
-  /** Flag if we are currently polling changes from the PCF8574/PCF8574A IC. */
-  private _currentlyPolling:boolean = false;
-
 
   private get i2cNode(): I2cNodeDriver {
     return this.depsInstances.i2cNode as I2cNodeDriver;
@@ -76,8 +62,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * If you use this IC with one or more input pins, you have to call ...
    *  a) enableInterrupt(gpioPin) to detect interrupts from the IC using a GPIO pin, or
    *  b) doPoll() frequently enough to detect input changes with manually polling.
-   * @param  {I2cBus}         i2cBus       Instance of an opened i2c-bus.
-   * @param  {number}         address      The address of the PCF8574/PCF8574A IC.
    * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
    */
 
@@ -99,12 +83,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
-  addEventListener(eventName: string, cb: Handler) {
-    this.events.addListener(eventName, cb);
+  addEventListener(cb: Handler) {
+    this.events.addListener(INPUT_EVENT_NAME, cb);
   }
 
-  removeEventListener(eventName: string, cb: Handler) {
-    this.events.removeListener(eventName, cb);
+  removeEventListener(cb: Handler) {
+    this.events.removeListener(INPUT_EVENT_NAME, cb);
   }
 
   /**
@@ -271,9 +255,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   private async _poll(noEmit?: PinNumber): Promise<void> {
-    if(this._currentlyPolling){
-      return Promise.reject('An other poll is in progress');
-    }
+    // if(this._currentlyPolling){
+    //   return Promise.reject('An other poll is in progress');
+    // }
 
     // this._currentlyPolling = true;
     //
@@ -299,7 +283,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //     let value: boolean = ((readState>>pin) % 2 !== 0);
     //     this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
     //     if(noEmit !== pin){
-    //       this.events.emit('input', <InputData>{pin: pin, value: value});
+    //       this.events.emit(INPUT_EVENT_NAME, <InputData>{pin: pin, value: value});
     //     }
     //   }
     // }
