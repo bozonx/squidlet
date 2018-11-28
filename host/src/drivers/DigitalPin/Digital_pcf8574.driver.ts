@@ -2,7 +2,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
+import {ExpanderDriverProps, PCF8574Driver, ResultHandler} from '../Pcf8574/Pcf8574.driver';
 
 
 interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
@@ -10,6 +10,9 @@ interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
+  private watchers: ResultHandler[] = [];
+
+
   private get expander(): PCF8574Driver {
     return this.depsInstances.expander as PCF8574Driver;
   }
@@ -53,13 +56,22 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Listen to interruption of input pin
    */
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
-    // TODO: если пин сконфигурирован на output - ругаться
+    const wrapper: ResultHandler = (err: Error | null, values: boolean[]) => {
+      if (err) {
+        // TODO: что делать с ошибкой???
 
-    // TODO: !!!
+        this.env.log.error(String(err));
 
-    // TODO: Handler возвращает - err, data - !!! обработать err
+        return;
+      }
 
-    return 0;
+      handler(values[pin]);
+    };
+
+    const watcherIndex: number = this.watchers.length;
+    this.watchers.push(wrapper);
+
+    return watcherIndex;
   }
 
   clearWatch(id: number): void {

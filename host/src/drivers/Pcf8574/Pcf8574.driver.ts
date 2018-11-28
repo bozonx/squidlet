@@ -12,6 +12,7 @@ import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
 
 
 type PinNumber = number;
+export type ResultHandler = (err: Error | null, values: boolean[]) => void;
 
 interface InputData {
   pin: number;
@@ -40,7 +41,7 @@ const INPUT_EVENT_NAME = 'input';
  * Class for handling a PCF8574/PCF8574A IC.
  */
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
-  private readonly events: EventEmitter = new EventEmitter();
+  //private readonly events: EventEmitter = new EventEmitter();
   /** Direction of each pin. By default all pin directions are undefined. */
   private _directions:Array<number> = [
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
@@ -83,6 +84,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   addEventListener(handler: Handler) {
+
+    // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
+    // TODO: слушаем 1 пин или все ???
+
     //this.events.addListener(INPUT_EVENT_NAME, cb);
     this.i2cNode.addListener(handler);
   }
@@ -99,8 +104,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * If you poll again before the last poll was completed, the promise will be rejected with an error.
    * @return {Promise}
    */
-  doPoll():Promise<void>{
-    return this._poll();
+  poll(): Promise<Uint8Array> {
+    //return this._poll();
+
+    // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
+
+    return this.i2cNode.poll();
   }
 
   getPinMode(pin: PinNumber): 'input' | 'output' | undefined {
