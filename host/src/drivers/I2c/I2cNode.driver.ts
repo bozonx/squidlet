@@ -1,8 +1,8 @@
-import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
-
+const _omit = require('lodash/omit');
 const _isEqual = require('lodash/isEqual');
 import * as EventEmitter from 'eventemitter3';
 
+import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import {I2cMasterDriver} from './I2cMaster.driver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
@@ -56,7 +56,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
-      .getInstance({ bus: this.props.bus });
+      .getInstance(_omit(this.props,
+        'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
+      ));
 
     this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
       .getInstance(this.props.int || {});
