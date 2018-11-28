@@ -86,7 +86,9 @@ export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
   protected DriverClass = I2cMasterDriver;
 
   async getInstance(props: I2cMasterDriverProps): Promise<I2cMasterDriver> {
-    return super.getInstance({ bus: String(props.bus) });
+    const resolvedProps = (typeof props.bus === 'undefined') ? {} : { bus: String(props.bus) };
+
+    return super.getInstance(resolvedProps);
   }
 
 }

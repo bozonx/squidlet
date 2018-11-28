@@ -36,6 +36,7 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
     const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
 
     this.depsInstances.i2cDataDriver = getDriverDep('I2cData.driver')
+    // TODO: bus will be undefined
       .getInstance({ i2cDriverName, bus: this.props.myAddress.bus });
   }
 
