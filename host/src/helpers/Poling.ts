@@ -23,7 +23,7 @@ export default class Poling {
    * Start poling.
    * This method calls only once on one id.
    */
-  startPoling(
+  start(
     methodWhichWillPoll: (...args: any[]) => Promise<any>,
     // in ms
     pollInterval: number,
@@ -59,7 +59,12 @@ export default class Poling {
     this.events.removeListener(id, handler);
   }
 
-  stopPoling(uniqId: string | undefined) {
+  restart(uniqId: string | undefined) {
+    // TODO: stop and start again
+    // TODO: test
+  }
+
+  stop(uniqId: string | undefined) {
     const id = this.resolveId(uniqId);
 
     clearInterval(this.intervals[id] as any);

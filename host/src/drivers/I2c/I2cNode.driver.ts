@@ -125,10 +125,13 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
       throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
     }
 
-    // TODO: рестартануть полинг чтобы он начался опять с этого момента
-    // TODO: наверное это лучше сделать через класс Polling
+    this.stopPoling();
 
-    return this.doPoll();
+    const result: Uint8Array = await this.doPoll();
+
+    this.startPoling();
+
+    return result;
   }
 
   /**
@@ -152,13 +155,12 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
 
   private setupFeedback(): void {
-    if (this.props.feedback === 'poll') {
-      this.poling.startPoling(this.doPoll, this.props.pollInterval, this.pollDataAddressString);
+    if (this.props.feedback === 'int') {
+      return this.impulseInput.addListener(this.doPoll);
     }
-    else if (this.props.feedback === 'int') {
-      this.impulseInput.addListener(this.doPoll);
-    }
-    // else don't use feedback
+    // start poling if feedback is poll
+    this.startPoling();
+    // else don't use feedback at all
   }
 
   /**
@@ -192,6 +194,18 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.pollLastData = data;
     // finally rise an event
     this.events.emit(POLL_EVENT_NAME, null, data);
+  }
+
+  private stopPoling() {
+    if (this.props.feedback === 'poll') {
+      this.poling.stop(this.pollDataAddressString);
+    }
+  }
+
+  private startPoling() {
+    if (this.props.feedback === 'poll') {
+      this.poling.start(this.doPoll, this.props.pollInterval, this.pollDataAddressString);
+    }
   }
 
   /**
