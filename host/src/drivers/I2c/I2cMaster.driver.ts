@@ -8,11 +8,15 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 const DATA_ADDRESS_LENGTH = 1;
 
 export interface I2cMasterDriverProps {
+  bus: number | string;
+}
+
+export interface I2cMasterDriverInstanceProps {
   bus: string;
 }
 
 
-export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
+export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
   private get i2cMasterDev(): I2cMaster {
     return this.depsInstances.i2cMaster as I2cMaster;
   }
@@ -81,6 +85,8 @@ export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;
 
-  // TODO: зарезолвить bus в string
+  async getInstance(instanceProps: I2cMasterDriverProps): Promise<I2cMasterDriver> {
+    return super.getInstance({ bus: String(instanceProps.bus) });
+  }
 
 }
