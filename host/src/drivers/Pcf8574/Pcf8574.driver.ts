@@ -131,23 +131,18 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Define a pin as an output.
    * This marks the pin to be used as an output pin.
    * @param  {PCF8574.PinNumber} pin          The pin number. (0 to 7)
-   * @param  {boolean}           inverted     true if this pin should be handled inverted (true=low, false=high)
    * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediatly.
    * @return {Promise}
    */
-  async outputPin(pin: PinNumber, inverted:boolean, initialValue?:boolean) {
+  async outputPin(pin: PinNumber, initialValue?:boolean) {
 
-    // TODO: remove inverted
-    // TODO: remove initialValue
+    // TODO: remove initialValue ???
 
     if(pin < 0 || pin > 7){
       throw new Error('Pin out of range');
     }
 
-    //this._inverted = this._setStatePin(this._inverted, pin, inverted);
-
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
-
     this._directions[pin] = DIR_OUT;
 
     // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
@@ -162,19 +157,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Define a pin as an input.
    * This marks the pin for input processing and activates the high level on this pin.
    * @param  {PCF8574.PinNumber} pin      The pin number. (0 to 7)
-   * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
    * @return {Promise}
    */
-  inputPin(pin: PinNumber, inverted:boolean): Promise<void> {
+  inputPin(pin: PinNumber): Promise<void> {
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }
 
-    // TODO: remove inverted
-    //this._inverted = this._setStatePin(this._inverted, pin, inverted);
-
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
-
     this._directions[pin] = DIR_IN;
 
     // call _setNewState() to activate the high level on the input pin ...
