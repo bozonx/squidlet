@@ -118,7 +118,8 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   /**
    * Poll once immediately. And restart current poll if it was specified.
-   * Data address and length you have to specify in props: pollDataLength and pollDataAddress
+   * Data address and length you have to specify in props: pollDataLength and pollDataAddress.
+   * It reject promise on error
    */
   async poll(): Promise<Uint8Array> {
     if (typeof this.props.pollDataAddress === 'undefined') {
@@ -175,9 +176,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     catch (err) {
       this.events.emit(POLL_EVENT_NAME, err);
 
-      // TODO: анверное лучше писать в лог или это делать в классе Poll
-      // TODO: или просто ничего не делать ведь поднялось событие с err, но тогда что вернеть из ф-и ???
-
       throw err;
     }
 
@@ -197,15 +195,30 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   }
 
   private stopPoling() {
-    if (this.props.feedback === 'poll') {
-      this.poling.stop(this.pollDataAddressString);
-    }
+    if (this.props.feedback !== 'poll') return;
+
+    this.poling.stop(this.pollDataAddressString);
   }
 
   private startPoling() {
-    if (this.props.feedback === 'poll') {
-      this.poling.start(this.doPoll, this.props.pollInterval, this.pollDataAddressString);
-    }
+    if (this.props.feedback !== 'poll') return;
+
+    const wrapper = async (): Promise<Uint8Array | undefined> => {
+      try {
+        return await this.doPoll();
+      }
+      catch (err) {
+        this.env.log.error(
+          `I2cNode.driver Poll error of bus "${this.props.bus}",
+           address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`
+        );
+      }
+
+      return;
+    };
+
+
+    this.poling.start(wrapper, this.props.pollInterval, this.pollDataAddressString);
   }
 
   /**
