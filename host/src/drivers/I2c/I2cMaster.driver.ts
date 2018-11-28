@@ -22,7 +22,6 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.dev');
   }
 
-  // TODO: получить список адресов на шине
 
   /**
    * Read once from bus.
@@ -59,6 +58,8 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   writeEmpty(addressHex: number, dataAddress: number): Promise<void> {
     const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
 
+    // TODO: а если нет data address ????
+
     dataToWrite[0] = dataAddress;
 
     return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
@@ -89,6 +90,6 @@ export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;
 
-  // TODO: зарезолвить bus
+  // TODO: зарезолвить bus в string
 
 }

@@ -23,12 +23,16 @@ async function init () {
 
 init()
   .catch((err) => {
-    if (debug) {
-      throw err;
-    }
-    else {
-      console.error(err.toString());
+    // if (debug) {
+    //   throw err;
+    // }
+    // else {
+    //   console.error(err.toString());
+    //
+    //   process.exit(3);
+    // }
 
-      process.exit(3);
-    }
+    console.error(String(err));
+
+    process.exit(3);
   });
