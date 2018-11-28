@@ -25,12 +25,10 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
 
   /**
    * Read once from bus.
-   * If dataAddress is specified, it do request to data address(dataAddress) first.
+   * if data address is defined then it will write an empty command before read
+   * and code on other side cat prepare data to send
    */
   async read(addressHex: number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-
-    // TODO: ??? разве это нужно ???
-    // write command
     if (typeof dataAddress !== 'undefined') {
       await this.writeEmpty(addressHex, dataAddress);
     }
@@ -58,8 +56,6 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
   writeEmpty(addressHex: number, dataAddress: number): Promise<void> {
     const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
 
-    // TODO: а если нет data address ????
-
     dataToWrite[0] = dataAddress;
 
     return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
@@ -74,13 +70,9 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverProps> {
     return this.read(addressHex, dataAddress, readLength);
   }
 
-
-  protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
-    //if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
-    //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
-
-    return;
-  }
+  // protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
+  //   return;
+  // }
 
 }
 
