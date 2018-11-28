@@ -56,7 +56,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
   // TODO: remove
   /** Bitmask for inverted pins. */
-  private _inverted:number = 0;
+  //private _inverted:number = 0;
 
   /** Bitmask representing the current state of the pins. */
   private _currentState: number = 0;
@@ -152,11 +152,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   async outputPin(pin: PinNumber, inverted:boolean, initialValue?:boolean) {
+
+    // TODO: remove inverted
+    // TODO: remove initialValue
+
     if(pin < 0 || pin > 7){
       throw new Error('Pin out of range');
     }
 
-    this._inverted = this._setStatePin(this._inverted, pin, inverted);
+    //this._inverted = this._setStatePin(this._inverted, pin, inverted);
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
 
@@ -182,7 +186,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return Promise.reject(new Error('Pin out of range'));
     }
 
-    this._inverted = this._setStatePin(this._inverted, pin, inverted);
+    // TODO: remove inverted
+    //this._inverted = this._setStatePin(this._inverted, pin, inverted);
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
 
@@ -248,38 +253,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       this._currentState = newState;
     }
 
-    // repect inverted with bitmask using XOR
-    let newIcState = this._currentState ^ this._inverted;
-
     // set all input pins to high
-    newIcState = newIcState | this._inputPinBitmask;
-
+    const newIcState = this._currentState | this._inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);
 
     dataToSend[0] = newIcState;
 
     await this.i2cNode.write(undefined, dataToSend);
-
-    // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
-    //
-    //   if(typeof(newState) === 'number'){
-    //     this._currentState = newState;
-    //   }
-    //
-    //   // repect inverted with bitmask using XOR
-    //   let newIcState = this._currentState ^ this._inverted;
-    //
-    //   // set all input pins to high
-    //   newIcState = newIcState | this._inputPinBitmask;
-    //
-    //   this._i2cBus.sendByte( this.props.address, newIcState, (err:Error)=>{
-    //     if(err){
-    //       reject(err);
-    //     }else{
-    //       resolve();
-    //     }
-    //   });
-    // });
   }
 
   /**
@@ -323,41 +303,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //     }
     //   }
     // }
-
-
-
-
-
-    // return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
-    //   // read from the IC
-    //   this._i2cBus.receiveByte( this.props.address, (err:Error, readState:number)=>{
-    //     this._currentlyPolling = false;
-    //     if(err){
-    //       reject(err);
-    //       return;
-    //     }
-    //
-    //     // repect inverted with bitmask using XOR
-    //     readState = readState ^ this._inverted;
-    //
-    //     // check each input for changes
-    //     for(let pin = 0; pin < 8; pin++){
-    //       if(this._directions[pin] !== PCF8574Driver.DIR_IN){
-    //         continue; // isn't an input pin
-    //       }
-    //       if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
-    //         // pin changed
-    //         let value: boolean = ((readState>>pin) % 2 !== 0);
-    //         this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
-    //         if(noEmit !== pin){
-    //           this.events.emit('input', <InputData>{pin: pin, value: value});
-    //         }
-    //       }
-    //     }
-    //
-    //     resolve();
-    //   });
-    // });
   }
 
   /**
