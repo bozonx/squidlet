@@ -8,10 +8,9 @@ const _omit = require('lodash/omit');
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {I2cNodeDriver} from '../I2c/I2cNode.driver';
+import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
 
 
-type Handler = (data: InputData) => void;
 type PinNumber = number;
 
 interface InputData {
@@ -83,12 +82,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
-  addEventListener(cb: Handler) {
-    this.events.addListener(INPUT_EVENT_NAME, cb);
+  addEventListener(handler: Handler) {
+    //this.events.addListener(INPUT_EVENT_NAME, cb);
+    this.i2cNode.addListener(handler);
   }
 
-  removeEventListener(cb: Handler) {
-    this.events.removeListener(INPUT_EVENT_NAME, cb);
+  removeEventListener(handler: Handler) {
+    //this.events.removeListener(INPUT_EVENT_NAME, cb);
+    this.i2cNode.removeListener(handler);
   }
 
   /**

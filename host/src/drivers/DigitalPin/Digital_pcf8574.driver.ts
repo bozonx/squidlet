@@ -57,6 +57,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
     // TODO: !!!
 
+    // TODO: Handler возвращает - err, data - !!! обработать err
+
     return 0;
   }
 

@@ -13,7 +13,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 
 
-type Handler = (error: Error | null, data?: Uint8Array) => void;
+export type Handler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cNodeDriverProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
