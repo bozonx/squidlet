@@ -83,7 +83,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
-  addEventListener(handler: Handler) {
+  addEventListener(handler: ResultHandler) {
 
     // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
     // TODO: слушаем 1 пин или все ???
@@ -92,7 +92,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.i2cNode.addListener(handler);
   }
 
-  removeEventListener(handler: Handler) {
+  removeEventListener(handler: ResultHandler) {
     //this.events.removeListener(INPUT_EVENT_NAME, cb);
     this.i2cNode.removeListener(handler);
   }
@@ -192,7 +192,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {boolean}           value The new value for this pin.
    * @return {Promise}
    */
-  setPin(pin: PinNumber, value?:boolean): Promise<void>{
+  setPinValue(pin: PinNumber, value?:boolean): Promise<void>{
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }

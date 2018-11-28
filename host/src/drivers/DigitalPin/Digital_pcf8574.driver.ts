@@ -10,8 +10,8 @@ interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
+  // saved watchers by index
   private watchers: ResultHandler[] = [];
-
 
   private get expander(): PCF8574Driver {
     return this.depsInstances.expander as PCF8574Driver;
@@ -49,13 +49,17 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Set level to output pin
    */
   write(pin: number, value: boolean): Promise<void> {
-    return this.expander.setPin(pin, value);
+    return this.expander.setPinValue(pin, value);
   }
 
   /**
    * Listen to interruption of input pin
    */
   setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+
+    // TODO: что делать с debounce ?
+    // TODO: что делать с edge ?
+
     const wrapper: ResultHandler = (err: Error | null, values: boolean[]) => {
       if (err) {
         // TODO: что делать с ошибкой???
@@ -75,11 +79,16 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   clearWatch(id: number): void {
-    // TODO: !!!
+    // do nothing if watcher doesn't exist
+    if (!this.watchers[id]) return;
+
+    this.expander.removeEventListener(this.watchers[id]);
   }
 
   clearAllWatches(): void {
-    // TODO: !!!
+    for (let id in this.watchers) {
+      this.expander.removeEventListener(this.watchers[id]);
+    }
   }
 
 }
