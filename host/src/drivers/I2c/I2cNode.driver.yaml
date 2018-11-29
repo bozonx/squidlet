@@ -11,7 +11,7 @@ props:
   # poling interval in ms
   pollInterval:
     type: number
-    default: 300
+    default: 1000
   # length of data which will be requested by poling or interruption
   pollDataLength:
     type: number

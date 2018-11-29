@@ -3,25 +3,19 @@
  */
 
 import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
-
-const _omit = require('lodash/omit');
-
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
 import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
+import {ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 
 
 type PinNumber = number;
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
 export interface ExpanderDriverProps extends MasterSlaveBusProps {
-
-  // TODO: ??? use int from I2cNode
-  // TODO: feedback
-  // TODO: pollInterval
-
+  int?: ImpulseInputDriverProps;
   bus?: string | number;
   address: string | number;
 }

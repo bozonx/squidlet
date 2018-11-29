@@ -11,3 +11,4 @@ props:
   address:
   feedback:
   pollInterval:
+  int:

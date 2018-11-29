@@ -3,3 +3,5 @@ bus:
 address:
 feedback:
 pollInterval:
+  default: 100
+int:
