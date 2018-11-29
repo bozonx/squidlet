@@ -75,6 +75,9 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
 }
 
 export function hexToBinArr(hexValue: number): boolean[] {
+
+  // TODO: test
+
   // convert 255 to "11111111"
   const binStr: string = hexValue.toString(2);
   // like ["1", "1", "1", "1", "1", "1", "1", "1"]
@@ -96,6 +99,9 @@ export function hexToBinArr(hexValue: number): boolean[] {
  * @param value
  */
 export function updateValueInBitMask(byte: number, position: number, value: boolean): number {
+
+  // TODO: test
+
   if (value) {
     // set the bit
     return byte | 1 << position;

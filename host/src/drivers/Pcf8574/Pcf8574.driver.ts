@@ -174,21 +174,21 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /**
    * Define a pin as an input.
    * This marks the pin for input processing and activates the high level on this pin.
-   * @param  {PCF8574.PinNumber} pin      The pin number. (0 to 7)
+   * @param  {number} pin      The pin number. (0 to 7)
    * @return {Promise}
    */
-  async inputPin(pin: PinNumber): Promise<void> {
-    if(pin < 0 || pin > 7){
+  async inputPin(pin: number): Promise<void> {
+    if (pin < 0 || pin > 7) {
       return Promise.reject(new Error('Pin out of range'));
     }
 
     this._inputPinBitmask = this.updatePinInBitMask(this._inputPinBitmask, pin, true);
     this._directions[pin] = DIR_IN;
 
-    // TODO: review что он записывает
+    // TODO: нужно записать после установки пинов
 
-    // call _setNewState() to activate the high level on the input pin ...
-    await this._setNewState();
+    // call writeToIc() to activate the high level on the input pin ...
+    //await this.writeToIc();
 
     // TODO: может не делать на время конфигурации ???
 
@@ -199,16 +199,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /**
    * Set the value of an output pin.
    * If no value is given, the pin will be toggled.
-   * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
+   * @param  {number} pin   The pin number. (0 to 7)
    * @param  {boolean}           value The new value for this pin.
    * @return {Promise}
    */
-  async setPinValue(pin: PinNumber, value?:boolean): Promise<void>{
+  async setPinValue(pin: number, value?:boolean): Promise<void>{
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
-
-    if (this._directions[pin] !== DIR_OUT) {
+    else if (this._directions[pin] !== DIR_OUT) {
       throw new Error('Pin is not defined as output');
     }
 
@@ -217,7 +216,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       value = !((this.currentState>>pin) % 2 !== 0);
     }
 
-    return this._setPinInternal(pin, value);
+    // TODO: почему не обновляет локальный стейт ???
+
+    let newState: number = this.updatePinInBitMask(this.currentState, pin, value);
+
+    await this.writeToIc(newState);
+
+    //return this._setPinInternal(pin, value);
+
   }
 
 
@@ -259,15 +265,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Write the current stateto the IC.
+   * Write the current state to the IC.
    * @param  {number}  newState (optional) The new state which will be set. If omitted the current state will be used.
    * @return {Promise}          Promise which gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private async _setNewState(newState?:number) {
+  private async writeToIc(newState?:number) {
 
     // TODO: review
 
-    if(typeof(newState) === 'number'){
+    if (typeof(newState) === 'number') {
       this.currentState = newState;
     }
 
@@ -280,20 +286,20 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.i2cNode.write(undefined, dataToSend);
   }
 
-  /**
-   * Internal function to set the state of a pin, regardless its direction.
-   * @param  {PinNumber} pin   The pin number. (0 to 7)
-   * @param  {boolean}           value The new value.
-   * @return {Promise}
-   */
-  private _setPinInternal(pin: PinNumber, value:boolean): Promise<void>{
-
-    // TODO: review
-
-    let newState:number = this.updatePinInBitMask(this.currentState, pin, value);
-
-    return this._setNewState(newState);
-  }
+  // /**
+  //  * Internal function to set the state of a pin, regardless its direction.
+  //  * @param  {PinNumber} pin   The pin number. (0 to 7)
+  //  * @param  {boolean}           value The new value.
+  //  * @return {Promise}
+  //  */
+  // private _setPinInternal(pin: PinNumber, value:boolean): Promise<void>{
+  //
+  //   // TODO: review
+  //
+  //   let newState: number = this.updatePinInBitMask(this.currentState, pin, value);
+  //
+  //   return this.writeToIc(newState);
+  // }
 
   /**
    * Set the given value to all output pins.
@@ -310,7 +316,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       newState = this.updatePinInBitMask(newState, <PinNumber>pin, value);
     }
 
-    return this._setNewState(newState);
+    return this.writeToIc(newState);
   }
 
 
