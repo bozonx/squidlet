@@ -31,15 +31,15 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   }
 
   protected didInit = async () => {
-    await this.gpio.setup(this.props.pin, 'output');
-
-    // set initial level
+    // setup and set initial level
     try {
-      await this.digitalWrite(this.props.initialLevel);
+      await this.gpio.setup(this.props.pin, 'output', this.props.initialLevel);
     }
     catch (err) {
-      throw new Error(`DigitalPinOutputDriver: Can't set initial value
-       of "${JSON.stringify(this.props)}": ${err.toString()}`);
+      throw new Error(
+        `DigitalPinOutputDriver: Can't setup pin ` +
+        `"${JSON.stringify(this.props)}": ${err.toString()}`
+      );
     }
   }
 
