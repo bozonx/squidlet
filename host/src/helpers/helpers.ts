@@ -93,12 +93,12 @@ export function hexToBinArr(hexValue: number): boolean[] {
 
 /**
  * Update specific position in bitmask.
- * E.g updateValueInBitmask(0, 2, true) ===> 4 (00000100)
+ * E.g updateBitInByte(0, 2, true) ===> 4 (00000100)
  * @param byte
  * @param position
  * @param value
  */
-export function updateValueInBitMask(byte: number, position: number, value: boolean): number {
+export function updateBitInByte(byte: number, position: number, value: boolean): number {
 
   // TODO: test
 

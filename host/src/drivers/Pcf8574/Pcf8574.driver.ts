@@ -8,7 +8,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
-import {hexToBinArr, updateValueInBitMask} from '../../helpers/helpers';
+import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
 
 
 type PinNumber = number;
@@ -198,12 +198,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
   /**
    * Set the value of an output pin.
-   * If no value is given, the pin will be toggled.
-   * @param  {number} pin   The pin number. (0 to 7)
-   * @param  {boolean}           value The new value for this pin.
+   * @param  {number}  pin   The pin number. (0 to 7)
+   * @param  {boolean} value The new value for this pin.
    * @return {Promise}
    */
-  async setPinValue(pin: number, value?:boolean): Promise<void>{
+  async setPinValue(pin: number, value:boolean): Promise<void>{
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
@@ -211,19 +210,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       throw new Error('Pin is not defined as output');
     }
 
-    if (typeof(value) == 'undefined') {
-      // set value dependend on current state to toggle
-      value = !((this.currentState>>pin) % 2 !== 0);
-    }
-
-    // TODO: почему не обновляет локальный стейт ???
-
-    let newState: number = this.updatePinInBitMask(this.currentState, pin, value);
-
-    await this.writeToIc(newState);
-
-    //return this._setPinInternal(pin, value);
-
+    // update local state
+    this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
+    // write to IC
+    await this.writeToIc();
   }
 
 
@@ -254,28 +244,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Helper function to set/clear one bit in a bitmask.
-   * @param  {number}            current The current bitmask.
-   * @param  {number}            pin     The bit-number in the bitmask.
-   * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
-   * @return {number}                    The new (modified) bitmask.
-   */
-  private updatePinInBitMask(current: number, pin: number, value: boolean): number{
-    return updateValueInBitMask(current, pin, value);
-  }
-
-  /**
    * Write the current state to the IC.
-   * @param  {number}  newState (optional) The new state which will be set. If omitted the current state will be used.
-   * @return {Promise}          Promise which gets resolved when the state is written to the IC, or rejected in case of an error.
+   * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private async writeToIc(newState?:number) {
+  private async writeToIc() {
 
     // TODO: review
-
-    if (typeof(newState) === 'number') {
-      this.currentState = newState;
-    }
+    // TODO: use this.currentState
 
     // set all input pins to high
     const newIcState = this.currentState | this._inputPinBitmask;
@@ -286,27 +261,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.i2cNode.write(undefined, dataToSend);
   }
 
-  // /**
-  //  * Internal function to set the state of a pin, regardless its direction.
-  //  * @param  {PinNumber} pin   The pin number. (0 to 7)
-  //  * @param  {boolean}           value The new value.
-  //  * @return {Promise}
-  //  */
-  // private _setPinInternal(pin: PinNumber, value:boolean): Promise<void>{
-  //
-  //   // TODO: review
-  //
-  //   let newState: number = this.updatePinInBitMask(this.currentState, pin, value);
-  //
-  //   return this.writeToIc(newState);
-  // }
-
   /**
    * Set the given value to all output pins.
    * @param  {boolean} value The new value for all output pins.
    * @return {Promise}
    */
   private setAllPins(value:boolean): Promise<void>{
+
+    // TODO: reveiw - зачем вообще нужно ???
+
     let newState:number = this.currentState;
 
     for(let pin = 0; pin < 8; pin++){
@@ -316,7 +279,20 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       newState = this.updatePinInBitMask(newState, <PinNumber>pin, value);
     }
 
-    return this.writeToIc(newState);
+    this.currentState = newState;
+
+    return this.writeToIc();
+  }
+
+  /**
+   * Helper function to set/clear one bit in a bitmask.
+   * @param  {number}            current The current bitmask.
+   * @param  {number}            pin     The bit-number in the bitmask.
+   * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
+   * @return {number}                    The new (modified) bitmask.
+   */
+  private updatePinInBitMask(current: number, pin: number, value: boolean): number{
+    return updateBitInByte(current, pin, value);
   }
 
 
@@ -354,9 +330,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 export default class Factory extends DriverFactoryBase<PCF8574Driver> {
   protected DriverClass = PCF8574Driver;
 
-  // TODO: review
-
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
-    return `${props.bus}-${props.address}`;
+    const bus: string = (props.bus) ? String(props.bus) : 'default';
+
+    return `${bus}-${props.address}`;
   }
+
 }
