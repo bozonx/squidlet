@@ -1,0 +1,5 @@
+# I2cNode.driver
+bus:
+address:
+feedback:
+pollInterval:

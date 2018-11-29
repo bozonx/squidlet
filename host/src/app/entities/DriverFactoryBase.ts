@@ -20,7 +20,7 @@ import DriverInstance from '../interfaces/DriverInstance';
 export default abstract class DriverFactoryBase<Instance extends DriverInstance> extends DriverBase {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
-  //protected instanceType: InstanceType = 'calc';
+  protected instanceAlwaysNew: boolean = false;
   protected instanceAlwaysSame: boolean = false;
   // name of instance id in props
   protected instanceByPropName?: string;
@@ -48,8 +48,12 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
 
   private getInstanceId(props: {[index: string]: any}): string | undefined {
+    if (this.instanceAlwaysNew) {
+      // undefined means always new instance
+      return;
+    }
     if (this.instanceAlwaysSame) {
-      return 'new';
+      return 'same';
     }
     else if (this.instanceByPropName) {
       if (typeof this.instanceByPropName === 'undefined') throw new Error(`You have to specify "instanceByPropName"`);
@@ -64,8 +68,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
       return this.instanceIdCalc(props);
     }
 
-    // undefined means always new instance
-    return;
+    throw new Error(`DriverFactoryBase: cant resolve getting instance method! $`);
   }
 
   private async makeInstance(props: {[index: string]: any}): Promise<Instance> {

@@ -53,5 +53,6 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
 
 
 export default class Factory extends DriverFactoryBase<DigitalLocalDriver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = DigitalLocalDriver;
 }

@@ -127,6 +127,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
 
 export default class Factory extends DriverFactoryBase<DigitalPinInputDriver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = DigitalPinInputDriver;
 
   // TODO: спросить bus и address у нижележащего драйвера - выполнить generateUniqId()

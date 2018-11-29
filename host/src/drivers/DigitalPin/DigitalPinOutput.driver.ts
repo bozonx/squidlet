@@ -79,6 +79,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
 
 export default class Factory extends DriverFactoryBase<DigitalPinOutputDriver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = DigitalPinOutputDriver;
 
   // TODO: не правильно!!!! может быть наложение если брать экспандеры

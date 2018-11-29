@@ -2,6 +2,8 @@
  * Remake of https://www.npmjs.com/package/pcf8574 module
  */
 
+import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
+
 const _omit = require('lodash/omit');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
@@ -14,12 +16,14 @@ import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
 type PinNumber = number;
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
-export interface ExpanderDriverProps {
+export interface ExpanderDriverProps extends MasterSlaveBusProps {
 
-  // TODO: ??? use props from I2cNode
+  // TODO: ??? use int from I2cNode
+  // TODO: feedback
+  // TODO: pollInterval
 
-  //address: string | number;
-  address: number;
+  bus?: string | number;
+  address: string | number;
 }
 
 
@@ -62,7 +66,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // TODO: send feedback props
 
     this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
-      .getInstance(this.props);
+      .getInstance({
+        ...this.props,
+        pollDataLength: 1,
+        pollDataAddress: undefined,
+      });
 
 
     // // save the inital state as current sate and write it to the IC
@@ -328,12 +336,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
 export default class Factory extends DriverFactoryBase<PCF8574Driver> {
-  protected DriverClass = PCF8574Driver;
-
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     const bus: string = (props.bus) ? String(props.bus) : 'default';
 
     return `${bus}-${props.address}`;
   }
-
+  protected DriverClass = PCF8574Driver;
 }

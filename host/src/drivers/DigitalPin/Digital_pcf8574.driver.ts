@@ -100,6 +100,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = DigitalPcf8574Driver;
 
   /**

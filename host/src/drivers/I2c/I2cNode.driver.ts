@@ -20,6 +20,9 @@ interface I2cNodeDriverProps extends MasterSlaveBusProps {
   int?: ImpulseInputDriverProps;
   // length of data which will be requested
   pollDataLength: number;
+
+  // TODO: поидее может быть undefined
+
   pollDataAddress: string | number;
 
   bus?: string | number;
@@ -248,5 +251,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
 
 export default class Factory extends DriverFactoryBase<I2cNodeDriver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = I2cNodeDriver;
 }

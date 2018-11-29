@@ -2,10 +2,4 @@ name: Pcf8574.driver
 main: Pcf8574.driver.ts
 drivers:
   - I2cNode.driver
-
-props:
-  bus:
-  # i2c address like "5a" or 22. Not converted to hex
-  address:
-    type: string | number
-    required: true
+props: ./props.yaml

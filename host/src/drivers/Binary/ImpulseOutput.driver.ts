@@ -108,5 +108,6 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
 
 
 export default class Factory extends DriverFactoryBase<ImpulseOutputDriver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = ImpulseOutputDriver;
 }

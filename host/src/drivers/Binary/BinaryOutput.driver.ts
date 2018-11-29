@@ -144,5 +144,6 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
 
 export default class Factory extends DriverFactoryBase<BinaryOutputDriver> {
+  protected instanceAlwaysNew = true;
   protected DriverClass = BinaryOutputDriver;
 }

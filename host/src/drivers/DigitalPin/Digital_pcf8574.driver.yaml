@@ -6,5 +6,8 @@ drivers:
   - Pcf8574.driver
 
 props:
+  # PCF8574.driver
   bus:
   address:
+  feedback:
+  pollInterval:
