@@ -91,39 +91,29 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Add listener to change of any pin.
    */
   addListener(handler: ResultHandler) {
-    const wrapper: Handler = (error: Error | null, data?: Uint8Array) => {
+    const wrapper: Handler = (error: Error | null) => {
       if (error) return handler(error);
-
-      // TODO: может лучше брать последние данные из i2cNode ???
-      //const values: boolean[] = this.convertValues(data);
 
       handler(null, this.getValues());
     };
-    // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
-    // TODO: слушаем 1 пин или все ???
 
-    //this.events.addListener(INPUT_EVENT_NAME, cb);
-    this.i2cNode.addListener(handler);
+    this.i2cNode.addListener(wrapper);
   }
 
   removeListener(handler: ResultHandler) {
-    //this.events.removeListener(INPUT_EVENT_NAME, cb);
-    this.i2cNode.removeListener(handler);
+
+    // TODO: do it - сохранять wrappers
+
+    //this.i2cNode.removeListener(handler);
   }
 
   /**
-   * Manually poll changed inputs from the PCF8574/PCF8574A IC.
-   * If a change on an input is detected, an "input" Event will be emitted with a data object containing the "pin" and the new "value".
-   * This have to be called frequently enough if you don't use a GPIO for interrupt detection.
-   * If you poll again before the last poll was completed, the promise will be rejected with an error.
-   * @return {Promise}
+   * Poll expander and return values of all the pins
    */
-  poll(): Promise<Uint8Array> {
-    //return this._poll();
+  async poll(): Promise<boolean[]> {
+    await this.i2cNode.poll();
 
-    // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
-
-    return this.i2cNode.poll();
+    return this.getValues();
   }
 
   getPinMode(pin: PinNumber): 'input' | 'output' | undefined {
@@ -138,7 +128,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   getValues(): boolean[] {
-
+    // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
   }
 
   /**
