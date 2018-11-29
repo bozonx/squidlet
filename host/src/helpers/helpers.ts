@@ -88,6 +88,24 @@ export function hexToBinArr(hexValue: number): boolean[] {
   return result;
 }
 
+/**
+ * Update specific position in bitmask.
+ * E.g updateValueInBitmask(0, 2, true) ===> 4 (00000100)
+ * @param byte
+ * @param position
+ * @param value
+ */
+export function updateValueInBitMask(byte: number, position: number, value: boolean): number {
+  if (value) {
+    // set the bit
+    return byte | 1 << position;
+  }
+  else {
+    // clear the bit
+    return byte & ~(1 << position);
+  }
+}
+
 
 export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
 
