@@ -15,8 +15,8 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
   }
 
 
-  async setup(pin: number, pinMode: PinMode) {
-    return this.digitalDev.setup(pin, pinMode);
+  async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean) {
+    return this.digitalDev.setup(pin, pinMode, outputInitialValue);
   }
 
   getPinMode(pin: number): PinMode | undefined {

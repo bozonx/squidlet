@@ -137,7 +137,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number}  pin          The pin number. (0 to 7)
    * @return {Promise}
    */
-  async outputPin(pin: number) {
+  async setupOutputPin(pin: number, outputInitialValue: boolean) {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
@@ -163,7 +163,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number} pin      The pin number. (0 to 7)
    * @return {Promise}
    */
-  async inputPin(pin: number): Promise<void> {
+  async setupInputPin(pin: number): Promise<void> {
     if (pin < 0 || pin > 7) {
       return Promise.reject(new Error('Pin out of range'));
     }

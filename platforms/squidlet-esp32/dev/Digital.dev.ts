@@ -20,8 +20,11 @@ declare function clearWatch(): void;
 
 
 export default class DigitalDev implements Digital {
-  async setup(pin: number, mode: PinMode): Promise<void> {
+  async setup(pin: number, mode: PinMode, outputInitialValue?: boolean): Promise<void> {
     pinMode(pin, mode);
+
+    // TODO: initial
+
   }
 
   getPinMode(pin: number): PinMode | undefined {
