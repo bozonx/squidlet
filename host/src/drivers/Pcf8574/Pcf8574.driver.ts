@@ -9,6 +9,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
+import {hexToBinArr} from '../../helpers/helpers';
 
 
 type PinNumber = number;
@@ -49,11 +50,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   ];
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
   private _inputPinBitmask: number = 0;
-
-  // TODO: поидее не нужно ???
-
   /** Bitmask representing the current state of the pins. */
-  private _currentState: number = 0;
+  private currentState: number = 0;
 
   private get i2cNode(): I2cNodeDriver {
     return this.depsInstances.i2cNode as I2cNodeDriver;
@@ -76,11 +74,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
     // // save the inital state as current sate and write it to the IC
-    // this._currentState = this.resolveInitialState();
+    // this.currentState = this.resolveInitialState();
     //
     // const dataToSend: Uint8Array = new Uint8Array(1);
     //
-    // dataToSend[0] = this._currentState;
+    // dataToSend[0] = this.currentState;
 
     // TODO: remove
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
@@ -124,11 +122,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return 'output';
     }
 
+    // undefined means didn't specify
     return;
   }
 
+  /**
+   * Returns array like [true, true, false, false, true, true, false, false]
+   */
   getValues(): boolean[] {
-    // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
+    return hexToBinArr(this.currentState);
   }
 
   /**
@@ -142,7 +144,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     if(pin < 0 || pin > 7){
       return false;
     }
-    return ((this._currentState>>pin) % 2 !== 0);
+    return ((this.currentState>>pin) % 2 !== 0);
   }
 
   /**
@@ -211,7 +213,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     if(typeof(value) == 'undefined'){
       // set value dependend on current state to toggle
-      value = !((this._currentState>>pin) % 2 !== 0);
+      value = !((this.currentState>>pin) % 2 !== 0);
     }
 
     return this._setPinInternal(pin, value);
@@ -242,11 +244,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
   private async _setNewState(newState?:number) {
     if(typeof(newState) === 'number'){
-      this._currentState = newState;
+      this.currentState = newState;
     }
 
     // set all input pins to high
-    const newIcState = this._currentState | this._inputPinBitmask;
+    const newIcState = this.currentState | this._inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);
 
     dataToSend[0] = newIcState;
@@ -286,10 +288,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //   if(this._directions[pin] !== DIR_IN){
     //     continue; // isn't an input pin
     //   }
-    //   if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
+    //   if((this.currentState>>pin) % 2 !== (readState>>pin) % 2){
     //     // pin changed
     //     let value: boolean = ((readState>>pin) % 2 !== 0);
-    //     this._currentState = this._setStatePin(this._currentState, <PinNumber>pin, value);
+    //     this.currentState = this._setStatePin(this.currentState, <PinNumber>pin, value);
     //     if(noEmit !== pin){
     //       this.events.emit(INPUT_EVENT_NAME, <InputData>{pin: pin, value: value});
     //     }
@@ -304,7 +306,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   private _setPinInternal(pin: PinNumber, value:boolean): Promise<void>{
-    let newState:number = this._setStatePin(this._currentState, pin, value);
+    let newState:number = this._setStatePin(this.currentState, pin, value);
 
     return this._setNewState(newState);
   }
@@ -315,7 +317,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   private setAllPins(value:boolean): Promise<void>{
-    let newState:number = this._currentState;
+    let newState:number = this.currentState;
 
     for(let pin = 0; pin < 8; pin++){
       if(this._directions[pin] !== DIR_OUT){

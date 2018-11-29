@@ -74,6 +74,21 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
   return result;
 }
 
+export function hexToBinArr(hexValue: number): boolean[] {
+  // convert 255 to "11111111"
+  const binStr: string = hexValue.toString(2);
+  // like ["1", "1", "1", "1", "1", "1", "1", "1"]
+  const binSplitStr: string[] = binStr.split('');
+  const result: boolean[] = new Array(8);
+
+  for (let itemStr of binSplitStr) {
+    result.push( Boolean( parseInt(itemStr) ) );
+  }
+
+  return result;
+}
+
+
 export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
 
   // TODO: test
