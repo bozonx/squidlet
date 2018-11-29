@@ -60,17 +60,22 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     // TODO: что делать с debounce ?
     // TODO: что делать с edge ?
 
-    const wrapper: ResultHandler = (err: Error | null, values: boolean[]) => {
+    const wrapper: ResultHandler = (err: Error | null, values?: boolean[]) => {
       if (err) {
-        // TODO: что делать с ошибкой???
-
         this.env.log.error(String(err));
+
+        return;
+      }
+      else if (!values) {
+        this.env.log.error(`DigitalPcf8574Driver.setWatch. pin: ${pin}. No values`);
 
         return;
       }
 
       handler(values[pin]);
     };
+
+    this.expander.addListener(wrapper);
 
     const watcherIndex: number = this.watchers.length;
     this.watchers.push(wrapper);
@@ -82,12 +87,12 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     // do nothing if watcher doesn't exist
     if (!this.watchers[id]) return;
 
-    this.expander.removeEventListener(this.watchers[id]);
+    this.expander.removeListener(this.watchers[id]);
   }
 
   clearAllWatches(): void {
     for (let id in this.watchers) {
-      this.expander.removeEventListener(this.watchers[id]);
+      this.expander.removeListener(this.watchers[id]);
     }
   }
 

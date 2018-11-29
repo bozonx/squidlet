@@ -12,7 +12,7 @@ import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
 
 
 type PinNumber = number;
-export type ResultHandler = (err: Error | null, values: boolean[]) => void;
+export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
 interface InputData {
   pin: number;
@@ -34,7 +34,7 @@ export const DIR_UNDEF = -1;
 export const DIR_IN = 1;
 /** Constant for output pin direction. */
 export const DIR_OUT = 0;
-const INPUT_EVENT_NAME = 'input';
+//const INPUT_EVENT_NAME = 'input';
 
 
 /**
@@ -48,7 +48,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
   ];
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
-  private _inputPinBitmask:number = 0;
+  private _inputPinBitmask: number = 0;
+
+  // TODO: поидее не нужно ???
+
   /** Bitmask representing the current state of the pins. */
   private _currentState: number = 0;
 
@@ -83,8 +86,19 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
-  addEventListener(handler: ResultHandler) {
 
+  /**
+   * Add listener to change of any pin.
+   */
+  addListener(handler: ResultHandler) {
+    const wrapper: Handler = (error: Error | null, data?: Uint8Array) => {
+      if (error) return handler(error);
+
+      // TODO: может лучше брать последние данные из i2cNode ???
+      //const values: boolean[] = this.convertValues(data);
+
+      handler(null, this.getValues());
+    };
     // TODO: преобразовать ответ в массив like [0,0,1,1,0,0,1,1]
     // TODO: слушаем 1 пин или все ???
 
@@ -92,7 +106,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.i2cNode.addListener(handler);
   }
 
-  removeEventListener(handler: ResultHandler) {
+  removeListener(handler: ResultHandler) {
     //this.events.removeListener(INPUT_EVENT_NAME, cb);
     this.i2cNode.removeListener(handler);
   }
@@ -121,6 +135,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     }
 
     return;
+  }
+
+  getValues(): boolean[] {
+
   }
 
   /**
