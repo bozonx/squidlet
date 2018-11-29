@@ -89,8 +89,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Add listener to change of any pin.
    */
   addListener(handler: ResultHandler) {
-    const wrapper: Handler = (error: Error | null) => {
-      if (error) return handler(error);
+    const wrapper: Handler = (error: Error | null, data?: Uint8Array) => {
+      if (error) {
+        return handler(error);
+      }
+      else if (!data) {
+        return handler(new Error(`No Data of "${JSON.stringify(this.props)}"`));
+      }
+
+      // TODO: нужно ли инвертировать???
+
+      this.currentState = data[0];
 
       handler(null, this.getValues());
     };
@@ -109,7 +118,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<boolean[]> {
-    await this.i2cNode.poll();
+    const data: Uint8Array = await this.i2cNode.poll();
+
+    // TODO: нужно ли инвертировать???
+
+    this.currentState = data[0];
 
     return this.getValues();
   }
