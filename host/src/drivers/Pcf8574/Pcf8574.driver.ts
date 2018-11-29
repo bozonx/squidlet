@@ -2,22 +2,17 @@
  * Remake of https://www.npmjs.com/package/pcf8574 module
  */
 
-import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {I2cNodeDriver, Handler} from '../I2c/I2cNode.driver';
+import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
 import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
-import {ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 
 
 type PinNumber = number;
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
-export interface ExpanderDriverProps extends MasterSlaveBusProps {
-  int?: ImpulseInputDriverProps;
-  bus?: string | number;
-  address: string | number;
+export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
 }
 
 
@@ -48,17 +43,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  /**
-   * Constructor for a new PCF8574/PCF8574A instance.
-   * If you use this IC with one or more input pins, you have to call ...
-   *  a) enableInterrupt(gpioPin) to detect interrupts from the IC using a GPIO pin, or
-   *  b) doPoll() frequently enough to detect input changes with manually polling.
-   * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
-   */
-
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    // TODO: send feedback props
-
     this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
       .getInstance({
         ...this.props,
@@ -74,7 +59,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //
     // dataToSend[0] = this.currentState;
 
-    // TODO: remove
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
@@ -229,6 +213,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     this.currentState = lastData[0];
 
+    // TODO: review old code
+    // TODO: see setAllPins
+
     // // check each input for changes
     // for(let pin = 0; pin < 8; pin++){
     //   if(this._directions[pin] !== DIR_IN){
@@ -250,10 +237,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
   private async writeToIc() {
-
-    // TODO: review
-    // TODO: use this.currentState
-
     // set all input pins to high
     const newIcState = this.currentState | this._inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);

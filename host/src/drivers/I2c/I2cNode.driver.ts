@@ -15,19 +15,21 @@ import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInpu
 
 export type Handler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cNodeDriverProps extends MasterSlaveBusProps {
+export interface I2cNodeDriverBaseProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
   int?: ImpulseInputDriverProps;
+  bus?: string | number;
+  // it can be i2c address as a string like '5a' or number equivalent - 90
+  address: string | number;
+}
+
+export interface I2cNodeDriverProps extends I2cNodeDriverBaseProps {
   // length of data which will be requested
   pollDataLength: number;
 
   // TODO: поидее может быть undefined
 
   pollDataAddress: string | number;
-
-  bus?: string | number;
-  // it can be i2c address as a string like '5a' or number equivalent - 90
-  address: string | number;
 }
 
 // TODO: why ???? better to use undefined
