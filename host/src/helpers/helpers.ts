@@ -77,6 +77,7 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
 export function hexToBinArr(hexValue: number): boolean[] {
 
   // TODO: test
+  // TODO: toString - опускает нули
 
   // convert 255 to "11111111"
   const binStr: string = hexValue.toString(2);

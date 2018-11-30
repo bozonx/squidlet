@@ -184,10 +184,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     if (!lastData) return;
 
-    // TODO: может брать только значения input пинов???
+    // TODO: брать только значения input пинов!!!!!
     // TODO: нужно ли инвертировать???
 
-    this.currentState = lastData[0];
+    console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', lastData[0].toString(2));
+    // TODO: use it
+    //this.currentState = lastData[0];
+
 
     // TODO: review old code
     // TODO: see setAllPins

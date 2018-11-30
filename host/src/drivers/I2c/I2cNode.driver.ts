@@ -65,8 +65,10 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
         'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
       ));
 
-    this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
-      .getInstance(this.props.int || {});
+    // TODO: don't set if no int
+
+    // this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
+    //   .getInstance(this.props.int || {});
 
     this.addressHex = hexStringToHexNum(String(this.props.address));
     this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
