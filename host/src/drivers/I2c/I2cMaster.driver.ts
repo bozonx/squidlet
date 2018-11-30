@@ -30,7 +30,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
   /**
    * Read once from bus.
    * if data address is defined then it will write an empty command before read
-   * and code on other side cat prepare data to send
+   * and code on other side cat prepare data to send.
    */
   async read(addressHex: number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
     if (typeof dataAddress !== 'undefined') {

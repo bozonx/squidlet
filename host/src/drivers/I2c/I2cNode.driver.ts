@@ -26,14 +26,10 @@ export interface I2cNodeDriverBaseProps extends MasterSlaveBusProps {
 export interface I2cNodeDriverProps extends I2cNodeDriverBaseProps {
   // length of data which will be requested
   pollDataLength: number;
-
-  // TODO: поидее может быть undefined
-
-  pollDataAddress: string | number;
+  pollDataAddress?: string | number;
 }
 
-// TODO: why ???? better to use undefined
-const DEFAULT_DATA_ADDRESS = 'default';
+const DEFAULT_POLL_ID = 'default';
 const POLL_EVENT_NAME = 'poll';
 
 
@@ -44,7 +40,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   private addressHex: number = -1;
   // data addr in hex to use in poling.
   private pollDataAddressHex?: number;
-  private pollDataAddressString: string = DEFAULT_DATA_ADDRESS;
+  private pollId: string = DEFAULT_POLL_ID;
 
   // last received data by poling
   // it needs to decide to rise change event or not
@@ -72,7 +68,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
     this.addressHex = hexStringToHexNum(String(this.props.address));
     this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
-    this.pollDataAddressString = this.dataAddressToString(this.props.pollDataAddress);
+    this.pollId = this.dataAddressToString(this.props.pollDataAddress);
   }
 
   protected didInit = async () => {
@@ -206,7 +202,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   private stopPoling() {
     if (this.props.feedback !== 'poll') return;
 
-    this.poling.stop(this.pollDataAddressString);
+    this.poling.stop(this.pollId);
   }
 
   private startPoling() {
@@ -227,14 +223,14 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     };
 
 
-    this.poling.start(wrapper, this.props.pollInterval, this.pollDataAddressString);
+    this.poling.start(wrapper, this.props.pollInterval, this.pollId);
   }
 
   /**
-   * Convert number to string or undefined to "DEFAULT_DATA_ADDRESS"
+   * Convert number to string or undefined to "DEFAULT_POLL_ID"
    */
   private dataAddressToString(dataAddress: string | number | undefined): string {
-    if (typeof dataAddress === 'undefined') return DEFAULT_DATA_ADDRESS;
+    if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
     if (typeof dataAddress === 'string') return dataAddress;
 
     return dataAddress.toString(16);
@@ -246,7 +242,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    */
   private parseDataAddress(dataAddressStr: string | number | undefined): number | undefined {
     if (typeof dataAddressStr === 'undefined') return undefined;
-    if (dataAddressStr === DEFAULT_DATA_ADDRESS) return undefined;
 
     return parseInt(String(dataAddressStr), 16);
   }
