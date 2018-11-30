@@ -50,8 +50,8 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
 
-  private get impulseInput(): ImpulseInputDriver {
-    return this.depsInstances.impulseInput as ImpulseInputDriver;
+  private get impulseInput(): ImpulseInputDriver | undefined {
+    return this.depsInstances.impulseInput as ImpulseInputDriver | undefined;
   }
 
 
@@ -61,10 +61,10 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
         'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
       ));
 
-    // TODO: don't set if no int
-
-    // this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
-    //   .getInstance(this.props.int || {});
+    if (this.props.int) {
+      this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
+        .getInstance(this.props.int || {});
+    }
 
     this.addressHex = hexStringToHexNum(String(this.props.address));
     this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
@@ -162,6 +162,12 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   private setupFeedback(): void {
     if (this.props.feedback === 'int') {
+      if (!this.impulseInput) {
+        throw new Error(
+          `I2cNode.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
+        );
+      }
+
       return this.impulseInput.addListener(this.doPoll);
     }
     // start poling if feedback is poll
