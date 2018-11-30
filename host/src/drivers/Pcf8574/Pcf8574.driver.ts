@@ -53,6 +53,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       });
   }
 
+  protected didInit = async () => {
+    // init IC state after app is inited if it isn't inited at this moment
+    this.env.system.onAppInit(async () => {
+      if (!this.wasIcInited) await this.initIc();
+    });
+  }
+
 
   async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
     if (pin < 0 || pin > 7) {
@@ -108,6 +115,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<boolean[]> {
+    // init IC if it isn't inited at this moment
+    if (!this.wasIcInited) await this.initIc();
+
     await this.i2cNode.poll();
     this.setLastReceivedState();
 
@@ -140,7 +150,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number} pin The pin number. (0 to 7)
    * @return {boolean}               The current value.
    */
-  getPinValue(pin: number): boolean {
+  read(pin: number): boolean {
     if (pin < 0 || pin > 7) {
       return false;
     }
@@ -154,7 +164,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {boolean} value The new value for this pin.
    * @return {Promise}
    */
-  async setPinValue(pin: number, value:boolean): Promise<void>{
+  async write(pin: number, value:boolean): Promise<void> {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
@@ -203,6 +213,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
   private async writeToIc() {
+    // it means that IC is inited when first data is written
+    this.wasIcInited = true;
+
     // set all input pins to high
     const newIcState = this.currentState | this.inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);
@@ -212,15 +225,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.i2cNode.write(undefined, dataToSend);
   }
 
-  initIc() {
-    // // save the inital state as current sate and write it to the IC
-    // this.currentState = this.resolveInitialState();
-    //
-    // const dataToSend: Uint8Array = new Uint8Array(1);
-    //
-    // dataToSend[0] = this.currentState;
-
-    //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
+  /**
+   * Do first write to IC if it doesn't do before.
+   */
+  async initIc() {
+    await this.writeToIc();
   }
 
   /**
