@@ -12,12 +12,16 @@ export default class Republish {
     if (!this.republishInterval) return;
 
     if (this.intervalId) {
-      clearInterval(this.intervalId);
+      this.stop();
     }
 
     this.intervalId = setInterval(() => {
       cb();
     }, this.republishInterval);
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
   }
 
 }

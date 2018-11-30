@@ -222,9 +222,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Write the current state to the IC.
    * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private async writeToIc() {
+  private async writeToIc () {
     // it means that IC is inited when first data is written
     this.wasIcInited = true;
+
+    // clear republish and start again
+    if (this.republish) {
+      this.republish.start(this.doResend);
+    }
 
     // set all input pins to high
     const newIcState = this.currentState | this.inputPinBitmask;
@@ -244,6 +249,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     }
     catch (err) {
       this.env.log.error(`PCF8574.driver. Can't init IC state. ${String(err)}`);
+    }
+  }
+
+  private doResend = async () => {
+    try {
+      await this.writeToIc();
+    }
+    catch (err) {
+      this.env.log.error(`PCF8574.driver. Can't resend state to IC. ${String(err)}`);
     }
   }
 
