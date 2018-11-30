@@ -1,6 +1,9 @@
 /*
- * Remake of https://www.npmjs.com/package/pcf8574 module
+ * Remake of https://www.npmjs.com/package/pcf8574 module.
+ * Handling a PCF8574/PCF8574A IC.
  */
+
+const _omit = require('lodash/omit');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -8,11 +11,13 @@ import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
 import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
+import Republish from '../../helpers/Republish';
 
 
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
+  resendStateInterval?: number;
 }
 
 
@@ -24,9 +29,6 @@ export const DIR_IN = 1;
 export const DIR_OUT = 0;
 
 
-/**
- * Class for handling a PCF8574/PCF8574A IC.
- */
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Direction of each pin. By default all pin directions are undefined. */
   private directions:Array<number> = [
@@ -38,6 +40,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Bitmask representing the current state of the pins. */
   private currentState: number = 0;
   private wasIcInited: boolean = false;
+  protected republish?: Republish;
 
   private get i2cNode(): I2cNodeDriver {
     return this.depsInstances.i2cNode as I2cNodeDriver;
@@ -47,10 +50,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
       .getInstance({
-        ...this.props,
+        ..._omit(this.props, 'resendStateInterval'),
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
+
+    if (this.props.resendStateInterval) {
+      this.republish = new Republish(this.props.resendStateInterval);
+    }
   }
 
   protected didInit = async () => {

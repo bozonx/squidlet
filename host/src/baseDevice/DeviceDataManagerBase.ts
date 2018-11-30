@@ -1,7 +1,7 @@
 import * as EventEmitter from 'eventemitter3';
 
 import System from '../app/System';
-import Republish from './Republish';
+import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 
