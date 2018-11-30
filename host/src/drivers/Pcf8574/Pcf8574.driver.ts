@@ -7,6 +7,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
 import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
+import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
@@ -36,6 +37,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private inputPinBitmask: number = 0;
   /** Bitmask representing the current state of the pins. */
   private currentState: number = 0;
+  private wasIcInited: boolean = false;
 
   private get i2cNode(): I2cNodeDriver {
     return this.depsInstances.i2cNode as I2cNodeDriver;
@@ -49,69 +51,34 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
-
-
-    // // save the inital state as current sate and write it to the IC
-    // this.currentState = this.resolveInitialState();
-    //
-    // const dataToSend: Uint8Array = new Uint8Array(1);
-    //
-    // dataToSend[0] = this.currentState;
-
-    //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
 
-  /**
-   * Define a pin as an output.
-   * This marks the pin to be used as an output pin.
-   * It just setup pin but don't set initial value, you should set it manually.
-   * @param  {number}  pin          The pin number. (0 to 7)
-   * @return {Promise}
-   */
-  async setupOutputPin(pin: number, outputInitialValue: boolean) {
+  async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
 
-    this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
-    this.directions[pin] = DIR_OUT;
+    if (pinMode === 'output') {
+      // output pin
+      if (typeof outputInitialValue === 'undefined') {
+        throw new Error(`You have to specify an outputInitialValue`);
+      }
 
-    // // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
-    // if (typeof (initialValue) === 'undefined') {
-    //   return;
-    // }
-    // else {
-    //
-    //   // TODO: review
-    //
-    //   return this._setPinInternal(pin, initialValue);
-    // }
-  }
-
-  /**
-   * Define a pin as an input.
-   * This marks the pin for input processing and activates the high level on this pin.
-   * @param  {number} pin      The pin number. (0 to 7)
-   * @return {Promise}
-   */
-  async setupInputPin(pin: number): Promise<void> {
-    if (pin < 0 || pin > 7) {
-      return Promise.reject(new Error('Pin out of range'));
+      this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
+      this.directions[pin] = DIR_OUT;
+      // update local state
+      this.currentState = this.updatePinInBitMask(this.currentState, pin, outputInitialValue);
     }
+    else {
+      // input pin
+      if (pinMode !== 'input') {
+        this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
+      }
 
-    this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
-    this.directions[pin] = DIR_IN;
-
-    // TODO: нужно записать после установки пинов
-
-    // call writeToIc() to activate the high level on the input pin ...
-    //await this.writeToIc();
-
-    // TODO: может не делать на время конфигурации ???
-
-    // ... and then poll all current inputs with noEmit on this pin to suspress the event
-    //await this._poll(pin);
+      this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
+      this.directions[pin] = DIR_IN;
+    }
   }
 
   /**
@@ -245,6 +212,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.i2cNode.write(undefined, dataToSend);
   }
 
+  initIc() {
+    // // save the inital state as current sate and write it to the IC
+    // this.currentState = this.resolveInitialState();
+    //
+    // const dataToSend: Uint8Array = new Uint8Array(1);
+    //
+    // dataToSend[0] = this.currentState;
+
+    //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
+  }
+
   /**
    * Set the given value to all output pins.
    * @param  {boolean} value The new value for all output pins.
@@ -289,6 +267,59 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return;
   }
 
+
+
+  // /**
+  //  * Define a pin as an output.
+  //  * This marks the pin to be used as an output pin.
+  //  * It just setup pin but don't set initial value, you should set it manually.
+  //  * @param  {number}  pin          The pin number. (0 to 7)
+  //  * @return {Promise}
+  //  */
+  // async setupOutputPin(pin: number, outputInitialValue: boolean) {
+  //   if (pin < 0 || pin > 7) {
+  //     throw new Error('Pin out of range');
+  //   }
+  //
+  //   this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
+  //   this.directions[pin] = DIR_OUT;
+  //
+  //   // // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
+  //   // if (typeof (initialValue) === 'undefined') {
+  //   //   return;
+  //   // }
+  //   // else {
+  //   //
+  //   //   // TODO: review
+  //   //
+  //   //   return this._setPinInternal(pin, initialValue);
+  //   // }
+  // }
+  //
+  // /**
+  //  * Define a pin as an input.
+  //  * This marks the pin for input processing and activates the high level on this pin.
+  //  * @param  {number} pin      The pin number. (0 to 7)
+  //  * @return {Promise}
+  //  */
+  // async setupInputPin(pin: number): Promise<void> {
+  //   if (pin < 0 || pin > 7) {
+  //     return Promise.reject(new Error('Pin out of range'));
+  //   }
+  //
+  //   this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
+  //   this.directions[pin] = DIR_IN;
+  //
+  //   // TODO: нужно записать после установки пинов
+  //
+  //   // call writeToIc() to activate the high level on the input pin ...
+  //   //await this.writeToIc();
+  //
+  //   // TODO: может не делать на время конфигурации ???
+  //
+  //   // ... and then poll all current inputs with noEmit on this pin to suspress the event
+  //   //await this._poll(pin);
+  // }
 
   // private resolveInitialState(): number {
   //   if (this.props.initialState === true) {

@@ -23,22 +23,24 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
-    if (pinMode === 'output') {
-      if (typeof outputInitialValue === 'undefined') {
-        throw new Error(`You have to specify an outputInitialValue`);
-      }
+    await this.expander.setup(pin, pinMode, outputInitialValue);
 
-      // output pin
-      await this.expander.setupOutputPin(pin, outputInitialValue);
-    }
-    else {
-      // input pin
-      if (pinMode !== 'input') {
-        this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
-      }
-
-      await this.expander.setupInputPin(pin);
-    }
+    // if (pinMode === 'output') {
+    //   if (typeof outputInitialValue === 'undefined') {
+    //     throw new Error(`You have to specify an outputInitialValue`);
+    //   }
+    //
+    //   // output pin
+    //   await this.expander.setupOutputPin(pin, outputInitialValue);
+    // }
+    // else {
+    //   // input pin
+    //   if (pinMode !== 'input') {
+    //     this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
+    //   }
+    //
+    //   await this.expander.setupInputPin(pin);
+    // }
   }
 
   getPinMode(pin: number): PinMode | undefined {
