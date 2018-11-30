@@ -229,7 +229,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Do first write to IC if it doesn't do before.
    */
   async initIc() {
-    await this.writeToIc();
+    try {
+      await this.writeToIc();
+    }
+    catch (err) {
+      this.env.log.error(`PCF8574.driver. Can't init IC state. ${String(err)}`);
+    }
   }
 
   /**
