@@ -9,7 +9,6 @@ import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.dri
 import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
 
 
-type PinNumber = number;
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
@@ -29,12 +28,12 @@ export const DIR_OUT = 0;
  */
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Direction of each pin. By default all pin directions are undefined. */
-  private _directions:Array<number> = [
+  private directions:Array<number> = [
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
   ];
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
-  private _inputPinBitmask: number = 0;
+  private inputPinBitmask: number = 0;
   /** Bitmask representing the current state of the pins. */
   private currentState: number = 0;
 
@@ -62,6 +61,58 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //await this.i2cMaster.write(this.props.address, undefined, dataToSend);
   }
 
+
+  /**
+   * Define a pin as an output.
+   * This marks the pin to be used as an output pin.
+   * It just setup pin but don't set initial value, you should set it manually.
+   * @param  {number}  pin          The pin number. (0 to 7)
+   * @return {Promise}
+   */
+  async setupOutputPin(pin: number, outputInitialValue: boolean) {
+    if (pin < 0 || pin > 7) {
+      throw new Error('Pin out of range');
+    }
+
+    this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
+    this.directions[pin] = DIR_OUT;
+
+    // // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
+    // if (typeof (initialValue) === 'undefined') {
+    //   return;
+    // }
+    // else {
+    //
+    //   // TODO: review
+    //
+    //   return this._setPinInternal(pin, initialValue);
+    // }
+  }
+
+  /**
+   * Define a pin as an input.
+   * This marks the pin for input processing and activates the high level on this pin.
+   * @param  {number} pin      The pin number. (0 to 7)
+   * @return {Promise}
+   */
+  async setupInputPin(pin: number): Promise<void> {
+    if (pin < 0 || pin > 7) {
+      return Promise.reject(new Error('Pin out of range'));
+    }
+
+    this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
+    this.directions[pin] = DIR_IN;
+
+    // TODO: нужно записать после установки пинов
+
+    // call writeToIc() to activate the high level on the input pin ...
+    //await this.writeToIc();
+
+    // TODO: может не делать на время конфигурации ???
+
+    // ... and then poll all current inputs with noEmit on this pin to suspress the event
+    //await this._poll(pin);
+  }
 
   /**
    * Add listener to change of any pin.
@@ -96,11 +147,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return this.getValues();
   }
 
-  getPinMode(pin: PinNumber): 'input' | 'output' | undefined {
-    if (this._directions[pin] === DIR_IN) {
+  getPinMode(pin: number): 'input' | 'output' | undefined {
+    if (this.directions[pin] === DIR_IN) {
       return 'input';
     }
-    else if (this._directions[pin] === DIR_OUT) {
+    else if (this.directions[pin] === DIR_OUT) {
       return 'output';
     }
 
@@ -119,67 +170,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Returns the current value of a pin.
    * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
    * To get the current value call doPoll() first, if you're not using interrupts.
-   * @param  {PinNumber} pin The pin number. (0 to 7)
+   * @param  {number} pin The pin number. (0 to 7)
    * @return {boolean}               The current value.
    */
-  getPinValue(pin: PinNumber): boolean {
+  getPinValue(pin: number): boolean {
     if (pin < 0 || pin > 7) {
       return false;
     }
     
     return ((this.currentState>>pin) % 2 !== 0);
-  }
-
-  /**
-   * Define a pin as an output.
-   * This marks the pin to be used as an output pin.
-   * It just setup pin but don't set initial value, you should set it manually.
-   * @param  {number}  pin          The pin number. (0 to 7)
-   * @return {Promise}
-   */
-  async setupOutputPin(pin: number, outputInitialValue: boolean) {
-    if (pin < 0 || pin > 7) {
-      throw new Error('Pin out of range');
-    }
-
-    this._inputPinBitmask = this.updatePinInBitMask(this._inputPinBitmask, pin, false);
-    this._directions[pin] = DIR_OUT;
-
-    // // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
-    // if (typeof (initialValue) === 'undefined') {
-    //   return;
-    // }
-    // else {
-    //
-    //   // TODO: review
-    //
-    //   return this._setPinInternal(pin, initialValue);
-    // }
-  }
-
-  /**
-   * Define a pin as an input.
-   * This marks the pin for input processing and activates the high level on this pin.
-   * @param  {number} pin      The pin number. (0 to 7)
-   * @return {Promise}
-   */
-  async setupInputPin(pin: number): Promise<void> {
-    if (pin < 0 || pin > 7) {
-      return Promise.reject(new Error('Pin out of range'));
-    }
-
-    this._inputPinBitmask = this.updatePinInBitMask(this._inputPinBitmask, pin, true);
-    this._directions[pin] = DIR_IN;
-
-    // TODO: нужно записать после установки пинов
-
-    // call writeToIc() to activate the high level on the input pin ...
-    //await this.writeToIc();
-
-    // TODO: может не делать на время конфигурации ???
-
-    // ... and then poll all current inputs with noEmit on this pin to suspress the event
-    //await this._poll(pin);
   }
 
   /**
@@ -192,7 +191,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
-    else if (this._directions[pin] !== DIR_OUT) {
+    else if (this.directions[pin] !== DIR_OUT) {
       throw new Error('Pin is not defined as output');
     }
 
@@ -218,13 +217,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // // check each input for changes
     // for(let pin = 0; pin < 8; pin++){
-    //   if(this._directions[pin] !== DIR_IN){
+    //   if(this.directions[pin] !== DIR_IN){
     //     continue; // isn't an input pin
     //   }
     //   if((this.currentState>>pin) % 2 !== (readState>>pin) % 2){
     //     // pin changed
     //     let value: boolean = ((readState>>pin) % 2 !== 0);
-    //     this.currentState = this.updatePinInBitMask(this.currentState, <PinNumber>pin, value);
+    //     this.currentState = this.updatePinInBitMask(this.currentState, <number>pin, value);
     //     if(noEmit !== pin){
     //       this.events.emit(INPUT_EVENT_NAME, <InputData>{pin: pin, value: value});
     //     }
@@ -238,7 +237,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
   private async writeToIc() {
     // set all input pins to high
-    const newIcState = this.currentState | this._inputPinBitmask;
+    const newIcState = this.currentState | this.inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);
 
     dataToSend[0] = newIcState;
@@ -258,10 +257,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     let newState:number = this.currentState;
 
     for(let pin = 0; pin < 8; pin++){
-      if(this._directions[pin] !== DIR_OUT){
+      if(this.directions[pin] !== DIR_OUT){
         continue; // isn't an output pin
       }
-      newState = this.updatePinInBitMask(newState, <PinNumber>pin, value);
+      newState = this.updatePinInBitMask(newState, pin, value);
     }
 
     this.currentState = newState;

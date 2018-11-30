@@ -30,8 +30,14 @@ export default class DigitalDev implements Digital {
       edge: (convertedMode.mode === Gpio.INPUT) ? Gpio.EITHER_EDGE : undefined,
     });
 
-    // TODO: outputInitialValue
+    // set initial value for output pin
+    if (pinMode === 'output') {
+      if (typeof outputInitialValue === 'undefined') {
+        throw new Error(`You have to specify an outputInitialValue`);
+      }
 
+      await this.write(pin, outputInitialValue);
+    }
   }
 
   /**

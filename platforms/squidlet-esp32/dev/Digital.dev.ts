@@ -23,8 +23,14 @@ export default class DigitalDev implements Digital {
   async setup(pin: number, mode: PinMode, outputInitialValue?: boolean): Promise<void> {
     pinMode(pin, mode);
 
-    // TODO: initial
+    // set initial value for output pin
+    if (mode === 'output') {
+      if (typeof outputInitialValue === 'undefined') {
+        throw new Error(`You have to specify an outputInitialValue`);
+      }
 
+      await this.write(pin, outputInitialValue);
+    }
   }
 
   getPinMode(pin: number): PinMode | undefined {
