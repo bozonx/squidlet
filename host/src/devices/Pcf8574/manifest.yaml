@@ -8,4 +8,4 @@ props: ./props.yaml
 
 status:
   default:
-    type: number
+    type: number[]
