@@ -1,6 +1,7 @@
 const _isEmpty = require('lodash/isEmpty');
 const _find = require('lodash/find');
 const _trim = require('lodash/trim');
+const _padStart = require('lodash/trim');
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import * as uniqid from 'uniqid';
 
@@ -74,13 +75,20 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
   return result;
 }
 
-export function hexToBinArr(hexValue: number): boolean[] {
+export function byteToString(hexValue: number): string {
 
   // TODO: test
-  // TODO: toString - опускает нули
 
-  // convert 255 to "11111111"
-  const binStr: string = hexValue.toString(2);
+  // convert 4 to ""00000100""
+  return _padStart( hexValue.toString(2), 8, '0' );
+}
+
+export function byteToBinArr(hexValue: number): boolean[] {
+
+  // TODO: test
+
+  // convert 4 to ""00000100""
+  const binStr: string = byteToString(hexValue);
   // like ["1", "1", "1", "1", "1", "1", "1", "1"]
   const binSplitStr: string[] = binStr.split('');
   const result: boolean[] = new Array(8);

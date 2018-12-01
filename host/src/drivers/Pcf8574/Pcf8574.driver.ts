@@ -9,7 +9,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
-import {hexToBinArr, updateBitInByte} from '../../helpers/helpers';
+import {byteToBinArr, updateBitInByte} from '../../helpers/helpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import Republish from '../../helpers/Republish';
 
@@ -147,7 +147,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Returns array like [true, true, false, false, true, true, false, false]
    */
   getValues(): boolean[] {
-    return hexToBinArr(this.currentState);
+    return byteToBinArr(this.currentState);
   }
 
   /**
@@ -228,7 +228,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // clear republish and start again
     if (this.republish) {
-      this.republish.start(this.doResend);
+
+      // TODO: нет от него толка - потомучто статус работает не правильно - если не получилось то от не переключает
+
+      //this.republish.start(this.doResend);
     }
 
     // set all input pins to high
