@@ -70,6 +70,7 @@ export default class System {
     this.riseEvent(eventNames.system.networkInitialized);
 
     this.messenger.init();
+    this.devices.init();
     this.riseEvent(eventNames.system.messengerInitialized);
 
     await this.servicesManager.initSystemServices();
@@ -104,7 +105,6 @@ export default class System {
     await this.driversManager.initRegularDrivers();
     await this.servicesManager.initRegularServices();
     await this.devicesManager.init();
-    this.devices.init();
   }
 
   private riseEvent(eventName: string) {
