@@ -33,7 +33,7 @@ export default class DigitalDev implements Digital {
     }
   }
 
-  getPinMode(pin: number): PinMode | undefined {
+  async getPinMode(pin: number): Promise<PinMode | undefined> {
     return getPinMode(pin);
   }
 
@@ -49,7 +49,7 @@ export default class DigitalDev implements Digital {
    * Start listen.
    * By default debounce set to 0 because some pins with buttons set by default 25ms and other to 0.
    */
-  setWatch(pin: number, handler: WatchHandler, debounce: number = 0, edge?: Edge): number {
+  async setWatch(pin: number, handler: WatchHandler, debounce: number = 0, edge?: Edge): Promise<number> {
 
     // TODO: на пинах которые не поддерживают прерывания - делать полинг
 
@@ -64,7 +64,7 @@ export default class DigitalDev implements Digital {
     });
   }
 
-  clearWatch(id: number): void {
+  async clearWatch(id: number): Promise<void> {
     // if no id param - all the watches will be cleared
     if (typeof id === 'undefined') {
       throw new Error(`You have to specify a watch id`);
@@ -73,7 +73,7 @@ export default class DigitalDev implements Digital {
     clearWatch(id);
   }
 
-  clearAllWatches() {
+  async clearAllWatches(): Promise<void> {
     clearWatch();
   }
 

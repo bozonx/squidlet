@@ -6,6 +6,7 @@ import {ExpanderDriverProps, PCF8574Driver, ResultHandler} from '../Pcf8574/Pcf8
 
 
 interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
+  expander: string;
 }
 
 
@@ -13,24 +14,27 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // saved watchers by index
   private watchers: ResultHandler[] = [];
 
-  private get expander(): PCF8574Driver {
-    return this.depsInstances.expander as PCF8574Driver;
-  }
+  // private get expander(): PCF8574Driver {
+  //   return this.depsInstances.expander as PCF8574Driver;
+  // }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
-      .getInstance(this.props);
+
+    // this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
+    //   .getInstance(this.props);
   }
 
-  async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
-    await this.expander.setup(pin, pinMode, outputInitialValue);
+  setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+    //await this.expander.setup(pin, pinMode, outputInitialValue);
+    return this.callAction('setup', pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): PinMode | undefined {
-    return this.expander.getPinMode(pin);
+  getPinMode(pin: number): Promise<PinMode | undefined> {
+    //return this.expander.getPinMode(pin);
+    return this.callAction('getPinMode', pin);
   }
 
-  async read(pin: number): Promise<boolean> {
+  read(pin: number): Promise<boolean> {
     return this.expander.read(pin);
   }
 
@@ -44,7 +48,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   /**
    * Listen to interruption of input pin
    */
-  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
 
     // TODO: что делать с debounce ?
     // TODO: что делать с edge ?
@@ -64,7 +68,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
       handler(values[pin]);
     };
 
-    this.expander.addListener(wrapper);
+    await this.expander.addListener(wrapper);
 
     const watcherIndex: number = this.watchers.length;
     this.watchers.push(wrapper);
@@ -72,17 +76,22 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     return watcherIndex;
   }
 
-  clearWatch(id: number): void {
+  async clearWatch(id: number): Promise<void> {
     // do nothing if watcher doesn't exist
     if (!this.watchers[id]) return;
 
-    this.expander.removeListener(this.watchers[id]);
+    await this.expander.removeListener(this.watchers[id]);
   }
 
-  clearAllWatches(): void {
+  async clearAllWatches(): Promise<void> {
     for (let id in this.watchers) {
-      this.expander.removeListener(this.watchers[id]);
+      await this.expander.removeListener(this.watchers[id]);
     }
+  }
+
+
+  private async callAction(actionName: string, ...args: any[]): Promise<any> {
+    return this.env.system.devices.callAction(this.props.expander, actionName, ...args);
   }
 
 }

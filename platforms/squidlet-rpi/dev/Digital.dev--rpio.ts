@@ -43,7 +43,7 @@ export default class DigitalDevRpio implements Digital {
     console.log(4444444, pin, pinMode, mode, pullUpDown);
   }
 
-  getPinMode(pin: number): PinMode | undefined {
+  async getPinMode(pin: number): Promise<PinMode | undefined> {
     if (this.pinModes[pin] === rpio.INPUT) {
       return 'input';
 
@@ -66,7 +66,7 @@ export default class DigitalDevRpio implements Digital {
     rpio.write(pin, numValue);
   }
 
-  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
 
     console.log(3333333, pin, debounce, edge);
 
@@ -94,7 +94,7 @@ export default class DigitalDevRpio implements Digital {
     return this.alertListeners.length - 1;
   }
 
-  clearWatch(id: number): void {
+  async clearWatch(id: number): Promise<void> {
     if (typeof id === 'undefined') {
       throw new Error(`You have to specify a watch id`);
     }
@@ -108,7 +108,7 @@ export default class DigitalDevRpio implements Digital {
     //pinInstance.off('interrupt', handler);
   }
 
-  clearAllWatches(): void {
+  async clearAllWatches(): Promise<void> {
     this.alertListeners.map((item, index: number) => {
       this.clearWatch(index);
     });

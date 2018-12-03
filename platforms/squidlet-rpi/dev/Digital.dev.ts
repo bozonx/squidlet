@@ -44,7 +44,7 @@ export default class DigitalDev implements Digital {
    * Get pin mode.
    * It throws an error if pin hasn't configured before
    */
-  getPinMode(pin: number): PinMode | undefined {
+  async getPinMode(pin: number): Promise<PinMode | undefined> {
     const pinInstance = this.getPinInstance(pin);
     const modeConst: number = pinInstance.getMode();
 
@@ -73,7 +73,7 @@ export default class DigitalDev implements Digital {
     pinInstance.digitalWrite(numValue);
   }
 
-  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
     const pinInstance = this.getPinInstance(pin);
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);
@@ -100,7 +100,7 @@ export default class DigitalDev implements Digital {
     return this.alertListeners.length - 1;
   }
 
-  clearWatch(id: number): void {
+  async clearWatch(id: number): Promise<void> {
     if (typeof id === 'undefined') {
       throw new Error(`You have to specify a watch id`);
     }
@@ -111,7 +111,7 @@ export default class DigitalDev implements Digital {
     pinInstance.off('interrupt', handler);
   }
 
-  clearAllWatches(): void {
+  async clearAllWatches(): Promise<void> {
     this.alertListeners.map((item, index: number) => {
       this.clearWatch(index);
     });

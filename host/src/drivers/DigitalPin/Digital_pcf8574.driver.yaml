@@ -6,6 +6,9 @@ drivers:
   - Pcf8574.driver
 
 props:
+  expander:
+    type: string
+    required: true
   # PCF8574.driver
   bus:
   address:

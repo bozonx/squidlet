@@ -14,10 +14,10 @@ export default class Pcf8574 extends DeviceBase<Props> {
     return this.depsInstances.expander as PCF8574Driver;
   }
 
-  // TODO: отключить republish
   // TODO: желательно проинициализировать одним запросом
   // TODO: может по умолчанию статус отключить
   // TODO: ??? навешаться на события
+  // TODO: byteToBinArr(this.currentState)
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
@@ -34,6 +34,10 @@ export default class Pcf8574 extends DeviceBase<Props> {
   //   return { [DEFAULT_STATUS]: await this.binaryInput.read() };
   // }
   //
+  // protected statusSetter = async (partialData: Data) => {
+  //   await this.binaryOutput.write(partialData[DEFAULT_STATUS]);
+  // }
+
   // protected transformPublishValue = (binArr: number[]): string => {
   //   return binArr.join('');
   // }

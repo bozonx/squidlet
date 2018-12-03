@@ -58,35 +58,39 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
    * @param edge - Listen to low, high or both levels. By default is both.
    */
-  addListener(handler: WatchHandler, debounce?: number, edge?: Edge): void {
-    const listenerId: number = this.setWatch(handler, edge, debounce);
+  async addListener(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<void> {
+    const listenerId: number = await this.setWatch(handler, edge, debounce);
     // save listener id
     this.listeners[listenerId] = handler;
   }
 
-  listenOnce(handler: WatchHandler, debounce?: number, edge?: Edge): void {
-    const wrapper: WatchHandler = (level: boolean) => {
+  async listenOnce(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<void> {
+    const wrapper: WatchHandler = async (level: boolean) => {
       // remove listener and don't listen any more
-      this.removeListener(handler);
+      await this.removeListener(handler);
 
       handler(level);
     };
 
-    const listenerId: number = this.setWatch(wrapper, edge, debounce);
+    const listenerId: number = await this.setWatch(wrapper, edge, debounce);
     // save listener id and its original handler
     this.listeners[listenerId] = handler;
   }
 
-  removeListener(handler: WatchHandler): void {
-    _find(this.listeners, (handlerItem: WatchHandler, listenerId: string) => {
-      if (handlerItem === handler) {
-        delete this.listeners[listenerId];
-        this.gpio.clearWatch(Number(listenerId));
+  removeListener(handler: WatchHandler): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      _find(this.listeners, (handlerItem: WatchHandler, listenerId: string) => {
+        if (handlerItem === handler) {
+          delete this.listeners[listenerId];
+          this.gpio.clearWatch(Number(listenerId))
+            .then(resolve)
+            .catch(reject);
 
-        return true;
-      }
+          return true;
+        }
 
-      return;
+        return;
+      });
     });
   }
 
@@ -107,8 +111,8 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     else return 'input';
   }
 
-  private setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): number {
-    const pinMode: PinMode | undefined = this.gpio.getPinMode(this.props.pin);
+  private async setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): Promise<number> {
+    const pinMode: PinMode | undefined = await this.gpio.getPinMode(this.props.pin);
     const normalEdge: Edge = edge || 'both';
 
     if (!pinMode || !pinMode.match(/input/)) {

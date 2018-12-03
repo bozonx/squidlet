@@ -15,11 +15,11 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
   }
 
 
-  async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean) {
+  setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
     return this.digitalDev.setup(pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): PinMode | undefined {
+  getPinMode(pin: number): Promise<PinMode | undefined> {
     return this.digitalDev.getPinMode(pin);
   }
 
@@ -37,16 +37,16 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
   /**
    * Listen to interruption of input pin
    */
-  setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): number {
+  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
     return this.digitalDev.setWatch(pin, handler, debounce, edge);
   }
 
-  clearWatch(id: number): void {
-    this.digitalDev.clearWatch(id);
+  async clearWatch(id: number): Promise<void> {
+    return this.digitalDev.clearWatch(id);
   }
 
-  clearAllWatches() {
-    this.digitalDev.clearAllWatches();
+  async clearAllWatches(): Promise<void> {
+    return this.digitalDev.clearAllWatches();
   }
 
 }

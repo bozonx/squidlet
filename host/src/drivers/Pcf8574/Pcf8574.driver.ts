@@ -131,7 +131,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return this.getValues();
   }
 
-  getPinMode(pin: number): 'input' | 'output' | undefined {
+  async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
     if (this.directions[pin] === DIR_IN) {
       return 'input';
     }
