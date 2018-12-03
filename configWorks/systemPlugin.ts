@@ -19,6 +19,8 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'SwitchSensor/manifest.yaml'));
   // TODO: remove
   await env.addDevice(path.join(devicesRoot, 'FakePeopleCount/manifest.yaml'));
+  // TODO: remove
+  await env.addDevice(path.join(devicesRoot, 'Pcf8574/manifest.yaml'));
 
   // drivers
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.driver.yaml'));
