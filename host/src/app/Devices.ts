@@ -82,6 +82,8 @@ export default class Devices {
     const wrapper = (message: Message) => {
       const payload: StatusPayload = message.payload;
 
+      // TODO: куда девается ошибка ???? разве ее не нужно получать и передавать дальше???
+
       if (
         payload.deviceId !== deviceId
         || payload.actionName !== STATUS_ACTION
@@ -106,6 +108,8 @@ export default class Devices {
     const wrapper = (message: Message) => {
       const payload: ConfigPayload = message.payload;
 
+      // TODO: куда девается ошибка ???? разве ее не нужно получать и передавать дальше???
+
       if (payload.deviceId !== deviceId || payload.actionName !== CONFIG_ACTION) return;
 
       handler(payload.config);
@@ -118,6 +122,7 @@ export default class Devices {
   removeListener(handler: (value: any) => void) {
     this.handlerWrappers.removeByHandler(handler);
 
+    // TODO: use deviceId and action as eventName
     // TODO: run unsubscribe ???
 
   }

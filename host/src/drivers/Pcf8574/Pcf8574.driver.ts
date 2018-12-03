@@ -157,10 +157,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {number} pin The pin number. (0 to 7)
    * @return {boolean}               The current value.
    */
-  read(pin: number): boolean {
+  async read(pin: number): Promise<boolean> {
     if (pin < 0 || pin > 7) {
       return false;
     }
+
+    // TODO: наверное лучше сделать poll
     
     return ((this.currentState>>pin) % 2 !== 0);
   }
