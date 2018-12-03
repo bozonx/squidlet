@@ -88,7 +88,7 @@ export default class RequestResponse {
     // start wait timeout for response
     this.timeouts[requestId] = setTimeout(() => {
       this.stopWaitForResponse(requestId);
-    }, this.system.host.networkConfig.params.requestTimeout);
+    }, this.system.host.config.config.network.requestTimeout);
 
     this.handlers[requestId] = wrapper;
 

@@ -17,6 +17,11 @@ export default interface PreHostConfig {
     defaultConfigRepublishIntervalMs?: number;
     // custom params
     params?: {[index: string]: any};
+
+    network: {
+      routedMessageTTL: number;
+      requestTimeout: number;
+    };
   };
 
   // devices definitions by deviceId
