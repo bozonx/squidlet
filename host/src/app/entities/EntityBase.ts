@@ -23,6 +23,8 @@ export default class EntityBase<Props = {}> {
   protected doInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // it calls after init. Better place to setup listeners
   protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  // it will be risen after app init
+  protected appDidInit?: () => Promise<void>;
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
   protected destroy?: () => void;
@@ -55,13 +57,22 @@ export default class EntityBase<Props = {}> {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
     const getDriverDep: GetDriverDep = (driverName: string): DriverInstance => {
       if (!_includes(manifest.drivers, driverName)) {
-        console.log(111111 , manifest, driverName)
-
         throw new Error(`Can't find driver "${driverName}"`);
       }
 
       return this.env.getDriver(driverName);
     };
+
+    if (this.appDidInit) {
+      this.env.system.onAppInit(async () => {
+        try {
+          this.appDidInit && await this.appDidInit();
+        }
+        catch (err) {
+          this.env.log.error(err);
+        }
+      });
+    }
 
     if (this.willInit) await this.willInit(getDriverDep);
     if (this.doInit) await this.doInit(getDriverDep);

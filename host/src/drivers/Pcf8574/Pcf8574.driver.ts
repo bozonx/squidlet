@@ -253,7 +253,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       await this.writeToIc();
     }
     catch (err) {
-      this.env.log.error(`PCF8574.driver. Can't init IC state. ${String(err)}`);
+      this.env.log.error(`PCF8574.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
   }
 
