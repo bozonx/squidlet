@@ -3,6 +3,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps, PCF8574Driver, ResultHandler} from '../Pcf8574/Pcf8574.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
+import Response from '../../messenger/interfaces/Response';
 
 
 type Wrapper = (values: boolean[]) => void;
@@ -101,7 +102,9 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
 
   private async callAction(actionName: string, ...args: any[]): Promise<any> {
-    return this.env.system.devices.callAction(this.props.expander, actionName, ...args);
+    const response: Response = await this.env.system.devices.callAction(this.props.expander, actionName, ...args);
+
+    return response.payload;
   }
 
   // TODO: validate expander prop - it has to be existent device in master config
