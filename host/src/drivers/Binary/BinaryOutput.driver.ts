@@ -1,4 +1,3 @@
-import * as EventEmitter from 'eventemitter3';
 const _omit = require('lodash/omit');
 
 import {invertIfNeed} from '../DigitalPin/digitalHelpers';
@@ -8,6 +7,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode, InitialLevel} from './interfaces/Types';
 import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
+import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 export interface BinaryOutputDriverProps extends DigitalBaseProps {
@@ -21,11 +21,9 @@ export interface BinaryOutputDriverProps extends DigitalBaseProps {
   initial: InitialLevel;
 }
 
-const delayedResultEventName = 'delayedResult';
-
 
 export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
-  private readonly events: EventEmitter = new EventEmitter();
+  private delayedResultEvents: IndexedEvents = new IndexedEvents();
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;
 
@@ -63,8 +61,9 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
         // wait while delayed value is set
         return new Promise<void>((resolve, reject) => {
+          let listenIndex: number;
           const listenHandler: (err: Error) => void = (err: Error) => {
-            this.events.removeListener(delayedResultEventName, listenHandler);
+            this.delayedResultEvents.removeListener(listenIndex);
             if (err) {
               return reject(err);
             }
@@ -72,7 +71,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
             resolve();
           };
 
-          this.events.addListener(delayedResultEventName, listenHandler);
+          listenIndex = this.delayedResultEvents.addListener(listenHandler);
         });
       }
     }
@@ -123,8 +122,8 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
       // don't wait in normal way
       this.write(invertIfNeed(lastDeferredValue, this.props.invert))
-        .then(() => this.events.emit(delayedResultEventName))
-        .catch((err) => this.events.emit(delayedResultEventName, err));
+        .then(() => this.delayedResultEvents.emit())
+        .catch((err) => this.delayedResultEvents.emit(err));
     }
   }
 

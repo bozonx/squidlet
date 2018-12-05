@@ -1,8 +1,7 @@
-import {WatchHandler} from '../../app/interfaces/dev/Digital';
-
 const _omit = require('lodash/omit');
 import * as EventEmitter from 'eventemitter3';
 
+import {WatchHandler} from '../../app/interfaces/dev/Digital';
 import {isDigitalInputInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
@@ -31,6 +30,9 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
 
 
 export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
+
+  // TODO: use IndexedEvents instead
+
   private readonly events: EventEmitter = new EventEmitter();
   private throttleInProgress: boolean = false;
   private impulseInProgress: boolean = false;
