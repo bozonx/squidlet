@@ -1,14 +1,24 @@
 import * as EventEmitter from 'eventemitter3';
 
-
 const DEFAULT_ID = 'defaultUniqId';
+enum CURRENT_POLL_ENUM {
+  intervalId,
+  methodWhicPoll,
+  methodWrapper,
+  pollInterval,
+}
+
+type MethodWhichPoll = () => Promise<any>;
+type MethodWrapper = () => void;
+// [ intervalId, MethodWrapper, pollInterval ]
+type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 
 
 export default class Poling {
   //private readonly log: Logger;
   private readonly events: EventEmitter = new EventEmitter();
   //private pollIntervalTimerId: number = NO_INTERVAL;
-  private readonly intervals: {[index: string]: number} = {};
+  private readonly currentPolls: {[index: string]: CurrentPoll} = {};
 
   constructor() {
   }
@@ -16,7 +26,7 @@ export default class Poling {
   isInProgress(uniqId: string | undefined): boolean {
     const id = this.resolveId(uniqId);
 
-    return typeof this.intervals[id] !== 'undefined';
+    return typeof this.currentPolls[id] !== 'undefined';
   }
 
   /**
@@ -24,7 +34,7 @@ export default class Poling {
    * This method calls only once on one id.
    */
   start(
-    methodWhichWillPoll: (...args: any[]) => Promise<any>,
+    methodWhichWillPoll: MethodWhichPoll,
     // in ms
     pollInterval: number,
     uniqId: string | undefined,
@@ -34,7 +44,7 @@ export default class Poling {
     }
 
     const id = this.resolveId(uniqId);
-    const polingCbWrapper = () => {
+    const polingCbWrapper: MethodWrapper = () => {
       methodWhichWillPoll()
         .then((result) => this.events.emit(id, null, result))
         .catch((err) => this.events.emit(id, err));
@@ -43,7 +53,11 @@ export default class Poling {
     // start first time immediately
     polingCbWrapper();
 
-    this.intervals[id] = setInterval(polingCbWrapper, pollInterval) as any;
+    // create timer
+    const intervalId = setInterval(polingCbWrapper, pollInterval);
+
+    // save  poll params
+    this.currentPolls[id] = [intervalId, methodWhichWillPoll, polingCbWrapper, pollInterval];
   }
 
   addListener(handler: (err: Error, result: any) => void, uniqId: string | undefined) {
@@ -63,35 +77,47 @@ export default class Poling {
    * Restart polling and return data of first poll
    */
   async restart(uniqId: string | undefined): Promise<any> {
-    // TODO: stop and start again
+
     // TODO: test
 
+    const id = this.resolveId(uniqId);
 
-    // let result: Uint8Array;
-    //
-    // this.stopPoling();
-    //
-    // try {
-    //   result = await this.doPoll();
-    // }
-    // catch(err) {
-    //   // start poling any way
-    //   this.startPoling();
-    //
-    //   throw err;
-    // }
-    //
-    // this.startPoling();
+    if (!this.currentPolls[id]) {
+      throw new Error(`Can't restart poling of "${uniqId}" because it hasn't been started yet`);
+    }
 
-    //return result;
+    const current: CurrentPoll = this.currentPolls[id];
+    let result: any;
+
+    // stop poling
+    this.stop(id);
+
+    // make first poll
+    try {
+      result = await current[CURRENT_POLL_ENUM.methodWrapper];
+    }
+    catch(err) {
+      // start poling any way
+      this.start(current[CURRENT_POLL_ENUM.methodWhicPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
+
+      throw err;
+    }
+
+    // start interval
+    this.start(current[CURRENT_POLL_ENUM.methodWhicPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
+
+    return result;
 
   }
 
   stop(uniqId: string | undefined) {
     const id = this.resolveId(uniqId);
 
-    clearInterval(this.intervals[id] as any);
-    delete this.intervals[id];
+    if (typeof this.currentPolls[id] !== 'undefined') {
+      clearInterval(this.currentPolls[id][CURRENT_POLL_ENUM.intervalId]);
+    }
+
+    delete this.currentPolls[id];
   }
 
   private resolveId(uniqId: string | undefined): string {
