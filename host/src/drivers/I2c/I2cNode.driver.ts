@@ -1,7 +1,7 @@
 const _omit = require('lodash/omit');
 const _isEqual = require('lodash/isEqual');
-import * as EventEmitter from 'eventemitter3';
 
+import IndexedEvents from '../../helpers/IndexedEvents';
 import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import {I2cMasterDriver} from './I2cMaster.driver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
@@ -31,12 +31,11 @@ export interface I2cNodeDriverProps extends I2cNodeDriverBaseProps {
 }
 
 const DEFAULT_POLL_ID = 'default';
-const POLL_EVENT_NAME = 'poll';
-const POLL_ERROR_EVENT_NAME = 'pollError';
 
 
 export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
-  private events: EventEmitter = new EventEmitter();
+  private pollEvents: IndexedEvents = new IndexedEvents();
+  private pollErrorEvents: IndexedEvents = new IndexedEvents();
   private readonly poling: Poling = new Poling();
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
@@ -141,22 +140,22 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    * Listen to data which received by polling or interruption.
    */
   addListener(handler: Handler): number {
-    this.events.addListener(POLL_EVENT_NAME, handler);
+    return this.pollEvents.addListener(handler);
   }
 
   removeListener(handlerId: number): void {
-    this.events.removeListener(POLL_EVENT_NAME, handler);
+    this.pollEvents.removeListener(handlerId);
   }
 
   /**
    * Listen to errors which take place while poling or interruption is in progress
    */
-  addPollErrorListener(handler: ErrorHandler): void {
-    this.events.addListener(POLL_ERROR_EVENT_NAME, handler);
+  addPollErrorListener(handler: ErrorHandler): number {
+    return this.pollErrorEvents.addListener(handler);
   }
 
-  removePollErrorListener(handler: ErrorHandler): void {
-    this.events.removeListener(POLL_ERROR_EVENT_NAME, handler);
+  removePollErrorListener(handlerId: number): void {
+    this.pollErrorEvents.removeListener(handlerId);
   }
 
   protected validateProps = (props: I2cNodeDriverProps): string | undefined => {
@@ -196,7 +195,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
            address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`;
 
       // emit error to poll error channel
-      this.events.emit(POLL_ERROR_EVENT_NAME, msg);
+      this.pollErrorEvents.emit(msg);
 
       throw new Error(msg);
     }
@@ -213,7 +212,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     // save data
     this.pollLastData = data;
     // finally rise an event
-    this.events.emit(POLL_EVENT_NAME, data);
+    this.pollEvents.emit(data);
   }
 
   private stopPoling() {

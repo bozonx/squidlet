@@ -1,4 +1,4 @@
-type EventHandler = () => void;
+type EventHandler = (...args: any[]) => void;
 
 
 const LENGTH_AND_START_ARR_DIFFERENCE = 1;
@@ -9,8 +9,8 @@ export default class IndexedEvents {
 
 
   emit(...args: any[]) {
-    for (var handler of this.handlers) {
-      handler();
+    for (const handler of this.handlers) {
+      handler(...args);
     }
   }
 
