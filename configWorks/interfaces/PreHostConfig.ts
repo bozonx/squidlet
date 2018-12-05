@@ -18,7 +18,7 @@ export default interface PreHostConfig {
     // custom params
     params?: {[index: string]: any};
 
-    network: {
+    network?: {
       routedMessageTTL: number;
       requestTimeout: number;
     };

@@ -4,6 +4,7 @@ import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryOutputDriver, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput.driver';
+import Status from '../../baseDevice/Status';
 
 
 interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
@@ -15,6 +16,9 @@ export default class Switch extends DeviceBase<Props> {
     return this.depsInstances.binaryOutput as BinaryOutputDriver;
   }
 
+  protected get status(): Status {
+    return this._status as Status;
+  }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryOutput = await getDriverDep('BinaryOutput.driver')
@@ -36,6 +40,9 @@ export default class Switch extends DeviceBase<Props> {
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
+
+      // TODO: може лучше использватть getStatus
+
       // skip while switch at block time
       if (this.binaryOutput.isBlocked()) return this.status.getLocal().default;
 

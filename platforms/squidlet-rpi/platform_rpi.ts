@@ -32,7 +32,8 @@ const platformConfig: PlatformConfig = {
       'I2cMaster.driver': {
         bus: 1,
       }
-    }
+    },
+
   }
 };
 

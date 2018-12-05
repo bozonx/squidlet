@@ -27,7 +27,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   protected configSetter?: Setter;
   protected transformPublishValue?: (value: any) => any;
   protected actions: {[index: string]: Function} = {};
-  private _status?: Status;
+  protected _status?: Status;
   private _config?: Config;
 
 
