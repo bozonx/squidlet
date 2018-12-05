@@ -14,6 +14,7 @@ import {PinMode} from '../../app/interfaces/dev/Digital';
 import Republish from '../../helpers/Republish';
 
 
+// TODO: наверное не нужно обрабатывать ошибку
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {

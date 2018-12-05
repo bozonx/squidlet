@@ -59,9 +59,32 @@ export default class Poling {
     this.events.removeListener(id, handler);
   }
 
-  restart(uniqId: string | undefined) {
+  /**
+   * Restart polling and return data of first poll
+   */
+  async restart(uniqId: string | undefined): Promise<any> {
     // TODO: stop and start again
     // TODO: test
+
+
+    // let result: Uint8Array;
+    //
+    // this.stopPoling();
+    //
+    // try {
+    //   result = await this.doPoll();
+    // }
+    // catch(err) {
+    //   // start poling any way
+    //   this.startPoling();
+    //
+    //   throw err;
+    // }
+    //
+    // this.startPoling();
+
+    //return result;
+
   }
 
   stop(uniqId: string | undefined) {
