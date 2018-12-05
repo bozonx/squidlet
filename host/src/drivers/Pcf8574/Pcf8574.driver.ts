@@ -116,8 +116,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return this.i2cNode.addListener(wrapper);
   }
 
-  removeListener(handlerId: number) {
-    this.i2cNode.removeListener(handlerId);
+  removeListener(handlerIndex: number) {
+    this.i2cNode.removeListener(handlerIndex);
   }
 
   /**

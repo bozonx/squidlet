@@ -142,8 +142,8 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return this.pollEvents.addListener(handler);
   }
 
-  removeListener(handlerId: number): void {
-    this.pollEvents.removeListener(handlerId);
+  removeListener(handlerIndex: number): void {
+    this.pollEvents.removeListener(handlerIndex);
   }
 
   /**
@@ -153,8 +153,8 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return this.pollErrorEvents.addListener(handler);
   }
 
-  removePollErrorListener(handlerId: number): void {
-    this.pollErrorEvents.removeListener(handlerId);
+  removePollErrorListener(handlerIndex: number): void {
+    this.pollErrorEvents.removeListener(handlerIndex);
   }
 
   protected validateProps = (props: I2cNodeDriverProps): string | undefined => {

@@ -39,14 +39,14 @@ export default class Events {
     return this.events.addListener(category, handler);
   }
 
-  removeListener(category: string, topic: string, handlerId: number): void {
+  removeListener(category: string, topic: string, handlerIndex: number): void {
     const eventName = generateEventName(category, topic);
 
-    this.events.removeListener(eventName, handlerId);
+    this.events.removeListener(eventName, handlerIndex);
   }
 
-  removeCategoryListener(category: string, handlerId: number): void {
-    this.events.removeListener(category, handlerId);
+  removeCategoryListener(category: string, handlerIndex: number): void {
+    this.events.removeListener(category, handlerIndex);
   }
 
 }

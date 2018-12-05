@@ -72,12 +72,12 @@ export default abstract class DeviceDataManagerBase {
     return this.publishEvents.addListener(cb);
   }
 
-  removeListener(handlerId: number): void {
-    this.changeEvents.removeListener(handlerId);
+  removeListener(handlerIndex: number): void {
+    this.changeEvents.removeListener(handlerIndex);
   }
 
-  removePublishListener(handlerId: number): void {
-    this.publishEvents.removeListener(handlerId);
+  removePublishListener(handlerIndex: number): void {
+    this.publishEvents.removeListener(handlerIndex);
   }
 
 

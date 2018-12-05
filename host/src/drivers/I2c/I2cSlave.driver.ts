@@ -92,7 +92,7 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
     i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
-    handlerId: number
+    handlerIndex: number
   ): void {
 
     // TODO: test
@@ -100,7 +100,7 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
 
     const id = this.generateId(dataAddress);
 
-    this.events.removeListener(id, handlerId);
+    this.events.removeListener(id, handlerIndex);
   }
 
   private handleIncomeData = (data: Uint8Array) => {

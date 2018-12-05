@@ -75,8 +75,8 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     return this.changeEvents.once(wrapper);
   }
 
-  removeListener(handlerId: number) {
-    this.changeEvents.removeListener(handlerId);
+  removeListener(handlerIndex: number) {
+    this.changeEvents.removeListener(handlerIndex);
   }
 
   destroy = () => {

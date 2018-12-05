@@ -32,10 +32,10 @@ export default class IndexedEventEmitter {
     return handlerIndex;
   }
 
-  removeListener(eventName: string, handlerId: number): void {
+  removeListener(eventName: string, handlerIndex: number): void {
     if (!this.handlersById[eventName]) return;
 
-    this.handlersById[eventName].removeListener(handlerId);
+    this.handlersById[eventName].removeListener(handlerIndex);
   }
 
 }

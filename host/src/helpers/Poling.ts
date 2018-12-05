@@ -67,10 +67,10 @@ export default class Poling {
     return this.events.addListener(id, handler);
   }
 
-  removeListener(handlerId: number, uniqId: string | undefined) {
+  removeListener(handlerIndex: number, uniqId: string | undefined) {
     const id = this.resolveId(uniqId);
 
-    this.events.removeListener(id, handlerId);
+    this.events.removeListener(id, handlerIndex);
   }
 
   /**

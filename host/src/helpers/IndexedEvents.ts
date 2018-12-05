@@ -35,10 +35,10 @@ export default class IndexedEvents {
     return handlerIndex;
   }
 
-  removeListener(handlerId: number): void {
-    if (!this.handlers[handlerId]) return;
+  removeListener(handlerIndex: number): void {
+    if (!this.handlers[handlerIndex]) return;
 
-    this.handlers.splice(handlerId, 1);
+    this.handlers.splice(handlerIndex, 1);
   }
 
 }
