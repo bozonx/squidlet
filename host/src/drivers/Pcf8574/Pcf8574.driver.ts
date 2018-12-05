@@ -65,6 +65,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected didInit = async () => {
     // init IC state after app is inited if it isn't inited at this moment
     this.env.system.onAppInit(async () => {
+
+      // TODO: !!! review сейчас setupы делаются везде в onAppInit
+
       if (!this.wasIcInited) await this.initIc();
     });
 

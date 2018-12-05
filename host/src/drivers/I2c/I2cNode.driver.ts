@@ -42,7 +42,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   // data addr in hex to use in poling.
   private pollDataAddressHex?: number;
   private pollId: string = DEFAULT_POLL_ID;
-  private handlers: Handler[] = [];
 
   // last received data by poling
   // it needs to decide to rise change event or not
