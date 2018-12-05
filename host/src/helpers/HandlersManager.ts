@@ -3,7 +3,7 @@ import HandlerWrappers from './HandlerWrappers';
 const HANDLER_POSITION = 0;
 const WRAPPER_POSITION = 1;
 
-// TODO: remove - remake to HandlerWrappers
+// TODO: remove
 
 
 export default class HandlersManager<HandlerType, WrapperType> {

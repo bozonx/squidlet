@@ -113,14 +113,14 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   /**
    * Listen status change
    */
-  onChange(cb: ChangeHandler): void {
+  onChange(cb: ChangeHandler): number {
     if (!this.status) {
       this.env.log.error(`You called onChange device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
 
-      return;
+      return -1;
     }
 
-    this.status.onChange(cb);
+    return this.status.onChange(cb);
   }
 
   /**

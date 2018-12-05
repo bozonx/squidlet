@@ -24,6 +24,8 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
   // TODO: почему не константа???
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
+
+  // TODO: use IndexedEvents instead
   private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
 
   private get i2cDataDriver(): I2cDataDriver {

@@ -1,5 +1,5 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {ChangeHandler, Data, publishEventName} from '../../baseDevice/DeviceDataManagerBase';
+import {ChangeHandler, Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ExpanderDriverProps, PCF8574Driver} from '../../drivers/Pcf8574/Pcf8574.driver';

@@ -47,6 +47,8 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
+
+  // TODO: use IndexedEvents instead
   private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
   private get i2cDriver(): I2cDriverClass {

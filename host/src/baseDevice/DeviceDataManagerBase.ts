@@ -1,9 +1,8 @@
-import * as EventEmitter from 'eventemitter3';
-
 import System from '../app/System';
 import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
+import IndexedEvents from '../helpers/IndexedEvents';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -15,9 +14,6 @@ export type Schema = {[index: string]: any};
 export type Data = {[index: string]: any};
 export type ChangeHandler = (changedParams: string[]) => void;
 
-export const changeEventName = 'change';
-export const publishEventName = 'publish';
-
 
 /**
  * Manage status of device
@@ -26,6 +22,8 @@ export const publishEventName = 'publish';
  * * publish - it emits on changes and on republish
  */
 export default abstract class DeviceDataManagerBase {
+  protected readonly changeEvents: IndexedEvents = new IndexedEvents();
+  protected readonly publishEvents: IndexedEvents = new IndexedEvents();
   protected abstract readonly typeNameOfData: string;
   protected readonly deviceId: string;
   protected readonly system: System;
@@ -34,7 +32,6 @@ export default abstract class DeviceDataManagerBase {
   protected initialize?: Initialize;
   protected getter?: Getter;
   protected setter?: Setter;
-  protected readonly events: EventEmitter = new EventEmitter();
 
   protected abstract publishState: PublishState;
   abstract read: () => Promise<Data>;
@@ -67,16 +64,20 @@ export default abstract class DeviceDataManagerBase {
     return this.localData;
   }
 
-  onChange(cb: ChangeHandler) {
-    this.events.addListener(changeEventName, cb);
+  onChange(cb: ChangeHandler): number {
+    return this.changeEvents.addListener(cb);
   }
 
-  onPublish(cb: Publisher) {
-    this.events.addListener(publishEventName, cb);
+  onPublish(cb: Publisher): number {
+    return this.publishEvents.addListener(cb);
   }
 
-  removeListener(cb: ChangeHandler) {
-    this.events.removeListener(changeEventName, cb);
+  removeListener(handlerId: number): void {
+    this.changeEvents.removeListener(handlerId);
+  }
+
+  removePublishListener(handlerId: number): void {
+    this.publishEvents.removeListener(handlerId);
   }
 
 
@@ -312,7 +313,7 @@ export default abstract class DeviceDataManagerBase {
   private emitOnChange(updatedParams: string[]) {
     if (updatedParams.length) {
       // emit change event
-      this.events.emit(changeEventName, updatedParams);
+      this.changeEvents.emit(updatedParams);
       this.republish.start(this.republishCb);
     }
 
@@ -332,7 +333,7 @@ export default abstract class DeviceDataManagerBase {
     // rise events change event
     if (updatedParams.length) {
       // emit change event
-      this.events.emit(changeEventName, updatedParams);
+      this.changeEvents.emit(updatedParams);
     }
 
     this.publishState(Object.keys(this.getLocal()), true);
