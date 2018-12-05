@@ -31,11 +31,11 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   private _config?: Config;
 
 
-  get status(): Status {
-    return this._status as Status;
+  protected get status(): Status | undefined {
+    return this._status;
   }
 
-  get config(): Config | undefined {
+  protected get config(): Config | undefined {
     return this._config;
   }
 
@@ -56,24 +56,26 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
   protected doInit = async () => {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
-    this._status = new Status(
-      this.id,
-      this.env.system,
-      manifest.status || {},
-      this.props.statusRepublishInterval,
-    );
+    if (manifest.status) {
+      this._status = new Status(
+        this.id,
+        this.env.system,
+        manifest.status,
+        this.props.statusRepublishInterval,
+      );
+    }
 
     if (manifest.config) {
       this._config = new Config(
         this.id,
         this.env.system,
-        manifest.config || {},
+        manifest.config,
         this.props.configRepublishInterval,
       );
     }
 
     // listen publish events and call publish
-    this.status.onPublish(this.publish);
+    this.status && this.status.onPublish(this.publish);
     this.config && this.config.onPublish(this.publish);
 
     // handle actions call
@@ -88,11 +90,23 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     ]);
   }
 
-  getStatus = (statusName?: string): Promise<any> => {
+  getStatus = async (statusName?: string): Promise<any> => {
+    if (!this.status) {
+      this.env.log.error(`You called getStatus("${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+
+      return;
+    }
+
     return this.status.readParam(statusName);
   }
 
-  setStatus = (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
+  setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
+    if (!this.status) {
+      this.env.log.error(`You called setStatus(${JSON.stringify(newValue)}, "${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+
+      return;
+    }
+
     return this.status.write({[statusName]: newValue});
   }
 
@@ -100,6 +114,12 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
    * Listen status change
    */
   onChange(cb: ChangeHandler): void {
+    if (!this.status) {
+      this.env.log.error(`You called onChange device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+
+      return;
+    }
+
     this.status.onChange(cb);
   }
 

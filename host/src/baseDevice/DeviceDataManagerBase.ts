@@ -83,7 +83,8 @@ export default abstract class DeviceDataManagerBase {
   protected async readAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!this.getter) return this.localData;
-    // else fetch config if getter is defined
+
+    // else fetch data if getter is defined
 
     const result: Data = await this.justReadAllData();
 
