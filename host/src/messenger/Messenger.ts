@@ -5,11 +5,9 @@ import RequestResponse from './RequestResponse';
 import Message from './interfaces/Message';
 import Request from './interfaces/Request';
 import OneWayMessages from './OneWayMessages';
-import HandlerWrappers from '../helpers/HandlerWrappers';
 
 
 type Handler = (payload: any, message: Message) => void;
-type HandlerWrapper = (message: Message) => void;
 
 
 /**
@@ -22,7 +20,7 @@ export default class Messenger {
   private readonly bridgeResponder: BridgeResponder;
   private readonly requestResponse: RequestResponse;
   private readonly oneWayMessages: OneWayMessages;
-  private handlerWrappers: HandlerWrappers<Handler, HandlerWrapper> = new HandlerWrappers<Handler, HandlerWrapper>();
+
 
   constructor(system: System) {
     this.system = system;
@@ -60,19 +58,19 @@ export default class Messenger {
    * Listen to events of current or remote host.
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
-  subscribeLocal(category: string, topic: string, handler: Handler): void {
-    this.subscribe(this.system.host.id, category, topic, handler);
+  subscribeLocal(category: string, topic: string, handler: Handler): number {
+    return this.subscribe(this.system.host.id, category, topic, handler);
   }
 
-  subscribeCategoryLocal(category: string, handler: Handler) {
-    this.subscribeCategory(this.system.host.id, category, handler);
+  subscribeCategoryLocal(category: string, handler: Handler): number {
+    return this.subscribeCategory(this.system.host.id, category, handler);
   }
 
   /**
    * Listen to events of current or remote host.
    * If toHost isn't equal to current host - it will subscribe to events of remote host.
    */
-  subscribe(toHost: string, category: string, topic: string, handler: Handler): void {
+  subscribe(toHost: string, category: string, topic: string, handler: Handler): number {
     if (!category) {
       throw new Error(`You have to specify the category`);
     }
@@ -80,12 +78,9 @@ export default class Messenger {
       throw new Error(`You have to specify the topic`);
     }
 
-    // TODO: непрпвильно - если будет один хэндлер на разные категории то он удалиться везде
     const wrapper = (message: Message) => {
       handler(message && message.payload, message);
     };
-
-    this.handlerWrappers.addHandler(handler, wrapper);
 
     if (this.isLocalHost(toHost)) {
       // subscribe to local events
@@ -93,10 +88,10 @@ export default class Messenger {
     }
 
     // else subscribe to remote host's events
-    this.bridgeSubscriber.subscribe(toHost, category, topic, wrapper);
+    return this.bridgeSubscriber.subscribe(toHost, category, topic, wrapper);
   }
 
-  subscribeCategory(toHost: string, category: string, handler: Handler) {
+  subscribeCategory(toHost: string, category: string, handler: Handler): number {
     if (!category) {
       throw new Error(`You have to specify the category`);
     }
@@ -105,24 +100,20 @@ export default class Messenger {
       handler(message && message.payload, message);
     };
 
-    this.handlerWrappers.addHandler(handler, wrapper);
-
     if (this.isLocalHost(toHost)) {
       // subscribe to local events
       return this.system.events.addCategoryListener(category, wrapper);
     }
 
     // else subscribe to remote host's events
-    this.bridgeSubscriber.subscribeCategory(toHost, category, wrapper);
+    return this.bridgeSubscriber.subscribeCategory(toHost, category, wrapper);
   }
 
   /**
    * Unsubscribe from events of remote or local host.
    * Handler has to be the same as has been specified to "subscribe" method previously.
    */
-  unsubscribe(toHost: string, category: string, topic: string, handler: Handler): void {
-    const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
-
+  unsubscribe(toHost: string, category: string, topic: string, handlerId: number): void {
     if (!category) {
       throw new Error(`You have to specify the category`);
     }
@@ -132,33 +123,27 @@ export default class Messenger {
 
     if (this.isLocalHost(toHost)) {
       // subscribe to local events
-      this.system.events.removeListener(category, topic, wrapper);
+      this.system.events.removeListener(category, topic, handlerId);
     }
     else {
       // unsubscribe from remote host's events
-      this.bridgeSubscriber.unsubscribe(toHost, category, topic, wrapper);
+      this.bridgeSubscriber.unsubscribe(toHost, category, topic, handlerId);
     }
-
-    this.handlerWrappers.removeByHandler(handler);
   }
 
-  unsubscribeCategory(toHost: string, category: string, handler: Handler): void {
-    const wrapper: HandlerWrapper = this.handlerWrappers.getWrapper(handler) as HandlerWrapper;
-
+  unsubscribeCategory(toHost: string, category: string, handlerId: number): void {
     if (!category) {
       throw new Error(`You have to specify the category`);
     }
 
     if (this.isLocalHost(toHost)) {
       // subscribe to local events
-      this.system.events.removeCategoryListener(category, wrapper);
+      this.system.events.removeCategoryListener(category, handlerId);
     }
     else {
       // unsubscribe from remote host's events
-      this.bridgeSubscriber.unsubscribeCategory(toHost, category, wrapper);
+      this.bridgeSubscriber.unsubscribeCategory(toHost, category, handlerId);
     }
-
-    this.handlerWrappers.removeByHandler(handler);
   }
 
 
@@ -173,12 +158,12 @@ export default class Messenger {
     return this.requestResponse.response(request, error, code, payload);
   }
 
-  listenRequests(topic: string, handler: (payload: any) => void): void {
-    this.requestResponse.listenRequests(topic, handler);
+  listenRequests(topic: string, handler: (payload: any) => void): number {
+    return this.requestResponse.listenRequests(topic, handler);
   }
 
-  removeRequestsListener(topic: string, handler: (payload: any) => void): void {
-    this.requestResponse.removeRequestsListener(topic, handler);
+  removeRequestsListener(topic: string, handlerId: number): void {
+    this.requestResponse.removeRequestsListener(topic, handlerId);
   }
 
 

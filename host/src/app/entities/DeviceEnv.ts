@@ -1,6 +1,5 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EnvBase from './EnvBase';
-import Logger from '../interfaces/Logger';
 import Events from '../Events';
 import Host from '../Host';
 import Messenger from '../../messenger/Messenger';
