@@ -1,7 +1,3 @@
-#ExpanderDriverProps
-resendStateInterval:
-  default: 0
-
 #I2cNodeDriverBaseProps
 int:
 bus:

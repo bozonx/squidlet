@@ -37,6 +37,8 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
       await this.writeEmpty(addressHex, dataAddress);
     }
 
+    console.log(9999999, this.props, addressHex, dataAddress, length);
+
     // read from bus
     return this.i2cMasterDev.readFrom(this.props.bus, addressHex, length);
   }

@@ -13,7 +13,7 @@ export default {
     // default params for connections
     connections: {
       i2c: {
-        pollInterval: 10,
+        pollInterval: 100,
       }
     },
 

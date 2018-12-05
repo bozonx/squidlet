@@ -31,6 +31,7 @@ export interface I2cNodeDriverProps extends I2cNodeDriverBaseProps {
 
 const DEFAULT_POLL_ID = 'default';
 const POLL_EVENT_NAME = 'poll';
+const POLL_ERROR_EVENT_NAME = 'pollError';
 
 
 export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
@@ -44,7 +45,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   // last received data by poling
   // it needs to decide to rise change event or not
-  private pollLastData?: Uint8Array;
+  private pollLastData: Uint8Array = new Uint8Array(0);
 
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
@@ -81,7 +82,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   }
 
 
-  getLastData(): Uint8Array | undefined {
+  getLastData(): Uint8Array {
     return this.pollLastData;
   }
 
@@ -151,6 +152,16 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.events.removeListener(POLL_EVENT_NAME, handler);
   }
 
+  /**
+   * Listen to errors which take place while poling or interruption is in progress
+   */
+  addPollErrorListener(handler: Handler): void {
+    this.events.addListener(POLL_ERROR_EVENT_NAME, handler);
+  }
+
+  removePollErrorListener(handler: Handler): void {
+    this.events.removeListener(POLL_ERROR_EVENT_NAME, handler);
+  }
 
   protected validateProps = (props: I2cNodeDriverProps): string | undefined => {
 
@@ -185,9 +196,14 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
       data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
     }
     catch (err) {
-      this.events.emit(POLL_EVENT_NAME, err);
+      // emit error to poll error channel
+      this.events.emit(POLL_ERROR_EVENT_NAME,
+        `I2cNode.driver Poll error of bus "${this.props.bus}",
+           address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`
+      );
 
-      throw err;
+      // return last known data instead of error.
+      return this.pollLastData;
     }
 
     this.updateLastPollData(data);
@@ -197,7 +213,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   private updateLastPollData(data: Uint8Array) {
     // if data is equal to previous data - do nothing
-    if (typeof this.pollLastData !== 'undefined' && _isEqual(this.pollLastData, data)) return;
+    if (_isEqual(this.pollLastData, data)) return;
 
     // save data
     this.pollLastData = data;
@@ -214,22 +230,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   private startPoling() {
     if (this.props.feedback !== 'poll') return;
 
-    const wrapper = async (): Promise<Uint8Array | undefined> => {
-      try {
-        return await this.doPoll();
-      }
-      catch (err) {
-        this.env.log.error(
-          `I2cNode.driver Poll error of bus "${this.props.bus}",
-           address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`
-        );
-      }
-
-      return;
-    };
-
-
-    this.poling.start(wrapper, this.props.pollInterval, this.pollId);
+    this.poling.start(this.doPoll, this.props.pollInterval, this.pollId);
   }
 
   /**
