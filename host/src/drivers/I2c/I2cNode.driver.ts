@@ -43,6 +43,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   // data addr in hex to use in poling.
   private pollDataAddressHex?: number;
   private pollId: string = DEFAULT_POLL_ID;
+  private handlers: Handler[] = [];
 
   // last received data by poling
   // it needs to decide to rise change event or not
@@ -139,11 +140,11 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   /**
    * Listen to data which received by polling or interruption.
    */
-  addListener(handler: Handler): void {
+  addListener(handler: Handler): number {
     this.events.addListener(POLL_EVENT_NAME, handler);
   }
 
-  removeListener(handler: Handler): void {
+  removeListener(handlerId: number): void {
     this.events.removeListener(POLL_EVENT_NAME, handler);
   }
 

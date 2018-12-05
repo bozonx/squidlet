@@ -31,6 +31,7 @@ export const DIR_OUT = 0;
 
 
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
+  private republish?: Republish;
   /** Direction of each pin. By default all pin directions are undefined. */
   private directions:Array<number> = [
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
@@ -41,7 +42,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /** Bitmask representing the current state of the pins. */
   private currentState: number = 0;
   private wasIcInited: boolean = false;
-  protected republish?: Republish;
+
 
   private get i2cNode(): I2cNodeDriver {
     return this.depsInstances.i2cNode as I2cNodeDriver;
@@ -103,20 +104,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /**
    * Add listener to change of any pin.
    */
-  addListener(handler: ResultHandler) {
+  addListener(handler: ResultHandler): number {
     const wrapper: Handler = () => {
       this.setLastReceivedState();
       handler(null, this.getValues());
     };
 
-    this.i2cNode.addListener(wrapper);
+    return this.i2cNode.addListener(wrapper);
   }
 
-  removeListener(handler: ResultHandler) {
-
-    // TODO: do it - сохранять wrappers
-
-    //this.i2cNode.removeListener(handler);
+  removeListener(handlerId: number) {
+    this.i2cNode.removeListener(handlerId);
   }
 
   /**
