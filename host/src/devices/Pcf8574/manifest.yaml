@@ -5,7 +5,3 @@ drivers:
   - Pcf8574.driver
 
 props: ./props.yaml
-
-status:
-  default:
-    type: number[]

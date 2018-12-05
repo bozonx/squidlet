@@ -17,28 +17,15 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // saved watchers by index
   private watchers: Wrapper[] = [];
 
-  // private get expander(): PCF8574Driver {
-  //   return this.depsInstances.expander as PCF8574Driver;
-  // }
-
-  // protected willInit = async (getDriverDep: GetDriverDep) => {
-  //
-  //   // this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
-  //   //   .getInstance(this.props);
-  // }
-
   setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
-    //await this.expander.setup(pin, pinMode, outputInitialValue);
     return this.callAction('setup', pin, pinMode, outputInitialValue);
   }
 
   getPinMode(pin: number): Promise<PinMode | undefined> {
-    //return this.expander.getPinMode(pin);
     return this.callAction('getPinMode', pin);
   }
 
   read(pin: number): Promise<boolean> {
-    //return this.expander.read(pin);
     return this.callAction('read', pin);
   }
 
@@ -46,7 +33,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Set level to output pin
    */
   write(pin: number, value: boolean): Promise<void> {
-    //return this.expander.write(pin, value);
     return this.callAction('write', pin, value);
   }
 
@@ -76,7 +62,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
       handler(values[pin]);
     };
 
-    //await this.expander.addListener(wrapper);
     await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
 
     const watcherIndex: number = this.watchers.length;
@@ -89,13 +74,11 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     // do nothing if watcher doesn't exist
     if (!this.watchers[id]) return;
 
-    //await this.expander.removeListener(this.watchers[id]);
     await this.env.system.devices.removeListener(this.watchers[id]);
   }
 
   async clearAllWatches(): Promise<void> {
     for (let id in this.watchers) {
-      //await this.expander.removeListener(this.watchers[id]);
       await this.env.system.devices.removeListener(this.watchers[id]);
     }
   }

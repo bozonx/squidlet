@@ -173,7 +173,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @param  {boolean} value The new value for this pin.
    * @return {Promise}
    */
-  async write(pin: number, value:boolean): Promise<void> {
+  async write(pin: number, value :boolean): Promise<void> {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
@@ -185,6 +185,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
     // write to IC
     await this.writeToIc();
+  }
+
+  async writeState(values: boolean[]): Promise<void> {
+    // TODO: do it
   }
 
 

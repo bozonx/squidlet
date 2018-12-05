@@ -1,5 +1,5 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {Data} from '../../baseDevice/DeviceDataManagerBase';
+import {ChangeHandler, Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ExpanderDriverProps, PCF8574Driver} from '../../drivers/Pcf8574/Pcf8574.driver';
@@ -28,7 +28,7 @@ export default class Pcf8574 extends DeviceBase<Props> {
 
   protected didInit = async () => {
     // listen driver's change
-    //this.binaryInput.addListener(this.onInputChange);
+    this.expander.addListener(this.onExpanderChange);
   }
 
   // TODO: use interface of ExpanderBase
@@ -70,21 +70,27 @@ export default class Pcf8574 extends DeviceBase<Props> {
 
   };
 
-  // protected statusGetter = async (): Promise<Data> => {
-  //   return { [DEFAULT_STATUS]: await this.binaryInput.read() };
-  // }
-  //
-  // protected statusSetter = async (partialData: Data) => {
-  //   await this.binaryOutput.write(partialData[DEFAULT_STATUS]);
-  // }
+  getStatus = async (): Promise<boolean[]> => {
+    return await this.expander.getValues();
+  }
+
+  setStatus = async (newValue: boolean[]): Promise<void> => {
+    return this.expander.writeState(newValue);
+  }
 
   // protected transformPublishValue = (binArr: number[]): string => {
   //   return binArr.join('');
   // }
-  //
-  //
-  // private onInputChange = async (binArr: number[]) => {
-  //   await this.setStatus(binArr);
-  // }
+
+
+  private onExpanderChange = async (err: Error | null, values?: boolean[]) => {
+    if (err) {
+      return this.env.log.error(String(err));
+    }
+
+    // TODO: rise event
+
+    //await this.setStatus(values);
+  }
 
 }
