@@ -23,7 +23,7 @@ export interface BinaryOutputDriverProps extends DigitalBaseProps {
 
 
 export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
-  private delayedResultEvents: IndexedEvents = new IndexedEvents();
+  private readonly delayedResultEvents: IndexedEvents = new IndexedEvents();
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;
 

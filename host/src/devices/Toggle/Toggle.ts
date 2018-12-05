@@ -1,7 +1,6 @@
-import {Data} from '../../baseDevice/DeviceDataManagerBase';
-
 const _omit = require('lodash/omit');
 
+import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';

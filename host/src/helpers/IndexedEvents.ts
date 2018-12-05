@@ -23,6 +23,18 @@ export default class IndexedEvents {
     return this.handlers.length - LENGTH_AND_START_ARR_DIFFERENCE;
   }
 
+  once(handler: EventHandler): number {
+    let handlerIndex: number;
+    const wrapper: EventHandler = (...args: any[]) => {
+      this.removeListener(handlerIndex);
+      handler(...args);
+    };
+
+    handlerIndex = this.addListener(wrapper);
+
+    return handlerIndex;
+  }
+
   removeListener(handlerId: number): void {
     if (!this.handlers[handlerId]) return;
 

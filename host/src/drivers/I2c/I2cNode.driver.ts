@@ -34,8 +34,8 @@ const DEFAULT_POLL_ID = 'default';
 
 
 export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
-  private pollEvents: IndexedEvents = new IndexedEvents();
-  private pollErrorEvents: IndexedEvents = new IndexedEvents();
+  private readonly pollEvents: IndexedEvents = new IndexedEvents();
+  private readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
   private readonly poling: Poling = new Poling();
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;

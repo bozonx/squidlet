@@ -1,6 +1,6 @@
-import * as EventEmitter from 'eventemitter3';
 const _omit = require('lodash/omit');
 
+import IndexedEvents from '../../helpers/IndexedEvents';
 import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
@@ -8,10 +8,6 @@ import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {isDigitalInputInverted} from '../../helpers/helpers';
-import HandlerWrappers from '../../helpers/HandlerWrappers';
-
-
-const eventName = 'change';
 
 
 export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
@@ -28,8 +24,7 @@ export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
 
 
 export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
-  private readonly events: EventEmitter = new EventEmitter();
-  private handlerWrappers: HandlerWrappers<WatchHandler, WatchHandler> = new HandlerWrappers<WatchHandler, WatchHandler>();
+  private readonly changeEvents: IndexedEvents = new IndexedEvents();
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;
 
@@ -64,29 +59,24 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
-  addListener(handler: WatchHandler) {
+  addListener(handler: WatchHandler): number {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.isInverted()));
     };
 
-    this.handlerWrappers.addHandler(handler, wrapper);
-    this.events.addListener(eventName, wrapper);
+    return this.changeEvents.addListener(wrapper);
   }
 
-  listenOnce(handler: WatchHandler) {
+  listenOnce(handler: WatchHandler): number {
     const wrapper: WatchHandler = (level: boolean) => {
-      this.handlerWrappers.removeByHandler(handler);
       handler(invertIfNeed(level, this.isInverted()));
     };
 
-    this.handlerWrappers.addHandler(handler, wrapper);
-
-    this.events.once(eventName, wrapper);
+    return this.changeEvents.once(wrapper);
   }
 
-  removeListener(handler: WatchHandler) {
-    this.events.removeListener(eventName, handler);
-    this.handlerWrappers.removeByHandler(handler);
+  removeListener(handlerId: number) {
+    this.changeEvents.removeListener(handlerId);
   }
 
   destroy = () => {
@@ -104,7 +94,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
-    this.events.emit(eventName, level);
+    this.changeEvents.emit(level);
 
     if (!this.props.blockTime) return;
 
