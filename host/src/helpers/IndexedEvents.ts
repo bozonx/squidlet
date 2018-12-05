@@ -1,4 +1,4 @@
-type EventHandler = (...args: any[]) => void;
+export type EventHandler = (...args: any[]) => void;
 
 
 const LENGTH_AND_START_ARR_DIFFERENCE = 1;

@@ -2,6 +2,9 @@ const HANDLER_POSITION = 0;
 const WRAPPER_POSITION = 1;
 
 
+// TODO: remove - use IndexedEvents instead of this
+
+
 export default class HandlerWrappers<HandlerType, WrapperType> {
   // item is [ handler, wrapper ]
   private readonly handlers: Array<[ HandlerType, WrapperType ]> = [];
