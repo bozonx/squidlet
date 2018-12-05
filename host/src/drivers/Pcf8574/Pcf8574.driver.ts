@@ -252,7 +252,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /**
    * Do first write to IC if it doesn't do before.
    */
-  async initIc() {
+  private async initIc() {
     try {
       await this.writeToIc();
     }

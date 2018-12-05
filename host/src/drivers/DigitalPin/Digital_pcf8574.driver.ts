@@ -1,7 +1,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import {ExpanderDriverProps, PCF8574Driver, ResultHandler} from '../Pcf8574/Pcf8574.driver';
+import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import Response from '../../messenger/interfaces/Response';
 

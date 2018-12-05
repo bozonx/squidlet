@@ -1,3 +1,4 @@
 export default interface PublishParams {
-  isRepeat: boolean;
+  isRepeat?: boolean;
+  //isSilent?: boolean;
 }
