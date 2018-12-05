@@ -1,10 +1,9 @@
-import * as EventEmitter from 'eventemitter3';
-
 import { generateEventName } from '../helpers/helpers';
+import IndexedEventEmitter from '../helpers/IndexedEventEmitter';
 
 
 export default class Events {
-  private readonly events: EventEmitter = new EventEmitter();
+  private readonly events: IndexedEventEmitter = new IndexedEventEmitter();
 
 
   emit(category: string, topic: string, data?: any): void {
@@ -18,36 +17,36 @@ export default class Events {
   /**
    * Listen for local messages of certain category.
    */
-  addListener(category: string, topic: string, handler: (data: any) => void): void {
+  addListener(category: string, topic: string, handler: (data: any) => void): number {
     const eventName = generateEventName(category, topic);
 
     // listen to local events
-    this.events.addListener(eventName, handler);
+    return this.events.addListener(eventName, handler);
   }
 
-  once(category: string, topic: string, handler: (data: any) => void): void {
+  once(category: string, topic: string, handler: (data: any) => void): number {
     const eventName = generateEventName(category, topic);
 
     // listen to local event once
-    this.events.once(eventName, handler);
+    return this.events.once(eventName, handler);
   }
 
   /**
    * Listen all the topics of category
    */
-  addCategoryListener(category: string, handler: (data: any) => void): void {
+  addCategoryListener(category: string, handler: (data: any) => void): number {
     // listen to local events
-    this.events.addListener(category, handler);
+    return this.events.addListener(category, handler);
   }
 
-  removeListener(category: string, topic: string, handler: (data: any) => void): void {
+  removeListener(category: string, topic: string, handlerId: number): void {
     const eventName = generateEventName(category, topic);
 
-    this.events.removeListener(eventName, handler);
+    this.events.removeListener(eventName, handlerId);
   }
 
-  removeCategoryListener(category: string, handler: (data: any) => void): void {
-    this.events.removeListener(category, handler);
+  removeCategoryListener(category: string, handlerId: number): void {
+    this.events.removeListener(category, handlerId);
   }
 
 }

@@ -1,10 +1,9 @@
-import * as EventEmitter from 'eventemitter3';
-
 import I2cSlave from '../../app/interfaces/dev/I2cSlave';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import IndexedEventEmitter from '../../helpers/IndexedEventEmitter';
 
 
 const NO_DATA_ADDRESS = 'null';
@@ -18,7 +17,7 @@ interface I2cSlaveDriverProps {
 
 
 export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
-  private readonly events: EventEmitter = new EventEmitter();
+  private readonly events: IndexedEventEmitter = new IndexedEventEmitter();
 
   private get i2cSlaveDev(): I2cSlave {
     return this.depsInstances.i2cSlave as I2cSlave;
@@ -78,7 +77,7 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
     dataAddress: number | undefined,
     length: number,
     handler: SlaveHandler
-  ): void {
+  ): number {
 
     // TODO: что делать с lenght ???? наверное проверить длинну
     // TODO: если слушаем data address - то возвращать ошибку что дина не совпадает
@@ -86,21 +85,22 @@ export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
 
     const id = this.generateId(dataAddress);
 
-    this.events.addListener(id, handler);
+    return this.events.addListener(id, handler);
   }
 
   removeListener(
     i2cAddress: undefined,
     dataAddress: number | undefined,
     length: number,
-    handler: SlaveHandler
+    handlerId: number
   ): void {
 
     // TODO: test
+    // TODO: length - для чего ???
 
     const id = this.generateId(dataAddress);
 
-    this.events.removeListener(id, handler);
+    this.events.removeListener(id, handlerId);
   }
 
   private handleIncomeData = (data: Uint8Array) => {

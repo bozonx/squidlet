@@ -85,8 +85,8 @@ export default class System {
     this.log.info(`===> Host initialization has finished`);
   }
 
-  onAppInit(cb: () => void) {
-    this.events.once(categories.system, eventNames.system.appInitialized, cb);
+  onAppInit(cb: () => void): number {
+    return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
   $registerConfigSetManager(ConfigSetManager: new (system: System) => ConfigSetManager) {

@@ -1,9 +1,10 @@
-import * as EventEmitter from 'eventemitter3';
+import IndexedEventEmitter from './IndexedEventEmitter';
+
 
 const DEFAULT_ID = 'defaultUniqId';
 enum CURRENT_POLL_ENUM {
   intervalId,
-  methodWhicPoll,
+  methodWhichPoll,
   methodWrapper,
   pollInterval,
 }
@@ -15,8 +16,7 @@ type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 
 
 export default class Poling {
-  //private readonly log: Logger;
-  private readonly events: EventEmitter = new EventEmitter();
+  private readonly events: IndexedEventEmitter = new IndexedEventEmitter();
   //private pollIntervalTimerId: number = NO_INTERVAL;
   private readonly currentPolls: {[index: string]: CurrentPoll} = {};
 
@@ -60,17 +60,17 @@ export default class Poling {
     this.currentPolls[id] = [intervalId, methodWhichWillPoll, polingCbWrapper, pollInterval];
   }
 
-  addListener(handler: (err: Error, result: any) => void, uniqId: string | undefined) {
+  addListener(handler: (err: Error, result: any) => void, uniqId: string | undefined): number {
     const id = this.resolveId(uniqId);
 
     // add event listener on status change
-    this.events.addListener(id, handler);
+    return this.events.addListener(id, handler);
   }
 
-  removeListener(handler: (err: Error, result: any) => void, uniqId: string | undefined) {
+  removeListener(handlerId: number, uniqId: string | undefined) {
     const id = this.resolveId(uniqId);
 
-    this.events.removeListener(id, handler);
+    this.events.removeListener(id, handlerId);
   }
 
   /**
@@ -98,13 +98,13 @@ export default class Poling {
     }
     catch(err) {
       // start poling any way
-      this.start(current[CURRENT_POLL_ENUM.methodWhicPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
+      this.start(current[CURRENT_POLL_ENUM.methodWhichPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
 
       throw err;
     }
 
     // start interval
-    this.start(current[CURRENT_POLL_ENUM.methodWhicPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
+    this.start(current[CURRENT_POLL_ENUM.methodWhichPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
 
     return result;
 
