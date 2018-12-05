@@ -65,6 +65,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.env.system.onAppInit(async () => {
       if (!this.wasIcInited) await this.initIc();
     });
+
+    this.i2cNode.addPollErrorListener((err: Error) => {
+      this.env.log.error(String(err));
+    });
   }
 
 
@@ -99,11 +103,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Add listener to change of any pin.
    */
   addListener(handler: ResultHandler) {
-    const wrapper: Handler = (error: Error | null) => {
-      if (error) {
-        return handler(error);
-      }
-
+    const wrapper: Handler = () => {
       this.setLastReceivedState();
       handler(null, this.getValues());
     };

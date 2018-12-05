@@ -30,7 +30,7 @@ export default class I2cMasterDev implements I2cMaster {
   }
 
   readFrom(bus: string, addrHex: number, quantity: number): Promise<Uint8Array> {
-    const bufferToRead = new Buffer(quantity);
+    const bufferToRead = Buffer.alloc(quantity);
 
     return new Promise((resolve, reject) => {
       const callback = (err: Error, bytesRead: number, resultBuffer: Buffer) => {
@@ -47,6 +47,8 @@ export default class I2cMasterDev implements I2cMaster {
 
         resolve(uIntArr);
       };
+
+      console.log(9999999, bus, addrHex, quantity);
 
       this.getI2cBus(bus).i2cRead(addrHex, quantity, bufferToRead, callback);
     });

@@ -13,7 +13,8 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 
 
-export type Handler = (error: Error | null, data?: Uint8Array) => void;
+export type Handler = (data: Uint8Array) => void;
+export type ErrorHandler = (err: Error) => void;
 
 export interface I2cNodeDriverBaseProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
@@ -155,11 +156,11 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   /**
    * Listen to errors which take place while poling or interruption is in progress
    */
-  addPollErrorListener(handler: Handler): void {
+  addPollErrorListener(handler: ErrorHandler): void {
     this.events.addListener(POLL_ERROR_EVENT_NAME, handler);
   }
 
-  removePollErrorListener(handler: Handler): void {
+  removePollErrorListener(handler: ErrorHandler): void {
     this.events.removeListener(POLL_ERROR_EVENT_NAME, handler);
   }
 
@@ -218,7 +219,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     // save data
     this.pollLastData = data;
     // finally rise an event
-    this.events.emit(POLL_EVENT_NAME, null, data);
+    this.events.emit(POLL_EVENT_NAME, data);
   }
 
   private stopPoling() {
