@@ -133,9 +133,19 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
       throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
     }
 
+    let result: Uint8Array;
+
     this.stopPoling();
 
-    const result: Uint8Array = await this.doPoll();
+    try {
+      result = await this.doPoll();
+    }
+    catch(err) {
+      // start poling any way
+      this.startPoling();
+
+      throw err;
+    }
 
     this.startPoling();
 
@@ -197,14 +207,16 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
       data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
     }
     catch (err) {
-      // emit error to poll error channel
-      this.events.emit(POLL_ERROR_EVENT_NAME,
-        `I2cNode.driver Poll error of bus "${this.props.bus}",
-           address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`
-      );
 
-      // return last known data instead of error.
-      return this.pollLastData;
+      // TODO: можно использовать poll.addListener - error
+
+      const msg = `I2cNode.driver Poll error of bus "${this.props.bus}",
+           address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`;
+
+      // emit error to poll error channel
+      this.events.emit(POLL_ERROR_EVENT_NAME, msg);
+
+      throw new Error(msg);
     }
 
     this.updateLastPollData(data);
