@@ -1,8 +1,7 @@
 import MyAddress from '../../app/interfaces/MyAddress';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import { I2cDataDriver, DataHandler } from '../../drivers/I2c/I2cData.driver';
+import { I2cDataDriver } from '../../drivers/I2c/I2cData.driver';
 import { uint8ArrayToText, textToUint8Array } from '../../helpers/helpers';
-import HandlersManager from '../../../../__old/HandlersManager';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
@@ -25,9 +24,6 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
   // dataAddress of this driver's data
   private readonly dataMark: number = 0x01;
 
-  // TODO: use IndexedEvents instead
-  private handlersManager: HandlersManager<ConnectionHandler, DataHandler> = new HandlersManager<ConnectionHandler, DataHandler>();
-
   private get i2cDataDriver(): I2cDataDriver {
     return this.depsInstances.i2cDataDriver as I2cDataDriver;
   }
@@ -49,7 +45,7 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
     await this.i2cDataDriver.send(remoteAddress, this.dataMark, uint8Arr);
   }
 
-  listenIncome(remoteAddress: string, handler: ConnectionHandler): void {
+  listenIncome(remoteAddress: string, handler: ConnectionHandler): number {
     const wrapper = (error: Error | null, payload?: Uint8Array): void => {
       if (error)  return handler(error);
       if (!payload) return handler(new Error(`Payload is undefined`));
@@ -60,16 +56,11 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
       handler(null, data);
     };
 
-    this.handlersManager.addHandler(remoteAddress, handler, wrapper);
-    this.i2cDataDriver.listenIncome(remoteAddress, this.dataMark, wrapper);
+    return this.i2cDataDriver.listenIncome(remoteAddress, this.dataMark, wrapper);
   }
 
-  removeListener(remoteAddress: string, handler: ConnectionHandler): void {
-    const wrapper: DataHandler = this.handlersManager.getWrapper(remoteAddress, handler) as DataHandler;
-
-    // unlisten
-    this.i2cDataDriver.removeListener(remoteAddress, this.dataMark, wrapper);
-    this.handlersManager.removeByHandler(remoteAddress, handler);
+  removeListener(remoteAddress: string, handlerIndex: number): void {
+    this.i2cDataDriver.removeListener(remoteAddress, this.dataMark, handlerIndex);
   }
 
 }

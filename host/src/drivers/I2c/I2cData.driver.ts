@@ -6,7 +6,6 @@ import {
   withoutFirstItemUint8Arr
 } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import HandlersManager from '../../../../__old/HandlersManager';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
@@ -28,11 +27,11 @@ export interface I2cDriverClass {
     dataAddress: number | undefined,
     length: number,
     handler: I2cDriverHandler
-  ) => void;
+  ) => number;
   removeListener: (
     i2cAddress: string | number | undefined,
     dataAddress: number | undefined,
-    handler: I2cDriverHandler
+    handlerIndex: number
   ) => void;
 }
 
@@ -47,9 +46,6 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;
-
-  // TODO: use IndexedEvents instead
-  private handlersManager: HandlersManager<DataHandler, I2cDriverHandler> = new HandlersManager<DataHandler, I2cDriverHandler>();
 
   private get i2cDriver(): I2cDriverClass {
     return this.depsInstances.i2cDriver as I2cDriverClass;
@@ -70,26 +66,24 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
     await this.i2cDriver.write(i2cAddress, this.sendDataRegister, data);
   }
 
-  listenIncome(i2cAddress: string | number | undefined, dataMark: number | undefined, handler: DataHandler): void {
+  listenIncome(i2cAddress: string | number | undefined, dataMark: number | undefined, handler: DataHandler): number {
     const resolvedDataMark = this.resolveDataMark(dataMark);
-    const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
 
     const wrapper = async (error: Error | null, payload?: Uint8Array): Promise<void> => {
       await this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
     };
 
-    this.handlersManager.addHandler(dataId, handler, wrapper);
-    this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
+    return this.i2cDriver.listenIncome(i2cAddress, this.lengthRegister, DATA_LENGTH_REQUEST, wrapper);
   }
 
-  removeListener(i2cAddress: string | number | undefined, dataMark: number | undefined, handler: DataHandler): void {
-    const resolvedDataMark: number = this.resolveDataMark(dataMark);
-    const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
-    const wrapper: DataHandler = this.handlersManager.getWrapper(dataId, handler) as DataHandler;
+  removeListener(i2cAddress: string | number | undefined, dataMark: number | undefined, handlerIndex: number): void {
+    //const resolvedDataMark: number = this.resolveDataMark(dataMark);
+    //const dataId: string = this.generateId(i2cAddress, resolvedDataMark);
 
     // unlisten
-    this.i2cDriver.removeListener(i2cAddress, this.lengthRegister, wrapper);
-    this.handlersManager.removeByHandler(dataId, handler);
+
+    // TODO: review
+    this.i2cDriver.removeListener(i2cAddress, dataMark, handlerIndex);
   }
 
   private async sendLength(i2cAddress: string | number | undefined, dataMark: number, dataLength: number): Promise<void> {
