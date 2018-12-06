@@ -142,9 +142,6 @@ export default class Messenger {
   }
 
   listenRequests(topic: string, handler: (payload: any) => void): number {
-
-    // TODO: review
-
     return this.requestResponse.listenRequests(topic, handler);
   }
 

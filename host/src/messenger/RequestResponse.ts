@@ -5,15 +5,12 @@ import Response from './interfaces/Response';
 import categories from '../app/dict/categories';
 
 
-type HandlerWrapper = (response: Response) => void;
-
-
 export default class RequestResponse {
   private readonly system: System;
   private readonly messenger: Messenger;
   private readonly timeouts: {[index: string]: NodeJS.Timer} = {};
-  // handlers by requestId
-  private readonly handlers: {[index: string]: HandlerWrapper} = {};
+  // handlers indexes by handleId
+  private readonly handlersIndexes: {[index: string]: number} = {};
 
 
   constructor(system: System, messenger: Messenger) {
@@ -63,12 +60,12 @@ export default class RequestResponse {
   /**
    * Listen for incoming request to generate response.
    */
-  listenRequests(topic: string, handler: (payload: any) => void): void {
-    this.system.events.addListener(categories.messengerRequestResponse, topic, handler);
+  listenRequests(topic: string, handler: (payload: any) => void): number {
+    return this.system.events.addListener(categories.messengerRequestResponse, topic, handler);
   }
 
-  removeRequestsListener(topic: string, handler: (payload: any) => void): void {
-    this.system.events.removeListener(categories.messengerRequestResponse, topic, handler);
+  removeRequestsListener(topic: string, handlerId: number): void {
+    this.system.events.removeListener(categories.messengerRequestResponse, topic, handlerId);
   }
 
 
@@ -81,7 +78,7 @@ export default class RequestResponse {
       if (response.requestId !== requestId) return;
 
       // remove listener because we already have got a message
-      this.system.events.removeCategoryListener(categories.messengerRequestResponse, wrapper);
+      this.system.events.removeCategoryListener(categories.messengerRequestResponse, this.handlersIndexes[requestId]);
       handler(null, response);
     };
 
@@ -90,17 +87,18 @@ export default class RequestResponse {
       this.stopWaitForResponse(requestId);
     }, this.system.host.config.config.network.requestTimeout);
 
-    this.handlers[requestId] = wrapper;
-
     // listen for all the topics of request category
-    this.system.events.addCategoryListener(categories.messengerRequestResponse, wrapper);
+    this.handlersIndexes[requestId] = this.system.events.addCategoryListener(
+      categories.messengerRequestResponse,
+      wrapper
+    );
   }
 
   private stopWaitForResponse(requestId: string): void {
     clearTimeout(this.timeouts[requestId]);
     delete this.timeouts[requestId];
-    this.system.events.removeCategoryListener(categories.messengerRequestResponse, this.handlers[requestId]);
-    delete this.handlers[requestId];
+    this.system.events.removeCategoryListener(categories.messengerRequestResponse, this.handlersIndexes[requestId]);
+    delete this.handlersIndexes[requestId];
   }
 
   private generateRequestMsg(toHost: string, topic: string, payload: any): Request {

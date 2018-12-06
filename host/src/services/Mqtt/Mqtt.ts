@@ -70,6 +70,9 @@ export default class Mqtt extends ServiceBase<Props> {
         this.hostPublishHandler(hostId, data);
       };
 
+
+      // TODO: save id
+
       // listen to publish messages
       this.env.messenger.subscribeCategory(hostId, categories.externalDataOutcome, handler);
     }

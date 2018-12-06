@@ -95,6 +95,9 @@ export default class Devices {
 
     //combineTopic(deviceId, 'status', statusName)
     this.handlerWrappers.addHandler(handler, wrapper);
+
+    // TODO: save id
+
     this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
@@ -116,6 +119,9 @@ export default class Devices {
     };
 
     this.handlerWrappers.addHandler(handler, wrapper);
+
+    // TODO: save id
+
     this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
