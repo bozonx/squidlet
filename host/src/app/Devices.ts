@@ -1,6 +1,5 @@
 import System from './System';
 import Request from '../messenger/interfaces/Request';
-import HandlerWrappers from '../helpers/HandlerWrappers';
 import Response from '../messenger/interfaces/Response';
 import Message from '../messenger/interfaces/Message';
 import categories from './dict/categories';
@@ -32,13 +31,10 @@ interface ConfigPayload extends Payload {
   config: {[idnex: string]: any};
 }
 
-type Handler = (payload: CallActionPayload | StatusPayload | ConfigPayload) => void;
-type HandlerWrapper = (payload: any) => void;
-
 
 export default class Devices {
   private readonly system: System;
-  private handlerWrappers: HandlerWrappers<Handler, HandlerWrapper> = new HandlerWrappers<Handler, HandlerWrapper>();
+
 
   constructor(system: System) {
     this.system = system;
@@ -77,7 +73,7 @@ export default class Devices {
    * To listed default status use 'default' as statusName.
    * Handler have to be a new function each time.
    */
-  listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): void {
+  listenStatus(deviceId: string, statusName: string, handler: (value: any) => void): string {
     const toHost: string = this.system.host.resolveHostIdByEntityId(deviceId);
     const wrapper = (message: Message) => {
       const payload: StatusPayload = message.payload;
@@ -94,11 +90,8 @@ export default class Devices {
     };
 
     //combineTopic(deviceId, 'status', statusName)
-    this.handlerWrappers.addHandler(handler, wrapper);
 
-    // TODO: save id
-
-    this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
+    return this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
   /**
@@ -106,7 +99,7 @@ export default class Devices {
    * It calls handler on each event with whole config.
    * Handler have to be a new function each time.
    */
-  listenConfig(deviceId: string, handler: (config: {[index: string]: any}) => void) {
+  listenConfig(deviceId: string, handler: (config: {[index: string]: any}) => void): string {
     const toHost: string = this.system.host.resolveHostIdByEntityId(deviceId);
     const wrapper = (message: Message) => {
       const payload: ConfigPayload = message.payload;
@@ -118,15 +111,10 @@ export default class Devices {
       handler(payload.config);
     };
 
-    this.handlerWrappers.addHandler(handler, wrapper);
-
-    // TODO: save id
-
-    this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
+    return this.system.messenger.subscribe(toHost, categories.devicesChannel, DEVICE_FEEDBACK_TOPIC, wrapper);
   }
 
-  removeListener(handler: (value: any) => void) {
-    this.handlerWrappers.removeByHandler(handler);
+  removeListener(handlerId: string): void {
 
     // TODO: use deviceId and action as eventName
     // TODO: run unsubscribe ???
