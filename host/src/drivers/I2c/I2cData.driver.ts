@@ -6,7 +6,7 @@ import {
   withoutFirstItemUint8Arr
 } from '../../helpers/helpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import HandlersManager from '../../helpers/HandlersManager';
+import HandlersManager from '../../../../__old/HandlersManager';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
