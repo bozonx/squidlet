@@ -15,21 +15,23 @@ export default class IndexedEventEmitter {
    * Register listener and return its index
    */
   addListener(eventName: string, handler: EventHandler): number {
-    this.handlersById[eventName] = new IndexedEvents();
+    if (!this.handlersById[eventName]) {
+      this.handlersById[eventName] = new IndexedEvents();
+    }
 
     return this.handlersById[eventName].addListener(handler);
   }
 
   once(eventName: string, handler: EventHandler): number {
-    let handlerIndex: number;
+    let wrapperIndex: number;
     const wrapper: EventHandler = (...args: any[]) => {
-      this.removeListener(eventName, handlerIndex);
+      this.removeListener(eventName, wrapperIndex);
       handler(...args);
     };
 
-    handlerIndex = this.addListener(eventName, wrapper);
+    wrapperIndex = this.addListener(eventName, wrapper);
 
-    return handlerIndex;
+    return wrapperIndex;
   }
 
   removeListener(eventName: string, handlerIndex: number): void {
