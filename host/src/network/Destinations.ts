@@ -1,7 +1,7 @@
 const _find = require('lodash/find');
 const _capitalize = require('lodash/capitalize');
-import * as EventEmitter from 'events';
 
+import IndexedEvents from '../helpers/IndexedEvents';
 import DriverEnv from '../app/entities/DriverEnv';
 import Connection from './interfaces/Connection';
 import MyAddress from '../app/interfaces/MyAddress';
@@ -17,12 +17,12 @@ type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Des
  */
 export default class Destinations {
   private readonly driverEnv: DriverEnv;
-  private readonly events: EventEmitter = new EventEmitter();
-  private readonly eventName: string = 'msg';
   private readonly neighbors: {[index: string]: Destination} = {};
   // addresses by "type-bus"
   private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
+  private readonly msgEvents: IndexedEvents = new IndexedEvents();
+
 
   constructor(driverEnv: DriverEnv, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
     this.driverEnv = driverEnv;
@@ -44,12 +44,12 @@ export default class Destinations {
   /**
    * Listen to all the addresses
    */
-  listenIncome(handler: DestHandler): void {
-    this.events.addListener(this.eventName, handler);
+  listenIncome(handler: DestHandler): number {
+    return this.msgEvents.addListener(handler);
   }
 
-  removeListener(handler: DestHandler): void {
-    this.events.removeListener(this.eventName, handler);
+  removeListener(handlerIndex: number): void {
+    this.msgEvents.removeListener(handlerIndex);
   }
 
   /**
@@ -102,7 +102,7 @@ export default class Destinations {
   }
 
   private handleIncomeMessages(fromDest: Destination, error: Error, payload?: any): void {
-    this.events.emit(this.eventName, error, payload, fromDest);
+    this.msgEvents.emit(error, payload, fromDest);
   }
 
   private getConnection(destination: Destination): Connection {
