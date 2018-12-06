@@ -7,6 +7,9 @@ export type EventHandler = (...args: any[]) => void;
 export default class IndexedEvents {
   private handlers: EventHandler[] = [];
 
+  getHandlers(): EventHandler[] {
+    return this.handlers;
+  }
 
   emit(...args: any[]) {
     for (const handler of this.handlers) {
@@ -24,15 +27,15 @@ export default class IndexedEvents {
   }
 
   once(handler: EventHandler): number {
-    let handlerIndex: number;
+    let wrapperIndex: number;
     const wrapper: EventHandler = (...args: any[]) => {
-      this.removeListener(handlerIndex);
+      this.removeListener(wrapperIndex);
       handler(...args);
     };
 
-    handlerIndex = this.addListener(wrapper);
+    wrapperIndex = this.addListener(wrapper);
 
-    return handlerIndex;
+    return wrapperIndex;
   }
 
   removeListener(handlerIndex: number): void {
