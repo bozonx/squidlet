@@ -1,6 +1,6 @@
 const _last = require('lodash/last');
-import * as EventEmitter from 'eventemitter3';
 
+import IndexedEvents from '../helpers/IndexedEvents';
 import Network from './Network';
 import DriverEnv from '../app/entities/DriverEnv';
 import Destinations from './Destinations';
@@ -20,8 +20,7 @@ export default class Router {
   private readonly network: Network;
   private readonly driverEnv: DriverEnv;
   private _destinations?: Destinations;
-  private readonly events: EventEmitter = new EventEmitter();
-  private readonly eventName: string = 'msg';
+  private readonly msgEvents: IndexedEvents = new IndexedEvents();
 
   private get destinations(): Destinations {
     return this._destinations as Destinations;
@@ -57,12 +56,12 @@ export default class Router {
   /**
    * Listen for income messages which is delivered to this final host.
    */
-  listenIncome(handler: RouterHandler): void {
-    this.events.addListener(this.eventName, handler);
+  listenIncome(handler: RouterHandler): number {
+    return this.msgEvents.addListener(handler);
   }
 
-  removeListener(handler: RouterHandler): void {
-    this.events.removeListener(this.eventName, handler);
+  removeListener(handlerIndex: number): void {
+    this.msgEvents.removeListener(handlerIndex);
   }
 
   /**
@@ -70,19 +69,19 @@ export default class Router {
    */
   private handleIncomeMessages = (error: Error | null, routerMessage?: RouterMessage): void => {
     if (error) {
-      this.events.emit(this.eventName, error);
+      this.msgEvents.emit(error);
 
       return;
     }
     if (!routerMessage) {
-      this.events.emit(this.eventName, `RouterMessage is undefined`);
+      this.msgEvents.emit(`RouterMessage is undefined`);
 
       return;
     }
 
     // if it's final destination - pass message to income listeners
     if (_last(routerMessage.route) === this.network.hostId) {
-      this.events.emit(this.eventName, null, routerMessage.payload);
+      this.msgEvents.emit(null, routerMessage.payload);
 
       return;
     }
@@ -96,7 +95,7 @@ export default class Router {
     const nextHostConnectionParams: Destination = this.resolveDestination(nextHostId);
 
     this.destinations.send(nextHostConnectionParams, newRouterMessage)
-      .catch((err) => this.events.emit(this.eventName, err));
+      .catch((err) => this.msgEvents.emit(err));
   }
 
   /**
