@@ -1,16 +1,12 @@
 const _omit = require('lodash/omit');
-import * as EventEmitter from 'eventemitter3';
 
+import IndexedEvents from '../../helpers/IndexedEvents';
 import {WatchHandler} from '../../app/interfaces/dev/Digital';
 import {isDigitalInputInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-
-
-const risingEventName = 'rising';
-const bothEventName = 'both';
 
 
 export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
@@ -30,10 +26,8 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
 
 
 export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
-
-  // TODO: use IndexedEvents instead
-
-  private readonly events: EventEmitter = new EventEmitter();
+  private readonly risingEvents: IndexedEvents = new IndexedEvents();
+  private readonly bothEvents: IndexedEvents = new IndexedEvents();
   private throttleInProgress: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
@@ -69,24 +63,27 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   /**
    * Listen only to rising of impulse, not falling.
    */
-  addRisingListener(handler: WatchHandler) {
-    this.events.addListener(risingEventName, handler);
+  addRisingListener(handler: WatchHandler): number {
+    return this.risingEvents.addListener(handler);
   }
 
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
-  addListener(handler: WatchHandler) {
-    this.events.addListener(bothEventName, handler);
+  addListener(handler: WatchHandler): number {
+    return this.bothEvents.addListener(handler);
   }
 
-  listenOnce(handler: WatchHandler) {
-    this.events.once(risingEventName, handler);
+  listenOnce(handler: WatchHandler): number {
+    return this.risingEvents.once(handler);
   }
 
-  removeListener(handler: WatchHandler) {
-    this.events.removeListener(risingEventName, handler);
-    this.events.removeListener(bothEventName, handler);
+  removeRisingListener(handlerIndex: number) {
+    this.risingEvents.removeListener(handlerIndex);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.bothEvents.removeListener(handlerIndex);
   }
 
   destroy = () => {
@@ -136,12 +133,12 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   private async startImpulse(): Promise<void> {
     this.impulseInProgress = true;
 
-    this.events.emit(risingEventName);
-    this.events.emit(bothEventName, true);
+    this.risingEvents.emit();
+    this.bothEvents.emit(true);
 
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
-        this.events.emit(bothEventName, false);
+        this.bothEvents.emit(false);
         this.impulseInProgress = false;
 
         if (this.props.blockTime) {
