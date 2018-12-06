@@ -41,4 +41,8 @@ export default class IndexedEvents {
     this.handlers.splice(handlerIndex, 1);
   }
 
+  removeAll(): void {
+    this.handlers.splice(0, this.handlers.length);
+  }
+
 }

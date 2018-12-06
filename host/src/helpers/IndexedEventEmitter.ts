@@ -38,4 +38,12 @@ export default class IndexedEventEmitter {
     this.handlersById[eventName].removeListener(handlerIndex);
   }
 
+  removeAllListeners(eventName: string): void {
+    if (!this.handlersById[eventName]) return;
+
+    this.handlersById[eventName].removeAll();
+
+    delete this.handlersById[eventName];
+  }
+
 }
