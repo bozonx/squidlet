@@ -4,6 +4,7 @@ import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Dig
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import Response from '../../messenger/interfaces/Response';
+import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 
 
 type Wrapper = (values: boolean[]) => void;
@@ -14,8 +15,9 @@ interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
-  // saved watchers by index
-  private watchers: Wrapper[] = [];
+  // saved handlerId. Keys are handlerIndexes
+  private handlerIds: string[] = [];
+
 
   setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
     return this.callAction('setup', pin, pinMode, outputInitialValue);
@@ -62,24 +64,23 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
       handler(values[pin]);
     };
 
-    await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
+    const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
 
-    const watcherIndex: number = this.watchers.length;
-    this.watchers.push(wrapper);
+    this.handlerIds.push(handlerId);
 
-    return watcherIndex;
+    return this.handlerIds.length - LENGTH_AND_START_ARR_DIFFERENCE;
   }
 
   async clearWatch(id: number): Promise<void> {
     // do nothing if watcher doesn't exist
-    if (!this.watchers[id]) return;
+    if (!this.handlerIds[id]) return;
 
-    await this.env.system.devices.removeListener(this.watchers[id]);
+    await this.env.system.devices.removeListener(this.handlerIds[id]);
   }
 
   async clearAllWatches(): Promise<void> {
-    for (let id in this.watchers) {
-      await this.env.system.devices.removeListener(this.watchers[id]);
+    for (let id in this.handlerIds) {
+      await this.env.system.devices.removeListener(this.handlerIds[id]);
     }
   }
 

@@ -1,7 +1,7 @@
+import {LENGTH_AND_START_ARR_DIFFERENCE} from '../app/dict/constants';
+
+
 export type EventHandler = (...args: any[]) => void;
-
-
-const LENGTH_AND_START_ARR_DIFFERENCE = 1;
 
 
 export default class IndexedEvents {
