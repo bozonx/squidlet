@@ -12,17 +12,14 @@ import categories from '../app/dict/categories';
 import {ALL_TOPICS} from '../app/dict/constants';
 
 
-type Handler = (message: Message) => void;
-
-
 /**
  * Respond to request from remote host which subscribes to local event.
  */
-export default class Bridge {
+export default class BridgeResponder {
   private readonly system: System;
   private readonly messenger: Messenger;
-  // handlers of local events by handleId
-  private readonly handlers: {[index: string]: Handler} = {};
+  // handlers indexes of local events by handleId
+  private readonly handlersIndexes: {[index: string]: number} = {};
 
 
   constructor(system: System, messenger: Messenger) {
@@ -76,38 +73,38 @@ export default class Bridge {
    * Subscribe to local event and send message to remote subscriber
    */
   private addLocalListener(category: string, topic: string, handlerId: string, subscriberHost: string) {
-    this.handlers[handlerId] = (payload: any): void => {
+    const wrapper = (payload: any): void => {
       this.response(handlerId, subscriberHost, category, topic, payload);
     };
 
-    this.system.events.addListener(category, topic, this.handlers[handlerId]);
+    this.handlersIndexes[handlerId] = this.system.events.addListener(category, topic, wrapper);
   }
 
   /**
    * Unsubscribe from local event
    */
   private removeLocalListener(category: string, topic: string, handlerId: string) {
-    this.system.events.removeListener(category, topic, this.handlers[handlerId]);
-    delete this.handlers[handlerId];
+    this.system.events.removeListener(category, topic, this.handlersIndexes[handlerId]);
+    delete this.handlersIndexes[handlerId];
   }
 
   /**
    * Subscribe to local event and send message to remote subscriber
    */
   private addLocalCategoryListener(category: string, handlerId: string, subscriberHost: string) {
-    this.handlers[handlerId] = (payload: any): void => {
+    const wrapper = (payload: any): void => {
       this.response(handlerId, subscriberHost, category, undefined, payload);
     };
 
-    this.system.events.addCategoryListener(category, this.handlers[handlerId]);
+    this.handlersIndexes[handlerId] = this.system.events.addCategoryListener(category, wrapper);
   }
 
   /**
    * Unsubscribe from local event
    */
   private removeLocalCategoryListener(category: string, handlerId: string) {
-    this.system.events.removeCategoryListener(category, this.handlers[handlerId]);
-    delete this.handlers[handlerId];
+    this.system.events.removeCategoryListener(category, this.handlersIndexes[handlerId]);
+    delete this.handlersIndexes[handlerId];
   }
 
   private response(
