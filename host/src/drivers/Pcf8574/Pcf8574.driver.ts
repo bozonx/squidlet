@@ -63,26 +63,30 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected didInit = async () => {
-    // init IC state after app is inited if it isn't inited at this moment
-    this.env.system.onAppInit(async () => {
-
-      // TODO: !!! review сейчас setupы делаются везде в onAppInit
-
-      if (!this.wasIcInited) await this.initIc();
-    });
-
     this.i2cNode.addPollErrorListener((err: Error) => {
       this.env.log.error(String(err));
     });
   }
 
+  protected appDidInit = async () => {
+    // init IC state after app is inited if it isn't inited at this moment
+    if (!this.wasIcInited) await this.initIc();
+  }
+
 
   async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+
+    console.log('------- setup', pin, pinMode, outputInitialValue);
+
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
 
-    // TODO: не делать setup 2й раз - warn
+    if (this.directions[pin] !== DIR_UNDEF) {
+      this.env.log.warn(`PCF8574Driver.setup(${pin}, ${pinMode}, ${outputInitialValue}). This pin has been already set up`);
+
+      return;
+    }
 
     if (pinMode === 'output') {
       // output pin
@@ -101,6 +105,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
         this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
       }
 
+      // set input pin to high
       this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
       this.directions[pin] = DIR_IN;
     }
@@ -126,6 +131,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<boolean[]> {
+
+    console.log('------- poll');
+
+    // TODO: поидее poll не нужно выполнять до запуска init ic
+    // TODO: проверить что выполнется после setup
+
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
 
@@ -166,8 +177,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return false;
     }
 
-    // TODO: наверное лучше сделать poll
-    
     return ((this.currentState>>pin) % 2 !== 0);
   }
 
@@ -178,15 +187,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   async write(pin: number, value :boolean): Promise<void> {
+
+    console.log('------- write', pin, value);
+
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
-
-    // TODO: вернуть
-
-    // else if (this.directions[pin] !== DIR_OUT) {
-    //   throw new Error('Pin is not defined as output');
-    // }
+    else if (this.directions[pin] !== DIR_OUT) {
+      throw new Error('Pin is not defined as output');
+    }
 
     // update local state
     this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
@@ -194,8 +203,25 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.writeToIc();
   }
 
+  /**
+   * Set new state of output pins.
+   * Not output pins (input, undefined) are ignored.
+   */
   async writeState(values: boolean[]): Promise<void> {
-    // TODO: do it
+    let newState: number = this.currentState;
+
+    for (let pin = 0; pin < 8; pin++) {
+      if (this.directions[pin] !== DIR_OUT) {
+        // isn't an output pin
+        continue;
+      }
+
+      newState = this.updatePinInBitMask(newState, pin, values[pin]);
+    }
+
+    this.currentState = newState;
+
+    return this.writeToIc();
   }
 
 
@@ -251,6 +277,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     const newIcState = this.currentState | this.inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);
 
+    // send one byte to IC
     dataToSend[0] = newIcState;
 
     await this.i2cNode.write(undefined, dataToSend);
@@ -275,29 +302,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     catch (err) {
       this.env.log.error(`PCF8574.driver. Can't resend state to IC. ${String(err)}`);
     }
-  }
-
-  /**
-   * Set the given value to all output pins.
-   * @param  {boolean} value The new value for all output pins.
-   * @return {Promise}
-   */
-  private setAllPins(value:boolean): Promise<void>{
-
-    // TODO: reveiw - зачем вообще нужно ???
-
-    let newState:number = this.currentState;
-
-    for(let pin = 0; pin < 8; pin++){
-      if(this.directions[pin] !== DIR_OUT){
-        continue; // isn't an output pin
-      }
-      newState = this.updatePinInBitMask(newState, pin, value);
-    }
-
-    this.currentState = newState;
-
-    return this.writeToIc();
   }
 
   /**
