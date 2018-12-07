@@ -80,12 +80,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
   async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
-
-    if (this.props.address === 22) {
-      console.log('------- pcf driver setup', this.props, pin, pinMode, outputInitialValue);
-    }
-
-
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
@@ -195,9 +189,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   async write(pin: number, value :boolean): Promise<void> {
-
-    console.log('------- write', pin, value);
-
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }

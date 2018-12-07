@@ -33,7 +33,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   //protected didInit = async () => {
   protected appDidInit = async () => {
 
-    console.log('------- DigitalPinOutputDriver', this.props);
+    //console.log('------- DigitalPinOutputDriver', this.props);
 
     // TODO: может делать после devicesInit ???
 
