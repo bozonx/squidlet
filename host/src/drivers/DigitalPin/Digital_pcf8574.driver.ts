@@ -5,6 +5,7 @@ import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import Response from '../../messenger/interfaces/Response';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
+import DebounceCall from '../../helpers/DebounceCall';
 
 
 type Wrapper = (values: boolean[]) => void;
@@ -18,7 +19,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: string[] = [];
-  private debounceTimeouts: {[index: string]: any} = {};
+  private readonly debounceCall: DebounceCall = new DebounceCall();
 
 
   setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
@@ -74,10 +75,10 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
       }
       else {
         // wait for debounce and read current level
-        this.debounceCall( async () => {
+        this.debounceCall.invoke( pin, debounce, async () => {
           const realLevel = await this.read(pin);
           handler(realLevel);
-        }, pin, debounce);
+        });
       }
     };
 
@@ -106,22 +107,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     const response: Response = await this.env.system.devices.callAction(this.props.expander, actionName, ...args);
 
     return response.payload;
-  }
-
-  private debounceCall(cb: () => void, pin: number, debounce?: number) {
-    // if there isn't debounce - call immediately
-    if (!debounce) return cb();
-
-    // if debounce is in progress - do nothing
-    if (typeof this.debounceTimeouts[pin] !== 'undefined') return;
-
-    // making new debounce timeout
-    const wrapper = () => {
-      delete this.debounceTimeouts[pin];
-      cb();
-    };
-
-    this.debounceTimeouts[pin] = setTimeout(wrapper, debounce);
   }
 
   // TODO: validate expander prop - it has to be existent device in master config

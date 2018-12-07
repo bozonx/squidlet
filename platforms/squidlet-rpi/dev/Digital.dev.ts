@@ -1,6 +1,7 @@
 import {Gpio} from 'pigpio';
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
+import DebounceCall from '../../../host/src/helpers/DebounceCall';
 
 
 type GpioHandler = (level: number) => void;
@@ -14,7 +15,7 @@ interface Listener {
 export default class DigitalDev implements Digital {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly alertListeners: Listener[] = [];
-  private debounceTimeouts: {[index: string]: any} = {};
+  private readonly debounceCall: DebounceCall = new DebounceCall();
 
 
   /**
@@ -85,10 +86,10 @@ export default class DigitalDev implements Digital {
       }
       else {
         // wait for debounce and read current level
-        this.debounceCall( async () => {
+        this.debounceCall.invoke(pin, debounce, async () => {
           const realLevel = await this.read(pin);
           handler(realLevel);
-        }, pin, debounce);
+        });
       }
     };
 
@@ -151,22 +152,6 @@ export default class DigitalDev implements Digital {
     }
 
     return this.pinInstances[pin];
-  }
-
-  private debounceCall(cb: () => void, pin: number, debounce?: number) {
-    // if there isn't debounce - call immediately
-    if (!debounce) return cb();
-
-    // if debounce is in progress - do nothing
-    if (typeof this.debounceTimeouts[pin] !== 'undefined') return;
-
-    // making new debounce timeout
-    const wrapper = () => {
-      delete this.debounceTimeouts[pin];
-      cb();
-    };
-
-    this.debounceTimeouts[pin] = setTimeout(wrapper, debounce);
   }
 
   private isCorrectEdge(value: boolean, edge?: Edge): boolean {

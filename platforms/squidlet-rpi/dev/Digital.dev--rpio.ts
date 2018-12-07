@@ -40,7 +40,6 @@ export default class DigitalDevRpio implements Digital {
 
     this.pinModes[pin] = mode;
 
-    console.log(4444444, pin, pinMode, mode, pullUpDown);
   }
 
   async getPinMode(pin: number): Promise<PinMode | undefined> {
@@ -67,11 +66,7 @@ export default class DigitalDevRpio implements Digital {
   }
 
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-
-    console.log(3333333, pin, debounce, edge);
-
     const handlerWrapper: GpioHanler = () => {
-      console.log(22222, rpio.read(pin));
       handler( Boolean(rpio.read(pin)) );
     };
     let convertedEdge = rpio.POLL_BOTH;

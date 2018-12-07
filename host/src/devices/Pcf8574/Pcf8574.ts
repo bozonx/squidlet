@@ -1,10 +1,7 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {ChangeHandler, Data} from '../../baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ExpanderDriverProps, PCF8574Driver} from '../../drivers/Pcf8574/Pcf8574.driver';
-import {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import Digital from '../../app/interfaces/dev/Digital';
+import {PinMode} from '../../app/interfaces/dev/Digital';
 import PublishParams from '../../app/interfaces/PublishParams';
 
 
@@ -16,9 +13,6 @@ export default class Pcf8574 extends DeviceBase<Props> {
   private get expander(): PCF8574Driver {
     return this.depsInstances.expander as PCF8574Driver;
   }
-
-  // TODO: желательно проинициализировать одним запросом
-  // TODO: byteToBinArr(this.currentState)
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
@@ -56,12 +50,15 @@ export default class Pcf8574 extends DeviceBase<Props> {
     return this.expander.writeState(newValue);
   }
 
-  // protected transformPublishValue = (binArr: number[]): string => {
-  //   return binArr.join('');
-  // }
+  protected transformPublishValue = (binArr: number[]): string => {
+    return binArr.join('');
+  }
 
 
   private onExpanderChange = async (err: Error | null, values?: boolean[]) => {
+
+    // TODO: проверить обработку ошибок что error придет
+
     if (err) {
       return this.env.log.error(String(err));
     }
@@ -71,8 +68,6 @@ export default class Pcf8574 extends DeviceBase<Props> {
     };
 
     this.publish('status', values, params);
-    //this.env.system.events.emit(publishEventName, 'status', values, params);
-    //await this.setStatus(values);
   }
 
 }

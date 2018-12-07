@@ -82,6 +82,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       throw new Error('Pin out of range');
     }
 
+    // TODO: не делать setup 2й раз - warn
+
     if (pinMode === 'output') {
       // output pin
       if (typeof outputInitialValue === 'undefined') {
@@ -179,9 +181,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
-    else if (this.directions[pin] !== DIR_OUT) {
-      throw new Error('Pin is not defined as output');
-    }
+
+    // TODO: вернуть
+
+    // else if (this.directions[pin] !== DIR_OUT) {
+    //   throw new Error('Pin is not defined as output');
+    // }
 
     // update local state
     this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
