@@ -16,6 +16,7 @@ interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
   // saved handlerId. Keys are handlerIndexes
+  // it needs to do clearAllWatches()
   private handlerIds: string[] = [];
 
 
@@ -44,7 +45,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
 
     // TODO: что делать с debounce ?
-    // TODO: что делать с edge ?
 
     const wrapper: Wrapper = (values: boolean[]) => {
 
@@ -61,7 +61,17 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
         return;
       }
 
-      handler(values[pin]);
+      const pinValue: boolean = values[pin];
+
+      // skip not suitable edge
+      if (edge === 'rising' && !pinValue) {
+        return;
+      }
+      else if (edge === 'falling' && pinValue) {
+        return;
+      }
+
+      handler(pinValue);
     };
 
     const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
