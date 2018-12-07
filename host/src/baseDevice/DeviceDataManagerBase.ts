@@ -57,7 +57,10 @@ export default abstract class DeviceDataManagerBase {
     this.getter = getter;
     this.setter = setter;
 
-    await this.initFirstValue();
+    // get first value after all the devices and drivers have been initialized
+    this.system.onAppInit(async () => {
+      await this.initFirstValue();
+    });
   }
 
   getLocal(): Data {

@@ -26,9 +26,9 @@ export default class Switch extends DeviceBase<Props> {
   }
 
 
-  // protected statusGetter = async (): Promise<Data> => {
-  //   return { [DEFAULT_STATUS]: await this.binaryOutput.read() };
-  // }
+  protected statusGetter = async (): Promise<Data> => {
+    return { [DEFAULT_STATUS]: await this.binaryOutput.read() };
+  }
 
   protected statusSetter = async (partialData: Data) => {
     await this.binaryOutput.write(partialData[DEFAULT_STATUS]);
