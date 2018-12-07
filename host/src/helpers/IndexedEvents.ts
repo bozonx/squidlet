@@ -17,7 +17,7 @@ export default class IndexedEvents {
   }
 
   emit(...args: any[]) {
-    for (const handler of this.handlers) {
+    for (let handler of this.handlers) {
       if (handler) handler(...args);
     }
   }
@@ -50,10 +50,7 @@ export default class IndexedEvents {
   }
 
   removeAll(): void {
-
-    // TODO; remake - set undefined
-
-    //this.handlers.splice(0, this.handlers.length);
+    this.handlers.splice(0, this.handlers.length);
   }
 
 }
