@@ -18,6 +18,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: string[] = [];
+  private debounceTimeouts: {[index: string]: any} = {};
 
 
   setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
@@ -43,9 +44,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-
-    // TODO: что делать с debounce ?
-
     const wrapper: Wrapper = (values: boolean[]) => {
 
       // TODO: нужно же обработать ошибку??? или она напишется в лог в Devices?
@@ -71,7 +69,16 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
         return;
       }
 
-      handler(pinValue);
+      if (!debounce) {
+        handler(pinValue);
+      }
+      else {
+        // wait for debounce and read current level
+        this.debounceCall( async () => {
+          const realLevel = await this.read(pin);
+          handler(realLevel);
+        }, pin, debounce);
+      }
     };
 
     const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
@@ -99,6 +106,22 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     const response: Response = await this.env.system.devices.callAction(this.props.expander, actionName, ...args);
 
     return response.payload;
+  }
+
+  private debounceCall(cb: () => void, pin: number, debounce?: number) {
+    // if there isn't debounce - call immediately
+    if (!debounce) return cb();
+
+    // if debounce is in progress - do nothing
+    if (typeof this.debounceTimeouts[pin] !== 'undefined') return;
+
+    // making new debounce timeout
+    const wrapper = () => {
+      delete this.debounceTimeouts[pin];
+      cb();
+    };
+
+    this.debounceTimeouts[pin] = setTimeout(wrapper, debounce);
   }
 
   // TODO: validate expander prop - it has to be existent device in master config
