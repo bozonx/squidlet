@@ -23,7 +23,7 @@ export default class IndexedEventEmitter {
   }
 
   once(eventName: string, handler: EventHandler): number {
-    let wrapperIndex: number;
+    let wrapperIndex: number = -1;
     const wrapper: EventHandler = (...args: any[]) => {
       this.removeListener(eventName, wrapperIndex);
       handler(...args);

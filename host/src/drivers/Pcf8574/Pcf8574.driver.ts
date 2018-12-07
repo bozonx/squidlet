@@ -69,14 +69,22 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected appDidInit = async () => {
-    // init IC state after app is inited if it isn't inited at this moment
-    if (!this.wasIcInited) await this.initIc();
+
+    // TODO: remove timeout
+
+    setTimeout(async () => {
+      // init IC state after app is inited if it isn't inited at this moment
+      if (!this.wasIcInited) await this.initIc();
+    }, 1000);
   }
 
 
   async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
 
-    console.log('------- setup', pin, pinMode, outputInitialValue);
+    if (this.props.address === 22) {
+      console.log('------- pcf driver setup', this.props, pin, pinMode, outputInitialValue);
+    }
+
 
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');

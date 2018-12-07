@@ -30,7 +30,13 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
       .getInstance(_omit(this.props, 'initialLevel', 'pin', 'gpio'));
   }
 
+  //protected didInit = async () => {
   protected appDidInit = async () => {
+
+    console.log('------- DigitalPinOutputDriver', this.props);
+
+    // TODO: может делать после devicesInit ???
+
     // setup and set initial level
     try {
       await this.gpio.setup(this.props.pin, 'output', this.props.initialLevel);

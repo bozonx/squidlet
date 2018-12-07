@@ -2,18 +2,23 @@ import {LENGTH_AND_START_ARR_DIFFERENCE} from '../app/dict/constants';
 
 
 export type EventHandler = (...args: any[]) => void;
+type Handlers = Array<EventHandler | undefined>;
 
 
 export default class IndexedEvents {
-  private handlers: EventHandler[] = [];
+  private handlers: Handlers = [];
 
-  getHandlers(): EventHandler[] {
+  /**
+   * Get all the handlers.
+   * Removed handlers will be undefined
+   */
+  getHandlers(): Handlers {
     return this.handlers;
   }
 
   emit(...args: any[]) {
     for (const handler of this.handlers) {
-      handler(...args);
+      if (handler) handler(...args);
     }
   }
 
@@ -27,7 +32,7 @@ export default class IndexedEvents {
   }
 
   once(handler: EventHandler): number {
-    let wrapperIndex: number;
+    let wrapperIndex: number = -1;
     const wrapper: EventHandler = (...args: any[]) => {
       this.removeListener(wrapperIndex);
       handler(...args);
@@ -41,11 +46,14 @@ export default class IndexedEvents {
   removeListener(handlerIndex: number): void {
     if (!this.handlers[handlerIndex]) return;
 
-    this.handlers.splice(handlerIndex, 1);
+    this.handlers[handlerIndex] = undefined;
   }
 
   removeAll(): void {
-    this.handlers.splice(0, this.handlers.length);
+
+    // TODO; remake - set undefined
+
+    //this.handlers.splice(0, this.handlers.length);
   }
 
 }
