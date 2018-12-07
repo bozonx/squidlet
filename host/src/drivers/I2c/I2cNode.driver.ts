@@ -72,7 +72,8 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.pollId = this.dataAddressToString(this.props.pollDataAddress);
   }
 
-  protected didInit = async () => {
+  protected appDidInit = async () => {
+    // start poling or int listeners after app is initialized
     this.setupFeedback();
   }
 
@@ -173,7 +174,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
         );
       }
 
-      return this.impulseInput.addListener(this.doPoll);
+      this.impulseInput.addListener(this.doPoll);
     }
     // start poling if feedback is poll
     this.startPoling();

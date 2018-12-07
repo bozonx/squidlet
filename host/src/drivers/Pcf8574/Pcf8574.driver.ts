@@ -131,11 +131,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<boolean[]> {
+    if (!this.env.system.isInitialized) {
+      this.env.log.warn(`PCF8574Driver.poll(). It runs before app is initialized`);
+    }
 
     console.log('------- poll');
-
-    // TODO: поидее poll не нужно выполнять до запуска init ic
-    // TODO: проверить что выполнется после setup
 
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
@@ -230,7 +230,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     if (!lastData) return;
 
-    // TODO: брать только значения input пинов!!!!!
+    // TODO: брать только значения input пинов!!!!! см writeState
     // TODO: нужно ли инвертировать???
 
     console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', lastData[0].toString(2));
@@ -239,7 +239,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
     // TODO: review old code
-    // TODO: see setAllPins
 
     // // check each input for changes
     // for(let pin = 0; pin < 8; pin++){

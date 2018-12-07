@@ -26,6 +26,7 @@ export default class System {
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
+  isInitialized: boolean = false;
   private configSetManager?: ConfigSetManager;
   // only for initialization time - it will be deleted after it
   private initializationConfig?: InitializationConfig;
@@ -77,6 +78,7 @@ export default class System {
     this.riseEvent(eventNames.system.systemServicesInitialized);
 
     await this.initApp();
+    this.isInitialized = true;
     this.riseEvent(eventNames.system.appInitialized);
 
     // remove initialization config
