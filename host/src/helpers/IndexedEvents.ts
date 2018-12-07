@@ -16,6 +16,20 @@ export default class IndexedEvents {
     return this.handlers;
   }
 
+  hasListeners() {
+    let hasInstance: boolean = false;
+
+    for (let handler of this.handlers) {
+      if (handler) {
+        hasInstance = true;
+
+        break;
+      }
+    }
+
+    return hasInstance;
+  }
+
   emit(...args: any[]) {
     for (let handler of this.handlers) {
       if (handler) handler(...args);

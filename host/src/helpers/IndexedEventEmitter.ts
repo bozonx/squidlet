@@ -38,13 +38,17 @@ export default class IndexedEventEmitter {
     if (!this.handlersById[eventName]) return;
 
     this.handlersById[eventName].removeListener(handlerIndex);
+
+    // remove instance if it doesn't have any instances
+    if (!this.handlersById[eventName].hasListeners()) {
+      this.removeAllListeners(eventName);
+    }
   }
 
   removeAllListeners(eventName: string): void {
     if (!this.handlersById[eventName]) return;
 
     this.handlersById[eventName].removeAll();
-
     delete this.handlersById[eventName];
   }
 
