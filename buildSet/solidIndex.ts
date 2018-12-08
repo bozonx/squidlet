@@ -1,6 +1,8 @@
 import HostApp from '../host/src/app/System';
 import ConfigSetSolid from '../host/src/app/config/ConfigSetSolid';
 import PlatformConfig from '../configWorks/interfaces/PlatformConfig';
+import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import {generateMasterConfigSet} from './masterStarter';
 
 // const debug = global.__DEBUG;
 // const SystemClass = System.import('host/src/System');
@@ -10,7 +12,7 @@ import PlatformConfig from '../configWorks/interfaces/PlatformConfig';
 declare const platformConfig: PlatformConfig;
 
 
-async function getPlatformSystem(platformName: string): Promise<HostApp> {
+async function getPlatformSystem(platformConfig: PlatformConfig): Promise<HostApp> {
   const system: HostApp = new HostApp();
   //const devsSet: {[index: string]: new (...params: any[]) => any} = collectDevs(platformName);
 
@@ -23,16 +25,22 @@ async function getPlatformSystem(platformName: string): Promise<HostApp> {
 }
 
 async function prepareHostSystem() {
-  const system: HostApp = new System();
+  console.info(`===> Initialize host system of platform`);
+  console.info(`--> generate master config object`);
 
+  // TODO: generate solid host config (not master)
 
-// make a system instance
-  const hostSystem: HostApp = await getPlatformSystem(platformName);
+  // generate master config js object with paths of master host configs and entities files
+  const hostConfigSet: HostFilesSet = generateMasterConfigSet();
 
-// integrate a config set
+  console.info(`--> getting host system of platform`);
+  // make a system instance
+  const hostSystem: HostApp = await getPlatformSystem(platformConfig);
+
+  // integrate a config to config set manager
   ConfigSetSolid.hostConfigSet = hostConfigSet;
 
-// register config set manager
+  // register config set manager
   hostSystem.$registerConfigSetManager(ConfigSetSolid);
 
   return hostSystem;
