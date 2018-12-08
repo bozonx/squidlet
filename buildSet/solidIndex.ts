@@ -5,22 +5,22 @@ import {prepareHostSystem} from './starterCommon';
 
 // const debug = global.__DEBUG;
 
-declare const platformDevSet: {[index: string]: new (...params: any[]) => any};
+declare const __PLATFORM_DEVS_SET: {[index: string]: new (...params: any[]) => any};
 // built host config which includes platform' host config on the bottom level
-declare const hostConfigSet: HostFilesSet;
+declare const __HOST_CONFIG_SET: HostFilesSet;
 
 
 async function getPlatformSystem(): Promise<HostApp> {
   const system: HostApp = new HostApp();
 
   console.info(`--> register platform's devs`);
-  await system.$registerDevs(platformDevSet);
+  await system.$registerDevs(__PLATFORM_DEVS_SET);
 
   return system;
 }
 
 async function init () {
-  const hostSystem: HostApp = await prepareHostSystem(getPlatformSystem, hostConfigSet, ConfigSetSolid);
+  const hostSystem: HostApp = await prepareHostSystem(getPlatformSystem, __HOST_CONFIG_SET, ConfigSetSolid);
 
   await hostSystem.start();
 }

@@ -8,7 +8,7 @@ type ExecuteResult = {execute: () => void, setters: any};
 const registeredModules: ModuleDef = {};
 
 
-global.System = {
+(global as any).System = {
   register: (moduleName: string, deps: string[], cb: (exportCb: ExportCb, context: Context) => ExecuteResult) => {
     const exportObj: ExportObj = {};
     const exportCb: ExportCb = (paramName: string, value: any) => {

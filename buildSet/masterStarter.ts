@@ -39,8 +39,8 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
 // }
 
 export default async function init (resolvedConfigPath: string) {
-  const config: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedConfigPath);
-  const main: Main = new Main(config, resolvedConfigPath);
+  const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedConfigPath);
+  const main: Main = new Main(masterConfig, resolvedConfigPath);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
   await main.collect();
@@ -51,7 +51,6 @@ export default async function init (resolvedConfigPath: string) {
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
-
   const hostSystem: HostApp = await prepareHostSystem(getPlatformSystem, hostConfigSet, ConfigSetMaster);
 
   console.info(`===> Starting master host system`);
