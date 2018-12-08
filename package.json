@@ -11,7 +11,7 @@
   "scripts": {
     "dist": "gulp dist",
     "slave": "gulp slave",
-    "solid": "gulp solid",
+    "solid": "cd buildSet; npm run solid",
     "master": "ts-node ./buildSet/masterIndex.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"

@@ -1,4 +1,3 @@
-// TODO: user requireJs
 var debug = global.__DEBUG;
 var SystemClass = global.__SYSTEM_CLASS;
 var hostConfigSet = global.__HOST_CONFIG_SET;

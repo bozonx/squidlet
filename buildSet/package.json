@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "solid": "webpack-cli --mode development --config webpack.config.js"
+    "solid": "gulp solid"
   },
   "dependencies": {},
   "devDependencies": {

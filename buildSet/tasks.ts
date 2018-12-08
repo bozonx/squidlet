@@ -1,8 +1,9 @@
 import * as path from 'path';
 import * as gulp from 'gulp';
 import * as yargs from 'yargs';
-import * as ts from 'gulp-typescript';
-import * as concat from 'gulp-concat';
+//import * as ts from 'gulp-typescript';
+const ts = require('gulp-typescript');
+//import * as concat from 'gulp-concat';
 //const rjs = require('gulp-requirejs');
 //import * as uglify from 'gulp-uglify';
 
@@ -49,40 +50,40 @@ gulp.task('slave', function () {
 });
 
 
-// // solid - build all in one file (system, host config, platform devs and config, entities files)
-// // * it receives name of host(default is master), host config like { host: ...hostParams }
-// // * it generates host configs set and put it to build
-// gulp.task('solid', async function () {
-//   if (!yargs.argv.name) {
-//     throw new Error(`You have to specify a "--name" params`);
-//   }
-//
-//   const hostId: string = yargs.argv.name || 'master';
-//   const resolvedPath: string = resolveConfigPath(yargs.argv.config);
-//   const hostConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedPath);
-//
-//   const main: Main = new Main(hostConfig, resolvedPath);
-//
-//   console.info(`===> Collecting configs and entities files of all the host`);
-//   await main.collect();
-//
-//   const hostConfigSet: HostFilesSet = {
-//     ...main.hostsFilesSet.getDefinitionsSet(hostId),
-//     config: main.masterConfig.getFinalHostConfig(hostId),
-//     entitiesSet: main.hostsFilesSet.generateDstEntitiesSet(main, hostId),
-//   };
-//
-//   const platformName: string = hostConfigSet.config.platform;
-//
-//   // TODO: global.__DEBUG
-//   // TODO: global.__SYSTEM_CLASS - use platform wrapper (возвращает промис)
-//   // TODO: global.__HOST_CONFIG_SET
-//   // TODO: global.__HOST_CONFIG_SET_MANAGER
-//   // TODO: build silidIndex.js
-//
-//   // TODO: все эти файлоы сделать через requireJs и склеить в один
-//   // TODO: так же сбилдить файлы entitites
-// });
+// solid - build all in one file (system, host config, platform devs and config, entities files)
+// * it receives name of host(default is master), host config like { host: ...hostParams }
+// * it generates host configs set and put it to build
+gulp.task('solid', async function () {
+  // if (!yargs.argv.name) {
+  //   throw new Error(`You have to specify a "--name" params`);
+  // }
+  //
+  // const hostId: string = yargs.argv.name || 'master';
+  // const resolvedPath: string = resolveConfigPath(yargs.argv.config);
+  // const hostConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedPath);
+  //
+  // const main: Main = new Main(hostConfig, resolvedPath);
+  //
+  // console.info(`===> Collecting configs and entities files of all the host`);
+  // await main.collect();
+  //
+  // const hostConfigSet: HostFilesSet = {
+  //   ...main.hostsFilesSet.getDefinitionsSet(hostId),
+  //   config: main.masterConfig.getFinalHostConfig(hostId),
+  //   entitiesSet: main.hostsFilesSet.generateDstEntitiesSet(main, hostId),
+  // };
+  //
+  // const platformName: string = hostConfigSet.config.platform;
+
+  // TODO: global.__DEBUG
+  // TODO: global.__SYSTEM_CLASS - use platform wrapper (возвращает промис)
+  // TODO: global.__HOST_CONFIG_SET
+  // TODO: global.__HOST_CONFIG_SET_MANAGER
+  // TODO: build silidIndex.js
+
+  // TODO: все эти файлоы сделать через requireJs и склеить в один
+  // TODO: так же сбилдить файлы entitites
+});
 
 
 
