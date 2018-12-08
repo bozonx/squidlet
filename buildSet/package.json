@@ -1,0 +1,28 @@
+{
+  "name": "squidlet-builder",
+  "version": "0.0.1",
+  "description": "It builds squidlet to run on misrocontroller",
+  "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
+  "repository": "git@github.com:bozonx/squidlet.git",
+  "engines": {
+    "node": ">=10.9.0"
+  },
+  "license": "MIT",
+  "scripts": {
+    "solid": "webpack-cli --mode development --config webpack.config.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/gulp": "^4.0.5",
+    "@types/gulp-typescript": "^2.13.0",
+    "@types/node": "^10.9.2",
+    "@types/source-map": "^0.5.7",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-typescript": "^5.0.0",
+    "gulpclass": "^0.2.0",
+    "source-map": "^0.7.3",
+    "ts-loader": "^5.3.1",
+    "typescript": "^3.0.1"
+  }
+}

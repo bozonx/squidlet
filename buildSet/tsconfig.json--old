@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    //"allowJs": true,
+    //"checkJs": true,
+    //"listEmittedFiles": true,
+    "experimentalDecorators": true,
+    "lib": ["ES2015"],
+    "module": "commonjs",  // commonjs
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "noImplicitReturns": true,
+    //"noUnusedLocals": true,
+    //"outFile": "build/result.js",
+    "outDir": "./builder/build",
+    "preserveSymlinks": true,
+    "removeComments": true,
+    //"sourceMap": true,
+    // for jsons
+    //"resolveJsonModule": true,
+    "rootDir": "src",
+    "strict": true,
+    "target": "es5"
+  },
+  "exclude": [
+    "./builder/build", "node_modules"
+  ],
+//  "include": [
+//    "src/**/*"
+//  ]
+}
