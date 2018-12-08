@@ -1,7 +1,4 @@
-import {
-  getPlatformSystem,
-  readConfig,
-} from './helpers';
+import {getPlatformSystem, readConfig} from './helpers';
 import System from '../host/src/app/System';
 import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
