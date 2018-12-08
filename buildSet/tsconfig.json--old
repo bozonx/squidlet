@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    //"allowJs": true,
+    "allowJs": true,
     //"checkJs": true,
     //"listEmittedFiles": true,
     "experimentalDecorators": true,
