@@ -1,0 +1,14 @@
+plugins: []
+
+hosts:
+  master:
+    platform: esp32
+    config:
+      storageDir: './masterStorage'
+
+    logger:
+
+    devices:
+      bedroom:
+        people-count-sensor:
+          device: FakePeopleCount

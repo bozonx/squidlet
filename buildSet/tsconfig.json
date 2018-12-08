@@ -23,5 +23,5 @@
   },
   "exclude": [
     "./builder/build", "node_modules"
-  ],
+  ]
 }

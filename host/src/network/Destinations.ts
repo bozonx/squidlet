@@ -101,7 +101,7 @@ export default class Destinations {
     }
   }
 
-  private handleIncomeMessages(fromDest: Destination, error: Error, payload?: any): void {
+  private handleIncomeMessages(fromDest: Destination, error: Error | null, payload?: any): void {
     this.msgEvents.emit(error, payload, fromDest);
   }
 
