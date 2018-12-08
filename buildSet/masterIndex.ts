@@ -1,8 +1,6 @@
 import * as yargs from 'yargs';
 
-import {
-  resolveConfigPath
-} from './helpers';
+import {resolveConfigPath} from './helpers';
 import masterStarter from './masterStarter';
 
 

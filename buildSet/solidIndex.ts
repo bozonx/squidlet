@@ -1,5 +1,5 @@
 var debug = global.__DEBUG;
-var SystemClass = global.__SYSTEM_CLASS;
+var SystemClass = System.import('host/src/System');
 var hostConfigSet = global.__HOST_CONFIG_SET;
 var ConfigSetManager = global.__HOST_CONFIG_SET_MANAGER;
 

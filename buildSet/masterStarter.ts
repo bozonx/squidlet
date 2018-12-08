@@ -14,6 +14,7 @@ import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
  */
 export function generateMasterConfigSet(main: Main): HostFilesSet {
   const hostId = 'master';
+
   return {
     ...main.hostsFilesSet.getDefinitionsSet(hostId),
     config: main.masterConfig.getFinalHostConfig(hostId),
