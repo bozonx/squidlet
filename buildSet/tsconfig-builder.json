@@ -5,6 +5,8 @@
     //"importHelpers": true,
     //"noLib": true,
 
+    //"baseUrl": "../host/src",
+
 
     // only listed module
     //"noResolve": true,
@@ -15,7 +17,7 @@
     //"preserveSymlinks": true,
     // for jsons
     //"resolveJsonModule": true,
-    "rootDir": "../host",
+    "rootDir": "../host/src",
     "target": "ES6",
     "sourceMap": false,
     "removeComments": true,
@@ -31,11 +33,7 @@
     "noImplicitReturns": true,
     "strict": true
   },
-//  "files": [
-//    "../host/src/app/System.ts"
-//  ],
-  "include": [
-    //"../host/src"
+  "files": [
     "../host/src/app/System.ts"
   ],
   "exclude": [

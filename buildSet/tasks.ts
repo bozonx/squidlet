@@ -1,29 +1,6 @@
 import * as gulp from 'gulp';
-import * as yargs from 'yargs';
+
 import solidTask from './solidTask';
-//import * as ts from 'gulp-typescript';
-const ts = require('gulp-typescript');
-
-
-// build system with platform
-// * slave_x86
-// * slave_rpi
-// * slave_esp8266
-// * slave_esp32
-gulp.task('dist', function () {
-  // TODO: сделать slave билд под каждую платформу
-  // TODO: интегрировать config set manager для слейва
-});
-
-
-// slave
-// * receives hostId, master config
-// * get its own network config from master config
-// * generate minimum network config
-// * make build of platform specified in config and build network config into
-gulp.task('slave', function () {
-  // TODO: самая минимальная прошивка - сама система будет загружаться с мастера
-});
 
 
 // solid - build all in one file (system, host config, platform devs and config, entities files)
@@ -32,6 +9,32 @@ gulp.task('slave', function () {
 gulp.task('solid', async function () {
   solidTask();
 });
+
+
+
+//
+//
+// // build system with platform
+// // * slave_x86
+// // * slave_rpi
+// // * slave_esp8266
+// // * slave_esp32
+// gulp.task('dist', function () {
+//   // TODO: сделать slave билд под каждую платформу
+//   // TODO: интегрировать config set manager для слейва
+// });
+//
+//
+// // slave
+// // * receives hostId, master config
+// // * get its own network config from master config
+// // * generate minimum network config
+// // * make build of platform specified in config and build network config into
+// gulp.task('slave', function () {
+//   // TODO: самая минимальная прошивка - сама система будет загружаться с мастера
+// });
+
+
 
 
 
@@ -55,7 +58,7 @@ gulp.task('solid', async function () {
 
 
 
-//  const tsProject = ts.createProject('tsconfig.json');
+//  const tsProject = ts.createProject('tsconfig-builder.json');
 // return tsProject.src()  // TODO: не билдить мастер
 //   .pipe(tsProject())
 //   .js
