@@ -1,4 +1,4 @@
-const _omit = require('lodash/omit');
+import _omit = require('lodash/omit');
 import * as path from 'path';
 
 import Main from './Main';

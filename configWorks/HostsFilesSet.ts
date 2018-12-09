@@ -1,5 +1,5 @@
 import * as path from 'path';
-const _values = require('lodash/values');
+import _values = require('lodash/values');
 
 import Main from './Main';
 import {EntitiesSet} from './interfaces/EntitySet';

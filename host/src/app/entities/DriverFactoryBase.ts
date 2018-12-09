@@ -1,5 +1,5 @@
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
+import _defaultsDeep = require('lodash/defaultsDeep');
+import _cloneDeep = require('lodash/cloneDeep');
 
 import DriverBase from './DriverBase';
 import DriverEnv from './DriverEnv';

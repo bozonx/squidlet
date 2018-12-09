@@ -1,5 +1,5 @@
-const _find = require('lodash/find');
-const _capitalize = require('lodash/capitalize');
+import _find = require('lodash/find');
+import _capitalize = require('lodash/capitalize');
 
 import IndexedEvents from '../helpers/IndexedEvents';
 import DriverEnv from '../app/entities/DriverEnv';

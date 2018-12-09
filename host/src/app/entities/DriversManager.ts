@@ -1,4 +1,4 @@
-const _capitalize = require('lodash/capitalize');
+import _capitalize = require('lodash/capitalize');
 
 import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';

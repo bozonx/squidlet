@@ -3,7 +3,7 @@
  * Handling a PCF8574/PCF8574A IC.
  */
 
-const _omit = require('lodash/omit');
+import _omit = require('lodash/omit');
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';

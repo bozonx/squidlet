@@ -1,7 +1,7 @@
 import * as path from 'path';
-const _omit = require('lodash/omit');
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
+import _omit = require('lodash/omit');
+import _defaultsDeep = require('lodash/defaultsDeep');
+import _cloneDeep = require('lodash/cloneDeep');
 
 import {ManifestsTypeName} from './interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';

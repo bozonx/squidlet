@@ -1,4 +1,4 @@
-const _omit = require('lodash/omit');
+import _omit = require('lodash/omit');
 
 import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';

@@ -1,7 +1,7 @@
-const _isEmpty = require('lodash/isEmpty');
-const _find = require('lodash/find');
-const _trim = require('lodash/trim');
-const _padStart = require('lodash/trim');
+import _isEmpty = require('lodash/isEmpty');
+import _find = require('lodash/find');
+import _trim = require('lodash/trim');
+import _padStart = require('lodash/trim');
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import * as uniqid from 'uniqid';
 

@@ -1,5 +1,4 @@
-const _trimEnd = require('lodash/trimEnd');
-
+import _trimEnd = require('lodash/trimEnd');
 import * as path from 'path';
 
 

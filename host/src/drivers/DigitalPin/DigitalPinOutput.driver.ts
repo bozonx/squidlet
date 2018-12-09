@@ -1,4 +1,4 @@
-const _omit = require('lodash/omit');
+import _omit = require('lodash/omit');
 
 import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';

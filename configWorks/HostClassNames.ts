@@ -1,7 +1,7 @@
-const _filter = require('lodash/filter');
-const _uniq = require('lodash/uniq');
-const _flatten = require('lodash/flatten');
-const _includes = require('lodash/includes');
+import _filter = require('lodash/filter');
+import _uniq = require('lodash/uniq');
+import _flatten = require('lodash/flatten');
+import _includes = require('lodash/includes');
 
 import Main from './Main';
 import {Dependencies, EntitiesNames} from './Entities';

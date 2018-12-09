@@ -1,4 +1,4 @@
-const _omit = require('lodash/omit');
+import _omit = require('lodash/omit');
 
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';

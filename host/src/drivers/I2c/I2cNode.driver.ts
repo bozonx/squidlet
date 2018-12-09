@@ -1,5 +1,5 @@
-const _omit = require('lodash/omit');
-const _isEqual = require('lodash/isEqual');
+import _omit = require('lodash/omit');
+import _isEqual = require('lodash/isEqual');
 
 import IndexedEvents from '../../helpers/IndexedEvents';
 import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';

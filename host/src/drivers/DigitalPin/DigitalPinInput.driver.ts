@@ -1,5 +1,5 @@
-const _find = require('lodash/find');
-const _omit = require('lodash/omit');
+import _find = require('lodash/find');
+import _omit = require('lodash/omit');
 
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';

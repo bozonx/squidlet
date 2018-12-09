@@ -1,4 +1,4 @@
-const _difference = require('lodash/difference');
+import _difference = require('lodash/difference');
 
 import Main from './Main';
 import {Dependencies, EntitiesNames} from './Entities';

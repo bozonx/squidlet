@@ -1,4 +1,4 @@
-const _last = require('lodash/last');
+import _last = require('lodash/last');
 
 import IndexedEvents from '../helpers/IndexedEvents';
 import Network from './Network';

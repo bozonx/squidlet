@@ -1,8 +1,8 @@
-const _defaultsDeep = require('lodash/defaultsDeep');
-const _cloneDeep = require('lodash/cloneDeep');
-const _omit = require('lodash/omit');
-const _values = require('lodash/values');
-const _isEmpty = require('lodash/isEmpty');
+import _defaultsDeep = require('lodash/defaultsDeep');
+import _cloneDeep = require('lodash/cloneDeep');
+import _omit = require('lodash/omit');
+import _values = require('lodash/values');
+import _isEmpty = require('lodash/isEmpty');
 
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';

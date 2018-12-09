@@ -1,4 +1,4 @@
-const _omit = require('lodash/omit');
+import _omit = require('lodash/omit');
 
 import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';

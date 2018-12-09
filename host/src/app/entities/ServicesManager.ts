@@ -1,4 +1,4 @@
-const _includes = require('lodash/includes');
+import _includes = require('lodash/includes');
 
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ServiceInstance from '../interfaces/ServiceInstance';

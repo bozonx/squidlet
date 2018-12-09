@@ -1,4 +1,4 @@
-const _isEmpty = require('lodash/isEmpty');
+import _isEmpty = require('lodash/isEmpty');
 
 import System from './System';
 import HostConfig from './interfaces/HostConfig';
