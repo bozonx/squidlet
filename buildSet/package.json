@@ -1,7 +1,7 @@
 {
   "name": "squidlet-builder",
   "version": "0.0.1",
-  "description": "It builds squidlet to run on misrocontroller",
+  "description": "It builds squidlet to run on micro controller",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
   "engines": {
@@ -11,19 +11,21 @@
   "scripts": {
     "solid": "gulp solid"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "@types/gulp": "^4.0.5",
-    "@types/gulp-typescript": "^2.13.0",
-    "@types/node": "^10.9.2",
-    "@types/source-map": "^0.5.7",
+  "dependencies": {
+    "shelljs": "^0.8.3",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-typescript": "^5.0.0",
     "gulpclass": "^0.2.0",
-    "source-map": "^0.7.3",
     "ts-loader": "^5.3.1",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/gulp": "^4.0.5",
+    "@types/gulp-typescript": "^2.13.0",
+    "@types/node": "^10.9.2",
+    "@types/shelljs": "^0.8.0",
+    "@types/source-map": "^0.5.7"
   }
 }

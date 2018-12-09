@@ -1,10 +1,6 @@
-import * as path from 'path';
 import * as gulp from 'gulp';
 import * as yargs from 'yargs';
-import {readConfig, resolveConfigPath} from './helpers';
-import Main from '../configWorks/Main';
-import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import solidTask from './solidTask';
 //import * as ts from 'gulp-typescript';
 const ts = require('gulp-typescript');
 
@@ -49,33 +45,7 @@ gulp.task('slave', function () {
 // * it receives name of host
 // * it generates host configs set and put it to build
 gulp.task('solid', async function () {
-  if (!yargs.argv.name) {
-    throw new Error(`You have to specify a host's "--name" param`);
-  }
-  else if (!yargs.argv.config) {
-    throw new Error(`You have to specify a master "--config" param`);
-  }
-
-  const hostId: string = yargs.argv.name;
-  const resolvedPath: string = resolveConfigPath(yargs.argv.config);
-  const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedPath);
-  const main: Main = new Main(masterConfig, resolvedPath);
-
-  console.info(`===> Collecting configs and entities files of host`);
-  await main.collect();
-
-  console.info(`===> generate master config object`);
-  const hostConfigSet: HostFilesSet = {
-    ...main.hostsFilesSet.getDefinitionsSet(hostId),
-    config: main.masterConfig.getFinalHostConfig(hostId),
-    entitiesSet: main.hostsFilesSet.generateDstEntitiesSet(main, hostId),
-  };
-
-  console.log(111111111, hostConfigSet);
-
-  // TODO: write tmp file with hostConfigSet as global to build/solid
-  // TODO: write tmp file with entities as global
-  // TODO: write tmp file with devs as global
+  solidTask();
 });
 
 
