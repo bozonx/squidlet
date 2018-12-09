@@ -1,45 +1,45 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "declaration": false,
-    //"checkJs": true,
-    //"listEmittedFiles": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
 
-    //"extendedDiagnostics": true,
     //"importHelpers": true,
+    //"noLib": true,
 
-    //"skipLibCheck": true,
 
-    "lib": ["ES2015"],
-    "module": "system",  // commonjs
-    "moduleResolution": "node",  // Classic
-    "noEmitOnError": false,
-    "noImplicitReturns": true,
+    // only listed module
+    //"noResolve": true,
+
     //"noUnusedLocals": true,
-    //"outFile": "./build/solid/result.js",
-    "outDir": "./build/solid/ts",
+    "outFile": "./build/solid/result.js",
+    //"outDir": "./build/solid/ts",
     //"preserveSymlinks": true,
-    "removeComments": true,
-    "sourceMap": false,
     // for jsons
     //"resolveJsonModule": true,
     "rootDir": "../host",
-    "strict": true,
-    "target": "ES6"
+    "target": "ES6",
+    "sourceMap": false,
+    "removeComments": true,
+
+    "noEmitOnError": false,
+    "allowJs": true,
+    //"checkJs": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "lib": ["ES2015"],
+    "module": "System",  // commonjs
+    "noImplicitReturns": true,
+    "strict": true
   },
-  "files": [
-    "../host/src/app/System.ts"
-  ],
-//  "include": [
-//    //"../host/src"
+//  "files": [
 //    "../host/src/app/System.ts"
 //  ],
+  "include": [
+    //"../host/src"
+    "../host/src/app/System.ts"
+  ],
   "exclude": [
-    "configWorks/*",
-    "../configWorks/**/*",
-    "../platforms",
+    "*/interfaces/*",
     "node_modules"
   ]
 }
