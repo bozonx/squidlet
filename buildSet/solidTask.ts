@@ -10,7 +10,6 @@ import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
-
 const buildDir = 'build/solid';
 const tmpDir = path.resolve(__dirname, buildDir, 'tmp');
 const hostConfigSetFileName = 'hostConfigSet.js';
@@ -33,30 +32,15 @@ function writeConfigSet(hostId: string, main: Main) {
 }
 
 function makeBuild() {
-  const tsProject = ts.createProject('tsconfig.json');
+  const tsProject = ts.createProject('tsconfig-builder.json');
 
-  return tsProject.src()
+  return gulp.src([
+    path.resolve(__dirname, './systemLoader.ts'),
+    tmpHostConfigSet,
+    path.resolve(__dirname, '../host/src/app/System.ts'),
+  ])
     .pipe(tsProject())
     .js.pipe(gulp.dest(path.resolve(__dirname, buildDir)));
-
-  // return gulp.src([
-  //   //path.resolve(__dirname, './systemLoader.ts'),
-  //   //tmpHostConfigSet,
-  //   //path.resolve(__dirname, '../host/src/**/*.ts'),
-  //   path.resolve(__dirname, '../host/src/app/System.ts'),
-  // ])
-  // //.pipe(concat('buildSet/node_modules/requirejs/bin/r.js'))
-  // //   .pipe(ts({
-  // //     allowJs: true,
-  // //     noImplicitAny: true,
-  // //     module: 'system',
-  // //     outFile: 'output.js',
-  // //     rootDir: path.resolve(__dirname, '../host/src'),
-  // //     lib: ['ES2015'],
-  // //   }))
-  //   .pipe(tsProject())
-  //   .js.pipe(gulp.dest(path.resolve(__dirname, buildDir)));
-  //   //.pipe(gulp.dest(path.resolve(__dirname, buildDir)));
 }
 
 export default async function () {

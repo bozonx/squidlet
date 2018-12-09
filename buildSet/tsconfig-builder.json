@@ -12,7 +12,7 @@
     //"noResolve": true,
 
     //"noUnusedLocals": true,
-    "outFile": "./build/solid/result.js",
+    "outFile": "result.js",
     //"outDir": "./build/solid/ts",
     //"preserveSymlinks": true,
     // for jsons
@@ -29,13 +29,13 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "lib": ["ES2015"],
-    "module": "System",  // commonjs
+    "module": "System",
     "noImplicitReturns": true,
     "strict": true
   },
-  "files": [
-    "../host/src/app/System.ts"
-  ],
+//  "files": [
+//    "../host/src/app/System.ts"
+//  ],
   "exclude": [
     "*/interfaces/*",
     "node_modules"

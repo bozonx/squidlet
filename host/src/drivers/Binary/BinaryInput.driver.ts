@@ -1,5 +1,4 @@
-const _omit = require('lodash/omit');
-
+import _omit = require('lodash/omit');
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
