@@ -1,27 +1,41 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "declaration": false,
     //"checkJs": true,
     //"listEmittedFiles": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    //"extendedDiagnostics": true,
+    "importHelpers": true,
+
     "lib": ["ES2015"],
-    "module": "commonjs",  // commonjs
-    "moduleResolution": "node",
+    "module": "system",  // commonjs
+    "moduleResolution": "node",  // Classic
     "noEmitOnError": false,
     "noImplicitReturns": true,
     //"noUnusedLocals": true,
-    //"outFile": "build/result.js",
-    "outDir": "./builder/build",
-    "preserveSymlinks": true,
+    //"outFile": "./build/solid/result.js",
+    "outDir": "./build/solid/ts",
+    //"preserveSymlinks": true,
     "removeComments": true,
-    //"sourceMap": true,
+    "sourceMap": false,
     // for jsons
     //"resolveJsonModule": true,
-    "rootDir": "src",
+    //"rootDir": "../host/src",
     "strict": true,
     "target": "es5"
   },
-  "exclude": [
-    "./builder/build", "node_modules"
+  "files": [
+    "../host/src/app/System.ts"
+  ],
+  "include": [
+    //"../host/src"
+    "../host/src/app/System.ts"
   ]
+//  "exclude": [
+//    "../configWorks",
+//    "node_modules"
+//  ]
 }

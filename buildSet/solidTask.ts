@@ -33,20 +33,30 @@ function writeConfigSet(hostId: string, main: Main) {
 }
 
 function makeBuild() {
-  return gulp.src([
-    path.resolve(__dirname, './systemLoader.ts'),
-    tmpHostConfigSet,
-    //'buildSet/node_modules/systemjs/dist/system.js',
-    //'buildSet/builder/src/**/*.ts'
-  ])
-  //.pipe(concat('buildSet/node_modules/requirejs/bin/r.js'))
-    .pipe(ts({
-      allowJs: true,
-      noImplicitAny: true,
-      module: 'system',
-      outFile: 'output.js'
-    }))
-    .pipe(gulp.dest(path.resolve(__dirname, buildDir)));
+  const tsProject = ts.createProject('tsconfig.json');
+
+  return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest(path.resolve(__dirname, buildDir)));
+
+  // return gulp.src([
+  //   //path.resolve(__dirname, './systemLoader.ts'),
+  //   //tmpHostConfigSet,
+  //   //path.resolve(__dirname, '../host/src/**/*.ts'),
+  //   path.resolve(__dirname, '../host/src/app/System.ts'),
+  // ])
+  // //.pipe(concat('buildSet/node_modules/requirejs/bin/r.js'))
+  // //   .pipe(ts({
+  // //     allowJs: true,
+  // //     noImplicitAny: true,
+  // //     module: 'system',
+  // //     outFile: 'output.js',
+  // //     rootDir: path.resolve(__dirname, '../host/src'),
+  // //     lib: ['ES2015'],
+  // //   }))
+  //   .pipe(tsProject())
+  //   .js.pipe(gulp.dest(path.resolve(__dirname, buildDir)));
+  //   //.pipe(gulp.dest(path.resolve(__dirname, buildDir)));
 }
 
 export default async function () {
