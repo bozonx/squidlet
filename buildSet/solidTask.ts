@@ -2,6 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as yargs from 'yargs';
 import * as shelljs from 'shelljs';
+import * as gulp from 'gulp';
+const ts = require('gulp-typescript');
 
 import {readConfig, resolveConfigPath} from './helpers';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
@@ -9,7 +11,8 @@ import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
 
-const tmpDir = path.resolve(__dirname, './build/solid/tmp');
+const buildDir = 'build/solid';
+const tmpDir = path.resolve(__dirname, buildDir, 'tmp');
 const hostConfigSetFileName = 'hostConfigSet.js';
 const tmpHostConfigSet = path.resolve(tmpDir, hostConfigSetFileName);
 
@@ -29,6 +32,22 @@ function writeConfigSet(hostId: string, main: Main) {
   fs.writeFileSync(tmpHostConfigSet, configSetContent);
 }
 
+function makeBuild() {
+  return gulp.src([
+    path.resolve(__dirname, './systemLoader.ts'),
+    tmpHostConfigSet,
+    //'buildSet/node_modules/systemjs/dist/system.js',
+    //'buildSet/builder/src/**/*.ts'
+  ])
+  //.pipe(concat('buildSet/node_modules/requirejs/bin/r.js'))
+    .pipe(ts({
+      allowJs: true,
+      noImplicitAny: true,
+      module: 'system',
+      outFile: 'output.js'
+    }))
+    .pipe(gulp.dest(path.resolve(__dirname, buildDir)));
+}
 
 export default async function () {
   if (!yargs.argv.config) {
@@ -50,4 +69,6 @@ export default async function () {
 
   // TODO: write tmp file with entities as global
   // TODO: write tmp file with devs as global
+
+  makeBuild();
 }

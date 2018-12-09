@@ -13,21 +13,6 @@ const ts = require('gulp-typescript');
 gulp.task('dist', function () {
   // TODO: сделать slave билд под каждую платформу
   // TODO: интегрировать config set manager для слейва
-
-
-  return gulp.src([
-    //'buildSet/node_modules/systemjs/dist/system.js',
-    'buildSet/systemLoader.ts',
-    'buildSet/builder/src/**/*.ts'
-  ])
-    //.pipe(concat('buildSet/node_modules/requirejs/bin/r.js'))
-    .pipe(ts({
-      allowJs: true,
-      noImplicitAny: true,
-      module: 'system',
-      outFile: 'output.js'
-    }))
-    .pipe(gulp.dest('buildSet/builder/build'));
 });
 
 
