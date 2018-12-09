@@ -37,15 +37,15 @@ export default class Register {
   }
 
   getDevicesPreManifests(): PreDeviceManifest[] {
-    return _values(this.devices.toJS());
+    return _values<any>(this.devices.toJS());
   }
 
   getDriversPreManifests(): PreDriverManifest[] {
-    return _values(this.drivers.toJS());
+    return _values<any>(this.drivers.toJS());
   }
 
   getServicesPreManifests(): PreServiceManifest[] {
-    return _values(this.services.toJS());
+    return _values<any>(this.services.toJS());
   }
 
   getRegisteringPromises(): Promise<any>[] {

@@ -100,8 +100,10 @@ export default class FsDev implements Fs {
 
   // additional
 
-  copyFile(src: string, dest: string): Promise<void> {
+  async copyFile(src: string, dest: string): Promise<void> {
     // TODO: !!! можно создать новый и удалить старый файл
+
+    return;
   }
 
 

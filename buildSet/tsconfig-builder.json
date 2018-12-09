@@ -2,6 +2,7 @@
   "compilerOptions": {
     "declaration": false,
 
+    "allowSyntheticDefaultImports": true,
     //"importHelpers": true,
     //"noLib": true,
 

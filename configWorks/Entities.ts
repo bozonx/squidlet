@@ -197,7 +197,7 @@ export default class Entities {
   private async prepareManifest<FinalManifest extends ManifestBase>(
     preManifest: PreManifestBase
   ): Promise<FinalManifest> {
-    const finalManifest: FinalManifest = _omit(
+    const finalManifest: FinalManifest = _omit<any>(
       preManifest,
       'files',
       'main',
