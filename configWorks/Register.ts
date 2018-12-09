@@ -1,8 +1,7 @@
-import {resolveIndexFile} from './helpers';
-
-const _values = require('lodash/values');
 import * as path from 'path';
+const _values = require('lodash/values');
 
+import {resolveIndexFile} from './helpers';
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
@@ -14,8 +13,8 @@ import Plugin from './interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
-import {ManifestsTypeName, ManifestsTypePluralName} from './Entities';
 import systemConfig from './configs/systemConfig';
+import {ManifestsTypeName, ManifestsTypePluralName} from './interfaces/ManifestTypes';
 
 
 /**

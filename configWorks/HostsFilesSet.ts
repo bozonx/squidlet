@@ -1,11 +1,12 @@
-const _values = require('lodash/values');
 import * as path from 'path';
+const _values = require('lodash/values');
 
 import Main from './Main';
 import {EntitiesSet} from './interfaces/EntitySet';
-import {EntitiesNames, ManifestsTypePluralName} from './Entities';
+import {EntitiesNames} from './Entities';
 import DefinitionsSet from './interfaces/DefinitionsSet';
 import {sortByIncludeInList} from './helpers';
+import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 
 
 export default class HostsFilesSet {

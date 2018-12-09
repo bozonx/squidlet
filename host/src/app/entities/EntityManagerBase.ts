@@ -1,7 +1,7 @@
 import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import Env from '../interfaces/Env';
-import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
+import {ManifestsTypePluralName} from '../../../../configWorks/interfaces/ManifestTypes';
 
 
 interface BaseEntityInstance {

@@ -1,5 +1,8 @@
-import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
+// TODO: remove
+
+
 import ManifestBase from './ManifestBase';
+import {ManifestsTypePluralName} from '../../../../configWorks/interfaces/ManifestTypes';
 
 
 export default interface ConfigSetManager {

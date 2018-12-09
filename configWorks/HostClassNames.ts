@@ -4,8 +4,9 @@ const _flatten = require('lodash/flatten');
 const _includes = require('lodash/includes');
 
 import Main from './Main';
-import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
+import {Dependencies, EntitiesNames} from './Entities';
 import PreHostConfig from './interfaces/PreHostConfig';
+import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 
 
 export default class HostClassNames {

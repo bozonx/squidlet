@@ -1,7 +1,8 @@
 const _difference = require('lodash/difference');
 
 import Main from './Main';
-import {Dependencies, EntitiesNames, ManifestsTypePluralName} from './Entities';
+import {Dependencies, EntitiesNames} from './Entities';
+import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 
 
 

@@ -5,8 +5,8 @@ import systemConfig from './systemConfig';
 import FsDev from '../interfaces/dev/Fs';
 import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
-import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ConfigSetBase from './ConfigSetBase';
+import {ManifestsTypePluralName} from '../../../../configWorks/interfaces/ManifestTypes';
 
 
 // TODO: extends ConfigSetBase

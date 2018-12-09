@@ -3,10 +3,10 @@ import * as path from 'path';
 import ConfigSetManager from '../interfaces/ConfigSetManager';
 import System from '../System';
 import {HostFilesSet} from '../interfaces/HostFilesSet';
-import {ManifestsTypePluralName} from '../../../../configWorks/Entities';
 import ManifestBase from '../interfaces/ManifestBase';
 import {EntitySet} from '../../../../configWorks/interfaces/EntitySet';
 import FsDev from '../interfaces/dev/Fs';
+import {ManifestsTypePluralName} from '../../../../configWorks/interfaces/ManifestTypes';
 
 
 /**

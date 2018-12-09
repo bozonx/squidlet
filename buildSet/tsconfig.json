@@ -8,7 +8,9 @@
     "emitDecoratorMetadata": true,
 
     //"extendedDiagnostics": true,
-    "importHelpers": true,
+    //"importHelpers": true,
+
+    //"skipLibCheck": true,
 
     "lib": ["ES2015"],
     "module": "system",  // commonjs
@@ -23,19 +25,21 @@
     "sourceMap": false,
     // for jsons
     //"resolveJsonModule": true,
-    //"rootDir": "../host/src",
+    "rootDir": "../host",
     "strict": true,
-    "target": "es5"
+    "target": "ES6"
   },
   "files": [
     "../host/src/app/System.ts"
   ],
-  "include": [
-    //"../host/src"
-    "../host/src/app/System.ts"
+//  "include": [
+//    //"../host/src"
+//    "../host/src/app/System.ts"
+//  ],
+  "exclude": [
+    "configWorks/*",
+    "../configWorks/**/*",
+    "../platforms",
+    "node_modules"
   ]
-//  "exclude": [
-//    "../configWorks",
-//    "node_modules"
-//  ]
 }

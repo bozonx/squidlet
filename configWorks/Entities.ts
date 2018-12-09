@@ -9,10 +9,7 @@ import ServiceManifest from '../host/src/app/interfaces/ServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../host/src/app/interfaces/ManifestBase';
 import systemConfig from './configs/systemConfig';
-
-
-export type ManifestsTypeName = 'device' | 'driver' | 'service';
-export type ManifestsTypePluralName = 'devices' | 'drivers' | 'services';
+import {ManifestsTypeName, ManifestsTypePluralName} from './interfaces/ManifestTypes';
 
 
 // dependencies of entities by class name
