@@ -32,7 +32,7 @@
     "experimentalDecorators": true,
     //"emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "lib": ["ES5", "ScriptHost", "ES2015"],
+    "lib": ["ES5", "ES2015.promise"],
     "target": "ES5",
     "module": "system",
     "noImplicitReturns": true,

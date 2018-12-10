@@ -40,13 +40,13 @@ export default class FsDev implements Fs {
     });
   }
 
-  async readdir(path: string): Promise<string[]> {
+  readdir(path: string): Promise<string[]> {
     let result: string[];
 
     console.log(3333333333)
 
     try {
-      result = (fs.readdir as (path: string) => string[])(path);
+      result = (fs.readdirSync as (path: string) => string[])(path);
     }
     catch (err) {
       // if directory wasn't found
@@ -55,7 +55,7 @@ export default class FsDev implements Fs {
 
     console.log(444444444, result)
 
-    return result;
+    return Promise.resolve(result);
   }
 
   readFile(path: string): Promise<string> {
