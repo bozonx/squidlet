@@ -37,12 +37,12 @@
     "moduleResolution": "node",
     "lib": ["ES2015"],
     "target": "es5",
-    "module": "amd",
+    "module": "system",
     "noImplicitReturns": true,
     "noImplicitUseStrict": true,
     "alwaysStrict": false,
     "strict": true
-  },
+  }
 //  "files": [
 //    "../host/src/app/System.ts"
 //  ]

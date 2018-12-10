@@ -1,6 +1,7 @@
 import Starter from './Starter';
 import FlashingReceiver from './FlashingReceiver';
 import LogEmitter from './LogEmitter';
+import './systemLoader';
 
 
 function init() {

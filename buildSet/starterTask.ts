@@ -8,8 +8,9 @@ const buildDir = path.resolve(__dirname, buildDirName);
 
 export default async function () {
   const tsProject = ts.createProject('tsconfig-builder.json', {
-    outDir: path.resolve(buildDir, 'ts'),
-    //rootDir: '',
+    //rootDir: [''],
+    //outDir: path.resolve(buildDir, 'ts'),
+    outFile: 'index.js',
   });
 
   return gulp.src([
