@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
 
+    //"listEmittedFiles": true,
+    //"listFiles": true,
+
     //"isolatedModules": false,
 
 //    "allowSyntheticDefaultImports": true,
@@ -35,12 +38,15 @@
     "experimentalDecorators": true,
     //"emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "lib": ["ES2015"],
-    "target": "es5",
+    "lib": ["ES5", "ScriptHost", "ES2015"],
+    "target": "ES5",
     "module": "system",
     "noImplicitReturns": true,
+
+    // this is for turning off "use strict"
     "noImplicitUseStrict": true,
     "alwaysStrict": false,
+
     "strict": true
   }
 //  "files": [

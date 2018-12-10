@@ -11,7 +11,8 @@
  */
 
 
-import * as fs from 'fs';
+//import * as fs from 'fs';
+const fs = require('fs');
 
 import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
 
@@ -39,15 +40,19 @@ export default class FsDev implements Fs {
     });
   }
 
-  readdir(path: string): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      const fn = fs.readdirSync as (path: string) => string[] | undefined;
-      const result: string[] | undefined = fn(path);
+  async readdir(path: string): Promise<string[]> {
+    // TODO: что вернет если нет директории
 
-      if (result) return resolve(result);
+    let result: string[];
 
-      reject(new Error(`Directory couldn't be listed`));
-    });
+    try {
+      result = (fs.readdirSync as (path: string) => string[])(path);
+    }
+    catch (err) {
+      throw new Error(`Directory couldn't be listed. ${String(err)}`);
+    }
+
+    return result;
   }
 
   readFile(path: string): Promise<string> {
