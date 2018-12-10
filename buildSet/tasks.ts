@@ -3,6 +3,7 @@ import * as  concat from 'gulp-concat';
 import * as path from 'path';
 
 import solidTask from './solidTask';
+import starterTask from './starterTask';
 
 
 
@@ -20,6 +21,10 @@ gulp.task('conc', async function () {
   ])
     .pipe(concat('result.js'))
     .pipe(gulp.dest(path.resolve(__dirname, './build/solid')));
+});
+
+gulp.task('starter', async function () {
+  starterTask();
 });
 
 //

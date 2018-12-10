@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-
-
 import Starter from './Starter';
 import FlashingReceiver from './FlashingReceiver';
 import LogEmitter from './LogEmitter';

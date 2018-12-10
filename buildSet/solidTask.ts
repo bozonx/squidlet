@@ -32,11 +32,13 @@ function writeConfigSet(hostId: string, main: Main) {
 }
 
 function makeBuild() {
-  const tsProject = ts.createProject('tsconfig-builder.json');
+  const tsProject = ts.createProject('tsconfig-builder.json', {
+    outDir: path.resolve(__dirname, buildDir, 'ts'),
+  });
 
   return gulp.src([
-    path.resolve(__dirname, './systemLoader.ts'),
-    tmpHostConfigSet,
+    //path.resolve(__dirname, './systemLoader.ts'),
+    //tmpHostConfigSet,
     path.resolve(__dirname, '../host/src/app/System.ts'),
   ])
     .pipe(tsProject())

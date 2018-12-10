@@ -19,7 +19,7 @@
 
     //"noUnusedLocals": true,
     //"outFile": "result.js",
-    "outDir": "./build/solid/ts",
+    //"outDir": "./build/solid/ts",
     //"preserveSymlinks": true,
     // for jsons
     //"resolveJsonModule": true,
@@ -31,8 +31,8 @@
     "noEmitOnError": false,
     "allowJs": true,
     //"checkJs": true,
-    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
     //"emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "lib": ["ES2015"],
@@ -43,9 +43,9 @@
     "alwaysStrict": false,
     "strict": true
   },
-  "files": [
-    "../host/src/app/System.ts"
-  ]
+//  "files": [
+//    "../host/src/app/System.ts"
+//  ]
 //  "include": [
 //    "../host/node_modules/lodash"
 //    //"node_modules/**/*"
