@@ -1,6 +1,9 @@
 import * as gulp from 'gulp';
+import * as  concat from 'gulp-concat';
+import * as path from 'path';
 
 import solidTask from './solidTask';
+
 
 
 // solid - build all in one file (system, host config, platform devs and config, entities files)
@@ -10,7 +13,14 @@ gulp.task('solid', async function () {
   solidTask();
 });
 
-
+gulp.task('conc', async function () {
+  gulp.src([
+    path.resolve(__dirname, './amdLoader.js'),
+    path.resolve(__dirname, './build/solid/ts/**/*')
+  ])
+    .pipe(concat('result.js'))
+    .pipe(gulp.dest(path.resolve(__dirname, './build/solid')));
+});
 
 //
 //
