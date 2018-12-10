@@ -20,12 +20,6 @@
     // only listed module
     //"noResolve": true,
 
-    //"noUnusedLocals": true,
-    //"outFile": "result.js",
-    //"outDir": "./build/solid/ts",
-    //"preserveSymlinks": true,
-    // for jsons
-    //"resolveJsonModule": true,
     //"rootDir": "../host/src",
 
     "removeComments": true,

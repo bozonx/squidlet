@@ -41,14 +41,13 @@ export default class FsDev implements Fs {
   }
 
   async readdir(path: string): Promise<string[]> {
-    // TODO: что вернет если нет директории
-
     let result: string[];
 
     try {
       result = (fs.readdirSync as (path: string) => string[])(path);
     }
     catch (err) {
+      // if directory wasn't found
       throw new Error(`Directory couldn't be listed. ${String(err)}`);
     }
 

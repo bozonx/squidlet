@@ -13,7 +13,7 @@ export default class Starter {
   }
 
   async start() {
-    const result: string[] = await this.fs.readdir('/');
+    const result: string[] = await this.fs.readdir('/aa');
 
     this.logEmitter.log(22222222, result);
   }
