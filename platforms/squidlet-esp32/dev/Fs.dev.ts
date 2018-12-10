@@ -1,5 +1,17 @@
+/**
+ * It uses FAT32 file system on connected flash card.
+ * Or you can use last 1mb of ESP32 flash by formatting it:
+ *   try {
+ *     fs.readdirSync();
+ *   } catch (e) { //'Uncaught Error: Unable to mount media : NO_FILESYSTEM'
+ *     console.log('Formatting FS - only need to do once');
+ *     E.flashFatFS({ format: true });
+ *   }
+ *
+ */
+
+
 import * as fs from 'fs';
-import {promises as fsPromises} from 'fs';
 
 import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
 
@@ -107,9 +119,9 @@ export default class FsDev implements Fs {
   }
 
 
-  rename(oldPath: string, newPath: string): Promise<void> {
+  async rename(oldPath: string, newPath: string): Promise<void> {
     // TODO: можно удалить старый файл и создать новый с тем же содержимым
-    return fsPromises.rename(oldPath, newPath);
+    //return fsPromises.rename(oldPath, newPath);
   }
 
   // TODO: add stat
