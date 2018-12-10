@@ -14,7 +14,9 @@ export default async function () {
   });
 
   return gulp.src([
+    path.resolve(__dirname, './starterMc/systemLoader.ts'),
     path.resolve(__dirname, './starterMc/index.ts'),
+    path.resolve(__dirname, './starterMc/init.js'),
   ])
     .pipe(tsProject())
     .js.pipe(gulp.dest(buildDir));

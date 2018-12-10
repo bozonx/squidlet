@@ -1,6 +1,10 @@
 export default class LogEmitter {
-  constructor() {
+  error(msg: Error) {
+    console.log(`ERROR: ${String(msg)}`);
+  }
 
+  log(...params: any[]) {
+    console.log(...params);
   }
 
 }
