@@ -60,7 +60,10 @@ gulp.task('compile-babel', () => {
         {
           targets: {
             esmodules: false,
-            node: '4.0',
+            // minimum support of promises (6.4) and classes (5.0)
+            node: '5.0',
+            // it uses unsupported arguments spread
+            //node: '6.5',
           },
           modules: 'commonjs',
           useBuiltIns: 'usage',
@@ -69,15 +72,15 @@ gulp.task('compile-babel', () => {
       plugins: [
         //'transform-remove-strict-mode',
         'transform-async-to-promises',
-      //   [
-      //     "@babel/plugin-transform-runtime",
-      //     {
-      //       // "corejs": false,
-      //       // "helpers": true,
-      //       // "regenerator": true,
-      //       "useESModules": false
-      //     }
-      //   ]
+        [
+          "@babel/plugin-transform-runtime",
+          {
+            //"corejs": true,
+            //"helpers": true,
+            // "regenerator": true,
+            "useESModules": false
+          }
+        ]
       ],
       //strictMode: false,
     }))
