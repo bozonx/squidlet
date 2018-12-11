@@ -3,11 +3,13 @@
 
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
+const babel = require('gulp-babel');
 const fs = require('fs');
 const { fork } = require('child_process');
 const path = require('path');
 const yaml = require('js-yaml');
 const _ = require('lodash');
+const log = require('fancy-log');
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 
@@ -16,9 +18,9 @@ const srcDir = './starterMc';
 const buildDirName = 'build/starter';
 const buildDir = path.resolve(__dirname, buildDirName);
 const compiledTsDir = path.join(buildDir, 'compiledTs');
-const mainJsFilePath = path.resolve(compiledTsDir, `${mainFileName}.js`);
-
-const espReadyBundleFileName = 'bundle.js';
+const compiledJsDir = path.join(buildDir, 'compiledJs');
+const mainJsFilePath = path.resolve(compiledJsDir, `${mainFileName}.js`);
+const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 
 // const distDir = './dist';
 // const appFileName = 'index.js';
@@ -30,42 +32,93 @@ const espReadyBundleFileName = 'bundle.js';
 // const userAppConfigFileName = 'app-config.user.yaml';
 
 const tsProject = ts.createProject('tsconfig-builder.json', {
+
+
   // rootDir: [path.resolve(__dirname, './starterMc')],
   // outDir: compiledTsDir,
   //outDir: 'cccc',
   //outFile: 'index.js',
 });
 
+//, ['gen-config-ts']
+gulp.task('compile-ts', () => {
 
-gulp.task('build', ['prepare-for-espruino']);
+  // const tsResult = tsProject.src().pipe(tsProject());
+  // return tsResult.js.pipe(gulp.dest(compiledTsDir));
+
+  return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest(compiledTsDir));
+});
+
+gulp.task('compile-babel', () => {
+  return gulp
+    .src(path.resolve(compiledTsDir, `**/*.js`))
+    .pipe(babel({
+      presets: [[
+        '@babel/env',
+        {
+          targets: {
+            esmodules: false,
+            node: '4.0',
+          },
+          modules: 'commonjs',
+          useBuiltIns: 'usage',
+        }
+      ]],
+      plugins: [
+        //'transform-remove-strict-mode',
+        'transform-async-to-promises',
+      //   [
+      //     "@babel/plugin-transform-runtime",
+      //     {
+      //       // "corejs": false,
+      //       // "helpers": true,
+      //       // "regenerator": true,
+      //       "useESModules": false
+      //     }
+      //   ]
+      ],
+      //strictMode: false,
+    }))
+    .pipe(gulp.dest(compiledJsDir))
+});
 
 // , 'content-to-dist'
 
-gulp.task('prepare-for-espruino', ['compile-ts'], (cb) => {
+gulp.task('prepare-for-espruino', (cb) => {
   if (!fs.existsSync(mainJsFilePath)) {
     cb('main app file does not exit ' + mainJsFilePath);
     return;
   }
 
-  let appContent = fs.readFileSync(mainJsFilePath).toString();
-  appContent = appContent.replace('Object.defineProperty(exports, "__esModule", { value: true });', '');
-  fs.writeFileSync(mainJsFilePath, appContent);
+  // TODO: review
+  // let appContent = fs.readFileSync(mainJsFilePath).toString();
+  // appContent = appContent.replace('Object.defineProperty(exports, "__esModule", { value: true });', '');
+  // fs.writeFileSync(mainJsFilePath, appContent);
 
   const buildproc = fork(
     require.resolve('espruino/bin/espruino-cli'),
-    ['--board', envConfig.board, mainJsFilePath, '-o', espReadyBundleFileName],
-    { cwd: compiledTsDir });
+    [
+      '--board', envConfig.board,
+      mainJsFilePath, '-o',
+      espReadyBundleFileName
+    ],
+    { cwd: compiledJsDir }
+  );
 
   buildproc.on('close', (code) => {
     cb();
   });
 });
 
-//, ['gen-config-ts']
-gulp.task('compile-ts', function () {
-  return tsProject.src().pipe(tsProject())
-    .js.pipe(gulp.dest(compiledTsDir));
+
+gulp.task('build', gulp.series('compile-ts', 'compile-babel', 'prepare-for-espruino'), (cb) => {
+  console.info('DONE!');
+
+  cb();
 });
+
 
 // gulp.task('content-to-dist', () => {
 //   return gulp

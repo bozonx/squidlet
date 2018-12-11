@@ -22,9 +22,9 @@
 
     //"rootDir": "../host/src",
 
-    //    // this is for turning off "use strict"
-    //    "noImplicitUseStrict": true,
-    //    "alwaysStrict": false,
+//    // this is for turning off "use strict"
+//    "noImplicitUseStrict": true,
+//    "alwaysStrict": false,
 
     "removeComments": true,
     "declaration": false,
