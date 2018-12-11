@@ -22,6 +22,10 @@
 
     //"rootDir": "../host/src",
 
+    //    // this is for turning off "use strict"
+    //    "noImplicitUseStrict": true,
+    //    "alwaysStrict": false,
+
     "removeComments": true,
     "declaration": false,
     "sourceMap": false,
@@ -32,17 +36,16 @@
     "experimentalDecorators": true,
     //"emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "lib": ["ES2015", "DOM"],
-    "target": "ES6",
+    "lib": ["ES2017", "DOM"],
+    "target": "ES2017",
     "module": "commonjs",
     "noImplicitReturns": true,
 
-//    // this is for turning off "use strict"
-//    "noImplicitUseStrict": true,
-//    "alwaysStrict": false,
-
     "strict": true
-  }
+  },
+  "include": [
+    "starterMc/**/*.ts"
+  ]
 //  "files": [
 //    "../host/src/app/System.ts"
 //  ]
