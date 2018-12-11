@@ -15,9 +15,8 @@ export default class Starter {
   async start() {
     console.log(2222222222);
     const fs = require('fs');
-    fs.readdirSync('/');
 
-    console.log(33333333);
+    console.log(33333333, fs.readdirSync('/'));
 
     //const result: string[] = await this.fs.readdir('/');
 

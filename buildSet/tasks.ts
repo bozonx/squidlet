@@ -7,6 +7,15 @@ import starterTask from './starterTask';
 
 
 
+
+
+
+
+
+
+
+
+
 // solid - build all in one file (system, host config, platform devs and config, entities files)
 // * it receives name of host. Master by default. It needs if you want to get one host from a huge master config
 // * it generates host configs set and put it to build

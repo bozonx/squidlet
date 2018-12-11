@@ -14,7 +14,7 @@ export default async function () {
   });
 
   return gulp.src([
-    path.resolve(__dirname, './starterMc/promise.js'),
+    //path.resolve(__dirname, './starterMc/promise.js'),
     path.resolve(__dirname, './starterMc/systemLoader.ts'),
     //path.resolve(__dirname, './starterMc/polyfill.ts'),
     path.resolve(__dirname, './starterMc/index.ts'),

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
 
-    //"listEmittedFiles": true,
-    //"listFiles": true,
+//    "listEmittedFiles": true,
+//    "listFiles": true,
 
     //"isolatedModules": false,
 
@@ -12,10 +12,10 @@
     //"importHelpers": true,
     //"noLib": true,
 
-    "baseUrl": ".",
-    "paths": {
-      "es6-promise": ["node_modules/es6-promise"]
-    },
+//    "baseUrl": ".",
+//    "paths": {
+//      "es6-promise": ["node_modules/es6-promise"]
+//    },
 
     // only listed module
     //"noResolve": true,
@@ -32,25 +32,25 @@
     "experimentalDecorators": true,
     //"emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "lib": ["ES5", "ES2015.promise"],
-    "target": "ES5",
-    "module": "system",
+    "lib": ["ES2015", "DOM"],
+    "target": "ES6",
+    "module": "commonjs",
     "noImplicitReturns": true,
 
-    // this is for turning off "use strict"
-    "noImplicitUseStrict": true,
-    "alwaysStrict": false,
+//    // this is for turning off "use strict"
+//    "noImplicitUseStrict": true,
+//    "alwaysStrict": false,
 
     "strict": true
-  },
+  }
 //  "files": [
 //    "../host/src/app/System.ts"
 //  ]
-  "include": [
-    //"../host/node_modules/lodash"
-    "../host/node_modules/es6-promise"
-    //"node_modules/**/*"
-  ]
+//  "include": [
+//    //"../host/node_modules/lodash"
+//    "../host/node_modules/es6-promise"
+//    //"node_modules/**/*"
+//  ]
 //  "exclude": [
 //    "*/interfaces/*"
 //    //"node_modules"

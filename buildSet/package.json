@@ -14,15 +14,18 @@
   },
   "dependencies": {
     "es6-promise": "^4.2.5",
+    "espruino": "^0.1.23",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-typescript": "^5.0.0",
     "gulpclass": "^0.2.0",
+    "lodash": "^4.17.11",
     "native-promise-only": "^0.8.1",
     "shelljs": "^0.8.3",
     "ts-loader": "^5.3.1",
     "ts-node": "^7.0.1",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "yaml": "^1.0.3"
   },
   "devDependencies": {
     "@types/es6-promise": "^3.3.0",
