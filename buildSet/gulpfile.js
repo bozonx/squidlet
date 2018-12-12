@@ -40,6 +40,11 @@ const tsProject = ts.createProject('tsconfig-builder.json', {
   //outFile: 'index.js',
 });
 
+
+// gulp.on('all',function (e, r) {
+//   console.log(1111, e,r)
+// });
+
 //, ['gen-config-ts']
 gulp.task('compile-ts', () => {
 
@@ -49,6 +54,85 @@ gulp.task('compile-ts', () => {
   return tsProject.src()
     .pipe(tsProject())
     .js.pipe(gulp.dest(compiledTsDir));
+});
+
+gulp.task('babel-ts', () => {
+  return gulp
+    .src(path.resolve(srcDir, `**/*.ts`))
+    //.src(path.resolve(srcDir, `index.ts`))
+    .pipe(babel({
+      presets: [
+        '@babel/preset-typescript',
+        // [
+        //   '@babel/env',
+        //   {
+        //     targets: {
+        //       esmodules: false,
+        //       // minimum support of promises (6.4) and classes (5.0)
+        //       //node: '5.0',
+        //       // it uses unsupported arguments spread
+        //       node: '6.5',
+        //     },
+        //     exclude: [
+        //       'transform-regenerator',
+        //       'transform-async-to-generator',
+        //       //'proposal-async-generator-functions',
+        //     ],
+        //     include: [
+        //       'transform-function-name',
+        //       'transform-arrow-functions',
+        //       'transform-for-of',
+        //       'transform-sticky-regex',
+        //       'transform-unicode-regex',
+        //       'transform-parameters',
+        //       'transform-destructuring',
+        //       'transform-block-scoping',
+        //       //'transform-regenerator',
+        //     ],
+        //     modules: 'commonjs',
+        //     //useBuiltIns: 'usage',
+        //     //debug: true,
+        //   }
+        // ],
+      ],
+      plugins: [
+        // transform-async-to-generator { "node":"5" }
+        // proposal-async-generator-functions { "node":"5" }
+        '@babel/plugin-transform-dotall-regex',
+        '@babel/plugin-proposal-unicode-property-regex',
+        '@babel/plugin-transform-sticky-regex',
+        '@babel/plugin-transform-unicode-regex',
+
+        '@babel/plugin-transform-exponentiation-operator',
+        '@babel/plugin-proposal-json-strings',
+        '@babel/plugin-proposal-optional-catch-binding',
+        '@babel/plugin-proposal-object-rest-spread',
+        '@babel/plugin-transform-destructuring',
+        '@babel/plugin-transform-function-name',
+        '@babel/plugin-transform-for-of',
+        '@babel/plugin-transform-parameters',
+        '@babel/plugin-transform-block-scoping',
+        ['@babel/plugin-transform-modules-commonjs', {
+          // removes "exports.__esModule = true;"
+          //strict: true,
+          // if true - it uses "exports.__esModule = true;"
+          loose: true,
+          //noInterop: true,
+        }],
+        [
+          "@babel/plugin-transform-runtime",
+          {
+            //"corejs": true,
+            // if false it put definition into files. If true - make requires
+            helpers: false,
+            // "regenerator": true,
+            "useESModules": false
+          }
+        ],
+        'transform-async-to-promises',
+      ],
+    }))
+    .pipe(gulp.dest(path.join(buildDir, 'babelTs')))
 });
 
 gulp.task('compile-babel', () => {
