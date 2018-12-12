@@ -5,6 +5,7 @@ import LogEmitter from './LogEmitter';
 //import omit = require('lodash/omit');
 //import omit from 'lodash/omit';
 //import * as omit from 'lodash.omit';
+//import * as lodash from 'lodash';
 
 
 function init() {
@@ -12,7 +13,7 @@ function init() {
   const starter = new Starter(logEmitter);
   //const flashingReceiver = new FlashingReceiver(logEmitter);
 
-  //console.log(1111111111, omit({a: 1, b: 2}), 'a');
+  //console.log(1111111111, lodash.omit({a: 1, b: 2}), 'a');
 
   starter.start()
     .catch((err: any) => logEmitter.error(err));
