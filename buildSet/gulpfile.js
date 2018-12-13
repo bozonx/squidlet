@@ -11,6 +11,7 @@ const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
 const log = require('fancy-log');
+const collectDependencies = require('./collectDependencies');
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 
@@ -225,6 +226,12 @@ gulp.task('prepare-for-espruino', (cb) => {
   });
 });
 
+gulp.task('dependencies', (cb) => {
+
+  // TODO: get from yargs
+
+  return collectDependencies('./starterMc/buildConfig.yaml');
+});
 
 gulp.task('build', gulp.series('compile', 'prepare-for-espruino'), (cb) => {
   console.info('DONE!');

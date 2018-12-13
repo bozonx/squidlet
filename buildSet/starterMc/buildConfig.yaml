@@ -1,7 +1,7 @@
 moduleRoots:
   - ../node_modules
 dependencies:
-  - @babel/runtime/helpers/interopRequireDefault
-  - @babel/runtime/helpers/classCallCheck
-  - @babel/runtime/helpers/createClass
-  - @babel/runtime/helpers/defineProperty
+  - '@babel/runtime/helpers/interopRequireDefault'
+  - '@babel/runtime/helpers/classCallCheck'
+  - '@babel/runtime/helpers/createClass'
+  - '@babel/runtime/helpers/defineProperty'

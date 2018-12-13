@@ -72,15 +72,15 @@ class Collect {
 
   async _buildMainFile(resolvedMainFile) {
     return new Promise((resolve, reject) => {
-      // TODO: !!!
-
+      // TODO: !!! build to one file
+      console.log(11111111, resolvedMainFile);
     });
   }
 
 }
 
 
-export default async function (buildConfigYaml, dstDir) {
+module.exports = async function (buildConfigYaml, dstDir) {
   const collect = new Collect(buildConfigYaml, dstDir);
 
   await collect.collect();
