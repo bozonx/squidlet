@@ -11,7 +11,7 @@ const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
 const log = require('fancy-log');
-const collectDependencies = require('./collectDependencies');
+const {collectDependencies, prependDepsToBundle} = require('./collectDependencies');
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 
@@ -231,10 +231,9 @@ gulp.task('prepare-for-espruino', (cb) => {
   });
 });
 
-gulp.task('dependencies', () => {
-  return collectDependencies(buildConfigYaml, dependenciesBuildDir);
-    // .then(cb)
-    // .catch(cb);
+gulp.task('dependencies', async () => {
+  await collectDependencies(buildConfigYaml, dependenciesBuildDir);
+  await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
 });
 
 gulp.task('build', gulp.series('compile', 'prepare-for-espruino'), (cb) => {

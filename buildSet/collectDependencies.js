@@ -8,7 +8,7 @@ const yaml = require('js-yaml');
 // TODO: get from yargs
 //const envConfig = yaml.load(fs.readFileSync('buildConfig.yaml'));
 
-const bundleFileName = '__bundle';
+//const bundleFileName = 'depsBundle';
 
 
 class Collect {
@@ -106,8 +106,31 @@ class Collect {
 }
 
 
-module.exports = async function (buildConfigYaml, dstDir) {
-  const collect = new Collect(buildConfigYaml, dstDir);
+module.exports = {
+  collectDependencies: async function (buildConfigYaml, dstDir) {
+    const collect = new Collect(buildConfigYaml, dstDir);
 
-  await collect.collect();
-}
+    await collect.collect();
+  },
+
+  async prependDepsToBundle(dstDir, mainBindlePath) {
+    const filesInDir = await fsPromises.readdir(dstDir)
+    let result = '';
+
+    for (let fileName of filesInDir) {
+      let preparedContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
+
+      preparedContent = preparedContent.replace(/\"/g, '\\"');
+      preparedContent = preparedContent.replace(/\n/g, '\\n');
+
+      result += `Modules.addCached("${fileName}", "${preparedContent}");\n`;
+
+    }
+
+    const mainBundleContent = await fsPromises.readFile(mainBindlePath, { encoding: 'utf8' });
+    const finalMainBundle = `${result}\n${mainBundleContent}`;
+
+    await fsPromises.writeFile(mainBindlePath, finalMainBundle);
+  },
+
+};
