@@ -1,8 +1,8 @@
-const { fork } = require('child_process');
-const path = require('path');
-const fs = require('fs');
 const gulp = require('gulp');
 const babel = require('gulp-babel');
+const fs = require('fs');
+const { fork } = require('child_process');
+const path = require('path');
 const shelljs = require('shelljs');
 const yaml = require('js-yaml');
 const esp = require("espruino");
@@ -28,6 +28,22 @@ gulp.task('compile', () => {
     .pipe(babel({
       presets: [
         '@babel/preset-typescript',
+        // [
+        //   '@babel/env',
+        //   {
+        //     targets: {
+        //       esmodules: false,
+        //       // minimum support of promises (6.4) and classes (5.0)
+        //       //node: '5.0',
+        //       // it uses unsupported arguments spread
+        //       //node: '6.5',
+        //       node: '4.0',
+        //     },
+        //     modules: 'commonjs',
+        //     //useBuiltIns: 'usage',
+        //     debug: true,
+        //   }
+        // ],
       ],
       plugins: [
         // plugins from node 4.0 env
