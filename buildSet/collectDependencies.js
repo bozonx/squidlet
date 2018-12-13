@@ -26,7 +26,7 @@ class Collect {
     for (let moduleOrFileName of this._buildConfig.dependencies) {
       const resolvedMainFile = await this._resolveModuleMainFile(moduleOrFileName);
 
-      await this._buildMainFile(resolvedMainFile);
+      await this._buildMainFile(moduleOrFileName, resolvedMainFile);
     }
 
     await this._makeDepsBundle();
@@ -83,13 +83,17 @@ class Collect {
     throw new Error(`File "${fullName}" does not exist`);
   }
 
-  async _buildMainFile(resolvedMainFile) {
+  async _buildMainFile(moduleName, resolvedMainFile) {
     return new Promise((resolve, reject) => {
-      // TODO: !!! build to one file
-      console.log('--> Building module/file', resolvedMainFile);
+      console.log(`--> Building dependency ${moduleName} - ${resolvedMainFile}`);
+
+      const safeModuleName = moduleName.replace(/\//g, '|');
 
       try {
-        shellJs.cp('-f', resolvedMainFile, this._dstDir);
+
+        // TODO: !!! use real building
+
+        shellJs.cp('-f', resolvedMainFile, path.join(this._dstDir, safeModuleName));
 
         resolve();
       }
@@ -119,11 +123,12 @@ module.exports = {
 
     for (let fileName of filesInDir) {
       let preparedContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
+      const realModuleName = fileName.replace(/\|/g, '/');
 
       preparedContent = preparedContent.replace(/\"/g, '\\"');
       preparedContent = preparedContent.replace(/\n/g, '\\n');
 
-      result += `Modules.addCached("${fileName}", "${preparedContent}");\n`;
+      result += `Modules.addCached("${realModuleName}", "${preparedContent}");\n`;
 
     }
 

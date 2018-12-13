@@ -236,7 +236,7 @@ gulp.task('dependencies', async () => {
   await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
 });
 
-gulp.task('build', gulp.series('compile', 'prepare-for-espruino'), (cb) => {
+gulp.task('build', gulp.series('compile', 'prepare-for-espruino', 'dependencies'), (cb) => {
   console.info('DONE!');
 
   cb();
