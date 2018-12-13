@@ -1,3 +1,10 @@
+src: ./starterMc
+dst: build/starter
+minimize: false
+# main file name without extension
+main: index
+prjConfig: ./starterMc/prjConfig.yaml
+
 # Port where mcu device is located
 port: /dev/ttyUSB0
 
@@ -7,4 +14,3 @@ port_speed: 115200
 board: ESP32
 #board: http://www.espruino.com/json/ESP32.json
 
-minimize: false
