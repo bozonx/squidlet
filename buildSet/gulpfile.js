@@ -212,6 +212,18 @@ gulp.task('prepare-for-espruino', (cb) => {
     return;
   }
 
+  // esp.init(() => {
+  //   Espruino.Config.BAUD_RATE = String(envConfig.port_speed);
+  //   //Espruino.Config.BLUETOOTH_LOW_ENERGY  = false;
+  //   Espruino.Config.BOARD_JSON_URL  = 'http://www.espruino.com/json/ESP32.json';
+  //   Espruino.Config.MINIFICATION_LEVEL = 'ESPRIMA';
+  //   Espruino.Config.MODULE_MINIFICATION_LEVEL = 'ESPRIMA';
+  //
+  //   esp.sendFile(envConfig.port, espReadyBundleFileName, function(err) {
+  //     cb(err);
+  //   })
+  // });
+
   // TODO: review
   // let appContent = fs.readFileSync(mainJsFilePath).toString();
   // appContent = appContent.replace('Object.defineProperty(exports, "__esModule", { value: true });', '');
@@ -219,11 +231,12 @@ gulp.task('prepare-for-espruino', (cb) => {
 
   const buildproc = fork(
     require.resolve('espruino/bin/espruino-cli'),
-    [
+    _.compact([
       '--board', envConfig.board,
+      envConfig.minimize && '-m',
       mainJsFilePath, '-o',
       espReadyBundleFileName
-    ],
+    ]),
     { cwd: compiledDir }
   );
 
@@ -247,12 +260,19 @@ gulp.task('build', gulp.series('clear', 'compile', 'prepare-for-espruino', 'depe
   cb();
 });
 
+
+// ./node_modules/.bin/espruino --board ESP32 --port /dev/ttyUSB0 -b 115200 --no-ble -m -t ./build/starter/bundle.js
 gulp.task('upload',  (cb) => {
   esp.init(() => {
     Espruino.Config.BAUD_RATE = String(envConfig.port_speed);
-    esp.sendFile(envConfig.port, espReadyBundleFileName, function() {
-      console.log('Done!');
-      cb();
+    Espruino.Config.BLUETOOTH_LOW_ENERGY  = false;
+    Espruino.Config.SET_TIME_ON_WRITE  = true;
+    Espruino.Config.BOARD_JSON_URL  = 'http://www.espruino.com/json/ESP32.json';
+    // Espruino.Config.MINIFICATION_LEVEL = 'ESPRIMA';
+    // Espruino.Config.MODULE_MINIFICATION_LEVEL = 'ESPRIMA';
+
+    esp.sendFile(envConfig.port, espReadyBundleFileName, function(err) {
+      cb(err);
     })
   });
 });
