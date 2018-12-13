@@ -21,10 +21,15 @@ const srcDirFull = path.resolve(__dirname, srcDir);
 const buildDirName = 'build/starter';
 const buildDir = path.resolve(__dirname, buildDirName);
 const compiledDir = path.join(buildDir, 'compiled');
+const dependenciesBuildDir = path.join(buildDir, 'deps');
 //const compiledTsDir = path.join(buildDir, 'compiledTs');
 //const compiledJsDir = path.join(buildDir, 'compiledJs');
 const mainJsFilePath = path.resolve(compiledDir, `${mainFileName}.js`);
 const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
+
+// TODO: get from yargs
+
+const buildConfigYaml = './starterMc/buildConfig.yaml';
 
 // const distDir = './dist';
 // const appFileName = 'index.js';
@@ -226,11 +231,10 @@ gulp.task('prepare-for-espruino', (cb) => {
   });
 });
 
-gulp.task('dependencies', (cb) => {
-
-  // TODO: get from yargs
-
-  return collectDependencies('./starterMc/buildConfig.yaml');
+gulp.task('dependencies', () => {
+  return collectDependencies(buildConfigYaml, dependenciesBuildDir);
+    // .then(cb)
+    // .catch(cb);
 });
 
 gulp.task('build', gulp.series('compile', 'prepare-for-espruino'), (cb) => {

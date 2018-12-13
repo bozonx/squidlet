@@ -1,4 +1,5 @@
 const path = require('path');
+const shellJs = require('shelljs');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const _ = require('lodash');
@@ -6,6 +7,9 @@ const yaml = require('js-yaml');
 
 // TODO: get from yargs
 //const envConfig = yaml.load(fs.readFileSync('buildConfig.yaml'));
+
+const bundleFileName = '__bundle';
+
 
 class Collect {
   constructor(buildConfigYaml, dstDir) {
@@ -17,11 +21,15 @@ class Collect {
   }
 
   async collect() {
+    shellJs.mkdir('-p', this._dstDir);
+
     for (let moduleOrFileName of this._buildConfig.dependencies) {
       const resolvedMainFile = await this._resolveModuleMainFile(moduleOrFileName);
 
       await this._buildMainFile(resolvedMainFile);
     }
+
+    await this._makeDepsBundle();
   }
 
   _validateBuildConfig() {
@@ -63,18 +71,36 @@ class Collect {
       fullName = `${moduleOrFileName}.js`;
     }
 
-    if (!fs.existsSync(fullName)) {
-      throw new Error(`File "${fullName}" does not exist`);
+    for (let root of this._buildConfig.moduleRoots) {
+      const modulesDirPath = path.resolve(path.dirname(this._buildConfigYaml), root);
+      const modulePath = path.join(modulesDirPath, fullName);
+
+      if (fs.existsSync(modulePath)) {
+        return modulePath;
+      }
     }
 
-    return fullName;
+    throw new Error(`File "${fullName}" does not exist`);
   }
 
   async _buildMainFile(resolvedMainFile) {
     return new Promise((resolve, reject) => {
       // TODO: !!! build to one file
-      console.log(11111111, resolvedMainFile);
+      console.log('--> Building module/file', resolvedMainFile);
+
+      try {
+        shellJs.cp('-f', resolvedMainFile, this._dstDir);
+
+        resolve();
+      }
+      catch (err) {
+        reject(err);
+      }
     });
+  }
+
+  async _makeDepsBundle() {
+    // TODO: place modules to Module.cache
   }
 
 }
