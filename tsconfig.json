@@ -8,7 +8,7 @@
     "noEmitOnError": false,
     "noImplicitReturns": true,
     //"noUnusedLocals": true,
-    "outDir": "build",
+    //"outDir": "build",
     "preserveSymlinks": true,
     "removeComments": true,
     "sourceMap": true,

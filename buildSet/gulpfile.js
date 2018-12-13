@@ -8,6 +8,7 @@ const fs = require('fs');
 const { fork } = require('child_process');
 const path = require('path');
 const yaml = require('js-yaml');
+const esp = require("espruino");
 const _ = require('lodash');
 const log = require('fancy-log');
 
@@ -61,7 +62,6 @@ const tsProject = ts.createProject('tsconfig-builder.json', {
 gulp.task('compile', () => {
   return gulp
     .src(path.resolve(srcDirFull, `**/*.ts`))
-    //.src(path.resolve(srcDir, `index.ts`))
     .pipe(babel({
       presets: [
         '@babel/preset-typescript',
@@ -81,30 +81,27 @@ gulp.task('compile', () => {
         //       'transform-async-to-generator',
         //       //'proposal-async-generator-functions',
         //     ],
-        //     include: [
-        //       'transform-function-name',
-        //       'transform-arrow-functions',
-        //       'transform-for-of',
-        //       'transform-sticky-regex',
-        //       'transform-unicode-regex',
-        //       'transform-parameters',
-        //       'transform-destructuring',
-        //       'transform-block-scoping',
-        //       //'transform-regenerator',
-        //     ],
+        //     // include: [
+        //     //   'transform-function-name',
+        //     //   'transform-arrow-functions',
+        //     //   'transform-for-of',
+        //     //   'transform-sticky-regex',
+        //     //   'transform-unicode-regex',
+        //     //   'transform-parameters',
+        //     //   'transform-destructuring',
+        //     //   'transform-block-scoping',
+        //     //   //'transform-regenerator',
+        //     // ],
         //     modules: 'commonjs',
         //     //useBuiltIns: 'usage',
-        //     //debug: true,
+        //     debug: true,
         //   }
         // ],
       ],
       plugins: [
-        //'@babel/plugin-transform-typescript',
-
-
-        // transform-async-to-generator { "node":"5" }
-        // proposal-async-generator-functions { "node":"5" }
-        // from node 5.0 env
+        // plugins from node 4.0 env
+        // * without "transform-arrow-functions" - they are supported on Espruino
+        // * without "transform-async-to-generator" and "proposal-async-generator-functions"
         '@babel/plugin-transform-dotall-regex',
         '@babel/plugin-proposal-unicode-property-regex',
         '@babel/plugin-transform-sticky-regex',
@@ -118,13 +115,18 @@ gulp.task('compile', () => {
         '@babel/plugin-transform-for-of',
         '@babel/plugin-transform-parameters',
         '@babel/plugin-transform-block-scoping',
+        '@babel/plugin-transform-spread',
+        '@babel/plugin-transform-object-super',
+        '@babel/plugin-transform-new-target',
+        ['@babel/plugin-proposal-class-properties', {
+          // true - don't use helpers, false - use helpers
+          //"loose": true
+        }],
+        ['@babel/plugin-transform-classes', {
+          // true - don't use helpers, false - use helpers
+          //"loose": true
+        }],
 
-
-        // ['babel-plugin-module-resolver', {
-        //   "root": [srcDirFull, 'node_modules'],
-        //   //"underscore": "lodash",
-        //   //"lodash": "underscore",
-        // }],
         ['@babel/plugin-transform-modules-commonjs', {
           // removes "exports.__esModule = true;"
           //strict: true,
@@ -132,26 +134,28 @@ gulp.task('compile', () => {
           loose: true,
           //noInterop: true,
         }],
+
+
+        //transform-arrow-functions
+
         [
           "@babel/plugin-transform-runtime",
           {
             //"corejs": true,
             // if false it put definition into files. If true - make requires
-            helpers: false,
+            //helpers: false,
             // "regenerator": true,
             "useESModules": false
           }
         ],
+
         'transform-async-to-promises',
 
-        ['@babel/plugin-proposal-class-properties', {
-          // true - don't use helpers, false - use helpers
-          "loose": true
-        }],
-        ['@babel/plugin-transform-classes', {
-          // true - don't use helpers, false - use helpers
-          "loose": true
-        }],
+        // ['babel-plugin-module-resolver', {
+        //   "root": [srcDirFull, 'node_modules'],
+        //   //"underscore": "lodash",
+        //   //"lodash": "underscore",
+        // }],
       ],
     }))
     .pipe(gulp.dest(compiledDir))
@@ -227,6 +231,17 @@ gulp.task('build', gulp.series('compile', 'prepare-for-espruino'), (cb) => {
 
   cb();
 });
+
+gulp.task('upload',  (cb) => {
+  esp.init(() => {
+    Espruino.Config.BAUD_RATE = String(envConfig.port_speed);
+    esp.sendFile(envConfig.port, espReadyBundleFileName, function() {
+      console.log('Done!');
+      cb();
+    })
+  });
+});
+
 
 
 // gulp.task('content-to-dist', () => {
