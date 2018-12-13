@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const ts = require('gulp-typescript');
 const babel = require('gulp-babel');
 const fs = require('fs');
 const { fork } = require('child_process');
@@ -22,6 +21,7 @@ const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 const buildConfigYaml = envConfig.prjConfig;
 
 
+// compile typescript and make espruino compatible javascript code
 gulp.task('compile', () => {
   return gulp
     .src(path.resolve(srcDirFull, `**/*.ts`))
@@ -39,22 +39,6 @@ gulp.task('compile', () => {
         //       //node: '6.5',
         //       node: '4.0',
         //     },
-        //     exclude: [
-        //       'transform-regenerator',
-        //       'transform-async-to-generator',
-        //       //'proposal-async-generator-functions',
-        //     ],
-        //     // include: [
-        //     //   'transform-function-name',
-        //     //   'transform-arrow-functions',
-        //     //   'transform-for-of',
-        //     //   'transform-sticky-regex',
-        //     //   'transform-unicode-regex',
-        //     //   'transform-parameters',
-        //     //   'transform-destructuring',
-        //     //   'transform-block-scoping',
-        //     //   //'transform-regenerator',
-        //     // ],
         //     modules: 'commonjs',
         //     //useBuiltIns: 'usage',
         //     debug: true,
@@ -64,7 +48,12 @@ gulp.task('compile', () => {
       plugins: [
         // plugins from node 4.0 env
         // * without "transform-arrow-functions" - they are supported on Espruino
-        // * without "transform-async-to-generator" and "proposal-async-generator-functions"
+        // * without "transform-async-to-generator", "@babel/plugin-transform-regenerator" and "proposal-async-generator-functions"
+
+        // '@babel/plugin-transform-async-to-generator',
+        // '@babel/plugin-transform-regenerator',
+        //'@babel/plugin-proposal-async-generator-functions',
+
         '@babel/plugin-transform-dotall-regex',
         '@babel/plugin-proposal-unicode-property-regex',
         '@babel/plugin-transform-sticky-regex',
@@ -81,14 +70,9 @@ gulp.task('compile', () => {
         '@babel/plugin-transform-spread',
         '@babel/plugin-transform-object-super',
         '@babel/plugin-transform-new-target',
-        ['@babel/plugin-proposal-class-properties', {
-          // true - don't use helpers, false - use helpers
-          //"loose": true
-        }],
-        ['@babel/plugin-transform-classes', {
-          // true - don't use helpers, false - use helpers
-          //"loose": true
-        }],
+        '@babel/plugin-proposal-class-properties',
+        // it isn't need for espruino 2.0, but compiler emits errors
+        '@babel/plugin-transform-classes',
 
         ['@babel/plugin-transform-modules-commonjs', {
           // removes "exports.__esModule = true;"
@@ -97,10 +81,6 @@ gulp.task('compile', () => {
           loose: true,
           //noInterop: true,
         }],
-
-
-        //transform-arrow-functions
-
         [
           "@babel/plugin-transform-runtime",
           {
@@ -113,18 +93,13 @@ gulp.task('compile', () => {
         ],
 
         'transform-async-to-promises',
-
-        // ['babel-plugin-module-resolver', {
-        //   "root": [srcDirFull, 'node_modules'],
-        //   //"underscore": "lodash",
-        //   //"lodash": "underscore",
-        // }],
       ],
     }))
     .pipe(gulp.dest(compiledDir))
 });
 
-gulp.task('prepare-for-espruino', (cb) => {
+// make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
+gulp.task('bundle', (cb) => {
   if (!fs.existsSync(mainJsFilePath)) {
     cb('main app file does not exit ' + mainJsFilePath);
     return;
@@ -146,16 +121,19 @@ gulp.task('prepare-for-espruino', (cb) => {
   });
 });
 
+// collect dependencies and write them to the beginning of bundle file
 gulp.task('dependencies', async () => {
   await collectDependencies(buildConfigYaml, dependenciesBuildDir);
   await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
 });
 
+// clear build dir
 gulp.task('clear', async () => {
   shelljs.rm('-rf', path.join(buildDir, '*'));
 });
 
-gulp.task('build', gulp.series('clear', 'compile', 'prepare-for-espruino', 'dependencies'), (cb) => {
+// full build
+gulp.task('build', gulp.series('clear', 'compile', 'bundle', 'dependencies'), (cb) => {
   console.info('DONE!');
 
   cb();
@@ -168,7 +146,7 @@ gulp.task('upload',  (cb) => {
     Espruino.Config.BAUD_RATE = String(envConfig.port_speed);
     Espruino.Config.BLUETOOTH_LOW_ENERGY  = false;
     Espruino.Config.SET_TIME_ON_WRITE  = true;
-    Espruino.Config.BOARD_JSON_URL  = 'http://www.espruino.com/json/ESP32.json';
+    Espruino.Config.BOARD_JSON_URL = `http://www.espruino.com/json/${envConfig.board}.json`;
     // Espruino.Config.MINIFICATION_LEVEL = 'ESPRIMA';
     // Espruino.Config.MODULE_MINIFICATION_LEVEL = 'ESPRIMA';
 

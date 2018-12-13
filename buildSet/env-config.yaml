@@ -12,5 +12,3 @@ port: /dev/ttyUSB0
 port_speed: 115200
 
 board: ESP32
-#board: http://www.espruino.com/json/ESP32.json
-

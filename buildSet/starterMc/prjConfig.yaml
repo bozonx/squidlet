@@ -5,3 +5,5 @@ dependencies:
   - '@babel/runtime/helpers/classCallCheck'
   - '@babel/runtime/helpers/createClass'
   - '@babel/runtime/helpers/defineProperty'
+  #- '@babel/runtime/helpers/asyncToGenerator'
+  #- '@babel/runtime/regenerator'
