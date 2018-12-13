@@ -2,7 +2,7 @@ import * as gulp from 'gulp';
 import * as  concat from 'gulp-concat';
 import * as path from 'path';
 
-import solidTask from './solidTask';
+import solidTask from '../buildSet/solidTask';
 import starterTask from './starterTask';
 
 
