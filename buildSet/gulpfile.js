@@ -65,6 +65,8 @@ gulp.task('compile', () => {
           loose: true,
           //noInterop: true,
         }],
+
+        // TODO: does it really need ?
         [
           "@babel/plugin-transform-runtime",
           {
