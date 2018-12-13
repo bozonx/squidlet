@@ -30,7 +30,7 @@ const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 
 // TODO: get from yargs
 
-const buildConfigYaml = './starterMc/buildConfig.yaml';
+const buildConfigYaml = './starterMc/prjConfig.yaml';
 
 // const distDir = './dist';
 // const appFileName = 'index.js';

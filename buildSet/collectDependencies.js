@@ -6,7 +6,7 @@ const _ = require('lodash');
 const yaml = require('js-yaml');
 
 // TODO: get from yargs
-//const envConfig = yaml.load(fs.readFileSync('buildConfig.yaml'));
+//const envConfig = yaml.load(fs.readFileSync('prjConfig.yaml'));
 
 //const bundleFileName = 'depsBundle';
 
