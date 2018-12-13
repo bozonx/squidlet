@@ -1,5 +1,5 @@
 const path = require('path');
-const shellJs = require('shelljs');
+const shelljs = require('shelljs');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const _ = require('lodash');
@@ -21,7 +21,7 @@ class Collect {
   }
 
   async collect() {
-    shellJs.mkdir('-p', this._dstDir);
+    shelljs.mkdir('-p', this._dstDir);
 
     for (let moduleOrFileName of this._buildConfig.dependencies) {
       const resolvedMainFile = await this._resolveModuleMainFile(moduleOrFileName);
@@ -93,7 +93,7 @@ class Collect {
 
         // TODO: !!! use real building
 
-        shellJs.cp('-f', resolvedMainFile, path.join(this._dstDir, safeModuleName));
+        shelljs.cp('-f', resolvedMainFile, path.join(this._dstDir, safeModuleName));
 
         resolve();
       }

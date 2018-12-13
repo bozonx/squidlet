@@ -7,6 +7,7 @@ const babel = require('gulp-babel');
 const fs = require('fs');
 const { fork } = require('child_process');
 const path = require('path');
+const shelljs = require('shelljs');
 const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
@@ -236,7 +237,11 @@ gulp.task('dependencies', async () => {
   await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
 });
 
-gulp.task('build', gulp.series('compile', 'prepare-for-espruino', 'dependencies'), (cb) => {
+gulp.task('clear', async () => {
+  shelljs.rm('-rf', path.join(buildDir, '*'));
+});
+
+gulp.task('build', gulp.series('clear', 'compile', 'prepare-for-espruino', 'dependencies'), (cb) => {
   console.info('DONE!');
 
   cb();
