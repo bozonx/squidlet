@@ -39,7 +39,7 @@ export default class FlashingReceiver {
     const systemDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs[root]}`;
     const systemFilePath: string = `${systemDir}/${relativeFilePath}`;
 
-    // TODO: наверное создать подпапку
+    // TODO: create sub dir
 
     console.log(222222222, systemFilePath);
 
