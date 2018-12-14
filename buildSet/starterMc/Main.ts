@@ -6,20 +6,20 @@ import LogEmitter from './LogEmitter';
 
 export default class Main {
   readonly config: ConfigInterface = config;
-  readonly logEmitter: LogEmitter;
+  readonly log: LogEmitter;
   private readonly starter: Starter;
   private readonly flashingReceiver: FlashingReceiver;
 
   constructor() {
-    this.logEmitter = new LogEmitter();
+    this.log = new LogEmitter();
     this.starter = new Starter(this);
     this.flashingReceiver = new FlashingReceiver(this);
   }
 
   init() {
     this.starter.start()
-      .catch((err: any) => this.logEmitter.error(err));
+      .catch((err: any) => this.log.error(err));
     this.flashingReceiver.start()
-      .catch((err: any) => this.logEmitter.error(err));
+      .catch((err: any) => this.log.error(err));
   }
 }

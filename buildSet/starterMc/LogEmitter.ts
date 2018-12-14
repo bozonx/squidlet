@@ -4,7 +4,11 @@ export default class LogEmitter {
     console.log(String(msg));
   }
 
-  log(...params: any[]) {
+  warn(...params: any[]) {
+    console.log(...params);
+  }
+
+  info(...params: any[]) {
     console.log(...params);
   }
 

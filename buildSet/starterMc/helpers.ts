@@ -1,22 +1,37 @@
 import * as fs from 'fs';
 
 
-export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) => void) {
-  // TODO: add
-  // TODO: проверить что папка существует и есть файлы
+type StatResult = {dir: boolean};
 
-  const dirs: string[] = fs.readdirSync(rootDir);
+
+export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) => void): void {
+  const currentDirs: string[] | undefined = fs.readdirSync(rootDir);
+  
+  // dir doesn't exists
+  if (!currentDirs) return;
+
+  for (let fileOrDir of currentDirs) {
+    const fileOrDirPath = `${rootDir}/${fileOrDir}`;
+    const statResult: StatResult = fs.statSync(fileOrDirPath) as any;
+
+    if (statResult.dir) {
+      // it's dir - go recursively
+      return eachFileRecursively(fileOrDirPath, cb);
+    }
+
+    // it's file
+    cb(fileOrDirPath);
+  }
+
 }
 
-export function makeModuleName(filePath: string, removeRoot: string, newRoot: string): string {
-  // TODO: add
-
+export function makeModuleName(filePath: string, rootToRemove: string, newRoot: string): string {
   let result: string = filePath;
-  const removedRoot: string[] = filePath.split(removeRoot);
+  const removedRoot: string[] = filePath.split(rootToRemove);
 
-  if (removeRoot.length > 0) {
+  if (removedRoot.length > 0) {
     // success
-    result = removeRoot[1];
+    result = removedRoot[1];
   }
 
   return `${newRoot}${result}`;
