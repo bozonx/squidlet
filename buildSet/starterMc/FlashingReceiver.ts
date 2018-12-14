@@ -1,13 +1,11 @@
-import LogEmitter from './LogEmitter';
-import FsDev from '../../platforms/squidlet-esp32/dev/Fs.dev';
+import Main from './Main';
 
 
 export default class FlashingReceiver {
-  private readonly logEmitter: LogEmitter;
-  private readonly fs: FsDev = new FsDev();
+  private readonly main: Main;
 
-  constructor(logEmitter: LogEmitter) {
-    this.logEmitter = logEmitter;
+  constructor(main: Main) {
+    this.main = main;
   }
 
   async start() {

@@ -1,19 +1,18 @@
 //import * as fs from 'fs';
 
-//import FsDev from '../../platforms/squidlet-esp32/dev/Fs.dev';
-import LogEmitter from './LogEmitter';
+import Main from './Main';
 
 
 export default class Starter {
-  private readonly logEmitter: LogEmitter;
-  //private readonly fs: FsDev = new FsDev();
+  private readonly main: Main;
 
-  constructor(logEmitter: LogEmitter) {
-    this.logEmitter = logEmitter;
+
+  constructor(main: Main) {
+    this.main = main;
   }
 
+
   async start() {
-    console.log(2222222222);
     const fs = require('fs');
 
     console.log(33333333, fs.readdirSync('/'));
