@@ -15,4 +15,18 @@ module.exports = {
 
     return `Modules.addCached("${moduleName}", "${preparedContent}");\n`;
   },
+
+  // TODO: дублируется - наверное лучше взять из starterMc/helper.ts
+  makeModuleName: (filePath, rootToRemove, newRoot) => {
+    let result = filePath;
+    const removedRoot = filePath.split(rootToRemove);
+
+    if (removedRoot.length > 0) {
+      // success
+      result = removedRoot[1];
+    }
+
+    return `${newRoot}${result}`;
+  }
+
 };

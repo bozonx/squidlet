@@ -1,9 +1,11 @@
 const dependencyTree = require('dependency-tree');
 
+const {makeModuleName} = require('./helpers');
+
 
 module.exports = {
   bundleApp: (rootDir, mainFile) => {
-    const list = dependencyTree.toList({
+    const modulesFilePaths = dependencyTree.toList({
       filename: mainFile,
       directory: rootDir,
       // exclude node_modules
@@ -12,7 +14,15 @@ module.exports = {
 
     // TODO: составить Mosules и вернуть
 
-    console.log(11111111, list)
+
+    let result = '';
+    const resolvedModulesNames = [];
+
+    for (let filePath of modulesFilePaths) {
+      resolvedModulesNames.push(makeModuleName(filePath, rootDir, 'system/host'));
+    }
+
+    console.log(11111111, modulesFilePaths, resolvedModulesNames);
   },
 
 };
