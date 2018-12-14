@@ -36,3 +36,7 @@ export function makeModuleName(filePath: string, rootToRemove: string, newRoot: 
 
   return `${newRoot}${result}`;
 }
+
+export function includes(arr: any[], itemToFind: any) {
+  return arr.indexOf(itemToFind) >= 0;
+}

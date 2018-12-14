@@ -3,6 +3,7 @@ import * as fs from 'fs';
 
 import Main from './Main';
 import {FileRoots} from './config';
+import {includes} from './helpers';
 
 
 declare const global: {
@@ -31,7 +32,7 @@ export default class FlashingReceiver {
   private flashFile = (root: FileRoots, relativeFilePath: string, content: string) => {
     const allowedRoots: string[] = Object.keys(this.main.config.systemDirs);
 
-    if (!allowedRoots.includes(root)) {
+    if (!includes(allowedRoots, root)) {
       throw new Error(`Unregistered root`);
     }
 
