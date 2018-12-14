@@ -50,11 +50,10 @@ module.exports = {
               // removes "exports.__esModule = true;"
               //strict: true,
               // if true - it uses "exports.__esModule = true;"
-              loose: true,
+              //loose: true,
               //noInterop: true,
             }],
 
-            // TODO: does it really need ?
             [
               "@babel/plugin-transform-runtime",
               {
@@ -62,7 +61,7 @@ module.exports = {
                 // if false it put definition into files. If true - make requires
                 //helpers: false,
                 // "regenerator": true,
-                "useESModules": false,
+                //"useESModules": false,
               }
             ],
 

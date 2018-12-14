@@ -22,7 +22,6 @@ const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 const buildConfigYaml = envConfig.prjConfig;
 
 
-
 gulp.task('compile', () => {
   return compileTs(srcDirFull, compiledDir);
 });
@@ -45,7 +44,8 @@ gulp.task('bundle', (cb) => {
     { cwd: compiledDir }
   );
 
-  buildproc.on('close', (code) => {
+  buildproc.on('close', async (code) => {
+    await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
     cb();
   });
 });
@@ -53,7 +53,6 @@ gulp.task('bundle', (cb) => {
 // collect dependencies and write them to the beginning of bundle file
 gulp.task('dependencies', async () => {
   await collectDependencies(buildConfigYaml, dependenciesBuildDir);
-  await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
 });
 
 // clear build dir
@@ -62,7 +61,7 @@ gulp.task('clear', async () => {
 });
 
 // full build
-gulp.task('build', gulp.series('clear', 'compile', 'bundle', 'dependencies'), (cb) => {
+gulp.task('build', gulp.series('clear', 'compile', 'dependencies', 'bundle'), (cb) => {
   console.info('DONE!');
 
   cb();
