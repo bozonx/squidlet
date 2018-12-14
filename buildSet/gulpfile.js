@@ -23,7 +23,9 @@ const buildConfigYaml = envConfig.prjConfig;
 
 
 gulp.task('sort', async () => {
-  const appBundle = bundleApp(compiledDir, mainJsFilePath);
+  const appBundle = await bundleApp(compiledDir, mainJsFilePath);
+
+  console.log(11111111,appBundle);
 
   // TODO: собырать зависимости
   // TODO: склеить bundle - сброс кэша, зависимости, основные файлы проекта, запускатель

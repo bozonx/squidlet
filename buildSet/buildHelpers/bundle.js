@@ -1,10 +1,12 @@
 const dependencyTree = require('dependency-tree');
+const fs = require('fs');
+const fsPromises = fs.promises;
 
-const {makeModuleName} = require('./helpers');
+const {makeModuleName, makeModuleCached} = require('./helpers');
 
 
 module.exports = {
-  bundleApp: (rootDir, mainFile) => {
+  bundleApp: async (rootDir, mainFile) => {
     const modulesFilePaths = dependencyTree.toList({
       filename: mainFile,
       directory: rootDir,
@@ -16,13 +18,16 @@ module.exports = {
 
 
     let result = '';
-    const resolvedModulesNames = [];
 
     for (let filePath of modulesFilePaths) {
-      resolvedModulesNames.push(makeModuleName(filePath, rootDir, 'system/host'));
+      const moduleName = makeModuleName(filePath, rootDir, 'system/host');
+      const moduleContent = await fsPromises.readFile(filePath, {encoding: 'utf8'});
+
+      result += makeModuleCached(moduleName, moduleContent);
     }
 
-    console.log(11111111, modulesFilePaths, resolvedModulesNames);
+
+    return result;
   },
 
 };
