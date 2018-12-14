@@ -1,3 +1,5 @@
+import {bundleApp} from "./buildTasks";
+
 const { fork } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -22,8 +24,12 @@ const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 const buildConfigYaml = envConfig.prjConfig;
 
 
-gulp.task('compile', () => {
-  return compileTs(srcDirFull, compiledDir);
+gulp.task('sort', async () => {
+  const appBundle = bundleApp();
+});
+
+gulp.task('compile', async () => {
+  await compileTs(srcDirFull, compiledDir);
 });
 
 // make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
