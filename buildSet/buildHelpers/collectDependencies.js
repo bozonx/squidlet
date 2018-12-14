@@ -1,3 +1,5 @@
+import {makeModuleCached, makeNormalModuleName, makeSafeModuleName} from "./helpers";
+
 const path = require('path');
 const shelljs = require('shelljs');
 const fs = require('fs');
@@ -82,7 +84,7 @@ class Collect {
     return new Promise((resolve, reject) => {
       console.log(`--> Building dependency ${moduleName} - ${resolvedMainFile}`);
 
-      const safeModuleName = moduleName.replace(/\//g, '|');
+      const safeModuleName = makeSafeModuleName(moduleName);
 
       try {
 
@@ -117,14 +119,10 @@ module.exports = {
     let result = '';
 
     for (let fileName of filesInDir) {
-      let preparedContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
-      const realModuleName = fileName.replace(/\|/g, '/');
+      const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
+      const realModuleName = makeNormalModuleName(fileName);
 
-      preparedContent = preparedContent.replace(/\"/g, '\\"');
-      preparedContent = preparedContent.replace(/\n/g, '\\n');
-
-      result += `Modules.addCached("${realModuleName}", "${preparedContent}");\n`;
-
+      result += makeModuleCached(realModuleName, moduleContent);
     }
 
     const mainBundleContent = await fsPromises.readFile(mainBindlePath, { encoding: 'utf8' });

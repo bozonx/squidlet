@@ -1,5 +1,3 @@
-import {bundleApp} from "./buildTasks";
-
 const { fork } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -10,8 +8,9 @@ const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
 
-const {collectDependencies, prependDepsToBundle} = require('./collectDependencies');
-const {compileTs} = require('./buildTasks');
+const {collectDependencies, prependDepsToBundle} = require('./buildHelpers/collectDependencies');
+const {compileTs} = require('./buildHelpers/buildTasks');
+import {bundleApp} from "./buildHelpers/bundle";
 
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
