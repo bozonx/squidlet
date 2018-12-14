@@ -5,8 +5,8 @@ import LogEmitter from './LogEmitter';
 
 
 export default class Main {
-  private readonly config: ConfigInterface = config;
-  private readonly logEmitter: LogEmitter;
+  readonly config: ConfigInterface = config;
+  readonly logEmitter: LogEmitter;
   private readonly starter: Starter;
   private readonly flashingReceiver: FlashingReceiver;
 

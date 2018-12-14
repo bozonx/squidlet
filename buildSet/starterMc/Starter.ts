@@ -1,6 +1,7 @@
-//import * as fs from 'fs';
+import * as fs from 'fs';
 
 import Main from './Main';
+import {eachFileRecursivelly} from './helpers';
 
 
 export default class Starter {
@@ -13,7 +14,11 @@ export default class Starter {
 
 
   async start() {
-    const fs = require('fs');
+    const hostDir = `${this.main.config.rootDir}/${this.main.config.hostDir}`;
+
+    eachFileRecursivelly(hostDir, (pathToFile: string) => {
+
+    });
 
     console.log(33333333, fs.readdirSync('/'));
 
