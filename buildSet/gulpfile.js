@@ -2,7 +2,6 @@ const { fork } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const gulp = require('gulp');
-const babel = require('gulp-babel');
 const shelljs = require('shelljs');
 const yaml = require('js-yaml');
 const esp = require("espruino");
@@ -10,7 +9,7 @@ const _ = require('lodash');
 
 const {collectDependencies, prependDepsToBundle} = require('./buildHelpers/collectDependencies');
 const {compileTs} = require('./buildHelpers/buildTasks');
-import {bundleApp} from "./buildHelpers/bundle";
+const {bundleApp} = require('./buildHelpers/bundle');
 
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
@@ -24,7 +23,10 @@ const buildConfigYaml = envConfig.prjConfig;
 
 
 gulp.task('sort', async () => {
-  const appBundle = bundleApp();
+  const appBundle = bundleApp(compiledDir, mainJsFilePath);
+
+  // TODO: собырать зависимости
+  // TODO: склеить bundle - сброс кэша, зависимости, основные файлы проекта, запускатель
 });
 
 gulp.task('compile', async () => {

@@ -1,11 +1,12 @@
-import {makeModuleCached, makeNormalModuleName, makeSafeModuleName} from "./helpers";
-
 const path = require('path');
 const shelljs = require('shelljs');
 const fs = require('fs');
 const fsPromises = fs.promises;
 const _ = require('lodash');
 const yaml = require('js-yaml');
+
+
+const {makeModuleCached, makeNormalModuleName, makeSafeModuleName} = require('./helpers');
 
 
 class Collect {

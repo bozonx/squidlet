@@ -3090,7 +3090,7 @@ semver@5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
 
-serialport@^7.0.2, serialport@^7.1.0:
+serialport@^7.0.2:
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/serialport/-/serialport-7.1.0.tgz#4fdb8d74a774acc6967ceef985cab87521c670e0"
   dependencies:
