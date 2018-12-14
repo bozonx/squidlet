@@ -1,9 +1,16 @@
+export type FileRoots = 'host';
+
 export interface ConfigInterface {
-  rootDir: string;
-  hostDir: string;
+  // main root on file system for al the modules
+  systemRoot: string;
+  systemDirs: {
+    host: string;
+  };
 }
 
 export default {
-  rootDir: 'system',
-  hostDir: 'host',
+  systemRoot: 'system',
+  systemDirs: {
+    host: 'host',
+  },
 };

@@ -17,9 +17,9 @@ export default class Main {
   }
 
   init() {
-    this.starter.start()
+    this.starter.init()
       .catch((err: any) => this.log.error(err));
-    this.flashingReceiver.start()
+    this.flashingReceiver.init()
       .catch((err: any) => this.log.error(err));
   }
 }

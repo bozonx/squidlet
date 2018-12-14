@@ -19,8 +19,8 @@ export default class Starter {
   }
 
 
-  async start() {
-    const hostDir = `${this.main.config.rootDir}/${this.main.config.hostDir}`;
+  async init() {
+    const hostDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs.host}`;
 
     // remove all the modules
     Modules.removeAllCached();
