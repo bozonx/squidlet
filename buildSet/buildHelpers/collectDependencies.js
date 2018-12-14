@@ -1,12 +1,13 @@
 const path = require('path');
 const shelljs = require('shelljs');
 const fs = require('fs');
-const fsPromises = fs.promises;
 const _ = require('lodash');
 const yaml = require('js-yaml');
 
-
 const {makeModuleCached, makeNormalModuleName, makeSafeModuleName} = require('./helpers');
+
+
+const fsPromises = fs.promises;
 
 
 class Collect {
@@ -115,8 +116,8 @@ module.exports = {
     await collect.collect();
   },
 
-  async prependDepsToBundle(dstDir, mainBindlePath) {
-    const filesInDir = await fsPromises.readdir(dstDir)
+  async depsBundle(dstDir) {
+    const filesInDir = await fsPromises.readdir(dstDir);
     let result = '';
 
     for (let fileName of filesInDir) {
@@ -126,10 +127,24 @@ module.exports = {
       result += makeModuleCached(realModuleName, moduleContent);
     }
 
-    const mainBundleContent = await fsPromises.readFile(mainBindlePath, { encoding: 'utf8' });
-    const finalMainBundle = `${result}\n${mainBundleContent}`;
-
-    await fsPromises.writeFile(mainBindlePath, finalMainBundle);
+    return result;
   },
+
+  // async prependDepsToBundle(dstDir, mainBindlePath) {
+  //   const filesInDir = await fsPromises.readdir(dstDir)
+  //   let result = '';
+  //
+  //   for (let fileName of filesInDir) {
+  //     const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
+  //     const realModuleName = makeNormalModuleName(fileName);
+  //
+  //     result += makeModuleCached(realModuleName, moduleContent);
+  //   }
+  //
+  //   const mainBundleContent = await fsPromises.readFile(mainBindlePath, { encoding: 'utf8' });
+  //   const finalMainBundle = `${result}\n${mainBundleContent}`;
+  //
+  //   await fsPromises.writeFile(mainBindlePath, finalMainBundle);
+  // },
 
 };

@@ -7,11 +7,12 @@ const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
 
-const {collectDependencies, prependDepsToBundle} = require('./buildHelpers/collectDependencies');
+const {collectDependencies, depsBundle} = require('./buildHelpers/collectDependencies');
 const {compileTs} = require('./buildHelpers/buildTasks');
-const {bundleApp} = require('./buildHelpers/bundle');
+const {bundleApp, makeMainBundleFile} = require('./buildHelpers/bundle');
 
 
+const fsPromises = fs.promises;
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 const srcDirFull = path.resolve(__dirname, envConfig.src);
 const buildDir = path.resolve(__dirname, envConfig.dst);
@@ -22,41 +23,44 @@ const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 const buildConfigYaml = envConfig.prjConfig;
 
 
-gulp.task('sort', async () => {
-  const appBundle = await bundleApp(compiledDir, mainJsFilePath);
-
-  console.log(11111111,appBundle);
-
-  // TODO: собырать зависимости
-  // TODO: склеить bundle - сброс кэша, зависимости, основные файлы проекта, запускатель
-});
-
 gulp.task('compile', async () => {
   await compileTs(srcDirFull, compiledDir);
 });
 
 // make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
-gulp.task('bundle', (cb) => {
+gulp.task('bundle', async () => {
   if (!fs.existsSync(mainJsFilePath)) {
-    cb('main app file does not exit ' + mainJsFilePath);
-    return;
+    throw new Error('main app file does not exit ' + mainJsFilePath);
   }
 
-  const buildproc = fork(
-    require.resolve('espruino/bin/espruino-cli'),
-    _.compact([
-      '--board', envConfig.board,
-      envConfig.minimize && '-m',
-      mainJsFilePath, '-o',
-      espReadyBundleFileName
-    ]),
-    { cwd: compiledDir }
-  );
+  const appBundled = await bundleApp(compiledDir, mainJsFilePath);
+  const depsBundled = await depsBundle(dependenciesBuildDir);
+  const mainBundle = makeMainBundleFile(depsBundled, appBundled);
 
-  buildproc.on('close', async (code) => {
-    await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
-    cb();
-  });
+  await fsPromises.writeFile(espReadyBundleFileName, mainBundle);
+
+
+  // TODO: собырать зависимости
+  // TODO: склеить bundle - сброс кэша, зависимости, основные файлы проекта, запускатель
+
+
+
+
+  // const buildproc = fork(
+  //   require.resolve('espruino/bin/espruino-cli'),
+  //   _.compact([
+  //     '--board', envConfig.board,
+  //     envConfig.minimize && '-m',
+  //     mainJsFilePath, '-o',
+  //     espReadyBundleFileName
+  //   ]),
+  //   { cwd: compiledDir }
+  // );
+  //
+  // buildproc.on('close', async (code) => {
+  //   await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
+  //   cb();
+  // });
 });
 
 // collect dependencies and write them to the beginning of bundle file

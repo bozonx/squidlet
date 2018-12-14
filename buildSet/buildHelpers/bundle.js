@@ -20,7 +20,10 @@ module.exports = {
     let result = '';
 
     for (let filePath of modulesFilePaths) {
-      const moduleName = makeModuleName(filePath, rootDir, 'system/host');
+
+      // TODO: use root from config
+
+      const moduleName = makeModuleName(filePath, rootDir, '.');
       const moduleContent = await fsPromises.readFile(filePath, {encoding: 'utf8'});
 
       result += makeModuleCached(moduleName, moduleContent);
@@ -29,5 +32,18 @@ module.exports = {
 
     return result;
   },
+
+  makeMainBundleFile(depsBundle, appBundle) {
+    let result = 'Modules.removeAllCached();\n';
+
+    result += depsBundle;
+    result += appBundle;
+
+    // TODO: получить имя модуля
+
+    result += `require("./index");`;
+
+    return result;
+  }
 
 };

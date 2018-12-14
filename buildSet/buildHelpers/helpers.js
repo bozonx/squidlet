@@ -1,6 +1,6 @@
 module.exports = {
   makeSafeModuleName: (fileName) => {
-    return fileName.replace(/\|/g, '/')
+    return fileName.replace(/\//g, '|')
   },
 
   makeNormalModuleName: (fileName) => {
@@ -25,6 +25,9 @@ module.exports = {
       // success
       result = removedRoot[1];
     }
+
+    // remove extension
+    result = result.replace(/\.js$/, '');
 
     return `${newRoot}${result}`;
   }

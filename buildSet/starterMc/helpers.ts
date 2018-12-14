@@ -34,6 +34,9 @@ export function makeModuleName(filePath: string, rootToRemove: string, newRoot: 
     result = removedRoot[1];
   }
 
+  // remove extension
+  result = result.replace(/\.js$/, '');
+
   return `${newRoot}${result}`;
 }
 
