@@ -1,4 +1,5 @@
-import * as fs from 'fs';
+//import * as fs from 'fs';
+const fs = require('fs');
 
 import Main from './Main';
 import {eachFileRecursively, makeModuleName} from './helpers';

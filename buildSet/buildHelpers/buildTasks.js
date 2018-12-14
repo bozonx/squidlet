@@ -53,6 +53,10 @@ module.exports = {
               loose: true,
               // if true - remove interop helper
               //noInterop: true,
+
+              // TODO: set via env config
+              // add/remove strict mode
+              strictMode: false,
             }],
 
             [
@@ -62,7 +66,7 @@ module.exports = {
                 // if false it put definition into files. If true - make requires
                 //helpers: false,
                 // "regenerator": true,
-                //"useESModules": false,
+                //useESModules: false,
               }
             ],
 
