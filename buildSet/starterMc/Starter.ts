@@ -19,7 +19,7 @@ export default class Starter {
   }
 
 
-  async init() {
+  init() {
     const hostDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs.host}`;
 
     // remove all the modules

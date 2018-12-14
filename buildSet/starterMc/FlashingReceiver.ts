@@ -7,7 +7,7 @@ import {includes} from './helpers';
 
 
 declare const global: {
-  FlashFile: (root: FileRoots, relativeFilePath: string, content: string) => void;
+  __flashFile: (root: FileRoots, relativeFilePath: string, content: string) => void;
 };
 
 
@@ -19,8 +19,8 @@ export default class FlashingReceiver {
     this.main = main;
   }
 
-  async init() {
-    global.FlashFile = this.flashFile;
+  init() {
+    global.__flashFile = this.flashFile;
   }
 
   /**
@@ -36,7 +36,14 @@ export default class FlashingReceiver {
       throw new Error(`Unregistered root`);
     }
 
-    const hostDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs.root}`;
+    const systemDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs[root]}`;
+    const systemFilePath: string = `${systemDir}/${relativeFilePath}`;
+
+    // TODO: наверное создать подпапку
+
+    console.log(222222222, systemFilePath);
+
+    fs.writeFileSync(systemFilePath, content);
   }
 
 }
