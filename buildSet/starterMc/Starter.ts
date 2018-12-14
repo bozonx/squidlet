@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 
 import Main from './Main';
-import {eachFileRecursivelly, makeModuleName} from './helpers';
+import {eachFileRecursively, makeModuleName} from './helpers';
 
 
 declare const Modules: {
@@ -25,20 +25,15 @@ export default class Starter {
     // remove all the modules
     Modules.removeAllCached();
 
-    eachFileRecursivelly(hostDir, (pathToFile: string) => {
+    eachFileRecursively(hostDir, (pathToFile: string) => {
       const fileContent: string = fs.readFileSync(pathToFile) as any;
       const moduleName: string = makeModuleName(pathToFile, hostDir, 'host');
 
-      console.log(1111111, pathToFile);
+      console.log(1111111, pathToFile, moduleName);
 
       Modules.addCached(moduleName, fileContent);
     });
 
-    console.log(33333333, fs.readdirSync('/'));
-
-    //const result: string[] = await this.fs.readdir('/');
-
-    //this.logEmitter.log(22222222, result);
   }
 
 }
