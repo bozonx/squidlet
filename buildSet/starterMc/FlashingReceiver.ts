@@ -39,11 +39,12 @@ export default class FlashingReceiver {
       throw new Error(`Unregistered root`);
     }
 
-    const systemDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs[root]}`;
+    // TODO: нужно ли использовать лидирующий слэш ?
+
+    const systemDir = `/${this.main.config.systemRoot}/${this.main.config.systemDirs[root]}`;
     const systemFilePath: string = `${systemDir}/${relativeFilePath}`;
 
-    // create sub dir
-
+    // create dir of file
     mkdirPLogic(
       dirname(systemFilePath),
       isExists,

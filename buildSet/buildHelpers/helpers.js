@@ -10,6 +10,7 @@ module.exports = {
   makeModuleCached: (moduleName, moduleContent) => {
     let preparedContent = moduleContent || '';
 
+    preparedContent = preparedContent.replace(/\\/g, '\\\\');
     preparedContent = preparedContent.replace(/\"/g, '\\"');
     preparedContent = preparedContent.replace(/\n/g, '\\n');
 
