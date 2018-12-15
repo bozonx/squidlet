@@ -10,6 +10,9 @@ import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
 
 
+export const PATH_SEPARATOR = '/';
+
+
 export function generateUniqId(): string {
   // TODO: почему не используется из helpers ???
   return uniqid();
@@ -330,4 +333,22 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
 
   // in other cases - use invert prop
   return invert;
+}
+
+export function isAbsolutePath(pathToDirOrFile: string): boolean {
+  return Boolean(pathToDirOrFile.match(/^\//));
+}
+
+export function dirname(pathToDirOrFile: string): string {
+  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
+
+  pathParts.pop();
+
+  return pathParts.join(PATH_SEPARATOR);
+}
+
+export function basename(pathToDirOrFile: string): string {
+  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
+
+  return pathParts[pathParts.length - 1];
 }

@@ -96,7 +96,7 @@ export class Storage extends DriverBase {
    * Make dir even parent dir doesn't exist
    */
   async mkDirP(pathToDir: string): Promise<void> {
-    // TODO: !!!!
+    // TODO: !!!! use helpers/mkdirPLogic.ts
   }
 
   /**

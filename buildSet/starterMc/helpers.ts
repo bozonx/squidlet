@@ -5,9 +5,23 @@ const fs = require('fs');
 type StatResult = {dir: boolean};
 
 
+export function isExists(fileOrDirPath: string): boolean {
+  return Boolean(fs.statSycn(fileOrDirPath));
+}
+
 export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) => void): void {
-  const currentDirs: string[] | undefined = fs.readdirSync(rootDir);
+  let currentDirs: string[] | undefined;
   
+  try {
+    currentDirs = fs.readdirSync(rootDir);
+  }
+  catch (err) {
+    throw new Error(
+      `Can't read dir "${rootDir}". Maybe it doesn't exist of you don't have FAT32 partition, ` +
+      `in this case run: E.flashFatFS({ format: true });`
+    );
+  }
+
   // dir doesn't exists
   if (!currentDirs) return;
 

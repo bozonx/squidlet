@@ -40,22 +40,14 @@ export default class FsDev implements Fs {
     });
   }
 
-  readdir(path: string): Promise<string[]> {
-    let result: string[];
-
-    console.log(3333333333)
-
+  async readdir(path: string): Promise<string[]> {
     try {
-      result = (fs.readdirSync as (path: string) => string[])(path);
+      return (fs.readdirSync as (path: string) => string[])(path);
     }
     catch (err) {
       // if directory wasn't found
-      throw new Error(`Directory couldn't be listed. ${String(err)}`);
+      throw new Error(`Directory "${path}" couldn't be listed. ${String(err)}`);
     }
-
-    console.log(444444444, result)
-
-    return Promise.resolve(result);
   }
 
   readFile(path: string): Promise<string> {

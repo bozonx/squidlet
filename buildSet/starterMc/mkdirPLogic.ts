@@ -1,5 +1,8 @@
 import _trimEnd = require('lodash/trimEnd');
-import {PATH_SEPARATOR, dirname, basename, isAbsolutePath} from './helpers';
+import * as path from 'path';
+
+
+// TODO: it's duplicate of host/helpers/mkdirPLogic.ts
 
 
 export default async function mkdirPLogic (
@@ -7,20 +10,20 @@ export default async function mkdirPLogic (
   isDirExists: (dirName: string) => Promise<boolean>,
   mkdir: (dirName: string) => Promise<void>
 ): Promise<boolean> {
-  if (!isAbsolutePath(pathToDir)) {
+  if (!path.isAbsolute(pathToDir)) {
     throw new Error(`path "${pathToDir}" has to be absolute`);
   }
 
   if (await isDirExists(pathToDir)) return false;
 
-  const preparedPath = _trimEnd(pathToDir, PATH_SEPARATOR);
+  const preparedPath = _trimEnd(pathToDir, path.sep);
 
   // path parts from closest to further
   const pathParts: string[] = [];
   let existentBasePath: string = '';
 
   async function recursionFind(localPathToDir: string) {
-    if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
+    if (!localPathToDir || localPathToDir === path.sep || localPathToDir === '~' || localPathToDir === `~${path.sep}`) {
       return;
     }
     else if (await isDirExists(localPathToDir)) {
@@ -31,8 +34,8 @@ export default async function mkdirPLogic (
     }
     else {
       // split path
-      const shorterPath = dirname(localPathToDir);
-      const lastPart = basename(localPathToDir);
+      const shorterPath = path.dirname(localPathToDir);
+      const lastPart = path.basename(localPathToDir);
 
       pathParts.push(lastPart);
 
@@ -49,8 +52,8 @@ export default async function mkdirPLogic (
   // create paths
   for (let pathIndex in pathParts.reverse()) {
     const pathPart = pathParts.slice(0, parseInt(pathIndex) + 1)
-      .join(PATH_SEPARATOR);
-    const fullPath = `${existentBasePath}${PATH_SEPARATOR}${pathPart}`;
+      .join(path.sep);
+    const fullPath = path.join(existentBasePath, pathPart);
 
     await mkdir(fullPath);
   }

@@ -2,7 +2,7 @@
 const fs = require('fs');
 
 import Main from './Main';
-import {eachFileRecursively, makeModuleName} from './helpers';
+import {eachFileRecursively, isExists, makeModuleName} from './helpers';
 
 
 declare const Modules: {
@@ -25,6 +25,15 @@ export default class Starter {
 
     // remove all the modules
     Modules.removeAllCached();
+
+    if (!isExists(hostDir)) {
+      this.main.log.error(
+        `Can't read dir "${hostDir}". Maybe it doesn't exist of you don't have FAT32 partition, ` +
+        `in this case run: E.flashFatFS({ format: true });`
+      );
+
+      return;
+    }
 
     eachFileRecursively(hostDir, (pathToFile: string) => {
       const fileContent: string = fs.readFileSync(pathToFile) as any;

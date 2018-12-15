@@ -1,5 +1,5 @@
 export default class LogEmitter {
-  error(msg: Error) {
+  error(msg: Error | string) {
     //console.log(`ERROR: ${String(msg)}`);
     console.log(String(msg));
   }
