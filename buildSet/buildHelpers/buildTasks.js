@@ -55,9 +55,9 @@ module.exports = {
               // // if true - remove interop helper
               // noInterop: true,
               //
-              // // TODO: set via env config
-              // // add/remove strict mode
-              // strictMode: false,
+              // TODO: set via env config
+              // add/remove strict mode
+              strictMode: false,
               // allowCommonJSExports: false,
               // lazy: false,
               // allowTopLevelThis: false,

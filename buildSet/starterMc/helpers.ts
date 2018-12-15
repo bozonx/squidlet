@@ -6,7 +6,7 @@ type StatResult = {dir: boolean};
 
 
 export function isExists(fileOrDirPath: string): boolean {
-  return Boolean(fs.statSycn(fileOrDirPath));
+  return Boolean(fs.statSync(fileOrDirPath));
 }
 
 export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) => void): void {

@@ -26,16 +26,16 @@ export function basename(pathToDirOrFile: string): string {
 }
 
 
-export default async function mkdirPLogic (
+export default function mkdirPLogic (
   pathToDir: string,
-  isDirExists: (dirName: string) => Promise<boolean>,
-  mkdir: (dirName: string) => Promise<void>
-): Promise<boolean> {
+  isDirExists: (dirName: string) => boolean,
+  mkdir: (dirName: string) => void
+): boolean {
   if (!isAbsolutePath(pathToDir)) {
     throw new Error(`path "${pathToDir}" has to be absolute`);
   }
 
-  if (await isDirExists(pathToDir)) return false;
+  if (isDirExists(pathToDir)) return false;
 
   const preparedPath = _trimEnd(pathToDir, PATH_SEPARATOR);
 
@@ -43,11 +43,11 @@ export default async function mkdirPLogic (
   const pathParts: string[] = [];
   let existentBasePath: string = '';
 
-  async function recursionFind(localPathToDir: string) {
+  function recursionFind(localPathToDir: string) {
     if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
       return;
     }
-    else if (await isDirExists(localPathToDir)) {
+    else if (isDirExists(localPathToDir)) {
       existentBasePath = localPathToDir;
 
       // finish of finding
@@ -61,11 +61,11 @@ export default async function mkdirPLogic (
       pathParts.push(lastPart);
 
       // go deeper
-      await recursionFind(shorterPath);
+      recursionFind(shorterPath);
     }
   }
 
-  await recursionFind(preparedPath);
+  recursionFind(preparedPath);
 
 
   if (!existentBasePath) return false;
@@ -76,7 +76,7 @@ export default async function mkdirPLogic (
       .join(PATH_SEPARATOR);
     const fullPath = `${existentBasePath}${PATH_SEPARATOR}${pathPart}`;
 
-    await mkdir(fullPath);
+    mkdir(fullPath);
   }
 
   return true;

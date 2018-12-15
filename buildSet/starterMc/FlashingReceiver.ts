@@ -32,7 +32,7 @@ export default class FlashingReceiver {
    * @param relativeFilePath {string} - file path include dirs relative root dir.
    * @param content {string} - content of file
    */
-  private flashFile = async (root: FileRoots, relativeFilePath: string, content: string) => {
+  private flashFile = (root: FileRoots, relativeFilePath: string, content: string) => {
     const allowedRoots: string[] = Object.keys(this.main.config.systemDirs);
 
     if (!includes(allowedRoots, root)) {
@@ -44,9 +44,9 @@ export default class FlashingReceiver {
 
     // create sub dir
 
-    await mkdirPLogic(
+    mkdirPLogic(
       dirname(systemFilePath),
-      async (fileOrDirPath: string) => isExists(fileOrDirPath),
+      isExists,
       fs.mkdirSync
     );
 
