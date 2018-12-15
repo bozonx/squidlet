@@ -1,10 +1,12 @@
 //import * as fs from 'fs';
+import mkdirPLogic, {dirname} from './mkdirPLogic';
+
 const fs = require('fs');
 
 
 import Main from './Main';
 import {FileRoots} from './config';
-import {includes} from './helpers';
+import {includes, isExists} from './helpers';
 
 
 declare const global: {
@@ -30,7 +32,7 @@ export default class FlashingReceiver {
    * @param relativeFilePath {string} - file path include dirs relative root dir.
    * @param content {string} - content of file
    */
-  private flashFile = (root: FileRoots, relativeFilePath: string, content: string) => {
+  private flashFile = async (root: FileRoots, relativeFilePath: string, content: string) => {
     const allowedRoots: string[] = Object.keys(this.main.config.systemDirs);
 
     if (!includes(allowedRoots, root)) {
@@ -40,7 +42,13 @@ export default class FlashingReceiver {
     const systemDir = `${this.main.config.systemRoot}/${this.main.config.systemDirs[root]}`;
     const systemFilePath: string = `${systemDir}/${relativeFilePath}`;
 
-    // TODO: create sub dir
+    // create sub dir
+
+    await mkdirPLogic(
+      dirname(systemFilePath),
+      async (fileOrDirPath: string) => isExists(fileOrDirPath),
+      fs.mkdirSync
+    );
 
     console.log(222222222, systemFilePath);
 

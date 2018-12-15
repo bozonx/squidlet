@@ -1,6 +1,7 @@
 moduleRoots:
   - ../node_modules
 dependencies:
+  - 'lodash/trimEnd'
   - '@babel/runtime/helpers/interopRequireDefault'
   - '@babel/runtime/helpers/interopRequireWildcard'
   - '@babel/runtime/helpers/createClass'
