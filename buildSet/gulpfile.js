@@ -2,6 +2,7 @@ const { fork } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const gulp = require('gulp');
+const ts = require("gulp-typescript");
 const shelljs = require('shelljs');
 const yaml = require('js-yaml');
 const esp = require("espruino");
@@ -21,6 +22,16 @@ const dependenciesBuildDir = path.join(buildDir, 'deps');
 const mainJsFilePath = path.resolve(compiledDir, `${envConfig.main}.js`);
 const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 const buildConfigYaml = envConfig.prjConfig;
+
+
+
+gulp.task('compile-ts', () => {
+  var tsProject = ts.createProject("tsconfig-builder.json");
+
+  return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest(path.join(buildDir, 'ts')));
+});
 
 
 gulp.task('compile', async () => {

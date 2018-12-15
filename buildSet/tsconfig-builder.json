@@ -1,0 +1,68 @@
+{
+  "compilerOptions": {
+
+//    "listEmittedFiles": true,
+//    "listFiles": true,
+
+
+
+    "allowSyntheticDefaultImports": true,
+
+
+    //"importHelpers": true,
+    //"noLib": true,
+
+    //"isolatedModules": false,
+
+//    "baseUrl": ".",
+//    "paths": {
+//      "es6-promise": ["node_modules/es6-promise"]
+//    },
+
+    // only listed module
+    //"noResolve": true,
+
+    //"rootDir": "../host/src",
+
+
+
+
+    // this is for turning off "use strict"
+    "noImplicitUseStrict": true,
+    "alwaysStrict": false,
+
+    // makes helper __importDefault
+    "esModuleInterop": true,
+    "removeComments": true,
+    "declaration": false,
+    "sourceMap": false,
+    "noEmitOnError": false,
+    "allowJs": true,
+    //"checkJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    //"emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "lib": ["ES2018"],
+    "target": "ES2018",
+    "module": "commonjs",
+    "noImplicitReturns": true,
+
+    "strict": true
+  },
+  "include": [
+    "starterMc/**/*.ts"
+  ]
+//  "files": [
+//    "../host/src/app/System.ts"
+//  ]
+//  "include": [
+//    //"../host/node_modules/lodash"
+//    "../host/node_modules/es6-promise"
+//    //"node_modules/**/*"
+//  ]
+//  "exclude": [
+//    "*/interfaces/*"
+//    //"node_modules"
+//  ]
+}

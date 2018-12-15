@@ -52,11 +52,14 @@ module.exports = {
               // if true - it uses "exports.__esModule = true;" instead Object.defineProperty...
               loose: true,
               // if true - remove interop helper
-              //noInterop: true,
+              noInterop: true,
 
               // TODO: set via env config
               // add/remove strict mode
               strictMode: false,
+              allowCommonJSExports: false,
+              lazy: false,
+              allowTopLevelThis: false,
             }],
 
             [
