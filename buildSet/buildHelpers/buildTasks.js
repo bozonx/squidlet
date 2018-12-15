@@ -10,11 +10,12 @@ module.exports = {
   compileTs: (srcDir, destDir) => {
     return new Promise((resolve, reject) => {
       return gulp
-        .src(path.resolve(srcDir, `**/*.ts`))
+        //.src(path.resolve(srcDir, `**/*.ts`))
+        .src(path.resolve(srcDir, `**/*.js`))
         .pipe(babel({
-          presets: [
-            '@babel/preset-typescript',
-          ],
+          // presets: [
+          //   '@babel/preset-typescript',
+          // ],
           plugins: [
             // plugins from node 4.0 env
             // * without "transform-arrow-functions" - they are supported on Espruino
@@ -47,19 +48,19 @@ module.exports = {
             '@babel/plugin-transform-classes',
 
             ['@babel/plugin-transform-modules-commonjs', {
-              // removes "exports.__esModule = true;"
-              //strict: true,
-              // if true - it uses "exports.__esModule = true;" instead Object.defineProperty...
-              loose: true,
-              // if true - remove interop helper
-              noInterop: true,
-
-              // TODO: set via env config
-              // add/remove strict mode
-              strictMode: false,
-              allowCommonJSExports: false,
-              lazy: false,
-              allowTopLevelThis: false,
+              // // removes "exports.__esModule = true;"
+              // //strict: true,
+              // // if true - it uses "exports.__esModule = true;" instead Object.defineProperty...
+              // loose: true,
+              // // if true - remove interop helper
+              // noInterop: true,
+              //
+              // // TODO: set via env config
+              // // add/remove strict mode
+              // strictMode: false,
+              // allowCommonJSExports: false,
+              // lazy: false,
+              // allowTopLevelThis: false,
             }],
 
             [

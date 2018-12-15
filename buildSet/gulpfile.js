@@ -17,25 +17,29 @@ const fsPromises = fs.promises;
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 const srcDirFull = path.resolve(__dirname, envConfig.src);
 const buildDir = path.resolve(__dirname, envConfig.dst);
-const compiledDir = path.join(buildDir, 'compiled');
+const compiledTsDir = path.join(buildDir, 'compiled-ts');
+const compiledJsDir = path.join(buildDir, 'compiled-js');
 const dependenciesBuildDir = path.join(buildDir, 'deps');
-const mainJsFilePath = path.resolve(compiledDir, `${envConfig.main}.js`);
+const mainJsFilePath = path.resolve(compiledJsDir, `${envConfig.main}.js`);
 const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
 const buildConfigYaml = envConfig.prjConfig;
 
 
 
 gulp.task('compile-ts', () => {
-  var tsProject = ts.createProject("tsconfig-builder.json");
+
+  // TODO: use srcDirFull
+
+  const tsProject = ts.createProject("tsconfig-builder.json");
 
   return tsProject.src()
     .pipe(tsProject())
-    .js.pipe(gulp.dest(path.join(buildDir, 'ts')));
+    .js.pipe(gulp.dest(compiledTsDir));
 });
 
 
-gulp.task('compile', async () => {
-  await compileTs(srcDirFull, compiledDir);
+gulp.task('compile-js', async () => {
+  await compileTs(compiledTsDir, compiledJsDir);
 });
 
 // make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
@@ -44,7 +48,7 @@ gulp.task('bundle', async () => {
     throw new Error('main app file does not exit ' + mainJsFilePath);
   }
 
-  const appBundled = await bundleApp(compiledDir, mainJsFilePath);
+  const appBundled = await bundleApp(compiledJsDir, mainJsFilePath);
   const depsBundled = await depsBundle(dependenciesBuildDir);
   const mainBundle = makeMainBundleFile(depsBundled, appBundled);
 
@@ -65,7 +69,7 @@ gulp.task('bundle', async () => {
   //     mainJsFilePath, '-o',
   //     espReadyBundleFileName
   //   ]),
-  //   { cwd: compiledDir }
+  //   { cwd: compiledJsDir }
   // );
   //
   // buildproc.on('close', async (code) => {
@@ -85,7 +89,7 @@ gulp.task('clear', async () => {
 });
 
 // full build
-gulp.task('build', gulp.series('clear', 'compile', 'dependencies', 'bundle'), (cb) => {
+gulp.task('build', gulp.series('clear', 'compile-ts', 'compile-js', 'dependencies', 'bundle'), (cb) => {
   console.info('DONE!');
 
   cb();
