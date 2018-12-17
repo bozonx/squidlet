@@ -11,7 +11,7 @@ export function isExists(fileOrDirPath: string): boolean {
 
 export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) => void): void {
   let currentDirs: string[] | undefined;
-  
+
   try {
     currentDirs = fs.readdirSync(rootDir);
   }
@@ -25,7 +25,10 @@ export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) =>
   // dir doesn't exists
   if (!currentDirs) return;
 
-  for (let fileOrDir of currentDirs) {
+  // remove "." and ".."
+  const preparedDirList = currentDirs.slice(2);
+
+  for (let fileOrDir of preparedDirList) {
     const fileOrDirPath = `${rootDir}/${fileOrDir}`;
     const statResult: StatResult = fs.statSync(fileOrDirPath) as any;
 

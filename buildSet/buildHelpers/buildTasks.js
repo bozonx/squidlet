@@ -21,6 +21,7 @@ module.exports = {
             // * without "transform-arrow-functions" - they are supported on Espruino
             // * without "transform-block-scoping"
             // * without "transform-function-name"
+            // * without "transform-for-of"
             // * without "transform-async-to-generator", "@babel/plugin-transform-regenerator" and "proposal-async-generator-functions"
 
             // '@babel/plugin-transform-async-to-generator',
@@ -32,11 +33,9 @@ module.exports = {
             '@babel/plugin-transform-sticky-regex',
             '@babel/plugin-transform-unicode-regex',
             '@babel/plugin-transform-exponentiation-operator',
-            '@babel/plugin-transform-for-of',
             '@babel/plugin-transform-object-super',
             '@babel/plugin-transform-new-target',
             '@babel/plugin-proposal-class-properties',
-
             '@babel/plugin-proposal-optional-catch-binding',
             '@babel/plugin-proposal-json-strings',
             '@babel/plugin-proposal-object-rest-spread',

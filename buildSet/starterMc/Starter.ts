@@ -39,8 +39,6 @@ export default class Starter {
       const fileContent: string = fs.readFileSync(pathToFile) as any;
       const moduleName: string = makeModuleName(pathToFile, hostDir, 'host');
 
-      console.log(111111111111, pathToFile);
-
       this.main.log.info('--> load Module', moduleName);
 
       Modules.addCached(moduleName, fileContent);
