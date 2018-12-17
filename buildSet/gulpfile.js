@@ -20,7 +20,7 @@ const starterCfg = projectConfig(envConfig.starter);
 gulp.task('build-starter', async () => {
   clearDir(starterCfg.buildDir);
   await compileTs(starterCfg.srcDir, starterCfg.compiledTsDir);
-  await compileJs(starterCfg.compiledTsDir, starterCfg.compiledJsDir);
+  await compileJs(starterCfg.compiledTsDir, starterCfg.compiledJsDir, starterCfg.strictMode);
   await collectDependencies(starterCfg.prjConfigYaml, starterCfg.dependenciesBuildDir);
   await makeBundle(
     starterCfg.compiledJsDir,

@@ -5,6 +5,7 @@ starter:
   # main ts file name without extension
   main: index
   prjConfig: ./starterMc/prjConfig.yaml
+  strictMode: false
 
 project:
   src: ../host/src
@@ -13,6 +14,7 @@ project:
   # main ts file name without extension
   main: index
   prjConfig: ../host/prjConfig.yaml
+  strictMode: false
 
 
 # Port where mcu device is located

@@ -50,9 +50,9 @@
 
     "strict": true
   },
-  "include": [
-    "starterMc/**/*.ts"
-  ]
+//  "include": [
+//    "starterMc/**/*.ts"
+//  ]
 //  "files": [
 //    "../host/src/app/System.ts"
 //  ]

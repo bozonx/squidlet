@@ -6,7 +6,7 @@ const babel = require('gulp-babel');
 /**
  * compile typescript and make espruino compatible javascript code
  */
-module.exports = function compileJs (srcDir, destDir) {
+module.exports = function compileJs (srcDir, destDir, strictMode) {
   return new Promise((resolve, reject) => {
     return gulp
       .src(path.resolve(srcDir, `**/*.js`))
@@ -52,9 +52,8 @@ module.exports = function compileJs (srcDir, destDir) {
             // // if true - remove interop helper
             // noInterop: true,
             //
-            // TODO: set via env config
             // add/remove strict mode
-            strictMode: false,
+            strictMode: strictMode,
             // allowCommonJSExports: false,
             // lazy: false,
             // allowTopLevelThis: false,

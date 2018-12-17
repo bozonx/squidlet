@@ -4,24 +4,20 @@ const shelljs = require('shelljs');
 
 module.exports = {
   projectConfig(envPrjConfig) {
-    const srcDir = path.resolve(__dirname, envPrjConfig.src);
     const buildDir = path.resolve(__dirname, envPrjConfig.dst);
     const compiledTsDir = path.join(buildDir, 'compiled-ts');
     const compiledJsDir = path.join(buildDir, 'compiled-js');
-    const dependenciesBuildDir = path.join(buildDir, 'deps');
-    const mainJsFile = path.resolve(compiledJsDir, `${envPrjConfig.main}.js`);
-    const bundleFile = path.join(buildDir, 'bundle.js');
-    const prjConfigYaml = envPrjConfig.prjConfig;
 
     return {
-      srcDir,
       buildDir,
       compiledTsDir,
       compiledJsDir,
-      dependenciesBuildDir,
-      mainJsFile,
-      bundleFile,
-      prjConfigYaml,
+      srcDir: path.resolve(__dirname, envPrjConfig.src),
+      dependenciesBuildDir: path.join(buildDir, 'deps'),
+      mainJsFile: path.resolve(compiledJsDir, `${envPrjConfig.main}.js`),
+      bundleFile: path.join(buildDir, 'bundle.js'),
+      prjConfigYaml: envPrjConfig.prjConfig,
+      strictMode: envPrjConfig.strictMode,
     };
   },
 
