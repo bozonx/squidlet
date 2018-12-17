@@ -1,5 +1,6 @@
 import _trimEnd = require('lodash/trimEnd');
 import {PATH_SEPARATOR, dirname, basename, isAbsolutePath} from './helpers';
+import {trimEnd} from '../../../buildSet/starterMc/mkdirPLogic';
 
 
 export default async function mkdirPLogic (
@@ -11,19 +12,22 @@ export default async function mkdirPLogic (
     throw new Error(`path "${pathToDir}" has to be absolute`);
   }
 
-  if (await isDirExists(pathToDir)) return false;
+  if (isDirExists(pathToDir)) return false;
 
-  const preparedPath = _trimEnd(pathToDir, PATH_SEPARATOR);
+  const preparedPath = trimEnd(pathToDir, PATH_SEPARATOR);
 
   // path parts from closest to further
   const pathParts: string[] = [];
-  let existentBasePath: string = '';
+  let existentBasePath: string = '/';
 
-  async function recursionFind(localPathToDir: string) {
-    if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
+  function recursionFind(localPathToDir: string) {
+    // TODO: why ~ - only absolute paths are supported
+    //if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
+    // skip root path
+    if (!localPathToDir || localPathToDir === PATH_SEPARATOR) {
       return;
     }
-    else if (await isDirExists(localPathToDir)) {
+    else if (isDirExists(localPathToDir)) {
       existentBasePath = localPathToDir;
 
       // finish of finding
@@ -37,14 +41,14 @@ export default async function mkdirPLogic (
       pathParts.push(lastPart);
 
       // go deeper
-      await recursionFind(shorterPath);
+      recursionFind(shorterPath);
     }
   }
 
-  await recursionFind(preparedPath);
+  recursionFind(preparedPath);
 
-
-  if (!existentBasePath) return false;
+  // TODO: why return false??
+  //if (!existentBasePath) return false;
 
   // create paths
   for (let pathIndex in pathParts.reverse()) {
@@ -52,7 +56,7 @@ export default async function mkdirPLogic (
       .join(PATH_SEPARATOR);
     const fullPath = `${existentBasePath}${PATH_SEPARATOR}${pathPart}`;
 
-    await mkdir(fullPath);
+    mkdir(fullPath);
   }
 
   return true;

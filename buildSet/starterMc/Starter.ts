@@ -28,7 +28,7 @@ export default class Starter {
 
     if (!isExists(hostDir)) {
       this.main.log.error(
-        `Can't read dir "${hostDir}". Maybe it doesn't exist of you don't have FAT32 partition, ` +
+        `Can't read dir "${hostDir}". Maybe it doesn't exist or you don't have FAT32 partition, ` +
         `in this case run: E.flashFatFS({ format: true });`
       );
 

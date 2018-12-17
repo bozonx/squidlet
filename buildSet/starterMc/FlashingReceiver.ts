@@ -1,12 +1,11 @@
 //import * as fs from 'fs';
-import mkdirPLogic, {dirname} from './mkdirPLogic';
-
 const fs = require('fs');
 
 
 import Main from './Main';
 import {FileRoots} from './config';
 import {includes, isExists} from './helpers';
+import mkdirPLogic, {dirname} from './mkdirPLogic';
 
 
 declare const global: {
@@ -51,7 +50,7 @@ export default class FlashingReceiver {
       fs.mkdirSync
     );
 
-    console.log(222222222, systemFilePath);
+    console.log(8888888888, dirname(systemFilePath), systemFilePath);
 
     fs.writeFileSync(systemFilePath, content);
   }

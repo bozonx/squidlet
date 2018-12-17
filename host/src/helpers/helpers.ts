@@ -352,3 +352,9 @@ export function basename(pathToDirOrFile: string): string {
 
   return pathParts[pathParts.length - 1];
 }
+
+export function trimEnd(stringToTrim: string, chars: string): string {
+  const regex = new RegExp(`\\${chars}+$`);
+
+  return stringToTrim.replace(regex, '');
+}

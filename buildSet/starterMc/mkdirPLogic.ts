@@ -1,11 +1,19 @@
 
 // TODO: it's duplicate of host/helpers/mkdirPLogic.ts
 
-const _trimEnd = require('lodash/trimEnd');
+//const _trimEnd = require('lodash/trimEnd');
+//import _trimEnd = require('lodash/trimEnd');
+//import _trimEnd = require('lodash.trimend/index.js');
 
 
 const PATH_SEPARATOR = '/';
 
+
+export function trimEnd(stringToTrim: string, chars: string): string {
+  const regex = new RegExp(`\\${chars}+$`);
+
+  return stringToTrim.replace(regex, '');
+}
 
 export function isAbsolutePath(pathToDirOrFile: string): boolean {
   return Boolean(pathToDirOrFile.match(/^\//));
@@ -37,14 +45,17 @@ export default function mkdirPLogic (
 
   if (isDirExists(pathToDir)) return false;
 
-  const preparedPath = _trimEnd(pathToDir, PATH_SEPARATOR);
+  const preparedPath = trimEnd(pathToDir, PATH_SEPARATOR);
 
   // path parts from closest to further
   const pathParts: string[] = [];
-  let existentBasePath: string = '';
+  let existentBasePath: string = '/';
 
   function recursionFind(localPathToDir: string) {
-    if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
+    // TODO: why ~ - only absolute paths are supported
+    //if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
+    // skip root path
+    if (!localPathToDir || localPathToDir === PATH_SEPARATOR) {
       return;
     }
     else if (isDirExists(localPathToDir)) {
@@ -67,8 +78,8 @@ export default function mkdirPLogic (
 
   recursionFind(preparedPath);
 
-
-  if (!existentBasePath) return false;
+  // TODO: why return false??
+  //if (!existentBasePath) return false;
 
   // create paths
   for (let pathIndex in pathParts.reverse()) {
