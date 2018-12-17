@@ -3,7 +3,7 @@ const fs = require('fs');
 const gulp = require('gulp');
 const yaml = require('js-yaml');
 
-const {clearDir} = require('./buildHelpers/helpers');
+const {projectConfig, clearDir} = require('./buildHelpers/helpers');
 const compileJs = require('./buildHelpers/compileJs');
 const compileTs = require('./buildHelpers/compileTs');
 const makeBundle = require('./buildHelpers/makeBundle');
@@ -13,24 +13,20 @@ const {collectDependencies} = require('./buildHelpers/collectDependencies');
 // TODO: review - make paths for project
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
-const srcDirFull = path.resolve(__dirname, envConfig.src);
-const buildDir = path.resolve(__dirname, envConfig.dst);
-const compiledTsDir = path.join(buildDir, 'compiled-ts');
-const compiledJsDir = path.join(buildDir, 'compiled-js');
-const dependenciesBuildDir = path.join(buildDir, 'deps');
-const mainJsFilePath = path.resolve(compiledJsDir, `${envConfig.main}.js`);
-const espReadyBundleFileName = path.join(buildDir, 'bundle.js');
-const buildConfigYaml = envConfig.prjConfig;
-
+const starterCfg = projectConfig(envConfig.starter);
 
 
 // build and upload starter
 gulp.task('build-starter', async () => {
-  clearDir(buildDir);
-  await compileTs(srcDirFull, compiledTsDir);
-  await compileJs(compiledTsDir, compiledJsDir);
-  await collectDependencies(buildConfigYaml, dependenciesBuildDir);
-  await makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFilePath, espReadyBundleFileName);
+  clearDir(starterCfg.buildDir);
+  await compileTs(starterCfg.srcDir, starterCfg.compiledTsDir);
+  await compileJs(starterCfg.compiledTsDir, starterCfg.compiledJsDir);
+  await collectDependencies(starterCfg.prjConfigYaml, starterCfg.dependenciesBuildDir);
+  await makeBundle(
+    starterCfg.compiledJsDir,
+    starterCfg.dependenciesBuildDir,
+    starterCfg.mainJsFile, starterCfg.bundleFile
+  );
 });
 
 gulp.task('upload-starter', async () => {
