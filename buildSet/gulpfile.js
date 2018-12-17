@@ -9,7 +9,7 @@ const _ = require('lodash');
 
 const compileJs = require('./buildHelpers/compileJs');
 const compileTs = require('./buildHelpers/compileTs');
-const {bundleApp, makeMainBundleFile} = require('./buildHelpers/bundle');
+const makeBundle = require('./buildHelpers/makeBundle');
 const {collectDependencies, depsBundle} = require('./buildHelpers/collectDependencies');
 
 
@@ -33,6 +33,8 @@ const buildConfigYaml = envConfig.prjConfig;
 gulp.task('starter', async () => {
   await compileTs(srcDirFull, compiledTsDir);
   await compileJs(compiledTsDir, compiledJsDir);
+  await collectDependencies(buildConfigYaml, dependenciesBuildDir);
+  await makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFilePath, espReadyBundleFileName);
 });
 
 // build and upload project
@@ -57,49 +59,6 @@ gulp.task('upload', async () => {
 
 
 
-
-/////////////////////////////
-
-// make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
-gulp.task('bundle', async () => {
-  if (!fs.existsSync(mainJsFilePath)) {
-    throw new Error('main app file does not exit ' + mainJsFilePath);
-  }
-
-  const appBundled = await bundleApp(compiledJsDir, mainJsFilePath);
-  const depsBundled = await depsBundle(dependenciesBuildDir);
-  const mainBundle = makeMainBundleFile(depsBundled, appBundled);
-
-  await fsPromises.writeFile(espReadyBundleFileName, mainBundle);
-
-
-  // TODO: собырать зависимости
-  // TODO: склеить bundle - сброс кэша, зависимости, основные файлы проекта, запускатель
-
-
-
-
-  // const buildproc = fork(
-  //   require.resolve('espruino/bin/espruino-cli'),
-  //   _.compact([
-  //     '--board', envConfig.board,
-  //     envConfig.minimize && '-m',
-  //     mainJsFilePath, '-o',
-  //     espReadyBundleFileName
-  //   ]),
-  //   { cwd: compiledJsDir }
-  // );
-  //
-  // buildproc.on('close', async (code) => {
-  //   await prependDepsToBundle(dependenciesBuildDir, espReadyBundleFileName);
-  //   cb();
-  // });
-});
-
-// collect dependencies and write them to the beginning of bundle file
-gulp.task('dependencies', async () => {
-  await collectDependencies(buildConfigYaml, dependenciesBuildDir);
-});
 
 // clear build dir
 gulp.task('clear', async () => {

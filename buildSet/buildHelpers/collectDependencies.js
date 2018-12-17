@@ -10,6 +10,9 @@ const {makeModuleCached, makeNormalModuleName, makeSafeModuleName} = require('./
 const fsPromises = fs.promises;
 
 
+/**
+ * collect dependencies and write them to the beginning of bundle file
+ */
 class Collect {
   constructor(buildConfigYaml, dstDir) {
     this._buildConfigYaml = buildConfigYaml;
