@@ -8,11 +8,12 @@ module.exports = function compileTs(srcDir, destDir) {
     const tsProject = ts.createProject("tsconfig-builder.json");
 
     //return tsProject.src()
-    return gulp.src(`${srcDir}/**/*.ts`)
+    return gulp
+      .src(path.resolve(srcDir, `**/*.ts`))
       .pipe(tsProject())
       .js.pipe(gulp.dest(destDir))
-      .on('end', resolve)
-      .on('error', reject);
+      .on('error', reject)
+      .on('end', resolve);
   });
 
 };

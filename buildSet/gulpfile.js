@@ -7,9 +7,10 @@ const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
 
-const {collectDependencies, depsBundle} = require('./buildHelpers/collectDependencies');
-const {compileJs} = require('./buildHelpers/buildTasks');
+const compileJs = require('./buildHelpers/compileJs');
+const compileTs = require('./buildHelpers/compileTs');
 const {bundleApp, makeMainBundleFile} = require('./buildHelpers/bundle');
+const {collectDependencies, depsBundle} = require('./buildHelpers/collectDependencies');
 
 
 const fsPromises = fs.promises;
