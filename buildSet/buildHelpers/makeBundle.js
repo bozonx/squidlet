@@ -1,6 +1,11 @@
+// const { fork } = require('child_process');
+
 const dependencyTree = require('dependency-tree');
 const fs = require('fs');
 const fsPromises = fs.promises;
+
+// TODO: review
+const {depsBundle} = require('./collectDependencies');
 
 const {makeModuleName, makeModuleCached} = require('./helpers');
 
