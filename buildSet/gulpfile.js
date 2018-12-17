@@ -1,4 +1,3 @@
-const path = require('path');
 const fs = require('fs');
 const gulp = require('gulp');
 const yaml = require('js-yaml');
@@ -8,15 +7,15 @@ const compileJs = require('./buildHelpers/compileJs');
 const compileTs = require('./buildHelpers/compileTs');
 const makeBundle = require('./buildHelpers/makeBundle');
 const {collectDependencies} = require('./buildHelpers/collectDependencies');
+const upload = require('./buildHelpers/upload');
 
-
-// TODO: review - make paths for project
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 const starterCfg = projectConfig(envConfig.starter);
+const projectCfg = projectConfig(envConfig.project);
 
 
-// build and upload starter
+// starter
 gulp.task('build-starter', async () => {
   clearDir(starterCfg.buildDir);
   await compileTs(starterCfg.srcDir, starterCfg.compiledTsDir);
@@ -30,21 +29,29 @@ gulp.task('build-starter', async () => {
 });
 
 gulp.task('upload-starter', async () => {
-  // TODO: upload
+  upload(envConfig.board, envConfig.port, envConfig.portSpeed. starterCfg.bundleFile);
 });
 
 gulp.task('starter', gulp.series('build-starter', 'upload-starter'), async () => {
 });
 
 
-// build project
+// project
 gulp.task('build', async () => {
-  // TODO: clear, compileTs, compileJs, collectDependencies, makeBundle
+  clearDir(projectCfg.buildDir);
+  await compileTs(projectCfg.srcDir, projectCfg.compiledTsDir);
+  await compileJs(projectCfg.compiledTsDir, projectCfg.compiledJsDir, projectCfg.strictMode);
+  await collectDependencies(projectCfg.prjConfigYaml, projectCfg.dependenciesBuildDir);
+  await makeBundle(
+    projectCfg.compiledJsDir,
+    projectCfg.dependenciesBuildDir,
+    projectCfg.mainJsFile, projectCfg.bundleFile
+  );
 });
 
 // upload project
 gulp.task('upload', async () => {
-  // TODO: upload
+  upload(envConfig.board, envConfig.port, envConfig.portSpeed. projectCfg.bundleFile);
 });
 
 // build and upload project
