@@ -7,7 +7,7 @@ module.exports = {
   /**
    * compile typescript and make espruino compatible javascript code
    */
-  compileTs: (srcDir, destDir) => {
+  compileJs: (srcDir, destDir) => {
     return new Promise((resolve, reject) => {
       return gulp
         //.src(path.resolve(srcDir, `**/*.ts`))

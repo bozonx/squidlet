@@ -2,14 +2,13 @@ const { fork } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const gulp = require('gulp');
-const ts = require("gulp-typescript");
 const shelljs = require('shelljs');
 const yaml = require('js-yaml');
 const esp = require("espruino");
 const _ = require('lodash');
 
 const {collectDependencies, depsBundle} = require('./buildHelpers/collectDependencies');
-const {compileTs} = require('./buildHelpers/buildTasks');
+const {compileJs} = require('./buildHelpers/buildTasks');
 const {bundleApp, makeMainBundleFile} = require('./buildHelpers/bundle');
 
 
@@ -26,21 +25,39 @@ const buildConfigYaml = envConfig.prjConfig;
 
 
 
-gulp.task('compile-ts', () => {
 
-  // TODO: use srcDirFull
 
-  const tsProject = ts.createProject("tsconfig-builder.json");
 
-  return tsProject.src()
-    .pipe(tsProject())
-    .js.pipe(gulp.dest(compiledTsDir));
+// build and upload starter
+gulp.task('starter', async () => {
+  await compileTs(srcDirFull, compiledTsDir);
+  await compileJs(compiledTsDir, compiledJsDir);
+});
+
+// build and upload project
+gulp.task('prj', async () => {
+
+});
+
+// build project
+gulp.task('build', async () => {
+
+});
+
+// upload project
+gulp.task('upload', async () => {
+
 });
 
 
-gulp.task('compile-js', async () => {
-  await compileTs(compiledTsDir, compiledJsDir);
-});
+
+
+
+
+
+
+
+/////////////////////////////
 
 // make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
 gulp.task('bundle', async () => {
