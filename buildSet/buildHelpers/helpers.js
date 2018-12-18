@@ -3,15 +3,16 @@ const shelljs = require('shelljs');
 
 
 module.exports = {
+  PATH_SEPARATOR: '/',
+
   projectConfig(envPrjConfig) {
     const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
-    const compiledTsDir = path.join(buildDir, 'compiled-ts');
-    const compiledJsDir = path.join(buildDir, 'compiled-js');
 
     return {
       buildDir,
-      compiledTsDir,
-      compiledJsDir,
+      compiledTsDir: path.join(buildDir, 'compiled-ts'),
+      compiledJsDir: path.join(buildDir, 'compiled-js'),
+      moduleRoot: envPrjConfig.moduleRoot,
       minPrjDir: path.join(buildDir, 'minPrj'),
       minDepsDir: path.join(buildDir, 'minDeps'),
       srcDir: path.resolve(process.cwd(), envPrjConfig.src),
@@ -47,6 +48,9 @@ module.exports = {
 
   // TODO: дублируется - наверное лучше взять из starterMc/helper.ts
   makeModuleName: (filePath, rootToRemove, newRoot) => {
+
+    // TODO: use path.relative
+
     let result = filePath;
     const removedRoot = filePath.split(rootToRemove);
 

@@ -4,6 +4,7 @@ starter:
   # main ts file name without extension
   main: index
   prjConfig: ./starterMc/prjConfig.yaml
+  moduleRoot: system/starter
   strictMode: false
 
 project:
@@ -14,6 +15,7 @@ project:
   main: index
   #prjConfig: ../host/prjConfig.yaml
   prjConfig: ./build/hostTest/prjConfig.yaml
+  moduleRoot: system/host
   strictMode: false
 
 
