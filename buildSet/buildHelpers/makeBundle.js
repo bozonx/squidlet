@@ -17,15 +17,13 @@ function moduleCachedLine(moduleName, moduleContent) {
  */
 async function collectAppModules (rootDir, mainFile) {
   const modulesFilePaths = dependencyTree.toList({
-    filename: mainFile,
+    filename: path.join(rootDir, mainFile),
     directory: rootDir,
     // exclude node_modules
     filter: path => path.indexOf('node_modules') === -1, // optional
   });
 
   let result = [];
-
-  console.log(3333333333, rootDir, mainFile, modulesFilePaths)
 
   for (let filePath of modulesFilePaths) {
 
