@@ -5,7 +5,7 @@ const dependencyTree = require('dependency-tree');
 const fs = require('fs');
 
 const fsPromises = fs.promises;
-const {makeModuleCached, makeNormalModuleName, makeModuleName} = require('./helpers');
+const {makeModuleCached, makeNormalModuleName, makeModuleName, stripExtension} = require('./helpers');
 
 
 function moduleCachedLine(moduleName, moduleContent) {
@@ -68,7 +68,7 @@ async function depsBundle(dstDir) {
   for (let fileName of filesInDir) {
     const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
     const normalModuleName = makeNormalModuleName(fileName);
-    const realModuleName = normalModuleName.replace(/\.js$/, '');
+    const realModuleName = stripExtension(normalModuleName, 'js');
 
     result += moduleCachedLine(realModuleName, moduleContent);
   }

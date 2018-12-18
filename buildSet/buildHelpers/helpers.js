@@ -5,6 +5,12 @@ const shelljs = require('shelljs');
 module.exports = {
   PATH_SEPARATOR: '/',
 
+  stripExtension(filePath, extension) {
+    const regex = new RegExp(`\\.${extension}$`);
+
+    return filePath.replace(regex, '');
+  },
+
   projectConfig(envPrjConfig) {
     const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
 
