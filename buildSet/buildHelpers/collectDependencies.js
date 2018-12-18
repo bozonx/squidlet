@@ -4,10 +4,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const yaml = require('js-yaml');
 
-const {makeModuleCached, makeNormalModuleName, makeSafeModuleName} = require('./helpers');
-
-
-const fsPromises = fs.promises;
+const { makeSafeModuleName} = require('./helpers');
 
 
 /**
@@ -112,42 +109,8 @@ class Collect {
 }
 
 
-module.exports = {
-  collectDependencies: async function (buildConfigYaml, dstDir) {
-    const collect = new Collect(buildConfigYaml, dstDir);
+module.exports = async function (buildConfigYaml, dstDir) {
+  const collect = new Collect(buildConfigYaml, dstDir);
 
-    await collect.collect();
-  },
-
-  async depsBundle(dstDir) {
-    const filesInDir = await fsPromises.readdir(dstDir);
-    let result = '';
-
-    for (let fileName of filesInDir) {
-      const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
-      const realModuleName = makeNormalModuleName(fileName);
-
-      result += makeModuleCached(realModuleName, moduleContent);
-    }
-
-    return result;
-  },
-
-  // async prependDepsToBundle(dstDir, mainBindlePath) {
-  //   const filesInDir = await fsPromises.readdir(dstDir)
-  //   let result = '';
-  //
-  //   for (let fileName of filesInDir) {
-  //     const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
-  //     const realModuleName = makeNormalModuleName(fileName);
-  //
-  //     result += makeModuleCached(realModuleName, moduleContent);
-  //   }
-  //
-  //   const mainBundleContent = await fsPromises.readFile(mainBindlePath, { encoding: 'utf8' });
-  //   const finalMainBundle = `${result}\n${mainBundleContent}`;
-  //
-  //   await fsPromises.writeFile(mainBindlePath, finalMainBundle);
-  // },
-
+  await collect.collect();
 };

@@ -4,10 +4,7 @@ const dependencyTree = require('dependency-tree');
 const fs = require('fs');
 const fsPromises = fs.promises;
 
-// TODO: review
-const {depsBundle} = require('./collectDependencies');
-
-const {makeModuleName, makeModuleCached} = require('./helpers');
+const {makeModuleCached, makeNormalModuleName, makeModuleName} = require('./helpers');
 
 
 async function bundleApp (rootDir, mainFile) {
@@ -34,15 +31,32 @@ async function bundleApp (rootDir, mainFile) {
   return result;
 }
 
-function makeMainBundleFile(depsBundle, appBundle) {
+/**
+ * Read all the files from dependencies dir and put content of them to Module.addCached()
+ */
+async function depsBundle(dstDir) {
+  const filesInDir = await fsPromises.readdir(dstDir);
+  let result = '';
+
+  for (let fileName of filesInDir) {
+    const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
+    const realModuleName = makeNormalModuleName(fileName);
+
+    result += makeModuleCached(realModuleName, moduleContent);
+  }
+
+  return result;
+}
+
+/**
+ * Glue dependencies and project files and add require() of index module
+ */
+function makeMainBundleFile(depsBundleStr, appBundleStr, mainModuleName) {
   let result = 'Modules.removeAllCached();\n';
 
-  result += depsBundle;
-  result += appBundle;
-
-  // TODO: получить имя модуля
-
-  result += `require("./index");`;
+  result += depsBundleStr;
+  result += appBundleStr;
+  result += `require(${mainModuleName});`;
 
   return result;
 }
@@ -56,12 +70,13 @@ module.exports = async function makeBundle(compiledJsDir, dependenciesBuildDir, 
     throw new Error('main app file does not exit ' + mainJsFilePath);
   }
 
+  // TODO: make module name
+  const mainModuleName = './index';
   const appBundled = await bundleApp(compiledJsDir, mainJsFilePath);
   const depsBundled = await depsBundle(dependenciesBuildDir);
-  const mainBundle = makeMainBundleFile(depsBundled, appBundled);
+  const mainBundle = makeMainBundleFile(depsBundled, appBundled, mainModuleName);
 
   await fsPromises.writeFile(espReadyBundleFileName, mainBundle);
-
 };
 
 

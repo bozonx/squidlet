@@ -6,7 +6,7 @@ const {projectConfig, clearDir} = require('./buildHelpers/helpers');
 const compileJs = require('./buildHelpers/compileJs');
 const compileTs = require('./buildHelpers/compileTs');
 const makeBundle = require('./buildHelpers/makeBundle');
-const {collectDependencies} = require('./buildHelpers/collectDependencies');
+const collectDependencies = require('./buildHelpers/collectDependencies');
 const upload = require('./buildHelpers/upload');
 
 
