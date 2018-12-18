@@ -1,13 +1,16 @@
 // const { fork } = require('child_process');
 const path = require('path');
 const _ = require('lodash');
-
 const dependencyTree = require('dependency-tree');
 const fs = require('fs');
-const fsPromises = fs.promises;
 
+const fsPromises = fs.promises;
 const {makeModuleCached, makeNormalModuleName, makeModuleName} = require('./helpers');
 
+
+function moduleCachedLine(moduleName, moduleContent) {
+  return `${makeModuleCached(moduleName, moduleContent)};\n`;
+}
 
 async function bundleApp (rootDir, mainFile) {
   const modulesFilePaths = dependencyTree.toList({
@@ -26,7 +29,7 @@ async function bundleApp (rootDir, mainFile) {
     const moduleName = makeModuleName(filePath, rootDir, '.');
     const moduleContent = await fsPromises.readFile(filePath, {encoding: 'utf8'});
 
-    result += makeModuleCached(moduleName, moduleContent);
+    result += moduleCachedLine(moduleName, moduleContent);
   }
 
 
@@ -52,7 +55,7 @@ async function depsBundle(dstDir) {
     const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
     const realModuleName = _.trimEnd(makeNormalModuleName(fileName), '.js');
 
-    result += makeModuleCached(realModuleName, moduleContent);
+    result += moduleCachedLine(realModuleName, moduleContent);
   }
 
   return result;

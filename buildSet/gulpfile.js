@@ -8,7 +8,7 @@ const compileTs = require('./buildHelpers/compileTs');
 const makeBundle = require('./buildHelpers/makeBundle');
 const collectDependencies = require('./buildHelpers/collectDependencies');
 const minimize = require('./buildHelpers/minimize');
-const upload = require('./buildHelpers/upload');
+const {uploadBundle, uploadProject} = require('./buildHelpers/upload');
 
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
@@ -35,7 +35,7 @@ gulp.task('build-starter', async () => {
 });
 
 gulp.task('upload-starter', async () => {
-  upload(envConfig.board, envConfig.port, envConfig.portSpeed. starterCfg.bundleFile);
+  await uploadBundle(envConfig.board, envConfig.port, envConfig.portSpeed, starterCfg.bundleFile);
 });
 
 gulp.task('starter', gulp.series('build-starter', 'upload-starter'), async () => {
@@ -52,17 +52,21 @@ gulp.task('build', async () => {
   await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
   // min deps
   await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
-  await makeBundle(
-    projectCfg.minPrjDir,
-    projectCfg.minDepsDir,
-    projectCfg.mainJsFileName,
-    projectCfg.bundleFile
-  );
 });
 
 // upload project
 gulp.task('upload', async () => {
-  upload(envConfig.board, envConfig.port, envConfig.portSpeed. projectCfg.bundleFile);
+
+  // TODO: make it
+
+  const modules = [{'./index': './index.js'}];
+
+  await uploadProject(
+    envConfig.board,
+    envConfig.port,
+    envConfig.portSpeed,
+    modules
+  );
 });
 
 // build and upload project

@@ -42,7 +42,7 @@ module.exports = {
     preparedContent = preparedContent.replace(/\"/g, '\\"');
     preparedContent = preparedContent.replace(/\n/g, '\\n');
 
-    return `Modules.addCached("${moduleName}", "${preparedContent}");\n`;
+    return `Modules.addCached("${moduleName}", "${preparedContent}")`;
   },
 
   // TODO: дублируется - наверное лучше взять из starterMc/helper.ts
