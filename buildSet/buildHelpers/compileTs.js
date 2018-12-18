@@ -1,3 +1,4 @@
+const path = require('path');
 const gulp = require('gulp');
 const ts = require("gulp-typescript");
 
@@ -5,7 +6,7 @@ const ts = require("gulp-typescript");
 module.exports = function compileTs(srcDir, destDir) {
   return new Promise((resolve, reject) => {
 
-    const tsProject = ts.createProject("tsconfig-builder.json", {
+    const tsProject = ts.createProject(path.resolve(__dirname, "tsconfig-builder.json"), {
       // rootDir: [path.resolve(__dirname, './starterMc')],
       // outDir: compiledTsDir,
       //outDir: 'cccc',

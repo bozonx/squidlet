@@ -7,6 +7,7 @@ const compileJs = require('./buildHelpers/compileJs');
 const compileTs = require('./buildHelpers/compileTs');
 const makeBundle = require('./buildHelpers/makeBundle');
 const collectDependencies = require('./buildHelpers/collectDependencies');
+const minimize = require('./buildHelpers/minimize');
 const upload = require('./buildHelpers/upload');
 
 
@@ -21,6 +22,10 @@ gulp.task('build-starter', async () => {
   await compileTs(starterCfg.srcDir, starterCfg.compiledTsDir);
   await compileJs(starterCfg.compiledTsDir, starterCfg.compiledJsDir, starterCfg.strictMode);
   await collectDependencies(starterCfg.prjConfigYaml, starterCfg.dependenciesBuildDir);
+  // min prj
+  await minimize();
+  // min deps
+  await minimize();
   await makeBundle(
     starterCfg.compiledJsDir,
     starterCfg.dependenciesBuildDir,
