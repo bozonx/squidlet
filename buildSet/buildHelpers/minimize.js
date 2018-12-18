@@ -7,8 +7,11 @@ module.exports = function minimize (srcDir, dstDir) {
   return new Promise((resolve, reject) => {
     pump(
       [
-        gulp.src(`${srcDir}/**/*`),
+        gulp.src(`${srcDir}/**/*.js`),
         terser({
+          //ecma: 7,
+          // keep_fnames: true,
+          // keep_classnames: true,
           // TODO: !!! setup - it removes EOF
           compress: false,
           //mangle: false,

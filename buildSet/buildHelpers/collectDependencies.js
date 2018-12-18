@@ -8,7 +8,7 @@ const { makeSafeModuleName} = require('./helpers');
 
 
 /**
- * collect dependencies and write them to the beginning of bundle file
+ * collect third party dependencies
  */
 class Collect {
   constructor(buildConfigYaml, dstDir) {
@@ -21,6 +21,8 @@ class Collect {
 
   async collect() {
     shelljs.mkdir('-p', this._dstDir);
+
+    if (!this._buildConfig.dependencies) return;
 
     for (let moduleOrFileName of this._buildConfig.dependencies) {
       const resolvedMainFile = await this._resolveModuleMainFile(moduleOrFileName);
@@ -41,7 +43,7 @@ class Collect {
     else if (!_.isArray(this._buildConfig.moduleRoots)) {
       throw new Error(`Parameter "moduleRoots" in buildConfig ${this._buildConfigYaml} has to be an array`);
     }
-    else if (!this._buildConfig.dependencies) {
+    else if (this._buildConfig.dependencies && !_.isArray(this._buildConfig.dependencies)) {
       throw new Error(`Parameter "dependencies" in buildConfig ${this._buildConfigYaml} has to be an array`);
     }
   }
@@ -86,7 +88,7 @@ class Collect {
     return new Promise((resolve, reject) => {
       console.log(`--> Building dependency ${moduleName} - ${resolvedMainFile}`);
 
-      const safeModuleName = makeSafeModuleName(moduleName);
+      const safeModuleName = `${makeSafeModuleName(moduleName)}.js`;
 
       try {
 

@@ -1,5 +1,6 @@
 // const { fork } = require('child_process');
 const path = require('path');
+const _ = require('lodash');
 
 const dependencyTree = require('dependency-tree');
 const fs = require('fs');
@@ -36,12 +37,20 @@ async function bundleApp (rootDir, mainFile) {
  * Read all the files from dependencies dir and put content of them to Module.addCached()
  */
 async function depsBundle(dstDir) {
-  const filesInDir = await fsPromises.readdir(dstDir);
+  let filesInDir = [];
+
+  try {
+    filesInDir = await fsPromises.readdir(dstDir);
+  }
+  catch (err) {
+    return '';
+  }
+
   let result = '';
 
   for (let fileName of filesInDir) {
     const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
-    const realModuleName = makeNormalModuleName(fileName);
+    const realModuleName = _.trimEnd(makeNormalModuleName(fileName), '.js');
 
     result += makeModuleCached(realModuleName, moduleContent);
   }
