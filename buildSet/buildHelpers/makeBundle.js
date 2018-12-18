@@ -25,6 +25,8 @@ async function collectAppModules (rootDir, mainFile) {
 
   let result = [];
 
+  console.log(3333333333, rootDir, mainFile, modulesFilePaths)
+
   for (let filePath of modulesFilePaths) {
 
     // TODO: use root from config
@@ -41,7 +43,7 @@ async function collectAppModules (rootDir, mainFile) {
 async function bundleApp (rootDir, mainFile) {
   let result = '';
 
-  const modules = collectAppModules(rootDir, mainFile);
+  const modules = await collectAppModules(rootDir, mainFile);
 
   for (let module of modules) {
     result += moduleCachedLine(module[0], module[1]);
@@ -67,7 +69,8 @@ async function depsBundle(dstDir) {
 
   for (let fileName of filesInDir) {
     const moduleContent = await fsPromises.readFile(path.join(dstDir, fileName), { encoding: 'utf8' }) || '';
-    const realModuleName = _.trimEnd(makeNormalModuleName(fileName), '.js');
+    const normalModuleName = makeNormalModuleName(fileName);
+    const realModuleName = normalModuleName.replace(/\.js$/, '');
 
     result += moduleCachedLine(realModuleName, moduleContent);
   }

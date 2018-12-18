@@ -34,6 +34,12 @@ function pushModule(port, moduleName, moduleContent) {
   return new Promise((resolve, reject) => {
     const expr = makeModuleCached(moduleName, moduleContent);
 
+    console.log(11111111, moduleName, moduleContent)
+
+    return;
+
+
+
     esp.expr(port, expr, function(err) {
       if (err) return reject(err);
 
