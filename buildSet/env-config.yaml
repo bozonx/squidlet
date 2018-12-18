@@ -7,11 +7,13 @@ starter:
   strictMode: false
 
 project:
-  src: ../host/src
+  #src: ../host/src
+  src: ./build/hostTest/src
   dst: build/host
   # main ts file name without extension
   main: index
-  prjConfig: ../host/prjConfig.yaml
+  #prjConfig: ../host/prjConfig.yaml
+  prjConfig: ./build/hostTest/prjConfig.yaml
   strictMode: false
 
 

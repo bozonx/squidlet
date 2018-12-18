@@ -59,7 +59,7 @@ gulp.task('upload', async () => {
 
   // TODO: make it
 
-  const modules = [{'./index': './index.js'}];
+  const modules = {'module1': 'module.exports = 11111111111111;'};
 
   await uploadProject(
     envConfig.board,
