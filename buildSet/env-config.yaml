@@ -1,7 +1,6 @@
 starter:
   src: ./starterMc
   dst: build/starter
-  #minimize: false
   # main ts file name without extension
   main: index
   prjConfig: ./starterMc/prjConfig.yaml
@@ -10,7 +9,6 @@ starter:
 project:
   src: ../host/src
   dst: build/host
-  #minimize: false
   # main ts file name without extension
   main: index
   prjConfig: ../host/prjConfig.yaml
