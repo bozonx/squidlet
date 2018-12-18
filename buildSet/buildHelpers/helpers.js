@@ -12,9 +12,11 @@ module.exports = {
       buildDir,
       compiledTsDir,
       compiledJsDir,
+      minPrjDir: path.join(buildDir, 'minPrj'),
+      minDepsDir: path.join(buildDir, 'minDeps'),
       srcDir: path.resolve(process.cwd(), envPrjConfig.src),
       dependenciesBuildDir: path.join(buildDir, 'deps'),
-      mainJsFile: path.resolve(compiledJsDir, `${envPrjConfig.main}.js`),
+      mainJsFileName: `${envPrjConfig.main}.js`,
       bundleFile: path.join(buildDir, 'bundle.js'),
       prjConfigYaml: envPrjConfig.prjConfig,
       strictMode: envPrjConfig.strictMode,
@@ -48,7 +50,7 @@ module.exports = {
     let result = filePath;
     const removedRoot = filePath.split(rootToRemove);
 
-    if (removedRoot.length > 0) {
+    if (removedRoot.length > 1) {
       // success
       result = removedRoot[1];
     }

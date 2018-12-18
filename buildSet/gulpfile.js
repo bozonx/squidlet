@@ -23,13 +23,14 @@ gulp.task('build-starter', async () => {
   await compileJs(starterCfg.compiledTsDir, starterCfg.compiledJsDir, starterCfg.strictMode);
   await collectDependencies(starterCfg.prjConfigYaml, starterCfg.dependenciesBuildDir);
   // min prj
-  await minimize();
+  await minimize(starterCfg.compiledJsDir, starterCfg.minPrjDir);
   // min deps
-  await minimize();
+  await minimize(starterCfg.dependenciesBuildDir, starterCfg.minDepsDir);
   await makeBundle(
-    starterCfg.compiledJsDir,
-    starterCfg.dependenciesBuildDir,
-    starterCfg.mainJsFile, starterCfg.bundleFile
+    starterCfg.minPrjDir,
+    starterCfg.minDepsDir,
+    starterCfg.mainJsFileName,
+    starterCfg.bundleFile
   );
 });
 
@@ -47,10 +48,15 @@ gulp.task('build', async () => {
   await compileTs(projectCfg.srcDir, projectCfg.compiledTsDir);
   await compileJs(projectCfg.compiledTsDir, projectCfg.compiledJsDir, projectCfg.strictMode);
   await collectDependencies(projectCfg.prjConfigYaml, projectCfg.dependenciesBuildDir);
+  // min prj
+  await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
+  // min deps
+  await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
   await makeBundle(
-    projectCfg.compiledJsDir,
-    projectCfg.dependenciesBuildDir,
-    projectCfg.mainJsFile, projectCfg.bundleFile
+    projectCfg.minPrjDir,
+    projectCfg.minDepsDir,
+    projectCfg.mainJsFileName,
+    projectCfg.bundleFile
   );
 });
 

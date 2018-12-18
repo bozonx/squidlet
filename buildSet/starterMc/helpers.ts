@@ -47,7 +47,7 @@ export function makeModuleName(filePath: string, rootToRemove: string, newRoot: 
   let result: string = filePath;
   const removedRoot: string[] = filePath.split(rootToRemove);
 
-  if (removedRoot.length > 0) {
+  if (removedRoot.length > 1) {
     // success
     result = removedRoot[1];
   }

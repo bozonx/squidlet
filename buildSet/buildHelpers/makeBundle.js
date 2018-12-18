@@ -57,7 +57,7 @@ function makeMainBundleFile(depsBundleStr, appBundleStr, mainModuleName) {
 
   result += depsBundleStr;
   result += appBundleStr;
-  result += `require(${mainModuleName});`;
+  result += `require("${mainModuleName}");`;
 
   return result;
 }
@@ -66,12 +66,14 @@ function makeMainBundleFile(depsBundleStr, appBundleStr, mainModuleName) {
 /**
  * make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
  */
-module.exports = async function makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFilePath, espReadyBundleFileName) {
+module.exports = async function makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFileName, espReadyBundleFileName) {
+  const mainJsFilePath = path.join(compiledJsDir, mainJsFileName);
+
   if (!fs.existsSync(mainJsFilePath)) {
     throw new Error('main app file does not exit ' + mainJsFilePath);
   }
 
-  // TODO: make module name
+  // TODO: make module name - use mainJsFileName
   const mainModuleName = './index';
   const appBundled = await bundleApp(compiledJsDir, mainJsFilePath);
   const depsBundled = await depsBundle(dependenciesBuildDir);

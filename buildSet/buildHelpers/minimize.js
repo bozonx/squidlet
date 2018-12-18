@@ -1,23 +1,19 @@
 const gulp = require('gulp');
-const uglify = require('gulp-uglify');
+const terser = require('gulp-terser');
 const pump = require('pump');
 
 
-export default function minimize (srcDir, dstDir) {
+module.exports = function minimize (srcDir, dstDir) {
   return new Promise((resolve, reject) => {
-    pump([
-        gulp.src(`${srcDir}/**/*.js`),
-        uglify({
-          // mangle: {
-          //   // mangle options
-          //
-          //   properties: {
-          //     // mangle property options
-          //   }
-          // },
-          //toplevel: true,
+    pump(
+      [
+        gulp.src(`${srcDir}/**/*`),
+        terser({
+          // TODO: !!! setup - it removes EOF
+          compress: false,
+          //mangle: false,
         }),
-        gulp.dest(dstDir)
+        gulp.dest(dstDir),
       ],
       (err) => {
         if (err) return reject(err);
@@ -26,4 +22,4 @@ export default function minimize (srcDir, dstDir) {
       }
     );
   });
-}
+};
