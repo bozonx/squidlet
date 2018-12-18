@@ -12,7 +12,10 @@ function moduleCachedLine(moduleName, moduleContent) {
   return `${makeModuleCached(moduleName, moduleContent)};\n`;
 }
 
-async function bundleApp (rootDir, mainFile) {
+/**
+ * Collect modules and make array like [ [moduleName, moduleContent] ]
+ */
+async function collectAppModules (rootDir, mainFile) {
   const modulesFilePaths = dependencyTree.toList({
     filename: mainFile,
     directory: rootDir,
@@ -20,7 +23,7 @@ async function bundleApp (rootDir, mainFile) {
     filter: path => path.indexOf('node_modules') === -1, // optional
   });
 
-  let result = '';
+  let result = [];
 
   for (let filePath of modulesFilePaths) {
 
@@ -29,9 +32,20 @@ async function bundleApp (rootDir, mainFile) {
     const moduleName = makeModuleName(filePath, rootDir, '.');
     const moduleContent = await fsPromises.readFile(filePath, {encoding: 'utf8'});
 
-    result += moduleCachedLine(moduleName, moduleContent);
+    result.push([moduleName, moduleContent]);
   }
 
+  return result;
+}
+
+async function bundleApp (rootDir, mainFile) {
+  let result = '';
+
+  const modules = collectAppModules(rootDir, mainFile);
+
+  for (let module of modules) {
+    result += moduleCachedLine(module[0], module[1]);
+  }
 
   return result;
 }
@@ -78,7 +92,7 @@ function makeMainBundleFile(depsBundleStr, appBundleStr, mainModuleName) {
 /**
  * make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
  */
-module.exports = async function makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFileName, espReadyBundleFileName) {
+async function makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFileName, espReadyBundleFileName) {
   const mainJsFilePath = path.join(compiledJsDir, mainJsFileName);
 
   if (!fs.existsSync(mainJsFilePath)) {
@@ -92,7 +106,10 @@ module.exports = async function makeBundle(compiledJsDir, dependenciesBuildDir, 
   const mainBundle = makeMainBundleFile(depsBundled, appBundled, mainModuleName);
 
   await fsPromises.writeFile(espReadyBundleFileName, mainBundle);
-};
+}
+
+module.exports.makeBundle = makeBundle;
+module.exports.collectAppModules = collectAppModules;
 
 
 // const buildproc = fork(

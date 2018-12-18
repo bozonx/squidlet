@@ -5,7 +5,7 @@ const yaml = require('js-yaml');
 const {projectConfig, clearDir} = require('./buildHelpers/helpers');
 const compileJs = require('./buildHelpers/compileJs');
 const compileTs = require('./buildHelpers/compileTs');
-const makeBundle = require('./buildHelpers/makeBundle');
+const {makeBundle, collectAppModules} = require('./buildHelpers/makeBundle');
 const collectDependencies = require('./buildHelpers/collectDependencies');
 const minimize = require('./buildHelpers/minimize');
 const {uploadBundle, uploadProject} = require('./buildHelpers/upload');
@@ -59,7 +59,9 @@ gulp.task('upload', async () => {
 
   // TODO: make it
 
-  const modules = {'module1': 'module.exports = 11111111111111;'};
+  //const modules = [['module1', 'module.exports = 11111111111111;']];
+
+  const modules = collectAppModules(projectCfg.minPrjDir, projectCfg.mainJsFileName);
 
   await uploadProject(
     envConfig.board,

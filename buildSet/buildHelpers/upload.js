@@ -57,7 +57,7 @@ exports.uploadProject = async function (board, port, portSpeed, modules) {
   await initEspruino();
   configureEspruino(board, portSpeed);
 
-  for (let moduleName of Object.keys(modules)) {
-    await pushModule(port, moduleName, modules[moduleName]);
+  for (let module of modules) {
+    await pushModule(port, module[0], module[1]);
   }
 };
