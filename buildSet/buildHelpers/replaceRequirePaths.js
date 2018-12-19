@@ -10,9 +10,7 @@ module.exports = function replaceRequirePaths (srcDir, moduleRoot) {
     pump(
       [
         gulp.src(`${srcDir}/**/*.js`),
-        replace(/require\(['"]([^\n]+)['"]\)/, function (fullMatch, savedPart) {
-          console.log(11111, fullMatch, '-----------', savedPart)
-
+        replace(/require\(['"]([^\n]+)['"]\)/g, function (fullMatch, savedPart) {
           // skip not local modules
           if (!savedPart.match(/^\./)) return fullMatch;
 
@@ -23,9 +21,7 @@ module.exports = function replaceRequirePaths (srcDir, moduleRoot) {
           const moduleName = `${moduleRoot}${PATH_SEPARATOR}${currentFileRelPath}`;
           const replacement = fullMatch.replace(savedPart, moduleName);
 
-          console.log(222222222, currentFileRelPath, moduleName, replacement);
-
-          return fullMatch;
+          return replacement;
         }),
         gulp.dest(srcDir),
       ],
