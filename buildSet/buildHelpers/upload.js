@@ -32,21 +32,21 @@ function sendBundle(port, bundleFile) {
 
 function runExp(port, expr) {
   return new Promise((resolve, reject) => {
-    esp.expr(port, expr, function(err) {
-      if (err) return reject(err);
+    esp.expr(port, expr, function(result, aa,ss) {
+      if (!result) return reject(`Expression din't return any result. ${expr}`);
 
-      resolve();
+      resolve(result);
     });
   });
 }
 
-async function pushModule(port, moduleName, moduleContent) {
+async function pushModule(port, relativeModulePath, moduleName, moduleContent) {
   const stringedModule = stringify(moduleContent);
 
   // TODO: get root from config
   const rootDir = 'host';
 
-  const expr = `global.__flashFile("${rootDir}", ${moduleName}", "${stringedModule}")`;
+  const expr = `global.__flashFile("${rootDir}", "${relativeModulePath}", "${stringedModule}")`;
 
   // console.log(11111111, moduleName, moduleContent)
   //
@@ -75,6 +75,6 @@ exports.uploadProject = async function (board, port, portSpeed, modules) {
   configureEspruino(board, portSpeed);
 
   for (let module of modules) {
-    await pushModule(port, module[0], module[1]);
+    await pushModule(port, module[0], module[1], module[2]);
   }
 };

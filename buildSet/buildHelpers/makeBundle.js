@@ -57,8 +57,9 @@ async function collectAppModules (rootDir, relativeMainFile, moduleRoot) {
     const moduleName = makeModuleName(rootDir, fullFilePath, moduleRoot);
     const moduleContent = await fsPromises.readFile(fullFilePath, {encoding: 'utf8'});
     const moduleComplete = replaceRequirePaths(rootDir, fullFilePath, moduleContent, moduleRoot);
+    const relativeModulePath = path.relative(rootDir, fullFilePath);
 
-    result.push([moduleName, moduleComplete]);
+    result.push([relativeModulePath, moduleName, moduleComplete]);
   }
 
   return result;
@@ -70,7 +71,7 @@ async function bundleApp (rootDir, relativeMainFile, moduleRoot) {
   const modules = await collectAppModules(rootDir, relativeMainFile, moduleRoot);
 
   for (let module of modules) {
-    result += moduleCachedLine(module[0], module[1]);
+    result += moduleCachedLine(module[1], module[2]);
   }
 
   return result;
