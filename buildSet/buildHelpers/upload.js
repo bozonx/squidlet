@@ -30,31 +30,33 @@ function sendBundle(port, bundleFile) {
   });
 }
 
-function pushModule(port, moduleName, moduleContent) {
+function runExp(port, expr) {
   return new Promise((resolve, reject) => {
-    const stringedModule = stringify(moduleContent);
-
-    // TODO: get root from config
-    const rootDir = 'host';
-
-    const expr = `global.__flashFile("${rootDir}", ${moduleName}", "${stringedModule}")`;
-
-    // console.log(11111111, moduleName, moduleContent)
-    //
-    // // TODO: remove
-    // resolve();
-    // return;
-
-    // ---- require('fs').readdir('/system')
-
-
-
     esp.expr(port, expr, function(err) {
       if (err) return reject(err);
 
       resolve();
     });
   });
+}
+
+async function pushModule(port, moduleName, moduleContent) {
+  const stringedModule = stringify(moduleContent);
+
+  // TODO: get root from config
+  const rootDir = 'host';
+
+  const expr = `global.__flashFile("${rootDir}", ${moduleName}", "${stringedModule}")`;
+
+  // console.log(11111111, moduleName, moduleContent)
+  //
+  // // TODO: remove
+  // resolve();
+  // return;
+
+  // ---- require('fs').readdir('/system')
+
+  await runExp(port, expr);
 }
 
 
