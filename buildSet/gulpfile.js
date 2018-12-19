@@ -62,7 +62,7 @@ gulp.task('build', async () => {
 
 // upload project
 gulp.task('upload', async () => {
-  const modules = await collectAppModules(projectCfg.minPrjDir, projectCfg.mainJsFileName);
+  const modules = await collectAppModules(projectCfg.minPrjDir, projectCfg.mainJsFileName, projectCfg.moduleRoot);
 
   await uploadProject(
     envConfig.board,

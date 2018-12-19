@@ -2,14 +2,18 @@ const path = require('path');
 const shelljs = require('shelljs');
 
 
+const PATH_SEPARATOR = '/';
+
+function stripExtension(filePath, extension) {
+  const regex = new RegExp(`\\.${extension}$`);
+
+  return filePath.replace(regex, '');
+};
+
+
 module.exports = {
-  PATH_SEPARATOR: '/',
-
-  stripExtension(filePath, extension) {
-    const regex = new RegExp(`\\.${extension}$`);
-
-    return filePath.replace(regex, '');
-  },
+  PATH_SEPARATOR,
+  stripExtension,
 
   projectConfig(envPrjConfig) {
     const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
@@ -53,22 +57,27 @@ module.exports = {
   },
 
   // TODO: дублируется - наверное лучше взять из starterMc/helper.ts
-  makeModuleName: (filePath, rootToRemove, newRoot) => {
+  makeModuleName(baseDir, moduleFullPath, moduleRoot) {
+    const strippedModuleName = stripExtension(moduleFullPath, 'js');
+    const moduleRelPath = path.relative(baseDir, strippedModuleName);
+    const moduleName = `${moduleRoot}${PATH_SEPARATOR}${moduleRelPath}`;
+
+    return moduleName;
 
     // TODO: use path.relative
 
-    let result = filePath;
-    const removedRoot = filePath.split(rootToRemove);
-
-    if (removedRoot.length > 1) {
-      // success
-      result = removedRoot[1];
-    }
-
-    // remove extension
-    result = result.replace(/\.js$/, '');
-
-    return `${newRoot}${result}`;
+    // let result = filePath;
+    // const removedRoot = filePath.split(rootToRemove);
+    //
+    // if (removedRoot.length > 1) {
+    //   // success
+    //   result = removedRoot[1];
+    // }
+    //
+    // // remove extension
+    // result = result.replace(/\.js$/, '');
+    //
+    // return `${newRoot}${result}`;
   }
 
 };

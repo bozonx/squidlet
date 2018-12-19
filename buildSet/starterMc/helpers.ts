@@ -43,6 +43,9 @@ export function eachFileRecursively(rootDir: string, cb: (pathToFile: string) =>
 
 }
 
+
+// TODO: remake !!!!
+
 export function makeModuleName(filePath: string, rootToRemove: string, newRoot: string): string {
   let result: string = filePath;
   const removedRoot: string[] = filePath.split(rootToRemove);

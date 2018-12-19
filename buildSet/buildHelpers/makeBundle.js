@@ -15,7 +15,7 @@ function moduleCachedLine(moduleName, moduleContent) {
 /**
  * Collect modules and make array like [ [moduleName, moduleContent] ]
  */
-async function collectAppModules (rootDir, mainFile) {
+async function collectAppModules (rootDir, mainFile, moduleRoot) {
   const modulesFilePaths = dependencyTree.toList({
     filename: path.join(rootDir, mainFile),
     directory: rootDir,
@@ -25,12 +25,9 @@ async function collectAppModules (rootDir, mainFile) {
 
   let result = [];
 
-  for (let filePath of modulesFilePaths) {
-
-    // TODO: use root from config
-
-    const moduleName = makeModuleName(filePath, rootDir, '.');
-    const moduleContent = await fsPromises.readFile(filePath, {encoding: 'utf8'});
+  for (let fullFilePath of modulesFilePaths) {
+    const moduleName = makeModuleName(rootDir, fullFilePath, moduleRoot);
+    const moduleContent = await fsPromises.readFile(fullFilePath, {encoding: 'utf8'});
 
     result.push([moduleName, moduleContent]);
   }
