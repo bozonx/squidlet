@@ -56,7 +56,7 @@ gulp.task('build', async () => {
   // min deps
   await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
   // replace modules paths int require statements
-  await replaceRequirePaths(projectCfg.minPrjDir, projectCfg.moduleRoot);
+  await replaceRequirePaths(projectCfg.compiledJsDir, projectCfg.moduleRoot);
 });
 
 // upload project
