@@ -1,6 +1,6 @@
 const esp = require("espruino");
 
-const {makeModuleCached} = require('./helpers');
+const {stringify} = require('./helpers');
 
 
 function configureEspruino(board, portSpeed) {
@@ -32,14 +32,20 @@ function sendBundle(port, bundleFile) {
 
 function pushModule(port, moduleName, moduleContent) {
   return new Promise((resolve, reject) => {
-    const expr = makeModuleCached(moduleName, moduleContent);
+    const stringedModule = stringify(moduleContent);
 
-    console.log(11111111, moduleName)
+    // TODO: get root from config
+    const rootDir = 'host';
 
-    // TODO: remove
-    resolve();
-    return;
+    const expr = `global.__flashFile("${rootDir}", ${moduleName}", "${stringedModule}")`;
 
+    // console.log(11111111, moduleName, moduleContent)
+    //
+    // // TODO: remove
+    // resolve();
+    // return;
+
+    // ---- require('fs').readdir('/system')
 
 
 

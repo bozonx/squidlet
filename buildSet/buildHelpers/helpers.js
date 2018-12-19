@@ -10,10 +10,21 @@ function stripExtension(filePath, extension) {
   return filePath.replace(regex, '');
 }
 
+function stringify (moduleContent) {
+  let preparedContent = moduleContent || '';
+
+  preparedContent = preparedContent.replace(/\\/g, '\\\\');
+  preparedContent = preparedContent.replace(/\"/g, '\\"');
+  preparedContent = preparedContent.replace(/\n/g, '\\n');
+
+  return preparedContent;
+}
+
 
 module.exports = {
   PATH_SEPARATOR,
   stripExtension,
+  stringify,
 
   projectConfig(envPrjConfig) {
     const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
@@ -47,13 +58,7 @@ module.exports = {
   },
 
   makeModuleCached: (moduleName, moduleContent) => {
-    let preparedContent = moduleContent || '';
-
-    preparedContent = preparedContent.replace(/\\/g, '\\\\');
-    preparedContent = preparedContent.replace(/\"/g, '\\"');
-    preparedContent = preparedContent.replace(/\n/g, '\\n');
-
-    return `Modules.addCached("${moduleName}", "${preparedContent}")`;
+    return `Modules.addCached("${moduleName}", "${stringify(moduleContent)}")`;
   },
 
   // TODO: дублируется - наверное лучше взять из starterMc/helper.ts

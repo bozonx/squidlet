@@ -1,20 +1,21 @@
 // const { fork } = require('child_process');
+
 const path = require('path');
 const _ = require('lodash');
 const dependencyTree = require('dependency-tree');
 const fs = require('fs');
 
 const fsPromises = fs.promises;
-const {makeModuleCached, makeNormalModuleName, makeModuleName, stripExtension} = require('./helpers');
+const {PATH_SEPARATOR, makeModuleCached, makeNormalModuleName, makeModuleName, stripExtension} = require('./helpers');
 
 
 function moduleCachedLine(moduleName, moduleContent) {
   return `${makeModuleCached(moduleName, moduleContent)};\n`;
 }
 
-function makeModulesTree (rootDir, mainFile) {
+function makeModulesTree (rootDir, relativeMainFile) {
   return dependencyTree.toList({
-    filename: path.join(rootDir, mainFile),
+    filename: path.join(rootDir, relativeMainFile),
     directory: rootDir,
     // exclude node_modules
     filter: path => path.indexOf('node_modules') === -1, // optional
@@ -47,8 +48,8 @@ function replaceRequirePaths (rootDir, currentFileFullPath, moduleContent, modul
 /**
  * Collect modules and make array like [ [moduleName, moduleContent] ]
  */
-async function collectAppModules (rootDir, mainFile, moduleRoot) {
-  const modulesFilePaths = makeModulesTree(rootDir, mainFile);
+async function collectAppModules (rootDir, relativeMainFile, moduleRoot) {
+  const modulesFilePaths = makeModulesTree(rootDir, relativeMainFile);
 
   let result = [];
 
@@ -63,10 +64,10 @@ async function collectAppModules (rootDir, mainFile, moduleRoot) {
   return result;
 }
 
-async function bundleApp (rootDir, mainFile) {
+async function bundleApp (rootDir, relativeMainFile, moduleRoot) {
   let result = '';
 
-  const modules = await collectAppModules(rootDir, mainFile);
+  const modules = await collectAppModules(rootDir, relativeMainFile, moduleRoot);
 
   for (let module of modules) {
     result += moduleCachedLine(module[0], module[1]);
@@ -118,16 +119,15 @@ function makeMainBundleFile(depsBundleStr, appBundleStr, mainModuleName) {
 /**
  * make bundle for espruino. Files which are required will be prepended to bundle as Modules.addCached(...)
  */
-async function makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFileName, espReadyBundleFileName) {
+async function makeBundle(compiledJsDir, dependenciesBuildDir, mainJsFileName, espReadyBundleFileName, moduleRoot) {
   const mainJsFilePath = path.join(compiledJsDir, mainJsFileName);
 
   if (!fs.existsSync(mainJsFilePath)) {
     throw new Error('main app file does not exit ' + mainJsFilePath);
   }
 
-  // TODO: make module name - use mainJsFileName
-  const mainModuleName = './index';
-  const appBundled = await bundleApp(compiledJsDir, mainJsFilePath);
+  const mainModuleName = `${moduleRoot}${PATH_SEPARATOR}${stripExtension(mainJsFileName, 'js')}`;
+  const appBundled = await bundleApp(compiledJsDir, mainJsFileName, moduleRoot);
   const depsBundled = await depsBundle(dependenciesBuildDir);
   const mainBundle = makeMainBundleFile(depsBundled, appBundled, mainModuleName);
 

@@ -33,7 +33,8 @@ gulp.task('build-starter', async () => {
     starterCfg.minPrjDir,
     starterCfg.minDepsDir,
     starterCfg.mainJsFileName,
-    starterCfg.bundleFile
+    starterCfg.bundleFile,
+    starterCfg.moduleRoot
   );
 });
 
