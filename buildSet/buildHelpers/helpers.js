@@ -8,7 +8,7 @@ function stripExtension(filePath, extension) {
   const regex = new RegExp(`\\.${extension}$`);
 
   return filePath.replace(regex, '');
-};
+}
 
 
 module.exports = {

@@ -12,18 +12,25 @@ function moduleCachedLine(moduleName, moduleContent) {
   return `${makeModuleCached(moduleName, moduleContent)};\n`;
 }
 
-/**
- * Collect modules and make array like [ [moduleName, moduleContent] ]
- */
-async function collectAppModules (rootDir, mainFile, moduleRoot) {
-  const modulesFilePaths = dependencyTree.toList({
+function makeModulesTree (rootDir, mainFile) {
+  return dependencyTree.toList({
     filename: path.join(rootDir, mainFile),
     directory: rootDir,
     // exclude node_modules
     filter: path => path.indexOf('node_modules') === -1, // optional
   });
+}
+
+
+/**
+ * Collect modules and make array like [ [moduleName, moduleContent] ]
+ */
+async function collectAppModules (rootDir, mainFile, moduleRoot) {
+  const modulesFilePaths = makeModulesTree(rootDir, mainFile);
 
   let result = [];
+
+  console.log(1111111111, modulesFilePaths)
 
   for (let fullFilePath of modulesFilePaths) {
     const moduleName = makeModuleName(rootDir, fullFilePath, moduleRoot);

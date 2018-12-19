@@ -24,7 +24,7 @@ gulp.task('build-starter', async () => {
   await compileJs(starterCfg.compiledTsDir, starterCfg.compiledJsDir, starterCfg.strictMode);
   await collectDependencies(starterCfg.prjConfigYaml, starterCfg.dependenciesBuildDir);
   // replace modules paths int require statements
-  await replaceRequirePaths(starterCfg.compiledJsDir, starterCfg.moduleRoot);
+  //await replaceRequirePaths(starterCfg.compiledJsDir, starterCfg.moduleRoot);
   // min prj
   await minimize(starterCfg.compiledJsDir, starterCfg.minPrjDir);
   // min deps
@@ -52,7 +52,7 @@ gulp.task('build', async () => {
   await compileJs(projectCfg.compiledTsDir, projectCfg.compiledJsDir, projectCfg.strictMode);
   await collectDependencies(projectCfg.prjConfigYaml, projectCfg.dependenciesBuildDir);
   // replace modules paths int require statements
-  await replaceRequirePaths(projectCfg.compiledJsDir, projectCfg.moduleRoot);
+  //await replaceRequirePaths(projectCfg.compiledJsDir, projectCfg.moduleRoot);
   // min prj
   await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
   // min deps
