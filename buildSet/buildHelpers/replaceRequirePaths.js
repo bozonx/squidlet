@@ -17,9 +17,7 @@ module.exports = function replaceRequirePaths (srcDir, moduleRoot) {
           const currentFileFullPath = this.file.path;
           const baseDir = path.dirname(currentFileFullPath);
           const depFullPath = path.resolve(baseDir, savedPart);
-
           const moduleName = makeModuleName(baseDir, depFullPath, moduleRoot);
-
           const replacement = fullMatch.replace(savedPart, moduleName);
 
           return replacement;

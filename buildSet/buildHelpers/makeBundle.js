@@ -21,6 +21,28 @@ function makeModulesTree (rootDir, mainFile) {
   });
 }
 
+function replaceRootOfModule(rootDir, currentFileFullPath, relativeModulePathInRequire, moduleRoot) {
+  const baseDir = path.dirname(currentFileFullPath);
+  const depFullPath = path.resolve(baseDir, relativeModulePathInRequire);
+  const moduleName = makeModuleName(rootDir, depFullPath, moduleRoot);
+
+  return moduleName;
+}
+
+function replaceRequirePaths (rootDir, currentFileFullPath, moduleContent, moduleRoot) {
+
+  // TODO: remove it
+  const prepareToReplace = moduleContent.replace(/;/g, ';\n');
+
+  return prepareToReplace.replace(/require\(['"]([^\n]+)['"]\)/g, (fullMatch, savedPart) => {
+    // skip not local modules
+    if (!savedPart.match(/^\./)) return fullMatch;
+
+    const replacedModulePath = replaceRootOfModule(rootDir, currentFileFullPath, savedPart, moduleRoot);
+
+    return fullMatch.replace(savedPart, replacedModulePath);
+  });
+}
 
 /**
  * Collect modules and make array like [ [moduleName, moduleContent] ]
@@ -30,13 +52,12 @@ async function collectAppModules (rootDir, mainFile, moduleRoot) {
 
   let result = [];
 
-  console.log(1111111111, modulesFilePaths)
-
   for (let fullFilePath of modulesFilePaths) {
     const moduleName = makeModuleName(rootDir, fullFilePath, moduleRoot);
     const moduleContent = await fsPromises.readFile(fullFilePath, {encoding: 'utf8'});
+    const moduleComplete = replaceRequirePaths(rootDir, fullFilePath, moduleContent, moduleRoot);
 
-    result.push([moduleName, moduleContent]);
+    result.push([moduleName, moduleComplete]);
   }
 
   return result;

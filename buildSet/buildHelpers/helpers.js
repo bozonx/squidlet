@@ -63,21 +63,6 @@ module.exports = {
     const moduleName = `${moduleRoot}${PATH_SEPARATOR}${moduleRelPath}`;
 
     return moduleName;
-
-    // TODO: use path.relative
-
-    // let result = filePath;
-    // const removedRoot = filePath.split(rootToRemove);
-    //
-    // if (removedRoot.length > 1) {
-    //   // success
-    //   result = removedRoot[1];
-    // }
-    //
-    // // remove extension
-    // result = result.replace(/\.js$/, '');
-    //
-    // return `${newRoot}${result}`;
   }
 
 };
