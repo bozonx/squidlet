@@ -1,11 +1,49 @@
+// global.navigator = { userAgent : "node" };
+// global.document = {};
+// global.document = undefined;
+// global.Espruino = undefined;
+
+
 const esp = require("espruino");
 const fs = require('fs');
 const path = require('path');
-
 const {stringify} = require('./helpers');
 
-
 const fsPromises = fs.promises;
+
+
+// var Espruino = eval(fs.readFileSync('./node_modules/espruino/espruino.js', {encoding: 'utf8'}));
+// Espruino.init();
+
+//console.log(111111, Espruino, Espruino.Core.Serial)
+
+
+function expr (port, expr) {
+  var exprResult = undefined;
+
+  Espruino.Core.Serial.startListening(function(data) { });
+
+  return new Promise((resolve, reject) => {
+    Espruino.Core.Serial.open(port, function(status) {
+      if (status === undefined) {
+        console.error("Unable to connect!");
+
+        return resolve();
+      }
+      Espruino.Core.Utils.executeExpression(expr, function(result) {
+        setTimeout(function() {
+          Espruino.Core.Serial.close();
+        }, 500);
+        exprResult = result;
+      });
+    }, function() { // disconnected
+      //if (callback) callback(exprResult);
+      resolve();
+    });
+  });
+}
+
+
 
 
 function configureEspruino(board, portSpeed) {
@@ -63,7 +101,10 @@ async function pushModule(port, relativeModulePath, moduleName, moduleContent) {
 
   // ---- require('fs').readdir('/system')
 
-  await runExp(port, expr);
+
+  await expr(port, expr);
+
+  //await runExp(port, expr);
 }
 
 
