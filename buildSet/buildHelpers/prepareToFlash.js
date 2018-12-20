@@ -7,12 +7,11 @@ const {makeModulesTree, stripExtension} = require('./helpers');
 
 const fsPromises = fs.promises;
 
+// TODO: собрать зависимости
 
-module.exports = function prepareToFlash (srcDir, dstDir, relativeIndexFile, moduleRoot) {
-  const modulesFileNames = makeModulesTree(srcDir, relativeIndexFile);
-  const modulesHashNames = {};
 
-  console.log(22222, srcDir, dstDir, relativeIndexFile, moduleRoot);
+function makeModulesNames (modulesFileNames, srcDir, moduleRoot) {
+  const result = {};
 
   for (let fullFileName of modulesFileNames) {
     const relativeFilePath = path.relative(srcDir, fullFileName);
@@ -20,7 +19,31 @@ module.exports = function prepareToFlash (srcDir, dstDir, relativeIndexFile, mod
     const moduleName = stripExtension(rootFileName, 'js');
     const moduleNameHash = hashSum(moduleName);
 
-    console.log(22222, fullFileName, relativeFilePath, rootFileName, moduleName, moduleNameHash)
+    result[moduleNameHash] = fullFileName;
   }
 
+  return result;
+}
+
+async function copyToFlashDir (modulesHashNames, dstDir) {
+  for (let moduleNameHash of Object.keys(modulesHashNames)) {
+    const dstFileName = path.join(dstDir, moduleNameHash);
+
+    await fsPromises.copyFile(modulesHashNames[moduleNameHash], dstFileName);
+  }
+}
+
+
+module.exports = async function prepareToFlash (srcDir, dstDir, relativeIndexFile, moduleRoot) {
+  const modulesFileNames = makeModulesTree(srcDir, relativeIndexFile);
+  const modulesHashNames = makeModulesNames(modulesFileNames, srcDir, moduleRoot);
+
+  try {
+    await fsPromises.mkdir(dstDir);
+  }
+  catch (e) {
+    // do nothing
+  }
+
+  await copyToFlashDir(modulesHashNames, dstDir);
 };

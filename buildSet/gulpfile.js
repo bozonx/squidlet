@@ -49,16 +49,16 @@ gulp.task('starter', gulp.series('build-starter', 'upload-starter'), async () =>
 
 // project
 gulp.task('build', async () => {
-  clearDir(projectCfg.buildDir);
-  await compileTs(projectCfg.srcDir, projectCfg.compiledTsDir);
-  await compileJs(projectCfg.compiledTsDir, projectCfg.compiledJsDir, projectCfg.strictMode);
-  await collectDependencies(projectCfg.prjConfigYaml, projectCfg.dependenciesBuildDir);
-  // replace modules paths int require statements
-  //await replaceRequirePaths(projectCfg.compiledJsDir, projectCfg.moduleRoot);
-  // min prj
-  await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
-  // min deps
-  await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
+  // clearDir(projectCfg.buildDir);
+  // await compileTs(projectCfg.srcDir, projectCfg.compiledTsDir);
+  // await compileJs(projectCfg.compiledTsDir, projectCfg.compiledJsDir, projectCfg.strictMode);
+  // await collectDependencies(projectCfg.prjConfigYaml, projectCfg.dependenciesBuildDir);
+  // // replace modules paths int require statements
+  // //await replaceRequirePaths(projectCfg.compiledJsDir, projectCfg.moduleRoot);
+  // // min prj
+  // await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
+  // // min deps
+  // await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
   await prepareToFlash(
     projectCfg.minPrjDir,
     projectCfg.flashDir,
