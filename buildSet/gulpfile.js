@@ -10,7 +10,7 @@ const collectDependencies = require('./buildHelpers/collectDependencies');
 const minimize = require('./buildHelpers/minimize');
 const replaceRequirePaths = require('./buildHelpers/replaceRequirePaths');
 const prepareToFlash = require('./buildHelpers/prepareToFlash');
-const {uploadBundle, uploadProject} = require('./buildHelpers/upload');
+const {uploadBundle, uploadProject, uploadToFlash} = require('./buildHelpers/upload');
 
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
@@ -70,13 +70,13 @@ gulp.task('build', async () => {
 
 // upload project
 gulp.task('upload', async () => {
-  const modules = await collectAppModules(projectCfg.minPrjDir, projectCfg.mainJsFileName, projectCfg.moduleRoot);
+  //const modules = await collectAppModules(projectCfg.minPrjDir, projectCfg.mainJsFileName, projectCfg.moduleRoot);
 
-  await uploadProject(
+  await uploadToFlash(
     envConfig.board,
     envConfig.port,
     envConfig.portSpeed,
-    modules
+    projectCfg.flashDir
   );
 });
 

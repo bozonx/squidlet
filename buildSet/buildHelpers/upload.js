@@ -1,6 +1,11 @@
 const esp = require("espruino");
+const fs = require('fs');
+const path = require('path');
 
 const {stringify} = require('./helpers');
+
+
+const fsPromises = fs.promises;
 
 
 function configureEspruino(board, portSpeed) {
@@ -78,5 +83,23 @@ exports.uploadProject = async function (board, port, portSpeed, modules) {
 
   for (let module of modules) {
     await pushModule(port, module[0], module[1], module[2]);
+  }
+};
+
+exports.uploadToFlash = async function (board, port, portSpeed, flashDir) {
+  await initEspruino();
+  configureEspruino(board, portSpeed);
+
+  const files = await fsPromises.readdir(flashDir);
+
+  for (let relFileName of files) {
+    const fullFileName = path.resolve(flashDir, relFileName);
+    const moduleContent = await fsPromises.readFile(fullFileName, {encoding: 'utf8'});
+    const stringedModule = stringify(moduleContent);
+    const expr = `require("Storage").write("${relFileName}", "${stringedModule}")`;
+
+    console.log(`-----> Writing file ${relFileName}`);
+
+    await runExp(port, expr);
   }
 };
