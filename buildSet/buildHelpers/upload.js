@@ -1,9 +1,3 @@
-// global.navigator = { userAgent : "node" };
-// global.document = {};
-// global.document = undefined;
-// global.Espruino = undefined;
-
-
 const esp = require("espruino");
 const fs = require('fs');
 const path = require('path');
@@ -12,31 +6,38 @@ const {stringify} = require('./helpers');
 const fsPromises = fs.promises;
 
 
-// var Espruino = eval(fs.readFileSync('./node_modules/espruino/espruino.js', {encoding: 'utf8'}));
-// Espruino.init();
-
-//console.log(111111, Espruino, Espruino.Core.Serial)
-
-
-function expr (port, expr) {
-  var exprResult = undefined;
-
+function runExprs (port, exprs) {
   Espruino.Core.Serial.startListening(function(data) { });
 
-  return new Promise((resolve, reject) => {
-    Espruino.Core.Serial.open(port, function(status) {
-      if (status === undefined) {
-        console.error("Unable to connect!");
+  const sendExpression = (exp) => {
+    return new Promise((resolve, reject) => {
+      Espruino.Core.Utils.executeExpression(exp, function(result) {
+        if (result) {
+          setTimeout(function() {
+            return resolve(result);
+          }, 500);
 
-        return resolve();
-      }
-      Espruino.Core.Utils.executeExpression(expr, function(result) {
-        setTimeout(function() {
-          Espruino.Core.Serial.close();
-        }, 500);
-        exprResult = result;
+          return;
+        }
+
+        reject(`No result of exp: ${exp}`);
       });
-    }, function() { // disconnected
+    });
+  };
+
+  return new Promise((resolve, reject) => {
+    Espruino.Core.Serial.open(port, async function(status) {
+      if (status === undefined) {
+        return reject(new Error('Unable to connect!'));
+      }
+
+      for (let exp of exprs) {
+        await sendExpression(exp);
+      }
+
+      Espruino.Core.Serial.close();
+    },
+    function() { // disconnected
       //if (callback) callback(exprResult);
       resolve();
     });
@@ -102,9 +103,9 @@ async function pushModule(port, relativeModulePath, moduleName, moduleContent) {
   // ---- require('fs').readdir('/system')
 
 
-  await expr(port, expr);
+  //await runExpr(port, expr);
 
-  //await runExp(port, expr);
+  await runExp(port, expr);
 }
 
 
@@ -132,6 +133,7 @@ exports.uploadToFlash = async function (board, port, portSpeed, flashDir) {
   configureEspruino(board, portSpeed);
 
   const files = await fsPromises.readdir(flashDir);
+  const exprs = [];
 
   for (let relFileName of files) {
     const fullFileName = path.resolve(flashDir, relFileName);
@@ -139,8 +141,12 @@ exports.uploadToFlash = async function (board, port, portSpeed, flashDir) {
     const stringedModule = stringify(moduleContent);
     const expr = `require("Storage").write("${relFileName}", "${stringedModule}")`;
 
-    console.log(`-----> Writing file ${relFileName}`);
+    //console.log(`-----> Writing file ${relFileName}`);
 
-    await runExp(port, expr);
+    //await runExp(port, expr);
+
+    exprs.push(expr);
   }
+
+  await runExprs(port, exprs);
 };
