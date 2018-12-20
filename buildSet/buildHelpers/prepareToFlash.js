@@ -3,19 +3,20 @@ const path = require('path');
 const fs = require('fs');
 const hashSum = require('hash-sum');
 
-const {makeModulesTree, stripExtension} = require('./helpers');
+const {makeModulesTree, stripExtension, makeNormalModuleName} = require('./helpers');
 
 
 const fsPromises = fs.promises;
 const HASH_POS = 0;
-const FULL_FILE_NAME_POS = 1;
-const DST_FILE_NAME_POS = 2;
-const DEP_NAME_POS = 1;
+const SRC_NAME_POS = 1;
+const DST_NAME_POS = 2;
+const DEP_NAME_POS = 3;
 
 
 class PrepareToFlash {
-  constructor(srcDir, dstDir, relativeIndexFile, moduleRoot) {
+  constructor(srcDir, depsSrcDir, dstDir, relativeIndexFile, moduleRoot) {
     this.srcDir = srcDir;
+    this.depsSrcDir = depsSrcDir;
     this.dstDir = dstDir;
     this.relativeIndexFile = relativeIndexFile;
     this.moduleRoot = moduleRoot;
@@ -34,6 +35,7 @@ class PrepareToFlash {
       // do nothing
     }
 
+    await this.copyDepsToFlashDir();
     await this.copyLocalToFlashDir();
     await this.renameLocalModulesRequires();
   }
@@ -61,14 +63,40 @@ class PrepareToFlash {
   }
 
   async collectDepsModules() {
+    const fileInDir = await fsPromises.readdir(this.depsSrcDir);
+    const result = [];
 
+    for (let moduleRelName of fileInDir) {
+      const normalName = stripExtension(makeNormalModuleName(moduleRelName), 'js');
+      const moduleNameHash = hashSum(normalName);
+      const srcFileName = path.join(this.depsSrcDir, moduleRelName);
+      const dstFileName = path.join(this.dstDir, moduleNameHash);
+
+      result.push([
+        moduleNameHash,
+        srcFileName,
+        dstFileName,
+        normalName,
+      ]);
+    }
+
+    return result;
   }
 
   async copyLocalToFlashDir() {
     for (let localModule of this.localModules) {
       await fsPromises.copyFile(
-        localModule[FULL_FILE_NAME_POS],
-        localModule[DST_FILE_NAME_POS]
+        localModule[SRC_NAME_POS],
+        localModule[DST_NAME_POS]
+      );
+    }
+  }
+
+  async copyDepsToFlashDir() {
+    for (let localModule of this.depsModules) {
+      await fsPromises.copyFile(
+        localModule[SRC_NAME_POS],
+        localModule[DST_NAME_POS]
       );
     }
   }
@@ -76,7 +104,7 @@ class PrepareToFlash {
   getHashOfRelativeModule(srcFileFullPath, requiredModuleRelPath) {
     const baseDir = path.dirname(srcFileFullPath);
     const depFullPath = path.resolve(baseDir, `${requiredModuleRelPath}.js`);
-    const foundItem = _.find(this.localModules, (item) => item[FULL_FILE_NAME_POS] === depFullPath);
+    const foundItem = _.find(this.localModules, (item) => item[SRC_NAME_POS] === depFullPath);
 
     if (!foundItem) {
       throw new Error(`Can't find local module "${requiredModuleRelPath}"`);
@@ -120,16 +148,16 @@ class PrepareToFlash {
   async renameLocalModulesRequires() {
     for (let localModule of this.localModules) {
       const moduleContent = await fsPromises.readFile(
-        localModule[DST_FILE_NAME_POS],
+        localModule[DST_NAME_POS],
         {encoding: 'utf8'}
       );
       const replacedContent = this.replaceRequirePaths(
         moduleContent,
-        localModule[FULL_FILE_NAME_POS]
+        localModule[SRC_NAME_POS]
       );
 
       await fsPromises.writeFile(
-        localModule[DST_FILE_NAME_POS],
+        localModule[DST_NAME_POS],
         replacedContent,
         {encoding: 'utf8'}
       );
@@ -140,8 +168,8 @@ class PrepareToFlash {
 
 
 
-module.exports = async function (srcDir, dstDir, relativeIndexFile, moduleRoot) {
-  const prepareToFlash = new PrepareToFlash(srcDir, dstDir, relativeIndexFile, moduleRoot);
+module.exports = async function (srcDir, depsSrcDir, dstDir, relativeIndexFile, moduleRoot) {
+  const prepareToFlash = new PrepareToFlash(srcDir, depsSrcDir, dstDir, relativeIndexFile, moduleRoot);
 
   await prepareToFlash.start();
 };

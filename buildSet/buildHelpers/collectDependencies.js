@@ -65,11 +65,11 @@ class Collect {
     // TODO: read package.json and find main
   }
 
-  _resolveFile(moduleOrFileName) {
-    let fullName = moduleOrFileName;
+  _resolveFile(fileName) {
+    let fullName = fileName;
 
-    if (!moduleOrFileName.match(/\.js$/)) {
-      fullName = `${moduleOrFileName}.js`;
+    if (!fileName.match(/\.js$/)) {
+      fullName = `${fileName}.js`;
     }
 
     for (let root of this._buildConfig.moduleRoots) {
