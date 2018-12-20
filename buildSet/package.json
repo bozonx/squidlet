@@ -42,6 +42,7 @@
     "gulp-replace": "^1.0.0",
     "gulp-terser": "^1.1.6",
     "gulp-typescript": "^5.0.0",
+    "hash-sum": "^1.0.2",
     "lodash": "^4.17.11",
     "pump": "^3.0.0",
     "shelljs": "^0.8.3",

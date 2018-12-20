@@ -59,7 +59,12 @@ gulp.task('build', async () => {
   await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
   // min deps
   await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
-  await prepareToFlash(projectCfg.minPrjDir, projectCfg.flashDir, projectCfg.mainJsFileName, projectCfg.moduleRoot);
+  await prepareToFlash(
+    projectCfg.minPrjDir,
+    projectCfg.flashDir,
+    projectCfg.mainJsFileName,
+    projectCfg.moduleRoot
+  );
 });
 
 // upload project

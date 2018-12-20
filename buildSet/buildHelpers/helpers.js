@@ -1,7 +1,9 @@
 const path = require('path');
+const fs = require('fs');
 const shelljs = require('shelljs');
+const dependencyTree = require('dependency-tree');
 
-
+const fsPromises = fs.promises;
 const PATH_SEPARATOR = '/';
 
 function stripExtension(filePath, extension) {
@@ -21,10 +23,48 @@ function stringify (moduleContent) {
 }
 
 
+async function eachFileRecursively(rootDir, cb) {
+  let currentDirs;
+
+  try {
+    currentDirs = fsPromises.readdir(rootDir);
+  }
+  catch (err) {
+    throw new Error(`Can't read dir "${rootDir}". ${String(err)}`);
+  }
+
+  // dir doesn't exists
+  if (!currentDirs) return;
+
+  // TODO: проверить
+  console.log(1111111, currentDirs);
+
+  // remove "." and ".."
+  const preparedDirList = currentDirs.slice(2);
+
+  for (let fileOrDir of preparedDirList) {
+    const fileOrDirPath = `${rootDir}/${fileOrDir}`;
+    const statResult = fsPromises.stat(fileOrDirPath) as any;
+
+    // TODO: проверить
+    console.log(1111111, statResult);
+
+    if (statResult.dir) {
+      // it's dir - go recursively
+      return eachFileRecursively(fileOrDirPath, cb);
+    }
+
+    // it's file
+    cb(fileOrDirPath);
+  }
+
+}
+
 module.exports = {
   PATH_SEPARATOR,
   stripExtension,
   stringify,
+  eachFileRecursively,
 
   projectConfig(envPrjConfig) {
     const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
@@ -69,6 +109,15 @@ module.exports = {
     const moduleName = `${moduleRoot}${PATH_SEPARATOR}${moduleRelPath}`;
 
     return moduleName;
-  }
+  },
+
+  makeModulesTree(rootDir, relativeMainFile) {
+    return dependencyTree.toList({
+      filename: path.join(rootDir, relativeMainFile),
+      directory: rootDir,
+      // exclude node_modules
+      filter: path => path.indexOf('node_modules') === -1, // optional
+    });
+  },
 
 };
