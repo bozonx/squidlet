@@ -35,7 +35,9 @@ function runExp(port, expr) {
     esp.expr(port, expr, function(result, aa,ss) {
       if (!result) return reject(`Expression din't return any result. ${expr}`);
 
-      resolve(result);
+      setTimeout(() => {
+        resolve(result);
+      }, 300);
     });
   });
 }
