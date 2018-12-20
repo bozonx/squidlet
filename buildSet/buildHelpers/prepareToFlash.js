@@ -10,6 +10,7 @@ const fsPromises = fs.promises;
 const HASH_POS = 0;
 const FULL_FILE_NAME_POS = 1;
 const DST_FILE_NAME_POS = 2;
+const DEP_NAME_POS = 1;
 
 
 class PrepareToFlash {
@@ -19,12 +20,12 @@ class PrepareToFlash {
     this.relativeIndexFile = relativeIndexFile;
     this.moduleRoot = moduleRoot;
     this.localModules = [];
+    this.depsModules = [];
   }
 
   async start() {
-    const modulesFileNames = makeModulesTree(this.srcDir, this.relativeIndexFile);
-
-    this.localModules = this.makeLocalModulesNames(modulesFileNames);
+    this.localModules = await this.collectLocalModules();
+    this.depsModules = await this.collectDepsModules();
 
     try {
       await fsPromises.mkdir(this.dstDir);
@@ -38,7 +39,8 @@ class PrepareToFlash {
   }
 
 
-  makeLocalModulesNames(modulesFileNames) {
+  async collectLocalModules() {
+    const modulesFileNames = makeModulesTree(this.srcDir, this.relativeIndexFile);
     const result = [];
 
     for (let fullFileName of modulesFileNames) {
@@ -58,6 +60,10 @@ class PrepareToFlash {
     return result;
   }
 
+  async collectDepsModules() {
+
+  }
+
   async copyLocalToFlashDir() {
     for (let localModule of this.localModules) {
       await fsPromises.copyFile(
@@ -73,14 +79,20 @@ class PrepareToFlash {
     const foundItem = _.find(this.localModules, (item) => item[FULL_FILE_NAME_POS] === depFullPath);
 
     if (!foundItem) {
-      throw new Error(`Can't find local module "${requiredModuleRelPath}" in "${foundItem[FULL_FILE_NAME_POS]}"`);
+      throw new Error(`Can't find local module "${requiredModuleRelPath}"`);
     }
 
     return foundItem[HASH_POS];
   }
 
-  getHashOfDependency() {
-    // TODO:
+  getHashOfDependency(requiredModuleNam) {
+    const foundItem = _.find(this.depsModules, (item) => item[DEP_NAME_POS] === requiredModuleNam);
+
+    if (!foundItem) {
+      throw new Error(`Can't find dependency module "${requiredModuleNam}"`);
+    }
+
+    return foundItem[HASH_POS];
   }
 
   replaceRequirePaths(moduleContent, srcFileFullPath) {
@@ -98,7 +110,7 @@ class PrepareToFlash {
       }
       else {
         // third party dependency
-        depHashName = this.getHashOfDependency();
+        depHashName = this.getHashOfDependency(savedPart);
       }
 
       return fullMatch.replace(savedPart, depHashName);
