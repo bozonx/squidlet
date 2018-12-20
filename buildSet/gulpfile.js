@@ -9,6 +9,7 @@ const {makeBundle, collectAppModules} = require('./buildHelpers/makeBundle');
 const collectDependencies = require('./buildHelpers/collectDependencies');
 const minimize = require('./buildHelpers/minimize');
 const replaceRequirePaths = require('./buildHelpers/replaceRequirePaths');
+const prepareToFlash = require('./buildHelpers/prepareToFlash');
 const {uploadBundle, uploadProject} = require('./buildHelpers/upload');
 
 
@@ -58,7 +59,7 @@ gulp.task('build', async () => {
   await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
   // min deps
   await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
-
+  await prepareToFlash(projectCfg.minPrjDir, projectCfg.flashDir, projectCfg.mainJsFileName, projectCfg.moduleRoot);
 });
 
 // upload project

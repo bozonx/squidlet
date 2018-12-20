@@ -36,6 +36,7 @@ module.exports = {
       moduleRoot: envPrjConfig.moduleRoot,
       minPrjDir: path.join(buildDir, 'minPrj'),
       minDepsDir: path.join(buildDir, 'minDeps'),
+      flashDir: path.join(buildDir, 'flash'),
       srcDir: path.resolve(process.cwd(), envPrjConfig.src),
       dependenciesBuildDir: path.join(buildDir, 'deps'),
       mainJsFileName: `${envPrjConfig.main}.js`,
