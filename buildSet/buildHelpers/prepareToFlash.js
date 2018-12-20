@@ -11,9 +11,6 @@ const FULL_FILE_NAME_POS = 0;
 const DST_FILE_NAME_POS = 1;
 
 
-// TODO: собрать сторонние зависимости
-
-
 function makeModulesNames (modulesFileNames, srcDir, dstDir, moduleRoot) {
 
   // TODO: поидее можно просто список сделать
@@ -45,7 +42,7 @@ async function copyToFlashDir (modules) {
   }
 }
 
-function replaceRootOfModule(modules, srcDir, srcFileFullPath, requiredModuleRelPath) {
+function getHashOrRelativeModule(modules, srcDir, srcFileFullPath, requiredModuleRelPath) {
   const baseDir = path.dirname(srcFileFullPath);
   const depFullPath = path.resolve(baseDir, `${requiredModuleRelPath}.js`);
   let depHashName;
@@ -64,16 +61,27 @@ function replaceRootOfModule(modules, srcDir, srcFileFullPath, requiredModuleRel
   return depHashName;
 }
 
+function getHashOfDependency(modules) {
+
+}
+
 function replaceRequirePaths (modules, moduleContent, srcDir, srcFileFullPath) {
 
   // TODO: remove it
   const prepareToReplace = moduleContent.replace(/;/g, ';\n');
 
   return prepareToReplace.replace(/require\(['"]([^\n]+)['"]\)/g, (fullMatch, savedPart) => {
+    let depHashName;
+    
     // skip not local modules
-    if (!savedPart.match(/^\./)) return fullMatch;
-
-    const depHashName = replaceRootOfModule(modules, srcDir, srcFileFullPath, savedPart);
+    if (savedPart.match(/^\./)) {
+      // local module
+      depHashName = getHashOrRelativeModule(modules, srcDir, srcFileFullPath, savedPart);
+    }
+    else {
+      // trird party dependency
+      depHashName = getHashOfDependency();
+    }
 
     return fullMatch.replace(savedPart, depHashName);
   });
