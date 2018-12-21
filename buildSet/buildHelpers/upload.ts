@@ -28,19 +28,37 @@ class Upload {
     await this.initEspruino();
     this.configureEspruino();
 
-    const uploadExpressions = await this.collectUploadExpressions();
+    const filesInFlashDir: string[] = await fsPromises.readdir(this.flashDir);
+    const fileWriteExprs: string[] = await this.collectUploadExpressions(filesInFlashDir);
+
+    let uploadExpressions: string[] = [
+      this.geFilesRemoveExp(filesInFlashDir),
+      ...fileWriteExprs,
+    ];
 
     await this.runExprs(uploadExpressions);
   }
 
-  private async collectUploadExpressions(): Promise<string[]> {
-    const filesInFlashDir: string[] = await fsPromises.readdir(this.flashDir);
+  private geFilesRemoveExp(filesInFlashDir: string[]): string {
+    return `for(let f of ${JSON.stringify(filesInFlashDir)}){require("Storage").erase(f)}`;
+
+    // let result = '';
+    //
+    // for (let relFileName of filesInFlashDir) {
+    //   result += `require("Storage").erase("${relFileName}");`;
+    // }
+    //
+    // return result;
+  }
+
+  private async collectUploadExpressions(filesInFlashDir: string[]): Promise<string[]> {
     const exprs: string[] = [];
 
     for (let relFileName of filesInFlashDir) {
       const fullFileName = path.resolve(this.flashDir, relFileName);
       const moduleContent: string = await fsPromises.readFile(fullFileName, {encoding: 'utf8'});
       const stringedModule = stringify(moduleContent);
+
       const expr = `require("Storage").write("${relFileName}", "${stringedModule}")`;
 
       exprs.push(expr);

@@ -149,7 +149,7 @@ class PrepareToFlash {
     // TODO: remove it
     const prepareToReplace = moduleContent.replace(/;/g, ';\n');
 
-    return prepareToReplace.replace(
+    const replaced = prepareToReplace.replace(
       /require\(['"]([^\n]+)['"]\)/g,
       (fullMatch: string, savedPart: string) => {
         let depHashName: string;
@@ -166,6 +166,9 @@ class PrepareToFlash {
         return fullMatch.replace(savedPart, depHashName);
       }
     );
+
+    // TODO: remove it
+    return replaced.replace(/;\n/g, ';');
   }
 
   /**
