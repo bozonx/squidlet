@@ -51,6 +51,11 @@
     "yaml": "^1.0.3"
   },
   "devDependencies": {
-    "@types/node": "^10.12.15"
+    "@types/gulp": "^4.0.5",
+    "@types/gulp-babel": "^6.1.29",
+    "@types/gulp-typescript": "^2.13.0",
+    "@types/js-yaml": "^3.11.4",
+    "@types/node": "^10.12.15",
+    "@types/pump": "^1.0.1"
   }
 }

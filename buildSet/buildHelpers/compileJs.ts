@@ -1,12 +1,12 @@
-const path = require('path');
-const gulp = require('gulp');
-const babel = require('gulp-babel');
+import * as path from 'path';
+import * as gulp from 'gulp';
+import * as babel from 'gulp-babel';
 
 
 /**
  * compile typescript and make espruino compatible javascript code
  */
-module.exports = function compileJs (srcDir, destDir, strictMode) {
+export default function compileJs (srcDir: string, destDir: string, strictMode?: boolean) {
   return new Promise((resolve, reject) => {
     return gulp
       .src(path.resolve(srcDir, `**/*.js`))
@@ -62,7 +62,7 @@ module.exports = function compileJs (srcDir, destDir, strictMode) {
           }],
 
           [
-            "@babel/plugin-transform-runtime",
+            '@babel/plugin-transform-runtime',
             {
               //"corejs": true,
               // if false it put definition into files. If true - make requires
@@ -74,7 +74,7 @@ module.exports = function compileJs (srcDir, destDir, strictMode) {
 
           //'transform-async-to-promises',
         ],
-      }))
+      } as any))
       .pipe(gulp.dest(destDir))
       .on('error', reject)
       .on('end', resolve);

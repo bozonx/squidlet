@@ -1,9 +1,9 @@
-const gulp = require('gulp');
+import * as gulp from 'gulp';
+import * as pump from 'pump';
 const terser = require('gulp-terser');
-const pump = require('pump');
 
 
-module.exports = function minimize (srcDir, dstDir) {
+module.exports = function minimize (srcDir: string, dstDir: string) {
   return new Promise((resolve, reject) => {
     pump(
       [
