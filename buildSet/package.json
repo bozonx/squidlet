@@ -52,7 +52,6 @@
   },
   "devDependencies": {
     "@types/dependency-tree": "^6.1.0",
-    "@types/espruino": "^1.94.2",
     "@types/gulp": "^4.0.5",
     "@types/gulp-babel": "^6.1.29",
     "@types/gulp-typescript": "^2.13.0",

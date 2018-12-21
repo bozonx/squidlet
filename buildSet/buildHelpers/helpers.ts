@@ -24,11 +24,13 @@ interface BuildConfig {
 
 
 export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPath: string): BuildConfig {
-  const buildDir = path.resolve(path.basename(envConfigPath), envPrjConfig.dst);
+  const envConfigBaseDir = path.dirname(envConfigPath);
+  const buildDir = path.resolve(envConfigBaseDir, envPrjConfig.dst);
 
   return {
     buildDir,
-    srcDir: path.resolve(path.basename(envConfigPath), envPrjConfig.src),
+    srcDir: path.resolve(envConfigBaseDir, envPrjConfig.src),
+    prjConfigYaml: path.resolve(envConfigBaseDir, envPrjConfig.prjConfig),
     compiledTsDir: path.join(buildDir, 'compiled-ts'),
     compiledJsDir: path.join(buildDir, 'compiled-js'),
     hostRoot: 'system/host',
@@ -38,7 +40,6 @@ export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPat
     dependenciesBuildDir: path.join(buildDir, 'deps'),
     mainJsFileName: `${envPrjConfig.main}.js`,
     bundleFile: path.join(buildDir, 'bundle.js'),
-    prjConfigYaml: envPrjConfig.prjConfig,
     strictMode: envPrjConfig.strictMode,
   };
 }
