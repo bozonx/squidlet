@@ -7,24 +7,34 @@ import * as yaml from 'js-yaml';
 const {makeSafeModuleName} = require('./helpers');
 
 
+interface BuildConfig {
+
+}
+
+
 /**
  * collect third party dependencies
  */
 class Collect {
+  private readonly buildConfigYaml: string;
+  private readonly dstDir: string;
+  private readonly buildConfig: BuildConfig;
+  
+  
   constructor(buildConfigYaml: string, dstDir: string) {
-    this._buildConfigYaml = buildConfigYaml;
-    this._dstDir = dstDir;
-    this._buildConfig = yaml.load(fs.readFileSync(buildConfigYaml));
+    this.buildConfigYaml = buildConfigYaml;
+    this.dstDir = dstDir;
+    this.buildConfig = yaml.load(fs.readFileSync(buildConfigYaml, 'utf8'));
 
     this._validateBuildConfig();
   }
 
   async collect() {
-    shelljs.mkdir('-p', this._dstDir);
+    shelljs.mkdir('-p', this.dstDir);
 
-    if (!this._buildConfig.dependencies) return;
+    if (!this.buildConfig.dependencies) return;
 
-    for (let moduleOrFileName of this._buildConfig.dependencies) {
+    for (let moduleOrFileName of this.buildConfig.dependencies) {
       const resolvedMainFile = await this._resolveModuleMainFile(moduleOrFileName);
 
       await this._buildMainFile(moduleOrFileName, resolvedMainFile);
@@ -34,23 +44,23 @@ class Collect {
   }
 
   _validateBuildConfig() {
-    if (!_.isPlainObject(this._buildConfig)) {
-      throw new Error(`BuildConfig ${this._buildConfigYaml} has to be an object`);
+    if (!_.isPlainObject(this.buildConfig)) {
+      throw new Error(`BuildConfig ${this.buildConfigYaml} has to be an object`);
     }
-    else if (!this._buildConfig.moduleRoots) {
-      throw new Error(`There isn't "moduleRoots" param in buildConfig ${this._buildConfigYaml}`);
+    else if (!this.buildConfig.moduleRoots) {
+      throw new Error(`There isn't "moduleRoots" param in buildConfig ${this.buildConfigYaml}`);
     }
-    else if (!_.isArray(this._buildConfig.moduleRoots)) {
-      throw new Error(`Parameter "moduleRoots" in buildConfig ${this._buildConfigYaml} has to be an array`);
+    else if (!_.isArray(this.buildConfig.moduleRoots)) {
+      throw new Error(`Parameter "moduleRoots" in buildConfig ${this.buildConfigYaml} has to be an array`);
     }
-    else if (this._buildConfig.dependencies && !_.isArray(this._buildConfig.dependencies)) {
-      throw new Error(`Parameter "dependencies" in buildConfig ${this._buildConfigYaml} has to be an array`);
+    else if (this.buildConfig.dependencies && !_.isArray(this.buildConfig.dependencies)) {
+      throw new Error(`Parameter "dependencies" in buildConfig ${this.buildConfigYaml} has to be an array`);
     }
   }
 
   async _resolveModuleMainFile(moduleOrFileName) {
     if (!_.isString(moduleOrFileName)) {
-      throw new Error(`Module or file name of dependency has to be a string. Build config "${this._buildConfigYaml}"`);
+      throw new Error(`Module or file name of dependency has to be a string. Build config "${this.buildConfigYaml}"`);
     }
 
     const regex = new RegExp(`\\${path.sep}`);
@@ -72,8 +82,8 @@ class Collect {
       fullName = `${fileName}.js`;
     }
 
-    for (let root of this._buildConfig.moduleRoots) {
-      const modulesDirPath = path.resolve(path.dirname(this._buildConfigYaml), root);
+    for (let root of this.buildConfig.moduleRoots) {
+      const modulesDirPath = path.resolve(path.dirname(this.buildConfigYaml), root);
       const modulePath = path.join(modulesDirPath, fullName);
 
       if (fs.existsSync(modulePath)) {
@@ -94,7 +104,7 @@ class Collect {
 
         // TODO: !!! use real building
 
-        shelljs.cp('-f', resolvedMainFile, path.join(this._dstDir, safeModuleName));
+        shelljs.cp('-f', resolvedMainFile, path.join(this.dstDir, safeModuleName));
 
         resolve();
       }
