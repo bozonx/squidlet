@@ -49,26 +49,16 @@ class Upload {
     return exprs;
   }
 
-  private runExprs (uploadExpressions: string[]) {
+  private async runExprs (uploadExpressions: string[]) {
     Espruino.Core.Serial.startListening(() => {});
 
-    return new Promise((resolve, reject) => {
-      Espruino.Core.Serial.open(this.port, async (status?: string) => {
-          if (status === undefined) {
-            return reject(new Error('Unable to connect!'));
-          }
+    await this.connectToMc();
 
-          for (let exp of uploadExpressions) {
-            await this.sendExpression(exp);
-          }
+    for (let exp of uploadExpressions) {
+      await this.sendExpression(exp);
+    }
 
-          Espruino.Core.Serial.close();
-        },
-        () => { // disconnected
-          //if (callback) callback(exprResult);
-          resolve();
-        });
-    });
+    Espruino.Core.Serial.close();
   }
 
   sendExpression(expression: string) {
@@ -101,6 +91,24 @@ class Upload {
 
         resolve();
       });
+    });
+  }
+
+  private connectToMc(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      Espruino.Core.Serial.open(
+        this.port,
+        (status?: string) => {
+          if (status === undefined) {
+            return reject(new Error('Unable to connect!'));
+          }
+
+          resolve(status);
+        },
+        () => { // disconnected
+          console.log('===> Disconnected');
+        }
+      );
     });
   }
 
