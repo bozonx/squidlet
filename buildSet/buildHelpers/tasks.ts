@@ -11,6 +11,7 @@ import prepareToFlash from './prepareToFlash';
 import upload from './upload';
 
 
+// TODO: получить из агрументов
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
 const projectCfg = projectConfig(envConfig.project);
 

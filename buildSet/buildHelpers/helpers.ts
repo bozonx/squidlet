@@ -23,6 +23,9 @@ export function stringify (moduleContent: string): string {
 }
 
 export function projectConfig(envPrjConfig) {
+
+  // TODO: корень build dir получить из аргументов
+
   const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
 
   return {
