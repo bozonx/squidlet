@@ -6,6 +6,24 @@ import * as dependencyTree from 'dependency-tree';
 export const PATH_SEPARATOR = '/';
 
 
+interface BuildConfig {
+  buildDir: string;
+  compiledTsDir: string;
+  compiledJsDir: string;
+  moduleRoot: string;
+  minPrjDir: string;
+  minDepsDir: string;
+  flashDir: string;
+  srcDir: string;
+  dependenciesBuildDir: string;
+  mainJsFileName: string;
+  bundleFile: string;
+  prjConfigYaml: string;
+  strictMode?: boolean;
+}
+
+
+
 export function stripExtension(filePath: string, extension: string): string {
   const regex = new RegExp(`\\.${extension}$`);
 
@@ -22,7 +40,7 @@ export function stringify (moduleContent: string): string {
   return preparedContent;
 }
 
-export function projectConfig(envPrjConfig) {
+export function projectConfig(envPrjConfig: {[index: string]: any}): BuildConfig {
 
   // TODO: корень build dir получить из аргументов
 

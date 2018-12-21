@@ -193,7 +193,6 @@ class PrepareToFlash {
 }
 
 
-
 export default async function (
   srcDir: string,
   depsSrcDir: string,
