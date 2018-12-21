@@ -45,7 +45,8 @@
     "moduleResolution": "node",
     "lib": ["ES2018"],
     "target": "ES2018",
-    "module": "commonjs",
+    //"module": "commonjs",
+    "module": "esnext",
     "noImplicitReturns": true,
 
     "strict": true

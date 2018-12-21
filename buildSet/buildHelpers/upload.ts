@@ -54,8 +54,15 @@ class Upload {
 
     await this.connectToMc();
 
-    for (let exp of uploadExpressions) {
-      await this.sendExpression(exp);
+    try {
+      for (let exp of uploadExpressions) {
+        await this.sendExpression(exp);
+      }
+    }
+    catch (err) {
+      Espruino.Core.Serial.close();
+
+      throw new Error(err);
     }
 
     Espruino.Core.Serial.close();
