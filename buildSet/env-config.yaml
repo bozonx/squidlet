@@ -1,11 +1,10 @@
 #src: ../host/src
-src: ./build/hostTest/src
-dst: build/host
+src: ../build/hostTest/src
+dst: ../build/host
+#prjConfig: ../host/prjConfig.yaml
+prjConfig: ../build/hostTest/prjConfig.yaml
 # main ts file name without extension
 main: index
-#prjConfig: ../host/prjConfig.yaml
-prjConfig: ./build/hostTest/prjConfig.yaml
-moduleRoot: system/host
 strictMode: false
 
 # Port where mcu device is located

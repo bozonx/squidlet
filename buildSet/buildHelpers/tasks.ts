@@ -1,8 +1,9 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 
-import {projectConfig, clearDir} from './helpers';
+import {makeEnvConfig, clearDir} from './helpers';
 import compileJs from './compileJs';
 import compileTs from './compileTs';
 import collectDependencies from './collectDependencies';
@@ -12,36 +13,37 @@ import upload from './upload';
 
 
 // TODO: получить из агрументов
-const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
-const projectCfg = projectConfig(envConfig.project);
+const envConfigPath = path.resolve(__dirname, '../env-config.yaml');
+const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
+const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 
 // host
 gulp.task('build-host', async () => {
-  clearDir(projectCfg.buildDir);
-  await compileTs(projectCfg.srcDir, projectCfg.compiledTsDir);
-  await compileJs(projectCfg.compiledTsDir, projectCfg.compiledJsDir, projectCfg.strictMode);
-  await collectDependencies(projectCfg.prjConfigYaml, projectCfg.dependenciesBuildDir);
+  clearDir(buildConfig.buildDir);
+  await compileTs(buildConfig.srcDir, buildConfig.compiledTsDir);
+  await compileJs(buildConfig.compiledTsDir, buildConfig.compiledJsDir, buildConfig.strictMode);
+  await collectDependencies(buildConfig.prjConfigYaml, buildConfig.dependenciesBuildDir);
   // min prj
-  await minimize(projectCfg.compiledJsDir, projectCfg.minPrjDir);
+  await minimize(buildConfig.compiledJsDir, buildConfig.minPrjDir);
   // min deps
-  await minimize(projectCfg.dependenciesBuildDir, projectCfg.minDepsDir);
+  await minimize(buildConfig.dependenciesBuildDir, buildConfig.minDepsDir);
   await prepareToFlash(
-    projectCfg.minPrjDir,
-    projectCfg.minDepsDir,
-    projectCfg.flashDir,
-    projectCfg.mainJsFileName,
-    projectCfg.moduleRoot
+    buildConfig.minPrjDir,
+    buildConfig.minDepsDir,
+    buildConfig.flashDir,
+    buildConfig.mainJsFileName,
+    buildConfig.hostRoot
   );
 });
 
 // upload all the files
 gulp.task('upload', async () => {
   await upload(
-    envConfig.board,
-    envConfig.port,
-    envConfig.portSpeed,
-    projectCfg.flashDir
+    envConfigParsedYaml.board,
+    envConfigParsedYaml.port,
+    envConfigParsedYaml.portSpeed,
+    buildConfig.flashDir
   );
 });
 

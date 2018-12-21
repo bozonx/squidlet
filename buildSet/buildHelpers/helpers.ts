@@ -10,7 +10,7 @@ interface BuildConfig {
   buildDir: string;
   compiledTsDir: string;
   compiledJsDir: string;
-  moduleRoot: string;
+  hostRoot: string;
   minPrjDir: string;
   minDepsDir: string;
   flashDir: string;
@@ -23,6 +23,25 @@ interface BuildConfig {
 }
 
 
+export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPath: string): BuildConfig {
+  const buildDir = path.resolve(path.basename(envConfigPath), envPrjConfig.dst);
+
+  return {
+    buildDir,
+    srcDir: path.resolve(path.basename(envConfigPath), envPrjConfig.src),
+    compiledTsDir: path.join(buildDir, 'compiled-ts'),
+    compiledJsDir: path.join(buildDir, 'compiled-js'),
+    hostRoot: 'system/host',
+    minPrjDir: path.join(buildDir, 'minPrj'),
+    minDepsDir: path.join(buildDir, 'minDeps'),
+    flashDir: path.join(buildDir, 'flash'),
+    dependenciesBuildDir: path.join(buildDir, 'deps'),
+    mainJsFileName: `${envPrjConfig.main}.js`,
+    bundleFile: path.join(buildDir, 'bundle.js'),
+    prjConfigYaml: envPrjConfig.prjConfig,
+    strictMode: envPrjConfig.strictMode,
+  };
+}
 
 export function stripExtension(filePath: string, extension: string): string {
   const regex = new RegExp(`\\.${extension}$`);
@@ -38,29 +57,6 @@ export function stringify (moduleContent: string): string {
   preparedContent = preparedContent.replace(/\n/g, '\\n');
 
   return preparedContent;
-}
-
-export function projectConfig(envPrjConfig: {[index: string]: any}): BuildConfig {
-
-  // TODO: корень build dir получить из аргументов
-
-  const buildDir = path.resolve(process.cwd(), envPrjConfig.dst);
-
-  return {
-    buildDir,
-    compiledTsDir: path.join(buildDir, 'compiled-ts'),
-    compiledJsDir: path.join(buildDir, 'compiled-js'),
-    moduleRoot: envPrjConfig.moduleRoot,
-    minPrjDir: path.join(buildDir, 'minPrj'),
-    minDepsDir: path.join(buildDir, 'minDeps'),
-    flashDir: path.join(buildDir, 'flash'),
-    srcDir: path.resolve(process.cwd(), envPrjConfig.src),
-    dependenciesBuildDir: path.join(buildDir, 'deps'),
-    mainJsFileName: `${envPrjConfig.main}.js`,
-    bundleFile: path.join(buildDir, 'bundle.js'),
-    prjConfigYaml: envPrjConfig.prjConfig,
-    strictMode: envPrjConfig.strictMode,
-  };
 }
 
 export function clearDir(dirName: string) {
