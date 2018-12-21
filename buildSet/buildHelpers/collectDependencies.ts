@@ -1,17 +1,17 @@
-const path = require('path');
-const shelljs = require('shelljs');
-const fs = require('fs');
-const _ = require('lodash');
-const yaml = require('js-yaml');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as shelljs from 'shelljs';
+import * as _ from 'lodash';
+import * as yaml from 'js-yaml';
 
-const { makeSafeModuleName} = require('./helpers');
+const {makeSafeModuleName} = require('./helpers');
 
 
 /**
  * collect third party dependencies
  */
 class Collect {
-  constructor(buildConfigYaml, dstDir) {
+  constructor(buildConfigYaml: string, dstDir: string) {
     this._buildConfigYaml = buildConfigYaml;
     this._dstDir = dstDir;
     this._buildConfig = yaml.load(fs.readFileSync(buildConfigYaml));
@@ -111,8 +111,8 @@ class Collect {
 }
 
 
-module.exports = async function (buildConfigYaml, dstDir) {
+export default async function (buildConfigYaml: string, dstDir: string) {
   const collect = new Collect(buildConfigYaml, dstDir);
 
   await collect.collect();
-};
+}
