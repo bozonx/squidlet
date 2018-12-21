@@ -451,6 +451,10 @@
     "@types/events" "*"
     "@types/node" "*"
 
+"@types/dependency-tree@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@types/dependency-tree/-/dependency-tree-6.1.0.tgz#12d30efd39b6caad29928d7ab3c39149feff09a5"
+
 "@types/events@*":
   version "1.2.0"
   resolved "http://registry.npmjs.org/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -510,6 +514,13 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/pump/-/pump-1.0.1.tgz#ae8157cefef04d1a4d24c1cc91d403c2f5da5cd0"
   dependencies:
+    "@types/node" "*"
+
+"@types/shelljs@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@types/shelljs/-/shelljs-0.8.1.tgz#133e874b5fb816a2e1c8647839c82d76760b1191"
+  dependencies:
+    "@types/glob" "*"
     "@types/node" "*"
 
 "@types/undertaker-registry@*":
