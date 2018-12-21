@@ -8,7 +8,8 @@ const {makeSafeModuleName} = require('./helpers');
 
 
 interface BuildConfig {
-
+  moduleRoots: string[];
+  dependencies?: string[];
 }
 
 
@@ -26,7 +27,7 @@ class Collect {
     this.dstDir = dstDir;
     this.buildConfig = yaml.load(fs.readFileSync(buildConfigYaml, 'utf8'));
 
-    this._validateBuildConfig();
+    this.validateBuildConfig();
   }
 
   async collect() {
@@ -35,15 +36,15 @@ class Collect {
     if (!this.buildConfig.dependencies) return;
 
     for (let moduleOrFileName of this.buildConfig.dependencies) {
-      const resolvedMainFile = await this._resolveModuleMainFile(moduleOrFileName);
+      const resolvedMainFile = await this.resolveModuleMainFile(moduleOrFileName);
 
-      await this._buildMainFile(moduleOrFileName, resolvedMainFile);
+      await this.buildMainFile(moduleOrFileName, resolvedMainFile);
     }
 
-    await this._makeDepsBundle();
+    await this.makeDepsBundle();
   }
 
-  _validateBuildConfig() {
+  private validateBuildConfig() {
     if (!_.isPlainObject(this.buildConfig)) {
       throw new Error(`BuildConfig ${this.buildConfigYaml} has to be an object`);
     }
@@ -58,7 +59,7 @@ class Collect {
     }
   }
 
-  async _resolveModuleMainFile(moduleOrFileName) {
+  private async resolveModuleMainFile(moduleOrFileName: string): Promise<string> {
     if (!_.isString(moduleOrFileName)) {
       throw new Error(`Module or file name of dependency has to be a string. Build config "${this.buildConfigYaml}"`);
     }
@@ -67,15 +68,17 @@ class Collect {
 
     if (moduleOrFileName.match(regex)) {
       // it's a file
-      return this._resolveFile(moduleOrFileName);
+      return this.resolveFile(moduleOrFileName);
     }
 
     // else it's a module
 
     // TODO: read package.json and find main
+
+    throw new Error('Only files are supported as a dependency at the moment');
   }
 
-  _resolveFile(fileName) {
+  private resolveFile(fileName: string): string {
     let fullName = fileName;
 
     if (!fileName.match(/\.js$/)) {
@@ -94,7 +97,7 @@ class Collect {
     throw new Error(`File "${fullName}" does not exist`);
   }
 
-  async _buildMainFile(moduleName, resolvedMainFile) {
+  private async buildMainFile(moduleName: string, resolvedMainFile: string) {
     return new Promise((resolve, reject) => {
       console.log(`--> Building dependency ${moduleName} - ${resolvedMainFile}`);
 
@@ -114,7 +117,7 @@ class Collect {
     });
   }
 
-  async _makeDepsBundle() {
+  private async makeDepsBundle() {
     // TODO: place modules to Module.cache
   }
 
