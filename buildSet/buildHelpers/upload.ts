@@ -11,14 +11,12 @@ const fsPromises = fs.promises;
 
 
 class Upload {
-  private readonly board: string;
   private readonly port: string;
   private readonly portSpeed: number;
   private readonly flashDir: string;
 
 
-  constructor(board: string, port: string, portSpeed: number, flashDir: string) {
-    this.board = board;
+  constructor(port: string, portSpeed: number, flashDir: string) {
     this.port = port;
     this.portSpeed = portSpeed;
     this.flashDir = flashDir;
@@ -40,15 +38,7 @@ class Upload {
   }
 
   private geFilesRemoveExp(filesInFlashDir: string[]): string {
-    return `for(let f of ${JSON.stringify(filesInFlashDir)}){require("Storage").erase(f)}`;
-
-    // let result = '';
-    //
-    // for (let relFileName of filesInFlashDir) {
-    //   result += `require("Storage").erase("${relFileName}");`;
-    // }
-    //
-    // return result;
+    return `(function(){for(let f of ${JSON.stringify(filesInFlashDir)}){try{require("Storage").erase(f)}catch(e){}}})()`;
   }
 
   private async collectUploadExpressions(filesInFlashDir: string[]): Promise<string[]> {
@@ -60,6 +50,7 @@ class Upload {
       const stringedModule = stringify(moduleContent);
 
       const expr = `require("Storage").write("${relFileName}", "${stringedModule}")`;
+      //const expr = `console.log("${relFileName}", "${stringedModule}")`;
 
       exprs.push(expr);
     }
@@ -92,7 +83,7 @@ class Upload {
         if (result) {
           setTimeout(() => {
             return resolve(result);
-          }, 500);
+          }, 15000);
 
           return;
         }
@@ -106,7 +97,6 @@ class Upload {
     Espruino.Config.BAUD_RATE = String(this.portSpeed);
     Espruino.Config.BLUETOOTH_LOW_ENERGY  = false;
     Espruino.Config.SET_TIME_ON_WRITE  = true;
-    Espruino.Config.BOARD_JSON_URL = `http://www.espruino.com/json/${this.board}.json`;
   }
 
   private initEspruino() {
@@ -140,8 +130,8 @@ class Upload {
 }
 
 
-export default async function (board: string, port: string, portSpeed: number, flashDir: string) {
-  const upload = new Upload(board, port, portSpeed, flashDir);
+export default async function (port: string, portSpeed: number, flashDir: string) {
+  const upload = new Upload(port, portSpeed, flashDir);
 
   await upload.start();
 }

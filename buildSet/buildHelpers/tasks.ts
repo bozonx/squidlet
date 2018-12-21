@@ -40,7 +40,6 @@ gulp.task('build-host', async () => {
 // upload all the files
 gulp.task('upload', async () => {
   await upload(
-    envConfigParsedYaml.board,
     envConfigParsedYaml.port,
     envConfigParsedYaml.portSpeed,
     buildConfig.flashDir

@@ -11,4 +11,3 @@ strictMode: false
 port: /dev/ttyUSB0
 # ESP32 after flash has 115200 speed.
 portSpeed: 115200
-board: ESP32
