@@ -24,7 +24,7 @@ export default function compileJs (srcDir: string, destDir: string, strictMode?:
 
           // '@babel/plugin-transform-async-to-generator',
           // '@babel/plugin-transform-regenerator',
-          //'@babel/plugin-proposal-async-generator-functions',
+          // '@babel/plugin-proposal-async-generator-functions',
 
           // TODO: check
 
@@ -67,12 +67,12 @@ export default function compileJs (srcDir: string, destDir: string, strictMode?:
               //"corejs": true,
               // if false it put definition into files. If true - make requires
               //helpers: false,
-              // "regenerator": true,
+              //regenerator: true,
               //useESModules: false,
             }
           ],
 
-          //'transform-async-to-promises',
+          'transform-async-to-promises',
         ],
       } as any))
       .pipe(gulp.dest(destDir))
