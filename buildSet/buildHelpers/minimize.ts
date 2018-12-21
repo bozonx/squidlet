@@ -3,7 +3,7 @@ import * as pump from 'pump';
 const terser = require('gulp-terser');
 
 
-module.exports = function minimize (srcDir: string, dstDir: string) {
+export default function minimize (srcDir: string, dstDir: string) {
   return new Promise((resolve, reject) => {
     pump(
       [
