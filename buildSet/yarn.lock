@@ -455,6 +455,10 @@
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@types/dependency-tree/-/dependency-tree-6.1.0.tgz#12d30efd39b6caad29928d7ab3c39149feff09a5"
 
+"@types/espruino@^1.94.2":
+  version "1.94.2"
+  resolved "https://registry.yarnpkg.com/@types/espruino/-/espruino-1.94.2.tgz#6f97c28a5616818ecea4e98984ecf3ffe9a67ed4"
+
 "@types/events@*":
   version "1.2.0"
   resolved "http://registry.npmjs.org/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"

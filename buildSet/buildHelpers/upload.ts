@@ -1,7 +1,9 @@
-const esp = require("espruino");
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
+const esp = require('espruino');
+
 const {stringify} = require('./helpers');
+
 
 const fsPromises = fs.promises;
 
@@ -44,9 +46,6 @@ function runExprs (port, exprs) {
   });
 }
 
-
-
-
 function configureEspruino(board, portSpeed) {
   Espruino.Config.BAUD_RATE = String(portSpeed);
   Espruino.Config.BLUETOOTH_LOW_ENERGY  = false;
@@ -64,71 +63,8 @@ function initEspruino() {
   });
 }
 
-function sendBundle(port, bundleFile) {
-  return new Promise((resolve, reject) => {
-    esp.sendFile(port, bundleFile, function(err) {
-      if (err) return reject(err);
 
-      resolve();
-    })
-  });
-}
-
-function runExp(port, expr) {
-  return new Promise((resolve, reject) => {
-    esp.expr(port, expr, function(result, aa,ss) {
-      if (!result) return reject(`Expression din't return any result. ${expr}`);
-
-      setTimeout(() => {
-        resolve(result);
-      }, 300);
-    });
-  });
-}
-
-async function pushModule(port, relativeModulePath, moduleName, moduleContent) {
-  const stringedModule = stringify(moduleContent);
-
-  // TODO: get root from config
-  const rootDir = 'host';
-
-  const expr = `global.__flashFile("${rootDir}", "${relativeModulePath}", "${stringedModule}")`;
-
-  // console.log(11111111, moduleName, moduleContent)
-  //
-  // // TODO: remove
-  // resolve();
-  // return;
-
-  // ---- require('fs').readdir('/system')
-
-
-  //await runExpr(port, expr);
-
-  await runExp(port, expr);
-}
-
-
-/**
- * like ./node_modules/.bin/espruino --board ESP32 --port /dev/ttyUSB0 -b 115200 --no-ble -m -t ./build/starter/bundle.js
- */
-exports.uploadBundle = async function (board, port, portSpeed, bundleFile) {
-  await initEspruino();
-  configureEspruino(board, portSpeed);
-  await sendBundle(port, bundleFile);
-};
-
-
-exports.uploadProject = async function (board, port, portSpeed, modules) {
-  await initEspruino();
-  configureEspruino(board, portSpeed);
-
-  for (let module of modules) {
-    await pushModule(port, module[0], module[1], module[2]);
-  }
-};
-
-exports.uploadToFlash = async function (board, port, portSpeed, flashDir) {
+export default async function (board: string, port: string, portSpeed: number, flashDir: string) {
   await initEspruino();
   configureEspruino(board, portSpeed);
 
@@ -149,4 +85,4 @@ exports.uploadToFlash = async function (board, port, portSpeed, flashDir) {
   }
 
   await runExprs(port, exprs);
-};
+}

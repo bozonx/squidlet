@@ -8,7 +8,7 @@ import compileTs from './compileTs';
 import collectDependencies from './collectDependencies';
 import minimize from './minimize';
 import prepareToFlash from './prepareToFlash';
-import {uploadToFlash} from './upload';
+import upload from './upload';
 
 
 const envConfig = yaml.load(fs.readFileSync('env-config.yaml'));
@@ -36,7 +36,7 @@ gulp.task('build-host', async () => {
 
 // upload all the files
 gulp.task('upload', async () => {
-  await uploadToFlash(
+  await upload(
     envConfig.board,
     envConfig.port,
     envConfig.portSpeed,
