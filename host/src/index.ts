@@ -1,3 +1,7 @@
+/**
+ * Main file which starts on microController's system boot.
+ */
+
 import System from './app/System';
 
 
@@ -5,8 +9,5 @@ const system = new System();
 
 system.start()
   .catch((err: Error) => {
-
-    // TODO: to starter's logger
-
-    console.log(String(err));
+    console.log(`Uncaught error: ${String(err)}`);
   });

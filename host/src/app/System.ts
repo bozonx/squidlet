@@ -62,29 +62,34 @@ export default class System {
   }
 
   async start() {
-    // runtime config
-    await this.host.init();
-    await this.driversManager.initSystemDrivers();
-    this.riseEvent(eventNames.system.systemDriversInitialized);
+    try {
+      // runtime config
+      await this.host.init();
+      await this.driversManager.initSystemDrivers();
+      this.riseEvent(eventNames.system.systemDriversInitialized);
 
-    this.network.init(this.host.id, this.host.networkConfig);
-    this.riseEvent(eventNames.system.networkInitialized);
+      this.network.init(this.host.id, this.host.networkConfig);
+      this.riseEvent(eventNames.system.networkInitialized);
 
-    this.messenger.init();
-    this.devices.init();
-    this.riseEvent(eventNames.system.messengerInitialized);
+      this.messenger.init();
+      this.devices.init();
+      this.riseEvent(eventNames.system.messengerInitialized);
 
-    await this.servicesManager.initSystemServices();
-    this.riseEvent(eventNames.system.systemServicesInitialized);
+      await this.servicesManager.initSystemServices();
+      this.riseEvent(eventNames.system.systemServicesInitialized);
 
-    await this.initApp();
-    this.isInitialized = true;
-    this.riseEvent(eventNames.system.appInitialized);
+      await this.initApp();
+      this.isInitialized = true;
+      this.riseEvent(eventNames.system.appInitialized);
 
-    // remove initialization config
-    delete this.initializationConfig;
+      // remove initialization config
+      delete this.initializationConfig;
 
-    this.log.info(`===> Host initialization has finished`);
+      this.log.info(`===> Host initialization has finished`);
+    }
+    catch (err) {
+      this.log.error(`Can't start host system: ${String(err)}`);
+    }
   }
 
   onAppInit(cb: () => void): number {

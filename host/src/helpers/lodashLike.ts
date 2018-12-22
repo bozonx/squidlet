@@ -1,4 +1,3 @@
-const _isEmpty = require('lodash/isEmpty');
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _capitalize = require('lodash/capitalize');
@@ -11,16 +10,15 @@ const _padStart = require('lodash/padStart');
 const _last = require('lodash/last');
 
 
-export function isEmpty(...p: any[]) {
-  return _isEmpty(...p);
-}
+// TODO: test
 
-export function defaultsDeep(...p: any[]) {
-  return _defaultsDeep(...p);
-}
 
-export function cloneDeep(...p: any[]) {
-  return _cloneDeep(...p);
+export function isEmpty(toCheck: any): boolean {
+  if (typeof toCheck == 'undefined' || toCheck === null || toCheck === '') return true;
+  if (toCheck instanceof Array && !toCheck.length) return true;
+  if (typeof toCheck === 'object' && !Object.keys(toCheck).length) return true;
+
+  return false;
 }
 
 export function capitalize(...p: any[]) {
@@ -37,10 +35,6 @@ export function omit(...p: any[]) {
 
 export function find(...p: any[]) {
   return _find(...p);
-}
-
-export function isEqual(...p: any[]) {
-  return _isEqual(...p);
 }
 
 export function trim(...p: any[]) {
@@ -61,3 +55,15 @@ export function trimEnd(stringToTrim: string, chars: string): string {
   return stringToTrim.replace(regex, '');
 }
 
+
+export function defaultsDeep(...p: any[]) {
+  return _defaultsDeep(...p);
+}
+
+export function cloneDeep(...p: any[]) {
+  return _cloneDeep(...p);
+}
+
+export function isEqual(...p: any[]) {
+  return _isEqual(...p);
+}
