@@ -14,7 +14,7 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
 import Main from './Main';
 import systemConfig from './configs/systemConfig';
-import {ManifestsTypeName, ManifestsTypePluralName} from './interfaces/ManifestTypes';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
 
 
 /**

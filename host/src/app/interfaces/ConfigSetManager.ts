@@ -2,7 +2,7 @@
 
 
 import ManifestBase from './ManifestBase';
-import {ManifestsTypePluralName} from '../../../../configWorks/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from './ManifestTypes';
 
 
 export default interface ConfigSetManager {

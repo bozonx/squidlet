@@ -6,7 +6,7 @@ import systemConfig from './configs/systemConfig';
 import {EntitiesNames} from './Entities';
 import PreManifestBase from './interfaces/PreManifestBase';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
-import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
 
 
 /**

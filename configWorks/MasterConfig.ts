@@ -3,7 +3,7 @@ import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _cloneDeep = require('lodash/cloneDeep');
 
-import {ManifestsTypeName} from './interfaces/ManifestTypes';
+import {ManifestsTypeName} from '../host/src/app/interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
