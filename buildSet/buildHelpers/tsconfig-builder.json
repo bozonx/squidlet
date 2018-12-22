@@ -8,8 +8,8 @@
     //"isolatedModules": false,
 
     "allowSyntheticDefaultImports": true,
-    // makes helper __importDefault
-    "esModuleInterop": true,
+    // if true adds helper __importDefault
+    "esModuleInterop": false,
     "removeComments": true,
     "declaration": false,
     "sourceMap": false,
