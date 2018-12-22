@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import Main from './Main';
-import DefinitionsSet from './interfaces/DefinitionsSet';
+import DefinitionsSet from '../host/src/app/interfaces/DefinitionsSet';
 import systemConfig from './configs/systemConfig';
 import {EntitiesNames} from './Entities';
 import PreManifestBase from './interfaces/PreManifestBase';

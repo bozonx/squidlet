@@ -5,7 +5,7 @@ import _cloneDeep = require('lodash/cloneDeep');
 
 import {ManifestsTypeName} from '../host/src/app/interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';
-import PreHostConfig from './interfaces/PreHostConfig';
+import PreHostConfig from '../host/src/app/interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
 import HostConfig from '../host/src/app/interfaces/HostConfig';

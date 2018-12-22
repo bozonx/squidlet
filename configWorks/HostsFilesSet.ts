@@ -4,7 +4,7 @@ import _values = require('lodash/values');
 import Main from './Main';
 import {EntitiesSet} from '../host/src/app/interfaces/EntitySet';
 import {EntitiesNames} from './Entities';
-import DefinitionsSet from './interfaces/DefinitionsSet';
+import DefinitionsSet from '../host/src/app/interfaces/DefinitionsSet';
 import {sortByIncludeInList} from './helpers';
 import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
 
