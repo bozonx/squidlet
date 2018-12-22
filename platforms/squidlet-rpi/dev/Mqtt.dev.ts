@@ -1,4 +1,5 @@
 import * as mqtt from 'mqtt';
+import Mqtt from '../../../host/src/app/interfaces/dev/Mqtt';
 
 
 interface Props {
@@ -7,7 +8,7 @@ interface Props {
   port: string;
 }
 
-export class MqttDevConnection {
+export class MqttDevConnection implements Mqtt {
   connectPromise: Promise<void>;
 
   private _connected: boolean = false;
@@ -46,7 +47,7 @@ export class MqttDevConnection {
     });
   }
 
-  subscribe(topic: string) {
+  subscribe(topic: string): Promise<void> {
     // TODO: support of options
 
     return new Promise((resolve, reject) => {
@@ -63,7 +64,7 @@ export class MqttDevConnection {
     });
   }
 
-  onMessage(handler: (topic: string, data: string) => void) {
+  onMessage(handler: (topic: string, data: string) => void): void {
     const handlerWrapper = (topic: string, data: Buffer) => {
       handler(topic, data.toString());
     };

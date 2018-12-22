@@ -1,5 +1,5 @@
-import {HostFilesSet} from '../interfaces/HostFilesSet';
-import ConfigSetBase from './ConfigSetBase';
+import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import ConfigSetBase from '../host/src/app/config/ConfigSetBase';
 
 
 export default class ConfigSetSolid extends ConfigSetBase {
