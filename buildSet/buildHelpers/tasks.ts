@@ -42,7 +42,8 @@ gulp.task('upload', async () => {
   await upload(
     envConfigParsedYaml.port,
     envConfigParsedYaml.portSpeed,
-    buildConfig.flashDir
+    buildConfig.flashDir,
+    buildConfig.bootrstPath
   );
 });
 

@@ -14,12 +14,14 @@ class Upload {
   private readonly port: string;
   private readonly portSpeed: number;
   private readonly flashDir: string;
+  private readonly bootrstPath: string;
 
 
-  constructor(port: string, portSpeed: number, flashDir: string) {
+  constructor(port: string, portSpeed: number, flashDir: string, bootrstPath: string) {
     this.port = port;
     this.portSpeed = portSpeed;
     this.flashDir = flashDir;
+    this.bootrstPath = bootrstPath;
   }
 
   async start() {
@@ -28,9 +30,11 @@ class Upload {
 
     const filesInFlashDir: string[] = await fsPromises.readdir(this.flashDir);
     const fileWriteExprs: string[] = await this.collectUploadExpressions(filesInFlashDir);
+    const bootrstContent: string = await fsPromises.readFile(this.bootrstPath, {encoding: 'utf8'});
 
     let uploadExpressions: string[] = [
       this.geFilesRemoveExp([ '.bootrst', ...filesInFlashDir ]),
+      this.makeFileWriteExpression('.bootrst', bootrstContent),
       ...fileWriteExprs,
     ];
 
@@ -49,13 +53,17 @@ class Upload {
       const moduleContent: string = await fsPromises.readFile(fullFileName, {encoding: 'utf8'});
       const stringedModule = stringify(moduleContent);
 
-      const expr = `require("Storage").write("${relFileName}", "${stringedModule}")`;
+      const expr = this.makeFileWriteExpression(relFileName, stringedModule);
       //const expr = `console.log("${relFileName}", "${stringedModule}")`;
 
       exprs.push(expr);
     }
 
     return exprs;
+  }
+
+  private makeFileWriteExpression(fileName: string, fileContent: string): string {
+    return `require("Storage").write("${fileName}", "${fileContent}")`;
   }
 
   private async runExprs (uploadExpressions: string[]) {
@@ -130,8 +138,8 @@ class Upload {
 }
 
 
-export default async function (port: string, portSpeed: number, flashDir: string) {
-  const upload = new Upload(port, portSpeed, flashDir);
+export default async function (port: string, portSpeed: number, flashDir: string, bootrstPath: string) {
+  const upload = new Upload(port, portSpeed, flashDir, bootrstPath);
 
   await upload.start();
 }

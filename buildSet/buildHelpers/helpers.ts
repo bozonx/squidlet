@@ -19,6 +19,7 @@ interface BuildConfig {
   mainJsFileName: string;
   bundleFile: string;
   prjConfigYaml: string;
+  bootrstPath: string;
   strictMode?: boolean;
 }
 
@@ -40,6 +41,7 @@ export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPat
     dependenciesBuildDir: path.join(buildDir, 'deps'),
     mainJsFileName: `${envPrjConfig.main}.js`,
     bundleFile: path.join(buildDir, 'bundle.js'),
+    bootrstPath: path.join(__dirname, '.bootrst'),
     strictMode: envPrjConfig.strictMode,
   };
 }
