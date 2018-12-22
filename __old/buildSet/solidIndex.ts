@@ -1,7 +1,7 @@
-import HostApp from '../host/src/app/System';
-import ConfigSetSolid from '../host/src/app/config/ConfigSetSolid';
-import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
-import {prepareHostSystem} from './starterCommon';
+import HostApp from '../../host/src/app/System';
+import ConfigSetSolid from '../../host/src/app/config/ConfigSetSolid';
+import {HostFilesSet} from '../../host/src/app/interfaces/HostFilesSet';
+import {prepareHostSystem} from '../../buildSet/starterCommon';
 
 // const debug = global.__DEBUG;
 

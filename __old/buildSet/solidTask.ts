@@ -5,10 +5,10 @@ import * as shelljs from 'shelljs';
 import * as gulp from 'gulp';
 const ts = require('gulp-typescript');
 
-import {readConfig, resolveConfigPath} from './helpers';
-import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-import Main from '../configWorks/Main';
-import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import {readConfig, resolveConfigPath} from '../../buildSet/helpers';
+import PreMasterConfig from '../../configWorks/interfaces/PreMasterConfig';
+import Main from '../../configWorks/Main';
+import {HostFilesSet} from '../../host/src/app/interfaces/HostFilesSet';
 
 const buildDir = 'build/solid';
 const tmpDir = path.resolve(__dirname, buildDir, 'tmp');

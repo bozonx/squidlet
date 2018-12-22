@@ -30,12 +30,9 @@ export default class LogPublisher {
   }
 
   async fatal(message: string) {
-
     await this.send('fatal', `ERROR: ${message}`);
 
-    // TODO: review - is exit really need ?
-
-    process.exit(2);
+    throw new Error(message);
   }
 
   private async send(level: string, message: string) {

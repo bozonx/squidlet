@@ -1,3 +1,7 @@
+/**
+ * Simple replacement of "System.js" module system.
+ */
+
 type ExportCb = (paramName: string, value: any) => void;
 type ExportObj = {[index: string]: any};
 type Context = {[index: string]: any};
