@@ -1,9 +1,8 @@
-import _isEmpty = require('lodash/isEmpty');
-
 import System from './System';
 import HostConfig from './interfaces/HostConfig';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
 import {generateUniqId} from '../helpers/helpers';
+import {isEmpty} from '../helpers/lodashLike';
 
 
 export default class Host {
@@ -96,7 +95,7 @@ export default class Host {
     for (let devicesId of devicesIds) {
       const device = this.system.devicesManager.getDevice(devicesId);
 
-      if (_isEmpty(device.actions)) continue;
+      if (isEmpty(device.actions)) continue;
 
       result[devicesId] = Object.keys(device.actions);
     }

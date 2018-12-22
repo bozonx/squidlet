@@ -1,12 +1,10 @@
-import _find = require('lodash/find');
-import _omit = require('lodash/omit');
-
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
+import {find, omit} from '../../helpers/lodashLike';
 
 
 export interface DigitalPinInputDriverProps extends DigitalBaseProps {
@@ -36,7 +34,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.gpio = await getDriverDep(driverName)
-      .getInstance(_omit(this.props, 'pullup', 'pulldown', 'pin', 'gpio'));
+      .getInstance(omit(this.props, 'pullup', 'pulldown', 'pin', 'gpio'));
   }
 
   protected didInit = async () => {
@@ -79,7 +77,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
   removeListener(handler: WatchHandler): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      _find(this.listeners, (handlerItem: WatchHandler, listenerId: string) => {
+      find(this.listeners, (handlerItem: WatchHandler, listenerId: string) => {
         if (handlerItem === handler) {
           delete this.listeners[listenerId];
           this.gpio.clearWatch(Number(listenerId))

@@ -1,11 +1,10 @@
-import _omit = require('lodash/omit');
-
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {invertIfNeed} from '../../drivers/DigitalPin/digitalHelpers';
+import {omit} from '../../helpers/lodashLike';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
@@ -27,7 +26,7 @@ export default class ImpulseSensor extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(_omit(this.props, 'impulseLength', 'blockTime'));
+      .getInstance(omit(this.props, 'impulseLength', 'blockTime'));
   }
 
   protected didInit = async () => {

@@ -1,5 +1,3 @@
-import _omit = require('lodash/omit');
-
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {WatchHandler} from '../../app/interfaces/dev/Digital';
 import {isDigitalInputInverted} from '../../helpers/helpers';
@@ -7,6 +5,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import {omit} from '../../helpers/lodashLike';
 
 
 export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
@@ -39,7 +38,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance({
-        ..._omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
+        ...omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
         invert: this.isInverted(),
       });
   }

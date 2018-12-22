@@ -1,13 +1,10 @@
-import _isEmpty = require('lodash/isEmpty');
-import _find = require('lodash/find');
-import _trim = require('lodash/trim');
-import _padStart = require('lodash/padStart');
 import { TextEncoder, TextDecoder } from 'text-encoding';
 import * as uniqid from 'uniqid';
 
 import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
+import {find, isEmpty, padStart, trim} from './lodashLike';
 
 
 export const PATH_SEPARATOR = '/';
@@ -83,7 +80,7 @@ export function byteToString(hexValue: number): string {
   // TODO: test
 
   // convert 4 to ""00000100""
-  return _padStart( hexValue.toString(2), 8, '0' );
+  return padStart( hexValue.toString(2), 8, '0' );
 }
 
 export function byteToBinArr(hexValue: number): boolean[] {
@@ -136,7 +133,7 @@ export function combineTopic(basePath: string, ...subPaths: Array<string>): stri
 
   // TODO: test
 
-  if (_isEmpty(subPaths)) return basePath;
+  if (isEmpty(subPaths)) return basePath;
 
   return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
 }
@@ -248,8 +245,8 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
   // TODO: test, review
 
   const recursive = (obj: object, rootPath: string): object | undefined => {
-    return _find(obj, (item: any, name: string): any => {
-      const itemPath = _trim(`${rootPath}.${name}`, '.');
+    return find(obj, (item: any, name: string): any => {
+      const itemPath = trim(`${rootPath}.${name}`, '.');
       const cbResult = cb(item, itemPath);
 
       if (typeof cbResult === 'undefined') {
@@ -351,10 +348,4 @@ export function basename(pathToDirOrFile: string): string {
   const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
 
   return pathParts[pathParts.length - 1];
-}
-
-export function trimEnd(stringToTrim: string, chars: string): string {
-  const regex = new RegExp(`\\${chars}+$`);
-
-  return stringToTrim.replace(regex, '');
 }

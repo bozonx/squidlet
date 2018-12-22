@@ -1,6 +1,5 @@
-import _trimEnd = require('lodash/trimEnd');
 import {PATH_SEPARATOR, dirname, basename, isAbsolutePath} from './helpers';
-import {trimEnd} from '../../../buildSet/starterMc/mkdirPLogic';
+import {trimEnd} from './lodashLike';
 
 
 export default async function mkdirPLogic (

@@ -1,11 +1,10 @@
-import _last = require('lodash/last');
-
 import IndexedEvents from '../helpers/IndexedEvents';
 import Network from './Network';
 import DriverEnv from '../app/entities/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
+import {last} from '../helpers/lodashLike';
 
 
 type RouterHandler = (error: Error | null, payload?: any) => void;
@@ -80,7 +79,7 @@ export default class Router {
     }
 
     // if it's final destination - pass message to income listeners
-    if (_last(routerMessage.route) === this.network.hostId) {
+    if (last(routerMessage.route) === this.network.hostId) {
       this.msgEvents.emit(null, routerMessage.payload);
 
       return;
@@ -106,7 +105,7 @@ export default class Router {
    */
   private resolveNextHostId(route: Array<string>): string {
     if (route.length < 2) throw new Error(`Incorrect route ${JSON.stringify(route)}`);
-    if (_last(route) === this.network.hostId) {
+    if (last(route) === this.network.hostId) {
       throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.network.hostId} is the last`);
     }
 

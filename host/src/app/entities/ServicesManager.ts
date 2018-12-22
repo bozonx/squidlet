@@ -1,10 +1,9 @@
-import _includes = require('lodash/includes');
-
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
 import ServiceEnv from './ServiceEnv';
 import System from '../System';
+import {includes} from '../../helpers/lodashLike';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceInstance, ServiceEnv> {
@@ -61,7 +60,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
     );
 
     for (let serviceId of Object.keys(definitions)) {
-      if (_includes(allowedClassNames, definitions[serviceId].className)) {
+      if (includes(allowedClassNames, definitions[serviceId].className)) {
         servicesIds.push(serviceId);
       }
     }

@@ -1,10 +1,9 @@
-import _capitalize = require('lodash/capitalize');
-
 import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import DriverEnv from './DriverEnv';
 import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
+import {capitalize} from '../../helpers/lodashLike';
 
 
 /**
@@ -38,7 +37,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
    * It rises an error if dev hasn't found.
    */
   getDev<T>(shortDevName: string): T {
-    const driverName = `${_capitalize(shortDevName)}.dev`;
+    const driverName = `${capitalize(shortDevName)}.dev`;
 
     return this.getDriver<T>(driverName);
   }

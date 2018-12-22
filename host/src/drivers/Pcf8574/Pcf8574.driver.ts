@@ -3,8 +3,6 @@
  * Handling a PCF8574/PCF8574A IC.
  */
 
-import _omit = require('lodash/omit');
-
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
@@ -12,6 +10,7 @@ import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.dri
 import {byteToBinArr, updateBitInByte} from '../../helpers/helpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import Republish from '../../helpers/Republish';
+import {omit} from '../../helpers/lodashLike';
 
 
 // TODO: наверное не нужно обрабатывать ошибку
@@ -52,7 +51,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
       .getInstance({
-        ..._omit(this.props, 'resendStateInterval'),
+        ...omit(this.props, 'resendStateInterval'),
         pollDataLength: 1,
         pollDataAddress: undefined,
       });

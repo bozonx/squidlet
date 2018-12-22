@@ -1,6 +1,3 @@
-import _omit = require('lodash/omit');
-import _isEqual = require('lodash/isEqual');
-
 import IndexedEvents from '../../helpers/IndexedEvents';
 import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import {I2cMasterDriver} from './I2cMaster.driver';
@@ -11,6 +8,7 @@ import Poling from '../../helpers/Poling';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
+import {isEqual, omit} from '../../helpers/lodashLike';
 
 
 export type Handler = (data: Uint8Array) => void;
@@ -58,7 +56,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
-      .getInstance(_omit(this.props,
+      .getInstance(omit(this.props,
         'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
       ));
 
@@ -207,7 +205,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
 
   private updateLastPollData(data: Uint8Array) {
     // if data is equal to previous data - do nothing
-    if (_isEqual(this.pollLastData, data)) return;
+    if (isEqual(this.pollLastData, data)) return;
 
     // save data
     this.pollLastData = data;

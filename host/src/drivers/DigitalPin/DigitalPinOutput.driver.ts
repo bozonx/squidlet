@@ -1,5 +1,3 @@
-import _omit = require('lodash/omit');
-
 import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
@@ -7,6 +5,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
+import {omit} from '../../helpers/lodashLike';
 
 
 export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
@@ -27,7 +26,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
     const driverName = resolveDriverName(this.props.gpio);
 
     this.depsInstances.gpio = await getDriverDep(driverName)
-      .getInstance(_omit(this.props, 'initialLevel', 'pin', 'gpio'));
+      .getInstance(omit(this.props, 'initialLevel', 'pin', 'gpio'));
   }
 
   //protected didInit = async () => {

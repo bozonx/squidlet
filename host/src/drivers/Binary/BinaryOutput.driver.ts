@@ -1,5 +1,3 @@
-import _omit = require('lodash/omit');
-
 import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {DigitalPinOutputDriver} from '../DigitalPin/DigitalPinOutput.driver';
@@ -8,6 +6,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode, InitialLevel} from './interfaces/Types';
 import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
 import IndexedEvents from '../../helpers/IndexedEvents';
+import {omit} from '../../helpers/lodashLike';
 
 
 export interface BinaryOutputDriverProps extends DigitalBaseProps {
@@ -35,7 +34,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
       .getInstance({
-        ..._omit(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
+        ...omit(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
         initialLevel: this.resolveInitial(),
       });
   }

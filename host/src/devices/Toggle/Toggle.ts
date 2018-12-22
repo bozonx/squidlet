@@ -1,5 +1,3 @@
-import _omit = require('lodash/omit');
-
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -7,6 +5,7 @@ import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/Bi
 import {convertToLevel} from '../../helpers/helpers';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {invertIfNeed} from '../../drivers/DigitalPin/digitalHelpers';
+import {omit} from '../../helpers/lodashLike';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
@@ -27,7 +26,7 @@ export default class Toggle extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(_omit(this.props, 'actionDebounce', 'blockTime'));
+      .getInstance(omit(this.props, 'actionDebounce', 'blockTime'));
   }
 
   protected didInit = async () => {

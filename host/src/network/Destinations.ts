@@ -1,11 +1,9 @@
-import _find = require('lodash/find');
-import _capitalize = require('lodash/capitalize');
-
 import IndexedEvents from '../helpers/IndexedEvents';
 import DriverEnv from '../app/entities/DriverEnv';
 import Connection from './interfaces/Connection';
 import MyAddress from '../app/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
+import {capitalize, find} from '../helpers/lodashLike';
 
 
 type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Destination) => void;
@@ -72,7 +70,7 @@ export default class Destinations {
     for (let name in this.neighbors) {
       const dest = this.neighbors[name];
       const connectionId: string = this.generateConnectionId(dest);
-      const found = _find(this.myAddresses, (item: MyAddress) => {
+      const found = find(this.myAddresses, (item: MyAddress) => {
         return item.type === dest.type && item.bus === dest.bus;
       });
 
@@ -120,7 +118,7 @@ export default class Destinations {
   }
 
   private generateDriverName(connectionType: string): string {
-    return `${_capitalize(connectionType)}.connection.driver`;
+    return `${capitalize(connectionType)}.connection.driver`;
   }
 
 }

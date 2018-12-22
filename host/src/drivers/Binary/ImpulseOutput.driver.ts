@@ -1,10 +1,9 @@
-import _omit = require('lodash/omit');
-
 import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode} from './interfaces/Types';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import {omit} from '../../helpers/lodashLike';
 
 
 export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
@@ -31,7 +30,7 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
-      .getInstance(_omit(this.props, 'impulseLength', 'blockTime', 'blockMode'));
+      .getInstance(omit(this.props, 'impulseLength', 'blockTime', 'blockMode'));
   }
 
 

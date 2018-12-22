@@ -1,4 +1,3 @@
-import _omit = require('lodash/omit');
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
@@ -7,6 +6,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {isDigitalInputInverted} from '../../helpers/helpers';
+import {omit} from '../../helpers/lodashLike';
 
 
 export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
@@ -35,7 +35,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
-      .getInstance(_omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'));
+      .getInstance(omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'));
   }
 
   protected didInit = async () => {
