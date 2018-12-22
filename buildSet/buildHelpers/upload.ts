@@ -64,7 +64,11 @@ class Upload {
   }
 
   private makeFileWriteExpression(fileName: string, fileContent: string): string {
-    return `require("Storage").write("${fileName}", "${fileContent}")`;
+
+    // TODO: remove compact
+
+    //return `(function(){require("Storage").write("${fileName}", "${fileContent}")})()`;
+    return `(function(){require("Storage").write("${fileName}", "${fileContent}");require("Storage").compact()})()`;
   }
 
   private async runExprs (uploadExpressions: string[]) {

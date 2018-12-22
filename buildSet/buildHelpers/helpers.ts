@@ -58,6 +58,9 @@ export function stringify (moduleContent: string): string {
   preparedContent = preparedContent.replace(/\\/g, '\\\\');
   preparedContent = preparedContent.replace(/\"/g, '\\"');
   preparedContent = preparedContent.replace(/\n/g, '\\n');
+  preparedContent = preparedContent.replace(/\r/g, '\\r');
+  // remove invisible and not ascii characters
+  preparedContent = preparedContent.replace(/[^\x20-\x7E]+/g, '');
 
   return preparedContent;
 }
