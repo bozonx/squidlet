@@ -1,4 +1,4 @@
-import Platforms from './Platforms';
+import Platforms from '../../host/src/app/interfaces/Platforms';
 import LogLevel from '../../host/src/app/interfaces/LogLevel';
 
 

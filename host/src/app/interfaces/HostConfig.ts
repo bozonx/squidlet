@@ -1,4 +1,4 @@
-import Platforms from '../../../../configWorks/interfaces/Platforms';
+import Platforms from './Platforms';
 import LogLevel from './LogLevel';
 
 
