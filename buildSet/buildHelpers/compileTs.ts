@@ -7,13 +7,9 @@ export default function compileTs(srcDir: string, destDir: string) {
   return new Promise((resolve, reject) => {
 
     const tsProject = ts.createProject(path.resolve(__dirname, 'tsconfig-builder.json'), {
-      // rootDir: [path.resolve(__dirname, './starterMc')],
-      // outDir: compiledTsDir,
-      //outDir: 'cccc',
-      //outFile: 'index.js',
+      // rootDir: '',
     });
 
-    //return tsProject.src()
     return gulp
       .src(path.resolve(srcDir, `**/*.ts`))
       .pipe(tsProject())

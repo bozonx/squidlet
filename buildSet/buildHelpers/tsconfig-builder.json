@@ -1,31 +1,13 @@
 {
   "compilerOptions": {
-
-//    "listEmittedFiles": true,
-//    "listFiles": true,
-
-    "allowSyntheticDefaultImports": true,
-
+    // "listEmittedFiles": true,
+    // "listFiles": true,
 
     //"importHelpers": true,
     //"noLib": true,
-
     //"isolatedModules": false,
 
-//    "baseUrl": ".",
-//    "paths": {
-//      "es6-promise": ["node_modules/es6-promise"]
-//    },
-
-    // only listed module
-    //"noResolve": true,
-
-    //"rootDir": "../host/src",
-
-
-
-
-
+    "allowSyntheticDefaultImports": true,
     // makes helper __importDefault
     "esModuleInterop": true,
     "removeComments": true,

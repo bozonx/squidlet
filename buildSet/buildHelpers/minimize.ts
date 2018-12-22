@@ -9,12 +9,8 @@ export default function minimize (srcDir: string, dstDir: string) {
       [
         gulp.src(`${srcDir}/**/*.js`),
         terser({
-          //ecma: 7,
-          // keep_fnames: true,
-          // keep_classnames: true,
-          // TODO: !!! setup - it removes EOF
+          // TODO: if true it removes EOF
           compress: false,
-          //mangle: false,
         }),
         gulp.dest(dstDir),
       ],
@@ -25,4 +21,4 @@ export default function minimize (srcDir: string, dstDir: string) {
       }
     );
   });
-};
+}

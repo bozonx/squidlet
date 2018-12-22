@@ -145,8 +145,7 @@ class PrepareToFlash {
    * Replace all the paths in require() functions in specified file
    */
   private replaceRequirePaths(moduleContent: string, srcFileFullPath: string): string {
-
-    // TODO: remove it
+    // it's need because file is minified
     const prepareToReplace = moduleContent.replace(/;/g, ';\n');
 
     const replaced = prepareToReplace.replace(
@@ -167,7 +166,7 @@ class PrepareToFlash {
       }
     );
 
-    // TODO: remove it
+    // remove line breaks which has been set previously
     return replaced.replace(/;\n/g, ';');
   }
 

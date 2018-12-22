@@ -22,12 +22,6 @@ export default function compileJs (srcDir: string, destDir: string, strictMode?:
           // * without "transform-for-of"
           // * without "transform-async-to-generator", "@babel/plugin-transform-regenerator" and "proposal-async-generator-functions"
 
-          // '@babel/plugin-transform-async-to-generator',
-          // '@babel/plugin-transform-regenerator',
-          // '@babel/plugin-proposal-async-generator-functions',
-
-          // TODO: check
-
           '@babel/plugin-transform-dotall-regex',
           '@babel/plugin-proposal-unicode-property-regex',
           '@babel/plugin-transform-sticky-regex',
@@ -72,6 +66,9 @@ export default function compileJs (srcDir: string, destDir: string, strictMode?:
             }
           ],
 
+          // '@babel/plugin-transform-async-to-generator',
+          // '@babel/plugin-transform-regenerator',
+          // '@babel/plugin-proposal-async-generator-functions',
           'transform-async-to-promises',
         ],
       } as any))
