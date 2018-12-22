@@ -16,7 +16,7 @@ import Platforms, {
   PLATFORM_RPI,
   PLATFORM_X86
 } from './interfaces/Platforms';
-import PlatformConfig from './interfaces/PlatformConfig';
+import PlatformConfig from '../host/src/app/interfaces/PlatformConfig';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';

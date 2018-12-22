@@ -1,4 +1,4 @@
-import PreHostConfig from './PreHostConfig';
+import PreHostConfig from '../../../../configWorks/interfaces/PreHostConfig';
 
 
 export default interface PlatformConfig {
