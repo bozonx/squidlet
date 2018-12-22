@@ -34,7 +34,8 @@ class Upload {
 
     let uploadExpressions: string[] = [
       this.geFilesRemoveExp([ '.bootrst', ...filesInFlashDir ]),
-      this.makeFileWriteExpression('.bootrst', bootrstContent),
+      'require("Storage").compact()',
+      this.makeFileWriteExpression('.bootrst', stringify(bootrstContent)),
       ...fileWriteExprs,
     ];
 
@@ -42,7 +43,7 @@ class Upload {
   }
 
   private geFilesRemoveExp(filesInFlashDir: string[]): string {
-    return `(function(){for(let f of ${JSON.stringify(filesInFlashDir)}){try{require("Storage").erase(f)}catch(e){}}require('Storage').compact()})()`;
+    return `(function(){for(let f of ${JSON.stringify(filesInFlashDir)}){try{require("Storage").erase(f)}catch(e){}}})()`;
   }
 
   private async collectUploadExpressions(filesInFlashDir: string[]): Promise<string[]> {
@@ -91,7 +92,8 @@ class Upload {
         if (result) {
           setTimeout(() => {
             return resolve(result);
-          }, 15000);
+            // TODO: set 500
+          }, 2500);
 
           return;
         }
