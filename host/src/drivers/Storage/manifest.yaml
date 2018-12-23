@@ -1,0 +1,5 @@
+name: Storage.driver
+main: Storage.driver.ts
+drivers:
+  - Storage.dev
+props: {}
