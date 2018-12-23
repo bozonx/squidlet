@@ -4,6 +4,7 @@ import PlatformConfig from '../../host/src/app/interfaces/PlatformConfig';
 const platformConfig: PlatformConfig = {
   devs: [
     'Storage.dev',
+    'Sys.dev',
     'Digital.dev',
     //'Pwm.dev',
     'Serial.dev',

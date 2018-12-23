@@ -4,6 +4,7 @@ import PlatformConfig from '../../host/src/app/interfaces/PlatformConfig';
 const platformConfig: PlatformConfig = {
   devs: [
     'Storage.dev',
+    'Sys.dev',
     //'Wifi.dev',
     //'Bluetooth.dev',
 

@@ -17,7 +17,7 @@ const fs = require('fs');
 import Storage, {Stats} from '../../../host/src/app/interfaces/dev/Storage';
 
 
-export default class FsDev implements Storage {
+export default class StorageDev implements Storage {
   appendFile(path: string, data: string | Uint8Array): Promise<void> {
     return new Promise((resolve, reject) => {
       const fn = fs.appendFileSync as (path: string, data: string | Uint8Array) => boolean;
@@ -123,11 +123,5 @@ export default class FsDev implements Storage {
     // TODO: можно удалить старый файл и создать новый с тем же содержимым
     //return fsPromises.rename(oldPath, newPath);
   }
-
-  // TODO: add stat
-  // stat(path: string): Promise<Stats> {
-  //   return fsPromises.stat(path);
-  // }
-
 
 }
