@@ -3,7 +3,7 @@ import {promises as fsPromises} from 'fs';
 import * as yaml from 'js-yaml';
 import systemConfig from './configs/systemConfig';
 import mkdirPLogic from '../host/src/helpers/mkdirPLogic';
-import {Stats} from '../host/src/app/interfaces/dev/Fs';
+import {Stats} from '../host/src/app/interfaces/dev/Storage';
 
 
 export async function loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {

@@ -2,7 +2,7 @@
 //
 // import ConfigSetManager from '../interfaces/ConfigSetManager';
 // import systemConfig from './systemConfig';
-// import StorageDev from '../interfaces/dev/Fs';
+// import StorageDev from '../interfaces/dev/Storage';
 // import System from '../System';
 // import ManifestBase from '../interfaces/ManifestBase';
 // import ConfigSetBase from './ConfigSetBase';

@@ -46,7 +46,7 @@ describe 'configWorks.MasterConfig', ->
 
     # TODO: not safe - may be make new class with cloned prototype
     MasterConfig.prototype.getPlatformConfig = => {
-      devs: ['Fs']
+      devs: ['Storage']
       hostConfig: { platformParam: 'value' }
     }
 
@@ -86,7 +86,7 @@ describe 'configWorks.MasterConfig', ->
     }
 
   it 'getHostPlatformDevs', ->
-    assert.deepEqual @masterConfig.getHostPlatformDevs('master'), ['Fs']
+    assert.deepEqual @masterConfig.getHostPlatformDevs('master'), ['Storage']
 
   it 'buildDir - use defaults if there is not storage dir of configWorks config', ->
     @masterConfig.preHosts.master.config.storageDir = undefined

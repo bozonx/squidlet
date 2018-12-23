@@ -2,23 +2,14 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 
-import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
+import Sys from '../../../host/src/app/interfaces/dev/Sys';
 
 
-export default class FsDev implements Fs {
+export default class SysDev implements Fs {
   // TODO: use constant
   private defaultEncode = 'utf8';
 
   // TODO: сделать конструктор который может заменить кодировку
-
-  appendFile(path: string, data: string | Uint8Array): Promise<void> {
-    if (typeof data === 'string') {
-      return fsPromises.appendFile(path, data, this.defaultEncode);
-    }
-    else {
-      return fsPromises.appendFile(path, data);
-    }
-  }
 
   mkdir(path: string): Promise<void> {
     return fsPromises.mkdir(path);
@@ -49,29 +40,8 @@ export default class FsDev implements Fs {
     }
   }
 
-  async stat(path: string): Promise<Stats> {
-    const stat = await fsPromises.stat(path);
-
-    return {
-      size: stat.size,
-      dir: stat.isDirectory(),
-      mtime: stat.mtimeMs,
-    };
-  }
-
   async exists(path: string): Promise<boolean> {
     return fs.existsSync(path);
-  }
-
-
-  // additional
-
-  copyFile(src: string, dest: string): Promise<void> {
-    return fsPromises.copyFile(src, dest);
-  }
-
-  rename(oldPath: string, newPath: string): Promise<void> {
-    return fsPromises.rename(oldPath, newPath);
   }
 
 }

@@ -1,4 +1,4 @@
-import FsDev, {Stats} from '../../app/interfaces/dev/Fs';
+import FsDev, {Stats} from '../../app/interfaces/dev/Storage';
 import DriverBase from '../../app/entities/DriverBase';
 import EntityDefinition from '../../app/interfaces/EntityDefinition';
 import Env from '../../app/interfaces/Env';
@@ -12,7 +12,7 @@ export class Storage extends DriverBase {
 
     // TODO: move to onInit()
     // TODO: use dependency
-    this.fsDev = this.env.getDev<FsDev>('Fs');
+    this.fsDev = this.env.getDev<FsDev>('Storage');
   }
 
   async isDir(pathToDir: string): Promise<boolean> {

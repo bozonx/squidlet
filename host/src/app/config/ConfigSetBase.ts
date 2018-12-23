@@ -5,7 +5,7 @@ import System from '../System';
 import {HostFilesSet} from '../interfaces/HostFilesSet';
 import ManifestBase from '../interfaces/ManifestBase';
 import {EntitySet} from '../interfaces/EntitySet';
-import FsDev from '../interfaces/dev/Fs';
+import FsDev from '../interfaces/dev/Storage';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 
 
@@ -23,7 +23,9 @@ export default abstract class ConfigSetBase implements ConfigSetManager {
 
   constructor(system: System) {
     this.system = system;
-    this.fs = this.system.driversManager.getDev('Fs');
+
+    // TODO: use Sys.dev
+    this.fs = this.system.driversManager.getDev('Storage');
   }
 
   /**

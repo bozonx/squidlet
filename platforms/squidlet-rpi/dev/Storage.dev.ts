@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 
-import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
+import Storage, {Stats} from '../../../host/src/app/interfaces/dev/Storage';
 
 
-export default class StorageDev implements Fs {
+export default class StorageDev implements Storage {
   // TODO: use constant
   private defaultEncode = 'utf8';
 

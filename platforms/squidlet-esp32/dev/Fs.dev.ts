@@ -14,10 +14,10 @@
 //import * as fs from 'fs';
 const fs = require('fs');
 
-import Fs, {Stats} from '../../../host/src/app/interfaces/dev/Fs';
+import Storage, {Stats} from '../../../host/src/app/interfaces/dev/Storage';
 
 
-export default class FsDev implements Fs {
+export default class FsDev implements Storage {
   appendFile(path: string, data: string | Uint8Array): Promise<void> {
     return new Promise((resolve, reject) => {
       const fn = fs.appendFileSync as (path: string, data: string | Uint8Array) => boolean;
