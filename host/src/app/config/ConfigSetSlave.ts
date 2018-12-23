@@ -2,7 +2,7 @@
 //
 // import ConfigSetManager from '../interfaces/ConfigSetManager';
 // import systemConfig from './systemConfig';
-// import FsDev from '../interfaces/dev/Fs';
+// import StorageDev from '../interfaces/dev/Fs';
 // import System from '../System';
 // import ManifestBase from '../interfaces/ManifestBase';
 // import ConfigSetBase from './ConfigSetBase';
@@ -101,7 +101,7 @@
 //
 //     // TODO: может будет работать через require на espurino?
 //
-//     const fs: FsDev = this.driversManager.getDev<FsDev>('fs');
+//     const fs: StorageDev = this.driversManager.getDev<StorageDev>('fs');
 //     const systemDriversListString = await fs.readFile(filePath);
 //
 //     return JSON.stringify(systemDriversListString);
