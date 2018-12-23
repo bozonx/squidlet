@@ -5,7 +5,7 @@ import {promises as fsPromises} from 'fs';
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
 
 
-export default class SysDev implements Fs {
+export default class SysDev implements Sys {
   // TODO: use constant
   private defaultEncode = 'utf8';
 
