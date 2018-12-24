@@ -1,22 +1,21 @@
 import * as path from 'path';
 
-//import ConfigSetManager from '../interfaces/ConfigSetManager';
-import System from '../System';
-import {HostFilesSet} from '../interfaces/HostFilesSet';
-import ManifestBase from '../interfaces/ManifestBase';
-import {EntitySet} from '../interfaces/EntitySet';
-import FsDev from '../interfaces/dev/Storage';
-import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
+import System from './System';
+import {HostFilesSet} from './interfaces/HostFilesSet';
+import ManifestBase from './interfaces/ManifestBase';
+import {EntitySet} from './interfaces/EntitySet';
+import FsDev from './interfaces/dev/Storage';
+import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 
 
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-export default abstract class ConfigSetBase implements ConfigSetManager {
+export default class ConfigSet {
   // host config which is integrated at index files init time
   static hostConfigSet: HostFilesSet;
 
-  abstract get configSet(): HostFilesSet;
+  //abstract get configSet(): HostFilesSet;
 
   private readonly system: System;
   private readonly fs: FsDev;

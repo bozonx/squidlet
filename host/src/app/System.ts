@@ -12,8 +12,8 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
-import ConfigSetManager from './interfaces/ConfigSetManager';
 import {EntityClassType} from './entities/EntityManagerBase';
+import ConfigSet from './ConfigSet';
 
 
 export default class System {
@@ -26,8 +26,8 @@ export default class System {
   readonly messenger: Messenger;
   readonly devicesManager: DevicesManager;
   readonly devices: Devices;
+  readonly configSet: ConfigSet;
   isInitialized: boolean = false;
-  private configSetManager?: ConfigSetManager;
   // only for initialization time - it will be deleted after it
   private initializationConfig?: InitializationConfig;
 
@@ -35,14 +35,11 @@ export default class System {
     return this.initializationConfig as InitializationConfig;
   }
 
-  get configSet(): ConfigSetManager {
-    return this.configSetManager as ConfigSetManager;
-  }
-
   constructor() {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.events = new Events();
+    this.configSet = new ConfigSet(this);
     this.host = new Host(this);
 
     // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
@@ -94,10 +91,6 @@ export default class System {
 
   onAppInit(cb: () => void): number {
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
-  }
-
-  $registerConfigSetManager(ConfigSetManager: new (system: System) => ConfigSetManager) {
-    this.configSetManager = new ConfigSetManager(this);
   }
 
   async $registerDevs(devs: {[index: string]: EntityClassType}) {

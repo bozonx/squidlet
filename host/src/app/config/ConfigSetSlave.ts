@@ -5,11 +5,11 @@
 // import StorageDev from '../interfaces/dev/Storage';
 // import System from '../System';
 // import ManifestBase from '../interfaces/ManifestBase';
-// import ConfigSetBase from './ConfigSetBase';
+// import ConfigSet from './ConfigSet';
 // import {ManifestsTypePluralName} from '../../../../configWorks/interfaces/ManifestTypes';
 //
 //
-// // TODO: extends ConfigSetBase
+// // TODO: extends ConfigSet
 // export default class ConfigSetSlave implements ConfigSetManager {
 //   private _system?: System;
 //
