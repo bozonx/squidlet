@@ -1,18 +1,17 @@
 import StorageDev, {Stats} from '../../app/interfaces/dev/Storage';
 import DriverBase from '../../app/entities/DriverBase';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
-import Env from '../../app/interfaces/Env';
+import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
 export class Storage extends DriverBase {
-  private storageDev: StorageDev;
+  private get storageDev(): StorageDev {
+    return this.depsInstances.storageDev as StorageDev;
+  }
 
-  constructor(definition: EntityDefinition, env: Env) {
-    super(definition, env);
 
-    // TODO: move to onInit()
-    // TODO: use dependency
-    this.storageDev = this.env.getDev<StorageDev>('Storage');
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.storageDev = await getDriverDep('Storage.dev')
+      .getInstance(this.props);
   }
 
   async isDir(pathToDir: string): Promise<boolean> {

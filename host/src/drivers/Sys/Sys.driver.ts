@@ -1,61 +1,84 @@
 import SysDev from '../../app/interfaces/dev/Sys';
 import DriverBase from '../../app/entities/DriverBase';
-import EntityDefinition from '../../app/interfaces/EntityDefinition';
-import Env from '../../app/interfaces/Env';
+import {GetDriverDep} from '../../app/entities/EntityBase';
+import pathJoin from '../../helpers/nodeLike';
+
+
+const HOST_HASHES_FILE = 'host-hashes.json';
+const CONFIGS_HASHES_FILE = 'configs-hashes.json';
+const ENTITIES_HASHES_FILE = 'entities-hashes.json';
+const HOST_DIR = 'host';
+const CONFIGS_DIR = 'configs';
+const ENTITIES_DIR = 'entities';
 
 
 export class SysDriver extends DriverBase {
-  private syseDev: SysDev;
 
-  constructor(definition: EntityDefinition, env: Env) {
-    super(definition, env);
-
-    // TODO: move to onInit()
-    // TODO: use dependency
-    this.syseDev = this.env.getDev<SysDev>('Storage');
+  private get sysDev(): SysDev {
+    return this.depsInstances.sysDev as SysDev;
   }
 
-  
-  
-  isExists(pathToFileOrDir: string): Promise<boolean> {
-    return this.syseDev.exists(pathToFileOrDir);
+
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.sysDev = await getDriverDep('Sys.dev')
+      .getInstance(this.props);
   }
 
-  readFile(pathToFile: string): Promise<string> {
-    return this.syseDev.readFile(pathToFile);
+
+  getHostHashes(): Promise<string> {
+    return this.sysDev.readFile(HOST_HASHES_FILE);
   }
 
-  /**
-   * Read files and dirs of dir
-   */
-  readDir(pathToDir: string): Promise<string[]> {
-    return this.syseDev.readdir(pathToDir);
+  getConfigsHashes(): Promise<string> {
+    return this.sysDev.readFile(CONFIGS_HASHES_FILE);
   }
 
-  // TODO: add loadJson
-
-  // /**
-  //  * Read the only files of dir
-  //  */
-  // readDirFiles(pathToDir: string) {
-  // }
-
-  writeFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
-    return this.syseDev.writeFile(pathToFile, data);
+  getEntitiesHashes(): Promise<string> {
+    return this.sysDev.readFile(ENTITIES_HASHES_FILE);
   }
 
-  /**
-   * Remove only a file of an empty dir
-   */
-  async rm(pathToFileOrDir: string) {
-    // const stats: Stats = await this.syseDev.stat(pathToFileOrDir);
-    //
-    // if (stats.dir) {
-    //   return this.syseDev.rmdir(pathToFileOrDir);
-    // }
-    // else {
-    //   return this.syseDev.unlink(pathToFileOrDir);
-    // }
+  async loadConfig(configName: string) {
+    return this.sysDev.readFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
+  }
+
+  async loadEntityFile(entityName: string, fileName: string) {
+    return this.sysDev.readFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+  }
+
+  async writeHostFile(fileName: string, content: string) {
+    // TODO: create dir, create or overwrite existing
+  }
+
+  async writeConfigFile(fileName: string, content: string) {
+    // TODO: create dir, create or overwrite existing
+  }
+
+  async writeEntityFile(fileName: string, content: string) {
+    // TODO: create dir, create or overwrite existing
+  }
+
+  writeHostHashesFile(content: string) {
+    return this.sysDev.writeFile(HOST_HASHES_FILE, content);
+  }
+
+  writeConfigHashesFile(content: string) {
+    return this.sysDev.writeFile(CONFIGS_HASHES_FILE, content);
+  }
+
+  writeEntitiesHashesFile(content: string) {
+    return this.sysDev.writeFile(ENTITIES_HASHES_FILE, content);
+  }
+
+  async removeHostFiles(filesList: string[]) {
+    // TODO: remove these files. They are unused files
+    // TODO:  And remove dir if no one file exist
+    // TODO: support of removing whole dirs
+  }
+
+  async removeEntitesFiles(filesList: string[]) {
+    // TODO: remove these files. They are unused files
+    // TODO:  And remove dir if no one file exist
+    // TODO: support of removing whole dirs
   }
 
 }

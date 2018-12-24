@@ -332,6 +332,9 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
+
+// TODO: move to nodeLike
+
 export function isAbsolutePath(pathToDirOrFile: string): boolean {
   return Boolean(pathToDirOrFile.match(/^\//));
 }
