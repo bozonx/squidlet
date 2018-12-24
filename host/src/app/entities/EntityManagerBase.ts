@@ -8,6 +8,7 @@ interface BaseEntityInstance {
   init?: () => Promise<void>;
 }
 
+// TODO: move to separate file
 export type EntityClassType = new (definition: EntityDefinition, env: Env) => BaseEntityInstance;
 
 

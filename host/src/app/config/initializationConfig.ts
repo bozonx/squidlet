@@ -6,6 +6,9 @@ export default function initializationConfig(): InitializationConfig {
     // dirs of host dir
     hostDirs: {
       config: 'config',
+
+      // TODO: review
+
       // there is devices are placed by deviceId
       devices: 'devices',
       drivers: 'drivers',

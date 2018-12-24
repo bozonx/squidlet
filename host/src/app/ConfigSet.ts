@@ -1,22 +1,14 @@
 import System from './System';
-import {HostFilesSet} from './interfaces/HostFilesSet';
 import ManifestBase from './interfaces/ManifestBase';
-import {EntitySet} from './interfaces/EntitySet';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {SysDriver} from '../drivers/Sys/Sys.driver';
+import {EntityClassType} from './entities/EntityManagerBase';
 
 
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
 export default class ConfigSet {
-
-  // TODO: review
-  // host config which is integrated at index files init time
-  static hostConfigSet: HostFilesSet;
-
-  //abstract get configSet(): HostFilesSet;
-
   private readonly system: System;
   private readonly sysDriver: SysDriver;
 
@@ -30,8 +22,8 @@ export default class ConfigSet {
    * Get builtin config
    * @param configName - config name without extension
    */
-  async loadConfig<T>(configName: string): Promise<T> {
-    return await this.sysDriver.loadConfig(configName) as T;
+  loadConfig<T>(configName: string): Promise<T> {
+    return this.sysDriver.loadConfig(configName) as Promise<T>;
   }
 
   /**
@@ -39,12 +31,8 @@ export default class ConfigSet {
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
    */
-  async loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-    if (!this.configSet.entitiesSet[pluralType][entityName]) {
-      throw new Error(`Can't find a manifest "${pluralType}, ${entityName}"`);
-    }
-
-    return this.configSet.entitiesSet[pluralType][entityName].manifest as T;
+  loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
+    return this.sysDriver.loadEntityManifest(pluralType, entityName) as Promise<T>;
   }
 
   /**
@@ -52,23 +40,24 @@ export default class ConfigSet {
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
    */
-  async loadMain<T>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-    const entitySet: EntitySet = this.configSet.entitiesSet[pluralType][entityName];
-
-    if (!entitySet.main) {
-      throw new Error(`Entity "${pluralType}, ${entityName}" does not have a main file`);
-    }
-
-    // TODO: в requireJs возможно вернется промис
-
-    // the main file is already resolved
-    return require(entitySet.main).default;
+  async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
+    return this.sysDriver.loadEntityMain(pluralType, entityName) as Promise<T>;
   }
 
+  loadEntityFile(
+    pluralType: ManifestsTypePluralName,
+    entityName: string,
+    fileName: string
+  ): Promise<string> {
+    return this.sysDriver.loadEntityFile(pluralType, entityName, fileName);
+  }
 
-  async loadEntityFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
-    // TODO: add
-    return '';
+  loadEntityBinFile(
+    pluralType: ManifestsTypePluralName,
+    entityName: string,
+    fileName: string
+  ): Promise<Uint8Array> {
+    return this.sysDriver.loadEntityBinFile(pluralType, entityName, fileName);
   }
 
 }
