@@ -5,6 +5,7 @@ const platformConfig: PlatformConfig = {
   devs: [
     'Storage.dev',
     'Sys.dev',
+    'Sha1',
     'Digital.dev',
     //'Pwm.dev',
     'Serial.dev',
