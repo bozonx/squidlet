@@ -53,9 +53,7 @@ export class SysDriver extends DriverBase {
 
     // TODO: запретить выход наверх
 
-    // TODO: add
-
-    //return this.sysDev.readFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+    return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, entityName, fileName));
   }
 
   async loadEntityManifest(
