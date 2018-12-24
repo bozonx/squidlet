@@ -1,3 +1,6 @@
+
+// TODO: remove
+
 import * as path from 'path';
 
 //import ConfigSetManager from '../interfaces/ConfigSetManager';
@@ -12,7 +15,7 @@ import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-export default abstract class ConfigSetBase implements ConfigSetManager {
+export default abstract class ConfigSetBase {
   // host config which is integrated at index files init time
   static hostConfigSet: HostFilesSet;
 

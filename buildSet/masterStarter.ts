@@ -1,6 +1,6 @@
 import {getPlatformSystem, readConfig} from './helpers';
 import HostApp from '../host/src/app/System';
-import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
+//import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
 import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
