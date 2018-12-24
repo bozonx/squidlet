@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import {loadYamlFile} from '../configWorks/IO';
-import System from '../host/src/app/System';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
@@ -24,23 +23,6 @@ export const platforms: {[index: string]: PlatformConfig} = {
   [PLATFORM_X86]: platform_x86_linux,
 };
 
-
-export async function getPlatformSystem(platformName: string): Promise<System> {
-  if (!platforms[platformName]) {
-    throw new Error(`Platform "${platformName}" haven't been found`);
-  }
-
-  const system: System = new System();
-  const devsSet: {[index: string]: new (...params: any[]) => any} = collectDevs(platformName);
-
-  // TODO: переделать - список devs это конфиг, потом он считывается и запрашиваются сами devs
-
-  console.info(`--> register platform's devs`);
-  await system.$registerDevs(devsSet);
-
-  return system;
-}
-
 export function resolveConfigPath(pathToYamlFile?: string): string {
   if (!pathToYamlFile) {
     throw new Error(`You have to specify a "--config" param`);
@@ -54,7 +36,11 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
 }
 
 
-function collectDevs(platformName: string) {
+export function collectDevs(platformName: string) {
+  if (!platforms[platformName]) {
+    throw new Error(`Platform "${platformName}" haven't been found`);
+  }
+
   const platformDevs: string[] = platforms[platformName].devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
   const platformDirName = `squidlet-${platformName}`;

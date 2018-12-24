@@ -1,10 +1,8 @@
-import {getPlatformSystem, readConfig} from './helpers';
-import HostApp from '../host/src/app/System';
-//import ConfigSetMaster from '../host/src/app/config/ConfigSetMaster';
+import {collectDevs, readConfig} from './helpers';
+import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-//import ConfigSetManager from '../host/src/app/interfaces/ConfigSetManager';
 
 
 /**
@@ -21,23 +19,23 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
 }
 
 export async function prepareHostSystem (
-  getPlatformSystem: (platformName: string) => Promise<HostApp>,
+  getPlatformSystem: (platformName: string) => Promise<System>,
   hostConfigSet: HostFilesSet,
-  ConfigSetManager: new (system: HostApp) => ConfigSetManager
-): Promise<HostApp> {
+): Promise<System> {
   console.info(`===> Initialize host system of platform`);
 
   const platformName: string = hostConfigSet.config.platform;
 
   console.info(`--> getting host system of platform "${platformName}"`);
 
-  const hostSystem: HostApp = await getPlatformSystem(platformName);
+  const hostSystem: System = new System();
+  const devsSet: {[index: string]: new (...params: any[]) => any} = collectDevs(platformName);
 
-  // integrate a config set as a static prop
-  (ConfigSetManager as {[index: string]: any}).hostConfigSet = hostConfigSet;
+  // TODO: replace master Sys.dev
+  // TODO: подмененный Sys.dev должен отдать список других devs
 
-  // register config set manager
-  hostSystem.$registerConfigSetManager(ConfigSetManager);
+  // console.info(`--> register platform's devs`);
+  // await hostSystem.$registerDevs(devsSet);
 
   return hostSystem;
 }
@@ -45,6 +43,9 @@ export async function prepareHostSystem (
 
 export default async function masterStarter (resolvedConfigPath: string) {
   const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedConfigPath);
+
+  // TODO: set buildDir
+
   const main: Main = new Main(masterConfig, resolvedConfigPath);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
@@ -56,7 +57,7 @@ export default async function masterStarter (resolvedConfigPath: string) {
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
-  const hostSystem: HostApp = await prepareHostSystem(getPlatformSystem, hostConfigSet, ConfigSetMaster);
+  const hostSystem: System = await prepareHostSystem(getPlatformSystem, hostConfigSet);
 
   console.info(`===> Starting master host system`);
   await hostSystem.start();
