@@ -39,7 +39,6 @@ export default class System {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.events = new Events();
-    this.configSet = new ConfigSet(this);
     this.host = new Host(this);
 
     // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
@@ -47,7 +46,7 @@ export default class System {
     this.log = new LogPublisher(this);
 
     this.driversManager = new DriversManager(this);
-
+    this.configSet = new ConfigSet(this);
     // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
 
     this.network = new Network(this.driversManager.env);
@@ -93,6 +92,7 @@ export default class System {
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
+  // TODO: review
   async $registerDevs(devs: {[index: string]: EntityClassType}) {
     await this.driversManager.$registerDevs(devs);
   }

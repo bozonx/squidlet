@@ -1,45 +1,37 @@
-import * as path from 'path';
-
 import System from './System';
 import {HostFilesSet} from './interfaces/HostFilesSet';
 import ManifestBase from './interfaces/ManifestBase';
 import {EntitySet} from './interfaces/EntitySet';
-import FsDev from './interfaces/dev/Storage';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
+import {SysDriver} from '../drivers/Sys/Sys.driver';
 
 
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
 export default class ConfigSet {
+
+  // TODO: review
   // host config which is integrated at index files init time
   static hostConfigSet: HostFilesSet;
 
   //abstract get configSet(): HostFilesSet;
 
   private readonly system: System;
-  private readonly fs: FsDev;
+  private readonly sysDriver: SysDriver;
 
   constructor(system: System) {
     this.system = system;
 
-    // TODO: use Sys.dev
-    this.fs = this.system.driversManager.getDev('Storage');
+    this.sysDriver = this.system.driversManager.getDev('Sys.driver');
   }
 
   /**
    * Get builtin config
-   * @param configFileName - config name like "config.json"
+   * @param configName - config name without extension
    */
-  async loadConfig<T>(configFileName: string): Promise<T> {
-    const baseName: string = path.basename(configFileName, '.json');
-    const config: T | undefined = (this.configSet as any)[baseName];
-
-    if (!config) {
-      throw new Error(`Can't find a config "${configFileName}"`);
-    }
-
-    return config;
+  async loadConfig<T>(configName: string): Promise<T> {
+    return await this.sysDriver.loadConfig(configName) as T;
   }
 
   /**
@@ -73,7 +65,8 @@ export default class ConfigSet {
     return require(entitySet.main).default;
   }
 
-  async loadFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
+
+  async loadEntityFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Promise<string> {
     // TODO: add
     return '';
   }

@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
+import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
 
 
 export default class SysDev implements Sys {
@@ -20,6 +21,12 @@ export default class SysDev implements Sys {
 
   readFile(path: string): Promise<string> {
     return fsPromises.readFile(path, this.defaultEncode) as Promise<string>;
+  }
+
+  async readBinFile(path: string): Promise<Uint8Array> {
+    const buffer: Buffer = await fsPromises.readFile(path);
+
+    return convertBufferToUint8Array(buffer);
   }
 
   rmdir(path: string): Promise<void> {

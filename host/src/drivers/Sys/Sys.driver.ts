@@ -37,12 +37,22 @@ export class SysDriver extends DriverBase {
     return this.sysDev.readFile(ENTITIES_HASHES_FILE);
   }
 
-  async loadConfig(configName: string) {
-    return this.sysDev.readFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
+  async loadConfig(configName: string): Promise<{[index: string]: any}> {
+    const content: string = await this.sysDev.readFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
+
+    return JSON.parse(content);
   }
 
-  async loadEntityFile(entityName: string, fileName: string) {
+  async loadMain(entityName: string, fileName: string): Promise<new (...p: any[]) => void> {
     return this.sysDev.readFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+  }
+
+  async loadEntityFile(entityName: string, fileName: string): Promise<string> {
+    return this.sysDev.readFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+  }
+
+  loadBinEntityFile(entityName: string, fileName: string): Promise<Uint8Array> {
+    return this.sysDev.readBinFile(pathJoin(ENTITIES_DIR, entityName, fileName));
   }
 
   async writeHostFile(fileName: string, content: string) {

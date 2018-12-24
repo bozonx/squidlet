@@ -1,6 +1,9 @@
+import {promises as fsPromises} from 'fs';
+
 import StorageDev, {Stats} from '../../app/interfaces/dev/Storage';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import {convertBufferToUint8Array} from '../../helpers/helpers';
 
 
 export class Storage extends DriverBase {
@@ -32,6 +35,10 @@ export class Storage extends DriverBase {
 
   readFile(pathToFile: string): Promise<string> {
     return this.storageDev.readFile(pathToFile);
+  }
+
+  readBinFile(pathToFile: string): Promise<Uint8Array> {
+    return this.storageDev.readBinFile(pathToFile);
   }
 
   /**

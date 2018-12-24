@@ -3,6 +3,7 @@ import {promises as fsPromises} from 'fs';
 
 
 import Storage, {Stats} from '../../../host/src/app/interfaces/dev/Storage';
+import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
 
 
 export default class StorageDev implements Storage {
@@ -30,6 +31,12 @@ export default class StorageDev implements Storage {
 
   readFile(path: string): Promise<string> {
     return fsPromises.readFile(path, this.defaultEncode) as Promise<string>;
+  }
+
+  async readBinFile(path: string): Promise<Uint8Array> {
+    const buffer: Buffer = await fsPromises.readFile(path);
+
+    return convertBufferToUint8Array(buffer);
   }
 
   rmdir(path: string): Promise<void> {

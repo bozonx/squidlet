@@ -1,5 +1,6 @@
 import {I2cBus, openSync} from 'i2c-bus';
 import I2cMaster from '../../../host/src/app/interfaces/dev/I2cMaster';
+import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
 
 
 /**
@@ -43,7 +44,7 @@ export default class I2cMasterDev implements I2cMaster {
         }
 
         // convert to Uint8Array
-        const uIntArr: Uint8Array = this.convertBufferToUint8Array(resultBuffer);
+        const uIntArr: Uint8Array = convertBufferToUint8Array(resultBuffer);
 
         resolve(uIntArr);
       };
@@ -61,16 +62,6 @@ export default class I2cMasterDev implements I2cMaster {
     this.instances[bus] = openSync(parseInt(bus));
 
     return this.instances[bus];
-  }
-
-  private convertBufferToUint8Array(data: Buffer): Uint8Array {
-    const uIntArr = new Uint8Array(data.length);
-
-    for(let i = 0; i < data.length; i++) {
-      uIntArr[i] = data.readInt8(i);
-    }
-
-    return uIntArr;
   }
 
 }
