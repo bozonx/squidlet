@@ -5,7 +5,7 @@ import _includes = require('lodash/includes');
 
 import Main from './Main';
 import {Dependencies, EntitiesNames} from './Entities';
-import PreHostConfig from '../host/src/app/interfaces/PreHostConfig';
+import PreHostConfig from './interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
 
 

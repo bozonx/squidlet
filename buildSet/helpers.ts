@@ -5,13 +5,13 @@ import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
-import PlatformConfig from '../host/src/app/interfaces/PlatformConfig';
+import PlatformConfig from '../configWorks/interfaces/PlatformConfig';
 import {
   PLATFORM_ESP32,
   PLATFORM_ESP8266,
   PLATFORM_RPI,
   PLATFORM_X86
-} from '../platforms/Platforms';
+} from '../configWorks/interfaces/Platforms';
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');

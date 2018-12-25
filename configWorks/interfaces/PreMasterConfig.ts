@@ -1,4 +1,4 @@
-import PreHostConfig from '../../host/src/app/interfaces/PreHostConfig';
+import PreHostConfig from './PreHostConfig';
 
 
 export default interface PreMasterConfig {

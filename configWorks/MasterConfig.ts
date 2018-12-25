@@ -5,7 +5,7 @@ import _cloneDeep = require('lodash/cloneDeep');
 
 import {ManifestsTypeName} from '../host/src/app/interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';
-import PreHostConfig from '../host/src/app/interfaces/PreHostConfig';
+import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
 import HostConfig from '../host/src/app/interfaces/HostConfig';
@@ -15,8 +15,8 @@ import Platforms, {
   PLATFORM_ESP8266,
   PLATFORM_RPI,
   PLATFORM_X86
-} from '../platforms/Platforms';
-import PlatformConfig from '../host/src/app/interfaces/PlatformConfig';
+} from './interfaces/Platforms';
+import PlatformConfig from './interfaces/PlatformConfig';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';

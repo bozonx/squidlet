@@ -1,4 +1,4 @@
-import PlatformConfig from '../../host/src/app/interfaces/PlatformConfig';
+import PlatformConfig from '../../configWorks/interfaces/PlatformConfig';
 
 
 const platformConfig: PlatformConfig = {
