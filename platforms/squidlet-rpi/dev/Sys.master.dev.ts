@@ -60,7 +60,9 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === 'entities') {
-      const fileContent: Uint8Array = await getEntityFile(pathSplit[1], pathSplit[2], pathSplit.slice(3).join(path.sep));
+      const entityType = pathSplit[1] as ManifestsTypePluralName;
+      const fileName: string = pathSplit.slice(3).join(path.sep);
+      const fileContent: Uint8Array = await getEntityFile(entityType, pathSplit[2], fileName);
 
       return uint8ArrayToText(fileContent);
     }
@@ -72,7 +74,10 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === 'entities') {
-      return await getEntityFile(pathSplit[1], pathSplit[2], pathSplit.slice(3).join(path.sep));
+      const entityType = pathSplit[1] as ManifestsTypePluralName;
+      const fileName: string = pathSplit.slice(3).join(path.sep);
+
+      return await getEntityFile(entityType, pathSplit[2], fileName);
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
