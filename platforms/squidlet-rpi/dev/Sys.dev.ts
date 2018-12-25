@@ -20,7 +20,13 @@ export default class SysDev implements Sys {
     return fsPromises.readdir(dirName, DEFAULT_ENCODING) as Promise<string[]>;
   }
 
-  readFile(fileName: string): Promise<string> {
+  async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
+    const fileContent: string = await fsPromises.readFile(fileName, DEFAULT_ENCODING);
+
+    return JSON.parse(fileContent);
+  }
+
+  readStringFile(fileName: string): Promise<string> {
     return fsPromises.readFile(fileName, DEFAULT_ENCODING) as Promise<string>;
   }
 

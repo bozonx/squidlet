@@ -28,25 +28,23 @@ export class SysDriver extends DriverBase {
   }
 
 
-  getHostHashes(): Promise<string> {
-    return this.sysDev.readFile(HOST_HASHES_FILE);
+  getHostHashes(): Promise<{[index: string]: any}> {
+    return this.sysDev.readJsonObjectFile(HOST_HASHES_FILE);
   }
 
-  getConfigsHashes(): Promise<string> {
-    return this.sysDev.readFile(CONFIGS_HASHES_FILE);
+  getConfigsHashes(): Promise<{[index: string]: any}> {
+    return this.sysDev.readJsonObjectFile(CONFIGS_HASHES_FILE);
   }
 
-  getEntitiesHashes(): Promise<string> {
-    return this.sysDev.readFile(ENTITIES_HASHES_FILE);
+  getEntitiesHashes(): Promise<{[index: string]: any}> {
+    return this.sysDev.readJsonObjectFile(ENTITIES_HASHES_FILE);
   }
 
-  async loadConfig(configName: string): Promise<{[index: string]: any}> {
+  loadConfig(configName: string): Promise<{[index: string]: any}> {
 
     // TODO: запретить выход наверх
 
-    const content: string = await this.sysDev.readFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
-
-    return JSON.parse(content);
+    return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
   }
 
   async loadEntityMain(entityName: string, fileName: string): Promise<EntityClassType> {
@@ -63,9 +61,8 @@ export class SysDriver extends DriverBase {
     await this.checkEntity(pluralType, entityName);
 
     const pathToFile = pathJoin(ENTITIES_DIR, entityName, this.env.system.initCfg.fileNames.manifest);
-    const content: string = await this.sysDev.readFile(pathToFile);
 
-    return JSON.parse(content);
+    return this.sysDev.readJsonObjectFile(pathToFile);
   }
 
   async loadEntityFile(
@@ -75,7 +72,7 @@ export class SysDriver extends DriverBase {
   ): Promise<string> {
     await this.checkEntity(pluralType, entityName, fileName);
 
-    return this.sysDev.readFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+    return this.sysDev.readStringFile(pathJoin(ENTITIES_DIR, entityName, fileName));
   }
 
   async loadEntityBinFile(

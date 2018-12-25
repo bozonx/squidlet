@@ -1,7 +1,8 @@
 export default interface Sys {
   mkdir(fileName: string): Promise<void>;
   readdir(dirName: string): Promise<string[]>;
-  readFile(fileName: string): Promise<string>;
+  readJsonObjectFile(fileName: string): Promise<{[index: string]: any}>
+  readStringFile(fileName: string): Promise<string>;
   readBinFile(fileName: string): Promise<Uint8Array>;
   requireFile(fileName: string): Promise<any>;
   rmdir(dirName: string): Promise<void>;

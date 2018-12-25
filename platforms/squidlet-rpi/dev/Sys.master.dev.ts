@@ -1,15 +1,17 @@
+import * as path from 'path';
+import {promises as fsPromises} from 'fs';
+
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
-import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
+import {convertBufferToUint8Array, PATH_SEPARATOR, uint8ArrayToText} from '../../../host/src/helpers/helpers';
 import {HostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
+import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 
 
-const DEFAULT_ENCODING = 'utf8';
-let configSet: HostFilesSet;
+let __configSet: HostFilesSet;
 
-// TODO: подставлять корень
 
 export function registerConfigSet (hostConfigSet: HostFilesSet) {
-  configSet = hostConfigSet;
+  __configSet = hostConfigSet;
 }
 
 
@@ -17,72 +19,89 @@ function getConfig(configName: string): {[index: string]: any} {
   // TODO: as a string
 }
 
-function getEntityFile(configName: string): any {
+async function getEntityFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Uint8Array {
+  // TODO: find
+  const absPathToFile: string = __configSet.entitiesSet[pluralType][entityName].files;
+  const fileContentBuffer: Buffer = await fsPromises.readFile(absPathToFile);
+  const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
 
+  return fileContent;
 }
 
 
 export default class SysDev implements Sys {
   mkdir(fileName: string): Promise<void> {
-    //return fsPromises.mkdir(fileName);
-    return Promise.resolve();
+    return Promise.reject(`Method "mkdir" of Sys.dev is not allowed on master`);
   }
 
   readdir(dirName: string): Promise<string[]> {
-    //return fsPromises.readdir(dirName, DEFAULT_ENCODING) as Promise<string[]>;
-    return Promise.resolve([]);
+
+    // TODO: remake or remove
+
+    return Promise.reject(`Method "readdir" of Sys.dev is not allowed on master`);
   }
 
-  readFile(fileName: string): Promise<string> {
-    //return fsPromises.readFile(fileName, DEFAULT_ENCODING) as Promise<string>;
-
-    const pathSplit = fileName.split('.');
+  async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
+    const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === 'configs') {
       return getConfig(pathSplit[1]);
     }
-    else if (pathSplit[0] === 'entities') {
+    else if (pathSplit[0] === 'entities' && pathSplit[3] === 'manifest') {
+      const entityType = pathSplit[1] as ManifestsTypePluralName;
 
-    }
-    else {
-      throw new Error(`Unsupported system dir "${pathSplit[0]}" on master`);
+      return __configSet.entitiesSet[entityType][pathSplit[2]].manifest;
     }
 
+    throw new Error(`Unsupported system dir "${fileName}" on master`);
+  }
+
+  async readStringFile(fileName: string): Promise<string> {
+    const pathSplit = fileName.split(PATH_SEPARATOR);
+
+    if (pathSplit[0] === 'entities') {
+      const fileContent: Uint8Array = await getEntityFile(pathSplit[1], pathSplit[2], pathSplit.slice(3).join(path.sep));
+
+      return uint8ArrayToText(fileContent);
+    }
+
+    throw new Error(`Unsupported system dir "${fileName}" on master`);
   }
 
   async readBinFile(fileName: string): Promise<Uint8Array> {
-    const buffer: Buffer = await fsPromises.readFile(fileName);
+    const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    return convertBufferToUint8Array(buffer);
+    if (pathSplit[0] === 'entities') {
+      return await getEntityFile(pathSplit[1], pathSplit[2], pathSplit.slice(3).join(path.sep));
+    }
+
+    throw new Error(`Unsupported system dir "${fileName}" on master`);
   }
 
   async requireFile(fileName: string): Promise<any> {
+
+    // TODO: remake
+
     return require(fileName);
   }
 
   rmdir(dirName: string): Promise<void> {
-    //return fsPromises.rmdir(dirName);
-    return Promise.resolve();
+    return Promise.reject(`Method "rmdir" of Sys.dev is not allowed on master`);
   }
 
-  unlink(fileName: string): Promise<void> {
-    //return fsPromises.unlink(fileName);
-    return Promise.resolve();
+  async unlink(fileName: string): Promise<void> {
+    return Promise.reject(`Method "unlink" of Sys.dev is not allowed on master`);
   }
 
-  writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
-    // if (typeof data === 'string') {
-    //   return fsPromises.writeFile(fileName, data, DEFAULT_ENCODING);
-    // }
-    // else {
-    //   return fsPromises.writeFile(fileName, data);
-    // }
-    return Promise.resolve();
+  async writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
+    return Promise.reject(`Method "writeFile" of Sys.dev is not allowed on master`);
   }
 
   async exists(fileOrDirName: string): Promise<boolean> {
-    //return fs.existsSync(fileOrDirName);
-    return Promise.resolve(true);
+
+    // TODO: remake or remove
+
+    return Promise.reject(`Method "writeFile" of Sys.dev is not allowed on master`);
   }
 
 }
