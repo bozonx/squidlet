@@ -1,3 +1,28 @@
+/**
+ * It uses the next file structure:
+ *
+ *     configs/
+ *       config.json
+ *       devicesDefinitions.json
+ *       ... other configs
+ *     entities/
+ *       devices/
+ *         deviceName/
+ *           manifest.json
+ *           __main.js
+ *           customFile.json
+ *           ...other entity's files
+ *       driver/
+ *       services/
+ *     host/
+ *       app/
+ *       ... other host's files
+ *       index.js
+ *     entities-hashes.json
+ *     configs-hashes.json
+ *     host-hashes.json
+ */
+
 import SysDev from '../../app/interfaces/dev/Sys';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -47,11 +72,13 @@ export class SysDriver extends DriverBase {
     return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
   }
 
-  async loadEntityMain(entityName: string, fileName: string): Promise<EntityClassType> {
+  async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
 
     // TODO: запретить выход наверх
 
-    return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+    const pathToFile = this.env.system.initCfg.fileNames.mainJs;
+
+    return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, pluralType, entityName, pathToFile));
   }
 
   async loadEntityManifest(

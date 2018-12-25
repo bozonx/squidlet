@@ -16,13 +16,32 @@ export function registerConfigSet (hostConfigSet: HostFilesSet) {
 
 
 function getConfig(configName: string): {[index: string]: any} {
-  // TODO: as a string
+  const config: any = (__configSet as any)[configName];
+
+  if (!config) throw new Error(`Can't find config "${configName}"`);
+
+  return config;
 }
 
-async function getEntityFile(pluralType: ManifestsTypePluralName, entityName: string, fileName: string): Uint8Array {
-  // TODO: find
-  const absPathToFile: string = __configSet.entitiesSet[pluralType][entityName].files;
-  const fileContentBuffer: Buffer = await fsPromises.readFile(absPathToFile);
+async function getEntityFile(
+  pluralType: ManifestsTypePluralName,
+  entityName: string,
+  fileName: string
+): Promise<Uint8Array> {
+  let foundAbsPath: string | undefined;
+  const regex = new RegExp(`${fileName}$`);
+
+  for (let absPath of __configSet.entitiesSet[pluralType][entityName].files) {
+    if (absPath.match(regex)) {
+      foundAbsPath = absPath;
+
+      break;
+    }
+  }
+
+  if (!foundAbsPath) throw new Error(`Can't find an entity file "${pluralType}/${entityName}/${fileName}"`);
+
+  const fileContentBuffer: Buffer = await fsPromises.readFile(foundAbsPath);
   const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
 
   return fileContent;
@@ -84,10 +103,16 @@ export default class SysDev implements Sys {
   }
 
   async requireFile(fileName: string): Promise<any> {
+    const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    // TODO: remake
+    if (pathSplit[0] === 'entities' && pathSplit[3] === 'main') {
+      const entityType = pathSplit[1] as ManifestsTypePluralName;
+      const fileName: string = pathSplit.slice(3).join(path.sep);
 
-    return require(fileName);
+      return await getEntityFile(entityType, pathSplit[2], fileName);
+    }
+
+    throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
   }
 
   rmdir(dirName: string): Promise<void> {
