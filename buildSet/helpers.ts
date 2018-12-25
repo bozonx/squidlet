@@ -16,7 +16,7 @@ import {
 
 const platformsDir = path.resolve(__dirname, '../platforms');
 
-export const platforms: {[index: string]: PlatformConfig} = {
+export const platformConfigs: {[index: string]: PlatformConfig} = {
   [PLATFORM_ESP32]: platform_esp32,
   [PLATFORM_ESP8266]: platform_esp8266,
   [PLATFORM_RPI]: platform_rpi,
@@ -37,11 +37,11 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
 
 
 export function collectDevs(platformName: string) {
-  if (!platforms[platformName]) {
+  if (!platformConfigs[platformName]) {
     throw new Error(`Platform "${platformName}" haven't been found`);
   }
 
-  const platformDevs: string[] = platforms[platformName].devs;
+  const platformDevs: string[] = platformConfigs[platformName].devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
   const platformDirName = `squidlet-${platformName}`;
 

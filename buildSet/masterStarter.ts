@@ -18,10 +18,7 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
   };
 }
 
-export async function prepareHostSystem (
-  getPlatformSystem: (platformName: string) => Promise<System>,
-  hostConfigSet: HostFilesSet,
-): Promise<System> {
+export async function prepareHostApp (hostConfigSet: HostFilesSet): Promise<System> {
   console.info(`===> Initialize host system of platform`);
 
   const platformName: string = hostConfigSet.config.platform;
@@ -57,7 +54,8 @@ export default async function masterStarter (resolvedConfigPath: string) {
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
   const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
-  const hostSystem: System = await prepareHostSystem(getPlatformSystem, hostConfigSet);
+  // prepare host app
+  const hostSystem: System = await prepareHostApp(hostConfigSet);
 
   console.info(`===> Starting master host system`);
   await hostSystem.start();
