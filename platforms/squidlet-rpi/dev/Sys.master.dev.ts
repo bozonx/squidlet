@@ -105,11 +105,14 @@ export default class SysDev implements Sys {
   async requireFile(fileName: string): Promise<any> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === 'entities' && pathSplit[3] === 'main') {
-      const entityType = pathSplit[1] as ManifestsTypePluralName;
-      const fileName: string = pathSplit.slice(3).join(path.sep);
+    // TODO: !!!! нужен абсолютный путь - взять из entity set
 
-      return await getEntityFile(entityType, pathSplit[2], fileName);
+    if (pathSplit[0] === 'entities') {
+      const entityType = pathSplit[1] as ManifestsTypePluralName;
+      const absFileName =
+      //const fileName: string = pathSplit.slice(3).join(path.sep);
+
+      return require();
     }
 
     throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);

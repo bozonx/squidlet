@@ -76,9 +76,9 @@ export class SysDriver extends DriverBase {
 
     // TODO: запретить выход наверх
 
-    const pathToFile = this.env.system.initCfg.fileNames.mainJs;
+    const fileName = this.env.system.initCfg.fileNames.mainJs;
 
-    return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, pluralType, entityName, pathToFile));
+    return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, pluralType, entityName, fileName));
   }
 
   async loadEntityManifest(
