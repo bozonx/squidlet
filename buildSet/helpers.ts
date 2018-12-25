@@ -25,6 +25,14 @@ export const platformConfigs: {[index: string]: PlatformConfig} = {
   [PLATFORM_X86]: platform_x86_linux,
 };
 
+export function resolveStorageDir(pathToDir?: string): string {
+  if (!pathToDir) {
+    throw new Error(`You have to specify a "--storage" param`);
+  }
+
+  return path.resolve(process.cwd(), (pathToDir as string));
+}
+
 export function resolveConfigPath(pathToYamlFile?: string): string {
   if (!pathToYamlFile) {
     throw new Error(`You have to specify a "--config" param`);

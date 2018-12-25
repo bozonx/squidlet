@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
@@ -5,60 +6,70 @@ import Sys from '../../../host/src/app/interfaces/dev/Sys';
 import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
 
 
+let __storageDir: string = '';
 const DEFAULT_ENCODING = 'utf8';
 
 
-// TODO: подставлять корень
-
-
+/**
+ * It is a slave Sys.dev
+ */
 export default class SysDev implements Sys {
-  mkdir(fileName: string): Promise<void> {
-    return fsPromises.mkdir(fileName);
+  static registerStorageDir(storageDir: string) {
+    __storageDir = storageDir;
+  }
+
+  mkdir(didName: string): Promise<void> {
+    return fsPromises.mkdir(path.join(__storageDir, didName));
   }
 
   readdir(dirName: string): Promise<string[]> {
-    return fsPromises.readdir(dirName, DEFAULT_ENCODING) as Promise<string[]>;
+    return fsPromises.readdir(path.join(__storageDir, dirName), DEFAULT_ENCODING) as Promise<string[]>;
   }
 
   async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
-    const fileContent: string = await fsPromises.readFile(fileName, DEFAULT_ENCODING);
+    const fileContent: string = await fsPromises.readFile(path.join(__storageDir, fileName), DEFAULT_ENCODING);
 
     return JSON.parse(fileContent);
   }
 
   readStringFile(fileName: string): Promise<string> {
-    return fsPromises.readFile(fileName, DEFAULT_ENCODING) as Promise<string>;
+    return fsPromises.readFile(path.join(__storageDir, fileName), DEFAULT_ENCODING) as Promise<string>;
   }
 
   async readBinFile(fileName: string): Promise<Uint8Array> {
-    const buffer: Buffer = await fsPromises.readFile(fileName);
+    const buffer: Buffer = await fsPromises.readFile(path.join(__storageDir, fileName));
 
     return convertBufferToUint8Array(buffer);
   }
 
   async requireFile(fileName: string): Promise<any> {
-    return require(fileName);
+    return require(path.join(__storageDir, fileName));
   }
 
   rmdir(dirName: string): Promise<void> {
-    return fsPromises.rmdir(dirName);
+    return fsPromises.rmdir(path.join(__storageDir, dirName));
   }
 
   unlink(fileName: string): Promise<void> {
-    return fsPromises.unlink(fileName);
+    return fsPromises.unlink(path.join(__storageDir, fileName));
   }
 
   writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
+    const filePath = path.join(__storageDir, fileName);
+
     if (typeof data === 'string') {
-      return fsPromises.writeFile(fileName, data, DEFAULT_ENCODING);
+      return fsPromises.writeFile(filePath, data, DEFAULT_ENCODING);
     }
     else {
-      return fsPromises.writeFile(fileName, data);
+      return fsPromises.writeFile(filePath, data);
     }
   }
 
   async exists(fileOrDirName: string): Promise<boolean> {
-    return fs.existsSync(fileOrDirName);
+
+    // TODO: use fs promises stat
+
+    return fs.existsSync(path.join(__storageDir, fileOrDirName));
   }
 
 }
