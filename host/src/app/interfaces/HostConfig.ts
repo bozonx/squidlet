@@ -1,4 +1,4 @@
-import Platforms from './Platforms';
+import Platforms from '../../../../platforms/Platforms';
 import LogLevel from './LogLevel';
 
 

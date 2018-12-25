@@ -11,7 +11,7 @@ import {
   PLATFORM_ESP8266,
   PLATFORM_RPI,
   PLATFORM_X86
-} from '../host/src/app/interfaces/Platforms';
+} from '../platforms/Platforms';
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');

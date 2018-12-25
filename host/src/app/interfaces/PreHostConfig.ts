@@ -1,10 +1,11 @@
-import Platforms from './Platforms';
+//import Platforms from './Platforms';
 import LogLevel from './LogLevel';
 
 
 // raw host config specified in master config
 export default interface PreHostConfig {
-  platform?: Platforms;
+  //platform?: Platforms;
+  platform?: string;
 
   // specific config for each host
   config: {
