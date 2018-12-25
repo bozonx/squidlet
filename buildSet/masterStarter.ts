@@ -1,4 +1,4 @@
-import {collectDevs, readConfig} from './helpers';
+import {collectDevs, getMasterSysDev, readConfig} from './helpers';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
@@ -26,13 +26,18 @@ export async function prepareHostApp (hostConfigSet: HostFilesSet): Promise<Syst
   console.info(`--> getting host system of platform "${platformName}"`);
 
   const hostSystem: System = new System();
+
+  console.info(`--> register platform's devs`);
+
   const devsSet: {[index: string]: new (...params: any[]) => any} = collectDevs(platformName);
+  const sysMasterDev = getMasterSysDev(platformName);
 
-  // TODO: replace master Sys.dev
-  // TODO: подмененный Sys.dev должен отдать список других devs
+  // register config set
+  sysMasterDev.registerConfigSet(hostConfigSet);
+  // replace Sys.dev to Sys.master.dev
+  devsSet['Sys.dev'] = sysMasterDev.default;
 
-  // console.info(`--> register platform's devs`);
-  // await hostSystem.$registerDevs(devsSet);
+  await hostSystem.$registerDevs(devsSet);
 
   return hostSystem;
 }

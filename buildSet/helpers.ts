@@ -15,6 +15,8 @@ import {
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');
+const DEVS_DIR = 'dev';
+
 
 export const platformConfigs: {[index: string]: PlatformConfig} = {
   [PLATFORM_ESP32]: platform_esp32,
@@ -36,6 +38,14 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
 }
 
 
+export function getMasterSysDev(platformName: string): {[index: string]: any} {
+  const platformDirName = `squidlet-${platformName}`;
+
+  const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
+
+  return require(devPath);
+}
+
 export function collectDevs(platformName: string) {
   if (!platformConfigs[platformName]) {
     throw new Error(`Platform "${platformName}" haven't been found`);
@@ -47,7 +57,7 @@ export function collectDevs(platformName: string) {
 
   for (let devName of platformDevs) {
     const fullDevName = `${devName}`;
-    const devPath = path.join(platformsDir, platformDirName, 'dev', fullDevName);
+    const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, fullDevName);
 
     devsSet[fullDevName] = require(devPath).default;
   }
