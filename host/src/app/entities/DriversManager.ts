@@ -32,19 +32,19 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
     await this.initDrivers(regularDriversList);
   }
 
-  /**
-   * Get dev by short name line 'fs', 'gpio' etc.
-   * It rises an error if dev hasn't found.
-   */
-  getDev<T>(shortDevName: string): T {
-    const driverName = `${capitalize(shortDevName)}.dev`;
-
-    return this.getDriver<T>(driverName);
-  }
+  // /**
+  //  * Get dev by short name line 'fs', 'gpio' etc.
+  //  * It rises an error if dev hasn't found.
+  //  */
+  // getDev<T>(shortDevName: string): T {
+  //   const driverName = `${capitalize(shortDevName)}.dev`;
+  //
+  //   return this.getDriver<T>(driverName);
+  // }
 
   /**
    * Get driver instance.
-   * It rises an error if dev hasn't found.
+   * It rises an error if driver hasn't found.
    */
   getDriver<T extends DriverInstance>(driverName: string): T {
     const driver: DriverInstance | undefined = this.instances[driverName];
@@ -57,26 +57,26 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
     return driver as T;
   }
 
-  /**
-   * Set platform specific devs
-   * @param devs - like {DeviClassName: DevClass}
-   */
-  async $registerDevs(devs: {[index: string]: EntityClassType}) {
-    // TODO: ещё нет configSet
-    // load list of definitions of drivers
-    //const definitions: {[index: string]: EntityDefinition} = await this.loadDriversDefinitions();
-
-    for (let driverName of Object.keys(devs)) {
-      const DriverClass: EntityClassType = devs[driverName];
-
-      // TODO: не надо подставлять ложный definition
-
-      //this.instances[driverName] = new DriverClass(definitions[driverName], this.env);
-      this.instances[driverName] = new DriverClass({id: driverName, className: driverName, props: {}}, this.env);
-    }
-
-    await this.initializeAll(Object.keys(devs));
-  }
+  // /**
+  //  * Set platform specific devs
+  //  * @param devs - like {DeviClassName: DevClass}
+  //  */
+  // async $registerDevs(devs: {[index: string]: EntityClassType}) {
+  //   // TODO: ещё нет configSet
+  //   // load list of definitions of drivers
+  //   //const definitions: {[index: string]: EntityDefinition} = await this.loadDriversDefinitions();
+  //
+  //   for (let driverName of Object.keys(devs)) {
+  //     const DriverClass: EntityClassType = devs[driverName];
+  //
+  //     // TODO: не надо подставлять ложный definition
+  //
+  //     //this.instances[driverName] = new DriverClass(definitions[driverName], this.env);
+  //     this.instances[driverName] = new DriverClass({id: driverName, className: driverName, props: {}}, this.env);
+  //   }
+  //
+  //   await this.initializeAll(Object.keys(devs));
+  // }
 
 
   private async initDrivers(driverNames: string[]) {

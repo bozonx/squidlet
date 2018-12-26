@@ -1,6 +1,9 @@
 import System from '../System';
-import {EntityClassType} from './EntityManagerBase';
 import Dev from '../interfaces/Dev';
+import {capitalize} from '../../helpers/lodashLike';
+
+
+type DevClass = new () => Dev;
 
 
 export default class DevManager {
@@ -21,16 +24,19 @@ export default class DevManager {
     }
   }
 
-  registerDevsSet(devSet: {[index: string]: EntityClassType}) {
+  registerDevsSet(devSet: {[index: string]: DevClass}) {
     for (let devNme of Object.keys(devSet)) {
 
-    }
-    // TODO: instantiate
+      // TODO: make definition ???
+      //const definition: {id: driverName, className: driverName, props: {}};
 
-    this.devSet = devSet;
+      this.devSet[devNme] = new devSet[devNme]();
+    }
   }
 
-  getDev<T extends Dev>(devName: string): T {
+  getDev<T extends Dev>(shortDevName: string): T {
+    const devName = `${capitalize(shortDevName)}.dev`;
+
     if (!this.devSet[devName]) {
       throw new Error(`Can't find dev "${devName}"`);
     }
