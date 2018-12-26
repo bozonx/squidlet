@@ -12,11 +12,12 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
-import {EntityClassType} from './entities/EntityManagerBase';
 import ConfigSet from './ConfigSet';
+import DevManager, {DevClass} from './entities/DevManager';
 
 
 export default class System {
+  readonly devManager: DevManager;
   readonly log: Logger;
   readonly events: Events;
   readonly host: Host;
@@ -37,6 +38,7 @@ export default class System {
 
 
   constructor() {
+    this.devManager = new DevManager();
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.events = new Events();
@@ -57,6 +59,9 @@ export default class System {
 
   async start() {
     try {
+      this.log.info(`---> Initializing devs`);
+      this.devManager.init();
+
       this.log.info(`---> Initializing configs`);
       this.configSet.init();
       await this.host.init();
@@ -90,8 +95,8 @@ export default class System {
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
-  async $registerDevs(devs: {[index: string]: EntityClassType}) {
-    await this.driversManager.$registerDevs(devs);
+  async $registerDevSet(devs: {[index: string]: DevClass}) {
+    await this.devManager.registerDevSet(devs);
   }
 
 

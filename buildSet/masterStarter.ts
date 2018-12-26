@@ -3,7 +3,7 @@ import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-import {EntityClassType} from '../host/src/app/entities/EntityManagerBase';
+import {DevClass} from '../host/src/app/entities/DevManager';
 
 
 /**
@@ -30,7 +30,7 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
   console.info(`--> register platform's devs`);
 
-  const devsSet: {[index: string]: EntityClassType} = collectDevs(platformName);
+  const devsSet: {[index: string]: DevClass} = collectDevs(platformName);
   const sysMasterDev = getMasterSysDev(platformName);
 
   // register config set
@@ -38,7 +38,7 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
   // replace Sys.dev to Sys.master.dev
   devsSet['Sys.dev'] = sysMasterDev;
 
-  await hostSystem.$registerDevs(devsSet);
+  await hostSystem.$registerDevSet(devsSet);
 
   return hostSystem;
 }

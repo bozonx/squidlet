@@ -3,17 +3,17 @@ import Dev from '../interfaces/Dev';
 import {capitalize} from '../../helpers/lodashLike';
 
 
-type DevClass = new () => Dev;
+export type DevClass = new () => Dev;
 
 
 export default class DevManager {
-  private readonly system: System;
+  //private readonly system: System;
   private devSet: {[index: string]: Dev} = {};
 
 
-  constructor(system: System) {
-    this.system = system;
-  }
+  // constructor(system: System) {
+  //   this.system = system;
+  // }
 
 
   init() {
@@ -24,7 +24,7 @@ export default class DevManager {
     }
   }
 
-  registerDevsSet(devSet: {[index: string]: DevClass}) {
+  registerDevSet(devSet: {[index: string]: DevClass}) {
     for (let devNme of Object.keys(devSet)) {
 
       // TODO: make definition ???

@@ -4,6 +4,7 @@ import {promises as fsPromises} from 'fs';
 
 import {collectDevs, resolveStorageDir} from './helpers';
 import System from '../host/src/app/System';
+import {DevClass} from '../host/src/app/entities/DevManager';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
@@ -28,12 +29,12 @@ async function init() {
 
   console.info(`--> register platform's devs`);
 
-  const devsSet: {[index: string]: new (...params: any[]) => any} = collectDevs(platformName);
+  const devsSet: {[index: string]: DevClass} = collectDevs(platformName);
 
   // set storage dir to Sys.dev
   (devsSet['Sys.dev'] as any).registerStorageDir(resolvedStorageDir);
 
-  await hostSystem.$registerDevs(devsSet);
+  await hostSystem.$registerDevSet(devsSet);
 
   return hostSystem;
 }

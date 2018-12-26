@@ -3,7 +3,6 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import DriverEnv from './DriverEnv';
 import EntityManagerBase, {EntityClassType} from './EntityManagerBase';
-import {capitalize} from '../../helpers/lodashLike';
 
 
 /**
