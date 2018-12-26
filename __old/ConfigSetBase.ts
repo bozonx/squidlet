@@ -4,12 +4,12 @@
 import * as path from 'path';
 
 //import ConfigSetManager from '../interfaces/ConfigSetManager';
-import System from '../System';
-import {HostFilesSet} from '../interfaces/HostFilesSet';
-import ManifestBase from '../interfaces/ManifestBase';
-import {EntitySet} from '../interfaces/EntitySet';
-import FsDev from '../interfaces/dev/Storage';
-import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
+import System from '../host/src/app/System';
+import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import ManifestBase from '../host/src/app/interfaces/ManifestBase';
+import {EntitySet} from '../host/src/app/interfaces/EntitySet';
+import FsDev from '../host/src/app/interfaces/dev/Storage';
+import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
 
 
 /**

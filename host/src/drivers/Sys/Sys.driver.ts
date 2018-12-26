@@ -31,7 +31,7 @@ import {ManifestsTypePluralName} from '../../app/interfaces/ManifestTypes';
 import {EntityClassType} from '../../app/entities/EntityManagerBase';
 
 
-// TODO: to initialization config ???
+// TODO: move to initialization config ???
 const HOST_HASHES_FILE = 'host-hashes.json';
 const CONFIGS_HASHES_FILE = 'configs-hashes.json';
 const ENTITIES_HASHES_FILE = 'entities-hashes.json';

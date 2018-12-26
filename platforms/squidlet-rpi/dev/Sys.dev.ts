@@ -7,7 +7,7 @@ import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
 
 
 let __storageDir: string = '';
-const DEFAULT_ENCODING = 'utf8';
+export const DEFAULT_ENCODING = 'utf8';
 
 
 /**

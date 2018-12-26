@@ -3,18 +3,19 @@ import {promises as fsPromises} from 'fs';
 
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
 import {convertBufferToUint8Array, PATH_SEPARATOR, uint8ArrayToText} from '../../../host/src/helpers/helpers';
-import {HostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
+import {SrcHostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/drivers/Sys/Sys.driver';
 import initializationConfig from '../../../host/src/app/config/initializationConfig';
+import {DEFAULT_ENCODING} from './Sys.dev';
 
 
-let __configSet: HostFilesSet;
+let __configSet: SrcHostFilesSet;
 const initCfg = initializationConfig();
 
 
 export default class SysDev implements Sys {
-  static registerConfigSet (hostConfigSet: HostFilesSet) {
+  static registerConfigSet (hostConfigSet: SrcHostFilesSet) {
     __configSet = hostConfigSet;
   }
 
@@ -49,9 +50,10 @@ export default class SysDev implements Sys {
     if (pathSplit[0] === ENTITIES_DIR) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
       const fileName: string = pathSplit.slice(3).join(path.sep);
-      const fileContent: Uint8Array = await this.getEntityFile(entityType, pathSplit[2], fileName);
+      const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[1]].srcDir;
+      const absFileName = path.join(entitySrcDir, fileName);
 
-      return uint8ArrayToText(fileContent);
+      return fsPromises.readFile(absFileName, {encoding: DEFAULT_ENCODING});
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
@@ -63,8 +65,11 @@ export default class SysDev implements Sys {
     if (pathSplit[0] === ENTITIES_DIR) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
       const fileName: string = pathSplit.slice(3).join(path.sep);
+      const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[1]].srcDir;
+      const absFileName = path.join(entitySrcDir, fileName);
+      const fileContentBuffer: Buffer = await fsPromises.readFile(absFileName);
 
-      return await this.getEntityFile(entityType, pathSplit[2], fileName);
+      return convertBufferToUint8Array(fileContentBuffer);
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
@@ -95,32 +100,32 @@ export default class SysDev implements Sys {
     return config;
   }
 
-  private async getEntityFile(
-    pluralType: ManifestsTypePluralName,
-    entityName: string,
-    fileName: string
-  ): Promise<Uint8Array> {
-
-    // TODO: remake
-
-    let foundAbsPath: string | undefined;
-    const regex = new RegExp(`${fileName}$`);
-
-    for (let absPath of __configSet.entitiesSet[pluralType][entityName].files) {
-      if (absPath.match(regex)) {
-        foundAbsPath = absPath;
-
-        break;
-      }
-    }
-
-    if (!foundAbsPath) throw new Error(`Can't find an entity file "${pluralType}/${entityName}/${fileName}"`);
-
-    const fileContentBuffer: Buffer = await fsPromises.readFile(foundAbsPath);
-    const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
-
-    return fileContent;
-  }
+  // private async getEntityFile(
+  //   pluralType: ManifestsTypePluralName,
+  //   entityName: string,
+  //   fileName: string
+  // ): Promise<Uint8Array> {
+  //
+  //   // TODO: remake
+  //
+  //   let foundAbsPath: string | undefined;
+  //   const regex = new RegExp(`${fileName}$`);
+  //
+  //   for (let absPath of __configSet.entitiesSet[pluralType][entityName].files) {
+  //     if (absPath.match(regex)) {
+  //       foundAbsPath = absPath;
+  //
+  //       break;
+  //     }
+  //   }
+  //
+  //   if (!foundAbsPath) throw new Error(`Can't find an entity file "${pluralType}/${entityName}/${fileName}"`);
+  //
+  //   const fileContentBuffer: Buffer = await fsPromises.readFile(foundAbsPath);
+  //   const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
+  //
+  //   return fileContent;
+  // }
 
 
   mkdir(fileName: string): Promise<void> {

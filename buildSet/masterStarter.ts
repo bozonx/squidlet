@@ -1,14 +1,14 @@
 import {collectDevs, getMasterSysDev, readConfig} from './helpers';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
-import {HostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
+import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 
 
 /**
  * Generate master host config with integrated files set which points to original (ts or js) files
  */
-export function generateMasterConfigSet(main: Main): HostFilesSet {
+export function generateMasterConfigSet(main: Main): SrcHostFilesSet {
   const hostId = 'master';
 
   return {
@@ -18,7 +18,7 @@ export function generateMasterConfigSet(main: Main): HostFilesSet {
   };
 }
 
-export async function prepareHostApp (hostConfigSet: HostFilesSet): Promise<System> {
+export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<System> {
   console.info(`===> Initialize host system of platform`);
 
   const platformName: string = hostConfigSet.config.platform;
@@ -58,7 +58,7 @@ export default async function masterStarter (resolvedConfigPath: string) {
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: HostFilesSet = generateMasterConfigSet(main);
+  const hostConfigSet: SrcHostFilesSet = generateMasterConfigSet(main);
   // prepare host app
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 

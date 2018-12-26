@@ -7,6 +7,7 @@ import {EntitiesNames} from './Entities';
 import DefinitionsSet from '../host/src/app/interfaces/DefinitionsSet';
 import {sortByIncludeInList} from './helpers';
 import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
+import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 
 
 export default class HostsFilesSet {
@@ -40,12 +41,14 @@ export default class HostsFilesSet {
   /**
    * Get set of entities of specified host with absolute path to source files.
    */
-  generateSrcEntitiesSet(hostId: string): EntitiesSet {
+  generateSrcEntitiesSet(hostId: string): SrcHostFilesSet {
     const result: EntitiesSet = {
       devices: {},
       drivers: {},
       services: {},
     };
+
+    // TODO: review
 
     const usedEntitiesNames: EntitiesNames = this.main.hostClassNames.getEntitiesNames(hostId);
 
