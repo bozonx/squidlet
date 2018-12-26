@@ -12,6 +12,7 @@ import {
   PLATFORM_RPI,
   PLATFORM_X86
 } from '../configWorks/interfaces/Platforms';
+import {EntityClassType} from '../host/src/app/entities/EntityManagerBase';
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');
@@ -46,7 +47,7 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
 }
 
 
-export function getMasterSysDev(platformName: string): new (...params: any[]) => any {
+export function getMasterSysDev(platformName: string): EntityClassType {
   const platformDirName = `squidlet-${platformName}`;
 
   const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
@@ -54,7 +55,7 @@ export function getMasterSysDev(platformName: string): new (...params: any[]) =>
   return require(devPath).default;
 }
 
-export function collectDevs(platformName: string) {
+export function collectDevs(platformName: string): {[index: string]: EntityClassType} {
   if (!platformConfigs[platformName]) {
     throw new Error(`Platform "${platformName}" haven't been found`);
   }

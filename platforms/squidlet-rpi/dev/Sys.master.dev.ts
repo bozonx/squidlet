@@ -2,7 +2,7 @@ import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
-import {convertBufferToUint8Array, PATH_SEPARATOR, uint8ArrayToText} from '../../../host/src/helpers/helpers';
+import {convertBufferToUint8Array, PATH_SEPARATOR} from '../../../host/src/helpers/helpers';
 import {SrcHostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/drivers/Sys/Sys.driver';
@@ -48,12 +48,7 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      const entityType = pathSplit[1] as ManifestsTypePluralName;
-      const fileName: string = pathSplit.slice(3).join(path.sep);
-      const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[1]].srcDir;
-      const absFileName = path.join(entitySrcDir, fileName);
-
-      return fsPromises.readFile(absFileName, {encoding: DEFAULT_ENCODING});
+      return fsPromises.readFile(this.getEntityFileAbsPath(fileName), {encoding: DEFAULT_ENCODING});
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
@@ -63,11 +58,7 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      const entityType = pathSplit[1] as ManifestsTypePluralName;
-      const fileName: string = pathSplit.slice(3).join(path.sep);
-      const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[1]].srcDir;
-      const absFileName = path.join(entitySrcDir, fileName);
-      const fileContentBuffer: Buffer = await fsPromises.readFile(absFileName);
+      const fileContentBuffer: Buffer = await fsPromises.readFile(this.getEntityFileAbsPath(fileName));
 
       return convertBufferToUint8Array(fileContentBuffer);
     }
@@ -78,19 +69,22 @@ export default class SysDev implements Sys {
   async requireFile(fileName: string): Promise<any> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    // TODO: !!!! нужен абсолютный путь - взять из entity set
-
-    if (pathSplit[0] === 'entities') {
-      const entityType = pathSplit[1] as ManifestsTypePluralName;
-      const absFileName =
-      //const fileName: string = pathSplit.slice(3).join(path.sep);
-
-      return require();
+    if (pathSplit[0] === ENTITIES_DIR) {
+      return require(this.getEntityFileAbsPath(fileName));
     }
 
     throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
   }
 
+
+  private getEntityFileAbsPath(virtFileName: string): string {
+    const pathSplit = virtFileName.split(PATH_SEPARATOR);
+    const entityType = pathSplit[1] as ManifestsTypePluralName;
+    const fileName: string = pathSplit.slice(3).join(path.sep);
+    const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[1]].srcDir;
+
+    return path.join(entitySrcDir, fileName);
+  }
 
   private getConfig(configName: string): {[index: string]: any} {
     const config: any = (__configSet as any)[configName];

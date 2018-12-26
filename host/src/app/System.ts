@@ -35,6 +35,7 @@ export default class System {
     return this.initializationConfig as InitializationConfig;
   }
 
+
   constructor() {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
@@ -46,6 +47,8 @@ export default class System {
     this.log = new LogPublisher(this);
 
     this.driversManager = new DriversManager(this);
+
+    // TODO: он требуется для driverManager
     this.configSet = new ConfigSet(this);
     // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
 
@@ -56,6 +59,7 @@ export default class System {
     this.devicesManager = new DevicesManager(this);
     this.devices = new Devices(this);
   }
+
 
   async start() {
     try {
@@ -92,7 +96,6 @@ export default class System {
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
-  // TODO: review
   async $registerDevs(devs: {[index: string]: EntityClassType}) {
     await this.driversManager.$registerDevs(devs);
   }
