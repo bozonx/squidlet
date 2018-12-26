@@ -11,29 +11,32 @@ const DEFAULT_ENCODING = 'utf8';
 
 
 /**
- * It is a slave Sys.dev
+ * It is a slave's Sys.dev
  */
 export default class SysDev implements Sys {
   static registerStorageDir(storageDir: string) {
     __storageDir = storageDir;
   }
 
-  mkdir(didName: string): Promise<void> {
-    return fsPromises.mkdir(path.join(__storageDir, didName));
+  mkdir(dirName: string): Promise<void> {
+    return fsPromises.mkdir(path.join(__storageDir, dirName));
   }
 
   readdir(dirName: string): Promise<string[]> {
-    return fsPromises.readdir(path.join(__storageDir, dirName), DEFAULT_ENCODING) as Promise<string[]>;
+    return fsPromises.readdir(path.join(__storageDir, dirName)) as Promise<string[]>;
   }
 
   async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
-    const fileContent: string = await fsPromises.readFile(path.join(__storageDir, fileName), DEFAULT_ENCODING);
+    const filePath = path.join(__storageDir, fileName);
+    const fileContent: string = await fsPromises.readFile(filePath, {encoding: DEFAULT_ENCODING});
 
     return JSON.parse(fileContent);
   }
 
   readStringFile(fileName: string): Promise<string> {
-    return fsPromises.readFile(path.join(__storageDir, fileName), DEFAULT_ENCODING) as Promise<string>;
+    const filePath = path.join(__storageDir, fileName);
+
+    return fsPromises.readFile(filePath, {encoding: DEFAULT_ENCODING}) as Promise<string>;
   }
 
   async readBinFile(fileName: string): Promise<Uint8Array> {
@@ -58,9 +61,10 @@ export default class SysDev implements Sys {
     const filePath = path.join(__storageDir, fileName);
 
     if (typeof data === 'string') {
-      return fsPromises.writeFile(filePath, data, DEFAULT_ENCODING);
+      return fsPromises.writeFile(filePath, data, {encoding: DEFAULT_ENCODING});
     }
     else {
+      // write Uint8Array
       return fsPromises.writeFile(filePath, data);
     }
   }
