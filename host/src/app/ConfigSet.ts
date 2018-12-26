@@ -10,12 +10,19 @@ import {EntityClassType} from './entities/EntityManagerBase';
  */
 export default class ConfigSet {
   private readonly system: System;
-  private readonly sysDriver: SysDriver;
+  private _sysDriver?: SysDriver;
+
+  private get sysDriver(): SysDriver {
+    return this._sysDriver as SysDriver;
+  }
 
   constructor(system: System) {
     this.system = system;
+  }
 
-    this.sysDriver = this.system.driversManager.getDev('Sys.driver');
+
+  init() {
+    this._sysDriver = this.system.driversManager.getDev('Sys.driver');
   }
 
   /**

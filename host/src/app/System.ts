@@ -40,6 +40,7 @@ export default class System {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.events = new Events();
+    this.configSet = new ConfigSet(this);
     this.host = new Host(this);
 
     // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
@@ -48,8 +49,6 @@ export default class System {
 
     this.driversManager = new DriversManager(this);
 
-    // TODO: он требуется для driverManager
-    this.configSet = new ConfigSet(this);
     // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
 
     this.network = new Network(this.driversManager.env);
@@ -63,22 +62,23 @@ export default class System {
 
   async start() {
     try {
-      // runtime config
+      this.log.info(`---> Initializing configs`);
+      // TODO: на момент инициализации не инициализирован driversManager
+      this.configSet.init();
+      // TODO: должен быть после инициализации this.configSet
       await this.host.init();
+      this.log.info(`---> Initializing system drivers`);
       await this.driversManager.initSystemDrivers();
       this.riseEvent(eventNames.system.systemDriversInitialized);
 
-      this.network.init(this.host.id, this.host.networkConfig);
-      this.riseEvent(eventNames.system.networkInitialized);
+      await this.initNetwork();
 
-      this.messenger.init();
-      this.devices.init();
-      this.riseEvent(eventNames.system.messengerInitialized);
-
+      this.log.info(`---> Initializing system services`);
       await this.servicesManager.initSystemServices();
       this.riseEvent(eventNames.system.systemServicesInitialized);
 
-      await this.initApp();
+      await this.initTopLayer();
+
       this.isInitialized = true;
       this.riseEvent(eventNames.system.appInitialized);
 
@@ -100,18 +100,31 @@ export default class System {
     await this.driversManager.$registerDevs(devs);
   }
 
+
+  private async initNetwork(): Promise<void> {
+    this.log.info(`---> Initializing network`);
+    this.network.init(this.host.id, this.host.networkConfig);
+    this.riseEvent(eventNames.system.networkInitialized);
+
+    this.log.info(`---> Initializing messenger`);
+    this.messenger.init();
+    this.devices.init();
+    this.riseEvent(eventNames.system.messengerInitialized);
+  }
+
   /**
-   * Init user layer - device representeur, devices, device's drivers and services
-   * @return {Promise<void>}
+   * Init top layer - devices, regular drivers and regular services
    */
-  private async initApp(): Promise<void> {
+  private async initTopLayer(): Promise<void> {
+    this.log.info(`---> Initializing regular drivers`);
     await this.driversManager.initRegularDrivers();
+    this.log.info(`---> Initializing regular services`);
     await this.servicesManager.initRegularServices();
+    this.log.info(`---> Initializing devices`);
     await this.devicesManager.init();
   }
 
   private riseEvent(eventName: string) {
-    // TODO: лучше поднять события через мессенджер или сэмитировать Message. Но непонятно откуда взять hostid
     this.events.emit(categories.system, eventName);
   }
 
