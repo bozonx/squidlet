@@ -1,5 +1,0 @@
-name: Sys.driver
-main: Sys.driver.ts
-drivers:
-  - Sys.dev
-props: {}
