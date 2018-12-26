@@ -10,6 +10,8 @@ import {EntityClassType} from './entities/EntityManagerBase';
  */
 export default class ConfigSet {
   private readonly system: System;
+
+  // TODO: remake to sysfs
   private _sysDriver?: SysDriver;
 
   private get sysDriver(): SysDriver {
