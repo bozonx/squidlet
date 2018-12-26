@@ -35,6 +35,9 @@ export default class Host {
    * load config from storage
    */
   async init(): Promise<void> {
+
+    // TODO: нет смыла это сохранять, лучше каждый раз брать из configSet где будет кэш
+
     this.hostConfig = await this.system.configSet.loadConfig<HostConfig>(
       this.system.initCfg.fileNames.hostConfig
     );
