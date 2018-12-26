@@ -14,6 +14,10 @@ async function init() {
   const hostConfigPath = path.join(resolvedStorageDir, 'configs/config.json');
   const hostConfig = JSON.parse(await fsPromises.readFile(hostConfigPath, {encoding: 'utf8'}));
 
+  if (!hostConfig) {
+    throw new Error(`Can't find host config "${hostConfigPath}"`);
+  }
+
   console.info(`===> Initialize host system of platform`);
 
   const platformName: string = hostConfig.platform;

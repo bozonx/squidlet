@@ -35,9 +35,9 @@ import {EntityClassType} from '../../app/entities/EntityManagerBase';
 const HOST_HASHES_FILE = 'host-hashes.json';
 const CONFIGS_HASHES_FILE = 'configs-hashes.json';
 const ENTITIES_HASHES_FILE = 'entities-hashes.json';
-const HOST_DIR = 'host';
-const CONFIGS_DIR = 'configs';
-const ENTITIES_DIR = 'entities';
+export const HOST_DIR = 'host';
+export const CONFIGS_DIR = 'configs';
+export const ENTITIES_DIR = 'entities';
 
 
 export class SysDriver extends DriverBase {

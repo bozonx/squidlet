@@ -5,42 +5,12 @@ import Sys from '../../../host/src/app/interfaces/dev/Sys';
 import {convertBufferToUint8Array, PATH_SEPARATOR, uint8ArrayToText} from '../../../host/src/helpers/helpers';
 import {HostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
+import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/drivers/Sys/Sys.driver';
+import initializationConfig from '../../../host/src/app/config/initializationConfig';
 
 
 let __configSet: HostFilesSet;
-
-
-function getConfig(configName: string): {[index: string]: any} {
-  const config: any = (__configSet as any)[configName];
-
-  if (!config) throw new Error(`Can't find config "${configName}"`);
-
-  return config;
-}
-
-async function getEntityFile(
-  pluralType: ManifestsTypePluralName,
-  entityName: string,
-  fileName: string
-): Promise<Uint8Array> {
-  let foundAbsPath: string | undefined;
-  const regex = new RegExp(`${fileName}$`);
-
-  for (let absPath of __configSet.entitiesSet[pluralType][entityName].files) {
-    if (absPath.match(regex)) {
-      foundAbsPath = absPath;
-
-      break;
-    }
-  }
-
-  if (!foundAbsPath) throw new Error(`Can't find an entity file "${pluralType}/${entityName}/${fileName}"`);
-
-  const fileContentBuffer: Buffer = await fsPromises.readFile(foundAbsPath);
-  const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
-
-  return fileContent;
-}
+const initCfg = initializationConfig();
 
 
 export default class SysDev implements Sys {
@@ -48,27 +18,26 @@ export default class SysDev implements Sys {
     __configSet = hostConfigSet;
   }
 
-  mkdir(fileName: string): Promise<void> {
-    return Promise.reject(`Method "mkdir" of Sys.dev is not allowed on master`);
-  }
-
-  readdir(dirName: string): Promise<string[]> {
-
-    // TODO: remake or remove
-
-    return Promise.reject(`Method "readdir" of Sys.dev is not allowed on master`);
-  }
 
   async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === 'configs') {
-      return getConfig(pathSplit[1]);
+    // config - read from memory
+    if (pathSplit[0] === CONFIGS_DIR) {
+      return this.getConfig(pathSplit[1]);
     }
-    else if (pathSplit[0] === 'entities' && pathSplit[3] === 'manifest') {
+    // manifest - read from memory
+    else if (pathSplit[0] === ENTITIES_DIR && pathSplit[3] === initCfg.fileNames.manifest) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
 
       return __configSet.entitiesSet[entityType][pathSplit[2]].manifest;
+    }
+    // other entity file - read from disk
+    else if (pathSplit[0] === ENTITIES_DIR) {
+      // load entity file
+      const fileContent: string = await this.readStringFile(fileName);
+
+      return JSON.parse(fileContent);
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
@@ -77,10 +46,10 @@ export default class SysDev implements Sys {
   async readStringFile(fileName: string): Promise<string> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === 'entities') {
+    if (pathSplit[0] === ENTITIES_DIR) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
       const fileName: string = pathSplit.slice(3).join(path.sep);
-      const fileContent: Uint8Array = await getEntityFile(entityType, pathSplit[2], fileName);
+      const fileContent: Uint8Array = await this.getEntityFile(entityType, pathSplit[2], fileName);
 
       return uint8ArrayToText(fileContent);
     }
@@ -91,11 +60,11 @@ export default class SysDev implements Sys {
   async readBinFile(fileName: string): Promise<Uint8Array> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === 'entities') {
+    if (pathSplit[0] === ENTITIES_DIR) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
       const fileName: string = pathSplit.slice(3).join(path.sep);
 
-      return await getEntityFile(entityType, pathSplit[2], fileName);
+      return await this.getEntityFile(entityType, pathSplit[2], fileName);
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
@@ -117,6 +86,51 @@ export default class SysDev implements Sys {
     throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
   }
 
+
+  private getConfig(configName: string): {[index: string]: any} {
+    const config: any = (__configSet as any)[configName];
+
+    if (!config) throw new Error(`Can't find config "${configName}"`);
+
+    return config;
+  }
+
+  private async getEntityFile(
+    pluralType: ManifestsTypePluralName,
+    entityName: string,
+    fileName: string
+  ): Promise<Uint8Array> {
+
+    // TODO: remake
+
+    let foundAbsPath: string | undefined;
+    const regex = new RegExp(`${fileName}$`);
+
+    for (let absPath of __configSet.entitiesSet[pluralType][entityName].files) {
+      if (absPath.match(regex)) {
+        foundAbsPath = absPath;
+
+        break;
+      }
+    }
+
+    if (!foundAbsPath) throw new Error(`Can't find an entity file "${pluralType}/${entityName}/${fileName}"`);
+
+    const fileContentBuffer: Buffer = await fsPromises.readFile(foundAbsPath);
+    const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
+
+    return fileContent;
+  }
+
+
+  mkdir(fileName: string): Promise<void> {
+    return Promise.reject(`Method "mkdir" of Sys.dev is not allowed on master`);
+  }
+
+  readdir(dirName: string): Promise<string[]> {
+    return Promise.reject(`Method "readdir" of Sys.dev is not allowed on master`);
+  }
+
   rmdir(dirName: string): Promise<void> {
     return Promise.reject(`Method "rmdir" of Sys.dev is not allowed on master`);
   }
@@ -130,9 +144,6 @@ export default class SysDev implements Sys {
   }
 
   async exists(fileOrDirName: string): Promise<boolean> {
-
-    // TODO: remake or remove
-
     return Promise.reject(`Method "writeFile" of Sys.dev is not allowed on master`);
   }
 
