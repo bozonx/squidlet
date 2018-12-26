@@ -36,7 +36,9 @@ export default class LogPublisher {
   }
 
   private async send(level: string, message: string) {
-    await this.system.messenger.emit(categories.logger, level, message);
+    this.system.events.emit(categories.logger, level, message);
+
+    //await this.system.messenger.emit(categories.logger, level, message);
   }
 
 }

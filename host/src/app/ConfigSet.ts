@@ -22,6 +22,9 @@ export default class ConfigSet {
 
 
   init() {
+
+    // TODO: на момент инициализации не инициализирован driversManager
+
     this._sysDriver = this.system.driversManager.getDev('Sys.driver');
   }
 

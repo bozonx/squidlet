@@ -41,32 +41,26 @@ export default class System {
     this.initializationConfig = initializationConfig();
     this.events = new Events();
     this.configSet = new ConfigSet(this);
-    this.host = new Host(this);
-
-    // TODO: если при инициализации нужно вывести log то будет ошибка - так как log ещё не инициализирован
-
     this.log = new LogPublisher(this);
+    this.host = new Host(this);
 
     this.driversManager = new DriversManager(this);
 
-    // TODO: тут уже нужен id - а где его взять если ещё не инициализировали host???
-
     this.network = new Network(this.driversManager.env);
     this.messenger = new Messenger(this);
+    this.devices = new Devices(this);
 
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
-    this.devices = new Devices(this);
   }
 
 
   async start() {
     try {
       this.log.info(`---> Initializing configs`);
-      // TODO: на момент инициализации не инициализирован driversManager
       this.configSet.init();
-      // TODO: должен быть после инициализации this.configSet
       await this.host.init();
+
       this.log.info(`---> Initializing system drivers`);
       await this.driversManager.initSystemDrivers();
       this.riseEvent(eventNames.system.systemDriversInitialized);
