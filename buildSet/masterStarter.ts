@@ -33,9 +33,9 @@ export async function prepareHostApp (hostConfigSet: HostFilesSet): Promise<Syst
   const sysMasterDev = getMasterSysDev(platformName);
 
   // register config set
-  sysMasterDev.registerConfigSet(hostConfigSet);
+  (sysMasterDev as any).registerConfigSet(hostConfigSet);
   // replace Sys.dev to Sys.master.dev
-  devsSet['Sys.dev'] = sysMasterDev.default;
+  devsSet['Sys.dev'] = sysMasterDev;
 
   await hostSystem.$registerDevs(devsSet);
 

@@ -46,12 +46,12 @@ export async function readConfig<T> (resolvedPath: string): Promise<T> {
 }
 
 
-export function getMasterSysDev(platformName: string): {[index: string]: any} {
+export function getMasterSysDev(platformName: string): new (...params: any[]) => any {
   const platformDirName = `squidlet-${platformName}`;
 
   const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
 
-  return require(devPath);
+  return require(devPath).default;
 }
 
 export function collectDevs(platformName: string) {

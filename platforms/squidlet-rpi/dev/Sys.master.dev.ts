@@ -10,11 +10,6 @@ import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/Manifest
 let __configSet: HostFilesSet;
 
 
-export function registerConfigSet (hostConfigSet: HostFilesSet) {
-  __configSet = hostConfigSet;
-}
-
-
 function getConfig(configName: string): {[index: string]: any} {
   const config: any = (__configSet as any)[configName];
 
@@ -49,6 +44,10 @@ async function getEntityFile(
 
 
 export default class SysDev implements Sys {
+  static registerConfigSet (hostConfigSet: HostFilesSet) {
+    __configSet = hostConfigSet;
+  }
+
   mkdir(fileName: string): Promise<void> {
     return Promise.reject(`Method "mkdir" of Sys.dev is not allowed on master`);
   }
