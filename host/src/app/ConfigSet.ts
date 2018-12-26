@@ -1,7 +1,6 @@
 import System from './System';
 import ManifestBase from './interfaces/ManifestBase';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
-import {SysDriver} from '../drivers/Sys/Sys.driver';
 import {EntityClassType} from './entities/EntityManagerBase';
 
 
@@ -11,31 +10,18 @@ import {EntityClassType} from './entities/EntityManagerBase';
 export default class ConfigSet {
   private readonly system: System;
 
-  // TODO: remake to sysfs
-  private _sysDriver?: SysDriver;
-
-  private get sysDriver(): SysDriver {
-    return this._sysDriver as SysDriver;
-  }
 
   constructor(system: System) {
     this.system = system;
   }
 
 
-  init() {
-
-    // TODO: на момент инициализации не инициализирован driversManager
-
-    this._sysDriver = this.system.driversManager.getDev('Sys.driver');
-  }
-
   /**
    * Get builtin config
    * @param configName - config name without extension
    */
   loadConfig<T>(configName: string): Promise<T> {
-    return this.sysDriver.loadConfig(configName) as Promise<T>;
+    return this.system.sysFs.loadConfig(configName) as Promise<T>;
   }
 
   /**
@@ -44,7 +30,7 @@ export default class ConfigSet {
    * @param entityName - name of entity
    */
   loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-    return this.sysDriver.loadEntityManifest(pluralType, entityName) as Promise<T>;
+    return this.system.sysFs.loadEntityManifest(pluralType, entityName) as Promise<T>;
   }
 
   /**
@@ -53,7 +39,7 @@ export default class ConfigSet {
    * @param entityName - name of entity
    */
   async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
-    return this.sysDriver.loadEntityMain(pluralType, entityName) as Promise<T>;
+    return this.system.sysFs.loadEntityMain(pluralType, entityName) as Promise<T>;
   }
 
   loadEntityFile(
@@ -61,7 +47,7 @@ export default class ConfigSet {
     entityName: string,
     fileName: string
   ): Promise<string> {
-    return this.sysDriver.loadEntityFile(pluralType, entityName, fileName);
+    return this.system.sysFs.loadEntityFile(pluralType, entityName, fileName);
   }
 
   loadEntityBinFile(
@@ -69,7 +55,7 @@ export default class ConfigSet {
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    return this.sysDriver.loadEntityBinFile(pluralType, entityName, fileName);
+    return this.system.sysFs.loadEntityBinFile(pluralType, entityName, fileName);
   }
 
 }

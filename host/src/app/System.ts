@@ -14,21 +14,27 @@ import eventNames from './dict/eventNames';
 import categories from './dict/categories';
 import ConfigSet from './ConfigSet';
 import DevManager, {DevClass} from './entities/DevManager';
+import SysFs from './SysFs';
 
 
 export default class System {
-  readonly devManager: DevManager;
-  readonly log: Logger;
   readonly events: Events;
+  readonly log: Logger;
+  readonly devManager: DevManager;
+
+  readonly sysFs: SysFs;
+  readonly configSet: ConfigSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
+
   readonly network: Network;
-  readonly servicesManager: ServicesManager;
   readonly messenger: Messenger;
-  readonly devicesManager: DevicesManager;
   readonly devices: Devices;
-  readonly configSet: ConfigSet;
-  isInitialized: boolean = false;
+
+  readonly servicesManager: ServicesManager;
+  readonly devicesManager: DevicesManager;
+
+  private _isInitialized: boolean = false;
   // only for initialization time - it will be deleted after it
   private initializationConfig?: InitializationConfig;
 
@@ -36,16 +42,22 @@ export default class System {
     return this.initializationConfig as InitializationConfig;
   }
 
+  get isInitialized() {
+    return this._isInitialized;
+  }
+
 
   constructor() {
-    this.devManager = new DevManager();
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.events = new Events();
-    this.configSet = new ConfigSet(this);
-    this.log = new LogPublisher(this);
-    this.host = new Host(this);
 
+    this.events = new Events();
+    this.log = new LogPublisher(this);
+    this.devManager = new DevManager();
+
+    this.sysFs = new SysFs(this);
+    this.configSet = new ConfigSet(this);
+    this.host = new Host(this);
     this.driversManager = new DriversManager(this);
 
     this.network = new Network(this.driversManager.env);
@@ -63,7 +75,7 @@ export default class System {
       this.devManager.init();
 
       this.log.info(`---> Initializing configs`);
-      this.configSet.init();
+      //this.configSet.init();
       await this.host.init();
 
       this.log.info(`---> Initializing system drivers`);
@@ -78,7 +90,7 @@ export default class System {
 
       await this.initTopLayer();
 
-      this.isInitialized = true;
+      this._isInitialized = true;
       this.riseEvent(eventNames.system.appInitialized);
 
       // remove initialization config

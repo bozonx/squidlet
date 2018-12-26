@@ -24,8 +24,6 @@
  */
 
 import SysDev from './interfaces/dev/Sys';
-import DriverBase from './entities/DriverBase';
-import {GetDriverDep} from './entities/EntityBase';
 import pathJoin from '../helpers/nodeLike';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
@@ -44,18 +42,12 @@ export const ENTITIES_DIR = 'entities';
 export default class SysFs {
   private readonly system: System;
   private get sysDev(): SysDev {
-    return this.depsInstances.sysDev as SysDev;
+    return this.system.devManager.getDev('Sys.dev');
   }
 
 
   constructor(system: System) {
     this.system = system;
-  }
-
-
-  async init() {
-    this.depsInstances.sysDev = await getDriverDep('Sys.dev')
-      .getInstance(this.props);
   }
 
 
@@ -82,7 +74,7 @@ export default class SysFs {
 
     // TODO: запретить выход наверх
 
-    const fileName = this.env.system.initCfg.fileNames.mainJs;
+    const fileName = this.system.initCfg.fileNames.mainJs;
 
     return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, pluralType, entityName, fileName));
   }
@@ -93,7 +85,7 @@ export default class SysFs {
   ): Promise<{[index: string]: any}> {
     await this.checkEntity(pluralType, entityName);
 
-    const pathToFile = pathJoin(ENTITIES_DIR, entityName, this.env.system.initCfg.fileNames.manifest);
+    const pathToFile = pathJoin(ENTITIES_DIR, entityName, this.system.initCfg.fileNames.manifest);
 
     return this.sysDev.readJsonObjectFile(pathToFile);
   }
