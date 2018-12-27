@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build-configs": "node ./buildSet/build-configs",
+    "build-configs": "node ./buildSet/build-configs --build-dir=./build/configs",
     "build-host": "cd buildSet; npm run build-host",
     "master": "ts-node ./buildSet/masterIndex.ts",
     "test": "mocha",

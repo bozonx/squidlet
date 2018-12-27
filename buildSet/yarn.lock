@@ -480,12 +480,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/gulp-typescript@^2.13.0":
-  version "2.13.0"
-  resolved "https://registry.yarnpkg.com/@types/gulp-typescript/-/gulp-typescript-2.13.0.tgz#716ee26ce734d62ec5544b872ac073337a07202d"
-  dependencies:
-    gulp-typescript "*"
-
 "@types/gulp@^4.0.5":
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/@types/gulp/-/gulp-4.0.5.tgz#f5f498d5bf9538364792de22490a12c0e6bc5eb4"
@@ -1870,7 +1864,7 @@ gulp-terser@^1.1.6:
     through2 "^3.0.0"
     vinyl-sourcemaps-apply "^0.2.1"
 
-gulp-typescript@*, gulp-typescript@^5.0.0:
+gulp-typescript@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/gulp-typescript/-/gulp-typescript-5.0.0.tgz#aac065a88bca95d1f960d4934a307feed2d091f8"
   dependencies:

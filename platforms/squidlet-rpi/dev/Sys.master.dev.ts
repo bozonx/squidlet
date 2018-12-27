@@ -5,9 +5,9 @@ import Sys from '../../../host/src/app/interfaces/dev/Sys';
 import {convertBufferToUint8Array, PATH_SEPARATOR} from '../../../host/src/helpers/helpers';
 import {SrcHostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
-import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/drivers/Sys/Sys.driver';
 import initializationConfig from '../../../host/src/app/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
+import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/app/SysFs';
 
 
 let __configSet: SrcHostFilesSet;
