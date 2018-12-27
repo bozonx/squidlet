@@ -5,6 +5,7 @@ import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 import {DevClass} from '../host/src/app/entities/DevManager';
 import * as path from "path";
+import * as yargs from 'yargs';
 
 
 /**
@@ -47,8 +48,8 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
 export default async function masterStarter () {
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
-  const absConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
-  const main: Main = await initConfigWorks(absConfigPath, true);
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
+  const main: Main = await initConfigWorks(resolvedConfigPath, resolvedBuildDir, true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files

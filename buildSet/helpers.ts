@@ -48,7 +48,7 @@ export function resolveParam(envParamName: string, argParamName: string): string
     value = yargs.argv.config;
   }
   else {
-    throw new Error(`You have to specify env variable CONFIG=./path/to/config.yaml or argument --config=./path/to/config.yaml`);
+    throw new Error(`You have to specify env variable ${envParamName}=... or argument --${argParamName}=...`);
   }
 
   return value as string;
@@ -86,14 +86,14 @@ export function collectDevs(platformName: string): {[index: string]: DevClass} {
   return devsSet;
 }
 
-export async function initConfigWorks(masterConfigPath: string, skipMaster?: boolean): Promise<Main> {
-  const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(masterConfigPath);
-
-  const main: Main = new Main(masterConfig, masterConfigPath);
+export async function initConfigWorks(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<Main> {
+  const absMasterConfigPath: string = path.resolve(process.cwd(), relMasterConfigPath);
+  const absBuildDir: string | undefined = relBuildDir && path.resolve(process.cwd(), relBuildDir);
+  //const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(absMasterConfigPath);
+  const main: Main = new Main(absMasterConfigPath, absBuildDir);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
   await main.collect();
-
 
   // write all the hosts and entities files exclude master's host files
   await main.writeToStorage(skipMaster);

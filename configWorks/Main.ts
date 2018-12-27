@@ -26,7 +26,10 @@ export default class Main {
   private readonly pluginEnv: PluginEnv;
 
 
-  constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
+  constructor(absMasterConfigPath: string, absBuildDir?: string) {
+
+    // TODO: считать конфиг тут - masterConfig: PreMasterConfig
+
     this.masterConfig = new MasterConfig(masterConfig, masterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);

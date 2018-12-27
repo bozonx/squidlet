@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
+import * as yargs from 'yargs';
 
 import {makeEnvConfig, clearDir} from './helpers';
 import compileJs from './compileJs';
@@ -13,6 +14,7 @@ import upload from './upload';
 import {initConfigWorks, resolveParam} from '../helpers';
 
 
+
 // TODO: получить из агрументов
 const envConfigPath = path.resolve(__dirname, '../env-config.yaml');
 const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
@@ -22,9 +24,9 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 // configs
 gulp.task('build-configs', async () => {
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
-  const absConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
 
-  await initConfigWorks(absConfigPath);
+  await initConfigWorks(resolvedConfigPath, resolvedBuildDir);
 });
 
 // host
