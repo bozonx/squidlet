@@ -65,10 +65,10 @@ describe 'configWorks.HostsFilesWriter', ->
       '/buildDir/entities/devices/device1/someFile'
     )
 
-  it 'writeHostsFiles', ->
+  it 'writeHostsConfigsFiles', ->
     configDir = '/buildDir/hosts/configWorks/config'
 
-    await @hostsFilesWriter.writeHostsFiles()
+    await @hostsFilesWriter.writeHostsConfigsFiles()
 
     sinon.assert.calledWith(@hostsFilesWriter.writeJson.getCall(0),
       "#{configDir}/hostConfig.json",

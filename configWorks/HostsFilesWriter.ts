@@ -21,6 +21,10 @@ export default class HostsFilesWriter {
 
   constructor(main: Main) {
     this.main = main;
+  }
+
+
+  async init() {
     this.hostsDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
     this.entitiesDstDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
@@ -44,7 +48,7 @@ export default class HostsFilesWriter {
    * Copy files of hosts to storage
    * @param skipMaster - don't write master's files
    */
-  async writeHostsFiles(skipMaster: boolean = false) {
+  async writeHostsConfigsFiles(skipMaster: boolean = false) {
     for (let hostId of this.main.masterConfig.getHostsIds()) {
       if (skipMaster && hostId === 'master') return;
 

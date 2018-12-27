@@ -47,7 +47,7 @@ export default class MasterConfig {
   readonly buildDir: string;
 
 
-  constructor(masterConfig: PreMasterConfig, masterConfigPath: string) {
+  constructor(masterConfigPath: string) {
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
@@ -57,6 +57,12 @@ export default class MasterConfig {
     this.preHosts = this.generatePreHosts(this.resolveHosts(masterConfig));
 
     this.buildDir = this.generateBuildDir(masterConfigPath);
+  }
+
+  async init() {
+    // TODO: считать конфиг тут - masterConfig: PreMasterConfig
+    //const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(absMasterConfigPath);
+
   }
 
   getHostsIds(): string[] {

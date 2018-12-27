@@ -63,6 +63,10 @@ export default class Entities {
 
   constructor(main: Main) {
     this.main = main;
+
+  }
+
+  async init() {
     this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 

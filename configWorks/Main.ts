@@ -1,4 +1,3 @@
-import PreMasterConfig from './interfaces/PreMasterConfig';
 import Register from './Register';
 import PluginEnv from './PluginEnv';
 import Entities from './Entities';
@@ -24,13 +23,14 @@ export default class Main {
   readonly log = defaultLogger;
   readonly io = Io;
   private readonly pluginEnv: PluginEnv;
+  // TODO: does it need???
+  private readonly absBuildDir: string | undefined;
 
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
+    this.absBuildDir = absBuildDir;
 
-    // TODO: считать конфиг тут - masterConfig: PreMasterConfig
-
-    this.masterConfig = new MasterConfig(masterConfig, masterConfigPath);
+    this.masterConfig = new MasterConfig(absMasterConfigPath);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.hostClassNames = new HostClassNames(this);
@@ -38,6 +38,12 @@ export default class Main {
     this.hostsFilesSet = new HostsFilesSet(this);
     this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
+  }
+
+  async init() {
+    await this.masterConfig.init();
+    await this.entities.init();
+    await this.hostsFilesWriter.init();
   }
 
   async collect() {
@@ -64,7 +70,7 @@ export default class Main {
   async writeToStorage(skipMaster?: boolean) {
     this.log.info(`--> Write hosts files`);
     await this.hostsFilesWriter.writeEntitiesFiles();
-    await this.hostsFilesWriter.writeHostsFiles(skipMaster);
+    await this.hostsFilesWriter.writeHostsConfigsFiles(skipMaster);
   }
 
 
