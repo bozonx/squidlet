@@ -48,7 +48,13 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
 export default async function masterStarter () {
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
+
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR as string;
+
+  // TODO: wtf - не работает
+
+  //const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'] || undefined;
+
   const main: Main = await initConfigWorks(resolvedConfigPath, resolvedBuildDir, true);
 
   console.info(`===> generate master config object`);
@@ -58,5 +64,6 @@ export default async function masterStarter () {
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 
   console.info(`===> Starting master host system`);
+
   await hostSystem.start();
 }

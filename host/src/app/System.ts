@@ -70,7 +70,7 @@ export default class System {
 
 
   async start() {
-    try {
+    //try {
       this.log.info(`---> Initializing devs`);
       this.devManager.init();
 
@@ -97,10 +97,13 @@ export default class System {
       delete this.initializationConfig;
 
       this.log.info(`===> Host initialization has finished`);
-    }
-    catch (err) {
-      this.log.error(`Can't start host system: ${String(err)}`);
-    }
+    // }
+    // catch (err) {
+    //
+    //   // TODO: не срабатывает
+    //   //this.log.error(`Can't start host system: ${String(err)}`);
+    //   throw new Error(`Can't start host system: ${String(err)}`);
+    // }
   }
 
   onAppInit(cb: () => void): number {

@@ -8,6 +8,7 @@ import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/Manifest
 import initializationConfig from '../../../host/src/app/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
 import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/app/SysFs';
+import {trimEnd} from '../../../host/src/helpers/lodashLike';
 
 
 let __configSet: SrcHostFilesSet;
@@ -67,10 +68,14 @@ export default class SysDev implements Sys {
   }
 
   async requireFile(fileName: string): Promise<any> {
+
+    console.log(1111111, fileName, __configSet.entitiesSet.drivers)
+
     const pathSplit = fileName.split(PATH_SEPARATOR);
+    const entityFilePath: string = this.getEntityFileAbsPath(fileName);
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      return require(this.getEntityFileAbsPath(fileName));
+      return require(this.getEntityFileAbsPath(entityFilePath));
     }
 
     throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
@@ -81,13 +86,17 @@ export default class SysDev implements Sys {
     const pathSplit = virtFileName.split(PATH_SEPARATOR);
     const entityType = pathSplit[1] as ManifestsTypePluralName;
     const fileName: string = pathSplit.slice(3).join(path.sep);
-    const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[1]].srcDir;
+    const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[2]].srcDir;
 
     return path.join(entitySrcDir, fileName);
   }
 
   private getConfig(configName: string): {[index: string]: any} {
-    const config: any = (__configSet as any)[configName];
+
+    // TODO: запрашивается config.json !!!!
+
+    const strippedName: string = trimEnd(configName, '.json');
+    const config: any = (__configSet as any)[strippedName];
 
     if (!config) throw new Error(`Can't find config "${configName}"`);
 

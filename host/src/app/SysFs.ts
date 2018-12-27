@@ -42,7 +42,7 @@ export const ENTITIES_DIR = 'entities';
 export default class SysFs {
   private readonly system: System;
   private get sysDev(): SysDev {
-    return this.system.devManager.getDev('Sys.dev');
+    return this.system.devManager.getDev('Sys');
   }
 
 
@@ -66,14 +66,17 @@ export default class SysFs {
   loadConfig(configName: string): Promise<{[index: string]: any}> {
 
     // TODO: запретить выход наверх
+    // TODO: зачем подставляли .json ??
 
-    return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
+    //return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
+    return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, configName));
   }
 
   async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
 
     // TODO: запретить выход наверх
 
+    // TODO: взять из манифеста или entity set
     const fileName = this.system.initCfg.fileNames.mainJs;
 
     return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, pluralType, entityName, fileName));
