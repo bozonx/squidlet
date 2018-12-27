@@ -63,7 +63,10 @@ export default class Main {
    */
   async writeToStorage(skipMaster?: boolean) {
     this.log.info(`--> Write hosts files`);
-    await this.hostsFilesWriter.writeEntitiesFiles();
+
+    // TODO: doesn't work
+
+    //await this.hostsFilesWriter.writeEntitiesFiles();
     await this.hostsFilesWriter.writeHostsConfigsFiles(skipMaster);
   }
 

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
+import * as shelljs from 'shelljs';
 import * as yaml from 'js-yaml';
 import systemConfig from './configs/systemConfig';
-import mkdirPLogic from '../host/src/helpers/mkdirPLogic';
 import {Stats} from '../host/src/app/interfaces/dev/Storage';
 
 
@@ -33,8 +33,8 @@ export function mkdir(path: string): Promise<void> {
   return fsPromises.mkdir(path);
 }
 
-export async function mkdirP(dirName: string): Promise<boolean> {
-  return mkdirPLogic(dirName, exists, mkdir);
+export async function mkdirP(dirName: string): Promise<void> {
+  shelljs.mkdir('-p', dirName);
 }
 
 export function yamlToJs(yamlString: string): any {

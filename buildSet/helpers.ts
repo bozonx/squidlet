@@ -87,6 +87,7 @@ export function collectDevs(platformName: string): {[index: string]: DevClass} {
 export async function initConfigWorks(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<Main> {
   const absMasterConfigPath: string = path.resolve(process.cwd(), relMasterConfigPath);
   const absBuildDir: string | undefined = relBuildDir && path.resolve(process.cwd(), relBuildDir);
+
   const main: Main = new Main(absMasterConfigPath, absBuildDir);
 
   await main.init();

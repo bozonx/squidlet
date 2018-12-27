@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build-configs": "cd buildSet; npm run build-configs",
+    "build-configs": "node ./buildSet/build-configs",
     "build-host": "cd buildSet; npm run build-host",
     "master": "ts-node ./buildSet/masterIndex.ts",
     "test": "mocha",
@@ -21,6 +21,7 @@
     "immutable": "^4.0.0-rc.12",
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.11",
+    "shelljs": "^0.8.3",
     "text-encoding": "^0.7.0",
     "yargs": "^12.0.5"
   },
@@ -29,6 +30,7 @@
     "@types/js-yaml": "^3.11.2",
     "@types/lodash": "^4.14.118",
     "@types/node": "^10.12.12",
+    "@types/shelljs": "^0.8.1",
     "@types/text-encoding": "^0.0.35",
     "@types/uniqid": "^4.1.2",
     "@types/yargs": "^12.0.1",
