@@ -91,7 +91,7 @@ describe 'configWorks.MasterConfig', ->
   it 'buildDir - use defaults if there is not storage dir of configWorks config', ->
     @masterConfig.preHosts.master.config.storageDir = undefined
 
-    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), systemConfig.defaultDuildDir)
+    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), systemConfig.defaultBuildDir)
 
   it 'buildDir - use configWorks\'s absolute storageDir', ->
     assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)

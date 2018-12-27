@@ -125,10 +125,6 @@ export default class HostsFilesWriter {
   private async writeJson(fileName: string, contentJs: any) {
     const content = JSON.stringify(contentJs);
 
-
-    console.log(22222, fileName, content);
-
-
     await this.main.io.mkdirP(path.dirname(fileName));
     await this.main.io.writeFile(fileName, content);
   }

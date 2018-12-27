@@ -151,7 +151,7 @@ export default class MasterConfig {
     }
 
     // use default build dir
-    return systemConfig.defaultDuildDir;
+    return systemConfig.defaultBuildDir;
   }
 
   private prepareHostConfig(id: string): HostConfig {
