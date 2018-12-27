@@ -15,8 +15,6 @@ import {
 } from '../configWorks/interfaces/Platforms';
 import {DevClass} from '../host/src/app/entities/DevManager';
 import Main from '../configWorks/Main';
-import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
-
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');

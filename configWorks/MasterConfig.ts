@@ -22,8 +22,11 @@ import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
+import {loadYamlFile} from './IO';
+import {appendArray} from './helpers';
 
 
+// TODO: move to build helpers ???
 const platforms: {[index: string]: PlatformConfig} = {
   [PLATFORM_ESP32]: platform_esp32,
   [PLATFORM_ESP8266]: platform_esp8266,
@@ -40,35 +43,45 @@ const servicesShortcut: {[index: string]: string} = {
 
 
 export default class MasterConfig {
-  readonly plugins: string[];
-  private readonly hostDefaults: {[index: string]: any};
-  private readonly preHosts: {[index: string]: PreHostConfig};
+  readonly plugins: string[] = [];
+  get buildDir(): string {
+    return this._buildDir as string;
+  }
+
+  private readonly hostDefaults: {[index: string]: any} = {};
+  // unprocessed hosts configs
+  private readonly preHosts: {[index: string]: PreHostConfig} = {};
   // storage base dir
-  readonly buildDir: string;
+  private _buildDir?: string;
+  // absolute path to master config yaml
+  private readonly masterConfigPath: string;
+  // specified build dir by arguments of command
+  private readonly argBuildDir?: string;
 
 
-  constructor(masterConfigPath: string) {
+  constructor(masterConfigPath: string, argBuildDir?: string) {
+    this.masterConfigPath = masterConfigPath;
+    this.argBuildDir = argBuildDir;
+  }
+
+  async init() {
+    const masterConfig: PreMasterConfig = await loadYamlFile(this.masterConfigPath);
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    this.plugins = masterConfig.plugins || [];
-    this.hostDefaults = masterConfig.hostDefaults || {};
-    this.preHosts = this.generatePreHosts(this.resolveHosts(masterConfig));
-
-    this.buildDir = this.generateBuildDir(masterConfigPath);
+    appendArray(this.plugins, masterConfig.plugins);
+    _defaultsDeep(this.hostDefaults, masterConfig.hostDefaults);
+    _defaultsDeep(this.preHosts, this.generatePreHosts(this.resolveHosts(masterConfig)));
+    this._buildDir = this.resolveBuildDir();
   }
 
-  async init() {
-    // TODO: считать конфиг тут - masterConfig: PreMasterConfig
-    //const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(absMasterConfigPath);
-
-  }
 
   getHostsIds(): string[] {
     return Object.keys(this.preHosts);
   }
 
+  // TODO: does it really need ???
   getPreHostConfig(hostId: string): PreHostConfig {
     if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
 
@@ -81,6 +94,7 @@ export default class MasterConfig {
     return this.prepareHostConfig(hostId);
   }
 
+  // TODO: review
   getHostPlatformDevs(hostId: string): string[] {
     const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
 
@@ -116,7 +130,10 @@ export default class MasterConfig {
     return hosts;
   }
 
-  private generateBuildDir(masterConfigPath: string): string {
+  private resolveBuildDir(): string {
+    // use command argument if specified
+    if (this.argBuildDir) return this.argBuildDir;
+
     const masterHostConfig: PreHostConfig = this.getPreHostConfig('master');
 
     if (masterHostConfig.config.storageDir) {
@@ -129,7 +146,7 @@ export default class MasterConfig {
       }
       else {
         // storageDir is relative path - make it absolute, use config file dir as a root
-        return path.join(path.dirname(masterConfigPath), storageDir);
+        return path.resolve(path.dirname(this.masterConfigPath), storageDir);
       }
     }
 

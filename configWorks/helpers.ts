@@ -6,6 +6,12 @@ import * as path from 'path';
 import {exists, stat} from './IO';
 
 
+export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
+  if (!arrToAppend) return;
+
+  for (let item of arrToAppend) srcArr.push(item);
+}
+
 export function sortByIncludeInList(itemsToSearch: string[], listToSearchIn: string[]): [string[], string[]] {
   const included: string[] = [];
   const notIncluded: string[] = [];

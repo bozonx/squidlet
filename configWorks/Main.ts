@@ -23,14 +23,10 @@ export default class Main {
   readonly log = defaultLogger;
   readonly io = Io;
   private readonly pluginEnv: PluginEnv;
-  // TODO: does it need???
-  private readonly absBuildDir: string | undefined;
 
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
-    this.absBuildDir = absBuildDir;
-
-    this.masterConfig = new MasterConfig(absMasterConfigPath);
+    this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
     this.register = new Register(this);
     this.entities = new Entities(this);
     this.hostClassNames = new HostClassNames(this);
