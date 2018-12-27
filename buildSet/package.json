@@ -9,8 +9,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "solid": "gulp solid",
-    "starter": "gulp starter"
+    "build-configs": "gulp build-configs",
+    "build-host": "gulp build-host"
   },
   "dependencies": {
     "@babel/core": "^7.2.0",

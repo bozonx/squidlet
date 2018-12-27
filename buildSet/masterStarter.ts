@@ -1,4 +1,4 @@
-import {collectDevs, getMasterSysDev, readConfig} from './helpers';
+import {collectDevs, getMasterSysDev, initConfigWorks, readConfig} from './helpers';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
@@ -45,17 +45,7 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
 
 export default async function masterStarter (resolvedConfigPath: string) {
-  const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(resolvedConfigPath);
-
-  // TODO: set buildDir
-
-  const main: Main = new Main(masterConfig, resolvedConfigPath);
-
-  console.info(`===> Collecting configs and entities files of all the hosts`);
-  await main.collect();
-
-  // write all the hosts and entities files exclude master's host files
-  await main.writeToStorage(true);
+  const main: Main = await initConfigWorks(resolvedConfigPath, true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files

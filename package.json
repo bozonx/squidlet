@@ -9,9 +9,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "dist": "gulp dist",
-    "slave": "gulp slave",
-    "solid": "cd buildSet; npm run solid",
+    "build-configs": "cd buildSet; npm run build-configs",
+    "build-host": "cd buildSet; npm run build-host",
     "master": "ts-node ./buildSet/masterIndex.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"

@@ -13,6 +13,8 @@ import {
   PLATFORM_X86
 } from '../configWorks/interfaces/Platforms';
 import {DevClass} from '../host/src/app/entities/DevManager';
+import Main from '../configWorks/Main';
+import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');
@@ -72,4 +74,19 @@ export function collectDevs(platformName: string): {[index: string]: DevClass} {
   }
 
   return devsSet;
+}
+
+export async function initConfigWorks(masterConfigPath: string, skipMaster?: boolean): Promise<Main> {
+  const masterConfig: PreMasterConfig = await readConfig<PreMasterConfig>(masterConfigPath);
+
+  const main: Main = new Main(masterConfig, masterConfigPath);
+
+  console.info(`===> Collecting configs and entities files of all the hosts`);
+  await main.collect();
+
+
+  // write all the hosts and entities files exclude master's host files
+  await main.writeToStorage(skipMaster);
+
+  return main;
 }
