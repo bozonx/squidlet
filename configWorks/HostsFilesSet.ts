@@ -48,6 +48,7 @@ export default class HostsFilesSet {
     };
 
     // TODO: review
+    // TODO: можеть сделать ввиде виртуальной фс ?
 
     const usedEntitiesNames: EntitiesNames = this.main.hostClassNames.getEntitiesNames(hostId);
 
@@ -58,6 +59,7 @@ export default class HostsFilesSet {
         const relativeFiles: string[] = this.main.entities.getFiles(pluralType, className);
 
         result[pluralType][className] = {
+          srcDir,
           manifest: this.main.entities.getManifest(pluralType, className),
           main: relativeMain && path.resolve(srcDir, relativeMain),
           files: relativeFiles.map((relativeFileName: string) => path.resolve(srcDir, relativeFileName)),

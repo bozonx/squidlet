@@ -29,7 +29,6 @@ export interface EntitiesNames {
 
 export default class Entities {
   private readonly main: Main;
-  private readonly entitiesDir: string;
   // Entities set which contains a srcDir which point to dir where original manifest places.
   // There are all the entities which was registered in the system.
   private entitiesSet: SrcEntitiesSet = {
@@ -66,9 +65,6 @@ export default class Entities {
 
   }
 
-  async init() {
-    this.entitiesDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
-  }
 
   getEntitiesSet(): SrcEntitiesSet {
     return this.entitiesSet;

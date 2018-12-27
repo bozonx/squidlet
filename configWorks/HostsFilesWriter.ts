@@ -15,19 +15,17 @@ import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes'
  */
 export default class HostsFilesWriter {
   private readonly main: Main;
-  private readonly hostsDir: string;
+
   // entities dir in storage
-  private readonly entitiesDstDir: string;
+  private get entitiesDstDir(): string {
+    return path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
+  }
+
 
   constructor(main: Main) {
     this.main = main;
   }
 
-
-  async init() {
-    this.hostsDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
-    this.entitiesDstDir = path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
-  }
 
   /**
    * Copy files of entities to storage
@@ -99,7 +97,8 @@ export default class HostsFilesWriter {
     const hostConfig: HostConfig = this.main.masterConfig.getFinalHostConfig(hostId);
     const definitionsSet: DefinitionsSet = this.main.hostsFilesSet.getDefinitionsSet(hostId);
     const hostsUsedEntitiesNames: EntitiesNames = this.main.hostClassNames.getEntitiesNames(hostId);
-    const hostDir = path.join(this.hostsDir, hostId);
+    const hostsDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
+    const hostDir = path.join(hostsDir, hostId);
     const hostDirs = systemConfig.hostInitCfg.hostDirs;
     const fileNames = systemConfig.hostInitCfg.fileNames;
     const configDir = path.join(hostDir, hostDirs.config);

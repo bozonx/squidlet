@@ -38,8 +38,6 @@ export default class Main {
 
   async init() {
     await this.masterConfig.init();
-    await this.entities.init();
-    await this.hostsFilesWriter.init();
   }
 
   async collect() {
