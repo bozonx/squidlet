@@ -13,8 +13,9 @@ export class Storage extends DriverBase {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.storageDev = await getDriverDep('Storage.dev')
-      .getInstance(this.props);
+    //this.depsInstances.storageDev = await getDriverDep('Storage.dev')
+    this.depsInstances.storageDev = this.env.getDev('Storage');
+    //  .getInstance(this.props);
   }
 
   async isDir(pathToDir: string): Promise<boolean> {

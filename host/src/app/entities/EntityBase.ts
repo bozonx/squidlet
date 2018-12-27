@@ -61,6 +61,9 @@ export default class EntityBase<Props = {}> {
 
       return this.env.getDriver(driverName);
     };
+    // const getDev: GetDriverDep = (devName: string): DriverInstance => {
+    //   return this.env.getDev(devName);
+    // };
 
     if (this.appDidInit) {
       this.env.system.onAppInit(async () => {

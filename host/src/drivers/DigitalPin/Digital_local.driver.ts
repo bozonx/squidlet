@@ -11,7 +11,8 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalDev = await getDriverDep('Digital.dev');
+    //this.depsInstances.digitalDev = await getDriverDep('Digital.dev');
+    this.depsInstances.digitalDev = this.env.getDev('Digital');
   }
 
 

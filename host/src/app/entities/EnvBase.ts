@@ -4,6 +4,7 @@ import Env from '../interfaces/Env';
 import ManifestBase from '../interfaces/ManifestBase';
 import Logger from '../interfaces/Logger';
 import HostConfig from '../interfaces/HostConfig';
+import Dev from '../interfaces/Dev';
 
 
 /**
@@ -20,8 +21,9 @@ export default abstract class EnvBase implements Env {
     this.config = system.host.config;
   }
 
-  getDev<T extends DriverInstance>(shortDevName: string): T {
-    return this.system.driversManager.getDev<T>(shortDevName);
+  getDev<T extends Dev>(shortDevName: string): T {
+    //return this.system.driversManager.getDev<T>(shortDevName);
+    return this.system.devManager.getDev<T>(shortDevName);
   }
 
   getDriver<T extends DriverInstance>(driverName: string): T {
