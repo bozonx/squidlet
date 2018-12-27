@@ -69,13 +69,18 @@ export default class SysDev implements Sys {
 
   async requireFile(fileName: string): Promise<any> {
 
-    console.log(1111111, fileName, __configSet.entitiesSet.drivers)
+    // TODO: review
 
     const pathSplit = fileName.split(PATH_SEPARATOR);
-    const entityFilePath: string = this.getEntityFileAbsPath(fileName);
+    const entityType = pathSplit[1] as ManifestsTypePluralName;
+
+    // const pathSplit = fileName.split(PATH_SEPARATOR);
+    // const entityFilePath: string = this.getEntityFileAbsPath(fileName);
+    const entityFilePath: string = __configSet.entitiesSet[entityType][pathSplit[2]].main as string;
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      return require(this.getEntityFileAbsPath(entityFilePath));
+      return require(entityFilePath);
+      //return require(this.getEntityFileAbsPath(entityFilePath));
     }
 
     throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
@@ -86,6 +91,9 @@ export default class SysDev implements Sys {
     const pathSplit = virtFileName.split(PATH_SEPARATOR);
     const entityType = pathSplit[1] as ManifestsTypePluralName;
     const fileName: string = pathSplit.slice(3).join(path.sep);
+
+    console.log(11111111, virtFileName, entityType, pathSplit[2])
+
     const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[2]].srcDir;
 
     return path.join(entitySrcDir, fileName);
