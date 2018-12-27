@@ -88,7 +88,7 @@ export default class SysFs {
   ): Promise<{[index: string]: any}> {
     await this.checkEntity(pluralType, entityName);
 
-    const pathToFile = pathJoin(ENTITIES_DIR, entityName, this.system.initCfg.fileNames.manifest);
+    const pathToFile = pathJoin(ENTITIES_DIR, pluralType, entityName, this.system.initCfg.fileNames.manifest);
 
     return this.sysDev.readJsonObjectFile(pathToFile);
   }

@@ -37,6 +37,7 @@ export default class SysDev implements Sys {
     // other entity file - read from disk
     else if (pathSplit[0] === ENTITIES_DIR) {
       // load entity file
+
       const fileContent: string = await this.readStringFile(fileName);
 
       return JSON.parse(fileContent);
@@ -79,7 +80,10 @@ export default class SysDev implements Sys {
     const entityFilePath: string = __configSet.entitiesSet[entityType][pathSplit[2]].main as string;
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      return require(entityFilePath);
+
+      // TODO: default наверное не здесь должно быть а выше
+
+      return require(entityFilePath).default;
       //return require(this.getEntityFileAbsPath(entityFilePath));
     }
 
@@ -91,8 +95,6 @@ export default class SysDev implements Sys {
     const pathSplit = virtFileName.split(PATH_SEPARATOR);
     const entityType = pathSplit[1] as ManifestsTypePluralName;
     const fileName: string = pathSplit.slice(3).join(path.sep);
-
-    console.log(11111111, virtFileName, entityType, pathSplit[2])
 
     const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[2]].srcDir;
 
