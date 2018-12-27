@@ -1,9 +1,10 @@
-import {collectDevs, getMasterSysDev, initConfigWorks, readConfig} from './helpers';
+import {collectDevs, getMasterSysDev, initConfigWorks, readConfig, resolveParam} from './helpers';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 import {DevClass} from '../host/src/app/entities/DevManager';
+import * as path from "path";
 
 
 /**
@@ -44,8 +45,10 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 }
 
 
-export default async function masterStarter (resolvedConfigPath: string) {
-  const main: Main = await initConfigWorks(resolvedConfigPath, true);
+export default async function masterStarter () {
+  const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
+  const absConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
+  const main: Main = await initConfigWorks(absConfigPath, true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files

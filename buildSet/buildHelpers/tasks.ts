@@ -10,11 +10,7 @@ import collectDependencies from './collectDependencies';
 import minimize from './minimize';
 import prepareToFlash from './prepareToFlash';
 import upload from './upload';
-import {initConfigWorks, resolveConfigPath} from '../helpers';
-import {SrcHostFilesSet} from '../../host/src/app/interfaces/HostFilesSet';
-import {generateMasterConfigSet} from '../masterStarter';
-import Main from '../../configWorks/Main';
-import * as yargs from 'yargs';
+import {initConfigWorks, resolveParam} from '../helpers';
 
 
 // TODO: получить из агрументов
@@ -25,16 +21,10 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 // configs
 gulp.task('build-configs', async () => {
+  const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
+  const absConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
 
-  // TODO: откуда брать конфиг???
-
-  const resolvedConfigPath: string = resolveConfigPath(yargs.argv.config);
-  const main: Main = await initConfigWorks(resolvedConfigPath);
-
-  console.info(`===> generate master config object`);
-  // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: SrcHostFilesSet = generateMasterConfigSet(main);
-
+  await initConfigWorks(absConfigPath);
 });
 
 // host

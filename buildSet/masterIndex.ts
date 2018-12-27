@@ -8,16 +8,13 @@
 
 import * as yargs from 'yargs';
 
-import {resolveConfigPath} from './helpers';
 import masterStarter from './masterStarter';
 
 
 const debug: boolean = Boolean(yargs.argv.debug);
 
 
-const resolvedConfigPath: string = resolveConfigPath(yargs.argv.config);
-
-masterStarter(resolvedConfigPath)
+masterStarter()
   .catch((err) => {
     // if (debug) {
     //   throw err;

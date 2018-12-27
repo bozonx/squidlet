@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as yargs from 'yargs';
 
 import {loadYamlFile} from '../configWorks/IO';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
@@ -15,6 +16,7 @@ import {
 import {DevClass} from '../host/src/app/entities/DevManager';
 import Main from '../configWorks/Main';
 import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
+
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');
@@ -36,12 +38,20 @@ export function resolveStorageDir(pathToDir?: string): string {
   return path.resolve(process.cwd(), (pathToDir as string));
 }
 
-export function resolveConfigPath(pathToYamlFile?: string): string {
-  if (!pathToYamlFile) {
-    throw new Error(`You have to specify a "--config" param`);
+export function resolveParam(envParamName: string, argParamName: string): string {
+  let value: string | undefined;
+
+  if (process.env[envParamName]) {
+    value = process.env.CONFIG;
+  }
+  else if (yargs.argv[argParamName]) {
+    value = yargs.argv.config;
+  }
+  else {
+    throw new Error(`You have to specify env variable CONFIG=./path/to/config.yaml or argument --config=./path/to/config.yaml`);
   }
 
-  return path.resolve(process.cwd(), (pathToYamlFile as string));
+  return value as string;
 }
 
 export async function readConfig<T> (resolvedPath: string): Promise<T> {
