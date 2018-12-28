@@ -6,7 +6,7 @@
  * * passes it to platform index file and runs host system as is, without building
  */
 
-import {collectDevs, getMasterSysDev, initConfigWorks, resolveParam} from './helpers';
+import {collectDevs, getMasterSysDev, initEnvFilesBuilder, resolveParam} from './helpers';
 import System from '../host/src/app/System';
 import Main from './buildHostEnv/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
@@ -65,7 +65,7 @@ async function masterStarter () {
 
   //const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
 
-  const main: Main = await initConfigWorks(resolvedConfigPath, resolvedBuildDir, true);
+  const main: Main = await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir, true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files

@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import {collectDevs, resolveStorageDir} from './helpers';
+import {collectDevs} from './helpers';
 import System from '../host/src/app/System';
 import {DevClass} from '../host/src/app/entities/DevManager';
 
@@ -10,7 +10,14 @@ import {DevClass} from '../host/src/app/entities/DevManager';
 // TODO: change
 //const debug: boolean = Boolean(yargs.argv.debug);
 const debug = true;
-const resolvedStorageDir: string = resolveStorageDir(yargs.argv.storage);
+
+
+if (!yargs.argv.storage) {
+  throw new Error(`You have to specify a "--storage" param`);
+}
+
+
+const resolvedStorageDir: string = path.resolve(process.cwd(), yargs.argv.storage as string);
 
 
 async function init() {

@@ -1,9 +1,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 import * as shelljs from 'shelljs';
-import * as dependencyTree from 'dependency-tree';
 
-import {loadYamlFile} from './buildHostEnv/IO';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
@@ -19,6 +17,7 @@ import {DevClass} from '../host/src/app/entities/DevManager';
 import Main from './buildHostEnv/Main';
 
 
+// TODO: review
 interface BuildConfig {
   buildDir: string;
   compiledTsDir: string;
@@ -26,14 +25,11 @@ interface BuildConfig {
   hostRoot: string;
   minPrjDir: string;
   minDepsDir: string;
-  flashDir: string;
   srcDir: string;
-  dependenciesBuildDir: string;
   mainJsFileName: string;
-  bundleFile: string;
-  prjConfigYaml: string;
-  bootrstPath: string;
   strictMode?: boolean;
+  //dependenciesBuildDir: string;
+  //prjConfigYaml: string;
 }
 
 
@@ -49,6 +45,13 @@ export const platformConfigs: {[index: string]: PlatformConfig} = {
 };
 
 
+export function getMasterSysDev(platformName: string): DevClass {
+  const platformDirName = `squidlet-${platformName}`;
+
+  const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
+
+  return require(devPath).default;
+}
 
 export function clearDir(dirName: string) {
   shelljs.rm('-rf', path.join(dirName, '*'));
@@ -61,27 +64,16 @@ export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPat
   return {
     buildDir,
     srcDir: path.resolve(envConfigBaseDir, envPrjConfig.src),
-    prjConfigYaml: path.resolve(envConfigBaseDir, envPrjConfig.prjConfig),
     compiledTsDir: path.join(buildDir, 'compiled-ts'),
     compiledJsDir: path.join(buildDir, 'compiled-js'),
     hostRoot: 'system/host',
     minPrjDir: path.join(buildDir, 'minPrj'),
     minDepsDir: path.join(buildDir, 'minDeps'),
-    flashDir: path.join(buildDir, 'flash'),
-    dependenciesBuildDir: path.join(buildDir, 'deps'),
     mainJsFileName: `${envPrjConfig.main}.js`,
-    bundleFile: path.join(buildDir, 'bundle.js'),
-    bootrstPath: path.join(__dirname, '.bootrst'),
     strictMode: envPrjConfig.strictMode,
+    //dependenciesBuildDir: path.join(buildDir, 'deps'),
+    //prjConfigYaml: path.resolve(envConfigBaseDir, envPrjConfig.prjConfig),
   };
-}
-
-export function resolveStorageDir(pathToDir?: string): string {
-  if (!pathToDir) {
-    throw new Error(`You have to specify a "--storage" param`);
-  }
-
-  return path.resolve(process.cwd(), (pathToDir as string));
 }
 
 export function resolveParam(envParamName: string, argParamName?: string): string {
@@ -91,7 +83,7 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
     value = process.env.CONFIG;
   }
   else if (argParamName && yargs.argv[argParamName]) {
-    value = yargs.argv.config;
+    value = yargs.argv.config as string;
   }
   else {
     throw new Error(`You have to specify env variable ${envParamName}=... or argument --${argParamName}=...`);
@@ -100,19 +92,9 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
   return value as string;
 }
 
-export async function readConfig<T> (resolvedPath: string): Promise<T> {
-  return await loadYamlFile(resolvedPath) as T;
-}
-
-
-export function getMasterSysDev(platformName: string): DevClass {
-  const platformDirName = `squidlet-${platformName}`;
-
-  const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
-
-  return require(devPath).default;
-}
-
+/**
+ * Make devs collection in memory like {"Digital.dev": DevClass}
+ */
 export function collectDevs(platformName: string): {[index: string]: DevClass} {
   if (!platformConfigs[platformName]) {
     throw new Error(`Platform "${platformName}" haven't been found`);
@@ -132,7 +114,10 @@ export function collectDevs(platformName: string): {[index: string]: DevClass} {
   return devsSet;
 }
 
-export async function initConfigWorks(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<Main> {
+/**
+ * Initialize env files builder
+ */
+export async function initEnvFilesBuilder(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<Main> {
   const absMasterConfigPath: string = path.resolve(process.cwd(), relMasterConfigPath);
   const absBuildDir: string | undefined = relBuildDir && path.resolve(process.cwd(), relBuildDir);
 
@@ -148,3 +133,8 @@ export async function initConfigWorks(relMasterConfigPath: string, relBuildDir?:
 
   return main;
 }
+
+
+// export async function readConfig<T> (resolvedPath: string): Promise<T> {
+//   return await loadYamlFile(resolvedPath) as T;
+// }

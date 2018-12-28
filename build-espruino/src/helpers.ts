@@ -5,6 +5,45 @@ import * as dependencyTree from 'dependency-tree';
 export const PATH_SEPARATOR = '/';
 
 
+interface BuildConfig {
+  buildDir: string;
+  compiledTsDir: string;
+  compiledJsDir: string;
+  hostRoot: string;
+  minPrjDir: string;
+  minDepsDir: string;
+  flashDir: string;
+  srcDir: string;
+  dependenciesBuildDir: string;
+  mainJsFileName: string;
+  bundleFile: string;
+  prjConfigYaml: string;
+  bootrstPath: string;
+  strictMode?: boolean;
+}
+
+
+export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPath: string): BuildConfig {
+  const envConfigBaseDir = path.dirname(envConfigPath);
+  const buildDir = path.resolve(envConfigBaseDir, envPrjConfig.dst);
+
+  return {
+    buildDir,
+    srcDir: path.resolve(envConfigBaseDir, envPrjConfig.src),
+    prjConfigYaml: path.resolve(envConfigBaseDir, envPrjConfig.prjConfig),
+    compiledTsDir: path.join(buildDir, 'compiled-ts'),
+    compiledJsDir: path.join(buildDir, 'compiled-js'),
+    hostRoot: 'system/host',
+    minPrjDir: path.join(buildDir, 'minPrj'),
+    minDepsDir: path.join(buildDir, 'minDeps'),
+    flashDir: path.join(buildDir, 'flash'),
+    dependenciesBuildDir: path.join(buildDir, 'deps'),
+    mainJsFileName: `${envPrjConfig.main}.js`,
+    bundleFile: path.join(buildDir, 'bundle.js'),
+    bootrstPath: path.join(__dirname, '.bootrst'),
+    strictMode: envPrjConfig.strictMode,
+  };
+}
 
 export function stripExtension(filePath: string, extension: string): string {
   const regex = new RegExp(`\\.${extension}$`);

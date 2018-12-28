@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build-configs": "gulp build-configs",
+    "build-env": "gulp build-env",
     "build-host": "gulp build-host",
     "master": "ts-node ./buildSet/masterIndex.ts",
     "slave": "ts-node ./buildSet/slaveIndex.ts",

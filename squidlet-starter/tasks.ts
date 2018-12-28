@@ -9,7 +9,7 @@ import compileJs from './buildJs/compileJs';
 import compileTs from './buildJs/compileTs';
 import collectDependencies from './buildJs/collectDependencies';
 import minimize from './buildJs/minimize';
-import {initConfigWorks, resolveParam} from './helpers';
+import {initEnvFilesBuilder, resolveParam} from './helpers';
 
 
 // TODO: получить из агрументов
@@ -19,7 +19,12 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 
 // configs
-gulp.task('build-configs', async () => {
+gulp.task('build-env', async () => {
+
+  // TODO: clear
+
+  //clearDir(buildConfig.buildDir);
+
   if (yargs.argv.config) {
     process.env.CONFIG = yargs.argv.config;
   }
@@ -32,7 +37,7 @@ gulp.task('build-configs', async () => {
   // TODO: get from args
   const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || './build/configs';
 
-  await initConfigWorks(resolvedConfigPath, resolvedBuildDir);
+  await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir);
 });
 
 // host
