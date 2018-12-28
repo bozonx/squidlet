@@ -1,5 +1,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
+import * as shelljs from 'shelljs';
+import * as dependencyTree from 'dependency-tree';
 
 import {loadYamlFile} from './buildHostEnv/IO';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
@@ -15,6 +17,24 @@ import {
 } from './buildHostEnv/interfaces/Platforms';
 import {DevClass} from '../host/src/app/entities/DevManager';
 import Main from './buildHostEnv/Main';
+
+
+interface BuildConfig {
+  buildDir: string;
+  compiledTsDir: string;
+  compiledJsDir: string;
+  hostRoot: string;
+  minPrjDir: string;
+  minDepsDir: string;
+  flashDir: string;
+  srcDir: string;
+  dependenciesBuildDir: string;
+  mainJsFileName: string;
+  bundleFile: string;
+  prjConfigYaml: string;
+  bootrstPath: string;
+  strictMode?: boolean;
+}
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');

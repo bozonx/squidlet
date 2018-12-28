@@ -9,9 +9,7 @@ import compileJs from './buildJs/compileJs';
 import compileTs from './buildJs/compileTs';
 import collectDependencies from './buildJs/collectDependencies';
 import minimize from './buildJs/minimize';
-import prepareToFlash from './src/prepareToFlash';
-import upload from './src/upload';
-import {initConfigWorks, resolveParam} from '../host/src/helpers';
+import {initConfigWorks, resolveParam} from './helpers';
 
 
 // TODO: получить из агрументов
@@ -39,11 +37,4 @@ gulp.task('build-host', async () => {
   await minimize(buildConfig.compiledJsDir, buildConfig.minPrjDir);
   // min deps
   await minimize(buildConfig.dependenciesBuildDir, buildConfig.minDepsDir);
-  await prepareToFlash(
-    buildConfig.minPrjDir,
-    buildConfig.minDepsDir,
-    buildConfig.flashDir,
-    buildConfig.mainJsFileName,
-    buildConfig.hostRoot
-  );
 });

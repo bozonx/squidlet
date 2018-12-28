@@ -1,27 +1,10 @@
 import * as path from 'path';
-import * as shelljs from 'shelljs';
 import * as dependencyTree from 'dependency-tree';
 
 
 export const PATH_SEPARATOR = '/';
 
 
-interface BuildConfig {
-  buildDir: string;
-  compiledTsDir: string;
-  compiledJsDir: string;
-  hostRoot: string;
-  minPrjDir: string;
-  minDepsDir: string;
-  flashDir: string;
-  srcDir: string;
-  dependenciesBuildDir: string;
-  mainJsFileName: string;
-  bundleFile: string;
-  prjConfigYaml: string;
-  bootrstPath: string;
-  strictMode?: boolean;
-}
 
 export function stripExtension(filePath: string, extension: string): string {
   const regex = new RegExp(`\\.${extension}$`);
