@@ -1,6 +1,6 @@
 import {collectDevs, getMasterSysDev, initConfigWorks, resolveParam} from '../host/src/helpers';
 import System from '../host/src/app/System';
-import Main from './build-host-env/Main';
+import Main from './buildHostEnv/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import {DevClass} from '../host/src/app/entities/DevManager';
 

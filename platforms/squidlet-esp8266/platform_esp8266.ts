@@ -1,4 +1,4 @@
-import PlatformConfig from '../../squidlet-starter/build-host-env/interfaces/PlatformConfig';
+import PlatformConfig from '../../squidlet-starter/buildHostEnv/interfaces/PlatformConfig';
 
 
 const platformConfig: PlatformConfig = {

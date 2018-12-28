@@ -1,4 +1,4 @@
-Entities = require('../../squidlet-starter/build-host-env/Entities').default
+Entities = require('../../squidlet-starter/buildHostEnv/Entities').default
 
 
 describe 'configWorks.Entities', ->

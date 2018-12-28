@@ -5,10 +5,10 @@ import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
 import {makeEnvConfig, clearDir} from './helpers';
-import compileJs from './build-js/compileJs';
-import compileTs from './build-js/compileTs';
-import collectDependencies from './build-js/collectDependencies';
-import minimize from '../squidlet-starter/build-js/minimize';
+import compileJs from './buildJs/compileJs';
+import compileTs from './buildJs/compileTs';
+import collectDependencies from './buildJs/collectDependencies';
+import minimize from './buildJs/minimize';
 import prepareToFlash from './src/prepareToFlash';
 import upload from './src/upload';
 import {initConfigWorks, resolveParam} from '../host/src/helpers';
