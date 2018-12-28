@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const hashSum = require('hash-sum');
 
-const {makeModulesTree, stripExtension, makeNormalModuleName} = require('./helpers');
+const {makeModulesTree, stripExtension, makeNormalModuleName} = require('../../host/src/helpers');
 
 
 const fsPromises = fs.promises;

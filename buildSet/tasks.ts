@@ -4,13 +4,13 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir} from './buildHelpers/helpers';
-import compileJs from './buildHelpers/compileJs';
-import compileTs from './buildHelpers/compileTs';
-import collectDependencies from './buildHelpers/collectDependencies';
-import minimize from './buildHelpers/minimize';
-import prepareToFlash from './buildHelpers/prepareToFlash';
-import upload from './buildHelpers/upload';
+import {makeEnvConfig, clearDir} from '../build-espruino/src/helpers';
+import compileJs from '../squidlet-starter/build-js/compileJs';
+import compileTs from '../squidlet-starter/build-js/compileTs';
+import collectDependencies from '../build-espruino/src/collectDependencies';
+import minimize from '../squidlet-starter/build-js/minimize';
+import prepareToFlash from '../build-espruino/src/prepareToFlash';
+import upload from '../build-espruino/src/upload';
 import {initConfigWorks, resolveParam} from './helpers';
 
 
