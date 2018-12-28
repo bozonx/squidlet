@@ -4,14 +4,14 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir} from '../build-espruino/src/helpers';
+import {makeEnvConfig, clearDir} from './src/helpers';
 import compileJs from '../squidlet-starter/build-js/compileJs';
 import compileTs from '../squidlet-starter/build-js/compileTs';
-import collectDependencies from '../build-espruino/src/collectDependencies';
+import collectDependencies from './src/collectDependencies';
 import minimize from '../squidlet-starter/build-js/minimize';
-import prepareToFlash from '../build-espruino/src/prepareToFlash';
-import upload from '../build-espruino/src/upload';
-import {initConfigWorks, resolveParam} from './helpers';
+import prepareToFlash from './src/prepareToFlash';
+import upload from './src/upload';
+import {initConfigWorks, resolveParam} from '../host/src/helpers';
 
 
 // TODO: получить из агрументов
@@ -46,17 +46,3 @@ gulp.task('build-host', async () => {
     buildConfig.hostRoot
   );
 });
-
-// upload all the files
-gulp.task('upload', async () => {
-  await upload(
-    envConfigParsedYaml.port,
-    envConfigParsedYaml.portSpeed,
-    buildConfig.flashDir,
-    buildConfig.bootrstPath
-  );
-});
-
-// // build and upload project
-// gulp.task('prj', gulp.series('build', 'upload'), async () => {
-// });
