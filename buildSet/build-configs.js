@@ -1,7 +1,7 @@
 const yargs = require('yargs');
 const gulp = require('gulp');
 
-require('./gulpfile');
+require('../gulpfile');
 
 
 if (yargs.argv.config) {

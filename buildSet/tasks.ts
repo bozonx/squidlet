@@ -4,19 +4,18 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir} from './helpers';
-import compileJs from './compileJs';
-import compileTs from './compileTs';
-import collectDependencies from './collectDependencies';
-import minimize from './minimize';
-import prepareToFlash from './prepareToFlash';
-import upload from './upload';
-import {initConfigWorks, resolveParam} from '../helpers';
-
+import {makeEnvConfig, clearDir} from './buildHelpers/helpers';
+import compileJs from './buildHelpers/compileJs';
+import compileTs from './buildHelpers/compileTs';
+import collectDependencies from './buildHelpers/collectDependencies';
+import minimize from './buildHelpers/minimize';
+import prepareToFlash from './buildHelpers/prepareToFlash';
+import upload from './buildHelpers/upload';
+import {initConfigWorks, resolveParam} from './helpers';
 
 
 // TODO: получить из агрументов
-const envConfigPath = path.resolve(__dirname, '../env-config.yaml');
+const envConfigPath = path.resolve(__dirname, './env-config.yaml');
 const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
 const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
