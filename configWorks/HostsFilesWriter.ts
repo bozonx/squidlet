@@ -99,9 +99,8 @@ export default class HostsFilesWriter {
     const hostsUsedEntitiesNames: EntitiesNames = this.main.hostClassNames.getEntitiesNames(hostId);
     const hostsDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
     const hostDir = path.join(hostsDir, hostId);
-    const hostDirs = systemConfig.hostInitCfg.hostDirs;
     const fileNames = systemConfig.hostInitCfg.fileNames;
-    const configDir = path.join(hostDir, hostDirs.config);
+    const configDir = path.join(hostDir, systemConfig.hostSysCfg.rootDirs.configs);
 
     // write host's config
     await this.writeJson(

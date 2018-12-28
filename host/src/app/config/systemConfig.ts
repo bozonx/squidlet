@@ -8,12 +8,6 @@ const systemConfig: SystemConfig = {
     host: 'host',
     configs: 'configs',
     entities: 'entities',
-    // // persistent state of devices
-    // devices: 'devices',
-    // // persistent state of services
-    // services: 'services',
-    // // custom data or state of user layer
-    // data: 'data',
   },
   hashFiles: {
     host: 'host-hashes.json',

@@ -3,17 +3,6 @@ import InitializationConfig from '../interfaces/InitializationConfig';
 
 export default function initializationConfig(): InitializationConfig {
   return {
-    // dirs of host dir
-    hostDirs: {
-      config: 'config',
-
-      // TODO: review
-
-      // there is devices are placed by deviceId
-      devices: 'devices',
-      drivers: 'drivers',
-      services: 'services',
-    },
     fileNames: {
       hostConfig: 'config.json',
       manifest: 'manifest.json',

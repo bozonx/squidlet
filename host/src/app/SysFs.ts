@@ -58,9 +58,7 @@ export default class SysFs {
   loadConfig(configName: string): Promise<{[index: string]: any}> {
 
     // TODO: запретить выход наверх
-    // TODO: зачем подставляли .json ??
 
-    //return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
     return this.sysDev.readJsonObjectFile(pathJoin(systemConfig.rootDirs.configs, configName));
   }
 

@@ -11,21 +11,20 @@ import * as yargs from 'yargs';
 import masterStarter from './masterStarter';
 
 
-const debug: boolean = Boolean(yargs.argv.debug);
+//const debug: boolean = Boolean(yargs.argv.debug);
+const debug = true;
 
 
 masterStarter()
   .catch((err) => {
-    // if (debug) {
-    //   throw err;
-    // }
-    // else {
-    //   console.error(err.toString());
-    //
-    //   process.exit(3);
-    // }
+    if (debug) {
+      console.error(err);
 
-    console.error(String(err));
+      throw err;
+    }
+    else {
+      console.error(err.toString());
 
-    process.exit(3);
+      process.exit(3);
+    }
   });
