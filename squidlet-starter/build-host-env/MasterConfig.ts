@@ -3,12 +3,12 @@ import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _cloneDeep = require('lodash/cloneDeep');
 
-import {ManifestsTypeName} from '../host/src/app/interfaces/ManifestTypes';
+import {ManifestsTypeName} from '../../host/src/app/interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
-import HostConfig from '../host/src/app/interfaces/HostConfig';
+import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import Platforms, {
   PLATFORM_ESP32,
@@ -17,13 +17,13 @@ import Platforms, {
   PLATFORM_X86
 } from './interfaces/Platforms';
 import PlatformConfig from './interfaces/PlatformConfig';
-import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
-import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
-import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
-import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
+import platform_esp32 from '../../platforms/squidlet-esp32/platform_esp32';
+import platform_esp8266 from '../../platforms/squidlet-esp8266/platform_esp8266';
+import platform_rpi from '../../platforms/squidlet-rpi/platform_rpi';
+import platform_x86_linux from '../../platforms/squidlet-x86/platform_x86_linux';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import {loadYamlFile} from './IO';
-import {appendArray} from './helpers';
+import {appendArray} from '../../host/src/helpers';
 
 
 // TODO: move to build helpers ???

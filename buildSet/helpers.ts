@@ -1,20 +1,20 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import {loadYamlFile} from '../configWorks/IO';
+import {loadYamlFile} from '../squidlet-starter/build-host-env/IO';
 import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
 import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
 import platform_rpi from '../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
-import PlatformConfig from '../configWorks/interfaces/PlatformConfig';
+import PlatformConfig from '../squidlet-starter/build-host-env/interfaces/PlatformConfig';
 import {
   PLATFORM_ESP32,
   PLATFORM_ESP8266,
   PLATFORM_RPI,
   PLATFORM_X86
-} from '../configWorks/interfaces/Platforms';
+} from '../squidlet-starter/build-host-env/interfaces/Platforms';
 import {DevClass} from '../host/src/app/entities/DevManager';
-import Main from '../configWorks/Main';
+import Main from '../squidlet-starter/build-host-env/Main';
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');

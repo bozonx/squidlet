@@ -1,6 +1,6 @@
 import {collectDevs, getMasterSysDev, initConfigWorks, resolveParam} from './helpers';
 import System from '../host/src/app/System';
-import Main from '../configWorks/Main';
+import Main from '../squidlet-starter/build-host-env/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import {DevClass} from '../host/src/app/entities/DevManager';
 

@@ -1,4 +1,4 @@
-HostClassNames = require('../../configWorks/HostClassNames').default
+HostClassNames = require('../../squidlet-starter/build-host-env/HostClassNames').default
 #hostDefaultConfig = require('../../configWorks/configs/hostDefaultConfig').default
 
 

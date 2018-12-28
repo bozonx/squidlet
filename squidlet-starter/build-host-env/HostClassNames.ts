@@ -6,7 +6,7 @@ import _includes = require('lodash/includes');
 import Main from './Main';
 import {Dependencies, EntitiesNames} from './Entities';
 import PreHostConfig from './interfaces/PreHostConfig';
-import {ManifestsTypePluralName} from '../host/src/app/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 
 
 export default class HostClassNames {

@@ -5,10 +5,10 @@ import _values = require('lodash/values');
 import _isEmpty = require('lodash/isEmpty');
 
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
-import EntityDefinition from '../host/src/app/interfaces/EntityDefinition';
+import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
 import PreHostConfig from './interfaces/PreHostConfig';
 import Main from './Main';
-import {SrcEntitiesSet, SrcEntitySet} from '../host/src/app/interfaces/EntitySet';
+import {SrcEntitiesSet, SrcEntitySet} from '../../host/src/app/interfaces/EntitySet';
 
 
 /**
