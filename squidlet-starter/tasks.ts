@@ -4,10 +4,10 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir} from './src/helpers';
-import compileJs from '../squidlet-starter/build-js/compileJs';
-import compileTs from '../squidlet-starter/build-js/compileTs';
-import collectDependencies from './src/collectDependencies';
+import {makeEnvConfig, clearDir} from './helpers';
+import compileJs from './build-js/compileJs';
+import compileTs from './build-js/compileTs';
+import collectDependencies from './build-js/collectDependencies';
 import minimize from '../squidlet-starter/build-js/minimize';
 import prepareToFlash from './src/prepareToFlash';
 import upload from './src/upload';

@@ -28,6 +28,34 @@ export const platformConfigs: {[index: string]: PlatformConfig} = {
   [PLATFORM_X86]: platform_x86_linux,
 };
 
+
+
+export function clearDir(dirName: string) {
+  shelljs.rm('-rf', path.join(dirName, '*'));
+}
+
+export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPath: string): BuildConfig {
+  const envConfigBaseDir = path.dirname(envConfigPath);
+  const buildDir = path.resolve(envConfigBaseDir, envPrjConfig.dst);
+
+  return {
+    buildDir,
+    srcDir: path.resolve(envConfigBaseDir, envPrjConfig.src),
+    prjConfigYaml: path.resolve(envConfigBaseDir, envPrjConfig.prjConfig),
+    compiledTsDir: path.join(buildDir, 'compiled-ts'),
+    compiledJsDir: path.join(buildDir, 'compiled-js'),
+    hostRoot: 'system/host',
+    minPrjDir: path.join(buildDir, 'minPrj'),
+    minDepsDir: path.join(buildDir, 'minDeps'),
+    flashDir: path.join(buildDir, 'flash'),
+    dependenciesBuildDir: path.join(buildDir, 'deps'),
+    mainJsFileName: `${envPrjConfig.main}.js`,
+    bundleFile: path.join(buildDir, 'bundle.js'),
+    bootrstPath: path.join(__dirname, '.bootrst'),
+    strictMode: envPrjConfig.strictMode,
+  };
+}
+
 export function resolveStorageDir(pathToDir?: string): string {
   if (!pathToDir) {
     throw new Error(`You have to specify a "--storage" param`);

@@ -23,29 +23,6 @@ interface BuildConfig {
   strictMode?: boolean;
 }
 
-
-export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPath: string): BuildConfig {
-  const envConfigBaseDir = path.dirname(envConfigPath);
-  const buildDir = path.resolve(envConfigBaseDir, envPrjConfig.dst);
-
-  return {
-    buildDir,
-    srcDir: path.resolve(envConfigBaseDir, envPrjConfig.src),
-    prjConfigYaml: path.resolve(envConfigBaseDir, envPrjConfig.prjConfig),
-    compiledTsDir: path.join(buildDir, 'compiled-ts'),
-    compiledJsDir: path.join(buildDir, 'compiled-js'),
-    hostRoot: 'system/host',
-    minPrjDir: path.join(buildDir, 'minPrj'),
-    minDepsDir: path.join(buildDir, 'minDeps'),
-    flashDir: path.join(buildDir, 'flash'),
-    dependenciesBuildDir: path.join(buildDir, 'deps'),
-    mainJsFileName: `${envPrjConfig.main}.js`,
-    bundleFile: path.join(buildDir, 'bundle.js'),
-    bootrstPath: path.join(__dirname, '.bootrst'),
-    strictMode: envPrjConfig.strictMode,
-  };
-}
-
 export function stripExtension(filePath: string, extension: string): string {
   const regex = new RegExp(`\\.${extension}$`);
 
@@ -64,10 +41,10 @@ export function stringify (moduleContent: string): string {
 
   return preparedContent;
 }
-
-export function clearDir(dirName: string) {
-  shelljs.rm('-rf', path.join(dirName, '*'));
-}
+//
+// export function clearDir(dirName: string) {
+//   shelljs.rm('-rf', path.join(dirName, '*'));
+// }
 
 export function makeSafeModuleName(fileName: string): string {
   return fileName.replace(/\//g, '|');

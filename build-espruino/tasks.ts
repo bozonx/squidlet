@@ -7,7 +7,7 @@ import * as yargs from 'yargs';
 import {makeEnvConfig, clearDir} from './src/helpers';
 import compileJs from '../squidlet-starter/build-js/compileJs';
 import compileTs from '../squidlet-starter/build-js/compileTs';
-import collectDependencies from './src/collectDependencies';
+import collectDependencies from '../squidlet-starter/build-js/collectDependencies';
 import minimize from '../squidlet-starter/build-js/minimize';
 import prepareToFlash from './src/prepareToFlash';
 import upload from './src/upload';
