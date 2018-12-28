@@ -36,7 +36,18 @@ export default class LogPublisher {
   }
 
   private async send(level: string, message: string) {
-    this.system.events.emit(categories.logger, level, message);
+
+    // TODO: reveiw
+
+    //this.system.events.emit(categories.logger, level, message);
+    this.system.events.emit(categories.logger, level, {
+      category: categories.logger,
+      topic: level,
+      from: 'master',
+      // send to local host
+      to: 'master',
+      payload: message,
+    });
 
     //await this.system.messenger.emit(categories.logger, level, message);
   }
