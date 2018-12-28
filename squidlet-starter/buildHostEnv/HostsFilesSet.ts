@@ -5,7 +5,7 @@ import Main from './Main';
 import {EntitiesSet, SrcEntitiesSet} from '../../host/src/app/interfaces/EntitySet';
 import {EntitiesNames} from './Entities';
 import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
-import {sortByIncludeInList} from '../../host/src/helpers';
+import {sortByIncludeInList} from './helpers';
 import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 
 

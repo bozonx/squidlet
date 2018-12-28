@@ -8,7 +8,6 @@ import DriverManifest from '../../host/src/app/interfaces/DriverManifest';
 import ServiceManifest from '../../host/src/app/interfaces/ServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../../host/src/app/interfaces/ManifestBase';
-import systemConfig from './configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 
 

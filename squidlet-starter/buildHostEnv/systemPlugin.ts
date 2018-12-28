@@ -1,7 +1,7 @@
 import * as path from 'path';
 import PluginEnv from './PluginEnv';
 
-const hostSrcRoot = '../host/src';
+const hostSrcRoot = '../../host/src';
 const devicesRoot = path.resolve(__dirname, hostSrcRoot, 'devices');
 const driversRoot = path.resolve(__dirname, hostSrcRoot, 'drivers');
 const servicesRoot = path.resolve(__dirname, hostSrcRoot, 'services');

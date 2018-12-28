@@ -47,7 +47,6 @@ export const platformConfigs: {[index: string]: PlatformConfig} = {
 
 export function getMasterSysDev(platformName: string): DevClass {
   const platformDirName = `squidlet-${platformName}`;
-
   const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
 
   return require(devPath).default;

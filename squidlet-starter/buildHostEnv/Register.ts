@@ -1,14 +1,14 @@
 import * as path from 'path';
 import _values = require('lodash/values');
+import {Map} from 'immutable';
 
-import {resolveIndexFile} from '../../host/src/helpers';
+import {resolveIndexFile} from './helpers';
 import PreDeviceManifest from './interfaces/PreDeviceManifest';
 import PreDriverManifest from './interfaces/PreDriverManifest';
 import PreServiceManifest from './interfaces/PreServiceManifest';
 import validateServiceManifest from './validateServiceManifest';
 import validateDeviceManifest from './validateDeviceManifest';
 import validateDriverManifest from './validateDriverManifest';
-import {Map} from 'immutable';
 import Plugin from './interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
