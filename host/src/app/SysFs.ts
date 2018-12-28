@@ -28,15 +28,7 @@ import pathJoin from '../helpers/nodeLike';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
 import System from './System';
-
-
-// TODO: move to initialization config ???
-const HOST_HASHES_FILE = 'host-hashes.json';
-const CONFIGS_HASHES_FILE = 'configs-hashes.json';
-const ENTITIES_HASHES_FILE = 'entities-hashes.json';
-export const HOST_DIR = 'host';
-export const CONFIGS_DIR = 'configs';
-export const ENTITIES_DIR = 'entities';
+import systemConfig from './config/systemConfig';
 
 
 export default class SysFs {
@@ -52,15 +44,15 @@ export default class SysFs {
 
 
   getHostHashes(): Promise<{[index: string]: any}> {
-    return this.sysDev.readJsonObjectFile(HOST_HASHES_FILE);
+    return this.sysDev.readJsonObjectFile(systemConfig.hashFiles.host);
   }
 
   getConfigsHashes(): Promise<{[index: string]: any}> {
-    return this.sysDev.readJsonObjectFile(CONFIGS_HASHES_FILE);
+    return this.sysDev.readJsonObjectFile(systemConfig.hashFiles.configs);
   }
 
   getEntitiesHashes(): Promise<{[index: string]: any}> {
-    return this.sysDev.readJsonObjectFile(ENTITIES_HASHES_FILE);
+    return this.sysDev.readJsonObjectFile(systemConfig.hashFiles.entities);
   }
 
   loadConfig(configName: string): Promise<{[index: string]: any}> {
@@ -69,7 +61,7 @@ export default class SysFs {
     // TODO: зачем подставляли .json ??
 
     //return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, `${configName}.json`));
-    return this.sysDev.readJsonObjectFile(pathJoin(CONFIGS_DIR, configName));
+    return this.sysDev.readJsonObjectFile(pathJoin(systemConfig.rootDirs.configs, configName));
   }
 
   async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
@@ -77,7 +69,7 @@ export default class SysFs {
     // TODO: запретить выход наверх
 
     const fileName = this.system.initCfg.fileNames.mainJs;
-    const filePath = pathJoin(ENTITIES_DIR, pluralType, entityName, fileName);
+    const filePath = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, fileName);
     const module = await this.sysDev.requireFile(filePath);
 
     return module.default;
@@ -89,7 +81,7 @@ export default class SysFs {
   ): Promise<{[index: string]: any}> {
     await this.checkEntity(pluralType, entityName);
 
-    const pathToFile = pathJoin(ENTITIES_DIR, pluralType, entityName, this.system.initCfg.fileNames.manifest);
+    const pathToFile = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, this.system.initCfg.fileNames.manifest);
 
     return this.sysDev.readJsonObjectFile(pathToFile);
   }
@@ -101,7 +93,7 @@ export default class SysFs {
   ): Promise<string> {
     await this.checkEntity(pluralType, entityName, fileName);
 
-    return this.sysDev.readStringFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+    return this.sysDev.readStringFile(pathJoin(systemConfig.rootDirs.entities, entityName, fileName));
   }
 
   async loadEntityBinFile(
@@ -111,7 +103,7 @@ export default class SysFs {
   ): Promise<Uint8Array> {
     await this.checkEntity(pluralType, entityName, fileName);
 
-    return this.sysDev.readBinFile(pathJoin(ENTITIES_DIR, entityName, fileName));
+    return this.sysDev.readBinFile(pathJoin(systemConfig.rootDirs.entities, entityName, fileName));
   }
 
   async writeHostFile(fileName: string, content: string) {
@@ -132,19 +124,19 @@ export default class SysFs {
   writeHostHashesFile(content: string) {
     // TODO: запретить выход наверх
 
-    return this.sysDev.writeFile(HOST_HASHES_FILE, content);
+    return this.sysDev.writeFile(systemConfig.hashFiles.host, content);
   }
 
   writeConfigHashesFile(content: string) {
     // TODO: запретить выход наверх
 
-    return this.sysDev.writeFile(CONFIGS_HASHES_FILE, content);
+    return this.sysDev.writeFile(systemConfig.hashFiles.configs, content);
   }
 
   writeEntitiesHashesFile(content: string) {
     // TODO: запретить выход наверх
 
-    return this.sysDev.writeFile(ENTITIES_HASHES_FILE, content);
+    return this.sysDev.writeFile(systemConfig.hashFiles.entities, content);
   }
 
   async removeHostFiles(filesList: string[]) {

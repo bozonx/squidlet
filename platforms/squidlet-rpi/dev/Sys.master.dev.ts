@@ -7,8 +7,8 @@ import {SrcHostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import initializationConfig from '../../../host/src/app/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
-import {CONFIGS_DIR, ENTITIES_DIR} from '../../../host/src/app/SysFs';
 import {trimEnd} from '../../../host/src/helpers/lodashLike';
+import systemConfig from '../../../host/src/app/config/systemConfig';
 
 
 let __configSet: SrcHostFilesSet;
@@ -25,17 +25,17 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     // config - read from memory
-    if (pathSplit[0] === CONFIGS_DIR) {
+    if (pathSplit[0] === systemConfig.rootDirs.configs) {
       return this.getConfig(pathSplit[1]);
     }
     // manifest - read from memory
-    else if (pathSplit[0] === ENTITIES_DIR && pathSplit[3] === initCfg.fileNames.manifest) {
+    else if (pathSplit[0] === systemConfig.rootDirs.entities && pathSplit[3] === initCfg.fileNames.manifest) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
 
       return __configSet.entitiesSet[entityType][pathSplit[2]].manifest;
     }
     // other entity file - read from disk
-    else if (pathSplit[0] === ENTITIES_DIR) {
+    else if (pathSplit[0] === systemConfig.rootDirs.entities) {
       // load entity file
 
       const fileContent: string = await this.readStringFile(fileName);
@@ -49,7 +49,7 @@ export default class SysDev implements Sys {
   async readStringFile(fileName: string): Promise<string> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === ENTITIES_DIR) {
+    if (pathSplit[0] === systemConfig.rootDirs.entities) {
       const fileAbsPath = this.getEntityFileAbsPath(fileName);
 
       return fsPromises.readFile(fileAbsPath, {encoding: DEFAULT_ENCODING});
@@ -61,7 +61,7 @@ export default class SysDev implements Sys {
   async readBinFile(fileName: string): Promise<Uint8Array> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === ENTITIES_DIR) {
+    if (pathSplit[0] === systemConfig.rootDirs.entities) {
       const fileAbsPath = this.getEntityFileAbsPath(fileName);
       const fileContentBuffer: Buffer = await fsPromises.readFile(fileAbsPath);
 
@@ -74,7 +74,7 @@ export default class SysDev implements Sys {
   async requireFile(fileName: string): Promise<any> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === ENTITIES_DIR) {
+    if (pathSplit[0] === systemConfig.rootDirs.entities) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
       const entityName: string = pathSplit[2];
       let entityFilePath: string | undefined;

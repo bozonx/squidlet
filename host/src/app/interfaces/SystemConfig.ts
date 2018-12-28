@@ -1,9 +1,21 @@
 export default interface SystemConfig {
   rootDirs: {
     host: string;
+    configs: string;
+    entities: string;
+    // devices: string;
+    // services: string;
+    // data: string;
+  };
+  hashFiles: {
+    host: string;
+    configs: string;
+    entities: string;
+  };
+  entitiesDirs: {
     devices: string;
+    drivers: string;
     services: string;
-    data: string;
   };
   deviceIdSeparator: string;
   topicSeparator: string;
