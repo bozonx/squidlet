@@ -1,2 +1,2 @@
 require('ts-node/register');
-require('./buildSet/tasks');
+require('./squidlet-starter/tasks');

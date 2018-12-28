@@ -22,8 +22,9 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 // configs
 gulp.task('build-configs', async () => {
-  const resolvedConfigPath: string = resolveParam('CONFIG');
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR;
+  const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
+  // TODO: get from args
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || './build/configs';
 
   await initConfigWorks(resolvedConfigPath, resolvedBuildDir);
 });
