@@ -23,11 +23,8 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 // configs
 gulp.task('build-configs', async () => {
-
-  // TODO: можно не брать из yargs, в build-configs.js уже подставляется в env
-
-  const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
+  const resolvedConfigPath: string = resolveParam('CONFIG');
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR;
 
   await initConfigWorks(resolvedConfigPath, resolvedBuildDir);
 });

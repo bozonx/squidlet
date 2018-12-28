@@ -1,11 +1,8 @@
-import {collectDevs, getMasterSysDev, initConfigWorks, readConfig, resolveParam} from './helpers';
+import {collectDevs, getMasterSysDev, initConfigWorks, resolveParam} from './helpers';
 import System from '../host/src/app/System';
 import Main from '../configWorks/Main';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
-import PreMasterConfig from '../configWorks/interfaces/PreMasterConfig';
 import {DevClass} from '../host/src/app/entities/DevManager';
-import * as path from "path";
-import * as yargs from 'yargs';
 
 
 /**
@@ -53,7 +50,7 @@ export default async function masterStarter () {
 
   // TODO: wtf - не работает
 
-  //const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'] || undefined;
+  //const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
 
   const main: Main = await initConfigWorks(resolvedConfigPath, resolvedBuildDir, true);
 

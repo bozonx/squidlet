@@ -36,13 +36,13 @@ export function resolveStorageDir(pathToDir?: string): string {
   return path.resolve(process.cwd(), (pathToDir as string));
 }
 
-export function resolveParam(envParamName: string, argParamName: string): string {
+export function resolveParam(envParamName: string, argParamName?: string): string {
   let value: string | undefined;
 
   if (process.env[envParamName]) {
     value = process.env.CONFIG;
   }
-  else if (yargs.argv[argParamName]) {
+  else if (argParamName && yargs.argv[argParamName]) {
     value = yargs.argv.config;
   }
   else {

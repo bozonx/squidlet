@@ -7,7 +7,9 @@ import System from '../host/src/app/System';
 import {DevClass} from '../host/src/app/entities/DevManager';
 
 
-const debug: boolean = Boolean(yargs.argv.debug);
+// TODO: change
+//const debug: boolean = Boolean(yargs.argv.debug);
+const debug = true;
 const resolvedStorageDir: string = resolveStorageDir(yargs.argv.storage);
 
 
@@ -42,16 +44,14 @@ async function init() {
 
 init()
   .catch((err) => {
-    // if (debug) {
-    //   throw err;
-    // }
-    // else {
-    //   console.error(err.toString());
-    //
-    //   process.exit(3);
-    // }
+    if (debug) {
+      console.error(err);
 
-    console.error(String(err));
+      throw err;
+    }
+    else {
+      console.error(err.toString());
 
-    process.exit(3);
+      process.exit(3);
+    }
   });
