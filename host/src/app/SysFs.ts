@@ -76,10 +76,11 @@ export default class SysFs {
 
     // TODO: запретить выход наверх
 
-    // TODO: взять из манифеста или entity set
     const fileName = this.system.initCfg.fileNames.mainJs;
+    const filePath = pathJoin(ENTITIES_DIR, pluralType, entityName, fileName);
+    const module = await this.sysDev.requireFile(filePath);
 
-    return this.sysDev.requireFile(pathJoin(ENTITIES_DIR, pluralType, entityName, fileName));
+    return module.default;
   }
 
   async loadEntityManifest(

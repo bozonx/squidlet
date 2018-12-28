@@ -50,7 +50,9 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      return fsPromises.readFile(this.getEntityFileAbsPath(fileName), {encoding: DEFAULT_ENCODING});
+      const fileAbsPath = this.getEntityFileAbsPath(fileName);
+
+      return fsPromises.readFile(fileAbsPath, {encoding: DEFAULT_ENCODING});
     }
 
     throw new Error(`Unsupported system dir "${fileName}" on master`);
@@ -60,7 +62,8 @@ export default class SysDev implements Sys {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] === ENTITIES_DIR) {
-      const fileContentBuffer: Buffer = await fsPromises.readFile(this.getEntityFileAbsPath(fileName));
+      const fileAbsPath = this.getEntityFileAbsPath(fileName);
+      const fileContentBuffer: Buffer = await fsPromises.readFile(fileAbsPath);
 
       return convertBufferToUint8Array(fileContentBuffer);
     }
@@ -69,22 +72,23 @@ export default class SysDev implements Sys {
   }
 
   async requireFile(fileName: string): Promise<any> {
-
-    // TODO: review
-
     const pathSplit = fileName.split(PATH_SEPARATOR);
-    const entityType = pathSplit[1] as ManifestsTypePluralName;
-
-    // const pathSplit = fileName.split(PATH_SEPARATOR);
-    // const entityFilePath: string = this.getEntityFileAbsPath(fileName);
-    const entityFilePath: string = __configSet.entitiesSet[entityType][pathSplit[2]].main as string;
 
     if (pathSplit[0] === ENTITIES_DIR) {
+      const entityType = pathSplit[1] as ManifestsTypePluralName;
+      const entityName: string = pathSplit[2];
+      let entityFilePath: string | undefined;
 
-      // TODO: default наверное не здесь должно быть а выше
+      if (pathSplit[3] === initCfg.fileNames.mainJs) {
+        // __main.js
+        entityFilePath = __configSet.entitiesSet[entityType][entityName].main;
+      }
+      else {
+        // other entity file
+        entityFilePath = this.getEntityFileAbsPath(fileName);
+      }
 
-      return require(entityFilePath).default;
-      //return require(this.getEntityFileAbsPath(entityFilePath));
+      return require(entityFilePath as string);
     }
 
     throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
@@ -102,9 +106,6 @@ export default class SysDev implements Sys {
   }
 
   private getConfig(configName: string): {[index: string]: any} {
-
-    // TODO: запрашивается config.json !!!!
-
     const strippedName: string = trimEnd(configName, '.json');
     const config: any = (__configSet as any)[strippedName];
 
@@ -112,33 +113,6 @@ export default class SysDev implements Sys {
 
     return config;
   }
-
-  // private async getEntityFile(
-  //   pluralType: ManifestsTypePluralName,
-  //   entityName: string,
-  //   fileName: string
-  // ): Promise<Uint8Array> {
-  //
-  //   // TODO: remake
-  //
-  //   let foundAbsPath: string | undefined;
-  //   const regex = new RegExp(`${fileName}$`);
-  //
-  //   for (let absPath of __configSet.entitiesSet[pluralType][entityName].files) {
-  //     if (absPath.match(regex)) {
-  //       foundAbsPath = absPath;
-  //
-  //       break;
-  //     }
-  //   }
-  //
-  //   if (!foundAbsPath) throw new Error(`Can't find an entity file "${pluralType}/${entityName}/${fileName}"`);
-  //
-  //   const fileContentBuffer: Buffer = await fsPromises.readFile(foundAbsPath);
-  //   const fileContent: Uint8Array = convertBufferToUint8Array(fileContentBuffer);
-  //
-  //   return fileContent;
-  // }
 
 
   mkdir(fileName: string): Promise<void> {
