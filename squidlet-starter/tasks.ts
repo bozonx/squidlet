@@ -20,6 +20,14 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 // configs
 gulp.task('build-configs', async () => {
+  if (yargs.argv.config) {
+    process.env.CONFIG = yargs.argv.config;
+  }
+
+  if (yargs.argv['build-dir']) {
+    process.env.BUILD_DIR = yargs.argv['build-dir'];
+  }
+
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
   // TODO: get from args
   const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || './build/configs';
