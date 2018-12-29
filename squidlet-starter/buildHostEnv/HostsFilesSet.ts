@@ -7,13 +7,20 @@ import {EntitiesNames} from './Entities';
 import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
 import {sortByIncludeInList} from './helpers';
 import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
+import HostClassNames from './HostClassNames';
+import Definitions from './Definitions';
 
 
 export default class HostsFilesSet {
-  private readonly main: BuildHostsEnv;
+  private readonly entities: BuildHostsEnv;
+  private readonly hostClassNames: HostClassNames;
+  private readonly definitions: Definitions;
 
-  constructor(main: BuildHostsEnv) {
-    this.main = main;
+
+  constructor(entities: BuildHostsEnv, hostClassNames: HostClassNames, definitions: Definitions) {
+    this.entities = entities;
+    this.hostClassNames = hostClassNames;
+    this.definitions = definitions;
   }
 
   getDefinitionsSet(hostId: string): DefinitionsSet {

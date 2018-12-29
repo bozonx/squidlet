@@ -25,13 +25,15 @@ export default class BuildHostsEnv {
   private readonly pluginEnv: PluginEnv;
 
 
+  // TODO: import BuildEntities
+
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
     this.register = new Register(this.io);
     this.entities = new Entities(this.io, this.register);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities);
     this.definitions = new Definitions(this.masterConfig, this.entities, this.hostClassNames);
-    this.hostsFilesSet = new HostsFilesSet(this);
+    this.hostsFilesSet = new HostsFilesSet(this.entities, this.hostClassNames, this.definitions);
     this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
   }
