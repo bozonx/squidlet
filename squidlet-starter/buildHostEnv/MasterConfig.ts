@@ -23,7 +23,7 @@ import platform_rpi from '../../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../../platforms/squidlet-x86/platform_x86_linux';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import {loadYamlFile} from './IO';
-import {appendArray} from '../../host/src/helpers';
+import {appendArray} from './helpers';
 
 
 // TODO: move to build helpers ???

@@ -16,6 +16,7 @@ import {initEnvFilesBuilder, resolveParam} from './helpers';
 const envConfigPath = path.resolve(__dirname, './env-config.yaml');
 const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
 const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
+//const DEFAUTL_ENV_DIR = './build/env';
 
 
 // configs
@@ -25,17 +26,10 @@ gulp.task('build-env', async () => {
 
   //clearDir(buildConfig.buildDir);
 
-  if (yargs.argv.config) {
-    process.env.CONFIG = yargs.argv.config;
-  }
-
-  if (yargs.argv['build-dir']) {
-    process.env.BUILD_DIR = yargs.argv['build-dir'];
-  }
-
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
   // TODO: get from args
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || './build/configs';
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR
+    || (yargs.argv['build-dir'] as string);
 
   await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir);
 });
