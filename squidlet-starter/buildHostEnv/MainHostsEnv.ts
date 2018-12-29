@@ -8,6 +8,7 @@ import HostClassNames from './hostEnv/HostClassNames';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
+import {SrcHostFilesSet} from '../../host/src/app/interfaces/HostFilesSet';
 
 
 export default class MainHostsEnv {
@@ -58,6 +59,19 @@ export default class MainHostsEnv {
     this.log.info(`--> Writing hosts files`);
 
     await this.hostsFilesWriter.writeHostsConfigsFiles(skipMaster);
+  }
+
+  /**
+   * Generate master host config with integrated files set which points to original (ts or js) files
+   */
+  generateMasterConfigSet(): SrcHostFilesSet {
+    const hostId = 'master';
+
+    return {
+      ...this.hostsFilesSet.getDefinitionsSet(hostId),
+      config: this.masterConfig.getFinalHostConfig(hostId),
+      entitiesSet: this.hostsFilesSet.generateSrcEntitiesSet(hostId),
+    };
   }
 
 }

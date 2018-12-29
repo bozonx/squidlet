@@ -6,30 +6,21 @@
  * * passes it to platform index file and runs host system as is, without building
  */
 
-import {collectDevs, getMasterSysDev, initEnvFilesBuilder, resolveParam} from './helpers';
+import * as yargs from 'yargs';
+import * as path from 'path';
+
+import {collectDevs, getMasterSysDev, resolveParam} from './helpers';
 import System from '../host/src/app/System';
 import MainHostsEnv from './buildHostEnv/MainHostsEnv';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import {DevClass} from '../host/src/app/entities/DevManager';
+import MainEntities from './buildHostEnv/MainEntities';
 
 
 // TODO: change
 //const debug: boolean = Boolean(yargs.argv.debug);
 const debug = true;
 
-
-/**
- * Generate master host config with integrated files set which points to original (ts or js) files
- */
-export function generateMasterConfigSet(main: MainHostsEnv): SrcHostFilesSet {
-  const hostId = 'master';
-
-  return {
-    ...main.hostsFilesSet.getDefinitionsSet(hostId),
-    config: main.masterConfig.getFinalHostConfig(hostId),
-    entitiesSet: main.hostsFilesSet.generateSrcEntitiesSet(hostId),
-  };
-}
 
 export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<System> {
   console.info(`===> Initialize host system of platform`);
@@ -57,19 +48,30 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
 
 async function masterStarter () {
+  // TODO: reveiw
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
+  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || (yargs.argv['build-dir'] as string);
+  const absMasterConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
+  const absBuildDir: string | undefined = resolvedBuildDir && path.resolve(process.cwd(), resolvedBuildDir);
 
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR as string;
+  // TODO: какие на самом деле будут build dir ???
 
-  // TODO: wtf - не работает
+  const mainEntities: MainEntities = new MainEntities(absMasterConfigPath, absBuildDir);
+  const mainHostsEnv: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
 
-  //const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
+  console.info(`===> generate entities`);
 
-  const main: MainHostsEnv = await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir, true);
+  await mainEntities.collect();
+  await mainEntities.write();
+
+  console.info(`===> generate hosts env files and configs`);
+
+  await mainHostsEnv.collect();
+  await mainHostsEnv.write(true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: SrcHostFilesSet = generateMasterConfigSet(main);
+  const hostConfigSet: SrcHostFilesSet = mainHostsEnv.generateMasterConfigSet();
   // prepare host app
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 

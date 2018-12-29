@@ -22,16 +22,19 @@ const resolvedStorageDir: string = path.resolve(process.cwd(), yargs.argv.storag
 
 async function init() {
   const hostConfigPath = path.join(resolvedStorageDir, 'configs/config.json');
-  const hostConfig = JSON.parse(await fsPromises.readFile(hostConfigPath, {encoding: 'utf8'}));
+  let hostConfigContent: string;
 
-  if (!hostConfig) {
+  try {
+    hostConfigContent = await fsPromises.readFile(hostConfigPath, {encoding: 'utf8'});
+  }
+  catch (err) {
     throw new Error(`Can't find host config "${hostConfigPath}"`);
   }
 
-  console.info(`===> Initialize host system of platform`);
-
+  const hostConfig = JSON.parse(hostConfigContent);
   const platformName: string = hostConfig.platform;
 
+  console.info(`===> Initialize host system of platform`);
   console.info(`--> getting host system of platform "${platformName}"`);
 
   const hostSystem: System = new System();

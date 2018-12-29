@@ -9,7 +9,8 @@ import compileJs from './buildJs/compileJs';
 import compileTs from './buildJs/compileTs';
 import collectDependencies from './buildJs/collectDependencies';
 import minimize from './buildJs/minimize';
-import {initEnvFilesBuilder, resolveParam} from './helpers';
+import {resolveParam} from './helpers';
+import MainHostsEnv from './buildHostEnv/MainHostsEnv';
 
 
 // TODO: получить из агрументов
@@ -21,7 +22,7 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 const DEFAULT_ENV_DIR = './build/env';
 
 
-// configs
+// hosts configs and entities
 gulp.task('build-env', async () => {
 
   // TODO: clear
@@ -34,10 +35,16 @@ gulp.task('build-env', async () => {
     || (yargs.argv['build-dir'] as string)
     || DEFAULT_ENV_DIR;
 
-  await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir);
+  const mainHostsEnv: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
+
+  console.info(`===> generate hosts env files and configs`);
+
+  await mainHostsEnv.collect();
+  await mainHostsEnv.write(true);
+
 });
 
-// host
+// host src
 gulp.task('build-host', async () => {
   clearDir(buildConfig.buildDir);
   await compileTs(buildConfig.srcDir, buildConfig.compiledTsDir);

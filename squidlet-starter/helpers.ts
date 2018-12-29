@@ -113,24 +113,6 @@ export function collectDevs(platformName: string): {[index: string]: DevClass} {
   return devsSet;
 }
 
-/**
- * Initialize env files builder
- */
-export async function initEnvFilesBuilder(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<MainHostsEnv> {
-  const absMasterConfigPath: string = path.resolve(process.cwd(), relMasterConfigPath);
-  const absBuildDir: string | undefined = relBuildDir && path.resolve(process.cwd(), relBuildDir);
-
-  const main: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
-
-  console.info(`===> Collecting configs and entities files of all the hosts`);
-  await main.collect();
-
-  // write all the hosts and entities files exclude master's host files
-  await main.writeToStorage(skipMaster);
-
-  return main;
-}
-
 
 // export async function readConfig<T> (resolvedPath: string): Promise<T> {
 //   return await loadYamlFile(resolvedPath) as T;
