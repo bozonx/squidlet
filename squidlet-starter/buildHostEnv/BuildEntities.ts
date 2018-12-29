@@ -1,6 +1,6 @@
 import Register from './Register';
 import PluginEnv from './PluginEnv';
-import Entities from './Entities';
+import Entities from './entities/Entities';
 import MasterConfig from './MasterConfig';
 import systemPlugin from './systemPlugin';
 import Io from './Io';

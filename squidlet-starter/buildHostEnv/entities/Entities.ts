@@ -1,15 +1,15 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import {SrcEntitiesSet, SrcEntitySet} from '../../host/src/app/interfaces/EntitySet';
-import DeviceManifest from '../../host/src/app/interfaces/DeviceManifest';
-import DriverManifest from '../../host/src/app/interfaces/DriverManifest';
-import ServiceManifest from '../../host/src/app/interfaces/ServiceManifest';
-import PreManifestBase from './interfaces/PreManifestBase';
-import ManifestBase from '../../host/src/app/interfaces/ManifestBase';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
-import Io from './Io';
-import Register from './Register';
+import {SrcEntitiesSet, SrcEntitySet} from '../../../host/src/app/interfaces/EntitySet';
+import DeviceManifest from '../../../host/src/app/interfaces/DeviceManifest';
+import DriverManifest from '../../../host/src/app/interfaces/DriverManifest';
+import ServiceManifest from '../../../host/src/app/interfaces/ServiceManifest';
+import PreManifestBase from '../interfaces/PreManifestBase';
+import ManifestBase from '../../../host/src/app/interfaces/ManifestBase';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
+import Io from '../Io';
+import Register from '../Register';
 
 
 // dependencies of entities by class name

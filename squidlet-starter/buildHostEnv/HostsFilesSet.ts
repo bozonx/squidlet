@@ -2,13 +2,13 @@ import * as path from 'path';
 import _values = require('lodash/values');
 
 import {EntitiesSet, SrcEntitiesSet} from '../../host/src/app/interfaces/EntitySet';
-import {EntitiesNames} from './Entities';
+import {EntitiesNames} from './entities/Entities';
 import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
 import {sortByIncludeInList} from './helpers';
 import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 import HostClassNames from './HostClassNames';
 import Definitions from './Definitions';
-import Entities from './Entities';
+import Entities from './entities/Entities';
 
 
 export default class HostsFilesSet {

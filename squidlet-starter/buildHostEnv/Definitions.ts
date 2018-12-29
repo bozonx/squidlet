@@ -9,7 +9,7 @@ import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
 import PreHostConfig from './interfaces/PreHostConfig';
 import {SrcEntitiesSet, SrcEntitySet} from '../../host/src/app/interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
-import Entities from './Entities';
+import Entities from './entities/Entities';
 import MasterConfig from './MasterConfig';
 
 
