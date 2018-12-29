@@ -5,7 +5,7 @@ import MasterConfig from './MasterConfig';
 import systemPlugin from './systemPlugin';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
-import EntitiesWriter from './EntitiesWriter';
+import EntitiesWriter from './entities/EntitiesWriter';
 
 
 export default class BuildEntities {

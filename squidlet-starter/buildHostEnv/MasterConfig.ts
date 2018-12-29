@@ -7,7 +7,7 @@ import {ManifestsTypeName} from '../../host/src/app/interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
-import validateMasterConfig from './validateMasterConfig';
+import validateMasterConfig from './hostEnv/validateMasterConfig';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import Platforms, {

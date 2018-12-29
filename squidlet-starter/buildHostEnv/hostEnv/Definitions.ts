@@ -4,13 +4,13 @@ import _omit = require('lodash/omit');
 import _values = require('lodash/values');
 import _isEmpty = require('lodash/isEmpty');
 
-import PreEntityDefinition from './interfaces/PreEntityDefinition';
-import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
-import PreHostConfig from './interfaces/PreHostConfig';
-import {SrcEntitiesSet, SrcEntitySet} from '../../host/src/app/interfaces/EntitySet';
+import PreEntityDefinition from '../interfaces/PreEntityDefinition';
+import EntityDefinition from '../../../host/src/app/interfaces/EntityDefinition';
+import PreHostConfig from '../interfaces/PreHostConfig';
+import {SrcEntitiesSet, SrcEntitySet} from '../../../host/src/app/interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
-import Entities from './entities/Entities';
-import MasterConfig from './MasterConfig';
+import Entities from '../entities/Entities';
+import MasterConfig from '../MasterConfig';
 
 
 /**

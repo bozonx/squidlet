@@ -1,14 +1,14 @@
 import * as path from 'path';
 
-import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
-import systemConfig from './configs/systemConfig';
-import {EntitiesNames} from './entities/Entities';
-import PreManifestBase from './interfaces/PreManifestBase';
-import HostConfig from '../../host/src/app/interfaces/HostConfig';
-import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
-import MasterConfig from './MasterConfig';
-import Entities from './entities/Entities';
-import Io from './Io';
+import DefinitionsSet from '../../../host/src/app/interfaces/DefinitionsSet';
+import systemConfig from '../configs/systemConfig';
+import {EntitiesNames} from '../entities/Entities';
+import PreManifestBase from '../interfaces/PreManifestBase';
+import HostConfig from '../../../host/src/app/interfaces/HostConfig';
+import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
+import MasterConfig from '../MasterConfig';
+import Entities from '../entities/Entities';
+import Io from '../Io';
 import HostClassNames from './HostClassNames';
 import HostsFilesSet from './HostsFilesSet';
 

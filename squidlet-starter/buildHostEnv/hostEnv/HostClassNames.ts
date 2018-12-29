@@ -3,11 +3,11 @@ import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 import _includes = require('lodash/includes');
 
-import {Dependencies, EntitiesNames} from './entities/Entities';
-import PreHostConfig from './interfaces/PreHostConfig';
-import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
-import MasterConfig from './MasterConfig';
-import Entities from './entities/Entities';
+import {Dependencies, EntitiesNames} from '../entities/Entities';
+import PreHostConfig from '../interfaces/PreHostConfig';
+import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
+import MasterConfig from '../MasterConfig';
+import Entities from '../entities/Entities';
 
 
 export default class HostClassNames {
