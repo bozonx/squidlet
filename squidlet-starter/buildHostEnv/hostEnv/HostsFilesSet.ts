@@ -12,13 +12,13 @@ import EntitiesCollection from '../entities/EntitiesCollection';
 
 
 export default class HostsFilesSet {
-  private readonly entitiesSet: EntitiesCollection;
+  private readonly entitiesCollection: EntitiesCollection;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
 
 
-  constructor(entitiesSet: EntitiesCollection, hostClassNames: HostClassNames, definitions: Definitions) {
-    this.entitiesSet = entitiesSet;
+  constructor(entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames, definitions: Definitions) {
+    this.entitiesCollection = entitiesCollection;
     this.hostClassNames = hostClassNames;
     this.definitions = definitions;
   }
@@ -61,13 +61,13 @@ export default class HostsFilesSet {
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
       for (let className of classes) {
-        const srcDir = this.entitiesSet.getSrcDir(pluralType, className);
-        const relativeMain: string | undefined = this.entities.getMainFilePath(pluralType, className);
-        const relativeFiles: string[] = this.entities.getFiles(pluralType, className);
+        const srcDir = this.entitiesCollection.getSrcDir(pluralType, className);
+        const relativeMain: string | undefined = this.entitiesCollection.getMainFilePath(pluralType, className);
+        const relativeFiles: string[] = this.entitiesCollection.getFiles(pluralType, className);
 
         result[pluralType][className] = {
           srcDir,
-          manifest: this.entitiesSet.getManifest(pluralType, className),
+          manifest: this.entitiesCollection.getManifest(pluralType, className),
           main: relativeMain && path.resolve(srcDir, relativeMain),
           files: relativeFiles.map((relativeFileName: string) => path.resolve(srcDir, relativeFileName)),
         };
@@ -102,7 +102,7 @@ export default class HostsFilesSet {
    */
   private sortDrivers(hostId: string): [string[], string[]] {
     const driversClasses: string[] = this.hostClassNames.getAllUsedDriversClassNames(hostId);
-    const allSystemDrivers: string[] = this.entitiesSet.getSystemDrivers();
+    const allSystemDrivers: string[] = this.entitiesCollection.getSystemDrivers();
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
   }
@@ -113,7 +113,7 @@ export default class HostsFilesSet {
    */
   private sortServices(hostId: string): [string[], string[]] {
     const servicesClasses: string[] = this.hostClassNames.getServicesClassNames(hostId);
-    const allSystemServices: string[] = this.entitiesSet.getSystemServices();
+    const allSystemServices: string[] = this.entitiesCollection.getSystemServices();
 
     return sortByIncludeInList(servicesClasses, allSystemServices);
   }

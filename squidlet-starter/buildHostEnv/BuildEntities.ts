@@ -16,15 +16,12 @@ export default class BuildEntities {
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.masterConfig);
-    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities.entitiesSet);
+    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities.entitiesCollection);
   }
 
-  async init() {
+
+  async collect() {
     await this.masterConfig.init();
-  }
-
-
-  async start() {
     await this.entities.start();
 
     this.log.info(`--> Initialization has finished`);

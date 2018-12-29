@@ -11,12 +11,12 @@ import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/Entit
 
 export default class HostClassNames {
   private readonly masterConfig: MasterConfig;
-  private readonly entitiesSet: EntitiesCollection;
+  private readonly entitiesCollection: EntitiesCollection;
 
 
-  constructor(masterConfig: MasterConfig, entitiesSet: EntitiesCollection) {
+  constructor(masterConfig: MasterConfig, entitiesCollection: EntitiesCollection) {
     this.masterConfig = masterConfig;
-    this.entitiesSet = entitiesSet;
+    this.entitiesCollection = entitiesCollection;
   }
 
 
@@ -104,7 +104,7 @@ export default class HostClassNames {
    */
   private getOnlyDrivers(hostId: string): string[] {
     const driversDefinitions: string[] = this.getDriversClassNames(hostId);
-    const allDevs: string[] = this.entitiesSet.getDevs();
+    const allDevs: string[] = this.entitiesCollection.getDevs();
     // remove devs from drivers definitions list
 
     return _filter(
@@ -136,7 +136,7 @@ export default class HostClassNames {
 
   private addDeps(pluralType: ManifestsTypePluralName, names: string[]): string[] {
     // dependencies of all the registered entities
-    const dependencies: Dependencies = this.entitiesSet.getDependencies();
+    const dependencies: Dependencies = this.entitiesCollection.getDependencies();
     let result: string[] = [];
 
     for (let entityClassName of names) {
@@ -151,7 +151,7 @@ export default class HostClassNames {
   }
 
   private resolveDeps(pluralType: ManifestsTypePluralName, name: string): string[] {
-    const dependencies: Dependencies = this.entitiesSet.getDependencies();
+    const dependencies: Dependencies = this.entitiesCollection.getDependencies();
     let result: string[] = [];
     // items which were processed to avoid infinity recursion
     const processedItems: string[] = [];

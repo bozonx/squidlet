@@ -11,7 +11,7 @@ export default class Entities {
   readonly masterConfig: MasterConfig;
   readonly log: Logger;
   readonly register: Register;
-  readonly entitiesSet: EntitiesCollection;
+  readonly entitiesCollection: EntitiesCollection;
   readonly pluginEnv: PluginEnv;
   private readonly io = new Io();
 
@@ -19,8 +19,8 @@ export default class Entities {
     this.log = log;
     this.masterConfig = masterConfig;
     this.register = new Register(this.io);
-    this.entitiesSet = new EntitiesCollection(this.io, this.register);
-    this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entitiesSet);
+    this.entitiesCollection = new EntitiesCollection(this.io, this.register);
+    this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entitiesCollection);
   }
 
 
@@ -29,7 +29,7 @@ export default class Entities {
     await this.registering();
 
     this.log.info(`--> Resolving and preparing entities`);
-    await this.entitiesSet.generate();
+    await this.entitiesCollection.generate();
   }
 
   /**

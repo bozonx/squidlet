@@ -122,8 +122,6 @@ export async function initEnvFilesBuilder(relMasterConfigPath: string, relBuildD
 
   const main: BuildHostsEnv = new BuildHostsEnv(absMasterConfigPath, absBuildDir);
 
-  await main.init();
-
   console.info(`===> Collecting configs and entities files of all the hosts`);
   await main.collect();
 

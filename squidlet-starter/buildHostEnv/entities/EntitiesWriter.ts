@@ -14,7 +14,7 @@ import Io from '../Io';
  */
 export default class EntitiesWriter {
   private readonly masterConfig: MasterConfig;
-  private readonly entitiesSet: EntitiesCollection;
+  private readonly entitiesCollection: EntitiesCollection;
   private readonly io: Io;
 
   // entities dir in storage
@@ -23,10 +23,10 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(io: Io, masterConfig: MasterConfig, entitiesSet: EntitiesCollection) {
+  constructor(io: Io, masterConfig: MasterConfig, entitiesCollection: EntitiesCollection) {
     this.io = io;
     this.masterConfig = masterConfig;
-    this.entitiesSet = entitiesSet;
+    this.entitiesCollection = entitiesCollection;
   }
 
 
@@ -34,7 +34,7 @@ export default class EntitiesWriter {
    * Copy files of entities to storage
    */
   async write() {
-    const allEntities: EntitiesNames = this.entitiesSet.getAllEntitiesNames();
+    const allEntities: EntitiesNames = this.entitiesCollection.getAllEntitiesNames();
     
     for (let typeName of Object.keys(allEntities)) {
       const pluralType: ManifestsTypePluralName = typeName as ManifestsTypePluralName;
@@ -47,18 +47,18 @@ export default class EntitiesWriter {
 
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const entitySrcDir = this.entitiesSet.getSrcDir(pluralType, entityName);
+    const entitySrcDir = this.entitiesCollection.getSrcDir(pluralType, entityName);
 
     // write manifest
     await this.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
-      this.entitiesSet.getManifest(pluralType, entityName)
+      this.entitiesCollection.getManifest(pluralType, entityName)
     );
 
     // TODO: build and write main files if exists
     // TODO: test running of build
 
-    const files: string[] = this.entitiesSet.getFiles(pluralType, entityName);
+    const files: string[] = this.entitiesCollection.getFiles(pluralType, entityName);
 
     for (let relativeFileName of files) {
       const fromFile = path.resolve(entitySrcDir, relativeFileName);

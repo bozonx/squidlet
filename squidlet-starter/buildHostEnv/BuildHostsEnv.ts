@@ -24,9 +24,9 @@ export default class BuildHostsEnv {
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.masterConfig);
-    this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesSet);
-    this.definitions = new Definitions(this.masterConfig, this.entities.entitiesSet, this.hostClassNames);
-    this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesSet, this.hostClassNames, this.definitions);
+    this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesCollection);
+    this.definitions = new Definitions(this.masterConfig, this.entities.entitiesCollection, this.hostClassNames);
+    this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
     this.hostsFilesWriter = new HostsFilesWriter(
       this.io,
       this.masterConfig,
@@ -35,12 +35,9 @@ export default class BuildHostsEnv {
     );
   }
 
-  async init() {
-    await this.masterConfig.init();
-  }
-
 
   async collect() {
+    await this.masterConfig.init();
     await this.entities.start();
 
     this.log.info(`--> Generating hosts entities definitions`);
