@@ -10,7 +10,7 @@ import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
 
 
-export default class BuildHostsEnv {
+export default class MainHostsEnv {
   private readonly masterConfig: MasterConfig;
   private readonly entities: Entities;
   private readonly hostClassNames: HostClassNames;

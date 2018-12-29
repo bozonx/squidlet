@@ -14,7 +14,7 @@ import {
   PLATFORM_X86
 } from './buildHostEnv/interfaces/Platforms';
 import {DevClass} from '../host/src/app/entities/DevManager';
-import BuildHostsEnv from './buildHostEnv/BuildHostsEnv';
+import MainHostsEnv from './buildHostEnv/MainHostsEnv';
 
 
 // TODO: review
@@ -116,11 +116,11 @@ export function collectDevs(platformName: string): {[index: string]: DevClass} {
 /**
  * Initialize env files builder
  */
-export async function initEnvFilesBuilder(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<BuildHostsEnv> {
+export async function initEnvFilesBuilder(relMasterConfigPath: string, relBuildDir?: string, skipMaster?: boolean): Promise<MainHostsEnv> {
   const absMasterConfigPath: string = path.resolve(process.cwd(), relMasterConfigPath);
   const absBuildDir: string | undefined = relBuildDir && path.resolve(process.cwd(), relBuildDir);
 
-  const main: BuildHostsEnv = new BuildHostsEnv(absMasterConfigPath, absBuildDir);
+  const main: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
 
   console.info(`===> Collecting configs and entities files of all the hosts`);
   await main.collect();

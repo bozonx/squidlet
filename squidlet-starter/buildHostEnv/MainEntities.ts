@@ -6,7 +6,7 @@ import EntitiesWriter from './entities/EntitiesWriter';
 import Logger from './interfaces/Logger';
 
 
-export default class BuildEntities {
+export default class MainEntities {
   private readonly masterConfig: MasterConfig;
   private readonly entities: Entities;
   private readonly entitiesWriter: EntitiesWriter;
