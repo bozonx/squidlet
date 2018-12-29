@@ -34,7 +34,13 @@ export default class BuildHostsEnv {
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities);
     this.definitions = new Definitions(this.masterConfig, this.entities, this.hostClassNames);
     this.hostsFilesSet = new HostsFilesSet(this.entities, this.hostClassNames, this.definitions);
-    this.hostsFilesWriter = new HostsFilesWriter(this);
+    this.hostsFilesWriter = new HostsFilesWriter(
+      this.io,
+      this.masterConfig,
+      this.entities,
+      this.hostClassNames,
+      this. hostsFilesSet
+    );
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
   }
 

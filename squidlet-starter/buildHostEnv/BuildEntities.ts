@@ -5,14 +5,14 @@ import MasterConfig from './MasterConfig';
 import systemPlugin from './systemPlugin';
 import * as Io from './Io';
 import * as defaultLogger from './defaultLogger';
-import HostsFilesWriter from './HostsFilesWriter';
+import EntitiesWriter from './EntitiesWriter';
 
 
 export default class BuildEntities {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly entities: Entities;
-  readonly hostsFilesWriter: HostsFilesWriter;
+  readonly entitiesWriter: EntitiesWriter;
   readonly log = defaultLogger;
   readonly io = Io;
   private readonly pluginEnv: PluginEnv;
@@ -22,7 +22,7 @@ export default class BuildEntities {
     this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
     this.register = new Register(this.io);
     this.entities = new Entities(this.io, this.register);
-    this.hostsFilesWriter = new HostsFilesWriter(this);
+    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
   }
 
@@ -48,7 +48,7 @@ export default class BuildEntities {
   async writeToStorage(skipMaster?: boolean) {
     this.log.info(`--> Write entities files`);
 
-    await this.hostsFilesWriter.writeEntitiesFiles();
+    await this.entitiesWriter.write();
   }
 
 

@@ -1,12 +1,16 @@
 import * as path from 'path';
 
-import BuildHostsEnv from './BuildHostsEnv';
 import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
 import systemConfig from './configs/systemConfig';
 import {EntitiesNames} from './Entities';
 import PreManifestBase from './interfaces/PreManifestBase';
 import HostConfig from '../../host/src/app/interfaces/HostConfig';
 import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
+import MasterConfig from './MasterConfig';
+import Entities from './Entities';
+import * as Io from './Io';
+import HostClassNames from './HostClassNames';
+import HostsFilesSet from './HostsFilesSet';
 
 
 /**
@@ -14,32 +18,30 @@ import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTyp
  * This files will be sent to a slave hosts.
  */
 export default class HostsFilesWriter {
-  private readonly main: BuildHostsEnv;
+  private readonly io: Io;
+  private readonly masterConfig: MasterConfig;
+  private readonly entities: Entities;
+  private readonly hostClassNames: HostClassNames;
+  private readonly hostsFilesSet: HostsFilesSet;
 
   // entities dir in storage
   private get entitiesDstDir(): string {
-    return path.join(this.main.masterConfig.buildDir, systemConfig.entityBuildDir);
+    return path.join(this.masterConfig.buildDir, systemConfig.entityBuildDir);
   }
 
 
-  constructor(main: BuildHostsEnv) {
-    this.main = main;
-  }
-
-
-  /**
-   * Copy files of entities to storage
-   */
-  async writeEntitiesFiles() {
-    const allEntities: EntitiesNames = this.main.entities.getAllEntitiesNames();
-    
-    for (let typeName of Object.keys(allEntities)) {
-      const pluralType: ManifestsTypePluralName = typeName as ManifestsTypePluralName;
-
-      for (let entityName of allEntities[pluralType]) {
-        await this.proceedEntity(pluralType, entityName);
-      }
-    }
+  constructor(
+    io: Io,
+    masterConfig: MasterConfig,
+    entities: Entities,
+    hostClassNames: HostClassNames,
+    hostsFilesSet: HostsFilesSet
+  ) {
+    this.io = io;
+    this.masterConfig = masterConfig;
+    this.entities = entities;
+    this.hostsFilesSet = hostsFilesSet;
+    this.hostsFilesSet = hostsFilesSet;
   }
 
   /**
@@ -47,36 +49,10 @@ export default class HostsFilesWriter {
    * @param skipMaster - don't write master's files
    */
   async writeHostsConfigsFiles(skipMaster: boolean = false) {
-    for (let hostId of this.main.masterConfig.getHostsIds()) {
+    for (let hostId of this.masterConfig.getHostsIds()) {
       if (skipMaster && hostId === 'master') return;
 
       await this.proceedHost(hostId);
-    }
-  }
-
-  private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
-    const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const entitySrcDir = this.main.entities.getSrcDir(pluralType, entityName);
-
-    // write manifest
-    await this.writeJson(
-      path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
-      this.main.entities.getManifest(pluralType, entityName)
-    );
-
-    // TODO: build and write main files if exists
-    // TODO: test running of build
-
-    const files: string[] = this.main.entities.getFiles(pluralType, entityName);
-
-    for (let relativeFileName of files) {
-      const fromFile = path.resolve(entitySrcDir, relativeFileName);
-      const toFileName = path.resolve(entityDstDir, relativeFileName);
-
-      // make inner dirs
-      await this.main.io.mkdirP(path.dirname(toFileName));
-      // copy
-      await this.main.io.copyFile(fromFile, toFileName);
     }
   }
 
@@ -94,10 +70,10 @@ export default class HostsFilesWriter {
   }
 
   private async proceedHost(hostId: string) {
-    const hostConfig: HostConfig = this.main.masterConfig.getFinalHostConfig(hostId);
-    const definitionsSet: DefinitionsSet = this.main.hostsFilesSet.getDefinitionsSet(hostId);
-    const hostsUsedEntitiesNames: EntitiesNames = this.main.hostClassNames.getEntitiesNames(hostId);
-    const hostsDir = path.join(this.main.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
+    const hostConfig: HostConfig = this.masterConfig.getFinalHostConfig(hostId);
+    const definitionsSet: DefinitionsSet = this.hostsFilesSet.getDefinitionsSet(hostId);
+    const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames(hostId);
+    const hostsDir = path.join(this.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
     const hostDir = path.join(hostsDir, hostId);
     const fileNames = systemConfig.hostInitCfg.fileNames;
     const configDir = path.join(hostDir, systemConfig.hostSysCfg.rootDirs.configs);
@@ -121,11 +97,12 @@ export default class HostsFilesWriter {
 
   }
 
+  // TODO: may be move to IO
   private async writeJson(fileName: string, contentJs: any) {
     const content = JSON.stringify(contentJs);
 
-    await this.main.io.mkdirP(path.dirname(fileName));
-    await this.main.io.writeFile(fileName, content);
+    await this.io.mkdirP(path.dirname(fileName));
+    await this.io.writeFile(fileName, content);
   }
 
 }
