@@ -14,7 +14,7 @@ import Io from '../Io';
  */
 export default class EntitiesWriter {
   private readonly masterConfig: MasterConfig;
-  private readonly entities: EntitiesSet;
+  private readonly entitiesSet: EntitiesSet;
   private readonly io: Io;
 
   // entities dir in storage
@@ -23,10 +23,10 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(io: Io, masterConfig: MasterConfig, entities: EntitiesSet) {
+  constructor(io: Io, masterConfig: MasterConfig, entitiesSet: EntitiesSet) {
     this.io = io;
     this.masterConfig = masterConfig;
-    this.entities = entities;
+    this.entitiesSet = entitiesSet;
   }
 
 
@@ -34,7 +34,7 @@ export default class EntitiesWriter {
    * Copy files of entities to storage
    */
   async write() {
-    const allEntities: EntitiesNames = this.entities.getAllEntitiesNames();
+    const allEntities: EntitiesNames = this.entitiesSet.getAllEntitiesNames();
     
     for (let typeName of Object.keys(allEntities)) {
       const pluralType: ManifestsTypePluralName = typeName as ManifestsTypePluralName;
@@ -47,18 +47,18 @@ export default class EntitiesWriter {
 
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const entitySrcDir = this.entities.getSrcDir(pluralType, entityName);
+    const entitySrcDir = this.entitiesSet.getSrcDir(pluralType, entityName);
 
     // write manifest
     await this.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
-      this.entities.getManifest(pluralType, entityName)
+      this.entitiesSet.getManifest(pluralType, entityName)
     );
 
     // TODO: build and write main files if exists
     // TODO: test running of build
 
-    const files: string[] = this.entities.getFiles(pluralType, entityName);
+    const files: string[] = this.entitiesSet.getFiles(pluralType, entityName);
 
     for (let relativeFileName of files) {
       const fromFile = path.resolve(entitySrcDir, relativeFileName);
