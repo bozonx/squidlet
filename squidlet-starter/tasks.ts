@@ -39,9 +39,9 @@ gulp.task('build-host', async () => {
   clearDir(buildConfig.buildDir);
   await compileTs(buildConfig.srcDir, buildConfig.compiledTsDir);
   await compileJs(buildConfig.compiledTsDir, buildConfig.compiledJsDir, buildConfig.strictMode);
-  await collectDependencies(buildConfig.prjConfigYaml, buildConfig.dependenciesBuildDir);
+  //await collectDependencies(buildConfig.prjConfigYaml, buildConfig.dependenciesBuildDir);
   // min prj
   await minimize(buildConfig.compiledJsDir, buildConfig.minPrjDir);
   // min deps
-  await minimize(buildConfig.dependenciesBuildDir, buildConfig.minDepsDir);
+  //await minimize(buildConfig.dependenciesBuildDir, buildConfig.minDepsDir);
 });
