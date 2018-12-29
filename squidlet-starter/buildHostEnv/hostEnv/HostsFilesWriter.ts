@@ -7,7 +7,6 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import HostConfig from '../../../host/src/app/interfaces/HostConfig';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
-import EntitiesSet from '../entities/EntitiesSet';
 import Io from '../Io';
 import HostClassNames from './HostClassNames';
 import HostsFilesSet from './HostsFilesSet';
@@ -20,7 +19,6 @@ import HostsFilesSet from './HostsFilesSet';
 export default class HostsFilesWriter {
   private readonly io: Io;
   private readonly masterConfig: MasterConfig;
-  private readonly entities: EntitiesSet;
   private readonly hostClassNames: HostClassNames;
   private readonly hostsFilesSet: HostsFilesSet;
 
@@ -33,13 +31,11 @@ export default class HostsFilesWriter {
   constructor(
     io: Io,
     masterConfig: MasterConfig,
-    entities: EntitiesSet,
     hostClassNames: HostClassNames,
     hostsFilesSet: HostsFilesSet
   ) {
     this.io = io;
     this.masterConfig = masterConfig;
-    this.entities = entities;
     this.hostClassNames = hostClassNames;
     this.hostsFilesSet = hostsFilesSet;
   }

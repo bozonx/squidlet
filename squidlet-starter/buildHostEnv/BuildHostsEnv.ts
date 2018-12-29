@@ -26,11 +26,10 @@ export default class BuildHostsEnv {
     this.entities = new Entities(this.log, this.masterConfig);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesSet);
     this.definitions = new Definitions(this.masterConfig, this.entities.entitiesSet, this.hostClassNames);
-    this.hostsFilesSet = new HostsFilesSet(this.entities, this.hostClassNames, this.definitions);
+    this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesSet, this.hostClassNames, this.definitions);
     this.hostsFilesWriter = new HostsFilesWriter(
       this.io,
       this.masterConfig,
-      this.entities,
       this.hostClassNames,
       this. hostsFilesSet
     );
