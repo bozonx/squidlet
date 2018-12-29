@@ -18,7 +18,7 @@ import MasterConfig from '../MasterConfig';
  */
 export default class Definitions {
   private readonly masterConfig: MasterConfig;
-  private readonly entities: EntitiesSet;
+  private readonly entitiesSet: EntitiesSet;
   private readonly hostClassNames: HostClassNames;
   // definitions like {hostId: {entityId: Definition}}
   private devicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
@@ -26,9 +26,9 @@ export default class Definitions {
   private servicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
 
 
-  constructor(masterConfig: MasterConfig, entities: EntitiesSet, hostClassNames: HostClassNames) {
+  constructor(masterConfig: MasterConfig, entitiesSet: EntitiesSet, hostClassNames: HostClassNames) {
     this.masterConfig = masterConfig;
-    this.entities = entities;
+    this.entitiesSet = entitiesSet;
     this.hostClassNames = hostClassNames;
   }
 
@@ -115,7 +115,7 @@ export default class Definitions {
     deviceDef: PreEntityDefinition,
     hostDeviceDefaultProps?: {[index: string]: any}
   ): EntityDefinition {
-    const manifest = this.entities.getManifest('devices', deviceDef.className);
+    const manifest = this.entitiesSet.getManifest('devices', deviceDef.className);
     const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
       && hostDeviceDefaultProps[deviceDef.className];
 
@@ -136,7 +136,7 @@ export default class Definitions {
   private generateDriverDef(id: string, driverDef?: PreEntityDefinition): EntityDefinition {
     // id and className is the same for drivers
     const className = id;
-    const manifest = this.entities.getManifest('drivers', className);
+    const manifest = this.entitiesSet.getManifest('drivers', className);
 
     return {
       id,
@@ -149,7 +149,7 @@ export default class Definitions {
   }
 
   private generateServiceDef(id: string, serviceDef: PreEntityDefinition): EntityDefinition {
-    const manifest = this.entities.getManifest('services', serviceDef.className);
+    const manifest = this.entitiesSet.getManifest('services', serviceDef.className);
 
     return {
       id,
@@ -165,7 +165,7 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
-    const entities: SrcEntitiesSet = this.entities.getEntitiesSet();
+    const entities: SrcEntitiesSet = this.entitiesSet.getEntitiesSet();
     const check = (
       entitiesOfType: {[index: string]: SrcEntitySet},
       definitions: {[index: string]: {[index: string]: EntityDefinition}}

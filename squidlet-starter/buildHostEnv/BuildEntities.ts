@@ -3,13 +3,14 @@ import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Entities from './entities/Entities';
 import EntitiesWriter from './entities/EntitiesWriter';
+import Logger from './interfaces/Logger';
 
 
 export default class BuildEntities {
   private readonly masterConfig: MasterConfig;
   private readonly entities: Entities;
   private readonly entitiesWriter: EntitiesWriter;
-  private readonly log = defaultLogger;
+  private readonly log: Logger = defaultLogger;
   private readonly io = new Io();
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {

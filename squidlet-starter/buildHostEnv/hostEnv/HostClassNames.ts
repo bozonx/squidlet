@@ -3,21 +3,20 @@ import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 import _includes = require('lodash/includes');
 
-import {Dependencies, EntitiesNames} from '../entities/EntitiesSet';
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
-import EntitiesSet from '../entities/EntitiesSet';
+import EntitiesSet, {Dependencies, EntitiesNames} from '../entities/EntitiesSet';
 
 
 export default class HostClassNames {
   private readonly masterConfig: MasterConfig;
-  private readonly entities: EntitiesSet;
+  private readonly entitiesSet: EntitiesSet;
 
 
-  constructor(masterConfig: MasterConfig, entities: EntitiesSet) {
+  constructor(masterConfig: MasterConfig, entitiesSet: EntitiesSet) {
     this.masterConfig = masterConfig;
-    this.entities = entities;
+    this.entitiesSet = entitiesSet;
   }
 
 
@@ -105,7 +104,7 @@ export default class HostClassNames {
    */
   private getOnlyDrivers(hostId: string): string[] {
     const driversDefinitions: string[] = this.getDriversClassNames(hostId);
-    const allDevs: string[] = this.entities.getDevs();
+    const allDevs: string[] = this.entitiesSet.getDevs();
     // remove devs from drivers definitions list
 
     return _filter(
@@ -137,7 +136,7 @@ export default class HostClassNames {
 
   private addDeps(pluralType: ManifestsTypePluralName, names: string[]): string[] {
     // dependencies of all the registered entities
-    const dependencies: Dependencies = this.entities.getDependencies();
+    const dependencies: Dependencies = this.entitiesSet.getDependencies();
     let result: string[] = [];
 
     for (let entityClassName of names) {
@@ -152,7 +151,7 @@ export default class HostClassNames {
   }
 
   private resolveDeps(pluralType: ManifestsTypePluralName, name: string): string[] {
-    const dependencies: Dependencies = this.entities.getDependencies();
+    const dependencies: Dependencies = this.entitiesSet.getDependencies();
     let result: string[] = [];
     // items which were processed to avoid infinity recursion
     const processedItems: string[] = [];
