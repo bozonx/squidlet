@@ -2,22 +2,22 @@ import * as path from 'path';
 import _values = require('lodash/values');
 
 import {EntitiesSet, SrcEntitiesSet} from '../../../host/src/app/interfaces/EntitySet';
-import {EntitiesNames} from '../entities/Entities';
+import {EntitiesNames} from '../entities/EntitiesSet';
 import DefinitionsSet from '../../../host/src/app/interfaces/DefinitionsSet';
 import {sortByIncludeInList} from '../helpers';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import HostClassNames from './HostClassNames';
 import Definitions from './Definitions';
-import Entities from '../entities/Entities';
+import EntitiesSet from '../entities/EntitiesSet';
 
 
 export default class HostsFilesSet {
-  private readonly entities: Entities;
+  private readonly entities: EntitiesSet;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
 
 
-  constructor(entities: Entities, hostClassNames: HostClassNames, definitions: Definitions) {
+  constructor(entities: EntitiesSet, hostClassNames: HostClassNames, definitions: Definitions) {
     this.entities = entities;
     this.hostClassNames = hostClassNames;
     this.definitions = definitions;

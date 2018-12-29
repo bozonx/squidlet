@@ -1,6 +1,6 @@
 import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
-import Entities from './entities/Entities';
+import EntitiesSet from './entities/EntitiesSet';
 import MasterConfig from './MasterConfig';
 import systemPlugin from './systemPlugin';
 import Io from './Io';
@@ -11,7 +11,7 @@ import EntitiesWriter from './entities/EntitiesWriter';
 export default class BuildEntities {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
-  readonly entities: Entities;
+  readonly entities: EntitiesSet;
   readonly entitiesWriter: EntitiesWriter;
   readonly log = defaultLogger;
   readonly io = new Io();
@@ -21,9 +21,9 @@ export default class BuildEntities {
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.register = new Register(this.io);
-    this.entities = new Entities(this.io, this.register);
-    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities);
+    this.entities = new EntitiesSet(this.io, this.register);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
+    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities);
   }
 
   async init() {

@@ -1,6 +1,6 @@
 import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
-import Entities from './entities/Entities';
+import EntitiesSet from './entities/EntitiesSet';
 import MasterConfig from './MasterConfig';
 import Definitions from './hostEnv/Definitions';
 import HostsFilesSet from './hostEnv/HostsFilesSet';
@@ -14,14 +14,17 @@ import HostClassNames from './hostEnv/HostClassNames';
 
 export default class BuildHostsEnv {
   readonly masterConfig: MasterConfig;
+  // TODO: не подключать
   readonly register: Register;
-  readonly entities: Entities;
+  // TODO: не подключать
+  readonly entities: EntitiesSet;
   readonly hostClassNames: HostClassNames;
   readonly definitions: Definitions;
   readonly hostsFilesSet: HostsFilesSet;
   readonly hostsFilesWriter: HostsFilesWriter;
   readonly log = defaultLogger;
   readonly io = new Io();
+  // TODO: не подключать
   private readonly pluginEnv: PluginEnv;
 
 
@@ -30,7 +33,7 @@ export default class BuildHostsEnv {
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.register = new Register(this.io);
-    this.entities = new Entities(this.io, this.register);
+    this.entities = new EntitiesSet(this.io, this.register);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities);
     this.definitions = new Definitions(this.masterConfig, this.entities, this.hostClassNames);
     this.hostsFilesSet = new HostsFilesSet(this.entities, this.hostClassNames, this.definitions);

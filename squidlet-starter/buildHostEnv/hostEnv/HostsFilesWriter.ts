@@ -2,12 +2,12 @@ import * as path from 'path';
 
 import DefinitionsSet from '../../../host/src/app/interfaces/DefinitionsSet';
 import systemConfig from '../configs/systemConfig';
-import {EntitiesNames} from '../entities/Entities';
+import {EntitiesNames} from '../entities/EntitiesSet';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import HostConfig from '../../../host/src/app/interfaces/HostConfig';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
-import Entities from '../entities/Entities';
+import EntitiesSet from '../entities/EntitiesSet';
 import Io from '../Io';
 import HostClassNames from './HostClassNames';
 import HostsFilesSet from './HostsFilesSet';
@@ -20,7 +20,7 @@ import HostsFilesSet from './HostsFilesSet';
 export default class HostsFilesWriter {
   private readonly io: Io;
   private readonly masterConfig: MasterConfig;
-  private readonly entities: Entities;
+  private readonly entities: EntitiesSet;
   private readonly hostClassNames: HostClassNames;
   private readonly hostsFilesSet: HostsFilesSet;
 
@@ -33,7 +33,7 @@ export default class HostsFilesWriter {
   constructor(
     io: Io,
     masterConfig: MasterConfig,
-    entities: Entities,
+    entities: EntitiesSet,
     hostClassNames: HostClassNames,
     hostsFilesSet: HostsFilesSet
   ) {

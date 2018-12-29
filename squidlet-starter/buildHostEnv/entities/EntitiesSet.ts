@@ -27,10 +27,10 @@ export interface EntitiesNames {
 }
 
 
-export default class Entities {
+export default class EntitiesSet {
   private readonly register: Register;
   private readonly io: Io;
-  // Entities set which contains a srcDir which point to dir where original manifest places.
+  // EntitiesSet set which contains a srcDir which point to dir where original manifest places.
   // There are all the entities which was registered in the system.
   private entitiesSet: SrcEntitiesSet = {
     devices: {},

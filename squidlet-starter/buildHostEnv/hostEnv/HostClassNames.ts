@@ -3,19 +3,19 @@ import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 import _includes = require('lodash/includes');
 
-import {Dependencies, EntitiesNames} from '../entities/Entities';
+import {Dependencies, EntitiesNames} from '../entities/EntitiesSet';
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
-import Entities from '../entities/Entities';
+import EntitiesSet from '../entities/EntitiesSet';
 
 
 export default class HostClassNames {
   private readonly masterConfig: MasterConfig;
-  private readonly entities: Entities;
+  private readonly entities: EntitiesSet;
 
 
-  constructor(masterConfig: MasterConfig, entities: Entities) {
+  constructor(masterConfig: MasterConfig, entities: EntitiesSet) {
     this.masterConfig = masterConfig;
     this.entities = entities;
   }

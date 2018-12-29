@@ -9,7 +9,7 @@ import EntityDefinition from '../../../host/src/app/interfaces/EntityDefinition'
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {SrcEntitiesSet, SrcEntitySet} from '../../../host/src/app/interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
-import Entities from '../entities/Entities';
+import EntitiesSet from '../entities/EntitiesSet';
 import MasterConfig from '../MasterConfig';
 
 
@@ -18,7 +18,7 @@ import MasterConfig from '../MasterConfig';
  */
 export default class Definitions {
   private readonly masterConfig: MasterConfig;
-  private readonly entities: Entities;
+  private readonly entities: EntitiesSet;
   private readonly hostClassNames: HostClassNames;
   // definitions like {hostId: {entityId: Definition}}
   private devicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
@@ -26,7 +26,7 @@ export default class Definitions {
   private servicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
 
 
-  constructor(masterConfig: MasterConfig, entities: Entities, hostClassNames: HostClassNames) {
+  constructor(masterConfig: MasterConfig, entities: EntitiesSet, hostClassNames: HostClassNames) {
     this.masterConfig = masterConfig;
     this.entities = entities;
     this.hostClassNames = hostClassNames;
