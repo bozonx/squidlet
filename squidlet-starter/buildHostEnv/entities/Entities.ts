@@ -9,7 +9,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../../host/src/app/interfaces/ManifestBase';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import Io from '../Io';
-import Register from '../Register';
+import Register from './Register';
 
 
 // dependencies of entities by class name

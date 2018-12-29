@@ -1,5 +1,5 @@
 import * as path from 'path';
-import PluginEnv from './PluginEnv';
+import PluginEnv from './entities/PluginEnv';
 
 const hostSrcRoot = '../../host/src';
 const devicesRoot = path.resolve(__dirname, hostSrcRoot, 'devices');

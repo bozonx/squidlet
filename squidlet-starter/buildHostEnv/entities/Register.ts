@@ -2,19 +2,19 @@ import * as path from 'path';
 import _values = require('lodash/values');
 import {Map} from 'immutable';
 
-import {resolveIndexFile} from './helpers';
-import PreDeviceManifest from './interfaces/PreDeviceManifest';
-import PreDriverManifest from './interfaces/PreDriverManifest';
-import PreServiceManifest from './interfaces/PreServiceManifest';
-import validateServiceManifest from './entities/validateServiceManifest';
-import validateDeviceManifest from './entities/validateDeviceManifest';
-import validateDriverManifest from './entities/validateDriverManifest';
-import Plugin from './interfaces/Plugin';
+import {resolveIndexFile} from '../helpers';
+import PreDeviceManifest from '../interfaces/PreDeviceManifest';
+import PreDriverManifest from '../interfaces/PreDriverManifest';
+import PreServiceManifest from '../interfaces/PreServiceManifest';
+import validateServiceManifest from './validateServiceManifest';
+import validateDeviceManifest from './validateDeviceManifest';
+import validateDriverManifest from './validateDriverManifest';
+import Plugin from '../interfaces/Plugin';
 import PluginEnv from './PluginEnv';
-import PreManifestBase from './interfaces/PreManifestBase';
-import Io from './Io';
-import systemConfig from './configs/systemConfig';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
+import PreManifestBase from '../interfaces/PreManifestBase';
+import Io from '../Io';
+import systemConfig from '../configs/systemConfig';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 
 
 /**

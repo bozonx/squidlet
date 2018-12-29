@@ -1,4 +1,4 @@
-import PluginEnv from '../PluginEnv';
+import PluginEnv from '../entities/PluginEnv';
 
 
 export default interface Plugin {

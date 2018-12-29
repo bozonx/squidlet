@@ -1,4 +1,4 @@
-Register = require('../../squidlet-starter/buildHostEnv/Register').default
+Register = require('../../squidlet-starter/buildHostEnv/entities/Register').default
 
 
 describe 'configWorks.Register', ->

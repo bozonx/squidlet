@@ -1,5 +1,5 @@
-import Register from './Register';
-import PluginEnv from './PluginEnv';
+import Register from './entities/Register';
+import PluginEnv from './entities/PluginEnv';
 import Entities from './entities/Entities';
 import MasterConfig from './MasterConfig';
 import Definitions from './hostEnv/Definitions';
