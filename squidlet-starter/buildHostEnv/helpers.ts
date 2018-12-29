@@ -3,7 +3,7 @@
 // }
 
 import * as path from 'path';
-import {exists, stat} from './Io';
+import {Stats} from '../../host/src/app/interfaces/dev/Storage';
 
 
 export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
@@ -31,7 +31,13 @@ export function sortByIncludeInList(itemsToSearch: string[], listToSearchIn: str
   ];
 }
 
-export async function resolveIndexFile(pathToDirOrFile: string, indexFileNames: string[]): Promise<string> {
+// TODO: maybe move to register?
+export async function resolveIndexFile(
+  stat: (path: string) => Promise<Stats>,
+  exists: (path: string) => Promise<boolean>,
+  pathToDirOrFile: string,
+  indexFileNames: string[]
+): Promise<string> {
   if (!(await stat(pathToDirOrFile)).dir) {
     // if it's file - return it
     return pathToDirOrFile;

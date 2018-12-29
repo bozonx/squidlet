@@ -22,8 +22,8 @@ import platform_esp8266 from '../../platforms/squidlet-esp8266/platform_esp8266'
 import platform_rpi from '../../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../../platforms/squidlet-x86/platform_x86_linux';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
-import {loadYamlFile} from './Io';
 import {appendArray} from './helpers';
+import Io from './Io';
 
 
 // TODO: move to build helpers ???
@@ -43,6 +43,7 @@ const servicesShortcut: {[index: string]: string} = {
 
 
 export default class MasterConfig {
+  private readonly io: Io;
   readonly plugins: string[] = [];
   get buildDir(): string {
     return this._buildDir as string;
@@ -59,13 +60,14 @@ export default class MasterConfig {
   private readonly argBuildDir?: string;
 
 
-  constructor(masterConfigPath: string, argBuildDir?: string) {
+  constructor(io: Io, masterConfigPath: string, argBuildDir?: string) {
+    this.io = io;
     this.masterConfigPath = masterConfigPath;
     this.argBuildDir = argBuildDir;
   }
 
   async init() {
-    const masterConfig: PreMasterConfig = await loadYamlFile(this.masterConfigPath);
+    const masterConfig: PreMasterConfig = await this.io.loadYamlFile(this.masterConfigPath);
     const validateError: string | undefined = validateMasterConfig(masterConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);

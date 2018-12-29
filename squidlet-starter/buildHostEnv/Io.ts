@@ -6,53 +6,56 @@ import systemConfig from './configs/systemConfig';
 import {Stats} from '../../host/src/app/interfaces/dev/Storage';
 
 
-export async function loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
-  const yamlContent: string = await getFileContent(fullPath);
+export default class Io {
+  async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
+    const yamlContent: string = await this.getFileContent(fullPath);
 
-  return yamlToJs(yamlContent);
-}
-
-export function getFileContent(path: string): Promise<string> {
-  return fsPromises.readFile(path, systemConfig.filesEncode) as Promise<string>;
-}
-
-export async function writeFile(path: string, data: string | Uint8Array): Promise<void> {
-  if (typeof data === 'string') {
-    return fsPromises.writeFile(path, data, systemConfig.filesEncode);
+    return this.yamlToJs(yamlContent);
   }
-  else {
-    return fsPromises.writeFile(path, data);
+
+  getFileContent(path: string): Promise<string> {
+    return fsPromises.readFile(path, systemConfig.filesEncode) as Promise<string>;
   }
-}
 
-export async function copyFile(src: string, dest: string): Promise<void> {
-  return fsPromises.copyFile(src, dest);
-}
+  async writeFile(path: string, data: string | Uint8Array): Promise<void> {
+    if (typeof data === 'string') {
+      return fsPromises.writeFile(path, data, systemConfig.filesEncode);
+    }
+    else {
+      return fsPromises.writeFile(path, data);
+    }
+  }
 
-export function mkdir(path: string): Promise<void> {
-  return fsPromises.mkdir(path);
-}
+  async copyFile(src: string, dest: string): Promise<void> {
+    return fsPromises.copyFile(src, dest);
+  }
 
-export async function mkdirP(dirName: string): Promise<void> {
-  shelljs.mkdir('-p', dirName);
-}
+  mkdir(path: string): Promise<void> {
+    return fsPromises.mkdir(path);
+  }
 
-export function yamlToJs(yamlString: string): any {
-  return yaml.safeLoad(yamlString);
-}
+  async mkdirP(dirName: string): Promise<void> {
+    shelljs.mkdir('-p', dirName);
+  }
 
-export async function exists(path: string): Promise<boolean> {
-  return fs.existsSync(path);
-}
+  yamlToJs(yamlString: string): any {
+    return yaml.safeLoad(yamlString);
+  }
 
-export async function stat(path: string): Promise<Stats> {
-  const stat = await fsPromises.stat(path);
+  async exists(path: string): Promise<boolean> {
+    return fs.existsSync(path);
+  }
 
-  return {
-    size: stat.size,
-    dir: stat.isDirectory(),
-    mtime: stat.mtimeMs,
-  };
+  async stat(path: string): Promise<Stats> {
+    const stat = await fsPromises.stat(path);
+
+    return {
+      size: stat.size,
+      dir: stat.isDirectory(),
+      mtime: stat.mtimeMs,
+    };
+  }
+
 }
 
 // loadYamlFileSync(fullPath: string): object {

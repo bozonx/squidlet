@@ -12,7 +12,7 @@ import validateDriverManifest from './validateDriverManifest';
 import Plugin from './interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
-import * as Io from './Io';
+import Io from './Io';
 import systemConfig from './configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 
@@ -167,6 +167,8 @@ export default class Register {
     }
 
     const resolvedPathToManifest: string = await resolveIndexFile(
+      this.io.stat,
+      this.io.exists,
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );

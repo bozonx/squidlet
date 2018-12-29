@@ -8,7 +8,7 @@ import ServiceManifest from '../../host/src/app/interfaces/ServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../../host/src/app/interfaces/ManifestBase';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
-import * as Io from './Io';
+import Io from './Io';
 import Register from './Register';
 
 
@@ -64,7 +64,6 @@ export default class Entities {
   constructor(io: Io, register: Register) {
     this.io = io;
     this.register = register;
-
   }
 
 
@@ -150,9 +149,9 @@ export default class Entities {
   }
 
   async generate() {
-    const preDevicesManifests = this.main.register.getDevicesPreManifests();
-    const preDriverManifests = this.main.register.getDriversPreManifests();
-    const preServiceManifests = this.main.register.getServicesPreManifests();
+    const preDevicesManifests = this.register.getDevicesPreManifests();
+    const preDriverManifests = this.register.getDriversPreManifests();
+    const preServiceManifests = this.register.getServicesPreManifests();
 
     for (let item of preDevicesManifests) {
       await this.proceed<DeviceManifest>('device', item);
@@ -209,7 +208,7 @@ export default class Entities {
     // load props file
     if (typeof preManifest.props === 'string') {
       const propPath = path.join(preManifest.baseDir, preManifest.props);
-      finalManifest.props = await this.main.io.loadYamlFile(propPath);
+      finalManifest.props = await this.io.loadYamlFile(propPath);
     }
 
     return finalManifest;

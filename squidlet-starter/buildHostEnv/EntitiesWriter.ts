@@ -5,7 +5,7 @@ import {EntitiesNames} from './Entities';
 import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from './MasterConfig';
 import Entities from './Entities';
-import * as Io from './Io';
+import Io from './Io';
 
 
 /**

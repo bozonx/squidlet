@@ -5,7 +5,7 @@ import MasterConfig from './MasterConfig';
 import Definitions from './Definitions';
 import HostsFilesSet from './HostsFilesSet';
 import systemPlugin from './systemPlugin';
-import * as Io from './Io';
+import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import HostsFilesWriter from './HostsFilesWriter';
 import validatePlatformDevs from './validatePlatformDevs';
@@ -21,14 +21,14 @@ export default class BuildHostsEnv {
   readonly hostsFilesSet: HostsFilesSet;
   readonly hostsFilesWriter: HostsFilesWriter;
   readonly log = defaultLogger;
-  readonly io = Io;
+  readonly io = new Io();
   private readonly pluginEnv: PluginEnv;
 
 
   // TODO: import BuildEntities
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
-    this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
+    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.register = new Register(this.io);
     this.entities = new Entities(this.io, this.register);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities);

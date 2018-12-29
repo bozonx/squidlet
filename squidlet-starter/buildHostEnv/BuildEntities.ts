@@ -3,7 +3,7 @@ import PluginEnv from './PluginEnv';
 import Entities from './Entities';
 import MasterConfig from './MasterConfig';
 import systemPlugin from './systemPlugin';
-import * as Io from './Io';
+import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import EntitiesWriter from './EntitiesWriter';
 
@@ -14,12 +14,12 @@ export default class BuildEntities {
   readonly entities: Entities;
   readonly entitiesWriter: EntitiesWriter;
   readonly log = defaultLogger;
-  readonly io = Io;
+  readonly io = new Io();
   private readonly pluginEnv: PluginEnv;
 
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
-    this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
+    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.register = new Register(this.io);
     this.entities = new Entities(this.io, this.register);
     this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities);
