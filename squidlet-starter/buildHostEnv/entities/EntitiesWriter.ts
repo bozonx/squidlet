@@ -1,10 +1,10 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import {EntitiesNames} from './EntitiesSet';
+import {EntitiesNames} from './EntitiesCollection';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
-import EntitiesSet from './EntitiesSet';
+import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
 
 
@@ -14,7 +14,7 @@ import Io from '../Io';
  */
 export default class EntitiesWriter {
   private readonly masterConfig: MasterConfig;
-  private readonly entitiesSet: EntitiesSet;
+  private readonly entitiesSet: EntitiesCollection;
   private readonly io: Io;
 
   // entities dir in storage
@@ -23,7 +23,7 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(io: Io, masterConfig: MasterConfig, entitiesSet: EntitiesSet) {
+  constructor(io: Io, masterConfig: MasterConfig, entitiesSet: EntitiesCollection) {
     this.io = io;
     this.masterConfig = masterConfig;
     this.entitiesSet = entitiesSet;

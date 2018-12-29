@@ -1,7 +1,7 @@
-Entities = require('../../squidlet-starter/buildHostEnv/entities/EntitiesSet').default
+Entities = require('../../squidlet-starter/buildHostEnv/entities/EntitiesCollection').default
 
 
-describe 'configWorks.EntitiesSet', ->
+describe 'configWorks.EntitiesCollection', ->
   beforeEach ->
     @preDevicesManifests = [
       {

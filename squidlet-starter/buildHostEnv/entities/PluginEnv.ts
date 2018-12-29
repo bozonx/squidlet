@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 
 import Register from './Register';
-import EntitiesSet from './EntitiesSet';
+import EntitiesCollection from './EntitiesCollection';
 import MasterConfig from '../MasterConfig';
 import {SrcEntitiesSet} from '../../../host/src/app/interfaces/EntitySet';
 
@@ -16,12 +16,12 @@ export default class PluginEnv {
   readonly masterConfig: MasterConfig;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly register: Register;
-  private readonly entities: EntitiesSet;
+  private readonly entities: EntitiesCollection;
 
   constructor(
     masterConfig: MasterConfig,
     register: Register,
-    entities: EntitiesSet,
+    entities: EntitiesCollection,
   ) {
     this.masterConfig = masterConfig;
     this.register = register;

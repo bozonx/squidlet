@@ -6,15 +6,15 @@ import _includes = require('lodash/includes');
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
-import EntitiesSet, {Dependencies, EntitiesNames} from '../entities/EntitiesSet';
+import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
 
 
 export default class HostClassNames {
   private readonly masterConfig: MasterConfig;
-  private readonly entitiesSet: EntitiesSet;
+  private readonly entitiesSet: EntitiesCollection;
 
 
-  constructor(masterConfig: MasterConfig, entitiesSet: EntitiesSet) {
+  constructor(masterConfig: MasterConfig, entitiesSet: EntitiesCollection) {
     this.masterConfig = masterConfig;
     this.entitiesSet = entitiesSet;
   }

@@ -1,5 +1,5 @@
 import Register from './Register';
-import EntitiesSet from './EntitiesSet';
+import EntitiesCollection from './EntitiesCollection';
 import MasterConfig from '../MasterConfig';
 import PluginEnv from './PluginEnv';
 import Io from '../Io';
@@ -11,7 +11,7 @@ export default class Entities {
   readonly masterConfig: MasterConfig;
   readonly log: Logger;
   readonly register: Register;
-  readonly entitiesSet: EntitiesSet;
+  readonly entitiesSet: EntitiesCollection;
   readonly pluginEnv: PluginEnv;
   private readonly io = new Io();
 
@@ -19,7 +19,7 @@ export default class Entities {
     this.log = log;
     this.masterConfig = masterConfig;
     this.register = new Register(this.io);
-    this.entitiesSet = new EntitiesSet(this.io, this.register);
+    this.entitiesSet = new EntitiesCollection(this.io, this.register);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entitiesSet);
   }
 

@@ -1,7 +1,7 @@
 import _difference = require('lodash/difference');
 
 import BuildHostsEnv from '../BuildHostsEnv';
-import {Dependencies, EntitiesNames} from '../entities/EntitiesSet';
+import {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 
 
