@@ -8,7 +8,7 @@
 
 import {collectDevs, getMasterSysDev, initEnvFilesBuilder, resolveParam} from './helpers';
 import System from '../host/src/app/System';
-import Main from './buildHostEnv/Main';
+import BuildHostsEnv from './buildHostEnv/BuildHostsEnv';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import {DevClass} from '../host/src/app/entities/DevManager';
 
@@ -21,7 +21,7 @@ const debug = true;
 /**
  * Generate master host config with integrated files set which points to original (ts or js) files
  */
-export function generateMasterConfigSet(main: Main): SrcHostFilesSet {
+export function generateMasterConfigSet(main: BuildHostsEnv): SrcHostFilesSet {
   const hostId = 'master';
 
   return {
@@ -65,7 +65,7 @@ async function masterStarter () {
 
   //const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || yargs.argv['build-dir'];
 
-  const main: Main = await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir, true);
+  const main: BuildHostsEnv = await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir, true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files

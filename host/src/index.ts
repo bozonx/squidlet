@@ -1,5 +1,5 @@
 /**
- * Main file which starts on microController's system boot.
+ * BuildHostsEnv file which starts on microController's system boot.
  */
 
 import System from './app/System';

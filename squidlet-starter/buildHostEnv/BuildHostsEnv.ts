@@ -12,7 +12,7 @@ import validatePlatformDevs from './validatePlatformDevs';
 import HostClassNames from './HostClassNames';
 
 
-export default class Main {
+export default class BuildHostsEnv {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly entities: Entities;
@@ -27,10 +27,10 @@ export default class Main {
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
-    this.register = new Register(this);
-    this.entities = new Entities(this);
-    this.hostClassNames = new HostClassNames(this);
-    this.definitions = new Definitions(this);
+    this.register = new Register(this.io);
+    this.entities = new Entities(this.io, this.register);
+    this.hostClassNames = new HostClassNames(this.masterConfig, this.entities);
+    this.definitions = new Definitions(this.masterConfig, this.entities, this.hostClassNames);
     this.hostsFilesSet = new HostsFilesSet(this);
     this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
@@ -59,12 +59,11 @@ export default class Main {
   }
 
   /**
-   * Write all the hosts and entities files to storage
+   * Write all the hosts files to storage
    */
   async writeToStorage(skipMaster?: boolean) {
     this.log.info(`--> Write hosts files`);
 
-    await this.hostsFilesWriter.writeEntitiesFiles();
     await this.hostsFilesWriter.writeHostsConfigsFiles(skipMaster);
   }
 

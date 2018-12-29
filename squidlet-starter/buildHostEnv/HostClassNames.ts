@@ -3,17 +3,21 @@ import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 import _includes = require('lodash/includes');
 
-import Main from './Main';
 import {Dependencies, EntitiesNames} from './Entities';
 import PreHostConfig from './interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
+import MasterConfig from './MasterConfig';
+import Entities from './Entities';
 
 
 export default class HostClassNames {
-  private readonly main: Main;
+  private readonly masterConfig: MasterConfig;
+  private readonly entities: Entities;
 
-  constructor(main: Main) {
-    this.main = main;
+
+  constructor(masterConfig: MasterConfig, entities: Entities) {
+    this.masterConfig = masterConfig;
+    this.entities = entities;
   }
 
 
@@ -60,7 +64,7 @@ export default class HostClassNames {
   }
 
   getServicesClassNames(hostId: string): string[] {
-    const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
+    const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
 
     if (!rawHostConfig.services) return [];
 
@@ -72,7 +76,7 @@ export default class HostClassNames {
 
 
   private getDevicesClassNames(hostId: string): string[] {
-    const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
+    const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
 
     if (!rawHostConfig.devices) return [];
 
@@ -86,7 +90,7 @@ export default class HostClassNames {
    * Get drivers and devs class names of host.
    */
   private getDriversClassNames(hostId: string): string[] {
-    const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
+    const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
 
     if (!rawHostConfig.drivers) return [];
 
@@ -101,7 +105,7 @@ export default class HostClassNames {
    */
   private getOnlyDrivers(hostId: string): string[] {
     const driversDefinitions: string[] = this.getDriversClassNames(hostId);
-    const allDevs: string[] = this.main.entities.getDevs();
+    const allDevs: string[] = this.entities.getDevs();
     // remove devs from drivers definitions list
 
     return _filter(
@@ -133,7 +137,7 @@ export default class HostClassNames {
 
   private addDeps(pluralType: ManifestsTypePluralName, names: string[]): string[] {
     // dependencies of all the registered entities
-    const dependencies: Dependencies = this.main.entities.getDependencies();
+    const dependencies: Dependencies = this.entities.getDependencies();
     let result: string[] = [];
 
     for (let entityClassName of names) {
@@ -148,7 +152,7 @@ export default class HostClassNames {
   }
 
   private resolveDeps(pluralType: ManifestsTypePluralName, name: string): string[] {
-    const dependencies: Dependencies = this.main.entities.getDependencies();
+    const dependencies: Dependencies = this.entities.getDependencies();
     let result: string[] = [];
     // items which were processed to avoid infinity recursion
     const processedItems: string[] = [];
@@ -173,29 +177,5 @@ export default class HostClassNames {
 
     return result;
   }
-
-  // private resolveDeps111(typeDependencies: string[]): string[] {
-  //   // dependencies of all the registered entities
-  //   const dependencies: Dependencies = this.main.entities.getDependencies();
-  //   let result: string[] = [];
-  //
-  //   // TODO: если встретил ту же зависимость - остановиться
-  //
-  //   // --- ['Middle.driver']
-  //   for (let depDriverName of typeDependencies) {
-  //     result.push(depDriverName);
-  //
-  //     // --- ['Top.driver']
-  //     const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
-  //
-  //     if (subDeps) {
-  //       const resolvedDriverDeps: string[] = this.resolveDeps(subDeps);
-  //
-  //       result = result.concat(resolvedDriverDeps);
-  //     }
-  //   }
-  //
-  //   return result;
-  // }
 
 }

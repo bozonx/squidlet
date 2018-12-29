@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Main from './Main';
+import BuildHostsEnv from './BuildHostsEnv';
 import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
 import systemConfig from './configs/systemConfig';
 import {EntitiesNames} from './Entities';
@@ -14,7 +14,7 @@ import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTyp
  * This files will be sent to a slave hosts.
  */
 export default class HostsFilesWriter {
-  private readonly main: Main;
+  private readonly main: BuildHostsEnv;
 
   // entities dir in storage
   private get entitiesDstDir(): string {
@@ -22,7 +22,7 @@ export default class HostsFilesWriter {
   }
 
 
-  constructor(main: Main) {
+  constructor(main: BuildHostsEnv) {
     this.main = main;
   }
 

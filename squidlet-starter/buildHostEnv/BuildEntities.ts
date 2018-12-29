@@ -2,14 +2,10 @@ import Register from './Register';
 import PluginEnv from './PluginEnv';
 import Entities from './Entities';
 import MasterConfig from './MasterConfig';
-import Definitions from './Definitions';
-import HostsFilesSet from './HostsFilesSet';
 import systemPlugin from './systemPlugin';
 import * as Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import HostsFilesWriter from './HostsFilesWriter';
-import validatePlatformDevs from './validatePlatformDevs';
-import HostClassNames from './HostClassNames';
 
 
 export default class BuildEntities {

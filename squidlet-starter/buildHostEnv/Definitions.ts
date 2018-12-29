@@ -7,23 +7,29 @@ import _isEmpty = require('lodash/isEmpty');
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import EntityDefinition from '../../host/src/app/interfaces/EntityDefinition';
 import PreHostConfig from './interfaces/PreHostConfig';
-import Main from './Main';
 import {SrcEntitiesSet, SrcEntitySet} from '../../host/src/app/interfaces/EntitySet';
+import HostClassNames from './HostClassNames';
+import Entities from './Entities';
+import MasterConfig from './MasterConfig';
 
 
 /**
  * Prepare hosts devices, drivers and services definitions.
  */
 export default class Definitions {
-  private readonly main: Main;
+  private readonly masterConfig: MasterConfig;
+  private readonly entities: Entities;
+  private readonly hostClassNames: HostClassNames;
   // definitions like {hostId: {entityId: Definition}}
   private devicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
   private driversDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
   private servicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
 
 
-  constructor(main: Main) {
-    this.main = main;
+  constructor(masterConfig: MasterConfig, entities: Entities, hostClassNames: HostClassNames) {
+    this.masterConfig = masterConfig;
+    this.entities = entities;
+    this.hostClassNames = hostClassNames;
   }
 
   getHostDevicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
@@ -39,10 +45,10 @@ export default class Definitions {
   }
 
   generate() {
-    const hostIds: string[] = this.main.masterConfig.getHostsIds();
+    const hostIds: string[] = this.masterConfig.getHostsIds();
 
     for (let hostId of hostIds) {
-      const rawHostConfig: PreHostConfig = this.main.masterConfig.getPreHostConfig(hostId);
+      const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
       const { devices, drivers, services } = this.prepareEntities(hostId, rawHostConfig);
 
       if (!_isEmpty(devices)) {
@@ -75,7 +81,7 @@ export default class Definitions {
     const devices: {[index: string]: EntityDefinition} = {};
     const drivers: {[index: string]: EntityDefinition} = {};
     const services: {[index: string]: EntityDefinition} = {};
-    const allHostDrivers: string[] = this.main.hostClassNames.getAllUsedDriversClassNames(hostId);
+    const allHostDrivers: string[] = this.hostClassNames.getAllUsedDriversClassNames(hostId);
 
     if (rawHostConfig.devices) {
       for (let id of Object.keys(rawHostConfig.devices)) {
@@ -109,7 +115,7 @@ export default class Definitions {
     deviceDef: PreEntityDefinition,
     hostDeviceDefaultProps?: {[index: string]: any}
   ): EntityDefinition {
-    const manifest = this.main.entities.getManifest('devices', deviceDef.className);
+    const manifest = this.entities.getManifest('devices', deviceDef.className);
     const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
       && hostDeviceDefaultProps[deviceDef.className];
 
@@ -130,7 +136,7 @@ export default class Definitions {
   private generateDriverDef(id: string, driverDef?: PreEntityDefinition): EntityDefinition {
     // id and className is the same for drivers
     const className = id;
-    const manifest = this.main.entities.getManifest('drivers', className);
+    const manifest = this.entities.getManifest('drivers', className);
 
     return {
       id,
@@ -143,7 +149,7 @@ export default class Definitions {
   }
 
   private generateServiceDef(id: string, serviceDef: PreEntityDefinition): EntityDefinition {
-    const manifest = this.main.entities.getManifest('services', serviceDef.className);
+    const manifest = this.entities.getManifest('services', serviceDef.className);
 
     return {
       id,
@@ -159,7 +165,7 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
-    const entities: SrcEntitiesSet = this.main.entities.getEntitiesSet();
+    const entities: SrcEntitiesSet = this.entities.getEntitiesSet();
     const check = (
       entitiesOfType: {[index: string]: SrcEntitySet},
       definitions: {[index: string]: {[index: string]: EntityDefinition}}

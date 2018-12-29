@@ -1,7 +1,7 @@
 import * as path from 'path';
 import _values = require('lodash/values');
 
-import Main from './Main';
+import BuildHostsEnv from './BuildHostsEnv';
 import {EntitiesSet, SrcEntitiesSet} from '../../host/src/app/interfaces/EntitySet';
 import {EntitiesNames} from './Entities';
 import DefinitionsSet from '../../host/src/app/interfaces/DefinitionsSet';
@@ -10,9 +10,9 @@ import {ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTyp
 
 
 export default class HostsFilesSet {
-  private readonly main: Main;
+  private readonly main: BuildHostsEnv;
 
-  constructor(main: Main) {
+  constructor(main: BuildHostsEnv) {
     this.main = main;
   }
 
@@ -74,7 +74,7 @@ export default class HostsFilesSet {
     return result;
   }
 
-  generateDstEntitiesSet(main: Main, hostId: string): EntitiesSet {
+  generateDstEntitiesSet(main: BuildHostsEnv, hostId: string): EntitiesSet {
     const result: EntitiesSet = {
       devices: {},
       drivers: {},
