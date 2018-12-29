@@ -16,7 +16,9 @@ import {initEnvFilesBuilder, resolveParam} from './helpers';
 const envConfigPath = path.resolve(__dirname, './env-config.yaml');
 const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
 const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
-//const DEFAUTL_ENV_DIR = './build/env';
+
+// TODO: поидее не нужно
+const DEFAULT_ENV_DIR = './build/env';
 
 
 // configs
@@ -29,7 +31,8 @@ gulp.task('build-env', async () => {
   const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
   // TODO: get from args
   const resolvedBuildDir: string | undefined = process.env.BUILD_DIR
-    || (yargs.argv['build-dir'] as string);
+    || (yargs.argv['build-dir'] as string)
+    || DEFAULT_ENV_DIR;
 
   await initEnvFilesBuilder(resolvedConfigPath, resolvedBuildDir);
 });

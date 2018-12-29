@@ -12,7 +12,7 @@ import validateDriverManifest from './validateDriverManifest';
 import Plugin from './interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from './interfaces/PreManifestBase';
-import Main from './Main';
+import * as Io from './Io';
 import systemConfig from './configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
 
@@ -21,7 +21,7 @@ import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/int
  * Register a new type of device, driver or service
  */
 export default class Register {
-  private readonly main: Main;
+  private readonly io: Io;
   private readonly plugins: Plugin[] = [];
   // devices manifest by manifest name
   private devices: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
@@ -32,8 +32,8 @@ export default class Register {
   private readonly registeringPromises: Promise<any>[] = [];
 
 
-  constructor(main: Main) {
-    this.main = main;
+  constructor(io: Io) {
+    this.io = io;
   }
 
   getDevicesPreManifests(): PreDeviceManifest[] {
@@ -170,7 +170,7 @@ export default class Register {
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );
-    const parsedManifest = (await this.main.io.loadYamlFile(resolvedPathToManifest)) as T;
+    const parsedManifest = (await this.io.loadYamlFile(resolvedPathToManifest)) as T;
 
     parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
 

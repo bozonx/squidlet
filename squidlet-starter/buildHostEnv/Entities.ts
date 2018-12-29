@@ -1,7 +1,6 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import Main from './Main';
 import {SrcEntitiesSet, SrcEntitySet} from '../../host/src/app/interfaces/EntitySet';
 import DeviceManifest from '../../host/src/app/interfaces/DeviceManifest';
 import DriverManifest from '../../host/src/app/interfaces/DriverManifest';
@@ -9,6 +8,8 @@ import ServiceManifest from '../../host/src/app/interfaces/ServiceManifest';
 import PreManifestBase from './interfaces/PreManifestBase';
 import ManifestBase from '../../host/src/app/interfaces/ManifestBase';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/src/app/interfaces/ManifestTypes';
+import * as Io from './Io';
+import Register from './Register';
 
 
 // dependencies of entities by class name
@@ -27,7 +28,8 @@ export interface EntitiesNames {
 
 
 export default class Entities {
-  private readonly main: Main;
+  private readonly register: Register;
+  private readonly io: Io;
   // Entities set which contains a srcDir which point to dir where original manifest places.
   // There are all the entities which was registered in the system.
   private entitiesSet: SrcEntitiesSet = {
@@ -59,8 +61,9 @@ export default class Entities {
   private systemServices: string[] = [];
 
 
-  constructor(main: Main) {
-    this.main = main;
+  constructor(io: Io, register: Register) {
+    this.io = io;
+    this.register = register;
 
   }
 

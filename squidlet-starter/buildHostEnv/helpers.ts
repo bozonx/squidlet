@@ -3,7 +3,7 @@
 // }
 
 import * as path from 'path';
-import {exists, stat} from './IO';
+import {exists, stat} from './Io';
 
 
 export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {

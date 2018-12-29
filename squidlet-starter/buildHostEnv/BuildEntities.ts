@@ -12,13 +12,10 @@ import validatePlatformDevs from './validatePlatformDevs';
 import HostClassNames from './HostClassNames';
 
 
-export default class Main {
+export default class BuildEntities {
   readonly masterConfig: MasterConfig;
   readonly register: Register;
   readonly entities: Entities;
-  readonly hostClassNames: HostClassNames;
-  readonly definitions: Definitions;
-  readonly hostsFilesSet: HostsFilesSet;
   readonly hostsFilesWriter: HostsFilesWriter;
   readonly log = defaultLogger;
   readonly io = Io;
@@ -27,11 +24,8 @@ export default class Main {
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
     this.masterConfig = new MasterConfig(absMasterConfigPath, absBuildDir);
-    this.register = new Register(this);
-    this.entities = new Entities(this);
-    this.hostClassNames = new HostClassNames(this);
-    this.definitions = new Definitions(this);
-    this.hostsFilesSet = new HostsFilesSet(this);
+    this.register = new Register(this.io);
+    this.entities = new Entities(this.io, this.register);
     this.hostsFilesWriter = new HostsFilesWriter(this);
     this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entities);
   }
@@ -40,18 +34,12 @@ export default class Main {
     await this.masterConfig.init();
   }
 
-  async collect() {
+  async start() {
     this.log.info(`--> Registering plugins, devices, drivers and services`);
     await this.registering();
 
     this.log.info(`--> Resolving and preparing entities`);
     await this.entities.generate();
-
-    this.log.info(`--> Generating hosts entities definitions`);
-    await this.definitions.generate();
-
-    this.log.info(`--> Checking platform dev dependencies`);
-    validatePlatformDevs(this);
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
@@ -59,13 +47,12 @@ export default class Main {
   }
 
   /**
-   * Write all the hosts and entities files to storage
+   * Write entities files to storage
    */
   async writeToStorage(skipMaster?: boolean) {
-    this.log.info(`--> Write hosts files`);
+    this.log.info(`--> Write entities files`);
 
     await this.hostsFilesWriter.writeEntitiesFiles();
-    await this.hostsFilesWriter.writeHostsConfigsFiles(skipMaster);
   }
 
 

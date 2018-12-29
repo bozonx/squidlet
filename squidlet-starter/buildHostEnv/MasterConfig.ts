@@ -22,7 +22,7 @@ import platform_esp8266 from '../../platforms/squidlet-esp8266/platform_esp8266'
 import platform_rpi from '../../platforms/squidlet-rpi/platform_rpi';
 import platform_x86_linux from '../../platforms/squidlet-x86/platform_x86_linux';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
-import {loadYamlFile} from './IO';
+import {loadYamlFile} from './Io';
 import {appendArray} from './helpers';
 
 
