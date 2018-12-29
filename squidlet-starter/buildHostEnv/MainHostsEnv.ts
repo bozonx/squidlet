@@ -3,7 +3,7 @@ import MasterConfig from './MasterConfig';
 import Definitions from './hostEnv/Definitions';
 import HostsFilesSet from './hostEnv/HostsFilesSet';
 import HostsFilesWriter from './hostEnv/HostsFilesWriter';
-import validatePlatformDevs from './hostEnv/validatePlatformDevs';
+import validatePlatformDevs from './validatePlatformDevs';
 import HostClassNames from './hostEnv/HostClassNames';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';

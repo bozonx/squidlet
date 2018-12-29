@@ -25,6 +25,8 @@ export default class MainEntities {
     await this.entities.start();
 
     this.log.info(`--> Initialization has finished`);
+
+    // TODO: review ???
     // call handlers after init
     this.entities.pluginEnv.$riseAfterInit();
   }
