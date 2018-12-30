@@ -133,6 +133,9 @@ export default class MasterConfig {
   }
 
   private resolveBuildDir(): string {
+
+    // TODO: review
+
     // use command argument if specified
     if (this.argBuildDir) return this.argBuildDir;
 

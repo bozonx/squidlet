@@ -6,15 +6,13 @@
  * * passes it to platform index file and runs host system as is, without building
  */
 
-import * as yargs from 'yargs';
 import * as path from 'path';
 
-import {collectDevs, getMasterSysDev, resolveParam} from './helpers';
+import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from './helpers';
 import System from '../host/src/app/System';
 import MainHostsEnv from './buildHostEnv/MainHostsEnv';
 import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
 import {DevClass} from '../host/src/app/entities/DevManager';
-import MainEntities from './buildHostEnv/MainEntities';
 
 
 // TODO: change
@@ -48,21 +46,19 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
 
 async function masterStarter () {
-  // TODO: reveiw
-  const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR || (yargs.argv['build-dir'] as string);
+  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+  const resolvedBuildDir: string | undefined = resolveParam('BUILD_DIR', 'build-dir');
   const absMasterConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
-  const absBuildDir: string | undefined = resolvedBuildDir && path.resolve(process.cwd(), resolvedBuildDir);
+  let absBuildDir: string;
 
-  // TODO: какие на самом деле будут build dir ???
+  if (resolvedBuildDir) {
+    absBuildDir = path.resolve(process.cwd(), resolvedBuildDir);
+  }
+  else {
+    absBuildDir = path.resolve(process.cwd(), HOSTS_BUILD_DEFAULT_DIR);
+  }
 
-  const mainEntities: MainEntities = new MainEntities(absMasterConfigPath, absBuildDir);
   const mainHostsEnv: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
-
-  console.info(`===> generate entities`);
-
-  await mainEntities.collect();
-  await mainEntities.write();
 
   console.info(`===> generate hosts env files and configs`);
 

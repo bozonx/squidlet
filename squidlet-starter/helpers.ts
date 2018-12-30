@@ -14,7 +14,6 @@ import {
   PLATFORM_X86
 } from './buildHostEnv/interfaces/Platforms';
 import {DevClass} from '../host/src/app/entities/DevManager';
-import MainHostsEnv from './buildHostEnv/MainHostsEnv';
 
 
 // TODO: review
@@ -35,6 +34,8 @@ interface BuildConfig {
 
 const platformsDir = path.resolve(__dirname, '../platforms');
 const DEVS_DIR = 'dev';
+export const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
+export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
 
 
 export const platformConfigs: {[index: string]: PlatformConfig} = {
@@ -75,20 +76,24 @@ export function makeEnvConfig(envPrjConfig: {[index: string]: any}, envConfigPat
   };
 }
 
-export function resolveParam(envParamName: string, argParamName?: string): string {
-  let value: string | undefined;
+export function resolveParamRequired(envParamName: string, argParamName?: string): string {
+  const resolved: string | undefined = resolveParam(envParamName, argParamName);
 
+  if (resolved) return resolved;
+
+  throw new Error(`You have to specify env variable ${envParamName}=... or argument --${argParamName}=...`);
+}
+
+export function resolveParam(envParamName: string, argParamName?: string): string | undefined {
   if (process.env[envParamName]) {
-    value = process.env.CONFIG;
-  }
-  else if (argParamName && yargs.argv[argParamName]) {
-    value = yargs.argv.config as string;
-  }
-  else {
-    throw new Error(`You have to specify env variable ${envParamName}=... or argument --${argParamName}=...`);
+    return process.env.CONFIG;
   }
 
-  return value as string;
+  else if (argParamName && yargs.argv[argParamName]) {
+    return yargs.argv.config as string;
+  }
+
+  return;
 }
 
 /**

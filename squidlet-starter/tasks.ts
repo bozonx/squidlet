@@ -4,13 +4,14 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir} from './helpers';
+import {makeEnvConfig, clearDir, resolveParamRequired} from './helpers';
 import compileJs from './buildJs/compileJs';
 import compileTs from './buildJs/compileTs';
 import collectDependencies from './buildJs/collectDependencies';
 import minimize from './buildJs/minimize';
 import {resolveParam} from './helpers';
 import MainHostsEnv from './buildHostEnv/MainHostsEnv';
+import MainEntities from './buildHostEnv/MainEntities';
 
 
 // TODO: получить из агрументов
@@ -22,7 +23,23 @@ const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 const DEFAULT_ENV_DIR = './build/env';
 
 
-// hosts configs and entities
+gulp.task('build-entities', async () => {
+
+  // TODO: !!!!!
+
+  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+  const resolvedBuildDir: string | undefined = resolveParam('BUILD_DIR', 'build-dir');
+  const absMasterConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
+  const absBuildDir: string | undefined = resolvedBuildDir && path.resolve(process.cwd(), resolvedBuildDir);
+
+  const mainEntities: MainEntities = new MainEntities(absMasterConfigPath, absBuildDir);
+
+  await mainEntities.collect();
+  await mainEntities.write();
+
+});
+
+// hosts configs and entities of them
 gulp.task('build-env', async () => {
 
   // TODO: clear
