@@ -4,14 +4,14 @@ class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;
   private readonly onResove: (data: any) => void;
   private readonly onReject: (err: Error) => void;
-  private readonly timeout: number;
-  private readonly resendTimout: number;
+  private readonly timeoutSec: number;
+  private readonly resendTimeoutMs: number;
   private startedTimeStamp: number = 0;
 
 
-  constructor(timeout: number, resendTimout: number, onResove: (data: any) => void, onReject: (err: Error) => void) {
-    this.timeout = timeout;
-    this.resendTimout = resendTimout;
+  constructor(timeoutSec: number, resendTimeoutSec: number, onResove: (data: any) => void, onReject: (err: Error) => void) {
+    this.timeoutSec = timeoutSec;
+    this.resendTimeoutMs = resendTimeoutSec * 1000;
     this.onResove = onResove;
     this.onReject = onReject;
   }
@@ -35,7 +35,7 @@ class SenderRequest {
     this.sendCb()
       .then(this.success)
       .catch((err: Error) => {
-        if (new Date().getTime() >= this.startedTimeStamp + this.timeout) {
+        if (new Date().getTime() >= this.startedTimeStamp + this.timeoutSec) {
           // stop trying and call reject
           this.onReject(err);
 
@@ -45,7 +45,7 @@ class SenderRequest {
         setTimeout(() => {
           // try another one
           this.trySend();
-        }, this.resendTimout);
+        }, this.resendTimeoutMs);
       });
   }
 
@@ -56,7 +56,16 @@ class SenderRequest {
 }
 
 export default class Sender {
+  private readonly timeoutSec: number;
+  private readonly resendTimeoutSec: number;
   private readonly requests: {[index: string]: SenderRequest} = {};
+
+
+  constructor(timeoutSec: number, resendTimeoutSec: number) {
+    this.timeoutSec = timeoutSec;
+    this.resendTimeoutSec = resendTimeoutSec;
+  }
+
 
   send<T>(id: string, sendCb: (...p: any[]) => Promise<T>): Promise<T> {
 
@@ -66,6 +75,8 @@ export default class Sender {
       if (!this.requests[id]) {
         // make new request
         this.requests[id] = new SenderRequest(
+          this.timeoutSec,
+          this.resendTimeoutSec,
           (data: T) => {
             delete this.requests[id];
             resolve(data);
