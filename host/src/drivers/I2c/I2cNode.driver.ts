@@ -9,6 +9,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 import {isEqual, omit} from '../../helpers/lodashLike';
+import Sender from '../../helpers/Sender';
 
 
 export type Handler = (data: Uint8Array) => void;
@@ -40,6 +41,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   // data addr in hex to use in poling.
   private pollDataAddressHex?: number;
   private pollId: string = DEFAULT_POLL_ID;
+  private sender?: Sender;
 
   // last received data by poling
   // it needs to decide to rise change event or not
@@ -68,6 +70,10 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.addressHex = hexStringToHexNum(String(this.props.address));
     this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
     this.pollId = this.dataAddressToString(this.props.pollDataAddress);
+    this.sender = new Sender(
+      this.env.config.config.senderTimeout,
+      this.env.config.config.senderResendTimeout
+    );
   }
 
   protected appDidInit = async () => {

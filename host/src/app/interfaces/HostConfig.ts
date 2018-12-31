@@ -10,6 +10,10 @@ export interface HostConfigConfig {
   defaultStatusRepublishIntervalMs: number;
   // republish config silently every 10 minutes if it hasn't been changed
   defaultConfigRepublishIntervalMs: number;
+  // main timeout in seconds
+  senderTimeout: number;
+  // resend timeout in seconds
+  senderResendTimeout: number;
   drivers: {
     // debounce of digital input in ms
     //defaultDigitalPinInputDebounce: number;
