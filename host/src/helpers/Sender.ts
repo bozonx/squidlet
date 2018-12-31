@@ -4,10 +4,16 @@ class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;
   private readonly onResove: (data: any) => void;
   private readonly onReject: (err: Error) => void;
+  private readonly timeout: number;
+  private readonly resendTimout: number;
   private started: boolean = false;
 
 
-  constructor(onResove: (data: any) => void, onReject: (err: Error) => void) {
+  // TODO: add main timeout
+
+  constructor(timeout: number, resendTimout: number, onResove: (data: any) => void, onReject: (err: Error) => void) {
+    this.timeout = timeout;
+    this.resendTimout = resendTimout;
     this.onResove = onResove;
     this.onReject = onReject;
   }
@@ -17,19 +23,29 @@ class SenderRequest {
   }
 
   start() {
-    if (!this.sendCb) throw new Error(`sendCb wasn't set`);
     if (this.started) return;
 
     this.started = true;
 
+    this.trySend();
+  }
+
+
+  private trySend() {
+    if (!this.sendCb) throw new Error(`sendCb wasn't set`);
+
     this.sendCb()
       .then(this.finish)
       .catch((err: Error) => {
+        // TODO: check main timeout
 
+        setTimeout(() => {
+
+        }, this.resendTimout);
       });
   }
 
-  finish = (data: any) => {
+  private finish = (data: any) => {
     this.onResove(data);
   }
 
