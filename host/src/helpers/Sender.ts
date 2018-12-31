@@ -2,17 +2,17 @@
 
 class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;
-  private readonly onResove: (data: any) => void;
+  private readonly onResolve: (data: any) => void;
   private readonly onReject: (err: Error) => void;
   private readonly timeoutSec: number;
   private readonly resendTimeoutMs: number;
   private startedTimeStamp: number = 0;
 
 
-  constructor(timeoutSec: number, resendTimeoutSec: number, onResove: (data: any) => void, onReject: (err: Error) => void) {
+  constructor(timeoutSec: number, resendTimeoutSec: number, onResolve: (data: any) => void, onReject: (err: Error) => void) {
     this.timeoutSec = timeoutSec;
     this.resendTimeoutMs = resendTimeoutSec * 1000;
-    this.onResove = onResove;
+    this.onResolve = onResolve;
     this.onReject = onReject;
   }
 
@@ -36,6 +36,7 @@ class SenderRequest {
       .then(this.success)
       .catch((err: Error) => {
         if (new Date().getTime() >= this.startedTimeStamp + this.timeoutSec) {
+          delete this.sendCb;
           // stop trying and call reject
           this.onReject(err);
 
@@ -50,7 +51,8 @@ class SenderRequest {
   }
 
   private success = (data: any) => {
-    this.onResove(data);
+    delete this.sendCb;
+    this.onResolve(data);
   }
 
 }

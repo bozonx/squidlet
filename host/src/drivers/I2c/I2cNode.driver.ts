@@ -94,16 +94,23 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   /**
    * Write only a dataAddress to bus
    */
-  writeEmpty(dataAddress: number): Promise<void> {
-    return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
+  async writeEmpty(dataAddress: number): Promise<void> {
+    this.sender && await this.sender.send<void>('writeEmpty', (): Promise<void> => {
+      return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
+    });
   }
 
   async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    await this.i2cMaster.write(this.addressHex, dataAddress, data);
+    this.sender && await this.sender.send<void>('write', (): Promise<void> => {
+      return this.i2cMaster.write(this.addressHex, dataAddress, data);
+    });
   }
 
   async read(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-    const result: Uint8Array = await this.i2cMaster.read(this.addressHex, dataAddress, length);
+    const result: Uint8Array = await (this.sender as Sender)
+      .send<Uint8Array>('read', (): Promise<Uint8Array> => {
+        return this.i2cMaster.read(this.addressHex, dataAddress, length);
+      });
 
     // update last poll data if data address the same
     if (this.props.feedback && dataAddress === this.props.pollDataAddress) {
@@ -117,7 +124,10 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    * Write and read from the same data address.
    */
   async request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    const result: Uint8Array = await this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);
+    const result: Uint8Array = await (this.sender as Sender)
+      .send<Uint8Array>('request', (): Promise<Uint8Array> => {
+        return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);
+      });
 
     // update last poll data if data address the same
     if (this.props.feedback && dataAddress === this.props.pollDataAddress) {
@@ -192,6 +202,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     let data: Uint8Array;
 
     try {
+      // TODO: use sender if int poll type is used
       data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
     }
     catch (err) {
