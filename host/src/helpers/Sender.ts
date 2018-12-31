@@ -4,13 +4,21 @@ class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;
   private readonly onResolve: (data: any) => void;
   private readonly onReject: (err: Error) => void;
-  private readonly timeoutSec: number;
+  private readonly id: string;
+  private readonly timeoutMs: number;
   private readonly resendTimeoutMs: number;
   private startedTimeStamp: number = 0;
 
 
-  constructor(timeoutSec: number, resendTimeoutSec: number, onResolve: (data: any) => void, onReject: (err: Error) => void) {
-    this.timeoutSec = timeoutSec;
+  constructor(
+    id: string,
+    timeoutSec: number,
+    resendTimeoutSec: number,
+    onResolve: (data: any) => void,
+    onReject: (err: Error) => void
+  ) {
+    this.id = id;
+    this.timeoutMs = timeoutSec * 1000;
     this.resendTimeoutMs = resendTimeoutSec * 1000;
     this.onResolve = onResolve;
     this.onReject = onReject;
@@ -35,7 +43,7 @@ class SenderRequest {
     this.sendCb()
       .then(this.success)
       .catch((err: Error) => {
-        if (new Date().getTime() >= this.startedTimeStamp + this.timeoutSec) {
+        if (new Date().getTime() >= this.startedTimeStamp + (this.timeoutMs)) {
           delete this.sendCb;
           // stop trying and call reject
           this.onReject(err);
@@ -46,7 +54,7 @@ class SenderRequest {
         setTimeout(() => {
 
           // TODO: print in debug
-          console.log('resending');
+          console.log(`resending - ${this.id}`);
 
           // try another one
           this.trySend();
@@ -81,6 +89,7 @@ export default class Sender {
       if (!this.requests[id]) {
         // make new request
         this.requests[id] = new SenderRequest(
+          id,
           this.timeoutSec,
           this.resendTimeoutSec,
           (data: T) => {
