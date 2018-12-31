@@ -3,7 +3,7 @@ export default {
     logLevel: 'info',
     defaultStatusRepublishIntervalMs: 60000,
     defaultConfigRepublishIntervalMs: 600000,
-    senderTimeout: 10,
+    senderTimeout: 60,
     senderResendTimeout: 1,
     drivers: {
       //defaultDigitalPinInputDebounce: 25,

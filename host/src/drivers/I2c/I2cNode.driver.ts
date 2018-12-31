@@ -106,8 +106,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}})`;
 
-    console.log(666666666, this.addressHex, dataAddress, data)
-
     this.sender && await this.sender.send<void>(senderId, (): Promise<void> => {
       return this.i2cMaster.write(this.addressHex, dataAddress, data);
     });

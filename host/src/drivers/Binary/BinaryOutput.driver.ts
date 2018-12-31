@@ -87,7 +87,11 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
 
   private async doWrite(level: boolean) {
-    this.blockTimeInProgress = true;
+    //this.blockTimeInProgress = true;
+
+    // TODO: return - it doesn't clear
+
+    this.blockTimeInProgress = false;
 
     try {
       await this.digitalOutput.write(invertIfNeed(level, this.props.invert));

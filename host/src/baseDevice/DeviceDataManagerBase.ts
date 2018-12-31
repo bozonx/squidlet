@@ -3,6 +3,7 @@ import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
+import {cloneDeep} from '../helpers/lodashLike';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -141,19 +142,30 @@ export default abstract class DeviceDataManagerBase {
     }
     // else do request to device if getter is defined
 
-    // TODO: обраотать ошибку
-
-    await this.save(
-      () => this.setter && this.setter(partialData),
-      `Can't save ${this.typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`
-    );
-
+    // TODO: при повторном запуске - только обновлять данные для отправки
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
+    // TODO: поидее только те поля которые сохраняются
+    const oldData = cloneDeep(this.localData);
     // set to local data
     const updatedParams = this.setLocalData(partialData);
     //  rise events change event and publish
     this.emitOnChange(updatedParams);
+
+    try {
+      await this.save(
+        () => this.setter && this.setter(partialData),
+        `Can't save ${this.typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`
+      );
+    }
+    catch (err) {
+      // on error return to previous state
+      // set to local data
+      this.setLocalData(oldData);
+      //  rise events change event and publish
+      this.emitOnChange(updatedParams);
+    }
+
   }
 
   protected validateParam(statusName: string, value: any, errorMsg: string) {
