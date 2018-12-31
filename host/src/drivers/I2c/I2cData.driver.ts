@@ -88,7 +88,7 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
 
   private async sendLength(i2cAddress: string | number | undefined, dataMark: number, dataLength: number): Promise<void> {
     if (dataLength < MIN_DATA_LENGTH) {
-      throw new Error(`Incorrect received data length ${dataLength}`);
+      throw new Error(`I2cData.i2cAddress: Incorrect data length ${dataLength}`);
     }
 
     // max is 0xffff - 16 bit (2 bytes) integer
