@@ -2,13 +2,16 @@
 
 class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;
+  private readonly onResove: (data: any) => void;
+  private readonly onReject: (err: Error) => void;
 
-  constructor(sendCb: (...p: any[]) => Promise<any>) {
-
+  constructor(onResove: (data: any) => void, onReject: (err: Error) => void) {
+    this.onResove = onResove;
+    this.onReject = onReject;
   }
 
-  setData(dataToSend: any[]) {
-
+  setCb(sendCb: (...p: any[]) => Promise<any>) {
+    this.sendCb = sendCb;
   }
 
 }
@@ -16,19 +19,27 @@ class SenderRequest {
 export default class Sender {
   private readonly requests: {[index: string]: SenderRequest} = {};
 
-  send<T>(id: string, sendCb: (...p: any[]) => Promise<T>, dataToSend: any[]): Promise<T> {
+  send<T>(id: string, sendCb: (...p: any[]) => Promise<T>): Promise<T> {
+
+    // TODO: можно не создавать постоянно новый промис
+
     return new Promise((resolve, reject) => {
       if (!this.requests[id]) {
-        this.requests[id] = new SenderRequest();
+        // make new request
+        this.requests[id] = new SenderRequest(
+          (data: T) => {
+            delete this.requests[id];
+            resolve(data);
+          },
+          (err: Error) => {
+            delete this.requests[id];
+            reject(err);
+          }
+        );
       }
 
-      const request: SenderRequest = this.requests[id];
-
-      request.setData(dataToSend);
-
-
-
-      // TODO: по завершению удалить requrest
+      // update callback. It can send the last data
+      this.requests[id].setCb(sendCb);
     });
   }
 
