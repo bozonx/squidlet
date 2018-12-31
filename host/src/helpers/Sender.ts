@@ -6,10 +6,8 @@ class SenderRequest {
   private readonly onReject: (err: Error) => void;
   private readonly timeout: number;
   private readonly resendTimout: number;
-  private started: boolean = false;
+  private startedTimeStamp: number = 0;
 
-
-  // TODO: add main timeout
 
   constructor(timeout: number, resendTimout: number, onResove: (data: any) => void, onReject: (err: Error) => void) {
     this.timeout = timeout;
@@ -23,29 +21,35 @@ class SenderRequest {
   }
 
   start() {
-    if (this.started) return;
+    if (this.startedTimeStamp) return;
 
-    this.started = true;
+    this.startedTimeStamp = new Date().getTime();
 
     this.trySend();
   }
 
 
   private trySend() {
-    if (!this.sendCb) throw new Error(`sendCb wasn't set`);
+    if (!this.sendCb) return this.onReject(new Error(`sendCb wasn't set`));
 
     this.sendCb()
-      .then(this.finish)
+      .then(this.success)
       .catch((err: Error) => {
-        // TODO: check main timeout
+        if (new Date().getTime() >= this.startedTimeStamp + this.timeout) {
+          // stop trying and call reject
+          this.onReject(err);
+
+          return;
+        }
 
         setTimeout(() => {
-
+          // try another one
+          this.trySend();
         }, this.resendTimout);
       });
   }
 
-  private finish = (data: any) => {
+  private success = (data: any) => {
     this.onResove(data);
   }
 
