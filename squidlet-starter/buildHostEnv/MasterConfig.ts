@@ -72,9 +72,11 @@ export default class MasterConfig {
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
+    const preHostsConfigs: {[index: string]: PreHostConfig} = this.resolveHosts(masterConfig);
+
     appendArray(this.plugins, masterConfig.plugins);
     _defaultsDeep(this.hostDefaults, masterConfig.hostDefaults);
-    _defaultsDeep(this.preHosts, this.generatePreHosts(this.resolveHosts(masterConfig)));
+    _defaultsDeep(this.preHosts, this.generatePreHosts(preHostsConfigs));
     this._buildDir = this.resolveBuildDir();
   }
 
