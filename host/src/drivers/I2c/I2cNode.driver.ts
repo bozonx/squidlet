@@ -104,7 +104,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
   }
 
   async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}, ${JSON.stringify(data)})`;
+    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}})`;
+
+    console.log(666666666, this.addressHex, dataAddress, data)
 
     this.sender && await this.sender.send<void>(senderId, (): Promise<void> => {
       return this.i2cMaster.write(this.addressHex, dataAddress, data);
@@ -130,7 +132,7 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    * Write and read from the same data address.
    */
   async request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${JSON.stringify(dataToSend)}, ${readLength})`;
+    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${readLength})`;
     const result: Uint8Array = await (this.sender as Sender)
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);

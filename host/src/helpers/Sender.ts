@@ -43,7 +43,7 @@ class SenderRequest {
     this.sendCb()
       .then(this.success)
       .catch((err: Error) => {
-        if (new Date().getTime() >= this.startedTimeStamp + (this.timeoutMs)) {
+        if (new Date().getTime() >= this.startedTimeStamp + this.timeoutMs) {
           delete this.sendCb;
           // stop trying and call reject
           this.onReject(err);
@@ -93,6 +93,10 @@ export default class Sender {
           this.timeoutSec,
           this.resendTimeoutSec,
           (data: T) => {
+
+            // TODO: print in debug
+            console.log(`Request successfully is finished ${id}`);
+
             delete this.requests[id];
             resolve(data);
           },
