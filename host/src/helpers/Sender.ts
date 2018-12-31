@@ -4,6 +4,8 @@ class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;
   private readonly onResove: (data: any) => void;
   private readonly onReject: (err: Error) => void;
+  private started: boolean = false;
+
 
   constructor(onResove: (data: any) => void, onReject: (err: Error) => void) {
     this.onResove = onResove;
@@ -11,16 +13,24 @@ class SenderRequest {
   }
 
   setCb(sendCb: (...p: any[]) => Promise<any>) {
-    const wasStarted: boolean = Boolean(this.sendCb());
-
     this.sendCb = sendCb;
-
-    if (!wasStarted) this.start();
   }
 
+  start() {
+    if (!this.sendCb) throw new Error(`sendCb wasn't set`);
+    if (this.started) return;
 
-  private start() {
+    this.started = true;
 
+    this.sendCb()
+      .then(this.finish)
+      .catch((err: Error) => {
+
+      });
+  }
+
+  finish = (data: any) => {
+    this.onResove(data);
   }
 
 }
@@ -49,6 +59,7 @@ export default class Sender {
 
       // update callback. It can send the last data
       this.requests[id].setCb(sendCb);
+      this.requests[id].start();
     });
   }
 
