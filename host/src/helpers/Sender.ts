@@ -11,7 +11,16 @@ class SenderRequest {
   }
 
   setCb(sendCb: (...p: any[]) => Promise<any>) {
+    const wasStarted: boolean = Boolean(this.sendCb());
+
     this.sendCb = sendCb;
+
+    if (!wasStarted) this.start();
+  }
+
+
+  private start() {
+
   }
 
 }
