@@ -18,6 +18,7 @@ interface EspruinoI2cBus {
 
 export default class I2cMasterDev implements I2cMaster {
   async writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void> {
+  //async writeTo(bus: string, addrHex: number, data: Uint8Array | undefined): Promise<void> {
     if (!(typeof data === 'object' && data.constructor.name === 'Uint8Array')) {
       throw new Error(`Supports only a Uint8Array. Your data is ${JSON.stringify(data)}`);
     }

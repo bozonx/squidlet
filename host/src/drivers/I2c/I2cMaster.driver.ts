@@ -63,6 +63,23 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
     return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
   }
 
+  // /**
+  //  * Write only a dataAddress or nothing to bus
+  //  */
+  // writeEmpty(addressHex: number, dataAddress: number | undefined): Promise<void> {
+  //   // send nothing
+  //   if (typeof dataAddress === 'undefined') {
+  //     return this.i2cMasterDev.writeTo(this.props.bus, addressHex);
+  //   }
+  //
+  //   // send only a data address
+  //   const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+  //
+  //   dataToWrite[0] = dataAddress;
+  //
+  //   return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+  // }
+
   /**
    * Write and read from the same data address.
    */

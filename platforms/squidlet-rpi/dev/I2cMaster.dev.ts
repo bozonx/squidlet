@@ -10,6 +10,8 @@ export default class I2cMasterDev implements I2cMaster {
   private readonly instances: {[index: string]: I2cBus} = {};
 
 
+  // writeTo(bus: string, addrHex: number, data: Uint8Array | undefined): Promise<void> {
+  //   const buffer = (data) ? Buffer.from(data) : new Buffer(0);
   writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void> {
     const buffer = Buffer.from(data);
 
@@ -17,7 +19,7 @@ export default class I2cMasterDev implements I2cMaster {
       const callback = (err: Error, bytesWritten: number) => {
         if (err) return reject(err);
 
-        if (data.length !== bytesWritten) {
+        if (data && data.length !== bytesWritten) {
           return reject(new Error(
             `Wrong number of bytes has been written. Tried to write ${data.length}, but eventually written ${bytesWritten}`
           ));

@@ -44,6 +44,10 @@ class SenderRequest {
         }
 
         setTimeout(() => {
+
+          // TODO: print in debug
+          console.log('resending');
+
           // try another one
           this.trySend();
         }, this.resendTimeoutMs);
