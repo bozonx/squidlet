@@ -1,0 +1,8 @@
+#I2cNodeDriverBaseProps
+int:
+bus:
+address:
+
+# MasterSlaveBusProps
+feedback:
+pollInterval:

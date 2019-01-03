@@ -324,82 +324,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     return;
   }
 
-
-
-  // /**
-  //  * Define a pin as an output.
-  //  * This marks the pin to be used as an output pin.
-  //  * It just setup pin but don't set initial value, you should set it manually.
-  //  * @param  {number}  pin          The pin number. (0 to 7)
-  //  * @return {Promise}
-  //  */
-  // async setupOutputPin(pin: number, outputInitialValue: boolean) {
-  //   if (pin < 0 || pin > 7) {
-  //     throw new Error('Pin out of range');
-  //   }
-  //
-  //   this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
-  //   this.directions[pin] = DIR_OUT;
-  //
-  //   // // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
-  //   // if (typeof (initialValue) === 'undefined') {
-  //   //   return;
-  //   // }
-  //   // else {
-  //   //
-  //   //   // TODO: review
-  //   //
-  //   //   return this._setPinInternal(pin, initialValue);
-  //   // }
-  // }
-  //
-  // /**
-  //  * Define a pin as an input.
-  //  * This marks the pin for input processing and activates the high level on this pin.
-  //  * @param  {number} pin      The pin number. (0 to 7)
-  //  * @return {Promise}
-  //  */
-  // async setupInputPin(pin: number): Promise<void> {
-  //   if (pin < 0 || pin > 7) {
-  //     return Promise.reject(new Error('Pin out of range'));
-  //   }
-  //
-  //   this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
-  //   this.directions[pin] = DIR_IN;
-  //
-  //   // TODO: нужно записать после установки пинов
-  //
-  //   // call writeToIc() to activate the high level on the input pin ...
-  //   //await this.writeToIc();
-  //
-  //   // TODO: может не делать на время конфигурации ???
-  //
-  //   // ... and then poll all current inputs with noEmit on this pin to suspress the event
-  //   //await this._poll(pin);
-  // }
-
-  // private resolveInitialState(): number {
-  //   if (this.props.initialState === true) {
-  //     return 255;
-  //   }
-  //   else if (this.props.initialState === false) {
-  //     return 0;
-  //   }
-  //   else if (
-  //     typeof(this.props.initialState) !== 'number'
-  //     || this.props.initialState < 0
-  //     || this.props.initialState > 255
-  //   ) {
-  //     throw new Error('InitalState bitmask out of range');
-  //   }
-  //
-  //   return this.props.initialState;
-  // }
-
 }
 
 
 export default class Factory extends DriverFactoryBase<PCF8574Driver> {
+
+  // TODO: review - может быть и wifi и ble
+
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     const bus: string = (props.bus) ? String(props.bus) : 'default';
 

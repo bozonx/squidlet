@@ -1,0 +1,7 @@
+name: Pcf8574
+type: expander
+main: ./Pcf8574.ts
+drivers:
+  - Pcf8574.driver
+
+props: ./props.yaml

@@ -1,0 +1,11 @@
+# if set driver will resend last output state to expander with interval in ms.
+resendStateInterval:
+  type: number
+
+# I2cNode.driver
+bus:
+address:
+feedback:
+pollInterval:
+  default: 100
+int:

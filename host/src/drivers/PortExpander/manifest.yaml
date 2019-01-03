@@ -1,0 +1,5 @@
+name: PortExpander.driver
+main: PortExpander.driver.ts
+drivers:
+  - I2cNode.driver
+props: ./props.yaml

@@ -21,6 +21,8 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'FakePeopleCount/manifest.yaml'));
   // TODO: remove
   await env.addDevice(path.join(devicesRoot, 'Pcf8574/manifest.yaml'));
+  // TODO: remove
+  await env.addDevice(path.join(devicesRoot, 'PortExpander/manifest.yaml'));
 
   // drivers
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.driver.yaml'));
@@ -40,6 +42,8 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_pcf8574.driver.yaml'));
   // TODO: remove
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
+  // TODO: remove
+  await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));
 
   // network connections drivers
   //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection.driver'));
