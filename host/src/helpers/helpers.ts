@@ -104,7 +104,7 @@ export function byteToBinArr(hexValue: number): boolean[] {
  * Update specific position in bitmask.
  * E.g updateBitInByte(0, 2, true) ===> 4 (00000100)
  * @param byte
- * @param position
+ * @param position - from 0 to 7
  * @param value
  */
 export function updateBitInByte(byte: number, position: number, value: boolean): number {

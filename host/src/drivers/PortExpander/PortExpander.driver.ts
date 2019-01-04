@@ -9,9 +9,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-//import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
 import {byteToBinArr, getHexNumber, updateBitInByte} from '../../helpers/helpers';
-import {PinMode} from '../../app/interfaces/dev/Digital';
 import {omit} from '../../helpers/lodashLike';
 import Connection, {Handler} from './Connection';
 import DriverBase from '../../app/entities/DriverBase';
@@ -88,7 +86,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   // private inputPinBitmask: number = 0;
   /** Bitmask representing the current state of the pins. */
   private currentState: number = 0;
-  // TODO: review
   private wasIcInited: boolean = false;
 
 
@@ -284,6 +281,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     catch (err) {
       this.env.log.error(`PortExpander.driver. Can't write initial output values to IC, props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
+
+    this.wasIcInited = true;
+    delete this.pinModes;
+    delete this.initialOutputValues;
   }
 
   private async writePinModes(pinModes: {[index: string]: number}) {
@@ -304,6 +305,20 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   private async writeOutputValues(outputValues: {[index: string]: boolean}) {
+
+    // TODO: test
+
+    const numOfBytes: number = Math.ceil(this.props.pinCount / 8);
+    const dataToSend: Uint8Array = new Uint8Array(numOfBytes);
+
+    for (let i = 0; i < this.props.pinCount; i++) {
+      // number of byte from 0
+      const byteNum: number = Math.floor(i / 8);
+      //const positionInByte: number = (Math.floor(i / 8) * 8);
+      const positionInByte: number = i - (byteNum * 8);
+
+      dataToSend[byteNum] = updateBitInByte(dataToSend[byteNum], positionInByte, outputValues[i]);
+    }
 
     await this.connection.write(undefined, dataToSend);
   }
@@ -388,14 +403,14 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<PCF8574Driver> {
+export default class Factory extends DriverFactoryBase<PortExpanderDriver> {
 
   // TODO: review - может быть и wifi и ble
 
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
-    const bus: string = (props.bus) ? String(props.bus) : 'default';
-
-    return `${bus}-${props.address}`;
-  }
-  protected DriverClass = PCF8574Driver;
+  // protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  //   const bus: string = (props.bus) ? String(props.bus) : 'default';
+  //
+  //   return `${bus}-${props.address}`;
+  // }
+  protected DriverClass = PortExpanderDriver;
 }
