@@ -9,10 +9,10 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {byteToBinArr, getHexNumber, updateBitInByte} from '../../helpers/helpers';
+import {updateBitInByte} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
-import Connection, {Handler} from './Connection';
 import DriverBase from '../../app/entities/DriverBase';
+import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
 
 
 //  extends I2cNodeDriverBaseProps
@@ -70,8 +70,6 @@ const NO_MODE = 0x21;
 
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
-  private readonly connection: Connection = new Connection();
-
   // pin modes which are stored during init time while setup IC is finished.
   private pinModes: {[index: string]: number} = {};
   // output pin values which are stored during init time while setup IC is finished.
@@ -88,13 +86,25 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private currentState: number = 0;
   private wasIcInited: boolean = false;
 
+  private get node(): NodeDriver {
+    return this.depsInstances.node as NodeDriver;
+  }
+
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    await this.connection.init(this.props, getDriverDep);
+
+    // TODO: choose driver
+
+    this.depsInstances.node = await getDriverDep('I2cNode.driver')
+      .getInstance({
+        ...omit(this.props, 'pinCount'),
+        pollDataLength: 1,
+        pollDataAddress: undefined,
+      });
   }
 
   protected didInit = async () => {
-    this.connection.addPollErrorListener((err: Error) => {
+    this.node.addPollErrorListener((err: Error) => {
       this.env.log.error(String(err));
     });
   }
@@ -142,16 +152,16 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     // TODO: review
 
-    const wrapper: Handler = () => {
+    const wrapper: NodeHandler = () => {
       this.setLastReceivedState();
       handler(null, this.getValues());
     };
 
-    return this.connection.addListener(wrapper);
+    return this.node.addListener(wrapper);
   }
 
   removeListener(handlerIndex: number) {
-    this.connection.removeListener(handlerIndex);
+    this.node.removeListener(handlerIndex);
   }
 
   /**
@@ -170,7 +180,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
 
-    await this.connection.poll();
+    await this.node.poll();
     this.setLastReceivedState();
 
     return this.getValues();
@@ -240,7 +250,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     dataToSend[1] = this.getHexPinNumber(pin);
     dataToSend[2] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
 
-    await this.connection.write(undefined, dataToSend);
+    await this.node.write(undefined, dataToSend);
   }
 
   /**
@@ -263,7 +273,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       dataToSend[byteNum] = updateBitInByte(dataToSend[byteNum], positionInByte, outputValues[i]);
     }
 
-    await this.connection.write(undefined, dataToSend);
+    await this.node.write(undefined, dataToSend);
   }
 
 
@@ -305,7 +315,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       }
     }
 
-    await this.connection.write(undefined, dataToSend);
+    await this.node.write(undefined, dataToSend);
   }
 
   private getHexPinNumber(pin: number): number {
@@ -317,7 +327,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     // TODO: review
 
-    const lastData: Uint8Array | undefined = this.connection.getLastData();
+    const lastData: Uint8Array | undefined = this.node.getLastData();
 
     if (!lastData) return;
 
