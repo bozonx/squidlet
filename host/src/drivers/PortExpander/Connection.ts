@@ -1,15 +1,16 @@
-
-import {ErrorHandler, I2cNodeDriver} from '../I2c/I2cNode.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {ExpanderDriverProps} from './PortExpander.driver';
+import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
 
 
-export type Handler = (data: Uint8Array) => void;
+
 
 
 export default class Connection {
-  private get i2cNode(): I2cNodeDriver {
-    return this.depsInstances.i2cNode as I2cNodeDriver;
+  private _node?: NodeDriver;
+
+  private get node(): NodeDriver {
+    return this._node as NodeDriver;
   }
 
 
@@ -18,41 +19,41 @@ export default class Connection {
   }
 
   async init(props: ExpanderDriverProps, getDriverDep: GetDriverDep) {
-    this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
+    this._node = await getDriverDep('I2cNode.driver')
       .getInstance({
         //...omit(this.props, 'resendStateInterval'),
-        ...this.props,
+        ...props,
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
   }
 
-  addListener(handler: Handler): number {
-    // TODO: add
+  addListener(handler: NodeHandler): number {
+    return this.node.addListener(handler);
   }
 
   removeListener(handlerIndex: number): void {
-    // TODO: add
+    return this.node.removeListener(handlerIndex);
   }
 
   addPollErrorListener(handler: ErrorHandler): number {
-    // TODO: add
+    return this.node.addPollErrorListener(handler);
   }
 
   removePollErrorListener(handlerIndex: number): void {
-    // TODO: add
+    return this.node.removePollErrorListener(handlerIndex);
   }
 
   async poll(): Promise<Uint8Array> {
-    // TODO: add
+    return this.node.poll();
   }
 
   getLastData(): Uint8Array {
-    // TODO: add
+    return this.node.getLastData();
   }
 
   async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
-    // TODO: add
+    return this.node.write(dataAddress, data);
   }
 
 }
