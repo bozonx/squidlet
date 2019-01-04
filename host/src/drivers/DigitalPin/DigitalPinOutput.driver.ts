@@ -71,11 +71,11 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   }
 
   private async digitalWrite(value: boolean): Promise<void> {
-    const pinMode: PinMode | undefined = await this.gpio.getPinMode(this.props.pin);
-
-    if (!pinMode || !pinMode.match(/output/)) {
-      throw new Error(`Can't set level. The GPIO pin "${this.props.pin}" wasn't set up as an output pin.`);
-    }
+    // const pinMode: PinMode | undefined = await this.gpio.getPinMode(this.props.pin);
+    //
+    // if (!pinMode || !pinMode.match(/output/)) {
+    //   throw new Error(`Can't set level. The GPIO pin "${this.props.pin}" wasn't set up as an output pin.`);
+    // }
 
     return this.gpio.write(this.props.pin, value);
   }

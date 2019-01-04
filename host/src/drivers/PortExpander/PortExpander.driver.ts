@@ -1,8 +1,9 @@
 /*
  * Driver for port expander based on arduino.
- * It supports the next types connection:
+ * It supports the next types of connection:
  * * I2C
  * * Serial
+ * * LAN
  * * Wifi
  * * Bluetooth
  */
@@ -15,9 +16,10 @@ import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
 
 
-//  extends I2cNodeDriverBaseProps
 export interface ExpanderDriverProps {
   pinCount: number;
+  // connection params
+  [index: string]: any;
 }
 
 export type PortExpanderPinMode = 'input'
@@ -71,7 +73,7 @@ const NO_MODE = 0x21;
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   // pin modes which are stored during init time while setup IC is finished.
-  private pinModes: {[index: string]: number} = {};
+  private pinModes: number[] = [];
   // output pin values which are stored during init time while setup IC is finished.
   private initialOutputValues: boolean[] = [];
 
@@ -143,6 +145,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     this.pinModes[pin] = MODES[pinMode];
+
+
+    console.log(444444444, this.pinModes[pin]);
   }
 
   /**
@@ -244,13 +249,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       throw new Error('Pin out of range');
     }
 
-    const dataToSend: Uint8Array = new Uint8Array(3);
+    const dataToSend: Uint8Array = new Uint8Array(2);
 
-    dataToSend[0] = COMMANDS.setOutputValue;
-    dataToSend[1] = this.getHexPinNumber(pin);
-    dataToSend[2] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
+    dataToSend[0] = this.getHexPinNumber(pin);
+    dataToSend[1] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
 
-    await this.node.write(undefined, dataToSend);
+    await this.node.write(COMMANDS.setOutputValue, dataToSend);
   }
 
   /**
@@ -273,7 +277,11 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       dataToSend[byteNum] = updateBitInByte(dataToSend[byteNum], positionInByte, outputValues[i]);
     }
 
-    await this.node.write(undefined, dataToSend);
+    console.log(222222222, this.props, dataToSend);
+
+    // TODO: add command
+
+    await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
   }
 
 
@@ -301,21 +309,23 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     delete this.initialOutputValues;
   }
 
-  private async writePinModes(pinModes: {[index: string]: number}) {
-    const dataToSend: Uint8Array = new Uint8Array(this.props.pinCount + 1);
+  private async writePinModes(pinModes: number[]) {
+    const dataToSend: Uint8Array = new Uint8Array(this.props.pinCount);
 
-    dataToSend[0] = COMMANDS.setupAll;
+    // TODO: pinMddes можно уже сформировать заранее
 
     for (let i = 0; i < this.props.pinCount; i++) {
       if (pinModes[i]) {
-        dataToSend[i + 1] = pinModes[i];
+        dataToSend[i] = pinModes[i];
       }
       else {
-        dataToSend[i + 1] = NO_MODE;
+        dataToSend[i] = NO_MODE;
       }
     }
 
-    await this.node.write(undefined, dataToSend);
+    console.log(111111111, this.props, pinModes, dataToSend);
+
+    await this.node.write(COMMANDS.setupAll, dataToSend);
   }
 
   private getHexPinNumber(pin: number): number {
