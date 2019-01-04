@@ -1,6 +1,10 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ExpanderDriverProps, PortExpanderDriver} from '../../drivers/PortExpander/PortExpander.driver';
+import {
+  ExpanderDriverProps,
+  PortExpanderDriver,
+  PortExpanderPinMode
+} from '../../drivers/PortExpander/PortExpander.driver';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import PublishParams from '../../app/interfaces/PublishParams';
 
@@ -29,7 +33,7 @@ export default class PortExpander extends DeviceBase<Props> {
       return this.expander.setup(pin, pinMode, outputInitialValue);
     },
 
-    getPinMode: (pin: number): Promise<'input' | 'output' | undefined> => {
+    getPinMode: (pin: number): Promise<PortExpanderPinMode | undefined> => {
       return this.expander.getPinMode(pin);
     },
 
@@ -47,7 +51,7 @@ export default class PortExpander extends DeviceBase<Props> {
   }
 
   setStatus = async (newValue: boolean[]): Promise<void> => {
-    return this.expander.writeState(newValue);
+    return this.expander.writeOutputValues(newValue);
   }
 
   protected transformPublishValue = (binArr: number[]): string => {

@@ -75,7 +75,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   // pin modes which are stored during init time while setup IC is finished.
   private pinModes: {[index: string]: number} = {};
   // output pin values which are stored during init time while setup IC is finished.
-  private initialOutputValues: {[index: string]: boolean} = {};
+  private initialOutputValues: boolean[] = [];
 
   // /** Direction of each pin. By default all pin directions are undefined. */
   // private directions:Array<number> = [
@@ -200,6 +200,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     // TODO: make promise and in pcf too
 
     //return byteToBinArr(this.currentState);
+
+    return [];
   }
 
   /**
@@ -217,6 +219,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     // TODO: read from expander
 
     //return ((this.currentState>>pin) % 2 !== 0);
+
+    return true;
   }
 
   /**
@@ -243,25 +247,25 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Set new state of all the output pins.
    * Not output pins (input, undefined) are ignored.
    */
-  async writeState(values: boolean[]): Promise<void> {
+  async writeOutputValues(outputValues: boolean[]) {
 
-    // TODO: review
+    // TODO: test
 
-    // let newState: number = this.currentState;
-    //
-    // for (let pin = 0; pin <= this.getLastPinNum(); pin++) {
-    //   if (this.directions[pin] !== DIR_OUT) {
-    //     // isn't an output pin
-    //     continue;
-    //   }
-    //
-    //   newState = this.updatePinInBitMask(newState, pin, values[pin]);
-    // }
-    //
-    // this.currentState = newState;
-    //
-    // return this.writeToIc();
+    const numOfBytes: number = Math.ceil(this.props.pinCount / 8);
+    const dataToSend: Uint8Array = new Uint8Array(numOfBytes);
+
+    for (let i = 0; i < this.props.pinCount; i++) {
+      // number of byte from 0
+      const byteNum: number = Math.floor(i / 8);
+      //const positionInByte: number = (Math.floor(i / 8) * 8);
+      const positionInByte: number = i - (byteNum * 8);
+
+      dataToSend[byteNum] = updateBitInByte(dataToSend[byteNum], positionInByte, outputValues[i]);
+    }
+
+    await this.connection.write(undefined, dataToSend);
   }
+
 
   /**
    * Do first write to IC if it doesn't do before.
@@ -299,25 +303,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       else {
         dataToSend[i + 1] = NO_MODE;
       }
-    }
-
-    await this.connection.write(undefined, dataToSend);
-  }
-
-  private async writeOutputValues(outputValues: {[index: string]: boolean}) {
-
-    // TODO: test
-
-    const numOfBytes: number = Math.ceil(this.props.pinCount / 8);
-    const dataToSend: Uint8Array = new Uint8Array(numOfBytes);
-
-    for (let i = 0; i < this.props.pinCount; i++) {
-      // number of byte from 0
-      const byteNum: number = Math.floor(i / 8);
-      //const positionInByte: number = (Math.floor(i / 8) * 8);
-      const positionInByte: number = i - (byteNum * 8);
-
-      dataToSend[byteNum] = updateBitInByte(dataToSend[byteNum], positionInByte, outputValues[i]);
     }
 
     await this.connection.write(undefined, dataToSend);

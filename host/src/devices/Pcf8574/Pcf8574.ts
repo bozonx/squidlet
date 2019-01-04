@@ -47,7 +47,7 @@ export default class Pcf8574 extends DeviceBase<Props> {
   }
 
   setStatus = async (newValue: boolean[]): Promise<void> => {
-    return this.expander.writeState(newValue);
+    return this.expander.writeOutputValues(newValue);
   }
 
   protected transformPublishValue = (binArr: number[]): string => {

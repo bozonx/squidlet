@@ -207,7 +207,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Set new state of output pins.
    * Not output pins (input, undefined) are ignored.
    */
-  async writeState(values: boolean[]): Promise<void> {
+  async writeOutputValues(values: boolean[]): Promise<void> {
     let newState: number = this.currentState;
 
     for (let pin = 0; pin < 8; pin++) {
