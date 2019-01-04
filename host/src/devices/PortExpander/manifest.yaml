@@ -1,7 +1,7 @@
-name: Pcf8574
+name: PortExpander
 type: expander
-main: ./Pcf8574.ts
+main: ./PortExpander.ts
 drivers:
-  - Pcf8574.driver
+  - PortExpander.driver
 
 props: ./props.yaml

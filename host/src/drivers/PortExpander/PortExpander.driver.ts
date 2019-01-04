@@ -400,6 +400,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
 export default class Factory extends DriverFactoryBase<PortExpanderDriver> {
 
+  protected instanceAlwaysNew = true;
   // TODO: review - может быть и wifi и ble
 
   // protected instanceIdCalc = (props: {[index: string]: any}): string => {
