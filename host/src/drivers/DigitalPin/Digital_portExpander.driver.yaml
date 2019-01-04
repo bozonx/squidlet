@@ -1,0 +1,17 @@
+name: Digital_portExpander.driver
+main: Digital_portExpander.driver.ts
+type: system
+
+drivers:
+  - PortExpander.driver
+
+props:
+  expander:
+    type: string
+    required: true
+#  # PortExpander.driver
+#  bus:
+#  address:
+#  feedback:
+#  pollInterval:
+#  int:

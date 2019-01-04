@@ -4,7 +4,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import {byteToBinArr, updateBitInByte} from '../../helpers/helpers';
-import {ResultHandler} from './PortExpander.driver';
+import Connection from './Connection';
 
 export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
   pinCount: number;
@@ -22,16 +22,19 @@ export const DIR_OUT = 0;
 
 
 export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
-  /** Direction of each pin. By default all pin directions are undefined. */
-  private directions:Array<number> = [
-    DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
-    DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
-  ];
+  private readonly connection: Connection = new Connection();
+  // /** Direction of each pin. By default all pin directions are undefined. */
+  // private directions:Array<number> = [
+  //   DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
+  //   DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
+  // ];
   /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
   private inputPinBitmask: number = 0;
   /** Bitmask representing the current state of the pins. */
   private currentState: number = 0;
   private wasIcInited: boolean = false;
+
+  // TODO: init connection
 
 
   async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
@@ -39,11 +42,11 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
       throw new Error('Pin out of range');
     }
 
-    if (this.directions[pin] !== DIR_UNDEF) {
-      this.env.log.warn(`PCF8574Driver.setup(${pin}, ${pinMode}, ${outputInitialValue}). This pin has been already set up`);
-
-      return;
-    }
+    // if (this.directions[pin] !== DIR_UNDEF) {
+    //   this.env.log.warn(`PCF8574Driver.setup(${pin}, ${pinMode}, ${outputInitialValue}). This pin has been already set up`);
+    //
+    //   return;
+    // }
 
     if (pinMode === 'output') {
       // output pin
@@ -52,7 +55,7 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
       }
 
       this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
-      this.directions[pin] = DIR_OUT;
+      //this.directions[pin] = DIR_OUT;
       // update local state
       this.currentState = this.updatePinInBitMask(this.currentState, pin, outputInitialValue);
     }
@@ -64,7 +67,7 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
 
       // set input pin to high
       this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
-      this.directions[pin] = DIR_IN;
+      //this.directions[pin] = DIR_IN;
     }
   }
 
@@ -77,11 +80,11 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
       handler(null, this.getValues());
     };
 
-    return this.i2cNode.addListener(wrapper);
+    return this.connection.addListener(wrapper);
   }
 
   removeListener(handlerIndex: number) {
-    this.i2cNode.removeListener(handlerIndex);
+    this.connection.removeListener(handlerIndex);
   }
 
   /**
@@ -97,19 +100,22 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
 
-    await this.i2cNode.poll();
+    await this.connection.poll();
     this.setLastReceivedState();
 
     return this.getValues();
   }
 
   async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
-    if (this.directions[pin] === DIR_IN) {
-      return 'input';
-    }
-    else if (this.directions[pin] === DIR_OUT) {
-      return 'output';
-    }
+
+    // TODO: make requrest
+
+    // if (this.directions[pin] === DIR_IN) {
+    //   return 'input';
+    // }
+    // else if (this.directions[pin] === DIR_OUT) {
+    //   return 'output';
+    // }
 
     // undefined means didn't specify
     return;
@@ -147,9 +153,9 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
     if (pin < 0 || pin > 7) {
       throw new Error('Pin out of range');
     }
-    else if (this.directions[pin] !== DIR_OUT) {
-      throw new Error('Pin is not defined as output');
-    }
+    // else if (this.directions[pin] !== DIR_OUT) {
+    //   throw new Error('Pin is not defined as output');
+    // }
 
     // update local state
     this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
@@ -180,7 +186,7 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
 
 
   private setLastReceivedState() {
-    const lastData: Uint8Array | undefined = this.i2cNode.getLastData();
+    const lastData: Uint8Array | undefined = this.connection.getLastData();
 
     if (!lastData) return;
 
@@ -225,7 +231,7 @@ export default class PortExpanderBase extends DriverBase<ExpanderDriverProps> {
     // send one byte to IC
     dataToSend[0] = newIcState;
 
-    await this.i2cNode.write(undefined, dataToSend);
+    await this.connection.write(undefined, dataToSend);
   }
 
 
