@@ -49,6 +49,8 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
 
       // TODO: нужно же обработать ошибку??? или она напишется в лог в Devices?
 
+      // TODO: review
+
       // if (err) {
       //   this.env.log.error(String(err));
       //
@@ -122,8 +124,6 @@ export default class Factory extends DriverFactoryBase<DigitalPortExpanderDriver
    * It generates unique id for DigitalPin input and output driver
    */
   generateUniqId(props: {[index: string]: any}): string {
-    const bus: string = (props.bus) ? String(props.bus) : 'default';
-
-    return `${bus}-${props.address}`;
+    return props.expander;
   }
 }

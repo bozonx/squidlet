@@ -41,6 +41,8 @@ export default async function systemPlugin (env: PluginEnv) {
   // TODO: remove
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_pcf8574.driver.yaml'));
   // TODO: remove
+  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_portExpander.driver.yaml'));
+  // TODO: remove
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   // TODO: remove
   await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));

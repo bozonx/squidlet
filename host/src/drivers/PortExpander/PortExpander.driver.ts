@@ -14,7 +14,7 @@ import PortExpanderBase from './PortExpanderBase';
 
 
 
-export class PCF8574Driver extends PortExpanderBase {
+export class PortExpanderDriver extends PortExpanderBase {
   // TODO: сделать прослойку выполняющую запрос
 
   private get i2cNode(): I2cNodeDriver {

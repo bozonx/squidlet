@@ -1,6 +1,6 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ExpanderDriverProps, PCF8574Driver} from '../../drivers/Pcf8574/Pcf8574.driver';
+import {ExpanderDriverProps, PortExpanderDriver} from '../../drivers/PortExpander/PortExpander.driver';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import PublishParams from '../../app/interfaces/PublishParams';
 
@@ -9,13 +9,13 @@ interface Props extends DeviceBaseProps, ExpanderDriverProps {
 }
 
 
-export default class Pcf8574 extends DeviceBase<Props> {
-  private get expander(): PCF8574Driver {
-    return this.depsInstances.expander as PCF8574Driver;
+export default class PortExpander extends DeviceBase<Props> {
+  private get expander(): PortExpanderDriver {
+    return this.depsInstances.expander as PortExpanderDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
+    this.depsInstances.expander = await getDriverDep('PortExpander.driver')
       .getInstance(this.props);
   }
 
