@@ -363,3 +363,11 @@ export function basename(pathToDirOrFile: string): string {
 
   return pathParts[pathParts.length - 1];
 }
+
+export function getHexNumber(num: number): number {
+  if (num < 0 || num > 9) {
+    throw new Error(`getHexNumber: Incorrect number to convert "${num}"`);
+  }
+
+  return num + 48;
+}
