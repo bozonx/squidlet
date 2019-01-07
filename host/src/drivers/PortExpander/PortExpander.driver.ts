@@ -23,8 +23,11 @@ export interface ExpanderDriverProps {
 }
 
 export interface State {
+  // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
   inputs: (boolean | undefined)[];
   outputs: (boolean | undefined)[];
+  // like {pinNum: value}
+  analogInputs: {[index: string]: number};
 }
 
 export type PortExpanderPinMode = 'input'
@@ -71,11 +74,10 @@ const NO_MODE = 0x21;
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   // pin modes which are stored during init time while setup IC is finished.
   private pinModes: number[] = [];
-  // output pin values which are stored during init time while setup IC is finished.
-  private initialOutputValues: boolean[] = [];
-  private currentState: State = {
+  private state: State = {
     inputs: [],
     outputs: [],
+    analogInputs: {},
   };
   private wasIcInited: boolean = false;
 
@@ -117,13 +119,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.props.pinCount - 1;
   }
 
-  /**
-   * Returns array like [true, undefined, false, ...].
-   * There is indexes are pin numbers.
-   * Undefined is for not input or output pins.
-   */
   getState(): State {
-    return this.currentState;
+    return this.state;
   }
 
   /**
@@ -140,8 +137,14 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
         throw new Error(`You have to specify an outputInitialValue`);
       }
 
-      this.initialOutputValues[pin] = outputInitialValue;
+      this.state.outputs[pin] = outputInitialValue;
     }
+    // else if (pinMode === 'input' || pinMode === 'input_pullup' || pinMode === 'input_pulldown') {
+    //   this.state.inputs[pin] = false;
+    // }
+    // else {
+    //   throw new Error(`Unsupported pin mode "${pinMode}"`);
+    // }
 
     this.pinModes[pin] = MODES[pinMode];
   }
