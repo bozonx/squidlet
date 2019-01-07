@@ -14,6 +14,7 @@ import {getKeyOfObject, updateBitInByte} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
+import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
 
 
 export interface ExpanderDriverProps {
@@ -215,17 +216,24 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Set the value of an output pin.
+   * Set the value of an digital output pin.
    * @param  {number}  pin   - The pin number. e.g 0 to 16
    * @param  {boolean} value - The new value for this pin.
    * @return {Promise}
    */
-  async write(pin: number, value: boolean): Promise<void> {
+  async writeDigital(pin: number, value: boolean): Promise<void> {
     if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('Pin out of range');
+      throw new Error('PortExpanderDriver.writeDigital: Pin out of range');
     }
 
-    // TODO: review - rename to writeDigital
+    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
+
+    if (!pinMode) {
+      throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" hasn't been set up`);
+    }
+    if (pinMode !== 'output') {
+      throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as output`);
+    }
 
     const dataToSend: Uint8Array = new Uint8Array(2);
 
@@ -241,6 +249,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async writeOutputValues(outputValues: boolean[]) {
 
+    // TODO: review - move to helpers
     // TODO: test
 
     const numOfBytes: number = Math.ceil(this.props.pinCount / 8);
@@ -272,20 +281,27 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       || pinMode === 'input_pulldown';
   }
 
-  private async isInputPin(pin: number): Promise<boolean> {
-    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
-
-    return pinMode === 'input' || pinMode === 'input_pullup' || pinMode === 'input_pulldown';
-  }
+  // private async isInputPin(pin: number): Promise<boolean> {
+  //   const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
+  //
+  //   return pinMode === 'input' || pinMode === 'input_pullup' || pinMode === 'input_pulldown';
+  // }
 
   private getLastPinNum(): number {
     return this.props.pinCount - 1;
+  }
+
+  private getHexPinNumber(pin: number): number {
+    return pin + ASCII_NUMERIC_OFFSET;
   }
 
   /**
    * Do first write to IC if it doesn't do before.
    */
   private async initIc() {
+
+    // TODO: review
+
     try {
       await this.writePinModes(this.pinModes);
     }
@@ -307,6 +323,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   private async writePinModes(pinModes: number[]) {
+
+    // TODO: review
+
     const dataToSend: Uint8Array = new Uint8Array(this.props.pinCount);
 
     // TODO: pinMddes можно уже сформировать заранее
@@ -324,11 +343,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     await this.node.write(COMMANDS.setupAll, dataToSend);
   }
-
-  private getHexPinNumber(pin: number): number {
-    return pin + 48;
-  }
-
 
   private setLastReceivedState() {
     const lastData: Uint8Array | undefined = this.node.getLastData();
