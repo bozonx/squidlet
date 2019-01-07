@@ -114,11 +114,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }, 1000);
   }
 
-
-  getLastPinNum(): number {
-    return this.props.pinCount - 1;
-  }
-
   getState(): State {
     return this.state;
   }
@@ -129,7 +124,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async setup(pin: number, pinMode: PortExpanderPinMode, outputInitialValue?: boolean): Promise<void> {
     if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('Pin out of range');
+      throw new Error('getPinMode.setup: Pin out of range');
     }
 
     if (pinMode === 'output') {
@@ -183,7 +178,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
     if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('Pin out of range');
+      throw new Error('PortExpanderDriver.getPinMode: Pin out of range');
     }
 
     const pinModeByte: number = this.pinModes[pin];
@@ -192,7 +187,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Returns the current value of a pin.
+   * Returns the current value of a digital pin.
    * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
    * To get the current value call poll() first, if you're not using interrupts.
    * @param  {number} pin The pin number. (0 to 7)
@@ -200,14 +195,23 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async readDigital(pin: number): Promise<boolean> {
     if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('Pin out of range');
+      throw new Error('PortExpanderDriver.readDigital: Pin out of range');
     }
 
-    // TODO: проверить что это именно digital pin
+    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
 
-    // TODO: find it in state.inputs or state.outputs
+    if (!pinMode) {
+      throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
+    }
+    else if (!await this.isDigitalPin(pin)) {
+      throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
+    }
 
-    return true;
+    if (pinMode === 'output') {
+      return Boolean(this.state.outputs[pin]);
+    }
+
+    return Boolean(this.state.inputs[pin]);
   }
 
   /**
@@ -220,6 +224,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     if (pin < 0 || pin > this.getLastPinNum()) {
       throw new Error('Pin out of range');
     }
+
+    // TODO: review - rename to writeDigital
 
     const dataToSend: Uint8Array = new Uint8Array(2);
 
@@ -256,6 +262,25 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
   }
 
+
+  private async isDigitalPin(pin: number): Promise<boolean> {
+    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
+
+    return pinMode === 'output'
+      || pinMode === 'input'
+      || pinMode === 'input_pullup'
+      || pinMode === 'input_pulldown';
+  }
+
+  private async isInputPin(pin: number): Promise<boolean> {
+    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
+
+    return pinMode === 'input' || pinMode === 'input_pullup' || pinMode === 'input_pulldown';
+  }
+
+  private getLastPinNum(): number {
+    return this.props.pinCount - 1;
+  }
 
   /**
    * Do first write to IC if it doesn't do before.
