@@ -47,7 +47,7 @@ export default class PortExpander extends DeviceBase<Props> {
   };
 
   getStatus = async (): Promise<boolean[]> => {
-    return await this.expander.getValues();
+    return await this.expander.getState();
   }
 
   setStatus = async (newValue: boolean[]): Promise<void> => {

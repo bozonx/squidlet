@@ -43,7 +43,7 @@ export default class Pcf8574 extends DeviceBase<Props> {
   };
 
   getStatus = async (): Promise<boolean[]> => {
-    return await this.expander.getValues();
+    return await this.expander.getState();
   }
 
   setStatus = async (newValue: boolean[]): Promise<void> => {

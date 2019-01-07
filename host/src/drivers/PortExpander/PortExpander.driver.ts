@@ -35,6 +35,8 @@ export type PortExpanderPinMode = 'input'
 // TODO: наверное не нужно обрабатывать ошибку
 export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
 
+export type State = (boolean | undefined)[];
+
 const COMMANDS = {
   setup:              0x30,
   setupAll:           0x31,
@@ -63,29 +65,13 @@ const DIGITAL_VALUE = {
 
 const NO_MODE = 0x21;
 
-// export const DIR_UNDEF = -1;
-// // Constant for input pin direction.
-// export const DIR_IN = 1;
-// // Constant for output pin direction.
-// export const DIR_OUT = 0;
-
-
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   // pin modes which are stored during init time while setup IC is finished.
   private pinModes: number[] = [];
   // output pin values which are stored during init time while setup IC is finished.
   private initialOutputValues: boolean[] = [];
-
-  // /** Direction of each pin. By default all pin directions are undefined. */
-  // private directions:Array<number> = [
-  //   DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
-  //   DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
-  // ];
-  // /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
-  // private inputPinBitmask: number = 0;
-  /** Bitmask representing the current state of the pins. */
-  private currentState: number = 0;
+  private currentState: State = [];
   private wasIcInited: boolean = false;
 
   private get node(): NodeDriver {
@@ -126,6 +112,13 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.props.pinCount - 1;
   }
 
+  /**
+   * Returns array like [true, undefined, false, ...].
+   * There is indexes are pin numbers and undefined for not input or output pins.
+   */
+  getState(): State {
+    return this.currentState;
+  }
 
   /**
    * Set pin mode.
@@ -145,9 +138,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     this.pinModes[pin] = MODES[pinMode];
-
-
-    console.log(444444444, this.pinModes[pin]);
   }
 
   /**
@@ -159,7 +149,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     const wrapper: NodeHandler = () => {
       this.setLastReceivedState();
-      handler(null, this.getValues());
+      handler(null, this.getState());
     };
 
     return this.node.addListener(wrapper);
@@ -188,7 +178,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.node.poll();
     this.setLastReceivedState();
 
-    return this.getValues();
+    return this.getState();
   }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
@@ -204,19 +194,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     // undefined means didn't specify
     return;
-  }
-
-  /**
-   * Returns array like [true, true, false, false, true, true, false, false]
-   */
-  getValues(): boolean[] {
-
-    // TODO: make request
-    // TODO: make promise and in pcf too
-
-    //return byteToBinArr(this.currentState);
-
-    return [];
   }
 
   /**

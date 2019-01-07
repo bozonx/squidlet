@@ -120,7 +120,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   addListener(handler: ResultHandler): number {
     const wrapper: Handler = () => {
       this.setLastReceivedState();
-      handler(null, this.getValues());
+      handler(null, this.getState());
     };
 
     return this.i2cNode.addListener(wrapper);
@@ -146,7 +146,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     await this.i2cNode.poll();
     this.setLastReceivedState();
 
-    return this.getValues();
+    return this.getState();
   }
 
   async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
@@ -164,7 +164,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /**
    * Returns array like [true, true, false, false, true, true, false, false]
    */
-  getValues(): boolean[] {
+  getState(): boolean[] {
     return byteToBinArr(this.currentState);
   }
 
