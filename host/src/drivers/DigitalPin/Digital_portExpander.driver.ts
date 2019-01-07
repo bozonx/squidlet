@@ -48,6 +48,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
     const wrapper: Wrapper = (values: boolean[]) => {
 
       // TODO: нужно же обработать ошибку??? или она напишется в лог в Devices?
+      // TODO: будут поднимать события на всех пинах, так как опрашивается все целиком
 
       // TODO: review
 
@@ -57,7 +58,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
       //   return;
       // }
       if (!values) {
-        this.env.log.error(`DigitalPcf8574Driver.setWatch. pin: ${pin}. No values`);
+        this.env.log.error(`DigitalPortExpanderDriver.setWatch. pin: ${pin}. No values`);
 
         return;
       }

@@ -13,8 +13,7 @@ import Republish from '../../helpers/Republish';
 import {omit} from '../../helpers/lodashLike';
 
 
-// TODO: наверное не нужно обрабатывать ошибку
-export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
+export type ResultHandler = (values?: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
   resendStateInterval?: number;
@@ -133,20 +132,16 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   /**
    * Poll expander and return values of all the pins
    */
-  async poll(): Promise<boolean[]> {
+  async poll(): Promise<void> {
     if (!this.env.system.isInitialized) {
       this.env.log.warn(`PCF8574Driver.poll(). It runs before app is initialized`);
     }
-
-    console.log('------- poll');
 
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
 
     await this.i2cNode.poll();
     this.setLastReceivedState();
-
-    return this.getState();
   }
 
   async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
@@ -165,6 +160,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Returns array like [true, true, false, false, true, true, false, false]
    */
   getState(): boolean[] {
+
+    // TODO: include input and output pins
+
     return byteToBinArr(this.currentState);
   }
 

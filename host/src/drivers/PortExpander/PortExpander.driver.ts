@@ -22,6 +22,11 @@ export interface ExpanderDriverProps {
   [index: string]: any;
 }
 
+export interface State {
+  inputs: (boolean | undefined)[];
+  outputs: (boolean | undefined)[];
+}
+
 export type PortExpanderPinMode = 'input'
   | 'input_pullup'
   | 'input_pulldown'
@@ -31,19 +36,16 @@ export type PortExpanderPinMode = 'input'
   | 'pwm'
   | 'rx'
   | 'tx';
+export type ResultHandler = (state?: State) => void;
 
-// TODO: наверное не нужно обрабатывать ошибку
-export type ResultHandler = (err: Error | null, values?: boolean[]) => void;
-
-export type State = (boolean | undefined)[];
 
 const COMMANDS = {
   setup:              0x30,
   setupAll:           0x31,
   setOutputValue:     0x32,
   setAllOutputValues: 0x33,
-  read:               0x34,
-  readAll:            0x35,
+  readDigital:        0x34,
+  readAllDigital:     0x35,
 };
 
 const MODES = {
@@ -71,7 +73,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private pinModes: number[] = [];
   // output pin values which are stored during init time while setup IC is finished.
   private initialOutputValues: boolean[] = [];
-  private currentState: State = [];
+  private currentState: State = {
+    inputs: [],
+    outputs: [],
+  };
   private wasIcInited: boolean = false;
 
   private get node(): NodeDriver {
@@ -114,7 +119,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
   /**
    * Returns array like [true, undefined, false, ...].
-   * There is indexes are pin numbers and undefined for not input or output pins.
+   * There is indexes are pin numbers.
+   * Undefined is for not input or output pins.
    */
   getState(): State {
     return this.currentState;
@@ -141,15 +147,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Add listener to change of any pin.
+   * Add listener to listen to changes of any pin.
    */
   addListener(handler: ResultHandler): number {
-
-    // TODO: review
-
     const wrapper: NodeHandler = () => {
       this.setLastReceivedState();
-      handler(null, this.getState());
+      handler(this.getState());
     };
 
     return this.node.addListener(wrapper);
@@ -162,23 +165,13 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   /**
    * Poll expander and return values of all the pins
    */
-  async poll(): Promise<boolean[]> {
-
-    // TODO: review
-
-    if (!this.env.system.isInitialized) {
-      this.env.log.warn(`PortExpanderDriver.poll(). It runs before app is initialized`);
+  async poll(): Promise<void> {
+    if (!this.wasIcInited) {
+      throw new Error(`PortExpanderDriver.poll(). It runs before app IC is setup`);
     }
-
-    console.log('------- poll');
-
-    // init IC if it isn't inited at this moment
-    if (!this.wasIcInited) await this.initIc();
 
     await this.node.poll();
     this.setLastReceivedState();
-
-    return this.getState();
   }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
@@ -311,19 +304,19 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
 
   private setLastReceivedState() {
-
-    // TODO: review
-
     const lastData: Uint8Array | undefined = this.node.getLastData();
 
     if (!lastData) return;
 
-    // TODO: брать только значения input пинов!!!!! см writeState
-    // TODO: нужно ли инвертировать???
+    // TODO: review
 
     console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', lastData[0].toString(2));
     // TODO: use it
-    //this.currentState = lastData[0];
+
+    // TODO: ответ придет в виде байт
+
+
+    this.currentState = lastData[0];
 
 
     // TODO: review old code
