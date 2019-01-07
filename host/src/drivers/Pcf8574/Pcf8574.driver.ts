@@ -119,6 +119,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   addListener(handler: ResultHandler): number {
     const wrapper: Handler = () => {
       this.setLastReceivedState();
+
+      // TODO: поидее если стейт не изменился то не поднимать событие, так как полинг будет делаться часто
+
       handler(null, this.getState());
     };
 

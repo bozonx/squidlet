@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {updateBitInByte} from '../../helpers/helpers';
+import {getKeyOfObject, updateBitInByte} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
@@ -72,7 +72,7 @@ const NO_MODE = 0x21;
 
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
-  // pin modes which are stored during init time while setup IC is finished.
+  // pin modes which are set at init time.
   private pinModes: number[] = [];
   private state: State = {
     inputs: [],
@@ -149,12 +149,16 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.pinModes[pin] = MODES[pinMode];
   }
 
+  // TODO: что слушаем ??? любые изменения или только digital, analog etc?
   /**
    * Add listener to listen to changes of any pin.
    */
   addListener(handler: ResultHandler): number {
     const wrapper: NodeHandler = () => {
       this.setLastReceivedState();
+
+      // TODO: поидее если стейт не изменился то не поднимать событие, так как полинг будет делаться часто
+
       handler(this.getState());
     };
 
@@ -178,35 +182,30 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
-    //this.connection
-    // TODO: make requrest or just read
+    if (pin < 0 || pin > this.getLastPinNum()) {
+      throw new Error('Pin out of range');
+    }
 
-    // if (this.directions[pin] === DIR_IN) {
-    //   return 'input';
-    // }
-    // else if (this.directions[pin] === DIR_OUT) {
-    //   return 'output';
-    // }
+    const pinModeByte: number = this.pinModes[pin];
 
-    // undefined means didn't specify
-    return;
+    return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
   }
 
   /**
    * Returns the current value of a pin.
    * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
-   * To get the current value call doPoll() first, if you're not using interrupts.
+   * To get the current value call poll() first, if you're not using interrupts.
    * @param  {number} pin The pin number. (0 to 7)
-   * @return {boolean}               The current value.
+   * @return {boolean} The current value.
    */
-  async read(pin: number): Promise<boolean> {
+  async readDigital(pin: number): Promise<boolean> {
     if (pin < 0 || pin > this.getLastPinNum()) {
-      return false;
+      throw new Error('Pin out of range');
     }
 
-    // TODO: read from expander
+    // TODO: проверить что это именно digital pin
 
-    //return ((this.currentState>>pin) % 2 !== 0);
+    // TODO: find it in state.inputs or state.outputs
 
     return true;
   }
@@ -278,8 +277,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     this.wasIcInited = true;
-    delete this.pinModes;
-    delete this.initialOutputValues;
+    //delete this.pinModes;
+    //delete this.initialOutputValues;
   }
 
   private async writePinModes(pinModes: number[]) {

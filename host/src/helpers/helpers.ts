@@ -4,7 +4,7 @@ import * as uniqid from 'uniqid';
 import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
-import {find, isEmpty, padStart, trim} from './lodashLike';
+import {find, isEmpty, padStart, trim, values} from './lodashLike';
 
 
 export const PATH_SEPARATOR = '/';
@@ -342,6 +342,19 @@ export function convertBufferToUint8Array(data: Buffer): Uint8Array {
   return uIntArr;
 }
 
+/**
+ * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
+ */
+export function getKeyOfObject(obj: {[index: string]: any}, value: any): string | undefined {
+  const valuesOfObj: any[] = values(obj);
+  const keys: string[] = Object.keys(obj);
+  const valueIndex: number = valuesOfObj.indexOf(value);
+
+  // if -1 - din't find
+  if (valueIndex < 0) return;
+
+  return keys[valueIndex];
+}
 
 
 // TODO: move to nodeLike

@@ -9,7 +9,6 @@ const _trim = require('lodash/trim');
 const _padStart = require('lodash/padStart');
 const _last = require('lodash/last');
 
-
 // TODO: test
 
 
@@ -19,6 +18,10 @@ export function isEmpty(toCheck: any): boolean {
   if (typeof toCheck === 'object' && !Object.keys(toCheck).length) return true;
 
   return false;
+}
+
+export function values(obj: {[index: string]: any}): any[] {
+  return Object.keys(obj).map(key => obj[key]);
 }
 
 export function capitalize(...p: any[]) {
