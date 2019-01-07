@@ -37,10 +37,12 @@ export default class PortExpander extends DeviceBase<Props> {
       return this.expander.getPinMode(pin);
     },
 
+    // TODO: rename to readDigital
     read: (pin: number): Promise<boolean> => {
       return this.expander.read(pin);
     },
 
+    // TODO: rename to writeDigital
     write: (pin: number, value: boolean): Promise<void> => {
       return this.expander.write(pin, value);
     },
