@@ -48,11 +48,13 @@ export default class PortExpander extends DeviceBase<Props> {
     },
   };
 
+  // TODO: review - ствтус не только digital - но и analog и тд
   getStatus = async (): Promise<boolean[]> => {
     return await this.expander.getState();
   }
 
-  setStatus = async (newValue: boolean[]): Promise<void> => {
+  // TODO: review - может не нужно. Либо добавить analog, pwm и тд
+  setStatus = async (newValue: (boolean | undefined)[]): Promise<void> => {
     return this.expander.writeDigitalState(newValue);
   }
 

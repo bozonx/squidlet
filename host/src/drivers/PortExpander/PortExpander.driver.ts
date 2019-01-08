@@ -206,7 +206,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     if (!pinMode) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
     }
-    else if (!await this.isDigitalPin(pin)) {
+    else if (!this.isDigitalPin(pin)) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
     }
 
@@ -271,13 +271,13 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
   }
 
-  private async isDigitalPin(pin: number): Promise<boolean> {
-    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
+  private isDigitalPin(pin: number): boolean {
+    const pinMode: number | undefined = this.pinModes[pin];
 
-    return pinMode === 'output'
-      || pinMode === 'input'
-      || pinMode === 'input_pullup'
-      || pinMode === 'input_pulldown';
+    return pinMode === MODES.output
+      || pinMode === MODES.input
+      || pinMode === MODES.input_pullup
+      || pinMode === MODES.input_pulldown;
   }
 
   // private async isInputPin(pin: number): Promise<boolean> {
