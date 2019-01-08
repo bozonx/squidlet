@@ -53,7 +53,7 @@ export default class PortExpander extends DeviceBase<Props> {
   }
 
   setStatus = async (newValue: boolean[]): Promise<void> => {
-    return this.expander.writeOutputValues(newValue);
+    return this.expander.writeDigitalState(newValue);
   }
 
   protected transformPublishValue = (binArr: number[]): string => {

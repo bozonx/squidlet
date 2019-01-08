@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {getKeyOfObject, updateBitInByte} from '../../helpers/helpers';
+import {convertBitsToBytes, getKeyOfObject, updateBitInByte} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
@@ -23,10 +23,12 @@ export interface ExpanderDriverProps {
   [index: string]: any;
 }
 
+type DigitalState = (boolean | undefined)[];
+
 export interface State {
   // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
-  inputs: (boolean | undefined)[];
-  outputs: (boolean | undefined)[];
+  inputs: DigitalState;
+  outputs: DigitalState;
   // like {pinNum: value}
   analogInputs: {[index: string]: number};
 }
@@ -247,30 +249,27 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Set new state of all the output pins.
    * Not output pins (input, undefined) are ignored.
    */
-  async writeOutputValues(outputValues: boolean[]) {
+  async writeDigitalState(outputState: DigitalState) {
+    this.updateOutputValues(outputState);
+    await this.writeDigitalStateToIc();
+  }
 
-    // TODO: review - move to helpers
-    // TODO: test
 
-    const numOfBytes: number = Math.ceil(this.props.pinCount / 8);
-    const dataToSend: Uint8Array = new Uint8Array(numOfBytes);
-
-    for (let i = 0; i < this.props.pinCount; i++) {
-      // number of byte from 0
-      const byteNum: number = Math.floor(i / 8);
-      //const positionInByte: number = (Math.floor(i / 8) * 8);
-      const positionInByte: number = i - (byteNum * 8);
-
-      dataToSend[byteNum] = updateBitInByte(dataToSend[byteNum], positionInByte, outputValues[i]);
+  private updateOutputValues(newValues: DigitalState) {
+    for (let pinNum in newValues) {
+      if (this.pinModes[pinNum] === MODES.output) {
+        this.state.outputs[pinNum] = newValues[pinNum];
+      }
     }
+  }
+
+  private async writeDigitalStateToIc() {
+    const dataToSend: Uint8Array = convertBitsToBytes(this.state.outputs, this.props.pinCount);
 
     console.log(222222222, this.props, dataToSend);
 
-    // TODO: add command
-
     await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
   }
-
 
   private async isDigitalPin(pin: number): Promise<boolean> {
     const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);

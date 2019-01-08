@@ -356,6 +356,26 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
   return keys[valueIndex];
 }
 
+/**
+ * Make [255,0] from [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0]
+ */
+export function convertBitsToBytes(bits: (boolean | undefined)[], bitsCount: number): Uint8Array {
+  // TODO: test
+
+  const numOfBytes: number = Math.ceil(bitsCount / 8);
+  const result: Uint8Array = new Uint8Array(numOfBytes);
+
+  for (let i = 0; i < bitsCount; i++) {
+    // number of byte from 0
+    const byteNum: number = Math.floor(i / 8);
+    //const positionInByte: number = (Math.floor(i / 8) * 8);
+    const positionInByte: number = i - (byteNum * 8);
+
+    result[byteNum] = updateBitInByte(result[byteNum], positionInByte, Boolean(bits[i]));
+  }
+
+  return result;
+}
 
 // TODO: move to nodeLike
 
