@@ -83,6 +83,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     analogInputs: {},
   };
   private wasIcInited: boolean = false;
+  private initingIcInProgress: boolean = false;
 
   private get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
@@ -113,7 +114,15 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     setTimeout(async () => {
       // init IC state after app is inited if it isn't inited at this moment
-      if (!this.wasIcInited) await this.initIc();
+      await this.initIcIfNeed();
+
+      // write output values initial values
+      try {
+        await this.writeDigitalOutputStateToIc();
+      }
+      catch (err) {
+        this.env.log.warn(`PortExpanderDriver init. Can't write initial output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      }
     }, 1000);
   }
 
@@ -165,9 +174,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<void> {
-    if (!this.wasIcInited) {
-      throw new Error(`PortExpanderDriver.poll(). It runs before app IC is setup`);
-    }
+    await this.initIcIfNeed();
 
     await this.node.poll();
     this.setLastReceivedState();
@@ -192,6 +199,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async readDigital(pin: number): Promise<boolean> {
     this.checkPin(pin);
+    await this.initIcIfNeed();
 
     if (!this.isDigitalPin(pin)) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
@@ -212,6 +220,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async writeDigital(pin: number, value: boolean): Promise<void> {
     this.checkPin(pin);
+    await this.initIcIfNeed();
 
     const pinMode: number | undefined = this.pinModes[pin];
 
@@ -233,7 +242,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async writeDigitalState(outputState: DigitalState) {
     this.updateOutputValues(outputState);
-    await this.writeDigitalStateToIc();
+    await this.writeDigitalOutputStateToIc();
   }
 
 
@@ -257,7 +266,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
   }
 
-  private async writeDigitalStateToIc() {
+  /**
+   * Write all the values of output pins to IC.
+   */
+  private async writeDigitalOutputStateToIc() {
+    await this.initIcIfNeed();
+
     const dataToSend: Uint8Array = convertBitsToBytes(this.state.outputs, this.props.pinCount);
 
     console.log(222222222, this.props, dataToSend);
@@ -289,33 +303,26 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Do first write to IC if it doesn't do before.
+   * Write pin modes to IC.
    */
-  private async initIc() {
+  private async initIcIfNeed() {
+    if (this.wasIcInited || this.initingIcInProgress) return;
 
-    // TODO: review
+    this.initingIcInProgress = true;
 
     try {
       await this.writePinModes(this.pinModes);
     }
     catch (err) {
-      this.env.log.error(`PortExpander.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      this.env.log.error(`PortExpanderDriver.initIc. Can't init IC state. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
 
-    // write output values initial values
-    try {
-      await this.writeOutputValues(this.initialOutputValues);
-    }
-    catch (err) {
-      this.env.log.error(`PortExpander.driver. Can't write initial output values to IC, props are "${JSON.stringify(this.props)}". ${String(err)}`);
-    }
-
+    this.initingIcInProgress = false;
     this.wasIcInited = true;
-    //delete this.pinModes;
-    //delete this.initialOutputValues;
   }
 
   private async writePinModes(pinModes: number[]) {
+    await this.initIcIfNeed();
 
     // TODO: review
 

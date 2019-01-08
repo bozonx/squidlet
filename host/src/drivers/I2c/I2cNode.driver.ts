@@ -154,6 +154,8 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
       throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
     }
 
+    // TODO: проверить что не будут выполняться другие poll пока выполняется текущий
+
     return this.poling.restart(this.pollId);
   }
 
