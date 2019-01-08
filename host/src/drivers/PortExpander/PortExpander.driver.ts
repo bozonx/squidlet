@@ -15,22 +15,28 @@ import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
+import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
 export interface ExpanderDriverProps {
-  pinCount: number;
+  // count of all the pins of expander
+  //allPinCount: number;
+  digitalPinsCount: number;
+  analogPinsCount: number;
   // connection params
   [index: string]: any;
 }
 
 type DigitalState = (boolean | undefined)[];
+type AnalogState = (number | undefined)[];
 
 export interface State {
   // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
   inputs: DigitalState;
   outputs: DigitalState;
-  // like {pinNum: value}
-  analogInputs: {[index: string]: number};
+  // indexes are analog pin numbers from 0
+  analogInputs: AnalogState;
+  analogOutputs: AnalogState;
 }
 
 export type PortExpanderPinMode = 'input'
@@ -80,7 +86,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private state: State = {
     inputs: [],
     outputs: [],
-    analogInputs: {},
+    analogInputs: [],
+    analogOutputs: [],
   };
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
@@ -96,7 +103,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     this.depsInstances.node = await getDriverDep('I2cNode.driver')
       .getInstance({
-        ...omit(this.props, 'pinCount'),
+        ...omit(this.props, 'digitalPinsCount', 'analogPinsCount'),
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
@@ -126,10 +133,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Set pin mode.
+   * Setup digital input or output pin.
    * Please set pin mode once on startup.
    */
-  async setup(pin: number, pinMode: PortExpanderPinMode, outputInitialValue?: boolean): Promise<void> {
+  async setupDigital(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
     if (this.wasIcInited) {
       // TODO: don't use system
       this.env.system.log.warn(`PortExpanderDriver.setup: can't setup pin "${pin}" because IC was already initialized`);
@@ -138,7 +145,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('PortExpanderDriver.setup: Pin out of range');
+      throw new Error('PortExpanderDriver.setupDigital: Pin out of range');
     }
 
     if (pinMode === 'output') {
@@ -147,6 +154,25 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       }
 
       this.state.outputs[pin] = outputInitialValue;
+    }
+
+    this.pinModes[pin] = MODES[pinMode];
+  }
+
+  async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
+    if (this.wasIcInited) {
+      // TODO: don't use system
+      this.env.system.log.warn(`PortExpanderDriver.setup: can't setup pin "${pin}" because IC was already initialized`);
+
+      return;
+    }
+
+    if (pin < 0 || pin > this.getLastAnalogPinNum()) {
+      throw new Error('PortExpanderDriver.setupAnalog: Pin out of range');
+    }
+
+    if (pinMode === 'analog_output') {
+      this.state.analogOutputs[pin] = outputInitialValue;
     }
 
     this.pinModes[pin] = MODES[pinMode];
@@ -277,7 +303,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private async writeDigitalOutputStateToIc() {
     await this.initIcIfNeed();
 
-    const dataToSend: Uint8Array = convertBitsToBytes(this.state.outputs, this.props.pinCount);
+    const dataToSend: Uint8Array = convertBitsToBytes(this.state.outputs, this.props.digitalPinsCount);
 
     console.log(222222222, this.props, dataToSend);
 
@@ -297,7 +323,11 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   private getLastPinNum(): number {
-    return this.props.pinCount - 1;
+    return this.props.digitalPinsCount - 1;
+  }
+
+  private getLastAnalogPinNum(): number {
+    return this.props.analogPinsCount - 1;
   }
 
   private getHexPinNumber(pin: number): number {
@@ -327,9 +357,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Write all the pin modes to IC.
    */
   private async writePinModes() {
-    const dataToSend: Uint8Array = new Uint8Array(this.props.pinCount);
 
-    for (let i = 0; i < this.props.pinCount; i++) {
+    // TODO: review - allPinCount
+
+    const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);
+
+    for (let i = 0; i < this.props.allPinCount; i++) {
       if (typeof this.pinModes[i] === 'undefined') {
         dataToSend[i] = NO_MODE;
       }
