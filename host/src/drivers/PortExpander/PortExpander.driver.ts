@@ -10,8 +10,8 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {convertBitsToBytes, getKeyOfObject} from '../../helpers/helpers';
-import {omit} from '../../helpers/lodashLike';
+import {convertBitsToBytes, convertBytesToBits, getKeyOfObject} from '../../helpers/helpers';
+import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
@@ -109,21 +109,16 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected appDidInit = async () => {
+    // init IC state after app is inited if it isn't inited at this moment
+    await this.initIcIfNeed();
 
-    // TODO: remove timeout
-
-    setTimeout(async () => {
-      // init IC state after app is inited if it isn't inited at this moment
-      await this.initIcIfNeed();
-
-      // write output values initial values
-      try {
-        await this.writeDigitalOutputStateToIc();
-      }
-      catch (err) {
-        this.env.log.warn(`PortExpanderDriver init. Can't write initial output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
-      }
-    }, 1000);
+    // write output values initial values
+    try {
+      await this.writeDigitalOutputStateToIc();
+    }
+    catch (err) {
+      this.env.log.warn(`PortExpanderDriver init. Can't write initial output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    }
   }
 
   getState(): State {
@@ -135,6 +130,13 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Please set pin mode once on startup.
    */
   async setup(pin: number, pinMode: PortExpanderPinMode, outputInitialValue?: boolean): Promise<void> {
+    if (this.wasIcInited) {
+      // TODO: don't use system
+      this.env.system.log.warn(`PortExpanderDriver.setup: can't setup pin "${pin}" because IC was already initialized`);
+
+      return;
+    }
+
     if (pin < 0 || pin > this.getLastPinNum()) {
       throw new Error('PortExpanderDriver.setup: Pin out of range');
     }
@@ -156,9 +158,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   addListener(handler: ResultHandler): number {
     const wrapper: NodeHandler = () => {
+      const lastState: State = cloneDeep(this.state);
+
       this.setLastReceivedState();
 
-      // TODO: поидее если стейт не изменился то не поднимать событие, так как полинг будет делаться часто
+      // do not rise an event if state doesn't changed
+      if (isEqual(lastState, this.state)) return;
 
       handler(this.getState());
     };
@@ -282,17 +287,14 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private isDigitalPin(pin: number): boolean {
     const pinMode: number | undefined = this.pinModes[pin];
 
-    return pinMode === MODES.output
-      || pinMode === MODES.input
-      || pinMode === MODES.input_pullup
-      || pinMode === MODES.input_pulldown;
+    return pinMode === MODES.output || this.isInputPin(pin);
   }
 
-  // private async isInputPin(pin: number): Promise<boolean> {
-  //   const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
-  //
-  //   return pinMode === 'input' || pinMode === 'input_pullup' || pinMode === 'input_pulldown';
-  // }
+  private isInputPin(pin: number): boolean {
+    const pinMode: number | undefined = this.pinModes[pin];
+
+    return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
+  }
 
   private getLastPinNum(): number {
     return this.props.pinCount - 1;
@@ -321,6 +323,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.wasIcInited = true;
   }
 
+  /**
+   * Write all the pin modes to IC.
+   */
   private async writePinModes() {
     const dataToSend: Uint8Array = new Uint8Array(this.props.pinCount);
 
@@ -333,7 +338,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       }
     }
 
-    console.log(111111111, this.props, this.pinModes, dataToSend);
+    console.log(44444444444, this.props, this.pinModes, dataToSend);
 
     await this.node.write(COMMANDS.setupAll, dataToSend);
   }
@@ -343,63 +348,19 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     if (!lastData) return;
 
-    // TODO: review
+    const newState: DigitalState = convertBytesToBits(lastData);
 
-    console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', lastData[0].toString(2));
-    // TODO: use it
+    console.log(11111111, 'current - ', this.state.inputs, ' | new - ', lastData, ' | parsed - ', newState);
 
-    // TODO: ответ придет в виде байт
+    // update values
+    for (let pinNum in newState) {
+      // filter only inputs
+      if (!this.isInputPin(parseInt(pinNum))) return;
 
-
-    this.currentState = lastData[0];
-
-
-    // TODO: review old code
-
-    // // check each input for changes
-    // for(let pin = 0; pin < 8; pin++){
-    //   if(this.directions[pin] !== DIR_IN){
-    //     continue; // isn't an input pin
-    //   }
-    //   if((this.currentState>>pin) % 2 !== (readState>>pin) % 2){
-    //     // pin changed
-    //     let value: boolean = ((readState>>pin) % 2 !== 0);
-    //     this.currentState = this.updatePinInBitMask(this.currentState, <number>pin, value);
-    //     if(noEmit !== pin){
-    //       this.events.emit(INPUT_EVENT_NAME, <InputData>{pin: pin, value: value});
-    //     }
-    //   }
-    // }
+      this.state.inputs[pinNum] = newState[pinNum];
+    }
   }
 
-  // /**
-  //  * Write the current state to the IC.
-  //  * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
-  //  */
-  // private async writeToIc () {
-  //   // it means that IC is inited when first data is written
-  //   this.wasIcInited = true;
-  //
-  //   // set all input pins to high
-  //   const newIcState = this.currentState | this.inputPinBitmask;
-  //   const dataToSend: Uint8Array = new Uint8Array(1);
-  //
-  //   // send one byte to IC
-  //   dataToSend[0] = newIcState;
-  //
-  //   await this.connection.write(undefined, dataToSend);
-  // }
-
-  // /**
-  //  * Helper function to set/clear one bit in a bitmask.
-  //  * @param  {number}            current The current bitmask.
-  //  * @param  {number}            pin     The bit-number in the bitmask.
-  //  * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
-  //  * @return {number}                    The new (modified) bitmask.
-  //  */
-  // private updatePinInBitMask(current: number, pin: number, value: boolean): number{
-  //   return updateBitInByte(current, pin, value);
-  // }
 
   protected validateProps = (props: ExpanderDriverProps): string | undefined => {
 

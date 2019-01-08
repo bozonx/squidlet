@@ -332,6 +332,7 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
+// TODO: remove - буфера возможно нет в других средах
 export function convertBufferToUint8Array(data: Buffer): Uint8Array {
   const uIntArr = new Uint8Array(data.length);
 
@@ -372,6 +373,20 @@ export function convertBitsToBytes(bits: (boolean | undefined)[], bitsCount: num
     const positionInByte: number = i - (byteNum * 8);
 
     result[byteNum] = updateBitInByte(result[byteNum], positionInByte, Boolean(bits[i]));
+  }
+
+  return result;
+}
+
+export function convertBytesToBits(bytes: Uint8Array): boolean[] {
+  if (!bytes.length) return [];
+
+  //const bitsLength: number = bytes.length * 8;
+  //new Array<boolean>(bitsLength)
+  let result: boolean[] = [];
+
+  for (let index of bytes.keys()) {
+    result = result.concat(byteToBinArr(bytes[index]));
   }
 
   return result;

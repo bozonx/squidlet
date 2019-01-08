@@ -68,5 +68,8 @@ export function cloneDeep(...p: any[]) {
 }
 
 export function isEqual(...p: any[]) {
+
+  // TODO: remake - use deep equal
+
   return _isEqual(...p);
 }
