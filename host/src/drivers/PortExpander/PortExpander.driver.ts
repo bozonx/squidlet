@@ -303,7 +303,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Write pin modes to IC.
+   * Write pin modes to IC if it isn't initialized before.
    */
   private async initIcIfNeed() {
     if (this.wasIcInited || this.initingIcInProgress) return;
@@ -311,7 +311,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.initingIcInProgress = true;
 
     try {
-      await this.writePinModes(this.pinModes);
+      await this.writePinModes();
     }
     catch (err) {
       this.env.log.error(`PortExpanderDriver.initIc. Can't init IC state. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
@@ -321,25 +321,19 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.wasIcInited = true;
   }
 
-  private async writePinModes(pinModes: number[]) {
-    await this.initIcIfNeed();
-
-    // TODO: review
-
+  private async writePinModes() {
     const dataToSend: Uint8Array = new Uint8Array(this.props.pinCount);
 
-    // TODO: pinMddes можно уже сформировать заранее
-
     for (let i = 0; i < this.props.pinCount; i++) {
-      if (pinModes[i]) {
-        dataToSend[i] = pinModes[i];
+      if (typeof this.pinModes[i] === 'undefined') {
+        dataToSend[i] = NO_MODE;
       }
       else {
-        dataToSend[i] = NO_MODE;
+        dataToSend[i] = this.pinModes[i];
       }
     }
 
-    console.log(111111111, this.props, pinModes, dataToSend);
+    console.log(111111111, this.props, this.pinModes, dataToSend);
 
     await this.node.write(COMMANDS.setupAll, dataToSend);
   }
