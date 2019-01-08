@@ -3,7 +3,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {
   ExpanderDriverProps,
   PortExpanderDriver,
-  PortExpanderPinMode
+  PortExpanderPinMode, State
 } from '../../drivers/PortExpander/PortExpander.driver';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import PublishParams from '../../app/interfaces/PublishParams';
@@ -49,7 +49,7 @@ export default class PortExpander extends DeviceBase<Props> {
   };
 
   // TODO: review - ствтус не только digital - но и analog и тд
-  getStatus = async (): Promise<boolean[]> => {
+  getStatus = async (): Promise<State> => {
     return await this.expander.getState();
   }
 

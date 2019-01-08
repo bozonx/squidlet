@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {convertBitsToBytes, getKeyOfObject, updateBitInByte} from '../../helpers/helpers';
+import {convertBitsToBytes, getKeyOfObject} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
@@ -127,7 +127,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async setup(pin: number, pinMode: PortExpanderPinMode, outputInitialValue?: boolean): Promise<void> {
     if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('getPinMode.setup: Pin out of range');
+      throw new Error('PortExpanderDriver.setup: Pin out of range');
     }
 
     if (pinMode === 'output') {
@@ -137,12 +137,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
       this.state.outputs[pin] = outputInitialValue;
     }
-    // else if (pinMode === 'input' || pinMode === 'input_pullup' || pinMode === 'input_pulldown') {
-    //   this.state.inputs[pin] = false;
-    // }
-    // else {
-    //   throw new Error(`Unsupported pin mode "${pinMode}"`);
-    // }
 
     this.pinModes[pin] = MODES[pinMode];
   }
@@ -197,20 +191,13 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * @return {boolean} The current value.
    */
   async readDigital(pin: number): Promise<boolean> {
-    if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('PortExpanderDriver.readDigital: Pin out of range');
-    }
+    this.checkPin(pin);
 
-    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
-
-    if (!pinMode) {
-      throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
-    }
-    else if (!this.isDigitalPin(pin)) {
+    if (!this.isDigitalPin(pin)) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
     }
 
-    if (pinMode === 'output') {
+    if (this.pinModes[pin] === MODES.output) {
       return Boolean(this.state.outputs[pin]);
     }
 
@@ -224,16 +211,11 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   async writeDigital(pin: number, value: boolean): Promise<void> {
-    if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('PortExpanderDriver.writeDigital: Pin out of range');
-    }
+    this.checkPin(pin);
 
-    const pinMode: PortExpanderPinMode | undefined = await this.getPinMode(pin);
+    const pinMode: number | undefined = this.pinModes[pin];
 
-    if (!pinMode) {
-      throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" hasn't been set up`);
-    }
-    if (pinMode !== 'output') {
+    if (this.pinModes[pin] !== MODES.output) {
       throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as output`);
     }
 
@@ -254,6 +236,18 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.writeDigitalStateToIc();
   }
 
+
+  private checkPin(pin: number) {
+    if (pin < 0 || pin > this.getLastPinNum()) {
+      throw new Error(`PortExpanderDriver: Pin "${pin}" out of range`);
+    }
+
+    const pinMode: number | undefined = this.pinModes[pin];
+
+    if (typeof pinMode === 'undefined') {
+      throw new Error(`PortExpanderDriver: pin "${pin}" hasn't been set up`);
+    }
+  }
 
   private updateOutputValues(newValues: DigitalState) {
     for (let pinNum in newValues) {
