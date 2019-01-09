@@ -241,7 +241,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.initIcIfNeed();
 
     if (!this.isDigitalPin(pin)) {
-      throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up`);
+      throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up as a digital`);
     }
 
     if (this.pinModes[pin] === MODES.output) {
@@ -264,7 +264,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     const pinMode: number | undefined = this.pinModes[pin];
 
     if (this.pinModes[pin] !== MODES.output) {
-      throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as output`);
+      throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as an digital output`);
     }
 
     const dataToSend: Uint8Array = new Uint8Array(2);
@@ -285,9 +285,18 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   async readAnalog(pin: number): Promise<number> {
-    // TODO: add
+    this.checkPin(pin);
+    await this.initIcIfNeed();
 
-    return 0;
+    if (!this.isAnalogPin(pin)) {
+      throw new Error(`PortExpanderDriver.readAnalog: pin "${pin}" hasn't been set up as an analog`);
+    }
+
+    if (this.pinModes[pin] === MODES.analog_output) {
+      return this.state.analogOutputs[pin] || 0;
+    }
+
+    return this.state.analogInputs[pin] || 0;
   }
 
   async writeAnalog(pin: number, value: number): Promise<void> {
@@ -367,6 +376,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
   }
 
+  private isAnalogPin(pin: number): boolean {
+    const pinMode: number | undefined = this.pinModes[pin];
+
+    return pinMode === MODES.analog_output || pinMode === MODES.analog_input;
+  }
+
   private getLastPinNum(): number {
     return this.props.digitalPinsCount - 1;
   }
@@ -422,6 +437,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   private setLastReceivedState() {
+
+    // TODO: review - what about analog ?
+
     const lastData: Uint8Array | undefined = this.node.getLastData();
 
     if (!lastData) return;

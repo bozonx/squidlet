@@ -38,7 +38,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    * Set level to output pin
    */
   write(pin: number, value: boolean): Promise<void> {
-    return this.callAction('write', pin, value);
+    return this.callAction('writeDigital', pin, value);
   }
 
   /**
