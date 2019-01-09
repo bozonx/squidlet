@@ -28,15 +28,12 @@ export const PINS_COUNT = 8;
 
 
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
-  /** Direction of each pin. By default all pin directions are undefined. */
+  // Direction of each pin. By default all pin directions are undefined
   private directions:Array<number> = [
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
   ];
-  /** Bitmask for all input pins. Used to set all input pins to high on the PCF8574/PCF8574A IC. */
-  private inputPinBitmask: number = 0;
-
-  /** Bitmask representing the current state of the pins. */
+  // Bitmask representing the current state of the pins
   private currentState: number = 0;
   private wasIcInited: boolean = false;
 
@@ -81,7 +78,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
         throw new Error(`You have to specify an outputInitialValue`);
       }
 
-      this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, false);
       this.directions[pin] = DIR_OUT;
       // update local state
       this.currentState = this.updatePinInBitMask(this.currentState, pin, outputInitialValue);
@@ -93,7 +89,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       }
 
       // set input pin to high
-      this.inputPinBitmask = this.updatePinInBitMask(this.inputPinBitmask, pin, true);
+      this.currentState = this.updatePinInBitMask(this.currentState, pin, true);
       this.directions[pin] = DIR_IN;
     }
   }
@@ -171,6 +167,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
   async read(pin: number): Promise<boolean> {
     this.checkPin(pin);
+
+    // TODO: do poll only if there are any input pins
 
     return ((this.currentState>>pin) % 2 !== 0);
   }
@@ -271,7 +269,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.wasIcInited = true;
 
     // set all input pins to high
-    const newIcState = this.currentState | this.inputPinBitmask;
+    const newIcState = this.currentState;
     const dataToSend: Uint8Array = new Uint8Array(1);
 
     // send one byte to IC

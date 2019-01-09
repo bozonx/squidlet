@@ -273,6 +273,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up as a digital`);
     }
 
+    // TODO: do poll only if there are any input pins
+
     if (this.pinModes[pin] === MODES.output) {
       return Boolean(this.state.outputs[pin]);
     }
