@@ -160,6 +160,22 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
   return recursive(rootObject, '');
 }
 
+
+export function callOnDifferentValues(
+  arr1: any[],
+  arr2: any[],
+  cb: (index: number, value1: any, value2: any) => void
+) {
+  for (let indexStr in arr1) {
+    const index: number = parseInt(indexStr);
+
+    if (arr1[index] !== arr2[index]) {
+      cb(index, arr1[index], arr2[index]);
+    }
+  }
+}
+
+
 export function convertToLevel(value: any): boolean {
   return value === '1' || value === 1
     || value === 'ON' || value === 'on' || value === 'On'

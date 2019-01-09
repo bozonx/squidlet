@@ -104,6 +104,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // TODO: ожидается что ResultHandler будет string а не number
 
     const wrapper: Handler = () => {
+
+      // TODO: наверное лучше повешать отдельно, иначе будет вызываться на каждое повешанное событие
       this.setLastReceivedState();
 
       // TODO: поидее если стейт не изменился то не поднимать событие, так как полинг будет делаться часто
@@ -131,7 +133,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     if (!this.wasIcInited) await this.initIc();
 
     await this.i2cNode.poll();
-    this.setLastReceivedState();
+    //this.setLastReceivedState();
   }
 
   async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {

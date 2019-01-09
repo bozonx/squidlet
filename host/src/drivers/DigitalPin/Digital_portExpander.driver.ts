@@ -58,6 +58,8 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
       handler(value);
     };
 
+    // TODO: можно вешаться напрямую на indexedEvents
+
     const handlerId: string = this.expanderDriver.addDigitalListener(wrapper);
 
     this.handlerIds.push(handlerId);

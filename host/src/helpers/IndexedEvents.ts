@@ -1,6 +1,7 @@
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../app/dict/constants';
 
 
+// TODO: use generic instead of this
 export type EventHandler = (...args: any[]) => void;
 type Handlers = Array<EventHandler | undefined>;
 

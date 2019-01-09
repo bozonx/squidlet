@@ -10,13 +10,14 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {getKeyOfObject} from '../../helpers/helpers';
+import {callOnDifferentValues, getKeyOfObject} from '../../helpers/helpers';
 import {convertBitsToBytes, convertBytesToBits, hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
-import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
+import NodeDriver from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../../app/dict/constants';
 import {PinMode} from '../../app/interfaces/dev/Digital';
+import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 type DigitalState = (boolean | undefined)[];
@@ -97,7 +98,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   };
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
-  private readonly handlers: (DigitalPinHandler | AnalogPinHandler)[] = [];
+  private readonly digitalEvents: IndexedEvents = new IndexedEvents();
+  private readonly analogEvents: IndexedEvents = new IndexedEvents();
 
   private get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
@@ -120,6 +122,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.node.addPollErrorListener((err: Error) => {
       this.env.log.error(String(err));
     });
+
+    this.node.addListener(this.handleNodeEvent);
   }
 
   protected appDidInit = async () => {
@@ -193,36 +197,13 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.pinModes[pin] = MODES[pinMode];
   }
 
-  addDigitalListener(handler: DigitalPinHandler): string {
-    const wrapper: NodeHandler = () => {
-      const lastState: State = cloneDeep(this.state);
-
-      this.setLastReceivedState();
-
-      // do not rise an event if state doesn't changed
-      if (isEqual(lastState, this.state)) return;
-
-      handler(this.getState());
-    };
-
-    return this.node.addListener(wrapper);
-
-    //this.handlers.push();
+  addDigitalListener(handler: DigitalPinHandler): number {
+    return this.digitalEvents.addListener(handler);
   }
 
-  addAnalogListener(handler: AnalogPinHandler): string {
-    //this.handlers.push();
-
-    // TODO: !!! make it
+  addAnalogListener(handler: AnalogPinHandler): number {
+    return this.analogEvents.addListener(handler);
   }
-
-  // // TODO: что слушаем ??? любые изменения или только digital, analog etc?
-  // /**
-  //  * Add listener to listen to changes of any pin.
-  //  */
-  // addListener(handler: ResultHandler): number {
-  //
-  // }
 
   removeListener(handlerIndex: string) {
 
@@ -244,7 +225,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     // TODO: review analog
 
     await this.node.poll();
-    this.setLastReceivedState();
+    //this.setLastReceivedState();
   }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
@@ -369,6 +350,29 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.writeAnalogOutputStateToIc();
   }
 
+
+  /**
+   * On change received data after poling on node driver.
+   * Find changed pins and rise events on them.
+   */
+  private handleNodeEvent() {
+    const lastState: State = cloneDeep(this.state);
+
+    this.setLastReceivedState();
+
+    callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
+      this.digitalEvents.emit(pinNum, newValue);
+    });
+    callOnDifferentValues(this.state.outputs, lastState.outputs, (pinNum: number, newValue: boolean) => {
+      this.digitalEvents.emit(pinNum, newValue);
+    });
+    callOnDifferentValues(this.state.analogInputs, lastState.analogInputs, (pinNum: number, newValue: number) => {
+      this.analogEvents.emit(pinNum, newValue);
+    });
+    callOnDifferentValues(this.state.analogOutputs, lastState.analogOutputs, (pinNum: number, newValue: number) => {
+      this.analogEvents.emit(pinNum, newValue);
+    });
+  }
 
   private checkPin(pin: number) {
     if (pin < 0 || pin > this.getLastPinNum()) {
@@ -521,6 +525,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private setLastReceivedState() {
 
     // TODO: review - what about analog ?
+    // TODO: outputs тоже обновлять на всякий случай
 
     const lastData: Uint8Array | undefined = this.node.getLastData();
 
