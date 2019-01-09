@@ -2,8 +2,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
-import {DigitalPinHandler, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
-import PortExpander from '../../devices/PortExpander/PortExpander';
+import {DigitalPinHandler, PortExpanderDriver, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 
 
@@ -17,17 +16,17 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   // it needs to do clearAllWatches()
   private handlerIds: string[] = [];
 
-  get expanderDevice(): PortExpander {
-    return this.env.system.devicesManager.getDevice<PortExpander>(this.props.expander);
+  get expanderDriver(): PortExpanderDriver {
+    return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
   }
 
 
   setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
-    return this.expanderDevice.expander.setupDigital(pin, pinMode, outputInitialValue);
+    return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
   }
 
   async getPinMode(pin: number): Promise<PinMode | undefined> {
-    const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDevice.expander.getPinMode(pin);
+    const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDriver.getPinMode(pin);
 
     if (expanderPinMode === 'input'
       || expanderPinMode === 'input_pullup'
@@ -39,14 +38,14 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
   read(pin: number): Promise<boolean> {
-    return this.expanderDevice.expander.readDigital(pin);
+    return this.expanderDriver.readDigital(pin);
   }
 
   /**
    * Set level to output pin
    */
   write(pin: number, value: boolean): Promise<void> {
-    return this.expanderDevice.expander.writeDigital(pin, value);
+    return this.expanderDriver.writeDigital(pin, value);
   }
 
   /**
@@ -59,7 +58,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
       handler(value);
     };
 
-    const handlerId: string = this.expanderDevice.expander.addDigitalListener(wrapper);
+    const handlerId: string = this.expanderDriver.addDigitalListener(wrapper);
 
     this.handlerIds.push(handlerId);
 

@@ -1,7 +1,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
+import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
@@ -21,28 +21,28 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   private handlerIds: string[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
 
-  get expanderDevice(): Pcf8574 {
-    return this.env.system.devicesManager.getDevice<Pcf8574>(this.props.expander);
+  get expanderDriver(): PCF8574Driver {
+    return this.env.system.devicesManager.getDevice<Pcf8574>(this.props.expander).expander;
   }
 
 
   setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
-    return this.expanderDevice.expander.setup(pin, pinMode, outputInitialValue);
+    return this.expanderDriver.setup(pin, pinMode, outputInitialValue);
   }
 
   getPinMode(pin: number): Promise<PinMode | undefined> {
-    return this.expanderDevice.expander.getPinMode(pin);
+    return this.expanderDriver.getPinMode(pin);
   }
 
   read(pin: number): Promise<boolean> {
-    return this.expanderDevice.expander.read(pin);
+    return this.expanderDriver.read(pin);
   }
 
   /**
    * Set level to output pin
    */
   write(pin: number, value: boolean): Promise<void> {
-    return this.expanderDevice.expander.write(pin, value);
+    return this.expanderDriver.write(pin, value);
   }
 
   /**
