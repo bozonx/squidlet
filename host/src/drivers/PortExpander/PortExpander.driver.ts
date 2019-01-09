@@ -119,12 +119,20 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     // init IC state after app is inited if it isn't inited at this moment
     await this.initIcIfNeed();
 
-    // write output values initial values
+    // write output digital initial values
     try {
       await this.writeDigitalOutputStateToIc();
     }
     catch (err) {
-      this.env.log.warn(`PortExpanderDriver init. Can't write initial output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    }
+
+    // write output analog initial values
+    try {
+      await this.writeAnalogOutputStateToIc();
+    }
+    catch (err) {
+      this.env.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
   }
 
@@ -168,7 +176,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     if (pin < 0 || pin > this.getLastAnalogPinNum()) {
-      throw new Error('PortExpanderDriver.setupAnalog: Pin out of range');
+      throw new Error('PortExpanderDriver.setupAnalog: Analog pin out of range');
     }
 
     if (pinMode === 'analog_output') {
@@ -272,8 +280,26 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Not output pins (input, undefined) are ignored.
    */
   async writeDigitalState(outputState: DigitalState) {
-    this.updateOutputValues(outputState);
+    this.updateDigitalOutputValues(outputState);
     await this.writeDigitalOutputStateToIc();
+  }
+
+  async readAnalog(pin: number): Promise<number> {
+    // TODO: add
+
+    return 0;
+  }
+
+  async writeAnalog(pin: number, value: number): Promise<void> {
+    // TODO: add
+  }
+
+  /**
+   * Write all the values of analog output pins.
+   */
+  async writeAnalogState(outputState: AnalogState): Promise<void> {
+    this.updateAnalogOutputValues(outputState);
+    await this.writeAnalogOutputStateToIc();
   }
 
 
@@ -289,7 +315,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
   }
 
-  private updateOutputValues(newValues: DigitalState) {
+  private updateDigitalOutputValues(newValues: DigitalState) {
     for (let pinNum in newValues) {
       if (this.pinModes[pinNum] === MODES.output) {
         this.state.outputs[pinNum] = newValues[pinNum];
@@ -297,8 +323,16 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
   }
 
+  private updateAnalogOutputValues(newValues: AnalogState) {
+    for (let pinNum in newValues) {
+      if (this.pinModes[pinNum] === MODES.analog_output) {
+        this.state.analogOutputs[pinNum] = newValues[pinNum];
+      }
+    }
+  }
+
   /**
-   * Write all the values of output pins to IC.
+   * Write all the values of digital output pins to IC.
    */
   private async writeDigitalOutputStateToIc() {
     await this.initIcIfNeed();
@@ -308,6 +342,17 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     console.log(222222222, this.props, dataToSend);
 
     await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
+  }
+
+  /**
+   * Write all the values of analog output pins to IC.
+   */
+  private async writeAnalogOutputStateToIc() {
+    await this.initIcIfNeed();
+
+    // TODO: разбить значения в 2х байтовые слова и передать подряд
+
+    // await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
   }
 
   private isDigitalPin(pin: number): boolean {

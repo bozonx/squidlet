@@ -31,7 +31,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
   read(pin: number): Promise<boolean> {
-    return this.callAction('read', pin);
+    return this.callAction('readDigital', pin);
   }
 
   /**
