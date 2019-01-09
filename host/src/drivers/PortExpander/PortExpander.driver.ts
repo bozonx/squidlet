@@ -10,7 +10,8 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {convertBitsToBytes, convertBytesToBits, getKeyOfObject, numToWord} from '../../helpers/helpers';
+import {getKeyOfObject} from '../../helpers/helpers';
+import {convertBitsToBytes, convertBytesToBits, numToWord} from '../../helpers/binaryHelpers';
 import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';

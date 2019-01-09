@@ -1,10 +1,10 @@
+import {withoutFirstItemUint8Arr} from '../../helpers/helpers';
 import {
   hexToBytes,
   bytesToHexString,
   numToWord,
-  wordToNum,
-  withoutFirstItemUint8Arr
-} from '../../helpers/helpers';
+  wordToNum
+} from '../../helpers/binaryHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';

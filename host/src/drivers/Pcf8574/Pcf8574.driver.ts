@@ -7,7 +7,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
-import {byteToBinArr, updateBitInByte} from '../../helpers/helpers';
+import {byteToBinArr, updateBitInByte} from '../../helpers/binaryHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 import Republish from '../../helpers/Republish';
 import {omit} from '../../helpers/lodashLike';
