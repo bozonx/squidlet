@@ -9,14 +9,12 @@ import DriverBase from '../../app/entities/DriverBase';
 import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
 import {byteToBinArr, updateBitInByte} from '../../helpers/binaryHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
-import Republish from '../../helpers/Republish';
 import {omit} from '../../helpers/lodashLike';
 
 
 export type ResultHandler = (values?: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
-  resendStateInterval?: number;
 }
 
 
@@ -29,7 +27,6 @@ export const DIR_OUT = 0;
 
 
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
-  private republish?: Republish;
   /** Direction of each pin. By default all pin directions are undefined. */
   private directions:Array<number> = [
     DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
@@ -50,16 +47,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
       .getInstance({
-        ...omit(this.props, 'resendStateInterval'),
+        ...this.props,
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
-
-    // TODO: remove resendStateInterval
-
-    if (this.props.resendStateInterval) {
-      this.republish = new Republish(this.props.resendStateInterval);
-    }
   }
 
   protected didInit = async () => {
@@ -271,14 +262,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // it means that IC is inited when first data is written
     this.wasIcInited = true;
 
-    // clear republish and start again
-    if (this.republish) {
-
-      // TODO: нет от него толка - потомучто статус работает не правильно - если не получилось то от не переключает
-
-      //this.republish.start(this.doResend);
-    }
-
     // set all input pins to high
     const newIcState = this.currentState | this.inputPinBitmask;
     const dataToSend: Uint8Array = new Uint8Array(1);
@@ -298,15 +281,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     }
     catch (err) {
       this.env.log.error(`PCF8574.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
-    }
-  }
-
-  private doResend = async () => {
-    try {
-      await this.writeToIc();
-    }
-    catch (err) {
-      this.env.log.error(`PCF8574.driver. Can't resend state to IC. ${String(err)}`);
     }
   }
 

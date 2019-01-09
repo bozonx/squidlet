@@ -51,6 +51,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
     const wrapper: Wrapper = (values: boolean[]) => {
 
+      // TODO: review
       // TODO: нужно же обработать ошибку??? или она напишется в лог в Devices?
 
       // if (err) {
