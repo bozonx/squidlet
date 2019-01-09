@@ -239,6 +239,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<void> {
+    if (!this.checkInitialization('poll')) return;
+
     await this.initIcIfNeed();
 
     // TODO: review
@@ -267,7 +269,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async readDigital(pin: number): Promise<boolean> {
     this.checkPin(pin);
-    await this.initIcIfNeed();
+    // if (!this.checkInitialization('readDigital')) return;
+    // await this.initIcIfNeed();
 
     if (!this.isDigitalPin(pin)) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up as a digital`);
@@ -289,8 +292,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   async writeDigital(pin: number, value: boolean): Promise<void> {
-    this.checkPin(pin);
+    if (!this.checkInitialization('writeDigital')) return;
+
     await this.initIcIfNeed();
+    this.checkPin(pin);
 
     if (this.pinModes[pin] !== MODES.output) {
       throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as an digital output`);
@@ -309,13 +314,19 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Not output pins (input, undefined) are ignored.
    */
   async writeDigitalState(outputState: DigitalState) {
+    if (!this.checkInitialization('writeDigitalState')) return;
+
+    await this.initIcIfNeed();
+
     this.updateDigitalOutputValues(outputState);
     await this.writeDigitalOutputStateToIc();
   }
 
   async readAnalog(pin: number): Promise<number> {
+    // if (!this.checkInitialization('writeDigitalState')) return;
+    //
+    // await this.initIcIfNeed();
     this.checkPin(pin);
-    await this.initIcIfNeed();
 
     if (!this.isAnalogPin(pin)) {
       throw new Error(`PortExpanderDriver.readAnalog: pin "${pin}" hasn't been set up as an analog`);
@@ -329,8 +340,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   async writeAnalog(pin: number, value: number): Promise<void> {
-    this.checkPin(pin);
+    if (!this.checkInitialization('writeAnalog')) return;
+
     await this.initIcIfNeed();
+    this.checkPin(pin);
 
     if (this.pinModes[pin] !== MODES.analog_output) {
       throw new Error(`PortExpanderDriver.writeAnalog: pin "${pin}" wasn't set as an analog output`);
@@ -351,6 +364,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Write all the values of analog output pins.
    */
   async writeAnalogState(outputState: AnalogState): Promise<void> {
+    if (!this.checkInitialization('writeAnalogState')) return;
+
+    await this.initIcIfNeed();
+
     this.updateAnalogOutputValues(outputState);
     await this.writeAnalogOutputStateToIc();
   }
@@ -388,8 +405,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Write all the values of digital output pins to IC.
    */
   private async writeDigitalOutputStateToIc() {
-    await this.initIcIfNeed();
-
     const dataToSend: Uint8Array = convertBitsToBytes(this.state.outputs, this.props.digitalPinsCount);
 
     console.log(222222222, this.props, dataToSend);
@@ -401,8 +416,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Write all the values of analog output pins to IC.
    */
   private async writeAnalogOutputStateToIc() {
-    await this.initIcIfNeed();
-
     const dataToSend: Uint8Array = new Uint8Array(this.getLastAnalogPinNum() * BYTES_IN_WORD);
 
     for (let pinNumString in this.state.analogOutputs) {
@@ -418,6 +431,21 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     await this.node.write(COMMANDS.setAllAnalogOutputValues, dataToSend);
+  }
+
+  private checkInitialization(method: string): boolean {
+    if (!this.initingIcInProgress) {
+      this.env.log.warn(`PortExpanderDriver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+
+      return false;
+    }
+    else if (!this.env.system.isInitialized) {
+      this.env.log.warn(`PortExpanderDriver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+
+      return false;
+    }
+
+    return true;
   }
 
   private isDigitalPin(pin: number): boolean {
@@ -454,7 +482,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Write pin modes to IC if it isn't initialized before.
    */
   private async initIcIfNeed() {
-    if (this.wasIcInited || this.initingIcInProgress) return;
+    if (this.wasIcInited) return;
 
     this.initingIcInProgress = true;
 

@@ -36,6 +36,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
   private wasIcInited: boolean = false;
+  private initingIcInProgress: boolean = false;
 
   private get i2cNode(): I2cNodeDriver {
     return this.depsInstances.i2cNode as I2cNodeDriver;
@@ -59,7 +60,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
   protected appDidInit = async () => {
     // init IC state after app is inited if it isn't inited at this moment
-    if (!this.wasIcInited) await this.initIc();
+    await this.initIc();
   }
 
 
@@ -124,12 +125,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<void> {
-
-    // TODO: review
-
-    // if (!this.env.system.isInitialized) {
-    //   this.env.log.warn(`PCF8574Driver.poll(). It runs before app is initialized`);
-    // }
+    if (!this.checkInitialization('poll')) return;
 
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
@@ -180,11 +176,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   async write(pin: number, value: boolean): Promise<void> {
+    if (!this.checkInitialization('write')) return;
+
     this.checkPin(pin);
 
     if (this.directions[pin] !== DIR_OUT) {
       throw new Error('Pin is not defined as an output');
     }
+
+    // It doesn't need to initialize IC, because new state will send below
 
     // update local state
     this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
@@ -197,6 +197,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Not output pins (input, undefined) are ignored.
    */
   async writeState(outputValues: boolean[]): Promise<void> {
+    if (!this.checkInitialization('writeState')) return;
+
     let newState: number = this.currentState;
 
     for (let pin = 0; pin < 8; pin++) {
@@ -249,9 +251,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Do first write to IC if it doesn't do before.
    */
   private async initIc() {
-
-    // TODO: review
-
     try {
       await this.writeToIc();
     }
@@ -265,6 +264,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
   private async writeToIc () {
+    if (!this.wasIcInited) {
+      this.initingIcInProgress = true;
+    }
+
     // it means that IC is inited when first data is written
     this.wasIcInited = true;
 
@@ -276,8 +279,25 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     dataToSend[0] = newIcState;
 
     await this.i2cNode.write(undefined, dataToSend);
+
+    this.initingIcInProgress = false;
   }
 
+  private checkInitialization(method: string): boolean {
+    if (!this.initingIcInProgress) {
+      this.env.log.warn(`PCF8574Driver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+
+      return false;
+    }
+    else if (!this.env.system.isInitialized) {
+      this.env.log.warn(`PCF8574Driver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+
+      return false;
+    }
+    
+    return true;
+  }
+  
   /**
    * Helper function to set/clear one bit in a bitmask.
    * @param  {number}            current The current bitmask.
