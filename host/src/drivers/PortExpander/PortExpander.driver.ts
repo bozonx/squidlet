@@ -15,7 +15,7 @@ import {convertBitsToBytes, convertBytesToBits, hexToBytes, numToWord} from '../
 import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
-import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
+import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../../app/dict/constants';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
@@ -399,7 +399,19 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private async writeAnalogOutputStateToIc() {
     await this.initIcIfNeed();
 
-    // TODO: разбить значения в 2х байтовые слова и передать подряд
+    const dataToSend: Uint8Array = new Uint8Array(this.getLastAnalogPinNum() * BYTES_IN_WORD);
+
+    for (let pinNumString in this.state.analogOutputs) {
+      const pinNum: number = parseInt(pinNumString);
+
+      if (typeof this.state.analogOutputs[pinNum] === 'undefined') continue;
+
+      const valueWord: string = numToWord(Number(this.state.analogOutputs[pinNum]));
+      const int8ValueWord: Uint8Array = hexToBytes(valueWord);
+
+      dataToSend[pinNum * BYTES_IN_WORD] = int8ValueWord[0];
+      dataToSend[pinNum * BYTES_IN_WORD + 1] = int8ValueWord[1];
+    }
 
     await this.node.write(COMMANDS.setAllAnalogOutputValues, dataToSend);
   }
