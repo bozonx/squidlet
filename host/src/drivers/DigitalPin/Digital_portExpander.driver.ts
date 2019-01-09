@@ -6,9 +6,10 @@ import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import Response from '../../messenger/interfaces/Response';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
+import {State} from '../PortExpander/PortExpander.driver';
 
 
-type Wrapper = (values: boolean[]) => void;
+type Wrapper = (state: State) => void;
 
 interface DigitalPortExpanderDriverProps extends ExpanderDriverProps {
   expander: string;
@@ -45,44 +46,20 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    const wrapper: Wrapper = (values: boolean[]) => {
+    const wrapper: Wrapper = (state: State) => {
 
-      // TODO: нужно же обработать ошибку??? или она напишется в лог в Devices?
       // TODO: будут поднимать события на всех пинах, так как опрашивается все целиком
+      // TODO: событие поднимится при изменении любого пина - нужно слушать только изменения конкретного пина
 
-      // TODO: review
-
-      // if (err) {
-      //   this.env.log.error(String(err));
-      //
-      //   return;
-      // }
-      if (!values) {
-        this.env.log.error(`DigitalPortExpanderDriver.setWatch. pin: ${pin}. No values`);
+      if (typeof state.inputs[pin] === 'undefined') {
+        this.env.system.log.error(`DigitalPortExpanderDriver.setWatch: Can't get digital pin state on pin "${pin}"`);
 
         return;
       }
 
-      const pinValue: boolean = values[pin];
+      const pinValue: boolean = Boolean(state.inputs[pin]);
 
-      // skip not suitable edge
-      if (edge === 'rising' && !pinValue) {
-        return;
-      }
-      else if (edge === 'falling' && pinValue) {
-        return;
-      }
-
-      if (!debounce) {
-        handler(pinValue);
-      }
-      else {
-        // wait for debounce and read current level
-        this.debounceCall.invoke( pin, debounce, async () => {
-          const realLevel = await this.read(pin);
-          handler(realLevel);
-        });
-      }
+      handler(pinValue);
     };
 
     const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
