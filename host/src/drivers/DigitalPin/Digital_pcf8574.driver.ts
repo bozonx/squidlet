@@ -52,13 +52,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     const wrapper: Wrapper = (values: boolean[]) => {
 
       // TODO: review
-      // TODO: нужно же обработать ошибку??? или она напишется в лог в Devices?
 
-      // if (err) {
-      //   this.env.log.error(String(err));
-      //
-      //   return;
-      // }
       if (!values) {
         this.env.log.error(`DigitalPcf8574Driver.setWatch. pin: ${pin}. No values`);
 
@@ -88,6 +82,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
       }
     };
 
+    // TODO: remake
     const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
 
     this.handlerIds.push(handlerId);
