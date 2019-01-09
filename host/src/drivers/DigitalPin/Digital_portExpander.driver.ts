@@ -2,14 +2,10 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
-import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
-import DebounceCall from '../../helpers/DebounceCall';
-import {PortExpanderDriver, State} from '../PortExpander/PortExpander.driver';
+import {DigitalPinHandler, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
 import PortExpander from '../../devices/PortExpander/PortExpander';
+import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 
-
-type Wrapper = (state: State) => void;
 
 interface DigitalPortExpanderDriverProps extends ExpanderDriverProps {
   expander: string;
@@ -20,7 +16,6 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: string[] = [];
-  private readonly debounceCall: DebounceCall = new DebounceCall();
 
   get expanderDevice(): PortExpander {
     return this.env.system.devicesManager.getDevice<PortExpander>(this.props.expander);
@@ -31,8 +26,16 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
     return this.expanderDevice.expander.setupDigital(pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): Promise<PinMode | undefined> {
-    return this.expanderDevice.expander.getPinMode(pin);
+  async getPinMode(pin: number): Promise<PinMode | undefined> {
+    const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDevice.expander.getPinMode(pin);
+
+    if (expanderPinMode === 'input'
+      || expanderPinMode === 'input_pullup'
+      || expanderPinMode === 'input_pulldown'
+      || expanderPinMode === 'output'
+    ) return expanderPinMode as PinMode;
+
+    return;
   }
 
   read(pin: number): Promise<boolean> {
@@ -50,23 +53,13 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    const wrapper: Wrapper = (state: State) => {
+    const wrapper: DigitalPinHandler = (targetPin: number, value: boolean) => {
+      if (targetPin !== pin) return;
 
-      // TODO: будут поднимать события на всех пинах, так как опрашивается все целиком
-      // TODO: событие поднимится при изменении любого пина - нужно слушать только изменения конкретного пина
-
-      if (typeof state.inputs[pin] === 'undefined') {
-        this.env.system.log.error(`DigitalPortExpanderDriver.setWatch: Can't get digital pin state on pin "${pin}"`);
-
-        return;
-      }
-
-      const pinValue: boolean = Boolean(state.inputs[pin]);
-
-      handler(pinValue);
+      handler(value);
     };
 
-    const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
+    const handlerId: string = this.expanderDevice.expander.addDigitalListener(wrapper);
 
     this.handlerIds.push(handlerId);
 

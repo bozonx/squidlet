@@ -205,13 +205,17 @@ export function textToUint8Array(str: string): Uint8Array {
   return new TextEncoder('utf-8').encode(str);
 }
 
+/**
+ * to hex. eg - "5A" -> 90. "5a" the same
+ */
 export function hexStringToHexNum(hesString: string): number {
-  // to hex. eg - "5A" -> 90. "5a" the same
   return parseInt(hesString, 16);
 }
 
+/**
+ * e.g 65535 => "ffff". To decode use - hexStringToHexNum() or parseInt("ffff", 16)
+ */
 export function hexNumToHexString(hexNum: number): string {
-  // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
   let hexString: string = hexNum.toString(16);
   if (hexString.length === 1) hexString = '0' + hexString;
 
@@ -227,6 +231,41 @@ export function numToWord(num: number): string {
 
 export function wordToNum(word: string): number {
   return parseInt(word, 16);
+}
+
+/**
+ * Make [255,0] from [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0]
+ */
+export function convertBitsToBytes(bits: (boolean | undefined)[], bitsCount: number): Uint8Array {
+  // TODO: test
+
+  const numOfBytes: number = Math.ceil(bitsCount / 8);
+  const result: Uint8Array = new Uint8Array(numOfBytes);
+
+  for (let i = 0; i < bitsCount; i++) {
+    // number of byte from 0
+    const byteNum: number = Math.floor(i / 8);
+    //const positionInByte: number = (Math.floor(i / 8) * 8);
+    const positionInByte: number = i - (byteNum * 8);
+
+    result[byteNum] = updateBitInByte(result[byteNum], positionInByte, Boolean(bits[i]));
+  }
+
+  return result;
+}
+
+export function convertBytesToBits(bytes: Uint8Array): boolean[] {
+  if (!bytes.length) return [];
+
+  //const bitsLength: number = bytes.length * 8;
+  //new Array<boolean>(bitsLength)
+  let result: boolean[] = [];
+
+  for (let index of bytes.keys()) {
+    result = result.concat(byteToBinArr(bytes[index]));
+  }
+
+  return result;
 }
 
 /**
@@ -355,41 +394,6 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
   if (valueIndex < 0) return;
 
   return keys[valueIndex];
-}
-
-/**
- * Make [255,0] from [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0]
- */
-export function convertBitsToBytes(bits: (boolean | undefined)[], bitsCount: number): Uint8Array {
-  // TODO: test
-
-  const numOfBytes: number = Math.ceil(bitsCount / 8);
-  const result: Uint8Array = new Uint8Array(numOfBytes);
-
-  for (let i = 0; i < bitsCount; i++) {
-    // number of byte from 0
-    const byteNum: number = Math.floor(i / 8);
-    //const positionInByte: number = (Math.floor(i / 8) * 8);
-    const positionInByte: number = i - (byteNum * 8);
-
-    result[byteNum] = updateBitInByte(result[byteNum], positionInByte, Boolean(bits[i]));
-  }
-
-  return result;
-}
-
-export function convertBytesToBits(bytes: Uint8Array): boolean[] {
-  if (!bytes.length) return [];
-
-  //const bitsLength: number = bytes.length * 8;
-  //new Array<boolean>(bitsLength)
-  let result: boolean[] = [];
-
-  for (let index of bytes.keys()) {
-    result = result.concat(byteToBinArr(bytes[index]));
-  }
-
-  return result;
 }
 
 // TODO: move to nodeLike

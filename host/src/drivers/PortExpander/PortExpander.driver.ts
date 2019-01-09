@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {convertBitsToBytes, convertBytesToBits, getKeyOfObject} from '../../helpers/helpers';
+import {convertBitsToBytes, convertBytesToBits, getKeyOfObject, numToWord} from '../../helpers/helpers';
 import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
@@ -50,14 +50,20 @@ export type PortExpanderPinMode = 'input'
   | 'tx';
 export type ResultHandler = (state?: State) => void;
 
+export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
+export type AnalogPinHandler = (targetPin: number, value: number) => void;
 
+
+// TODO: review commands - add set debounce, edge, setup analog, setup all analog
 const COMMANDS = {
-  setup:              0x30,
-  setupAll:           0x31,
-  setOutputValue:     0x32,
-  setAllOutputValues: 0x33,
-  readDigital:        0x34,
-  readAllDigital:     0x35,
+  setup:                    0x30,
+  setupAll:                 0x31,
+  setOutputValue:           0x32,
+  setAllOutputValues:       0x33,
+  readDigital:              0x34,
+  readAllDigital:           0x35,
+  setAnalogOutputValue:     0x36,
+  setAllAnalogOutputValues: 0x37,
 };
 
 const MODES = {
@@ -91,6 +97,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   };
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
+  private readonly handlers: (DigitalPinHandler | AnalogPinHandler)[] = [];
 
   private get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
@@ -186,11 +193,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.pinModes[pin] = MODES[pinMode];
   }
 
-  // TODO: что слушаем ??? любые изменения или только digital, analog etc?
-  /**
-   * Add listener to listen to changes of any pin.
-   */
-  addListener(handler: ResultHandler): number {
+  addDigitalListener(handler: DigitalPinHandler): string {
     const wrapper: NodeHandler = () => {
       const lastState: State = cloneDeep(this.state);
 
@@ -203,10 +206,30 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     };
 
     return this.node.addListener(wrapper);
+
+    //this.handlers.push();
   }
 
-  removeListener(handlerIndex: number) {
-    this.node.removeListener(handlerIndex);
+  addAnalogListener(handler: AnalogPinHandler): string {
+    //this.handlers.push();
+
+    // TODO: !!! make it
+  }
+
+  // // TODO: что слушаем ??? любые изменения или только digital, analog etc?
+  // /**
+  //  * Add listener to listen to changes of any pin.
+  //  */
+  // addListener(handler: ResultHandler): number {
+  //
+  // }
+
+  removeListener(handlerIndex: string) {
+
+    // TODO: !!! make it
+    // TODO: !!! support analog
+
+    //this.node.removeListener(handlerIndex);
   }
 
   /**
@@ -214,6 +237,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   async poll(): Promise<void> {
     await this.initIcIfNeed();
+
+    // TODO: review
+    // TODO: review analog
 
     await this.node.poll();
     this.setLastReceivedState();
@@ -261,8 +287,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.checkPin(pin);
     await this.initIcIfNeed();
 
-    const pinMode: number | undefined = this.pinModes[pin];
-
     if (this.pinModes[pin] !== MODES.output) {
       throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as an digital output`);
     }
@@ -300,7 +324,23 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   async writeAnalog(pin: number, value: number): Promise<void> {
-    // TODO: add
+    this.checkPin(pin);
+    await this.initIcIfNeed();
+
+    if (this.pinModes[pin] !== MODES.analog_output) {
+      throw new Error(`PortExpanderDriver.writeAnalog: pin "${pin}" wasn't set as an analog output`);
+    }
+
+    const dataToSend: Uint8Array = new Uint8Array(2);
+    const valueWord: string = numToWord(value);
+
+    dataToSend[0] = this.getHexPinNumber(pin);
+
+    // TODO: разбить значение на 2 байта
+
+    //dataToSend[1] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
+
+    await this.node.write(COMMANDS.setAnalogOutputValue, dataToSend);
   }
 
   /**
@@ -361,7 +401,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     // TODO: разбить значения в 2х байтовые слова и передать подряд
 
-    // await this.node.write(COMMANDS.setAllOutputValues, dataToSend);
+    await this.node.write(COMMANDS.setAllAnalogOutputValues, dataToSend);
   }
 
   private isDigitalPin(pin: number): boolean {

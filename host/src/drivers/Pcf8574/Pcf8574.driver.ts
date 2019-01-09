@@ -117,6 +117,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Add listener to change of any pin.
    */
   addListener(handler: ResultHandler): number {
+
+    // TODO: ожидается что ResultHandler будет string а не number
+
     const wrapper: Handler = () => {
       this.setLastReceivedState();
 
@@ -129,6 +132,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   removeListener(handlerIndex: number) {
+
+    // TODO: ожидается что ResultHandler будет string а не number
+
     this.i2cNode.removeListener(handlerIndex);
   }
 
