@@ -36,7 +36,7 @@ export function byteToString(hexValue: number): string {
 
   // TODO: test
 
-  // convert 4 to ""00000100""
+  // convert 4 to "00000100"
   return padStart( hexValue.toString(2), 8, '0' );
 }
 
@@ -79,10 +79,12 @@ export function updateBitInByte(byte: number, position: number, value: boolean):
 }
 
 
+// TODO: remake
 export function uint8ArrayToText(arr: Uint8Array): string {
   return new TextDecoder('utf-8').decode(arr);
 }
 
+// TODO: remake
 export function textToUint8Array(str: string): Uint8Array {
   return new TextEncoder('utf-8').encode(str);
 }

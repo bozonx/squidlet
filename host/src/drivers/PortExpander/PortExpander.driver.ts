@@ -11,7 +11,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {getKeyOfObject} from '../../helpers/helpers';
-import {convertBitsToBytes, convertBytesToBits, numToWord} from '../../helpers/binaryHelpers';
+import {convertBitsToBytes, convertBytesToBits, hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver, {NodeHandler} from '../../app/interfaces/NodeDriver';
@@ -334,12 +334,11 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     const dataToSend: Uint8Array = new Uint8Array(2);
     const valueWord: string = numToWord(value);
+    const int8ValueWord: Uint8Array = hexToBytes(valueWord);
 
     dataToSend[0] = this.getHexPinNumber(pin);
-
-    // TODO: разбить значение на 2 байта
-
-    //dataToSend[1] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
+    dataToSend[1] = int8ValueWord[0];
+    dataToSend[2] = int8ValueWord[1];
 
     await this.node.write(COMMANDS.setAnalogOutputValue, dataToSend);
   }
