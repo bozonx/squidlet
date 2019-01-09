@@ -471,6 +471,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private async writePinModes() {
 
     // TODO: review - allPinCount
+    // TODO: review - write analog and digital modes - у ниъ разные пины
 
     const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);
 
