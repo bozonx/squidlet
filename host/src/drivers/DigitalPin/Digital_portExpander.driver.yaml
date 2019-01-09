@@ -9,9 +9,10 @@ props:
   expander:
     type: string
     required: true
-#  # PortExpander.driver
-#  bus:
-#  address:
-#  feedback:
-#  pollInterval:
-#  int:
+  # PortExpander.driver
+  connection:
+  # ... connection props
+  digitalPinsCount:
+  analogPinsCount:
+  pollInterval:
+  alogPinsCount:

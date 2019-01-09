@@ -22,7 +22,7 @@ export default async function systemPlugin (env: PluginEnv) {
   // TODO: remove
   await env.addDevice(path.join(devicesRoot, 'Pcf8574/manifest.yaml'));
   // TODO: remove
-  await env.addDevice(path.join(devicesRoot, 'PortExpander/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'PortExpanderEsp32/manifest.yaml'));
 
   // drivers
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.driver.yaml'));

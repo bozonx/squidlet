@@ -19,27 +19,11 @@ import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../../app/dict/constants';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
 
-export interface ExpanderDriverProps {
-  // count of all the pins of expander
-  //allPinCount: number;
-  digitalPinsCount: number;
-  analogPinsCount: number;
-  // connection params
-  [index: string]: any;
-}
-
 type DigitalState = (boolean | undefined)[];
 type AnalogState = (number | undefined)[];
-
-export interface State {
-  // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
-  inputs: DigitalState;
-  outputs: DigitalState;
-  // indexes are analog pin numbers from 0
-  analogInputs: AnalogState;
-  analogOutputs: AnalogState;
-}
-
+export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
+export type AnalogPinHandler = (targetPin: number, value: number) => void;
+export type PortExpanderConnection = 'i2c' | 'serial';
 export type PortExpanderPinMode = 'input'
   | 'input_pullup'
   | 'input_pulldown'
@@ -51,10 +35,23 @@ export type PortExpanderPinMode = 'input'
   | 'tx';
 
 
-//export type ResultHandler = (state?: State) => void;
 
-export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
-export type AnalogPinHandler = (targetPin: number, value: number) => void;
+export interface ExpanderDriverProps {
+  connection: PortExpanderConnection;
+  digitalPinsCount: number;
+  analogPinsCount: number;
+  // connection params
+  [index: string]: any;
+}
+
+export interface State {
+  // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
+  inputs: DigitalState;
+  outputs: DigitalState;
+  // indexes are analog pin numbers from 0
+  analogInputs: AnalogState;
+  analogOutputs: AnalogState;
+}
 
 
 // TODO: review commands - add set debounce, edge, setup analog, setup all analog
@@ -109,7 +106,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
 
-    // TODO: choose driver
+    // TODO: choose driver - use connection
 
     this.depsInstances.node = await getDriverDep('I2cNode.driver')
       .getInstance({

@@ -1,13 +1,18 @@
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ExpanderDriverProps, PortExpanderDriver} from '../../drivers/PortExpander/PortExpander.driver';
+import {
+  ExpanderDriverProps,
+  PortExpanderConnection,
+  PortExpanderDriver
+} from '../../drivers/PortExpander/PortExpander.driver';
 
 
 interface Props extends DeviceBaseProps, ExpanderDriverProps {
+  connection: PortExpanderConnection;
 }
 
 
-export default class PortExpander extends DeviceBase<Props> {
+export default class PortExpanderEsp32 extends DeviceBase<Props> {
   get expander(): PortExpanderDriver {
     return this.depsInstances.expander as PortExpanderDriver;
   }

@@ -1,6 +1,6 @@
-name: PortExpander
+name: PortExpanderEsp32
 type: expander
-main: ./PortExpander.ts
+main: ./PortExpanderEsp32.ts
 drivers:
   - PortExpander.driver
 

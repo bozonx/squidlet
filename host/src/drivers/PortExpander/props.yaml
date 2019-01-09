@@ -1,4 +1,11 @@
-pinCount: 16
+connection: i2c|serial
+# ... connection props
+digitalPinsCount:
+  type: number
+  required: true
+analogPinsCount:
+  type: number
+  required: true
 
 # I2cNode.driver
 bus:
