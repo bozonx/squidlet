@@ -49,7 +49,9 @@ export type PortExpanderPinMode = 'input'
   | 'pwm'
   | 'rx'
   | 'tx';
-export type ResultHandler = (state?: State) => void;
+
+
+//export type ResultHandler = (state?: State) => void;
 
 export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
 export type AnalogPinHandler = (targetPin: number, value: number) => void;
