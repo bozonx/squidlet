@@ -1,4 +1,5 @@
-const _isEqual = require('lodash/isEqual');
+import {isUint8Array} from './helpers';
+
 const _capitalize = require('lodash/capitalize');
 const _padStart = require('lodash/padStart');
 
@@ -54,7 +55,7 @@ export function find(collection: any[] | {[index: string]: any}, cb: (item: any,
     }
   }
   else {
-    throw new Error(`find: unsupported type of collection`);
+    throw new Error(`find: unsupported type of collection "${JSON.stringify(collection)}"`);
   }
 }
 
@@ -98,22 +99,56 @@ export function cloneDeep(value: any): any {
   ) {
     return value;
   }
-  else if (typeof value === 'object') {
+  else if (isPlainObject(value) || Array.isArray(value)) {
     // arrays or plain object. Don't support of class instances.
     return JSON.parse(JSON.stringify(value));
   }
 
-  throw new Error(`cloneDeep: unsupported type of value`);
+  throw new Error(`cloneDeep: unsupported type of value "${JSON.stringify(value)}"`);
 }
 
-export function isEqual(...p: any[]) {
+export function isEqual(first: any, second: any): boolean {
+  if (
+    first === null
+    || typeof first === 'string'
+    || typeof first === 'number'
+    || typeof first === 'undefined'
+    || typeof first === 'function'
+    || second === null
+    || typeof second === 'string'
+    || typeof second === 'number'
+    || typeof second === 'undefined'
+    || typeof second === 'function'
+  ) {
+    return first === second;
+  }
+  else if (Array.isArray(first)) {
+    if  (!Array.isArray(second)) return false;
 
-  // TODO: remake - use deep equal
-  // TODO: support Uint8Array
+    // TODO: remake - use deep equal
+  }
+  else if (isPlainObject(first)) {
+    if (!isPlainObject(second)) return false;
 
-  return _isEqual(...p);
+    // TODO: remake - use deep equal
+  }
+  else if (isUint8Array(first)) {
+    if (isUint8Array(second)) return false;
+
+    // TODO: support Uint8Array
+  }
+  else {
+    throw new Error(`isEqual: unsupported types of values "${JSON.stringify(first)}", "${JSON.stringify(second)}"`);
+  }
 }
 
-export function isObject(item) {
+export function isObject(item: any): boolean {
   return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
+function isPlainObject(obj: any): boolean {
+  return  typeof obj === 'object' // separate from primitives
+    && obj !== null         // is obvious
+    && obj.constructor === Object // separate instances (Array, DOM, ...)
+    && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math
 }
