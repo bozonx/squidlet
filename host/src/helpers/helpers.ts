@@ -137,7 +137,7 @@ export function findRecursively(rootObject: object, cb: (item: any, itemPath: st
   // TODO: test, review
 
   const recursive = (obj: object, rootPath: string): object | undefined => {
-    return find(obj, (item: any, name: string): any => {
+    return find(obj, (item: any, name: string | number): any => {
       const itemPath = trim(`${rootPath}.${name}`, '.');
       const cbResult = cb(item, itemPath);
 
