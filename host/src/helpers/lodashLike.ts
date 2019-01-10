@@ -1,7 +1,6 @@
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _capitalize = require('lodash/capitalize');
-const _includes = require('lodash/includes');
 const _omit = require('lodash/omit');
 const _isEqual = require('lodash/isEqual');
 const _trim = require('lodash/trim');
@@ -27,13 +26,6 @@ export function capitalize(...p: any[]) {
   // TODO: remake
 
   return _capitalize(...p);
-}
-
-export function includes(...p: any[]) {
-
-  // TODO: remake
-
-  return _includes(...p);
 }
 
 export function omit(...p: any[]) {

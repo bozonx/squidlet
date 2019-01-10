@@ -3,7 +3,6 @@ import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
 import ServiceEnv from './ServiceEnv';
 import System from '../System';
-import {includes} from '../../helpers/lodashLike';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceInstance, ServiceEnv> {
@@ -60,7 +59,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
     );
 
     for (let serviceId of Object.keys(definitions)) {
-      if (includes(allowedClassNames, definitions[serviceId].className)) {
+      if (allowedClassNames.includes(definitions[serviceId].className)) {
         servicesIds.push(serviceId);
       }
     }

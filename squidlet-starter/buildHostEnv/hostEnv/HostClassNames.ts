@@ -1,7 +1,6 @@
 import _filter = require('lodash/filter');
 import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
-import _includes = require('lodash/includes');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
@@ -166,7 +165,7 @@ export default class HostClassNames {
 
         const subDeps: string[] | undefined = dependencies['drivers'][depDriverName];
 
-        if (subDeps && !_includes(processedItems, `drivers-${depDriverName}`)) {
+        if (subDeps && !processedItems.includes(`drivers-${depDriverName}`)) {
           recursively('drivers', depDriverName);
         }
       }

@@ -3,7 +3,6 @@ import ManifestBase from '../interfaces/ManifestBase';
 import Env from '../interfaces/Env';
 import DriverInstance from '../interfaces/DriverInstance';
 import DeviceManifest from '../interfaces/DeviceManifest';
-import {includes} from '../../helpers/lodashLike';
 
 
 export type GetDriverDep = (driverName: string) => DriverInstance;
@@ -55,7 +54,7 @@ export default class EntityBase<Props = {}> {
 
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
     const getDriverDep: GetDriverDep = (driverName: string): DriverInstance => {
-      if (!includes(manifest.drivers, driverName)) {
+      if (!manifest.drivers.includes(driverName)) {
         throw new Error(`Can't find driver "${driverName}"`);
       }
 
