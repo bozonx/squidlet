@@ -7,7 +7,7 @@ import {omit} from '../../helpers/lodashLike';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
 
 
-export interface I2cNodeDriverProps extends MasterSlaveBaseProps {
+export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
   bus?: string | number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
@@ -16,7 +16,7 @@ export interface I2cNodeDriverProps extends MasterSlaveBaseProps {
 }
 
 
-export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps> {
+export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps> {
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
 
@@ -55,14 +55,12 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverPro
     });
   }
 
-  async read(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
-
-    // TODO: length is optional - try to get from props
-
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, read(${this.dataAddressToString(dataAddress)}, ${length})`;
+  async read(dataAddress: number, length?: number): Promise<Uint8Array> {
+    const resolvedLength: number = this.resolveReadLength(length);
+    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, read(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
-        return this.i2cMaster.read(this.addressHex, dataAddress, length);
+        return this.i2cMaster.read(this.addressHex, dataAddress, resolvedLength);
       });
 
     // update last poll data if data address the same
@@ -76,14 +74,12 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverPro
   /**
    * Write and read from the same data address.
    */
-  async request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-
-    // TODO: review
-
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${readLength})`;
+  async request(dataAddress?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array> {
+    const resolvedLength: number = this.resolveReadLength(readLength);
+    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
-        return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, readLength);
+        return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, resolvedLength);
       });
 
     // update last poll data if data address the same
@@ -105,7 +101,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverPro
       data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
     }
     catch (err) {
-      const msg = `I2cNode.driver Poll error of bus "${this.props.bus}",
+      const msg = `I2cToSlaveDriver: Poll error of bus "${this.props.bus}",
            address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`;
 
       // emit error to poll error channel
@@ -119,8 +115,16 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverPro
     return data;
   }
 
+  private resolveReadLength(readLength?: number): number {
+    if (typeof readLength !== 'undefined') return readLength;
 
-  protected validateProps = (props: I2cNodeDriverProps): string | undefined => {
+    // TODO: resolve on props
+
+    throw new Error(`I2cToSlaveDriver: You have to specify a length param to read or request methods`);
+  }
+
+
+  protected validateProps = (props: I2cToSlaveDriverProps): string | undefined => {
 
     // TODO; validate
 

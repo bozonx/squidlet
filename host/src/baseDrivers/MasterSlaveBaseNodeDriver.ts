@@ -31,8 +31,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * * write(undefined, data) - write only data
    */
   abstract write(dataAddress?: number, data?: Uint8Array): Promise<void>;
-  abstract read(dataAddress: number | undefined, length: number): Promise<Uint8Array>;
-  abstract request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array>;
+  abstract read(dataAddress?: number, length?: number): Promise<Uint8Array>;
+  abstract request(dataAddress?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
   protected abstract doPoll: () => Promise<Uint8Array>;
 
   protected readonly pollEvents: IndexedEvents = new IndexedEvents();
