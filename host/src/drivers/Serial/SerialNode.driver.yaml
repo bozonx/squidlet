@@ -1,0 +1,7 @@
+name: SerialNode.driver
+main: SerialNode.driver.ts
+type: system
+drivers:
+  - Serial.dev
+  - ImpulseInput.driver
+props:
