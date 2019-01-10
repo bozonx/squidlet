@@ -1,12 +1,11 @@
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
-export type EventName = 'data' | 'dataString' | 'framing' | 'parity';
+export type EventName = 'data' | 'dataString' | 'error';
 
 
 export interface Options {
   bytesize?: 7 | 8;                      // (default 8)How many data bits - 7 or 8
   parity?: null | 'none' | 'o' | 'odd' | 'e' | 'even'; // (default none) Parity bit
   stopbits?: number;                     // (default 1) Number of stop bits to use
-  // TODO: add echo             Print characters as you type them
 }
 
 
@@ -17,10 +16,10 @@ export interface Options {
 export default interface Serial {
   on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): number;
   on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): number;
-  on(uartNum: number, eventsName: EventName, handler: () => void): number;
+  on(uartNum: number, eventsName: 'error', handler: (err: string) => void): number;
 
-  // TODO: add error event - framing и parity - наверное это и есть ошибки???
-  // TODO: add open event
+  // TODO: add open event or promise
+  // TODO: events 'framing' | 'parity' - maybe they are errors
 
   // write binary data
   write(uartNum: number, data: Uint8Array): Promise<void>;
