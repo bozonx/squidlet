@@ -1,60 +1,27 @@
-import IndexedEvents from '../../helpers/IndexedEvents';
-import MasterSlaveBusProps from '../../app/interfaces/MasterSlaveBusProps';
 import {I2cMasterDriver} from './I2cMaster.driver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import {hexStringToHexNum} from '../../helpers/binaryHelpers';
-import Poling from '../../helpers/Poling';
-import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {ImpulseInputDriver, ImpulseInputDriverProps} from '../Binary/ImpulseInput.driver';
 import {isEqual, omit} from '../../helpers/lodashLike';
 import Sender from '../../helpers/Sender';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
 
 
-export type Handler = (data: Uint8Array) => void;
-export type ErrorHandler = (err: Error) => void;
-
-export interface I2cNodeDriverBaseProps extends MasterSlaveBusProps {
-  // if you have one interrupt pin you can specify in there
-  int?: ImpulseInputDriverProps;
+export interface I2cNodeDriverProps extends MasterSlaveBaseProps {
   bus?: string | number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
 }
 
-export interface I2cNodeDriverProps extends I2cNodeDriverBaseProps {
-  // length of data which will be requested
-  pollDataLength: number;
-  pollDataAddress?: string | number;
-}
 
-const DEFAULT_POLL_ID = 'default';
-
-
-export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
-  private readonly pollEvents: IndexedEvents = new IndexedEvents();
-  private readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
-  private readonly poling: Poling = new Poling();
+export class I2cNodeDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps> {
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
-  // data addr in hex to use in poling.
-  private pollDataAddressHex?: number;
-  private pollId: string = DEFAULT_POLL_ID;
-  private sender?: Sender;
-
-  // last received data by poling
-  // it needs to decide to rise change event or not
-  private pollLastData: Uint8Array = new Uint8Array(0);
 
   private get i2cMaster(): I2cMasterDriver {
     return this.depsInstances.i2cMaster as I2cMasterDriver;
   }
-
-  private get impulseInput(): ImpulseInputDriver | undefined {
-    return this.depsInstances.impulseInput as ImpulseInputDriver | undefined;
-  }
-
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
@@ -62,34 +29,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
         'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
       ));
 
-    if (this.props.int) {
-      this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
-        .getInstance(this.props.int || {});
-    }
-
     this.addressHex = hexStringToHexNum(String(this.props.address));
-    this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
-    this.pollId = this.dataAddressToString(this.props.pollDataAddress);
-    this.sender = new Sender(
-      // TODO: don't use system.host
-      this.env.system.host.config.config.senderTimeout,
-      this.env.system.host.config.config.senderResendTimeout
-    );
-  }
 
-  protected appDidInit = async () => {
-    // start poling or int listeners after app is initialized
-    this.setupFeedback();
-  }
-
-  destroy = () => {
-    // TODO: удалить из pollLengths, Polling
-    // TODO: удалить из intListenersLengths, unlisten of driver
-  }
-
-
-  getLastData(): Uint8Array {
-    return this.pollLastData;
+    await super.willInit(getDriverDep);
   }
 
   /**
@@ -133,6 +75,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    * Write and read from the same data address.
    */
   async request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
+
+    // TODO: review
+
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${readLength})`;
     const result: Uint8Array = await (this.sender as Sender)
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
@@ -147,43 +92,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return result;
   }
 
-  /**
-   * Poll once immediately. And restart current poll if it was specified.
-   * Data address and length you have to specify in props: pollDataLength and pollDataAddress.
-   * It reject promise on error
-   */
-  async poll(): Promise<Uint8Array> {
-    if (typeof this.props.pollDataAddress === 'undefined') {
-      throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
-    }
-
-    // TODO: проверить что не будут выполняться другие poll пока выполняется текущий
-
-    return this.poling.restart(this.pollId);
-  }
-
-  /**
-   * Listen to data which received by polling or interruption.
-   */
-  addListener(handler: Handler): number {
-    return this.pollEvents.addListener(handler);
-  }
-
-  removeListener(handlerIndex: number): void {
-    this.pollEvents.removeListener(handlerIndex);
-  }
-
-  /**
-   * Listen to errors which take place while poling or interruption is in progress
-   */
-  addPollErrorListener(handler: ErrorHandler): number {
-    return this.pollErrorEvents.addListener(handler);
-  }
-
-  removePollErrorListener(handlerIndex: number): void {
-    this.pollErrorEvents.removeListener(handlerIndex);
-  }
-
   protected validateProps = (props: I2cNodeDriverProps): string | undefined => {
 
     // TODO; validate
@@ -191,21 +99,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     return;
   }
 
-
-  private setupFeedback(): void {
-    if (this.props.feedback === 'int') {
-      if (!this.impulseInput) {
-        throw new Error(
-          `I2cNode.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
-        );
-      }
-
-      this.impulseInput.addListener(this.doPoll);
-    }
-    // start poling if feedback is poll
-    this.startPoling();
-    // else don't use feedback at all
-  }
 
   /**
    * Read data once and rise an data event
@@ -230,48 +123,6 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
     this.updateLastPollData(data);
 
     return data;
-  }
-
-  private updateLastPollData(data: Uint8Array) {
-    // if data is equal to previous data - do nothing
-    if (isEqual(this.pollLastData, data)) return;
-
-    // save data
-    this.pollLastData = data;
-    // finally rise an event
-    this.pollEvents.emit(data);
-  }
-
-  private stopPoling() {
-    if (this.props.feedback !== 'poll') return;
-
-    this.poling.stop(this.pollId);
-  }
-
-  private startPoling() {
-    if (this.props.feedback !== 'poll') return;
-
-    this.poling.start(this.doPoll, this.props.pollInterval, this.pollId);
-  }
-
-  /**
-   * Convert number to string or undefined to "DEFAULT_POLL_ID"
-   */
-  private dataAddressToString(dataAddress: string | number | undefined): string {
-    if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
-    if (typeof dataAddress === 'string') return dataAddress;
-
-    return dataAddress.toString(16);
-  }
-
-  /**
-   * Convert string or number data address to hex.
-   * Undefined means no data address.
-   */
-  private parseDataAddress(dataAddressStr: string | number | undefined): number | undefined {
-    if (typeof dataAddressStr === 'undefined') return undefined;
-
-    return parseInt(String(dataAddressStr), 16);
   }
 
 }
