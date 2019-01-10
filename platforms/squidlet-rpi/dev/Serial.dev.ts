@@ -6,6 +6,7 @@ import Serial, {BaudRate, Options, EventName} from '../../../host/src/app/interf
 export default class SerialDev implements Serial {
   private readonly instances: SerialPort[] = [];
 
+
   on(uartNum: number, eventsName: EventName, handler: (...params: any[]) => void): void {
 
     // TODO: rise dataString - data as string
@@ -40,7 +41,7 @@ export default class SerialDev implements Serial {
 
   async read(uartNum: number, length?: number): Promise<Uint8Array> {
 
-    // TODO: зачем это нужно ???
+    // TODO: review - return Uint8Array
 
     const result: string | Buffer | null = this.getSerial(uartNum).read(length);
 
