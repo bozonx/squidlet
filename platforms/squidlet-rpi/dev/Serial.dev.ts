@@ -22,6 +22,9 @@ export default class SerialDev implements Serial {
   }
 
   async read(uartName: string, chars?: number): Promise<string> {
+
+    // TODO: зачем это нужно ???
+
     const result: string | Buffer | null = this.getSerial(uartName).read(chars);
 
     if (result === null) {

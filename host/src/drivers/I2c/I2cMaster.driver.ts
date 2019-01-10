@@ -3,9 +3,8 @@ import I2cMaster from '../../app/interfaces/dev/I2cMaster';
 import { addFirstItemUint8Arr } from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
+import {DATA_ADDRESS_LENGTH} from '../../app/dict/constants';
 
-
-const DATA_ADDRESS_LENGTH = 1;
 
 export interface I2cMasterDriverProps {
   bus: number | string;
@@ -106,9 +105,11 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
 
 
 export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
+  // TODO: review - зачем если используется getInstance
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;
 
+  // TODO: review
   async getInstance(props: I2cMasterDriverProps): Promise<I2cMasterDriver> {
     const resolvedProps = (typeof props.bus === 'undefined') ? {} : { bus: String(props.bus) };
 
