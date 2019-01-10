@@ -2,7 +2,6 @@ const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _capitalize = require('lodash/capitalize');
 const _isEqual = require('lodash/isEqual');
-const _trim = require('lodash/trim');
 const _padStart = require('lodash/padStart');
 
 // TODO: test
@@ -62,9 +61,24 @@ export function find(collection: any[] | {[index: string]: any}, cb: (item: any,
   }
 }
 
-export function trim(...p: any[]) {
-  // TODO: remake
-  return _trim(...p);
+export function trimStart(src: string, char: string = ' '): string {
+  if (typeof src !== 'string') return src;
+
+  const regex = new RegExp(`^\\${char}*`);
+
+  return src.replace(regex, '');
+}
+
+export function trimEnd(src: string, char: string = ' '): string {
+  if (typeof src !== 'string') return src;
+
+  const regex = new RegExp(`\\${char}*$`);
+
+  return src.replace(regex, '');
+}
+
+export function trim(src: string, char: string = ' '): string {
+  return trimEnd( trimStart(src, char), char);
 }
 
 export function padStart(...p: any[]) {
@@ -75,13 +89,6 @@ export function padStart(...p: any[]) {
 export function last(arr: any[]) {
   return arr[arr.length - 1];
 }
-
-export function trimEnd(stringToTrim: string, chars: string): string {
-  const regex = new RegExp(`\\${chars}+$`);
-
-  return stringToTrim.replace(regex, '');
-}
-
 
 export function defaultsDeep(...p: any[]) {
   // TODO: remake - to merge deep
