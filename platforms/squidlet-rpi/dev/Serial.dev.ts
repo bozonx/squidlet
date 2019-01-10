@@ -79,6 +79,10 @@ export default class SerialDev implements Serial {
     this.instances[uartNum] = new SerialPort(uartName, portOptions);
   }
 
+  removeListener(handlerIndex: number): void {
+
+  }
+
 
   private getSerial(uartNum: number): SerialPort {
     if (!this.instances[uartNum]) {

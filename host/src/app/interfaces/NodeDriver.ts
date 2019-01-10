@@ -6,5 +6,4 @@ export default interface NodeDriver {
   request(dataAddress: number, data?: Uint8Array): Promise<Uint8Array>;
   onReceive(handler: ReceiveHandler): number;
   removeListener(handlerIndex: number): void;
-  getLastData(): Uint8Array;
 }

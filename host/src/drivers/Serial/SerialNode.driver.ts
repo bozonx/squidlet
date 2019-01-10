@@ -55,12 +55,12 @@ export class SerialNodeDriver extends DriverBase<SerialNodeProps> implements Nod
     // TODO: запретить посылать данные (или посылать другие requests) пока ждем ответ или добавить свой маркер
   }
 
-  onReceive(cb: ReceiveHandler): void {
-
+  onReceive(cb: ReceiveHandler): number {
+    return this.serialDev.on(this.props.uartNum, 'data', cb);
   }
 
   removeListener(handlerIndex: number): void {
-
+    this.serialDev.removeListener(handlerIndex);
   }
 
 }

@@ -15,9 +15,9 @@ export interface Options {
  * uartNum - it's number of UART interface on specified platform
  */
 export default interface Serial {
-  on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): void;
-  on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): void;
-  on(uartNum: number, eventsName: EventName, handler: () => void): void;
+  on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): number;
+  on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): number;
+  on(uartNum: number, eventsName: EventName, handler: () => void): number;
 
   // TODO: add error event - framing и parity - наверное это и есть ошибки???
   // TODO: add open event
@@ -42,6 +42,7 @@ export default interface Serial {
    */
   setup(uartNum: number, baudRate?: BaudRate, options?: Options): void;
 
+  removeListener(handlerIndex: number): void;
 
   // TODO: Is it need to add? : find, inject, pipe, setConsole
 }
