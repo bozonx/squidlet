@@ -33,21 +33,21 @@ export class I2cNodeDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps>
     this.addressHex = hexStringToHexNum(String(this.props.address));
   }
 
-  /**
-   * Write only a dataAddress to bus
-   */
-  async writeEmpty(dataAddress: number): Promise<void> {
+  // /**
+  //  * Write only a dataAddress to bus
+  //  */
+  // async writeEmpty(dataAddress: number): Promise<void> {
+  //
+  //   // TODO: наверное не нужно - использоваь write без данных
+  //
+  //   const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, writeEmpty(${this.dataAddressToString(dataAddress)})`;
+  //
+  //   await this.sender.send<void>(senderId, (): Promise<void> => {
+  //     return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
+  //   });
+  // }
 
-    // TODO: наверное не нужно - использоваь write без данных
-
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, writeEmpty(${this.dataAddressToString(dataAddress)})`;
-
-    await this.sender.send<void>(senderId, (): Promise<void> => {
-      return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
-    });
-  }
-
-  async write(dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+  async write(dataAddress?: number, data?: Uint8Array): Promise<void> {
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}})`;
 
     await this.sender.send<void>(senderId, (): Promise<void> => {
@@ -56,6 +56,9 @@ export class I2cNodeDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps>
   }
 
   async read(dataAddress: number | undefined, length: number): Promise<Uint8Array> {
+
+    // TODO: length is optional - try to get from props
+
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, read(${this.dataAddressToString(dataAddress)}, ${length})`;
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {

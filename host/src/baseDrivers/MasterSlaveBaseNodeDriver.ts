@@ -23,7 +23,14 @@ const DEFAULT_POLL_ID = 'default';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
-  abstract write(dataAddress: number | undefined, data: Uint8Array): Promise<void>;
+  /**
+   * Write data to slave.
+   * * write(dataAddress, data) - write data ti data address
+   * * write(dataAddress) - write just 1 byte - data address
+   * * write() - write an empty
+   * * write(undefined, data) - write only data
+   */
+  abstract write(dataAddress?: number, data?: Uint8Array): Promise<void>;
   abstract read(dataAddress: number | undefined, length: number): Promise<Uint8Array>;
   abstract request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array>;
   protected abstract doPoll: () => Promise<Uint8Array>;

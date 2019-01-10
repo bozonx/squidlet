@@ -35,33 +35,51 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
    */
   async read(addressHex: number, dataAddress: number | undefined, length: number): Promise<Uint8Array> {
     if (typeof dataAddress !== 'undefined') {
-      await this.writeEmpty(addressHex, dataAddress);
+      await this.write(addressHex, dataAddress);
     }
 
     // read from bus
     return this.i2cMasterDev.readFrom(this.props.bus, addressHex, length);
   }
 
-  async write(addressHex: number, dataAddress: number | undefined, data: Uint8Array): Promise<void> {
+  async write(addressHex: number, dataAddress?: number, data?: Uint8Array): Promise<void> {
     let dataToWrite = data;
 
-    if (typeof dataAddress !== 'undefined') {
+    if (typeof dataAddress !== 'undefined' && typeof data === 'undefined') {
+      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+    }
+    else if (typeof dataAddress !== 'undefined' && typeof data !== 'undefined') {
       dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
 
-    await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+    // if (typeof dataAddress === 'undefined' && typeof data !== 'undefined') dataToWrite = data
+    // if (typeof dataAddress === 'undefined' && typeof data === 'undefined') dataToWrite = undefined;
+
+    // TODO: выяснить поддерживается ли запись без данных
+
+    //await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+    await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite || new Uint8Array(0));
   }
 
   /**
-   * Write only a dataAddress to bus
+   * Write and read from the same data address.
    */
-  writeEmpty(addressHex: number, dataAddress: number): Promise<void> {
-    const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+  async request(addressHex: number, dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
+    await this.write(addressHex, dataAddress, dataToSend);
 
-    dataToWrite[0] = dataAddress;
-
-    return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+    return this.read(addressHex, dataAddress, readLength);
   }
+
+  // /**
+  //  * Write only a dataAddress to bus
+  //  */
+  // writeEmpty(addressHex: number, dataAddress: number): Promise<void> {
+  //   const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+  //
+  //   dataToWrite[0] = dataAddress;
+  //
+  //   return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+  // }
 
   // /**
   //  * Write only a dataAddress or nothing to bus
@@ -79,15 +97,6 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
   //
   //   return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
   // }
-
-  /**
-   * Write and read from the same data address.
-   */
-  async request(addressHex: number, dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array> {
-    await this.write(addressHex, dataAddress, dataToSend);
-
-    return this.read(addressHex, dataAddress, readLength);
-  }
 
   // protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
   //   return;
