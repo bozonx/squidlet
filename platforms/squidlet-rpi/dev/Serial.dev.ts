@@ -4,28 +4,45 @@ import Serial, {BaudRate, Options, EventName} from '../../../host/src/app/interf
 
 
 export default class SerialDev implements Serial {
-  private readonly instances: {[index: string]: SerialPort} = {};
+  private readonly instances: SerialPort[] = [];
 
-  on(uartName: string, eventsName: EventName, handler: (...params: any[]) => void): void {
+  on(uartNum: number, eventsName: EventName, handler: (...params: any[]) => void): void {
+
+    // TODO: rise dataString - data as string
 
     // TODO: convert event name if need
 
-    this.getSerial(uartName).on(eventsName, handler);
+    this.getSerial(uartNum).on(eventsName, handler);
   }
 
-  async print(uartName: string, data: string): Promise<void> {
-    this.getSerial(uartName).write(data);
+
+  async write(uartNum: number, data: Uint8Array): Promise<void> {
+    let value: Buffer;
+
+    if (typeof data === 'object' && (data as any).data && (data as any).count) {
+      // TODO: взять только заданную длинну или просто проверить что данные нужно длинны ???
+      value = Buffer.from(data as any[]);
+    }
+    else {
+      value = Buffer.from(data as any[]);
+    }
+
+    this.getSerial(uartNum).write(value);
   }
 
-  async println(uartName: string, data: string): Promise<void> {
-    this.getSerial(uartName).write(`${data}\r\n`);
+  async print(uartNum: number, data: string): Promise<void> {
+    this.getSerial(uartNum).write(data);
   }
 
-  async read(uartName: string, chars?: number): Promise<string> {
+  async println(uartNum: number, data: string): Promise<void> {
+    this.getSerial(uartNum).write(`${data}\r\n`);
+  }
+
+  async read(uartNum: number, length?: number): Promise<Uint8Array> {
 
     // TODO: зачем это нужно ???
 
-    const result: string | Buffer | null = this.getSerial(uartName).read(chars);
+    const result: string | Buffer | null = this.getSerial(uartNum).read(length);
 
     if (result === null) {
       return '';
@@ -41,7 +58,7 @@ export default class SerialDev implements Serial {
     }
   }
 
-  setup(uartName: string, baudRate?: BaudRate, options?: Options): void {
+  setup(uartNum: number, baudRate?: BaudRate, options?: Options): void {
     let portOptions: {[index: string]: any} = {
       baudRate,
     };
@@ -56,30 +73,18 @@ export default class SerialDev implements Serial {
       };
     }
 
-    this.instances[uartName] = new SerialPort(uartName, portOptions);
-  }
+    // TODO: make uartName
 
-  async write(uartName: string, data: Uint8Array | string[] | { data: any, count: number }, ): Promise<void> {
-    let value: Buffer;
-
-    if (typeof data === 'object' && (data as any).data && (data as any).count) {
-      // TODO: взять только заданную длинну или просто проверить что данные нужно длинны ???
-      value = Buffer.from(data as any[]);
-    }
-    else {
-      value = Buffer.from(data as any[]);
-    }
-
-    this.getSerial(uartName).write(value);
+    this.instances[uartNum] = new SerialPort(uartName, portOptions);
   }
 
 
-  private getSerial(uartName: string): SerialPort {
-    if (!this.instances[uartName]) {
+  private getSerial(uartNum: number): SerialPort {
+    if (!this.instances[uartNum]) {
       throw new Error(`You have to do setup before acting with serial`);
     }
 
-    return this.instances[uartName];
+    return this.instances[uartNum];
   }
 
 }
