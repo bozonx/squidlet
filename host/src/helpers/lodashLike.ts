@@ -1,7 +1,6 @@
 const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
 const _capitalize = require('lodash/capitalize');
-const _omit = require('lodash/omit');
 const _isEqual = require('lodash/isEqual');
 const _trim = require('lodash/trim');
 const _padStart = require('lodash/padStart');
@@ -28,11 +27,16 @@ export function capitalize(...p: any[]) {
   return _capitalize(...p);
 }
 
-export function omit(...p: any[]) {
+export function omit(obj: {[index: string]: any}, ...propToExclude: string[]): {[index: string]: any} {
+  const result: {[index: string]: any} = {};
 
-  // TODO: remake
+  for (let key of Object.keys(obj)) {
+    if (propToExclude.indexOf(key) < 0) {
+      result[key] = obj[key];
+    }
+  }
 
-  return _omit(...p);
+  return result;
 }
 
 export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any | undefined): any | undefined {
