@@ -240,17 +240,6 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
-// TODO: remove - буфера возможно нет в других средах
-export function convertBufferToUint8Array(data: Buffer): Uint8Array {
-  const uIntArr = new Uint8Array(data.length);
-
-  for(let i = 0; i < data.length; i++) {
-    uIntArr[i] = data.readInt8(i);
-  }
-
-  return uIntArr;
-}
-
 /**
  * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
  */

@@ -3,7 +3,7 @@ import {promises as fsPromises} from 'fs';
 
 
 import Storage, {Stats} from '../../../host/src/app/interfaces/dev/Storage';
-import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
+import {convertBufferToUint8Array} from '../helpers';
 
 
 export default class StorageDev implements Storage {

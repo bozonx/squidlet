@@ -2,7 +2,8 @@ import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
-import {convertBufferToUint8Array, PATH_SEPARATOR} from '../../../host/src/helpers/helpers';
+import {PATH_SEPARATOR} from '../../../host/src/helpers/helpers';
+import {convertBufferToUint8Array} from '../helpers';
 import {SrcHostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
 import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
 import initializationConfig from '../../../host/src/app/config/initializationConfig';

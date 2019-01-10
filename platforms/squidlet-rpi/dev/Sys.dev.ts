@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 import Sys from '../../../host/src/app/interfaces/dev/Sys';
-import {convertBufferToUint8Array} from '../../../host/src/helpers/helpers';
+import {convertBufferToUint8Array} from '../helpers';
 
 
 let __storageDir: string = '';
