@@ -1,4 +1,3 @@
-const _cloneDeep = require('lodash/cloneDeep');
 const _isEqual = require('lodash/isEqual');
 const _capitalize = require('lodash/capitalize');
 const _padStart = require('lodash/padStart');
@@ -88,9 +87,23 @@ export function last(arr: any[]) {
   return arr[arr.length - 1];
 }
 
-export function cloneDeep(...p: any[]) {
-  // TODO: remake
-  return _cloneDeep(...p);
+export function cloneDeep(value: any): any {
+  // not cloneable
+  if (
+    value === null
+    || typeof value === 'string'
+    || typeof value === 'number'
+    || typeof value === 'undefined'
+    || typeof value === 'function'
+  ) {
+    return value;
+  }
+  else if (typeof value === 'object') {
+    // arrays or plain object. Don't support of class instances.
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  throw new Error(`cloneDeep: unsupported type of value`);
 }
 
 export function isEqual(...p: any[]) {
