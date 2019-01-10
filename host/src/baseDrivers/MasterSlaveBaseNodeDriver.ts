@@ -17,31 +17,38 @@ export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // length of data which will be requested
   pollDataLength: number;
   pollDataAddress?: string | number;
-  // TODO: указать длины для data adresses
 }
 
 const DEFAULT_POLL_ID = 'default';
 
 
-export default class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
-  private readonly pollEvents: IndexedEvents = new IndexedEvents();
-  private readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
-  private readonly poling: Poling = new Poling();
-  // data addr in hex to use in poling.
-  private pollDataAddressHex?: number;
-  private pollId: string = DEFAULT_POLL_ID;
-  protected sender?: Sender;
+export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
+  abstract write(dataAddress: number | undefined, data: Uint8Array): Promise<void>;
+  abstract read(dataAddress: number | undefined, length: number): Promise<Uint8Array>;
+  abstract request(dataAddress: number | undefined, dataToSend: Uint8Array, readLength: number): Promise<Uint8Array>;
+  protected abstract doPoll: () => Promise<Uint8Array>;
 
+  protected readonly pollEvents: IndexedEvents = new IndexedEvents();
+  protected readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
+  protected readonly poling: Poling = new Poling();
+  // data addr in hex to use in poling.
+  protected pollDataAddressHex?: number;
+  private pollId: string = DEFAULT_POLL_ID;
   // last received data by poling
   // it needs to decide to rise change event or not
   private pollLastData: Uint8Array = new Uint8Array(0);
+  private _sender?: Sender;
+
+  protected get sender(): Sender {
+    return this._sender as Sender;
+  }
 
   private get impulseInput(): ImpulseInputDriver | undefined {
     return this.depsInstances.impulseInput as ImpulseInputDriver | undefined;
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
+  protected doInit = async (getDriverDep: GetDriverDep) => {
     if (this.props.int) {
       this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
         .getInstance(this.props.int || {});
@@ -49,7 +56,7 @@ export default class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> e
 
     this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
     this.pollId = this.dataAddressToString(this.props.pollDataAddress);
-    this.sender = new Sender(
+    this._sender = new Sender(
       // TODO: don't use system.host
       this.env.system.host.config.config.senderTimeout,
       this.env.system.host.config.config.senderResendTimeout
