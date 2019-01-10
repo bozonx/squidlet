@@ -96,6 +96,9 @@ export class I2cNodeDriver extends DriverBase<I2cNodeDriverProps> {
    * Write only a dataAddress to bus
    */
   async writeEmpty(dataAddress: number): Promise<void> {
+
+    // TODO: наверное не нужно - использоваь write без данных
+
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, writeEmpty(${this.dataAddressToString(dataAddress)})`;
 
     this.sender && await this.sender.send<void>(senderId, (): Promise<void> => {

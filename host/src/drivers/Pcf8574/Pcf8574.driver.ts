@@ -127,6 +127,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<void> {
+
+    // TODO: не нужно вообщето
+
     if (!this.checkInitialization('poll')) return;
 
     // init IC if it isn't inited at this moment

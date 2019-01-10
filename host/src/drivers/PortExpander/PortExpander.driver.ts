@@ -12,7 +12,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {callOnDifferentValues, getKeyOfObject} from '../../helpers/helpers';
 import {convertBitsToBytes, convertBytesToBits, hexToBytes, numToWord} from '../../helpers/binaryHelpers';
-import {cloneDeep, isEqual, omit} from '../../helpers/lodashLike';
+import {cloneDeep, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../../app/dict/constants';
@@ -113,6 +113,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.depsInstances.node = await getDriverDep('I2cNode.driver')
       .getInstance({
         ...omit(this.props, 'digitalPinsCount', 'analogPinsCount'),
+
+        // TODO: почему 1 ???
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
@@ -217,6 +219,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Poll expander and return values of all the pins
    */
   async poll(): Promise<void> {
+
+    // TODO: не нужно вообщето
+
     if (!this.checkInitialization('poll')) return;
 
     await this.initIcIfNeed();
@@ -225,7 +230,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     // TODO: review analog
 
     await this.node.poll();
-    //this.setLastReceivedState();
   }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
