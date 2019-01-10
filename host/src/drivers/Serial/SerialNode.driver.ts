@@ -27,19 +27,24 @@ export class SerialNodeDriver extends DriverBase<SerialNodeProps> implements Nod
   async send(dataAddress: number, data?: Uint8Array): Promise<void> {
     let dataToWrite: Uint8Array;
 
-    if (typeof dataAddress !== 'undefined' && typeof data === 'undefined') {
-      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+    if (typeof dataAddress === 'undefined') {
+      throw new Error(`SerialNodeDriver.send: You have to specify a "dataAddress" param`);
     }
-    else if (typeof dataAddress !== 'undefined' && typeof data !== 'undefined') {
+
+    if (typeof data === 'undefined') {
+      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+      dataToWrite[0] = dataAddress;
+    }
+    else {
       dataToWrite = addFirstItemUint8Arr(data, dataAddress);
     }
-    else if (typeof dataAddress === 'undefined' && typeof data !== 'undefined') {
-      dataToWrite = data;
-    }
+    // else if (typeof dataAddress === 'undefined' && typeof data !== 'undefined') {
+    //   dataToWrite = data;
+    // }
     // if (typeof dataAddress === 'undefined' && typeof data === 'undefined')
-    else {
-      throw new Error(`SerialNodeDriver.send: you have to specify at least a dataAddress or data param`);
-    }
+    // else {
+    //   throw new Error(`SerialNodeDriver.send: you have to specify at least a dataAddress or data param`);
+    // }
 
     return this.serialDev.write(this.props.uartNum, dataToWrite);
   }
