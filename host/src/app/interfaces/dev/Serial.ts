@@ -1,5 +1,5 @@
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
-export type EventName = 'data' | 'dataString' | 'error';
+export type EventName = 'data' | 'dataString' | 'error' | 'open';
 
 
 export interface Options {
@@ -17,9 +17,7 @@ export default interface Serial {
   on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): number;
   on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): number;
   on(uartNum: number, eventsName: 'error', handler: (err: string) => void): number;
-
-  // TODO: add open event or promise
-  // TODO: events 'framing' | 'parity' - maybe they are errors
+  on(uartNum: number, eventsName: 'open', handler: () => void): number;
 
   // write binary data
   write(uartNum: number, data: Uint8Array): Promise<void>;
@@ -30,18 +28,18 @@ export default interface Serial {
 
   /**
    * Return a string containing characters that have been received
+   * @param uartNum
    * @param length - The number of characters to read, or undefined/0 for all available
    */
   read(uartNum: number, length?: number): Promise<Uint8Array>;
 
   /**
    * Setup serial
+   * @param uartNum
    * @param baudRate - default is 9600
    * @param options
    */
   setup(uartNum: number, baudRate?: BaudRate, options?: Options): void;
 
   removeListener(handlerIndex: number): void;
-
-  // TODO: Is it need to add? : find, inject, pipe, setConsole
 }

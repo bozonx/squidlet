@@ -27,6 +27,9 @@ interface EspOptions extends Options {
 
 
 export default class SerialDev implements Serial {
+
+  // TODO: events 'framing' | 'parity' - maybe they are errors
+
   on(uartName: Uart, eventsName: EventName, handler: (...params: any[]) => void): void {
     this.getSerial(uartName).on(eventsName, handler);
   }

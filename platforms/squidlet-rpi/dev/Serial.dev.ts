@@ -6,12 +6,13 @@ import Serial, {BaudRate, Options, EventName} from '../../../host/src/app/interf
 export default class SerialDev implements Serial {
   private readonly instances: SerialPort[] = [];
 
+  // TODO: rise dataString - data as string
+  // TODO: listen to errors
 
   on(uartNum: number, eventsName: EventName, handler: (...params: any[]) => void): void {
 
-    // TODO: rise dataString - data as string
-
     // TODO: convert event name if need
+    // TODO: если open и serial был уже открыт то сразу поднять событие
 
     this.getSerial(uartNum).on(eventsName, handler);
   }
@@ -75,6 +76,7 @@ export default class SerialDev implements Serial {
     }
 
     // TODO: make uartName
+    // TODO: rise open error
 
     this.instances[uartNum] = new SerialPort(uartName, portOptions);
   }
