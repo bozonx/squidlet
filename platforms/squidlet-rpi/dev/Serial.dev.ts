@@ -82,7 +82,7 @@ export default class SerialDev implements Serial {
   }
 
   removeListener(handlerIndex: number): void {
-
+    // TODO: add
   }
 
 

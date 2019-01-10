@@ -17,6 +17,7 @@ export default interface Serial {
   on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): number;
   on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): number;
   on(uartNum: number, eventsName: 'error', handler: (err: string) => void): number;
+  // It rises on Serial initialization event or immediately if serial is initialized
   on(uartNum: number, eventsName: 'open', handler: () => void): number;
 
   // write binary data
