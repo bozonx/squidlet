@@ -1,5 +1,5 @@
-name: I2cNode.driver
-main: I2cNode.driver.ts
+name: I2cToSlave.driver
+main: I2cToSlave.driver.ts
 type: system
 drivers:
   - I2cMaster.driver

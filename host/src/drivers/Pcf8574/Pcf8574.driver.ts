@@ -6,7 +6,7 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {I2cNodeDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cNode.driver';
+import {I2cToSlaveDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, updateBitInByte} from '../../helpers/binaryHelpers';
 import {PinMode} from '../../app/interfaces/dev/Digital';
 
@@ -38,8 +38,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
 
-  private get i2cNode(): I2cNodeDriver {
-    return this.depsInstances.i2cNode as I2cNodeDriver;
+  private get i2cNode(): I2cToSlaveDriver {
+    return this.depsInstances.i2cNode as I2cToSlaveDriver;
   }
 
 

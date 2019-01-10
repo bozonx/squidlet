@@ -16,7 +16,7 @@ export interface I2cNodeDriverProps extends MasterSlaveBaseProps {
 }
 
 
-export class I2cNodeDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps> {
+export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps> {
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
 
@@ -130,7 +130,7 @@ export class I2cNodeDriver extends MasterSlaveBaseNodeDriver<I2cNodeDriverProps>
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cNodeDriver> {
+export default class Factory extends DriverFactoryBase<I2cToSlaveDriver> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = I2cNodeDriver;
+  protected DriverClass = I2cToSlaveDriver;
 }

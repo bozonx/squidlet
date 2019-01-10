@@ -1,4 +1,4 @@
-import {ErrorHandler} from '../../drivers/I2c/I2cNode.driver';
+import {ErrorHandler} from '../../drivers/I2c/I2cToSlave.driver';
 
 export type NodeHandler = (data: Uint8Array) => void;
 export type NodeErrorHandler = (err: Error) => void;
