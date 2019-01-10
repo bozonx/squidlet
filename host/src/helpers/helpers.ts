@@ -3,7 +3,7 @@ import * as uniqid from 'uniqid';
 import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
-import {find, isEmpty, trim, values} from './lodashLike';
+import {find, isEmpty, isObject, trim, values} from './lodashLike';
 
 
 export const PATH_SEPARATOR = '/';
@@ -272,4 +272,31 @@ export function basename(pathToDirOrFile: string): string {
   const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
 
   return pathParts[pathParts.length - 1];
+}
+
+/**
+ * Deep merge two objects.
+ * It mutates target object.
+ * To not mutate first object use it this way `mergeDeep({}, defaultValues, newValues)`
+ */
+export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: string]: any}[]): {[index: string]: any} {
+
+  // TODO: test - проверить чтобы не мутировалось если передан первым параметр объект
+
+  if (!sources.length) return target;
+
+  const source = sources.shift();
+
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!target[key]) Object.assign(target, { [key]: {} });
+        mergeDeep(target[key], source[key]);
+      } else {
+        Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+
+  return mergeDeep(target, ...sources);
 }

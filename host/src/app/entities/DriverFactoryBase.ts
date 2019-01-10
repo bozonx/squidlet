@@ -2,7 +2,7 @@ import DriverBase from './DriverBase';
 import DriverEnv from './DriverEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
-import {cloneDeep, defaultsDeep} from '../../helpers/lodashLike';
+import {mergeDeep} from '../../helpers/helpers';
 
 
 /**
@@ -28,7 +28,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     // combined instance and definition props
-    const props: {[index: string]: any} = defaultsDeep(cloneDeep(instanceProps), this.definition.props);
+    const props: {[index: string]: any} = mergeDeep({}, this.definition.props, instanceProps);
     const instanceId: string | undefined = this.getInstanceId(props);
 
     if (typeof instanceId === 'undefined') {

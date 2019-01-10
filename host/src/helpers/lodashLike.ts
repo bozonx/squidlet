@@ -1,11 +1,9 @@
-const _defaultsDeep = require('lodash/defaultsDeep');
 const _cloneDeep = require('lodash/cloneDeep');
-const _capitalize = require('lodash/capitalize');
 const _isEqual = require('lodash/isEqual');
+const _capitalize = require('lodash/capitalize');
 const _padStart = require('lodash/padStart');
 
 // TODO: test
-
 
 export function isEmpty(toCheck: any): boolean {
   if (typeof toCheck == 'undefined' || toCheck === null || toCheck === '') return true;
@@ -90,11 +88,6 @@ export function last(arr: any[]) {
   return arr[arr.length - 1];
 }
 
-export function defaultsDeep(...p: any[]) {
-  // TODO: remake - to merge deep
-  return _defaultsDeep(...p);
-}
-
 export function cloneDeep(...p: any[]) {
   // TODO: remake
   return _cloneDeep(...p);
@@ -103,6 +96,11 @@ export function cloneDeep(...p: any[]) {
 export function isEqual(...p: any[]) {
 
   // TODO: remake - use deep equal
+  // TODO: support Uint8Array
 
   return _isEqual(...p);
+}
+
+export function isObject(item) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
 }
