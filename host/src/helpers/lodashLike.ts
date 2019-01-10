@@ -1,5 +1,3 @@
-import {isUint8Array} from './helpers';
-
 const _capitalize = require('lodash/capitalize');
 const _padStart = require('lodash/padStart');
 
@@ -122,24 +120,8 @@ export function isEqual(first: any, second: any): boolean {
   ) {
     return first === second;
   }
-  else if (Array.isArray(first)) {
-    if  (!Array.isArray(second)) return false;
 
-    // TODO: remake - use deep equal
-  }
-  else if (isPlainObject(first)) {
-    if (!isPlainObject(second)) return false;
-
-    // TODO: remake - use deep equal
-  }
-  else if (isUint8Array(first)) {
-    if (isUint8Array(second)) return false;
-
-    // TODO: support Uint8Array
-  }
-  else {
-    throw new Error(`isEqual: unsupported types of values "${JSON.stringify(first)}", "${JSON.stringify(second)}"`);
-  }
+  return JSON.stringify(first) === JSON.stringify(second);
 }
 
 export function isObject(item: any): boolean {
