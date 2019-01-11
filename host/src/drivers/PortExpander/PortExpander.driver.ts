@@ -16,7 +16,7 @@ import {cloneDeep, omit} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../../app/dict/constants';
-import {PinMode} from '../../app/interfaces/dev/Digital';
+import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import IndexedEvents from '../../helpers/IndexedEvents';
 
 
@@ -34,8 +34,6 @@ export type PortExpanderPinMode = 'input'
   | 'pwm'
   | 'rx'
   | 'tx';
-
-
 
 export interface ExpanderDriverProps {
   connection: PortExpanderConnection;
@@ -110,43 +108,27 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     // TODO: choose driver - use connection
 
-    this.depsInstances.node = await getDriverDep('I2cNode.driver')
-      .getInstance({
-        ...omit(this.props, 'digitalPinsCount', 'analogPinsCount'),
-
-        // TODO: почему 1 ???
-        pollDataLength: 1,
-        pollDataAddress: undefined,
-      });
+    // this.depsInstances.node = await getDriverDep('I2cNode.driver')
+    //   .getInstance({
+    //     ...omit(this.props, 'digitalPinsCount', 'analogPinsCount'),
+    //
+    //     // TODO: почему 1 ???
+    //     pollDataLength: 1,
+    //     pollDataAddress: undefined,
+    //   });
   }
 
   protected didInit = async () => {
-    this.node.addPollErrorListener((err: Error) => {
-      this.env.log.error(String(err));
-    });
+    // this.node.addPollErrorListener((err: Error) => {
+    //   this.env.log.error(String(err));
+    // });
 
-    this.node.addListener(this.handleNodeEvent);
+    this.node.onReceive(this.handleNodeEvent);
   }
 
   protected appDidInit = async () => {
     // init IC state after app is inited if it isn't inited at this moment
     await this.initIcIfNeed();
-
-    // write output digital initial values
-    try {
-      await this.writeDigitalOutputStateToIc();
-    }
-    catch (err) {
-      this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
-    }
-
-    // write output analog initial values
-    try {
-      await this.writeAnalogOutputStateToIc();
-    }
-    catch (err) {
-      this.env.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
-    }
   }
 
   getState(): State {
@@ -157,10 +139,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Setup digital input or output pin.
    * Please set pin mode once on startup.
    */
-  async setupDigital(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  async setupDigital(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     if (this.wasIcInited) {
       // TODO: don't use system
-      this.env.system.log.warn(`PortExpanderDriver.setup: can't setup pin "${pin}" because IC was already initialized`);
+      this.env.system.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
     }
@@ -183,7 +165,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
     if (this.wasIcInited) {
       // TODO: don't use system
-      this.env.system.log.warn(`PortExpanderDriver.setup: can't setup pin "${pin}" because IC was already initialized`);
+      this.env.system.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
     }
@@ -359,10 +341,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * On change received data after poling on node driver.
    * Find changed pins and rise events on them.
    */
-  private handleNodeEvent() {
+  private handleNodeEvent(data: Uint8Array) {
     const lastState: State = cloneDeep(this.state);
 
-    this.setLastReceivedState();
+    this.setLastReceivedState(data);
 
     callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
       this.digitalEvents.emit(pinNum, newValue);
@@ -500,6 +482,22 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     this.initingIcInProgress = false;
     this.wasIcInited = true;
+
+    // write output digital initial values
+    try {
+      await this.writeDigitalOutputStateToIc();
+    }
+    catch (err) {
+      this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    }
+
+    // write output analog initial values
+    try {
+      await this.writeAnalogOutputStateToIc();
+    }
+    catch (err) {
+      this.env.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    }
   }
 
   /**
@@ -526,7 +524,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.node.write(COMMANDS.setupAll, dataToSend);
   }
 
-  private setLastReceivedState() {
+  private setLastReceivedState(data: Uint8Array) {
 
     // TODO: review - what about analog ?
     // TODO: outputs тоже обновлять на всякий случай

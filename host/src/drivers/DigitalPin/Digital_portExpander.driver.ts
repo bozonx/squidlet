@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
 import {DigitalPinHandler, PortExpanderDriver, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
@@ -21,18 +21,18 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
 
-  setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
   }
 
-  async getPinMode(pin: number): Promise<PinMode | undefined> {
+  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDriver.getPinMode(pin);
 
     if (expanderPinMode === 'input'
       || expanderPinMode === 'input_pullup'
       || expanderPinMode === 'input_pulldown'
       || expanderPinMode === 'output'
-    ) return expanderPinMode as PinMode;
+    ) return expanderPinMode as DigitalPinMode;
 
     return;
   }

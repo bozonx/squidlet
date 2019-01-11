@@ -1,6 +1,6 @@
 import {Gpio} from 'pigpio';
 
-import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
 import DebounceCall from '../../../host/src/helpers/DebounceCall';
 
 
@@ -22,7 +22,7 @@ export default class DigitalDev implements Digital {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(pinMode);
 
     this.pinInstances[pin] = new Gpio(pin, {
@@ -45,7 +45,7 @@ export default class DigitalDev implements Digital {
    * Get pin mode.
    * It throws an error if pin hasn't configured before
    */
-  async getPinMode(pin: number): Promise<PinMode | undefined> {
+  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     const pinInstance = this.getPinInstance(pin);
     const modeConst: number = pinInstance.getMode();
 
@@ -118,7 +118,7 @@ export default class DigitalDev implements Digital {
     });
   }
 
-  private convertMode(pinMode: PinMode): {mode: number, pullUpDown: number} {
+  private convertMode(pinMode: DigitalPinMode): {mode: number, pullUpDown: number} {
     switch (pinMode) {
       case ('input'):
         return {

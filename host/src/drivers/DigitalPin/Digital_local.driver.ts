@@ -1,4 +1,4 @@
-import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
@@ -16,11 +16,11 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
   }
 
 
-  setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     return this.digitalDev.setup(pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): Promise<PinMode | undefined> {
+  getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     return this.digitalDev.getPinMode(pin);
   }
 

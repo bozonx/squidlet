@@ -4,7 +4,6 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
-import {PinMode} from '../../app/interfaces/dev/Digital';
 import {omit} from '../../helpers/lodashLike';
 
 

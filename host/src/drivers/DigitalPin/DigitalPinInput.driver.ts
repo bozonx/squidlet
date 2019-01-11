@@ -1,4 +1,4 @@
-import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -103,14 +103,14 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     return;
   }
 
-  private resolvePinMode(): PinMode {
+  private resolvePinMode(): DigitalPinMode {
     if (this.props.pullup) return 'input_pullup';
     else if (this.props.pulldown) return 'input_pulldown';
     else return 'input';
   }
 
   private async setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): Promise<number> {
-    const pinMode: PinMode | undefined = await this.gpio.getPinMode(this.props.pin);
+    const pinMode: DigitalPinMode | undefined = await this.gpio.getPinMode(this.props.pin);
     const normalEdge: Edge = edge || 'both';
 
     if (!pinMode || !pinMode.match(/input/)) {

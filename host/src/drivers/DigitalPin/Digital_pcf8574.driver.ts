@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import Digital, {Edge, PinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
@@ -26,11 +26,11 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
 
-  setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     return this.expanderDriver.setup(pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): Promise<PinMode | undefined> {
+  getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     return this.expanderDriver.getPinMode(pin);
   }
 

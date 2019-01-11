@@ -6,14 +6,14 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {I2cToSlaveDriver, Handler, I2cNodeDriverBaseProps} from '../I2c/I2cToSlave.driver';
+import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, updateBitInByte} from '../../helpers/binaryHelpers';
-import {PinMode} from '../../app/interfaces/dev/Digital';
+import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 
 
 export type ResultHandler = (values?: boolean[]) => void;
 
-export interface ExpanderDriverProps extends I2cNodeDriverBaseProps {
+export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
 }
 
 
@@ -64,7 +64,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  async setup(pin: number, pinMode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     this.checkPin(pin);
 
     if (this.directions[pin] !== DIR_UNDEF) {

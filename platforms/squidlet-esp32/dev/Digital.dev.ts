@@ -1,7 +1,7 @@
-import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
 
 
-declare function getPinMode(pin: number): PinMode | undefined;
+declare function getPinMode(pin: number): DigitalPinMode | undefined;
 declare function digitalRead(pin: number): boolean;
 declare function digitalWrite(pin: number, value: boolean): void;
 declare function pinMode(pin: number, mode: string, automatic?: boolean): void;
@@ -20,7 +20,7 @@ declare function clearWatch(): void;
 
 
 export default class DigitalDev implements Digital {
-  async setup(pin: number, mode: PinMode, outputInitialValue?: boolean): Promise<void> {
+  async setup(pin: number, mode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     pinMode(pin, mode);
 
     // set initial value for output pin
@@ -33,7 +33,7 @@ export default class DigitalDev implements Digital {
     }
   }
 
-  async getPinMode(pin: number): Promise<PinMode | undefined> {
+  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     return getPinMode(pin);
   }
 
