@@ -89,6 +89,7 @@ export default class State {
     });
   }
 
+  // TODO: впринципе можно принимать не все сразу а по 1 пину
   updateAnalogState(data: Uint8Array) {
     // save old arrays. It doesn't need to clone them because they will be reassigned
     const lastInputState: AnalogState = this.state.analogInputs;

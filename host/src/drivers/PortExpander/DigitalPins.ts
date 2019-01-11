@@ -27,7 +27,6 @@ export default class DigitalPins {
    */
   async setupDigital(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     if (this.expander.wasIcInited) {
-      // TODO: don't use system
       this.expander.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
 
       return;

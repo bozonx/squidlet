@@ -79,6 +79,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   pinModes: number[] = [];
   wasIcInited: boolean = false;
   readonly state: State = new State();
+  // TODO: does it really need?
   readonly log: Logger = this.env.system.log;
   get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
@@ -163,7 +164,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   addDigitalListener(handler: DigitalPinHandler): number {
-    //return this.digitalPins.addDigitalListener(handler);
     return this.state.digitalEvents.addListener(handler);
   }
 
@@ -210,7 +210,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   addAnalogListener(handler: AnalogPinHandler): number {
-    //return this.analogPins.addAnalogListener(handler);
     return this.state.analogEvents.addListener(handler);
   }
 

@@ -18,7 +18,6 @@ export default class AnalogPins {
 
   async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
     if (this.expander.wasIcInited) {
-      // TODO: don't use system
       this.expander.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
