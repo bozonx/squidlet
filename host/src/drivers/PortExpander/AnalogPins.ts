@@ -1,4 +1,4 @@
-import {AnalogPinHandler, PortExpanderDriver} from './PortExpander.driver';
+import {AnalogPinHandler, COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
 import {hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
 import IndexedEvents from '../../helpers/IndexedEvents';
@@ -22,9 +22,9 @@ export default class AnalogPins {
 
 
   async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
-    if (this.wasIcInited) {
+    if (this.expander.wasIcInited) {
       // TODO: don't use system
-      this.env.system.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
+      this.expander.env.system.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
     }
@@ -38,7 +38,7 @@ export default class AnalogPins {
       this.state.analogOutputs[pin] = outputInitialValue;
     }
 
-    this.pinModes[pin] = MODES[pinMode];
+    this.expander.pinModes[pin] = MODES[pinMode];
   }
 
   addAnalogListener(handler: AnalogPinHandler): number {
@@ -52,7 +52,7 @@ export default class AnalogPins {
       throw new Error(`PortExpanderDriver.readAnalog: pin "${pin}" hasn't been set up as an analog`);
     }
 
-    if (this.pinModes[pin] === MODES.analog_output) {
+    if (this.expander.pinModes[pin] === MODES.analog_output) {
       return this.state.analogOutputs[pin] || 0;
     }
 
@@ -65,7 +65,7 @@ export default class AnalogPins {
     this.checkPin(pin);
     await this.initIcIfNeed();
 
-    if (this.pinModes[pin] !== MODES.analog_output) {
+    if (this.expander.pinModes[pin] !== MODES.analog_output) {
       throw new Error(`PortExpanderDriver.writeAnalog: Can't write to not analog output pin "${pin}"`);
     }
 
@@ -95,7 +95,7 @@ export default class AnalogPins {
 
   private updateAnalogOutputValues(newValues: AnalogState) {
     for (let pinNum in newValues) {
-      if (this.pinModes[pinNum] === MODES.analog_output) {
+      if (this.expander.pinModes[pinNum] === MODES.analog_output) {
         this.state.analogOutputs[pinNum] = newValues[pinNum];
       }
     }
@@ -123,7 +123,7 @@ export default class AnalogPins {
   }
 
   private isAnalogPin(pin: number): boolean {
-    const pinMode: number | undefined = this.pinModes[pin];
+    const pinMode: number | undefined = this.expander.pinModes[pin];
 
     return pinMode === MODES.analog_output || pinMode === MODES.analog_input;
   }

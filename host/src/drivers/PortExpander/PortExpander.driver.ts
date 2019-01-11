@@ -56,7 +56,7 @@ export interface State {
 
 
 // TODO: review commands - add set debounce, edge, setup analog, setup all analog
-const COMMANDS = {
+export const COMMANDS = {
   setup:                    0x30,
   setupAll:                 0x31,
   setOutputValue:           0x32,
@@ -67,7 +67,7 @@ const COMMANDS = {
   setAllAnalogOutputValues: 0x37,
 };
 
-const MODES = {
+export const MODES = {
   output:         0x30,
   input:          0x31,
   input_pullup:   0x32,
@@ -95,14 +95,14 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   private readonly digitalPins: DigitalPins = new DigitalPins(this);
   private readonly analogPins: AnalogPins = new AnalogPins(this);
   // pin modes which are set at init time.
-  private pinModes: number[] = [];
+  pinModes: number[] = [];
   private state: State = {
     inputs: [],
     outputs: [],
     analogInputs: [],
     analogOutputs: [],
   };
-  private wasIcInited: boolean = false;
+  wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
 
 
