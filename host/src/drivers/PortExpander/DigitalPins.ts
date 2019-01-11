@@ -1,10 +1,11 @@
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
-import {COMMANDS, DigitalPinHandler, MODES, PortExpanderDriver} from './PortExpander.driver';
+import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
 import {convertBitsToBytes} from '../../helpers/binaryHelpers';
 import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 export type DigitalState = (boolean | undefined)[];
+export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
 
 const DIGITAL_VALUE = {
   low: 0x30,
@@ -100,7 +101,7 @@ export default class DigitalPins {
 
     const dataToSend: Uint8Array = new Uint8Array(2);
 
-    dataToSend[0] = this.getHexPinNumber(pin);
+    dataToSend[0] = this.expander.getHexPinNumber(pin);
     dataToSend[1] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
 
     await this.expander.node.send(COMMANDS.setOutputValue, dataToSend);

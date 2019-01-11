@@ -1,10 +1,11 @@
-import {AnalogPinHandler, COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
+import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
 import {hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
 import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 export type AnalogState = (number | undefined)[];
+export type AnalogPinHandler = (targetPin: number, value: number) => void;
 
 
 export default class AnalogPins {
@@ -73,7 +74,7 @@ export default class AnalogPins {
     const valueWord: string = numToWord(value);
     const int8ValueWord: Uint8Array = hexToBytes(valueWord);
 
-    dataToSend[0] = this.getHexPinNumber(pin);
+    dataToSend[0] = this.expander.getHexPinNumber(pin);
     dataToSend[1] = int8ValueWord[0];
     dataToSend[2] = int8ValueWord[1];
 

@@ -3,28 +3,23 @@
  * It supports the next types of connection:
  * * I2C
  * * Serial
- * * LAN
- * * Wifi
- * * Bluetooth
+ * * ?LAN
+ * * ?Wifi
+ * * ?Bluetooth
  */
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {callOnDifferentValues, getKeyOfObject} from '../../helpers/helpers';
-import {convertBytesToBits} from '../../helpers/binaryHelpers';
-import {cloneDeep} from '../../helpers/lodashLike';
+import {getKeyOfObject} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
-import DigitalPins, {DigitalState} from './DigitalPins';
-import AnalogPins, {AnalogState} from './AnalogPins';
+import DigitalPins, {DigitalPinHandler, DigitalState} from './DigitalPins';
+import AnalogPins, {AnalogPinHandler, AnalogState} from './AnalogPins';
+import State, {ExpanderState} from './State';
 
 
-
-
-export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
-export type AnalogPinHandler = (targetPin: number, value: number) => void;
 export type PortExpanderConnection = 'i2c' | 'serial';
 export type PortExpanderPinMode = 'input'
   | 'input_pullup'
@@ -43,16 +38,6 @@ export interface ExpanderDriverProps {
   // connection params
   [index: string]: any;
 }
-
-export interface State {
-  // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
-  inputs: DigitalState;
-  outputs: DigitalState;
-  // indexes are analog pin numbers from 0
-  analogInputs: AnalogState;
-  analogOutputs: AnalogState;
-}
-
 
 // TODO: review commands - add set debounce, edge, setup analog, setup all analog
 export const COMMANDS = {
@@ -84,21 +69,16 @@ const NO_MODE = 0x21;
 // TODO: не делать публичное то что не нужно
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
+  // pin modes which are set at init time.
+  pinModes: number[] = [];
+  wasIcInited: boolean = false;
+  readonly state: State = new State();
   get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
   }
 
   private readonly digitalPins: DigitalPins = new DigitalPins(this);
   private readonly analogPins: AnalogPins = new AnalogPins(this);
-  // pin modes which are set at init time.
-  pinModes: number[] = [];
-  private state: State = {
-    inputs: [],
-    outputs: [],
-    analogInputs: [],
-    analogOutputs: [],
-  };
-  wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
 
 
@@ -122,7 +102,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     //   this.env.log.error(String(err));
     // });
 
-    this.node.onReceive(this.handleStateEvent);
+    this.node.onReceive(this.state.handleStateEvent);
   }
 
   protected appDidInit = async () => {
@@ -130,8 +110,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.initIcIfNeed();
   }
 
-  getState(): State {
-    return this.state;
+  getState(): ExpanderState {
+    return this.state.state;
   }
 
   // /**
@@ -269,7 +249,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     this.wasIcInited = true;
   }
 
-  public checkInitialization(method: string): boolean {
+  checkInitialization(method: string): boolean {
     if (!this.initingIcInProgress) {
       this.env.log.warn(`PortExpanderDriver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
 
@@ -292,37 +272,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
   }
 
-
-  /**
-   * On change received data after poling on node driver.
-   * Find changed pins and rise events on them.
-   */
-  private handleStateEvent(data: Uint8Array) {
-
-    // TODO: может 1й байт будет коммандой???
-    // TODO: помдее должен прийти весь стейт сразу
-
-    const lastState: State = cloneDeep(this.state);
-
-    this.setLastReceivedState(data);
-
-    callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
-      this.digitalPins.events.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.outputs, lastState.outputs, (pinNum: number, newValue: boolean) => {
-      this.digitalPins.events.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.analogInputs, lastState.analogInputs, (pinNum: number, newValue: number) => {
-      this.analogPins.events.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.analogOutputs, lastState.analogOutputs, (pinNum: number, newValue: number) => {
-      this.analogPins.events.emit(pinNum, newValue);
-    });
-  }
-
-  private getHexPinNumber(pin: number): number {
+  getHexPinNumber(pin: number): number {
     return pin + ASCII_NUMERIC_OFFSET;
   }
+
 
   /**
    * Write all the pin modes to IC.
@@ -348,26 +301,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.node.send(COMMANDS.setupAll, dataToSend);
   }
 
-  private setLastReceivedState(data: Uint8Array) {
-
-    // TODO: review
-    // TODO: what about analog ?
-    // TODO: outputs тоже обновлять на всякий случай
-
-    const newState: DigitalState = convertBytesToBits(data);
-
-    console.log(11111111, 'current - ', this.state.inputs, ' | new - ', data, ' | parsed - ', newState);
-
-    // update values
-    for (let pinNum in newState) {
-      // TODO: почему только digital ???
-      // filter only inputs
-      if (!this.digitalPins.isInputPin(parseInt(pinNum))) return;
-
-      this.state.inputs[pinNum] = newState[pinNum];
-    }
-  }
-
 
   protected validateProps = (props: ExpanderDriverProps): string | undefined => {
 
@@ -384,7 +317,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 export default class Factory extends DriverFactoryBase<PortExpanderDriver> {
 
   protected instanceAlwaysNew = true;
-  // TODO: review - может быть и wifi и ble
+  // TODO: review - может быть и wifi и ble и их адреса
 
   // protected instanceIdCalc = (props: {[index: string]: any}): string => {
   //   const bus: string = (props.bus) ? String(props.bus) : 'default';
