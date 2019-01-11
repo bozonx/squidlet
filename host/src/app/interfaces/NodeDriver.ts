@@ -1,4 +1,4 @@
-export type ReceiveHandler = (data: Uint8Array) => void;
+export type ReceiveHandler = (dataAddress: number, data: Uint8Array) => void;
 
 
 export default interface NodeDriver {

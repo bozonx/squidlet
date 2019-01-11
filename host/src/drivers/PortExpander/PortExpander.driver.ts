@@ -15,9 +15,9 @@ import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver from '../../app/interfaces/NodeDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
-import DigitalPins, {DigitalPinHandler, DigitalState} from './DigitalPins';
-import AnalogPins, {AnalogPinHandler, AnalogState} from './AnalogPins';
-import State, {ExpanderState} from './State';
+import DigitalPins, {DigitalPinHandler} from './DigitalPins';
+import AnalogPins, {AnalogPinHandler} from './AnalogPins';
+import State, {AnalogState, DigitalState, ExpanderState} from './State';
 import Logger from '../../app/interfaces/Logger';
 
 
@@ -64,6 +64,10 @@ export const MODES = {
   tx:             0x38,
 };
 
+const INCOME_COMMANDS = {
+  newState: 0x30,
+};
+
 const NO_MODE = 0x21;
 
 
@@ -104,7 +108,17 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     //   this.env.log.error(String(err));
     // });
 
-    this.node.onReceive(this.state.handleStateEvent);
+    this.node.onReceive((dataAddress: number, data: Uint8Array) => {
+      if (typeof dataAddress == 'undefined') {
+        this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
+      }
+      else if (dataAddress === INCOME_COMMANDS.newState) {
+        this.state.handleStateEvent(data);
+      }
+      else {
+        this.env.system.log.error(`PortExpanderDriver: Unknown command "${dataAddress.toString(16)}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
+      }
+    });
   }
 
   protected appDidInit = async () => {
@@ -113,7 +127,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   getState(): ExpanderState {
-    return this.state.state;
+    return this.state.getAllState();
   }
 
   // /**
@@ -148,7 +162,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   addDigitalListener(handler: DigitalPinHandler): number {
-    return this.digitalPins.addDigitalListener(handler);
+    //return this.digitalPins.addDigitalListener(handler);
+    return this.state.digitalEvents.addListener(handler);
   }
 
   removeListener(handlerIndex: string) {
@@ -194,7 +209,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   addAnalogListener(handler: AnalogPinHandler): number {
-    return this.analogPins.addAnalogListener(handler);
+    //return this.analogPins.addAnalogListener(handler);
+    return this.state.analogEvents.addListener(handler);
   }
 
   readAnalog(pin: number): Promise<number> {

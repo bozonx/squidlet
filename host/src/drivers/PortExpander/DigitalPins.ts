@@ -1,7 +1,6 @@
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
 import {convertBitsToBytes} from '../../helpers/binaryHelpers';
-import IndexedEvents from '../../helpers/IndexedEvents';
 import {DigitalState} from './State';
 
 
@@ -16,9 +15,7 @@ const DIGITAL_VALUE = {
 export default class DigitalPins {
   private readonly expander: PortExpanderDriver;
   
-  
-  readonly events: IndexedEvents = new IndexedEvents();
-  
+
   constructor(expander: PortExpanderDriver) {
     this.expander = expander;
   }
@@ -49,10 +46,6 @@ export default class DigitalPins {
     }
 
     this.expander.pinModes[pin] = MODES[pinMode];
-  }
-
-  addDigitalListener(handler: DigitalPinHandler): number {
-    return this.events.addListener(handler);
   }
 
   /**
@@ -118,7 +111,7 @@ export default class DigitalPins {
    */
   async writeOutputStateToIc() {
     const dataToSend: Uint8Array = convertBitsToBytes(
-      this.expander.state.getAllDigitalOutputs(),
+      this.expander.state.getAllState().outputs,
       this.expander.props.digitalPinsCount
     );
 

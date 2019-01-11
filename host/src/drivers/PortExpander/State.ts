@@ -1,6 +1,7 @@
 import {cloneDeep} from '../../helpers/lodashLike';
 import {callOnDifferentValues} from '../../helpers/helpers';
 import {convertBytesToBits} from '../../helpers/binaryHelpers';
+import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 export type DigitalState = (boolean | undefined)[];
@@ -17,6 +18,9 @@ export interface ExpanderState {
 
 
 export default class State {
+  readonly digitalEvents: IndexedEvents = new IndexedEvents();
+  readonly analogEvents: IndexedEvents = new IndexedEvents();
+
   private readonly state: ExpanderState = {
     inputs: [],
     outputs: [],
@@ -24,12 +28,13 @@ export default class State {
     analogOutputs: [],
   };
 
-  constructor() {
 
+  constructor() {
   }
 
-  getAllDigitalOutputs(): DigitalState {
-    return this.state.outputs;
+
+  getAllState(): ExpanderState {
+    return this.state;
   }
 
   getDigitalOutput(pin: number): boolean | undefined {
@@ -74,29 +79,27 @@ export default class State {
    * Find changed pins and rise events on them.
    */
   handleStateEvent(data: Uint8Array) {
-
-    // TODO: может 1й байт будет коммандой???
-    // TODO: помдее должен прийти весь стейт сразу
-
-    const lastState: State = cloneDeep(this.state);
+    const lastState: ExpanderState = cloneDeep(this.state);
 
     this.setLastReceivedState(data);
 
     callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
-      this.digitalPins.events.emit(pinNum, newValue);
+      this.digitalEvents.emit(pinNum, newValue);
     });
     callOnDifferentValues(this.state.outputs, lastState.outputs, (pinNum: number, newValue: boolean) => {
-      this.digitalPins.events.emit(pinNum, newValue);
+      this.digitalEvents.emit(pinNum, newValue);
     });
     callOnDifferentValues(this.state.analogInputs, lastState.analogInputs, (pinNum: number, newValue: number) => {
-      this.analogPins.events.emit(pinNum, newValue);
+      this.analogEvents.emit(pinNum, newValue);
     });
     callOnDifferentValues(this.state.analogOutputs, lastState.analogOutputs, (pinNum: number, newValue: number) => {
-      this.analogPins.events.emit(pinNum, newValue);
+      this.analogEvents.emit(pinNum, newValue);
     });
   }
 
   private setLastReceivedState(data: Uint8Array) {
+
+    // TODO: помдее должен прийти весь стейт сразу
 
     // TODO: review
     // TODO: what about analog ?

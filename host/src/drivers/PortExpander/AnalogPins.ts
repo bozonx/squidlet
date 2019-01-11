@@ -1,7 +1,6 @@
 import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
 import {hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
-import IndexedEvents from '../../helpers/IndexedEvents';
 import {AnalogState} from './State';
 
 
@@ -10,8 +9,7 @@ export type AnalogPinHandler = (targetPin: number, value: number) => void;
 
 export default class AnalogPins {
   private readonly expander: PortExpanderDriver;
-  readonly events: IndexedEvents = new IndexedEvents();
-  
+
   
   constructor(expander: PortExpanderDriver) {
     this.expander = expander;
@@ -36,10 +34,6 @@ export default class AnalogPins {
     }
 
     this.expander.pinModes[pin] = MODES[pinMode];
-  }
-
-  addAnalogListener(handler: AnalogPinHandler): number {
-    return this.events.addListener(handler);
   }
 
   async readAnalog(pin: number): Promise<number> {
