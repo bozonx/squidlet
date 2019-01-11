@@ -81,6 +81,8 @@ export const MODES = {
 const NO_MODE = 0x21;
 
 
+// TODO: не делать публичное то что не нужно
+
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
@@ -230,63 +232,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
 
   /**
-   * On change received data after poling on node driver.
-   * Find changed pins and rise events on them.
-   */
-  private handleStateEvent(data: Uint8Array) {
-
-    // TODO: может 1й байт будет коммандой???
-    // TODO: помдее должен прийти весь стейт сразу
-
-    const lastState: State = cloneDeep(this.state);
-
-    this.setLastReceivedState(data);
-
-    callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
-      this.digitalPins.events.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.outputs, lastState.outputs, (pinNum: number, newValue: boolean) => {
-      this.digitalPins.events.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.analogInputs, lastState.analogInputs, (pinNum: number, newValue: number) => {
-      this.analogPins.events.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.analogOutputs, lastState.analogOutputs, (pinNum: number, newValue: number) => {
-      this.analogPins.events.emit(pinNum, newValue);
-    });
-  }
-
-  private checkPin(pin: number) {
-    const pinMode: number | undefined = this.pinModes[pin];
-
-    if (typeof pinMode === 'undefined') {
-      throw new Error(`PortExpanderDriver: pin "${pin}" hasn't been set up`);
-    }
-  }
-
-  private checkInitialization(method: string): boolean {
-    if (!this.initingIcInProgress) {
-      this.env.log.warn(`PortExpanderDriver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
-
-      return false;
-    }
-    else if (!this.env.system.isInitialized) {
-      this.env.log.warn(`PortExpanderDriver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
-
-      return false;
-    }
-
-    return true;
-  }
-
-  private getHexPinNumber(pin: number): number {
-    return pin + ASCII_NUMERIC_OFFSET;
-  }
-
-  /**
    * Write pin modes to IC if it isn't initialized before.
    */
-  private async initIcIfNeed() {
+  async initIcIfNeed() {
     if (this.wasIcInited) return;
 
     this.initingIcInProgress = true;
@@ -319,6 +267,61 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     this.initingIcInProgress = false;
     this.wasIcInited = true;
+  }
+
+  public checkInitialization(method: string): boolean {
+    if (!this.initingIcInProgress) {
+      this.env.log.warn(`PortExpanderDriver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+
+      return false;
+    }
+    else if (!this.env.system.isInitialized) {
+      this.env.log.warn(`PortExpanderDriver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+
+      return false;
+    }
+
+    return true;
+  }
+
+  checkPin(pin: number) {
+    const pinMode: number | undefined = this.pinModes[pin];
+
+    if (typeof pinMode === 'undefined') {
+      throw new Error(`PortExpanderDriver: pin "${pin}" hasn't been set up`);
+    }
+  }
+
+
+  /**
+   * On change received data after poling on node driver.
+   * Find changed pins and rise events on them.
+   */
+  private handleStateEvent(data: Uint8Array) {
+
+    // TODO: может 1й байт будет коммандой???
+    // TODO: помдее должен прийти весь стейт сразу
+
+    const lastState: State = cloneDeep(this.state);
+
+    this.setLastReceivedState(data);
+
+    callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
+      this.digitalPins.events.emit(pinNum, newValue);
+    });
+    callOnDifferentValues(this.state.outputs, lastState.outputs, (pinNum: number, newValue: boolean) => {
+      this.digitalPins.events.emit(pinNum, newValue);
+    });
+    callOnDifferentValues(this.state.analogInputs, lastState.analogInputs, (pinNum: number, newValue: number) => {
+      this.analogPins.events.emit(pinNum, newValue);
+    });
+    callOnDifferentValues(this.state.analogOutputs, lastState.analogOutputs, (pinNum: number, newValue: number) => {
+      this.analogPins.events.emit(pinNum, newValue);
+    });
+  }
+
+  private getHexPinNumber(pin: number): number {
+    return pin + ASCII_NUMERIC_OFFSET;
   }
 
   /**

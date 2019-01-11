@@ -69,7 +69,7 @@ export default class DigitalPins {
    * @return {boolean} The current value.
    */
   async readDigital(pin: number): Promise<boolean> {
-    this.checkPin(pin);
+    this.expander.checkPin(pin);
 
     if (!this.isDigitalPin(pin)) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up as a digital`);
@@ -89,10 +89,10 @@ export default class DigitalPins {
    * @return {Promise}
    */
   async writeDigital(pin: number, value: boolean): Promise<void> {
-    if (!this.checkInitialization('writeDigital')) return;
+    if (!this.expander.checkInitialization('writeDigital')) return;
 
-    this.checkPin(pin);
-    await this.initIcIfNeed();
+    this.expander.checkPin(pin);
+    await this.expander.initIcIfNeed();
 
     if (this.expander.pinModes[pin] !== MODES.output) {
       throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as an digital output`);
@@ -111,9 +111,9 @@ export default class DigitalPins {
    * Not output pins (input, undefined) are ignored.
    */
   async writeDigitalState(outputState: DigitalState) {
-    if (!this.checkInitialization('writeDigitalState')) return;
+    if (!this.expander.checkInitialization('writeDigitalState')) return;
 
-    await this.initIcIfNeed();
+    await this.expander.initIcIfNeed();
 
     this.updateDigitalOutputValues(outputState);
     await this.writeOutputStateToIc();

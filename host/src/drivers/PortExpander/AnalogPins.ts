@@ -46,7 +46,7 @@ export default class AnalogPins {
   }
 
   async readAnalog(pin: number): Promise<number> {
-    this.checkPin(pin);
+    this.expander.checkPin(pin);
 
     if (!this.isAnalogPin(pin)) {
       throw new Error(`PortExpanderDriver.readAnalog: pin "${pin}" hasn't been set up as an analog`);
@@ -60,10 +60,10 @@ export default class AnalogPins {
   }
 
   async writeAnalog(pin: number, value: number): Promise<void> {
-    if (!this.checkInitialization('writeAnalog')) return;
+    if (!this.expander.checkInitialization('writeAnalog')) return;
 
-    this.checkPin(pin);
-    await this.initIcIfNeed();
+    this.expander.checkPin(pin);
+    await this.expander.initIcIfNeed();
 
     if (this.expander.pinModes[pin] !== MODES.analog_output) {
       throw new Error(`PortExpanderDriver.writeAnalog: Can't write to not analog output pin "${pin}"`);
@@ -84,9 +84,9 @@ export default class AnalogPins {
    * Write all the values of analog output pins.
    */
   async writeAnalogState(outputState: AnalogState): Promise<void> {
-    if (!this.checkInitialization('writeAnalogState')) return;
+    if (!this.expander.checkInitialization('writeAnalogState')) return;
 
-    await this.initIcIfNeed();
+    await this.expander.initIcIfNeed();
 
     this.updateAnalogOutputValues(outputState);
     await this.writeOutputStateToIc();
