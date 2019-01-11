@@ -6,6 +6,11 @@ import IndexedEvents from '../../helpers/IndexedEvents';
 
 export type DigitalState = (boolean | undefined)[];
 
+const DIGITAL_VALUE = {
+  low: 0x30,
+  high: 0x31,
+};
+
 
 export default class DigitalPins {
   inputStates: DigitalState = [];

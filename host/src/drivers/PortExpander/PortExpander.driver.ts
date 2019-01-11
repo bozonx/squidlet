@@ -11,13 +11,12 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {callOnDifferentValues, getKeyOfObject} from '../../helpers/helpers';
-import {convertBitsToBytes, convertBytesToBits, hexToBytes, numToWord} from '../../helpers/binaryHelpers';
+import {convertBytesToBits} from '../../helpers/binaryHelpers';
 import {cloneDeep} from '../../helpers/lodashLike';
 import DriverBase from '../../app/entities/DriverBase';
 import NodeDriver from '../../app/interfaces/NodeDriver';
-import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../../app/dict/constants';
+import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
-import IndexedEvents from '../../helpers/IndexedEvents';
 import DigitalPins, {DigitalState} from './DigitalPins';
 import AnalogPins, {AnalogState} from './AnalogPins';
 
@@ -77,11 +76,6 @@ export const MODES = {
   pwm:            0x36,
   rx:             0x37,
   tx:             0x38,
-};
-
-const DIGITAL_VALUE = {
-  low: 0x30,
-  high: 0x31,
 };
 
 const NO_MODE = 0x21;
