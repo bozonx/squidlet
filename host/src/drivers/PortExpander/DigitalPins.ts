@@ -31,7 +31,7 @@ export default class DigitalPins {
   async setupDigital(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     if (this.expander.wasIcInited) {
       // TODO: don't use system
-      this.expander.env.system.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
+      this.expander.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
     }
@@ -73,7 +73,7 @@ export default class DigitalPins {
       return Boolean(this.expander.state.getDigitalOutput(pin));
     }
 
-    return Boolean(this.expander.state.getDigitalInput(pin);
+    return Boolean(this.expander.state.getDigitalInput(pin));
   }
 
   /**
@@ -119,7 +119,7 @@ export default class DigitalPins {
   async writeOutputStateToIc() {
     const dataToSend: Uint8Array = convertBitsToBytes(
       this.expander.state.getAllDigitalOutputs(),
-      this.props.digitalPinsCount
+      this.expander.props.digitalPinsCount
     );
 
     await this.expander.node.send(COMMANDS.setAllOutputValues, dataToSend);
@@ -147,9 +147,8 @@ export default class DigitalPins {
     return pinMode === MODES.output || this.isInputPin(pin);
   }
 
-  // TODO: rename to getLastDigitalPinNum
   private getLastPinNum(): number {
-    return this.props.digitalPinsCount - 1;
+    return this.expander.props.digitalPinsCount - 1;
   }
 
 }

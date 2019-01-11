@@ -18,6 +18,7 @@ import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import DigitalPins, {DigitalPinHandler, DigitalState} from './DigitalPins';
 import AnalogPins, {AnalogPinHandler, AnalogState} from './AnalogPins';
 import State, {ExpanderState} from './State';
+import Logger from '../../app/interfaces/Logger';
 
 
 export type PortExpanderConnection = 'i2c' | 'serial';
@@ -73,6 +74,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   pinModes: number[] = [];
   wasIcInited: boolean = false;
   readonly state: State = new State();
+  readonly log: Logger = this.env.system.log;
   get node(): NodeDriver {
     return this.depsInstances.node as NodeDriver;
   }

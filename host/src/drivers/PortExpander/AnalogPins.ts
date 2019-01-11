@@ -21,12 +21,12 @@ export default class AnalogPins {
   async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
     if (this.expander.wasIcInited) {
       // TODO: don't use system
-      this.expander.env.system.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
+      this.expander.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
     }
 
-    if (pin < 0 || pin > this.getLastAnalogPinNum()) {
+    if (pin < 0 || pin > this.getLastPinNum()) {
       throw new Error('PortExpanderDriver.setupAnalog: Analog pin out of range');
     }
 
@@ -104,7 +104,7 @@ export default class AnalogPins {
    * Values of pins which din't set as analog will be 0.
    */
   async writeOutputStateToIc() {
-    const dataToSend: Uint8Array = new Uint8Array(this.getLastAnalogPinNum() * BYTES_IN_WORD);
+    const dataToSend: Uint8Array = new Uint8Array(this.getLastPinNum() * BYTES_IN_WORD);
 
     // TODO: пройтись по количеству аналоговых пинов
     for (let pinNumString in this.expander.state.getAllAnalogOuputs()) {
@@ -129,8 +129,8 @@ export default class AnalogPins {
     return pinMode === MODES.analog_output || pinMode === MODES.analog_input;
   }
 
-  private getLastAnalogPinNum(): number {
-    return this.props.analogPinsCount - 1;
+  private getLastPinNum(): number {
+    return this.expander.props.analogPinsCount - 1;
   }
 
 }
