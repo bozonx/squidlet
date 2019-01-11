@@ -1,9 +1,8 @@
-name: SerialNode.driver
-main: SerialNode.driver.ts
+name: SerialDuplex.driver
+main: SerialDuplex.driver.ts
 type: system
 drivers:
   - Serial.dev
-  - ImpulseInput.driver
 props:
   # Number of system UART interface starts from 0
   uartNum:

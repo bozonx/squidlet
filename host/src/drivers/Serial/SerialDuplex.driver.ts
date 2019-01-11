@@ -13,7 +13,7 @@ export interface SerialNodeProps {
 }
 
 
-export class SerialNodeDriver extends DriverBase<SerialNodeProps> implements NodeDriver {
+export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements NodeDriver {
   private get serialDev(): Serial {
     return this.depsInstances.serialDev as Serial;
   }
@@ -49,7 +49,7 @@ export class SerialNodeDriver extends DriverBase<SerialNodeProps> implements Nod
     // }
     // if (typeof dataAddress === 'undefined' && typeof data === 'undefined')
     // else {
-    //   throw new Error(`SerialNodeDriver.send: you have to specify at least a dataAddress or data param`);
+    //   throw new Error(`SerialDuplexDriver.send: you have to specify at least a dataAddress or data param`);
     // }
 
     return this.serialDev.write(this.props.uartNum, dataToWrite);
@@ -74,8 +74,8 @@ export class SerialNodeDriver extends DriverBase<SerialNodeProps> implements Nod
 }
 
 
-export default class Factory extends DriverFactoryBase<SerialNodeDriver> {
-  protected DriverClass = SerialNodeDriver;
+export default class Factory extends DriverFactoryBase<SerialDuplexDriver> {
+  protected DriverClass = SerialDuplexDriver;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return String(props.uartNum);
