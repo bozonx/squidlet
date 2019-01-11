@@ -1,10 +1,10 @@
-import {State} from './PortExpander.driver';
-import {DigitalState} from './DigitalPins';
-import {AnalogState} from './AnalogPins';
 import {cloneDeep} from '../../helpers/lodashLike';
 import {callOnDifferentValues} from '../../helpers/helpers';
 import {convertBytesToBits} from '../../helpers/binaryHelpers';
 
+
+export type DigitalState = (boolean | undefined)[];
+export type AnalogState = (number | undefined)[];
 
 export interface ExpanderState {
   // array like [true, undefined, false, ...]. Indexes are pin numbers, undefined is for not input pins
@@ -17,7 +17,7 @@ export interface ExpanderState {
 
 
 export default class State {
-  readonly state: ExpanderState = {
+  private readonly state: ExpanderState = {
     inputs: [],
     outputs: [],
     analogInputs: [],
@@ -28,6 +28,46 @@ export default class State {
 
   }
 
+  getAllDigitalOutputs(): DigitalState {
+    return this.state.outputs;
+  }
+
+  getDigitalOutput(pin: number): boolean | undefined {
+    return this.state.outputs[pin];
+  }
+
+  getDigitalInput(pin: number): boolean | undefined {
+    return this.state.inputs[pin];
+  }
+
+  // TODO: remove
+  getAllAnalogOuputs(): AnalogState {
+    return this.state.analogOutputs;
+  }
+
+  getAnalogOutput(pin: number): number | undefined {
+    return this.state.analogOutputs[pin];
+  }
+
+  getAnalogInput(pin: number): number | undefined {
+    return this.state.analogInputs[pin];
+  }
+
+  // setDigitalInput(pin: number, value: boolean) {
+  //   this.state.inputs[pin] = value;
+  // }
+
+  setDigitalOutput(pin: number, value: boolean) {
+    this.state.outputs[pin] = value;
+  }
+
+  // setAnalogInput(pin: number, value: number) {
+  //
+  // }
+
+  setAnalogOutput(pin: number, value: number) {
+    this.state.analogOutputs[pin] = value;
+  }
 
   /**
    * On change received data after poling on node driver.

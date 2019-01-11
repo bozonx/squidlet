@@ -2,9 +2,9 @@ import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
 import {convertBitsToBytes} from '../../helpers/binaryHelpers';
 import IndexedEvents from '../../helpers/IndexedEvents';
+import {DigitalState} from './State';
 
 
-export type DigitalState = (boolean | undefined)[];
 export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
 
 const DIGITAL_VALUE = {
@@ -14,9 +14,6 @@ const DIGITAL_VALUE = {
 
 
 export default class DigitalPins {
-  inputStates: DigitalState = [];
-  outputStates: DigitalState = [];
-  
   private readonly expander: PortExpanderDriver;
   
   
@@ -24,10 +21,6 @@ export default class DigitalPins {
   
   constructor(expander: PortExpanderDriver) {
     this.expander = expander;
-  }
-
-  init() {
-
   }
 
 
@@ -52,7 +45,7 @@ export default class DigitalPins {
         throw new Error(`You have to specify an outputInitialValue`);
       }
 
-      this.state.outputs[pin] = outputInitialValue;
+      this.expander.state.setDigitalOutput(pin, outputInitialValue);
     }
 
     this.expander.pinModes[pin] = MODES[pinMode];
@@ -77,10 +70,10 @@ export default class DigitalPins {
     }
 
     if (this.expander.pinModes[pin] === MODES.output) {
-      return Boolean(this.state.outputs[pin]);
+      return Boolean(this.expander.state.getDigitalOutput(pin));
     }
 
-    return Boolean(this.state.inputs[pin]);
+    return Boolean(this.expander.state.getDigitalInput(pin);
   }
 
   /**
@@ -124,9 +117,10 @@ export default class DigitalPins {
    * Write all the values of digital output pins to IC.
    */
   async writeOutputStateToIc() {
-    const dataToSend: Uint8Array = convertBitsToBytes(this.state.outputs, this.props.digitalPinsCount);
-
-    console.log(222222222, this.props, dataToSend);
+    const dataToSend: Uint8Array = convertBitsToBytes(
+      this.expander.state.getAllDigitalOutputs(),
+      this.props.digitalPinsCount
+    );
 
     await this.expander.node.send(COMMANDS.setAllOutputValues, dataToSend);
   }
@@ -142,7 +136,7 @@ export default class DigitalPins {
   private updateDigitalOutputValues(newValues: DigitalState) {
     for (let pinNum in newValues) {
       if (this.expander.pinModes[pinNum] === MODES.output) {
-        this.state.outputs[pinNum] = newValues[pinNum];
+        this.expander.state.setDigitalOutput(parseInt(pinNum), Boolean(newValues[pinNum]));
       }
     }
   }
