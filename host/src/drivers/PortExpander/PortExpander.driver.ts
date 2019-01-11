@@ -156,10 +156,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   // }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
-    if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error('PortExpanderDriver.getPinMode: Pin out of range');
-    }
-
     const pinModeByte: number = this.pinModes[pin];
 
     return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
@@ -267,10 +263,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   private checkPin(pin: number) {
-    if (pin < 0 || pin > this.getLastPinNum()) {
-      throw new Error(`PortExpanderDriver: Pin "${pin}" out of range`);
-    }
-
     const pinMode: number | undefined = this.pinModes[pin];
 
     if (typeof pinMode === 'undefined') {
@@ -371,8 +363,9 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
     // update values
     for (let pinNum in newState) {
+      // TODO: почему только digital ???
       // filter only inputs
-      if (!this.isInputPin(parseInt(pinNum))) return;
+      if (!this.digitalPins.isInputPin(parseInt(pinNum))) return;
 
       this.state.inputs[pinNum] = newState[pinNum];
     }

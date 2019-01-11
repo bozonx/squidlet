@@ -114,7 +114,6 @@ export default class DigitalPins {
     await this.writeOutputStateToIc();
   }
 
-
   /**
    * Write all the values of digital output pins to IC.
    */
@@ -125,6 +124,13 @@ export default class DigitalPins {
 
     await this.expander.node.send(COMMANDS.setAllOutputValues, dataToSend);
   }
+
+  isInputPin(pin: number): boolean {
+    const pinMode: number | undefined = this.pinModes[pin];
+
+    return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
+  }
+
 
   private updateDigitalOutputValues(newValues: DigitalState) {
     for (let pinNum in newValues) {
@@ -138,13 +144,6 @@ export default class DigitalPins {
     const pinMode: number | undefined = this.pinModes[pin];
 
     return pinMode === MODES.output || this.isInputPin(pin);
-  }
-
-  // TODO: rename to isDigitalInput
-  private isInputPin(pin: number): boolean {
-    const pinMode: number | undefined = this.pinModes[pin];
-
-    return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
   }
 
   // TODO: rename to getLastDigitalPinNum
