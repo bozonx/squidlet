@@ -102,6 +102,8 @@ export function cloneDeep(value: any): any {
     return JSON.parse(JSON.stringify(value));
   }
 
+  // TODO: support of Uint8Arr
+
   throw new Error(`cloneDeep: unsupported type of value "${JSON.stringify(value)}"`);
 }
 

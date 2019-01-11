@@ -74,30 +74,40 @@ export default class State {
     this.state.analogOutputs[pin] = value;
   }
 
-  /**
-   * On change received data after poling on node driver.
-   * Find changed pins and rise events on them.
-   */
-  handleStateEvent(data: Uint8Array) {
-    const lastState: ExpanderState = cloneDeep(this.state);
+  updateDigitalState(data: Uint8Array) {
+    // save old arrays. It doesn't need to clone them because they will be reassigned
+    const lastInputState: DigitalState = this.state.inputs;
+    const lastOutputState: DigitalState = this.state.outputs;
 
-    this.setLastReceivedState(data);
+    // TODO: set new state
+    const newState: DigitalState = this.parseDigitalReceivedState(data);
 
-    callOnDifferentValues(this.state.inputs, lastState.inputs, (pinNum: number, newValue: boolean) => {
+    callOnDifferentValues(this.state.inputs, lastInputState, (pinNum: number, newValue: boolean) => {
       this.digitalEvents.emit(pinNum, newValue);
     });
-    callOnDifferentValues(this.state.outputs, lastState.outputs, (pinNum: number, newValue: boolean) => {
+    callOnDifferentValues(this.state.outputs, lastOutputState, (pinNum: number, newValue: boolean) => {
       this.digitalEvents.emit(pinNum, newValue);
     });
-    callOnDifferentValues(this.state.analogInputs, lastState.analogInputs, (pinNum: number, newValue: number) => {
+  }
+
+  updateAnalogState(data: Uint8Array) {
+    // save old arrays. It doesn't need to clone them because they will be reassigned
+    const lastInputState: AnalogState = this.state.analogInputs;
+    const lastOutputState: AnalogState = this.state.analogOutputs;
+
+    // TODO: set new state
+    const newState: AnalogState = this.parseAnalogReceivedState(data);
+
+    callOnDifferentValues(this.state.analogInputs, lastInputState, (pinNum: number, newValue: number) => {
       this.analogEvents.emit(pinNum, newValue);
     });
-    callOnDifferentValues(this.state.analogOutputs, lastState.analogOutputs, (pinNum: number, newValue: number) => {
+    callOnDifferentValues(this.state.analogOutputs, lastOutputState, (pinNum: number, newValue: number) => {
       this.analogEvents.emit(pinNum, newValue);
     });
   }
 
-  private setLastReceivedState(data: Uint8Array) {
+
+  private parseDigitalReceivedState(data: Uint8Array): DigitalState {
 
     // TODO: помдее должен прийти весь стейт сразу
 
@@ -117,6 +127,10 @@ export default class State {
 
       this.state.inputs[pinNum] = newState[pinNum];
     }
+  }
+
+  private parseAnalogReceivedState(data: Uint8Array): AnalogState {
+
   }
 
 }

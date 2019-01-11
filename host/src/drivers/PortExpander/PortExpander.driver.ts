@@ -65,7 +65,8 @@ export const MODES = {
 };
 
 const INCOME_COMMANDS = {
-  newState: 0x30,
+  newDigitalState: 0x30,
+  newAnalogState: 0x31,
 };
 
 const NO_MODE = 0x21;
@@ -112,8 +113,11 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       if (typeof dataAddress == 'undefined') {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
-      else if (dataAddress === INCOME_COMMANDS.newState) {
-        this.state.handleStateEvent(data);
+      else if (dataAddress === INCOME_COMMANDS.newDigitalState) {
+        this.state.updateDigitalState(data);
+      }
+      else if (dataAddress === INCOME_COMMANDS.newAnalogState) {
+        this.state.updateAnalogState(data);
       }
       else {
         this.env.system.log.error(`PortExpanderDriver: Unknown command "${dataAddress.toString(16)}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
