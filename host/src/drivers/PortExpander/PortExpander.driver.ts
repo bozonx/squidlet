@@ -92,7 +92,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
 
     // TODO: choose driver - use connection
-    // TODO: choose driver - setup driver - set pollDataAddress etc
+    // TODO: setup driver - set pollDataAddress etc
+    // TODO: указать длины для income commands
 
     // this.depsInstances.node = await getDriverDep('I2cNode.driver')
     //   .getInstance({
@@ -105,10 +106,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected didInit = async () => {
-    // this.node.addPollErrorListener((err: Error) => {
-    //   this.env.log.error(String(err));
-    // });
-
     this.node.onReceive((dataAddress: number, data: Uint8Array) => {
       if (typeof dataAddress == 'undefined') {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);

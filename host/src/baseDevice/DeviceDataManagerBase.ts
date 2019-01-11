@@ -146,6 +146,7 @@ export default abstract class DeviceDataManagerBase {
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
     // TODO: поидее только те поля которые сохраняются
+    // TODO: можно ли обойтись без cloneDeep?
     const oldData = cloneDeep(this.localData);
     // set to local data
     const updatedParams = this.setLocalData(partialData);

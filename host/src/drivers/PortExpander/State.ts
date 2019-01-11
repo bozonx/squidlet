@@ -1,4 +1,3 @@
-import {cloneDeep} from '../../helpers/lodashLike';
 import {callOnDifferentValues} from '../../helpers/helpers';
 import {convertBytesToBits} from '../../helpers/binaryHelpers';
 import IndexedEvents from '../../helpers/IndexedEvents';
