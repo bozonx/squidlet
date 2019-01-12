@@ -35,6 +35,9 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   }
 
   async write(dataAddressStr?: string | number, data?: Uint8Array): Promise<void> {
+    const dataAddress: number | undefined = (typeof dataAddressStr === 'undefined')
+      ? undefined :
+      this.makeDataAddressHexNum(dataAddressStr);
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}})`;
 
     await this.sender.send<void>(senderId, (): Promise<void> => {
@@ -43,6 +46,9 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   }
 
   async read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array> {
+    const dataAddress: number | undefined = (typeof dataAddressStr === 'undefined')
+      ? undefined :
+      this.makeDataAddressHexNum(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(length);
     // TODO: review - make method
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, read(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
@@ -50,10 +56,12 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.read(this.addressHex, dataAddress, resolvedLength);
       });
-    const isItPolingDataAddr: boolean = this.props.feedback && this.props.poll.map((item) => item.dataAddress).includes(dataAddress);
+    const isItPolingDataAddr: boolean = typeof dataAddress !== 'undefined'
+      && this.props.feedback
+      && this.props.poll.map((item) => item.dataAddress).includes(dataAddress);
 
     // update last poll data if data address the same
-    if (isItPolingDataAddr) {
+    if (typeof dataAddress !== 'undefined' && isItPolingDataAddr) {
       this.updateLastPollData(dataAddress, result);
     }
 
@@ -64,6 +72,9 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
    * Write and read from the same data address.
    */
   async request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array> {
+    const dataAddress: number | undefined = (typeof dataAddressStr === 'undefined')
+      ? undefined :
+      this.makeDataAddressHexNum(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(readLength);
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
     const result: Uint8Array = await this.sender

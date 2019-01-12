@@ -175,6 +175,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     return dataAddress.toString(16);
   }
 
+  protected makeDataAddressHexNum(dataAddrStr: string | number): number {
+    return hexStringToHexNum(dataAddrStr);
+  }
+
 
   private setupFeedback(): void {
     if (this.props.feedback === 'int') {
@@ -186,7 +190,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
       this.impulseInput.addListener(async () => {
         for (let item of this.props.poll) {
-          await this.doPoll(this.makeDataAddressesHexNum(item.dataAddress));
+          await this.doPoll(this.makeDataAddressHexNum(item.dataAddress));
         }
       });
     }
@@ -202,10 +206,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     return find(this.props.poll, (item: PollProps) => {
       return item.dataAddress === dataAddrStr;
     });
-  }
-
-  private makeDataAddressesHexNum(dataAddrStr: string | number): number {
-    return hexStringToHexNum(dataAddrStr);
   }
 
   /**
