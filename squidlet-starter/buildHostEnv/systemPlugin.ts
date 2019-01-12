@@ -35,7 +35,8 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'I2c/I2cMaster.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2c/I2cToSlave.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2c/I2cSlave.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cToSlaveDuplex.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cToMaster.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cDuplex.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/SerialDuplex.driver.yaml'));
 
   // TODO: remove

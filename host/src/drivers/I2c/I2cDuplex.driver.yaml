@@ -1,5 +1,5 @@
 name: I2cToSlaveDuplex.driver
-main: I2cToSlaveDuplex.driver.ts
+main: I2cDuplex.driver.ts
 type: system
 drivers:
   - I2cToSlave.driver

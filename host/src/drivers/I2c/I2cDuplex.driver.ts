@@ -5,11 +5,11 @@ import {I2cToSlaveDriver, I2cToSlaveDriverProps} from './I2cToSlave.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 
 
-export interface I2cToSlaveDuplexDriverProps extends I2cToSlaveDriverProps {
+export interface I2cDuplexDriverProps extends I2cToSlaveDriverProps {
 }
 
 
-export class I2cToSlaveDuplexDriver extends DriverBase<I2cToSlaveDuplexDriverProps> implements DuplexDriver {
+export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements DuplexDriver {
 
 
   // TODO: слушать ошибки полинга
@@ -46,8 +46,8 @@ export class I2cToSlaveDuplexDriver extends DriverBase<I2cToSlaveDuplexDriverPro
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cToSlaveDuplexDriver> {
-  protected DriverClass = I2cToSlaveDuplexDriver;
+export default class Factory extends DriverFactoryBase<I2cDuplexDriver> {
+  protected DriverClass = I2cDuplexDriver;
 
   // TODO: почему всегда новый инстанс, а не по address + bus ???
 
