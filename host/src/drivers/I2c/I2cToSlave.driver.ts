@@ -34,21 +34,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     this.addressHex = hexStringToHexNum(String(this.props.address));
   }
 
-  // /**
-  //  * Write only a dataAddress to bus
-  //  */
-  // async writeEmpty(dataAddress: number): Promise<void> {
-  //
-  //   // TODO: наверное не нужно - использоваь write без данных
-  //
-  //   const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, writeEmpty(${this.dataAddressToString(dataAddress)})`;
-  //
-  //   await this.sender.send<void>(senderId, (): Promise<void> => {
-  //     return this.i2cMaster.writeEmpty(this.addressHex, dataAddress);
-  //   });
-  // }
-
-  async write(dataAddress?: number, data?: Uint8Array): Promise<void> {
+  async write(dataAddressStr?: string | number, data?: Uint8Array): Promise<void> {
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}})`;
 
     await this.sender.send<void>(senderId, (): Promise<void> => {
@@ -56,17 +42,19 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     });
   }
 
-  async read(dataAddress: number, length?: number): Promise<Uint8Array> {
+  async read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array> {
     const resolvedLength: number = this.resolveReadLength(length);
+    // TODO: review - make method
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, read(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.read(this.addressHex, dataAddress, resolvedLength);
       });
+    const isItPolingDataAddr: boolean = this.props.feedback && this.props.poll.map((item) => item.dataAddress).includes(dataAddress);
 
     // update last poll data if data address the same
-    if (this.props.feedback && dataAddress === this.props.pollDataAddress) {
-      this.updateLastPollData(result);
+    if (isItPolingDataAddr) {
+      this.updateLastPollData(dataAddress, result);
     }
 
     return result;
@@ -75,7 +63,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   /**
    * Write and read from the same data address.
    */
-  async request(dataAddress?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array> {
+  async request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array> {
     const resolvedLength: number = this.resolveReadLength(readLength);
     const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
     const result: Uint8Array = await this.sender

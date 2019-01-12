@@ -33,9 +33,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * * write() - write an empty
    * * write(undefined, data) - write only data
    */
-  abstract write(dataAddress?: number, data?: Uint8Array): Promise<void>;
-  abstract read(dataAddress?: number, length?: number): Promise<Uint8Array>;
-  abstract request(dataAddress?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
+  abstract write(dataAddressStr?: string | number, data?: Uint8Array): Promise<void>;
+  abstract read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array>;
+  abstract request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
   protected abstract doPoll: (dataAddressStr: string | number) => Promise<Uint8Array>;
 
   protected readonly pollEvents: IndexedEvents = new IndexedEvents();
@@ -182,7 +182,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback === 'int') {
       if (!this.impulseInput) {
         throw new Error(
-          `I2cNode.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
+          `MasterSlaveBaseNodeDriver.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
         );
       }
 

@@ -11,7 +11,7 @@ export interface I2cToSlaveDuplexDriverProps extends I2cToSlaveDriverProps {
 
 export class I2cToSlaveDuplexDriver extends DriverBase<I2cToSlaveDuplexDriverProps> implements DuplexDriver {
 
-  // TODO: может определять что мастер по наличию адреса?
+
   // TODO: слушать ошибки полинга
 
   private get i2cNode(): I2cToSlaveDriver {
@@ -19,6 +19,9 @@ export class I2cToSlaveDuplexDriver extends DriverBase<I2cToSlaveDuplexDriverPro
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+
+    // TODO: определять что мастер по наличию адреса и выбирать соответствующий драйвер
+
     this.depsInstances.i2cNode = await getDriverDep('I2cToSlave.driver')
       .getInstance(this.props);
   }
