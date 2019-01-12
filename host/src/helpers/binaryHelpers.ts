@@ -92,8 +92,8 @@ export function textToUint8Array(str: string): Uint8Array {
 /**
  * to hex. eg - "5A" -> 90. "5a" the same
  */
-export function hexStringToHexNum(hesString: string): number {
-  return parseInt(hesString, 16);
+export function hexStringToHexNum(hexString: string): number {
+  return parseInt(hexString, 16);
 }
 
 /**
@@ -111,10 +111,6 @@ export function numToWord(num: number): string {
   if (result.length === 2) result = '00' + result;
 
   return result;
-}
-
-export function wordToNum(word: string): number {
-  return parseInt(word, 16);
 }
 
 /**

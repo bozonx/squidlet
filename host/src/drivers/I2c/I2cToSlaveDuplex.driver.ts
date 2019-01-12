@@ -12,7 +12,7 @@ export interface I2cToSlaveDuplexDriverProps extends I2cToSlaveDriverProps {
 export class I2cToSlaveDuplexDriver extends DriverBase<I2cToSlaveDuplexDriverProps> implements DuplexDriver {
 
   // TODO: может определять что мастер по наличию адреса?
-  // TODO: setup poll on several data address
+  // TODO: слушать ошибки полинга
 
   private get i2cNode(): I2cToSlaveDriver {
     return this.depsInstances.i2cNode as I2cToSlaveDriver;
@@ -33,11 +33,11 @@ export class I2cToSlaveDuplexDriver extends DriverBase<I2cToSlaveDuplexDriverPro
   }
 
   onReceive(cb: ReceiveHandler): number {
-    // TODO: add listeners of settedup data addresses
+    return this.i2cNode.addListener(cb);
   }
 
   removeListener(handlerIndex: number): void {
-    // TODO: make it
+    this.i2cNode.removeListener(handlerIndex);
   }
 
 }

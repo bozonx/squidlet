@@ -8,7 +8,7 @@ import MasterSlaveBusProps from '../app/interfaces/MasterSlaveBusProps';
 import {isEqual} from '../helpers/lodashLike';
 
 
-export type Handler = (data: Uint8Array) => void;
+export type Handler = (dataAddress: number, data: Uint8Array) => void;
 export type ErrorHandler = (err: Error) => void;
 
 export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
@@ -35,19 +35,18 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   abstract write(dataAddress?: number, data?: Uint8Array): Promise<void>;
   abstract read(dataAddress?: number, length?: number): Promise<Uint8Array>;
   abstract request(dataAddress?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
-  protected abstract doPoll: () => Promise<Uint8Array>;
+  protected abstract doPoll: (dataAddress: number) => Promise<Uint8Array>;
 
   protected readonly pollEvents: IndexedEvents = new IndexedEvents();
   protected readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
   protected readonly poling: Poling = new Poling();
-  // data addr in hex to use in poling.
-  protected pollDataAddressHex?: number;
+  // data addrs in hex to use in poling. by number data address
+  protected pollDataAddressesHex: {[index: string]: number};
   private pollId: string = DEFAULT_POLL_ID;
 
-  // TODO: make for each data address
-  // last received data by poling
+  // last received data by poling by dataAddress
   // it needs to decide to rise change event or not
-  private pollLastData: Uint8Array = new Uint8Array(0);
+  private pollLastData: {[index: string]: Uint8Array} = {};
   private _sender?: Sender;
 
   protected get sender(): Sender {
@@ -59,13 +58,22 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
+  // TODO: setup poll on several data address
+  // TODO: поддержка poll interval на каждом data address
+
   protected doInit = async (getDriverDep: GetDriverDep) => {
     if (this.props.int) {
       this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
         .getInstance(this.props.int || {});
     }
 
-    this.pollDataAddressHex = this.parseDataAddress(this.props.pollDataAddress);
+    for (let item of this.props.poll) {
+      this.pollDataAddressesHex[item.dataAddress] = this.parseDataAddress(item.dataAddress);
+
+    }
+    // TODO: make for each data address - new Uint8Array(0)
+
+
     this.pollId = this.dataAddressToString(this.props.pollDataAddress);
     this._sender = new Sender(
       // TODO: don't use system.host
@@ -85,8 +93,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // TODO: удалить из intListenersLengths, unlisten of driver
   }
 
-  getLastData(): Uint8Array {
-    return this.pollLastData;
+  getLastData(dataAddress: number): Uint8Array {
+    return this.pollLastData[dataAddress];
   }
 
   /**
@@ -179,6 +187,12 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Convert string or number data address to hex.
    * Undefined means no data address.
    */
+  // private parseDataAddress(dataAddressStr: string | number | undefined): number | undefined {
+  //   if (typeof dataAddressStr === 'undefined') return undefined;
+  //
+  //   return parseInt(String(dataAddressStr), 16);
+  // }
+
   private parseDataAddress(dataAddressStr: string | number | undefined): number | undefined {
     if (typeof dataAddressStr === 'undefined') return undefined;
 

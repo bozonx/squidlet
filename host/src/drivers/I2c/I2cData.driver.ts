@@ -3,7 +3,7 @@ import {
   hexToBytes,
   bytesToHexString,
   numToWord,
-  wordToNum
+  hexStringToHexNum
 } from '../../helpers/binaryHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
@@ -115,7 +115,7 @@ export class I2cDataDriver extends DriverBase<I2cDataDriverProps> {
   private lengthBytesToNumber(bytes: Uint8Array): number {
     const dataLengthHex: string = bytesToHexString(bytes);
 
-    return wordToNum(dataLengthHex);
+    return hexStringToHexNum(dataLengthHex);
   }
 
   private async handleIncome(
