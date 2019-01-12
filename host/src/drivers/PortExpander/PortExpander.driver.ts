@@ -12,7 +12,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {getKeyOfObject} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
-import NodeDriver from '../../app/interfaces/NodeDriver';
+import DuplexDriver from '../../app/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
@@ -81,8 +81,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   readonly state: State = new State();
   // TODO: does it really need?
   readonly log: Logger = this.env.system.log;
-  get node(): NodeDriver {
-    return this.depsInstances.node as NodeDriver;
+  get node(): DuplexDriver {
+    return this.depsInstances.node as DuplexDriver;
   }
 
   private readonly digitalPins: DigitalPins = new DigitalPins(this);

@@ -1,4 +1,4 @@
-import NodeDriver, {ReceiveHandler} from '../../app/interfaces/NodeDriver';
+import DuplexDriver, {ReceiveHandler} from '../../app/interfaces/DuplexDriver';
 import DriverBase from '../../app/entities/DriverBase';
 import Serial from '../../app/interfaces/dev/Serial';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
@@ -13,7 +13,7 @@ export interface SerialNodeProps {
 }
 
 
-export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements NodeDriver {
+export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements DuplexDriver {
   private get serialDev(): Serial {
     return this.depsInstances.serialDev as Serial;
   }
