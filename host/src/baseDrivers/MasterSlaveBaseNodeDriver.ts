@@ -15,8 +15,10 @@ export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
   int?: ImpulseInputDriverProps;
   // length of data which will be requested
-  pollDataLength: number;
-  pollDataAddress?: string | number;
+  // pollDataLength: number;
+  // pollDataAddress?: string | number;
+
+  poll: {dataAddress: number | string, length: string, interval?: number}[];
 }
 
 const DEFAULT_POLL_ID = 'default';
@@ -41,6 +43,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // data addr in hex to use in poling.
   protected pollDataAddressHex?: number;
   private pollId: string = DEFAULT_POLL_ID;
+
+  // TODO: make for each data address
   // last received data by poling
   // it needs to decide to rise change event or not
   private pollLastData: Uint8Array = new Uint8Array(0);

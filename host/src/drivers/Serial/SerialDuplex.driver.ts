@@ -2,7 +2,7 @@ import DuplexDriver, {ReceiveHandler} from '../../app/interfaces/DuplexDriver';
 import DriverBase from '../../app/entities/DriverBase';
 import Serial from '../../app/interfaces/dev/Serial';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {addFirstItemUint8Arr} from '../../helpers/helpers';
+import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from '../../helpers/helpers';
 import {DATA_ADDRESS_LENGTH} from '../../app/dict/constants';
 
 
@@ -64,7 +64,18 @@ export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements D
   }
 
   onReceive(cb: ReceiveHandler): number {
-    return this.serialDev.on(this.props.uartNum, 'data', cb);
+    const wrapper = (data: Uint8Array) => {
+      if (!data.length) {
+        return this.env.system.log.error(`SerialDuplexDriver: Received event without a dataAddress`);
+      }
+
+      const dataAddress = data[0];
+      const onlyData: Uint8Array = withoutFirstItemUint8Arr(data);
+
+      cb(dataAddress, onlyData);
+    };
+
+    return this.serialDev.on(this.props.uartNum, 'data', wrapper);
   }
 
   removeListener(handlerIndex: number): void {

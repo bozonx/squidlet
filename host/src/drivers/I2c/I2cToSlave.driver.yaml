@@ -12,14 +12,20 @@ props:
   pollInterval:
     type: number
     default: 1000
-  # length of data which will be requested by poling or interruption
-  pollDataLength:
-    type: number
-    default: 1
-  # data address (first byte) which will be used in poling or interruption if it is specified
-  # if it doesn't set data wil send without first byte where was a data address.
-  pollDataAddress:
-    type: number | string
+
+  poll:
+    type: array
+    # TODO: add check for items - {dataAddress: number | string, length: string, interval?: number}
+
+#  # length of data which will be requested by poling or interruption
+#  pollDataLength:
+#    type: number
+#    default: 1
+#  # data address (first byte) which will be used in poling or interruption if it is specified
+#  # if it doesn't set data wil send without first byte where was a data address.
+#  pollDataAddress:
+#    type: number | string
+
   # props of ImpulseInput driver which will be used for listen to interruption
   int:
     type: object
