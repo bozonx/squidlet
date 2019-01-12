@@ -1,19 +1,18 @@
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../app/dict/constants';
 
 
-// TODO: use generic instead of this
-export type EventHandler = (...args: any[]) => void;
-type Handlers = Array<EventHandler | undefined>;
+// export type EventHandler = (...args: any[]) => void;
+// type Handlers = Array<EventHandler | undefined>;
 
 
-export default class IndexedEvents {
-  private handlers: Handlers = [];
+export default class IndexedEvents<T extends (...args: any[]) => void> {
+  private handlers: (T | undefined)[] = [];
 
   /**
    * Get all the handlers.
    * Removed handlers will be undefined
    */
-  getHandlers(): Handlers {
+  getHandlers(): (T | undefined)[] {
     return this.handlers;
   }
 
@@ -40,18 +39,18 @@ export default class IndexedEvents {
   /**
    * Register listener and return its index
    */
-  addListener(handler: EventHandler): number {
+  addListener(handler: T): number {
     this.handlers.push(handler);
 
     return this.handlers.length - LENGTH_AND_START_ARR_DIFFERENCE;
   }
 
-  once(handler: EventHandler): number {
+  once(handler: T): number {
     let wrapperIndex: number = -1;
-    const wrapper: EventHandler = (...args: any[]) => {
+    const wrapper = ((...args: any[]) => {
       this.removeListener(wrapperIndex);
       handler(...args);
-    };
+    }) as T;
 
     wrapperIndex = this.addListener(wrapper);
 

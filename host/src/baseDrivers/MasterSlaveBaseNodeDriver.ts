@@ -38,8 +38,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   abstract request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
   protected abstract doPoll: (dataAddressStr: string | number) => Promise<Uint8Array>;
 
-  protected readonly pollEvents: IndexedEvents = new IndexedEvents();
-  protected readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
+  protected readonly pollEvents = new IndexedEvents<Handler>();
+  protected readonly pollErrorEvents = new IndexedEvents<ErrorHandler>();
   protected readonly poling: Poling = new Poling();
 
   // last received data by poling by dataAddress
