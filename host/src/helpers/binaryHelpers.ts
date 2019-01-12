@@ -90,10 +90,13 @@ export function textToUint8Array(str: string): Uint8Array {
 }
 
 /**
- * to hex. eg - "5A" -> 90. "5a" the same
+ * to hex. eg - "5A" -> 90. "5a" the same.
+ * undefined -> 0
  */
-export function hexStringToHexNum(hexString: string): number {
-  return parseInt(hexString, 16);
+export function hexStringToHexNum(hexString: string | number | undefined): number {
+  if (typeof hexString === 'undefined') return 0;
+
+  return parseInt(String(hexString), 16);
 }
 
 /**

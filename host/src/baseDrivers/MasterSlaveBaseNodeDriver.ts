@@ -6,6 +6,7 @@ import {ImpulseInputDriver, ImpulseInputDriverProps} from '../drivers/Binary/Imp
 import {GetDriverDep} from '../app/entities/EntityBase';
 import MasterSlaveBusProps from '../app/interfaces/MasterSlaveBusProps';
 import {isEqual} from '../helpers/lodashLike';
+import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 
 export type Handler = (dataAddress: number, data: Uint8Array) => void;
@@ -68,8 +69,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      this.pollDataAddressesHex[item.dataAddress] = this.parseDataAddress(item.dataAddress);
-
+      this.pollDataAddressesHex[item.dataAddress] = hexStringToHexNum(item.dataAddress);
     }
     // TODO: make for each data address - new Uint8Array(0)
 
@@ -192,11 +192,5 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   //
   //   return parseInt(String(dataAddressStr), 16);
   // }
-
-  private parseDataAddress(dataAddressStr: string | number | undefined): number | undefined {
-    if (typeof dataAddressStr === 'undefined') return undefined;
-
-    return parseInt(String(dataAddressStr), 16);
-  }
 
 }
