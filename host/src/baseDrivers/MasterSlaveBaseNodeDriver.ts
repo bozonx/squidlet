@@ -5,7 +5,7 @@ import Sender from '../helpers/Sender';
 import {ImpulseInputDriver, ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
 import {GetDriverDep} from '../app/entities/EntityBase';
 import MasterSlaveBusProps from '../app/interfaces/MasterSlaveBusProps';
-import {isEqual} from '../helpers/lodashLike';
+import {find, isEqual} from '../helpers/lodashLike';
 import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 
@@ -134,10 +134,17 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     const pollId: string = this.dataAddressToString(dataAddressStr);
-    //const pollInterval: number = if (typeof this.props.poll)
-    // TODO: поддержка poll interval на каждом data address
+    const pollProps: PollProps | undefined = this.getPollProps(dataAddressStr);
 
-    this.poling.start(() => this.doPoll(dataAddressStr), this.props.pollInterval, pollId);
+    if (!pollProps) {
+      throw new Error(`MasterSlaveBaseNodeDriver.startPoling: Can't find poll props of data address "${dataAddressStr}"`);
+    }
+
+    const pollInterval: number = (typeof pollProps.interval === 'undefined')
+      ? this.props.pollInterval
+      : pollProps.interval;
+
+    this.poling.start(() => this.doPoll(dataAddressStr), pollInterval, pollId);
   }
 
   protected stopPoling(dataAddressStr: number | string) {
@@ -149,11 +156,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   protected updateLastPollData(dataAddressStr: number | string, data: Uint8Array) {
-
-    // TODO: review
-
     // if data is equal to previous data - do nothing
-    if (isEqual(this.pollLastData, data)) return;
+    if (isEqual(this.pollLastData[dataAddressStr], data)) return;
 
     // save data
     this.pollLastData[dataAddressStr] = data;
@@ -194,9 +198,11 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // else don't use feedback at all
   }
 
-  // private pollAllTheDataAddresses() {
-  //
-  // }
+  private getPollProps(dataAddrStr: string | number): PollProps | undefined {
+    return find(this.props.poll, (item: PollProps) => {
+      return item.dataAddress === dataAddrStr;
+    });
+  }
 
   private makeDataAddressesHexNum(dataAddrStr: string | number): number {
     return hexStringToHexNum(dataAddrStr);
@@ -212,4 +218,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   //   return parseInt(String(dataAddressStr), 16);
   // }
 
+  // private pollAllTheDataAddresses() {
+  //
+  // }
 }

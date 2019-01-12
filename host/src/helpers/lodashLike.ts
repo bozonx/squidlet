@@ -1,3 +1,5 @@
+import {isUint8Array} from './helpers';
+
 const _capitalize = require('lodash/capitalize');
 const _padStart = require('lodash/padStart');
 
@@ -121,6 +123,15 @@ export function isEqual(first: any, second: any): boolean {
     || typeof second === 'function'
   ) {
     return first === second;
+  }
+  else if (typeof first !== 'undefined' && typeof second === 'undefined') {
+    return false;
+  }
+  else if (typeof first === 'undefined' && typeof second !== 'undefined') {
+    return false;
+  }
+  else if (isUint8Array(first) && isUint8Array(second)) {
+    return first.toString() === second.toString();
   }
 
   return JSON.stringify(first) === JSON.stringify(second);

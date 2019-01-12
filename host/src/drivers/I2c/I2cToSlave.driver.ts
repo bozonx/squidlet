@@ -85,6 +85,8 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   protected doPoll = async (dataAddressStr: string | number): Promise<Uint8Array> => {
     let data: Uint8Array;
 
+    // TODO: reveiw
+
     try {
       // TODO: use sender if int poll type is used
       data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
