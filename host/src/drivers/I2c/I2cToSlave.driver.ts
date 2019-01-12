@@ -94,7 +94,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
            address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`;
 
       // emit error to poll error channel
-      this.pollErrorEvents.emit(msg);
+      this.pollErrorEvents.emit(dataAddressStr, new Error(msg));
 
       throw new Error(msg);
     }

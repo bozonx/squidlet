@@ -9,8 +9,8 @@ import {isEqual} from '../helpers/lodashLike';
 import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 
-export type Handler = (dataAddress: number, data: Uint8Array) => void;
-export type ErrorHandler = (dataAddress: number, err: Error) => void;
+export type Handler = (dataAddressStr: number | string, data: Uint8Array) => void;
+export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void;
 
 export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
@@ -19,7 +19,7 @@ export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // pollDataLength: number;
   // pollDataAddress?: string | number;
 
-  poll: {dataAddress: number | string, length: string, interval?: number}[];
+  poll: {dataAddressStr: number | string, length: string, interval?: number}[];
 }
 
 const DEFAULT_POLL_ID = 'default';
@@ -110,9 +110,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Listen to data which received by polling or interruption.
    */
   addListener(handler: Handler): number {
-
-    // TODO: review
-
     return this.pollEvents.addListener(handler);
   }
 
@@ -124,9 +121,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Listen to errors which take place while poling or interruption is in progress
    */
   addPollErrorListener(handler: ErrorHandler): number {
-
-    // TODO: review
-
     return this.pollErrorEvents.addListener(handler);
   }
 
@@ -163,7 +157,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // save data
     this.pollLastData[dataAddressStr] = data;
     // finally rise an event
-    this.pollEvents.emit(data);
+    this.pollEvents.emit(dataAddressStr, data);
   }
 
   /**
@@ -187,7 +181,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
       this.impulseInput.addListener(async () => {
         for (let item of this.props.poll) {
-          await this.doPoll(this.makeDataAddressesHexNum((item.dataAddress));
+          await this.doPoll(this.makeDataAddressesHexNum(item.dataAddress));
         }
       });
     }

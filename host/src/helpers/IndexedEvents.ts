@@ -30,11 +30,11 @@ export default class IndexedEvents<T extends (...args: any[]) => void> {
     return hasInstance;
   }
 
-  emit(...args: any[]) {
+  emit: T = ((...args: any[]) => {
     for (let handler of this.handlers) {
       if (handler) handler(...args);
     }
-  }
+  }) as T;
 
   /**
    * Register listener and return its index
