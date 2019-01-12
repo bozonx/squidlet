@@ -36,7 +36,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   abstract write(dataAddress?: number, data?: Uint8Array): Promise<void>;
   abstract read(dataAddress?: number, length?: number): Promise<Uint8Array>;
   abstract request(dataAddress?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
-  protected abstract doPoll: (dataAddress: number) => Promise<Uint8Array>;
+  protected abstract doPoll: (dataAddressStr: string | number) => Promise<Uint8Array>;
 
   protected readonly pollEvents: IndexedEvents = new IndexedEvents();
   protected readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
@@ -65,6 +65,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         .getInstance(this.props.int || {});
     }
 
+    // TODO: does it need?
     for (let item of this.props.poll) {
       this.pollLastData[item.dataAddress] = new Uint8Array(0);
     }
@@ -87,8 +88,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // TODO: удалить из intListenersLengths, unlisten of driver
   }
 
-  getLastData(dataAddress: number): Uint8Array {
-    return this.pollLastData[dataAddress];
+  getLastData(dataAddressStr: string | number): Uint8Array {
+    return this.pollLastData[dataAddressStr];
   }
 
   /**
@@ -112,6 +113,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Listen to data which received by polling or interruption.
    */
   addListener(handler: Handler): number {
+
+    // TODO: review
+
     return this.pollEvents.addListener(handler);
   }
 
@@ -123,6 +127,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Listen to errors which take place while poling or interruption is in progress
    */
   addPollErrorListener(handler: ErrorHandler): number {
+
+    // TODO: review
+
     return this.pollErrorEvents.addListener(handler);
   }
 
@@ -131,18 +138,18 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
-  protected startPoling(dataAddress: number | string) {
+  protected startPoling(dataAddressStr: number | string) {
     if (this.props.feedback !== 'poll') return;
 
-    const pollId: string = this.dataAddressToString(dataAddress);
+    const pollId: string = this.dataAddressToString(dataAddressStr);
 
-    this.poling.start(() => this.doPoll(dataAddress), this.props.pollInterval, pollId);
+    this.poling.start(() => this.doPoll(dataAddressStr), this.props.pollInterval, pollId);
   }
 
-  protected stopPoling(dataAddress: number | string) {
+  protected stopPoling(dataAddressStr: number | string) {
     if (this.props.feedback !== 'poll') return;
 
-    const pollId: string = this.dataAddressToString(dataAddress);
+    const pollId: string = this.dataAddressToString(dataAddressStr);
 
     this.poling.stop(pollId);
   }

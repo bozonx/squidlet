@@ -94,7 +94,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   /**
    * Read data once and rise an data event
    */
-  protected doPoll = async (): Promise<Uint8Array> => {
+  protected doPoll = async (dataAddressStr: string | number): Promise<Uint8Array> => {
     let data: Uint8Array;
 
     try {
