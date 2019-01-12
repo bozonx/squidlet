@@ -27,6 +27,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
       .getInstance(omit(this.props,
+        // TODO: review
         'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
       ));
 

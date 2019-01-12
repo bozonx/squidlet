@@ -42,8 +42,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
   protected readonly poling: Poling = new Poling();
   // data addrs in hex to use in poling. by number data address
-  protected pollDataAddressesHex: {[index: string]: number};
-  private pollId: string = DEFAULT_POLL_ID;
+  protected pollDataAddressesHex: {[index: string]: number} = {};
 
   // last received data by poling by dataAddress
   // it needs to decide to rise change event or not
@@ -70,11 +69,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
     for (let item of this.props.poll) {
       this.pollDataAddressesHex[item.dataAddress] = hexStringToHexNum(item.dataAddress);
+      this.pollLastData[item.dataAddress] = new Uint8Array(0);
     }
-    // TODO: make for each data address - new Uint8Array(0)
 
-
-    this.pollId = this.dataAddressToString(this.props.pollDataAddress);
     this._sender = new Sender(
       // TODO: don't use system.host
       this.env.system.host.config.config.senderTimeout,
@@ -107,6 +104,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
     }
 
+    const pollId: string = this.dataAddressToString();
+
     // TODO: проверить что не будут выполняться другие poll пока выполняется текущий
 
     return this.poling.restart(this.pollId);
@@ -135,19 +134,26 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
-  protected stopPoling() {
+  protected startPoling(dataAddress: number | string) {
     if (this.props.feedback !== 'poll') return;
 
-    this.poling.stop(this.pollId);
+    const pollId: string = this.dataAddressToString(dataAddress);
+
+    this.poling.start(() => this.doPoll(dataAddress), this.props.pollInterval, pollId);
   }
 
-  protected startPoling() {
+  protected stopPoling(dataAddress: number | string) {
     if (this.props.feedback !== 'poll') return;
 
-    this.poling.start(this.doPoll, this.props.pollInterval, this.pollId);
+    const pollId: string = this.dataAddressToString(dataAddress);
+
+    this.poling.stop(pollId);
   }
 
   protected updateLastPollData(data: Uint8Array) {
+
+    // TODO: review
+
     // if data is equal to previous data - do nothing
     if (isEqual(this.pollLastData, data)) return;
 
@@ -176,10 +182,17 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         );
       }
 
-      this.impulseInput.addListener(this.doPoll);
+      this.impulseInput.addListener(async () => {
+        for (let item of this.props.poll) {
+          await this.doPoll(this.pollDataAddressesHex[item.dataAddress]);
+        }
+      });
     }
     // start poling if feedback is poll
-    this.startPoling();
+    for (let item of this.props.poll) {
+      this.startPoling(item.dataAddress);
+    }
+
     // else don't use feedback at all
   }
 
