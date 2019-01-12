@@ -15,6 +15,10 @@ type MethodWrapper = () => void;
 type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 
 
+// TODO: проверить что не будут выполняться другие poll пока выполняется текущий
+// TODO: может сделать 2 режима - общая очередь или очередь на каждый id
+
+
 export default class Poling {
   private readonly events: IndexedEventEmitter = new IndexedEventEmitter();
   //private pollIntervalTimerId: number = NO_INTERVAL;

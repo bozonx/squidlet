@@ -12,6 +12,13 @@ import {hexStringToHexNum} from '../helpers/binaryHelpers';
 export type Handler = (dataAddressStr: number | string, data: Uint8Array) => void;
 export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void;
 
+interface PollProps {
+  // data address e.g "5a" or "33" or 27
+  dataAddress: string | number;
+  length: string;
+  interval?: number;
+}
+
 export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
   int?: ImpulseInputDriverProps;
@@ -19,7 +26,7 @@ export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // pollDataLength: number;
   // pollDataAddress?: string | number;
 
-  poll: {dataAddressStr: number | string, length: string, interval?: number}[];
+  poll: PollProps[];
 }
 
 const DEFAULT_POLL_ID = 'default';
@@ -61,10 +68,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         .getInstance(this.props.int || {});
     }
 
-    // for (let item of this.props.poll) {
-    //   this.pollLastData[item.dataAddress] = new Uint8Array(0);
-    // }
-
     this._sender = new Sender(
       // TODO: don't use system.host
       this.env.system.host.config.config.senderTimeout,
@@ -83,7 +86,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // TODO: удалить из intListenersLengths, unlisten of driver
   }
 
-  getLastData(dataAddressStr: string | number): Uint8Array {
+  getLastData(dataAddressStr: string | number): Uint8Array | undefined {
     return this.pollLastData[dataAddressStr];
   }
 
@@ -96,8 +99,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback === 'none') {
       throw new Error(`MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured`);
     }
-
-    // TODO: проверить что не будут выполняться другие poll пока выполняется текущий
 
     for (let item of this.props.poll) {
       const pollId: string = this.dataAddressToString(item.dataAddress);
