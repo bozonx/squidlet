@@ -10,7 +10,7 @@ import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 
 export type Handler = (dataAddress: number, data: Uint8Array) => void;
-export type ErrorHandler = (err: Error) => void;
+export type ErrorHandler = (dataAddress: number, err: Error) => void;
 
 export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   // if you have one interrupt pin you can specify in there
@@ -46,29 +46,24 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // it needs to decide to rise change event or not
   private pollLastData: {[index: string]: Uint8Array} = {};
   private _sender?: Sender;
+  private impulseInput?: ImpulseInputDriver;
 
   protected get sender(): Sender {
     return this._sender as Sender;
   }
 
-  private get impulseInput(): ImpulseInputDriver | undefined {
-    return this.depsInstances.impulseInput as ImpulseInputDriver | undefined;
-  }
 
-
-  // TODO: setup poll on several data address
-  // TODO: поддержка poll interval на каждом data address
+  // TODO: наверное не нужно конвертировать data address для pollId - или сделать отдельный метод
 
   protected doInit = async (getDriverDep: GetDriverDep) => {
     if (this.props.int) {
-      this.depsInstances.impulseInput = await getDriverDep('ImpulseInput.driver')
+      this.impulseInput = await getDriverDep('ImpulseInput.driver')
         .getInstance(this.props.int || {});
     }
 
-    // TODO: does it need?
-    for (let item of this.props.poll) {
-      this.pollLastData[item.dataAddress] = new Uint8Array(0);
-    }
+    // for (let item of this.props.poll) {
+    //   this.pollLastData[item.dataAddress] = new Uint8Array(0);
+    // }
 
     this._sender = new Sender(
       // TODO: don't use system.host
@@ -94,19 +89,21 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   /**
    * Poll once immediately. And restart current poll if it was specified.
-   * Data address and length you have to specify in props: pollDataLength and pollDataAddress.
-   * It reject promise on error
+   * Data address and length you have to specify in poll prop.
+   * It rejects promise on error
    */
-  async poll(): Promise<Uint8Array> {
-    if (typeof this.props.pollDataAddress === 'undefined') {
-      throw new Error(`You have to define a "pollDataAddress" prop to do poll`);
+  async poll(): Promise<void> {
+    if (this.props.feedback === 'none') {
+      throw new Error(`MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured`);
     }
-
-    const pollId: string = this.dataAddressToString();
 
     // TODO: проверить что не будут выполняться другие poll пока выполняется текущий
 
-    return this.poling.restart(this.pollId);
+    for (let item of this.props.poll) {
+      const pollId: string = this.dataAddressToString(item.dataAddress);
+
+      await this.poling.restart(pollId);
+    }
   }
 
   /**
@@ -142,6 +139,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     const pollId: string = this.dataAddressToString(dataAddressStr);
+    //const pollInterval: number = if (typeof this.props.poll)
+    // TODO: поддержка poll interval на каждом data address
 
     this.poling.start(() => this.doPoll(dataAddressStr), this.props.pollInterval, pollId);
   }
@@ -154,7 +153,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.poling.stop(pollId);
   }
 
-  protected updateLastPollData(data: Uint8Array) {
+  protected updateLastPollData(dataAddressStr: number | string, data: Uint8Array) {
 
     // TODO: review
 
@@ -162,7 +161,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (isEqual(this.pollLastData, data)) return;
 
     // save data
-    this.pollLastData = data;
+    this.pollLastData[dataAddressStr] = data;
     // finally rise an event
     this.pollEvents.emit(data);
   }
@@ -199,7 +198,11 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
     // else don't use feedback at all
   }
-  
+
+  // private pollAllTheDataAddresses() {
+  //
+  // }
+
   private makeDataAddressesHexNum(dataAddrStr: string | number): number {
     return hexStringToHexNum(dataAddrStr);
   }
