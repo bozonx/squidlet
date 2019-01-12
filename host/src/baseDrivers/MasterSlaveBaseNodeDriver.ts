@@ -41,8 +41,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected readonly pollEvents: IndexedEvents = new IndexedEvents();
   protected readonly pollErrorEvents: IndexedEvents = new IndexedEvents();
   protected readonly poling: Poling = new Poling();
-  // data addrs in hex to use in poling. by number data address
-  protected pollDataAddressesHex: {[index: string]: number} = {};
 
   // last received data by poling by dataAddress
   // it needs to decide to rise change event or not
@@ -68,7 +66,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      this.pollDataAddressesHex[item.dataAddress] = hexStringToHexNum(item.dataAddress);
       this.pollLastData[item.dataAddress] = new Uint8Array(0);
     }
 
@@ -184,7 +181,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
       this.impulseInput.addListener(async () => {
         for (let item of this.props.poll) {
-          await this.doPoll(this.pollDataAddressesHex[item.dataAddress]);
+          await this.doPoll(this.makeDataAddressesHexNum((item.dataAddress));
         }
       });
     }
@@ -194,6 +191,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     // else don't use feedback at all
+  }
+  
+  private makeDataAddressesHexNum(dataAddrStr: string | number): number {
+    return hexStringToHexNum(dataAddrStr);
   }
 
   /**
