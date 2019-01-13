@@ -1,10 +1,11 @@
-import IndexedEvents, {EventHandler} from './IndexedEvents';
+import IndexedEvents, {AnyHandler} from './IndexedEvents';
 
 
-export default class IndexedEventEmitter {
-  private handlersById: {[index: string]: IndexedEvents} = {};
+export default class IndexedEventEmitter<T extends AnyHandler> {
+  private handlersById: {[index: string]: IndexedEvents<T>} = {};
 
 
+  // TODO: как сделать типизированный ?? или хотябы error first
   emit(eventName: string, ...args: any[]) {
     if (!this.handlersById[eventName]) return;
 
@@ -14,7 +15,7 @@ export default class IndexedEventEmitter {
   /**
    * Register listener and return its index
    */
-  addListener(eventName: string, handler: EventHandler): number {
+  addListener(eventName: string, handler: T): number {
     if (!this.handlersById[eventName]) {
       this.handlersById[eventName] = new IndexedEvents();
     }
@@ -22,12 +23,12 @@ export default class IndexedEventEmitter {
     return this.handlersById[eventName].addListener(handler);
   }
 
-  once(eventName: string, handler: EventHandler): number {
+  once(eventName: string, handler: T): number {
     let wrapperIndex: number = -1;
-    const wrapper: EventHandler = (...args: any[]) => {
+    const wrapper = ((...args: any[]) => {
       this.removeListener(eventName, wrapperIndex);
       handler(...args);
-    };
+    }) as T;
 
     wrapperIndex = this.addListener(eventName, wrapper);
 

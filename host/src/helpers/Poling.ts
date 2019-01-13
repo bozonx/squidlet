@@ -9,6 +9,7 @@ enum CURRENT_POLL_ENUM {
   pollInterval,
 }
 
+type PollHandler = (err: Error, result: any) => void;
 type MethodWhichPoll = () => Promise<any>;
 type MethodWrapper = () => void;
 // [ intervalId, MethodWrapper, pollInterval ]
@@ -20,7 +21,7 @@ type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 
 
 export default class Poling {
-  private readonly events: IndexedEventEmitter = new IndexedEventEmitter();
+  private readonly events = new IndexedEventEmitter<PollHandler>();
   //private pollIntervalTimerId: number = NO_INTERVAL;
   private readonly currentPolls: {[index: string]: CurrentPoll} = {};
 
@@ -64,14 +65,14 @@ export default class Poling {
     this.currentPolls[id] = [intervalId, methodWhichWillPoll, polingCbWrapper, pollInterval];
   }
 
-  addListener(handler: (err: Error, result: any) => void, uniqId: string | undefined): number {
+  addListener(handler: PollHandler, uniqId?: string): number {
     const id = this.resolveId(uniqId);
 
     // add event listener on status change
     return this.events.addListener(id, handler);
   }
 
-  removeListener(handlerIndex: number, uniqId: string | undefined) {
+  removeListener(handlerIndex: number, uniqId?: string) {
     const id = this.resolveId(uniqId);
 
     this.events.removeListener(id, handlerIndex);

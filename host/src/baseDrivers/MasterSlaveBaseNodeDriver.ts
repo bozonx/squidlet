@@ -55,8 +55,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected readonly sender: Sender = this.newSender();
 
 
-  // protected doInit = async (getDriverDep: GetDriverDep) => {
-  // }
+  protected doInit = async () => {
+    for (let pollProps of this.props.poll) {
+      this.poling.addListener((err: Error) => {
+        this.pollErrorEvents.emit(pollProps.dataAddress, err);
+      }, String(pollProps.dataAddress));
+    }
+  }
 
   protected appDidInit = async () => {
     // start poling or int listeners after app is initialized

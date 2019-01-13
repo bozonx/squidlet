@@ -95,23 +95,26 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   protected async doPoll(dataAddressStr: string | number): Promise<Uint8Array> {
     let data: Uint8Array;
 
-    // TODO: reveiw
-
     try {
       // TODO: use sender if int poll type is used
       data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
     }
     catch (err) {
+
+      // TODO: почему не используется обработка ошибок в Pling ???
+
       const msg = `I2cToSlaveDriver: Poll error of bus "${this.props.bus}",
-           address "${this.props.address}", dataAddress "${this.props.pollDataAddress}": ${String(err)}`;
+           address "${this.props.address}", dataAddress "${dataAddressStr}": ${String(err)}`;
 
       // emit error to poll error channel
       this.pollErrorEvents.emit(dataAddressStr, new Error(msg));
 
+      // TODO: не нужно
       throw new Error(msg);
+      //return;
     }
 
-    this.updateLastPollData(data);
+    this.updateLastPollData(dataAddressStr, data);
 
     return data;
   }

@@ -4,8 +4,10 @@ import {LENGTH_AND_START_ARR_DIFFERENCE} from '../app/dict/constants';
 // export type EventHandler = (...args: any[]) => void;
 // type Handlers = Array<EventHandler | undefined>;
 
+export type AnyHandler = (...args: any[]) => void;
 
-export default class IndexedEvents<T extends (...args: any[]) => void> {
+
+export default class IndexedEvents<T extends AnyHandler> {
   private handlers: (T | undefined)[] = [];
 
   /**
