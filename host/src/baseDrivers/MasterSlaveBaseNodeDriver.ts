@@ -2,8 +2,7 @@ import DriverBase from '../app/entities/DriverBase';
 import IndexedEvents from '../helpers/IndexedEvents';
 import Poling from '../helpers/Poling';
 import Sender from '../helpers/Sender';
-import {ImpulseInputDriver, ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
-import {GetDriverDep} from '../app/entities/EntityBase';
+import {ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
 import MasterSlaveBusProps from '../app/interfaces/MasterSlaveBusProps';
 import {find, isEqual} from '../helpers/lodashLike';
 import {hexStringToHexNum} from '../helpers/binaryHelpers';
@@ -68,8 +67,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 
   destroy = () => {
-    // TODO: удалить из pollLengths, Polling
-    // TODO: удалить из intListenersLengths, unlisten of driver
   }
 
   getLastData(dataAddressStr: string | number): Uint8Array | undefined {
@@ -115,8 +112,12 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollErrorEvents.removeListener(handlerIndex);
   }
 
-  protected startPollings() {
-    if (this.props.feedback !== 'poll') return;
+  protected startPolls() {
+    if (this.props.feedback !== 'poll') {
+      this.env.system.log.warn(`MasterSlaveBaseNodeDriver.startPolls: Trying to start`);
+
+      return;
+    }
 
     for (let item of this.props.poll) {
       // TODO: pollId ???
@@ -143,6 +144,20 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollEvents.emit(dataAddressStr, data);
   }
 
+  /**
+   * Convert number to string or undefined to "DEFAULT_POLL_ID"
+   */
+  protected dataAddressToString(dataAddress: string | number | undefined): string {
+    if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
+    if (typeof dataAddress === 'string') return dataAddress;
+
+    return dataAddress.toString(16);
+  }
+
+  protected makeDataAddressHexNum(dataAddrStr: string | number): number {
+    return hexStringToHexNum(dataAddrStr);
+  }
+
 
   private startPolingOnDataAddress(dataAddressStr: number | string) {
     if (this.props.feedback !== 'poll') return;
@@ -160,21 +175,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
     this.poling.start(() => this.doPoll(dataAddressStr), pollInterval, pollId);
   }
-
-  /**
-   * Convert number to string or undefined to "DEFAULT_POLL_ID"
-   */
-  protected dataAddressToString(dataAddress: string | number | undefined): string {
-    if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
-    if (typeof dataAddress === 'string') return dataAddress;
-
-    return dataAddress.toString(16);
-  }
-
-  protected makeDataAddressHexNum(dataAddrStr: string | number): number {
-    return hexStringToHexNum(dataAddrStr);
-  }
-
 
   private getPollProps(dataAddrStr: string | number): PollProps | undefined {
     return find(this.props.poll, (item: PollProps) => {

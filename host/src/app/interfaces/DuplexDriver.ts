@@ -1,4 +1,4 @@
-export type ReceiveHandler = (dataAddress: number, data: Uint8Array) => void;
+import {Handler} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
 
 
 export default interface DuplexDriver {
@@ -8,6 +8,6 @@ export default interface DuplexDriver {
   /**
    * Listen to all the received data of all the dataAddresses
    */
-  onReceive(handler: ReceiveHandler): number;
+  onReceive(handler: Handler): number;
   removeListener(handlerIndex: number): void;
 }

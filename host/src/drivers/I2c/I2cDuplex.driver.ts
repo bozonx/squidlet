@@ -1,8 +1,8 @@
 import DriverBase from '../../app/entities/DriverBase';
-import DuplexDriver, {ReceiveHandler} from '../../app/interfaces/DuplexDriver';
+import DuplexDriver from '../../app/interfaces/DuplexDriver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
+import MasterSlaveBaseNodeDriver, {Handler, MasterSlaveBaseProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
 
 
 export interface I2cDuplexDriverProps extends MasterSlaveBaseProps {
@@ -27,7 +27,7 @@ export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements
     }
 
     // listen to poll errors and print it to logger
-    this.i2cDriver.addPollErrorListener((dataAddress: number, err: Error) => {
+    this.i2cDriver.addPollErrorListener((dataAddressStr: string | number, err: Error) => {
       this.env.system.log.error(String(err));
     });
   }
@@ -41,7 +41,7 @@ export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements
     return this.i2cDriver.request(dataAddress, data);
   }
 
-  onReceive(cb: ReceiveHandler): number {
+  onReceive(cb: Handler): number {
     return this.i2cDriver.addListener(cb);
   }
 
