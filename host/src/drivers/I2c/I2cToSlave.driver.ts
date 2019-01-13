@@ -153,7 +153,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   }
 
   private makeSenderId(dataAddressStr: string | number | undefined, method: string, ...params: (string | number)[]) {
-    return `${this.props.bus},${this.props.address},${dataAddressStr}),${method},${params.join()}`;
+    return [this.props.bus, this.props.address, dataAddressStr, method, ...params].join();
   }
 
 
