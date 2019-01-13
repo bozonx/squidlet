@@ -109,11 +109,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   protected startPolls() {
-    if (this.props.feedback !== 'poll') {
-      this.env.system.log.warn(`MasterSlaveBaseNodeDriver.startPolls: Trying to start`);
-
-      return;
-    }
+    if (this.props.feedback !== 'poll') return;
 
     for (let item of this.props.poll) {
       this.startPolingOnDataAddress(item.dataAddress);
@@ -150,8 +146,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 
   private startPolingOnDataAddress(dataAddressStr: number | string) {
-    if (this.props.feedback !== 'poll') return;
-
     const pollProps: PollProps | undefined = this.getPollProps(dataAddressStr);
 
     if (!pollProps) {

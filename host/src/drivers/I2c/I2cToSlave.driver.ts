@@ -55,18 +55,20 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
       && this.makeDataAddressHexNum(dataAddressStr) || undefined;
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, length);
     const senderId = this.makeSenderId(dataAddressStr, 'read', resolvedLength);
+    // send data and wait
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.read(this.addressHex, dataAddressHex, resolvedLength);
       });
-    const isItPolingDataAddr: boolean = typeof dataAddressHex !== 'undefined'
+
+    // is data address which read includes to one of poll
+    const isItPolingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
       && this.props.feedback
-      // TODO: review
-      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressHex);
+      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressStr);
 
     // update last poll data if data address the same
-    if (typeof dataAddressHex !== 'undefined' && isItPolingDataAddr) {
-      this.updateLastPollData(dataAddressHex, result);
+    if (typeof dataAddressStr !== 'undefined' && isItPolingDataAddr) {
+      this.updateLastPollData(dataAddressStr, result);
     }
 
     return result;
@@ -169,7 +171,6 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   private makeSenderId(dataAddressStr: string | number | undefined, method: string, ...params: (string | number)[]) {
     return [this.props.bus, this.props.address, dataAddressStr, method, ...params].join();
   }
-
 
 
   protected validateProps = (props: I2cToSlaveDriverProps): string | undefined => {
