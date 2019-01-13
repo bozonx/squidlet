@@ -14,7 +14,7 @@ export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void
 interface PollProps {
   // data address e.g "5a" or "33" or 27
   dataAddress: string | number;
-  length: string;
+  length?: number;
   interval?: number;
 }
 
@@ -142,6 +142,12 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     return hexStringToHexNum(dataAddrStr);
   }
 
+  protected getPollProps(dataAddrStr: string | number): PollProps | undefined {
+    return find(this.props.poll, (item: PollProps) => {
+      return item.dataAddress === dataAddrStr;
+    });
+  }
+
 
   private startPolingOnDataAddress(dataAddressStr: number | string) {
     if (this.props.feedback !== 'poll') return;
@@ -161,12 +167,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       pollInterval,
       String(dataAddressStr)
     );
-  }
-
-  private getPollProps(dataAddrStr: string | number): PollProps | undefined {
-    return find(this.props.poll, (item: PollProps) => {
-      return item.dataAddress === dataAddrStr;
-    });
   }
 
   /**
