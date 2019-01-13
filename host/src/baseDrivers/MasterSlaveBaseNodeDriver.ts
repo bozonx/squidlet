@@ -124,7 +124,15 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
-  protected updateLastPollData(dataAddressStr: number | string, data: Uint8Array) {
+  protected updateLastPollData(dataAddressStr: number | string | undefined, data: Uint8Array) {
+    // is data address which read includes to one of poll
+    const isItPolingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
+      && this.props.feedback
+      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressStr);
+
+    // do nothing if it isn't poling data address
+    if (typeof dataAddressStr === 'undefined' || !isItPolingDataAddr) return;
+
     // if data is equal to previous data - do nothing
     if (isEqual(this.pollLastData[dataAddressStr], data)) return;
 

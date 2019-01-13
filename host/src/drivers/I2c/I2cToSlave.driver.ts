@@ -61,15 +61,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
         return this.i2cMaster.read(this.addressHex, dataAddressHex, resolvedLength);
       });
 
-    // is data address which read includes to one of poll
-    const isItPolingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
-      && this.props.feedback
-      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressStr);
-
-    // update last poll data if data address the same
-    if (typeof dataAddressStr !== 'undefined' && isItPolingDataAddr) {
-      this.updateLastPollData(dataAddressStr, result);
-    }
+    this.updateLastPollData(dataAddressStr, result);
 
     return result;
   }
@@ -77,20 +69,22 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   /**
    * Write and read from the same data address.
    */
-  async request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array> {
+  async request(
+    dataAddressStr?: string | number,
+    dataToSend?: Uint8Array,
+    readLength?: number
+  ): Promise<Uint8Array> {
     const dataAddressHex: number | undefined = typeof dataAddressStr !== 'undefined'
       && this.makeDataAddressHexNum(dataAddressStr) || undefined;
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, readLength);
     const senderId = this.makeSenderId(dataAddressStr, 'request', resolvedLength);
+    // make request
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.request(this.addressHex, dataAddressHex, dataToSend, resolvedLength);
       });
 
-    // update last poll data if data address the same
-    if (this.props.feedback && dataAddress === this.props.pollDataAddress) {
-      this.updateLastPollData(result);
-    }
+    this.updateLastPollData(dataAddressStr, result);
 
     return result;
   }
