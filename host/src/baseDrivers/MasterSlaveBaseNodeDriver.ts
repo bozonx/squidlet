@@ -58,7 +58,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected doInit = async () => {
     for (let pollProps of this.props.poll) {
       this.poling.addListener((err: Error) => {
-        this.pollErrorEvents.emit(pollProps.dataAddress, err);
+        const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${pollProps.dataAddress}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
+
+        this.pollErrorEvents.emit(pollProps.dataAddress, new Error(msg));
       }, String(pollProps.dataAddress));
     }
   }

@@ -93,26 +93,32 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
    * Read data once and rise an data event
    */
   protected async doPoll(dataAddressStr: string | number): Promise<Uint8Array> {
-    let data: Uint8Array;
+    //let data: Uint8Array;
+    const senderId = this.makeSenderId(dataAddressStr, 'doPoll');
 
-    try {
-      // TODO: use sender if int poll type is used
-      data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
-    }
-    catch (err) {
+    const data: Uint8Array = await this.sender
+      .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
+        return await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);;
+      });
 
-      // TODO: почему не используется обработка ошибок в Pling ???
-
-      const msg = `I2cToSlaveDriver: Poll error of bus "${this.props.bus}",
-           address "${this.props.address}", dataAddress "${dataAddressStr}": ${String(err)}`;
-
-      // emit error to poll error channel
-      this.pollErrorEvents.emit(dataAddressStr, new Error(msg));
-
-      // TODO: не нужно
-      throw new Error(msg);
-      //return;
-    }
+    // try {
+    //   // TODO: use sender if int poll type is used
+    //   data = await this.i2cMaster.read(this.addressHex, this.pollDataAddressHex, this.props.pollDataLength);
+    // }
+    // catch (err) {
+    //
+    //   // TODO: почему не используется обработка ошибок в Pling ???
+    //
+    //   const msg = `I2cToSlaveDriver: Poll error of bus "${this.props.bus}",
+    //        address "${this.props.address}", dataAddress "${dataAddressStr}": ${String(err)}`;
+    //
+    //   // emit error to poll error channel
+    //   this.pollErrorEvents.emit(dataAddressStr, new Error(msg));
+    //
+    //   // TODO: не нужно
+    //   throw new Error(msg);
+    //   //return;
+    // }
 
     this.updateLastPollData(dataAddressStr, data);
 
