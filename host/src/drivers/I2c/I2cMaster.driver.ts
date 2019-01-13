@@ -6,6 +6,9 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {DATA_ADDRESS_LENGTH} from '../../app/dict/constants';
 
 
+// TODO: does it really need?
+
+
 export interface I2cMasterDriverProps {
   bus: number | string;
 }

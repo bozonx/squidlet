@@ -43,7 +43,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   abstract write(dataAddressStr?: string | number, data?: Uint8Array): Promise<void>;
   abstract read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array>;
   abstract request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
-  protected abstract doPoll: (dataAddressStr: string | number) => Promise<Uint8Array>;
+  protected abstract doPoll(dataAddressStr: string | number): Promise<Uint8Array>;
+  protected abstract setupFeedback(): void;
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly pollErrorEvents = new IndexedEvents<ErrorHandler>();
@@ -52,28 +53,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // last received data by poling by dataAddress
   // it needs to decide to rise change event or not
   private pollLastData: {[index: string]: Uint8Array} = {};
-  private _sender?: Sender;
-  private impulseInput?: ImpulseInputDriver;
-
-  protected get sender(): Sender {
-    return this._sender as Sender;
-  }
+  protected readonly sender: Sender = this.newSender();
 
 
   // TODO: наверное не нужно конвертировать data address для pollId - или сделать отдельный метод
 
-  protected doInit = async (getDriverDep: GetDriverDep) => {
-    if (this.props.int) {
-      this.impulseInput = await getDriverDep('ImpulseInput.driver')
-        .getInstance(this.props.int || {});
-    }
-
-    this._sender = new Sender(
-      // TODO: don't use system.host
-      this.env.system.host.config.config.senderTimeout,
-      this.env.system.host.config.config.senderResendTimeout
-    );
-  }
+  // protected doInit = async (getDriverDep: GetDriverDep) => {
+  // }
 
   protected appDidInit = async () => {
     // start poling or int listeners after app is initialized
@@ -129,8 +115,36 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollErrorEvents.removeListener(handlerIndex);
   }
 
+  protected startPollings() {
+    if (this.props.feedback !== 'poll') return;
 
-  protected startPoling(dataAddressStr: number | string) {
+    for (let item of this.props.poll) {
+      // TODO: pollId ???
+      this.startPolingOnDataAddress(item.dataAddress);
+    }
+  }
+
+  protected stopPollings() {
+    if (this.props.feedback !== 'poll') return;
+
+    for (let item of this.props.poll) {
+      const pollId: string = this.dataAddressToString(item.dataAddress);
+      this.poling.stop(pollId);
+    }
+  }
+
+  protected updateLastPollData(dataAddressStr: number | string, data: Uint8Array) {
+    // if data is equal to previous data - do nothing
+    if (isEqual(this.pollLastData[dataAddressStr], data)) return;
+
+    // save data
+    this.pollLastData[dataAddressStr] = data;
+    // finally rise an event
+    this.pollEvents.emit(dataAddressStr, data);
+  }
+
+
+  private startPolingOnDataAddress(dataAddressStr: number | string) {
     if (this.props.feedback !== 'poll') return;
 
     const pollId: string = this.dataAddressToString(dataAddressStr);
@@ -147,24 +161,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.poling.start(() => this.doPoll(dataAddressStr), pollInterval, pollId);
   }
 
-  protected stopPoling(dataAddressStr: number | string) {
-    if (this.props.feedback !== 'poll') return;
-
-    const pollId: string = this.dataAddressToString(dataAddressStr);
-
-    this.poling.stop(pollId);
-  }
-
-  protected updateLastPollData(dataAddressStr: number | string, data: Uint8Array) {
-    // if data is equal to previous data - do nothing
-    if (isEqual(this.pollLastData[dataAddressStr], data)) return;
-
-    // save data
-    this.pollLastData[dataAddressStr] = data;
-    // finally rise an event
-    this.pollEvents.emit(dataAddressStr, data);
-  }
-
   /**
    * Convert number to string or undefined to "DEFAULT_POLL_ID"
    */
@@ -179,28 +175,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     return hexStringToHexNum(dataAddrStr);
   }
 
-
-  private setupFeedback(): void {
-    if (this.props.feedback === 'int') {
-      if (!this.impulseInput) {
-        throw new Error(
-          `MasterSlaveBaseNodeDriver.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
-        );
-      }
-
-      this.impulseInput.addListener(async () => {
-        for (let item of this.props.poll) {
-          await this.doPoll(this.makeDataAddressHexNum(item.dataAddress));
-        }
-      });
-    }
-    // start poling if feedback is poll
-    for (let item of this.props.poll) {
-      this.startPoling(item.dataAddress);
-    }
-
-    // else don't use feedback at all
-  }
 
   private getPollProps(dataAddrStr: string | number): PollProps | undefined {
     return find(this.props.poll, (item: PollProps) => {

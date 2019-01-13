@@ -1,6 +1,7 @@
 import EntityBase from './EntityBase';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverEnv from './DriverEnv';
+import Sender from '../../helpers/Sender';
 
 
 export default class DriverBase<Props = {}> extends EntityBase<Props> {
@@ -10,4 +11,13 @@ export default class DriverBase<Props = {}> extends EntityBase<Props> {
     super(definition, env);
     this.env = env;
   }
+
+  protected newSender(): Sender {
+    return new Sender(
+      // TODO: don't use system.host
+      this.env.system.host.config.config.senderTimeout,
+      this.env.system.host.config.config.senderResendTimeout
+    );
+  }
+
 }

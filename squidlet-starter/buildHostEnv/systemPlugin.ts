@@ -5,7 +5,7 @@ const hostSrcRoot = '../../host/src';
 const devicesRoot = path.resolve(__dirname, hostSrcRoot, 'devices');
 const driversRoot = path.resolve(__dirname, hostSrcRoot, 'drivers');
 const servicesRoot = path.resolve(__dirname, hostSrcRoot, 'services');
-const networkConnectionDriversRoot = path.resolve(__dirname, hostSrcRoot, 'network/connections');
+//const networkConnectionDriversRoot = path.resolve(__dirname, hostSrcRoot, 'network/connections');
 
 
 export default async function systemPlugin (env: PluginEnv) {

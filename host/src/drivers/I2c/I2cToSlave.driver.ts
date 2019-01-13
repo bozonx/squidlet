@@ -5,6 +5,7 @@ import {hexStringToHexNum} from '../../helpers/binaryHelpers';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {omit} from '../../helpers/lodashLike';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
+import {ImpulseInputDriver} from '../Binary/ImpulseInput.driver';
 
 
 export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
@@ -17,6 +18,7 @@ export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
 
 
 export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps> {
+  private impulseInput?: ImpulseInputDriver;
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
 
@@ -25,6 +27,11 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+    if (this.props.int) {
+      this.impulseInput = await getDriverDep('ImpulseInput.driver')
+        .getInstance(this.props.int || {});
+    }
+
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
       .getInstance(omit(this.props,
         // TODO: review
@@ -93,7 +100,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   /**
    * Read data once and rise an data event
    */
-  protected doPoll = async (dataAddressStr: string | number): Promise<Uint8Array> => {
+  protected async doPoll(dataAddressStr: string | number): Promise<Uint8Array> {
     let data: Uint8Array;
 
     // TODO: reveiw
@@ -116,6 +123,27 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
     return data;
   }
+
+  protected setupFeedback(): void {
+    if (this.props.feedback === 'int') {
+      if (!this.impulseInput) {
+        throw new Error(
+          `MasterSlaveBaseNodeDriver.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
+        );
+      }
+
+      this.impulseInput.addListener(async () => {
+        for (let item of this.props.poll) {
+          await this.doPoll(this.makeDataAddressHexNum(item.dataAddress));
+        }
+      });
+    }
+    // start poling if feedback is poll
+    this.startPollings();
+
+    // else don't use feedback at all
+  }
+
 
   private resolveReadLength(readLength?: number): number {
     if (typeof readLength !== 'undefined') return readLength;
