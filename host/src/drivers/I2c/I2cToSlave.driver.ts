@@ -12,8 +12,6 @@ export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
   bus?: string | number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
   address: string | number;
-
-  // TODO: указать длины для data adresses
 }
 
 

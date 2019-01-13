@@ -28,7 +28,7 @@ export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
   poll: PollProps[];
 }
 
-const DEFAULT_POLL_ID = 'default';
+//const DEFAULT_POLL_ID = 'default';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
@@ -82,9 +82,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      const pollId: string = this.dataAddressToString(item.dataAddress);
-
-      await this.poling.restart(pollId);
+      await this.poling.restart(String(item.dataAddress));
     }
   }
 
@@ -118,7 +116,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      // TODO: pollId ???
       this.startPolingOnDataAddress(item.dataAddress);
     }
   }
@@ -127,8 +124,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let item of this.props.poll) {
-      const pollId: string = this.dataAddressToString(item.dataAddress);
-      this.poling.stop(pollId);
+      this.poling.stop(String(item.dataAddress));
     }
   }
 
@@ -142,16 +138,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollEvents.emit(dataAddressStr, data);
   }
 
-  /**
-   * Convert number to string or undefined to "DEFAULT_POLL_ID"
-   */
-  protected dataAddressToString(dataAddress: string | number | undefined): string {
-    if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
-    if (typeof dataAddress === 'string') return dataAddress;
-
-    return dataAddress.toString(16);
-  }
-
   protected makeDataAddressHexNum(dataAddrStr: string | number): number {
     return hexStringToHexNum(dataAddrStr);
   }
@@ -160,7 +146,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   private startPolingOnDataAddress(dataAddressStr: number | string) {
     if (this.props.feedback !== 'poll') return;
 
-    const pollId: string = this.dataAddressToString(dataAddressStr);
     const pollProps: PollProps | undefined = this.getPollProps(dataAddressStr);
 
     if (!pollProps) {
@@ -171,7 +156,11 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       ? this.props.pollInterval
       : pollProps.interval;
 
-    this.poling.start(() => this.doPoll(dataAddressStr), pollInterval, pollId);
+    this.poling.start(
+      () => this.doPoll(dataAddressStr),
+      pollInterval,
+      String(dataAddressStr)
+    );
   }
 
   private getPollProps(dataAddrStr: string | number): PollProps | undefined {
@@ -193,4 +182,15 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // private pollAllTheDataAddresses() {
   //
   // }
+
+  // /**
+  //  * Convert number to string or undefined to "DEFAULT_POLL_ID"
+  //  */
+  // protected dataAddressToString(dataAddress: string | number | undefined): string {
+  //   if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
+  //   if (typeof dataAddress === 'string') return dataAddress;
+  //
+  //   return dataAddress.toString(16);
+  // }
+
 }
