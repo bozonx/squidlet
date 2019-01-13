@@ -45,7 +45,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     const dataAddress: number | undefined = (typeof dataAddressStr === 'undefined')
       ? undefined :
       this.makeDataAddressHexNum(dataAddressStr);
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, write(${this.dataAddressToString(dataAddress)}})`;
+    const senderId = this.makeSenderId(dataAddressStr, 'write');
 
     await this.sender.send<void>(senderId, (): Promise<void> => {
       return this.i2cMaster.write(this.addressHex, dataAddress, data);
@@ -57,8 +57,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
       ? undefined :
       this.makeDataAddressHexNum(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(length);
-    // TODO: review - make method
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, read(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
+    const senderId = this.makeSenderId(dataAddressStr, 'read', resolvedLength);
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.read(this.addressHex, dataAddress, resolvedLength);
@@ -83,7 +82,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
       ? undefined :
       this.makeDataAddressHexNum(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(readLength);
-    const senderId = `bus: ${this.props.bus}, addr: ${this.props.address}, request(${this.dataAddressToString(dataAddress)}, ${resolvedLength})`;
+    const senderId = this.makeSenderId(dataAddressStr, 'request', resolvedLength);
     const result: Uint8Array = await this.sender
       .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
         return this.i2cMaster.request(this.addressHex, dataAddress, dataToSend, resolvedLength);
@@ -152,6 +151,11 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
     throw new Error(`I2cToSlaveDriver: You have to specify a length param to read or request methods`);
   }
+
+  private makeSenderId(dataAddressStr: string | number | undefined, method: string, ...params: (string | number)[]) {
+    return `${this.props.bus},${this.props.address},${dataAddressStr}),${method},${params.join()}`;
+  }
+
 
 
   protected validateProps = (props: I2cToSlaveDriverProps): string | undefined => {

@@ -55,8 +55,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected readonly sender: Sender = this.newSender();
 
 
-  // TODO: наверное не нужно конвертировать data address для pollId - или сделать отдельный метод
-
   // protected doInit = async (getDriverDep: GetDriverDep) => {
   // }
 
