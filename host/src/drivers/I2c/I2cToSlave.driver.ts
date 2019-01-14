@@ -121,7 +121,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
         }
       });
     }
-    // start poling if feedback is poll
+    // start polling if feedback is poll
     this.startPolls();
 
     // else don't use feedback at all

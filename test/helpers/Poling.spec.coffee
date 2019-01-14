@@ -1,10 +1,10 @@
-Poling = require('../../host/src/helpers/Poling').default;
+Polling = require('../../host/src/helpers/Polling').default;
 
 
-describe 'Poling', ->
+describe 'Polling', ->
   beforeEach ->
     @id = 'myId'
-    @poling = new Poling()
+    @polling = new Polling()
 
   it "start", (done) ->
     listenHandler = (err, data) ->
@@ -13,20 +13,20 @@ describe 'Poling', ->
       done()
 
     methodWhichWillPoll = sinon.stub().returns(Promise.resolve(1))
-    @poling.addListener(listenHandler, @id)
+    @polling.addListener(listenHandler, @id)
 
-    @poling.start(methodWhichWillPoll, 10000, @id)
-    clearInterval(@poling.intervals[@id])
+    @polling.start(methodWhichWillPoll, 10000, @id)
+    clearInterval(@polling.intervals[@id])
 
-    assert.isObject(@poling.intervals[@id])
+    assert.isObject(@polling.intervals[@id])
 
   it "start - don't run polling if it's", ->
     methodWhichWillPoll = sinon.stub().returns(Promise.resolve(1))
 
-    @poling.start(methodWhichWillPoll, 10000, @id)
-    assert.throws(() => @poling.start(methodWhichWillPoll, 10000, @id))
+    @polling.start(methodWhichWillPoll, 10000, @id)
+    assert.throws(() => @polling.start(methodWhichWillPoll, 10000, @id))
 
-    @poling.stop(@id)
+    @polling.stop(@id)
 
     expect(methodWhichWillPoll).to.be.calledOnce
-    assert.isUndefined(@poling.intervals[@id])
+    assert.isUndefined(@polling.intervals[@id])

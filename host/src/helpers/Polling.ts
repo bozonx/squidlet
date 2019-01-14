@@ -20,7 +20,7 @@ type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 // TODO: может сделать 2 режима - общая очередь или очередь на каждый id
 
 
-export default class Poling {
+export default class Polling {
   private readonly events = new IndexedEventEmitter<PollHandler>();
   //private pollIntervalTimerId: number = NO_INTERVAL;
   private readonly currentPolls: {[index: string]: CurrentPoll} = {};
@@ -35,7 +35,7 @@ export default class Poling {
   }
 
   /**
-   * Start poling.
+   * Start polling.
    * This method calls only once on one id.
    */
   start(
@@ -45,24 +45,24 @@ export default class Poling {
     uniqId: string | undefined,
   ): void {
     if (this.isInProgress(uniqId)) {
-      throw new Error(`Poling of "${uniqId}" and interval ${pollInterval}: This poll already is in progress`);
+      throw new Error(`Polling of "${uniqId}" and interval ${pollInterval}: This poll already is in progress`);
     }
 
     const id = this.resolveId(uniqId);
-    const polingCbWrapper: MethodWrapper = () => {
+    const pollingCbWrapper: MethodWrapper = () => {
       methodWhichWillPoll()
         .then((result) => this.events.emit(id, null, result))
         .catch((err) => this.events.emit(id, err));
     };
 
     // start first time immediately
-    polingCbWrapper();
+    pollingCbWrapper();
 
     // create timer
-    const intervalId = setInterval(polingCbWrapper, pollInterval);
+    const intervalId = setInterval(pollingCbWrapper, pollInterval);
 
     // save  poll params
-    this.currentPolls[id] = [intervalId, methodWhichWillPoll, polingCbWrapper, pollInterval];
+    this.currentPolls[id] = [intervalId, methodWhichWillPoll, pollingCbWrapper, pollInterval];
   }
 
   addListener(handler: PollHandler, uniqId?: string): number {
@@ -88,13 +88,13 @@ export default class Poling {
     const id = this.resolveId(uniqId);
 
     if (!this.currentPolls[id]) {
-      throw new Error(`Can't restart poling of "${uniqId}" because it hasn't been started yet`);
+      throw new Error(`Can't restart polling of "${uniqId}" because it hasn't been started yet`);
     }
 
     const current: CurrentPoll = this.currentPolls[id];
     let result: any;
 
-    // stop poling
+    // stop polling
     this.stop(id);
 
     // make first poll
@@ -102,7 +102,7 @@ export default class Poling {
       result = await current[CURRENT_POLL_ENUM.methodWrapper];
     }
     catch(err) {
-      // start poling any way
+      // start polling any way
       this.start(current[CURRENT_POLL_ENUM.methodWhichPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
 
       throw err;

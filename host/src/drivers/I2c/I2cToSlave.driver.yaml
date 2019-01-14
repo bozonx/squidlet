@@ -17,7 +17,7 @@ props:
     type: object
   feedback:
     type: poll | int
-  # default poling interval in ms
+  # default polling interval in ms
   pollInterval:
     type: number
     default: 1000
@@ -25,11 +25,11 @@ props:
     type: array
     # TODO: add check for items - {dataAddress: number | string, length: string, interval?: number}
 
-#  # length of data which will be requested by poling or interruption
+#  # length of data which will be requested by polling or interruption
 #  pollDataLength:
 #    type: number
 #    default: 1
-#  # data address (first byte) which will be used in poling or interruption if it is specified
+#  # data address (first byte) which will be used in polling or interruption if it is specified
 #  # if it doesn't set data wil send without first byte where was a data address.
 #  pollDataAddress:
 #    type: number | string

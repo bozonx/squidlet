@@ -1,6 +1,6 @@
 import DriverBase from '../app/entities/DriverBase';
 import IndexedEvents from '../helpers/IndexedEvents';
-import Poling from '../helpers/Poling';
+import Polling from '../helpers/Polling';
 import Sender from '../helpers/Sender';
 import {ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
 import {find, isEqual} from '../helpers/lodashLike';
@@ -24,8 +24,8 @@ export interface MasterSlaveBaseProps {
   int?: ImpulseInputDriverProps;
   poll: PollProps[];
   feedback?: FeedbackType;
-  // Default poll interval
-  pollInterval?: number;
+  // Default poll interval. By default is 1000
+  pollInterval: number;
 }
 
 
@@ -45,9 +45,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly pollErrorEvents = new IndexedEvents<ErrorHandler>();
-  protected readonly poling: Poling = new Poling();
+  protected readonly polling: Polling = new Polling();
 
-  // last received data by poling by dataAddress
+  // last received data by polling by dataAddress
   // it needs to decide to rise change event or not
   private pollLastData: {[index: string]: Uint8Array} = {};
   protected readonly sender: Sender = this.newSender();
@@ -56,7 +56,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected doInit = async () => {
     // listen to errors which happen on polling
     for (let pollProps of this.props.poll) {
-      this.poling.addListener((err: Error) => {
+      this.polling.addListener((err: Error) => {
         const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${pollProps.dataAddress}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
 
         this.pollErrorEvents.emit(pollProps.dataAddress, new Error(msg));
@@ -65,7 +65,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   protected appDidInit = async () => {
-    // start poling or int listeners after app is initialized
+    // start polling or int listeners after app is initialized
     this.setupFeedback();
   }
 
@@ -88,7 +88,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      await this.poling.restart(String(item.dataAddress));
+      await this.polling.restart(String(item.dataAddress));
     }
   }
 
@@ -104,7 +104,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   /**
-   * Listen to errors which take place while poling or interruption is in progress
+   * Listen to errors which take place while polling or interruption is in progress
    */
   addPollErrorListener(handler: ErrorHandler): number {
     return this.pollErrorEvents.addListener(handler);
@@ -118,7 +118,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let item of this.props.poll) {
-      this.startPolingOnDataAddress(item.dataAddress);
+      this.startPollingOnDataAddress(item.dataAddress);
     }
   }
 
@@ -126,18 +126,19 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let item of this.props.poll) {
-      this.poling.stop(String(item.dataAddress));
+      this.polling.stop(String(item.dataAddress));
     }
   }
 
   protected updateLastPollData(dataAddressStr: number | string | undefined, data: Uint8Array) {
-    // is data address which read includes to one of poll
-    const isItPolingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
+    // is data address which read uses in polling
+    const isItPollingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
       && this.props.feedback
-      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressStr);
+      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressStr)
+      || false;
 
-    // do nothing if it isn't poling data address
-    if (typeof dataAddressStr === 'undefined' || !isItPolingDataAddr) return;
+    // do nothing if it isn't polling data address
+    if (typeof dataAddressStr === 'undefined' || !isItPollingDataAddr) return;
 
     // if data is equal to previous data - do nothing
     if (isEqual(this.pollLastData[dataAddressStr], data)) return;
@@ -159,18 +160,18 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
-  private startPolingOnDataAddress(dataAddressStr: number | string) {
+  private startPollingOnDataAddress(dataAddressStr: number | string) {
     const pollProps: PollProps | undefined = this.getPollProps(dataAddressStr);
 
     if (!pollProps) {
-      throw new Error(`MasterSlaveBaseNodeDriver.startPoling: Can't find poll props of data address "${dataAddressStr}"`);
+      throw new Error(`MasterSlaveBaseNodeDriver.startPolling: Can't find poll props of data address "${dataAddressStr}"`);
     }
 
     const pollInterval: number = (typeof pollProps.interval === 'undefined')
       ? this.props.pollInterval
       : pollProps.interval;
 
-    this.poling.start(
+    this.polling.start(
       () => this.doPoll(dataAddressStr),
       pollInterval,
       String(dataAddressStr)
