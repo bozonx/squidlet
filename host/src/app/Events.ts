@@ -3,7 +3,7 @@ import IndexedEventEmitter from '../helpers/IndexedEventEmitter';
 
 
 export default class Events {
-  private readonly events: IndexedEventEmitter = new IndexedEventEmitter();
+  private readonly events = new IndexedEventEmitter();
 
 
   emit(category: string, topic: string, data?: any): void {
