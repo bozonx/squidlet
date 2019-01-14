@@ -11,7 +11,7 @@ import {byteToBinArr, updateBitInByte} from '../../helpers/binaryHelpers';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 
 
-export type ResultHandler = (values?: boolean[]) => void;
+export type ResultHandler = (values: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
 }
@@ -32,6 +32,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private currentState: number = 0;
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
+  private mainListenerWasAdded: boolean = false;
 
   private get i2cDriver(): I2cToSlaveDriver {
     return this.depsInstances.i2cDriver as I2cToSlaveDriver;
@@ -45,12 +46,16 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
         pollDataLength: 1,
         pollDataAddress: undefined,
       });
-  }
 
-  protected didInit = async () => {
     this.i2cDriver.addPollErrorListener((dataAddressStr: number | string, err: Error) => {
       this.env.log.error(String(err));
     });
+
+    this.i2cDriver.addListener((dataAddressStr: number | string, data: Uint8Array) => {
+      this.setLastReceivedState(data);
+    });
+
+    this.mainListenerWasAdded = true;
   }
 
   protected appDidInit = async () => {
@@ -92,46 +97,34 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
   /**
    * Add listener to change of any pin.
+   * Call this method inside a didInit() callback of your driver or device or after.
    */
   addListener(handler: ResultHandler): number {
+    if (!this.mainListenerWasAdded) {
+      throw new Error(`PCF8574Driver.addListener: You try to add listener too early. Please add it inside a didInit callback or after`);
+    }
 
-    // TODO: review
-    // TODO: ожидается что ResultHandler будет string а не number
-
-    const wrapper: Handler = () => {
-
-      // TODO: наверное лучше повешать отдельно, иначе будет вызываться на каждое повешанное событие
-      this.setLastReceivedState();
-
-      // TODO: поидее если стейт не изменился то не поднимать событие, так как полинг будет делаться часто
-
-      handler(null, this.getState());
+    const wrapper = () => {
+      handler(this.getState());
     };
 
     return this.i2cDriver.addListener(wrapper);
   }
 
   removeListener(handlerIndex: number) {
-
-    // TODO: ожидается что ResultHandler будет string а не number
-
     this.i2cDriver.removeListener(handlerIndex);
   }
 
   /**
    * Poll expander and return values of all the pins
    */
-  async poll(): Promise<void> {
+  async pollOnce(): Promise<boolean[]> {
+    if (!this.checkInitialization('poll')) return this.getState();
+    else if (!this.wasIcInited) return this.getState();
 
-    // TODO: не нужно вообщето
+    await this.i2cDriver.pollOnce();
 
-    if (!this.checkInitialization('poll')) return;
-
-    // init IC if it isn't inited at this moment
-    if (!this.wasIcInited) await this.initIc();
-
-    await this.i2cDriver.poll();
-    //this.setLastReceivedState();
+    return this.getState();
   }
 
   async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
@@ -217,7 +210,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  private setLastReceivedState() {
+  private setLastReceivedState(data: Uint8Array) {
     const lastData: Uint8Array | undefined = this.i2cDriver.getLastData();
 
     if (!lastData) return;
