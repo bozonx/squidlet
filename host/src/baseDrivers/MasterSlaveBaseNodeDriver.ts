@@ -9,7 +9,9 @@ import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 // type of feedback - polling or interruption
 export type FeedbackType = 'poll' | 'int';
+// TODO: а если не был задан dataAddress ???
 export type Handler = (dataAddressStr: number | string, data: Uint8Array) => void;
+// TODO: а если не был задан dataAddress ???
 export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void;
 
 interface PollProps {

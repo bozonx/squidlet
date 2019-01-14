@@ -17,34 +17,29 @@ export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
 }
 
 
-// Constant for undefined pin direction (unused pin).
-export const DIR_UNDEF = -1;
 // Constant for input pin direction.
 export const DIR_IN = 1;
 // Constant for output pin direction.
 export const DIR_OUT = 0;
-
+// Count of pins which IC has
 export const PINS_COUNT = 8;
 
 
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
-  // Direction of each pin. By default all pin directions are undefined
-  private directions:Array<number> = [
-    DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF,
-    DIR_UNDEF, DIR_UNDEF, DIR_UNDEF, DIR_UNDEF
-  ];
+  // Direction of each pin. By default all the pin directions are undefined
+  private readonly directions: Array<number> = [];
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
 
-  private get i2cNode(): I2cToSlaveDriver {
-    return this.depsInstances.i2cNode as I2cToSlaveDriver;
+  private get i2cDriver(): I2cToSlaveDriver {
+    return this.depsInstances.i2cDriver as I2cToSlaveDriver;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cNode = await getDriverDep('I2cNode.driver')
+    this.depsInstances.i2cDriver = await getDriverDep('I2cNode.driver')
       .getInstance({
         ...this.props,
         pollDataLength: 1,
@@ -53,7 +48,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected didInit = async () => {
-    this.i2cNode.addPollErrorListener((err: Error) => {
+    this.i2cDriver.addPollErrorListener((dataAddressStr: number | string, err: Error) => {
       this.env.log.error(String(err));
     });
   }
@@ -67,7 +62,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     this.checkPin(pin);
 
-    if (this.directions[pin] !== DIR_UNDEF) {
+    if (typeof this.directions[pin] === 'undefined') {
       this.env.log.warn(`PCF8574Driver.setup(${pin}, ${pinMode}, ${outputInitialValue}). This pin has been already set up`);
 
       return;
@@ -75,6 +70,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     if (pinMode === 'output') {
       // output pin
+      // output initial value has to be specified
       if (typeof outputInitialValue === 'undefined') {
         throw new Error(`You have to specify an outputInitialValue`);
       }
@@ -113,14 +109,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       handler(null, this.getState());
     };
 
-    return this.i2cNode.addListener(wrapper);
+    return this.i2cDriver.addListener(wrapper);
   }
 
   removeListener(handlerIndex: number) {
 
     // TODO: ожидается что ResultHandler будет string а не number
 
-    this.i2cNode.removeListener(handlerIndex);
+    this.i2cDriver.removeListener(handlerIndex);
   }
 
   /**
@@ -135,7 +131,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // init IC if it isn't inited at this moment
     if (!this.wasIcInited) await this.initIc();
 
-    await this.i2cNode.poll();
+    await this.i2cDriver.poll();
     //this.setLastReceivedState();
   }
 
@@ -222,7 +218,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
   private setLastReceivedState() {
-    const lastData: Uint8Array | undefined = this.i2cNode.getLastData();
+    const lastData: Uint8Array | undefined = this.i2cDriver.getLastData();
 
     if (!lastData) return;
 
@@ -283,7 +279,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // send one byte to IC
     dataToSend[0] = newIcState;
 
-    await this.i2cNode.write(undefined, dataToSend);
+    await this.i2cDriver.write(undefined, dataToSend);
 
     this.initingIcInProgress = false;
   }
