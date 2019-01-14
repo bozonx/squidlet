@@ -307,9 +307,12 @@ export function isUint8Array(value: any): boolean {
   return value.constructor === Uint8Array;
 }
 
-export function firstLetterToUpperCase(...p: any[]) {
+export function firstLetterToUpperCase(value: string): string {
+  if (!value) return value;
 
-  // TODO: remake
+  const split: string[] = value.split('');
 
-  return _capitalize(...p);
+  split[0] = split[0].toUpperCase();
+
+  return split.join('');
 }
