@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {firstLetterToUpperCase, getKeyOfObject} from '../../helpers/helpers';
+import {firstLetterToUpperCase} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import DuplexDriver from '../../app/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
@@ -33,6 +33,8 @@ export type PortExpanderPinMode = 'input'
   | 'pwm'
   | 'rx'
   | 'tx';
+export type PortExpanderDigitalPinMode = 'input' | 'input_pullup' | 'input_pulldown' | 'output';
+export type PortExpanderAnalogPinMode = 'analog_input' | 'analog_output';
 
 export interface ExpanderDriverProps {
   connection: PortExpanderConnection;
@@ -77,9 +79,6 @@ const INCOME_COMMANDS = {
 // TODO: не делать публичное то что не нужно
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
-  // TODO: нужно назделять на analog and digital
-  // pin modes which are set at init time.
-  pinModes: number[] = [];
   wasIcInited: boolean = false;
   readonly state: State = new State();
   // TODO: does it really need?
@@ -137,10 +136,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.state.getAllState();
   }
 
-  async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
-    const pinModeByte: number = this.pinModes[pin];
+  async getDigitalPinMode(pin: number): Promise<PortExpanderDigitalPinMode | undefined> {
+    return this.digitalPins.getPinMode(pin);
+  }
 
-    return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
+  async getAnalogPinMode(pin: number): Promise<PortExpanderAnalogPinMode | undefined> {
+    return this.analogPins.getPinMode(pin);
   }
 
   /**
@@ -288,12 +289,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     }
 
     return true;
-  }
-
-  checkPin(pin: number) {
-    if (typeof this.pinModes[pin] === 'undefined') {
-      throw new Error(`PortExpanderDriver: pin "${pin}" hasn't been set up`);
-    }
   }
 
   getHexPinNumber(pin: number): number {

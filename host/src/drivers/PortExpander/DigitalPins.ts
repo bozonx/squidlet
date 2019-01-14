@@ -1,7 +1,14 @@
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
-import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
+import {
+  COMMANDS,
+  MODES,
+  PortExpanderDigitalPinMode,
+  PortExpanderDriver,
+  PortExpanderPinMode
+} from './PortExpander.driver';
 import {convertBitsToBytes} from '../../helpers/binaryHelpers';
 import {DigitalState} from './State';
+import {getKeyOfObject} from '../../helpers/helpers';
 
 
 export type DigitalPinHandler = (targetPin: number, value: boolean) => void;
@@ -13,6 +20,8 @@ const DIGITAL_VALUE = {
 
 
 export default class DigitalPins {
+  // pin modes which are set at init time.
+  private pinModes: number[] = [];
   private readonly expander: PortExpanderDriver;
   
 
@@ -20,6 +29,13 @@ export default class DigitalPins {
     this.expander = expander;
   }
 
+
+  getPinMode(pin: number): PortExpanderDigitalPinMode | undefined {
+    // TODO: указать digital или аналог
+    const pinModeByte: number = this.pinModes[pin];
+
+    return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
+  }
 
   /**
    * Setup digital input or output pin.
@@ -44,7 +60,7 @@ export default class DigitalPins {
       this.expander.state.setDigitalOutput(pin, outputInitialValue);
     }
 
-    this.expander.pinModes[pin] = MODES[pinMode];
+    this.pinModes[pin] = MODES[pinMode];
   }
 
   /**
@@ -79,13 +95,13 @@ export default class DigitalPins {
    * @return {boolean} The current value.
    */
   async readDigital(pin: number): Promise<boolean> {
-    this.expander.checkPin(pin);
+    this.checkPin(pin);
 
     if (!this.isDigitalPin(pin)) {
       throw new Error(`PortExpanderDriver.readDigital: pin "${pin}" hasn't been set up as a digital`);
     }
 
-    if (this.expander.pinModes[pin] === MODES.output) {
+    if (this.pinModes[pin] === MODES.output) {
       return Boolean(this.expander.state.getDigitalOutput(pin));
     }
 
@@ -101,10 +117,10 @@ export default class DigitalPins {
   async writeDigital(pin: number, value: boolean): Promise<void> {
     if (!this.expander.checkInitialization('writeDigital')) return;
 
-    this.expander.checkPin(pin);
+    this.checkPin(pin);
     await this.expander.initIcIfNeed();
 
-    if (this.expander.pinModes[pin] !== MODES.output) {
+    if (this.pinModes[pin] !== MODES.output) {
       throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as an digital output`);
     }
 
@@ -150,32 +166,38 @@ export default class DigitalPins {
 
   // TODO: make private
   isInputPin(pin: number): boolean {
-    const pinMode: number | undefined = this.expander.pinModes[pin];
+    const pinMode: number | undefined = this.pinModes[pin];
 
     return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
   }
 
   hasOutputPins(): boolean {
-    return this.expander.pinModes.includes(MODES.output);
+    return this.pinModes.includes(MODES.output);
   }
 
 
   private updateDigitalOutputValues(newValues: DigitalState) {
     for (let pinNum in newValues) {
-      if (this.expander.pinModes[pinNum] === MODES.output) {
+      if (this.pinModes[pinNum] === MODES.output) {
         this.expander.state.setDigitalOutput(parseInt(pinNum), Boolean(newValues[pinNum]));
       }
     }
   }
 
   private isDigitalPin(pin: number): boolean {
-    const pinMode: number | undefined = this.expander.pinModes[pin];
+    const pinMode: number | undefined = this.pinModes[pin];
 
     return pinMode === MODES.output || this.isInputPin(pin);
   }
 
   private getLastPinNum(): number {
     return this.expander.props.digitalPinsCount - 1;
+  }
+
+  private checkPin(pin: number) {
+    if (typeof this.pinModes[pin] === 'undefined') {
+      throw new Error(`PortExpanderDriver: digital pin "${pin}" hasn't been set up`);
+    }
   }
 
 }

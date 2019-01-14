@@ -1,13 +1,22 @@
-import {COMMANDS, MODES, PortExpanderDriver} from './PortExpander.driver';
+import {
+  COMMANDS,
+  MODES,
+  PortExpanderAnalogPinMode,
+  PortExpanderDriver,
+  PortExpanderPinMode
+} from './PortExpander.driver';
 import {hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
 import {AnalogState} from './State';
+import {getKeyOfObject} from '../../helpers/helpers';
 
 
 export type AnalogPinHandler = (targetPin: number, value: number) => void;
 
 
 export default class AnalogPins {
+  // pin modes which are set at init time.
+  private pinModes: number[] = [];
   private readonly expander: PortExpanderDriver;
 
   
@@ -15,6 +24,13 @@ export default class AnalogPins {
     this.expander = expander;
   }
 
+
+  getPinMode(pin: number): PortExpanderAnalogPinMode | undefined {
+    // TODO: указать digital или аналог
+    const pinModeByte: number = this.pinModes[pin];
+
+    return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
+  }
 
   async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
     if (this.expander.wasIcInited) {
@@ -32,7 +48,7 @@ export default class AnalogPins {
       this.expander.state.setAnalogOutput(pin, outputInitialValue);
     }
 
-    this.expander.pinModes[pin] = MODES[pinMode];
+    this.pinModes[pin] = MODES[pinMode];
   }
 
   /**
@@ -60,13 +76,13 @@ export default class AnalogPins {
   }
 
   async readAnalog(pin: number): Promise<number> {
-    this.expander.checkPin(pin);
+    this.checkPin(pin);
 
     if (!this.isAnalogPin(pin)) {
       throw new Error(`PortExpanderDriver.readAnalog: pin "${pin}" hasn't been set up as an analog`);
     }
 
-    if (this.expander.pinModes[pin] === MODES.analog_output) {
+    if (this.pinModes[pin] === MODES.analog_output) {
       return this.expander.state.getAnalogOutput(pin) || 0;
     }
 
@@ -76,10 +92,10 @@ export default class AnalogPins {
   async writeAnalog(pin: number, value: number): Promise<void> {
     if (!this.expander.checkInitialization('writeAnalog')) return;
 
-    this.expander.checkPin(pin);
+    this.checkPin(pin);
     await this.expander.initIcIfNeed();
 
-    if (this.expander.pinModes[pin] !== MODES.analog_output) {
+    if (this.pinModes[pin] !== MODES.analog_output) {
       throw new Error(`PortExpanderDriver.writeAnalog: Can't write to not analog output pin "${pin}"`);
     }
 
@@ -107,13 +123,13 @@ export default class AnalogPins {
   }
 
   hasOutputPins(): boolean {
-    return this.expander.pinModes.includes(MODES.output);
+    return this.pinModes.includes(MODES.output);
   }
 
 
   private updateAnalogOutputValues(newValues: AnalogState) {
     for (let pinNum in newValues) {
-      if (this.expander.pinModes[pinNum] === MODES.analog_output) {
+      if (this.pinModes[pinNum] === MODES.analog_output) {
         this.expander.state.setAnalogOutput(parseInt(pinNum), newValues[pinNum] || 0);
       }
     }
@@ -145,13 +161,19 @@ export default class AnalogPins {
   }
 
   private isAnalogPin(pin: number): boolean {
-    const pinMode: number | undefined = this.expander.pinModes[pin];
+    const pinMode: number | undefined = this.pinModes[pin];
 
     return pinMode === MODES.analog_output || pinMode === MODES.analog_input;
   }
 
   private getLastPinNum(): number {
     return this.expander.props.analogPinsCount - 1;
+  }
+
+  private checkPin(pin: number) {
+    if (typeof this.pinModes[pin] === 'undefined') {
+      throw new Error(`PortExpanderDriver: analog pin "${pin}" hasn't been set up`);
+    }
   }
 
 }

@@ -25,7 +25,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
   async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDriver.getPinMode(pin);
+    const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDriver.getDigitalPinMode(pin);
 
     if (expanderPinMode === 'input'
       || expanderPinMode === 'input_pullup'
@@ -68,12 +68,12 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
     // do nothing if watcher doesn't exist
     if (!this.handlerIds[id]) return;
 
-    await this.expanderDriver.removeListener(this.handlerIds[id]);
+    await this.expanderDriver.removeDigitalListener(this.handlerIds[id]);
   }
 
   async clearAllWatches(): Promise<void> {
     for (let id in this.handlerIds) {
-      await this.expanderDriver.removeListener(this.handlerIds[id]);
+      await this.expanderDriver.removeDigitalListener(this.handlerIds[id]);
     }
   }
 
