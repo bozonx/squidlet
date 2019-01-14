@@ -306,3 +306,10 @@ export function isUint8Array(value: any): boolean {
 
   return value.constructor === Uint8Array;
 }
+
+export function firstLetterToUpperCase(...p: any[]) {
+
+  // TODO: remake
+
+  return _capitalize(...p);
+}

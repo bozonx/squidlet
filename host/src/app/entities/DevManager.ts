@@ -1,6 +1,5 @@
 import System from '../System';
 import Dev from '../interfaces/Dev';
-import {capitalize} from '../../helpers/lodashLike';
 
 
 export type DevClass = new () => Dev;

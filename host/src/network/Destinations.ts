@@ -3,7 +3,8 @@ import DriverEnv from '../app/entities/DriverEnv';
 import Connection from './interfaces/Connection';
 import MyAddress from '../app/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
-import {capitalize, find} from '../helpers/lodashLike';
+import {find} from '../helpers/lodashLike';
+import {firstLetterToUpperCase} from '../helpers/helpers';
 
 
 type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Destination) => void;
@@ -19,7 +20,7 @@ export default class Destinations {
   // addresses by "type-bus"
   private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
-  private readonly msgEvents: IndexedEvents = new IndexedEvents();
+  private readonly msgEvents = new IndexedEvents();
 
 
   constructor(driverEnv: DriverEnv, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {
@@ -118,7 +119,7 @@ export default class Destinations {
   }
 
   private generateDriverName(connectionType: string): string {
-    return `${capitalize(connectionType)}.connection.driver`;
+    return `${firstLetterToUpperCase(connectionType)}.connection.driver`;
   }
 
 }

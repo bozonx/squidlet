@@ -1,6 +1,5 @@
 import {isUint8Array} from './helpers';
 
-const _capitalize = require('lodash/capitalize');
 const _padStart = require('lodash/padStart');
 
 // TODO: test
@@ -15,13 +14,6 @@ export function isEmpty(toCheck: any): boolean {
 
 export function values(obj: {[index: string]: any}): any[] {
   return Object.keys(obj).map(key => obj[key]);
-}
-
-export function capitalize(...p: any[]) {
-
-  // TODO: remake
-
-  return _capitalize(...p);
 }
 
 export function omit(obj: {[index: string]: any}, ...propToExclude: string[]): {[index: string]: any} {
