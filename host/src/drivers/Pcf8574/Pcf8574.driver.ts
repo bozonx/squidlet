@@ -76,8 +76,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       }
 
       this.directions[pin] = DIR_OUT;
-      // update local state
-      this.currentState = this.updatePinInBitMask(this.currentState, pin, outputInitialValue);
+      this.updateCurrentState(pin, outputInitialValue);
     }
     else {
       // input pin
@@ -86,7 +85,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       }
 
       // set input pin to high
-      this.currentState = this.updatePinInBitMask(this.currentState, pin, true);
+      this.updateCurrentState(pin, true);
       this.directions[pin] = DIR_IN;
     }
   }
@@ -188,7 +187,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // It doesn't need to initialize IC, because new state will send below
 
     // update local state
-    this.currentState = this.updatePinInBitMask(this.currentState, pin, value);
+    this.updateCurrentState(pin, value);
     // write to IC
     await this.writeToIc();
   }
@@ -211,6 +210,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       newState = this.updatePinInBitMask(newState, pin, outputValues[pin]);
     }
 
+    // TODO: review
     this.currentState = newState;
 
     return this.writeToIc();
@@ -318,6 +318,10 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     if (pin < 0 || pin > this.getLastPinNumber()) {
       throw new Error(`Pin "${pin}" out of range`);
     }
+  }
+
+  private updateCurrentState(pin: number, newValue: boolean) {
+    this.currentState = this.updatePinInBitMask(this.currentState, pin, newValue);
   }
 
   protected validateProps = (props: ExpanderDriverProps): string | undefined => {
