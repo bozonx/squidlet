@@ -124,7 +124,7 @@ export default class DigitalPins {
     if (!this.expander.checkInitialization('writeDigitalState')) {
       return;
     }
-    else if (!this.hasOuputPins()) {
+    else if (!this.hasOutputPins()) {
       this.expander.log.warn(`Trying to write digital state to expander but there isn't configured digital output pins`);
 
       return;
@@ -155,7 +155,7 @@ export default class DigitalPins {
     return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
   }
 
-  hasOuputPins(): boolean {
+  hasOutputPins(): boolean {
     return this.expander.pinModes.includes(MODES.output);
   }
 

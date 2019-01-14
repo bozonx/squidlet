@@ -224,8 +224,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     if (this.wasIcInited) return;
 
     this.initingIcInProgress = true;
-    const hasDigitalOutputPins = this.digitalPins.hasOuputPins();
-    const hasAnalogOutputPins = this.analogPins.hasOuputPins();
+    const hasDigitalOutputPins = this.digitalPins.hasOutputPins();
+    const hasAnalogOutputPins = this.analogPins.hasOutputPins();
 
     // write digital pin modes
     if (hasDigitalOutputPins) {

@@ -106,6 +106,10 @@ export default class AnalogPins {
     await this.writeOutputStateToIc();
   }
 
+  hasOutputPins(): boolean {
+    return this.expander.pinModes.includes(MODES.output);
+  }
+
 
   private updateAnalogOutputValues(newValues: AnalogState) {
     for (let pinNum in newValues) {
