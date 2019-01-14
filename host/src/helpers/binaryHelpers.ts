@@ -78,6 +78,14 @@ export function updateBitInByte(byte: number, position: number, value: boolean):
   }
 }
 
+export function getBitFromByte(byte: number, position: number): boolean {
+  if (position < 0 && position > 7) {
+    throw new Error(`getBitFromByte: incorrect position "${position}" it has to be 0-7.`);
+  }
+
+  return (byte>>position) % 2 !== 0;
+}
+
 
 // TODO: remake
 export function uint8ArrayToText(arr: Uint8Array): string {

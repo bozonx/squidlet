@@ -7,7 +7,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
-import {byteToBinArr, updateBitInByte} from '../../helpers/binaryHelpers';
+import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../helpers/binaryHelpers';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 
 
@@ -157,9 +157,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   async read(pin: number): Promise<boolean> {
     this.checkPin(pin);
 
-    // TODO: do poll only if there are any input pins
+    if (this.hasInputPins()) {
+      await this.pollOnce();
+    }
 
-    return ((this.currentState>>pin) % 2 !== 0);
+    return getBitFromByte(this.currentState, pin);
   }
 
   /**
@@ -277,14 +279,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.initingIcInProgress = false;
   }
 
-  private checkInitialization(method: string): boolean {
+  private checkInitialization(methodWichCheck: string): boolean {
     if (!this.initingIcInProgress) {
-      this.env.log.warn(`PCF8574Driver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+      this.env.log.warn(`PCF8574Driver.${methodWichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }
     else if (!this.env.system.isInitialized) {
-      this.env.log.warn(`PCF8574Driver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+      this.env.log.warn(`PCF8574Driver.${methodWichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }
@@ -316,6 +318,19 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private updateCurrentState(pin: number, newValue: boolean) {
     this.currentState = this.updatePinInBitMask(this.currentState, pin, newValue);
   }
+
+  private hasInputPins(): boolean {
+    return this.directions.includes(DIR_IN);
+
+    // for (let direction of this.directions) {
+    //   if (direction === DIR_IN) {
+    //     return true;
+    //   }
+    // }
+    //
+    // return false;
+  }
+
 
   protected validateProps = (props: ExpanderDriverProps): string | undefined => {
 
