@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {getKeyOfObject} from '../../helpers/helpers';
+import {firstLetterToUpperCase, getKeyOfObject} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import DuplexDriver from '../../app/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
@@ -19,6 +19,8 @@ import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import AnalogPins, {AnalogPinHandler} from './AnalogPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';
 import Logger from '../../app/interfaces/Logger';
+import {omit} from '../../helpers/lodashLike';
+import {PollProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
 
 
 export type PortExpanderConnection = 'i2c' | 'serial';
@@ -91,34 +93,35 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+    const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex.driver`;
 
-    // TODO: choose driver - use connection
-    // TODO: setup driver - set pollDataAddress etc
-    // TODO: указать длины для income commands
+    const props = {
+      ...omit(this.props, 'connection', 'digitalPinsCount', 'analogPinsCount'),
+      poll: <PollProps[]>[],
+    };
 
-    // this.depsInstances.node = await getDriverDep('I2cNode.driver')
-    //   .getInstance({
-    //     ...omit(this.props, 'digitalPinsCount', 'analogPinsCount'),
-    //
-    //     // TODO: почему 1 ???
-    //     pollDataLength: 1,
-    //     pollDataAddress: undefined,
-    //   });
+    if (this.props.connection === 'i2c') {
+      props.poll.push({dataAddress: INCOME_COMMANDS.newDigitalState, dataLength: this.props.digitalPinsCount});
+      props.poll.push({dataAddress: INCOME_COMMANDS.newAnalogState,  dataLength: this.props.analogPinsCount});
+    }
+
+    this.depsInstances.node = await getDriverDep(driverName)
+      .getInstance(props);
   }
 
   protected didInit = async () => {
-    this.node.onReceive((dataAddress: number, data: Uint8Array) => {
-      if (typeof dataAddress == 'undefined') {
+    this.node.onReceive((dataAddressStr: number | string, data: Uint8Array) => {
+      if (typeof dataAddressStr === 'undefined') {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
-      else if (dataAddress === INCOME_COMMANDS.newDigitalState) {
+      else if (dataAddressStr === INCOME_COMMANDS.newDigitalState) {
         this.state.updateDigitalState(data);
       }
-      else if (dataAddress === INCOME_COMMANDS.newAnalogState) {
+      else if (dataAddressStr === INCOME_COMMANDS.newAnalogState) {
         this.state.updateAnalogState(data);
       }
       else {
-        this.env.system.log.error(`PortExpanderDriver: Unknown command "${dataAddress.toString(16)}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
+        this.env.system.log.error(`PortExpanderDriver: Unknown command "${dataAddressStr}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
     });
   }
@@ -128,26 +131,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     await this.initIcIfNeed();
   }
 
+
   getState(): ExpanderState {
     return this.state.getAllState();
   }
-
-  // /**
-  //  * Poll expander and return values of all the pins
-  //  */
-  // async poll(): Promise<void> {
-  //
-  //   // TODO: не нужно вообщето
-  //
-  //   if (!this.checkInitialization('poll')) return;
-  //
-  //   await this.initIcIfNeed();
-  //
-  //   // TODO: review
-  //   // TODO: review analog
-  //
-  //   await this.node.poll();
-  // }
 
   async getPinMode(pin: number): Promise<PortExpanderPinMode | undefined> {
     const pinModeByte: number = this.pinModes[pin];
@@ -167,12 +154,8 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.state.digitalEvents.addListener(handler);
   }
 
-  removeListener(handlerIndex: number) {
-
-    // TODO: !!! make it
-    // TODO: !!! support analog
-
-    //this.node.removeListener(handlerIndex);
+  removeDigitalListener(handlerIndex: number) {
+    this.state.digitalEvents.removeListener(handlerIndex);
   }
 
   /**
@@ -213,6 +196,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.state.analogEvents.addListener(handler);
   }
 
+  removeAnalogListener(handlerIndex: number) {
+    this.state.analogEvents.removeListener(handlerIndex);
+  }
+
   readAnalog(pin: number): Promise<number> {
     return this.analogPins.readAnalog(pin);
   }
@@ -247,6 +234,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       throw new Error(`PortExpanderDriver.initIc. Can't init IC state. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
 
+    // TODO: тольео если есть digital pins
     // write output digital initial values
     try {
       await this.digitalPins.writeOutputStateToIc();
@@ -255,6 +243,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
 
+    // TODO: тольео если есть analog pins
     // write output analog initial values
     try {
       await this.analogPins.writeOutputStateToIc();
@@ -283,9 +272,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   checkPin(pin: number) {
-    const pinMode: number | undefined = this.pinModes[pin];
-
-    if (typeof pinMode === 'undefined') {
+    if (typeof this.pinModes[pin] === 'undefined') {
       throw new Error(`PortExpanderDriver: pin "${pin}" hasn't been set up`);
     }
   }
@@ -300,7 +287,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    */
   private async writePinModes() {
 
-    // TODO: review - allPinCount
+    // TODO: review - move to analog and digital - отдельными запросами
     // TODO: review - write analog and digital modes - у ниъ разные пины
 
     const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);

@@ -14,10 +14,10 @@ export type Handler = (dataAddressStr: number | string, data: Uint8Array) => voi
 // TODO: а если не был задан dataAddress ???
 export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void;
 
-interface PollProps {
+export interface PollProps {
   // data address e.g "5a" or "33" or 27
   dataAddress: string | number;
-  length?: number;
+  dataLength?: number;
   interval?: number;
 }
 

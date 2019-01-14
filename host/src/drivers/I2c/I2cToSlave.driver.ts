@@ -142,11 +142,11 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     if (!pollProps) {
       throw new Error(`Can't find poll props of dataAddress "${dataAddressStr}"`);
     }
-    else if (typeof pollProps.length === 'undefined') {
+    else if (typeof pollProps.dataLength === 'undefined') {
       throw new Error(`Length param is not specified on poll props "${pollProps}"`);
     }
 
-    return pollProps.length;
+    return pollProps.dataLength;
   }
 
   private makeSenderId(dataAddressStr: string | number | undefined, method: string, ...params: (string | number)[]) {
