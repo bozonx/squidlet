@@ -149,7 +149,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Please set pin mode once on startup.
    */
   setupDigital(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
-    return this.digitalPins.setupDigital(pin, pinMode, outputInitialValue);
+    return this.digitalPins.setup(pin, pinMode, outputInitialValue);
   }
 
   addDigitalListener(handler: DigitalPinHandler): number {
@@ -168,7 +168,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * @return {boolean} The current value.
    */
   readDigital(pin: number): Promise<boolean> {
-    return this.digitalPins.readDigital(pin);
+    return this.digitalPins.read(pin);
   }
 
   /**
@@ -178,7 +178,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * @return {Promise}
    */
   writeDigital(pin: number, value: boolean): Promise<void> {
-    return this.digitalPins.writeDigital(pin, value);
+    return this.digitalPins.write(pin, value);
   }
 
   /**
@@ -191,7 +191,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
 
   setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
-    return this.analogPins.setupAnalog(pin, pinMode, outputInitialValue);
+    return this.analogPins.setup(pin, pinMode, outputInitialValue);
   }
 
   addAnalogListener(handler: AnalogPinHandler): number {
@@ -203,11 +203,11 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   readAnalog(pin: number): Promise<number> {
-    return this.analogPins.readAnalog(pin);
+    return this.analogPins.read(pin);
   }
 
   writeAnalog(pin: number, value: number): Promise<void> {
-    return this.analogPins.writeAnalog(pin, value);
+    return this.analogPins.write(pin, value);
   }
 
   /**

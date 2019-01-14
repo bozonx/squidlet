@@ -4,7 +4,6 @@ import {
   MODES,
   PortExpanderDigitalPinMode,
   PortExpanderDriver,
-  PortExpanderPinMode
 } from './PortExpander.driver';
 import {convertBitsToBytes} from '../../helpers/binaryHelpers';
 import {DigitalState} from './State';
@@ -31,24 +30,23 @@ export default class DigitalPins {
 
 
   getPinMode(pin: number): PortExpanderDigitalPinMode | undefined {
-    // TODO: указать digital или аналог
     const pinModeByte: number = this.pinModes[pin];
 
-    return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
+    return getKeyOfObject(MODES, pinModeByte) as PortExpanderDigitalPinMode | undefined;
   }
 
   /**
    * Setup digital input or output pin.
    * Please set pin mode once on startup.
    */
-  async setupDigital(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     if (this.expander.wasIcInited) {
       this.expander.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
 
       return;
     }
 
-    if (pin < 0 || pin > this.getLastPinNum()) {
+    if (pin < 0 || pin >= this.expander.props.digitalPinsCount) {
       throw new Error('PortExpanderDriver.setupDigital: Pin out of range');
     }
 
@@ -60,7 +58,12 @@ export default class DigitalPins {
       this.expander.state.setDigitalOutput(pin, outputInitialValue);
     }
 
-    this.pinModes[pin] = MODES[pinMode];
+    if (this.isDigitalPin(pin)) {
+      this.pinModes[pin] = MODES[pinMode];
+    }
+    else {
+      throw new Error(`Unsupported mode "${pinMode}" of digital pin "${pin}"`);
+    }
   }
 
   /**
@@ -94,7 +97,7 @@ export default class DigitalPins {
    * @param  {number} pin The pin number. (0 to 7)
    * @return {boolean} The current value.
    */
-  async readDigital(pin: number): Promise<boolean> {
+  async read(pin: number): Promise<boolean> {
     this.checkPin(pin);
 
     if (!this.isDigitalPin(pin)) {
@@ -114,7 +117,7 @@ export default class DigitalPins {
    * @param  {boolean} value - The new value for this pin.
    * @return {Promise}
    */
-  async writeDigital(pin: number, value: boolean): Promise<void> {
+  async write(pin: number, value: boolean): Promise<void> {
     if (!this.expander.checkInitialization('writeDigital')) return;
 
     this.checkPin(pin);
@@ -188,10 +191,6 @@ export default class DigitalPins {
     const pinMode: number | undefined = this.pinModes[pin];
 
     return pinMode === MODES.output || this.isInputPin(pin);
-  }
-
-  private getLastPinNum(): number {
-    return this.expander.props.digitalPinsCount - 1;
   }
 
   private checkPin(pin: number) {

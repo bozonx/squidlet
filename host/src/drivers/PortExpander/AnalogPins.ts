@@ -3,7 +3,6 @@ import {
   MODES,
   PortExpanderAnalogPinMode,
   PortExpanderDriver,
-  PortExpanderPinMode
 } from './PortExpander.driver';
 import {hexToBytes, numToWord} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
@@ -26,13 +25,12 @@ export default class AnalogPins {
 
 
   getPinMode(pin: number): PortExpanderAnalogPinMode | undefined {
-    // TODO: указать digital или аналог
     const pinModeByte: number = this.pinModes[pin];
 
-    return getKeyOfObject(MODES, pinModeByte) as PortExpanderPinMode | undefined;
+    return getKeyOfObject(MODES, pinModeByte) as PortExpanderAnalogPinMode | undefined;
   }
 
-  async setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
+  async setup(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
     if (this.expander.wasIcInited) {
       this.expander.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
 
@@ -48,7 +46,12 @@ export default class AnalogPins {
       this.expander.state.setAnalogOutput(pin, outputInitialValue);
     }
 
-    this.pinModes[pin] = MODES[pinMode];
+    if (this.isAnalogPin(pin)) {
+      this.pinModes[pin] = MODES[pinMode];
+    }
+    else {
+      throw new Error(`Unsupported mode "${pinMode}" of digital pin "${pin}"`);
+    }
   }
 
   /**
@@ -75,7 +78,7 @@ export default class AnalogPins {
     await this.node.send(COMMANDS.setupAll, dataToSend);
   }
 
-  async readAnalog(pin: number): Promise<number> {
+  async read(pin: number): Promise<number> {
     this.checkPin(pin);
 
     if (!this.isAnalogPin(pin)) {
@@ -89,7 +92,7 @@ export default class AnalogPins {
     return this.expander.state.getAnalogInput(pin) || 0;
   }
 
-  async writeAnalog(pin: number, value: number): Promise<void> {
+  async write(pin: number, value: number): Promise<void> {
     if (!this.expander.checkInitialization('writeAnalog')) return;
 
     this.checkPin(pin);
