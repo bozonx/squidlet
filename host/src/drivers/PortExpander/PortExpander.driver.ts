@@ -1,5 +1,5 @@
 /*
- * Driver for port expander based on arduino.
+ * Driver for port expander based on microcontroller.
  * It supports the next types of connection:
  * * I2C
  * * Serial

@@ -99,12 +99,18 @@ export function cloneDeep(value: any): any {
   ) {
     return value;
   }
+  else if (isUint8Array(value)) {
+    const oldArr: Uint8Array = value;
+    const newArr: Uint8Array = new Uint8Array(oldArr.length);
+
+    for (let index in oldArr) newArr[index] = value[index];
+
+    return newArr;
+  }
   else if (isPlainObject(value) || Array.isArray(value)) {
     // arrays or plain object. Don't support of class instances.
     return JSON.parse(JSON.stringify(value));
   }
-
-  // TODO: support of Uint8Arr
 
   throw new Error(`cloneDeep: unsupported type of value "${JSON.stringify(value)}"`);
 }
