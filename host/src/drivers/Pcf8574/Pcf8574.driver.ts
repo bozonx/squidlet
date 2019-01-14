@@ -23,6 +23,8 @@ export const DIR_IN = 1;
 export const DIR_OUT = 0;
 // Count of pins which IC has
 export const PINS_COUNT = 8;
+// length of data to send and receive
+export const DATA_LENGTH = 1;
 
 
 export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
@@ -40,10 +42,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+
+    // TODO: setup poll in ToSlave
+
     this.depsInstances.i2cDriver = await getDriverDep('I2cNode.driver')
       .getInstance({
         ...this.props,
-        pollDataLength: 1,
+        pollDataLength: DATA_LENGTH,
         pollDataAddress: undefined,
       });
 
@@ -213,7 +218,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
   private handleIcStateChange = (dataAddressStr: number | string, data: Uint8Array) => {
-    if (!data || data.length !== 1) {
+    if (!data || data.length !== DATA_LENGTH) {
       throw new Error(`PCF8574Driver: No data has been received`);
     }
 
@@ -238,19 +243,16 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       this.initingIcInProgress = true;
     }
 
-    // it means that IC is inited when first data is written
-    this.wasIcInited = true;
-
-    // set all input pins to high
-    const newIcState = this.currentState;
-    const dataToSend: Uint8Array = new Uint8Array(1);
+    const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
 
     // send one byte to IC
-    dataToSend[0] = newIcState;
+    dataToSend[0] = this.currentState;
 
     await this.i2cDriver.write(undefined, dataToSend);
 
     this.initingIcInProgress = false;
+    // it means that IC is inited when first data is written
+    this.wasIcInited = true;
   }
 
   private checkInitialization(methodWhichCheck: string): boolean {
@@ -267,42 +269,19 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     
     return true;
   }
-  
-  /**
-   * Helper function to set/clear one bit in a bitmask.
-   * @param  {number}            current The current bitmask.
-   * @param  {number}            pin     The bit-number in the bitmask.
-   * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
-   * @return {number}                    The new (modified) bitmask.
-   */
-  private updatePinInBitMask(current: number, pin: number, value: boolean): number{
-    return updateBitInByte(current, pin, value);
-  }
-
-  private getLastPinNumber(): number {
-    return PINS_COUNT - 1;
-  }
 
   private checkPin(pin: number) {
-    if (pin < 0 || pin > this.getLastPinNumber()) {
+    if (pin < 0 || pin >= PINS_COUNT) {
       throw new Error(`Pin "${pin}" out of range`);
     }
   }
 
   private updateCurrentState(pin: number, newValue: boolean) {
-    this.currentState = this.updatePinInBitMask(this.currentState, pin, newValue);
+    this.currentState = updateBitInByte(this.currentState, pin, newValue);
   }
 
   private hasInputPins(): boolean {
     return this.directions.includes(DIR_IN);
-
-    // for (let direction of this.directions) {
-    //   if (direction === DIR_IN) {
-    //     return true;
-    //   }
-    // }
-    //
-    // return false;
   }
 
 
@@ -314,6 +293,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     return;
   }
+
+  // /**
+  //  * Helper function to set/clear one bit in a bitmask.
+  //  * @param  {number}            current The current bitmask.
+  //  * @param  {number}            pin     The bit-number in the bitmask.
+  //  * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
+  //  * @return {number}                    The new (modified) bitmask.
+  //  */
+  // private updatePinInBitMask(current: number, pin: number, value: boolean): number{
+  //   return updateBitInByte(current, pin, value);
+  // }
 
 }
 

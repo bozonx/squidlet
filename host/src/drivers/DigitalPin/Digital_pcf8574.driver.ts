@@ -2,7 +2,6 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
-import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
 import Pcf8574 from '../../devices/Pcf8574/Pcf8574';
@@ -20,8 +19,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // it needs to do clearAllWatches()
   private handlerIds: string[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
-
-  get expanderDriver(): PCF8574Driver {
+  private get expanderDriver(): PCF8574Driver {
     return this.env.system.devicesManager.getDevice<Pcf8574>(this.props.expander).expander;
   }
 
@@ -83,7 +81,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     };
 
     // TODO: remake
-    const handlerId: string = await this.env.system.devices.listenStatus(this.props.expander, DEFAULT_STATUS, wrapper);
+    const handlerId: number = await this.expanderDriver.addListener(wrapper);
 
     this.handlerIds.push(handlerId);
 
