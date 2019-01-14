@@ -115,11 +115,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
         );
       }
 
-      this.impulseInput.addListener(async () => {
-        for (let item of this.props.poll) {
-          await this.doPoll(this.makeDataAddressHexNum(item.dataAddress));
-        }
-      });
+      this.impulseInput.addListener(this.pollAllDataAddresses);
     }
     // start polling if feedback is poll
     this.startPolls();

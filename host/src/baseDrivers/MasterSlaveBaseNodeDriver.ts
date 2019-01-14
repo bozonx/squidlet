@@ -82,7 +82,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Data address and length you have to specify in poll prop.
    * It rejects promise on error
    */
-  async poll(): Promise<void> {
+  async pollOnce(): Promise<void> {
     if (!this.props.feedback) {
       throw new Error(`MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured`);
     }
@@ -112,6 +112,17 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   removePollErrorListener(handlerIndex: number): void {
     this.pollErrorEvents.removeListener(handlerIndex);
+  }
+
+  protected pollAllDataAddresses = async () => {
+    for (let item of this.props.poll) {
+      try {
+        await this.doPoll(this.makeDataAddressHexNum(item.dataAddress));
+      }
+      catch (err) {
+        this.pollErrorEvents.emit(item.dataAddress, err);
+      }
+    }
   }
 
   protected startPolls() {
@@ -170,6 +181,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     const pollInterval: number = (typeof pollProps.interval === 'undefined')
       ? this.props.pollInterval
       : pollProps.interval;
+
+    // TODO: может выполнять pollAllDataAddresses? тогда не получится указать pollInterval на каждый полинг
 
     this.polling.start(
       () => this.doPoll(dataAddressStr),
