@@ -1,4 +1,5 @@
 
+// TODO: добавить таймаут соединения если соединение слишком долгое
 
 class SenderRequest {
   private sendCb?: (...p: any[]) => Promise<any>;

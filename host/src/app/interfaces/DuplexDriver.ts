@@ -1,13 +1,13 @@
-import {Handler} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
+export type ReceiveHandler = (dataAddressStr: number | string, data: Uint8Array) => void;
 
 
 export default interface DuplexDriver {
-  send(dataAddress: number, data: Uint8Array): Promise<void>;
-  request(dataAddress: number, data?: Uint8Array): Promise<Uint8Array>;
+  send(dataAddressStr: number | string, data: Uint8Array): Promise<void>;
+  request(dataAddressStr: number | string, data?: Uint8Array): Promise<Uint8Array>;
 
   /**
    * Listen to all the received data of all the dataAddresses
    */
-  onReceive(handler: Handler): number;
+  onReceive(handler: ReceiveHandler): number;
   removeListener(handlerIndex: number): void;
 }

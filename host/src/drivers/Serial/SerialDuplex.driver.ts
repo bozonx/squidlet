@@ -4,12 +4,13 @@ import Serial from '../../app/interfaces/dev/Serial';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from '../../helpers/helpers';
 import {DATA_ADDRESS_LENGTH} from '../../app/dict/constants';
+import {hexStringToHexNum} from '../../helpers/binaryHelpers';
 
 
 export interface SerialNodeProps {
- uartNum: number;
-
- // TODO: baudRate, options
+  uartNum: number;
+  // wait for data transfer ends on send and request methods
+  requestTimeout: number;
 }
 
 
@@ -19,48 +20,61 @@ export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements D
   }
 
   protected willInit = async () => {
-
-    // TODO: make setup baud rate
-
     this.depsInstances.serialDev = this.env.getDev('Serial');
   }
 
-  // TODO: продумать обработку ошибок
 
-  async send(dataAddress: number, data?: Uint8Array): Promise<void> {
-    let dataToWrite: Uint8Array;
+  // TODO: add queue - запретить посылать данные (или посылать другие requests) пока ждем ответ или добавить свой маркер
 
-    if (typeof dataAddress === 'undefined') {
-      throw new Error(`SerialNodeDriver.send: You have to specify a "dataAddress" param`);
-    }
 
-    if (typeof data === 'undefined') {
-      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
-      dataToWrite[0] = dataAddress;
-    }
-    else {
-      dataToWrite = addFirstItemUint8Arr(data, dataAddress);
-    }
+  async send(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
 
-    // TODO: или всетаки разрашеить отправку без dataAddress ?
+    // TODO: таймаут соединения - use sendoer
 
-    // else if (typeof dataAddress === 'undefined' && typeof data !== 'undefined') {
-    //   dataToWrite = data;
-    // }
-    // if (typeof dataAddress === 'undefined' && typeof data === 'undefined')
-    // else {
-    //   throw new Error(`SerialDuplexDriver.send: you have to specify at least a dataAddress or data param`);
-    // }
-
-    return this.serialDev.write(this.props.uartNum, dataToWrite);
+    await this.sendData(dataAddressStr, data);
   }
 
-  async request(dataAddress: number, data?: Uint8Array): Promise<Uint8Array> {
-    // TODO: write and wait for response
-    // TODO: add timeout
-    // TODO: запретить посылать данные (или посылать другие requests) пока ждем ответ или добавить свой маркер
+  async request(dataAddressStr: number | string, data?: Uint8Array): Promise<Uint8Array> {
 
-    return new Uint8Array(0);
+    // TODO: review
+
+    if (typeof dataAddressStr === 'undefined') {
+      throw new Error(`SerialDuplexDriver.request: You have to specify a "dataAddress" param`);
+    }
+
+    return new Promise<Uint8Array>(async (resolve, reject) => {
+      let failed = false;
+      let fulfilled = false;
+
+      // TODO: тоже ждать таймаут - лучше наверное тогда вызвать this.send()
+      this.sendData(dataAddressStr, data)
+        .catch((err) => {
+          failed = true;
+          reject(err);
+        });
+
+      // listen for response
+      const listenIndex = this.onReceive((receivedDataAddressStr: number | string, data: Uint8Array) => {
+        // do nothing if filed
+        if (failed) return;
+
+        fulfilled = true;
+
+        if (receivedDataAddressStr !== dataAddressStr) return;
+
+        resolve(data);
+      });
+
+      setTimeout(() => {
+        if (failed) return;
+
+        if (!fulfilled) {
+          failed = true;
+          reject(`SerialDuplexDriver.request: Timeout of request has been reached of dataAddress "${dataAddressStr}"`);
+        }
+
+      }, this.props.requestTimeout);
+    });
   }
 
   onReceive(cb: ReceiveHandler): number {
@@ -80,6 +94,26 @@ export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements D
 
   removeListener(handlerIndex: number): void {
     this.serialDev.removeListener(handlerIndex);
+  }
+
+
+  private sendData(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
+    if (typeof dataAddressStr === 'undefined') {
+      throw new Error(`SerialDuplexDriver.send: You have to specify a "dataAddress" param`);
+    }
+
+    let dataToWrite: Uint8Array;
+    const dataAddrHex: number = hexStringToHexNum(dataAddressStr);
+
+    if (typeof data === 'undefined') {
+      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+      dataToWrite[0] = dataAddrHex;
+    }
+    else {
+      dataToWrite = addFirstItemUint8Arr(data, dataAddrHex);
+    }
+
+    return this.serialDev.write(this.props.uartNum, dataToWrite);
   }
 
 }

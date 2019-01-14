@@ -8,6 +8,9 @@ import MasterSlaveBaseNodeDriver, {Handler, MasterSlaveBaseProps} from '../../ba
 export interface I2cDuplexDriverProps extends MasterSlaveBaseProps {
   // I2C address. Number for direction to slave. Undefined for direction to master
   address: number | undefined;
+
+  // TODO: таймаут соединения
+
 }
 
 
@@ -35,12 +38,26 @@ export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements
   }
 
 
-  send(dataAddress: number, data?: Uint8Array): Promise<void> {
-    return this.i2cDriver.write(dataAddress, data);
+  send(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
+
+    // TODO: таймаут соединения
+
+    if (typeof dataAddressStr === 'undefined') {
+      throw new Error(`I2cDuplexDriver.send: You have to specify a "dataAddress" param`);
+    }
+
+    return this.i2cDriver.write(dataAddressStr, data);
   }
 
-  request(dataAddress: number, data?: Uint8Array): Promise<Uint8Array> {
-    return this.i2cDriver.request(dataAddress, data);
+  request(dataAddressStr: number | string, data?: Uint8Array): Promise<Uint8Array> {
+
+    // TODO: таймаут соединения ??? или он есть в sender ???
+
+    if (typeof dataAddressStr === 'undefined') {
+      throw new Error(`I2cDuplexDriver.request: You have to specify a "dataAddress" param`);
+    }
+
+    return this.i2cDriver.request(dataAddressStr, data);
   }
 
   onReceive(cb: Handler): number {
