@@ -32,8 +32,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
       .getInstance(omit(this.props,
-        // TODO: review
-        'int', 'pollDataLength', 'pollDataAddress', 'address', 'feedback', 'pollInterval'
+        'address', 'int', 'poll', 'feedback', 'pollInterval'
       ));
 
     this.addressHex = hexStringToHexNum(String(this.props.address));

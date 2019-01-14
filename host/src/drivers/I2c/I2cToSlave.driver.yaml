@@ -5,14 +5,22 @@ drivers:
   - I2cMaster.driver
   - ImpulseInput.driver
 props:
+  bus:
+    type: string | number
+  address:
+    type: string | number
+    required: true
+
+  # MasterSlaveBaseNodeDriver
+  # props of ImpulseInput driver which will be used for listen to interruption
+  int:
+    type: object
   feedback:
-    type: poll | int | none
-    default: none
-  # poling interval in ms
+    type: poll | int
+  # default poling interval in ms
   pollInterval:
     type: number
     default: 1000
-
   poll:
     type: array
     # TODO: add check for items - {dataAddress: number | string, length: string, interval?: number}
@@ -25,13 +33,3 @@ props:
 #  # if it doesn't set data wil send without first byte where was a data address.
 #  pollDataAddress:
 #    type: number | string
-
-  # props of ImpulseInput driver which will be used for listen to interruption
-  int:
-    type: object
-
-  bus:
-    type: string | number
-  address:
-    type: string | number
-    required: true

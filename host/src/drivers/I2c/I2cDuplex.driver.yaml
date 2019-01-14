@@ -1,13 +1,16 @@
 name: I2cToSlaveDuplex.driver
 main: I2cDuplex.driver.ts
 type: system
+
 drivers:
   - I2cToSlave.driver
+
 props:
   # I2cToSlave
+  bus:
+  address:
+  # MasterSlaveBaseNodeDriver
+  int:
   feedback:
   pollInterval:
   poll:
-  int:
-  bus:
-  address:

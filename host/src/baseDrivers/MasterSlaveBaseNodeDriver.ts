@@ -3,11 +3,12 @@ import IndexedEvents from '../helpers/IndexedEvents';
 import Poling from '../helpers/Poling';
 import Sender from '../helpers/Sender';
 import {ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
-import MasterSlaveBusProps from '../app/interfaces/MasterSlaveBusProps';
 import {find, isEqual} from '../helpers/lodashLike';
 import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 
+// type of feedback - polling or interruption
+export type FeedbackType = 'poll' | 'int';
 export type Handler = (dataAddressStr: number | string, data: Uint8Array) => void;
 export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void;
 
@@ -18,23 +19,20 @@ interface PollProps {
   interval?: number;
 }
 
-export interface MasterSlaveBaseProps extends MasterSlaveBusProps {
+export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   int?: ImpulseInputDriverProps;
-  // length of data which will be requested
-  // pollDataLength: number;
-  // pollDataAddress?: string | number;
-
   poll: PollProps[];
+  feedback?: FeedbackType;
+  // Default poll interval
+  pollInterval?: number;
 }
-
-//const DEFAULT_POLL_ID = 'default';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
   /**
    * Write data to slave.
-   * * write(dataAddress, data) - write data ti data address
+   * * write(dataAddress, data) - write data to data address
    * * write(dataAddress) - write just 1 byte - data address
    * * write() - write an empty
    * * write(undefined, data) - write only data
@@ -56,6 +54,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 
   protected doInit = async () => {
+    // listen to errors which happen on polling
     for (let pollProps of this.props.poll) {
       this.poling.addListener((err: Error) => {
         const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${pollProps.dataAddress}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
@@ -70,9 +69,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.setupFeedback();
   }
 
-
   destroy = () => {
   }
+
 
   getLastData(dataAddressStr: string | number): Uint8Array | undefined {
     return this.pollLastData[dataAddressStr];
@@ -84,7 +83,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * It rejects promise on error
    */
   async poll(): Promise<void> {
-    if (this.props.feedback === 'none') {
+    if (!this.props.feedback) {
       throw new Error(`MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured`);
     }
 
@@ -177,29 +176,5 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       String(dataAddressStr)
     );
   }
-
-  /**
-   * Convert string or number data address to hex.
-   * Undefined means no data address.
-   */
-  // private parseDataAddress(dataAddressStr: string | number | undefined): number | undefined {
-  //   if (typeof dataAddressStr === 'undefined') return undefined;
-  //
-  //   return parseInt(String(dataAddressStr), 16);
-  // }
-
-  // private pollAllTheDataAddresses() {
-  //
-  // }
-
-  // /**
-  //  * Convert number to string or undefined to "DEFAULT_POLL_ID"
-  //  */
-  // protected dataAddressToString(dataAddress: string | number | undefined): string {
-  //   if (typeof dataAddress === 'undefined') return DEFAULT_POLL_ID;
-  //   if (typeof dataAddress === 'string') return dataAddress;
-  //
-  //   return dataAddress.toString(16);
-  // }
 
 }

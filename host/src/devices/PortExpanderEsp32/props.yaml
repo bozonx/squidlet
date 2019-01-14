@@ -1,8 +1,4 @@
-connection: i2c|serial
-# ... connection props
 digitalPinsCount: 16
 analogPinsCount: 4
-
-# MasterSlaveBusProps
-feedback:
-pollInterval:
+connection: i2c|serial
+# ... connection props
