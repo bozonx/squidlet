@@ -2,7 +2,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
-import {DigitalPinHandler, PortExpanderDriver, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
+import {PortExpanderDriver, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 
 
@@ -14,9 +14,8 @@ interface DigitalPortExpanderDriverProps extends ExpanderDriverProps {
 export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDriverProps> implements Digital {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
-  private handlerIds: string[] = [];
-
-  get expanderDriver(): PortExpanderDriver {
+  private handlerIds: number[] = [];
+  private get expanderDriver(): PortExpanderDriver {
     return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
   }
 
@@ -52,13 +51,11 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    const wrapper: DigitalPinHandler = (targetPin: number, value: boolean) => {
+    const wrapper = (targetPin: number, value: boolean) => {
       if (targetPin !== pin) return;
 
       handler(value);
     };
-
-    // TODO: можно вешаться напрямую на indexedEvents
 
     const handlerId: number = this.expanderDriver.addDigitalListener(wrapper);
 
@@ -71,12 +68,12 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
     // do nothing if watcher doesn't exist
     if (!this.handlerIds[id]) return;
 
-    await this.env.system.devices.removeListener(this.handlerIds[id]);
+    await this.expanderDriver.removeListener(this.handlerIds[id]);
   }
 
   async clearAllWatches(): Promise<void> {
     for (let id in this.handlerIds) {
-      await this.env.system.devices.removeListener(this.handlerIds[id]);
+      await this.expanderDriver.removeListener(this.handlerIds[id]);
     }
   }
 

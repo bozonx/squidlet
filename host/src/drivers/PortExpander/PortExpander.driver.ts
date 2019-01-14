@@ -167,7 +167,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.state.digitalEvents.addListener(handler);
   }
 
-  removeListener(handlerIndex: string) {
+  removeListener(handlerIndex: number) {
 
     // TODO: !!! make it
     // TODO: !!! support analog
