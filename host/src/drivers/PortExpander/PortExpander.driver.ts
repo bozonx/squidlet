@@ -77,6 +77,7 @@ const INCOME_COMMANDS = {
 // TODO: не делать публичное то что не нужно
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
+  // TODO: нужно назделять на analog and digital
   // pin modes which are set at init time.
   pinModes: number[] = [];
   wasIcInited: boolean = false;

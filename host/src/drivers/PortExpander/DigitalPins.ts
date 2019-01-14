@@ -156,7 +156,7 @@ export default class DigitalPins {
   }
 
   hasOuputPins(): boolean {
-    // TODO: add
+    return this.expander.pinModes.includes(MODES.output);
   }
 
 
