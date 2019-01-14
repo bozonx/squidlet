@@ -48,6 +48,30 @@ export default class DigitalPins {
   }
 
   /**
+   * Write all the pin modes to IC.
+   */
+  async writePinModes() {
+
+    // TODO: review - move to analog and digital - отдельными запросами
+    // TODO: review - write analog and digital modes - у ниъ разные пины
+
+    const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);
+
+    for (let i = 0; i < this.props.allPinCount; i++) {
+      if (typeof this.pinModes[i] === 'undefined') {
+        dataToSend[i] = NO_MODE;
+      }
+      else {
+        dataToSend[i] = this.pinModes[i];
+      }
+    }
+
+    console.log(44444444444, this.props, this.pinModes, dataToSend);
+
+    await this.node.send(COMMANDS.setupAll, dataToSend);
+  }
+
+  /**
    * Returns the current value of a digital pin.
    * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
    * To get the current value call poll() first, if you're not using interrupts.
@@ -97,7 +121,14 @@ export default class DigitalPins {
    * Not output pins (input, undefined) are ignored.
    */
   async writeDigitalState(outputState: DigitalState) {
-    if (!this.expander.checkInitialization('writeDigitalState')) return;
+    if (!this.expander.checkInitialization('writeDigitalState')) {
+      return;
+    }
+    else if (!this.hasOuputPins()) {
+      this.expander.log.warn(`Trying to write digital state to expander but there isn't configured digital output pins`);
+
+      return;
+    }
 
     await this.expander.initIcIfNeed();
 
@@ -122,6 +153,10 @@ export default class DigitalPins {
     const pinMode: number | undefined = this.expander.pinModes[pin];
 
     return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
+  }
+
+  hasOuputPins(): boolean {
+    // TODO: add
   }
 
 

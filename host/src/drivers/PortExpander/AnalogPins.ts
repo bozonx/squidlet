@@ -35,6 +35,30 @@ export default class AnalogPins {
     this.expander.pinModes[pin] = MODES[pinMode];
   }
 
+  /**
+   * Write all the pin modes to IC.
+   */
+  async writePinModes() {
+
+    // TODO: review - move to analog and digital - отдельными запросами
+    // TODO: review - write analog and digital modes - у ниъ разные пины
+
+    const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);
+
+    for (let i = 0; i < this.props.allPinCount; i++) {
+      if (typeof this.pinModes[i] === 'undefined') {
+        dataToSend[i] = NO_MODE;
+      }
+      else {
+        dataToSend[i] = this.pinModes[i];
+      }
+    }
+
+    console.log(44444444444, this.props, this.pinModes, dataToSend);
+
+    await this.node.send(COMMANDS.setupAll, dataToSend);
+  }
+
   async readAnalog(pin: number): Promise<number> {
     this.expander.checkPin(pin);
 

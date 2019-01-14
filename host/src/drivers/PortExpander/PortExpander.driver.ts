@@ -71,7 +71,7 @@ const INCOME_COMMANDS = {
   newAnalogState: 0x31,
 };
 
-const NO_MODE = 0x21;
+//const NO_MODE = 0x21;
 
 
 // TODO: не делать публичное то что не нужно
@@ -223,33 +223,51 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     if (this.wasIcInited) return;
 
     this.initingIcInProgress = true;
+    const hasDigitalOutputPins = this.digitalPins.hasOuputPins();
+    const hasAnalogOutputPins = this.analogPins.hasOuputPins();
 
-    // write pin modes
-    try {
-      await this.writePinModes();
+    // write digital pin modes
+    if (hasDigitalOutputPins) {
+      try {
+        await this.digitalPins.writePinModes();
+      }
+      catch (err) {
+        this.initingIcInProgress = false;
+
+        throw new Error(`PortExpanderDriver.initIc. Can't init digital IC state. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      }
     }
-    catch (err) {
-      this.initingIcInProgress = false;
 
-      throw new Error(`PortExpanderDriver.initIc. Can't init IC state. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    // write analog pin modes
+    if (hasAnalogOutputPins) {
+      try {
+        await this.analogPins.writePinModes();
+      }
+      catch (err) {
+        this.initingIcInProgress = false;
+
+        throw new Error(`PortExpanderDriver.initIc. Can't init analog IC state. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      }
     }
 
-    // TODO: тольео если есть digital pins
     // write output digital initial values
-    try {
-      await this.digitalPins.writeOutputStateToIc();
-    }
-    catch (err) {
-      this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    if (hasAnalogOutputPins) {
+      try {
+        await this.digitalPins.writeOutputStateToIc();
+      }
+      catch (err) {
+        this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      }
     }
 
-    // TODO: тольео если есть analog pins
     // write output analog initial values
-    try {
-      await this.analogPins.writeOutputStateToIc();
-    }
-    catch (err) {
-      this.env.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    if (hasDigitalOutputPins) {
+      try {
+        await this.analogPins.writeOutputStateToIc();
+      }
+      catch (err) {
+        this.env.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      }
     }
 
     this.initingIcInProgress = false;
@@ -279,31 +297,6 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
   getHexPinNumber(pin: number): number {
     return pin + ASCII_NUMERIC_OFFSET;
-  }
-
-
-  /**
-   * Write all the pin modes to IC.
-   */
-  private async writePinModes() {
-
-    // TODO: review - move to analog and digital - отдельными запросами
-    // TODO: review - write analog and digital modes - у ниъ разные пины
-
-    const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);
-
-    for (let i = 0; i < this.props.allPinCount; i++) {
-      if (typeof this.pinModes[i] === 'undefined') {
-        dataToSend[i] = NO_MODE;
-      }
-      else {
-        dataToSend[i] = this.pinModes[i];
-      }
-    }
-
-    console.log(44444444444, this.props, this.pinModes, dataToSend);
-
-    await this.node.send(COMMANDS.setupAll, dataToSend);
   }
 
 
