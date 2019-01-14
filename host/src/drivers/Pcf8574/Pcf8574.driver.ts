@@ -51,16 +51,19 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       this.env.log.error(String(err));
     });
 
-    this.i2cDriver.addListener((dataAddressStr: number | string, data: Uint8Array) => {
-      this.setLastReceivedState(data);
-    });
+    this.i2cDriver.addListener(this.handleIcStateChange);
 
     this.mainListenerWasAdded = true;
   }
 
   protected appDidInit = async () => {
     // init IC state after app is inited if it isn't inited at this moment
-    await this.initIc();
+    try {
+      await this.writeToIc();
+    }
+    catch (err) {
+      this.env.log.error(`PCF8574.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
+    }
   }
 
 
@@ -181,10 +184,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // It doesn't need to initialize IC, because new state will send below
 
-    // update local state
+    // update local state before writing to IC
     this.updateCurrentState(pin, value);
     // write to IC
     await this.writeToIc();
+
+    // TODO: вернуть старый стейт если запись не удалась
   }
 
   /**
@@ -194,64 +199,33 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   async writeState(outputValues: boolean[]): Promise<void> {
     if (!this.checkInitialization('writeState')) return;
 
-    let newState: number = this.currentState;
+    for (let pin = 0; pin < PINS_COUNT; pin++) {
+      // isn't an output pin
+      if (this.directions[pin] !== DIR_OUT) continue;
 
-    for (let pin = 0; pin < 8; pin++) {
-      if (this.directions[pin] !== DIR_OUT) {
-        // isn't an output pin
-        continue;
-      }
-
-      newState = this.updatePinInBitMask(newState, pin, outputValues[pin]);
+      this.updateCurrentState(pin, outputValues[pin]);
     }
-
-    // TODO: review
-    this.currentState = newState;
 
     return this.writeToIc();
+
+    // TODO: вернуть старый стейт если запись не удалась
   }
 
 
-  private setLastReceivedState(data: Uint8Array) {
-    const lastData: Uint8Array | undefined = this.i2cDriver.getLastData();
+  private handleIcStateChange = (dataAddressStr: number | string, data: Uint8Array) => {
+    if (!data || data.length !== 1) {
+      throw new Error(`PCF8574Driver: No data has been received`);
+    }
 
-    if (!lastData) return;
+    console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', data[0].toString(2));
 
-    // TODO: брать только значения input пинов!!!!! см writeState
     // TODO: нужно ли инвертировать???
 
-    console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', lastData[0].toString(2));
-    // TODO: use it
-    //this.currentState = lastData[0];
+    for (let pin = 0; pin < PINS_COUNT; pin++) {
+      // isn't an output pin
+      if (this.directions[pin] !== DIR_OUT) continue;
 
-
-    // TODO: review old code
-
-    // // check each input for changes
-    // for(let pin = 0; pin < 8; pin++){
-    //   if(this.directions[pin] !== DIR_IN){
-    //     continue; // isn't an input pin
-    //   }
-    //   if((this.currentState>>pin) % 2 !== (readState>>pin) % 2){
-    //     // pin changed
-    //     let value: boolean = ((readState>>pin) % 2 !== 0);
-    //     this.currentState = this.updatePinInBitMask(this.currentState, <number>pin, value);
-    //     if(noEmit !== pin){
-    //       this.events.emit(INPUT_EVENT_NAME, <InputData>{pin: pin, value: value});
-    //     }
-    //   }
-    // }
-  }
-
-  /**
-   * Do first write to IC if it doesn't do before.
-   */
-  private async initIc() {
-    try {
-      await this.writeToIc();
-    }
-    catch (err) {
-      this.env.log.error(`PCF8574.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      this.updateCurrentState(pin, getBitFromByte(data[0], pin));
     }
   }
 
@@ -279,14 +253,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.initingIcInProgress = false;
   }
 
-  private checkInitialization(methodWichCheck: string): boolean {
+  private checkInitialization(methodWhichCheck: string): boolean {
     if (!this.initingIcInProgress) {
-      this.env.log.warn(`PCF8574Driver.${methodWichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+      this.env.log.warn(`PCF8574Driver.${methodWhichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }
     else if (!this.env.system.isInitialized) {
-      this.env.log.warn(`PCF8574Driver.${methodWichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+      this.env.log.warn(`PCF8574Driver.${methodWhichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }
