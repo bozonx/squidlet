@@ -1,6 +1,6 @@
 import {padStart} from './lodashLike';
 import {TextDecoder, TextEncoder} from 'text-encoding';
-import {ASCII_NUMERIC_OFFSET} from '../app/dict/constants';
+import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../app/dict/constants';
 
 
 /**
@@ -122,6 +122,12 @@ export function numToWord(num: number): string {
   if (result.length === 2) result = '00' + result;
 
   return result;
+}
+
+export function numToUint8Word(num: number): Uint8Array {
+  const valueWord: string = numToWord(num);
+
+  return hexToBytes(valueWord);
 }
 
 /**

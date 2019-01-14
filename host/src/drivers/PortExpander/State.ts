@@ -23,6 +23,7 @@ export default class State {
   private readonly state: ExpanderState = {
     inputs: [],
     outputs: [],
+    // TODO: можно сделать uint8Arr
     analogInputs: [],
     analogOutputs: [],
   };
@@ -49,11 +50,11 @@ export default class State {
     return this.state.analogOutputs;
   }
 
-  getAnalogOutput(pin: number): number | undefined {
+  getAnalogOutput(pin: number): number {
     return this.state.analogOutputs[pin];
   }
 
-  getAnalogInput(pin: number): number | undefined {
+  getAnalogInput(pin: number): number {
     return this.state.analogInputs[pin];
   }
 

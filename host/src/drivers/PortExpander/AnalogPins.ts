@@ -4,7 +4,7 @@ import {
   PortExpanderAnalogPinMode,
   PortExpanderDriver,
 } from './PortExpander.driver';
-import {hexToBytes, numToWord} from '../../helpers/binaryHelpers';
+import {hexToBytes, numToUint8Word, numToWord} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
 import {AnalogState} from './State';
 import {getKeyOfObject} from '../../helpers/helpers';
@@ -86,10 +86,10 @@ export default class AnalogPins {
     }
 
     if (this.pinModes[pin] === MODES.analog_output) {
-      return this.expander.state.getAnalogOutput(pin) || 0;
+      return this.expander.state.getAnalogOutput(pin);
     }
 
-    return this.expander.state.getAnalogInput(pin) || 0;
+    return this.expander.state.getAnalogInput(pin);
   }
 
   async write(pin: number, value: number): Promise<void> {
@@ -103,12 +103,11 @@ export default class AnalogPins {
     }
 
     const dataToSend: Uint8Array = new Uint8Array(3);
-    const valueWord: string = numToWord(value);
-    const int8ValueWord: Uint8Array = hexToBytes(valueWord);
+    const uint8Word = numToUint8Word(value);
 
     dataToSend[0] = this.expander.getHexPinNumber(pin);
-    dataToSend[1] = int8ValueWord[0];
-    dataToSend[2] = int8ValueWord[1];
+    dataToSend[1] = uint8Word[0];
+    dataToSend[2] = uint8Word[1];
 
     await this.expander.node.send(COMMANDS.setAnalogOutputValue, dataToSend);
   }
@@ -140,18 +139,14 @@ export default class AnalogPins {
   async writeOutputStateToIc() {
     const dataToSend: Uint8Array = new Uint8Array(this.getLastPinNum() * BYTES_IN_WORD);
 
-    // TODO: пройтись по количеству аналоговых пинов
-    for (let pinNumString in this.expander.state.getAllAnalogOuputs()) {
-      const pinNum: number = parseInt(pinNumString);
+    for (let pinNum = 0; pinNum <= this.expander.props.analogPinsCount; pinNum++) {
+      // skip is it isn't an output pin
+      if (this.pinModes[pinNum] !== MODES.analog_output) continue;
 
-      // TODO: если режим не analog output - continue
-      if (typeof this.expander.state.getAnalogOutput(pinNum) === 'undefined') continue;
+      const uint8Word = numToUint8Word(this.expander.state.getAnalogOutput(pinNum));
 
-      const valueWord: string = numToWord(Number(this.expander.state.getAnalogOutput(pinNum)));
-      const int8ValueWord: Uint8Array = hexToBytes(valueWord);
-
-      dataToSend[pinNum * BYTES_IN_WORD] = int8ValueWord[0];
-      dataToSend[pinNum * BYTES_IN_WORD + 1] = int8ValueWord[1];
+      dataToSend[pinNum * BYTES_IN_WORD] = uint8Word[0];
+      dataToSend[pinNum * BYTES_IN_WORD + 1] = uint8Word[1];
     }
 
     await this.expander.node.send(COMMANDS.setAllAnalogOutputValues, dataToSend);
