@@ -37,7 +37,7 @@ export default class AnalogPins {
       return;
     }
 
-    if (pin < 0 || pin > this.getLastPinNum()) {
+    if (pin < 0 || pin >= this.expander.props.analogPinsCount) {
       throw new Error('PortExpanderDriver.setupAnalog: Analog pin out of range');
     }
 
@@ -116,26 +116,20 @@ export default class AnalogPins {
   /**
    * Write all the values of analog output pins.
    */
-  async writeAnalogState(outputState: AnalogState): Promise<void> {
-    if (!this.expander.checkInitialization('writeAnalogState')) return;
+  async writeState(outputState: AnalogState): Promise<void> {
+    if (!this.expander.checkInitialization('writeState')) {
+      return;
+    }
+    else if (!this.hasOutputPins()) {
+      this.expander.log.warn(`Trying to write analog state to expander but there isn't configured any analod output pins`);
+
+      return;
+    }
 
     await this.expander.initIcIfNeed();
 
-    this.updateAnalogOutputValues(outputState);
+    this.updateOutputValues(outputState);
     await this.writeOutputStateToIc();
-  }
-
-  hasOutputPins(): boolean {
-    return this.pinModes.includes(MODES.output);
-  }
-
-
-  private updateAnalogOutputValues(newValues: AnalogState) {
-    for (let pinNum in newValues) {
-      if (this.pinModes[pinNum] === MODES.analog_output) {
-        this.expander.state.setAnalogOutput(parseInt(pinNum), newValues[pinNum] || 0);
-      }
-    }
   }
 
   /**
@@ -161,6 +155,19 @@ export default class AnalogPins {
     }
 
     await this.expander.node.send(COMMANDS.setAllAnalogOutputValues, dataToSend);
+  }
+
+  hasOutputPins(): boolean {
+    return this.pinModes.includes(MODES.output);
+  }
+
+
+  private updateOutputValues(newValues: AnalogState) {
+    for (let pinNum in newValues) {
+      if (this.pinModes[pinNum] === MODES.analog_output) {
+        this.expander.state.setAnalogOutput(parseInt(pinNum), newValues[pinNum] || 0);
+      }
+    }
   }
 
   private isAnalogPin(pin: number): boolean {

@@ -124,7 +124,7 @@ export default class DigitalPins {
     await this.expander.initIcIfNeed();
 
     if (this.pinModes[pin] !== MODES.output) {
-      throw new Error(`PortExpanderDriver.writeDigital: pin "${pin}" wasn't set as an digital output`);
+      throw new Error(`PortExpanderDriver.writeDigital: Can't write to not digital output pin "${pin}"`);
     }
 
     const dataToSend: Uint8Array = new Uint8Array(2);
@@ -139,19 +139,19 @@ export default class DigitalPins {
    * Set new state of all the output pins.
    * Not output pins (input, undefined) are ignored.
    */
-  async writeDigitalState(outputState: DigitalState) {
-    if (!this.expander.checkInitialization('writeDigitalState')) {
+  async writeState(outputState: DigitalState) {
+    if (!this.expander.checkInitialization('writeState')) {
       return;
     }
     else if (!this.hasOutputPins()) {
-      this.expander.log.warn(`Trying to write digital state to expander but there isn't configured digital output pins`);
+      this.expander.log.warn(`Trying to write digital state to expander but there isn't configured any digital output pins`);
 
       return;
     }
 
     await this.expander.initIcIfNeed();
 
-    this.updateDigitalOutputValues(outputState);
+    this.updateOutputValues(outputState);
     await this.writeOutputStateToIc();
   }
 
@@ -167,6 +167,11 @@ export default class DigitalPins {
     await this.expander.node.send(COMMANDS.setAllOutputValues, dataToSend);
   }
 
+  hasOutputPins(): boolean {
+    return this.pinModes.includes(MODES.output);
+  }
+
+
   // TODO: make private
   isInputPin(pin: number): boolean {
     const pinMode: number | undefined = this.pinModes[pin];
@@ -174,12 +179,7 @@ export default class DigitalPins {
     return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
   }
 
-  hasOutputPins(): boolean {
-    return this.pinModes.includes(MODES.output);
-  }
-
-
-  private updateDigitalOutputValues(newValues: DigitalState) {
+  private updateOutputValues(newValues: DigitalState) {
     for (let pinNum in newValues) {
       if (this.pinModes[pinNum] === MODES.output) {
         this.expander.state.setDigitalOutput(parseInt(pinNum), Boolean(newValues[pinNum]));

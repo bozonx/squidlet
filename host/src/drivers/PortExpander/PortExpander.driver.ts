@@ -186,7 +186,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Not output pins (input, undefined) are ignored.
    */
   writeDigitalState(outputState: DigitalState) {
-    return this.digitalPins.writeDigitalState(outputState);
+    return this.digitalPins.writeState(outputState);
   }
 
 
@@ -214,7 +214,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Write all the values of analog output pins.
    */
   async writeAnalogState(outputState: AnalogState): Promise<void> {
-    return this.analogPins.writeAnalogState(outputState);
+    return this.analogPins.writeState(outputState);
   }
 
 
