@@ -42,14 +42,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-
-    // TODO: setup poll in ToSlave
-
-    this.depsInstances.i2cDriver = await getDriverDep('I2cNode.driver')
+    this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave.driver')
       .getInstance({
         ...this.props,
-        pollDataLength: DATA_LENGTH,
-        pollDataAddress: undefined,
+        poll: [
+          {length: DATA_LENGTH}
+        ],
       });
 
     this.i2cDriver.addPollErrorListener((dataAddressStr: number | string, err: Error) => {
@@ -310,9 +308,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 export default class Factory extends DriverFactoryBase<PCF8574Driver> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
-    const bus: string = (props.bus) ? String(props.bus) : 'default';
-
-    return `${bus}-${props.address}`;
+    return `${props.bus || 'default'}-${props.address}`;
   }
   protected DriverClass = PCF8574Driver;
 }

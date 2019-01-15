@@ -165,9 +165,8 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
 
 export default class Factory extends DriverFactoryBase<I2cToSlaveDriver> {
+  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+    return `${props.bus || 'default'}-${props.address}`;
+  }
   protected DriverClass = I2cToSlaveDriver;
-
-  // TODO: почему всегда новый инстанс, а не по address + bus ???
-
-  protected instanceAlwaysNew = true;
 }

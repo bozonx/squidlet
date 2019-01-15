@@ -108,7 +108,6 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
 
 
 export default class Factory extends DriverFactoryBase<I2cMasterDriver> {
-  // TODO: review - зачем если используется getInstance
   protected instanceByPropName = 'bus';
   protected DriverClass = I2cMasterDriver;
 

@@ -48,7 +48,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     const wrapper = (values: boolean[]) => {
       const pinValue: boolean = values[pin];
 
-      // TODO: move to pcf driver
       // skip not suitable edge
       if (edge === 'rising' && !pinValue) {
         return;

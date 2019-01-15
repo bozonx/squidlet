@@ -1,7 +1,8 @@
-# I2cNode.driver
+# I2cToSlave.driver
 bus:
 address:
+  int:
 feedback:
 pollInterval:
   default: 100
-int:
+poll:

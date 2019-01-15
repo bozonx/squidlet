@@ -79,9 +79,8 @@ export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements
 
 
 export default class Factory extends DriverFactoryBase<I2cDuplexDriver> {
+  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+    return `${props.bus || 'default'}-${props.address}`;
+  }
   protected DriverClass = I2cDuplexDriver;
-
-  // TODO: почему всегда новый инстанс, а не по address + bus ???
-
-  protected instanceAlwaysNew = true;
 }
