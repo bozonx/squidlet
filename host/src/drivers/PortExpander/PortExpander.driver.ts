@@ -13,7 +13,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {firstLetterToUpperCase} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import DuplexDriver from '../../app/interfaces/DuplexDriver';
-import {ASCII_NUMERIC_OFFSET} from '../../app/dict/constants';
+import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../../app/dict/constants';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import AnalogPins, {AnalogPinHandler} from './AnalogPins';
@@ -89,8 +89,10 @@ export const MODES = {
 };
 
 const INCOME_COMMANDS = {
-  newDigitalState: 0x30,
-  newAnalogState: 0x31,
+  // 2 bytes - all the states
+  newAllDigitalState: 0x30,
+  // 3 bytes - pin number, 2 bytes value
+  newAnalogPinState:  0x31,
 };
 
 export const NO_MODE = 0x21;
@@ -121,8 +123,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     };
 
     if (this.props.connection === 'i2c') {
-      props.poll.push({dataAddress: INCOME_COMMANDS.newDigitalState, dataLength: this.props.digitalPinsCount});
-      props.poll.push({dataAddress: INCOME_COMMANDS.newAnalogState,  dataLength: this.props.analogPinsCount});
+      const digitalBytesCount: number = Math.ceil(this.props.digitalPinsCount / BITS_IN_BYTE);
+
+      props.poll.push({dataAddress: INCOME_COMMANDS.newAllDigitalState, dataLength: digitalBytesCount});
+      props.poll.push({dataAddress: INCOME_COMMANDS.newAnalogPinState,  dataLength: 3});
     }
 
     this.depsInstances.node = await getDriverDep(driverName)
@@ -136,10 +140,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
       // TODO: впринципе можно принимать не все сразу а по 1 пину
-      else if (dataAddressStr === INCOME_COMMANDS.newDigitalState) {
+      else if (dataAddressStr === INCOME_COMMANDS.newAllDigitalState) {
         this.state.updateDigitalState(data);
       }
-      else if (dataAddressStr === INCOME_COMMANDS.newAnalogState) {
+      else if (dataAddressStr === INCOME_COMMANDS.newAnalogPinState) {
         this.state.updateAnalogState(data);
       }
       else {
