@@ -9,6 +9,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../helpers/binaryHelpers';
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
+import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 export type ResultHandler = (values: boolean[]) => void;
@@ -34,7 +35,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private currentState: number = 0;
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
-  private mainListenerWasAdded: boolean = false;
+  private readonly events = new IndexedEvents<ResultHandler>();
 
   private get i2cDriver(): I2cToSlaveDriver {
     return this.depsInstances.i2cDriver as I2cToSlaveDriver;
@@ -49,14 +50,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
           {length: DATA_LENGTH}
         ],
       });
+  }
 
+  protected didInit = async () => {
     this.i2cDriver.addPollErrorListener((dataAddressStr: number | string | undefined, err: Error) => {
       this.env.log.error(String(err));
     });
 
     this.i2cDriver.addListener(this.handleIcStateChange);
-
-    this.mainListenerWasAdded = true;
   }
 
   protected appDidInit = async () => {
@@ -87,6 +88,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       }
 
       this.directions[pin] = DIR_OUT;
+      // TODO: нужно ли поднимать событие???
       this.updateCurrentState(pin, outputInitialValue);
     }
     else {
@@ -96,6 +98,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       }
 
       // set input pin to high
+      // TODO: нужно ли поднимать событие???
       this.updateCurrentState(pin, true);
       this.directions[pin] = DIR_IN;
     }
@@ -106,19 +109,11 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Call this method inside a didInit() callback of your driver or device or after.
    */
   addListener(handler: ResultHandler): number {
-    if (!this.mainListenerWasAdded) {
-      throw new Error(`PCF8574Driver.addListener: You try to add listener too early. Please add it inside a didInit callback or after`);
-    }
-
-    const wrapper = () => {
-      handler(this.getState());
-    };
-
-    return this.i2cDriver.addListener(wrapper);
+    return this.events.addListener(handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.i2cDriver.removeListener(handlerIndex);
+    this.events.removeListener(handlerIndex);
   }
 
   /**
@@ -189,6 +184,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     const oldState: number = this.currentState;
 
+    // TODO: нужно ли поднимать событие???
     // update local state before writing to IC
     this.updateCurrentState(pin, value);
 
@@ -200,7 +196,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       // switch back old value on error
       this.currentState = oldState;
 
-      // TODO: rise an event
+      this.events.emit(this.getState());
 
       throw new Error(err);
     }
@@ -215,6 +211,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     const oldState: number = this.currentState;
 
+    // TODO: нужно ли поднимать событие???
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // isn't an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
@@ -230,7 +227,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       // switch back old value on error
       this.currentState = oldState;
 
-      // TODO: rise an event
+      this.events.emit(this.getState());
 
       throw new Error(err);
     }
@@ -247,11 +244,16 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // TODO: нужно ли инвертировать???
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
+
+      // TODO: должно же быть input????
+
       // isn't an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
 
       this.updateCurrentState(pin, getBitFromByte(data[0], pin));
     }
+
+    this.events.emit(this.getState());
   }
 
   /**
