@@ -316,3 +316,7 @@ export function firstLetterToUpperCase(value: string): string {
 
   return split.join('');
 }
+
+export function updateArray(arrToUpdate: any[], newValues: any[]): void {
+  for (let index in newValues) arrToUpdate[index] = newValues[index];
+}

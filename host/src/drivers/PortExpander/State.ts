@@ -1,8 +1,9 @@
-import {callOnDifferentValues} from '../../helpers/helpers';
+import {callOnDifferentValues, updateArray} from '../../helpers/helpers';
 import {convertBytesToBits} from '../../helpers/binaryHelpers';
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {DigitalPinHandler} from './DigitalPins';
 import {AnalogPinHandler} from './AnalogPins';
+import {PortExpanderDriver} from './PortExpander.driver';
 
 
 export type DigitalState = (boolean | undefined)[];
@@ -21,17 +22,17 @@ export interface ExpanderState {
 export default class State {
   readonly digitalEvents = new IndexedEvents<DigitalPinHandler>();
   readonly analogEvents = new IndexedEvents<AnalogPinHandler>();
-
+  private readonly expander: PortExpanderDriver;
   private readonly state: ExpanderState = {
     inputs: [],
     outputs: [],
-    // TODO: можно сделать uint8Arr
     analogInputs: [],
     analogOutputs: [],
   };
 
 
-  constructor() {
+  constructor(expander: PortExpanderDriver) {
+    this.expander = expander;
   }
 
 
@@ -47,52 +48,50 @@ export default class State {
     return this.state.inputs[pin];
   }
 
-  // TODO: remove
-  getAllAnalogOuputs(): AnalogState {
-    return this.state.analogOutputs;
-  }
-
   getAnalogOutput(pin: number): number {
-    return this.state.analogOutputs[pin];
+    return this.state.analogOutputs[pin] || 0;
   }
 
   getAnalogInput(pin: number): number {
-    return this.state.analogInputs[pin];
+    return this.state.analogInputs[pin] || 0;
   }
-
-  // setDigitalInput(pin: number, value: boolean) {
-  //   this.state.inputs[pin] = value;
-  // }
 
   setDigitalOutput(pin: number, value: boolean) {
     this.state.outputs[pin] = value;
   }
-
-  // setAnalogInput(pin: number, value: number) {
-  //
-  // }
 
   setAnalogOutput(pin: number, value: number) {
     this.state.analogOutputs[pin] = value;
   }
 
   updateDigitalState(data: Uint8Array) {
-    // save old arrays. It doesn't need to clone them because they will be reassigned
-    const lastInputState: DigitalState = this.state.inputs;
-    const lastOutputState: DigitalState = this.state.outputs;
+    const oldInputsState: DigitalState = this.state.inputs;
+    const oldOutputsState: DigitalState = this.state.outputs;
+    const newInputsState: DigitalState = [];
+    const newOutputsState: DigitalState = [];
+    const bitsState: DigitalState = convertBytesToBits(data);
 
-    // TODO: set new state
-    const newState: DigitalState = this.parseDigitalReceivedState(data);
+    for (let pinNum in bitsState) {
+      // filter only inputs
+      if (this.expander.digitalPins.isInputPin(parseInt(pinNum))) {
+        newInputsState[pinNum] = bitsState[pinNum];
+      }
+      else {
+        newOutputsState[pinNum] = bitsState[pinNum];
+      }
+    }
 
-    callOnDifferentValues(this.state.inputs, lastInputState, (pinNum: number, newValue: boolean) => {
+    this.state.inputs = newInputsState;
+    this.state.outputs = newOutputsState;
+
+    callOnDifferentValues(this.state.inputs, oldInputsState, (pinNum: number, newValue: boolean) => {
       this.digitalEvents.emit(pinNum, newValue);
     });
-    callOnDifferentValues(this.state.outputs, lastOutputState, (pinNum: number, newValue: boolean) => {
+    callOnDifferentValues(this.state.outputs, oldOutputsState, (pinNum: number, newValue: boolean) => {
       this.digitalEvents.emit(pinNum, newValue);
     });
   }
 
-  // TODO: впринципе можно принимать не все сразу а по 1 пину
   updateAnalogState(data: Uint8Array) {
     // save old arrays. It doesn't need to clone them because they will be reassigned
     const lastInputState: AnalogState = this.state.analogInputs;
@@ -133,7 +132,7 @@ export default class State {
   }
 
   private parseAnalogReceivedState(data: Uint8Array): AnalogState {
-
+    // TODO: !!!!!!
   }
 
 }

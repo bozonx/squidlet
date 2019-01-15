@@ -100,15 +100,15 @@ export const NO_MODE = 0x21;
 
 export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   wasIcInited: boolean = false;
-  readonly state: State = new State();
+  readonly state: State = new State(this);
   // TODO: does it really need?
   readonly log: Logger = this.env.system.log;
   get node(): DuplexDriver {
     return this.depsInstances.node as DuplexDriver;
   }
 
-  private readonly digitalPins: DigitalPins = new DigitalPins(this);
-  private readonly analogPins: AnalogPins = new AnalogPins(this);
+  readonly digitalPins: DigitalPins = new DigitalPins(this);
+  readonly analogPins: AnalogPins = new AnalogPins(this);
   private initingIcInProgress: boolean = false;
 
 
@@ -130,10 +130,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected didInit = async () => {
+    // Listen to received data
     this.node.onReceive((dataAddressStr: number | string, data: Uint8Array) => {
       if (typeof dataAddressStr === 'undefined') {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
+      // TODO: впринципе можно принимать не все сразу а по 1 пину
       else if (dataAddressStr === INCOME_COMMANDS.newDigitalState) {
         this.state.updateDigitalState(data);
       }
