@@ -121,28 +121,17 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
 
   private resolveReadLength(dataAddressStr?: string | number, readLength?: number): number {
-
-    // TODO: поддержка если dataAddress = undefined - взять props без dataAddress
-
-    if (typeof dataAddressStr === 'undefined') {
-      if (typeof readLength === 'undefined') {
-        throw new Error(`I2cToSlaveDriver: You should specify dataAddressStr or readLength`);
-      }
-
-      return readLength;
-    }
-    else if (typeof readLength !== 'undefined') {
+    if (typeof readLength !== 'undefined') {
       return readLength;
     }
 
-    // else if specified dataAddressStr and not specified readLength
     const pollProps = this.getPollProps(dataAddressStr);
 
     if (!pollProps) {
       throw new Error(`Can't find poll props of dataAddress "${dataAddressStr}"`);
     }
-    else if (typeof pollProps.dataLength === 'undefined') {
-      throw new Error(`Length param is not specified on poll props "${pollProps}"`);
+    else if (!pollProps.dataLength) {
+      throw new Error(`I2cToSlaveDriver: Can't resolve length of data of dataAddress "${dataAddressStr}"`);
     }
 
     return pollProps.dataLength;
