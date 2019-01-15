@@ -58,13 +58,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected doInit = async () => {
     // listen to errors which happen on polling
     for (let pollProps of this.props.poll) {
-      const dataAddrStr: string = this.resolveDataAddressStr(pollProps.dataAddress);
+      const resolvedDataAddr: string = this.resolveDataAddressStr(pollProps.dataAddress);
 
       this.polling.addListener((err: Error) => {
-        const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${dataAddrStr}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
+        const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${resolvedDataAddr}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
 
-        this.pollErrorEvents.emit(dataAddrStr, new Error(msg));
-      }, dataAddrStr);
+        this.pollErrorEvents.emit(resolvedDataAddr, new Error(msg));
+      }, resolvedDataAddr);
     }
   }
 
@@ -78,9 +78,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 
   getLastData(dataAddressStr: string | number | undefined): Uint8Array | undefined {
-    const dataAddrStr: string = this.resolveDataAddressStr(dataAddressStr);
+    const resolvedDataAddr: string = this.resolveDataAddressStr(dataAddressStr);
 
-    return this.pollLastData[dataAddrStr];
+    return this.pollLastData[resolvedDataAddr];
   }
 
   /**
@@ -94,9 +94,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      const dataAddrStr: string = this.resolveDataAddressStr(item.dataAddress);
+      const resolvedDataAddr: string = this.resolveDataAddressStr(item.dataAddress);
 
-      await this.polling.restart(dataAddrStr);
+      await this.polling.restart(resolvedDataAddr);
     }
   }
 
@@ -131,9 +131,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         await this.doPoll(item.dataAddress);
       }
       catch (err) {
-        const dataAddrStr: string = this.resolveDataAddressStr(item.dataAddress);
+        const resolvedDataAddr: string = this.resolveDataAddressStr(item.dataAddress);
 
-        this.pollErrorEvents.emit(dataAddrStr, err);
+        this.pollErrorEvents.emit(resolvedDataAddr, err);
       }
     }
   }
@@ -150,9 +150,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let item of this.props.poll) {
-      const dataAddrStr: string = this.resolveDataAddressStr(item.dataAddress);
+      const resolvedDataAddr: string = this.resolveDataAddressStr(item.dataAddress);
 
-      this.polling.stop(dataAddrStr);
+      this.polling.stop(resolvedDataAddr);
     }
   }
 
@@ -212,14 +212,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     const pollInterval: number = (typeof pollProps.interval === 'undefined')
       ? this.props.pollInterval
       : pollProps.interval;
-    const dataAddrStr: string = this.resolveDataAddressStr(dataAddressStr);
+    const resolvedDataAddr: string = this.resolveDataAddressStr(dataAddressStr);
 
     // TODO: может выполнять pollAllDataAddresses? тогда не получится указать pollInterval на каждый полинг
 
     this.polling.start(
       () => this.doPoll(dataAddressStr),
       pollInterval,
-      dataAddrStr
+      resolvedDataAddr
     );
   }
 
