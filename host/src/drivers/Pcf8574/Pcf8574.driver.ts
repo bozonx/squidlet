@@ -213,7 +213,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // TODO: нужно ли поднимать событие???
     for (let pin = 0; pin < PINS_COUNT; pin++) {
-      // isn't an output pin
+      // skit not an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
 
       this.updateCurrentState(pin, outputValues[pin]);
@@ -244,11 +244,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // TODO: нужно ли инвертировать???
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
-
-      // TODO: должно же быть input????
-
-      // isn't an output pin
-      if (this.directions[pin] !== DIR_OUT) continue;
+      // skip not input pins
+      if (this.directions[pin] !== DIR_IN) continue;
 
       this.updateCurrentState(pin, getBitFromByte(data[0], pin));
     }
