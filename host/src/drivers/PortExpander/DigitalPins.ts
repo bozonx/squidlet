@@ -127,7 +127,7 @@ export default class DigitalPins {
     dataToSend[0] = this.expander.getHexPinNumber(pin);
     dataToSend[1] = (value) ? DIGITAL_VALUE.high : DIGITAL_VALUE.low;
 
-    await this.expander.node.send(COMMANDS.setOutputValue, dataToSend);
+    await this.expander.node.send(COMMANDS.setDigitalOutputValue, dataToSend);
   }
 
   /**
@@ -159,7 +159,7 @@ export default class DigitalPins {
       this.expander.props.digitalPinsCount
     );
 
-    await this.expander.node.send(COMMANDS.setAllOutputValues, dataToSend);
+    await this.expander.node.send(COMMANDS.setAllDigitalOutputValues, dataToSend);
   }
 
   hasOutputPins(): boolean {

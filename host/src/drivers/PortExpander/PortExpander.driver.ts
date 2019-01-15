@@ -46,30 +46,35 @@ export interface ExpanderDriverProps {
 
 
 export const COMMANDS = {
-  setupDigital:               0x30,
-  setupAllDigital:            0x31,
-  setupAnalog:                0x32,
-  setupAllAnalog:             0x33,
+  getDigitalMode:             0x30,
+  getAllDigitalModes:         0x31,
+  setupDigital:               0x32,
+  setupAllDigital:            0x33,
+  setDigitalOutputValue:      0x34,
+  setAllDigitalOutputValues:  0x35,
+  readDigital:                0x36,
+  readAllDigital:             0x37,
 
-  setDigitalOutputValue:      0x41,
-  setAllDigitalOutputValues:  0x42,
-  readDigital:                0x43,
-  readAllDigital:             0x44,
-  setAnalogOutputValue:       0x45,
-  setAllAnalogOutputValues:   0x46,
-  readAnalog:                 0x47,
-  readAllAnalog:              0x48,
+  getAnalogMode:              0x40,
+  getAllAnalogModes:          0x41,
+  setupAnalog:                0x42,
+  setupAllAnalog:             0x43,
+  setAnalogOutputValue:       0x44,
+  setAllAnalogOutputValues:   0x45,
+  readAnalog:                 0x46,
+  readAllAnalog:              0x47,
+
 
   // 50+ pwm
   // 60+ serial
 
-  //setDigitalEdge:             0x91,
-  //setAllDigitalEdges:         0x92,
-  //setDigitalDebounce:         0x93,
-  //setAllDigitalDebounce:      0x94,
-  //setAnalogDebounce:          0x95,
-  //setAllAnalogDebounce:       0x96,
+  // setDigitalEdge:             0x36,
+  // setAllDigitalEdges:         0x37,
+  // setDigitalDebounce:         0x38,
+  // setAllDigitalDebounce:      0x39,
 
+  //setAnalogDebounce:          0x47,
+  //setAllAnalogDebounce:       0x48,
 };
 
 export const MODES = {
