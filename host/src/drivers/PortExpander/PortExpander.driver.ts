@@ -21,6 +21,7 @@ import State, {AnalogState, DigitalState, ExpanderState} from './State';
 import Logger from '../../app/interfaces/Logger';
 import {omit} from '../../helpers/lodashLike';
 import {PollProps} from '../../baseDrivers/MasterSlaveBaseNodeDriver';
+import {uint8WordToNum} from '../../helpers/binaryHelpers';
 
 
 export type PortExpanderConnection = 'i2c' | 'serial';
@@ -129,8 +130,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       props.poll.push({dataAddress: INCOME_COMMANDS.newAnalogPinState,  dataLength: 3});
     }
 
-    this.depsInstances.node = await getDriverDep(driverName)
-      .getInstance(props);
+    this.depsInstances.node = await getDriverDep(driverName).getInstance(props);
   }
 
   protected didInit = async () => {
@@ -139,12 +139,16 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
       if (typeof dataAddressStr === 'undefined') {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
-      // TODO: впринципе можно принимать не все сразу а по 1 пину
       else if (dataAddressStr === INCOME_COMMANDS.newAllDigitalState) {
         this.state.updateDigitalState(data);
       }
       else if (dataAddressStr === INCOME_COMMANDS.newAnalogPinState) {
-        this.state.updateAnalogState(data);
+        // first byte is pin number with 48 position shift
+        const pinNumber: number = this.hexPinToNumber(data[0]);
+        // 2nd and 3rd are word which represent a 16bit number
+        const value: number = uint8WordToNum(new Uint8Array([data[1], data[2]]));
+
+        this.state.setAnalogInput(pinNumber, value);
       }
       else {
         this.env.system.log.error(`PortExpanderDriver: Unknown command "${dataAddressStr}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
@@ -319,6 +323,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
   getHexPinNumber(pin: number): number {
     return pin + ASCII_NUMERIC_OFFSET;
+  }
+
+  hexPinToNumber(pinHex: number): number {
+    return pinHex - ASCII_NUMERIC_OFFSET;
   }
 
 

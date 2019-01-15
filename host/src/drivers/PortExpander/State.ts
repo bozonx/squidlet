@@ -1,4 +1,4 @@
-import {callOnDifferentValues, updateArray} from '../../helpers/helpers';
+import {callOnDifferentValues} from '../../helpers/helpers';
 import {convertBytesToBits} from '../../helpers/binaryHelpers';
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {DigitalPinHandler} from './DigitalPins';
@@ -64,6 +64,15 @@ export default class State {
     this.state.analogOutputs[pin] = value;
   }
 
+  setAnalogInput(pin: number, value: number) {
+    this.state.analogInputs[pin] = value;
+  }
+
+  /**
+   * Set all the digital state.
+   * 1st byte - pin numbers from 0 to 7 and values of them
+   * 2nd byte - pin numbers from 8 and more
+   */
   updateDigitalState(data: Uint8Array) {
     const oldInputsState: DigitalState = this.state.inputs;
     const oldOutputsState: DigitalState = this.state.outputs;
@@ -90,49 +99,6 @@ export default class State {
     callOnDifferentValues(this.state.outputs, oldOutputsState, (pinNum: number, newValue: boolean) => {
       this.digitalEvents.emit(pinNum, newValue);
     });
-  }
-
-  updateAnalogState(data: Uint8Array) {
-    // save old arrays. It doesn't need to clone them because they will be reassigned
-    const lastInputState: AnalogState = this.state.analogInputs;
-    const lastOutputState: AnalogState = this.state.analogOutputs;
-
-    // TODO: set new state
-    const newState: AnalogState = this.parseAnalogReceivedState(data);
-
-    callOnDifferentValues(this.state.analogInputs, lastInputState, (pinNum: number, newValue: number) => {
-      this.analogEvents.emit(pinNum, newValue);
-    });
-    callOnDifferentValues(this.state.analogOutputs, lastOutputState, (pinNum: number, newValue: number) => {
-      this.analogEvents.emit(pinNum, newValue);
-    });
-  }
-
-
-  private parseDigitalReceivedState(data: Uint8Array): DigitalState {
-
-    // TODO: помдее должен прийти весь стейт сразу
-
-    // TODO: review
-    // TODO: what about analog ?
-    // TODO: outputs тоже обновлять на всякий случай
-
-    const newState: DigitalState = convertBytesToBits(data);
-
-    console.log(11111111, 'current - ', this.state.inputs, ' | new - ', data, ' | parsed - ', newState);
-
-    // update values
-    for (let pinNum in newState) {
-      // TODO: почему только digital ???
-      // filter only inputs
-      if (!this.digitalPins.isInputPin(parseInt(pinNum))) return;
-
-      this.state.inputs[pinNum] = newState[pinNum];
-    }
-  }
-
-  private parseAnalogReceivedState(data: Uint8Array): AnalogState {
-    // TODO: !!!!!!
   }
 
 }

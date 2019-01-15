@@ -130,6 +130,12 @@ export function numToUint8Word(num: number): Uint8Array {
   return hexToBytes(valueWord);
 }
 
+export function uint8WordToNum(word: Uint8Array): number {
+  const hexStr: string = bytesToHexString(word);
+
+  return hexStringToHexNum(hexStr);
+}
+
 /**
  * Make [255,0] from [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0]
  */
