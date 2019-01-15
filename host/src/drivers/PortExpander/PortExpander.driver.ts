@@ -64,7 +64,6 @@ export const COMMANDS = {
   readAnalog:                 0x46,
   readAllAnalog:              0x47,
 
-
   // 50+ pwm
   // 60+ serial
 

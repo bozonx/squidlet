@@ -1,6 +1,8 @@
 import {callOnDifferentValues} from '../../helpers/helpers';
 import {convertBytesToBits} from '../../helpers/binaryHelpers';
 import IndexedEvents from '../../helpers/IndexedEvents';
+import {DigitalPinHandler} from './DigitalPins';
+import {AnalogPinHandler} from './AnalogPins';
 
 
 export type DigitalState = (boolean | undefined)[];
@@ -17,8 +19,8 @@ export interface ExpanderState {
 
 
 export default class State {
-  readonly digitalEvents: IndexedEvents = new IndexedEvents();
-  readonly analogEvents: IndexedEvents = new IndexedEvents();
+  readonly digitalEvents = new IndexedEvents<DigitalPinHandler>();
+  readonly analogEvents = new IndexedEvents<AnalogPinHandler>();
 
   private readonly state: ExpanderState = {
     inputs: [],

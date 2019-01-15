@@ -4,7 +4,7 @@ import {
   PortExpanderAnalogPinMode,
   PortExpanderDriver,
 } from './PortExpander.driver';
-import {hexToBytes, numToUint8Word, numToWord} from '../../helpers/binaryHelpers';
+import {numToUint8Word} from '../../helpers/binaryHelpers';
 import {BYTES_IN_WORD} from '../../app/dict/constants';
 import {AnalogState} from './State';
 import {getKeyOfObject} from '../../helpers/helpers';
