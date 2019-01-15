@@ -187,12 +187,23 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // It doesn't need to initialize IC, because new state will send below
 
+    const oldState: number = this.currentState;
+
     // update local state before writing to IC
     this.updateCurrentState(pin, value);
-    // write to IC
-    await this.writeToIc();
 
-    // TODO: вернуть старый стейт если запись не удалась
+    // write to IC
+    try {
+      await this.writeToIc();
+    }
+    catch (err) {
+      // switch back old value on error
+      this.currentState = oldState;
+
+      // TODO: rise an event
+
+      throw new Error(err);
+    }
   }
 
   /**
@@ -202,6 +213,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   async writeState(outputValues: boolean[]): Promise<void> {
     if (!this.checkInitialization('writeState')) return;
 
+    const oldState: number = this.currentState;
+
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // isn't an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
@@ -209,9 +222,18 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       this.updateCurrentState(pin, outputValues[pin]);
     }
 
-    return this.writeToIc();
+    // write to IC
+    try {
+      await this.writeToIc();
+    }
+    catch (err) {
+      // switch back old value on error
+      this.currentState = oldState;
 
-    // TODO: вернуть старый стейт если запись не удалась
+      // TODO: rise an event
+
+      throw new Error(err);
+    }
   }
 
 
@@ -246,7 +268,14 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     // send one byte to IC
     dataToSend[0] = this.currentState;
 
-    await this.i2cDriver.write(undefined, dataToSend);
+    try {
+      await this.i2cDriver.write(undefined, dataToSend);
+    }
+    catch (err) {
+      this.initingIcInProgress = false;
+
+      throw new Error(err);
+    }
 
     this.initingIcInProgress = false;
     // it means that IC is inited when first data is written
