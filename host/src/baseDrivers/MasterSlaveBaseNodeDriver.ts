@@ -157,26 +157,19 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   protected updateLastPollData(dataAddressStr: number | string | undefined, data: Uint8Array) {
-
-    // TODO: поддержка если dataAddress = undefined
-    // TODO: dataAddressStr === undefined- используется в poll
-
-    // is data address which read uses in polling
-    const isItPollingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
-      && this.props.feedback
-      && this.props.poll.map((item) => item.dataAddress).includes(dataAddressStr)
-      || false;
+    const pollProps = this.getPollProps(dataAddressStr);
+    const resolvedDataAddr: string = this.resolveDataAddressStr(dataAddressStr);
 
     // do nothing if it isn't polling data address
-    if (typeof dataAddressStr === 'undefined' || !isItPollingDataAddr) return;
+    if (typeof dataAddressStr === 'undefined' || !pollProps) return;
 
     // if data is equal to previous data - do nothing
-    if (isEqual(this.pollLastData[dataAddressStr], data)) return;
+    if (isEqual(this.pollLastData[resolvedDataAddr], data)) return;
 
     // save data
-    this.pollLastData[dataAddressStr] = data;
+    this.pollLastData[resolvedDataAddr] = data;
     // finally rise an event
-    this.pollEvents.emit(dataAddressStr, data);
+    this.pollEvents.emit(resolvedDataAddr, data);
   }
 
   protected makeDataAddrHex(dataAddressStr: string | number | undefined): number | undefined {
