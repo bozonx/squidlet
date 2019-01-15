@@ -44,16 +44,32 @@ export interface ExpanderDriverProps {
   [index: string]: any;
 }
 
-// TODO: review commands - add set debounce, edge, setup analog, setup all analog
+
 export const COMMANDS = {
-  setup:                    0x30,
-  setupAll:                 0x31,
-  setOutputValue:           0x32,
-  setAllOutputValues:       0x33,
-  readDigital:              0x34,
-  readAllDigital:           0x35,
-  setAnalogOutputValue:     0x36,
-  setAllAnalogOutputValues: 0x37,
+  setupDigital:               0x30,
+  setupAllDigital:            0x31,
+  setupAnalog:                0x32,
+  setupAllAnalog:             0x33,
+
+  setDigitalOutputValue:      0x41,
+  setAllDigitalOutputValues:  0x42,
+  readDigital:                0x43,
+  readAllDigital:             0x44,
+  setAnalogOutputValue:       0x45,
+  setAllAnalogOutputValues:   0x46,
+  readAnalog:                 0x47,
+  readAllAnalog:              0x48,
+
+  // 50+ pwm
+  // 60+ serial
+
+  //setDigitalEdge:             0x91,
+  //setAllDigitalEdges:         0x92,
+  //setDigitalDebounce:         0x93,
+  //setAllDigitalDebounce:      0x94,
+  //setAnalogDebounce:          0x95,
+  //setAllAnalogDebounce:       0x96,
+
 };
 
 export const MODES = {
@@ -73,7 +89,7 @@ const INCOME_COMMANDS = {
   newAnalogState: 0x31,
 };
 
-//const NO_MODE = 0x21;
+export const NO_MODE = 0x21;
 
 
 // TODO: не делать публичное то что не нужно

@@ -1,7 +1,7 @@
 import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import {
   COMMANDS,
-  MODES,
+  MODES, NO_MODE,
   PortExpanderDigitalPinMode,
   PortExpanderDriver,
 } from './PortExpander.driver';
@@ -70,13 +70,10 @@ export default class DigitalPins {
    * Write all the pin modes to IC.
    */
   async writePinModes() {
+    const pinCount = this.expander.props.digitalPinsCount;
+    const dataToSend: Uint8Array = new Uint8Array(pinCount);
 
-    // TODO: review - move to analog and digital - отдельными запросами
-    // TODO: review - write analog and digital modes - у ниъ разные пины
-
-    const dataToSend: Uint8Array = new Uint8Array(this.props.allPinCount);
-
-    for (let i = 0; i < this.props.allPinCount; i++) {
+    for (let i = 0; i < pinCount; i++) {
       if (typeof this.pinModes[i] === 'undefined') {
         dataToSend[i] = NO_MODE;
       }
@@ -85,9 +82,7 @@ export default class DigitalPins {
       }
     }
 
-    console.log(44444444444, this.props, this.pinModes, dataToSend);
-
-    await this.node.send(COMMANDS.setupAll, dataToSend);
+    await this.expander.node.send(COMMANDS.setupAllDigital, dataToSend);
   }
 
   /**
