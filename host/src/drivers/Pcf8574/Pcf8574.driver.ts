@@ -50,7 +50,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
         ],
       });
 
-    this.i2cDriver.addPollErrorListener((dataAddressStr: number | string, err: Error) => {
+    this.i2cDriver.addPollErrorListener((dataAddressStr: number | string | undefined, err: Error) => {
       this.env.log.error(String(err));
     });
 
@@ -60,7 +60,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   protected appDidInit = async () => {
-    // init IC state after app is inited if it isn't inited at this moment
+    // init IC state after app is initialized if it isn't at this moment
     try {
       await this.writeToIc();
     }
@@ -215,7 +215,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  private handleIcStateChange = (dataAddressStr: number | string, data: Uint8Array) => {
+  private handleIcStateChange = (dataAddressStr: number | string | undefined, data: Uint8Array) => {
     if (!data || data.length !== DATA_LENGTH) {
       throw new Error(`PCF8574Driver: No data has been received`);
     }

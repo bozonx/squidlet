@@ -40,8 +40,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
 
   async write(dataAddressStr?: string | number, data?: Uint8Array): Promise<void> {
-    const dataAddressHex: number | undefined = typeof dataAddressStr !== 'undefined'
-      && this.makeDataAddressHexNum(dataAddressStr) || undefined;
+    const dataAddressHex: number | undefined = this.makeDataAddrHex(dataAddressStr);
     const senderId = this.makeSenderId(dataAddressStr, 'write');
 
     await this.sender.send<void>(senderId, (): Promise<void> => {
@@ -50,8 +49,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   }
 
   async read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array> {
-    const dataAddressHex: number | undefined = typeof dataAddressStr !== 'undefined'
-      && this.makeDataAddressHexNum(dataAddressStr) || undefined;
+    const dataAddressHex: number | undefined = this.makeDataAddrHex(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, length);
     const senderId = this.makeSenderId(dataAddressStr, 'read', resolvedLength);
     // send data and wait
@@ -73,8 +71,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     dataToSend?: Uint8Array,
     readLength?: number
   ): Promise<Uint8Array> {
-    const dataAddressHex: number | undefined = typeof dataAddressStr !== 'undefined'
-      && this.makeDataAddressHexNum(dataAddressStr) || undefined;
+    const dataAddressHex: number | undefined = this.makeDataAddrHex(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, readLength);
     const senderId = this.makeSenderId(dataAddressStr, 'request', resolvedLength);
     // make request
@@ -91,9 +88,8 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   /**
    * Read data once and rise an data event
    */
-  protected async doPoll(dataAddressStr: string | number): Promise<Uint8Array> {
-    const dataAddressHex: number | undefined = typeof dataAddressStr !== 'undefined'
-      && this.makeDataAddressHexNum(dataAddressStr) || undefined;
+  protected async doPoll(dataAddressStr?: string | number): Promise<Uint8Array> {
+    const dataAddressHex: number | undefined = this.makeDataAddrHex(dataAddressStr);
     const resolvedLength: number = this.resolveReadLength(dataAddressStr);
     const senderId = this.makeSenderId(dataAddressStr, 'doPoll');
 
@@ -125,6 +121,9 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
 
   private resolveReadLength(dataAddressStr?: string | number, readLength?: number): number {
+
+    // TODO: поддержка если dataAddress = undefined - взять props без dataAddress
+
     if (typeof dataAddressStr === 'undefined') {
       if (typeof readLength === 'undefined') {
         throw new Error(`I2cToSlaveDriver: You should specify dataAddressStr or readLength`);
@@ -150,7 +149,9 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   }
 
   private makeSenderId(dataAddressStr: string | number | undefined, method: string, ...params: (string | number)[]) {
-    return [this.props.bus, this.props.address, dataAddressStr, method, ...params].join();
+    const dataAddrStr: string = this.resolveDataAddressStr(dataAddressStr);
+
+    return [this.props.bus, this.props.address, dataAddrStr, method, ...params].join();
   }
 
 

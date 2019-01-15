@@ -9,14 +9,12 @@ import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 // type of feedback - polling or interruption
 export type FeedbackType = 'poll' | 'int';
-// TODO: а если не был задан dataAddress ???
-export type Handler = (dataAddressStr: number | string, data: Uint8Array) => void;
-// TODO: а если не был задан dataAddress ???
-export type ErrorHandler = (dataAddressStr: number | string, err: Error) => void;
+export type Handler = (dataAddressStr: number | string | undefined, data: Uint8Array) => void;
+export type ErrorHandler = (dataAddressStr: number | string | undefined, err: Error) => void;
 
 export interface PollProps {
-  // data address e.g "5a" or "33" or 27
-  dataAddress: string | number;
+  // data address e.g "5a" or "33" or 27. Undefined means do poll without specifying a data address
+  dataAddress?: string | number;
   dataLength?: number;
   interval?: number;
 }
@@ -30,6 +28,8 @@ export interface MasterSlaveBaseProps {
   pollInterval: number;
 }
 
+export const UNDEFINED_DATA_ADDRESS = 'default';
+
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
   /**
@@ -42,7 +42,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   abstract write(dataAddressStr?: string | number, data?: Uint8Array): Promise<void>;
   abstract read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array>;
   abstract request(dataAddressStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
-  protected abstract doPoll(dataAddressStr: string | number): Promise<Uint8Array>;
+  protected abstract doPoll(dataAddressStr: string | number | undefined): Promise<Uint8Array>;
   protected abstract setupFeedback(): void;
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
@@ -58,11 +58,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected doInit = async () => {
     // listen to errors which happen on polling
     for (let pollProps of this.props.poll) {
-      this.polling.addListener((err: Error) => {
-        const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${pollProps.dataAddress}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
+      const dataAddrStr: string = this.resolveDataAddressStr(pollProps.dataAddress);
 
-        this.pollErrorEvents.emit(pollProps.dataAddress, new Error(msg));
-      }, String(pollProps.dataAddress));
+      this.polling.addListener((err: Error) => {
+        const msg = `MasterSlaveBaseNodeDriver: Error on polling to dataAddress "${dataAddrStr}". Props are "${JSON.stringify(this.props)}": ${String(err)}`;
+
+        this.pollErrorEvents.emit(dataAddrStr, new Error(msg));
+      }, dataAddrStr);
     }
   }
 
@@ -75,8 +77,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
-  getLastData(dataAddressStr: string | number): Uint8Array | undefined {
-    return this.pollLastData[dataAddressStr];
+  getLastData(dataAddressStr: string | number | undefined): Uint8Array | undefined {
+    const dataAddrStr: string = this.resolveDataAddressStr(dataAddressStr);
+
+    return this.pollLastData[dataAddrStr];
   }
 
   /**
@@ -90,7 +94,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
 
     for (let item of this.props.poll) {
-      await this.polling.restart(String(item.dataAddress));
+      const dataAddrStr: string = this.resolveDataAddressStr(item.dataAddress);
+
+      await this.polling.restart(dataAddrStr);
     }
   }
 
@@ -116,13 +122,18 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollErrorEvents.removeListener(handlerIndex);
   }
 
+  /**
+   * Poll all the defined polling to data addresses
+   */
   protected pollAllDataAddresses = async () => {
     for (let item of this.props.poll) {
       try {
-        await this.doPoll(this.makeDataAddressHexNum(item.dataAddress));
+        await this.doPoll(item.dataAddress);
       }
       catch (err) {
-        this.pollErrorEvents.emit(item.dataAddress, err);
+        const dataAddrStr: string = this.resolveDataAddressStr(item.dataAddress);
+
+        this.pollErrorEvents.emit(dataAddrStr, err);
       }
     }
   }
@@ -139,11 +150,17 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let item of this.props.poll) {
-      this.polling.stop(String(item.dataAddress));
+      const dataAddrStr: string = this.resolveDataAddressStr(item.dataAddress);
+
+      this.polling.stop(dataAddrStr);
     }
   }
 
   protected updateLastPollData(dataAddressStr: number | string | undefined, data: Uint8Array) {
+
+    // TODO: поддержка если dataAddress = undefined
+    // TODO: dataAddressStr === undefined- используется в poll
+
     // is data address which read uses in polling
     const isItPollingDataAddr: boolean = typeof dataAddressStr !== 'undefined'
       && this.props.feedback
@@ -162,18 +179,30 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollEvents.emit(dataAddressStr, data);
   }
 
-  protected makeDataAddressHexNum(dataAddrStr: string | number): number {
-    return hexStringToHexNum(dataAddrStr);
+  protected makeDataAddrHex(dataAddressStr: string | number | undefined): number | undefined {
+    if (typeof dataAddressStr === 'undefined') return;
+
+    return hexStringToHexNum(dataAddressStr);
   }
 
-  protected getPollProps(dataAddrStr: string | number): PollProps | undefined {
+  /**
+   * Find poll props line {dataAddress, length, interval}
+   * If dataAddressStr is undefined then item with dataAddress = undefined will be found.
+   */
+  protected getPollProps(dataAddressStr: string | number | undefined): PollProps | undefined {
     return find(this.props.poll, (item: PollProps) => {
-      return item.dataAddress === dataAddrStr;
+      return item.dataAddress === dataAddressStr;
     });
   }
 
+  protected resolveDataAddressStr(dataAddressStr: number | string | undefined): string {
+    if (typeof dataAddressStr === 'undefined') return UNDEFINED_DATA_ADDRESS;
 
-  private startPollingOnDataAddress(dataAddressStr: number | string) {
+    return String(dataAddressStr);
+  }
+
+
+  private startPollingOnDataAddress(dataAddressStr: number | string | undefined) {
     const pollProps: PollProps | undefined = this.getPollProps(dataAddressStr);
 
     if (!pollProps) {
@@ -183,13 +212,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     const pollInterval: number = (typeof pollProps.interval === 'undefined')
       ? this.props.pollInterval
       : pollProps.interval;
+    const dataAddrStr: string = this.resolveDataAddressStr(dataAddressStr);
 
     // TODO: может выполнять pollAllDataAddresses? тогда не получится указать pollInterval на каждый полинг
 
     this.polling.start(
       () => this.doPoll(dataAddressStr),
       pollInterval,
-      String(dataAddressStr)
+      dataAddrStr
     );
   }
 
