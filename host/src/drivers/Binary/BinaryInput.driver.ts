@@ -22,7 +22,7 @@ export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
 
 
 export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
-  private readonly changeEvents: IndexedEvents = new IndexedEvents();
+  private readonly changeEvents = new IndexedEvents<WatchHandler>();
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;
 

@@ -9,6 +9,8 @@ import {omit} from '../../helpers/lodashLike';
 import {invertIfNeed} from '../../helpers/helpers';
 
 
+type DelayedResultHandler = (err?: Error) => void;
+
 export interface BinaryOutputDriverProps extends DigitalBaseProps {
   blockTime: number;
   // if "refuse" - it doesn't write while block time. It is on default.
@@ -22,7 +24,7 @@ export interface BinaryOutputDriverProps extends DigitalBaseProps {
 
 
 export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
-  private readonly delayedResultEvents: IndexedEvents = new IndexedEvents();
+  private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;
 

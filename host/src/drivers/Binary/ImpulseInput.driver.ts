@@ -8,6 +8,8 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {omit} from '../../helpers/lodashLike';
 
 
+type RisingHandler = () => void;
+
 export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
   // time between 1 and 0
   impulseLength: number;
@@ -25,8 +27,8 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
 
 
 export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
-  private readonly risingEvents: IndexedEvents = new IndexedEvents();
-  private readonly bothEvents: IndexedEvents = new IndexedEvents();
+  private readonly risingEvents = new IndexedEvents<RisingHandler>();
+  private readonly bothEvents = new IndexedEvents<WatchHandler>();
   private throttleInProgress: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
@@ -62,7 +64,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   /**
    * Listen only to rising of impulse, not falling.
    */
-  addRisingListener(handler: WatchHandler): number {
+  addRisingListener(handler: RisingHandler): number {
     return this.risingEvents.addListener(handler);
   }
 
@@ -73,7 +75,8 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     return this.bothEvents.addListener(handler);
   }
 
-  listenOnce(handler: WatchHandler): number {
+  listenOnce(handler: RisingHandler): number {
+    // TODO: why not bothEvents?
     return this.risingEvents.once(handler);
   }
 
@@ -86,7 +89,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   }
 
   destroy = () => {
-    this.digitalInput.removeListener(this.listenHandler);
+    //this.digitalInput.removeListener(this.listenHandler);
   }
 
 
