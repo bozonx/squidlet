@@ -16,7 +16,7 @@ export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverProps> {
-  private get gpio(): GpioDigitalDriver {
+  private get source(): GpioDigitalDriver {
     return this.depsInstances.gpio as GpioDigitalDriver;
   }
 
@@ -24,8 +24,8 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const driverName = resolveDriverName(this.props.gpio);
 
-    this.depsInstances.gpio = await getDriverDep(driverName)
-      .getInstance(omit(this.props, 'initialLevel', 'pin', 'gpio'));
+    this.depsInstances.source = await getDriverDep(driverName)
+      .getInstance(omit(this.props, 'initialLevel', 'pin', 'source'));
   }
 
   //protected didInit = async () => {
@@ -37,7 +37,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
     // setup and set initial level
     try {
-      await this.gpio.setup(this.props.pin, 'output', this.props.initialLevel);
+      await this.source.setup(this.props.pin, 'output', this.props.initialLevel);
     }
     catch (err) {
       throw new Error(
@@ -52,7 +52,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
    * Get current level of pin.
    */
   read(): Promise<boolean> {
-    return this.gpio.read(this.props.pin);
+    return this.source.read(this.props.pin);
   }
 
   async write(newLevel: boolean): Promise<void> {
@@ -70,13 +70,13 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   }
 
   private async digitalWrite(value: boolean): Promise<void> {
-    // const pinMode: PinMode | undefined = await this.gpio.getPinMode(this.props.pin);
+    // const pinMode: PinMode | undefined = await this.source.getPinMode(this.props.pin);
     //
     // if (!pinMode || !pinMode.match(/output/)) {
     //   throw new Error(`Can't set level. The GPIO pin "${this.props.pin}" wasn't set up as an output pin.`);
     // }
 
-    return this.gpio.write(this.props.pin, value);
+    return this.source.write(this.props.pin, value);
   }
 
 }
