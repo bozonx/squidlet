@@ -1,11 +1,11 @@
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {WatchHandler} from '../../app/interfaces/dev/Digital';
-import {isDigitalInputInverted} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {omit} from '../../helpers/lodashLike';
+import {isDigitalInputInverted} from './binaryHelpers';
 
 
 type RisingHandler = () => void;

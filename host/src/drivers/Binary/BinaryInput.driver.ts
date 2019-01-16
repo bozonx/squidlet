@@ -4,15 +4,16 @@ import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {invertIfNeed, isDigitalInputInverted} from '../../helpers/helpers';
+import {invertIfNeed} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
+import {isDigitalInputInverted} from './binaryHelpers';
 
 
 export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
   edge: Edge;
-  debounce: number;
+  debounce?: number;
   // in this time driver doesn't receive any data
-  blockTime: number;
+  blockTime?: number;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
   // when receives 1 actually returned 0 and otherwise
@@ -33,11 +34,18 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
-      .getInstance(omit(this.props, 'edge', 'debounce', 'blockTime', 'invertOnPullup', 'invert'));
+      .getInstance(omit(
+        this.props,
+        'edge',
+        'debounce',
+        'blockTime',
+        'invertOnPullup',
+        'invert'
+      ));
   }
 
   protected didInit = async () => {
-    await this.digitalInput.addListener(this.listenHandler, this.props.debounce, this.resolveEdge());
+    await this.digitalInput.addListener(this.handleInputChange, this.props.debounce, this.resolveEdge());
   }
 
 
@@ -54,7 +62,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   /**
-   * Listen to rising and faling of impulse (1 and 0 levels)
+   * Listen to rising and falling of impulse (1 and 0 levels)
    */
   addListener(handler: WatchHandler): number {
     const wrapper: WatchHandler = (level: boolean) => {
@@ -77,17 +85,11 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   }
 
   destroy = () => {
-    this.digitalInput.removeListener(this.listenHandler);
+    //this.digitalInput.removeListener(this.listenHandler);
   }
 
 
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
-  }
-
-
-  private listenHandler = async (level: boolean) => {
+  private handleInputChange = async (level: boolean) => {
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
@@ -106,7 +108,6 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
 
   /**
    * It is set invert param - then invert edge
-   * @param edge
    */
   private resolveEdge(edge?: Edge): Edge {
 
@@ -123,6 +124,12 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     }
 
     return edge;
+  }
+
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
   }
 
 }

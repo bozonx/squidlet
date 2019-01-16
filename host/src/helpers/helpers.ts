@@ -233,16 +233,6 @@ export function parseValue(rawValue: any): any {
   return rawValue;
 }
 
-export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
-  // twice inverting on pullup if allowed
-  if (pullup && invertOnPullup) {
-    return !invert;
-  }
-
-  // in other cases - use invert prop
-  return invert;
-}
-
 /**
  * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
  */

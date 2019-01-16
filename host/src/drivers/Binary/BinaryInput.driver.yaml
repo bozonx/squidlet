@@ -10,12 +10,10 @@ props:
     default: both
   debounce:
     type: number
-    default: 0
   # timeout after received signal. At this time it doesn't receive any signals.
   blockTime:
     type: number
-    default: 0
-  # Do invert value if pullup resistor is on or not
+  # In true case it inverts value if pullup resistor is on
   invertOnPullup:
     type: boolean
     default: true
