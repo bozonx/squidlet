@@ -32,15 +32,13 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   // setup pin after drivers and devices have been initialized
   protected devicesDidInit = async () => {
     // setup and set initial level
-    try {
-      await this.source.setup(this.props.pin, 'output', this.props.initialLevel);
-    }
-    catch (err) {
-      throw new Error(
-        `DigitalPinOutputDriver: Can't setup pin. ` +
-        `"${JSON.stringify(this.props)}": ${err.toString()}`
-      );
-    }
+    this.source.setup(this.props.pin, 'output', this.props.initialLevel)
+      .catch((err) => {
+        this.env.system.log.error(
+          `DigitalPinOutputDriver: Can't setup pin. ` +
+          `"${JSON.stringify(this.props)}": ${err.toString()}`
+        );
+      });
   }
 
 
@@ -54,25 +52,13 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   async write(newLevel: boolean): Promise<void> {
     if (typeof newLevel !== 'boolean') throw new Error(`Invalid type of level`);
 
-    await this.digitalWrite(newLevel);
+    return this.source.write(this.props.pin, newLevel);
   }
 
 
   protected validateProps = (): string | undefined => {
-    // TODO: validate params
-    // TODO: validate props.driver
-    // TODO: validate specific for certain driver params
+    // TODO: validate params, props.driver, specific for certain driver params
     return;
-  }
-
-  private async digitalWrite(value: boolean): Promise<void> {
-    // const pinMode: PinMode | undefined = await this.source.getPinMode(this.props.pin);
-    //
-    // if (!pinMode || !pinMode.match(/output/)) {
-    //   throw new Error(`Can't set level. The GPIO pin "${this.props.pin}" wasn't set up as an output pin.`);
-    // }
-
-    return this.source.write(this.props.pin, value);
   }
 
 }
@@ -81,14 +67,5 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 export default class Factory extends DriverFactoryBase<DigitalPinOutputDriver> {
   protected instanceAlwaysNew = true;
   protected DriverClass = DigitalPinOutputDriver;
-
-  // TODO: не правильно!!!! может быть наложение если брать экспандеры
-
-  // protected calcInstanceId = (props: {[index: string]: any}): string => {
-  //   const driverName: string = (props.driver && props.driver.name)
-  //     ? props.driver.name
-  //     : 'local';
-  //
-  //   return `${driverName}-${props.pin}`;
-  // }
+  // TODO: source + pin + спросить адрес у нижележащего драйвера
 }

@@ -40,9 +40,15 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       .getInstance(omit(this.props, 'pullup', 'pulldown', 'pin', 'source'));
   }
 
-  protected didInit = async () => {
+  protected devicesDidInit = async () => {
     // setup pin as an input with resistor if specified
-    await this.source.setup(this.props.pin, this.resolvePinMode());
+    this.source.setup(this.props.pin, this.resolvePinMode())
+      .catch((err) => {
+        this.env.system.log.error(
+          `DigitalPinInputDriver: Can't setup pin. ` +
+          `"${JSON.stringify(this.props)}": ${err.toString()}`
+        );
+      });
   }
 
 
@@ -134,17 +140,5 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 export default class Factory extends DriverFactoryBase<DigitalPinInputDriver> {
   protected instanceAlwaysNew = true;
   protected DriverClass = DigitalPinInputDriver;
-
-  // TODO: спросить bus и address у нижележащего драйвера - выполнить generateUniqId()
-
-  // protected calcInstanceId = (props: {[index: string]: any}): string => {
-  //
-  //   // TODO: не правильно!!!! может быть наложение если брать экспандеры
-  //
-  //   const driverName: string = (props.driver && props.driver.name)
-  //     ? props.driver.name
-  //     : 'local';
-  //
-  //   return `${driverName}-${props.pin}`;
-  // }
+  // TODO: source + pin + спросить адрес у нижележащего драйвера
 }

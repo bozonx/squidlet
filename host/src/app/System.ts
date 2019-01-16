@@ -107,10 +107,12 @@ export default class System {
   }
 
   onDevicesInit(cb: () => void): number {
+    // TODO: если событие уже прошло - то выполнить сразу
     return this.events.once(categories.system, eventNames.system.devicesManagerInitialized, cb);
   }
 
   onAppInit(cb: () => void): number {
+    // TODO: если событие уже прошло - то выполнить сразу
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
