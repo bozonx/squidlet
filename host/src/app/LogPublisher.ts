@@ -22,7 +22,7 @@ export default class LogPublisher {
   }
 
   async warn(message: string) {
-    await this.send('warn', message);
+    await this.send('warn', `WARNING: ${message}`);
   }
 
   async error(message: string) {

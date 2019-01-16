@@ -96,7 +96,7 @@ export default class Sender {
           (data: T) => {
 
             // TODO: print in debug
-            console.log(`Request successfully is finished ${id}`);
+            console.log(`Request successfully finished ${id}`);
 
             delete this.requests[id];
             resolve(data);

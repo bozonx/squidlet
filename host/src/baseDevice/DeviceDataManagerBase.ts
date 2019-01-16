@@ -210,7 +210,7 @@ export default abstract class DeviceDataManagerBase {
     }
     catch(err) {
       this.system.log.error(`${errorMsg}: ${err.toString()}`);
-      throw new Error(err);
+      throw new err;
     }
 
     return result;

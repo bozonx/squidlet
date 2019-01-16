@@ -74,7 +74,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
     this.checkPin(pin);
 
-    if (typeof this.directions[pin] === 'undefined') {
+    if (typeof this.directions[pin] !== 'undefined') {
       this.env.log.warn(`PCF8574Driver.setup(${pin}, ${pinMode}, ${outputInitialValue}). This pin has been already set up`);
 
       return;
@@ -273,7 +273,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     catch (err) {
       this.initingIcInProgress = false;
 
-      throw new Error(err);
+      throw err;
     }
 
     this.initingIcInProgress = false;
@@ -282,7 +282,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   private checkInitialization(methodWhichCheck: string): boolean {
-    if (!this.initingIcInProgress) {
+    if (this.initingIcInProgress) {
       this.env.log.warn(`PCF8574Driver.${methodWhichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
