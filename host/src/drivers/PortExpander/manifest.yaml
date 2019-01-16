@@ -1,5 +1,7 @@
 name: PortExpander.driver
 main: PortExpander.driver.ts
 drivers:
-  - I2cNode.driver
+  # TODO: remove
+  - I2cDuplex.driver
+  - SerialDuplex.driver
 props: ./props.yaml

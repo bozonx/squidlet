@@ -13,6 +13,7 @@ export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
 
 
 /**
+ * This is middleware driver which allows acting with low level drivers as an output pin.
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverProps> {
@@ -22,7 +23,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    const driverName = resolveDriverName(this.props.gpio);
+    const driverName = resolveDriverName(this.props.source);
 
     this.depsInstances.source = await getDriverDep(driverName)
       .getInstance(omit(this.props, 'initialLevel', 'pin', 'source'));

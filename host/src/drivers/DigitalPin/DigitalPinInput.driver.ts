@@ -19,9 +19,12 @@ const NO_DEBOUNCE_VALUE = 0;
 
 
 /**
+ * This is middleware driver which allows acting with low level drivers as an input pin.
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
+
+  // TODO: reveiw
   // listener and its wrapper by listener id which gets from setWatch method of dev
   private listeners: {[index: string]: WatchHandler} = {};
 
