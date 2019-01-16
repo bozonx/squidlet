@@ -148,7 +148,7 @@ export default class DigitalDev implements Digital {
 
   private getPinInstance(pin: number): Gpio {
     if (!this.pinInstances[pin]) {
-      throw new Error(`You have to do setup of local GPIO pin "${pin}" before manipulating it`);
+      throw new Error(`DigitalDev: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
 
     return this.pinInstances[pin];

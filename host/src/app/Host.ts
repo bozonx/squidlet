@@ -91,6 +91,7 @@ export default class Host {
 
     // TODO: get all the hosts from master config
 
+
     const result: {[index: string]: string[]} = {};
 
     const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
@@ -98,9 +99,11 @@ export default class Host {
     for (let devicesId of devicesIds) {
       const device = this.system.devicesManager.getDevice(devicesId);
 
-      if (isEmpty(device.actions)) continue;
+      // TODO: review
 
-      result[devicesId] = Object.keys(device.actions);
+      if (isEmpty((device as any).actions)) continue;
+
+      result[devicesId] = Object.keys((device as any).actions);
     }
 
     return result;

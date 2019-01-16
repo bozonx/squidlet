@@ -55,7 +55,7 @@ export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements D
         });
 
       // listen for response
-      const listenIndex = this.onReceive((receivedDataAddressStr: number | string, data: Uint8Array) => {
+      const listenIndex = this.onReceive((receivedDataAddressStr: number | string | undefined, data: Uint8Array) => {
         // do nothing if filed
         if (failed) return;
 

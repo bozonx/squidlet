@@ -72,7 +72,7 @@ export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements
    * If true that I'm master and direction of connection is to slave.
    */
   private isToSlave(): boolean {
-    return typeof this.props.address === 'undefined';
+    return typeof this.props.address !== 'undefined';
   }
 
 }

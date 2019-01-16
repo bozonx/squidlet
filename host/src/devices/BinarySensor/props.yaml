@@ -15,7 +15,7 @@ invert:
 
 ### DigitalPin base props
 pin:
-gpio:
+sorce:
 
 ### Device base props
 statusRepublishInterval:
