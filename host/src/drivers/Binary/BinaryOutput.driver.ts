@@ -110,12 +110,9 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     // starting block time
 
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        this.blockTimeFinished();
-        resolve();
-      }, this.props.blockTime as number);
-    });
+    setTimeout(() => {
+      this.blockTimeFinished();
+    }, this.props.blockTime);
   }
 
   private blockTimeFinished = () => {
