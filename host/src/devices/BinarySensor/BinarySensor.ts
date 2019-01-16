@@ -11,7 +11,7 @@ interface Props extends DeviceBaseProps, BinaryInputDriverProps {
 
 export default class BinarySensor extends DeviceBase<Props> {
   private get binaryInput(): BinaryInputDriver {
-    return this.depsInstances.binaryInput as BinaryInputDriver;
+    return this.depsInstances.binaryInput as any;
   }
 
 

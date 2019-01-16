@@ -13,7 +13,7 @@ interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
 
 export default class Switch extends DeviceBase<Props> {
   private get binaryOutput(): BinaryOutputDriver {
-    return this.depsInstances.binaryOutput as BinaryOutputDriver;
+    return this.depsInstances.binaryOutput as any;
   }
 
   protected get status(): Status {

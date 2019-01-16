@@ -9,7 +9,7 @@ interface Props extends DeviceBaseProps, ExpanderDriverProps {
 
 export default class Pcf8574 extends DeviceBase<Props> {
   get expander(): PCF8574Driver {
-    return this.depsInstances.expander as PCF8574Driver;
+    return this.depsInstances.expander as any;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
@@ -54,8 +54,6 @@ export default class Pcf8574 extends DeviceBase<Props> {
   //
   //
   // private onExpanderChange = async (err: Error | null, values?: boolean[]) => {
-  //
-  //   // TODO: проверить обработку ошибок что error придет
   //
   //   if (err) {
   //     return this.env.log.error(String(err));
