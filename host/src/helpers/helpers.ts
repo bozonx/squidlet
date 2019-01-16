@@ -320,3 +320,9 @@ export function firstLetterToUpperCase(value: string): string {
 export function updateArray(arrToUpdate: any[], newValues: any[]): void {
   for (let index in newValues) arrToUpdate[index] = newValues[index];
 }
+
+export function invertIfNeed(value: boolean, invert?: boolean): boolean {
+  if (invert) return !value;
+
+  return value;
+}

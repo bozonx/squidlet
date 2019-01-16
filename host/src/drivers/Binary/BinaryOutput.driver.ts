@@ -1,4 +1,3 @@
-import {invertIfNeed} from '../DigitalPin/digitalHelpers';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {DigitalPinOutputDriver} from '../DigitalPin/DigitalPinOutput.driver';
 import DriverBase from '../../app/entities/DriverBase';
@@ -7,6 +6,7 @@ import {BlockMode, InitialLevel} from './interfaces/Types';
 import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {omit} from '../../helpers/lodashLike';
+import {invertIfNeed} from '../../helpers/helpers';
 
 
 export interface BinaryOutputDriverProps extends DigitalBaseProps {

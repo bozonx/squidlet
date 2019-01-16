@@ -2,9 +2,8 @@ import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
-import {convertToLevel} from '../../helpers/helpers';
+import {convertToLevel, invertIfNeed} from '../../helpers/helpers';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import {invertIfNeed} from '../../drivers/DigitalPin/digitalHelpers';
 import {omit} from '../../helpers/lodashLike';
 
 

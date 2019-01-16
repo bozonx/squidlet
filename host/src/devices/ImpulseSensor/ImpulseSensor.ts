@@ -3,8 +3,8 @@ import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import {invertIfNeed} from '../../drivers/DigitalPin/digitalHelpers';
 import {omit} from '../../helpers/lodashLike';
+import {invertIfNeed} from '../../helpers/helpers';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {

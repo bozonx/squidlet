@@ -6,10 +6,3 @@ export function resolveDriverName(specifiedName?: string): string {
     return 'Digital_local.driver';
   }
 }
-
-
-export function invertIfNeed(value: boolean, invert?: boolean): boolean {
-  if (invert) return !value;
-
-  return value;
-}
