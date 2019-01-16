@@ -4,7 +4,6 @@ import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/
 import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
-import Pcf8574 from '../../devices/Pcf8574/Pcf8574';
 
 
 interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
@@ -19,7 +18,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private get expanderDriver(): PCF8574Driver {
     // TODO: use system.devices
-    return this.env.system.devicesManager.getDevice<Pcf8574>(this.props.expander).expander;
+    return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
   }
 
 

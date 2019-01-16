@@ -134,7 +134,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
   protected didInit = async () => {
     // Listen to received data
-    this.node.onReceive((dataAddressStr: number | string, data: Uint8Array) => {
+    this.node.onReceive((dataAddressStr: number | string | undefined, data: Uint8Array) => {
       if (typeof dataAddressStr === 'undefined') {
         this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }

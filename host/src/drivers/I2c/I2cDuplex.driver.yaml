@@ -1,4 +1,4 @@
-name: I2cToSlaveDuplex.driver
+name: I2cDuplex.driver
 main: I2cDuplex.driver.ts
 type: system
 

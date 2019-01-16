@@ -1,4 +1,6 @@
-export type ReceiveHandler = (dataAddressStr: number | string, data: Uint8Array) => void;
+
+// TODO: может ли быть data addr undefined ?
+export type ReceiveHandler = (dataAddressStr: number | string | undefined, data: Uint8Array) => void;
 
 
 export default interface DuplexDriver {

@@ -257,7 +257,7 @@ export default class EntitiesCollection {
         return true;
       }
 
-      throw new Error(`There is not manifest of driver "${driverName}" which is dependency of ${entityName}`);
+      throw new Error(`There is no manifest of driver "${driverName}" which is dependency of ${entityName}`);
     }
 
     const driverManifest: DriverManifest = drivers[driverName].manifest;
