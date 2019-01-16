@@ -23,11 +23,6 @@ const NO_DEBOUNCE_VALUE = 0;
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
-
-  // TODO: reveiw
-  // listener and its wrapper by listener id which gets from setWatch method of dev
-  private listeners: {[index: string]: WatchHandler} = {};
-
   private get source(): Digital {
     return this.depsInstances.source as Digital;
   }
@@ -65,52 +60,26 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
    * @param edge - Listen to low, high or both levels. By default is both.
    */
-  async addListener(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<void> {
-    const listenerId: number = await this.setWatch(handler, edge, debounce);
-    // save listener id
-    this.listeners[listenerId] = handler;
+  async addListener(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
+    return this.source.setWatch(this.props.pin, handler, debounce, edge);
   }
 
   async listenOnce(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<void> {
+    let handlerId: number;
     const wrapper: WatchHandler = async (level: boolean) => {
       // remove listener and don't listen any more
-      await this.removeListener(handler);
+      await this.removeListener(handlerId);
 
       handler(level);
     };
 
-    const listenerId: number = await this.setWatch(wrapper, edge, debounce);
-    // save listener id and its original handler
-    this.listeners[listenerId] = handler;
+    handlerId = await this.source.setWatch(this.props.pin, wrapper, debounce, edge);
   }
 
-  removeListener(handler: WatchHandler): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      find(this.listeners, (handlerItem: WatchHandler, listenerId: string) => {
-        if (handlerItem === handler) {
-          delete this.listeners[listenerId];
-          this.source.clearWatch(Number(listenerId))
-            .then(resolve)
-            .catch(reject);
-
-          return true;
-        }
-
-        return;
-      });
-    });
+  removeListener(handlerIndex: number): Promise<void> {
+    return this.source.clearWatch(handlerIndex);
   }
 
-
-  // TODO: add destroy ???
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: validate params
-    // TODO: validate specific for certain driver params
-    // TODO: только pullup или pulldown может быть установлен
-    return;
-  }
 
   private resolvePinMode(): DigitalPinMode {
     if (this.props.pullup) return 'input_pullup';
@@ -132,6 +101,12 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       debounce,
       normalEdge
     );
+  }
+
+
+  protected validateProps = (): string | undefined => {
+    // TODO: validate params, specific for certain driver params, только pullup или pulldown может быть установлен
+    return;
   }
 
 }
