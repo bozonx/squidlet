@@ -19,7 +19,7 @@ export default class Router {
   private readonly network: Network;
   private readonly driverEnv: DriverEnv;
   private _destinations?: Destinations;
-  private readonly msgEvents: IndexedEvents = new IndexedEvents();
+  private readonly msgEvents = new IndexedEvents<RouterHandler>();
 
   private get destinations(): Destinations {
     return this._destinations as Destinations;
@@ -73,7 +73,7 @@ export default class Router {
       return;
     }
     if (!routerMessage) {
-      this.msgEvents.emit(`RouterMessage is undefined`);
+      this.msgEvents.emit(new Error(`RouterMessage is undefined`));
 
       return;
     }

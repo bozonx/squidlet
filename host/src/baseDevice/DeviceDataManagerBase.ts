@@ -23,8 +23,8 @@ export type ChangeHandler = (changedParams: string[]) => void;
  * * publish - it emits on changes and on republish
  */
 export default abstract class DeviceDataManagerBase {
-  protected readonly changeEvents: IndexedEvents = new IndexedEvents();
-  protected readonly publishEvents: IndexedEvents = new IndexedEvents();
+  protected readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  protected readonly publishEvents = new IndexedEvents<Publisher>();
   protected abstract readonly typeNameOfData: string;
   protected readonly deviceId: string;
   protected readonly system: System;

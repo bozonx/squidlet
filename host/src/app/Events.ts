@@ -3,6 +3,7 @@ import IndexedEventEmitter from '../helpers/IndexedEventEmitter';
 
 
 export default class Events {
+  // TODO: add handler type
   private readonly events = new IndexedEventEmitter();
 
 

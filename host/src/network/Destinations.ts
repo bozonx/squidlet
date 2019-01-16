@@ -20,7 +20,7 @@ export default class Destinations {
   // addresses by "type-bus"
   private readonly myAddresses: Array<MyAddress>;
   private readonly connections: {[index: string]: Connection} = {};
-  private readonly msgEvents = new IndexedEvents();
+  private readonly msgEvents = new IndexedEvents<DestHandler>();
 
 
   constructor(driverEnv: DriverEnv, myAddresses: Array<MyAddress>, neighbors: {[index: string]: Destination}) {

@@ -17,7 +17,7 @@ interface I2cSlaveDriverProps {
 
 
 export class I2cSlaveDriver extends DriverBase<I2cSlaveDriverProps> {
-  private readonly events = new IndexedEventEmitter();
+  private readonly events = new IndexedEventEmitter<SlaveHandler>();
 
   private get i2cSlaveDev(): I2cSlave {
     return this.depsInstances.i2cSlave as any;
