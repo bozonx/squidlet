@@ -15,8 +15,9 @@ export interface SerialNodeProps {
 
 
 export class SerialDuplexDriver extends DriverBase<SerialNodeProps> implements DuplexDriver {
+  // TODO: упростить
   private get serialDev(): Serial {
-    return this.depsInstances.serialDev as Serial;
+    return this.depsInstances.serialDev as any;
   }
 
   protected willInit = async () => {

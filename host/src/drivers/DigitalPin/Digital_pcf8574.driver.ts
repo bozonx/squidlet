@@ -18,6 +18,7 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   private handlerIds: number[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private get expanderDriver(): PCF8574Driver {
+    // TODO: use system.devices
     return this.env.system.devicesManager.getDevice<Pcf8574>(this.props.expander).expander;
   }
 

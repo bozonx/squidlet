@@ -24,7 +24,7 @@ const NO_DEBOUNCE_VALUE = 0;
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
   private get source(): Digital {
-    return this.depsInstances.source as Digital;
+    return this.depsInstances.source as any;
   }
 
 

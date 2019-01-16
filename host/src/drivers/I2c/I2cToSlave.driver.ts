@@ -21,7 +21,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
   private addressHex: number = -1;
 
   private get i2cMaster(): I2cMasterDriver {
-    return this.depsInstances.i2cMaster as I2cMasterDriver;
+    return this.depsInstances.i2cMaster as any;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {

@@ -38,7 +38,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private readonly events = new IndexedEvents<ResultHandler>();
 
   private get i2cDriver(): I2cToSlaveDriver {
-    return this.depsInstances.i2cDriver as I2cToSlaveDriver;
+    return this.depsInstances.i2cDriver as any;
   }
 
 

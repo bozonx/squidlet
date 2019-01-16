@@ -27,7 +27,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   private _isInverted: boolean = false;
 
   private get digitalInput(): DigitalPinInputDriver {
-    return this.depsInstances.digitalInput as DigitalPinInputDriver;
+    return this.depsInstances.digitalInput as any;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {

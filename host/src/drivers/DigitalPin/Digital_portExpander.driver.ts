@@ -2,7 +2,7 @@ import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
-import {PortExpanderDriver, PortExpanderPinMode} from '../PortExpander/PortExpander.driver';
+import {PortExpanderDriver} from '../PortExpander/PortExpander.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 
 
@@ -16,6 +16,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];
   private get expanderDriver(): PortExpanderDriver {
+    // TODO: use system.devices
     return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
   }
 

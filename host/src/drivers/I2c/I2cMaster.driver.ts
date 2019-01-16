@@ -20,7 +20,7 @@ export interface I2cMasterDriverInstanceProps {
 
 export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
   private get i2cMasterDev(): I2cMaster {
-    return this.depsInstances.i2cMaster as I2cMaster;
+    return this.depsInstances.i2cMaster as any;
   }
 
 

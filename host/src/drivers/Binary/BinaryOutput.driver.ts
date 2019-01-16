@@ -29,7 +29,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   private lastDeferredValue?: boolean;
 
   private get digitalOutput(): DigitalPinOutputDriver {
-    return this.depsInstances.digitalOutput as DigitalPinOutputDriver;
+    return this.depsInstances.digitalOutput as any;
   }
 
 
