@@ -177,9 +177,12 @@ export function callOnDifferentValues(
 
 
 export function convertToLevel(value: any): boolean {
-  return value === '1' || value === 1
-    || value === 'ON' || value === 'on' || value === 'On'
-    || value === 'true' || value === true;
+  return value === true
+    || value === 1
+    || value === 'high'
+    || value === 'true'
+    || value === '1'
+    || value === 'ON' || value === 'on' || value === 'On';
 }
 
 export function parseValue(rawValue: any): any {

@@ -6,18 +6,17 @@ import {BlockMode, InitialLevel} from './interfaces/Types';
 import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
 import IndexedEvents from '../../helpers/IndexedEvents';
 import {omit} from '../../helpers/lodashLike';
-import {invertIfNeed} from '../../helpers/helpers';
+import {convertToLevel, invertIfNeed} from '../../helpers/helpers';
 
 
 type DelayedResultHandler = (err?: Error) => void;
 
 export interface BinaryOutputDriverProps extends DigitalBaseProps {
-  blockTime: number;
-  // if "refuse" - it doesn't write while block time. It is on default.
-  // If "defer" it waits for block time finished and write last last value which was tried to set
+  blockTime?: number;
+  // if "refuse" - it doesn't write while block time is in progress. It is on default.
+  // If "defer" it waits for block time finished and write last value which was tried to set
   blockMode: BlockMode;
-  // for input: when receives 1 actually returned 0 and otherwise
-  // for output: when sends 1 actually sends 0 and otherwise
+  // when sends 1 actually sends 0 and otherwise
   invert: boolean;
   initial: InitialLevel;
 }
@@ -37,7 +36,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
       .getInstance({
         ...omit(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
-        initialLevel: this.resolveInitial(),
+        initialLevel: this.resolveInitialLevel(),
       });
   }
 
@@ -53,7 +52,7 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   async write(level: boolean) {
     if (this.blockTimeInProgress) {
       if (this.props.blockMode === 'refuse') {
-        // don't write while block time
+        // don't write while block time is in progress
         return;
       }
       else {
@@ -79,12 +78,6 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     // normal write
     await this.doWrite(level);
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 
@@ -132,15 +125,22 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     }
   }
 
-  private resolveInitial(): boolean {
+  private resolveInitialLevel(): boolean {
+    const resolvedLevel: boolean = convertToLevel(this.props.initial);
+
+    // inverting the initial level
     if (this.props.invert) {
-      // Inverted. initial 0 | low = true. Else false.
-      return !this.props.initial || this.props.initial === 'low';
+      return !resolvedLevel;
     }
 
-    // not inverted - initial 1 | high = true. Else false
-    // if initial === high it's logical 1, otherwise 0;
-    return this.props.initial === 1 || this.props.initial === 'high';
+    // not inverted
+    return resolvedLevel;
+  }
+
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
   }
 
 }
