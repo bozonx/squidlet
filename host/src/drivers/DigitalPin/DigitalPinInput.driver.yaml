@@ -6,6 +6,7 @@ type: system
 drivers:
   - Digital_local.driver
   - Digital_pcf8574.driver
+  - Digital_portExpander.driver
 
 props:
   pullup:
