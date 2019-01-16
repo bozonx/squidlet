@@ -29,20 +29,15 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
       .getInstance(omit(this.props, 'initialLevel', 'pin', 'source'));
   }
 
-  //protected didInit = async () => {
-  protected appDidInit = async () => {
-
-    //console.log('------- DigitalPinOutputDriver', this.props);
-
-    // TODO: может делать после devicesInit ???
-
+  // setup pin after drivers and devices have been initialized
+  protected devicesDidInit = async () => {
     // setup and set initial level
     try {
       await this.source.setup(this.props.pin, 'output', this.props.initialLevel);
     }
     catch (err) {
       throw new Error(
-        `DigitalPinOutputDriver: Can't setup pin ` +
+        `DigitalPinOutputDriver: Can't setup pin. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }

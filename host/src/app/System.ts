@@ -106,6 +106,10 @@ export default class System {
     // }
   }
 
+  onDevicesInit(cb: () => void): number {
+    return this.events.once(categories.system, eventNames.system.devicesManagerInitialized, cb);
+  }
+
   onAppInit(cb: () => void): number {
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
@@ -136,6 +140,7 @@ export default class System {
     await this.servicesManager.initRegularServices();
     this.log.info(`---> Initializing devices`);
     await this.devicesManager.init();
+    this.riseEvent(eventNames.system.devicesManagerInitialized);
   }
 
   private riseEvent(eventName: string) {

@@ -21,6 +21,8 @@ export default class EntityBase<Props = {}> {
   protected doInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // it calls after init. Better place to setup listeners
   protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  // it will be risen after devices init
+  protected devicesDidInit?: () => Promise<void>;
   // it will be risen after app init
   protected appDidInit?: () => Promise<void>;
   // If you have props you can validate it in this method
@@ -63,6 +65,17 @@ export default class EntityBase<Props = {}> {
     // const getDev: GetDriverDep = (devName: string): DriverInstance => {
     //   return this.env.getDev(devName);
     // };
+
+    if (this.devicesDidInit) {
+      this.env.system.onDevicesInit(async () => {
+        try {
+          this.devicesDidInit && await this.devicesDidInit();
+        }
+        catch (err) {
+          this.env.log.error(err);
+        }
+      });
+    }
 
     if (this.appDidInit) {
       this.env.system.onAppInit(async () => {
