@@ -4,7 +4,7 @@ import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
-import {find, omit} from '../../helpers/lodashLike';
+import {omit} from '../../helpers/lodashLike';
 
 
 export interface DigitalPinInputDriverProps extends DigitalBaseProps {
@@ -61,7 +61,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * @param edge - Listen to low, high or both levels. By default is both.
    */
   async addListener(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    return this.source.setWatch(this.props.pin, handler, debounce, edge);
+    return this.source.setWatch(this.props.pin, handler, debounce, this.resolveEdge(edge));
   }
 
   async listenOnce(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<void> {
@@ -73,7 +73,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       handler(level);
     };
 
-    handlerId = await this.source.setWatch(this.props.pin, wrapper, debounce, edge);
+    handlerId = await this.source.setWatch(this.props.pin, wrapper, debounce, this.resolveEdge(edge));
   }
 
   removeListener(handlerIndex: number): Promise<void> {
@@ -87,20 +87,8 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     else return 'input';
   }
 
-  private async setWatch(wrapper: WatchHandler, edge?: Edge, debounce: number = NO_DEBOUNCE_VALUE): Promise<number> {
-    const pinMode: DigitalPinMode | undefined = await this.source.getPinMode(this.props.pin);
-    const normalEdge: Edge = edge || 'both';
-
-    if (!pinMode || !pinMode.match(/input/)) {
-      throw new Error(`Can't add listener. The GPIO pin "${this.props.pin}" wasn't set up as an input pin.`);
-    }
-
-    return this.source.setWatch(
-      this.props.pin,
-      wrapper,
-      debounce,
-      normalEdge
-    );
+    private resolveEdge(edge?: Edge): Edge {
+    return edge || 'both';
   }
 
 
