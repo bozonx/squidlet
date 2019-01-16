@@ -61,23 +61,8 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
         // store level which is delayed
         this.lastDeferredValue = level;
 
-        // TODO: нужно ли возвращать промис ???
-
         // wait while delayed value is set
-        return new Promise<void>((resolve, reject) => {
-          let listenIndex: number;
-          const listenHandler = (err?: Error): void => {
-            this.delayedResultEvents.removeListener(listenIndex);
-
-            if (err) {
-              return reject(err);
-            }
-
-            resolve();
-          };
-
-          listenIndex = this.delayedResultEvents.addListener(listenHandler);
-        });
+        return this.waitDeferredValueWritten();
       }
     }
 
@@ -129,6 +114,24 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
         .then(() => this.delayedResultEvents.emit())
         .catch((err) => this.delayedResultEvents.emit(err));
     }
+  }
+
+  /**
+   * Wait for deferred value has been written.
+   */
+  private waitDeferredValueWritten(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let listenIndex: number;
+      const listenHandler = (err?: Error): void => {
+        this.delayedResultEvents.removeListener(listenIndex);
+
+        if (err) return reject(err);
+
+        resolve();
+      };
+
+      listenIndex = this.delayedResultEvents.addListener(listenHandler);
+    });
   }
 
   private resolveInitialLevel(): boolean {

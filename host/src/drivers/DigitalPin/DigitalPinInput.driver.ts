@@ -15,8 +15,6 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
   pulldown?: boolean;
 }
 
-const NO_DEBOUNCE_VALUE = 0;
-
 
 /**
  * This is middleware driver which allows acting with low level drivers as an input pin.
