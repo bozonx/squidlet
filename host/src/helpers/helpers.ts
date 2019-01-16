@@ -278,7 +278,7 @@ export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: s
 
   if (!sources.length) return target;
 
-  const source = sources.shift();
+  const source = sources.shift() as {[index: string]: any};
 
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
