@@ -25,15 +25,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
   async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    const expanderPinMode: PortExpanderPinMode | undefined = await this.expanderDriver.getDigitalPinMode(pin);
-
-    if (expanderPinMode === 'input'
-      || expanderPinMode === 'input_pullup'
-      || expanderPinMode === 'input_pulldown'
-      || expanderPinMode === 'output'
-    ) return expanderPinMode as DigitalPinMode;
-
-    return;
+    return this.expanderDriver.getDigitalPinMode(pin);
   }
 
   read(pin: number): Promise<boolean> {

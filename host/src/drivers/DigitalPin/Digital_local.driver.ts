@@ -1,5 +1,4 @@
 import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
-import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 
@@ -10,8 +9,7 @@ export class DigitalLocalDriver extends DriverBase implements Digital {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    //this.depsInstances.digitalDev = await getDriverDep('Digital.dev');
+  protected willInit = async () => {
     this.depsInstances.digitalDev = this.env.getDev('Digital');
   }
 

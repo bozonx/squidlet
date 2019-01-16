@@ -2,7 +2,6 @@ import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import {
   COMMANDS,
   MODES, NO_MODE,
-  PortExpanderDigitalPinMode,
   PortExpanderDriver,
 } from './PortExpander.driver';
 import {convertBitsToBytes} from '../../helpers/binaryHelpers';
@@ -29,10 +28,17 @@ export default class DigitalPins {
   }
 
 
-  getPinMode(pin: number): PortExpanderDigitalPinMode | undefined {
+  getPinMode(pin: number): DigitalPinMode | undefined {
     const pinModeByte: number = this.pinModes[pin];
+    const pinMode = getKeyOfObject(MODES, pinModeByte) as DigitalPinMode | undefined;
 
-    return getKeyOfObject(MODES, pinModeByte) as PortExpanderDigitalPinMode | undefined;
+    if (pinMode === 'input'
+      || pinMode === 'input_pullup'
+      || pinMode === 'input_pulldown'
+      || pinMode === 'output'
+    ) return pinMode as DigitalPinMode;
+
+    return;
   }
 
   /**

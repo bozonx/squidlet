@@ -34,7 +34,6 @@ export type PortExpanderPinMode = 'input'
   | 'pwm'
   | 'rx'
   | 'tx';
-export type PortExpanderDigitalPinMode = 'input' | 'input_pullup' | 'input_pulldown' | 'output';
 export type PortExpanderAnalogPinMode = 'analog_input' | 'analog_output';
 
 export interface ExpanderDriverProps {
@@ -166,7 +165,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     return this.state.getAllState();
   }
 
-  async getDigitalPinMode(pin: number): Promise<PortExpanderDigitalPinMode | undefined> {
+  async getDigitalPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     return this.digitalPins.getPinMode(pin);
   }
 
@@ -189,6 +188,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   removeDigitalListener(handlerIndex: number) {
     this.state.digitalEvents.removeListener(handlerIndex);
   }
+
+  // removeAllDigitalListeners() {
+  //   this.state.digitalEvents.removeAll();
+  // }
 
   /**
    * Returns the current value of a digital pin.
@@ -231,6 +234,10 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   removeAnalogListener(handlerIndex: number) {
     this.state.analogEvents.removeListener(handlerIndex);
   }
+
+  // removeAllAnalogListeners() {
+  //   this.state.analogEvents.removeAll();
+  // }
 
   readAnalog(pin: number): Promise<number> {
     return this.analogPins.read(pin);
