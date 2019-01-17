@@ -182,10 +182,6 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private async writeAllDataAndSetState(partialData: Data): Promise<void> {
-
-    // TODO: при повторном запуске - только обновлять данные для отправки
-    // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
-
     const oldData: Data = {};
 
     for (let key of Object.keys(partialData)) oldData[key] = cloneDeep(partialData[key]);
@@ -206,7 +202,13 @@ export default abstract class DeviceDataManagerBase {
     catch (err) {
       // on error return to previous state
       // set to local data
-      this.setLocalData(oldData);
+      //this.setLocalData(oldData);
+
+      for (let key of updatedParams) {
+        // if state hasn't changed while request was in process then set old value
+        if (partialData[key] === this.localData[key]) this.localData[key] = oldData[key];
+      }
+
       //  rise events change event and publish
       this.emitOnChange(updatedParams);
     }
