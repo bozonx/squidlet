@@ -38,7 +38,10 @@ export default abstract class DeviceDataManagerBase {
   abstract read: () => Promise<Data>;
   abstract write: (partialData: Data) => Promise<void>;
 
-  protected localData: Data = {};
+  // state which in consistency with remote state
+  protected localState: Data = {};
+  // temporary state which sets while save request is in progress
+  protected tmpState?: Data;
 
 
   constructor(deviceId: string, system: System, schema: Schema, republishInterval?: number) {
@@ -64,8 +67,13 @@ export default abstract class DeviceDataManagerBase {
     });
   }
 
-  getLocal(): Data {
-    return this.localData;
+  /**
+   * Get local state. It returns temporary state if it set else local state.
+   */
+  getState(): Data {
+    if (this.tmpState) return this.tmpState;
+
+    return this.localState;
   }
 
   onChange(cb: ChangeHandler): number {
@@ -98,18 +106,18 @@ export default abstract class DeviceDataManagerBase {
    */
   protected async readAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
-    if (!this.getter) return this.localData;
+    if (!this.getter) return this.getState();
 
     // else fetch data if getter is defined
 
     const result: Data = await this.justReadAllData();
 
     // set to local data
-    const updatedParams = this.setLocalData(result);
+    const updatedParams = this.setLocalState(result);
     //  rise events change event and publish
     this.emitOnChange(updatedParams);
 
-    return this.localData;
+    return this.localState;
   }
 
   /**
@@ -119,7 +127,7 @@ export default abstract class DeviceDataManagerBase {
    */
   protected async readJustParam(paramName: string): Promise<any> {
     // if there isn't a data getter - just return local status
-    if (!this.getter) return this.localData[paramName];
+    if (!this.getter) return this.getState()[paramName];
     // else fetch status if getter is defined
 
     const result: Data = await this.doRequest(
@@ -130,14 +138,14 @@ export default abstract class DeviceDataManagerBase {
     this.validateParam(paramName, result[paramName], `Invalid "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`);
 
     // set to local data and rise events
-    const wasSet = this.setLocalDataParam(paramName, result[paramName]);
+    const wasSet = this.setLocalStateParam(paramName, result[paramName]);
 
     if (wasSet) {
       //  rise events change event and publish
       this.emitOnChange([paramName]);
     }
 
-    return this.localData[paramName];
+    return this.localState[paramName];
   }
 
   /**
@@ -154,7 +162,7 @@ export default abstract class DeviceDataManagerBase {
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
       // set to local data
-      const updatedParams = this.setLocalData(partialData);
+      const updatedParams = this.setLocalState(partialData);
       //  rise events change event and publish
       this.emitOnChange(updatedParams);
 
@@ -193,17 +201,17 @@ export default abstract class DeviceDataManagerBase {
 
     this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data
-    this.localData = {
-      ...this.localData,
+    this.localState = {
+      ...this.localState,
       result,
     };
     // rise change events and publish on all the params
-    this.emitOnChange(Object.keys(this.localData));
+    this.emitOnChange(Object.keys(this.localState));
   }
 
   private async justReadAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
-    if (!this.getter) return this.localData;
+    if (!this.getter) return this.getState();
     // else fetch config if getter is defined
 
     const result: Data = await this.doRequest(
@@ -217,12 +225,17 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private async writeAllDataAndSetState(partialData: Data): Promise<void> {
+    // if (!this.tmpState) {
+    //   this.tmpState = cloneDeep(this.localState);
+    // }
+
     const oldData: Data = {};
 
     for (let key of Object.keys(partialData)) oldData[key] = cloneDeep(partialData[key]);
 
+    // TODO: она очистит tmp state
     // set to local data
-    const updatedParams = this.setLocalData(partialData);
+    const updatedParams = this.setLocalState(partialData);
     //  rise events change event and publish
     this.emitOnChange(updatedParams);
 
@@ -239,15 +252,15 @@ export default abstract class DeviceDataManagerBase {
       // on error return to previous state
       const currentData: Data = {};
       // collect current data
-      for (let key of updatedParams) currentData[key] = this.localData[key];
+      for (let key of updatedParams) currentData[key] = this.localState[key];
 
       // do nothing if some param has been changed while request was in progress
       if (!isEqual(currentData, partialData)) return;
 
       // set old data to localData
-      //for (let key of updatedParams) this.localData[key] = oldData[key];
-      this.localData = {
-        ...this.localData,
+      //for (let key of updatedParams) this.localState[key] = oldData[key];
+      this.localState = {
+        ...this.localState,
         ...oldData,
       };
 
@@ -309,21 +322,22 @@ export default abstract class DeviceDataManagerBase {
 
   /**
    * Set whole structure to local data.
+   * It clears tmp state and set consistent new state.
    * @returns {string} List of params names which were updated
    */
-  private setLocalData(partialData: Data): string[] {
+  private setLocalState(partialData: Data): string[] {
     const updatedParams: string[] = [];
 
     for (let name of Object.keys(partialData)) {
-      if (partialData[name] !== this.localData[name]) updatedParams.push(name);
+      if (partialData[name] !== this.localState[name]) updatedParams.push(name);
     }
 
     // do nothing if there isn't changed data
     if (!updatedParams.length) return updatedParams;
 
     // update local data
-    this.localData = {
-      ...this.localData,
+    this.localState = {
+      ...this.localState,
       ...partialData,
     };
 
@@ -334,10 +348,13 @@ export default abstract class DeviceDataManagerBase {
    * Set param to local data.
    * If param was set it returns true else false
    */
-  private setLocalDataParam(paramName: string, value: any): boolean {
-    if (this.localData[paramName] === value) return false;
+  private setLocalStateParam(paramName: string, value: any): boolean {
 
-    this.localData[paramName] = value;
+    // TODO: review
+
+    if (this.localState[paramName] === value) return false;
+
+    this.localState[paramName] = value;
 
     return true;
   }
@@ -363,7 +380,7 @@ export default abstract class DeviceDataManagerBase {
     const result: Data = await this.justReadAllData();
 
     // set to local data
-    const updatedParams = this.setLocalData(result);
+    const updatedParams = this.setLocalState(result);
 
     // rise events change event
     if (updatedParams.length) {
@@ -372,7 +389,7 @@ export default abstract class DeviceDataManagerBase {
     }
 
     // publish state any way even values hasn't changed
-    this.publishState(Object.keys(this.getLocal()), true);
+    this.publishState(Object.keys(this.getState()), true);
   }
 
 }

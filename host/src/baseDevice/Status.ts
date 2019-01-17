@@ -40,7 +40,7 @@ export default class Status extends DeviceDataManagerBase {
   protected publishState = (changedParams: string[], isRepeat: boolean) => {
     // publish all the statuses
     for (let statusName of changedParams) {
-      this.publishOneStatus(statusName, this.localData[statusName], isRepeat);
+      this.publishOneStatus(statusName, this.getState()[statusName], isRepeat);
     }
   }
 

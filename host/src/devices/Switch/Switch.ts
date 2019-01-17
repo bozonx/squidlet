@@ -44,7 +44,7 @@ export default class Switch extends DeviceBase<Props> {
       // TODO: може лучше использватть getStatus
 
       // skip while switch at block time
-      if (this.binaryOutput.isBlocked()) return this.status.getLocal().default;
+      if (this.binaryOutput.isBlocked()) return this.status.getState().default;
 
       const level: boolean = convertToLevel(onOrOff);
 
@@ -55,7 +55,7 @@ export default class Switch extends DeviceBase<Props> {
 
     toggle: async (): Promise<boolean> => {
       // skip while switch at block time
-      if (this.binaryOutput.isBlocked()) return this.status.getLocal().default;
+      if (this.binaryOutput.isBlocked()) return this.status.getState().default;
 
       const currentLevel: boolean = await this.getStatus();
       const resultLevel: boolean = !currentLevel;

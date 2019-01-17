@@ -59,7 +59,7 @@ describe 'devices.Switch', ->
     sinon.assert.calledOnce(@outputDriver.write)
     sinon.assert.calledWith(@outputDriver.write, false)
     assert.isFalse(result)
-    assert.isFalse(@switch.status.getLocal().default)
+    assert.isFalse(@switch.status.getState().default)
 
     # TODO: once or twice ???
     sinon.assert.calledOnce(@handleStatusChange);
@@ -78,7 +78,7 @@ describe 'devices.Switch', ->
 
     await @switch.action('toggle')
 
-    assert.isFalse(@switch.status.getLocal().default)
+    assert.isFalse(@switch.status.getState().default)
     sinon.assert.calledOnce(@outputDriver.write)
     sinon.assert.calledWith(@outputDriver.write, false)
 
@@ -88,7 +88,7 @@ describe 'devices.Switch', ->
 
     await @switch.action('toggle')
 
-    assert.isTrue(@switch.status.getLocal().default)
+    assert.isTrue(@switch.status.getState().default)
     sinon.assert.calledOnce(@outputDriver.write)
     sinon.assert.calledWith(@outputDriver.write, true)
 

@@ -73,7 +73,7 @@ describe 'devices.BinarySensor', ->
 #    await @readResult
 #
 #    # after setStatus
-#    assert.equal(@binarySensor.status.getLocal().default, true)
+#    assert.equal(@binarySensor.status.getState().default, true)
 #
 #    sinon.assert.calledOnce(@handleStatusChange);
 #    sinon.assert.calledWith(@handleStatusChange, ['default']);
@@ -90,7 +90,7 @@ describe 'devices.BinarySensor', ->
 #
 #  it "main logic - debounceType = throttle", ->
 #    @definition.props.debounceType = 'throttle'
-#    assert.equal(@binarySensor.status.getLocal().default, false)
+#    assert.equal(@binarySensor.status.getState().default, false)
 #
 #    @readResult = Promise.resolve(true)
 #    clock = sinon.useFakeTimers()
@@ -110,7 +110,7 @@ describe 'devices.BinarySensor', ->
 #    await @readResult
 #
 #    # after setStatus
-#    assert.equal(@binarySensor.status.getLocal().default, true)
+#    assert.equal(@binarySensor.status.getState().default, true)
 #
 #    sinon.assert.calledOnce(@handleStatusChange);
 #    sinon.assert.calledWith(@handleStatusChange, ['default']);
