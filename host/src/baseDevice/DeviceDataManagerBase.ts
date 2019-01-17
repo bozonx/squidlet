@@ -93,8 +93,8 @@ export default abstract class DeviceDataManagerBase {
 
   /**
    * Returns full dataset.
-   * If getter is set: read data using 'getter'
-   * It there isn't a getter - return 'localData'
+   * If getter is set: read data using "getter"
+   * It there isn't a getter - return "localData"
    */
   protected async readAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
@@ -114,6 +114,8 @@ export default abstract class DeviceDataManagerBase {
 
   /**
    * Get certain param value from device.
+   * If getter is set: read data using "getter"
+   * It there isn't a getter - return "localData"
    */
   protected async readJustParam(paramName: string): Promise<any> {
     // if there isn't a data getter - just return local status
@@ -138,6 +140,11 @@ export default abstract class DeviceDataManagerBase {
     return this.localData[paramName];
   }
 
+  /**
+   * Write full dataset.
+   * If getter is set: it writes data using "setter" and update "localData"
+   * It there isn't a getter - it sets to "localData"
+   */
   protected async writeData(partialData: Data): Promise<void> {
     this.validateDict(partialData,
       `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
@@ -153,12 +160,36 @@ export default abstract class DeviceDataManagerBase {
     }
     // else do request to device if getter is defined
 
+    return this.justWriteAllData(partialData);
+  }
+
+
+  private async justReadAllData(): Promise<Data> {
+    // if there isn't a data getter - just return local config
+    if (!this.getter) return this.localData;
+    // else fetch config if getter is defined
+
+    const result: Data = await this.load(
+      this.getter,
+      `Can't fetch ${this.typeNameOfData} of device "${this.deviceId}"`
+    );
+
+    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+
+    return result;
+  }
+
+  private async justWriteAllData(partialData: Data): Promise<void> {
+
     // TODO: при повторном запуске - только обновлять данные для отправки
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
     // TODO: поидее только те поля которые сохраняются
     // TODO: можно ли обойтись без cloneDeep?
     const oldData = cloneDeep(this.localData);
+
+
+
     // set to local data
     const updatedParams = this.setLocalData(partialData);
     //  rise events change event and publish
@@ -180,7 +211,7 @@ export default abstract class DeviceDataManagerBase {
 
   }
 
-  protected validateParam(paramName: string, value: any, errorMsg: string) {
+  private validateParam(paramName: string, value: any, errorMsg: string) {
 
     // TODO: review
 
@@ -194,7 +225,7 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
-  protected validateDict(dict: {[index: string]: any}, errorMsg: string) {
+  private validateDict(dict: {[index: string]: any}, errorMsg: string) {
 
     // TODO: review
 
@@ -208,7 +239,7 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
-  protected async load(fetcher: () => any, errorMsg: string): Promise<any> {
+  private async load(fetcher: () => any, errorMsg: string): Promise<any> {
     let result;
 
     // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
@@ -228,7 +259,7 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  protected async save(fetcher: () => void, errorMsg: string): Promise<any> {
+  private async save(fetcher: () => void, errorMsg: string): Promise<any> {
     let result;
 
     // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
@@ -241,22 +272,6 @@ export default abstract class DeviceDataManagerBase {
       this.system.log.error(`${errorMsg}: ${err.toString()}`);
       throw new Error(err);
     }
-
-    return result;
-  }
-
-
-  private async justReadAllData(): Promise<Data> {
-    // if there isn't a data getter - just return local config
-    if (!this.getter) return this.localData;
-    // else fetch config if getter is defined
-
-    const result: Data = await this.load(
-      this.getter,
-      `Can't fetch ${this.typeNameOfData} of device "${this.deviceId}"`
-    );
-
-    this.validateDict(result, `Invalid fetched ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
 
     return result;
   }
@@ -343,6 +358,8 @@ export default abstract class DeviceDataManagerBase {
       this.changeEvents.emit(updatedParams);
       this.republish.start(this.republishCb);
     }
+
+    // TODO: если updatedParams пустая - зачем делать publish ??
 
     // emit publish event
     this.publishState(updatedParams, false);
