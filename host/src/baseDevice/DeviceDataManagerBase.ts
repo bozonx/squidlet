@@ -3,7 +3,7 @@ import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
-import {cloneDeep} from '../helpers/lodashLike';
+import {cloneDeep, isEmpty} from '../helpers/lodashLike';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -146,6 +146,8 @@ export default abstract class DeviceDataManagerBase {
    * It there isn't a getter - it sets to "localData"
    */
   protected async writeData(partialData: Data): Promise<void> {
+    if (isEmpty(partialData)) return;
+
     this.validateDict(partialData,
       `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
@@ -158,9 +160,9 @@ export default abstract class DeviceDataManagerBase {
 
       return;
     }
-    // else do request to device if getter is defined
+    // else do request
 
-    return this.justWriteAllData(partialData);
+    return this.writeAllDataAndSetState(partialData);
   }
 
 
@@ -179,16 +181,16 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  private async justWriteAllData(partialData: Data): Promise<void> {
+  private async writeAllDataAndSetState(partialData: Data): Promise<void> {
 
     // TODO: при повторном запуске - только обновлять данные для отправки
     // TODO: что будет со значение которое было установленно в промежутке пока идет запрос и оно отличалось от старого???
 
-    // TODO: поидее только те поля которые сохраняются
-    // TODO: можно ли обойтись без cloneDeep?
-    const oldData = cloneDeep(this.localData);
+    const oldData: Data = {};
 
+    for (let key of Object.keys(partialData)) oldData[key] = cloneDeep(partialData[key]);
 
+    //cloneDeep(this.localData);
 
     // set to local data
     const updatedParams = this.setLocalData(partialData);
@@ -208,7 +210,6 @@ export default abstract class DeviceDataManagerBase {
       //  rise events change event and publish
       this.emitOnChange(updatedParams);
     }
-
   }
 
   private validateParam(paramName: string, value: any, errorMsg: string) {

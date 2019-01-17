@@ -4,10 +4,15 @@ const _padStart = require('lodash/padStart');
 
 // TODO: test
 
+/**
+ * When undefined, null, '', [] or {}.
+ * 0 is not empty!
+ * @param toCheck
+ */
 export function isEmpty(toCheck: any): boolean {
   if (typeof toCheck == 'undefined' || toCheck === null || toCheck === '') return true;
-  if (toCheck instanceof Array && !toCheck.length) return true;
-  if (typeof toCheck === 'object' && !Object.keys(toCheck).length) return true;
+  else if (toCheck instanceof Array && !toCheck.length) return true;
+  else if (typeof toCheck === 'object' && !Object.keys(toCheck).length) return true;
 
   return false;
 }
@@ -84,12 +89,14 @@ export function cloneDeep(value: any): any {
   // not cloneable
   if (
     value === null
-    || typeof value === 'string'
     || typeof value === 'number'
     || typeof value === 'undefined'
     || typeof value === 'function'
   ) {
     return value;
+  }
+  if (typeof value === 'string') {
+    return '' + value;
   }
   else if (isUint8Array(value)) {
     const oldArr: Uint8Array = value;
