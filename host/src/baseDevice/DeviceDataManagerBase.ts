@@ -3,7 +3,8 @@ import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
-import {cloneDeep, isEmpty} from '../helpers/lodashLike';
+import {cloneDeep, isEmpty, isEqual} from '../helpers/lodashLike';
+import {mergeDeep} from '../helpers/helpers';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -201,15 +202,19 @@ export default abstract class DeviceDataManagerBase {
     }
     catch (err) {
       // on error return to previous state
-      // set to local data
-      //this.setLocalData(oldData);
+      // for (let key of updatedParams) {
+      //   // if state hasn't changed while request was in process then set old value
+      //   if (partialData[key] === this.localData[key]) this.localData[key] = oldData[key];
+      // }
 
-      for (let key of updatedParams) {
-        // if state hasn't changed while request was in process then set old value
-        if (partialData[key] === this.localData[key]) this.localData[key] = oldData[key];
-      }
-
-      //  rise events change event and publish
+      const currentData: Data = {};
+      // collect current data
+      for (let key of updatedParams) currentData[key] = this.localData[key];
+      // do nothing if some param has been changed while request was in progress
+      if (!isEqual(currentData, partialData)) return;
+      // set old data to localData
+      for (let key of updatedParams) this.localData[key] = oldData[key];
+      //  rise change event and publish
       this.emitOnChange(updatedParams);
     }
   }
