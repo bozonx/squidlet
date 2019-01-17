@@ -107,6 +107,9 @@ export default abstract class DeviceDataManagerBase {
   protected async readAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!this.getter) return this.getState();
+    // if there is a writing request in progress
+    // then disallow making read request and return data which will be saved
+    else if (this.tmpState) return this.getState();
 
     // else fetch data if getter is defined
 
@@ -114,10 +117,12 @@ export default abstract class DeviceDataManagerBase {
 
     // set to local data
     const updatedParams = this.setLocalState(result);
+    // clear temporary state because we have the last one
+    this.tmpState = undefined;
     //  rise events change event and publish
     this.emitOnChange(updatedParams);
 
-    return this.localState;
+    return this.getState();
   }
 
   /**
@@ -129,6 +134,9 @@ export default abstract class DeviceDataManagerBase {
     // if there isn't a data getter - just return local status
     if (!this.getter) return this.getState()[paramName];
     // else fetch status if getter is defined
+    // if there is a writing request in progress
+    // then disallow making read request and return data which will be saved
+    else if (this.tmpState) return this.getState()[paramName];
 
     const result: Data = await this.doRequest(
       () => this.getter && this.getter([paramName]),
@@ -141,11 +149,14 @@ export default abstract class DeviceDataManagerBase {
     const wasSet = this.setLocalStateParam(paramName, result[paramName]);
 
     if (wasSet) {
+      // update last consistent param value if there is a temporary state
+      if (this.tmpState) (this.tmpState as any)[paramName] = result[paramName];
+
       //  rise events change event and publish
       this.emitOnChange([paramName]);
     }
 
-    return this.localState[paramName];
+    return this.getState()[paramName];
   }
 
   /**
@@ -335,9 +346,6 @@ export default abstract class DeviceDataManagerBase {
    * If param was set it returns true else false
    */
   private setLocalStateParam(paramName: string, value: any): boolean {
-
-    // TODO: review
-
     if (this.localState[paramName] === value) return false;
 
     this.localState[paramName] = value;
@@ -367,6 +375,8 @@ export default abstract class DeviceDataManagerBase {
 
     // set to local data
     const updatedParams = this.setLocalState(result);
+    // clear temporary state because we have the last one
+    this.tmpState = undefined;
 
     // rise events change event
     if (updatedParams.length) {
