@@ -76,15 +76,26 @@ export default abstract class DeviceDataManagerBase {
     return this.publishEvents.addListener(cb);
   }
 
+  /**
+   * Remove listener which was set by 'onChange'
+   */
   removeListener(handlerIndex: number): void {
     this.changeEvents.removeListener(handlerIndex);
   }
 
+  /**
+   * Remove listener which was set by 'onPublish'
+   */
   removePublishListener(handlerIndex: number): void {
     this.publishEvents.removeListener(handlerIndex);
   }
 
 
+  /**
+   * Returns full dataset.
+   * If getter is set: read data using 'getter'
+   * It there isn't a getter - return 'localData'
+   */
   protected async readAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!this.getter) return this.localData;
@@ -104,27 +115,27 @@ export default abstract class DeviceDataManagerBase {
   /**
    * Get certain param value from device.
    */
-  protected async readJustParam(statusName: string): Promise<any> {
+  protected async readJustParam(paramName: string): Promise<any> {
     // if there isn't a data getter - just return local status
-    if (!this.getter) return this.localData[statusName];
+    if (!this.getter) return this.localData[paramName];
     // else fetch status if getter is defined
 
     const result: Data = await this.load(
-      () => this.getter && this.getter([statusName]),
-      `Can't fetch "${this.typeNameOfData}" "${statusName}" of device "${this.deviceId}"`
+      () => this.getter && this.getter([paramName]),
+      `Can't fetch "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`
     );
 
-    this.validateParam(statusName, result[statusName], `Invalid "${this.typeNameOfData}" "${statusName}" of device "${this.deviceId}"`);
+    this.validateParam(paramName, result[paramName], `Invalid "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`);
 
     // set to local data and rise events
-    const wasSet = this.setLocalDataParam(statusName, result[statusName]);
+    const wasSet = this.setLocalDataParam(paramName, result[paramName]);
 
     if (wasSet) {
       //  rise events change event and publish
-      this.emitOnChange([statusName]);
+      this.emitOnChange([paramName]);
     }
 
-    return this.localData[statusName];
+    return this.localData[paramName];
   }
 
   protected async writeData(partialData: Data): Promise<void> {
@@ -169,11 +180,11 @@ export default abstract class DeviceDataManagerBase {
 
   }
 
-  protected validateParam(statusName: string, value: any, errorMsg: string) {
+  protected validateParam(paramName: string, value: any, errorMsg: string) {
 
     // TODO: review
 
-    const validateError: string | undefined = validateParam(this.schema, statusName, value);
+    const validateError: string | undefined = validateParam(this.schema, paramName, value);
 
     if (validateError) {
       const completeErrMsg = `${errorMsg}: ${validateError}`;
@@ -209,7 +220,8 @@ export default abstract class DeviceDataManagerBase {
       result = await fetcher();
     }
     catch(err) {
-      this.system.log.error(`${errorMsg}: ${err.toString()}`);
+      console.log(111111111, err)
+      this.system.log.error(`${errorMsg}: ${String(err)}`);
       throw new err;
     }
 
@@ -292,8 +304,7 @@ export default abstract class DeviceDataManagerBase {
 
   /**
    * Set whole structure to local data.
-   * If structure was set it returns true else false.
-   * @returns {string} List of params names which was updated
+   * @returns {string} List of params names which were updated
    */
   private setLocalData(partialData: Data): string[] {
     const updatedParams: string[] = [];

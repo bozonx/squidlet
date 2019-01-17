@@ -90,7 +90,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    */
   async pollOnce(): Promise<void> {
     if (!this.props.feedback) {
-      throw new Error(`MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured`);
+      throw new Error(
+        `MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured. `
+        + `Props are "${JSON.stringify(this.props)}"`
+      );
     }
 
     for (let item of this.props.poll) {
