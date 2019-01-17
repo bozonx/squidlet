@@ -4,7 +4,6 @@ import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
 import {cloneDeep, isEmpty, isEqual} from '../helpers/lodashLike';
-import {mergeDeep} from '../helpers/helpers';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -187,8 +186,6 @@ export default abstract class DeviceDataManagerBase {
 
     for (let key of Object.keys(partialData)) oldData[key] = cloneDeep(partialData[key]);
 
-    //cloneDeep(this.localData);
-
     // set to local data
     const updatedParams = this.setLocalData(partialData);
     //  rise events change event and publish
@@ -202,16 +199,13 @@ export default abstract class DeviceDataManagerBase {
     }
     catch (err) {
       // on error return to previous state
-      // for (let key of updatedParams) {
-      //   // if state hasn't changed while request was in process then set old value
-      //   if (partialData[key] === this.localData[key]) this.localData[key] = oldData[key];
-      // }
-
       const currentData: Data = {};
       // collect current data
       for (let key of updatedParams) currentData[key] = this.localData[key];
+
       // do nothing if some param has been changed while request was in progress
       if (!isEqual(currentData, partialData)) return;
+
       // set old data to localData
       for (let key of updatedParams) this.localData[key] = oldData[key];
       //  rise change event and publish
