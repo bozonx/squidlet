@@ -122,7 +122,7 @@ export default abstract class DeviceDataManagerBase {
     if (!this.getter) return this.localData[paramName];
     // else fetch status if getter is defined
 
-    const result: Data = await this.load(
+    const result: Data = await this.doRequest(
       () => this.getter && this.getter([paramName]),
       `Can't fetch "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`
     );
@@ -170,13 +170,13 @@ export default abstract class DeviceDataManagerBase {
     let result: Data;
 
     if (this.initialize) {
-      result = await this.load(
+      result = await this.doRequest(
         this.initialize,
         `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via initialize`
       );
     }
     else if (this.getter) {
-      result = await this.load(
+      result = await this.doRequest(
         this.getter,
         `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via getter`
       );
@@ -197,7 +197,7 @@ export default abstract class DeviceDataManagerBase {
     if (!this.getter) return this.localData;
     // else fetch config if getter is defined
 
-    const result: Data = await this.load(
+    const result: Data = await this.doRequest(
       this.getter,
       `Can't fetch ${this.typeNameOfData} of device "${this.deviceId}"`
     );
@@ -218,7 +218,7 @@ export default abstract class DeviceDataManagerBase {
     this.emitOnChange(updatedParams);
 
     try {
-      await this.save(
+      await this.doRequest(
         () => this.setter && this.setter(partialData),
         `Can't save ${this.typeNameOfData} "${JSON.stringify(partialData)}" of device "${this.deviceId}"`
       );
@@ -267,38 +267,15 @@ export default abstract class DeviceDataManagerBase {
     }
   }
 
-  private async load(fetcher: () => any, errorMsg: string): Promise<any> {
+  private async doRequest(fetcher: () => any, errorMsg: string): Promise<any> {
     let result;
-
-    // TODO: встать в очередь(дождаться пока выполнится текущий запрос) и не давать перебить его запросом единичных статустов
-
-    // TODO: если запрос статуса в процессе - то не делать новый запрос, а ждать пока пройдет текущий запрос
-      // установить в очередь следующий запрос и все новые запросы будут получать результат того что в очереди
 
     try {
       result = await fetcher();
     }
     catch(err) {
-      console.log(111111111, err)
       this.system.log.error(`${errorMsg}: ${String(err)}`);
-      throw new err;
-    }
-
-    return result;
-  }
-
-  private async save(fetcher: () => void, errorMsg: string): Promise<any> {
-    let result;
-
-    // TODO: если запрос установки статуса в процессе - то дождаться завершения и сделать новый запрос,
-      // при этом в очереди может быть только 1 запрос - самый последний
-
-    try {
-      result = await fetcher();
-    }
-    catch(err) {
-      this.system.log.error(`${errorMsg}: ${err.toString()}`);
-      throw new Error(err);
+      throw err;
     }
 
     return result;
