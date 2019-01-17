@@ -166,6 +166,32 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
+  private async initFirstValue() {
+    let result: Data;
+
+    if (this.initialize) {
+      result = await this.load(
+        this.initialize,
+        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via initialize`
+      );
+    }
+    else if (this.getter) {
+      result = await this.load(
+        this.getter,
+        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via getter`
+      );
+    }
+    else {
+      result = this.getDefaultValues();
+    }
+
+    this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
+    // set to local data
+    const updatedParams = this.setLocalData(result);
+    //  rise events change event and publish
+    this.emitOnChange(updatedParams);
+  }
+
   private async justReadAllData(): Promise<Data> {
     // if there isn't a data getter - just return local config
     if (!this.getter) return this.localData;
@@ -198,6 +224,9 @@ export default abstract class DeviceDataManagerBase {
       );
     }
     catch (err) {
+
+      // TODO: нужно гарантированно знать что это последний промис, а предыдущие catch не должны отрабатывать
+
       // on error return to previous state
       const currentData: Data = {};
       // collect current data
@@ -207,36 +236,33 @@ export default abstract class DeviceDataManagerBase {
       if (!isEqual(currentData, partialData)) return;
 
       // set old data to localData
-      for (let key of updatedParams) this.localData[key] = oldData[key];
+      //for (let key of updatedParams) this.localData[key] = oldData[key];
+      this.localData = {
+        ...this.localData,
+        ...oldData,
+      };
+
       //  rise change event and publish
       this.emitOnChange(updatedParams);
     }
   }
 
   private validateParam(paramName: string, value: any, errorMsg: string) {
-
-    // TODO: review
-
     const validateError: string | undefined = validateParam(this.schema, paramName, value);
 
     if (validateError) {
       const completeErrMsg = `${errorMsg}: ${validateError}`;
 
-      this.system.log.error(completeErrMsg);
       throw new Error(completeErrMsg);
     }
   }
 
   private validateDict(dict: {[index: string]: any}, errorMsg: string) {
-
-    // TODO: review
-
     const validateError: string | undefined = validateDict(this.schema, dict);
 
     if (validateError) {
       const completeErrMsg = `${errorMsg}: ${validateError}`;
 
-      this.system.log.error(completeErrMsg);
       throw new Error(completeErrMsg);
     }
   }
@@ -278,34 +304,8 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  private async initFirstValue() {
-    let result: Data;
-
-    if (this.initialize) {
-      result = await this.load(
-        this.initialize,
-        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via initialize`
-      );
-    }
-    else if (this.getter) {
-      result = await this.load(
-        this.getter,
-        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via getter`
-      );
-    }
-    else {
-      result = this.getDefaultValues();
-    }
-
-    this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
-    // set to local data
-    const updatedParams = this.setLocalData(result);
-    //  rise events change event and publish
-    this.emitOnChange(updatedParams);
-  }
-
   /**
-   * Set default values to local data
+   * Get default values from schema of local state
    */
   private getDefaultValues(): Data {
     const result: Data = {};
@@ -355,22 +355,23 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private emitOnChange(updatedParams: string[]) {
-    if (updatedParams.length) {
-      // emit change event
-      this.changeEvents.emit(updatedParams);
-      this.republish.start(this.republishCb);
-    }
+    if (!updatedParams.length) return;
 
-    // TODO: если updatedParams пустая - зачем делать publish ??
-
+    // emit change event
+    this.changeEvents.emit(updatedParams);
+    // start/restart republish logic
+    this.republish.start(this.republishCb);
     // emit publish event
     this.publishState(updatedParams, false);
   }
 
   /**
-   * Republish current state
+   * Republish current state.
+   * It reads current data and set it to localState.
+   * And do publish.
    */
   private republishCb = async () => {
+    // read current data
     const result: Data = await this.justReadAllData();
 
     // set to local data
@@ -382,6 +383,7 @@ export default abstract class DeviceDataManagerBase {
       this.changeEvents.emit(updatedParams);
     }
 
+    // publish state any way even values hasn't changed
     this.publishState(Object.keys(this.getLocal()), true);
   }
 
