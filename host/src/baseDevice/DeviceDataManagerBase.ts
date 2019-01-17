@@ -3,7 +3,7 @@ import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
-import {cloneDeep, isEmpty, isEqual} from '../helpers/lodashLike';
+import {cloneDeep, isEmpty} from '../helpers/lodashLike';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -225,15 +225,10 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private async writeAllDataAndSetState(partialData: Data): Promise<void> {
-    // if (!this.tmpState) {
-    //   this.tmpState = cloneDeep(this.localState);
-    // }
+    if (!this.tmpState) {
+      this.tmpState = cloneDeep(this.localState);
+    }
 
-    const oldData: Data = {};
-
-    for (let key of Object.keys(partialData)) oldData[key] = cloneDeep(partialData[key]);
-
-    // TODO: она очистит tmp state
     // set to local data
     const updatedParams = this.setLocalState(partialData);
     //  rise events change event and publish
@@ -246,29 +241,20 @@ export default abstract class DeviceDataManagerBase {
       );
     }
     catch (err) {
+      // restore last consistent state
+      if (this.tmpState) {
+        const updatedParams = this.setLocalState(this.tmpState);
 
-      // TODO: нужно гарантированно знать что это последний промис, а предыдущие catch не должны отрабатывать
-
-      // on error return to previous state
-      const currentData: Data = {};
-      // collect current data
-      for (let key of updatedParams) currentData[key] = this.localState[key];
-
-      // do nothing if some param has been changed while request was in progress
-      if (!isEqual(currentData, partialData)) return;
-
-      // set old data to localData
-      //for (let key of updatedParams) this.localState[key] = oldData[key];
-      this.localState = {
-        ...this.localState,
-        ...oldData,
-      };
-
-      //  rise change event and publish
-      this.emitOnChange(updatedParams);
+        this.tmpState = undefined;
+        //  rise events change event and publish
+        this.emitOnChange(updatedParams);
+      }
 
       throw err;
     }
+
+    // on success
+    this.tmpState = undefined;
   }
 
   private validateParam(paramName: string, value: any, errorMsg: string) {
