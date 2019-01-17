@@ -166,6 +166,12 @@ export default abstract class DeviceDataManagerBase {
   }
 
 
+  /**
+   * Gets initial value:
+   * * if "initialize" callback is set - it tries call it and set data which is received
+   * * else if "getter" callback is set - it tries call it and set data which is received
+   * * else get default values from schema
+   */
   private async initFirstValue() {
     let result: Data;
 
@@ -187,9 +193,12 @@ export default abstract class DeviceDataManagerBase {
 
     this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data
-    const updatedParams = this.setLocalData(result);
-    //  rise events change event and publish
-    this.emitOnChange(updatedParams);
+    this.localData = {
+      ...this.localData,
+      result,
+    };
+    // rise change events and publish on all the params
+    this.emitOnChange(Object.keys(this.localData));
   }
 
   private async justReadAllData(): Promise<Data> {
@@ -244,6 +253,8 @@ export default abstract class DeviceDataManagerBase {
 
       //  rise change event and publish
       this.emitOnChange(updatedParams);
+
+      throw err;
     }
   }
 
