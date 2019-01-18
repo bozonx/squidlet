@@ -52,11 +52,8 @@ export default class DigitalDev implements Digital {
       ...convertedMode,
     });
 
-    // set initial value
-    if (typeof outputInitialValue !== 'undefined') {
-      //throw new Error(`You have to specify an outputInitialValue`);
-      await this.write(pin, outputInitialValue);
-    }
+    // set initial value if is set
+    if (typeof outputInitialValue !== 'undefined') await this.write(pin, outputInitialValue);
   }
 
   /**
@@ -93,11 +90,6 @@ export default class DigitalDev implements Digital {
   }
 
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-
-    // TODO: review
-    // TODO: remove
-    //if (!this.pinInstances[pin]) return 0;
-
     const pinInstance = this.getPinInstance('setWatch', pin);
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);
@@ -128,10 +120,15 @@ export default class DigitalDev implements Digital {
       throw new Error(`You have to specify a watch id`);
     }
 
+    // it has been removed recently
+    if (!this.alertListeners[id]) return;
+
     const {pin, handler} = this.alertListeners[id];
     const pinInstance = this.getPinInstance('clearWatch', pin);
 
     pinInstance.off('interrupt', handler);
+
+    delete this.alertListeners[id];
   }
 
   async clearAllWatches(): Promise<void> {
