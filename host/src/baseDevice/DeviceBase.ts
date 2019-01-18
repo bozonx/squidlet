@@ -19,6 +19,9 @@ export interface DeviceBaseProps extends EntityProps {
 
 export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props> {
   protected readonly env: DeviceEnv;
+  /**
+   * Callback to setup initial status to not use statusGetter at init time.
+   */
   protected initialStatus?: Initialize;
   protected statusGetter?: Getter;
   protected statusSetter?: Setter;
@@ -80,6 +83,7 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
 
     // handle actions call
     if (this.actions) {
+      // TODO: maybe move to devices ?
       // subscribe to external messages where topic is this device id to call action
       this.env.messenger.subscribeLocal(categories.externalDataIncome, this.id, this.handleIncomeData);
     }

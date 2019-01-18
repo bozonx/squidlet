@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
 import {PortExpanderDriver} from '../PortExpander/PortExpander.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
@@ -11,7 +11,7 @@ interface DigitalPortExpanderDriverProps extends ExpanderDriverProps {
 }
 
 
-export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDriverProps> implements Digital {
+export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDriverProps> implements DigitalSubDriver {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];

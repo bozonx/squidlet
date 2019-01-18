@@ -1,9 +1,9 @@
-import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 
 
-export class DigitalLocalDriver extends DriverBase implements Digital {
+export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {
   private get digitalDev(): Digital {
     return this.depsInstances.digitalDev as Digital;
   }

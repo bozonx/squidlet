@@ -46,7 +46,7 @@ export default class DigitalDev implements Digital {
    * It throws an error if pin hasn't configured before
    */
   async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    const pinInstance = this.getPinInstance(pin);
+    const pinInstance = this.getPinInstance('getPinMode', pin);
     const modeConst: number = pinInstance.getMode();
 
     if (modeConst === Gpio.INPUT) {
@@ -62,20 +62,24 @@ export default class DigitalDev implements Digital {
   }
 
   async read(pin: number): Promise<boolean> {
-    const pinInstance = this.getPinInstance(pin);
+    const pinInstance = this.getPinInstance('read', pin);
 
     return Boolean(pinInstance.digitalRead());
   }
 
   async write(pin: number, value: boolean): Promise<void> {
-    const pinInstance = this.getPinInstance(pin);
+    const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
 
     pinInstance.digitalWrite(numValue);
   }
 
   async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    const pinInstance = this.getPinInstance(pin);
+
+    // TODO: remove
+    //if (!this.pinInstances[pin]) return 0;
+
+    const pinInstance = this.getPinInstance('setWatch', pin);
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);
 
@@ -107,7 +111,7 @@ export default class DigitalDev implements Digital {
     }
 
     const {pin, handler} = this.alertListeners[id];
-    const pinInstance = this.getPinInstance(pin);
+    const pinInstance = this.getPinInstance('clearWatch', pin);
 
     pinInstance.off('interrupt', handler);
   }
@@ -146,9 +150,9 @@ export default class DigitalDev implements Digital {
 
   }
 
-  private getPinInstance(pin: number): Gpio {
+  private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
     if (!this.pinInstances[pin]) {
-      throw new Error(`DigitalDev: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
+      throw new Error(`DigitalDev.${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
 
     return this.pinInstances[pin];

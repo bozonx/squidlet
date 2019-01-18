@@ -14,6 +14,7 @@ props:
     default: both
   debounce:
     type: number
+    default: 0
   pullup:
     type: boolean
     default: false

@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
@@ -11,7 +11,7 @@ interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 }
 
 
-export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements Digital {
+export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements DigitalSubDriver {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];

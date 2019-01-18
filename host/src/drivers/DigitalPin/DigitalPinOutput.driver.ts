@@ -1,10 +1,10 @@
-import GpioDigitalDriver from './interfaces/GpioDigitalDriver';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 import {omit} from '../../helpers/lodashLike';
+import {DigitalSubDriver} from '../../app/interfaces/dev/Digital';
 
 
 export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
@@ -17,7 +17,7 @@ export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverProps> {
-  private get source(): GpioDigitalDriver {
+  private get source(): DigitalSubDriver {
     return this.depsInstances.source as any;
   }
 
@@ -32,7 +32,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   // setup pin after drivers and devices have been initialized
   protected devicesDidInit = async () => {
     // setup and set initial level
-    this.source.setup(this.props.pin, 'output', this.props.initialLevel)
+    this.source.setupOutput(this.props.pin, this.props.initialLevel)
       .catch((err) => {
         this.env.system.log.error(
           `DigitalPinOutputDriver: Can't setup pin. ` +

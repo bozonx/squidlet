@@ -1,4 +1,4 @@
-import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {Edge, DigitalPinMode, WatchHandler, DigitalSubDriver, DigitalInputMode} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -11,7 +11,7 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
   // debounce time in ms only for input pins. If not set system defaults will be used.
   edge: Edge;
   // Listen to low, high or both levels. By default is both.
-  debounce?: number;
+  debounce: number;
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
   pullup?: boolean;
@@ -25,7 +25,7 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
-  private get source(): Digital {
+  private get source(): DigitalSubDriver {
     return this.depsInstances.source as any;
   }
 
@@ -39,7 +39,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
   protected devicesDidInit = async () => {
     // setup pin as an input with resistor if specified
-    this.source.setup(this.props.pin, this.resolvePinMode())
+    this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
       .catch((err) => {
         this.env.system.log.error(
           `DigitalPinInputDriver: Can't setup pin. ` +
@@ -60,7 +60,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * Listen to interruption of pin.
    */
   async addListener(handler: WatchHandler): Promise<number> {
-    return this.source.setWatch(this.props.pin, handler, this.props.debounce, this.resolveEdge());
+    return this.source.setWatch(this.props.pin, handler);
   }
 
   async listenOnce(handler: WatchHandler): Promise<number> {
@@ -72,7 +72,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       handler(level);
     };
 
-    handlerId = await this.source.setWatch(this.props.pin, wrapper, this.props.debounce, this.resolveEdge());
+    handlerId = await this.source.setWatch(this.props.pin, wrapper);
 
     return handlerId;
   }
@@ -82,14 +82,10 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
   }
 
 
-  private resolvePinMode(): DigitalPinMode {
+  private resolvePinMode(): DigitalInputMode {
     if (this.props.pullup) return 'input_pullup';
     else if (this.props.pulldown) return 'input_pulldown';
     else return 'input';
-  }
-
-  private resolveEdge(): Edge {
-    return this.props.edge || 'both';
   }
 
 
