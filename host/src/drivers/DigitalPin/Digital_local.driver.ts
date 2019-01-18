@@ -1,4 +1,10 @@
-import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {
+  DigitalSubDriver,
+  Edge,
+  WatchHandler,
+  Digital,
+  DigitalInputMode
+} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 
@@ -14,13 +20,17 @@ export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {
   }
 
 
-  setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
     return this.digitalDev.setup(pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    return this.digitalDev.getPinMode(pin);
+  setupOutput(pin: number, outputInitialValue: boolean): Promise<void> {
+    return this.digitalDev.setup(pin, pinMode, outputInitialValue);
   }
+
+  // getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
+  //   return this.digitalDev.getPinMode(pin);
+  // }
 
   read(pin: number): Promise<boolean> {
     return this.digitalDev.read(pin);
@@ -36,8 +46,9 @@ export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {
   /**
    * Listen to interruption of input pin
    */
-  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    return this.digitalDev.setWatch(pin, handler, debounce, edge);
+  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+    // TODO: review
+    return this.digitalDev.setWatch(pin, handler);
   }
 
   async clearWatch(id: number): Promise<void> {

@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler, DigitalInputMode} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
@@ -22,7 +22,11 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
 
-  setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
+    return this.expanderDriver.setup(pin, pinMode, outputInitialValue);
+  }
+
+  setupOutput(pin: number, outputInitialValue: boolean): Promise<void> {
     return this.expanderDriver.setup(pin, pinMode, outputInitialValue);
   }
 
@@ -44,7 +48,10 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   /**
    * Listen to interruption of input pin
    */
-  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
+  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+
+    // TODO: remake debounce and edge
+
     const wrapper = (values: boolean[]) => {
       const pinValue: boolean = values[pin];
 

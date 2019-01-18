@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler, DigitalInputMode} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps} from '../Pcf8574/Pcf8574.driver';
 import {PortExpanderDriver} from '../PortExpander/PortExpander.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
@@ -21,7 +21,11 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
 
-  setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
+    return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
+  }
+
+  setupOutput(pin: number, outputInitialValue: boolean): Promise<void> {
     return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
   }
 
@@ -43,7 +47,10 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   /**
    * Listen to interruption of input pin
    */
-  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
+  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+
+    // TODO: review
+
     const wrapper = (targetPin: number, value: boolean) => {
       if (targetPin !== pin) return;
 

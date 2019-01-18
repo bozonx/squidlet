@@ -1,6 +1,12 @@
 import {Gpio} from 'pigpio';
 
-import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
+import {
+  Digital,
+  Edge,
+  DigitalPinMode,
+  WatchHandler,
+  DigitalInputMode
+} from '../../../host/src/app/interfaces/dev/Digital';
 import DebounceCall from '../../../host/src/helpers/DebounceCall';
 
 
@@ -22,8 +28,10 @@ export default class DigitalDev implements Digital {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
     const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(pinMode);
+
+    //, debounce?: number, edge?: Edge
 
     this.pinInstances[pin] = new Gpio(pin, {
       ...convertedMode,
@@ -31,12 +39,23 @@ export default class DigitalDev implements Digital {
       edge: (convertedMode.mode === Gpio.INPUT) ? Gpio.EITHER_EDGE : undefined,
     });
 
-    // set initial value for output pin
-    if (pinMode === 'output') {
-      if (typeof outputInitialValue === 'undefined') {
-        throw new Error(`You have to specify an outputInitialValue`);
-      }
 
+  }
+
+  /**
+   * Setup pin before using.
+   * It doesn't set an initial value on output pin because a driver have to use it.
+   */
+  async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
+    //const convertedMode: {mode: number, pullUpDown: number} = this.convertMode('output');
+
+    this.pinInstances[pin] = new Gpio(pin, {
+      mode: Gpio.OUTPUT,
+    });
+
+    // set initial value
+    if (typeof outputInitialValue !== 'undefined') {
+      //throw new Error(`You have to specify an outputInitialValue`);
       await this.write(pin, outputInitialValue);
     }
   }
@@ -74,8 +93,9 @@ export default class DigitalDev implements Digital {
     pinInstance.digitalWrite(numValue);
   }
 
-  async setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
+  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
 
+    // TODO: review
     // TODO: remove
     //if (!this.pinInstances[pin]) return 0;
 
@@ -139,6 +159,7 @@ export default class DigitalDev implements Digital {
           mode: Gpio.INPUT,
           pullUpDown: Gpio.PUD_DOWN,
         };
+      // TODO: remove
       case ('output'):
         return {
           mode: Gpio.OUTPUT,
