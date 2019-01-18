@@ -10,8 +10,6 @@ import {isDigitalInputInverted} from './binaryHelpers';
 
 
 export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
-  edge: Edge;
-  debounce?: number;
   // in this time driver doesn't receive any data
   blockTime?: number;
   // auto invert if pullup resistor is set. Default is true
@@ -30,22 +28,24 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     return this.depsInstances.digitalInput as any;
   }
 
+
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
-      .getInstance(omit(
-        this.props,
-        'edge',
-        'debounce',
-        'blockTime',
-        'invertOnPullup',
-        'invert'
-      ));
+      .getInstance({
+        ...omit(
+          this.props,
+          'blockTime',
+          'invertOnPullup',
+          'invert'
+        ),
+        edge: this.resolveEdge(),
+      });
   }
 
   protected didInit = async () => {
-    await this.digitalInput.addListener(this.handleInputChange, this.props.debounce, this.resolveEdge());
+    await this.digitalInput.addListener(this.handleInputChange);
   }
 
 
@@ -80,12 +80,8 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     return this.changeEvents.once(wrapper);
   }
 
-  removeListener(handlerIndex: number) {
-    this.changeEvents.removeListener(handlerIndex);
-  }
-
-  destroy = () => {
-    //this.digitalInput.removeListener(this.listenHandler);
+  removeListener(handlerIndex: number): void {
+    return this.changeEvents.removeListener(handlerIndex);
   }
 
 

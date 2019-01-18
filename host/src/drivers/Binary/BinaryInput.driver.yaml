@@ -5,11 +5,6 @@ drivers:
   - DigitalPinInput.driver
 
 props:
-  edge:
-    type: rising | falling | both
-    default: both
-  debounce:
-    type: number
   # timeout after received signal. At this time it doesn't receive any signals.
   blockTime:
     type: number

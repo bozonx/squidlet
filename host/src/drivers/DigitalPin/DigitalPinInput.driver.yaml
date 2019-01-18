@@ -9,6 +9,11 @@ drivers:
   - Digital_portExpander.driver
 
 props:
+  edge:
+    type: rising | falling | both
+    default: both
+  debounce:
+    type: number
   pullup:
     type: boolean
     default: false

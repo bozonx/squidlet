@@ -8,6 +8,10 @@ import {omit} from '../../helpers/lodashLike';
 
 
 export interface DigitalPinInputDriverProps extends DigitalBaseProps {
+  // debounce time in ms only for input pins. If not set system defaults will be used.
+  edge: Edge;
+  // Listen to low, high or both levels. By default is both.
+  debounce?: number;
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
   pullup?: boolean;
@@ -54,15 +58,12 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
   /**
    * Listen to interruption of pin.
-   * @param handler
-   * @param debounce - debounce time in ms only for input pins. If not set system defaults will be used.
-   * @param edge - Listen to low, high or both levels. By default is both.
    */
-  async addListener(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number> {
-    return this.source.setWatch(this.props.pin, handler, debounce, this.resolveEdge(edge));
+  async addListener(handler: WatchHandler): Promise<number> {
+    return this.source.setWatch(this.props.pin, handler, this.props.debounce, this.resolveEdge());
   }
 
-  async listenOnce(handler: WatchHandler, debounce?: number, edge?: Edge): Promise<void> {
+  async listenOnce(handler: WatchHandler): Promise<number> {
     let handlerId: number;
     const wrapper: WatchHandler = async (level: boolean) => {
       // remove listener and don't listen any more
@@ -71,7 +72,9 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       handler(level);
     };
 
-    handlerId = await this.source.setWatch(this.props.pin, wrapper, debounce, this.resolveEdge(edge));
+    handlerId = await this.source.setWatch(this.props.pin, wrapper, this.props.debounce, this.resolveEdge());
+
+    return handlerId;
   }
 
   removeListener(handlerIndex: number): Promise<void> {
@@ -85,8 +88,8 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     else return 'input';
   }
 
-    private resolveEdge(edge?: Edge): Edge {
-    return edge || 'both';
+  private resolveEdge(): Edge {
+    return this.props.edge || 'both';
   }
 
 
