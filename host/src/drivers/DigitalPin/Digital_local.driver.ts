@@ -21,11 +21,11 @@ export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {
 
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
-    return this.digitalDev.setup(pin, pinMode, outputInitialValue);
+    return this.digitalDev.setupInput(pin, inputMode, debounce, edge);
   }
 
-  setupOutput(pin: number, outputInitialValue: boolean): Promise<void> {
-    return this.digitalDev.setup(pin, pinMode, outputInitialValue);
+  setupOutput(pin: number, initialValue: boolean): Promise<void> {
+    return this.digitalDev.setupOutput(pin, initialValue);
   }
 
   // getPinMode(pin: number): Promise<DigitalPinMode | undefined> {

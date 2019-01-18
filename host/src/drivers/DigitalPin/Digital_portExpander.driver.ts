@@ -25,8 +25,8 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
     return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
   }
 
-  setupOutput(pin: number, outputInitialValue: boolean): Promise<void> {
-    return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
+  setupOutput(pin: number, initialValue: boolean): Promise<void> {
+    return this.expanderDriver.setupDigital(pin, pinMode, initialValue);
   }
 
   // async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {

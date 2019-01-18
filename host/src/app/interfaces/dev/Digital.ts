@@ -22,12 +22,12 @@ interface DigitalBase {
 // Digital.dev
 export interface Digital extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
-  setupOutput(pin: number, outputInitialValue?: boolean): Promise<void>;
+  setupOutput(pin: number, initialValue?: boolean): Promise<void>;
   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
 }
 
 export interface DigitalSubDriver extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
-  setupOutput(pin: number, outputInitialValue: boolean): Promise<void>;
+  setupOutput(pin: number, initialValue: boolean): Promise<void>;
   // getPinMode isn't used
 }

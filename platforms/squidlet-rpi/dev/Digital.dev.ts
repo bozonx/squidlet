@@ -45,7 +45,7 @@ export default class DigitalDev implements Digital {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
+  async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
     const convertedMode: {mode: number, pullUpDown: number} = this.convertMode('output');
 
     this.pinInstances[pin] = new Gpio(pin, {
@@ -53,7 +53,7 @@ export default class DigitalDev implements Digital {
     });
 
     // set initial value if is set
-    if (typeof outputInitialValue !== 'undefined') await this.write(pin, outputInitialValue);
+    if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
 
   /**
