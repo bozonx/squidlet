@@ -1,4 +1,4 @@
-import {Edge, DigitalPinMode, WatchHandler, DigitalSubDriver, DigitalInputMode} from '../../app/interfaces/dev/Digital';
+import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode, DigitalPinMode} from '../../app/interfaces/dev/Digital';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
@@ -48,6 +48,10 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       });
   }
 
+
+  async getPinMode(): Promise<DigitalInputMode> {
+    return this.resolvePinMode();
+  }
 
   /**
    * Get current binary value of pin.
