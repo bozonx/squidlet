@@ -1,6 +1,6 @@
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import DriverBase from '../../app/entities/DriverBase';
-import {DigitalSubDriver, Edge, DigitalPinMode, WatchHandler, DigitalInputMode} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from '../../app/interfaces/dev/Digital';
 import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 import DebounceCall from '../../helpers/DebounceCall';
@@ -23,11 +23,15 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
 
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
-    return this.expanderDriver.setup(pin, pinMode, outputInitialValue);
+    if (inputMode !== 'input') {
+      this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
+    }
+
+    return this.expanderDriver.setupInput(pin, debounce, edge);
   }
 
   setupOutput(pin: number, initialValue: boolean): Promise<void> {
-    return this.expanderDriver.setup(pin, pinMode, initialValue);
+    return this.expanderDriver.setupOutput(pin, initialValue);
   }
 
   // getPinMode(pin: number): Promise<DigitalPinMode | undefined> {

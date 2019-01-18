@@ -8,7 +8,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../helpers/binaryHelpers';
-import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
+import {Edge} from '../../app/interfaces/dev/Digital';
 import IndexedEvents from '../../helpers/IndexedEvents';
 
 
@@ -71,37 +71,38 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  async setupInput(pin: number, debounce?: number, edge?: Edge): Promise<void> {
     this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
-      this.env.log.warn(`PCF8574Driver.setup(${pin}, ${pinMode}, ${outputInitialValue}). This pin has been already set up`);
+      this.env.log.warn(`PCF8574Driver.setupInput(${pin}, ${debounce}, ${edge}). This pin has been already set up`);
 
       return;
     }
 
-    if (pinMode === 'output') {
-      // output pin
-      // output initial value has to be specified
-      if (typeof outputInitialValue === 'undefined') {
-        throw new Error(`You have to specify an outputInitialValue`);
-      }
+    // set input pin to high
+    // TODO: нужно ли поднимать событие???
+    this.updateCurrentState(pin, true);
+    this.directions[pin] = DIR_IN;
+  }
 
-      this.directions[pin] = DIR_OUT;
-      // TODO: нужно ли поднимать событие???
-      this.updateCurrentState(pin, outputInitialValue);
-    }
-    else {
-      // input pin
-      if (pinMode !== 'input') {
-        this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
-      }
+  async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
+    this.checkPin(pin);
 
-      // set input pin to high
-      // TODO: нужно ли поднимать событие???
-      this.updateCurrentState(pin, true);
-      this.directions[pin] = DIR_IN;
+    if (typeof this.directions[pin] !== 'undefined') {
+      this.env.log.warn(`PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up`);
+
+      return;
     }
+
+    // output initial value has to be specified
+    if (typeof outputInitialValue === 'undefined') {
+      throw new Error(`You have to specify an outputInitialValue`);
+    }
+
+    this.directions[pin] = DIR_OUT;
+    // TODO: нужно ли поднимать событие???
+    this.updateCurrentState(pin, outputInitialValue);
   }
 
   /**
