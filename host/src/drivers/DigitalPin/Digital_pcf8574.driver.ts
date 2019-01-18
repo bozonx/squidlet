@@ -26,9 +26,9 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     return this.expanderDriver.setup(pin, pinMode, outputInitialValue);
   }
 
-  getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    return this.expanderDriver.getPinMode(pin);
-  }
+  // getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
+  //   return this.expanderDriver.getPinMode(pin);
+  // }
 
   read(pin: number): Promise<boolean> {
     return this.expanderDriver.read(pin);

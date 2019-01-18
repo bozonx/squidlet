@@ -6,11 +6,7 @@ export type DigitalPinMode = DigitalInputMode | 'output';
 export type Edge = 'rising' | 'falling' | 'both';
 
 
-// Digital.dev
-export interface Digital {
-  setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
-  setupOutput(pin: number, outputInitialValue?: boolean): Promise<void>;
-  getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
+interface DigitalBase {
   read(pin: number): Promise<boolean>;
 
   // only for output pins
@@ -23,7 +19,15 @@ export interface Digital {
   clearAllWatches(): Promise<void>;
 }
 
-export interface DigitalSubDriver extends Digital {
+// Digital.dev
+export interface Digital extends DigitalBase {
+  setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
+  setupOutput(pin: number, outputInitialValue?: boolean): Promise<void>;
+  getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
+}
+
+export interface DigitalSubDriver extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
   setupOutput(pin: number, outputInitialValue: boolean): Promise<void>;
+  // getPinMode isn't used
 }
