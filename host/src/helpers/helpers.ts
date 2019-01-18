@@ -319,3 +319,11 @@ export function invertIfNeed(value: boolean, invert?: boolean): boolean {
 
   return value;
 }
+
+// export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
+//   if (!edge || edge === 'both') return true;
+//   else if (value && edge === 'rising') return true;
+//   else if (!value && edge === 'falling') return true;
+//
+//   return false;
+// }

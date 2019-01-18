@@ -22,6 +22,8 @@ export default class DigitalDev implements Digital {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
+  // debounce times by pin number
+  private debounceTimes: {[index: string]: number | undefined} = {};
 
 
   /**
@@ -29,17 +31,14 @@ export default class DigitalDev implements Digital {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
-    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(pinMode);
-
-    //, debounce?: number, edge?: Edge
-
+    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(inputMode);
+    // save debounce time
+    this.debounceTimes[pin] = debounce;
+    // make a new instance of Gpio
     this.pinInstances[pin] = new Gpio(pin, {
       ...convertedMode,
-      // listen both and skip unnecessary in setWatch
-      edge: (convertedMode.mode === Gpio.INPUT) ? Gpio.EITHER_EDGE : undefined,
+      edge: this.resolveEdge(edge),
     });
-
-
   }
 
   /**
@@ -47,10 +46,10 @@ export default class DigitalDev implements Digital {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
-    //const convertedMode: {mode: number, pullUpDown: number} = this.convertMode('output');
+    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode('output');
 
     this.pinInstances[pin] = new Gpio(pin, {
-      mode: Gpio.OUTPUT,
+      ...convertedMode,
     });
 
     // set initial value
@@ -103,14 +102,13 @@ export default class DigitalDev implements Digital {
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);
 
-      if (!this.isCorrectEdge(value, edge)) return;
-
-      if (!debounce) {
+      // if undefined or 0 - call handler immediately
+      if (!this.debounceTimes[pin]) {
         handler(value);
       }
       else {
         // wait for debounce and read current level
-        this.debounceCall.invoke(pin, debounce, async () => {
+        this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
           const realLevel = await this.read(pin);
           handler(realLevel);
         });
@@ -137,10 +135,11 @@ export default class DigitalDev implements Digital {
   }
 
   async clearAllWatches(): Promise<void> {
-    this.alertListeners.map((item, index: number) => {
-      this.clearWatch(index);
-    });
+    for (let index in this.alertListeners) {
+      await this.clearWatch(parseInt(index));
+    }
   }
+
 
   private convertMode(pinMode: DigitalPinMode): {mode: number, pullUpDown: number} {
     switch (pinMode) {
@@ -159,7 +158,6 @@ export default class DigitalDev implements Digital {
           mode: Gpio.INPUT,
           pullUpDown: Gpio.PUD_DOWN,
         };
-      // TODO: remove
       case ('output'):
         return {
           mode: Gpio.OUTPUT,
@@ -168,7 +166,17 @@ export default class DigitalDev implements Digital {
       default:
         throw new Error(`Unknown mode "${pinMode}"`);
     }
+  }
 
+  private resolveEdge(edge?: Edge): number {
+    if (edge === 'rising') {
+      return Gpio.RISING_EDGE;
+    }
+    else if (edge === 'falling') {
+      return Gpio.FALLING_EDGE;
+    }
+
+    return Gpio.EITHER_EDGE;
   }
 
   private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
@@ -177,14 +185,6 @@ export default class DigitalDev implements Digital {
     }
 
     return this.pinInstances[pin];
-  }
-
-  private isCorrectEdge(value: boolean, edge?: Edge): boolean {
-    if (!edge || edge === 'both') return true;
-    else if (value && edge === 'rising') return true;
-    else if (!value && edge === 'falling') return true;
-
-    return false;
   }
 
 }
