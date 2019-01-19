@@ -1,4 +1,4 @@
-import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
+import {DigitalInputMode, DigitalPinMode, Edge} from '../../app/interfaces/dev/Digital';
 import {
   COMMANDS,
   MODES, NO_MODE,
@@ -45,7 +45,7 @@ export default class DigitalPins {
    * Setup digital input or output pin.
    * Please set pin mode once on startup.
    */
-  async setup(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  async setupInput(pin: number, pinMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
     if (this.expander.wasIcInited) {
       this.expander.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
 
@@ -56,20 +56,39 @@ export default class DigitalPins {
       throw new Error('PortExpanderDriver.setupDigital: Pin out of range');
     }
 
-    if (pinMode === 'output') {
-      if (typeof outputInitialValue === 'undefined') {
-        throw new Error(`You have to specify an outputInitialValue`);
-      }
+    // TODO: save debounce and edge to send it to IC
 
-      this.expander.state.setDigitalOutput(pin, outputInitialValue);
-    }
-
-    if (this.isDigitalPin(pin)) {
+    if (this.isInputPin(pin)) {
       this.pinModes[pin] = MODES[pinMode];
     }
     else {
-      throw new Error(`Unsupported mode "${pinMode}" of digital pin "${pin}"`);
+      throw new Error(`Unsupported mode "${pinMode}" of digital input pin "${pin}"`);
     }
+  }
+
+  /**
+   * Setup digital input or output pin.
+   * Please set pin mode once on startup.
+   */
+  async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
+    if (this.expander.wasIcInited) {
+      this.expander.log.warn(`PortExpanderDriver.setupDigital: can't setup pin "${pin}" because IC was already initialized`);
+
+      return;
+    }
+
+    if (pin < 0 || pin >= this.expander.props.digitalPinsCount) {
+      throw new Error('PortExpanderDriver.setupDigital: Pin out of range');
+    }
+
+    // if (typeof outputInitialValue === 'undefined') {
+    //   throw new Error(`You have to specify an outputInitialValue`);
+    // }
+
+    // set value to local state or use default value
+    this.expander.state.setDigitalOutput(pin, outputInitialValue || false);
+
+    this.pinModes[pin] = MODES['output'];
   }
 
   /**

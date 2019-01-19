@@ -31,7 +31,7 @@ export default class Config extends DeviceDataManagerBase {
     };
 
     // publish all the statuses
-    this.publishEvents.emit(this.typeNameOfData, this.localData, params);
+    this.publishEvents.emit(this.typeNameOfData, this.getState(), params);
   }
 
 }

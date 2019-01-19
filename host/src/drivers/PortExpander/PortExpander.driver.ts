@@ -26,7 +26,7 @@ import {uint8WordToNum} from '../../helpers/binaryHelpers';
 
 export type PortExpanderConnection = 'i2c' | 'serial';
 export type PortExpanderAnalogPinMode = 'analog_input' | 'analog_output';
-export type PortExpanderPinMode = DigitalPinMode |
+export type PortExpanderPinMode = DigitalPinMode
   | PortExpanderAnalogPinMode
   | 'pwm'
   | 'rx'
@@ -174,7 +174,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Please call it once on startup.
    */
   setupDigitalInput(pin: number, pinMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
-    return this.digitalPins.setup(pin, pinMode, outputInitialValue);
+    return this.digitalPins.setupInput(pin, pinMode, debounce, edge);
   }
 
   /**
@@ -182,7 +182,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
    * Please call it once on startup.
    */
   setupDigitalOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
-    return this.digitalPins.setup(pin, pinMode, outputInitialValue);
+    return this.digitalPins.setupOutput(pin, outputInitialValue);
   }
 
   addDigitalListener(handler: DigitalPinHandler): number {

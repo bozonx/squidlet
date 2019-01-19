@@ -42,14 +42,16 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
       .getInstance({
         ...omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
         invert: this.isInverted(),
+        edge: 'rising',
+        debounce: this.props.impulseLength,
       });
   }
 
   protected didInit = async () => {
     //const debounce: number = Math.ceil(this.props.impulseLength / 2);
-    const debounce: number = this.props.impulseLength;
+    //const debounce: number = this.props.impulseLength;
 
-    this.digitalInput.addListener(this.listenHandler, debounce, 'rising');
+    this.digitalInput.addListener(this.listenHandler);
   }
 
 
