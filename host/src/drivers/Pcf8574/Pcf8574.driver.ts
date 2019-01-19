@@ -13,8 +13,6 @@ import DebounceCall from '../../helpers/DebounceCall';
 import IndexedEventEmitter from '../../helpers/IndexedEventEmitter';
 
 
-//export type ResultHandler = (values: boolean[]) => void;
-
 export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
 }
 
@@ -36,6 +34,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private currentState: number = 0;
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
+  private readonly pinEdges: {[index: string]: Edge | undefined} = {};
+  private readonly pinDebounces: {[index: string]: number | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly events = new IndexedEventEmitter<WatchHandler>();
 
@@ -82,37 +82,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return;
     }
 
-
-    // TODO: remake debounce and edge
-
-    const wrapper = (values: boolean[]) => {
-      const pinValue: boolean = values[pin];
-
-      // skip not suitable edge
-      if (edge === 'rising' && !pinValue) {
-        return;
-      }
-      else if (edge === 'falling' && pinValue) {
-        return;
-      }
-
-      if (!debounce) {
-        handler(pinValue);
-      }
-      else {
-        // wait for debounce and read current level
-        this.debounceCall.invoke( pin, debounce, async () => {
-          const realLevel = await this.read(pin);
-          handler(realLevel);
-        });
-      }
-    };
-
+    this.pinDebounces[pin] = debounce;
+    this.pinEdges[pin] = edge;
+    this.directions[pin] = DIR_IN;
 
     // set input pin to high
-    // TODO: нужно ли поднимать событие???
     this.updateCurrentState(pin, true);
-    this.directions[pin] = DIR_IN;
   }
 
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
@@ -150,8 +125,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   removeListener(pin: number, handlerIndex: number) {
     this.events.removeListener(String(pin), handlerIndex);
   }
-
-  // TODO: add whole listener and pin listeners
 
   /**
    * Poll expander and return values of all the pins
@@ -217,6 +190,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       throw new Error('Pin is not defined as an output');
     }
 
+
+    // TODO: review events
+
     // It doesn't need to initialize IC, because new state will send below
 
     const oldState: number = this.currentState;
@@ -233,7 +209,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       // switch back old value on error
       this.currentState = oldState;
 
-      this.events.emit(this.getState());
+      this.emitChangeEvents(oldState);
 
       throw new Error(err);
     }
@@ -300,12 +276,31 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     for (let pinNumStr in currentBoolState) {
       if (currentBoolState[pinNumStr] !== oldBoolState[pinNumStr]) {
-        this.events.emit(pinNumStr, currentBoolState[pinNumStr]);
+        this.emitPinEvent(pinNumStr, currentBoolState[pinNumStr]);
       }
     }
+  }
 
-    // TODO: rise whole change event
-    //this.events.emit(this.getState());
+  private emitPinEvent(pinNumStr: string, pinValue: boolean) {
+    // skip not suitable edge
+    if (this.pinEdges[pinNumStr] === 'rising' && !pinValue) {
+      return;
+    }
+    else if (this.pinEdges[pinNumStr] === 'falling' && pinValue) {
+      return;
+    }
+
+    if (!this.pinDebounces[pinNumStr]) {
+      this.events.emit(pinNumStr, pinValue);
+    }
+    else {
+      // wait for debounce and read current level
+      this.debounceCall.invoke(pinNumStr, this.pinDebounces[pinNumStr], async () => {
+        const realLevel = await this.read(parseInt(pinNumStr));
+
+        this.events.emit(pinNumStr, realLevel);
+      });
+    }
   }
 
   /**
