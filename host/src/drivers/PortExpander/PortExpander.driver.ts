@@ -14,7 +14,7 @@ import {firstLetterToUpperCase} from '../../helpers/helpers';
 import DriverBase from '../../app/entities/DriverBase';
 import DuplexDriver from '../../app/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../../app/dict/constants';
-import {DigitalPinMode} from '../../app/interfaces/dev/Digital';
+import {DigitalInputMode, DigitalPinMode, Edge} from '../../app/interfaces/dev/Digital';
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import AnalogPins, {AnalogPinHandler} from './AnalogPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';
@@ -25,16 +25,12 @@ import {uint8WordToNum} from '../../helpers/binaryHelpers';
 
 
 export type PortExpanderConnection = 'i2c' | 'serial';
-export type PortExpanderPinMode = 'input'
-  | 'input_pullup'
-  | 'input_pulldown'
-  | 'output'
-  | 'analog_input'
-  | 'analog_output'
+export type PortExpanderAnalogPinMode = 'analog_input' | 'analog_output';
+export type PortExpanderPinMode = DigitalPinMode |
+  | PortExpanderAnalogPinMode
   | 'pwm'
   | 'rx'
   | 'tx';
-export type PortExpanderAnalogPinMode = 'analog_input' | 'analog_output';
 
 export interface ExpanderDriverProps {
   connection: PortExpanderConnection;
@@ -174,10 +170,18 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
   /**
-   * Setup digital input or output pin.
-   * Please set pin mode once on startup.
+   * Setup digital input pin.
+   * Please call it once on startup.
    */
-  setupDigital(pin: number, pinMode: DigitalPinMode, outputInitialValue?: boolean): Promise<void> {
+  setupDigitalInput(pin: number, pinMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
+    return this.digitalPins.setup(pin, pinMode, outputInitialValue);
+  }
+
+  /**
+   * Setup digital output pin.
+   * Please call it once on startup.
+   */
+  setupDigitalOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
     return this.digitalPins.setup(pin, pinMode, outputInitialValue);
   }
 

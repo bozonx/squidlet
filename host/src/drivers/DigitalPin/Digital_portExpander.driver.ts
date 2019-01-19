@@ -22,11 +22,11 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
 
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
-    return this.expanderDriver.setupDigital(pin, pinMode, outputInitialValue);
+    return this.expanderDriver.setupDigitalInput(pin, inputMode, debounce, edge);
   }
 
   setupOutput(pin: number, initialValue: boolean): Promise<void> {
-    return this.expanderDriver.setupDigital(pin, pinMode, initialValue);
+    return this.expanderDriver.setupDigitalOutput(pin, initialValue);
   }
 
   // async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
@@ -48,9 +48,6 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-
-    // TODO: review
-
     const wrapper = (targetPin: number, value: boolean) => {
       if (targetPin !== pin) return;
 
