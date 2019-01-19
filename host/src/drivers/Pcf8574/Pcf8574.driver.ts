@@ -99,21 +99,15 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return;
     }
 
-    // // output initial value has to be specified
-    // if (typeof outputInitialValue === 'undefined') {
-    //   throw new Error(`You have to specify an outputInitialValue`);
-    // }
-
     this.directions[pin] = DIR_OUT;
 
     if (typeof outputInitialValue !== 'undefined') {
-      // TODO: нужно ли поднимать событие???
       this.updateCurrentState(pin, outputInitialValue);
     }
   }
 
   /**
-   * Add listener to change of any pin.
+   * Listen to changes of pin after edge and debounce were processed.
    * Call this method inside a didInit() callback of your driver or device or after.
    */
   addListener(pin: number, handler: WatchHandler): number {
@@ -123,6 +117,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   }
 
   removeListener(pin: number, handlerIndex: number) {
+    this.checkPin(pin);
     this.events.removeListener(String(pin), handlerIndex);
   }
 
