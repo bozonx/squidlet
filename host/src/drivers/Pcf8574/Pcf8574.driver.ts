@@ -65,7 +65,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   protected appDidInit = async () => {
     // init IC state after app is initialized if it isn't at this moment
     try {
-      await this.writeToIc();
+      await this.writeToIc(this.currentState);
     }
     catch (err) {
       this.env.log.error(`PCF8574.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
@@ -185,29 +185,30 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       throw new Error('Pin is not defined as an output');
     }
 
-
-    // TODO: review events
-
     // It doesn't need to initialize IC, because new state will send below
 
-    const oldState: number = this.currentState;
-
-    // TODO: нужно ли поднимать событие???
+    //const oldValue: boolean = getBitFromByte(this.currentState, pin);
     // update local state before writing to IC
+    //this.updateCurrentState(pin, value);
+    // // write to IC
+    // try {
+    //   await this.writeToIc();
+    // }
+    // catch (err) {
+    //   // switch back old value on error
+    //   this.updateCurrentState(pin, oldValue);
+    //
+    //   throw new Error(err);
+    // }
+
+    const newState = this.currentState;
+
+    updateBitInByte(newState, pin, value);
+
+    await this.writeToIc(newState);
+
+    // update only this pin eventually
     this.updateCurrentState(pin, value);
-
-    // write to IC
-    try {
-      await this.writeToIc();
-    }
-    catch (err) {
-      // switch back old value on error
-      this.currentState = oldState;
-
-      this.emitChangeEvents(oldState);
-
-      throw new Error(err);
-    }
   }
 
   /**
@@ -217,29 +218,41 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   async writeState(outputValues: boolean[]): Promise<void> {
     if (!this.checkInitialization('writeState')) return;
 
-    const oldState: number = this.currentState;
+    //const oldState: number = this.currentState;
+    // for (let pin = 0; pin < PINS_COUNT; pin++) {
+    //   // skit not an output pin
+    //   if (this.directions[pin] !== DIR_OUT) continue;
+    //
+    //   this.updateCurrentState(pin, outputValues[pin]);
+    // }
 
-    // TODO: review events
+    // try {
+    //   await this.writeToIc();
+    // }
+    // catch (err) {
+    //   // switch back old value on error
+    //   this.currentState = oldState;
+    //
+    //   throw new Error(err);
+    // }
 
-    // TODO: нужно ли поднимать событие???
+    const newState = this.currentState;
+
+    for (let pin = 0; pin < PINS_COUNT; pin++) {
+      // skit not an output pin
+      if (this.directions[pin] !== DIR_OUT) continue;
+
+      updateBitInByte(newState, pin, outputValues[pin]);
+    }
+
+    await this.writeToIc(newState);
+
+    // update only output pins eventually
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skit not an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
 
       this.updateCurrentState(pin, outputValues[pin]);
-    }
-
-    // write to IC
-    try {
-      await this.writeToIc();
-    }
-    catch (err) {
-      // switch back old value on error
-      this.currentState = oldState;
-
-      this.emitChangeEvents(oldState);
-
-      throw new Error(err);
     }
   }
 
@@ -265,11 +278,17 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.emitChangeEvents(oldState);
   }
 
+  /**
+   * Emit event on changed input pins
+   */
   private emitChangeEvents(oldState: number) {
     const oldBoolState: boolean[] = byteToBinArr(oldState);
     const currentBoolState: boolean[] = this.getState();
 
     for (let pinNumStr in currentBoolState) {
+      // skip not input pins
+      if (this.directions[pinNumStr] !== DIR_IN) continue;
+
       if (currentBoolState[pinNumStr] !== oldBoolState[pinNumStr]) {
         this.emitPinEvent(pinNumStr, currentBoolState[pinNumStr]);
       }
@@ -302,7 +321,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Write the current state to the IC.
    * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private async writeToIc () {
+  private async writeToIc(newState: number) {
     if (!this.wasIcInited) {
       this.initingIcInProgress = true;
     }
@@ -310,7 +329,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
 
     // send one byte to IC
-    dataToSend[0] = this.currentState;
+    dataToSend[0] = newState;
 
     try {
       await this.i2cDriver.write(undefined, dataToSend);
