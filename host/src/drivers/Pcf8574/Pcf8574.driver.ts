@@ -8,11 +8,12 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../helpers/binaryHelpers';
-import {Edge} from '../../app/interfaces/dev/Digital';
-import IndexedEvents from '../../helpers/IndexedEvents';
+import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
+import DebounceCall from '../../helpers/DebounceCall';
+import IndexedEventEmitter from '../../helpers/IndexedEventEmitter';
 
 
-export type ResultHandler = (values: boolean[]) => void;
+//export type ResultHandler = (values: boolean[]) => void;
 
 export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
 }
@@ -35,7 +36,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private currentState: number = 0;
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
-  private readonly events = new IndexedEvents<ResultHandler>();
+  private readonly debounceCall: DebounceCall = new DebounceCall();
+  private readonly events = new IndexedEventEmitter<WatchHandler>();
 
   private get i2cDriver(): I2cToSlaveDriver {
     return this.depsInstances.i2cDriver as any;
@@ -80,6 +82,33 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return;
     }
 
+
+    // TODO: remake debounce and edge
+
+    const wrapper = (values: boolean[]) => {
+      const pinValue: boolean = values[pin];
+
+      // skip not suitable edge
+      if (edge === 'rising' && !pinValue) {
+        return;
+      }
+      else if (edge === 'falling' && pinValue) {
+        return;
+      }
+
+      if (!debounce) {
+        handler(pinValue);
+      }
+      else {
+        // wait for debounce and read current level
+        this.debounceCall.invoke( pin, debounce, async () => {
+          const realLevel = await this.read(pin);
+          handler(realLevel);
+        });
+      }
+    };
+
+
     // set input pin to high
     // TODO: нужно ли поднимать событие???
     this.updateCurrentState(pin, true);
@@ -95,27 +124,34 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       return;
     }
 
-    // output initial value has to be specified
-    if (typeof outputInitialValue === 'undefined') {
-      throw new Error(`You have to specify an outputInitialValue`);
-    }
+    // // output initial value has to be specified
+    // if (typeof outputInitialValue === 'undefined') {
+    //   throw new Error(`You have to specify an outputInitialValue`);
+    // }
 
     this.directions[pin] = DIR_OUT;
-    // TODO: нужно ли поднимать событие???
-    this.updateCurrentState(pin, outputInitialValue);
+
+    if (typeof outputInitialValue !== 'undefined') {
+      // TODO: нужно ли поднимать событие???
+      this.updateCurrentState(pin, outputInitialValue);
+    }
   }
 
   /**
    * Add listener to change of any pin.
    * Call this method inside a didInit() callback of your driver or device or after.
    */
-  addListener(handler: ResultHandler): number {
-    return this.events.addListener(handler);
+  addListener(pin: number, handler: WatchHandler): number {
+    this.checkPin(pin);
+
+    return this.events.addListener(String(pin), handler);
   }
 
-  removeListener(handlerIndex: number) {
-    this.events.removeListener(handlerIndex);
+  removeListener(pin: number, handlerIndex: number) {
+    this.events.removeListener(String(pin), handlerIndex);
   }
+
+  // TODO: add whole listener and pin listeners
 
   /**
    * Poll expander and return values of all the pins
@@ -212,6 +248,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     const oldState: number = this.currentState;
 
+    // TODO: review events
+
     // TODO: нужно ли поднимать событие???
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skit not an output pin
@@ -228,7 +266,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       // switch back old value on error
       this.currentState = oldState;
 
-      this.events.emit(this.getState());
+      this.emitChangeEvents(oldState);
 
       throw new Error(err);
     }
@@ -239,6 +277,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     if (!data || data.length !== DATA_LENGTH) {
       throw new Error(`PCF8574Driver: No data has been received`);
     }
+
+    const oldState = this.currentState;
 
     console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', data[0].toString(2));
 
@@ -251,7 +291,21 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
       this.updateCurrentState(pin, getBitFromByte(data[0], pin));
     }
 
-    this.events.emit(this.getState());
+    this.emitChangeEvents(oldState);
+  }
+
+  private emitChangeEvents(oldState: number) {
+    const oldBoolState: boolean[] = byteToBinArr(oldState);
+    const currentBoolState: boolean[] = this.getState();
+
+    for (let pinNumStr in currentBoolState) {
+      if (currentBoolState[pinNumStr] !== oldBoolState[pinNumStr]) {
+        this.events.emit(pinNumStr, currentBoolState[pinNumStr]);
+      }
+    }
+
+    // TODO: rise whole change event
+    //this.events.emit(this.getState());
   }
 
   /**

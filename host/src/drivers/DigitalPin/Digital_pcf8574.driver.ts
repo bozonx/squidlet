@@ -15,7 +15,6 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];
-  private readonly debounceCall: DebounceCall = new DebounceCall();
   private get expanderDriver(): PCF8574Driver {
     // TODO: use system.devices
     return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
@@ -53,33 +52,13 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-
-    // TODO: remake debounce and edge
-
-    const wrapper = (values: boolean[]) => {
-      const pinValue: boolean = values[pin];
-
-      // skip not suitable edge
-      if (edge === 'rising' && !pinValue) {
-        return;
-      }
-      else if (edge === 'falling' && pinValue) {
-        return;
-      }
-
-      if (!debounce) {
-        handler(pinValue);
-      }
-      else {
-        // wait for debounce and read current level
-        this.debounceCall.invoke( pin, debounce, async () => {
-          const realLevel = await this.read(pin);
-          handler(realLevel);
-        });
-      }
-    };
-
-    const handlerId: number = await this.expanderDriver.addListener(wrapper);
+    // const wrapper = (values: boolean[]) => {
+    //   const pinValue: boolean = values[pin];
+    //
+    //   handler(pinValue);
+    // };
+    //
+    const handlerId: number = await this.expanderDriver.addListener(pin, handler);
 
     this.handlerIds.push(handlerId);
 
@@ -90,7 +69,9 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     // do nothing if watcher doesn't exist
     if (!this.handlerIds[id]) return;
 
-    await this.expanderDriver.removeListener(this.handlerIds[id]);
+    // TODO: get saved pin number
+
+    await this.expanderDriver.removeListener(pin, this.handlerIds[id]);
   }
 
   async clearAllWatches(): Promise<void> {
