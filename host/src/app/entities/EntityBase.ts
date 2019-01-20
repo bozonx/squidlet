@@ -81,13 +81,10 @@ export default class EntityBase<Props = {}> {
     if (this.willInit) await this.willInit(getDriverDep);
     if (this.doInit) await this.doInit(getDriverDep);
 
-  }
-
-  async $riseDidInit() {
-    const getDriverDep: GetDriverDep = await this.getDriverDepCb();
-
+    // TODO: call on event which is risen after entities of the same type are inited
     // not critical error
     if (this.didInit) {
+      //this.env.system.afterEntitiesInit()
       try {
         await this.didInit(getDriverDep);
       }
@@ -96,6 +93,12 @@ export default class EntityBase<Props = {}> {
       }
     }
   }
+
+  // async $riseDidInit() {
+  //   const getDriverDep: GetDriverDep = await this.getDriverDepCb();
+  //
+  //
+  // }
 
   /**
    * Load manifest of this entity

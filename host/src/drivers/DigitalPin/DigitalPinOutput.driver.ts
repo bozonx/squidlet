@@ -4,7 +4,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 import {omit} from '../../helpers/lodashLike';
-import {DigitalPinMode, DigitalSubDriver} from '../../app/interfaces/dev/Digital';
+import {DigitalSubDriver} from '../../app/interfaces/dev/Digital';
 
 
 export interface DigitalPinOutputDriverProps extends DigitalBaseProps {

@@ -14,21 +14,24 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];
-  private get expanderDriver(): PCF8574Driver {
+  private get expanderDriver(): PCF8574Driver | undefined {
+    if (!this.env.system.devicesManager.getDevice(this.props.expander)) return;
+
     // TODO: use system.devices
     return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
   }
 
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
-    if (inputMode !== 'input') {
-      this.env.log.warn(`Pcf8574 expander doesn't support setting of pullup or pulldown resistors`);
-    }
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('setupInput'));
 
     return this.expanderDriver.setupInput(pin, debounce, edge);
   }
 
+  // TODO: должно быть запущенно после инициализации девайсов
   setupOutput(pin: number, initialValue: boolean): Promise<void> {
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('setupOutput'));
+
     return this.expanderDriver.setupOutput(pin, initialValue);
   }
 
@@ -37,6 +40,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   // }
 
   read(pin: number): Promise<boolean> {
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('read'));
+
     return this.expanderDriver.read(pin);
   }
 
@@ -44,6 +49,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Set level to output pin
    */
   write(pin: number, value: boolean): Promise<void> {
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('write'));
+
     return this.expanderDriver.write(pin, value);
   }
 
@@ -51,6 +58,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('setWatch'));
+
     const wrapper = (targetPin: number, value: boolean) => {
       if (targetPin === pin) handler(value);
     };
@@ -63,6 +72,8 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async clearWatch(id: number): Promise<void> {
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('clearWatch'));
+
     // do nothing if watcher doesn't exist
     if (!this.handlerIds[id]) return;
 
@@ -70,12 +81,18 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   async clearAllWatches(): Promise<void> {
+    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('clearAllWatches'));
+
     for (let id in this.handlerIds) {
       await this.expanderDriver.removeListener(this.handlerIds[id]);
     }
   }
 
   // TODO: validate expander prop - it has to be existent device in master config
+
+  private expanderErrMsg(methodWhichCheck: string): string {
+    return `DigitalPcf8574Driver.${methodWhichCheck}: It seems that it calls before Pcf8574 is initialized`
+  }
 
 }
 
