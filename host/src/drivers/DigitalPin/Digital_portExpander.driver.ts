@@ -49,9 +49,7 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    */
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
     const wrapper = (targetPin: number, value: boolean) => {
-      if (targetPin !== pin) return;
-
-      handler(value);
+      if (targetPin === pin) handler(value);
     };
 
     const handlerId: number = this.expanderDriver.addDigitalListener(wrapper);

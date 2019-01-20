@@ -5,9 +5,6 @@ import {ExpanderDriverProps, PCF8574Driver} from '../Pcf8574/Pcf8574.driver';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../app/dict/constants';
 
 
-// [pinNum, indexIntPcfDriver]
-type HandlerPinAndIndex = [number, number];
-
 interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
   expander: string;
 }
@@ -16,7 +13,7 @@ interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
 export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements DigitalSubDriver {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
-  private handlerIds: HandlerPinAndIndex[] = [];
+  private handlerIds: number[] = [];
   private get expanderDriver(): PCF8574Driver {
     // TODO: use system.devices
     return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
@@ -54,9 +51,13 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-    const handlerId: number = await this.expanderDriver.addListener(pin, handler);
+    const wrapper = (targetPin: number, value: boolean) => {
+      if (targetPin === pin) handler(value);
+    };
 
-    this.handlerIds.push([pin, handlerId]);
+    const handlerId: number = await this.expanderDriver.addListener(wrapper);
+
+    this.handlerIds.push(handlerId);
 
     return this.handlerIds.length - LENGTH_AND_START_ARR_DIFFERENCE;
   }
@@ -65,12 +66,12 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
     // do nothing if watcher doesn't exist
     if (!this.handlerIds[id]) return;
 
-    await this.expanderDriver.removeListener(this.handlerIds[id][0], this.handlerIds[id][1]);
+    await this.expanderDriver.removeListener(this.handlerIds[id]);
   }
 
   async clearAllWatches(): Promise<void> {
     for (let id in this.handlerIds) {
-      await this.expanderDriver.removeListener(this.handlerIds[id][0], this.handlerIds[id][1]);
+      await this.expanderDriver.removeListener(this.handlerIds[id]);
     }
   }
 

@@ -8,10 +8,12 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverBase from '../../app/entities/DriverBase';
 import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../helpers/binaryHelpers';
-import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {Edge} from '../../app/interfaces/dev/Digital';
 import DebounceCall from '../../helpers/DebounceCall';
-import IndexedEventEmitter from '../../helpers/IndexedEventEmitter';
+import IndexedEvents from '../../helpers/IndexedEvents';
 
+
+export type ChangeStateHandler = (targetPin: number, value: boolean) => void;
 
 export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
 }
@@ -37,7 +39,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly pinDebounces: {[index: string]: number | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private readonly events = new IndexedEventEmitter<WatchHandler>();
+  private readonly events = new IndexedEvents<ChangeStateHandler>();
 
   private get i2cDriver(): I2cToSlaveDriver {
     return this.depsInstances.i2cDriver as any;
@@ -110,15 +112,12 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Listen to changes of pin after edge and debounce were processed.
    * Call this method inside a didInit() callback of your driver or device or after.
    */
-  addListener(pin: number, handler: WatchHandler): number {
-    this.checkPin(pin);
-
-    return this.events.addListener(String(pin), handler);
+  addListener(handler: ChangeStateHandler): number {
+    return this.events.addListener(handler);
   }
 
-  removeListener(pin: number, handlerIndex: number) {
-    this.checkPin(pin);
-    this.events.removeListener(String(pin), handlerIndex);
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
   }
 
   /**
@@ -286,33 +285,35 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     const currentBoolState: boolean[] = this.getState();
 
     for (let pinNumStr in currentBoolState) {
-      // skip not input pins
-      if (this.directions[pinNumStr] !== DIR_IN) continue;
+      const pinNum: number = parseInt(pinNumStr);
 
-      if (currentBoolState[pinNumStr] !== oldBoolState[pinNumStr]) {
-        this.emitPinEvent(pinNumStr, currentBoolState[pinNumStr]);
+      // skip not input pins
+      if (this.directions[pinNum] !== DIR_IN) continue;
+
+      if (currentBoolState[pinNum] !== oldBoolState[pinNum]) {
+        this.emitPinEvent(pinNum, currentBoolState[pinNum]);
       }
     }
   }
 
-  private emitPinEvent(pinNumStr: string, pinValue: boolean) {
+  private emitPinEvent(pinNum: number, pinValue: boolean) {
     // skip not suitable edge
-    if (this.pinEdges[pinNumStr] === 'rising' && !pinValue) {
+    if (this.pinEdges[pinNum] === 'rising' && !pinValue) {
       return;
     }
-    else if (this.pinEdges[pinNumStr] === 'falling' && pinValue) {
+    else if (this.pinEdges[pinNum] === 'falling' && pinValue) {
       return;
     }
 
-    if (!this.pinDebounces[pinNumStr]) {
-      this.events.emit(pinNumStr, pinValue);
+    if (!this.pinDebounces[pinNum]) {
+      this.events.emit(pinNum, pinValue);
     }
     else {
       // wait for debounce and read current level
-      this.debounceCall.invoke(pinNumStr, this.pinDebounces[pinNumStr], async () => {
-        const realLevel = await this.read(parseInt(pinNumStr));
+      this.debounceCall.invoke(pinNum, this.pinDebounces[pinNum], async () => {
+        const realLevel = await this.read(pinNum);
 
-        this.events.emit(pinNumStr, realLevel);
+        this.events.emit(pinNum, realLevel);
       });
     }
   }
