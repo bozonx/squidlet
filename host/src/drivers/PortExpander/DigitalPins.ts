@@ -58,7 +58,7 @@ export default class DigitalPins {
 
     // TODO: save debounce and edge to send it to IC
 
-    if (this.isInputPin(pin)) {
+    if (this.isDigitalInputMode(pin)) {
       this.pinModes[pin] = MODES[pinMode];
     }
     else {
@@ -80,10 +80,6 @@ export default class DigitalPins {
     if (pin < 0 || pin >= this.expander.props.digitalPinsCount) {
       throw new Error('PortExpanderDriver.setupDigital: Pin out of range');
     }
-
-    // if (typeof outputInitialValue === 'undefined') {
-    //   throw new Error(`You have to specify an outputInitialValue`);
-    // }
 
     // set value to local state or use default value
     this.expander.state.setDigitalOutput(pin, outputInitialValue || false);
@@ -196,7 +192,12 @@ export default class DigitalPins {
   isInputPin(pin: number): boolean {
     const pinMode: number | undefined = this.pinModes[pin];
 
-    return pinMode === MODES.input || pinMode === MODES.input_pullup || pinMode === MODES.input_pulldown;
+    return this.isDigitalInputMode(pinMode);
+  }
+
+
+  private isDigitalInputMode(mode: number | undefined): boolean {
+    return mode === MODES.input || mode === MODES.input_pullup || mode === MODES.input_pulldown;
   }
 
   private updateOutputValues(newValues: DigitalState) {

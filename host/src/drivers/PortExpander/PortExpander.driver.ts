@@ -16,7 +16,7 @@ import DuplexDriver from '../../app/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../../app/dict/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from '../../app/interfaces/dev/Digital';
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
-import AnalogPins, {AnalogPinHandler} from './AnalogPins';
+import AnalogPins, {AnalogPinHandler, FilterTypes} from './AnalogPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';
 import Logger from '../../app/interfaces/Logger';
 import {omit} from '../../helpers/lodashLike';
@@ -227,8 +227,12 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  setupAnalog(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
-    return this.analogPins.setup(pin, pinMode, outputInitialValue);
+  setupAnalogInput(pin: number, filterType?: FilterTypes, filterThreshold?: number): Promise<void> {
+    return this.analogPins.setupInput(pin);
+  }
+
+  setupAnalogOutput(pin: number, outputInitialValue?: number): Promise<void> {
+    return this.analogPins.setupOutput(pin, outputInitialValue);
   }
 
   addAnalogListener(handler: AnalogPinHandler): number {

@@ -10,6 +10,8 @@ import {AnalogState} from './State';
 import {getKeyOfObject} from '../../helpers/helpers';
 
 
+export type FilterTypes = 'lowPass' | 'median';
+
 export type AnalogPinHandler = (targetPin: number, value: number) => void;
 
 
@@ -30,7 +32,23 @@ export default class AnalogPins {
     return getKeyOfObject(MODES, pinModeByte) as PortExpanderAnalogPinMode | undefined;
   }
 
-  async setup(pin: number, pinMode: 'analog_input' | 'analog_output', outputInitialValue?: number): Promise<void> {
+  async setupInput(pin: number, filterType?: FilterTypes, filterThreshold?: number): Promise<void> {
+    if (this.expander.wasIcInited) {
+      this.expander.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
+
+      return;
+    }
+
+    if (pin < 0 || pin >= this.expander.props.analogPinsCount) {
+      throw new Error('PortExpanderDriver.setupAnalog: Analog pin out of range');
+    }
+
+    // TODO: save filter type and filter treshold
+
+    this.pinModes[pin] = MODES.analog_input;
+  }
+
+  async setupOutput(pin: number, outputInitialValue?: number): Promise<void> {
     if (this.expander.wasIcInited) {
       this.expander.log.warn(`PortExpanderDriver.setupAnalog: can't setup pin "${pin}" because IC was already initialized`);
 
@@ -42,16 +60,9 @@ export default class AnalogPins {
     }
 
     // save value
-    if (pinMode === 'analog_output' && typeof outputInitialValue !== 'undefined') {
-      this.expander.state.setAnalogOutput(pin, outputInitialValue);
-    }
+    this.expander.state.setAnalogOutput(pin, outputInitialValue || 0);
 
-    if (this.isAnalogPin(pin)) {
-      this.pinModes[pin] = MODES[pinMode];
-    }
-    else {
-      throw new Error(`Unsupported mode "${pinMode}" of digital pin "${pin}"`);
-    }
+    this.pinModes[pin] = MODES.analog_output;
   }
 
   /**
