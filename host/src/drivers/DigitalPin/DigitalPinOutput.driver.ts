@@ -30,7 +30,7 @@ export class DigitalPinOutputDriver extends DriverBase<DigitalPinOutputDriverPro
   }
 
   // setup pin after drivers and devices have been initialized
-  protected devicesDidInit = async () => {
+  protected didInit = async () => {
     // setup and set initial level
     this.source.setupOutput(this.props.pin, this.props.initialLevel)
       .catch((err) => {

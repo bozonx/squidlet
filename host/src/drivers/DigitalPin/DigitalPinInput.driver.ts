@@ -37,7 +37,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       .getInstance(omit(this.props, 'pullup', 'pulldown', 'pin', 'source'));
   }
 
-  protected devicesDidInit = async () => {
+  protected didInit = async () => {
     // setup pin as an input with resistor if specified
     this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
       .catch((err) => {

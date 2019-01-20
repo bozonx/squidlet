@@ -44,7 +44,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
       });
   }
 
-  protected didInit = async () => {
+  protected devicesDidInit = async () => {
     await this.digitalInput.addListener(this.handleInputChange);
   }
 

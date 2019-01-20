@@ -64,7 +64,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
-  protected appDidInit = async () => {
+  protected devicesDidInit = async () => {
     // init IC state after app is initialized if it isn't at this moment
     try {
       await this.writeToIc(this.currentState);
