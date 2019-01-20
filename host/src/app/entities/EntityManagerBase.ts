@@ -6,6 +6,7 @@ import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 
 interface BaseEntityInstance {
   init?: () => Promise<void>;
+  $riseDidInit?: () => Promise<void>;
 }
 
 // TODO: move to separate file
@@ -50,6 +51,13 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
       const entity: EntityInstance = this.instances[entityId];
 
       if (entity.init) await entity.init();
+    }
+
+    // Rise did init after enities base initialization
+    for (let entityId of entitiesIds) {
+      const entity: EntityInstance = this.instances[entityId];
+
+      if (entity.$riseDidInit) await entity.$riseDidInit();
     }
   }
 

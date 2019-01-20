@@ -54,17 +54,7 @@ export default class EntityBase<Props = {}> {
       if (errorMsg) throw new Error(errorMsg);
     }
 
-    const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
-    const getDriverDep: GetDriverDep = (driverName: string): DriverInstance => {
-      if (!manifest.drivers || !manifest.drivers.includes(driverName)) {
-        throw new Error(`Can't find driver "${driverName}"`);
-      }
-
-      return this.env.getDriver(driverName);
-    };
-    // const getDev: GetDriverDep = (devName: string): DriverInstance => {
-    //   return this.env.getDev(devName);
-    // };
+    const getDriverDep: GetDriverDep = await this.getDriverDepCb();
 
     if (this.devicesDidInit) {
       this.env.system.onDevicesInit(async () => {
@@ -90,6 +80,12 @@ export default class EntityBase<Props = {}> {
 
     if (this.willInit) await this.willInit(getDriverDep);
     if (this.doInit) await this.doInit(getDriverDep);
+
+  }
+
+  async $riseDidInit() {
+    const getDriverDep: GetDriverDep = await this.getDriverDepCb();
+
     // not critical error
     if (this.didInit) {
       try {
@@ -106,6 +102,18 @@ export default class EntityBase<Props = {}> {
    */
   protected async getManifest<T extends ManifestBase>(): Promise<T> {
     return await this.env.loadManifest(this.className) as T;
+  }
+
+  private async getDriverDepCb(): Promise<GetDriverDep> {
+    const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
+
+    return (driverName: string): DriverInstance => {
+      if (!manifest.drivers || !manifest.drivers.includes(driverName)) {
+        throw new Error(`Can't find driver "${driverName}"`);
+      }
+
+      return this.env.getDriver(driverName);
+    };
   }
 
 }
