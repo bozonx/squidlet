@@ -23,15 +23,19 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
 
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
-    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('setupInput'));
+    return this.callOnDevicesInit<void>(async () => {
+      if (this.expanderDriver) return this.expanderDriver.setupDigitalInput(pin, inputMode, debounce, edge);
 
-    return this.expanderDriver.setupDigitalInput(pin, inputMode, debounce, edge);
+      throw new Error(this.expanderErrMsg('setupInput'));
+    });
   }
 
   setupOutput(pin: number, initialValue: boolean): Promise<void> {
-    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('setupOutput'));
+    return this.callOnDevicesInit<void>(async () => {
+      if (this.expanderDriver) return this.expanderDriver.setupDigitalOutput(pin, initialValue);
 
-    return this.expanderDriver.setupDigitalOutput(pin, initialValue);
+      throw new Error(this.expanderErrMsg('setupOutput'));
+    });
   }
 
   // async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
@@ -57,17 +61,21 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
    * Listen to interruption of input pin
    */
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-    if (!this.expanderDriver) throw new Error(this.expanderErrMsg('setWatch'));
+    return this.callOnDevicesInit<number>(async () => {
+      if (this.expanderDriver) {
+        const wrapper = (targetPin: number, value: boolean) => {
+          if (targetPin === pin) handler(value);
+        };
 
-    const wrapper = (targetPin: number, value: boolean) => {
-      if (targetPin === pin) handler(value);
-    };
+        const handlerId: number = await this.expanderDriver.addDigitalListener(wrapper);
 
-    const handlerId: number = this.expanderDriver.addDigitalListener(wrapper);
+        this.handlerIds.push(handlerId);
 
-    this.handlerIds.push(handlerId);
+        return this.handlerIds.length - LENGTH_AND_START_ARR_DIFFERENCE;
+      }
 
-    return this.handlerIds.length - LENGTH_AND_START_ARR_DIFFERENCE;
+      throw new Error(this.expanderErrMsg('setWatch'));
+    });
   }
 
   async clearWatch(id: number): Promise<void> {
@@ -88,6 +96,16 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
   // TODO: validate expander prop - it has to be existent device in master config
+
+  private callOnDevicesInit<T>(cb: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      this.env.system.onDevicesInit(() => {
+        cb()
+          .then(resolve)
+          .catch(reject);
+      });
+    });
+  }
 
   private expanderErrMsg(methodWhichCheck: string): string {
     return `DigitalPortExpanderDriver.${methodWhichCheck}: It seems that it calls before Pcf8574 is initialized`;

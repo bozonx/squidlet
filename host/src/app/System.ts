@@ -34,7 +34,8 @@ export default class System {
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
 
-  private _isInitialized: boolean = false;
+  private _isDevicesInitialized: boolean = false;
+  private _isAppInitialized: boolean = false;
   // only for initialization time - it will be deleted after it
   private initializationConfig?: InitializationConfig;
 
@@ -43,7 +44,7 @@ export default class System {
   }
 
   get isInitialized() {
-    return this._isInitialized;
+    return this._isAppInitialized;
   }
 
 
@@ -90,7 +91,7 @@ export default class System {
 
       await this.initTopLayer();
 
-      this._isInitialized = true;
+      this._isAppInitialized = true;
       this.riseEvent(eventNames.system.appInitialized);
 
       // remove initialization config
@@ -107,12 +108,24 @@ export default class System {
   }
 
   onDevicesInit(cb: () => void): number {
-    // TODO: если событие уже прошло - то выполнить сразу
+    // call immediately if devices are initialized
+    if (this._isDevicesInitialized) {
+      cb();
+
+      return -1;
+    }
+
     return this.events.once(categories.system, eventNames.system.devicesManagerInitialized, cb);
   }
 
   onAppInit(cb: () => void): number {
-    // TODO: если событие уже прошло - то выполнить сразу
+    // call immediately if app is initialized
+    if (this._isAppInitialized) {
+      cb();
+
+      return -1;
+    }
+
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
@@ -142,6 +155,7 @@ export default class System {
     await this.servicesManager.initRegularServices();
     this.log.info(`---> Initializing devices`);
     await this.devicesManager.init();
+    this._isDevicesInitialized = true;
     this.riseEvent(eventNames.system.devicesManagerInitialized);
   }
 

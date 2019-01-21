@@ -236,6 +236,9 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private async writeAllDataAndSetState(partialData: Data): Promise<void> {
+
+    // TODO: fix - после ошибки блокирует запросы
+
     if (!this.tmpState) {
       this.tmpState = cloneDeep(this.localState);
     }
