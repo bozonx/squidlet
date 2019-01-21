@@ -3,7 +3,7 @@ import * as uniqid from 'uniqid';
 import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
-import {find, isEmpty, isObject, trim, values} from './lodashLike';
+import {find, isEmpty, isEqual, isObject, trim, values} from './lodashLike';
 
 
 export const PATH_SEPARATOR = '/';
@@ -318,6 +318,23 @@ export function invertIfNeed(value: boolean, invert?: boolean): boolean {
   if (invert) return !value;
 
   return value;
+}
+
+/**
+ * Compare 2 objects and collect keys which are different.
+ * PartialObj can omit some props of sourceObj
+ * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
+ */
+export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: {[index: string]: any}): string[] {
+  const diffKeys: string[] = [];
+
+  for (let key of Object.keys(sourceObj)) {
+    if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
+      diffKeys.push(key);
+    }
+  }
+
+  return diffKeys;
 }
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {

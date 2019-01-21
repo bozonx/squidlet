@@ -3,7 +3,8 @@ import Republish from '../helpers/Republish';
 import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../app/interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
-import {cloneDeep, isEmpty} from '../helpers/lodashLike';
+import {isEmpty} from '../helpers/lodashLike';
+import {getDifferentKeys} from '../helpers/helpers';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
@@ -40,7 +41,7 @@ export default abstract class DeviceDataManagerBase {
 
   // state which in consistency with remote state
   protected localState: Data = {};
-  // temporary state which sets while save request is in progress
+  // temporary state which contents the newest state while saving of request is in progress
   protected tmpState?: Data;
 
 
@@ -114,9 +115,13 @@ export default abstract class DeviceDataManagerBase {
     // else fetch data if getter is defined
 
     const result: Data = await this.justReadAllData();
-
     // set to local data
-    const updatedParams = this.setLocalState(result);
+    const updatedParams = getDifferentKeys(this.localState, result);
+
+    this.localState = {
+      ...this.localState,
+      ...result,
+    };
     // clear temporary state because we have the last one
     this.tmpState = undefined;
     //  rise events change event and publish
@@ -146,9 +151,8 @@ export default abstract class DeviceDataManagerBase {
     this.validateParam(paramName, result[paramName], `Invalid "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`);
 
     // set to local data and rise events
-    const wasSet = this.setLocalStateParam(paramName, result[paramName]);
-
-    if (wasSet) {
+    if (this.localState[paramName] !== result[paramName]) {
+      this.localState[paramName] = result[paramName];
       // update last consistent param value if there is a temporary state
       if (this.tmpState) (this.tmpState as any)[paramName] = result[paramName];
 
@@ -167,13 +171,21 @@ export default abstract class DeviceDataManagerBase {
   protected async writeData(partialData: Data): Promise<void> {
     if (isEmpty(partialData)) return;
 
+    console.log('------- status writeData', partialData)
+
     this.validateDict(partialData,
       `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
     // if there isn't a data setter - just set to local status
     if (!this.setter) {
       // set to local data
-      const updatedParams = this.setLocalState(partialData);
+      const updatedParams = getDifferentKeys(this.localState, partialData);
+
+      this.localState = {
+        ...this.localState,
+        ...partialData,
+      };
+
       //  rise events change event and publish
       this.emitOnChange(updatedParams);
 
@@ -236,15 +248,19 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private async writeAllDataAndSetState(partialData: Data): Promise<void> {
+    const updatedParams = getDifferentKeys(this.localState, partialData);
 
-    // TODO: fix - после ошибки блокирует запросы
-
+    // set tmpState - it is the newest state.
     if (!this.tmpState) {
-      this.tmpState = cloneDeep(this.localState);
+      //this.tmpState = cloneDeep(this.localState);
+      this.tmpState = {
+        ...this.localState,
+        ...partialData,
+      };
     }
 
-    // set to local data
-    const updatedParams = this.setLocalState(partialData);
+    console.log('------- status writeAllDataAndSetState', partialData, updatedParams, this.tmpState, this.localState, this.getState())
+
     //  rise events change event and publish
     this.emitOnChange(updatedParams);
 
@@ -255,9 +271,9 @@ export default abstract class DeviceDataManagerBase {
       );
     }
     catch (err) {
-      // restore last consistent state
+      // clear tmpState
       if (this.tmpState) {
-        const updatedParams = this.setLocalState(this.tmpState);
+        //const updatedParams = this.setLocalState(this.tmpState);
 
         this.tmpState = undefined;
         //  rise events change event and publish
@@ -267,8 +283,11 @@ export default abstract class DeviceDataManagerBase {
       throw err;
     }
 
-    // on success
-    this.tmpState = undefined;
+    // on success - set tmpState as a permanent one
+    if (this.tmpState) {
+      this.localState = this.tmpState;
+      this.tmpState = undefined;
+    }
   }
 
   private validateParam(paramName: string, value: any, errorMsg: string) {
@@ -320,41 +339,47 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  /**
-   * Set whole structure to local data.
-   * It clears tmp state and set consistent new state.
-   * @returns {string} List of params names which were updated
-   */
-  private setLocalState(partialData: Data): string[] {
-    const updatedParams: string[] = [];
+  // /**
+  //  * Set whole structure to local data.
+  //  * It clears tmp state and set consistent new state.
+  //  * @returns {string} List of params names which were updated
+  //  */
+  // private setLocalState(partialData: Data): string[] {
+  //
+  //   // TODO: remove
+  //
+  //   const updatedParams: string[] = [];
+  //
+  //   for (let name of Object.keys(partialData)) {
+  //     if (partialData[name] !== this.localState[name]) updatedParams.push(name);
+  //   }
+  //
+  //   // do nothing if there isn't changed data
+  //   if (!updatedParams.length) return updatedParams;
+  //
+  //   // update local data
+  //   this.localState = {
+  //     ...this.localState,
+  //     ...partialData,
+  //   };
+  //
+  //   return updatedParams;
+  // }
 
-    for (let name of Object.keys(partialData)) {
-      if (partialData[name] !== this.localState[name]) updatedParams.push(name);
-    }
-
-    // do nothing if there isn't changed data
-    if (!updatedParams.length) return updatedParams;
-
-    // update local data
-    this.localState = {
-      ...this.localState,
-      ...partialData,
-    };
-
-    return updatedParams;
-  }
-
-  /**
-   * Set param to local data.
-   * If param was set it returns true else false
-   */
-  private setLocalStateParam(paramName: string, value: any): boolean {
-    if (this.localState[paramName] === value) return false;
-
-    this.localState[paramName] = value;
-
-    return true;
-  }
+  // /**
+  //  * Set param to local data.
+  //  * If param was set it returns true else false
+  //  */
+  // private setLocalStateParam(paramName: string, value: any): boolean {
+  //
+  //   // TODO: revew
+  //
+  //   if (this.localState[paramName] === value) return false;
+  //
+  //   this.localState[paramName] = value;
+  //
+  //   return true;
+  // }
 
   private emitOnChange(updatedParams: string[]) {
     if (!updatedParams.length) return;
@@ -377,7 +402,12 @@ export default abstract class DeviceDataManagerBase {
     const result: Data = await this.justReadAllData();
 
     // set to local data
-    const updatedParams = this.setLocalState(result);
+    const updatedParams = getDifferentKeys(this.localState, result);
+
+    this.localState = {
+      ...this.localState,
+      ...result,
+    };
     // clear temporary state because we have the last one
     this.tmpState = undefined;
 
