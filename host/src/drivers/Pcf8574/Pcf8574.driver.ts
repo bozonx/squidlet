@@ -200,9 +200,9 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //   throw new Error(err);
     // }
 
-    const newState = this.currentState;
+    const newState = updateBitInByte(this.currentState, pin, value);
 
-    updateBitInByte(newState, pin, value);
+    console.log('------- pcf driver write', pin, value, this.currentState, newState)
 
     await this.writeToIc(newState);
 
@@ -235,13 +235,13 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //   throw new Error(err);
     // }
 
-    const newState = this.currentState;
+    let newState = this.currentState;
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skit not an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
 
-      updateBitInByte(newState, pin, outputValues[pin]);
+      newState = updateBitInByte(newState, pin, outputValues[pin]);
     }
 
     await this.writeToIc(newState);
