@@ -226,7 +226,7 @@ export default abstract class DeviceDataManagerBase {
     // set to local data
     this.localState = {
       ...this.localState,
-      result,
+      ...result,
     };
     // rise change events and publish on all the params
     this.emitOnChange(Object.keys(this.localState));
