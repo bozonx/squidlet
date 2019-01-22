@@ -43,9 +43,7 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     const dataAddressHex: number | undefined = this.makeDataAddrHex(dataAddressStr);
     const senderId = this.makeSenderId(dataAddressStr, 'write');
 
-    await this.sender.send<void>(senderId, (): Promise<void> => {
-      return this.i2cMaster.write(this.addressHex, dataAddressHex, data);
-    });
+    await this.sender.send<void>(senderId, this.i2cMaster.write, this.addressHex, dataAddressHex, data);
   }
 
   async read(dataAddressStr?: string | number, length?: number): Promise<Uint8Array> {
@@ -53,10 +51,13 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, length);
     const senderId = this.makeSenderId(dataAddressStr, 'read', resolvedLength);
     // send data and wait
-    const result: Uint8Array = await this.sender
-      .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
-        return this.i2cMaster.read(this.addressHex, dataAddressHex, resolvedLength);
-      });
+    const result: Uint8Array = await this.sender.send<Uint8Array>(
+      senderId,
+      this.i2cMaster.read,
+      this.addressHex,
+      dataAddressHex,
+      resolvedLength
+    );
 
     this.updateLastPollData(dataAddressStr, result);
 
@@ -75,10 +76,14 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, readLength);
     const senderId = this.makeSenderId(dataAddressStr, 'request', resolvedLength);
     // make request
-    const result: Uint8Array = await this.sender
-      .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
-        return this.i2cMaster.request(this.addressHex, dataAddressHex, dataToSend, resolvedLength);
-      });
+    const result: Uint8Array = await this.sender.send<Uint8Array>(
+      senderId,
+      this.i2cMaster.request,
+      this.addressHex,
+      dataAddressHex,
+      dataToSend,
+      resolvedLength
+    );
 
     this.updateLastPollData(dataAddressStr, result);
 
@@ -93,10 +98,13 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
     const resolvedLength: number = this.resolveReadLength(dataAddressStr);
     const senderId = this.makeSenderId(dataAddressStr, 'doPoll');
 
-    const data: Uint8Array = await this.sender
-      .send<Uint8Array>(senderId, (): Promise<Uint8Array> => {
-        return this.i2cMaster.read(this.addressHex, dataAddressHex, resolvedLength);
-      });
+    const data: Uint8Array = await this.sender.send<Uint8Array>(
+      senderId,
+      this.i2cMaster.read,
+      this.addressHex,
+      dataAddressHex,
+      resolvedLength
+    );
 
     this.updateLastPollData(dataAddressStr, data);
 

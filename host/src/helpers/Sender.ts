@@ -29,6 +29,10 @@ class SenderRequest {
     });
   }
 
+  isCbSame(cb: (...p: any[]) => any): boolean {
+    return this.sendCb === cb;
+  }
+
   updateParams(sendParams: any[]) {
     this.sendParams = sendParams;
   }
@@ -43,15 +47,12 @@ class SenderRequest {
 
 
   private trySend() {
-    if (!this.sendCb) return this.onReject(new Error(`sendCb wasn't set`));
-
-    this.sendCb()
+    this.sendCb(this.sendParams)
       .then(this.success)
       .catch((err: Error) => {
         if (new Date().getTime() >= this.startedTimeStamp + this.timeoutMs) {
-          delete this.sendCb;
           // stop trying and call reject
-          this.onReject(err);
+          this.reject(err);
 
           return;
         }
@@ -68,8 +69,7 @@ class SenderRequest {
   }
 
   private success = (data: any) => {
-    delete this.sendCb;
-    this.onResolve(data);
+    this.resolve(data);
   }
 
 }
@@ -87,7 +87,15 @@ export default class Sender {
 
 
   async send<T>(id: string, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
-    if (!this.requests[id]) {
+    if (this.requests[id]) {
+      // update callback params
+      this.requests[id].updateParams(params);
+
+      if (!this.requests[id].isCbSame(sendCb)) {
+        throw new Error(`Callback has been changed for sender id "${id}"`);
+      }
+    }
+    else {
       // make new request
       this.requests[id] = new SenderRequest(
         id,
@@ -99,12 +107,6 @@ export default class Sender {
 
       this.requests[id].start();
     }
-    else {
-      // update callback params
-      this.requests[id].updateParams(params);
-    }
-
-    // TODO: может не позволять чтобы cb отличался ??? тогда id и не нужен по идее
 
     try {
       const result: T = await this.requests[id].promise;

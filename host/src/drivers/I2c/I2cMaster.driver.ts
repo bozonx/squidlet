@@ -35,7 +35,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
    * if data address is defined then it will write an empty command before read
    * and code on other side cat prepare data to send.
    */
-  async read(addressHex: number, dataAddressHex: number | undefined, length: number): Promise<Uint8Array> {
+  read = async(addressHex: number, dataAddressHex: number | undefined, length: number): Promise<Uint8Array> => {
     if (typeof dataAddressHex !== 'undefined') {
       await this.write(addressHex, dataAddressHex);
     }
@@ -44,7 +44,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
     return this.i2cMasterDev.readFrom(this.props.bus, addressHex, length);
   }
 
-  async write(addressHex: number, dataAddressHex?: number, data?: Uint8Array): Promise<void> {
+  write = async (addressHex: number, dataAddressHex?: number, data?: Uint8Array): Promise<void> => {
     let dataToWrite = data;
 
     if (typeof dataAddressHex !== 'undefined' && typeof data === 'undefined') {
@@ -66,7 +66,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
   /**
    * Write and read from the same data address.
    */
-  async request(addressHex: number, dataAddressHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> {
+  request = async(addressHex: number, dataAddressHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> => {
     await this.write(addressHex, dataAddressHex, dataToSend);
 
     return this.read(addressHex, dataAddressHex, readLength);
