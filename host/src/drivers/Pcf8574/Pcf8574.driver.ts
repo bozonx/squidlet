@@ -34,6 +34,8 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
   private readonly directions: Array<number> = [];
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
+  // State which is sets on write and removes after it
+  private tmpState?: number;
   private wasIcInited: boolean = false;
   private initingIcInProgress: boolean = false;
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
@@ -200,14 +202,30 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //   throw new Error(err);
     // }
 
-    const newState = updateBitInByte(this.currentState, pin, value);
+    // TODO: что будет если ещё выполнится 2й запрос в очереди - на тот момент же будет удален tmpState ???
 
-    console.log('------- pcf driver write', pin, value, this.currentState, newState)
+    if (typeof this.tmpState === 'undefined') {
+      this.tmpState = this.currentState;
+    }
 
-    await this.writeToIc(newState);
+    this.tmpState = updateBitInByte(this.tmpState, pin, value);
+
+    try {
+      await this.writeToIc(this.tmpState);
+
+      if (this.tmpState) {
+        this.currentState = this.tmpState;
+        this.tmpState = undefined;
+      }
+    }
+    catch (err) {
+      this.tmpState = undefined;
+
+      throw err;
+    }
 
     // update only this pin eventually
-    this.updateCurrentState(pin, value);
+    //this.updateCurrentState(pin, value);
   }
 
   /**
@@ -235,24 +253,42 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     //   throw new Error(err);
     // }
 
-    let newState = this.currentState;
+    if (typeof this.tmpState === 'undefined') {
+      this.tmpState = this.currentState;
+    }
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skit not an output pin
       if (this.directions[pin] !== DIR_OUT) continue;
 
-      newState = updateBitInByte(newState, pin, outputValues[pin]);
+      this.tmpState = updateBitInByte(this.tmpState, pin, outputValues[pin]);
     }
 
-    await this.writeToIc(newState);
+    try {
+      await this.writeToIc(this.tmpState);
 
-    // update only output pins eventually
-    for (let pin = 0; pin < PINS_COUNT; pin++) {
-      // skit not an output pin
-      if (this.directions[pin] !== DIR_OUT) continue;
-
-      this.updateCurrentState(pin, outputValues[pin]);
+      if (this.tmpState) {
+        this.currentState = this.tmpState;
+        this.tmpState = undefined;
+      }
     }
+    catch (err) {
+      this.tmpState = undefined;
+
+      throw err;
+    }
+
+    //await this.writeToIc(this.tmpState);
+
+    // TODO: review - use tmp sate
+
+    // // update only output pins eventually
+    // for (let pin = 0; pin < PINS_COUNT; pin++) {
+    //   // skit not an output pin
+    //   if (this.directions[pin] !== DIR_OUT) continue;
+    //
+    //   this.updateCurrentState(pin, outputValues[pin]);
+    // }
   }
 
 
@@ -322,7 +358,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    * Write the current state to the IC.
    * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private async writeToIc(newState: number) {
+  private async writeToIc(newState: number): Promise<void> {
     if (!this.wasIcInited) {
       this.initingIcInProgress = true;
     }
@@ -367,6 +403,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
     }
   }
 
+  // TODO: remove ???
   private updateCurrentState(pin: number, newValue: boolean) {
     this.currentState = updateBitInByte(this.currentState, pin, newValue);
   }

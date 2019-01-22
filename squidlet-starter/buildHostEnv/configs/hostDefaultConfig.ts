@@ -3,6 +3,7 @@ export default {
     logLevel: 'info',
     defaultStatusRepublishIntervalMs: 60000,
     defaultConfigRepublishIntervalMs: 600000,
+    // main timeout in seconds
     senderTimeout: 60,
     senderResendTimeout: 1,
     drivers: {

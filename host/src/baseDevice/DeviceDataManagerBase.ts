@@ -171,8 +171,6 @@ export default abstract class DeviceDataManagerBase {
   protected async writeData(partialData: Data): Promise<void> {
     if (isEmpty(partialData)) return;
 
-    console.log('------- status writeData', partialData)
-
     this.validateDict(partialData,
       `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
 
@@ -259,8 +257,6 @@ export default abstract class DeviceDataManagerBase {
       };
     }
 
-    console.log('------- status writeAllDataAndSetState', partialData, updatedParams, this.tmpState, this.localState, this.getState())
-
     //  rise events change event and publish
     this.emitOnChange(updatedParams);
 
@@ -272,9 +268,8 @@ export default abstract class DeviceDataManagerBase {
     }
     catch (err) {
       // clear tmpState
-      if (this.tmpState) {
-        //const updatedParams = this.setLocalState(this.tmpState);
 
+      if (this.tmpState) {
         this.tmpState = undefined;
         //  rise events change event and publish
         this.emitOnChange(updatedParams);

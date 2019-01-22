@@ -136,6 +136,9 @@ export default class DigitalPins {
   async write(pin: number, value: boolean): Promise<void> {
     if (!this.expander.checkInitialization('writeDigital')) return;
 
+    // TODO: наверное тоже нужне tmpState как в pcf экспандере - тоже в analog ???
+
+
     this.checkPin(pin);
     await this.expander.initIcIfNeed();
 

@@ -83,8 +83,6 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
     // use blocking if there is set blockTime prop
     if (this.props.blockTime) this.blockTimeInProgress = true;
 
-    console.log('------- binary output doWrite', this.props.pin, this.props.invert, resolvedValue, this.props.blockTime, this.props.blockMode)
-
     try {
       await this.digitalOutput.write(resolvedValue);
     }
@@ -100,8 +98,6 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
       throw new Error(errorMsg);
     }
-
-    console.log('------- binary output doWrite WRITTEN', this.props.pin, this.blockTimeInProgress);
 
     // if blockTime prop isn't set - don't do blocking.
     if (!this.props.blockTime) return;

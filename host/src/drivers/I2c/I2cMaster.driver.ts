@@ -60,7 +60,20 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
     // TODO: выяснить поддерживается ли запись без данных
 
     //await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
+
     await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite || new Uint8Array(0));
+
+    // try {
+    //   await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite || new Uint8Array(0));
+    //
+    //   console.log('==== i2c master SUCCESS', addressHex, dataAddressHex, data);
+    // }
+    // catch (err) {
+    //   console.log('==== i2c master ERROR', addressHex, dataAddressHex, data);
+    //
+    //   throw err;
+    // }
+
   }
 
   /**
