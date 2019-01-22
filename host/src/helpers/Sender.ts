@@ -1,32 +1,36 @@
-
-// TODO: добавить таймаут соединения если соединение слишком долгое
-
 class SenderRequest {
-  private sendCb?: (...p: any[]) => Promise<any>;
-  private readonly onResolve: (data: any) => void;
-  private readonly onReject: (err: Error) => void;
+  readonly promise: Promise<any>;
   private readonly id: string;
   private readonly timeoutMs: number;
   private readonly resendTimeoutMs: number;
   private startedTimeStamp: number = 0;
+  private readonly sendCb: (...p: any[]) => any;
+  private sendParams: any[] = [];
+  private resolve: (data: any) => void = () => {};
+  private reject: (err: Error) => void = () => {};
 
 
   constructor(
     id: string,
     timeoutSec: number,
     resendTimeoutSec: number,
-    onResolve: (data: any) => void,
-    onReject: (err: Error) => void
+    sendCb: (...p: any[]) => any,
+    sendParams: any[],
   ) {
     this.id = id;
     this.timeoutMs = timeoutSec * 1000;
     this.resendTimeoutMs = resendTimeoutSec * 1000;
-    this.onResolve = onResolve;
-    this.onReject = onReject;
+    this.sendCb = sendCb;
+    this.sendParams = sendParams;
+
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
   }
 
-  setCb(sendCb: (...p: any[]) => Promise<any>) {
-    this.sendCb = sendCb;
+  updateParams(sendParams: any[]) {
+    this.sendParams = sendParams;
   }
 
   start() {
@@ -82,36 +86,41 @@ export default class Sender {
   }
 
 
-  send<T>(id: string, sendCb: (...p: any[]) => Promise<T>): Promise<T> {
+  async send<T>(id: string, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
+    if (!this.requests[id]) {
+      // make new request
+      this.requests[id] = new SenderRequest(
+        id,
+        this.timeoutSec,
+        this.resendTimeoutSec,
+        sendCb,
+        params,
+      );
 
-    // TODO: можно не создавать постоянно новый промис
-
-    return new Promise((resolve, reject) => {
-      if (!this.requests[id]) {
-        // make new request
-        this.requests[id] = new SenderRequest(
-          id,
-          this.timeoutSec,
-          this.resendTimeoutSec,
-          (data: T) => {
-
-            // TODO: print in debug
-            console.log(`Request successfully finished ${id}`);
-
-            delete this.requests[id];
-            resolve(data);
-          },
-          (err: Error) => {
-            delete this.requests[id];
-            reject(err);
-          }
-        );
-      }
-
-      // update callback. It can send the last data
-      this.requests[id].setCb(sendCb);
       this.requests[id].start();
-    });
+    }
+    else {
+      // update callback params
+      this.requests[id].updateParams(params);
+    }
+
+    // TODO: может не позволять чтобы cb отличался ??? тогда id и не нужен по идее
+
+    try {
+      const result: T = await this.requests[id].promise;
+      // TODO: print in debug
+      console.log(`Request successfully finished ${id}`);
+
+      delete this.requests[id];
+
+      return result;
+    }
+    catch (err) {
+      delete this.requests[id];
+
+      throw err;
+    }
+
   }
 
 }
