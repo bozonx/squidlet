@@ -1,3 +1,5 @@
+import {isEqual} from './lodashLike';
+
 class SenderRequest {
   readonly promise: Promise<any>;
   private readonly id: string;
@@ -8,6 +10,8 @@ class SenderRequest {
   private sendParams: any[] = [];
   private resolve: (data: any) => void = () => {};
   private reject: (err: Error) => void = () => {};
+  // if cb params was changed while request was in progress - it means the last cb will set to queue
+  //private sendQueued: boolean = false;
 
 
   constructor(
@@ -34,6 +38,10 @@ class SenderRequest {
   }
 
   updateParams(sendParams: any[]) {
+    // if (this.sendParams && !isEqual(this.sendParams, sendParams)) {
+    //   this.sendQueued = true;
+    // }
+
     this.sendParams = sendParams;
   }
 
@@ -47,6 +55,8 @@ class SenderRequest {
 
 
   private trySend() {
+    //this.sendQueued = false;
+
     this.sendCb(...this.sendParams)
       .then(this.success)
       .catch((err: Error) => {
@@ -60,7 +70,7 @@ class SenderRequest {
         setTimeout(() => {
 
           // TODO: print in debug
-          console.log(`resending - ${this.id}`);
+          console.log(`--> resending - ${this.id}`);
 
           // try another one
           this.trySend();
@@ -70,6 +80,11 @@ class SenderRequest {
 
   private success = (data: any) => {
     this.resolve(data);
+
+    // // send queued
+    // if (this.sendQueued) {
+    //   this.trySend();
+    // }
   }
 
 }
@@ -87,32 +102,21 @@ export default class Sender {
 
 
   async send<T>(id: string, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
-    if (this.requests[id]) {
-      // update callback params
-      this.requests[id].updateParams(params);
 
-      if (!this.requests[id].isCbSame(sendCb)) {
-        // TODO: use logger
-        console.warn(`Callback has been changed for sender id "${id}"`);
-      }
+    // TODO: review
+
+    if (this.requests[id]) {
+      this.addToQueue(id, sendCb, params);
     }
     else {
       // make new request
-      this.requests[id] = new SenderRequest(
-        id,
-        this.timeoutSec,
-        this.resendTimeoutSec,
-        sendCb,
-        params,
-      );
-
-      this.requests[id].start();
+      this.startNewRequest(id, sendCb, params);
     }
 
     try {
-      const result: T = await this.requests[id].promise;
+      const result: any = await this.requests[id].promise;
       // TODO: print in debug
-      console.log(`Request successfully finished ${id}`);
+      console.log(`==> Request successfully finished ${id}`);
 
       delete this.requests[id];
 
@@ -123,7 +127,44 @@ export default class Sender {
 
       throw err;
     }
+  }
 
+
+  private async startNewRequest(id: string, sendCb: (...p: any[]) => Promise<any>, params: any[]): Promise<any> {
+    this.requests[id] = new SenderRequest(
+      id,
+      this.timeoutSec,
+      this.resendTimeoutSec,
+      sendCb,
+      params,
+    );
+
+    this.requests[id].start();
+  }
+
+  private async addToQueue(id: string, sendCb: (...p: any[]) => Promise<any>, params: any[]): Promise<any> {
+    // update callback params
+    this.requests[id].updateParams(params);
+
+    if (!this.requests[id].isCbSame(sendCb)) {
+      // TODO: use logger
+      console.warn(`Callback has been changed for sender id "${id}"`);
+    }
+
+    // try {
+    //   const result: any = await this.requests[id].queuePromise;
+    //   // TODO: print in debug
+    //   console.log(`==> Request successfully finished ${id}`);
+    //
+    //   delete this.requests[id];
+    //
+    //   return result;
+    // }
+    // catch (err) {
+    //   delete this.requests[id];
+    //
+    //   throw err;
+    // }
   }
 
 }
