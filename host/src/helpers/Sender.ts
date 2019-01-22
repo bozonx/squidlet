@@ -47,7 +47,7 @@ class SenderRequest {
 
 
   private trySend() {
-    this.sendCb(this.sendParams)
+    this.sendCb(...this.sendParams)
       .then(this.success)
       .catch((err: Error) => {
         if (new Date().getTime() >= this.startedTimeStamp + this.timeoutMs) {
@@ -92,7 +92,8 @@ export default class Sender {
       this.requests[id].updateParams(params);
 
       if (!this.requests[id].isCbSame(sendCb)) {
-        throw new Error(`Callback has been changed for sender id "${id}"`);
+        // TODO: use logger
+        console.warn(`Callback has been changed for sender id "${id}"`);
       }
     }
     else {

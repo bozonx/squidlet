@@ -46,7 +46,9 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
   }
 
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.digitalOutput.read(), this.props.invert);
+    const realValue: boolean = await this.digitalOutput.read();
+
+    return invertIfNeed(realValue, this.props.invert);
   }
 
   async write(level: boolean): Promise<void> {
@@ -61,24 +63,36 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
         // store level which is delayed
         this.lastDeferredValue = level;
 
+        // TODO: review
+
         // wait while delayed value is set
         return this.waitDeferredValueWritten();
       }
+
+      return;
     }
 
-    // normal write
+    // normal write only if there isn't blocking
     return this.doWrite(level);
   }
 
 
   private async doWrite(level: boolean): Promise<void> {
-    this.blockTimeInProgress = true;
+    const resolvedValue: boolean = invertIfNeed(level, this.props.invert);
+
+    // use blocking if there is set blockTime prop
+    if (this.props.blockTime) this.blockTimeInProgress = true;
+
+    console.log('------- binary output doWrite', this.props.pin, this.props.invert, resolvedValue, this.props.blockTime, this.props.blockMode)
 
     try {
-      await this.digitalOutput.write(invertIfNeed(level, this.props.invert));
+      await this.digitalOutput.write(resolvedValue);
     }
     catch (err) {
       this.blockTimeInProgress = false;
+      // TODO: review
+      // TODO: что делать с отложенным значением? - наверное очистить
+
       const errorMsg = `BinaryOutputDriver: Can't write "${level}",
         props: "${JSON.stringify(this.props)}". ${String(err)}`;
 
@@ -87,17 +101,13 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
       throw new Error(errorMsg);
     }
 
-    if (!this.props.blockTime) {
-      this.blockTimeInProgress = false;
+    console.log('------- binary output doWrite WRITTEN', this.props.pin, this.blockTimeInProgress);
 
-      return;
-    }
+    // if blockTime prop isn't set - don't do blocking.
+    if (!this.props.blockTime) return;
 
-    // starting block time
-
-    setTimeout(() => {
-      this.blockTimeFinished();
-    }, this.props.blockTime);
+    // starting blocking
+    setTimeout(this.blockTimeFinished, this.props.blockTime);
   }
 
   private blockTimeFinished = () => {
@@ -105,14 +115,20 @@ export class BinaryOutputDriver extends DriverBase<BinaryOutputDriverProps> {
 
     // setting last delayed value
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
-      const lastDeferredValue = this.lastDeferredValue;
+      const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.props.invert);
       // clear deferred value
       this.lastDeferredValue = undefined;
       // write deferred value
       // don't wait in normal way
-      this.write(invertIfNeed(lastDeferredValue, this.props.invert))
-        .then(() => this.delayedResultEvents.emit())
-        .catch((err) => this.delayedResultEvents.emit(err));
+      this.write(resolvedValue)
+        .then(() => {
+          this.blockTimeInProgress = false;
+          this.delayedResultEvents.emit();
+        })
+        .catch((err) => {
+          this.blockTimeInProgress = false;
+          this.delayedResultEvents.emit(err);
+      });
     }
   }
 
