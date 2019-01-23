@@ -1,6 +1,6 @@
-name: SwitchSensor
+name: WallSwitchSensor
 type: switch-sensor
-main: ./SwitchSensor.ts
+main: ./WallSwitchSensor.ts
 drivers:
   - BinaryInput.driver
 

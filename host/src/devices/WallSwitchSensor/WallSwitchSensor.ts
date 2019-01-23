@@ -1,5 +1,5 @@
 import BinarySensor from '../BinarySensor/BinarySensor';
 
 
-export default class SwitchSensor extends BinarySensor {
+export default class WallSwitchSensor extends BinarySensor {
 }

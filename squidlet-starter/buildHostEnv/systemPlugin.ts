@@ -16,7 +16,8 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'Toggle/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Switch/manifest.yaml'));
-  await env.addDevice(path.join(devicesRoot, 'SwitchSensor/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'WallSwitchSensor/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'WallToggle/manifest.yaml'));
   // TODO: remove
   await env.addDevice(path.join(devicesRoot, 'FakePeopleCount/manifest.yaml'));
   // TODO: remove
