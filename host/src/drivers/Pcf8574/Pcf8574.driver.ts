@@ -188,20 +188,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
     // It doesn't need to initialize IC, because new state will send below
 
-    //const oldValue: boolean = getBitFromByte(this.currentState, pin);
-    // update local state before writing to IC
-    //this.updateCurrentState(pin, value);
-    // // write to IC
-    // try {
-    //   await this.writeToIc();
-    // }
-    // catch (err) {
-    //   // switch back old value on error
-    //   this.updateCurrentState(pin, oldValue);
-    //
-    //   throw new Error(err);
-    // }
-
     // TODO: что будет если ещё выполнится 2й запрос в очереди - на тот момент же будет удален tmpState ???
 
     if (typeof this.tmpState === 'undefined') {
@@ -223,9 +209,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
       throw err;
     }
-
-    // update only this pin eventually
-    //this.updateCurrentState(pin, value);
   }
 
   /**
@@ -234,24 +217,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
    */
   async writeState(outputValues: boolean[]): Promise<void> {
     if (!this.checkInitialization('writeState')) return;
-
-    //const oldState: number = this.currentState;
-    // for (let pin = 0; pin < PINS_COUNT; pin++) {
-    //   // skit not an output pin
-    //   if (this.directions[pin] !== DIR_OUT) continue;
-    //
-    //   this.updateCurrentState(pin, outputValues[pin]);
-    // }
-
-    // try {
-    //   await this.writeToIc();
-    // }
-    // catch (err) {
-    //   // switch back old value on error
-    //   this.currentState = oldState;
-    //
-    //   throw new Error(err);
-    // }
 
     if (typeof this.tmpState === 'undefined') {
       this.tmpState = this.currentState;
@@ -277,18 +242,6 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
       throw err;
     }
-
-    //await this.writeToIc(this.tmpState);
-
-    // TODO: review - use tmp sate
-
-    // // update only output pins eventually
-    // for (let pin = 0; pin < PINS_COUNT; pin++) {
-    //   // skit not an output pin
-    //   if (this.directions[pin] !== DIR_OUT) continue;
-    //
-    //   this.updateCurrentState(pin, outputValues[pin]);
-    // }
   }
 
 
