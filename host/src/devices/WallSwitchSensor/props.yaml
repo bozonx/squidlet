@@ -1,6 +1,8 @@
 ### BinaryInput driver props
 debounce:
+  default: 50
 blockTime:
+  default: 500
 edge:
 invertOnPullup:
 
