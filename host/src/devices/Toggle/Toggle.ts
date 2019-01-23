@@ -8,7 +8,6 @@ import {omit} from '../../helpers/lodashLike';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
-  actionDebounce: number;
   // in this time driver doesn't receive any data
   blockTime: number;
 }
@@ -25,7 +24,8 @@ export default class Toggle extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(omit(this.props, 'actionDebounce', 'blockTime'));
+      // BinaryInput driver doesn't need a block time because it is put in place here
+      .getInstance(omit(this.props, 'blockTime'));
   }
 
   protected didInit = async () => {

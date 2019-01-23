@@ -1,0 +1,11 @@
+name: WallToggle
+main: ./WallToggle.ts
+type: toggle
+#drivers:
+#  - BinaryInput.driver
+
+props: ./props.yaml
+
+status:
+  default:
+    type: boolean
