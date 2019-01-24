@@ -1,22 +1,21 @@
-### BinaryInput driver props
-# debounce time in ms
-debounce:
-  default: 25
-edge:
-  default: rising
-# timeout after received signal. At this time it doesn't receive any signals.
+# Publish logical 1 on down or up events. Or publish 1 and 0 which are represent the state of button
+publish:
+  type: down | up | state
+  default: state
+
+# BinaryInput
 blockTime:
-  default: 0
 invertOnPullup:
+invert:
 
 ### DigitalPinInput driver props
 pullup:
 pulldown:
-invert:
 
 ### DigitalPin base props
 pin:
-sorce:
+source:
+
 
 ### Device base props
 statusRepublishInterval:

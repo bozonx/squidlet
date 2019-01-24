@@ -4,10 +4,12 @@ import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {BinaryClickDriver} from '../../drivers/Binary/BinaryClick.driver';
+import {omit} from '../../helpers/lodashLike';
 
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
+  publish: 'down' | 'up' | 'state';
 }
 
 
@@ -19,14 +21,23 @@ export default class ClickSensor extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryClick = await getDriverDep('BinaryClick.driver')
-      .getInstance(this.props);
+      .getInstance(omit(this.props, 'publish'));
   }
 
   protected didInit = async () => {
-    // listen driver's change
-    this.binaryClick.addStateListener(this.onClickStateChange);
+    if (this.props.publish === 'down') {
+      // TODO: нужно поднять событие, но не устанавливать state
+      //this.binaryClick.addStateListener(this.onClickStateChange);
 
-    // TODO: в props задается какое событие слушать
+
+    }
+    else if (this.props.publish === 'up') {
+      // TODO: нужно поднять событие, но не устанавливать state
+      //this.binaryClick.addStateListener(this.onClickStateChange);
+    }
+    else if (this.props.publish === 'state') {
+      this.binaryClick.addStateListener(this.onClickStateChange);
+    }
   }
 
   protected statusGetter = async (): Promise<Data> => {
