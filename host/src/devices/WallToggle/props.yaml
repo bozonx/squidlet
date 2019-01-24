@@ -1,19 +1,18 @@
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   default: 500
-invert:
 
 ### BinaryInput driver props
-# debounce time in ms
-debounce:
-  default: 50
-edge:
+invert:
 invertOnPullup:
 
-### DigitalPinInput driver props
+### DigitalPinInput driver
+# debounce time in ms
+debounce:
+  default: 25
+edge:
 pullup:
 pulldown:
-#invert
 
 ### DigitalPin base props
 pin:

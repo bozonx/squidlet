@@ -1,17 +1,17 @@
-### BinaryInput driver props
-debounce:
-  default: 50
+### BinaryInput driver
 blockTime:
   default: 500
-edge:
+invert:
 invertOnPullup:
 
-### DigitalPinInput driver props
+### DigitalPinInput driver
+debounce:
+  default: 50
+edge:
 pullup:
 pulldown:
-invert:
 
-### DigitalPin base props
+### DigitalPin base
 pin:
 sorce:
 

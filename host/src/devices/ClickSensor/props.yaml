@@ -8,14 +8,15 @@ blockTime:
 invertOnPullup:
 invert:
 
-### DigitalPinInput driver props
+### DigitalPinInput driver
+debounce:
+edge:
 pullup:
 pulldown:
 
-### DigitalPin base props
+### DigitalPin base
 pin:
 source:
-
 
 ### Device base props
 statusRepublishInterval:

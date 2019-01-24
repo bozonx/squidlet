@@ -8,15 +8,17 @@ props:
   # timeout after received signal. At this time it doesn't receive any signals.
   blockTime:
     type: number
+  invert:
+    type: boolean
+    default: false
   # In true case it inverts value if pullup resistor is on
   invertOnPullup:
     type: boolean
     default: true
-  invert:
-    type: boolean
-    default: false
 
   ### DigitalPinInput driver props
+  debounce:
+  edge:
   pullup:
   pulldown:
 
