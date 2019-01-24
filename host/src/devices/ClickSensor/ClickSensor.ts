@@ -9,7 +9,7 @@ import {omit} from '../../helpers/lodashLike';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
-  publish: 'down' | 'up' | 'state';
+  publish: 'down' | 'up' | 'both';
 }
 
 
@@ -29,15 +29,15 @@ export default class ClickSensor extends DeviceBase<Props> {
       // change status silently
       this.binaryClick.addStateListener(this.onSilentStatusChange);
       // rise 1 on key up
-      this.binaryClick.addDownListener(this.onDownOrUp);
+      this.binaryClick.addDownListener(this.onDown);
     }
     else if (this.props.publish === 'up') {
       // change status silently
       this.binaryClick.addStateListener(this.onSilentStatusChange);
-      // rise 1 on key up
-      this.binaryClick.addUpListener(this.onDownOrUp);
+      // rise 0 on key up
+      this.binaryClick.addUpListener(this.onUp);
     }
-    else if (this.props.publish === 'state') {
+    else if (this.props.publish === 'both') {
       this.binaryClick.addStateListener(this.onClickStateChange);
     }
   }
@@ -65,10 +65,16 @@ export default class ClickSensor extends DeviceBase<Props> {
     await this.status.write({[DEFAULT_STATUS]: true}, true);
   }
 
-  private onDownOrUp = () => {
+  private onDown = () => {
     if (!this.status) return;
 
     this.status.publish(true);
+  }
+
+  private onUp = () => {
+    if (!this.status) return;
+
+    this.status.publish(false);
   }
 
   private onClickStateChange = async (level: boolean) => {
