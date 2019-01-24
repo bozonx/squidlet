@@ -4,7 +4,6 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {convertToLevel, invertIfNeed} from '../../helpers/helpers';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import {omit} from '../../helpers/lodashLike';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
@@ -24,13 +23,21 @@ export default class Toggle extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      // BinaryInput driver doesn't need a block time because it is put in place here
-      .getInstance(omit(this.props, 'blockTime'));
+      .getInstance({
+        ...this.props,
+        // BinaryInput driver doesn't need a block time because it is put in place here
+        blockTime: 0,
+        // TODO: remove
+        // listen only logical 1
+        edge: 'rising',
+      });
   }
 
   protected didInit = async () => {
     // listen driver's change
     this.binaryInput.addListener(this.onInputChange);
+
+    console.log(333333333, this.props)
   }
 
   protected transformPublishValue = (value: boolean): number => {
@@ -65,13 +72,20 @@ export default class Toggle extends DeviceBase<Props> {
 
   private onInputChange = async (level: boolean) => {
     // listen only for 1
+
+    // TODO: remove
+
     if (!level) return;
+
+    console.log(11111111, level)
 
     await this.doToggle();
   }
 
   private async doToggle(): Promise<boolean> {
     if (this.blockTimeInProgress) return this.getStatus();
+
+    console.log(2222222)
 
     this.blockTimeInProgress = true;
 

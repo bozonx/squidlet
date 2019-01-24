@@ -1,12 +1,12 @@
 ### BinaryInput driver props
 # debounce time in ms
 debounce:
-  default: 0
+  default: 25
 edge:
   default: rising
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
-  default: 300
+  default: 0
 invertOnPullup:
 
 ### DigitalPinInput driver props

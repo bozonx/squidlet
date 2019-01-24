@@ -36,6 +36,9 @@ export default class BinarySensor extends DeviceBase<Props> {
 
 
   private onInputChange = async (level: boolean) => {
+
+    console.log('------- binary sensor', level)
+
     await this.setStatus(level);
   }
 
