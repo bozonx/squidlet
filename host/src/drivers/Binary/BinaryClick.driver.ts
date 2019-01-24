@@ -18,6 +18,7 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
   private readonly upEvents = new IndexedEvents<Handler>();
   private keyDown: boolean = false;
   private debounceInProgress: boolean = false;
+  private blockTimeInProgress: boolean = false;
 
   private get binaryInput(): BinaryInputDriver {
     return this.depsInstances.binaryInput as any;
@@ -26,7 +27,10 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
-      .getInstance(this.props);
+      .getInstance({
+        ...this.props,
+        blockTime: 0,
+      });
   }
 
   protected didInit = async () => {
@@ -64,6 +68,8 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
 
 
   private handleInputChange = async (level: boolean) => {
+    if (this.blockTimeInProgress) return;
+
     if (level) {
       if (this.keyDown) return;
 
@@ -88,18 +94,29 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
     this.debounceInProgress = true;
 
     setTimeout(async () => {
-      if (await this.binaryInput.read()) {
-        // logical 1 = do nothing
-        this.debounceInProgress = false;
-      }
-      else {
-        // logical 0 = end of key down
-        this.debounceInProgress = false;
-        this.keyDown = false;
-        this.stateEvents.emit(false);
-        this.upEvents.emit();
+      const currentLevel: boolean = await this.binaryInput.read();
+
+      this.debounceInProgress = false;
+
+      // if logical 1 = do nothing
+
+      if (!currentLevel) {
+        // logical 0 = finish
+        await this.finishLogic();
       }
     }, this.props.debounce);
+  }
+
+  private async finishLogic() {
+    this.keyDown = false;
+    this.stateEvents.emit(false);
+    this.upEvents.emit();
+
+    this.blockTimeInProgress = true;
+
+    setTimeout(() => {
+      this.blockTimeInProgress = false;
+    }, this.props.blockTime || 0);
   }
 
 
