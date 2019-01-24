@@ -29,8 +29,12 @@ export default class Status extends DeviceDataManagerBase {
   /**
    * Set status of device.
    */
-  write = async (partialData: Data) => {
-    await this.writeData(partialData);
+  write = async (partialData: Data, silent?: boolean) => {
+    await this.writeData(partialData, silent);
+  }
+
+  publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
+    this.publishOneStatus(value, statusName, false);
   }
 
 
@@ -40,12 +44,12 @@ export default class Status extends DeviceDataManagerBase {
   protected publishState = (changedParams: string[], isRepeat: boolean) => {
     // publish all the statuses
     for (let statusName of changedParams) {
-      this.publishOneStatus(statusName, this.getState()[statusName], isRepeat);
+      this.publishOneStatus(this.getState()[statusName], statusName, isRepeat);
     }
   }
 
 
-  private publishOneStatus(statusName: string, value: any, isRepeat: boolean) {
+  private publishOneStatus(value: any, statusName: string, isRepeat: boolean) {
     const params: PublishParams = {
       isRepeat,
     };

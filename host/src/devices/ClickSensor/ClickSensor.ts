@@ -26,14 +26,16 @@ export default class ClickSensor extends DeviceBase<Props> {
 
   protected didInit = async () => {
     if (this.props.publish === 'down') {
-      // TODO: нужно поднять событие, но не устанавливать state
-      //this.binaryClick.addStateListener(this.onClickStateChange);
-
-
+      // change status silently
+      this.binaryClick.addStateListener(this.onSilentStatusChange);
+      // rise 1 on key up
+      this.binaryClick.addDownListener(this.onDownOrUp);
     }
     else if (this.props.publish === 'up') {
-      // TODO: нужно поднять событие, но не устанавливать state
-      //this.binaryClick.addStateListener(this.onClickStateChange);
+      // change status silently
+      this.binaryClick.addStateListener(this.onSilentStatusChange);
+      // rise 1 on key up
+      this.binaryClick.addUpListener(this.onDownOrUp);
     }
     else if (this.props.publish === 'state') {
       this.binaryClick.addStateListener(this.onClickStateChange);
@@ -57,9 +59,20 @@ export default class ClickSensor extends DeviceBase<Props> {
   //   this.upEvents.addListener(cb);
   // }
 
+  private onSilentStatusChange = async () => {
+    if (!this.status) return;
+
+    await this.status.write({[DEFAULT_STATUS]: true}, true);
+  }
+
+  private onDownOrUp = () => {
+    if (!this.status) return;
+
+    this.status.publish(true);
+  }
 
   private onClickStateChange = async (level: boolean) => {
-    await this.setStatus(true);
+    await this.setStatus(level);
   }
 
 }

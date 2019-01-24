@@ -168,7 +168,7 @@ export default abstract class DeviceDataManagerBase {
    * If getter is set: it writes data using "setter" and update "localData"
    * It there isn't a getter - it sets to "localData"
    */
-  protected async writeData(partialData: Data): Promise<void> {
+  protected async writeData(partialData: Data, silent?: boolean): Promise<void> {
     if (isEmpty(partialData)) return;
 
     this.validateDict(partialData,
@@ -185,13 +185,13 @@ export default abstract class DeviceDataManagerBase {
       };
 
       //  rise events change event and publish
-      this.emitOnChange(updatedParams);
+      this.emitOnChange(updatedParams, silent);
 
       return;
     }
     // else do request
 
-    return this.writeAllDataAndSetState(partialData);
+    return this.writeAllDataAndSetState(partialData, silent);
   }
 
 
@@ -245,7 +245,7 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
-  private async writeAllDataAndSetState(partialData: Data): Promise<void> {
+  private async writeAllDataAndSetState(partialData: Data, silent?: boolean): Promise<void> {
     const updatedParams = getDifferentKeys(this.localState, partialData);
 
     // set tmpState - it is the newest state.
@@ -258,7 +258,7 @@ export default abstract class DeviceDataManagerBase {
     }
 
     //  rise events change event and publish
-    this.emitOnChange(updatedParams);
+    this.emitOnChange(updatedParams, silent);
 
     try {
       await this.doRequest(
@@ -272,7 +272,7 @@ export default abstract class DeviceDataManagerBase {
       if (this.tmpState) {
         this.tmpState = undefined;
         //  rise events change event and publish
-        this.emitOnChange(updatedParams);
+        this.emitOnChange(updatedParams, silent);
       }
 
       throw err;
@@ -376,7 +376,7 @@ export default abstract class DeviceDataManagerBase {
   //   return true;
   // }
 
-  private emitOnChange(updatedParams: string[]) {
+  private emitOnChange(updatedParams: string[], silent?: boolean) {
     if (!updatedParams.length) return;
 
     // emit change event
@@ -384,7 +384,7 @@ export default abstract class DeviceDataManagerBase {
     // start/restart republish logic
     this.republish.start(this.republishCb);
     // emit publish event
-    this.publishState(updatedParams, false);
+    if (!silent) this.publishState(updatedParams, false);
   }
 
   /**
