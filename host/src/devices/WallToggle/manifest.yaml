@@ -2,7 +2,7 @@ name: WallToggle
 main: ./WallToggle.ts
 type: toggle
 drivers:
-  - BinaryInput.driver
+  - BinaryClick.driver
 
 props: ./props.yaml
 

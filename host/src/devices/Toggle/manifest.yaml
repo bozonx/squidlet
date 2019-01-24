@@ -2,7 +2,7 @@ name: Toggle
 type: toggle
 main: ./Toggle.ts
 drivers:
-  - BinaryInput.driver
+  - BinaryClick.driver
 
 props: ./props.yaml
 

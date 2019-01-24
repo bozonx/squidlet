@@ -1,12 +1,12 @@
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
 import {convertToLevel, invertIfNeed} from '../../helpers/helpers';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
+import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
 
 
-interface Props extends DeviceBaseProps, BinaryInputDriverProps {
+interface Props extends DeviceBaseProps, BinaryClickDriverProps {
   // in this time driver doesn't receive any data
   blockTime: number;
 }
@@ -16,28 +16,23 @@ export default class Toggle extends DeviceBase<Props> {
   private blockTimeInProgress: boolean = false;
 
 
-  private get binaryInput(): BinaryInputDriver {
-    return this.depsInstances.binaryInput as BinaryInputDriver;
+  private get binaryClick(): BinaryClickDriver {
+    return this.depsInstances.binaryClick as any;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
+    this.depsInstances.binaryClick = await getDriverDep('BinaryClick.driver')
       .getInstance({
         ...this.props,
-        // BinaryInput driver doesn't need a block time because it is put in place here
+        // BinaryClick driver doesn't need a block time because it is put in place here
         blockTime: 0,
-        // TODO: remove
-        // listen only logical 1
-        edge: 'rising',
       });
   }
 
   protected didInit = async () => {
-    // listen driver's change
-    this.binaryInput.addListener(this.onInputChange);
-
-    console.log(333333333, this.props)
+    // listen only keyUp events
+    this.binaryClick.addUpListener(this.onUp);
   }
 
   protected transformPublishValue = (value: boolean): number => {
@@ -70,22 +65,12 @@ export default class Toggle extends DeviceBase<Props> {
   };
 
 
-  private onInputChange = async (level: boolean) => {
-    // listen only for 1
-
-    // TODO: remove
-
-    if (!level) return;
-
-    console.log(11111111, level)
-
+  private onUp = async () => {
     await this.doToggle();
   }
 
   private async doToggle(): Promise<boolean> {
     if (this.blockTimeInProgress) return this.getStatus();
-
-    console.log(2222222)
 
     this.blockTimeInProgress = true;
 

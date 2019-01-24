@@ -2,13 +2,12 @@ import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
 import {Data} from '../../baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from '../../baseDevice/Status';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
-import {BinaryClickDriver} from '../../drivers/Binary/BinaryClick.driver';
+import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
 import {omit} from '../../helpers/lodashLike';
 
 
 
-interface Props extends DeviceBaseProps, BinaryInputDriverProps {
+interface Props extends DeviceBaseProps, BinaryClickDriverProps {
   publish: 'down' | 'up' | 'both';
 }
 
