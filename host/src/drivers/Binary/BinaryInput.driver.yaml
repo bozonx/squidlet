@@ -22,4 +22,4 @@ props:
 
   ### DigitalPin base props
   pin:
-  gpio:
+  source:

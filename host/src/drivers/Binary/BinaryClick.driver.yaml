@@ -1,0 +1,22 @@
+name: BinaryClick.driver
+main: BinaryClick.driver.ts
+type: system
+drivers:
+  - BinaryInput.driver
+
+props:
+  # BinaryInput
+  # Block time after keyUp
+  blockTime:
+    type: number
+    default: 0
+  invertOnPullup:
+  invert:
+
+  ### DigitalPinInput driver props
+  pullup:
+  pulldown:
+
+  ### DigitalPin base props
+  pin:
+  source:
