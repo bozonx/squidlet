@@ -10,12 +10,12 @@ props:
   blockMode:
     type: refuse | defer
     default: refuse
-  initial:
-    type: 1 | 0 | low | high
-    default: 0
   invert:
     type: boolean
     default: false
+  initial:
+    type: 1 | 0 | low | high
+    default: 0
 
   ### DigitalPin base props
   pin:

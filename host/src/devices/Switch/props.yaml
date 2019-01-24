@@ -1,12 +1,10 @@
-### DigitalPinOutput driver props
+### BinaryOutput driver
 # timeout after switching. At this time it doesn't receive any signals.
 blockTime:
-  default: 100
+  default: 0
 blockMode:
-
-### DigitalPinOutput driver props
-initial:
 invert:
+initial:
 
 ### DigitalPin base props
 pin:
