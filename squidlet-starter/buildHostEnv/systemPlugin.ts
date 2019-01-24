@@ -16,6 +16,7 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'Toggle/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Switch/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'WallClickSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'WallSwitchSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'WallToggle/manifest.yaml'));
   // TODO: remove
@@ -30,6 +31,7 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryOutput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Binary/ImpulseInput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'Binary/ImpulseOutput.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Binary/BinaryClick.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinInput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinOutput.driver.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2c/I2cData.driver.yaml'));

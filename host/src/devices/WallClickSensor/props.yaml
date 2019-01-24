@@ -1,0 +1,24 @@
+# ClickSensor
+publish:
+  default: up
+
+### BinaryInput driver props
+debounce:
+  default: 50
+blockTime:
+  default: 300
+edge:
+invertOnPullup:
+
+### DigitalPinInput driver props
+pullup:
+pulldown:
+invert:
+
+### DigitalPin base props
+pin:
+sorce:
+
+### Device base props
+statusRepublishInterval:
+configRepublishInterval:

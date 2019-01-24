@@ -1,0 +1,11 @@
+name: WallClickSensor
+main: ./WallClickSensor.ts
+type: switch-sensor
+drivers:
+  - BinaryClick.driver
+
+props: ./props.yaml
+
+status:
+  default:
+    type: boolean
