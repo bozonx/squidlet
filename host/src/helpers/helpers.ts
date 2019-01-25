@@ -368,6 +368,17 @@ export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
   });
 }
 
+export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
+  // twice inverting on pullup if allowed
+  if (pullup && invertOnPullup) {
+    return !invert;
+  }
+
+  // in other cases - use invert prop
+  return invert;
+}
+
+
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;
 //   else if (value && edge === 'rising') return true;

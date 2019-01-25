@@ -4,9 +4,8 @@ import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {invertIfNeed, resolveEdge} from '../../helpers/helpers';
+import {invertIfNeed, isDigitalInputInverted, resolveEdge} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
-import {isDigitalInputInverted} from './binaryHelpers';
 
 
 export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {

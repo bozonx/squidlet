@@ -11,7 +11,6 @@ export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
   // time or rising state
   impulseLength: number;
   blockTime: number;
-  // TODO: review
   // if "refuse" - it doesn't write while block time.
   // If "defer" it waits for block time finished and write last write request
   blockMode: BlockMode;
@@ -51,10 +50,9 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   }
 
   async read(): Promise<boolean> {
+    //return this.digitalOutput.read();
 
-    // TODO: return current state
-
-    return this.digitalOutput.read();
+    return this.impulseInProgress;
   }
 
   /**

@@ -5,8 +5,7 @@ import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/D
 import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {omit} from '../../helpers/lodashLike';
-import {isDigitalInputInverted} from './binaryHelpers';
-import {resolveEdge} from '../../helpers/helpers';
+import {isDigitalInputInverted, resolveEdge} from '../../helpers/helpers';
 
 
 type RisingHandler = () => void;
