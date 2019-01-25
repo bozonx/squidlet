@@ -29,6 +29,7 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
   private changeEvents = new IndexedEvents<WatchHandler>();
+  private doubleCheckInProgress: boolean = false;
 
   private get source(): DigitalSubDriver {
     return this.depsInstances.source as any;
@@ -105,10 +106,31 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
 
 
   private handleChange(state: boolean): void {
+    // skip events if double check is waiting
+    if (this.doubleCheckInProgress) return;
 
-    // TODO: double check
+    // if doubleCheck isn't set up - just rise an event
+    if (!this.props.doubleCheck) return this.changeEvents.emit(state);
 
-    this.changeEvents.emit(state);
+    // the second check is half of debounce time
+    const checkTimeout = Math.ceil((this.props.debounce || 0) / 2);
+
+    // TODO: делать проверку если есть сомнения
+
+    this.doubleCheckInProgress = true;
+
+    setTimeout(async () => {
+      this.doubleCheckInProgress = false;
+
+      const secondValue: boolean = await this.read();
+      const result: boolean = this.resolveDoubleCheckValue(state, secondValue);
+
+      this.changeEvents.emit(result);
+    }, checkTimeout);
+  }
+
+  private resolveDoubleCheckValue(firstValue: boolean, secondValue: boolean): boolean {
+    // TODO: !!!!
   }
 
   private resolvePinMode(): DigitalInputMode {
