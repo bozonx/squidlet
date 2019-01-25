@@ -128,29 +128,20 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
       this.doubleCheckInProgress = false;
 
       const secondValue: boolean = await this.read();
-      const result: boolean = this.resolveDoubleCheckValue(newState, secondValue, this.lastValue);
+      const result: boolean = this.resolveDoubleCheckValue(newState, secondValue);
 
       this.lastValue = newState;
       this.changeEvents.emit(result);
     }, this.secondCheckTimeout);
   }
 
-  private resolveDoubleCheckValue(newState: boolean, secondCheckState: boolean, lastState?: boolean): boolean {
-    if (typeof lastState === 'undefined') {
+  private resolveDoubleCheckValue(newState: boolean, secondCheckState: boolean): boolean {
+    if (newState && secondCheckState) return true;
+    else if (!newState && secondCheckState) return true;
 
-    }
-    else if (lastState) {
-
-    }
-
-    // TODO: true if
-    //   - lastState && newState && secondCheckState - не рассматриваем
-    //   - lastState && newState && secondCheckState
-
-    // TODO: !!!!
-
-    // TODO: if lastValue is undefined
-
+    // !newState && !secondCheckState = false
+    // newState && !secondCheckState = false
+    return false;
   }
 
   private resolvePinMode(): DigitalInputMode {
