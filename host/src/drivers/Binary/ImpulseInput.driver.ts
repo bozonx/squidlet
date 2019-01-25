@@ -16,8 +16,9 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
   impulseLength: number;
   // in this time driver doesn't receive any data
   blockTime: number;
+  // TODO: may be use just debounce ???
   // if specified - it will wait for specified time
-  // and after that read level and start impulse if level is 1
+  //   and after that read level and start impulse if level is 1
   throttle?: number;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
@@ -55,7 +56,8 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
         ),
         edge: resolveEdge('rising', this._isInverted),
         // TODO: ??? why
-        debounce: this.props.impulseLength,
+        //debounce: this.props.impulseLength,
+        debounce: 0,
       });
   }
 
@@ -67,8 +69,12 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   }
 
 
-  isInProgress(): boolean {
-    return this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress;
+  isImpulseInProgress(): boolean {
+    return this.throttleInProgress || this.impulseInProgress;
+  }
+
+  isBlocked(): boolean {
+    return this.blockTimeInProgress;
   }
 
   isInverted(): boolean {
@@ -112,7 +118,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
   private handleInputChange = async () => {
     // don't process new impulse while current is in progress
-    if (this.isInProgress()) return;
+    if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
 
     if (typeof this.props.throttle === 'undefined') {
       await this.startImpulse();
@@ -120,6 +126,32 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     else {
       await this.throttle();
     }
+  }
+
+  private async startImpulse(): Promise<void> {
+    this.impulseInProgress = true;
+
+    this.risingEvents.emit();
+    this.bothEvents.emit(true);
+
+    // TODO: зачем вообще нужен промис ????
+
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        this.bothEvents.emit(false);
+        this.impulseInProgress = false;
+
+        if (this.props.blockTime) {
+          // TODO: block time не относится ко времени импульса
+          this.startBlockTime()
+            .then(resolve)
+            .catch(reject);
+        }
+        else {
+          resolve();
+        }
+      }, this.props.impulseLength);
+    });
   }
 
   private async throttle(): Promise<void> {
@@ -139,29 +171,6 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
           .then(resolve)
           .catch(reject);
       }, Number(this.props.throttle));
-    });
-  }
-
-  private async startImpulse(): Promise<void> {
-    this.impulseInProgress = true;
-
-    this.risingEvents.emit();
-    this.bothEvents.emit(true);
-
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        this.bothEvents.emit(false);
-        this.impulseInProgress = false;
-
-        if (this.props.blockTime) {
-          this.startBlockTime()
-            .then(resolve)
-            .catch(reject);
-        }
-        else {
-          resolve();
-        }
-      }, this.props.impulseLength);
     });
   }
 
