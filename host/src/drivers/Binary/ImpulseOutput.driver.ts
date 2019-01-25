@@ -4,6 +4,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode} from './interfaces/Types';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {omit} from '../../helpers/lodashLike';
+import {deferCall} from '../../helpers/helpers';
 
 
 export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
@@ -60,38 +61,24 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   /**
    * Start impulse
    */
-  async impulse() {
+  async impulse(): Promise<void> {
     // skip while switch at block time or impulse is in progress
     if (this.impulseInProgress || this.blockTimeInProgress) {
-      if (this.props.blockMode === 'refuse') {
-        // don't write while block time if impulse is in progress
-        return;
-      }
-      else {
-        // mark that there is a deferred impulse
+      if (this.props.blockMode === 'defer') {
+        // mark that there is a deferred impulse and exit
         this.deferredImpulse = true;
-
-        return;
       }
+      // else if is "refuse": don't write while block time if impulse is in progress
+      return;
     }
+
+    // start the new impulse
 
     this.impulseInProgress = true;
 
     await this.digitalOutput.write(true);
 
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        this.impulseFinished()
-          .then(resolve)
-          .catch(reject);
-      }, this.props.impulseLength);
-    });
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
+    return deferCall<void>(this.impulseFinished, this.props.impulseLength);
   }
 
 
@@ -109,7 +96,6 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
     });
   }
 
-
   private blockTimeFinished = async () => {
     this.blockTimeInProgress = false;
 
@@ -119,6 +105,12 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
       // make deferred impulse
       await this.impulse();
     }
+  }
+
+
+  protected validateProps = (): string | undefined => {
+    // TODO: ???!!!!
+    return;
   }
 
 }

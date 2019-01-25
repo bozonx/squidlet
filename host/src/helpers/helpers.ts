@@ -355,6 +355,16 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
   return diffKeys;
 }
 
+export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    setTimeout(() => {
+      cb()
+        .then(resolve)
+        .catch(reject);
+    }, delayMs);
+  });
+}
+
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;
 //   else if (value && edge === 'rising') return true;
