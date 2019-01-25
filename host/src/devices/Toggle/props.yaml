@@ -10,6 +10,7 @@ invertOnPullup:
 # debounce time in ms
 debounce:
   default: 25
+doubleCheck:
 edge:
 pullup:
 pulldown:

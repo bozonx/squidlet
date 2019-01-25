@@ -15,6 +15,9 @@ props:
   debounce:
     type: number
     default: 0
+  doubleCheck:
+    type: boolean
+    default: false
   pullup:
     type: boolean
     default: false

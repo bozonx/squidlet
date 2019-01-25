@@ -7,6 +7,8 @@ invertOnPullup:
 ### DigitalPinInput driver
 debounce:
   default: 100
+doubleCheck:
+  default: true
 edge:
 pullup:
 pulldown:

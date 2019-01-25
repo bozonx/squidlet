@@ -21,6 +21,7 @@ props:
 
   ### DigitalPinInput driver
   debounce:
+  doubleCheck:
   edge:
   pullup:
   pulldown:

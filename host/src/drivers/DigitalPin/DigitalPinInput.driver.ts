@@ -12,6 +12,8 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
   edge: Edge;
   // Listen to low, high or both levels. By default is both.
   debounce: number;
+  // additional check value after debounce
+  doubleCheck: boolean;
   // if no one of pullup and pulldown are set then both resistors will off
   // use pullup resistor
   pullup?: boolean;

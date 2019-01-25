@@ -20,13 +20,14 @@ props:
     type: boolean
     default: false
 
-  ### DigitalPinInput driver props
+  ### DigitalPinInput driver
   debounce:
     default: 0
+  doubleCheck:
   edge:
   pullup:
   pulldown:
 
-  ### DigitalPin base props
+  ### DigitalPin base
   pin:
   source:

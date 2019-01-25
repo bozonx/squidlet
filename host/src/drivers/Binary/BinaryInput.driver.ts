@@ -1,6 +1,6 @@
 import IndexedEvents from '../../helpers/IndexedEvents';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
+import {WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
