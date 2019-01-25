@@ -16,3 +16,16 @@ props:
   invertOnPullup:
     type: boolean
     default: true
+  invert:
+    type: boolean
+    default: false
+
+  ### DigitalPinInput driver props
+  debounce:
+  edge:
+  pullup:
+  pulldown:
+
+  ### DigitalPin base props
+  pin:
+  source:

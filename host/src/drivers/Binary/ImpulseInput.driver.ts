@@ -32,17 +32,28 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   private throttleInProgress: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
+  private _isInverted: boolean = false;
 
   private get digitalInput(): DigitalPinInputDriver {
-    return this.depsInstances.digitalInput as DigitalPinInputDriver;
+    return this.depsInstances.digitalInput as any;
   }
 
+
   protected willInit = async (getDriverDep: GetDriverDep) => {
+    this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
+
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
       .getInstance({
-        ...omit(this.props, 'impulseLength', 'blockTime', 'throttle', 'invertOnPullup'),
-        invert: this.isInverted(),
+        ...omit(
+          this.props,
+          'impulseLength',
+          'blockTime',
+          'throttle',
+          'invertOnPullup',
+          'invert'
+        ),
         edge: 'rising',
+        // TODO: ??? why
         debounce: this.props.impulseLength,
       });
   }
@@ -51,15 +62,22 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     //const debounce: number = Math.ceil(this.props.impulseLength / 2);
     //const debounce: number = this.props.impulseLength;
 
-    this.digitalInput.addListener(this.listenHandler);
+    await this.digitalInput.addListener(this.handleInputChange);
   }
 
 
+  isInProgress(): boolean {
+    return this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress;
+  }
+
   isInverted(): boolean {
-    return isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
+    return this._isInverted;
   }
 
   async read(): Promise<boolean> {
+
+    // TODO: вернуть текущее состояние
+
     return this.digitalInput.read();
   }
 
@@ -90,21 +108,10 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     this.bothEvents.removeListener(handlerIndex);
   }
 
-  destroy = () => {
-    //this.digitalInput.removeListener(this.listenHandler);
-  }
 
-
-  protected validateProps = (): string | undefined => {
-    // TODO: impulseLength не может быть 0 или меньше
-    // TODO: throttle не может быть 0 или меньше
-    return;
-  }
-
-
-  private listenHandler = async () => {
+  private handleInputChange = async () => {
     // don't process new impulse while current is in progress
-    if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
+    if (this.isInProgress()) return;
 
     if (typeof this.props.throttle === 'undefined') {
       await this.startImpulse();
@@ -168,6 +175,14 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
       }, this.props.blockTime);
     });
   }
+
+
+  protected validateProps = (): string | undefined => {
+    // TODO: impulseLength не может быть 0 или меньше
+    // TODO: throttle не может быть 0 или меньше
+    return;
+  }
+
 
 }
 
