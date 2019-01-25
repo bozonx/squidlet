@@ -6,6 +6,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {omit} from '../../helpers/lodashLike';
 import {isDigitalInputInverted} from './binaryHelpers';
+import {resolveEdge} from '../../helpers/helpers';
 
 
 type RisingHandler = () => void;
@@ -52,7 +53,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
           'invertOnPullup',
           'invert'
         ),
-        edge: 'rising',
+        edge: resolveEdge('rising', this._isInverted),
         // TODO: ??? why
         debounce: this.props.impulseLength,
       });

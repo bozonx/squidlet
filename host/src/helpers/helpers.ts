@@ -4,6 +4,7 @@ import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
 import {find, isEmpty, isEqual, isObject, trim, values} from './lodashLike';
+import {Edge} from '../app/interfaces/dev/Digital';
 
 
 export const PATH_SEPARATOR = '/';
@@ -318,6 +319,23 @@ export function invertIfNeed(value: boolean, invert?: boolean): boolean {
   if (invert) return !value;
 
   return value;
+}
+
+export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
+
+  // TODO: test
+
+  if (!edge) {
+    return 'both';
+  }
+  else if (inverted && edge === 'rising') {
+    return 'falling';
+  }
+  else if (inverted && edge === 'falling') {
+    return 'rising';
+  }
+
+  return edge;
 }
 
 /**

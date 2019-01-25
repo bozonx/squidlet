@@ -4,7 +4,7 @@ import {Edge, WatchHandler} from '../../app/interfaces/dev/Digital';
 import DriverBase from '../../app/entities/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
 import {GetDriverDep} from '../../app/entities/EntityBase';
-import {invertIfNeed} from '../../helpers/helpers';
+import {invertIfNeed, resolveEdge} from '../../helpers/helpers';
 import {omit} from '../../helpers/lodashLike';
 import {isDigitalInputInverted} from './binaryHelpers';
 
@@ -40,7 +40,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
           'invertOnPullup',
           'invert'
         ),
-        edge: this.resolveEdge(),
+        edge: resolveEdge(this.props.edge, this._isInverted),
       });
   }
 
@@ -99,27 +99,6 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
     setTimeout(() => {
       this.blockTimeInProgress = false;
     }, this.props.blockTime);
-  }
-
-
-  /**
-   * It is set invert param - then invert edge
-   */
-  private resolveEdge(edge?: Edge): Edge {
-
-    // TODO: test
-
-    if (!edge) {
-      return 'both';
-    }
-    else if (this.isInverted() && edge === 'rising') {
-      return 'falling';
-    }
-    else if (this.isInverted() && edge === 'falling') {
-      return 'rising';
-    }
-
-    return edge;
   }
 
 
