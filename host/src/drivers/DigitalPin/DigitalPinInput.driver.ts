@@ -5,6 +5,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 import {omit} from '../../helpers/lodashLike';
+import IndexedEvents from '../../helpers/IndexedEvents';
 
 
 export interface DigitalPinInputDriverProps extends DigitalBaseProps {
@@ -27,6 +28,8 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
 export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps> {
+  private changeEvents = new IndexedEvents<WatchHandler>();
+
   private get source(): DigitalSubDriver {
     return this.depsInstances.source as any;
   }
@@ -36,18 +39,27 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
     const driverName = resolveDriverName(this.props.source);
 
     this.depsInstances.source = await getDriverDep(driverName)
-      .getInstance(omit(this.props, 'pullup', 'pulldown', 'pin', 'source'));
+      .getInstance(omit(
+        this.props,
+        'doubleCheck',
+        'pullup',
+        'pulldown',
+        'pin',
+        'source'
+      ));
   }
 
   protected didInit = async () => {
     // setup pin as an input with resistor if specified
-    this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
+    await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
       .catch((err) => {
         this.env.system.log.error(
           `DigitalPinInputDriver: Can't setup pin. ` +
           `"${JSON.stringify(this.props)}": ${err.toString()}`
         );
       });
+
+    await this.source.setWatch(this.props.pin, this.handleChange);
   }
 
 
@@ -66,27 +78,38 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
    * Listen to interruption of pin.
    */
   async addListener(handler: WatchHandler): Promise<number> {
-    return this.source.setWatch(this.props.pin, handler);
+    //return this.source.setWatch(this.props.pin, handler);
+    return this.changeEvents.addListener(handler);
   }
 
   async listenOnce(handler: WatchHandler): Promise<number> {
-    let handlerId: number;
-    const wrapper: WatchHandler = async (level: boolean) => {
-      // remove listener and don't listen any more
-      await this.removeListener(handlerId);
+    return this.changeEvents.once(handler);
 
-      handler(level);
-    };
-
-    handlerId = await this.source.setWatch(this.props.pin, wrapper);
-
-    return handlerId;
+    // let handlerId: number;
+    // const wrapper: WatchHandler = async (level: boolean) => {
+    //   // remove listener and don't listen any more
+    //   await this.removeListener(handlerId);
+    //
+    //   handler(level);
+    // };
+    //
+    // handlerId = await this.source.setWatch(this.props.pin, wrapper);
+    //
+    // return handlerId;
   }
 
-  removeListener(handlerIndex: number): Promise<void> {
-    return this.source.clearWatch(handlerIndex);
+  async removeListener(handlerIndex: number): Promise<void> {
+    //return this.source.clearWatch(handlerIndex);
+    this.changeEvents.removeListener(handlerIndex);
   }
 
+
+  private handleChange(state: boolean): void {
+
+    // TODO: double check
+
+    this.changeEvents.emit(state);
+  }
 
   private resolvePinMode(): DigitalInputMode {
     if (this.props.pullup) return 'input_pullup';
