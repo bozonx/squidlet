@@ -50,14 +50,6 @@ export default class ClickSensor extends DeviceBase<Props> {
   }
 
 
-  // onDown(cb: Handler): void {
-  //   this.downEvents.addListener(cb);
-  // }
-  //
-  // onUp(): void {
-  //   this.upEvents.addListener(cb);
-  // }
-
   private onSilentStatusChange = async () => {
     if (!this.status) return;
 

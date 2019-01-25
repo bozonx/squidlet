@@ -9,6 +9,7 @@ import {BinaryInputDriver, BinaryInputDriverProps} from './BinaryInput.driver';
 type Handler = () => void;
 
 export interface BinaryClickDriverProps extends BinaryInputDriverProps {
+  releaseTimeoutMs: number;
 }
 
 
@@ -19,6 +20,9 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
   private keyDown: boolean = false;
   private debounceInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
+  private releaseTimeout: any;
+  private secondDebounceTimeout: any;
+  private blockTimeTimeout: any;
 
   private get binaryInput(): BinaryInputDriver {
     return this.depsInstances.binaryInput as any;
@@ -83,6 +87,7 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
   }
 
   private async startDownLogic() {
+    clearTimeout(this.releaseTimeout);
     this.keyDown = true;
     this.stateEvents.emit(true);
     this.downEvents.emit();
@@ -93,7 +98,18 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
 
     this.debounceInProgress = true;
 
-    setTimeout(async () => {
+    // release if timeout is reached
+    this.releaseTimeout = setTimeout(() => {
+      this.releaseTimeout = undefined;
+      clearTimeout(this.secondDebounceTimeout);
+      clearTimeout(this.blockTimeTimeout);
+    }, this.props.releaseTimeoutMs);
+
+    // TODO: does it need second debounce???
+    // start second debounce timeout
+    this.secondDebounceTimeout = setTimeout(async () => {
+      this.secondDebounceTimeout = undefined;
+
       const currentLevel: boolean = await this.binaryInput.read();
 
       this.debounceInProgress = false;
@@ -109,13 +125,16 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
 
   private async finishLogic() {
     this.keyDown = false;
+    this.blockTimeInProgress = true;
+
     this.stateEvents.emit(false);
     this.upEvents.emit();
 
-    this.blockTimeInProgress = true;
-
-    setTimeout(() => {
+    this.blockTimeTimeout = setTimeout(() => {
       this.blockTimeInProgress = false;
+      this.blockTimeTimeout = undefined;
+
+      clearTimeout(this.releaseTimeout);
     }, this.props.blockTime || 0);
   }
 

@@ -1,12 +1,12 @@
 ### BinaryInput driver
 blockTime:
-  default: 500
+  default: 300
 invert:
 invertOnPullup:
 
 ### DigitalPinInput driver
 debounce:
-  default: 50
+  default: 100
 edge:
 pullup:
 pulldown:
