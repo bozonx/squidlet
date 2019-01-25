@@ -116,74 +116,60 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   }
 
 
-  private handleInputChange = async () => {
+  private handleInputChange = () => {
     // don't process new impulse while current is in progress
     if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
 
     if (typeof this.props.throttle === 'undefined') {
-      await this.startImpulse();
+      this.startImpulse();
     }
     else {
-      await this.throttle();
+      this.throttle();
     }
   }
 
-  private async startImpulse(): Promise<void> {
+  private startImpulse(): void {
     this.impulseInProgress = true;
 
     this.risingEvents.emit();
     this.bothEvents.emit(true);
 
-    // TODO: зачем вообще нужен промис ????
+    setTimeout(() => {
+      this.impulseInProgress = false;
+      this.bothEvents.emit(false);
 
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        this.bothEvents.emit(false);
-        this.impulseInProgress = false;
-
-        if (this.props.blockTime) {
-          // TODO: block time не относится ко времени импульса
-          this.startBlockTime()
-            .then(resolve)
-            .catch(reject);
-        }
-        else {
-          resolve();
-        }
-      }, this.props.impulseLength);
-    });
+      // start block time if need
+      this.startBlockTime();
+    }, this.props.impulseLength);
   }
 
-  private async throttle(): Promise<void> {
+  private throttle(): void {
     this.throttleInProgress = true;
 
     // waiting and then read level
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(async () => {
-        const currentValue: boolean = await this.digitalInput.read();
+    setTimeout(async () => {
+      const currentValue: boolean = await this.digitalInput.read();
 
-        this.throttleInProgress = false;
+      this.throttleInProgress = false;
 
-        // if level is 0 - it isn't an impulse - do nothing
-        if (!currentValue) return;
+      // if level is 0 - it isn't an impulse - do nothing
+      if (!currentValue) return;
 
-        this.startImpulse()
-          .then(resolve)
-          .catch(reject);
-      }, Number(this.props.throttle));
-    });
+      this.startImpulse()
+        .then(resolve)
+        .catch(reject);
+    }, Number(this.props.throttle));
   }
 
-  private async startBlockTime(): Promise<void> {
+  private startBlockTime(): void {
+    // if block time isn't set = do nothing
+    if (!this.props.blockTime) return;
+
     this.blockTimeInProgress = true;
 
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        this.blockTimeInProgress = false;
-
-        resolve();
-      }, this.props.blockTime);
-    });
+    setTimeout(() => {
+      this.blockTimeInProgress = false;
+    }, this.props.blockTime);
   }
 
 
