@@ -155,9 +155,7 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
       // if level is 0 - it isn't an impulse - do nothing
       if (!currentValue) return;
 
-      this.startImpulse()
-        .then(resolve)
-        .catch(reject);
+      this.startImpulse();
     }, Number(this.props.throttle));
   }
 
