@@ -11,8 +11,8 @@ props:
   blockTime:
     type: number
     default: 0
-  throttle:
-    type: number?
+#  throttle:
+#    type: number?
   invertOnPullup:
     type: boolean
     default: true
@@ -22,6 +22,7 @@ props:
 
   ### DigitalPinInput driver props
   debounce:
+    default: 0
   edge:
   pullup:
   pulldown:

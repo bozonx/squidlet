@@ -16,10 +16,9 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
   impulseLength: number;
   // in this time driver doesn't receive any data
   blockTime: number;
-  // TODO: may be use just debounce ???
   // if specified - it will wait for specified time
   //   and after that read level and start impulse if level is 1
-  throttle?: number;
+  //throttle?: number;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
   // for input: when receives 1 actually returned 0 and otherwise
@@ -31,7 +30,7 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
 export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   private readonly risingEvents = new IndexedEvents<RisingHandler>();
   private readonly bothEvents = new IndexedEvents<WatchHandler>();
-  private throttleInProgress: boolean = false;
+  //private throttleInProgress: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;
@@ -50,28 +49,18 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
           this.props,
           'impulseLength',
           'blockTime',
-          'throttle',
+          //'throttle',
           'invertOnPullup',
           'invert'
         ),
         edge: resolveEdge('rising', this._isInverted),
-        // TODO: ??? why
-        //debounce: this.props.impulseLength,
-        debounce: 0,
       });
   }
 
   protected didInit = async () => {
-    //const debounce: number = Math.ceil(this.props.impulseLength / 2);
-    //const debounce: number = this.props.impulseLength;
-
     await this.digitalInput.addListener(this.handleInputChange);
   }
 
-
-  isImpulseInProgress(): boolean {
-    return this.throttleInProgress || this.impulseInProgress;
-  }
 
   isBlocked(): boolean {
     return this.blockTimeInProgress;
@@ -82,10 +71,9 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
   }
 
   async read(): Promise<boolean> {
-
-    // TODO: вернуть текущее состояние
-
-    return this.digitalInput.read();
+    //return this.digitalInput.read();
+    //return this.throttleInProgress || this.impulseInProgress;
+    return this.impulseInProgress;
   }
 
   /**
@@ -95,16 +83,15 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     return this.risingEvents.addListener(handler);
   }
 
+  listenRisingOnce(handler: RisingHandler): number {
+    return this.risingEvents.once(handler);
+  }
+
   /**
    * Listen to rising and faling of impulse (1 and 0 levels)
    */
   addListener(handler: WatchHandler): number {
     return this.bothEvents.addListener(handler);
-  }
-
-  listenOnce(handler: RisingHandler): number {
-    // TODO: why not bothEvents?
-    return this.risingEvents.once(handler);
   }
 
   removeRisingListener(handlerIndex: number) {
@@ -118,14 +105,17 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
 
   private handleInputChange = () => {
     // don't process new impulse while current is in progress
-    if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
+    //if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
+    if (this.impulseInProgress || this.blockTimeInProgress) return;
 
-    if (typeof this.props.throttle === 'undefined') {
-      this.startImpulse();
-    }
-    else {
-      this.throttle();
-    }
+    this.startImpulse();
+
+    // if (typeof this.props.throttle === 'undefined') {
+    //   this.startImpulse();
+    // }
+    // else {
+    //   this.throttle();
+    // }
   }
 
   private startImpulse(): void {
@@ -143,21 +133,21 @@ export class ImpulseInputDriver extends DriverBase<ImpulseInputDriverProps> {
     }, this.props.impulseLength);
   }
 
-  private throttle(): void {
-    this.throttleInProgress = true;
-
-    // waiting and then read level
-    setTimeout(async () => {
-      const currentValue: boolean = await this.digitalInput.read();
-
-      this.throttleInProgress = false;
-
-      // if level is 0 - it isn't an impulse - do nothing
-      if (!currentValue) return;
-
-      this.startImpulse();
-    }, Number(this.props.throttle));
-  }
+  // private throttle(): void {
+  //   this.throttleInProgress = true;
+  //
+  //   // waiting and then read level
+  //   setTimeout(async () => {
+  //     const currentValue: boolean = await this.digitalInput.read();
+  //
+  //     this.throttleInProgress = false;
+  //
+  //     // if level is 0 - it isn't an impulse - do nothing
+  //     if (!currentValue) return;
+  //
+  //     this.startImpulse();
+  //   }, Number(this.props.throttle));
+  // }
 
   private startBlockTime(): void {
     // if block time isn't set = do nothing
