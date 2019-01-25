@@ -4,7 +4,7 @@ import {GetDriverDep} from '../../app/entities/EntityBase';
 import {BlockMode} from './interfaces/Types';
 import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
 import {omit} from '../../helpers/lodashLike';
-import {deferCall} from '../../helpers/helpers';
+import {deferCall, invertIfNeed} from '../../helpers/helpers';
 
 
 export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
@@ -39,8 +39,7 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
           'blockMode',
           'invert',
         ),
-        // TODO: resilve using invert
-        initialLevel: 0,
+        initialLevel: invertIfNeed(false, this.props.invert),
       });
   }
 
@@ -73,14 +72,14 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
 
     this.impulseInProgress = true;
 
-    await this.digitalOutput.write(true);
+    await this.digitalOutput.write(invertIfNeed(true, this.props.invert));
 
     return deferCall<void>(this.impulseFinished, this.props.impulseLength);
   }
 
 
   private impulseFinished = async () => {
-    await this.digitalOutput.write(false);
+    await this.digitalOutput.write(invertIfNeed(false, this.props.invert));
     this.impulseInProgress = false;
 
     this.startBlockTime();
