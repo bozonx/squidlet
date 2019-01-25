@@ -110,7 +110,7 @@ export class DigitalPinInputDriver extends DriverBase<DigitalPinInputDriverProps
   }
 
 
-  private handleChange(state: boolean): void {
+  private handleChange = (state: boolean): void => {
     // skip events if double check is waiting
     if (this.doubleCheckInProgress) return;
     // if doubleCheck isn't set up - just rise an event
