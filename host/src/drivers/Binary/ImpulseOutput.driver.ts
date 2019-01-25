@@ -21,8 +21,7 @@ export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
 
 
 export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
-  // TODO: review
-  private deferredImpulse?: boolean;
+  private deferredImpulse: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
@@ -85,26 +84,33 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   private impulseFinished = async () => {
     await this.digitalOutput.write(false);
     this.impulseInProgress = false;
-    this.blockTimeInProgress = true;
 
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        this.blockTimeFinished()
-          .then(resolve)
-          .catch(reject);
-      }, this.props.blockTime);
-    });
+    this.startBlockTime();
   }
 
-  private blockTimeFinished = async () => {
-    this.blockTimeInProgress = false;
+  private startBlockTime(): void {
+    // if block time isn't set = try to write deferred value if is set
+    if (!this.props.blockTime) return this.writeDeferred();
 
-    if (this.props.blockMode === 'defer' && typeof this.deferredImpulse !== 'undefined') {
-      // clear deferred value
-      this.deferredImpulse = undefined;
-      // make deferred impulse
-      await this.impulse();
-    }
+    this.blockTimeInProgress = true;
+
+    setTimeout(() => {
+      this.blockTimeInProgress = false;
+      this.writeDeferred();
+    }, this.props.blockTime);
+  }
+
+  private writeDeferred(): void {
+    // do nothing if blockMode isn't defer or deffered impulse isn't in a queue
+    if (this.props.blockMode !== 'defer' || !this.deferredImpulse) return;
+
+    // clear deferred value
+    this.deferredImpulse = false;
+    // make deferred impulse
+    this.impulse()
+      .catch((err) => {
+        this.env.system.log.error(`ImpulseOutput.driver: Error with writing deferred impulse: ${String(err)}`);
+      });
   }
 
 

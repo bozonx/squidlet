@@ -357,10 +357,13 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
 
 export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    setTimeout(() => {
-      cb()
-        .then(resolve)
-        .catch(reject);
+    setTimeout(async () => {
+      try {
+        resolve(await cb());
+      }
+      catch(err) {
+        reject(err);
+      }
     }, delayMs);
   });
 }
