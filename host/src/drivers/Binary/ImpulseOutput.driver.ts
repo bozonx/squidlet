@@ -7,30 +7,42 @@ import {omit} from '../../helpers/lodashLike';
 
 
 export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
-  // time between 1 and 0
+  // time or rising state
   impulseLength: number;
   blockTime: number;
+  // TODO: review
   // if "refuse" - it doesn't write while block time.
   // If "defer" it waits for block time finished and write last write request
   blockMode: BlockMode;
-  // for input: when receives 1 actually returned 0 and otherwise
-  // for output: when sends 1 actually sends 0 and otherwise
-  invert?: boolean;
+  // if true when sends 1 actually sends 0
+  invert: boolean;
 }
 
 
 export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
+  // TODO: review
   private deferredImpulse?: boolean;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
   private get digitalOutput(): DigitalPinOutputDriver {
-    return this.depsInstances.digitalOutput as DigitalPinOutputDriver;
+    return this.depsInstances.digitalOutput as any;
   }
+
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput.driver')
-      .getInstance(omit(this.props, 'impulseLength', 'blockTime', 'blockMode'));
+      .getInstance({
+        ...omit(
+          this.props,
+          'impulseLength',
+          'blockTime',
+          'blockMode',
+          'invert',
+        ),
+        // TODO: resilve using invert
+        initialLevel: 0,
+      });
   }
 
 
@@ -39,9 +51,15 @@ export class ImpulseOutputDriver extends DriverBase<ImpulseOutputDriverProps> {
   }
 
   async read(): Promise<boolean> {
+
+    // TODO: return current state
+
     return this.digitalOutput.read();
   }
 
+  /**
+   * Start impulse
+   */
   async impulse() {
     // skip while switch at block time or impulse is in progress
     if (this.impulseInProgress || this.blockTimeInProgress) {
