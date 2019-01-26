@@ -151,7 +151,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
     });
   }
 
-  protected devicesDidInit = async () => {
+  protected appDidInit = async () => {
     // init IC state after app is inited if it isn't inited at this moment
     await this.initIcIfNeed();
   }
