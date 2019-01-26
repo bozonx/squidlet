@@ -40,9 +40,6 @@ export default class Switch extends DeviceBase<Props> {
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
-
-      // TODO: може лучше использватть getStatus
-
       // skip while switch at block time
       if (this.binaryOutput.isBlocked()) return this.status.getState().default;
 

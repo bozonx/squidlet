@@ -18,10 +18,10 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
   private readonly downEvents = new IndexedEvents<Handler>();
   private readonly upEvents = new IndexedEvents<Handler>();
   private keyDown: boolean = false;
-  private debounceInProgress: boolean = false;
+  //private debounceInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
   private releaseTimeout: any;
-  private secondDebounceTimeout: any;
+  //private secondDebounceTimeout: any;
   private blockTimeTimeout: any;
 
   private get binaryInput(): BinaryInputDriver {
@@ -82,7 +82,10 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
     else {
       if (!this.keyDown) return;
 
-      await this.startUpLogic();
+      //await this.startUpLogic();
+
+      // logical 0 = finish
+      await this.finishLogic();
     }
   }
 
@@ -91,37 +94,39 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
     this.keyDown = true;
     this.stateEvents.emit(true);
     this.downEvents.emit();
-  }
-
-  private async startUpLogic() {
-    if (this.debounceInProgress) return;
-
-    this.debounceInProgress = true;
 
     // release if timeout is reached
     this.releaseTimeout = setTimeout(() => {
       this.releaseTimeout = undefined;
-      clearTimeout(this.secondDebounceTimeout);
+      //clearTimeout(this.secondDebounceTimeout);
       clearTimeout(this.blockTimeTimeout);
+      //this.debounceInProgress = false;
+      this.blockTimeInProgress = false;
     }, this.props.releaseTimeoutMs);
-
-    // TODO: does it need second debounce???
-    // start second debounce timeout
-    this.secondDebounceTimeout = setTimeout(async () => {
-      this.secondDebounceTimeout = undefined;
-
-      const currentLevel: boolean = await this.binaryInput.read();
-
-      this.debounceInProgress = false;
-
-      // if logical 1 = do nothing
-
-      if (!currentLevel) {
-        // logical 0 = finish
-        await this.finishLogic();
-      }
-    }, this.props.debounce);
   }
+
+  // private async startUpLogic() {
+  //   if (this.debounceInProgress) return;
+  //
+  //   this.debounceInProgress = true;
+  //
+  //   // TODO: does it need second debounce???
+  //   // start second debounce timeout
+  //   this.secondDebounceTimeout = setTimeout(async () => {
+  //     this.secondDebounceTimeout = undefined;
+  //
+  //     const currentLevel: boolean = await this.binaryInput.read();
+  //
+  //     this.debounceInProgress = false;
+  //
+  //     // if logical 1 = do nothing
+  //
+  //     if (!currentLevel) {
+  //       // logical 0 = finish
+  //       await this.finishLogic();
+  //     }
+  //   }, this.props.debounce);
+  // }
 
   private async finishLogic() {
     this.keyDown = false;
