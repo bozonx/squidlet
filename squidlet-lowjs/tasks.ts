@@ -5,13 +5,13 @@ import * as yargs from 'yargs';
 import PlatformConfig from '../squidlet-starter/buildHostEnv/interfaces/PlatformConfig';
 import compileTs from '../squidlet-starter/buildJs/compileTs';
 import compileJs from '../squidlet-starter/buildJs/compileJs';
+import buildConfig, {BuildConfig} from '../squidlet-starter/buildJs/buildConfig';
 
 
-const BUILD_DIR = path.resolve(__dirname, `./build`);
-const BUILD_DEVS_MODERN = path.resolve(__dirname, `./build/_devs_modern`);
-const BUILD_DEVS_ES5 = path.resolve(__dirname, `./build/_devs_es5`);
-const DEVS_DIR = path.resolve(__dirname, `./devs`);
 const machineName: string = yargs.argv.machine as string;
+const config: BuildConfig = buildConfig(__dirname);
+// TODO: move to env config
+const strictMode: boolean = false;
 
 
 gulp.task('build-devs', async () => {
@@ -28,10 +28,10 @@ gulp.task('build-devs', async () => {
 
   const machineConfigFilePath: string = path.resolve(__dirname, `./${machineName}.ts`);
   const machineConfig: PlatformConfig = require(machineConfigFilePath);
-  const machineBuildDir: string = path.resolve(BUILD_DIR, machineName);
+  const machineBuildDir: string = path.resolve(config.buildDir, machineName);
 
-  await compileTs(DEVS_DIR, BUILD_DEVS_MODERN);
-  //await compileJs(buildConfig.compiledTsDir, buildConfig.compiledJsDir, buildConfig.strictMode);
+  await compileTs(config.devsSrc, config.devsModersDst);
+  await compileJs(config.devsModersDst, config.devsLegacyDst, strictMode);
 
   // for (let devName of machineConfig.devs) {
   //   const devFilePath: string = path.resolve(__dirname, `./${devName}.ts`);
