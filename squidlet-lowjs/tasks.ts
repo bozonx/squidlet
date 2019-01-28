@@ -30,6 +30,14 @@ function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string
   }
 }
 
+function copyHost(hostBuildDir: string) {
+  const hostDstDir: string = path.join(hostBuildDir, 'host');
+
+  shelljs.mkdir('-p', hostDstDir);
+
+  // TODO: copy whole hosts files
+}
+
 
 gulp.task('build-devs', async () => {
   const buildConfig: BuildConfig = makeBuildConfig(__dirname);
@@ -59,8 +67,8 @@ gulp.task('build', async () => {
   const hostBuildDir: string = path.join(buildConfig.buildDir, envConfig.id);
 
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
+  copyHost(hostBuildDir);
 
-  // TODO: copy host
   // TODO: нужно ещё как-то передать конфиг в configWorks
 
 });
