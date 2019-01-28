@@ -17,6 +17,20 @@ import PreHostConfig from '../squidlet-starter/buildHostEnv/interfaces/PreHostCo
 const envConfigRelPath: string = yargs.argv.config as string;
 
 
+function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
+  const devsDstDir: string = path.join(hostBuildDir, 'devs');
+
+  shelljs.mkdir('-p', devsDstDir);
+
+  // copy specified devs
+  for (let devName of machineDevs) {
+    const devSrcFile: string = path.join(devSrcDir, `${devName}.js`);
+
+    shelljs.cp('-f', devSrcFile, devsDstDir);
+  }
+}
+
+
 gulp.task('build-devs', async () => {
   const buildConfig: BuildConfig = makeBuildConfig(__dirname);
 
@@ -43,16 +57,8 @@ gulp.task('build', async () => {
   const machineConfigFilePath: string = path.resolve(__dirname, `./${envConfig.machine}.ts`);
   const machineConfig: PlatformConfig = require(machineConfigFilePath).default;
   const hostBuildDir: string = path.join(buildConfig.buildDir, envConfig.id);
-  const devsDstDir: string = path.join(hostBuildDir, 'devs');
 
-  shelljs.mkdir('-p', devsDstDir);
-
-  // copy specified devs
-  for (let devName of machineConfig.devs) {
-    const devSrcFile: string = path.join(buildConfig.devsLegacyDst, `${devName}.js`);
-
-    shelljs.cp('-f', devSrcFile, devsDstDir);
-  }
+  copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
 
   // TODO: copy host
   // TODO: нужно ещё как-то передать конфиг в configWorks
