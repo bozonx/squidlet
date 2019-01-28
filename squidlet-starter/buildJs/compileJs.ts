@@ -76,4 +76,4 @@ export default function compileJs (srcDir: string, destDir: string, strictMode?:
       .on('error', reject)
       .on('end', resolve);
   });
-};
+}
