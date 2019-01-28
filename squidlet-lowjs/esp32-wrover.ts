@@ -3,18 +3,18 @@ import PlatformConfig from '../squidlet-starter/buildHostEnv/interfaces/Platform
 
 const platformConfig: PlatformConfig = {
   devs: [
-    'Storage.dev',
-    'Sys.dev',
+    //'Storage.dev',
+    //'Sys.dev',
     //'Sha1',
     'Digital.dev',
     //'Pwm.dev',
-    'Serial.dev',
+    //'Serial.dev',
     //'Spi.dev',
     //'Wifi.dev',
     //'Bluetooth.dev',
-    'I2cMaster.dev',
+    //'I2cMaster.dev',
 
-    'Mqtt.dev',
+    //'Mqtt.dev',
 
     //'Adc.dev',
     //'Dac.dev',
