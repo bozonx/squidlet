@@ -1,17 +1,9 @@
 import * as path from 'path';
+import BuildConfig from '../buildHostEnv/interfaces/BuildConfig';
 
 
-export interface BuildConfig {
-  buildDir: string;
-  devsModersDst: string;
-  devsLegacyDst: string;
-  devsSrc: string;
-}
-
-
-export default function buildConfig (rootDir: string): BuildConfig {
+export default function makeBuildConfig (rootDir: string): BuildConfig {
   const buildDir: string = path.resolve(rootDir, `./build`);
-
 
   return {
     buildDir,

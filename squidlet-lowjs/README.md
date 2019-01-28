@@ -4,4 +4,4 @@
 
 ### ESP32 wrover
 
-    yarn build-devs --machine=esp32-wrover
+    yarn build --config=my-host.yaml
