@@ -1,2 +1,2 @@
 require('ts-node/register');
-require('./tasks/tasks');
+require('./tasks');
