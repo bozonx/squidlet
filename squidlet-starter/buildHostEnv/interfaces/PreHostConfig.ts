@@ -6,6 +6,8 @@ import BuildConfig from './BuildConfig';
 
 // raw host config specified in master config
 export default interface PreHostConfig {
+  // host unique id
+  id?: string;
   platform?: Platforms;
   machine?: Machines;
 
