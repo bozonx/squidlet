@@ -1,11 +1,11 @@
 import * as path from 'path';
 import PluginEnv from './entities/PluginEnv';
 
-const hostSrcRoot = '../../host/src';
-const devicesRoot = path.resolve(__dirname, hostSrcRoot, 'devices');
-const driversRoot = path.resolve(__dirname, hostSrcRoot, 'drivers');
-const servicesRoot = path.resolve(__dirname, hostSrcRoot, 'services');
-//const networkConnectionDriversRoot = path.resolve(__dirname, hostSrcRoot, 'network/connections');
+const systemEntitiesRoot = '../../host/entities';
+const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
+const driversRoot = path.resolve(__dirname, systemEntitiesRoot, 'drivers');
+const servicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'services');
+//const networkConnectionDriversRoot = path.resolve(__dirname, systemEntitiesRoot, 'network/connections');
 
 
 export default async function systemPlugin (env: PluginEnv) {
