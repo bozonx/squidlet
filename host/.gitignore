@@ -1,6 +1,7 @@
 # idea's files
 .idea
 build
+dist
 
 *.csv
 *.dat
