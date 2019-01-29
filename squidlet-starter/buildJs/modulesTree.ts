@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as dependencyTree from 'dependency-tree';
+import * as shelljs from 'shelljs';
 
 
 export function makeModulesTree(rootDir: string, relativeMainFile: string): string[] {
@@ -14,5 +15,11 @@ export function makeModulesTree(rootDir: string, relativeMainFile: string): stri
 export default async function modulesTree (srcDir: string, dstDir: string, relativeMainFile: string = 'index.js') {
   const modulesFileNames = makeModulesTree(srcDir, relativeMainFile);
 
-  console.log(111111111, makeModulesTree)
+  for (let absFileName of modulesFileNames) {
+    const relFilePathPath = path.relative(srcDir, absFileName);
+    const dstFileDir = path.join(dstDir, path.dirname(relFilePathPath));
+
+    shelljs.mkdir('-p', dstFileDir);
+    shelljs.cp(absFileName, dstFileDir);
+  }
 }
