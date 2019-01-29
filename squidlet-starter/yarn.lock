@@ -1006,14 +1006,14 @@ delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
 
-dependency-tree@^6.3.0:
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/dependency-tree/-/dependency-tree-6.4.0.tgz#561f21902179ffd6ca710f939f411c691e1759fa"
+dependency-tree@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/dependency-tree/-/dependency-tree-7.0.2.tgz#01df8bbdc51e41438f5bb93f4a53e1a9cf8301a1"
   dependencies:
     commander "^2.19.0"
     debug "^4.1.1"
-    filing-cabinet "^2.2.0"
-    precinct "^5.3.1"
+    filing-cabinet "^2.3.1"
+    precinct "^6.1.1"
 
 detect-file@^1.0.0:
   version "1.0.0"
@@ -1082,13 +1082,13 @@ detective-stylus@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/detective-stylus/-/detective-stylus-1.0.0.tgz#50aee7db8babb990381f010c63fabba5b58e54cd"
 
-detective-typescript@^4.1.2:
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/detective-typescript/-/detective-typescript-4.1.2.tgz#796ef6215a948ce3a11ec7e787a6c2c03db62d35"
+detective-typescript@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/detective-typescript/-/detective-typescript-5.1.0.tgz#4b2f94db4859a6563243f5b849c83582d6fb19d2"
   dependencies:
-    node-source-walk "^4.0.0"
-    typescript "^3.0.3"
-    typescript-eslint-parser "^18.0.0"
+    node-source-walk "^4.2.0"
+    typescript "^3.2.1"
+    typescript-estree "^18.1.0"
 
 diff@^3.1.0:
   version "3.5.0"
@@ -1284,9 +1284,9 @@ file-exists@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/file-exists/-/file-exists-5.0.1.tgz#1dcd017f787fc7be7a09a6ef3e6a3550cea31198"
 
-filing-cabinet@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/filing-cabinet/-/filing-cabinet-2.2.0.tgz#0c8967f337f1ae9ad086d2b2d48cb86a182e9d94"
+filing-cabinet@^2.3.1:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/filing-cabinet/-/filing-cabinet-2.3.2.tgz#57e3da3f2fb81149ee68ad9b50744b96290e2447"
   dependencies:
     app-module-path "^2.2.0"
     commander "^2.13.0"
@@ -2564,9 +2564,9 @@ postcss@^7.0.2:
     source-map "^0.6.1"
     supports-color "^5.5.0"
 
-precinct@^5.3.1:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/precinct/-/precinct-5.3.1.tgz#4ab0ec1d1a8f1b2f4982b810d56419e7b3025870"
+precinct@^6.1.1:
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/precinct/-/precinct-6.1.1.tgz#b643542dc81e302b4e030a1e9bf57bc65051fa3d"
   dependencies:
     commander "^2.19.0"
     debug "^4.1.1"
@@ -2578,7 +2578,7 @@ precinct@^5.3.1:
     detective-sass "^3.0.0"
     detective-scss "^2.0.0"
     detective-stylus "^1.0.0"
-    detective-typescript "^4.1.2"
+    detective-typescript "^5.1.0"
     module-definition "^3.1.0"
     node-source-walk "^4.2.0"
 
@@ -3229,9 +3229,9 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript-eslint-parser@^18.0.0:
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/typescript-eslint-parser/-/typescript-eslint-parser-18.0.0.tgz#3e5055a44980d69e4154350fc5d8b1ab4e2332a8"
+typescript-estree@^18.1.0:
+  version "18.1.0"
+  resolved "https://registry.yarnpkg.com/typescript-estree/-/typescript-estree-18.1.0.tgz#ea168c3888587cde684ff366e470296196d3ae42"
   dependencies:
     lodash.unescape "4.0.1"
     semver "5.5.0"
@@ -3239,6 +3239,10 @@ typescript-eslint-parser@^18.0.0:
 typescript@^3.0.1, typescript@^3.0.3:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.2.tgz#fe8101c46aa123f8353523ebdcf5730c2ae493e5"
+
+typescript@^3.2.1:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.2.4.tgz#c585cb952912263d915b462726ce244ba510ef3d"
 
 unc-path-regex@^0.1.2:
   version "0.1.2"

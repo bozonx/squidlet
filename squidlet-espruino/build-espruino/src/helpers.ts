@@ -89,11 +89,11 @@ export function makeModuleName(baseDir: string, moduleFullPath: string, moduleRo
   return moduleName;
 }
 
-export function makeModulesTree(rootDir: string, relativeMainFile: string): string[] {
-  return dependencyTree.toList({
-    filename: path.join(rootDir, relativeMainFile),
-    directory: rootDir,
-    // exclude node_modules
-    filter: (curPath: string) => curPath.indexOf('node_modules') === -1, // optional
-  });
-}
+// export function makeModulesTree(rootDir: string, relativeMainFile: string): string[] {
+//   return dependencyTree.toList({
+//     filename: path.join(rootDir, relativeMainFile),
+//     directory: rootDir,
+//     // exclude node_modules
+//     filter: (curPath: string) => curPath.indexOf('node_modules') === -1, // optional
+//   });
+// }
