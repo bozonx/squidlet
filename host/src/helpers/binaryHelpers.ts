@@ -1,5 +1,5 @@
 import {padStart} from './lodashLike';
-import {TextDecoder, TextEncoder} from 'text-encoding';
+//import {TextDecoder, TextEncoder} from 'text-encoding';
 import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../app/dict/constants';
 
 
@@ -89,12 +89,14 @@ export function getBitFromByte(byte: number, position: number): boolean {
 
 // TODO: remake
 export function uint8ArrayToText(arr: Uint8Array): string {
-  return new TextDecoder('utf-8').decode(arr);
+  return '123';
+  //return new TextDecoder('utf-8').decode(arr);
 }
 
 // TODO: remake
 export function textToUint8Array(str: string): Uint8Array {
-  return new TextEncoder('utf-8').encode(str);
+  return new Uint8Array(0);
+  //return new TextEncoder('utf-8').encode(str);
 }
 
 /**
