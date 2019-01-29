@@ -202,23 +202,7 @@ export default abstract class DeviceDataManagerBase {
    * * else get default values from schema
    */
   private async initFirstValue() {
-    let result: Data;
-
-    if (this.initialize) {
-      result = await this.doRequest(
-        this.initialize,
-        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via initialize`
-      );
-    }
-    else if (this.getter) {
-      result = await this.doRequest(
-        this.getter,
-        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via getter`
-      );
-    }
-    else {
-      result = this.getDefaultValues();
-    }
+    let result: Data = this.fetchFirstValue();
 
     this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data
@@ -228,6 +212,23 @@ export default abstract class DeviceDataManagerBase {
     };
     // rise change events and publish on all the params
     this.emitOnChange(Object.keys(this.localState));
+  }
+
+  private async fetchFirstValue(): Promise<Data> {
+    if (this.getter) {
+      return this.doRequest(
+        this.getter,
+        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via getter`
+      );
+    }
+    else if (this.initialize) {
+      return this.doRequest(
+        this.initialize,
+        `Can't fetch initial ${this.typeNameOfData} of device "${this.deviceId}" via initialize`
+      );
+    }
+
+    return this.getDefaultValues();
   }
 
   private async justReadAllData(): Promise<Data> {
