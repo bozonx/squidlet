@@ -1,5 +1,3 @@
-import * as uniqid from 'uniqid';
-
 import {ALL_TOPICS} from '../app/dict/constants';
 import systemConfig from '../app/config/systemConfig';
 import Message from '../messenger/interfaces/Message';
@@ -9,11 +7,6 @@ import {Edge} from '../app/interfaces/dev/Digital';
 
 export const PATH_SEPARATOR = '/';
 
-
-export function generateUniqId(): string {
-  // TODO: почему не используется из helpers ???
-  return uniqid();
-}
 
 // TODO: move to separate file
 export function validateMessage(message: Message) {

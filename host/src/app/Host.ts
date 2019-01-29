@@ -1,7 +1,6 @@
 import System from './System';
 import HostConfig from './interfaces/HostConfig';
 import HostNetworkConfig from '../network/interfaces/HostNetworkConfig';
-import {generateUniqId} from '../helpers/helpers';
 import {isEmpty} from '../helpers/lodashLike';
 
 
@@ -49,7 +48,10 @@ export default class Host {
    * It places here for easy testing and mocking.
    */
   generateUniqId(): string {
-    return generateUniqId();
+    // TODO: make - system id + timestamp + index
+
+    return '1234567';
+    //return generateUniqId();
   }
 
   /**
