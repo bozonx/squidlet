@@ -1,7 +1,7 @@
-import EntityBase from './EntityBase';
-import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverEnv from './DriverEnv';
-import Sender from '../../helpers/Sender';
+import EntityBase from '../app/entities/EntityBase';
+import EntityDefinition from '../app/interfaces/EntityDefinition';
+import DriverEnv from '../app/entities/DriverEnv';
+import Sender from '../helpers/Sender';
 
 
 export default class DriverBase<Props = {}> extends EntityBase<Props> {

@@ -1,4 +1,4 @@
-import DriverBase from '../app/entities/DriverBase';
+import DriverBase from './DriverBase';
 import IndexedEvents from '../helpers/IndexedEvents';
 import Polling from '../helpers/Polling';
 import Sender from '../helpers/Sender';

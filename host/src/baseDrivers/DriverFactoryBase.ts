@@ -1,8 +1,8 @@
 import DriverBase from './DriverBase';
-import DriverEnv from './DriverEnv';
-import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverInstance from '../interfaces/DriverInstance';
-import {mergeDeep} from '../../helpers/helpers';
+import DriverEnv from '../app/entities/DriverEnv';
+import EntityDefinition from '../app/interfaces/EntityDefinition';
+import DriverInstance from '../app/interfaces/DriverInstance';
+import {mergeDeep} from '../helpers/helpers';
 
 
 /**
