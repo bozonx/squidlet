@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as gulp from 'gulp';
+import * as rimraf from 'rimraf';
 
 import compileTs from '../squidlet-starter/buildJs/compileTs';
 import compileJs from '../squidlet-starter/buildJs/compileJs';
@@ -12,6 +13,8 @@ const DST_DIR = path.join(DIST_DIR, 'src');
 
 
 gulp.task('build', async () => {
+  rimraf.sync(`${BUILD_DIR}/**/*`);
   await compileTs(SRC_DIR, BUILD_DIR);
+  rimraf.sync(`${DST_DIR}/**/*`);
   await compileJs(BUILD_DIR, DST_DIR, false);
 });

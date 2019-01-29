@@ -104,7 +104,7 @@ export default class EntityBase<Props = {}> {
    * Load manifest of this entity
    */
   protected async getManifest<T extends ManifestBase>(): Promise<T> {
-    return await this.env.loadManifest(this.className) as T;
+    return this.env.loadManifest(this.className) as Promise<T>;
   }
 
   private async getDriverDepCb(): Promise<GetDriverDep> {

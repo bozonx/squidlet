@@ -60,7 +60,7 @@ export default class Toggle extends DeviceBase<Props> {
     },
 
     toggle: async (): Promise<boolean> => {
-      return await this.doToggle();
+      return this.doToggle();
     }
   };
 

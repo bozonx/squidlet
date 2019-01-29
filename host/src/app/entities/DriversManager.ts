@@ -93,7 +93,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
    * load list of definitions of drivers
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
-    return await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+    return this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
   }

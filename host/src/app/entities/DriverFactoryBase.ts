@@ -33,7 +33,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
     if (typeof instanceId === 'undefined') {
       // just create always new instance and don't save
-      return await this.makeInstance(props);
+      return this.makeInstance(props);
     }
 
     // return previously saved instance if it is
