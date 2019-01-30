@@ -1,4 +1,4 @@
-BridgeSubscriber = require('../../host/core/messenger/BridgeSubscriber').default
+BridgeSubscriber = require('../../plugin-bridge/messenger/BridgeSubscriber').default
 
 
 describe 'messenger.BridgeSubscriber', ->

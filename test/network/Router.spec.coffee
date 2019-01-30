@@ -1,4 +1,4 @@
-Router = require('../../host/core/network/Router').default
+Router = require('../../plugin-bridge/network/Router').default
 
 
 describe 'app.Router', ->

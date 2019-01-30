@@ -1,8 +1,8 @@
 import Messenger from './Messenger';
-import System from '../System';
+import System from '../../host/core/System';
 import Request from './interfaces/Request';
 import Response from './interfaces/Response';
-import categories from '../dict/categories';
+import categories from '../../host/core/dict/categories';
 
 
 export default class RequestResponse {

@@ -1,10 +1,10 @@
-import IndexedEvents from '../helpers/IndexedEvents';
+import IndexedEvents from '../../host/core/helpers/IndexedEvents';
 import Network from './';
-import DriverEnv from '../entities/DriverEnv';
+import DriverEnv from '../../host/core/entities/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
-import {last} from '../helpers/lodashLike';
+import {last} from '../../host/core/helpers/lodashLike';
 
 
 type RouterHandler = (error: Error | null, payload?: any) => void;

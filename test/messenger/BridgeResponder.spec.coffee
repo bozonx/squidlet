@@ -1,4 +1,4 @@
-BridgeResponder = require('../../host/core/messenger/BridgeResponder').default
+BridgeResponder = require('../../plugin-bridge/messenger/BridgeResponder').default
 
 
 describe 'messenger.BridgeResponder', ->

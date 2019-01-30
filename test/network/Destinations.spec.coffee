@@ -1,4 +1,4 @@
-Destinations = require('../../host/core/network/Destinations').default
+Destinations = require('../../plugin-bridge/network/Destinations').default
 
 
 describe 'app.Destinations', ->

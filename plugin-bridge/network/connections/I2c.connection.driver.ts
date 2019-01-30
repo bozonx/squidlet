@@ -1,9 +1,9 @@
-import MyAddress from '../../interfaces/MyAddress';
-import DriverFactoryBase from '../../baseDrivers/DriverFactoryBase';
+import MyAddress from '../../../host/core/interfaces/MyAddress';
+import DriverFactoryBase from '../../../host/core/baseDrivers/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData.driver';
-import { uint8ArrayToText, textToUint8Array} from '../../helpers/binaryHelpers';
-import DriverBase from '../../baseDrivers/DriverBase';
-import {GetDriverDep} from '../../entities/EntityBase';
+import { uint8ArrayToText, textToUint8Array} from '../../../host/core/helpers/binaryHelpers';
+import DriverBase from '../../../host/core/baseDrivers/DriverBase';
+import {GetDriverDep} from '../../../host/core/entities/EntityBase';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;

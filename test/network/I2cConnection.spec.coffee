@@ -1,4 +1,4 @@
-I2cConnection = require('../../host/core/network/connections/I2c.connection.driver').default
+I2cConnection = require('../../plugin-bridge/network/connections/I2c.connection.driver').default
 helpers = require('../../host/core/helpers/binaryHelpers')
 
 

@@ -1,4 +1,4 @@
-Messenger = require('../../host/core/messenger/Messenger.ts').default
+Messenger = require('../../plugin-bridge/messenger/Messenger.ts').default
 
 
 describe 'app.Messenger', ->

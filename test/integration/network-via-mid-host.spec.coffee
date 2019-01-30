@@ -1,4 +1,4 @@
-Network = require('../../host/core/network/Network').default
+Network = require('../../plugin-bridge/network/Network').default
 Drivers = require('../../host/core/entities/DriverEnv').default
 { Map } = require('immutable');
 

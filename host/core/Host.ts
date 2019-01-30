@@ -1,13 +1,11 @@
 import System from './System';
 import HostConfig from './interfaces/HostConfig';
-import HostNetworkConfig from './network/interfaces/HostNetworkConfig';
 import {isEmpty} from './helpers/lodashLike';
 
 
 export default class Host {
   private readonly system: System;
   private hostConfig?: HostConfig;
-  private readonly hostNetworkConfig: HostNetworkConfig;
 
   get id(): string {
     return this.config.id;
@@ -17,16 +15,8 @@ export default class Host {
     return this.hostConfig as HostConfig;
   }
 
-  get networkConfig(): HostNetworkConfig {
-    return this.hostNetworkConfig;
-  }
-
   constructor(system: System) {
     this.system = system;
-
-    // TODO: review - put into main config
-
-    this.hostNetworkConfig = {} as HostNetworkConfig;
   }
 
 

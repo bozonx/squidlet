@@ -2,7 +2,6 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import EnvBase from './EnvBase';
 import Events from '../Events';
 import Host from '../Host';
-import Messenger from '../messenger/Messenger';
 import Devices from '../Devices';
 import System from '../System';
 
@@ -13,14 +12,12 @@ import System from '../System';
 export default class DeviceEnv extends EnvBase {
   readonly events: Events;
   readonly host: Host;
-  readonly messenger: Messenger;
   readonly devices: Devices;
 
   constructor(system: System) {
     super(system);
     this.events = system.events;
     this.host = system.host;
-    this.messenger = system.messenger;
     this.devices = system.devices;
   }
 

@@ -1,4 +1,4 @@
-OneWayMessages = require('../../host/core/messenger/OneWayMessages').default
+OneWayMessages = require('../../plugin-bridge/messenger/OneWayMessages').default
 
 
 describe 'messenger.OneWayMessages', ->

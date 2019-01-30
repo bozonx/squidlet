@@ -1,4 +1,4 @@
-RequestResponse = require('../../host/core/messenger/RequestResponse').default
+RequestResponse = require('../../plugin-bridge/messenger/RequestResponse').default
 
 
 describe 'messenger.RequestResponse', ->

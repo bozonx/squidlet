@@ -1,6 +1,5 @@
 import {ALL_TOPICS} from '../dict/constants';
 import systemConfig from '../config/systemConfig';
-import Message from '../messenger/interfaces/Message';
 import {find, isEmpty, isEqual, isObject, trim, values} from './lodashLike';
 import {Edge} from '../interfaces/dev/Digital';
 
@@ -8,10 +7,10 @@ import {Edge} from '../interfaces/dev/Digital';
 export const PATH_SEPARATOR = '/';
 
 
-// TODO: move to separate file
-export function validateMessage(message: Message) {
-  return message && message.category && message.topic && message.from && message.to;
-}
+// // TODO: move to separate file
+// export function validateMessage(message: Message) {
+//   return message && message.category && message.topic && message.from && message.to;
+// }
 
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
 

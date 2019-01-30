@@ -1,5 +1,5 @@
 import Destination from './Destination';
-import MyAddress from '../../interfaces/MyAddress';
+import MyAddress from '../../../host/core/interfaces/MyAddress';
 
 
 export default interface HostNetworkConfig {

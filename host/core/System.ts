@@ -1,8 +1,6 @@
-import Network from './network/Network';
 import Host from './Host';
 import Events from './Events';
 import LogPublisher from './LogPublisher';
-import Messenger from './messenger/Messenger';
 import DevicesManager from './entities/DevicesManager';
 import Devices from './Devices';
 import DriversManager from './entities/DriversManager';
@@ -27,8 +25,6 @@ export default class System {
   readonly host: Host;
   readonly driversManager: DriversManager;
 
-  readonly network: Network;
-  readonly messenger: Messenger;
   readonly devices: Devices;
 
   readonly servicesManager: ServicesManager;
@@ -61,8 +57,6 @@ export default class System {
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
 
-    this.network = new Network(this.driversManager.env);
-    this.messenger = new Messenger(this);
     this.devices = new Devices(this);
 
     this.servicesManager = new ServicesManager(this);
@@ -82,8 +76,6 @@ export default class System {
       this.log.info(`---> Initializing system drivers`);
       await this.driversManager.initSystemDrivers();
       this.riseEvent(eventNames.system.systemDriversInitialized);
-
-      await this.initNetwork();
 
       this.log.info(`---> Initializing system services`);
       await this.servicesManager.initSystemServices();
@@ -134,16 +126,16 @@ export default class System {
   }
 
 
-  private async initNetwork(): Promise<void> {
-    this.log.info(`---> Initializing network`);
-    this.network.init(this.host.id, this.host.networkConfig);
-    this.riseEvent(eventNames.system.networkInitialized);
-
-    this.log.info(`---> Initializing messenger`);
-    this.messenger.init();
-    this.devices.init();
-    this.riseEvent(eventNames.system.messengerInitialized);
-  }
+  // private async initNetwork(): Promise<void> {
+  //   this.log.info(`---> Initializing network`);
+  //   this.network.init(this.host.id, this.host.networkConfig);
+  //   this.riseEvent(eventNames.system.networkInitialized);
+  //
+  //   this.log.info(`---> Initializing messenger`);
+  //   this.messenger.init();
+  //   this.devices.init();
+  //   this.riseEvent(eventNames.system.messengerInitialized);
+  // }
 
   /**
    * Init top layer - devices, regular drivers and regular services

@@ -1,7 +1,7 @@
 import System from './System';
-import Request from './messenger/interfaces/Request';
-import Response from './messenger/interfaces/Response';
-import Message from './messenger/interfaces/Message';
+import Request from '../../plugin-bridge/messenger/interfaces/Request';
+import Response from '../../plugin-bridge/messenger/interfaces/Response';
+import Message from '../../plugin-bridge/messenger/interfaces/Message';
 import categories from './dict/categories';
 
 
