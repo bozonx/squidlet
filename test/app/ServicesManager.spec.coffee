@@ -1,5 +1,5 @@
-ServicesManager = require('../../host/src/app/entities/ServicesManager').default
-initializationConfig = require('../../host/src/app/config/initializationConfig').default
+ServicesManager = require('../../host/core/entities/ServicesManager').default
+initializationConfig = require('../../host/core/config/initializationConfig').default
 
 
 describe 'app.ServicesManager', ->

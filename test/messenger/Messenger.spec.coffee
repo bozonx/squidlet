@@ -1,4 +1,4 @@
-Messenger = require('../../host/src/messenger/Messenger.ts').default
+Messenger = require('../../host/core/messenger/Messenger.ts').default
 
 
 describe 'app.Messenger', ->

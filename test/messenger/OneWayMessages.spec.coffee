@@ -1,4 +1,4 @@
-OneWayMessages = require('../../host/src/messenger/OneWayMessages').default
+OneWayMessages = require('../../host/core/messenger/OneWayMessages').default
 
 
 describe 'messenger.OneWayMessages', ->

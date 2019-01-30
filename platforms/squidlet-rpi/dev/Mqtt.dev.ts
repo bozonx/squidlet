@@ -1,5 +1,5 @@
 import * as mqtt from 'mqtt';
-import Mqtt from '../../../host/src/app/interfaces/dev/Mqtt';
+import Mqtt from '../../../host/core/interfaces/dev/Mqtt';
 
 
 interface Props {

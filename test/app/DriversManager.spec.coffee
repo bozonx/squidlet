@@ -1,5 +1,5 @@
-DriversManager = require('../../host/src/app/entities/DriversManager').default
-initializationConfig = require('../../host/src/app/config/initializationConfig').default
+DriversManager = require('../../host/core/entities/DriversManager').default
+initializationConfig = require('../../host/core/config/initializationConfig').default
 
 
 describe 'app.DriversManager', ->

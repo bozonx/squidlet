@@ -1,6 +1,6 @@
 import {Gpio} from 'onoff';
 
-import Digital, {Edge, PinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
+import Digital, {Edge, PinMode, WatchHandler} from '../../../host/core/interfaces/dev/Digital';
 
 
 type DIRECTION = 'in' | 'out';

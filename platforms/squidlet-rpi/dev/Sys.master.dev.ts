@@ -1,15 +1,15 @@
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import Sys from '../../../host/src/app/interfaces/dev/Sys';
-import {PATH_SEPARATOR} from '../../../host/src/helpers/helpers';
+import Sys from '../../../host/core/interfaces/dev/Sys';
+import {PATH_SEPARATOR} from '../../../host/core/helpers/helpers';
 import {convertBufferToUint8Array} from '../helpers';
-import {SrcHostFilesSet} from '../../../host/src/app/interfaces/HostFilesSet';
-import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
-import initializationConfig from '../../../host/src/app/config/initializationConfig';
+import {SrcHostFilesSet} from '../../../host/core/interfaces/HostFilesSet';
+import {ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
+import initializationConfig from '../../../host/core/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
-import {trimEnd} from '../../../host/src/helpers/lodashLike';
-import systemConfig from '../../../host/src/app/config/systemConfig';
+import {trimEnd} from '../../../host/core/helpers/lodashLike';
+import systemConfig from '../../../host/core/config/systemConfig';
 
 
 let __configSet: SrcHostFilesSet;

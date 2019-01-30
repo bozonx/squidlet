@@ -1,4 +1,4 @@
-Polling = require('../../host/src/helpers/Polling').default;
+Polling = require('../../host/core/helpers/Polling').default;
 
 
 describe 'Polling', ->

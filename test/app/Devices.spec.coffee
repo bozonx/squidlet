@@ -1,4 +1,4 @@
-Devices = require('../../host/src/app/Devices').default
+Devices = require('../../host/core/Devices').default
 
 
 describe 'app.Devices', ->

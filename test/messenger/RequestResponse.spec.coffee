@@ -1,4 +1,4 @@
-RequestResponse = require('../../host/src/messenger/RequestResponse').default
+RequestResponse = require('../../host/core/messenger/RequestResponse').default
 
 
 describe 'messenger.RequestResponse', ->

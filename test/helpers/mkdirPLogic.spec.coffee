@@ -1,4 +1,4 @@
-mkdirPLogic = require('../../host/src/helpers/mkdirPLogic').default
+mkdirPLogic = require('../../host/core/helpers/mkdirPLogic').default
 
 
 describe 'helpers.mkdirPLogic', ->

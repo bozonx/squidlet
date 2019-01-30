@@ -1,5 +1,5 @@
-I2cConnection = require('../../host/src/network/connections/I2c.connection.driver').default
-helpers = require('../../host/src/helpers/binaryHelpers')
+I2cConnection = require('../../host/core/network/connections/I2c.connection.driver').default
+helpers = require('../../host/core/helpers/binaryHelpers')
 
 
 describe 'connections.I2cConnection', ->

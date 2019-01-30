@@ -1,4 +1,4 @@
-Destinations = require('../../host/src/network/Destinations').default
+Destinations = require('../../host/core/network/Destinations').default
 
 
 describe 'app.Destinations', ->

@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
 import {EntitiesNames} from './EntitiesCollection';
-import {ManifestsTypePluralName} from '../../../host/src/app/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
 import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';

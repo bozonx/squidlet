@@ -1,5 +1,5 @@
-Network = require('../../host/src/network/Network').default
-Drivers = require('../../host/src/app/entities/DriverEnv').default
+Network = require('../../host/core/network/Network').default
+Drivers = require('../../host/core/entities/DriverEnv').default
 { Map } = require('immutable');
 
 

@@ -13,7 +13,7 @@ import {
   PLATFORM_RPI,
   PLATFORM_X86
 } from './buildHostEnv/interfaces/Platforms';
-import {DevClass} from '../host/src/app/entities/DevManager';
+import {DevClass} from '../host/core/entities/DevManager';
 
 
 // TODO: review

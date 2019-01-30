@@ -9,10 +9,10 @@
 import * as path from 'path';
 
 import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from './helpers';
-import System from '../host/src/app/System';
+import System from '../host/core/System';
 import MainHostsEnv from './buildHostEnv/MainHostsEnv';
-import {SrcHostFilesSet} from '../host/src/app/interfaces/HostFilesSet';
-import {DevClass} from '../host/src/app/entities/DevManager';
+import {SrcHostFilesSet} from '../host/core/interfaces/HostFilesSet';
+import {DevClass} from '../host/core/entities/DevManager';
 
 
 // TODO: change
