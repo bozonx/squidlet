@@ -1,5 +1,5 @@
 Network = require('../../plugin-bridge/network/Network').default
-Drivers = require('../../host/core/entities/DriverEnv').default
+Drivers = require('../../squidlet-core/core/entities/DriverEnv').default
 { Map } = require('immutable');
 
 

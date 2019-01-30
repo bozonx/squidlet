@@ -1,5 +1,5 @@
 import {I2cBus, openSync} from 'i2c-bus';
-import I2cMaster from '../../../host/core/interfaces/dev/I2cMaster';
+import I2cMaster from '../../../squidlet-core/core/interfaces/dev/I2cMaster';
 import {convertBufferToUint8Array} from '../helpers';
 
 

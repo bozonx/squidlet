@@ -1,4 +1,4 @@
-I2cSlave = require('../../../host/src/drivers/I2c/I2cSlave.driver').default
+I2cSlave = require('../../../squidlet-core/src/drivers/I2c/I2cSlave.driver').default
 
 
 describe 'I2cSlave.driver', ->

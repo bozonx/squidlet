@@ -1,4 +1,4 @@
-mkdirPLogic = require('../../host/core/helpers/mkdirPLogic').default
+mkdirPLogic = require('../../squidlet-core/core/helpers/mkdirPLogic').default
 
 
 describe 'helpers.mkdirPLogic', ->

@@ -3,8 +3,8 @@ import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
 import {collectDevs} from './helpers';
-import System from '../host/core/System';
-import {DevClass} from '../host/core/entities/DevManager';
+import System from '../squidlet-core/core/System';
+import {DevClass} from '../squidlet-core/core/entities/DevManager';
 
 
 // TODO: change

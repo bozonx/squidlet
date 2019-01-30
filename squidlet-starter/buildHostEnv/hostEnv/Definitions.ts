@@ -5,9 +5,9 @@ import _values = require('lodash/values');
 import _isEmpty = require('lodash/isEmpty');
 
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import EntityDefinition from '../../../host/core/interfaces/EntityDefinition';
+import EntityDefinition from '../../../squidlet-core/core/interfaces/EntityDefinition';
 import PreHostConfig from '../interfaces/PreHostConfig';
-import {SrcEntitiesSet, SrcEntitySet} from '../../../host/core/interfaces/EntitySet';
+import {SrcEntitiesSet, SrcEntitySet} from '../../../squidlet-core/core/interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
 import EntitiesCollection from '../entities/EntitiesCollection';
 import MasterConfig from '../MasterConfig';

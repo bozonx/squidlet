@@ -1,4 +1,4 @@
-Polling = require('../../host/core/helpers/Polling').default;
+Polling = require('../../squidlet-core/core/helpers/Polling').default;
 
 
 describe 'Polling', ->

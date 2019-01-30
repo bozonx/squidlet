@@ -1,4 +1,4 @@
-BinaryInput = require('../../../host/src/drivers/Binary/BinaryInput.driver').default
+BinaryInput = require('../../../squidlet-core/src/drivers/Binary/BinaryInput.driver').default
 
 
 describe 'BinaryInput.driver', ->

@@ -1,4 +1,4 @@
-I2cMaster = require('../../../host/src/drivers/I2c/I2cMaster.driver').default
+I2cMaster = require('../../../squidlet-core/src/drivers/I2c/I2cMaster.driver').default
 
 
 describe 'I2cMaster.driver', ->

@@ -1,6 +1,6 @@
 import {Gpio} from 'onoff';
 
-import Digital, {Edge, PinMode, WatchHandler} from '../../../host/core/interfaces/dev/Digital';
+import Digital, {Edge, PinMode, WatchHandler} from '../../../squidlet-core/core/interfaces/dev/Digital';
 
 
 type DIRECTION = 'in' | 'out';

@@ -1,4 +1,4 @@
-helpers = require('../../host/core/helpers/binaryHelpers')
+helpers = require('../../squidlet-core/core/helpers/binaryHelpers')
 
 
 describe 'helpers.helpers', ->

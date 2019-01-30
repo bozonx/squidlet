@@ -1,4 +1,4 @@
-ImpulseInput = require('../../../host/src/drivers/Binary/ImpulseInput.driver').default
+ImpulseInput = require('../../../squidlet-core/src/drivers/Binary/ImpulseInput.driver').default
 
 
 describe 'ImpulseInput.driver', ->

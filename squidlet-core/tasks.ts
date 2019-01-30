@@ -4,7 +4,6 @@ import * as rimraf from 'rimraf';
 
 import compileTs from '../squidlet-starter/buildJs/compileTs';
 import compileJs from '../squidlet-starter/buildJs/compileJs';
-//import collectDependencies from '../squidlet-starter/buildJs/collectDependencies';
 import minimize from '../squidlet-starter/buildJs/minimize';
 import modulesTree from '../squidlet-starter/buildJs/modulesTree';
 
@@ -16,7 +15,6 @@ const MODERN_DST_DIR = path.join(BUILD_DIR, 'modern');
 const LEGACY_DST_DIR = path.join(BUILD_DIR, 'legacy');
 const DEV_DST_DIR = path.join(DIST_DIR, 'dev');
 const MIN_DST_DIR = path.join(DIST_DIR, 'min');
-//const PRJ_CONFIG_YAML = path.resolve(__dirname, 'prjConfig.yaml');
 
 
 gulp.task('build', async () => {

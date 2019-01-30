@@ -1,15 +1,15 @@
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import Sys from '../../../host/core/interfaces/dev/Sys';
-import {PATH_SEPARATOR} from '../../../host/core/helpers/helpers';
+import Sys from '../../../squidlet-core/core/interfaces/dev/Sys';
+import {PATH_SEPARATOR} from '../../../squidlet-core/core/helpers/helpers';
 import {convertBufferToUint8Array} from '../helpers';
-import {SrcHostFilesSet} from '../../../host/core/interfaces/HostFilesSet';
-import {ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
-import initializationConfig from '../../../host/core/config/initializationConfig';
+import {SrcHostFilesSet} from '../../../squidlet-core/core/interfaces/HostFilesSet';
+import {ManifestsTypePluralName} from '../../../squidlet-core/core/interfaces/ManifestTypes';
+import initializationConfig from '../../../squidlet-core/core/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
-import {trimEnd} from '../../../host/core/helpers/lodashLike';
-import systemConfig from '../../../host/core/config/systemConfig';
+import {trimEnd} from '../../../squidlet-core/core/helpers/lodashLike';
+import systemConfig from '../../../squidlet-core/core/config/systemConfig';
 
 
 let __configSet: SrcHostFilesSet;

@@ -1,4 +1,4 @@
-Status = require('../../host/core/baseDevice/Status').default
+Status = require('../../squidlet-core/core/baseDevice/Status').default
 
 
 describe 'baseDevice.Status', ->

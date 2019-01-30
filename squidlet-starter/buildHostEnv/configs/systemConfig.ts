@@ -2,10 +2,10 @@
  * This is system config for master configurator and host
  */
 
-import initializationConfig from '../../../host/core/config/initializationConfig';
-import InitializationConfig from '../../../host/core/interfaces/InitializationConfig';
-import systemConfig from '../../../host/core/config/systemConfig';
-import SystemConfig from '../../../host/core/interfaces/SystemConfig';
+import initializationConfig from '../../../squidlet-core/core/config/initializationConfig';
+import InitializationConfig from '../../../squidlet-core/core/interfaces/InitializationConfig';
+import systemConfig from '../../../squidlet-core/core/config/systemConfig';
+import SystemConfig from '../../../squidlet-core/core/interfaces/SystemConfig';
 
 
 const hostInitCfg: InitializationConfig = initializationConfig();

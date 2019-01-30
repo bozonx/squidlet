@@ -8,7 +8,7 @@ import HostClassNames from './hostEnv/HostClassNames';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
-import {SrcHostFilesSet} from '../../host/core/interfaces/HostFilesSet';
+import {SrcHostFilesSet} from '../../squidlet-core/core/interfaces/HostFilesSet';
 
 
 export default class MainHostsEnv {

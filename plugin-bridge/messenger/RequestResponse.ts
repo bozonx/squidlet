@@ -1,8 +1,8 @@
 import Messenger from './Messenger';
-import System from '../../host/core/System';
+import System from '../../squidlet-core/core/System';
 import Request from './interfaces/Request';
 import Response from './interfaces/Response';
-import categories from '../../host/core/dict/categories';
+import categories from '../../squidlet-core/core/dict/categories';
 
 
 export default class RequestResponse {

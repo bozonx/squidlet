@@ -15,6 +15,7 @@ import PreHostConfig from '../squidlet-starter/buildHostEnv/interfaces/PreHostCo
 
 
 const envConfigRelPath: string = yargs.argv.config as string;
+const hostSrcDir = '../host';
 
 
 function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
@@ -34,8 +35,7 @@ function copyHost(hostBuildDir: string) {
   const hostDstDir: string = path.join(hostBuildDir, 'host');
 
   shelljs.mkdir('-p', hostDstDir);
-
-  // TODO: copy whole hosts files
+  shelljs.cp('-Rf', hostDstDir);
 }
 
 
