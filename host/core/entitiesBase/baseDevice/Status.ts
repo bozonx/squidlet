@@ -1,6 +1,6 @@
 import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
-import {combineTopic} from '../helpers/helpers';
-import PublishParams from '../interfaces/PublishParams';
+import {combineTopic} from '../../helpers/helpers';
+import PublishParams from '../../interfaces/PublishParams';
 
 
 export const DEFAULT_STATUS = 'default';

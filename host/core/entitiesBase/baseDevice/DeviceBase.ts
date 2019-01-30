@@ -1,14 +1,14 @@
 import {ChangeHandler, Getter, Initialize, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
-import PublishParams from '../interfaces/PublishParams';
-import {EntityProps} from '../interfaces/EntityDefinition';
-import DeviceManifest from '../interfaces/DeviceManifest';
-import EntityBase from '../entities/EntityBase';
-import DeviceEnv from '../entities/DeviceEnv';
-import EntityDefinition from '../interfaces/EntityDefinition';
-import categories from '../dict/categories';
-import DeviceData from '../interfaces/DeviceData';
+import PublishParams from '../../interfaces/PublishParams';
+import {EntityProps} from '../../interfaces/EntityDefinition';
+import DeviceManifest from '../../interfaces/DeviceManifest';
+import EntityBase from '../EntityBase';
+import DeviceEnv from '../../entities/DeviceEnv';
+import EntityDefinition from '../../interfaces/EntityDefinition';
+import categories from '../../dict/categories';
+import DeviceData from '../../interfaces/DeviceData';
 
 
 export interface DeviceBaseProps extends EntityProps {

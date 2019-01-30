@@ -1,5 +1,5 @@
 import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
-import PublishParams from '../interfaces/PublishParams';
+import PublishParams from '../../interfaces/PublishParams';
 
 
 /**

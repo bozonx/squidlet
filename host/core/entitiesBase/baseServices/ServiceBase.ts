@@ -1,7 +1,7 @@
-import EntityBase from '../entities/EntityBase';
-import {EntityProps} from '../interfaces/EntityDefinition';
-import ServiceEnv from '../entities/ServiceEnv';
-import EntityDefinition from '../interfaces/EntityDefinition';
+import EntityBase from '../EntityBase';
+import {EntityProps} from '../../interfaces/EntityDefinition';
+import ServiceEnv from '../../entities/ServiceEnv';
+import EntityDefinition from '../../interfaces/EntityDefinition';
 
 
 export interface ServiceBaseProps extends EntityProps {
