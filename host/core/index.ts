@@ -2,6 +2,20 @@
  * MainHostsEnv file which starts on microController's system boot.
  */
 
+// Import helpers which will copy to final tree
+import './helpers/binaryHelpers';
+import './helpers/DebounceCall';
+import './helpers/mkdirPLogic';
+import './helpers/Polling';
+import './helpers/Republish';
+import './helpers/Sender';
+import './helpers/validateSchema';
+import './helpers/validators';
+// Import entities base which will copy to final tree
+import './baseDevice/DeviceBase';
+import './baseDrivers/DriverBase';
+import './baseServices/ServiceBase';
+
 import System from './System';
 
 

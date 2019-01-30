@@ -1,10 +1,10 @@
 import DriverBase from './DriverBase';
-import IndexedEvents from '../../helpers/IndexedEvents';
-import Polling from '../../helpers/Polling';
-import Sender from '../../helpers/Sender';
+import IndexedEvents from '../helpers/IndexedEvents';
+import Polling from '../helpers/Polling';
+import Sender from '../helpers/Sender';
 import {ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
-import {find, isEqual} from '../../helpers/lodashLike';
-import {hexStringToHexNum} from '../../helpers/binaryHelpers';
+import {find, isEqual} from '../helpers/lodashLike';
+import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
 
 // type of feedback - polling or interruption

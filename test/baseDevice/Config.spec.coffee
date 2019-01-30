@@ -1,4 +1,4 @@
-Config = require('../../host/core/entitiesBase/baseDevice/Config').default
+Config = require('../../host/core/baseDevice/Config').default
 
 
 describe 'baseDevice.Config', ->
