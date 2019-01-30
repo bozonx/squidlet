@@ -1,6 +1,5 @@
-import {isUint8Array} from './';
+import {isUint8Array} from './helpers';
 
-const _padStart = require('lodash/padStart');
 
 // TODO: test
 

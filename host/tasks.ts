@@ -11,7 +11,7 @@ import modulesTree from '../squidlet-starter/buildJs/modulesTree';
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
 const DIST_DIR = path.resolve(__dirname, 'dist');
-const SRC_DIR = path.resolve(__dirname, 'src');
+const CORE_SRC_DIR = path.resolve(__dirname, 'core');
 const DST_DIR = path.join(DIST_DIR, 'src');
 const MODERN_DST_DIR = path.join(BUILD_DIR, 'modern');
 const LEGACY_DST_DIR = path.join(BUILD_DIR, 'legacy');
@@ -22,7 +22,7 @@ const PRJ_CONFIG_YAML = path.resolve(__dirname, 'prjConfig.yaml');
 gulp.task('build', async () => {
   rimraf.sync(`${MODERN_DST_DIR}/**/*`);
   rimraf.sync(`${LEGACY_DST_DIR}/**/*`);
-  await compileTs(SRC_DIR, MODERN_DST_DIR);
+  await compileTs(CORE_SRC_DIR, MODERN_DST_DIR);
   await compileJs(MODERN_DST_DIR, LEGACY_DST_DIR, false);
   //await collectDependencies(PRJ_CONFIG_YAML, buildConfig.dependenciesBuildDir);
   //await minimize(buildConfig.compiledJsDir, buildConfig.minPrjDir);

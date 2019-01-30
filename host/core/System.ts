@@ -4,7 +4,7 @@ import Events from './Events';
 import LogPublisher from './LogPublisher';
 import Messenger from './messenger/Messenger';
 import DevicesManager from './entities/DevicesManager';
-import Devices from '../entities/devices';
+import Devices from './Devices';
 import DriversManager from './entities/DriversManager';
 import ServicesManager from './entities/ServicesManager';
 import Logger from './interfaces/Logger';
