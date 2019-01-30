@@ -9,6 +9,7 @@ export default function makeBuildConfig (rootDir: string): BuildConfig {
     buildDir,
     devsModersDst: path.resolve(buildDir, `./_devs_modern`),
     devsLegacyDst: path.resolve(buildDir, `./_devs_legacy`),
+    devsMinDst: path.resolve(buildDir, `./_devs_min`),
     devsSrc: path.resolve(rootDir, './devs'),
   };
 }

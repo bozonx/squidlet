@@ -13,15 +13,18 @@ import compileJs from '../squidlet-starter/buildJs/compileJs';
 import makeBuildConfig from '../squidlet-starter/buildJs/buildConfig';
 import BuildConfig from '../squidlet-starter/buildHostEnv/interfaces/BuildConfig';
 import PreHostConfig from '../squidlet-starter/buildHostEnv/interfaces/PreHostConfig';
+import minimize from '../squidlet-starter/buildJs/minimize';
 
 
 const envConfigRelPath: string = yargs.argv.config as string;
 // TODO: use min
 const hostSrcDir = path.resolve(__dirname, '../squidlet-core/dist/dev');
+const HOST_DEVS_DIR = 'devs';
+const HOST_CORE_DIR = 'core';
 
 
 function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
-  const devsDstDir: string = path.join(hostBuildDir, 'devs');
+  const devsDstDir: string = path.join(hostBuildDir, HOST_DEVS_DIR);
 
   shelljs.mkdir('-p', devsDstDir);
 
@@ -34,7 +37,7 @@ function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string
 }
 
 function copyHost(hostBuildDir: string) {
-  const hostDstDir: string = path.join(hostBuildDir, 'host');
+  const hostDstDir: string = path.join(hostBuildDir, HOST_CORE_DIR);
 
   rimraf.sync(`${hostDstDir}/**/*`);
   shelljs.mkdir('-p', hostDstDir);
@@ -45,12 +48,15 @@ function copyHost(hostBuildDir: string) {
 gulp.task('build-devs', async () => {
   const buildConfig: BuildConfig = makeBuildConfig(__dirname);
 
+  // ts to modern js
   rimraf.sync(`${buildConfig.devsModersDst}/**/*`);
   await compileTs(buildConfig.devsSrc, buildConfig.devsModersDst);
+  // modern js to ES5
   rimraf.sync(`${buildConfig.devsLegacyDst}/**/*`);
   await compileJs(buildConfig.devsModersDst, buildConfig.devsLegacyDst, false);
-
-  // TODO: minimize
+  // minimize
+  rimraf.sync(`${buildConfig.devsMinDst}/**/*`);
+  await minimize(buildConfig.devsLegacyDst, buildConfig.devsMinDst);
 });
 
 gulp.task('build', async () => {
@@ -73,6 +79,7 @@ gulp.task('build', async () => {
   const machineConfig: PlatformConfig = require(machineConfigFilePath).default;
   const hostBuildDir: string = path.join(buildConfig.buildDir, envConfig.id);
 
+  // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
   copyHost(hostBuildDir);
 
