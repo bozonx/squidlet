@@ -84,8 +84,9 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
     // handle actions call
     if (this.actions) {
       // TODO: maybe move to devices ?
+      // TODO: remake to events - see mqtt service
       // subscribe to external messages where topic is this device id to call action
-      this.env.messenger.subscribeLocal(categories.externalDataIncome, this.id, this.handleIncomeData);
+      //this.env.messenger.subscribeLocal(categories.externalDataIncome, this.id, this.handleIncomeData);
     }
 
     await Promise.all([
@@ -163,7 +164,8 @@ export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBas
       params,
     };
 
-    this.env.messenger.emit(categories.externalDataOutcome, this.id, data);
+    // TODO: remake to events
+    //this.env.messenger.emit(categories.externalDataOutcome, this.id, data);
   }
 
   private handleIncomeData = (incomeData: DeviceData) => {

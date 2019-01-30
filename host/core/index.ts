@@ -14,6 +14,8 @@ import './helpers/validators';
 // Import entities base which will copy to final tree
 import './baseDevice/DeviceBase';
 import './baseDrivers/DriverBase';
+import './baseDrivers/DriverFactoryBase';
+import './baseDrivers/MasterSlaveBaseNodeDriver';
 import './baseServices/ServiceBase';
 
 import System from './System';

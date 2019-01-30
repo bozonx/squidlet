@@ -2,7 +2,6 @@ import Host from './Host';
 import Events from './Events';
 import LogPublisher from './LogPublisher';
 import DevicesManager from './entities/DevicesManager';
-import Devices from './Devices';
 import DriversManager from './entities/DriversManager';
 import ServicesManager from './entities/ServicesManager';
 import Logger from './interfaces/Logger';
@@ -24,8 +23,6 @@ export default class System {
   readonly configSet: ConfigSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
-
-  readonly devices: Devices;
 
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
@@ -56,8 +53,6 @@ export default class System {
     this.configSet = new ConfigSet(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
-
-    this.devices = new Devices(this);
 
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
