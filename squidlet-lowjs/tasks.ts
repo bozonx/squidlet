@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import * as gulp from 'gulp';
 import * as yargs from 'yargs';
 import * as yaml from 'js-yaml';
+import * as rimraf from 'rimraf';
 
 import PlatformConfig from '../squidlet-starter/buildHostEnv/interfaces/PlatformConfig';
 import compileTs from '../squidlet-starter/buildJs/compileTs';
@@ -15,7 +16,8 @@ import PreHostConfig from '../squidlet-starter/buildHostEnv/interfaces/PreHostCo
 
 
 const envConfigRelPath: string = yargs.argv.config as string;
-const hostSrcDir = '../host';
+// TODO: use min
+const hostSrcDir = path.resolve(__dirname, '../squidlet-core/dist/dev');
 
 
 function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
@@ -34,16 +36,21 @@ function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string
 function copyHost(hostBuildDir: string) {
   const hostDstDir: string = path.join(hostBuildDir, 'host');
 
+  rimraf.sync(`${hostDstDir}/**/*`);
   shelljs.mkdir('-p', hostDstDir);
-  shelljs.cp('-Rf', hostDstDir);
+  shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
 }
 
 
 gulp.task('build-devs', async () => {
   const buildConfig: BuildConfig = makeBuildConfig(__dirname);
 
+  rimraf.sync(`${buildConfig.devsModersDst}/**/*`);
   await compileTs(buildConfig.devsSrc, buildConfig.devsModersDst);
+  rimraf.sync(`${buildConfig.devsLegacyDst}/**/*`);
   await compileJs(buildConfig.devsModersDst, buildConfig.devsLegacyDst, false);
+
+  // TODO: minimize
 });
 
 gulp.task('build', async () => {
