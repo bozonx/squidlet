@@ -1,4 +1,4 @@
-Devices = require('../../host/core/Devices').default
+Devices = require('../../plugin-bridge/Devices').default
 
 
 describe 'app.Devices', ->

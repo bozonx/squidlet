@@ -2,7 +2,6 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import EnvBase from './EnvBase';
 import Events from '../Events';
 import Host from '../Host';
-import Devices from '../Devices';
 import System from '../System';
 
 
@@ -12,13 +11,11 @@ import System from '../System';
 export default class DeviceEnv extends EnvBase {
   readonly events: Events;
   readonly host: Host;
-  readonly devices: Devices;
 
   constructor(system: System) {
     super(system);
     this.events = system.events;
     this.host = system.host;
-    this.devices = system.devices;
   }
 
   async loadManifest(className: string): Promise<DeviceManifest> {
