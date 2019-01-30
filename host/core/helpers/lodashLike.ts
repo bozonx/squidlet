@@ -75,9 +75,12 @@ export function trim(src: string, char: string = ' '): string {
   return trimEnd( trimStart(src, char), char);
 }
 
-export function padStart(...p: any[]) {
-  // TODO: remake
-  return _padStart(...p);
+export function padStart(srcString: string, repeatNum: number = 0, chars: string = ' ') {
+  let result = '';
+
+  for (let i = 0; i < repeatNum; i ++) result += chars;
+
+  return `${result}${srcString}`;
 }
 
 export function last(arr: any[]) {

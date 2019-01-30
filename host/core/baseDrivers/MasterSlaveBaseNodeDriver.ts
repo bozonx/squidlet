@@ -2,7 +2,7 @@ import DriverBase from './DriverBase';
 import IndexedEvents from '../helpers/IndexedEvents';
 import Polling from '../helpers/Polling';
 import Sender from '../helpers/Sender';
-import {ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
+//import {ImpulseInputDriverProps} from '../drivers/Binary/ImpulseInput.driver';
 import {find, isEqual} from '../helpers/lodashLike';
 import {hexStringToHexNum} from '../helpers/binaryHelpers';
 
@@ -21,7 +21,8 @@ export interface PollProps {
 
 export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
-  int?: ImpulseInputDriverProps;
+  //int?: ImpulseInputDriverProps;
+  int?: {[index: string]: any};
   poll: PollProps[];
   feedback?: FeedbackType;
   // Default poll interval. By default is 1000
