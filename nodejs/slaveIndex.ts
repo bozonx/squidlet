@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import {collectDevs} from './helpers';
+import {collectDevs} from './commonHelpers';
 import System from '../host/System';
 import {DevClass} from '../host/entities/DevManager';
 
