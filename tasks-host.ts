@@ -2,10 +2,10 @@ import * as path from 'path';
 import * as gulp from 'gulp';
 import * as rimraf from 'rimraf';
 
-import compileTs from '../squidlet-starter/buildJs/compileTs';
-import compileJs from '../squidlet-starter/buildJs/compileJs';
-import minimize from '../squidlet-starter/buildJs/minimize';
-import modulesTree from '../squidlet-starter/buildJs/modulesTree';
+import compileTs from './squidlet-starter/buildJs/compileTs';
+import compileJs from './squidlet-starter/buildJs/compileJs';
+import minimize from './squidlet-starter/buildJs/minimize';
+import modulesTree from './squidlet-starter/buildJs/modulesTree';
 
 
 const BUILD_DIR = path.resolve(__dirname, 'build');
