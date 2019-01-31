@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
-import Sys from '../../../squidlet-core/core/interfaces/dev/Sys';
-import {convertBufferToUint8Array} from '../helpers';
+import Sys from '../../squidlet-core/core/interfaces/dev/Sys';
+import {convertBufferToUint8Array} from '../../platforms/squidlet-rpi/helpers';
 
 
 let __storageDir: string = '';
