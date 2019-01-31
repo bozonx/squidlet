@@ -7,12 +7,12 @@ import * as yargs from 'yargs';
 import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
-import PlatformConfig from '../squidlet-starter/buildHostEnv/interfaces/PlatformConfig';
+import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
 import compileTs from '../helpers/buildJs/compileTs';
 import compileJs from '../helpers/buildJs/compileJs';
 import makeBuildConfig from '../helpers/buildJs/buildConfig';
-import BuildConfig from '../squidlet-starter/buildHostEnv/interfaces/BuildConfig';
-import PreHostConfig from '../squidlet-starter/buildHostEnv/interfaces/PreHostConfig';
+import BuildConfig from '../buildHostEnv/interfaces/BuildConfig';
+import PreHostConfig from '../buildHostEnv/interfaces/PreHostConfig';
 import minimize from '../helpers/buildJs/minimize';
 
 

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import BuildConfig from '../../squidlet-starter/buildHostEnv/interfaces/BuildConfig';
+import BuildConfig from '../../buildHostEnv/interfaces/BuildConfig';
 
 
 export default function makeBuildConfig (rootDir: string): BuildConfig {

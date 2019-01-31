@@ -2,7 +2,7 @@ import _difference = require('lodash/difference');
 
 import MainHostsEnv from './MainHostsEnv';
 import {Dependencies, EntitiesNames} from './entities/EntitiesCollection';
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
 
 
 

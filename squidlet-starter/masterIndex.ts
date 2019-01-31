@@ -10,7 +10,7 @@ import * as path from 'path';
 
 import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from './helpers';
 import System from '../host/System';
-import MainHostsEnv from './buildHostEnv/MainHostsEnv';
+import MainHostsEnv from '../buildHostEnv/MainHostsEnv';
 import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
 import {DevClass} from '../host/entities/DevManager';
 

@@ -1,5 +1,5 @@
-Definitions = require('../../squidlet-starter/buildHostEnv/hostEnv/Definitions').default
-hostDefaultConfig = require('../../squidlet-starter/buildHostEnv/configs/hostDefaultConfig').default
+Definitions = require('../../buildHostEnv/hostEnv/Definitions').default
+hostDefaultConfig = require('../../buildHostEnv/configs/hostDefaultConfig').default
 
 
 describe 'configWorks.Definitions', ->

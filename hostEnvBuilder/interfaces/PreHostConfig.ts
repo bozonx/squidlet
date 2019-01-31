@@ -1,5 +1,5 @@
 import Platforms from './Platforms';
-import LogLevel from '../../../host/interfaces/LogLevel';
+import LogLevel from '../../host/interfaces/LogLevel';
 import Machines from './Machines';
 import BuildConfig from './BuildConfig';
 

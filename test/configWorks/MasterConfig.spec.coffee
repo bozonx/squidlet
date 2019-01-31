@@ -1,6 +1,6 @@
-MasterConfig = require('../../squidlet-starter/buildHostEnv/MasterConfig').default
-hostDefaultConfig = require('../../squidlet-starter/buildHostEnv/configs/hostDefaultConfig').default
-systemConfig = require('../../squidlet-starter/buildHostEnv/configs/systemConfig').default
+MasterConfig = require('../../buildHostEnv/MasterConfig').default
+hostDefaultConfig = require('../../buildHostEnv/configs/hostDefaultConfig').default
+systemConfig = require('../../buildHostEnv/configs/systemConfig').default
 
 
 describe 'configWorks.MasterConfig', ->

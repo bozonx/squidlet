@@ -3,12 +3,12 @@ import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _cloneDeep = require('lodash/cloneDeep');
 
-import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypeName} from '../host/interfaces/ManifestTypes';
 import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
-import HostConfig from '../../host/interfaces/HostConfig';
+import HostConfig from '../host/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import Platforms, {
   PLATFORM_ESP32,

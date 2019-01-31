@@ -1,6 +1,6 @@
 path = require('path')
 
-HostsFilesWriter = require('../../squidlet-starter/buildHostEnv/hostEnv/HostsFilesWriter').default
+HostsFilesWriter = require('../../buildHostEnv/hostEnv/HostsFilesWriter').default
 
 
 describe 'configWorks.HostsFilesWriter', ->

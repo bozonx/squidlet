@@ -1,6 +1,6 @@
 path = require('path')
 
-HostsFilesSet = require('../../squidlet-starter/buildHostEnv/hostEnv/HostsFilesSet').default
+HostsFilesSet = require('../../buildHostEnv/hostEnv/HostsFilesSet').default
 
 
 describe 'configWorks.HostsFilesSet', ->
