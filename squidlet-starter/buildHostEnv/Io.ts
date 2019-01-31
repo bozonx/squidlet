@@ -3,7 +3,7 @@ import {promises as fsPromises} from 'fs';
 import * as shelljs from 'shelljs';
 import * as yaml from 'js-yaml';
 import systemConfig from './configs/systemConfig';
-import {Stats} from '../../host/core/interfaces/dev/Storage';
+import {Stats} from '../../host/interfaces/dev/Storage';
 
 
 export default class Io {

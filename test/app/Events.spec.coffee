@@ -1,4 +1,4 @@
-Events = require('../../host/core/Events').default
+Events = require('../../host/Events').default
 
 
 describe 'app.Events', ->

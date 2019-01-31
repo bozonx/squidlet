@@ -1,8 +1,8 @@
-import System from '../host/core/System';
+import System from '../host/System';
 import Request from './messenger/interfaces/Request';
 import Response from './messenger/interfaces/Response';
 import Message from './messenger/interfaces/Message';
-import categories from '../host/core/dict/categories';
+import categories from '../host/dict/categories';
 
 
 const CALL_ACTION_TOPIC = 'deviceCallAction';

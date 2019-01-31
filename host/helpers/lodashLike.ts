@@ -1,4 +1,4 @@
-import {isUint8Array} from './helpers';
+import {isUint8Array} from './';
 
 
 // TODO: test

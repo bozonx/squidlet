@@ -1,4 +1,4 @@
-import {PATH_SEPARATOR, dirname, basename, isAbsolutePath} from './helpers';
+import {PATH_SEPARATOR, dirname, basename, isAbsolutePath} from './';
 import {trimEnd} from './lodashLike';
 
 

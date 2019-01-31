@@ -3,7 +3,7 @@ import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
-import {ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
 import MasterConfig from '../MasterConfig';
 import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
 

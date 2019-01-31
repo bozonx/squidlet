@@ -1,10 +1,10 @@
-import IndexedEvents from '../../host/core/helpers/IndexedEvents';
-import DriverEnv from '../../host/core/entities/DriverEnv';
+import IndexedEvents from '../../host/helpers/IndexedEvents';
+import DriverEnv from '../../host/entities/DriverEnv';
 import Connection from './interfaces/Connection';
-import MyAddress from '../../host/core/interfaces/MyAddress';
+import MyAddress from '../../host/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
-import {find} from '../../host/core/helpers/lodashLike';
-import {firstLetterToUpperCase} from '../../host/core/helpers/helpers';
+import {find} from '../../host/helpers/lodashLike';
+import {firstLetterToUpperCase} from '../../host/helpers/helpers';
 
 
 type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Destination) => void;

@@ -1,13 +1,13 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import {SrcEntitiesSet, SrcEntitySet} from '../../../host/core/interfaces/EntitySet';
-import DeviceManifest from '../../../host/core/interfaces/DeviceManifest';
-import DriverManifest from '../../../host/core/interfaces/DriverManifest';
-import ServiceManifest from '../../../host/core/interfaces/ServiceManifest';
+import {SrcEntitiesSet, SrcEntitySet} from '../../../host/interfaces/EntitySet';
+import DeviceManifest from '../../../host/interfaces/DeviceManifest';
+import DriverManifest from '../../../host/interfaces/DriverManifest';
+import ServiceManifest from '../../../host/interfaces/ServiceManifest';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import ManifestBase from '../../../host/core/interfaces/ManifestBase';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
+import ManifestBase from '../../../host/interfaces/ManifestBase';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
 import Io from '../Io';
 import Register from './Register';
 

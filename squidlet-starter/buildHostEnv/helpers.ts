@@ -3,7 +3,7 @@
 // }
 
 import * as path from 'path';
-import {Stats} from '../../host/core/interfaces/dev/Storage';
+import {Stats} from '../../host/interfaces/dev/Storage';
 
 
 export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
