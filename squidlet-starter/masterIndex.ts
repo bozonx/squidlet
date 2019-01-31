@@ -9,10 +9,10 @@
 import * as path from 'path';
 
 import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from './helpers';
-import System from '../squidlet-core/core/System';
+import System from '../host/core/System';
 import MainHostsEnv from './buildHostEnv/MainHostsEnv';
-import {SrcHostFilesSet} from '../squidlet-core/core/interfaces/HostFilesSet';
-import {DevClass} from '../squidlet-core/core/entities/DevManager';
+import {SrcHostFilesSet} from '../host/core/interfaces/HostFilesSet';
+import {DevClass} from '../host/core/entities/DevManager';
 
 
 // TODO: change

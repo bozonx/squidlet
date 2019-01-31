@@ -1,5 +1,5 @@
 I2cConnection = require('../../plugin-bridge/network/connections/I2c.connection.driver').default
-helpers = require('../../squidlet-core/core/helpers/binaryHelpers')
+helpers = require('../../host/core/helpers/binaryHelpers')
 
 
 describe 'connections.I2cConnection', ->

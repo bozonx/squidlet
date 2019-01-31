@@ -1,4 +1,4 @@
-Events = require('../../squidlet-core/core/Events').default
+Events = require('../../host/core/Events').default
 
 
 describe 'app.Events', ->

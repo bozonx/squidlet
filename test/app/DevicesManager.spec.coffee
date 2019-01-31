@@ -1,5 +1,5 @@
-DevicesManager = require('../../squidlet-core/core/entities/DevicesManager').default
-initializationConfig = require('../../squidlet-core/core/config/initializationConfig').default
+DevicesManager = require('../../host/core/entities/DevicesManager').default
+initializationConfig = require('../../host/core/config/initializationConfig').default
 
 
 describe 'app.DevicesManager', ->

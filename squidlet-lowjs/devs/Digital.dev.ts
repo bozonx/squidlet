@@ -6,8 +6,8 @@ import {
   DigitalPinMode,
   WatchHandler,
   DigitalInputMode
-} from '../../squidlet-core/core/interfaces/dev/Digital';
-import DebounceCall from '../../squidlet-core/core/helpers/DebounceCall';
+} from '../../host/core/interfaces/dev/Digital';
+import DebounceCall from '../../host/core/helpers/DebounceCall';
 
 
 type GpioHandler = (level: number) => void;

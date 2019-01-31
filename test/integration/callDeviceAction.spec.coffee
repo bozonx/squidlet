@@ -3,7 +3,7 @@
 # * i2c connection uses to connect
 # * request does from MQTT backed
 
-System = require('../../squidlet-core/core/System').default;
+System = require('../../host/core/System').default;
 
 describe.skip 'intergation. Call device\'s action', ->
   beforeEach ->

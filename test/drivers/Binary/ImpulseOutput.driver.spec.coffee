@@ -1,4 +1,4 @@
-ImpulseOutput = require('../../../squidlet-core/src/drivers/Binary/ImpulseOutput.driver').default
+ImpulseOutput = require('../../../host/src/drivers/Binary/ImpulseOutput.driver').default
 
 
 describe 'ImpulseOutput.driver', ->

@@ -14,7 +14,7 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import Io from '../Io';
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../../squidlet-core/core/interfaces/ManifestTypes';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
 
 
 /**

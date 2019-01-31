@@ -1,4 +1,4 @@
-DigitalPinOutput = require('../../../squidlet-core/src/drivers/DigitalPin/DigitalPinOutput.driver').default
+DigitalPinOutput = require('../../../host/src/drivers/DigitalPin/DigitalPinOutput.driver').default
 
 
 describe 'DigitalPinOutput.driver', ->

@@ -1,13 +1,13 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import {SrcEntitiesSet, SrcEntitySet} from '../../../squidlet-core/core/interfaces/EntitySet';
-import DeviceManifest from '../../../squidlet-core/core/interfaces/DeviceManifest';
-import DriverManifest from '../../../squidlet-core/core/interfaces/DriverManifest';
-import ServiceManifest from '../../../squidlet-core/core/interfaces/ServiceManifest';
+import {SrcEntitiesSet, SrcEntitySet} from '../../../host/core/interfaces/EntitySet';
+import DeviceManifest from '../../../host/core/interfaces/DeviceManifest';
+import DriverManifest from '../../../host/core/interfaces/DriverManifest';
+import ServiceManifest from '../../../host/core/interfaces/ServiceManifest';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import ManifestBase from '../../../squidlet-core/core/interfaces/ManifestBase';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../../squidlet-core/core/interfaces/ManifestTypes';
+import ManifestBase from '../../../host/core/interfaces/ManifestBase';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../../../host/core/interfaces/ManifestTypes';
 import Io from '../Io';
 import Register from './Register';
 

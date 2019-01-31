@@ -1,5 +1,5 @@
-I2cData = require('../../../squidlet-core/src/drivers/I2c/I2cData.driver').default
-helpers = require('../../../squidlet-core/core/helpers/helpers')
+I2cData = require('../../../host/src/drivers/I2c/I2cData.driver').default
+helpers = require('../../../host/core/helpers/helpers')
 
 
 describe 'I2cData.driver', ->

@@ -1,4 +1,4 @@
-Switch = require('../../squidlet-core/src/devices/Switch/Switch').default
+Switch = require('../../host/src/devices/Switch/Switch').default
 
 
 describe 'devices.Switch', ->

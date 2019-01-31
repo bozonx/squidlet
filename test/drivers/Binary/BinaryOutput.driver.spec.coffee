@@ -1,4 +1,4 @@
-BinaryOutput = require('../../../squidlet-core/src/drivers/Binary/BinaryOutput.driver').default
+BinaryOutput = require('../../../host/src/drivers/Binary/BinaryOutput.driver').default
 
 
 describe 'BinaryOutput.driver', ->

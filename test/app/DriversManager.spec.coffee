@@ -1,5 +1,5 @@
-DriversManager = require('../../squidlet-core/core/entities/DriversManager').default
-initializationConfig = require('../../squidlet-core/core/config/initializationConfig').default
+DriversManager = require('../../host/core/entities/DriversManager').default
+initializationConfig = require('../../host/core/config/initializationConfig').default
 
 
 describe 'app.DriversManager', ->

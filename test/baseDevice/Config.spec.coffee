@@ -1,4 +1,4 @@
-Config = require('../../squidlet-core/core/baseDevice/Config').default
+Config = require('../../host/core/baseDevice/Config').default
 
 
 describe 'baseDevice.Config', ->

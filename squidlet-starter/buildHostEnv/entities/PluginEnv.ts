@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import Register from './Register';
 import EntitiesCollection from './EntitiesCollection';
 import MasterConfig from '../MasterConfig';
-import {SrcEntitiesSet} from '../../../squidlet-core/core/interfaces/EntitySet';
+import {SrcEntitiesSet} from '../../../host/core/interfaces/EntitySet';
 
 
 const AFTER_INIT_EVENT = 'afterInit';

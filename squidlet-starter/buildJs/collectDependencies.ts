@@ -4,7 +4,7 @@ import * as shelljs from 'shelljs';
 import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
 
-const {makeSafeModuleName} = require('../../squidlet-core/core/helpers');
+const {makeSafeModuleName} = require('../../host/core/helpers');
 
 
 interface BuildConfig {

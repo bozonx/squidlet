@@ -1,9 +1,9 @@
-import MyAddress from '../../../squidlet-core/core/interfaces/MyAddress';
-import DriverFactoryBase from '../../../squidlet-core/core/baseDrivers/DriverFactoryBase';
+import MyAddress from '../../../host/core/interfaces/MyAddress';
+import DriverFactoryBase from '../../../host/core/baseDrivers/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData.driver';
-import { uint8ArrayToText, textToUint8Array} from '../../../squidlet-core/core/helpers/binaryHelpers';
-import DriverBase from '../../../squidlet-core/core/baseDrivers/DriverBase';
-import {GetDriverDep} from '../../../squidlet-core/core/entities/EntityBase';
+import { uint8ArrayToText, textToUint8Array} from '../../../host/core/helpers/binaryHelpers';
+import DriverBase from '../../../host/core/baseDrivers/DriverBase';
+import {GetDriverDep} from '../../../host/core/entities/EntityBase';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
