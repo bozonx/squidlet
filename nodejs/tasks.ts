@@ -10,8 +10,8 @@ import compileTs from '../helpers/buildJs/compileTs';
 import collectDependencies from '../helpers/buildJs/collectDependencies';
 import minimize from '../helpers/buildJs/minimize';
 import {resolveParam} from './commonHelpers';
-import MainHostsEnv from '../buildHostEnv/MainHostsEnv';
-import MainEntities from '../buildHostEnv/MainEntities';
+import MainHostsEnv from '../hostEnvBuilder/MainHostsEnv';
+import MainEntities from '../hostEnvBuilder/MainEntities';
 
 
 // TODO: получить из агрументов

@@ -1,4 +1,4 @@
-import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
+import PlatformConfig from '../hostEnvBuilder/interfaces/PlatformConfig';
 
 
 const platformConfig: PlatformConfig = {
