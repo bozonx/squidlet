@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 import Sys from '../../squidlet-core/core/interfaces/dev/Sys';
-import {convertBufferToUint8Array} from '../../platforms/squidlet-rpi/helpers';
+import {convertBufferToUint8Array} from '../helpers';
 
 
 let __storageDir: string = '';
