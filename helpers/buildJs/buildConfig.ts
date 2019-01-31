@@ -2,11 +2,9 @@ import * as path from 'path';
 import BuildConfig from '../../buildHostEnv/interfaces/BuildConfig';
 
 
-export default function makeBuildConfig (rootDir: string): BuildConfig {
-  const buildDir: string = path.resolve(rootDir, `./build`);
+export default function makeBuildConfig (rootDir: string, buildDir: string): BuildConfig {
 
   return {
-    buildDir,
     devsModersDst: path.resolve(buildDir, `./_devs_modern`),
     devsLegacyDst: path.resolve(buildDir, `./_devs_legacy`),
     devsMinDst: path.resolve(buildDir, `./_devs_min`),

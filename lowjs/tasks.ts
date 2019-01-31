@@ -16,9 +16,10 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import minimize from '../helpers/buildJs/minimize';
 
 
+const buildDir: string = path.resolve(__dirname, `../build/lowjs`);
+const hostSrcDir = path.resolve(__dirname, '../build/host/dev');
 const envConfigRelPath: string = yargs.argv.config as string;
 // TODO: use min
-const hostSrcDir = path.resolve(__dirname, '../squidlet-core/dist/dev');
 const HOST_DEVS_DIR = 'devs';
 const HOST_CORE_DIR = 'core';
 
@@ -46,7 +47,7 @@ function copyHost(hostBuildDir: string) {
 
 
 gulp.task('build-devs', async () => {
-  const buildConfig: BuildConfig = makeBuildConfig(__dirname);
+  const buildConfig: BuildConfig = makeBuildConfig(__dirname, buildDir);
 
   // ts to modern js
   rimraf.sync(`${buildConfig.devsModersDst}/**/*`);
@@ -77,7 +78,7 @@ gulp.task('build', async () => {
 
   const machineConfigFilePath: string = path.resolve(__dirname, `./${envConfig.machine}.ts`);
   const machineConfig: PlatformConfig = require(machineConfigFilePath).default;
-  const hostBuildDir: string = path.join(buildConfig.buildDir, envConfig.id);
+  const hostBuildDir: string = path.join(buildDir, envConfig.id);
 
   // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
