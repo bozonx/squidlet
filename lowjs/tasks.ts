@@ -8,12 +8,12 @@ import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
 import PlatformConfig from '../squidlet-starter/buildHostEnv/interfaces/PlatformConfig';
-import compileTs from '../squidlet-starter/buildJs/compileTs';
-import compileJs from '../squidlet-starter/buildJs/compileJs';
-import makeBuildConfig from '../squidlet-starter/buildJs/buildConfig';
+import compileTs from '../helpers/buildJs/compileTs';
+import compileJs from '../helpers/buildJs/compileJs';
+import makeBuildConfig from '../helpers/buildJs/buildConfig';
 import BuildConfig from '../squidlet-starter/buildHostEnv/interfaces/BuildConfig';
 import PreHostConfig from '../squidlet-starter/buildHostEnv/interfaces/PreHostConfig';
-import minimize from '../squidlet-starter/buildJs/minimize';
+import minimize from '../helpers/buildJs/minimize';
 
 
 const envConfigRelPath: string = yargs.argv.config as string;

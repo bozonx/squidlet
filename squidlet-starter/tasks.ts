@@ -5,10 +5,10 @@ import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
 import {makeEnvConfig, clearDir, resolveParamRequired} from './helpers';
-import compileJs from './buildJs/compileJs';
-import compileTs from './buildJs/compileTs';
-import collectDependencies from './buildJs/collectDependencies';
-import minimize from './buildJs/minimize';
+import compileJs from '../helpers/buildJs/compileJs';
+import compileTs from '../helpers/buildJs/compileTs';
+import collectDependencies from '../helpers/buildJs/collectDependencies';
+import minimize from '../helpers/buildJs/minimize';
 import {resolveParam} from './helpers';
 import MainHostsEnv from './buildHostEnv/MainHostsEnv';
 import MainEntities from './buildHostEnv/MainEntities';
