@@ -7,12 +7,12 @@ import * as yargs from 'yargs';
 import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
-import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
+import PlatformConfig from '../hostEnvBuilder/interfaces/PlatformConfig';
 import compileTs from '../helpers/buildJs/compileTs';
 import compileJs from '../helpers/buildJs/compileJs';
 import makeBuildConfig from '../helpers/buildJs/buildConfig';
-import BuildConfig from '../buildHostEnv/interfaces/BuildConfig';
-import PreHostConfig from '../buildHostEnv/interfaces/PreHostConfig';
+import BuildConfig from '../hostEnvBuilder/interfaces/BuildConfig';
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import minimize from '../helpers/buildJs/minimize';
 
 
