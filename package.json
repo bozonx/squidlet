@@ -11,6 +11,8 @@
   "scripts": {
     "build-host": "gulp build-host",
     "build-entities": "gulp build-entities",
+    "build-lowjs-devs": "gulp build-lowjs-devs",
+    "build-lowjs": "gulp build-lowjs",
     "build-env": "gulp build-env",
     "master": "ts-node ./buildSet/masterIndex.ts",
     "slave": "ts-node ./buildSet/slaveIndex.ts",

@@ -46,7 +46,7 @@ function copyHost(hostBuildDir: string) {
 }
 
 
-gulp.task('build-devs', async () => {
+gulp.task('build-lowjs-devs', async () => {
   const buildConfig: BuildConfig = makeBuildConfig(__dirname, buildDir);
 
   // ts to modern js
@@ -60,14 +60,18 @@ gulp.task('build-devs', async () => {
   await minimize(buildConfig.devsLegacyDst, buildConfig.devsMinDst);
 });
 
-gulp.task('build', async () => {
+gulp.task('build-lowjs', async () => {
   if (!envConfigRelPath) {
     throw new Error(`You have to specify a machine name`);
   }
 
   const envConfigPath = path.resolve(process.cwd(), envConfigRelPath);
   const envConfig: PreHostConfig = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
-  const buildConfig: BuildConfig = _.defaultsDeep({}, envConfig.buildConfig, makeBuildConfig(__dirname));
+  const buildConfig: BuildConfig = _.defaultsDeep(
+    {},
+    envConfig.buildConfig,
+    makeBuildConfig(__dirname, buildDir)
+  );
 
   if (!envConfig.machine) {
     throw new Error(`You have to specify a "machine" param in your host config`);

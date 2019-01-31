@@ -18,4 +18,4 @@ export default function compileTs(srcDir: string, destDir: string) {
       .on('end', resolve);
   });
 
-};
+}

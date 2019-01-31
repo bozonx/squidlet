@@ -4,7 +4,8 @@ import * as shelljs from 'shelljs';
 import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
 
-const {makeSafeModuleName} = require('../../host/helpers');
+// TODO: !!!!
+//const {makeSafeModuleName} = require('../../host/helpers');
 
 
 interface BuildConfig {

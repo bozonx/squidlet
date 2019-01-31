@@ -1,5 +1,5 @@
 import * as path from 'path';
-import BuildConfig from '../../buildHostEnv/interfaces/BuildConfig';
+import BuildConfig from '../../hostEnvBuilder/interfaces/BuildConfig';
 
 
 export default function makeBuildConfig (rootDir: string, buildDir: string): BuildConfig {
