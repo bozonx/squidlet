@@ -8,7 +8,7 @@
 
 import * as path from 'path';
 
-import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from './commonHelpers';
+import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from '../helpers/buildHelpers';
 import System from '../host/System';
 import MainHostsEnv from '../hostEnvBuilder/MainHostsEnv';
 import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';

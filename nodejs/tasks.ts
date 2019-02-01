@@ -4,12 +4,12 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir, resolveParamRequired} from './commonHelpers';
+import {makeEnvConfig, clearDir, resolveParamRequired} from '../helpers/buildHelpers';
 import compileJs from '../helpers/buildJs/compileJs';
 import compileTs from '../helpers/buildJs/compileTs';
 import collectDependencies from '../helpers/buildJs/collectDependencies';
 import minimize from '../helpers/buildJs/minimize';
-import {resolveParam} from './commonHelpers';
+import {resolveParam} from '../helpers/buildHelpers';
 import MainHostsEnv from '../hostEnvBuilder/MainHostsEnv';
 import MainEntities from '../hostEnvBuilder/MainEntities';
 
