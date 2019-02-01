@@ -4,11 +4,7 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {makeEnvConfig, clearDir, resolveParamRequired} from '../helpers/buildHelpers';
-import compileJs from '../helpers/buildJs/compileJs';
-import compileTs from '../helpers/buildJs/compileTs';
-import collectDependencies from '../helpers/buildJs/collectDependencies';
-import minimize from '../helpers/buildJs/minimize';
+import {resolveParamRequired} from '../helpers/buildHelpers';
 import {resolveParam} from '../helpers/buildHelpers';
 import MainHostsEnv from '../hostEnvBuilder/MainHostsEnv';
 import MainEntities from '../hostEnvBuilder/MainEntities';
@@ -17,7 +13,6 @@ import MainEntities from '../hostEnvBuilder/MainEntities';
 // TODO: получить из агрументов
 const envConfigPath = path.resolve(__dirname, './env-config.yaml');
 const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
-const buildConfig = makeEnvConfig(envConfigParsedYaml, envConfigPath);
 
 // TODO: поидее не нужно
 const DEFAULT_ENV_DIR = './build/env';
@@ -59,16 +54,4 @@ gulp.task('build-env', async () => {
   await mainHostsEnv.collect();
   await mainHostsEnv.write(true);
 
-});
-
-// host src
-gulp.task('build-host', async () => {
-  clearDir(buildConfig.buildDir);
-  await compileTs(buildConfig.srcDir, buildConfig.compiledTsDir);
-  await compileJs(buildConfig.compiledTsDir, buildConfig.compiledJsDir, buildConfig.strictMode);
-  //await collectDependencies(buildConfig.prjConfigYaml, buildConfig.dependenciesBuildDir);
-  // min prj
-  await minimize(buildConfig.compiledJsDir, buildConfig.minPrjDir);
-  // min deps
-  //await minimize(buildConfig.dependenciesBuildDir, buildConfig.minDepsDir);
 });
