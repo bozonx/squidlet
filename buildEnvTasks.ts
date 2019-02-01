@@ -4,10 +4,10 @@ import * as gulp from 'gulp';
 import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
-import {resolveParamRequired} from '../helpers/buildHelpers';
-import {resolveParam} from '../helpers/buildHelpers';
-import MainHostsEnv from '../hostEnvBuilder/MainHostsEnv';
-import MainEntities from '../hostEnvBuilder/MainEntities';
+import {resolveParamRequired} from './helpers/buildHelpers';
+import {resolveParam} from './helpers/buildHelpers';
+import MainHostsEnv from './hostEnvBuilder/MainHostsEnv';
+import MainEntities from './hostEnvBuilder/MainEntities';
 
 
 // TODO: получить из агрументов
