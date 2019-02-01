@@ -21,7 +21,8 @@ const hostSrcDir = path.resolve(__dirname, '../build/host/dev');
 const envConfigRelPath: string = yargs.argv.config as string;
 // TODO: use min
 const HOST_DEVS_DIR = 'devs';
-const HOST_CORE_DIR = 'core';
+const HOST_DIR = 'host';
+const HOST_ENV = 'env';
 
 
 function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
@@ -38,11 +39,19 @@ function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string
 }
 
 function copyHost(hostBuildDir: string) {
-  const hostDstDir: string = path.join(hostBuildDir, HOST_CORE_DIR);
+  const hostDstDir: string = path.join(hostBuildDir, HOST_DIR);
 
   rimraf.sync(`${hostDstDir}/**/*`);
   shelljs.mkdir('-p', hostDstDir);
   shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
+}
+
+function makeEnv(hostBuildDir: string) {
+  const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
+
+
+  // TODO: нужно ещё как-то передать конфиг в configWorks
+
 }
 
 
@@ -87,7 +96,5 @@ gulp.task('build-lowjs', async () => {
   // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
   copyHost(hostBuildDir);
-
-  // TODO: нужно ещё как-то передать конфиг в configWorks
-
+  makeEnv(hostBuildDir);
 });
