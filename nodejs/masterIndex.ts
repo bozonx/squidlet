@@ -35,10 +35,8 @@ export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<S
 
   console.info(`--> register platform's devs`);
 
-  const devsSet: {[index: string]: DevClass} = collectDevs('nodejs', machine);
-
-  // TODO: remake
-  const sysMasterDev = getMasterSysDev(platformName);
+  const devsSet: {[index: string]: DevClass} = collectDevs(__dirname, machine);
+  const sysMasterDev = getMasterSysDev(__dirname);
 
   // register config set
   (sysMasterDev as any).registerConfigSet(hostConfigSet);

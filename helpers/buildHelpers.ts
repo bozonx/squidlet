@@ -14,6 +14,7 @@ import * as shelljs from 'shelljs';
 //   PLATFORM_X86
 // } from '../buildHostEnv/interfaces/Platforms';
 import {DevClass} from '../host/entities/DevManager';
+import PlatformConfig from '../hostEnvBuilder/interfaces/PlatformConfig';
 
 
 // TODO: review
@@ -33,7 +34,7 @@ interface BuildConfig {
 
 
 const platformsDir = path.resolve(__dirname, '../platforms');
-const DEVS_DIR = 'dev';
+const DEVS_DIR = 'devs';
 export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
 
 
@@ -45,7 +46,10 @@ export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
 // };
 
 
-export function getMasterSysDev(platformName: string): DevClass {
+export function getMasterSysDev(platformDirName: string): DevClass {
+
+  // TODO: remake
+
   const platformDirName = `squidlet-${platformName}`;
   const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, 'Sys.master.dev');
 
@@ -98,21 +102,15 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
 /**
  * Make devs collection in memory like {"Digital.dev": DevClass}
  */
-export function collectDevs(platformName: string, machine: string): {[index: string]: DevClass} {
-
-  // TODO: remake
-
-  if (!platformConfigs[platformName]) {
-    throw new Error(`Platform "${platformName}" haven't been found`);
-  }
-
-  const platformDevs: string[] = platformConfigs[platformName].devs;
+export function collectDevs(platformDirName: string, machine: string): {[index: string]: DevClass} {
+  const machineConfigPath = path.join(platformDirName, `${path.basename(platformDirName)}-${machine}`);
+  const machineConfig: PlatformConfig = require(machineConfigPath).default;
+  const platformDevs: string[] = machineConfig.devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-  const platformDirName = `squidlet-${platformName}`;
 
   for (let devName of platformDevs) {
     const fullDevName = `${devName}`;
-    const devPath = path.join(platformsDir, platformDirName, DEVS_DIR, fullDevName);
+    const devPath = path.join(platformDirName, DEVS_DIR, fullDevName);
 
     devsSet[fullDevName] = require(devPath).default;
   }
