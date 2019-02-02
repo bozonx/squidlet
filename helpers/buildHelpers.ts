@@ -2,17 +2,17 @@ import * as path from 'path';
 import * as yargs from 'yargs';
 import * as shelljs from 'shelljs';
 
-import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
-import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
-import platform_rpi from '../squidlet-nodejs/platform_rpi';
-import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
-import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
-import {
-  PLATFORM_ESP32,
-  PLATFORM_ESP8266,
-  PLATFORM_RPI,
-  PLATFORM_X86
-} from '../buildHostEnv/interfaces/Platforms';
+// import platform_esp32 from '../platforms/squidlet-esp32/platform_esp32';
+// import platform_esp8266 from '../platforms/squidlet-esp8266/platform_esp8266';
+// import platform_rpi from '../squidlet-nodejs/platform_rpi';
+// import platform_x86_linux from '../platforms/squidlet-x86/platform_x86_linux';
+// import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
+// import {
+//   PLATFORM_ESP32,
+//   PLATFORM_ESP8266,
+//   PLATFORM_RPI,
+//   PLATFORM_X86
+// } from '../buildHostEnv/interfaces/Platforms';
 import {DevClass} from '../host/entities/DevManager';
 
 
@@ -37,12 +37,12 @@ const DEVS_DIR = 'dev';
 export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
 
 
-export const platformConfigs: {[index: string]: PlatformConfig} = {
-  [PLATFORM_ESP32]: platform_esp32,
-  [PLATFORM_ESP8266]: platform_esp8266,
-  [PLATFORM_RPI]: platform_rpi,
-  [PLATFORM_X86]: platform_x86_linux,
-};
+// export const platformConfigs: {[index: string]: PlatformConfig} = {
+//   [PLATFORM_ESP32]: platform_esp32,
+//   [PLATFORM_ESP8266]: platform_esp8266,
+//   [PLATFORM_RPI]: platform_rpi,
+//   [PLATFORM_X86]: platform_x86_linux,
+// };
 
 
 export function getMasterSysDev(platformName: string): DevClass {
@@ -98,7 +98,10 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
 /**
  * Make devs collection in memory like {"Digital.dev": DevClass}
  */
-export function collectDevs(platformName: string): {[index: string]: DevClass} {
+export function collectDevs(platformName: string, machine: string): {[index: string]: DevClass} {
+
+  // TODO: remake
+
   if (!platformConfigs[platformName]) {
     throw new Error(`Platform "${platformName}" haven't been found`);
   }

@@ -9,6 +9,7 @@ export default interface PreHostConfig {
   // host unique id
   id?: string;
   platform?: Platforms;
+  // TODO: наверное лучше string
   machine?: Machines;
 
   buildConfig?: BuildConfig;

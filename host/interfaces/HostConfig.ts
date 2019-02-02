@@ -34,6 +34,7 @@ export default interface HostConfig {
   // id of host e.g master
   id: string;
   platform: string;
+  machine: string;
   //platform: Platforms;
   // specific config for each host
   config: HostConfigConfig;

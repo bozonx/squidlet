@@ -27,17 +27,17 @@ const debug = true;
 
 
 export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<System> {
-  console.info(`===> Initialize host system of platform`);
+  const machine: string = hostConfigSet.config.machine;
 
-  const platformName: string = hostConfigSet.config.platform;
-
-  console.info(`--> getting host system of platform "${platformName}"`);
+  console.info(`===> initializing host system on machine "${machine}"`);
 
   const hostSystem: System = new System();
 
   console.info(`--> register platform's devs`);
 
-  const devsSet: {[index: string]: DevClass} = collectDevs(platformName);
+  const devsSet: {[index: string]: DevClass} = collectDevs('nodejs', machine);
+
+  // TODO: remake
   const sysMasterDev = getMasterSysDev(platformName);
 
   // register config set
@@ -70,8 +70,6 @@ async function masterStarter () {
   console.info(`===> generate hosts env files and configs`);
 
   await envBuilder.collect();
-  // TODO: не делать write
-  //await envBuilder.write(true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
