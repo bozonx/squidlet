@@ -1,20 +1,33 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import * as gulp from 'gulp';
-import * as yaml from 'js-yaml';
 import * as yargs from 'yargs';
 
 import {resolveParamRequired} from './helpers/buildHelpers';
-import {resolveParam} from './helpers/buildHelpers';
 import EnvBuilder from './hostEnvBuilder/EnvBuilder';
 
 
-// TODO: получить из агрументов
-const envConfigPath = path.resolve(__dirname, './env-config.yaml');
-const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
+const ENTITIES_DIR = 'entities';
+const ENV_DIR = 'env';
 
-// TODO: поидее не нужно
-const DEFAULT_ENV_DIR = './build/env';
+
+// hosts configs and entities of them
+gulp.task('build-env', async () => {
+  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+  const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
+  const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
+  const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
+  const entitiesBuildDir: string | undefined = buildDir && path.join(buildDir, ENTITIES_DIR);
+  const envBuildDir: string | undefined = buildDir && path.join(buildDir, ENV_DIR);
+  const envBuilder: EnvBuilder = new EnvBuilder(absConfigPath, entitiesBuildDir, envBuildDir);
+
+  // TODO: mkdir
+  // TODO: clear dirs
+
+  console.info(`===> generating hosts env files and configs`);
+
+  await envBuilder.collect();
+  await envBuilder.write(true);
+});
 
 
 // gulp.task('build-entities', async () => {
@@ -29,20 +42,3 @@ const DEFAULT_ENV_DIR = './build/env';
 //   await mainEntities.write();
 //
 // });
-
-// hosts configs and entities of them
-gulp.task('build-env', async () => {
-  // TODO: clear
-
-  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
-  // TODO: get from args
-  const resolvedBuildDir: string | undefined = process.env.BUILD_DIR
-    || (yargs.argv['build-dir'] as string)
-    || DEFAULT_ENV_DIR;
-  const envBuilder: EnvBuilder = new EnvBuilder(absMasterConfigPath, absBuildDir);
-
-  console.info(`===> generate hosts env files and configs`);
-
-  await envBuilder.collect();
-  await envBuilder.write(true);
-});
