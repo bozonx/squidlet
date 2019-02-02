@@ -12,6 +12,9 @@ import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 
 
+//export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
+
+
 export default class EnvBuilder {
   private readonly masterConfig: MasterConfig;
   private readonly entities: Entities;
