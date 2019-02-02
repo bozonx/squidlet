@@ -20,6 +20,7 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 const buildDir: string = path.resolve(__dirname, `../build/lowjs`);
 const hostSrcDir = path.resolve(__dirname, '../build/host/dev');
 const envConfigRelPath: string = yargs.argv.config as string;
+const entitiesDir = path.join(buildDir, 'entities');
 // TODO: use min
 const HOST_DEVS_DIR = 'devs';
 const HOST_DIR = 'host';
@@ -47,14 +48,14 @@ function copyHost(hostBuildDir: string) {
   shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
 }
 
-function buildEnv(hostBuildDir: string, envConfigPath: string) {
+async function buildEnv(hostBuildDir: string, envConfigPath: string) {
   const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
 
-  const envBuilder: EnvBuilder = new EnvBuilder();
+  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, entitiesDir, envDstDir);
 
-
-  // TODO: нужно ещё как-то передать конфиг в configWorks
-
+  await envBuilder.collect();
+  await envBuilder.writeEntities();
+  await envBuilder.write();
 }
 
 
@@ -99,5 +100,5 @@ gulp.task('build-lowjs', async () => {
   // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
   copyHost(hostBuildDir);
-  buildEnv(hostBuildDir, envConfigPath);
+  await buildEnv(hostBuildDir, envConfigPath);
 });

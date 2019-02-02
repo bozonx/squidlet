@@ -9,11 +9,13 @@ import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
 import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
+import EntitiesWriter from './entities/EntitiesWriter';
 
 
 export default class EnvBuilder {
   private readonly masterConfig: MasterConfig;
   private readonly entities: Entities;
+  private readonly entitiesWriter: EntitiesWriter;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
   private readonly hostsFilesSet: HostsFilesSet;
@@ -22,10 +24,12 @@ export default class EnvBuilder {
   private readonly io = new Io();
 
 
-  constructor(absMasterConfigPath: string, absEntitiesBuildDir: string, absBuildDir?: string) {
+  constructor(absMasterConfigPath: string, absEntitiesBuildDir?: string, absBuildDir?: string) {
     // TODO: absBuildDir - это место куда только hosts билдится
+    // TODO: absEntitiesBuildDir и absBuildDir - если указываются то используются
     this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.masterConfig);
+    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesCollection);
     this.definitions = new Definitions(this.masterConfig, this.entities.entitiesCollection, this.hostClassNames);
     this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
@@ -51,6 +55,15 @@ export default class EnvBuilder {
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
     this.entities.pluginEnv.$riseAfterInit();
+  }
+
+  /**
+   * Write entities files to storage
+   */
+  async writeEntities() {
+    this.log.info(`--> Writing entities files`);
+
+    await this.entitiesWriter.write();
   }
 
   /**
