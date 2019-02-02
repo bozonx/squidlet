@@ -79,6 +79,7 @@ export default class EnvBuilder {
    * Generate master host config with integrated files set which points to original (ts or js) files
    */
   generateMasterConfigSet(): SrcHostFilesSet {
+    // TODO: rename to srcConfigSet - смысл что там будут ссылки на сами ts файлы
     const hostId = 'master';
 
     return {

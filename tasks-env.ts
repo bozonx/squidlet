@@ -18,21 +18,18 @@ const envConfigParsedYaml = yaml.load(fs.readFileSync(envConfigPath, {encoding :
 const DEFAULT_ENV_DIR = './build/env';
 
 
-gulp.task('build-entities', async () => {
-
-  // TODO: !!!!!
-
-  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
-  const resolvedBuildDir: string | undefined = resolveParam('BUILD_DIR', 'build-dir');
-  const absMasterConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
-  const absBuildDir: string | undefined = resolvedBuildDir && path.resolve(process.cwd(), resolvedBuildDir);
-
-  const mainEntities: MainEntities = new MainEntities(absMasterConfigPath, absBuildDir);
-
-  await mainEntities.collect();
-  await mainEntities.write();
-
-});
+// gulp.task('build-entities', async () => {
+//   const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+//   const resolvedBuildDir: string | undefined = resolveParam('BUILD_DIR', 'build-dir');
+//   const absMasterConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
+//   const absBuildDir: string | undefined = resolvedBuildDir && path.resolve(process.cwd(), resolvedBuildDir);
+//
+//   const mainEntities: MainEntities = new MainEntities(absMasterConfigPath, absBuildDir);
+//
+//   await mainEntities.collect();
+//   await mainEntities.write();
+//
+// });
 
 // hosts configs and entities of them
 gulp.task('build-env', async () => {

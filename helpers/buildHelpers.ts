@@ -34,7 +34,6 @@ interface BuildConfig {
 
 const platformsDir = path.resolve(__dirname, '../platforms');
 const DEVS_DIR = 'dev';
-export const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
 
 

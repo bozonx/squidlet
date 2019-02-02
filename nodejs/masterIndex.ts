@@ -8,13 +8,19 @@
 
 import * as path from 'path';
 
-import {collectDevs, getMasterSysDev, HOSTS_BUILD_DEFAULT_DIR, resolveParam, resolveParamRequired} from '../helpers/buildHelpers';
+import {
+  collectDevs,
+  getMasterSysDev,
+  resolveParam,
+  resolveParamRequired
+} from '../helpers/buildHelpers';
 import System from '../host/System';
-import MainHostsEnv from '../hostEnvBuilder/MainHostsEnv';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
 import {DevClass} from '../host/entities/DevManager';
 
 
+export const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 // TODO: change
 //const debug: boolean = Boolean(yargs.argv.debug);
 const debug = true;
@@ -58,16 +64,18 @@ async function masterStarter () {
     absBuildDir = path.resolve(process.cwd(), HOSTS_BUILD_DEFAULT_DIR);
   }
 
-  const mainHostsEnv: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
+  // make env builder instance
+  const envBuilder: EnvBuilder = new EnvBuilder(absMasterConfigPath, absBuildDir);
 
   console.info(`===> generate hosts env files and configs`);
 
-  await mainHostsEnv.collect();
-  await mainHostsEnv.write(true);
+  await envBuilder.collect();
+  // TODO: не делать write
+  //await envBuilder.write(true);
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: SrcHostFilesSet = mainHostsEnv.generateMasterConfigSet();
+  const hostConfigSet: SrcHostFilesSet = envBuilder.generateMasterConfigSet();
   // prepare host app
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 
