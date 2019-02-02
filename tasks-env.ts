@@ -6,8 +6,7 @@ import * as yargs from 'yargs';
 
 import {resolveParamRequired} from './helpers/buildHelpers';
 import {resolveParam} from './helpers/buildHelpers';
-import MainHostsEnv from './hostEnvBuilder/MainHostsEnv';
-import MainEntities from './hostEnvBuilder/MainEntities';
+import EnvBuilder from './hostEnvBuilder/EnvBuilder';
 
 
 // TODO: получить из агрументов
@@ -33,22 +32,17 @@ const DEFAULT_ENV_DIR = './build/env';
 
 // hosts configs and entities of them
 gulp.task('build-env', async () => {
-
   // TODO: clear
 
-  //clearDir(buildConfig.buildDir);
-
-  const resolvedConfigPath: string = resolveParam('CONFIG', 'config');
+  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
   // TODO: get from args
   const resolvedBuildDir: string | undefined = process.env.BUILD_DIR
     || (yargs.argv['build-dir'] as string)
     || DEFAULT_ENV_DIR;
-
-  const mainHostsEnv: MainHostsEnv = new MainHostsEnv(absMasterConfigPath, absBuildDir);
+  const envBuilder: EnvBuilder = new EnvBuilder(absMasterConfigPath, absBuildDir);
 
   console.info(`===> generate hosts env files and configs`);
 
-  await mainHostsEnv.collect();
-  await mainHostsEnv.write(true);
-
+  await envBuilder.collect();
+  await envBuilder.write(true);
 });
