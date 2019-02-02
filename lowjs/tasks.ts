@@ -14,6 +14,7 @@ import makeBuildConfig from '../helpers/buildJs/buildConfig';
 import BuildConfig from '../hostEnvBuilder/interfaces/BuildConfig';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import minimize from '../helpers/buildJs/minimize';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
 const buildDir: string = path.resolve(__dirname, `../build/lowjs`);
@@ -46,8 +47,10 @@ function copyHost(hostBuildDir: string) {
   shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
 }
 
-function makeEnv(hostBuildDir: string) {
+function buildEnv(hostBuildDir: string, envConfigPath: string) {
   const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
+
+  const envBuilder: EnvBuilder = new EnvBuilder();
 
 
   // TODO: нужно ещё как-то передать конфиг в configWorks
@@ -96,5 +99,5 @@ gulp.task('build-lowjs', async () => {
   // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
   copyHost(hostBuildDir);
-  makeEnv(hostBuildDir);
+  buildEnv(hostBuildDir, envConfigPath);
 });

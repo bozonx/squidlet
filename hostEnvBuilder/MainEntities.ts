@@ -24,7 +24,7 @@ export default class MainEntities {
     await this.masterConfig.init();
     await this.entities.start();
 
-    this.log.info(`--> Initialization has finished`);
+    this.log.info(`--> Initialization has been finished`);
 
     // TODO: review ???
     // call handlers after init
