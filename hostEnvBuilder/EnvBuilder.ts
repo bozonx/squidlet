@@ -25,9 +25,7 @@ export default class EnvBuilder {
 
 
   constructor(absMasterConfigPath: string, absEntitiesBuildDir?: string, absBuildDir?: string) {
-    // TODO: absBuildDir - это место куда только hosts билдится
-    // TODO: absEntitiesBuildDir и absBuildDir - если указываются то используются
-    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
+    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absEntitiesBuildDir, absBuildDir);
     this.entities = new Entities(this.log, this.masterConfig);
     this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesCollection);

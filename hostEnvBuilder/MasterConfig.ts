@@ -18,27 +18,30 @@ import {servicesShortcut} from './dict/dict';
 
 
 export default class MasterConfig {
-  private readonly io: Io;
+  // path to plugins specified in config
   readonly plugins: string[] = [];
-  get buildDir(): string {
-    return this._buildDir as string;
+  get entitiesBuildDir(): string {
+    return this._entitiesBuildDir as string;
+  }
+  get envBuildDir(): string {
+    return this._envBuildDir as string;
   }
 
+  private readonly io: Io;
   private readonly hostDefaults: {[index: string]: any} = {};
   // unprocessed hosts configs
   private readonly preHosts: {[index: string]: PreHostConfig} = {};
-  // storage base dir
-  private _buildDir?: string;
   // absolute path to master config yaml
   private readonly masterConfigPath: string;
-  // specified build dir by arguments of command
-  private readonly argBuildDir?: string;
+  private _entitiesBuildDir?: string;
+  private _envBuildDir?: string;
 
 
-  constructor(io: Io, masterConfigPath: string, argBuildDir?: string) {
+  constructor(io: Io, masterConfigPath: string, absEntitiesBuildDir?: string, absBuildDir?: string) {
     this.io = io;
     this.masterConfigPath = masterConfigPath;
-    this.argBuildDir = argBuildDir;
+    this._entitiesBuildDir = absEntitiesBuildDir;
+    this._envBuildDir = absBuildDir;
   }
 
   async init() {
@@ -52,7 +55,7 @@ export default class MasterConfig {
     appendArray(this.plugins, masterConfig.plugins);
     _defaultsDeep(this.hostDefaults, masterConfig.hostDefaults);
     _defaultsDeep(this.preHosts, this.generatePreHosts(preHostsConfigs));
-    this._buildDir = this.resolveBuildDir();
+    this.resolveBuildDirs();
   }
 
 
@@ -102,6 +105,7 @@ export default class MasterConfig {
     }
     else if (preMasterConfig.host) {
       hosts = {
+        // TODO: почему называется master - ведь это может быть сборка под мк?
         master: preMasterConfig.host,
       };
     }
@@ -109,7 +113,9 @@ export default class MasterConfig {
     return hosts;
   }
 
-  private resolveBuildDir(): string {
+  private resolveBuildDirs(): string {
+    // TODO: absBuildDir - это место куда только hosts билдится
+    // TODO: absEntitiesBuildDir и absBuildDir - если указываются то используются
 
     // TODO: review
 
