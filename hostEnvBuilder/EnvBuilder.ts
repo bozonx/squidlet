@@ -12,9 +12,6 @@ import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 
 
-//export const ENTITIES_BUILD_DEFAULT_DIR = '../build/entities';
-
-
 export default class EnvBuilder {
   private readonly masterConfig: MasterConfig;
   private readonly entities: Entities;
@@ -79,10 +76,10 @@ export default class EnvBuilder {
   }
 
   /**
-   * Generate master host config with integrated files set which points to original (ts or js) files
+   * Generate host config with integrated files set which points to original (ts or js) files.
+   * It uses only to start in nodejs environment.
    */
-  generateMasterConfigSet(): SrcHostFilesSet {
-    // TODO: rename to srcConfigSet - смысл что там будут ссылки на сами ts файлы
+  generateSrcConfigSet(): SrcHostFilesSet {
     const hostId = 'master';
 
     return {

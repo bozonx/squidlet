@@ -71,7 +71,7 @@ async function masterStarter () {
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: SrcHostFilesSet = envBuilder.generateMasterConfigSet();
+  const hostConfigSet: SrcHostFilesSet = envBuilder.generateSrcConfigSet();
   // prepare host app
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 

@@ -10,36 +10,11 @@ import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
 import HostConfig from '../host/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
-import Platforms, {
-  PLATFORM_ESP32,
-  PLATFORM_ESP8266,
-  PLATFORM_RPI,
-  PLATFORM_X86
-} from './interfaces/Platforms';
 import PlatformConfig from './interfaces/PlatformConfig';
-import platform_esp32 from '../../platforms/squidlet-esp32/platform_esp32';
-import platform_esp8266 from '../../platforms/squidlet-esp8266/platform_esp8266';
-import platform_rpi from '../../squidlet-nodejs/platform_rpi';
-import platform_x86_linux from '../../platforms/squidlet-x86/platform_x86_linux';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import Io from './Io';
 import {appendArray} from '../host/helpers/helpers';
-
-
-// TODO: move to build helpers ???
-const platforms: {[index: string]: PlatformConfig} = {
-  [PLATFORM_ESP32]: platform_esp32,
-  [PLATFORM_ESP8266]: platform_esp8266,
-  [PLATFORM_RPI]: platform_rpi,
-  [PLATFORM_X86]: platform_x86_linux,
-};
-
-const servicesShortcut: {[index: string]: string} = {
-  automation: 'Automation',
-  mqtt: 'Mqtt',
-  logger: 'Logger',
-  webApi: 'WebApi',
-};
+import {servicesShortcut} from './dict/dict';
 
 
 export default class MasterConfig {
@@ -288,3 +263,22 @@ export default class MasterConfig {
   }
 
 }
+
+// import Platforms, {
+//   PLATFORM_ESP32,
+//   PLATFORM_ESP8266,
+//   PLATFORM_RPI,
+//   PLATFORM_X86
+// } from './interfaces/Platforms';
+// import platform_esp32 from '../../platforms/squidlet-esp32/platform_esp32';
+// import platform_esp8266 from '../../platforms/squidlet-esp8266/platform_esp8266';
+// import platform_rpi from '../../squidlet-nodejs/platform_rpi';
+// import platform_x86_linux from '../../platforms/squidlet-x86/platform_x86_linux';
+
+// const platforms: {[index: string]: PlatformConfig} = {
+//   [PLATFORM_ESP32]: platform_esp32,
+//   [PLATFORM_ESP8266]: platform_esp8266,
+//   [PLATFORM_RPI]: platform_rpi,
+//   [PLATFORM_X86]: platform_x86_linux,
+// };
+
