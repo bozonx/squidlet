@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 import {DevClass} from '../host/entities/DevManager';
-import PlatformConfig from '../hostEnvBuilder/interfaces/PlatformConfig';
+import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const DEVS_DIR = 'devs';
@@ -38,7 +38,7 @@ export function getMasterSysDev(platformDirName: string): DevClass {
  */
 export function collectDevs(platformDirName: string, machine: string): {[index: string]: DevClass} {
   const machineConfigPath = path.join(platformDirName, `${path.basename(platformDirName)}-${machine}`);
-  const machineConfig: PlatformConfig = require(machineConfigPath).default;
+  const machineConfig: MachineConfig = require(machineConfigPath).default;
   const platformDevs: string[] = machineConfig.devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 

@@ -7,7 +7,7 @@ import * as yargs from 'yargs';
 import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
-import PlatformConfig from '../hostEnvBuilder/interfaces/PlatformConfig';
+import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import compileTs from '../helpers/buildJs/compileTs';
 import compileJs from '../helpers/buildJs/compileJs';
 import makeBuildConfig from '../helpers/buildJs/buildConfig';
@@ -94,7 +94,7 @@ gulp.task('build-lowjs', async () => {
   }
 
   const machineConfigFilePath: string = path.resolve(__dirname, `./${envConfig.machine}.ts`);
-  const machineConfig: PlatformConfig = require(machineConfigFilePath).default;
+  const machineConfig: MachineConfig = require(machineConfigFilePath).default;
   const hostBuildDir: string = path.join(buildDir, envConfig.id);
 
   // TODO: use devsMinyDst

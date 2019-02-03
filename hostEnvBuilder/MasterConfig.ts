@@ -1,14 +1,12 @@
 import * as path from 'path';
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import {ManifestsTypeName} from '../host/interfaces/ManifestTypes';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
 import HostConfig, {HostConfigConfig} from '../host/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
-import PlatformConfig from './interfaces/PlatformConfig';
-import PreEntityDefinition from './interfaces/PreEntityDefinition';
+import MachineConfig from './interfaces/MachineConfig';
 import Io from './Io';
 import {appendArray} from '../host/helpers/helpers';
 import {servicesShortcut} from './dict/dict';
@@ -61,24 +59,8 @@ export default class MasterConfig {
   }
 
 
-  // getHostsIds(): string[] {
-  //   return Object.keys(this.preHosts);
-  // }
-
-  // // TODO: does it really need ???
-  // getPreHostConfig(hostId: string): PreHostConfig {
-  //   if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
-  //
-  //   return this.preHosts[hostId];
-  // }
-
-  // // TODO: review
-  // getFinalHostConfig(): HostConfig {
-  //   return this.prepareHostConfig();
-  // }
-
   // TODO: review - remake to get machine config
-  getHostPlatformDevs(): string[] {
+  getMachineConfig(): string[] {
     //const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
 
     //return this.getPlatformConfig(platformName).devs;
@@ -146,7 +128,7 @@ export default class MasterConfig {
     };
   }
 
-  private async getPlatformConfig(): PlatformConfig {
+  private async getPlatformConfig(): MachineConfig {
     const hostPlatform: Platforms = preHostConfig.platform as Platforms;
     // TODO: and get machine
 
@@ -182,10 +164,23 @@ export default class MasterConfig {
 //   }
 //   else if (preMasterConfig.host) {
 //     hosts = {
-//       // TODO: почему называется master - ведь это может быть сборка под мк?
 //       master: preMasterConfig.host,
 //     };
 //   }
 //
 //   return hosts;
+// }
+
+// getHostsIds(): string[] {
+//   return Object.keys(this.preHosts);
+// }
+
+// getPreHostConfig(hostId: string): PreHostConfig {
+//   if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
+//
+//   return this.preHosts[hostId];
+// }
+
+// getFinalHostConfig(): HostConfig {
+//   return this.prepareHostConfig();
 // }

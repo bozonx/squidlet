@@ -1,7 +1,7 @@
-import PlatformConfig from '../hostEnvBuilder/interfaces/PlatformConfig';
+import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
-const platformConfig: PlatformConfig = {
+const platformConfig: MachineConfig = {
   devs: [
     'Storage.dev',
     'Sys.dev',
