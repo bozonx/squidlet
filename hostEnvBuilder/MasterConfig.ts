@@ -82,21 +82,38 @@ export default class MasterConfig {
     //return this.getPlatformConfig(platformName).devs;
   }
 
-  // private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
-  //   let hosts: {[index: string]: PreHostConfig} = {};
-  //
-  //   if (preMasterConfig.hosts) {
-  //     hosts = preMasterConfig.hosts;
-  //   }
-  //   else if (preMasterConfig.host) {
-  //     hosts = {
-  //       // TODO: почему называется master - ведь это может быть сборка под мк?
-  //       master: preMasterConfig.host,
-  //     };
-  //   }
-  //
-  //   return hosts;
-  // }
+
+  /**
+   * Make devices plain, fill services from shortcuts and convert drivers and devices definitions
+   */
+  private normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    const plainDevices: {[index: string]: any} = makeDevicesPlain(preHostConfig.devices);
+
+    return {
+      ...preHostConfig,
+      devices: this.convertDefinitions('device', plainDevices),
+      drivers: this.convertDefinitions('driver', preHostConfig.drivers || {}),
+      services: {
+        ...this.convertDefinitions('service', preHostConfig.services || {}),
+        // make services from shortcut
+        ...this.collectServicesFromShortcuts(preHostConfig),
+      },
+    };
+  }
+
+  /**
+   * Merge host config with platform config
+   */
+  private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
+
+    return _defaultsDeep(
+      _cloneDeep(preHostConfig),
+      this.hostDefaults,
+      hostDefaultConfig,
+      this.getPlatformConfig(hostPlatform).hostConfig,
+    );
+  }
 
   private resolveBuildDir(): string {
     // TODO: absBuildDir - это место куда только hosts билдится
@@ -134,40 +151,8 @@ export default class MasterConfig {
     };
   }
 
-  /**
-   * Merge host config with platform config
-   */
-  private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
-
-    return _defaultsDeep(
-      _cloneDeep(preHostConfig),
-      this.hostDefaults,
-      hostDefaultConfig,
-      this.getPlatformConfig(hostPlatform).hostConfig,
-    );
-  }
-
   private getPlatformConfig(hostPlatform: Platforms): PlatformConfig {
     return platforms[hostPlatform];
-  }
-
-  /**
-   * Make devices plain, fill services from shortcuts and convert drivers and devices definitions
-   */
-  private normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const plainDevices: {[index: string]: any} = makeDevicesPlain(preHostConfig.devices);
-
-    return {
-      ...preHostConfig,
-      devices: this.convertDefinitions('device', plainDevices),
-      drivers: this.convertDefinitions('driver', preHostConfig.drivers || {}),
-      services: {
-        ...this.convertDefinitions('service', preHostConfig.services || {}),
-        // make services from shortcut
-        ...this.collectServicesFromShortcuts(preHostConfig),
-      },
-    };
   }
 
   /**
@@ -241,3 +226,19 @@ export default class MasterConfig {
 //   [PLATFORM_X86]: platform_x86_linux,
 // };
 
+
+// private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
+//   let hosts: {[index: string]: PreHostConfig} = {};
+//
+//   if (preMasterConfig.hosts) {
+//     hosts = preMasterConfig.hosts;
+//   }
+//   else if (preMasterConfig.host) {
+//     hosts = {
+//       // TODO: почему называется master - ведь это может быть сборка под мк?
+//       master: preMasterConfig.host,
+//     };
+//   }
+//
+//   return hosts;
+// }
