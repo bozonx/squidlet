@@ -2,7 +2,6 @@ import * as path from 'path';
 import _values = require('lodash/values');
 import {Map} from 'immutable';
 
-import {resolveIndexFile} from '../helpers';
 import PreDeviceManifest from '../interfaces/PreDeviceManifest';
 import PreDriverManifest from '../interfaces/PreDriverManifest';
 import PreServiceManifest from '../interfaces/PreServiceManifest';
@@ -15,6 +14,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import Io from '../Io';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {Stats} from '../../host/interfaces/dev/Storage';
 
 
 /**
@@ -166,7 +166,7 @@ export default class Register {
       throw new Error(`You have to specify an absolute path of "${pathToDirOrFile}"`);
     }
 
-    const resolvedPathToManifest: string = await resolveIndexFile(
+    const resolvedPathToManifest: string = await this.resolveIndexFile(
       this.io.stat,
       this.io.exists,
       pathToDirOrFile,
@@ -182,6 +182,29 @@ export default class Register {
   // it needs for test purpose
   private require(devicePath: string) {
     return require(devicePath);
+  }
+
+  private async resolveIndexFile(
+    stat: (path: string) => Promise<Stats>,
+    exists: (path: string) => Promise<boolean>,
+    pathToDirOrFile: string,
+    indexFileNames: string[]
+  ): Promise<string> {
+    if (!(await stat(pathToDirOrFile)).dir) {
+      // if it's file - return it
+      return pathToDirOrFile;
+    }
+    // else it is dir
+
+    for (let indexFile of indexFileNames) {
+      const fullPath = path.join(pathToDirOrFile, indexFile);
+
+      if (exists(fullPath)) {
+        return fullPath;
+      }
+    }
+
+    throw new Error(`Can't resolve index file "${pathToDirOrFile}"`);
   }
 
 }

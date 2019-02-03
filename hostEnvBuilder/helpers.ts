@@ -30,27 +30,3 @@ export function sortByIncludeInList(itemsToSearch: string[], listToSearchIn: str
     notIncluded,
   ];
 }
-
-// TODO: maybe move to register?
-export async function resolveIndexFile(
-  stat: (path: string) => Promise<Stats>,
-  exists: (path: string) => Promise<boolean>,
-  pathToDirOrFile: string,
-  indexFileNames: string[]
-): Promise<string> {
-  if (!(await stat(pathToDirOrFile)).dir) {
-    // if it's file - return it
-    return pathToDirOrFile;
-  }
-  // else it is dir
-
-  for (let indexFile of indexFileNames) {
-    const fullPath = path.join(pathToDirOrFile, indexFile);
-
-    if (exists(fullPath)) {
-      return fullPath;
-    }
-  }
-
-  throw new Error(`Can't resolve index file "${pathToDirOrFile}"`);
-}
