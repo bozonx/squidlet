@@ -20,102 +20,85 @@ import {servicesShortcut} from './dict/dict';
 export default class MasterConfig {
   // path to plugins specified in config
   readonly plugins: string[] = [];
-  get entitiesBuildDir(): string {
-    return this._entitiesBuildDir as string;
-  }
   get envBuildDir(): string {
     return this._envBuildDir as string;
   }
+  get preHostConfig(): PreHostConfig {
+    return this._preHostConfig as any;
+  }
 
   private readonly io: Io;
-  private readonly hostDefaults: {[index: string]: any} = {};
-  // unprocessed hosts configs
-  private readonly preHosts: {[index: string]: PreHostConfig} = {};
+  //private readonly hostDefaults: {[index: string]: any} = {};
+  // unprocessed host config
+  private _preHostConfig?: PreHostConfig;
   // absolute path to master config yaml
   private readonly masterConfigPath: string;
-  private _entitiesBuildDir?: string;
   private _envBuildDir?: string;
 
 
-  constructor(io: Io, masterConfigPath: string, absEntitiesBuildDir?: string, absBuildDir?: string) {
+  constructor(io: Io, masterConfigPath: string, absBuildDir?: string) {
     this.io = io;
     this.masterConfigPath = masterConfigPath;
-    this._entitiesBuildDir = absEntitiesBuildDir;
     this._envBuildDir = absBuildDir;
   }
 
   async init() {
-    const masterConfig: PreMasterConfig = await this.io.loadYamlFile(this.masterConfigPath);
-    const validateError: string | undefined = validateMasterConfig(masterConfig);
+    const preHostConfig = await this.io.loadYamlFile(this.masterConfigPath) as PreHostConfig;
+    const validateError: string | undefined = validateMasterConfig(preHostConfig);
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    const preHostsConfigs: {[index: string]: PreHostConfig} = this.resolveHosts(masterConfig);
+    const mergedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
 
-    appendArray(this.plugins, masterConfig.plugins);
-    _defaultsDeep(this.hostDefaults, masterConfig.hostDefaults);
-    _defaultsDeep(this.preHosts, this.generatePreHosts(preHostsConfigs));
-    this.resolveBuildDirs();
+    this._preHostConfig = this.normalizeHostConfig(mergedConfig);
+
+    appendArray(this.plugins, this.preHostConfig.plugins);
+    //_defaultsDeep(this.hostDefaults, preHostConfig.hostDefaults);
+    this._envBuildDir = this.resolveBuildDir();
   }
 
 
-  getHostsIds(): string[] {
-    return Object.keys(this.preHosts);
-  }
+  // getHostsIds(): string[] {
+  //   return Object.keys(this.preHosts);
+  // }
 
-  // TODO: does it really need ???
-  getPreHostConfig(hostId: string): PreHostConfig {
-    if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
+  // // TODO: does it really need ???
+  // getPreHostConfig(hostId: string): PreHostConfig {
+  //   if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
+  //
+  //   return this.preHosts[hostId];
+  // }
 
-    return this.preHosts[hostId];
-  }
-
-  getFinalHostConfig(hostId: string): HostConfig {
-    if (!this.preHosts[hostId]) throw new Error(`Host "${hostId}" not found`);
-
+  // TODO: review
+  getFinalHostConfig(): HostConfig {
     return this.prepareHostConfig(hostId);
   }
 
   // TODO: review
-  getHostPlatformDevs(hostId: string): string[] {
-    const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
+  getHostPlatformDevs(): string[] {
+    //const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
 
-    return this.getPlatformConfig(platformName).devs;
+    //return this.getPlatformConfig(platformName).devs;
   }
 
+  // private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
+  //   let hosts: {[index: string]: PreHostConfig} = {};
+  //
+  //   if (preMasterConfig.hosts) {
+  //     hosts = preMasterConfig.hosts;
+  //   }
+  //   else if (preMasterConfig.host) {
+  //     hosts = {
+  //       // TODO: почему называется master - ведь это может быть сборка под мк?
+  //       master: preMasterConfig.host,
+  //     };
+  //   }
+  //
+  //   return hosts;
+  // }
 
-  private generatePreHosts(preHosts: {[index: string]: PreHostConfig}): {[index: string]: PreHostConfig} {
-    const result: {[index: string]: PreHostConfig} = {};
-
-    for (let hostId of Object.keys(preHosts)) {
-      const preHostConfig: PreHostConfig = preHosts[hostId];
-
-      const mergedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
-      result[hostId] = this.normalizeHostConfig(mergedConfig);
-    }
-
-    return result;
-  }
-
-  private resolveHosts(preMasterConfig: PreMasterConfig): {[index: string]: PreHostConfig} {
-    let hosts: {[index: string]: PreHostConfig} = {};
-
-    if (preMasterConfig.hosts) {
-      hosts = preMasterConfig.hosts;
-    }
-    else if (preMasterConfig.host) {
-      hosts = {
-        // TODO: почему называется master - ведь это может быть сборка под мк?
-        master: preMasterConfig.host,
-      };
-    }
-
-    return hosts;
-  }
-
-  private resolveBuildDirs(): string {
+  private resolveBuildDir(): string {
     // TODO: absBuildDir - это место куда только hosts билдится
-    // TODO: absEntitiesBuildDir и absBuildDir - если указываются то используются
 
     // TODO: review
 

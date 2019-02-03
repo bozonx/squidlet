@@ -1,6 +1,5 @@
 import Platforms from './Platforms';
 import LogLevel from '../../host/interfaces/LogLevel';
-import Machines from './Machines';
 import BuildConfig from './BuildConfig';
 
 
@@ -9,8 +8,9 @@ export default interface PreHostConfig {
   // host unique id
   id?: string;
   platform?: Platforms;
-  // TODO: наверное лучше string
-  machine?: Machines;
+  machine?: string;
+
+  plugins?: string[];
 
   buildConfig?: BuildConfig;
 

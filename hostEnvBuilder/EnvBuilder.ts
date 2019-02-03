@@ -24,8 +24,8 @@ export default class EnvBuilder {
   private readonly io = new Io();
 
 
-  constructor(absMasterConfigPath: string, absEntitiesBuildDir?: string, absBuildDir?: string) {
-    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absEntitiesBuildDir, absBuildDir);
+  constructor(absMasterConfigPath: string, absBuildDir?: string) {
+    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.masterConfig);
     this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesCollection);
@@ -78,12 +78,10 @@ export default class EnvBuilder {
    * It uses only to start in nodejs environment.
    */
   generateSrcConfigSet(): SrcHostFilesSet {
-    const hostId = 'master';
-
     return {
-      ...this.hostsFilesSet.getDefinitionsSet(hostId),
-      config: this.masterConfig.getFinalHostConfig(hostId),
-      entitiesSet: this.hostsFilesSet.generateSrcEntitiesSet(hostId),
+      ...this.hostsFilesSet.getDefinitionsSet(),
+      config: this.masterConfig.getFinalHostConfig(),
+      entitiesSet: this.hostsFilesSet.generateSrcEntitiesSet(),
     };
   }
 
