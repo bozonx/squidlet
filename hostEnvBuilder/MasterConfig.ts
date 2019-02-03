@@ -8,7 +8,7 @@ import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
-import HostConfig from '../host/interfaces/HostConfig';
+import HostConfig, {HostConfigConfig} from '../host/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import PlatformConfig from './interfaces/PlatformConfig';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
@@ -21,10 +21,13 @@ import {makeDevicesPlain} from './helpers';
 export default class MasterConfig {
   // path to plugins specified in config
   readonly plugins: string[] = [];
-  get envBuildDir(): string {
-    return this._envBuildDir as string;
+  get buildDir(): string {
+    return this._buildDir as string;
   }
   get preHostConfig(): PreHostConfig {
+    return this._preHostConfig as any;
+  }
+  get hostConfig(): HostConfig {
     return this._preHostConfig as any;
   }
 
@@ -32,15 +35,16 @@ export default class MasterConfig {
   //private readonly hostDefaults: {[index: string]: any} = {};
   // unprocessed host config
   private _preHostConfig?: PreHostConfig;
+  private _hostConfig?: HostConfig;
   // absolute path to master config yaml
   private readonly masterConfigPath: string;
-  private _envBuildDir?: string;
+  private _buildDir?: string;
 
 
   constructor(io: Io, masterConfigPath: string, absBuildDir?: string) {
     this.io = io;
     this.masterConfigPath = masterConfigPath;
-    this._envBuildDir = absBuildDir;
+    this._buildDir = absBuildDir;
   }
 
   async init() {
@@ -52,10 +56,11 @@ export default class MasterConfig {
     const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
 
     this._preHostConfig = this.normalizeHostConfig(mergedConfig);
+    this._hostConfig = this.prepareHostConfig();
 
     appendArray(this.plugins, this.preHostConfig.plugins);
     //_defaultsDeep(this.hostDefaults, preHostConfig.hostDefaults);
-    this._envBuildDir = this.resolveBuildDir();
+    this._buildDir = this.resolveBuildDir();
   }
 
 
@@ -70,10 +75,10 @@ export default class MasterConfig {
   //   return this.preHosts[hostId];
   // }
 
-  // TODO: review
-  getFinalHostConfig(): HostConfig {
-    return this.prepareHostConfig(hostId);
-  }
+  // // TODO: review
+  // getFinalHostConfig(): HostConfig {
+  //   return this.prepareHostConfig();
+  // }
 
   // TODO: review - remake to get machine config
   getHostPlatformDevs(): string[] {
@@ -99,61 +104,6 @@ export default class MasterConfig {
         ...this.collectServicesFromShortcuts(preHostConfig),
       },
     };
-  }
-
-  /**
-   * Merge host config with platform config
-   */
-  private async mergePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
-    return _defaultsDeep({},
-      preHostConfig,
-      //this.hostDefaults,
-      await this.getPlatformConfig().hostConfig,
-      hostDefaultConfig,
-    );
-  }
-
-  private resolveBuildDir(): string {
-    // TODO: absBuildDir - это место куда только hosts билдится
-
-    // TODO: review
-
-    // use command argument if specified
-    if (this.argBuildDir) return this.argBuildDir;
-
-    const masterHostConfig: PreHostConfig = this.getPreHostConfig('master');
-
-    if (masterHostConfig.config.storageDir) {
-      // use master's storage dir
-      const storageDir = masterHostConfig.config.storageDir;
-
-      if (path.isAbsolute(storageDir)) {
-        // it's an absolute path
-        return storageDir;
-      }
-      else {
-        // storageDir is relative path - make it absolute, use config file dir as a root
-        return path.resolve(path.dirname(this.masterConfigPath), storageDir);
-      }
-    }
-
-    // use default build dir
-    return systemConfig.defaultBuildDir;
-  }
-
-  private prepareHostConfig(id: string): HostConfig {
-    return {
-      id,
-      platform: this.preHosts[id].platform as Platforms,
-      config: this.preHosts[id].config as HostConfig['config'],
-    };
-  }
-
-  private async getPlatformConfig(): PlatformConfig {
-    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
-    // TODO: and get machine
-
-    return platforms[hostPlatform];
   }
 
   /**
@@ -197,6 +147,56 @@ export default class MasterConfig {
     }
 
     return services;
+  }
+
+  /**
+   * Merge host config with platform config
+   */
+  private async mergePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
+    return _defaultsDeep({},
+      preHostConfig,
+      //this.hostDefaults,
+      await this.getPlatformConfig().hostConfig,
+      hostDefaultConfig,
+    );
+  }
+
+  private resolveBuildDir(): string {
+    // use command argument if specified
+    if (this._buildDir) return this._buildDir;
+
+    if (this.preHostConfig.config.storageDir) {
+      // use host's storage dir
+      const storageDir = this.preHostConfig.config.storageDir;
+
+      if (path.isAbsolute(storageDir)) {
+        // it's an absolute path
+        return storageDir;
+      }
+      else {
+        // storageDir is relative path - make it absolute, use config file dir as a root
+        return path.resolve(path.dirname(this.masterConfigPath), storageDir);
+      }
+    }
+
+    // use default build dir
+    return systemConfig.defaultBuildDir;
+  }
+
+  private prepareHostConfig(): HostConfig {
+    return {
+      id: this.preHostConfig.id as string,
+      platform: this.preHostConfig.platform as string,
+      machine: this.preHostConfig.machine as string,
+      config: this.preHostConfig.config as HostConfigConfig,
+    };
+  }
+
+  private async getPlatformConfig(): PlatformConfig {
+    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
+    // TODO: and get machine
+
+    return platforms[hostPlatform];
   }
 
   getDefinitionClassName(type: ManifestsTypeName, id: string, preDefinitions: PreEntityDefinition): string {
