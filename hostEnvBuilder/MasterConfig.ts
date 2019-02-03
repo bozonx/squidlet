@@ -49,7 +49,7 @@ export default class MasterConfig {
 
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
-    const mergedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
+    const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
 
     this._preHostConfig = this.normalizeHostConfig(mergedConfig);
 
@@ -104,14 +104,12 @@ export default class MasterConfig {
   /**
    * Merge host config with platform config
    */
-  private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
-
-    return _defaultsDeep(
-      _cloneDeep(preHostConfig),
-      this.hostDefaults,
+  private async mergePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
+    return _defaultsDeep({},
+      preHostConfig,
+      //this.hostDefaults,
+      await this.getPlatformConfig().hostConfig,
       hostDefaultConfig,
-      this.getPlatformConfig(hostPlatform).hostConfig,
     );
   }
 
@@ -151,7 +149,10 @@ export default class MasterConfig {
     };
   }
 
-  private getPlatformConfig(hostPlatform: Platforms): PlatformConfig {
+  private async getPlatformConfig(): PlatformConfig {
+    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
+    // TODO: and get machine
+
     return platforms[hostPlatform];
   }
 
