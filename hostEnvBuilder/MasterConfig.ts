@@ -1,10 +1,7 @@
 import * as path from 'path';
-import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
-import _cloneDeep = require('lodash/cloneDeep');
 
 import {ManifestsTypeName} from '../host/interfaces/ManifestTypes';
-import PreMasterConfig from './interfaces/PreMasterConfig';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
 import validateMasterConfig from './validateMasterConfig';
@@ -15,7 +12,7 @@ import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import Io from './Io';
 import {appendArray} from '../host/helpers/helpers';
 import {servicesShortcut} from './dict/dict';
-import {makeDevicesPlain} from './helpers';
+import {collectServicesFromShortcuts, convertDefinitions, makeDevicesPlain} from './helpers';
 
 
 export default class MasterConfig {
@@ -96,57 +93,14 @@ export default class MasterConfig {
 
     return {
       ...preHostConfig,
-      devices: this.convertDefinitions('device', plainDevices),
-      drivers: this.convertDefinitions('driver', preHostConfig.drivers || {}),
+      devices: convertDefinitions('device', plainDevices),
+      drivers: convertDefinitions('driver', preHostConfig.drivers || {}),
       services: {
-        ...this.convertDefinitions('service', preHostConfig.services || {}),
+        ...convertDefinitions('service', preHostConfig.services || {}),
         // make services from shortcut
-        ...this.collectServicesFromShortcuts(preHostConfig),
+        ...collectServicesFromShortcuts(preHostConfig, servicesShortcut),
       },
     };
-  }
-
-  /**
-   * Convert definition line { device: MyClass, ... } to { className: MyClass, ... }
-   */
-  private convertDefinitions(
-    type: ManifestsTypeName,
-    preDefinitions: {[index: string]: any}
-  ): {[index: string]: PreEntityDefinition} {
-    const definitions: {[index: string]: PreEntityDefinition} = {};
-
-    for (let id of Object.keys(preDefinitions)) {
-      definitions[id] = {
-        ..._omit(preDefinitions[id], type),
-        className: this.getDefinitionClassName(type, id, preDefinitions[id]),
-      };
-    }
-
-    return definitions;
-  }
-
-  /**
-   * Generate service from shortcuts like 'automation', 'logger' etc.
-   */
-  private collectServicesFromShortcuts(
-    preHostConfig: {[index: string]: any}
-  ): {[index: string]: PreEntityDefinition} {
-    const services: {[index: string]: PreEntityDefinition} = {};
-
-    // collect services
-    for (let serviceId of Object.keys(servicesShortcut)) {
-      if (typeof preHostConfig[serviceId] === 'undefined') continue;
-
-      // if it is empty then yaml parser will return null
-      const definition: PreEntityDefinition = preHostConfig[serviceId] || {};
-
-      services[serviceId] = {
-        ...definition,
-        className: servicesShortcut[serviceId],
-      };
-    }
-
-    return services;
   }
 
   /**
@@ -197,14 +151,6 @@ export default class MasterConfig {
     // TODO: and get machine
 
     return platforms[hostPlatform];
-  }
-
-  getDefinitionClassName(type: ManifestsTypeName, id: string, preDefinitions: PreEntityDefinition): string {
-    if (type === 'driver') {
-      return id;
-    }
-
-    return preDefinitions[type];
   }
 
 }
