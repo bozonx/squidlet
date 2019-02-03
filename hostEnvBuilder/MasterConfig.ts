@@ -15,6 +15,7 @@ import PreEntityDefinition from './interfaces/PreEntityDefinition';
 import Io from './Io';
 import {appendArray} from '../host/helpers/helpers';
 import {servicesShortcut} from './dict/dict';
+import {makeDevicesPlain} from './helpers';
 
 
 export default class MasterConfig {
@@ -135,7 +136,6 @@ export default class MasterConfig {
 
   /**
    * Merge host config with platform config
-   * @param preHostConfig
    */
   private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
     const hostPlatform: Platforms = preHostConfig.platform as Platforms;
@@ -153,10 +153,10 @@ export default class MasterConfig {
   }
 
   /**
-   * Make devices plain
+   * Make devices plain, fill services from shortcuts and convert drivers and devices definitions
    */
   private normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const plainDevices: {[index: string]: any} = this.makeDevicesPlain(preHostConfig.devices);
+    const plainDevices: {[index: string]: any} = makeDevicesPlain(preHostConfig.devices);
 
     return {
       ...preHostConfig,
@@ -171,37 +171,7 @@ export default class MasterConfig {
   }
 
   /**
-   * Make devices plain
-   */
-  private makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: any} {
-    if (!preDevices) return {};
-
-    const result: {[index: string]: any} = {};
-
-    const recursively = (root: string, preDevicesOrRoom: {[index: string]: any}) => {
-      if (preDevicesOrRoom.device) {
-        // it's device definition
-        result[root] = preDevicesOrRoom;
-
-        return;
-      }
-
-      // else it's room - go deeper in room
-      for (let itemName of Object.keys(preDevicesOrRoom)) {
-        const newRoot = (root)
-          ? [ root, itemName ].join(systemConfig.hostSysCfg.deviceIdSeparator)
-          : itemName;
-        recursively(newRoot, preDevicesOrRoom[itemName]);
-      }
-    };
-
-    recursively('', preDevices);
-
-    return result;
-  }
-
-  /**
-   * Convert definition line { device: MyClass, ... } to { iclassName: MyClass, ... }
+   * Convert definition line { device: MyClass, ... } to { className: MyClass, ... }
    */
   private convertDefinitions(
     type: ManifestsTypeName,
