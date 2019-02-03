@@ -1,8 +1,8 @@
 import _difference = require('lodash/difference');
 
-import MainHostsEnv from './MainHostsEnv';
 import {Dependencies, EntitiesNames} from './entities/EntitiesCollection';
 import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
+import EnvBuilder from './EnvBuilder';
 
 
 
@@ -31,7 +31,7 @@ function getHostDevs(hostEntitiesNames: EntitiesNames, devDeps: Dependencies): s
 /**
  * Check that all the host's dev dependencies exist in platform devs list.
  */
-export default function validatePlatformDevs (main: MainHostsEnv) {
+export default function validatePlatformDevs (main: EnvBuilder) {
 
   // TODO: fix
 

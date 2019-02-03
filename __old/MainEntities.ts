@@ -1,9 +1,9 @@
-import MasterConfig from './MasterConfig';
-import Io from './Io';
-import * as defaultLogger from './defaultLogger';
-import Entities from './entities/Entities';
-import EntitiesWriter from './entities/EntitiesWriter';
-import Logger from './interfaces/Logger';
+import MasterConfig from '../hostEnvBuilder/MasterConfig';
+import Io from '../hostEnvBuilder/Io';
+import * as defaultLogger from '../hostEnvBuilder/defaultLogger';
+import Entities from '../hostEnvBuilder/entities/Entities';
+import EntitiesWriter from '../hostEnvBuilder/entities/EntitiesWriter';
+import Logger from '../host/interfaces/Logger';
 
 
 export default class MainEntities {
