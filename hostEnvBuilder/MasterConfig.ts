@@ -75,7 +75,7 @@ export default class MasterConfig {
     return this.prepareHostConfig(hostId);
   }
 
-  // TODO: review
+  // TODO: review - remake to get machine config
   getHostPlatformDevs(): string[] {
     //const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
 
