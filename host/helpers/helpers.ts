@@ -370,6 +370,12 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
+export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
+  if (!arrToAppend) return;
+
+  for (let item of arrToAppend) srcArr.push(item);
+}
+
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;
