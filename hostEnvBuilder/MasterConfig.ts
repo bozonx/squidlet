@@ -11,6 +11,7 @@ import Io from './Io';
 import {appendArray} from '../host/helpers/helpers';
 import {servicesShortcut} from './dict/dict';
 import {collectServicesFromShortcuts, convertDefinitions, makeDevicesPlain} from './helpers';
+import {loadMachineConfig} from '../helpers/buildHelpers';
 
 
 export default class MasterConfig {
@@ -23,7 +24,10 @@ export default class MasterConfig {
     return this._preHostConfig as any;
   }
   get hostConfig(): HostConfig {
-    return this._preHostConfig as any;
+    return this._hostConfig as any;
+  }
+  get machineConfig(): MachineConfig {
+    return this._machineConfig as any;
   }
 
   private readonly io: Io;
@@ -31,6 +35,7 @@ export default class MasterConfig {
   // unprocessed host config
   private _preHostConfig?: PreHostConfig;
   private _hostConfig?: HostConfig;
+  private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
   private readonly masterConfigPath: string;
   private _buildDir?: string;
@@ -49,21 +54,15 @@ export default class MasterConfig {
     if (validateError) throw new Error(`Invalid master config: ${validateError}`);
 
     const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
+    const platformDirName = path.resolve(__dirname, `../${preHostConfig.platform}`);
 
     this._preHostConfig = this.normalizeHostConfig(mergedConfig);
     this._hostConfig = this.prepareHostConfig();
+    this._machineConfig = loadMachineConfig(platformDirName, this._hostConfig.machine);
 
     appendArray(this.plugins, this.preHostConfig.plugins);
     //_defaultsDeep(this.hostDefaults, preHostConfig.hostDefaults);
     this._buildDir = this.resolveBuildDir();
-  }
-
-
-  // TODO: review - remake to get machine config
-  getMachineConfig(): string[] {
-    //const platformName: Platforms = this.preHosts[hostId].platform as Platforms;
-
-    //return this.getPlatformConfig(platformName).devs;
   }
 
 
@@ -92,7 +91,7 @@ export default class MasterConfig {
     return _defaultsDeep({},
       preHostConfig,
       //this.hostDefaults,
-      await this.getPlatformConfig().hostConfig,
+      await this.machineConfig.hostConfig,
       hostDefaultConfig,
     );
   }
@@ -126,13 +125,6 @@ export default class MasterConfig {
       machine: this.preHostConfig.machine as string,
       config: this.preHostConfig.config as HostConfigConfig,
     };
-  }
-
-  private async getPlatformConfig(): MachineConfig {
-    const hostPlatform: Platforms = preHostConfig.platform as Platforms;
-    // TODO: and get machine
-
-    return platforms[hostPlatform];
   }
 
 }

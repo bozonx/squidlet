@@ -37,8 +37,7 @@ export function getMasterSysDev(platformDirName: string): DevClass {
  * Make devs collection in memory like {"Digital.dev": DevClass}
  */
 export function collectDevs(platformDirName: string, machine: string): {[index: string]: DevClass} {
-  const machineConfigPath = path.join(platformDirName, `${path.basename(platformDirName)}-${machine}`);
-  const machineConfig: MachineConfig = require(machineConfigPath).default;
+  const machineConfig: MachineConfig = loadMachineConfig(platformDirName, machine);
   const platformDevs: string[] = machineConfig.devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 
@@ -50,6 +49,12 @@ export function collectDevs(platformDirName: string, machine: string): {[index: 
   }
 
   return devsSet;
+}
+
+export function loadMachineConfig(platformDirName: string, machine: string): MachineConfig {
+  const machineConfigPath = path.join(platformDirName, `${path.basename(platformDirName)}-${machine}`);
+
+  return require(machineConfigPath).default;
 }
 
 // export function clearDir(dirName: string) {
