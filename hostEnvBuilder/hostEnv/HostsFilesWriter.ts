@@ -45,34 +45,17 @@ export default class HostsFilesWriter {
    * @param skipMaster - don't write master's files
    */
   async writeHostsConfigsFiles(skipMaster: boolean = false) {
-    for (let hostId of this.configManager.getHostsIds()) {
-      if (skipMaster && hostId === 'master') return;
-
-      await this.proceedHost(hostId);
-    }
+    return this.proceedHost();
   }
 
-  private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
-    const entityDstDir = path.join(this.entitiesDstDir, pluralType, preManifest.name);
-    const mainJsFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
-    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
-
-    // TODO: !!!!! билдить во временную папку
-    // TODO: !!!!! написать в лог что билдится файл
-    // TODO: !!!!! поддержка билда js файлов
-    // TODO: !!!!! test
-
-  }
-
-  private async proceedHost(hostId: string) {
-    const hostConfig: HostConfig = this.configManager.getFinalHostConfig(hostId);
-    const definitionsSet: DefinitionsSet = this.hostsFilesSet.getDefinitionsSet(hostId);
-    const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames(hostId);
-    const hostsDir = path.join(this.configManager.buildDir, systemConfig.pathToSaveHostsFileSet);
-    const hostDir = path.join(hostsDir, hostId);
+  private async proceedHost() {
+    const hostConfig: HostConfig = this.configManager.hostConfig;
+    const definitionsSet: DefinitionsSet = this.hostsFilesSet.getDefinitionsSet();
+    //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
+    const buildDir = this.configManager.buildDir;
     const fileNames = systemConfig.hostInitCfg.fileNames;
-    const configDir = path.join(hostDir, systemConfig.hostSysCfg.rootDirs.configs);
+    const configDir = path.join(buildDir, systemConfig.hostSysCfg.rootDirs.configs);
 
     // write host's config
     await this.writeJson(
@@ -88,9 +71,9 @@ export default class HostsFilesWriter {
     await this.writeJson(path.join(configDir, fileNames.devicesDefinitions), definitionsSet.devicesDefinitions);
     await this.writeJson(path.join(configDir, fileNames.driversDefinitions), definitionsSet.driversDefinitions);
     await this.writeJson(path.join(configDir, fileNames.servicesDefinitions), definitionsSet.servicesDefinitions);
+    // TODO: does it really need????
     // write list of entities names
-    await this.writeJson(path.join(hostDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
-
+    //await this.writeJson(path.join(buildDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
   }
 
   // TODO: may be move to IO
@@ -99,6 +82,19 @@ export default class HostsFilesWriter {
 
     await this.io.mkdirP(path.dirname(fileName));
     await this.io.writeFile(fileName, content);
+  }
+
+  private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
+    const entityDstDir = path.join(this.entitiesDstDir, pluralType, preManifest.name);
+    const mainJsFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
+
+    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
+
+    // TODO: !!!!! билдить во временную папку
+    // TODO: !!!!! написать в лог что билдится файл
+    // TODO: !!!!! поддержка билда js файлов
+    // TODO: !!!!! test
+
   }
 
 }
