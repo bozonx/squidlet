@@ -6,6 +6,7 @@ import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
 import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
+import PreManifestBase from '../interfaces/PreManifestBase';
 
 
 /**
@@ -50,7 +51,7 @@ export default class EntitiesWriter {
     const entitySrcDir = this.entitiesCollection.getSrcDir(pluralType, entityName);
 
     // write manifest
-    await this.writeJson(
+    await this.io.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
       this.entitiesCollection.getManifest(pluralType, entityName)
     );
@@ -71,12 +72,17 @@ export default class EntitiesWriter {
     }
   }
 
-  // TODO: may be move to IO
-  private async writeJson(fileName: string, contentJs: any) {
-    const content = JSON.stringify(contentJs);
+  private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
+    const entityDstDir = path.join(this.entitiesDstDir, pluralType, preManifest.name);
+    const mainJsFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
-    await this.io.mkdirP(path.dirname(fileName));
-    await this.io.writeFile(fileName, content);
+    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
+
+    // TODO: !!!!! билдить во временную папку
+    // TODO: !!!!! написать в лог что билдится файл
+    // TODO: !!!!! поддержка билда js файлов
+    // TODO: !!!!! test
+
   }
 
 }

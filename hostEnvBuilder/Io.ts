@@ -1,7 +1,9 @@
+import * as path from 'path';
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 import * as shelljs from 'shelljs';
 import * as yaml from 'js-yaml';
+
 import systemConfig from './configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/Storage';
 
@@ -54,6 +56,13 @@ export default class Io {
       dir: stat.isDirectory(),
       mtime: stat.mtimeMs,
     };
+  }
+
+  async writeJson(fileName: string, contentJs: any) {
+    const content = JSON.stringify(contentJs);
+
+    await this.mkdirP(path.dirname(fileName));
+    await this.writeFile(fileName, content);
   }
 
 }
