@@ -10,8 +10,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 
 
 /**
- * Write all the hosts files to storage.
- * This files will be sent to a slave hosts.
+ * Write all the host's entities files to storage.
  */
 export default class EntitiesWriter {
   private readonly configManager: ConfigManager;

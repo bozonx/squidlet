@@ -18,7 +18,7 @@ export default {
   defaultBuildDir: '~/.squidlet/build',
   indexManifestFileNames: ['manifest.yaml'],
   // dir in storage where will be generated devices, drivers and services main files
-  entityBuildDir: 'entities',
+  //entityBuildDir: 'entities',
   //entitiesFile: 'entitiesFiles.json',
   //usedEntitiesNamesFile: 'usedEntities.json',
   //pathToSaveHostsFileSet: 'hosts',

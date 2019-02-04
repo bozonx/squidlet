@@ -19,11 +19,6 @@ export default class HostsConfigsWriter {
   private readonly hostClassNames: HostClassNames;
   private readonly configsSet: ConfigsSet;
 
-  // entities dir in storage
-  private get entitiesDstDir(): string {
-    return path.join(this.configManager.buildDir, systemConfig.entityBuildDir);
-  }
-
 
   constructor(
     io: Io,
