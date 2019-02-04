@@ -1,4 +1,4 @@
-export default function validateMasterConfig(rawConfig: {[index: string]: any}): string | undefined {
+export default function validateHostConfig(rawConfig: {[index: string]: any}): string | undefined {
   // TODO: add
   // TODO: validate definitions
 

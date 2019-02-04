@@ -3,7 +3,7 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemConfig from './configs/systemConfig';
-import validateMasterConfig from './validateMasterConfig';
+import validateHostConfig from './validateHostConfig';
 import HostConfig, {HostConfigConfig} from '../host/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import MachineConfig from './interfaces/MachineConfig';
@@ -37,21 +37,21 @@ export default class ConfigManager {
   private _hostConfig?: HostConfig;
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
-  private readonly masterConfigPath: string;
+  private readonly hostConfigPath: string;
   private _buildDir?: string;
 
 
-  constructor(io: Io, masterConfigPath: string, absBuildDir?: string) {
+  constructor(io: Io, hostConfigPath: string, absBuildDir?: string) {
     this.io = io;
-    this.masterConfigPath = masterConfigPath;
+    this.hostConfigPath = hostConfigPath;
     this._buildDir = absBuildDir;
   }
 
   async init() {
-    const preHostConfig = await this.io.loadYamlFile(this.masterConfigPath) as PreHostConfig;
-    const validateError: string | undefined = validateMasterConfig(preHostConfig);
+    const preHostConfig = await this.io.loadYamlFile(this.hostConfigPath) as PreHostConfig;
+    const validateError: string | undefined = validateHostConfig(preHostConfig);
 
-    if (validateError) throw new Error(`Invalid master config: ${validateError}`);
+    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
 
     const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
     const platformDirName = path.resolve(__dirname, `../${preHostConfig.platform}`);
@@ -110,7 +110,7 @@ export default class ConfigManager {
       }
       else {
         // storageDir is relative path - make it absolute, use config file dir as a root
-        return path.resolve(path.dirname(this.masterConfigPath), storageDir);
+        return path.resolve(path.dirname(this.hostConfigPath), storageDir);
       }
     }
 

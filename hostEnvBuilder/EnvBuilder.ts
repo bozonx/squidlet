@@ -24,8 +24,8 @@ export default class EnvBuilder {
   private readonly io = new Io();
 
 
-  constructor(absMasterConfigPath: string, absBuildDir?: string) {
-    this.configManager = new ConfigManager(this.io, absMasterConfigPath, absBuildDir);
+  constructor(absHostConfigPath: string, absBuildDir?: string) {
+    this.configManager = new ConfigManager(this.io, absHostConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.configManager);
     this.entitiesWriter = new EntitiesWriter(this.io, this.configManager, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
