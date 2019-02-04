@@ -6,7 +6,6 @@ import _isEmpty = require('lodash/isEmpty');
 
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import EntityDefinition from '../../host/interfaces/EntityDefinition';
-import PreHostConfig from '../interfaces/PreHostConfig';
 import {SrcEntitiesSet, SrcEntitySet} from '../../host/interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
 import EntitiesCollection from '../entities/EntitiesCollection';
@@ -20,46 +19,46 @@ export default class Definitions {
   private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
   private readonly hostClassNames: HostClassNames;
-  // definitions like {hostId: {entityId: Definition}}
-  private devicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
-  private driversDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
-  private servicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
+  // definitions like {entityId: Definition}
+  private devicesDefinitions: {[index: string]: EntityDefinition} = {};
+  private driversDefinitions: {[index: string]: EntityDefinition} = {};
+  private servicesDefinitions: {[index: string]: EntityDefinition} = {};
 
 
-  constructor(configManager: ConfigManager, entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames) {
+  constructor(
+    configManager: ConfigManager,
+    entitiesCollection: EntitiesCollection,
+    hostClassNames: HostClassNames
+  ) {
     this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
     this.hostClassNames = hostClassNames;
   }
 
+
   getHostDevicesDefinitions(): {[index: string]: EntityDefinition} {
-    return this.devicesDefinitions[hostId] || {};
+    return this.devicesDefinitions;
   }
 
   getHostDriversDefinitions(): {[index: string]: EntityDefinition} {
-    return this.driversDefinitions[hostId] || {};
+    return this.driversDefinitions;
   }
 
   getHostServicesDefinitions(): {[index: string]: EntityDefinition} {
-    return this.servicesDefinitions[hostId] || {};
+    return this.servicesDefinitions;
   }
 
   generate() {
-    const hostIds: string[] = this.configManager.getHostsIds();
+    const { devices, drivers, services } = this.prepareEntities();
 
-    for (let hostId of hostIds) {
-      const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
-      const { devices, drivers, services } = this.prepareEntities(hostId, rawHostConfig);
-
-      if (!_isEmpty(devices)) {
-        this.devicesDefinitions[hostId] = devices;
-      }
-      if (!_isEmpty(drivers)) {
-        this.driversDefinitions[hostId] = drivers;
-      }
-      if (!_isEmpty(services)) {
-        this.servicesDefinitions[hostId] = services;
-      }
+    if (!_isEmpty(devices)) {
+      this.devicesDefinitions = devices;
+    }
+    if (!_isEmpty(drivers)) {
+      this.driversDefinitions = drivers;
+    }
+    if (!_isEmpty(services)) {
+      this.servicesDefinitions = services;
     }
 
     // check for definition have a manifest
@@ -72,7 +71,7 @@ export default class Definitions {
    * and makes devices plain.
    * And makes props
    */
-  private prepareEntities(rawHostConfig: PreHostConfig):
+  private prepareEntities():
   {
     devices: {[index: string]: EntityDefinition},
     drivers: {[index: string]: EntityDefinition},
@@ -81,11 +80,15 @@ export default class Definitions {
     const devices: {[index: string]: EntityDefinition} = {};
     const drivers: {[index: string]: EntityDefinition} = {};
     const services: {[index: string]: EntityDefinition} = {};
-    const allHostDrivers: string[] = this.hostClassNames.getAllUsedDriversClassNames(hostId);
+    const allHostDrivers: string[] = this.hostClassNames.getAllUsedDriversClassNames();
 
-    if (rawHostConfig.devices) {
-      for (let id of Object.keys(rawHostConfig.devices)) {
-        devices[id] = this.generateDeviceDef(id, rawHostConfig.devices[id], rawHostConfig.devicesDefaults);
+    if (this.configManager.preHostConfig.devices) {
+      for (let id of Object.keys(this.configManager.preHostConfig.devices)) {
+        devices[id] = this.generateDeviceDef(
+          id,
+          this.configManager.preHostConfig.devices[id],
+          this.configManager.preHostConfig.devicesDefaults
+        );
       }
     }
 
@@ -93,13 +96,13 @@ export default class Definitions {
     for (let entityName of allHostDrivers) {
       drivers[entityName] = this.generateDriverDef(
         entityName,
-        rawHostConfig.drivers && rawHostConfig.drivers[entityName]
+        this.configManager.preHostConfig.drivers && this.configManager.preHostConfig.drivers[entityName]
       );
     }
 
-    if (rawHostConfig.services) {
-      for (let entityName of Object.keys(rawHostConfig.services || {})) {
-        services[entityName] = this.generateServiceDef(entityName, rawHostConfig.services[entityName]);
+    if (this.configManager.preHostConfig.services) {
+      for (let entityName of Object.keys(this.configManager.preHostConfig.services || {})) {
+        services[entityName] = this.generateServiceDef(entityName, this.configManager.preHostConfig.services[entityName]);
       }
     }
 
