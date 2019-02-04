@@ -1,10 +1,10 @@
 import Entities from './entities/Entities';
 import ConfigManager from './ConfigManager';
-import Definitions from './hostEnv/Definitions';
-import ConfigsSet from './hostEnv/ConfigsSet';
-import HostsConfigsWriter from './hostEnv/HostsConfigsWriter';
+import Definitions from './configSet/Definitions';
+import ConfigsSet from './configSet/ConfigsSet';
+import HostsConfigsWriter from './configSet/HostsConfigsWriter';
 import validatePlatformDevs from './validatePlatformDevs';
-import HostClassNames from './hostEnv/HostClassNames';
+import HostClassNames from './configSet/HostClassNames';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
