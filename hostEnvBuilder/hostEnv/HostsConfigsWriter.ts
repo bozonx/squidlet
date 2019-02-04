@@ -13,7 +13,7 @@ import HostsFilesSet from './HostsFilesSet';
  * Write all the hosts files to storage.
  * This files will be sent to a slave hosts.
  */
-export default class HostsFilesWriter {
+export default class HostsConfigsWriter {
   private readonly io: Io;
   private readonly configManager: ConfigManager;
   private readonly hostClassNames: HostClassNames;

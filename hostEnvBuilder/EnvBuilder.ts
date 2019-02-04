@@ -2,7 +2,7 @@ import Entities from './entities/Entities';
 import ConfigManager from './ConfigManager';
 import Definitions from './hostEnv/Definitions';
 import HostsFilesSet from './hostEnv/HostsFilesSet';
-import HostsFilesWriter from './hostEnv/HostsFilesWriter';
+import HostsConfigsWriter from './hostEnv/HostsConfigsWriter';
 import validatePlatformDevs from './validatePlatformDevs';
 import HostClassNames from './hostEnv/HostClassNames';
 import Io from './Io';
@@ -19,7 +19,7 @@ export default class EnvBuilder {
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
   private readonly hostsFilesSet: HostsFilesSet;
-  private readonly hostsFilesWriter: HostsFilesWriter;
+  private readonly hostsConfigWriter: HostsConfigsWriter;
   private readonly log: Logger = defaultLogger;
   private readonly io = new Io();
 
@@ -31,7 +31,7 @@ export default class EnvBuilder {
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
     this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
-    this.hostsFilesWriter = new HostsFilesWriter(
+    this.hostsConfigWriter = new HostsConfigsWriter(
       this.io,
       this.configManager,
       this.hostClassNames,
@@ -70,7 +70,7 @@ export default class EnvBuilder {
   async write() {
     this.log.info(`--> Writing host configs`);
 
-    await this.hostsFilesWriter.writeHostsConfigsFiles();
+    await this.hostsConfigWriter.writeHostsConfigsFiles();
 
     // TODO: write entities of host
   }
