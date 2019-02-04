@@ -3,7 +3,7 @@ import * as path from 'path';
 import systemConfig from '../configs/systemConfig';
 import {EntitiesNames} from './EntitiesCollection';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import MasterConfig from '../MasterConfig';
+import ConfigManager from '../ConfigManager';
 import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
 
@@ -13,19 +13,19 @@ import Io from '../Io';
  * This files will be sent to a slave hosts.
  */
 export default class EntitiesWriter {
-  private readonly masterConfig: MasterConfig;
+  private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
   private readonly io: Io;
 
   // entities dir in storage
   private get entitiesDstDir(): string {
-    return path.join(this.masterConfig.buildDir, systemConfig.entityBuildDir);
+    return path.join(this.configManager.buildDir, systemConfig.entityBuildDir);
   }
 
 
-  constructor(io: Io, masterConfig: MasterConfig, entitiesCollection: EntitiesCollection) {
+  constructor(io: Io, configManager: ConfigManager, entitiesCollection: EntitiesCollection) {
     this.io = io;
-    this.masterConfig = masterConfig;
+    this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
   }
 

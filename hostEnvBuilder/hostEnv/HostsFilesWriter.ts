@@ -6,7 +6,7 @@ import {EntitiesNames} from '../entities/EntitiesCollection';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import HostConfig from '../../host/interfaces/HostConfig';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import MasterConfig from '../MasterConfig';
+import ConfigManager from '../ConfigManager';
 import Io from '../Io';
 import HostClassNames from './HostClassNames';
 import HostsFilesSet from './HostsFilesSet';
@@ -18,24 +18,24 @@ import HostsFilesSet from './HostsFilesSet';
  */
 export default class HostsFilesWriter {
   private readonly io: Io;
-  private readonly masterConfig: MasterConfig;
+  private readonly configManager: ConfigManager;
   private readonly hostClassNames: HostClassNames;
   private readonly hostsFilesSet: HostsFilesSet;
 
   // entities dir in storage
   private get entitiesDstDir(): string {
-    return path.join(this.masterConfig.buildDir, systemConfig.entityBuildDir);
+    return path.join(this.configManager.buildDir, systemConfig.entityBuildDir);
   }
 
 
   constructor(
     io: Io,
-    masterConfig: MasterConfig,
+    configManager: ConfigManager,
     hostClassNames: HostClassNames,
     hostsFilesSet: HostsFilesSet
   ) {
     this.io = io;
-    this.masterConfig = masterConfig;
+    this.configManager = configManager;
     this.hostClassNames = hostClassNames;
     this.hostsFilesSet = hostsFilesSet;
   }
@@ -45,7 +45,7 @@ export default class HostsFilesWriter {
    * @param skipMaster - don't write master's files
    */
   async writeHostsConfigsFiles(skipMaster: boolean = false) {
-    for (let hostId of this.masterConfig.getHostsIds()) {
+    for (let hostId of this.configManager.getHostsIds()) {
       if (skipMaster && hostId === 'master') return;
 
       await this.proceedHost(hostId);
@@ -66,10 +66,10 @@ export default class HostsFilesWriter {
   }
 
   private async proceedHost(hostId: string) {
-    const hostConfig: HostConfig = this.masterConfig.getFinalHostConfig(hostId);
+    const hostConfig: HostConfig = this.configManager.getFinalHostConfig(hostId);
     const definitionsSet: DefinitionsSet = this.hostsFilesSet.getDefinitionsSet(hostId);
     const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames(hostId);
-    const hostsDir = path.join(this.masterConfig.buildDir, systemConfig.pathToSaveHostsFileSet);
+    const hostsDir = path.join(this.configManager.buildDir, systemConfig.pathToSaveHostsFileSet);
     const hostDir = path.join(hostsDir, hostId);
     const fileNames = systemConfig.hostInitCfg.fileNames;
     const configDir = path.join(hostDir, systemConfig.hostSysCfg.rootDirs.configs);

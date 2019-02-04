@@ -6,7 +6,7 @@ describe 'configWorks.HostClassNames', ->
   beforeEach ->
     @driversClasses = ['Top.driver', 'Middle.driver', 'Bottom.driver', 'Other.driver']
     @main = {
-      masterConfig: {
+      configManager: {
         hostDefaults: {
           hostDefaultParam: 1
         }

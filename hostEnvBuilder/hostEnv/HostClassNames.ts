@@ -4,17 +4,17 @@ import _flatten = require('lodash/flatten');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import MasterConfig from '../MasterConfig';
+import ConfigManager from '../ConfigManager';
 import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
 
 
 export default class HostClassNames {
-  private readonly masterConfig: MasterConfig;
+  private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
 
 
-  constructor(masterConfig: MasterConfig, entitiesCollection: EntitiesCollection) {
-    this.masterConfig = masterConfig;
+  constructor(configManager: ConfigManager, entitiesCollection: EntitiesCollection) {
+    this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
   }
 
@@ -62,7 +62,7 @@ export default class HostClassNames {
   }
 
   getServicesClassNames(hostId: string): string[] {
-    const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
+    const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
 
     if (!rawHostConfig.services) return [];
 
@@ -74,7 +74,7 @@ export default class HostClassNames {
 
 
   private getDevicesClassNames(hostId: string): string[] {
-    const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
+    const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
 
     if (!rawHostConfig.devices) return [];
 
@@ -88,7 +88,7 @@ export default class HostClassNames {
    * Get drivers and devs class names of host.
    */
   private getDriversClassNames(hostId: string): string[] {
-    const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
+    const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
 
     if (!rawHostConfig.drivers) return [];
 

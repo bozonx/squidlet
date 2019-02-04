@@ -90,7 +90,7 @@ describe 'configWorks.EntitiesCollection', ->
     }
 
     @main = {
-      masterConfig: {
+      configManager: {
         buildDir: '/buildDir'
       }
       register: {

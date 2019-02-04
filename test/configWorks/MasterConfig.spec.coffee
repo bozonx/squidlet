@@ -35,7 +35,7 @@ describe 'configWorks.MasterConfig', ->
         }
       }
     }
-    @masterConfig = {
+    @configManager = {
       host: @preMasterHostConfig
       hostDefaults: {
         hostDefaultParam: 'value'
@@ -50,53 +50,53 @@ describe 'configWorks.MasterConfig', ->
       hostConfig: { platformParam: 'value' }
     }
 
-    @masterConfig = new MasterConfig(@masterConfig, @pathToMasterConfig)
+    @configManager = new MasterConfig(@configManager, @pathToMasterConfig)
 
 
   it 'buildDir on init', ->
-    assert.equal(@masterConfig.buildDir, '/myDir')
+    assert.equal(@configManager.buildDir, '/myDir')
 
   it 'getHostsIds', ->
-    assert.deepEqual(@masterConfig.getHostsIds(), [ 'master' ])
+    assert.deepEqual(@configManager.getHostsIds(), [ 'master' ])
 
   it 'getPreHostConfig', ->
-    assert.deepEqual @masterConfig.getPreHostConfig('master'), {
+    assert.deepEqual @configManager.getPreHostConfig('master'), {
       @preMasterHostConfig...
       hostDefaultConfig...
-      @masterConfig.hostDefaults...
-      @masterConfig.getPlatformConfig().hostConfig...
+      @configManager.hostDefaults...
+      @configManager.getPlatformConfig().hostConfig...
       config: {
         @preMasterHostConfig.config...
         hostDefaultConfig.config...
-        @masterConfig.hostDefaults.config...
-        @masterConfig.getPlatformConfig().hostConfig.config...
+        @configManager.hostDefaults.config...
+        @configManager.getPlatformConfig().hostConfig.config...
       }
     }
 
   it 'getFinalHostConfig', ->
-    assert.deepEqual @masterConfig.getFinalHostConfig('master'), {
+    assert.deepEqual @configManager.getFinalHostConfig('master'), {
       id: 'master'
       platform: 'rpi'
       config: {
         @preMasterHostConfig.config...
         hostDefaultConfig.config...
-        @masterConfig.hostDefaults.config...
-        @masterConfig.getPlatformConfig().hostConfig.config...
+        @configManager.hostDefaults.config...
+        @configManager.getPlatformConfig().hostConfig.config...
       }
     }
 
   it 'getHostPlatformDevs', ->
-    assert.deepEqual @masterConfig.getHostPlatformDevs('master'), ['Storage']
+    assert.deepEqual @configManager.getHostPlatformDevs('master'), ['Storage']
 
   it 'buildDir - use defaults if there is not storage dir of configWorks config', ->
-    @masterConfig.preHosts.master.config.storageDir = undefined
+    @configManager.preHosts.master.config.storageDir = undefined
 
-    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), systemConfig.defaultBuildDir)
+    assert.equal(@configManager.generateBuildDir(@pathToMasterConfig), systemConfig.defaultBuildDir)
 
   it 'buildDir - use configWorks\'s absolute storageDir', ->
-    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)
+    assert.equal(@configManager.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)
 
   it 'buildDir - use configWorks\'s relative storageDir', ->
-    @masterConfig.preHosts.master.config.storageDir = './myDir'
+    @configManager.preHosts.master.config.storageDir = './myDir'
 
-    assert.equal(@masterConfig.generateBuildDir(@pathToMasterConfig), '/path/to/myDir')
+    assert.equal(@configManager.generateBuildDir(@pathToMasterConfig), '/path/to/myDir')

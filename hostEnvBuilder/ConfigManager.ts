@@ -14,7 +14,7 @@ import {collectServicesFromShortcuts, convertDefinitions, makeDevicesPlain} from
 import {loadMachineConfig} from '../helpers/buildHelpers';
 
 
-export default class MasterConfig {
+export default class ConfigManager {
   // path to plugins specified in config
   readonly plugins: string[] = [];
   get buildDir(): string {

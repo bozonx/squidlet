@@ -2,7 +2,7 @@ import * as EventEmitter from 'events';
 
 import Register from './Register';
 import EntitiesCollection from './EntitiesCollection';
-import MasterConfig from '../MasterConfig';
+import ConfigManager from '../ConfigManager';
 import {SrcEntitiesSet} from '../../host/interfaces/EntitySet';
 
 
@@ -13,17 +13,17 @@ const AFTER_INIT_EVENT = 'afterInit';
  * This manager is passed to plugins.
  */
 export default class PluginEnv {
-  readonly masterConfig: MasterConfig;
+  readonly configManager: ConfigManager;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly register: Register;
   private readonly entities: EntitiesCollection;
 
   constructor(
-    masterConfig: MasterConfig,
+    configManager: ConfigManager,
     register: Register,
     entities: EntitiesCollection,
   ) {
-    this.masterConfig = masterConfig;
+    this.configManager = configManager;
     this.register = register;
     this.entities = entities;
   }

@@ -1,5 +1,5 @@
 import Entities from './entities/Entities';
-import MasterConfig from './MasterConfig';
+import ConfigManager from './ConfigManager';
 import Definitions from './hostEnv/Definitions';
 import HostsFilesSet from './hostEnv/HostsFilesSet';
 import HostsFilesWriter from './hostEnv/HostsFilesWriter';
@@ -13,7 +13,7 @@ import EntitiesWriter from './entities/EntitiesWriter';
 
 
 export default class EnvBuilder {
-  private readonly masterConfig: MasterConfig;
+  private readonly configManager: ConfigManager;
   private readonly entities: Entities;
   private readonly entitiesWriter: EntitiesWriter;
   private readonly hostClassNames: HostClassNames;
@@ -25,15 +25,15 @@ export default class EnvBuilder {
 
 
   constructor(absMasterConfigPath: string, absBuildDir?: string) {
-    this.masterConfig = new MasterConfig(this.io, absMasterConfigPath, absBuildDir);
-    this.entities = new Entities(this.log, this.masterConfig);
-    this.entitiesWriter = new EntitiesWriter(this.io, this.masterConfig, this.entities.entitiesCollection);
-    this.hostClassNames = new HostClassNames(this.masterConfig, this.entities.entitiesCollection);
-    this.definitions = new Definitions(this.masterConfig, this.entities.entitiesCollection, this.hostClassNames);
+    this.configManager = new ConfigManager(this.io, absMasterConfigPath, absBuildDir);
+    this.entities = new Entities(this.log, this.configManager);
+    this.entitiesWriter = new EntitiesWriter(this.io, this.configManager, this.entities.entitiesCollection);
+    this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
+    this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
     this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
     this.hostsFilesWriter = new HostsFilesWriter(
       this.io,
-      this.masterConfig,
+      this.configManager,
       this.hostClassNames,
       this. hostsFilesSet
     );
@@ -41,7 +41,7 @@ export default class EnvBuilder {
 
 
   async collect() {
-    await this.masterConfig.init();
+    await this.configManager.init();
     await this.entities.start();
 
     this.log.info(`--> Generating hosts entities definitions`);
@@ -80,7 +80,7 @@ export default class EnvBuilder {
   generateSrcConfigSet(): SrcHostFilesSet {
     return {
       ...this.hostsFilesSet.getDefinitionsSet(),
-      config: this.masterConfig.getFinalHostConfig(),
+      config: this.configManager.getFinalHostConfig(),
       entitiesSet: this.hostsFilesSet.generateSrcEntitiesSet(),
     };
   }

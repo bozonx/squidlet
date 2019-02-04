@@ -21,7 +21,7 @@ describe 'configWorks.HostsFilesWriter', ->
       services: [ 'service1' ]
     }
     @main = {
-      masterConfig: {
+      configManager: {
         buildDir: '/buildDir'
         getHostsIds: => [ 'master' ]
         getFinalHostConfig: => 'config'

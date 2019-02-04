@@ -1,6 +1,6 @@
 import Register from './Register';
 import EntitiesCollection from './EntitiesCollection';
-import MasterConfig from '../MasterConfig';
+import ConfigManager from '../ConfigManager';
 import PluginEnv from './PluginEnv';
 import Io from '../Io';
 import systemPlugin from '../systemPlugin';
@@ -8,19 +8,19 @@ import Logger from '../interfaces/Logger';
 
 
 export default class Entities {
-  readonly masterConfig: MasterConfig;
+  readonly configManager: ConfigManager;
   readonly log: Logger;
   readonly register: Register;
   readonly entitiesCollection: EntitiesCollection;
   readonly pluginEnv: PluginEnv;
   private readonly io = new Io();
 
-  constructor(log: Logger, masterConfig: MasterConfig) {
+  constructor(log: Logger, configManager: ConfigManager) {
     this.log = log;
-    this.masterConfig = masterConfig;
+    this.configManager = configManager;
     this.register = new Register(this.io);
     this.entitiesCollection = new EntitiesCollection(this.io, this.register);
-    this.pluginEnv = new PluginEnv(this.masterConfig, this.register, this.entitiesCollection);
+    this.pluginEnv = new PluginEnv(this.configManager, this.register, this.entitiesCollection);
   }
 
 
@@ -40,8 +40,8 @@ export default class Entities {
     this.register.addPlugin(systemPlugin);
 
     // register plugins specified in config
-    if (this.masterConfig.plugins) {
-      for (let pluginPath of this.masterConfig.plugins) {
+    if (this.configManager.plugins) {
+      for (let pluginPath of this.configManager.plugins) {
         this.register.addPlugin(pluginPath);
       }
     }

@@ -38,7 +38,7 @@ describe 'configWorks.HostsFilesSet', ->
     }
 
     @main = {
-      masterConfig: {
+      configManager: {
         getHostsIds: => ['master']
         getHostPlatformDevs: => ['MyDev.dev']
       }
@@ -156,7 +156,7 @@ describe 'configWorks.HostsFilesSet', ->
       }
 
       @main = {
-        masterConfig: {
+        configManager: {
           getHostsIds: => ['master']
           getHostPlatformDevs: => []
         }

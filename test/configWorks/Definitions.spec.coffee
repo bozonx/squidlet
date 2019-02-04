@@ -5,7 +5,7 @@ hostDefaultConfig = require('../../buildHostEnv/configs/hostDefaultConfig').defa
 describe 'configWorks.Definitions', ->
   beforeEach ->
     @main = {
-      masterConfig: {
+      configManager: {
         hostDefaults: {
           hostDefaultParam: 1
         }

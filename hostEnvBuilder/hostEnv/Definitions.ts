@@ -10,14 +10,14 @@ import PreHostConfig from '../interfaces/PreHostConfig';
 import {SrcEntitiesSet, SrcEntitySet} from '../../host/interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
 import EntitiesCollection from '../entities/EntitiesCollection';
-import MasterConfig from '../MasterConfig';
+import ConfigManager from '../ConfigManager';
 
 
 /**
  * Prepare hosts devices, drivers and services definitions.
  */
 export default class Definitions {
-  private readonly masterConfig: MasterConfig;
+  private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
   private readonly hostClassNames: HostClassNames;
   // definitions like {hostId: {entityId: Definition}}
@@ -26,8 +26,8 @@ export default class Definitions {
   private servicesDefinitions: {[index: string]: {[index: string]: EntityDefinition}} = {};
 
 
-  constructor(masterConfig: MasterConfig, entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames) {
-    this.masterConfig = masterConfig;
+  constructor(configManager: ConfigManager, entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames) {
+    this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
     this.hostClassNames = hostClassNames;
   }
@@ -45,10 +45,10 @@ export default class Definitions {
   }
 
   generate() {
-    const hostIds: string[] = this.masterConfig.getHostsIds();
+    const hostIds: string[] = this.configManager.getHostsIds();
 
     for (let hostId of hostIds) {
-      const rawHostConfig: PreHostConfig = this.masterConfig.getPreHostConfig(hostId);
+      const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
       const { devices, drivers, services } = this.prepareEntities(hostId, rawHostConfig);
 
       if (!_isEmpty(devices)) {
