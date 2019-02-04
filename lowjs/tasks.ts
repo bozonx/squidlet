@@ -54,8 +54,8 @@ async function buildEnv(hostBuildDir: string, envConfigPath: string) {
   const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, entitiesDir, envDstDir);
 
   await envBuilder.collect();
+  await envBuilder.writeConfigs();
   await envBuilder.writeEntities();
-  await envBuilder.write();
 }
 
 

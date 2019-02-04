@@ -41,7 +41,7 @@ export default class HostsConfigsWriter {
   /**
    * Copy files of hosts to storage
    */
-  async writeHostsConfigsFiles() {
+  async write() {
     const hostConfig: HostConfig = this.configManager.hostConfig;
     const definitionsSet: DefinitionsSet = this.configsSet.getDefinitionsSet();
     //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();

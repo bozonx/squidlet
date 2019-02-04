@@ -11,7 +11,10 @@ const ENV_DIR = 'env';
 
 
 // hosts configs and entities of them
-gulp.task('build-env', async () => {
+gulp.task('build-hosts-set', async () => {
+
+  // TODO: remake to parse hosts set
+
   const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
   const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
   const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
@@ -26,7 +29,7 @@ gulp.task('build-env', async () => {
   console.info(`===> generating hosts env files and configs`);
 
   await envBuilder.collect();
-  await envBuilder.write(true);
+  await envBuilder.writeConfigs(true);
 });
 
 

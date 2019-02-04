@@ -12,7 +12,7 @@
     "build-host": "gulp build-host",
     "build-lowjs-devs": "gulp build-lowjs-devs",
     "build-lowjs": "gulp build-lowjs",
-    "build-env": "gulp build-env",
+    "build-env": "gulp build-hosts-set",
     "master": "ts-node ./nodejs/masterIndex.ts",
     "slave": "ts-node ./nodejs/slaveIndex.ts",
     "test": "mocha",

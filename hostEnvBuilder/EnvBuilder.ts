@@ -55,24 +55,22 @@ export default class EnvBuilder {
     this.entities.pluginEnv.$riseAfterInit();
   }
 
-  // /**
-  //  * Write entities files to storage
-  //  */
-  // async writeEntities() {
-  //   this.log.info(`--> Writing entities files`);
-  //
-  //   await this.entitiesWriter.write();
-  // }
+  /**
+   * Write entities files to storage
+   */
+  async writeEntities() {
+    this.log.info(`--> Writing entities files`);
+
+    await this.entitiesWriter.write();
+  }
 
   /**
    * Write all the host's files to storage
    */
-  async write() {
+  async writeConfigs() {
     this.log.info(`--> Writing host configs`);
 
-    await this.hostsConfigWriter.writeHostsConfigsFiles();
-
-    // TODO: write entities of host
+    await this.hostsConfigWriter.write();
   }
 
   /**
