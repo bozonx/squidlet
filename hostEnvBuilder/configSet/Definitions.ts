@@ -171,13 +171,11 @@ export default class Definitions {
     const entities: SrcEntitiesSet = this.entitiesCollection.getEntitiesSet();
     const check = (
       entitiesOfType: {[index: string]: SrcEntitySet},
-      definitions: {[index: string]: {[index: string]: EntityDefinition}}
+      definitions: {[index: string]: EntityDefinition}
     ) => {
-      for(let hostId of Object.keys(definitions)) {
-        for (let entityDef of _values(definitions[hostId])) {
-          if (!entitiesOfType[entityDef.className]) {
-            throw new Error(`Can't find an entity "${entityDef.className}" of definition ${JSON.stringify(entityDef)}`);
-          }
+      for (let entityDef of _values(definitions)) {
+        if (!entitiesOfType[entityDef.className]) {
+          throw new Error(`Can't find an entity "${entityDef.className}" of definition ${JSON.stringify(entityDef)}`);
         }
       }
     };
