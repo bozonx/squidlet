@@ -19,7 +19,7 @@ export default class HostClassNames {
   }
 
 
-  getEntitiesNames(hostId: string): EntitiesNames {
+  getEntitiesNames(): EntitiesNames {
     const result: EntitiesNames = {
       devices: [],
       drivers: [],
@@ -47,7 +47,7 @@ export default class HostClassNames {
   /**
    * All the used drivers include which are dependencies of other entities but without devs.
    */
-  getAllUsedDriversClassNames(hostId: string): string[] {
+  getAllUsedDriversClassNames(): string[] {
     // collect manifest names of used entities
     const devicesClasses = this.getDevicesClassNames(hostId);
     const onlyDriversClasses = this.getOnlyDrivers(hostId);
@@ -61,7 +61,7 @@ export default class HostClassNames {
     );
   }
 
-  getServicesClassNames(hostId: string): string[] {
+  getServicesClassNames(): string[] {
     const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
 
     if (!rawHostConfig.services) return [];
@@ -73,7 +73,7 @@ export default class HostClassNames {
   }
 
 
-  private getDevicesClassNames(hostId: string): string[] {
+  private getDevicesClassNames(): string[] {
     const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
 
     if (!rawHostConfig.devices) return [];
@@ -87,7 +87,7 @@ export default class HostClassNames {
   /**
    * Get drivers and devs class names of host.
    */
-  private getDriversClassNames(hostId: string): string[] {
+  private getDriversClassNames(): string[] {
     const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
 
     if (!rawHostConfig.drivers) return [];
@@ -101,7 +101,7 @@ export default class HostClassNames {
   /**
    * Get list of used drivers of host (which has definitions) exclude devs.
    */
-  private getOnlyDrivers(hostId: string): string[] {
+  private getOnlyDrivers(): string[] {
     const driversDefinitions: string[] = this.getDriversClassNames(hostId);
     const allDevs: string[] = this.entitiesCollection.getDevs();
     // remove devs from drivers definitions list

@@ -32,15 +32,15 @@ export default class Definitions {
     this.hostClassNames = hostClassNames;
   }
 
-  getHostDevicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
+  getHostDevicesDefinitions(): {[index: string]: EntityDefinition} {
     return this.devicesDefinitions[hostId] || {};
   }
 
-  getHostDriversDefinitions(hostId: string): {[index: string]: EntityDefinition} {
+  getHostDriversDefinitions(): {[index: string]: EntityDefinition} {
     return this.driversDefinitions[hostId] || {};
   }
 
-  getHostServicesDefinitions(hostId: string): {[index: string]: EntityDefinition} {
+  getHostServicesDefinitions(): {[index: string]: EntityDefinition} {
     return this.servicesDefinitions[hostId] || {};
   }
 
@@ -72,7 +72,7 @@ export default class Definitions {
    * and makes devices plain.
    * And makes props
    */
-  private prepareEntities(hostId: string, rawHostConfig: PreHostConfig):
+  private prepareEntities(rawHostConfig: PreHostConfig):
   {
     devices: {[index: string]: EntityDefinition},
     drivers: {[index: string]: EntityDefinition},
