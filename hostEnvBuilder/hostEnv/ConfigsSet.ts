@@ -11,7 +11,7 @@ import Definitions from './Definitions';
 import EntitiesCollection from '../entities/EntitiesCollection';
 
 
-export default class HostsFilesSet {
+export default class ConfigsSet {
   private readonly entitiesCollection: EntitiesCollection;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
@@ -23,7 +23,7 @@ export default class HostsFilesSet {
     this.definitions = definitions;
   }
 
-  getDefinitionsSet(hostId: string): DefinitionsSet {
+  getDefinitionsSet(): DefinitionsSet {
     const [
       systemDrivers,
       regularDrivers,

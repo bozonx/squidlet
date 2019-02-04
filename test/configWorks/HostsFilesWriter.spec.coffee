@@ -26,7 +26,7 @@ describe 'configWorks.HostsFilesWriter', ->
         getHostsIds: => [ 'master' ]
         getFinalHostConfig: => 'config'
       }
-      hostsFilesSet: {
+      configsSet: {
         getDefinitionsSet: => @definitionsSet
         getEntitiesNames: => @entitiesNames
       }

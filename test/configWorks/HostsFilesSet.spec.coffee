@@ -58,11 +58,11 @@ describe 'configWorks.HostsFilesSet', ->
         getManifest: => @entitySet.manifest
       }
     }
-    @hostsFilesSet = new HostsFilesSet(@main)
+    @configsSet = new HostsFilesSet(@main)
 
 
   it 'getDefinitionsSet', ->
-    assert.deepEqual @hostsFilesSet.getDefinitionsSet('master'), {
+    assert.deepEqual @configsSet.getDefinitionsSet('master'), {
       systemDrivers: @systemDrivers
       regularDrivers: [ 'RegularDriver', 'OtherDriver' ]
       systemServices: @systemServices
@@ -74,14 +74,14 @@ describe 'configWorks.HostsFilesSet', ->
     }
 
   it 'getEntitiesNames', ->
-    assert.deepEqual @hostsFilesSet.getEntitiesNames('master'), {
+    assert.deepEqual @configsSet.getEntitiesNames('master'), {
       devices: [ 'DeviceClass' ]
       drivers: [ 'SysDriver', 'RegularDriver', 'OtherDriver' ]
       services: [ 'SysService', 'RegularService' ]
     }
 
   it 'generateSrcEntitiesSet', ->
-    assert.deepEqual @hostsFilesSet.generateSrcEntitiesSet('master'), {
+    assert.deepEqual @configsSet.generateSrcEntitiesSet('master'), {
       devices: {
         DeviceClass: {
           @entitySetResult...
@@ -118,7 +118,7 @@ describe 'configWorks.HostsFilesSet', ->
         services: {}
       }
 
-    assert.doesNotThrow(() => @hostsFilesSet.checkPlatformDevDeps())
+    assert.doesNotThrow(() => @configsSet.checkPlatformDevDeps())
 
   it 'checkPlatformDevDeps - Fail situation', ->
     @main.entities.getDevDependencies = =>
@@ -132,7 +132,7 @@ describe 'configWorks.HostsFilesSet', ->
 
     assert.throws(
       () =>
-        @hostsFilesSet.checkPlatformDevDeps()
+        @configsSet.checkPlatformDevDeps()
       'Not registered dev dependencies'
     )
 
@@ -170,10 +170,10 @@ describe 'configWorks.HostsFilesSet', ->
           getDevs: => []
         }
       }
-      @hostsFilesSet = new HostsFilesSet(@main)
+      @configsSet = new HostsFilesSet(@main)
 
     it 'getEntitiesNames', ->
-      assert.deepEqual @hostsFilesSet.getEntitiesNames('master'), {
+      assert.deepEqual @configsSet.getEntitiesNames('master'), {
         devices: [ 'DeviceClass' ]
         drivers: [ 'Dep1Driver', 'Dep2Driver' ]
         services: []

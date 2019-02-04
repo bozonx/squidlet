@@ -1,7 +1,7 @@
 import Entities from './entities/Entities';
 import ConfigManager from './ConfigManager';
 import Definitions from './hostEnv/Definitions';
-import HostsFilesSet from './hostEnv/HostsFilesSet';
+import ConfigsSet from './hostEnv/ConfigsSet';
 import HostsConfigsWriter from './hostEnv/HostsConfigsWriter';
 import validatePlatformDevs from './validatePlatformDevs';
 import HostClassNames from './hostEnv/HostClassNames';
@@ -18,7 +18,7 @@ export default class EnvBuilder {
   private readonly entitiesWriter: EntitiesWriter;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
-  private readonly hostsFilesSet: HostsFilesSet;
+  private readonly configsSet: ConfigsSet;
   private readonly hostsConfigWriter: HostsConfigsWriter;
   private readonly log: Logger = defaultLogger;
   private readonly io = new Io();
@@ -30,12 +30,12 @@ export default class EnvBuilder {
     this.entitiesWriter = new EntitiesWriter(this.io, this.configManager, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
-    this.hostsFilesSet = new HostsFilesSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
+    this.configsSet = new ConfigsSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
     this.hostsConfigWriter = new HostsConfigsWriter(
       this.io,
       this.configManager,
       this.hostClassNames,
-      this. hostsFilesSet
+      this. configsSet
     );
   }
 
@@ -81,9 +81,9 @@ export default class EnvBuilder {
    */
   generateSrcConfigSet(): SrcHostFilesSet {
     return {
-      ...this.hostsFilesSet.getDefinitionsSet(),
+      ...this.configsSet.getDefinitionsSet(),
       config: this.configManager.getFinalHostConfig(),
-      entitiesSet: this.hostsFilesSet.generateSrcEntitiesSet(),
+      entitiesSet: this.configsSet.generateSrcEntitiesSet(),
     };
   }
 

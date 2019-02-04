@@ -6,7 +6,7 @@ import HostConfig from '../../host/interfaces/HostConfig';
 import ConfigManager from '../ConfigManager';
 import Io from '../Io';
 import HostClassNames from './HostClassNames';
-import HostsFilesSet from './HostsFilesSet';
+import ConfigsSet from './ConfigsSet';
 
 
 /**
@@ -17,7 +17,7 @@ export default class HostsConfigsWriter {
   private readonly io: Io;
   private readonly configManager: ConfigManager;
   private readonly hostClassNames: HostClassNames;
-  private readonly hostsFilesSet: HostsFilesSet;
+  private readonly configsSet: ConfigsSet;
 
   // entities dir in storage
   private get entitiesDstDir(): string {
@@ -29,12 +29,12 @@ export default class HostsConfigsWriter {
     io: Io,
     configManager: ConfigManager,
     hostClassNames: HostClassNames,
-    hostsFilesSet: HostsFilesSet
+    configsSet: ConfigsSet
   ) {
     this.io = io;
     this.configManager = configManager;
     this.hostClassNames = hostClassNames;
-    this.hostsFilesSet = hostsFilesSet;
+    this.configsSet = configsSet;
   }
 
 
@@ -43,7 +43,7 @@ export default class HostsConfigsWriter {
    */
   async writeHostsConfigsFiles() {
     const hostConfig: HostConfig = this.configManager.hostConfig;
-    const definitionsSet: DefinitionsSet = this.hostsFilesSet.getDefinitionsSet();
+    const definitionsSet: DefinitionsSet = this.configsSet.getDefinitionsSet();
     //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
     const buildDir = this.configManager.buildDir;
     const fileNames = systemConfig.hostInitCfg.fileNames;
