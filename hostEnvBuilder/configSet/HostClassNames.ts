@@ -19,6 +19,9 @@ export default class HostClassNames {
   }
 
 
+  /**
+   * Generate class names of all the used entities
+   */
   getEntitiesNames(): EntitiesNames {
     const result: EntitiesNames = {
       devices: [],
@@ -27,9 +30,9 @@ export default class HostClassNames {
     };
 
     // collect manifest names of used entities
-    const devicesClasses = this.getDevicesClassNames(hostId);
-    const allDriversClasses: string[] = this.getAllUsedDriversClassNames(hostId);
-    const servicesClasses: string[] = this.getServicesClassNames(hostId);
+    const devicesClasses = this.getDevicesClassNames();
+    const allDriversClasses: string[] = this.getAllUsedDriversClassNames();
+    const servicesClasses: string[] = this.getServicesClassNames();
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
       for (let className of classes) {
@@ -49,9 +52,9 @@ export default class HostClassNames {
    */
   getAllUsedDriversClassNames(): string[] {
     // collect manifest names of used entities
-    const devicesClasses = this.getDevicesClassNames(hostId);
-    const onlyDriversClasses = this.getOnlyDrivers(hostId);
-    const servicesClasses: string[] = this.getServicesClassNames(hostId);
+    const devicesClasses = this.getDevicesClassNames();
+    const onlyDriversClasses = this.getOnlyDrivers();
+    const servicesClasses: string[] = this.getServicesClassNames();
 
     // collect all the drivers dependencies
     return this.collectDriverNamesWithDependencies(
@@ -62,11 +65,9 @@ export default class HostClassNames {
   }
 
   getServicesClassNames(): string[] {
-    const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
+    if (!this.configManager.preHostConfig.services) return [];
 
-    if (!rawHostConfig.services) return [];
-
-    const entities: {[index: string]: any} | undefined = rawHostConfig.services;
+    const entities: {[index: string]: any} | undefined = this.configManager.preHostConfig.services;
 
     return Object.keys(entities || {})
       .map((id: string) => entities[id].className);
@@ -74,11 +75,9 @@ export default class HostClassNames {
 
 
   private getDevicesClassNames(): string[] {
-    const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
+    if (!this.configManager.preHostConfig.devices) return [];
 
-    if (!rawHostConfig.devices) return [];
-
-    const entities: {[index: string]: any} | undefined = rawHostConfig.devices;
+    const entities: {[index: string]: any} | undefined = this.configManager.preHostConfig.devices;
 
     return Object.keys(entities || {})
       .map((id: string) => entities[id].className);
@@ -88,11 +87,9 @@ export default class HostClassNames {
    * Get drivers and devs class names of host.
    */
   private getDriversClassNames(): string[] {
-    const rawHostConfig: PreHostConfig = this.configManager.getPreHostConfig(hostId);
+    if (!this.configManager.preHostConfig.drivers) return [];
 
-    if (!rawHostConfig.drivers) return [];
-
-    const entities: {[index: string]: any} | undefined = rawHostConfig.drivers;
+    const entities: {[index: string]: any} | undefined = this.configManager.preHostConfig.drivers;
 
     return Object.keys(entities || {})
       .map((id: string) => entities[id].className);
@@ -102,7 +99,7 @@ export default class HostClassNames {
    * Get list of used drivers of host (which has definitions) exclude devs.
    */
   private getOnlyDrivers(): string[] {
-    const driversDefinitions: string[] = this.getDriversClassNames(hostId);
+    const driversDefinitions: string[] = this.getDriversClassNames();
     const allDevs: string[] = this.entitiesCollection.getDevs();
     // remove devs from drivers definitions list
 
