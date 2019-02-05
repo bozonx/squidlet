@@ -119,37 +119,6 @@ export default class EntitiesCollection {
     return this.systemServices;
   }
 
-  /**
-   * Get all the devs class names.
-   * Collect they from drivers and all the dependencies
-   */
-  getDevs(): string[] {
-    const result: {[index: string]: true} = {};
-    const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
-
-    // TODO: review
-    const collect = (depsOfType: {[index: string]: string[]}) => {
-      for (let entityName of Object.keys(depsOfType)) {
-        for (let itemName of depsOfType[entityName]) {
-          result[itemName] = true;
-        }
-      }
-    };
-
-    // TODO: у dev нет манифеста
-    // get devs from drivers
-    for (let itemName of Object.keys(drivers)) {
-      if (drivers[itemName].manifest.dev) result[itemName] = true;
-    }
-
-    // dev dependencies of entities
-    collect(this.devDependencies.devices);
-    collect(this.devDependencies.drivers);
-    collect(this.devDependencies.services);
-
-    return Object.keys(result);
-  }
-
   async generate() {
     const preDevicesManifests  = this.register.getDevicesPreManifests();
     const preDriversManifests  = this.register.getDriversPreManifests();
@@ -167,7 +136,7 @@ export default class EntitiesCollection {
       await this.proceed<ServiceManifest>('service', item);
     }
 
-    // sort deps drivers and devs and save they to separate list
+    // sort deps drivers and devs and save them to separate list
     this.sortDependencies();
     this.generateSystemDriversList();
     this.generateSystemServicesList();
@@ -265,7 +234,7 @@ export default class EntitiesCollection {
 
     const driverManifest: DriverManifest = drivers[driverName].manifest;
 
-    //if (driverName.match(/\.dev$/)) {
+    // TODO: у dev нет манифеста
 
     return Boolean(driverManifest.dev);
   }

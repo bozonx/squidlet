@@ -6,6 +6,7 @@ import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
 import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
+import {SrcEntitySet} from '../../host/interfaces/EntitySet';
 
 
 export default class HostClassNames {
@@ -100,13 +101,45 @@ export default class HostClassNames {
    */
   private getOnlyDrivers(): string[] {
     const driversDefinitions: string[] = this.getDriversClassNames();
-    const allDevs: string[] = this.entitiesCollection.getDevs();
+    const allDevs: string[] = this.getDevs();
     // remove devs from drivers definitions list
 
     return _filter(
       driversDefinitions,
       (driverClassName: string) => allDevs.indexOf(driverClassName) < 0
     );
+  }
+
+  /**
+   * Get all the devs class names.
+   * Collect they from drivers and all the dependencies
+   */
+  getDevs(): string[] {
+    const result: {[index: string]: true} = {};
+    const drivers: {[index: string]: SrcEntitySet} = this.entitiesCollection.getEntitiesSet().drivers;
+    const devDependencies = this.entitiesCollection.getDependencies();
+
+    // TODO: review
+    const collect = (depsOfType: {[index: string]: string[]}) => {
+      for (let entityName of Object.keys(depsOfType)) {
+        for (let itemName of depsOfType[entityName]) {
+          result[itemName] = true;
+        }
+      }
+    };
+
+    // TODO: у dev нет манифеста
+    // get devs from drivers
+    for (let itemName of Object.keys(drivers)) {
+      if (drivers[itemName].manifest.dev) result[itemName] = true;
+    }
+
+    // dev dependencies of entities
+    collect(devDependencies.devices);
+    collect(devDependencies.drivers);
+    collect(devDependencies.services);
+
+    return Object.keys(result);
   }
 
   /**
