@@ -16,10 +16,9 @@ export default class EntitiesWriter {
   private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
   private readonly io: Io;
-
   // entities dir in storage
   private get entitiesDstDir(): string {
-    return path.join(this.configManager.buildDir, systemConfig.entityBuildDir);
+    return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.rootDirs.entities);
   }
 
 
@@ -37,7 +36,7 @@ export default class EntitiesWriter {
     const allEntities: EntitiesNames = this.entitiesCollection.getAllEntitiesNames();
     
     for (let typeName of Object.keys(allEntities)) {
-      const pluralType: ManifestsTypePluralName = typeName as ManifestsTypePluralName;
+      const pluralType = typeName as ManifestsTypePluralName;
 
       for (let entityName of allEntities[pluralType]) {
         await this.proceedEntity(pluralType, entityName);
@@ -58,6 +57,7 @@ export default class EntitiesWriter {
     // TODO: build and write main files if exists
     // TODO: test running of build
 
+    // copy assets
     const files: string[] = this.entitiesCollection.getFiles(pluralType, entityName);
 
     for (let relativeFileName of files) {

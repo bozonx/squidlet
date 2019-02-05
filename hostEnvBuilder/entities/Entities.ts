@@ -15,6 +15,7 @@ export default class Entities {
   readonly pluginEnv: PluginEnv;
   private readonly io = new Io();
 
+
   constructor(log: Logger, configManager: ConfigManager) {
     this.log = log;
     this.configManager = configManager;

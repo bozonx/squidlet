@@ -127,6 +127,7 @@ export default class EntitiesCollection {
     const result: {[index: string]: true} = {};
     const drivers: {[index: string]: SrcEntitySet} = this.getEntitiesSet().drivers;
 
+    // TODO: review
     const collect = (depsOfType: {[index: string]: string[]}) => {
       for (let entityName of Object.keys(depsOfType)) {
         for (let itemName of depsOfType[entityName]) {
@@ -135,6 +136,7 @@ export default class EntitiesCollection {
       }
     };
 
+    // TODO: у dev нет манифеста
     // get devs from drivers
     for (let itemName of Object.keys(drivers)) {
       if (drivers[itemName].manifest.dev) result[itemName] = true;
@@ -149,19 +151,19 @@ export default class EntitiesCollection {
   }
 
   async generate() {
-    const preDevicesManifests = this.register.getDevicesPreManifests();
-    const preDriverManifests = this.register.getDriversPreManifests();
-    const preServiceManifests = this.register.getServicesPreManifests();
+    const preDevicesManifests  = this.register.getDevicesPreManifests();
+    const preDriversManifests  = this.register.getDriversPreManifests();
+    const preServicesManifests = this.register.getServicesPreManifests();
 
     for (let item of preDevicesManifests) {
       await this.proceed<DeviceManifest>('device', item);
     }
 
-    for (let item of preDriverManifests) {
+    for (let item of preDriversManifests) {
       await this.proceed<DriverManifest>('driver', item);
     }
 
-    for (let item of preServiceManifests) {
+    for (let item of preServicesManifests) {
       await this.proceed<ServiceManifest>('service', item);
     }
 
@@ -180,6 +182,7 @@ export default class EntitiesCollection {
     preManifest: PreManifestBase,
   ) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
+    // TODO: делать это только для необходимых сущностей
     const finalManifest: FinalManifest = await this.prepareManifest<FinalManifest>(preManifest);
 
     this.entitiesSet[pluralType][preManifest.name] = {
