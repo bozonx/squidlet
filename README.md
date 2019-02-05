@@ -30,3 +30,26 @@ or
 
     sudo apt-get update
     sudo apt-get install pigpio
+
+
+## Build cluster
+
+Config looks like that:
+
+    # List of common plugins
+    plugins:
+      - /path/to/plugin.ts
+      
+    # Default host config which will be merged to each host
+    hostDefaults:
+      devices:
+        ...some devices definitions
+    
+    # Hosts configs by host id
+    hosts:
+      hostOne: ./hostOne.yaml
+
+Build it
+
+    yarn build-cluster --config=./path/to/clusterConfig.yaml --build-dir=./my/dir
+    

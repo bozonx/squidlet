@@ -11,25 +11,26 @@ const ENV_DIR = 'env';
 
 
 // hosts configs and entities of them
-gulp.task('build-hosts-set', async () => {
+gulp.task('build-cluster', async () => {
+
 
   // TODO: remake to parse hosts set
 
-  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
-  const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
-  const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
-  const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
-  const entitiesBuildDir: string | undefined = buildDir && path.join(buildDir, ENTITIES_DIR);
-  const envBuildDir: string | undefined = buildDir && path.join(buildDir, ENV_DIR);
-  const envBuilder: EnvBuilder = new EnvBuilder(absConfigPath, entitiesBuildDir, envBuildDir);
-
-  // TODO: mkdir
-  // TODO: clear dirs
-
-  console.info(`===> generating hosts env files and configs`);
-
-  await envBuilder.collect();
-  await envBuilder.writeConfigs(true);
+  // const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+  // const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
+  // const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
+  // const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
+  // const entitiesBuildDir: string | undefined = buildDir && path.join(buildDir, ENTITIES_DIR);
+  // const envBuildDir: string | undefined = buildDir && path.join(buildDir, ENV_DIR);
+  // const envBuilder: EnvBuilder = new EnvBuilder(absConfigPath, entitiesBuildDir, envBuildDir);
+  //
+  // // TODO: mkdir
+  // // TODO: clear dirs
+  //
+  // console.info(`===> generating hosts env files and configs`);
+  //
+  // await envBuilder.collect();
+  // await envBuilder.writeConfigs(true);
 });
 
 
