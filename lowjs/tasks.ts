@@ -20,7 +20,6 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 const buildDir: string = path.resolve(__dirname, `../build/lowjs`);
 const hostSrcDir = path.resolve(__dirname, '../build/host/dev');
 const envConfigRelPath: string = yargs.argv.config as string;
-const entitiesDir = path.join(buildDir, 'entities');
 // TODO: use min
 const HOST_DEVS_DIR = 'devs';
 const HOST_DIR = 'host';
@@ -50,8 +49,7 @@ function copyHost(hostBuildDir: string) {
 
 async function buildEnv(hostBuildDir: string, envConfigPath: string) {
   const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
-
-  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, entitiesDir, envDstDir);
+  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, envDstDir);
 
   await envBuilder.collect();
   await envBuilder.writeConfigs();

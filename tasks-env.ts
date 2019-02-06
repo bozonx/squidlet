@@ -37,18 +37,15 @@ gulp.task('build-cluster', async () => {
   for (let hostId of Object.keys(clusterConfig.hosts)) {
     const hostConfig: PreHostConfig = makeHostConfig(hostId, clusterConfig);
 
+    // TODO: mkdir
+    // TODO: clear dirs
 
+    // console.info(`===> generating hosts env files and configs`);
+    //
+    // await envBuilder.collect();
+    // await envBuilder.writeConfigs(true);
   }
 
-  // TODO: remake to parse hosts set
-
-  // // TODO: mkdir
-  // // TODO: clear dirs
-  //
-  // console.info(`===> generating hosts env files and configs`);
-  //
-  // await envBuilder.collect();
-  // await envBuilder.writeConfigs(true);
 });
 
 
