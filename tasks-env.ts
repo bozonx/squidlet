@@ -1,29 +1,47 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as yargs from 'yargs';
+import * as yaml from 'js-yaml';
+import _defaultsDeep = require('lodash/defaultsDeep');
+import _uniq = require('lodash/uniq');
 
 import {resolveParamRequired} from './helpers/buildHelpers';
 import EnvBuilder from './hostEnvBuilder/EnvBuilder';
+import PreHostConfig from './hostEnvBuilder/interfaces/PreHostConfig';
+import ClusterConfig from './hostEnvBuilder/interfaces/ClusterConfig';
 
 
-const ENTITIES_DIR = 'entities';
-const ENV_DIR = 'env';
+function makeHostConfig(hostId: string, clusterConfig: ClusterConfig): PreHostConfig {
+  const mergedConfig: PreHostConfig = _defaultsDeep({}, clusterConfig.hosts[hostId], clusterConfig.hostDefaults);
+
+  mergedConfig.plugins = _uniq([
+    ...mergedConfig.plugins,
+    ...clusterConfig.plugins,
+  ]);
+
+  return mergedConfig;
+}
 
 
 // hosts configs and entities of them
 gulp.task('build-cluster', async () => {
+  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+  const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
+  const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
+  const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
+  const clusterConfig: ClusterConfig = yaml.load(fs.readFileSync(absConfigPath, {encoding : 'utf8'}));
 
+  // Build each host
+
+  for (let hostId of Object.keys(clusterConfig.hosts)) {
+    const hostConfig: PreHostConfig = makeHostConfig(hostId, clusterConfig);
+
+
+  }
 
   // TODO: remake to parse hosts set
 
-  // const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
-  // const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
-  // const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
-  // const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
-  // const entitiesBuildDir: string | undefined = buildDir && path.join(buildDir, ENTITIES_DIR);
-  // const envBuildDir: string | undefined = buildDir && path.join(buildDir, ENV_DIR);
-  // const envBuilder: EnvBuilder = new EnvBuilder(absConfigPath, entitiesBuildDir, envBuildDir);
-  //
   // // TODO: mkdir
   // // TODO: clear dirs
   //
