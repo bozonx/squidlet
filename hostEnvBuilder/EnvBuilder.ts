@@ -10,6 +10,7 @@ import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
 import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
 import EntitiesWriter from './entities/EntitiesWriter';
+import PreHostConfig from './interfaces/PreHostConfig';
 
 
 export default class EnvBuilder {
@@ -24,8 +25,8 @@ export default class EnvBuilder {
   private readonly io = new Io();
 
 
-  constructor(absHostConfigPath: string, absBuildDir?: string) {
-    this.configManager = new ConfigManager(this.io, absHostConfigPath, absBuildDir);
+  constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
+    this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.configManager);
     this.entitiesWriter = new EntitiesWriter(this.io, this.configManager, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);

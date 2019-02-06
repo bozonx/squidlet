@@ -12,7 +12,6 @@ import {resolveParamRequired} from './helpers/buildHelpers';
 import EnvBuilder from './hostEnvBuilder/EnvBuilder';
 import PreHostConfig from './hostEnvBuilder/interfaces/PreHostConfig';
 import ClusterConfig from './hostEnvBuilder/interfaces/ClusterConfig';
-import * as rimraf from './lowjs/tasks';
 
 
 function makeHostConfig(hostId: string, clusterConfig: ClusterConfig): PreHostConfig {
@@ -46,25 +45,10 @@ gulp.task('build-cluster', async () => {
 
     console.info(`===> generating configs and entities of host "${hostId}"`);
 
-    const envBuilder: EnvBuilder = new EnvBuilder(undefined, hostBuildDir, hostConfig);
+    const envBuilder: EnvBuilder = new EnvBuilder(hostConfig, hostBuildDir);
 
     await envBuilder.collect();
     await envBuilder.writeConfigs();
     await envBuilder.writeEntities();
   }
-
 });
-
-
-// gulp.task('build-entities', async () => {
-//   const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
-//   const resolvedBuildDir: string | undefined = resolveParam('BUILD_DIR', 'build-dir');
-//   const absMasterConfigPath: string = path.resolve(process.cwd(), resolvedConfigPath);
-//   const absBuildDir: string | undefined = resolvedBuildDir && path.resolve(process.cwd(), resolvedBuildDir);
-//
-//   const mainEntities: MainEntities = new MainEntities(absMasterConfigPath, absBuildDir);
-//
-//   await mainEntities.collect();
-//   await mainEntities.write();
-//
-// });

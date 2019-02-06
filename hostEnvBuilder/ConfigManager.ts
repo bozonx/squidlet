@@ -37,18 +37,18 @@ export default class ConfigManager {
   private _hostConfig?: HostConfig;
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
-  private readonly hostConfigPath: string;
+  private hostConfigOrConfigPath: string | PreHostConfig;
   private _buildDir?: string;
 
 
-  constructor(io: Io, hostConfigPath: string, absBuildDir?: string) {
+  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
     this.io = io;
-    this.hostConfigPath = hostConfigPath;
+    this.hostConfigOrConfigPath = hostConfigOrConfigPath;
     this._buildDir = absBuildDir;
   }
 
   async init() {
-    const preHostConfig = await this.io.loadYamlFile(this.hostConfigPath) as PreHostConfig;
+    const preHostConfig: PreHostConfig = await this.resolveHostConfig();
     const validateError: string | undefined = validateHostConfig(preHostConfig);
 
     if (validateError) throw new Error(`Invalid host config: ${validateError}`);
@@ -63,8 +63,22 @@ export default class ConfigManager {
     appendArray(this.plugins, this.preHostConfig.plugins);
     //_defaultsDeep(this.hostDefaults, preHostConfig.hostDefaults);
     this._buildDir = this.resolveBuildDir();
+
+    delete this.hostConfigOrConfigPath;
   }
 
+
+  private async resolveHostConfig(): Promise<PreHostConfig> {
+    if (typeof this.hostConfigOrConfigPath === 'string') {
+      return await this.io.loadYamlFile(this.hostConfigOrConfigPath) as PreHostConfig;
+    }
+    else if (typeof this.hostConfigOrConfigPath === 'object') {
+      return this.hostConfigOrConfigPath;
+    }
+    else {
+      throw new Error(`Unsupported type of host config`);
+    }
+  }
 
   /**
    * Make devices plain, fill services from shortcuts and convert drivers and devices definitions
@@ -109,8 +123,12 @@ export default class ConfigManager {
         return storageDir;
       }
       else {
+        if (typeof this.hostConfigOrConfigPath !== 'string') {
+          throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
+        }
+
         // storageDir is relative path - make it absolute, use config file dir as a root
-        return path.resolve(path.dirname(this.hostConfigPath), storageDir);
+        return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
       }
     }
 
