@@ -42,8 +42,8 @@ function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string
 function copyHost(hostBuildDir: string) {
   const hostDstDir: string = path.join(hostBuildDir, HOST_DIR);
 
-  rimraf.sync(`${hostDstDir}/**/*`);
   shelljs.mkdir('-p', hostDstDir);
+  rimraf.sync(`${hostDstDir}/**/*`);
   shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
 }
 

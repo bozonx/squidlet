@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import * as gulp from 'gulp';
 import * as yargs from 'yargs';
 import * as yaml from 'js-yaml';
+import * as shelljs from 'shelljs';
+import * as rimraf from 'rimraf';
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
@@ -10,6 +12,7 @@ import {resolveParamRequired} from './helpers/buildHelpers';
 import EnvBuilder from './hostEnvBuilder/EnvBuilder';
 import PreHostConfig from './hostEnvBuilder/interfaces/PreHostConfig';
 import ClusterConfig from './hostEnvBuilder/interfaces/ClusterConfig';
+import * as rimraf from './lowjs/tasks';
 
 
 function makeHostConfig(hostId: string, clusterConfig: ClusterConfig): PreHostConfig {
@@ -36,14 +39,18 @@ gulp.task('build-cluster', async () => {
 
   for (let hostId of Object.keys(clusterConfig.hosts)) {
     const hostConfig: PreHostConfig = makeHostConfig(hostId, clusterConfig);
+    const hostBuildDir: string = path.join(buildDir, hostId);
 
-    // TODO: mkdir
-    // TODO: clear dirs
+    shelljs.mkdir('-p', hostBuildDir);
+    rimraf.sync(`${hostBuildDir}/**/*`);
 
-    // console.info(`===> generating hosts env files and configs`);
-    //
-    // await envBuilder.collect();
-    // await envBuilder.writeConfigs(true);
+    console.info(`===> generating configs and entities of host "${hostId}"`);
+
+    const envBuilder: EnvBuilder = new EnvBuilder(undefined, hostBuildDir, hostConfig);
+
+    await envBuilder.collect();
+    await envBuilder.writeConfigs();
+    await envBuilder.writeEntities();
   }
 
 });
