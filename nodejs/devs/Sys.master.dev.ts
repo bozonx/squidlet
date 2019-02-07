@@ -1,23 +1,23 @@
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import Sys from '../../../squidlet-core/core/interfaces/dev/Sys';
-import {PATH_SEPARATOR} from '../../../squidlet-core/core/helpers/helpers';
+import {PATH_SEPARATOR} from '../../host/helpers/helpers';
 import {convertBufferToUint8Array} from '../helpers';
-import {SrcHostFilesSet} from '../../../squidlet-core/core/interfaces/HostFilesSet';
-import {ManifestsTypePluralName} from '../../../squidlet-core/core/interfaces/ManifestTypes';
-import initializationConfig from '../../../squidlet-core/core/config/initializationConfig';
+import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import initializationConfig from '../../host/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
-import {trimEnd} from '../../../squidlet-core/core/helpers/lodashLike';
-import systemConfig from '../../../squidlet-core/core/config/systemConfig';
+import {trimEnd} from '../../host/helpers/lodashLike';
+import systemConfig from '../../host/config/systemConfig';
+import Sys from '../../host/interfaces/dev/Sys';
+import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
 
 
-let __configSet: SrcHostFilesSet;
+let __configSet: SrcHostEnvSet;
 const initCfg = initializationConfig();
 
 
 export default class SysDev implements Sys {
-  static registerConfigSet (hostConfigSet: SrcHostFilesSet) {
+  static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
     __configSet = hostConfigSet;
   }
 
@@ -33,7 +33,7 @@ export default class SysDev implements Sys {
     else if (pathSplit[0] === systemConfig.rootDirs.entities && pathSplit[3] === initCfg.fileNames.manifest) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
 
-      return __configSet.entitiesSet[entityType][pathSplit[2]].manifest;
+      return __configSet.entities[entityType][pathSplit[2]].manifest;
     }
     // other entity file - read from disk
     else if (pathSplit[0] === systemConfig.rootDirs.entities) {
@@ -82,7 +82,7 @@ export default class SysDev implements Sys {
 
       if (pathSplit[3] === initCfg.fileNames.mainJs) {
         // __main.js
-        entityFilePath = __configSet.entitiesSet[entityType][entityName].main;
+        entityFilePath = __configSet.entities[entityType][entityName].main;
       }
       else {
         // other entity file
@@ -101,14 +101,14 @@ export default class SysDev implements Sys {
     const entityType = pathSplit[1] as ManifestsTypePluralName;
     const fileName: string = pathSplit.slice(3).join(path.sep);
 
-    const entitySrcDir: string = __configSet.entitiesSet[entityType][pathSplit[2]].srcDir;
+    const entitySrcDir: string = __configSet.entities[entityType][pathSplit[2]].srcDir;
 
     return path.join(entitySrcDir, fileName);
   }
 
   private getConfig(configName: string): {[index: string]: any} {
     const strippedName: string = trimEnd(configName, '.json');
-    const config: any = (__configSet as any)[strippedName];
+    const config: any = (__configSet.configs as any)[strippedName];
 
     if (!config) throw new Error(`Can't find config "${configName}"`);
 
