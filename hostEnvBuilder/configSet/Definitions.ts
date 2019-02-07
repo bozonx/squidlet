@@ -6,7 +6,7 @@ import _isEmpty = require('lodash/isEmpty');
 
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import EntityDefinition from '../../host/interfaces/EntityDefinition';
-import {SrcEntitiesSet, SrcEntitySet} from '../../host/interfaces/EntitySet';
+import {SrcEntitiesSet, SrcEntitySet} from '../interfaces/EntitySet';
 import HostClassNames from './HostClassNames';
 import EntitiesCollection from '../entities/EntitiesCollection';
 import ConfigManager from '../ConfigManager';

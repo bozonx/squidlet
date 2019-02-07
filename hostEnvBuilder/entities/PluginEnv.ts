@@ -3,7 +3,7 @@ import * as EventEmitter from 'events';
 import Register from './Register';
 import EntitiesCollection from './EntitiesCollection';
 import ConfigManager from '../ConfigManager';
-import {SrcEntitiesSet} from '../../host/interfaces/EntitySet';
+import {SrcEntitiesSet} from '../interfaces/EntitySet';
 
 
 const AFTER_INIT_EVENT = 'afterInit';

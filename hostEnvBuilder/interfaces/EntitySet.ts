@@ -1,6 +1,6 @@
-import DeviceManifest from './DeviceManifest';
-import DriverManifest from './DriverManifest';
-import ServiceManifest from './ServiceManifest';
+import DeviceManifest from '../../host/interfaces/DeviceManifest';
+import DriverManifest from '../../host/interfaces/DriverManifest';
+import ServiceManifest from '../../host/interfaces/ServiceManifest';
 
 
 // // entities set by type and name like {driver: {Name: {...EntitySet}}}

@@ -1,5 +1,5 @@
 import DefinitionsSet from '../../host/interfaces/DefinitionsSet';
-import {SrcEntitiesSet} from '../../host/interfaces/EntitySet';
+import {SrcEntitiesSet} from './EntitySet';
 import HostConfig from '../../host/interfaces/HostConfig';
 
 

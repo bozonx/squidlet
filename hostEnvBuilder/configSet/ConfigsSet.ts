@@ -1,7 +1,7 @@
 import * as path from 'path';
 import _values = require('lodash/values');
 
-import {SrcEntitiesSet} from '../../host/interfaces/EntitySet';
+import {SrcEntitiesSet} from '../interfaces/EntitySet';
 import {EntitiesNames} from '../entities/EntitiesCollection';
 import DefinitionsSet from '../../host/interfaces/DefinitionsSet';
 import {sortByIncludeInList} from '../helpers';
