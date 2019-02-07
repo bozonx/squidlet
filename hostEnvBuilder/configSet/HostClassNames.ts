@@ -6,7 +6,7 @@ import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
 import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
-import {SrcEntitySet} from '../interfaces/EntitySet';
+import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 
 
 export default class HostClassNames {

@@ -3,15 +3,6 @@ import DriverManifest from '../../host/interfaces/DriverManifest';
 import ServiceManifest from '../../host/interfaces/ServiceManifest';
 
 
-// // entities set by type and name like {driver: {Name: {...EntitySet}}}
-// export interface EntitiesSet {
-//   devices: {[index: string]: EntitySet};
-//   drivers: {[index: string]: EntitySet};
-//   services: {[index: string]: EntitySet};
-// }
-
-
-
 export interface SrcEntitySet {
   srcDir: string;
 
