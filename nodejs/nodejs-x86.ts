@@ -22,6 +22,7 @@ const platformConfig: MachineConfig = {
   ],
 
   hostConfig: {
+    defaultBuildDir: '~/.squidlet/build',
     config: {
     },
     drivers: {

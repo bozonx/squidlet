@@ -132,8 +132,12 @@ export default class ConfigManager {
       }
     }
 
+    if (!this.preHostConfig.defaultStorageDir) {
+      throw new Error(`defaultStorageDir config param hasn't been specified on current platform.`);
+    }
+
     // use default build dir
-    return systemConfig.defaultBuildDir;
+    return this.preHostConfig.defaultStorageDir;
   }
 
   private prepareHostConfig(): HostConfig {

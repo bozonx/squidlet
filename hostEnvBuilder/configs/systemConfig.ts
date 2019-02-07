@@ -15,7 +15,6 @@ export default {
   hostInitCfg,
   hostSysCfg,
 
-  defaultBuildDir: '~/.squidlet/build',
   indexManifestFileNames: ['manifest.yaml'],
   // dir in storage where will be generated devices, drivers and services main files
   //entityBuildDir: 'entities',

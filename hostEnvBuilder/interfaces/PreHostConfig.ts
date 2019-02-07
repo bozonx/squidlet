@@ -9,6 +9,8 @@ export default interface PreHostConfig {
   id?: string;
   platform?: Platforms;
   machine?: string;
+  // storage dir which is specified for each platform
+  defaultStorageDir?: string;
 
   plugins?: string[];
 

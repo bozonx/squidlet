@@ -1,7 +1,7 @@
-import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
+import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
-const platformConfig: PlatformConfig = {
+const platformConfig: MachineConfig = {
   devs: [
     //'Storage.dev',
     //'Sys.dev',
@@ -22,6 +22,7 @@ const platformConfig: PlatformConfig = {
   ],
 
   hostConfig: {
+    defaultStorageDir: '/storage',
     config: {
     },
     drivers: {
