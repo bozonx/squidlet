@@ -8,7 +8,7 @@ import HostClassNames from './configSet/HostClassNames';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
-import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
+import SrcHostEnvSet from './interfaces/SrcHostEnvSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 import PreHostConfig from './interfaces/PreHostConfig';
 
@@ -78,7 +78,7 @@ export default class EnvBuilder {
    * Generate host config with integrated files set which points to original (ts or js) files.
    * It uses only to start in nodejs environment.
    */
-  generateSrcConfigSet(): SrcHostFilesSet {
+  generateSrcConfigSet(): SrcHostEnvSet {
 
     // TODO: поидее должно напоминать файловую структура
 

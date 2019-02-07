@@ -16,7 +16,7 @@ import {
 } from '../helpers/buildHelpers';
 import System from '../host/System';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import {SrcHostFilesSet} from '../host/interfaces/HostFilesSet';
+import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
 
@@ -26,7 +26,7 @@ export const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 const debug = true;
 
 
-export async function prepareHostApp (hostConfigSet: SrcHostFilesSet): Promise<System> {
+export async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
   const machine: string = hostConfigSet.config.machine;
 
   console.info(`===> initializing host system on machine "${machine}"`);
@@ -71,7 +71,7 @@ async function masterStarter () {
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: SrcHostFilesSet = envBuilder.generateSrcConfigSet();
+  const hostConfigSet: SrcHostEnvSet = envBuilder.generateSrcConfigSet();
   // prepare host app
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 

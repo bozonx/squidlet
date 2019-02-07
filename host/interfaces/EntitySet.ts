@@ -3,12 +3,12 @@ import DriverManifest from './DriverManifest';
 import ServiceManifest from './ServiceManifest';
 
 
-// entities set by type and name like {driver: {Name: {...EntitySet}}}
-export interface EntitiesSet {
-  devices: {[index: string]: EntitySet};
-  drivers: {[index: string]: EntitySet};
-  services: {[index: string]: EntitySet};
-}
+// // entities set by type and name like {driver: {Name: {...EntitySet}}}
+// export interface EntitiesSet {
+//   devices: {[index: string]: EntitySet};
+//   drivers: {[index: string]: EntitySet};
+//   services: {[index: string]: EntitySet};
+// }
 
 export interface EntitySet {
   manifest: DeviceManifest | DriverManifest | ServiceManifest;
