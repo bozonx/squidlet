@@ -1,4 +1,4 @@
-import EntityDefinition from './EntityDefinition';
+import EntityDefinition from '../../host/interfaces/EntityDefinition';
 
 
 export default interface DefinitionsSet {

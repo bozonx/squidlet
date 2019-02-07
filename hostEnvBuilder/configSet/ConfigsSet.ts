@@ -3,7 +3,7 @@ import _values = require('lodash/values');
 
 import {SrcEntitiesSet} from '../interfaces/EntitySet';
 import {EntitiesNames} from '../entities/EntitiesCollection';
-import DefinitionsSet from '../../host/interfaces/DefinitionsSet';
+import DefinitionsSet from '../interfaces/DefinitionsSet';
 import {sortByIncludeInList} from '../helpers';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import HostClassNames from './HostClassNames';

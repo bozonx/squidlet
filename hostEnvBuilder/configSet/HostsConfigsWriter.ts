@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import DefinitionsSet from '../../host/interfaces/DefinitionsSet';
+import DefinitionsSet from '../interfaces/DefinitionsSet';
 import systemConfig from '../configs/systemConfig';
 import HostConfig from '../../host/interfaces/HostConfig';
 import ConfigManager from '../ConfigManager';

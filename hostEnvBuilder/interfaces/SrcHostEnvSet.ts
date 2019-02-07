@@ -1,4 +1,4 @@
-import DefinitionsSet from '../../host/interfaces/DefinitionsSet';
+import DefinitionsSet from './DefinitionsSet';
 import {SrcEntitiesSet} from './EntitySet';
 import HostConfig from '../../host/interfaces/HostConfig';
 
