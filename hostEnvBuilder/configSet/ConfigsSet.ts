@@ -8,8 +8,8 @@ import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import HostClassNames from './HostClassNames';
 import Definitions from './Definitions';
 import EntitiesCollection from '../entities/EntitiesCollection';
-import {HostConfigSet} from '../interfaces/SrcHostEnvSet';
 import ConfigManager from '../ConfigManager';
+import HostConfigSet from '../interfaces/HostConfigSet';
 
 
 export default class ConfigsSet {

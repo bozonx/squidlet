@@ -5,7 +5,7 @@ import ConfigManager from '../ConfigManager';
 import Io from '../Io';
 import HostClassNames from './HostClassNames';
 import ConfigsSet from './ConfigsSet';
-import {HostConfigSet} from '../interfaces/SrcHostEnvSet';
+import HostConfigSet from '../interfaces/HostConfigSet';
 
 
 /**
