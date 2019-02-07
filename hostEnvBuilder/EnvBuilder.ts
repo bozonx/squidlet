@@ -31,7 +31,12 @@ export default class EnvBuilder {
     this.entitiesWriter = new EntitiesWriter(this.io, this.configManager, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
-    this.configsSet = new ConfigsSet(this.entities.entitiesCollection, this.hostClassNames, this.definitions);
+    this.configsSet = new ConfigsSet(
+      this.configManager,
+      this.entities.entitiesCollection,
+      this.hostClassNames,
+      this.definitions
+    );
     this.hostsConfigWriter = new HostsConfigsWriter(
       this.io,
       this.configManager,
@@ -80,10 +85,7 @@ export default class EnvBuilder {
    */
   generateSrcConfigSet(): SrcHostEnvSet {
     return {
-      configs: {
-        ...this.configsSet.getDefinitionsSet(),
-        config: this.configManager.hostConfig,
-      },
+      configs: this.configsSet.getConfigSet(),
       entities: this.configsSet.generateSrcEntitiesSet(),
     };
   }

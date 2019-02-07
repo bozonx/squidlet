@@ -1,12 +1,11 @@
 import * as path from 'path';
 
-import DefinitionsSet from '../interfaces/DefinitionsSet';
 import systemConfig from '../configs/systemConfig';
-import HostConfig from '../../host/interfaces/HostConfig';
 import ConfigManager from '../ConfigManager';
 import Io from '../Io';
 import HostClassNames from './HostClassNames';
 import ConfigsSet from './ConfigsSet';
+import {HostConfigSet} from '../interfaces/SrcHostEnvSet';
 
 
 /**
@@ -37,8 +36,7 @@ export default class HostsConfigsWriter {
    * Copy files of hosts to storage
    */
   async write() {
-    const hostConfig: HostConfig = this.configManager.hostConfig;
-    const definitionsSet: DefinitionsSet = this.configsSet.getDefinitionsSet();
+    const hostConfigSet: HostConfigSet = this.configsSet.getConfigSet();
     //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
     const buildDir = this.configManager.buildDir;
     const fileNames = systemConfig.hostInitCfg.fileNames;
@@ -47,17 +45,16 @@ export default class HostsConfigsWriter {
     // write host's config
     await this.io.writeJson(
       path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
-      hostConfig
+      hostConfigSet.config
     );
-
     // write host's definitions
-    await this.io.writeJson(path.join(configDir, fileNames.systemDrivers), definitionsSet.systemDrivers);
-    await this.io.writeJson(path.join(configDir, fileNames.regularDrivers), definitionsSet.regularDrivers);
-    await this.io.writeJson(path.join(configDir, fileNames.systemServices), definitionsSet.systemServices);
-    await this.io.writeJson(path.join(configDir, fileNames.regularServices), definitionsSet.regularServices);
-    await this.io.writeJson(path.join(configDir, fileNames.devicesDefinitions), definitionsSet.devicesDefinitions);
-    await this.io.writeJson(path.join(configDir, fileNames.driversDefinitions), definitionsSet.driversDefinitions);
-    await this.io.writeJson(path.join(configDir, fileNames.servicesDefinitions), definitionsSet.servicesDefinitions);
+    await this.io.writeJson(path.join(configDir, fileNames.systemDrivers), hostConfigSet.systemDrivers);
+    await this.io.writeJson(path.join(configDir, fileNames.regularDrivers), hostConfigSet.regularDrivers);
+    await this.io.writeJson(path.join(configDir, fileNames.systemServices), hostConfigSet.systemServices);
+    await this.io.writeJson(path.join(configDir, fileNames.regularServices), hostConfigSet.regularServices);
+    await this.io.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostConfigSet.devicesDefinitions);
+    await this.io.writeJson(path.join(configDir, fileNames.driversDefinitions), hostConfigSet.driversDefinitions);
+    await this.io.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostConfigSet.servicesDefinitions);
     // TODO: does it really need????
     // write list of entities names
     //await this.writeJson(path.join(buildDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);

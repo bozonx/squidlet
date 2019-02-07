@@ -3,27 +3,35 @@ import _values = require('lodash/values');
 
 import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
 import {EntitiesNames} from '../entities/EntitiesCollection';
-import DefinitionsSet from '../interfaces/DefinitionsSet';
 import {sortByIncludeInList} from '../helpers';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import HostClassNames from './HostClassNames';
 import Definitions from './Definitions';
 import EntitiesCollection from '../entities/EntitiesCollection';
+import {HostConfigSet} from '../interfaces/SrcHostEnvSet';
+import ConfigManager from '../ConfigManager';
 
 
 export default class ConfigsSet {
+  private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
 
 
-  constructor(entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames, definitions: Definitions) {
+  constructor(
+    configManager: ConfigManager,
+    entitiesCollection: EntitiesCollection,
+    hostClassNames: HostClassNames,
+    definitions: Definitions
+  ) {
+    this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
     this.hostClassNames = hostClassNames;
     this.definitions = definitions;
   }
 
-  getDefinitionsSet(): DefinitionsSet {
+  getConfigSet(): HostConfigSet {
     const [
       systemDrivers,
       regularDrivers,
@@ -34,6 +42,7 @@ export default class ConfigsSet {
     ] = this.sortServices();
 
     return {
+      config: this.configManager.hostConfig,
       systemDrivers,
       regularDrivers,
       systemServices,
