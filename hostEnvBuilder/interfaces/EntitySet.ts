@@ -10,7 +10,11 @@ import ServiceManifest from '../../host/interfaces/ServiceManifest';
 //   services: {[index: string]: EntitySet};
 // }
 
-export interface EntitySet {
+
+
+export interface SrcEntitySet {
+  srcDir: string;
+
   manifest: DeviceManifest | DriverManifest | ServiceManifest;
   // relative path to main file
   main?: string;
@@ -18,12 +22,8 @@ export interface EntitySet {
   files: string[];
 }
 
-export interface SrcEntitiesSet {
+export default interface SrcEntitiesSet {
   devices: {[index: string]: SrcEntitySet};
   drivers: {[index: string]: SrcEntitySet};
   services: {[index: string]: SrcEntitySet};
-}
-
-export interface SrcEntitySet extends EntitySet {
-  srcDir: string;
 }
