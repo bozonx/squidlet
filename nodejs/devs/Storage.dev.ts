@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 
-import Storage, {Stats} from '../../../squidlet-core/core/interfaces/dev/Storage';
+import Storage, {Stats} from '../../host/interfaces/dev/Storage';
 import {convertBufferToUint8Array} from '../helpers';
 
 

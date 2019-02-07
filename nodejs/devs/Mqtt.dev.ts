@@ -1,5 +1,6 @@
 import * as mqtt from 'mqtt';
-import Mqtt from '../../../squidlet-core/core/interfaces/dev/Mqtt';
+
+import Mqtt from '../../host/interfaces/dev/Mqtt';
 
 
 interface Props {

@@ -1,8 +1,8 @@
 import * as SerialPort from 'serialport';
 
-import Serial, {BaudRate, Options, EventName} from '../../../squidlet-core/core/interfaces/dev/Serial';
 import {convertBufferToUint8Array} from '../helpers';
-import {textToUint8Array} from '../../../squidlet-core/core/helpers/binaryHelpers';
+import {textToUint8Array} from '../../host/helpers/binaryHelpers';
+import Serial from '../../host/interfaces/dev/Serial';
 
 
 
