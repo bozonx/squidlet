@@ -79,13 +79,12 @@ export default class EnvBuilder {
    * It uses only to start in nodejs environment.
    */
   generateSrcConfigSet(): SrcHostEnvSet {
-
-    // TODO: поидее должно напоминать файловую структура
-
     return {
-      ...this.configsSet.getDefinitionsSet(),
-      config: this.configManager.hostConfig,
-      entitiesSet: this.configsSet.generateSrcEntitiesSet(),
+      configs: {
+        ...this.configsSet.getDefinitionsSet(),
+        config: this.configManager.hostConfig,
+      },
+      entities: this.configsSet.generateSrcEntitiesSet(),
     };
   }
 

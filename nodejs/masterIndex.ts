@@ -20,14 +20,14 @@ import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
 
-export const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
+const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 // TODO: change
 //const debug: boolean = Boolean(yargs.argv.debug);
 const debug = true;
 
 
-export async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
-  const machine: string = hostConfigSet.config.machine;
+async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
+  const machine: string = hostConfigSet.configs.config.machine;
 
   console.info(`===> initializing host system on machine "${machine}"`);
 

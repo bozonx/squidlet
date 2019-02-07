@@ -14,7 +14,12 @@ import HostConfig from '../../host/interfaces/HostConfig';
 //   | 'servicesDefinitions';
 
 
-export default interface SrcHostEnvSet extends DefinitionsSet {
-  entitiesSet: SrcEntitiesSet;
+interface Configs extends DefinitionsSet {
   config: HostConfig;
+}
+
+
+export default interface SrcHostEnvSet {
+  configs: Configs;
+  entities: SrcEntitiesSet;
 }
