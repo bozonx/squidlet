@@ -17,7 +17,7 @@ export default interface PreHostConfig {
   buildConfig?: BuildConfig;
 
   // specific config for each host
-  config: {
+  config?: {
     // path to dir where will be placed storage of host. It can be absolute or relative of master config file
     storageDir?: string;
     logLevel?: LogLevel;
@@ -32,10 +32,10 @@ export default interface PreHostConfig {
     // custom params
     params?: {[index: string]: any};
 
-    network?: {
-      routedMessageTTL: number;
-      requestTimeout: number;
-    };
+    // network?: {
+    //   routedMessageTTL: number;
+    //   requestTimeout: number;
+    // };
   };
 
   // devices definitions by deviceId

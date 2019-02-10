@@ -2,9 +2,10 @@ plugins: []
 
 hosts:
   master:
-    platform: esp32
+    platform: lowjs
+    machine: esp32wrover
     config:
-      storageDir: './masterStorage'
+      #storageDir: './masterStorage'
 
     logger:
 
@@ -12,3 +13,4 @@ hosts:
       bedroom:
         people-count-sensor:
           device: FakePeopleCount
+hostDefaults:

@@ -1,0 +1,12 @@
+id: testHost
+platform: lowjs
+machine: esp32-wrover
+#buildConfig:
+#  strictMode: false
+config:
+logger:
+
+devices:
+  bedroom:
+    people-count-sensor:
+      device: FakePeopleCount
