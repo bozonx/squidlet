@@ -7,6 +7,7 @@ import ConfigManager from '../ConfigManager';
 import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
 import PreManifestBase from '../interfaces/PreManifestBase';
+import HostClassNames from '../configSet/HostClassNames';
 
 
 /**
@@ -15,6 +16,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 export default class EntitiesWriter {
   private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
+  private readonly hostClassNames: HostClassNames;
   private readonly io: Io;
   // entities dir in storage
   private get entitiesDstDir(): string {
@@ -22,23 +24,24 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(io: Io, configManager: ConfigManager, entitiesCollection: EntitiesCollection) {
+  constructor(io: Io, configManager: ConfigManager, entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames) {
     this.io = io;
     this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
+    this.hostClassNames = hostClassNames;
   }
 
 
   /**
-   * Copy files of entities to storage
+   * Copy used files of entities to storage
    */
-  async write() {
-    const allEntities: EntitiesNames = this.entitiesCollection.getAllEntitiesNames();
-    
-    for (let typeName of Object.keys(allEntities)) {
+  async writeUsed() {
+    const usedEntities: EntitiesNames = this.hostClassNames.getEntitiesNames();
+
+    for (let typeName of Object.keys(usedEntities)) {
       const pluralType = typeName as ManifestsTypePluralName;
 
-      for (let entityName of allEntities[pluralType]) {
+      for (let entityName of usedEntities[pluralType]) {
         await this.proceedEntity(pluralType, entityName);
       }
     }
@@ -84,4 +87,17 @@ export default class EntitiesWriter {
 
   }
 
+  // async writeAll() {
+  //   const allEntities: EntitiesNames = this.entitiesCollection.getAllEntitiesNames();
+  //
+  //   console.log(1111111, allEntities)
+  //
+  //   for (let typeName of Object.keys(allEntities)) {
+  //     const pluralType = typeName as ManifestsTypePluralName;
+  //
+  //     for (let entityName of allEntities[pluralType]) {
+  //       await this.proceedEntity(pluralType, entityName);
+  //     }
+  //   }
+  // }
 }

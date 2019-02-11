@@ -2,7 +2,6 @@ import _filter = require('lodash/filter');
 import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 
-import PreHostConfig from '../interfaces/PreHostConfig';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
 import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';

@@ -28,8 +28,13 @@ export default class EnvBuilder {
   constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
     this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.configManager);
-    this.entitiesWriter = new EntitiesWriter(this.io, this.configManager, this.entities.entitiesCollection);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
+    this.entitiesWriter = new EntitiesWriter(
+      this.io,
+      this.configManager,
+      this.entities.entitiesCollection,
+      this.hostClassNames
+    );
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
     this.configsSet = new ConfigsSet(
       this.configManager,
@@ -67,7 +72,7 @@ export default class EnvBuilder {
   async writeEntities() {
     this.log.info(`--> Writing entities files`);
 
-    await this.entitiesWriter.write();
+    await this.entitiesWriter.writeUsed();
   }
 
   /**
