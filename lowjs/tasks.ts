@@ -50,6 +50,7 @@ async function buildEnv(hostBuildDir: string, envConfigPath: string) {
   const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
   const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, envDstDir);
 
+  shelljs.mkdir('-p', envDstDir);
   rimraf.sync(`${envDstDir}/**/*`);
   await envBuilder.collect();
   await envBuilder.writeConfigs();

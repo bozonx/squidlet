@@ -106,7 +106,7 @@ export default class ConfigManager {
     return _defaultsDeep({},
       preHostConfig,
       //this.hostDefaults,
-      await this.machineConfig.hostConfig,
+      this.machineConfig.hostConfig,
       hostDefaultConfig,
     );
   }
