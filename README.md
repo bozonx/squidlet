@@ -3,33 +3,35 @@
 Easy make IoT devices and local net of devices which can be managed by master
 
 
-## Build
+## Build host's files
 
-### Build config
-
-    CONFIG=./path/to/masterConfig.yaml BUILD_DIR=./my/dir yarn build-config
-
-or
-
-    yarn build-config --config=./path/to/masterConfig.yaml --build-dir=./my/dir
+    yarn build-host
 
 
-# Squidlet lowjs platform
+## Lowjs
 
-## Machines
+### Build devs
+
+   yarn build-lowjs-devs
 
 ### ESP32 wrover
 
     yarn build --config=./my-host.yaml
 
-## Build devs
 
-   yarn build-devs
-
-# Run squidlet on a raspberry pi
+## Nodejs
+ 
+### raspberry pi
 
     sudo apt-get update
     sudo apt-get install pigpio
+    
+    cd nodejs
+    yarn
+    
+    cd ..
+    
+    yarn master
 
 
 ## Build cluster
