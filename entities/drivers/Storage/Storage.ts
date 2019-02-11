@@ -1,6 +1,6 @@
-import StorageDev, {Stats} from '../../app/interfaces/dev/Storage';
-import DriverBase from '../../app/entities/DriverBase';
-import {GetDriverDep} from '../../app/entities/EntityBase';
+import StorageDev, {Stats} from '../../../host/interfaces/dev/Storage';
+import DriverBase from '../../../host/baseDrivers/DriverBase';
+import {GetDriverDep} from '../../../host/entities/EntityBase';
 
 
 export class Storage extends DriverBase {

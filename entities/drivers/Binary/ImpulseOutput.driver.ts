@@ -1,10 +1,10 @@
 import {DigitalPinOutputDriver, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput.driver';
-import DriverBase from '../../app/entities/DriverBase';
-import {GetDriverDep} from '../../app/entities/EntityBase';
+import DriverBase from '../../../host/baseDrivers/DriverBase';
+import {GetDriverDep} from '../../../host/entities/EntityBase';
 import {BlockMode} from './interfaces/Types';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {omit} from '../../helpers/lodashLike';
-import {deferCall, invertIfNeed} from '../../helpers/helpers';
+import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
+import {omit} from '../../../host/helpers/lodashLike';
+import {deferCall, invertIfNeed} from '../../../host/helpers/helpers';
 
 
 export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {

@@ -1,9 +1,9 @@
-import ServiceBase from '../../app/entities/ServiceBase';
-import categories from '../../app/dict/categories';
+import ServiceBase from '../../../host/baseServices/ServiceBase';
+import categories from '../../../host/dict/categories';
 import Message from '../../messenger/interfaces/Message';
-import LogLevel from '../../app/interfaces/LogLevel';
+import LogLevel from '../../../host/interfaces/LogLevel';
 import * as defaultLogger from './defaultLogger';
-import {LOG_LEVELS} from '../../app/dict/constants';
+import {LOG_LEVELS} from '../../../host/dict/constants';
 
 
 interface Props {
