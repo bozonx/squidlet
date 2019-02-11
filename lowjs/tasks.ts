@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as shelljs from 'shelljs';
 import * as _ from 'lodash';
 import * as gulp from 'gulp';
-import * as yargs from 'yargs';
 import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
@@ -15,11 +14,11 @@ import BuildConfig from '../hostEnvBuilder/interfaces/BuildConfig';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import minimize from '../helpers/buildJs/minimize';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
+import {resolveParamRequired} from '../helpers/buildHelpers';
 
 
 const buildDir: string = path.resolve(__dirname, `../build/lowjs`);
 const hostSrcDir = path.resolve(__dirname, '../build/host/dev');
-const envConfigRelPath: string = yargs.argv.config as string;
 // TODO: use min
 const HOST_DEVS_DIR = 'devs';
 const HOST_DIR = 'host';
@@ -72,11 +71,8 @@ gulp.task('build-lowjs-devs', async () => {
 });
 
 gulp.task('build-lowjs', async () => {
-  if (!envConfigRelPath) {
-    throw new Error(`You have to specify a machine name`);
-  }
-
-  const envConfigPath = path.resolve(process.cwd(), envConfigRelPath);
+  const resolvedConfigPath: string = resolveParamRequired('CONFIG', 'config');
+  const envConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
   const envConfig: PreHostConfig = yaml.load(fs.readFileSync(envConfigPath, {encoding : 'utf8'}));
   const buildConfig: BuildConfig = _.defaultsDeep(
     {},
