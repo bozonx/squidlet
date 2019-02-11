@@ -1,6 +1,6 @@
 id: testHost
 platform: lowjs
-machine: esp32-wrover
+machine: esp32wrover
 #buildConfig:
 #  strictMode: false
 config:

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import PluginEnv from './entities/PluginEnv';
 
-const systemEntitiesRoot = '../../host/entities';
+const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
 const driversRoot = path.resolve(__dirname, systemEntitiesRoot, 'drivers');
 const servicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'services');

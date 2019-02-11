@@ -52,12 +52,14 @@ export default class ConfigManager {
 
     if (validateError) throw new Error(`Invalid host config: ${validateError}`);
 
-    const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
     const platformDirName = path.resolve(__dirname, `../${preHostConfig.platform}`);
+
+    this._machineConfig = loadMachineConfig(platformDirName, preHostConfig.machine as string);
+
+    const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
 
     this._preHostConfig = this.normalizeHostConfig(mergedConfig);
     this._hostConfig = this.prepareHostConfig();
-    this._machineConfig = loadMachineConfig(platformDirName, this._hostConfig.machine);
 
     appendArray(this.plugins, this.preHostConfig.plugins);
     //_defaultsDeep(this.hostDefaults, preHostConfig.hostDefaults);

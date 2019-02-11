@@ -14,9 +14,9 @@ Easy make IoT devices and local net of devices which can be managed by master
 
    yarn build-lowjs-devs
 
-### ESP32 wrover
+### Build host
 
-    yarn build --config=./my-host.yaml
+    yarn build-lowjs --config=./my-host.yaml
 
 
 ## Nodejs

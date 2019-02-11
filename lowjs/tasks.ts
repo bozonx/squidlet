@@ -87,7 +87,7 @@ gulp.task('build-lowjs', async () => {
     throw new Error(`You have to specify an "id" param in your host config`);
   }
 
-  const machineConfigFilePath: string = path.resolve(__dirname, `./${envConfig.machine}.ts`);
+  const machineConfigFilePath: string = path.resolve(__dirname, `./lowjs-${envConfig.machine}.ts`);
   const machineConfig: MachineConfig = require(machineConfigFilePath).default;
   const hostBuildDir: string = path.join(buildDir, envConfig.id);
 
