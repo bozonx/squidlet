@@ -1,10 +1,10 @@
-import DeviceBase, {DeviceBaseProps} from '../../baseDevice/DeviceBase';
-import {convertToLevel} from '../../helpers/helpers';
-import {Data} from '../../baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from '../../baseDevice/Status';
-import {GetDriverDep} from '../../app/entities/EntityBase';
+import DeviceBase, {DeviceBaseProps} from '../../../host/baseDevice/DeviceBase';
+import {convertToLevel} from '../../../host/helpers/helpers';
+import {Data} from '../../../host/baseDevice/DeviceDataManagerBase';
+import {DEFAULT_STATUS} from '../../../host/baseDevice/Status';
+import {GetDriverDep} from '../../../host/entities/EntityBase';
 import {BinaryOutputDriver, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput.driver';
-import Status from '../../baseDevice/Status';
+import Status from '../../../host/baseDevice/Status';
 
 
 interface Props extends DeviceBaseProps, BinaryOutputDriverProps {

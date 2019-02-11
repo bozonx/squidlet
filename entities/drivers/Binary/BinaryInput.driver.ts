@@ -1,11 +1,11 @@
-import IndexedEvents from '../../helpers/IndexedEvents';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {WatchHandler} from '../../app/interfaces/dev/Digital';
-import DriverBase from '../../app/entities/DriverBase';
+import IndexedEvents from '../../../host/helpers/IndexedEvents';
+import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
+import {WatchHandler} from '../../../host/interfaces/dev/Digital';
+import DriverBase from '../../../host/baseDrivers/DriverBase';
 import {DigitalPinInputDriver, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput.driver';
-import {GetDriverDep} from '../../app/entities/EntityBase';
-import {invertIfNeed, isDigitalInputInverted, resolveEdge} from '../../helpers/helpers';
-import {omit} from '../../helpers/lodashLike';
+import {GetDriverDep} from '../../../host/entities/EntityBase';
+import {invertIfNeed, isDigitalInputInverted, resolveEdge} from '../../../host/helpers/helpers';
+import {omit} from '../../../host/helpers/lodashLike';
 
 
 export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {

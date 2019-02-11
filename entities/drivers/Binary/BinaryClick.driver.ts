@@ -1,8 +1,8 @@
-import IndexedEvents from '../../helpers/IndexedEvents';
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {WatchHandler} from '../../app/interfaces/dev/Digital';
-import DriverBase from '../../app/entities/DriverBase';
-import {GetDriverDep} from '../../app/entities/EntityBase';
+import IndexedEvents from '../../../host/helpers/IndexedEvents';
+import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
+import {WatchHandler} from '../../../host/interfaces/dev/Digital';
+import DriverBase from '../../../host/baseDrivers/DriverBase';
+import {GetDriverDep} from '../../../host/entities/EntityBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from './BinaryInput.driver';
 
 
