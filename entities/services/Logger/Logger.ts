@@ -1,6 +1,5 @@
 import ServiceBase from '../../../host/baseServices/ServiceBase';
 import categories from '../../../host/dict/categories';
-import Message from '../../messenger/interfaces/Message';
 import LogLevel from '../../../host/interfaces/LogLevel';
 import * as defaultLogger from './defaultLogger';
 import {LOG_LEVELS} from '../../../host/dict/constants';
@@ -28,7 +27,8 @@ export default class Logger extends ServiceBase<Props> {
 
     for (let hostId of hosts) {
       // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
-      const handler = (logMessage: string, message: Message) => {
+      // TODO: не использовать message
+      const handler = (logMessage: string, message: any) => {
         // TODO: обработка ошибки промиса
         this.hostPublishHandler(hostId, message.topic as LogLevel, logMessage);
       };
@@ -37,6 +37,7 @@ export default class Logger extends ServiceBase<Props> {
 
       // listen to allowed levels
       for (let level of allowedLogLevels) {
+        // TODO: не использовать messager - use events
         this.env.messenger.subscribe(hostId, categories.logger, level, handler);
       }
     }

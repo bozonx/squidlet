@@ -3,14 +3,14 @@
  * Handling a PCF8574/PCF8574A IC.
  */
 
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
-import {GetDriverDep} from '../../app/entities/EntityBase';
-import DriverBase from '../../app/entities/DriverBase';
+import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
+import {GetDriverDep} from '../../../host/entities/EntityBase';
+import DriverBase from '../../../host/baseDrivers/DriverBase';
 import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
-import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../helpers/binaryHelpers';
-import {Edge} from '../../app/interfaces/dev/Digital';
-import DebounceCall from '../../helpers/DebounceCall';
-import IndexedEvents from '../../helpers/IndexedEvents';
+import {byteToBinArr, getBitFromByte, updateBitInByte} from '../../../host/helpers/binaryHelpers';
+import {Edge} from '../../../host/interfaces/dev/Digital';
+import DebounceCall from '../../../host/helpers/DebounceCall';
+import IndexedEvents from '../../../host/helpers/IndexedEvents';
 
 
 export type ChangeStateHandler = (targetPin: number, value: boolean) => void;
