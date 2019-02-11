@@ -8,6 +8,8 @@ import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import HostClassNames from '../configSet/HostClassNames';
+import ManifestBase from '../../host/interfaces/ManifestBase';
+import Register from './Register';
 
 
 /**
@@ -17,6 +19,7 @@ export default class EntitiesWriter {
   private readonly configManager: ConfigManager;
   private readonly entitiesCollection: EntitiesCollection;
   private readonly hostClassNames: HostClassNames;
+  private readonly register: Register;
   private readonly io: Io;
   // entities dir in storage
   private get entitiesDstDir(): string {
@@ -24,10 +27,17 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(io: Io, configManager: ConfigManager, entitiesCollection: EntitiesCollection, hostClassNames: HostClassNames) {
+  constructor(
+    io: Io,
+    configManager: ConfigManager,
+    entitiesCollection: EntitiesCollection,
+    register: Register,
+    hostClassNames: HostClassNames
+  ) {
     this.io = io;
     this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
+    this.register = register;
     this.hostClassNames = hostClassNames;
   }
 
@@ -57,8 +67,8 @@ export default class EntitiesWriter {
       this.entitiesCollection.getManifest(pluralType, entityName)
     );
 
-    // TODO: build and write main files if exists
-    // TODO: test running of build
+    // build and write main file if exists
+    await this.buildMainFile(pluralType, entityName);
 
     // copy assets
     const files: string[] = this.entitiesCollection.getFiles(pluralType, entityName);
@@ -74,17 +84,28 @@ export default class EntitiesWriter {
     }
   }
 
-  private async buildMainFile(pluralType: ManifestsTypePluralName, preManifest: PreManifestBase) {
-    const entityDstDir = path.join(this.entitiesDstDir, pluralType, preManifest.name);
-    const mainJsFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
+  private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
+    const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
+    const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
+    const mainSrcFile = path.resolve(preManifest.baseDir, preManifest.main);
+    const mainJsDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
-    const absoluteMainFileName = path.resolve(preManifest.baseDir, preManifest.main);
+    console.log(11111111, mainSrcFile, mainJsDstFile);
 
     // TODO: !!!!! билдить во временную папку
     // TODO: !!!!! написать в лог что билдится файл
     // TODO: !!!!! поддержка билда js файлов
-    // TODO: !!!!! test
+  }
 
+  private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {
+    if (pluralType === 'devices') {
+      return this.register.getDevicesPreManifests()[entityName];
+    }
+    else if (pluralType === 'drivers') {
+      return this.register.getDriversPreManifests()[entityName];
+    }
+    // services
+    return this.register.getServicesPreManifests()[entityName];
   }
 
   // async writeAll() {

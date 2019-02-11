@@ -120,9 +120,9 @@ export default class EntitiesCollection {
   }
 
   async generate() {
-    const preDevicesManifests  = this.register.getDevicesPreManifests();
-    const preDriversManifests  = this.register.getDriversPreManifests();
-    const preServicesManifests = this.register.getServicesPreManifests();
+    const preDevicesManifests  = this.register.getDevicesPreManifestsList();
+    const preDriversManifests  = this.register.getDriversPreManifestsList();
+    const preServicesManifests = this.register.getServicesPreManifestsList();
 
     for (let item of preDevicesManifests) {
       await this.proceed<DeviceManifest>('device', item);

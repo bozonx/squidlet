@@ -34,9 +34,9 @@ describe 'configWorks.Register', ->
     await @register.addService(@entity)
 
     assert.equal(@register.registeringPromises.length, 3)
-    assert.deepEqual(@register.getDevicesPreManifests(), [ @entity ])
-    assert.deepEqual(@register.getDriversPreManifests(), [ @entity ])
-    assert.deepEqual(@register.getServicesPreManifests(), [ @entity ])
+    assert.deepEqual(@register.getDevicesPreManifestsList(), [ @entity ])
+    assert.deepEqual(@register.getDriversPreManifestsList(), [ @entity ])
+    assert.deepEqual(@register.getServicesPreManifestsList(), [ @entity ])
 
   it 'addDevice, addDriver, addService as a path', ->
     @register.loadManifest = () => @entity

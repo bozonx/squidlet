@@ -33,6 +33,7 @@ export default class EnvBuilder {
       this.io,
       this.configManager,
       this.entities.entitiesCollection,
+      this.entities.register,
       this.hostClassNames
     );
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);

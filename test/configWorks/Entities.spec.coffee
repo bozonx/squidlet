@@ -94,9 +94,9 @@ describe 'configWorks.EntitiesCollection', ->
         buildDir: '/buildDir'
       }
       register: {
-        getDevicesPreManifests: => @preDevicesManifests
-        getDriversPreManifests: => @prePreDriverManifest
-        getServicesPreManifests: => @prePreServiceManifest
+        getDevicesPreManifestsList: => @preDevicesManifests
+        getDriversPreManifestsList: => @prePreDriverManifest
+        getServicesPreManifestsList: => @prePreServiceManifest
       }
       io: {
         loadYamlFile: () =>

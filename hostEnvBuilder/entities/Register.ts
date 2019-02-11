@@ -36,15 +36,28 @@ export default class Register {
     this.io = io;
   }
 
-  getDevicesPreManifests(): PreDeviceManifest[] {
+
+  getDevicesPreManifests(): {[index: string]: PreDeviceManifest} {
+    return this.devices.toJS() as any;
+  }
+
+  getDriversPreManifests(): {[index: string]: PreDriverManifest} {
+    return this.drivers.toJS() as any;
+  }
+
+  getServicesPreManifests(): {[index: string]: PreServiceManifest} {
+    return this.services.toJS() as any;
+  }
+
+  getDevicesPreManifestsList(): PreDeviceManifest[] {
     return _values<any>(this.devices.toJS());
   }
 
-  getDriversPreManifests(): PreDriverManifest[] {
+  getDriversPreManifestsList(): PreDriverManifest[] {
     return _values<any>(this.drivers.toJS());
   }
 
-  getServicesPreManifests(): PreServiceManifest[] {
+  getServicesPreManifestsList(): PreServiceManifest[] {
     return _values<any>(this.services.toJS());
   }
 
