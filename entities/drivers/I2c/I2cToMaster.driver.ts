@@ -1,4 +1,4 @@
-import DriverFactoryBase from '../../app/entities/DriverFactoryBase';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 
 
 export class I2cToMasterDriver {

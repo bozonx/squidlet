@@ -1,10 +1,11 @@
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
-import DigitalBaseProps from './interfaces/DigitalBaseProps';
-import {resolveDriverName} from './digitalHelpers';
 import {omit} from 'host/helpers/lodashLike';
 import {DigitalSubDriver} from 'host/interfaces/dev/Digital';
+
+import DigitalBaseProps from './interfaces/DigitalBaseProps';
+import {resolveDriverName} from './digitalHelpers';
 
 
 export interface DigitalPinOutputDriverProps extends DigitalBaseProps {

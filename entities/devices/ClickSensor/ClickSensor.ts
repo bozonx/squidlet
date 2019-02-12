@@ -2,8 +2,9 @@ import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
 import {Data} from 'host/baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
-import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
 import {omit} from 'host/helpers/lodashLike';
+
+import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
 
 
 

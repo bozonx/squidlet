@@ -1,12 +1,13 @@
 import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/Digital';
+import {convertBitsToBytes} from 'host/helpers/binaryHelpers';
+import {getKeyOfObject} from 'host/helpers/helpers';
+
 import {
   COMMANDS,
   MODES, NO_MODE,
   PortExpanderDriver,
 } from './PortExpander.driver';
-import {convertBitsToBytes} from 'host/helpers/binaryHelpers';
 import {DigitalState} from './State';
-import {getKeyOfObject} from 'host/helpers/helpers';
 
 
 export type DigitalPinHandler = (targetPin: number, value: boolean) => void;

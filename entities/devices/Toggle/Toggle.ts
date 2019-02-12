@@ -3,6 +3,7 @@ import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
+
 import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
 
 

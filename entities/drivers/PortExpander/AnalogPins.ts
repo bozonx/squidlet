@@ -1,13 +1,14 @@
+import {numToUint8Word} from 'host/helpers/binaryHelpers';
+import {BYTES_IN_WORD} from 'host/dict/constants';
+import {getKeyOfObject} from 'host/helpers/helpers';
+
 import {
   COMMANDS,
   MODES, NO_MODE,
   PortExpanderAnalogPinMode,
   PortExpanderDriver,
 } from './PortExpander.driver';
-import {numToUint8Word} from 'host/helpers/binaryHelpers';
-import {BYTES_IN_WORD} from 'host/dict/constants';
 import {AnalogState} from './State';
-import {getKeyOfObject} from 'host/helpers/helpers';
 
 
 export type FilterTypes = 'lowPass' | 'median';

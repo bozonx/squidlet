@@ -1,6 +1,7 @@
 import {callOnDifferentValues} from 'host/helpers/helpers';
 import {convertBytesToBits} from 'host/helpers/binaryHelpers';
 import IndexedEvents from 'host/helpers/IndexedEvents';
+
 import {DigitalPinHandler} from './DigitalPins';
 import {AnalogPinHandler} from './AnalogPins';
 import {PortExpanderDriver} from './PortExpander.driver';

@@ -6,11 +6,12 @@
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'host/helpers/binaryHelpers';
 import {Edge} from 'host/interfaces/dev/Digital';
 import DebounceCall from 'host/helpers/DebounceCall';
 import IndexedEvents from 'host/helpers/IndexedEvents';
+
+import {I2cToSlaveDriver, I2cToSlaveDriverProps} from '../I2c/I2cToSlave.driver';
 
 
 export type ChangeStateHandler = (targetPin: number, value: boolean) => void;

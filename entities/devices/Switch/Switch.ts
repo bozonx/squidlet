@@ -3,8 +3,9 @@ import {convertToLevel} from 'host/helpers/helpers';
 import {Data} from 'host/baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
-import {BinaryOutputDriver, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput.driver';
 import Status from 'host/baseDevice/Status';
+
+import {BinaryOutputDriver, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput.driver';
 
 
 interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
