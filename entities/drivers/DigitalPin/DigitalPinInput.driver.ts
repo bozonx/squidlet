@@ -1,11 +1,11 @@
-import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from '../../../host/interfaces/dev/Digital';
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
+import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'host/interfaces/dev/Digital';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
-import {omit} from '../../../host/helpers/lodashLike';
-import IndexedEvents from '../../../host/helpers/IndexedEvents';
+import {omit} from 'host/helpers/lodashLike';
+import IndexedEvents from 'host/helpers/IndexedEvents';
 
 
 export interface DigitalPinInputDriverProps extends DigitalBaseProps {

@@ -1,9 +1,9 @@
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import I2cMaster from '../../../host/interfaces/dev/I2cMaster';
-import { addFirstItemUint8Arr } from '../../../host/helpers/helpers';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import {DATA_ADDRESS_LENGTH} from '../../../host/dict/constants';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import I2cMaster from 'host/interfaces/dev/I2cMaster';
+import { addFirstItemUint8Arr } from 'host/helpers/helpers';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import {DATA_ADDRESS_LENGTH} from 'host/dict/constants';
 
 
 // TODO: does it really need?

@@ -1,9 +1,9 @@
-import I2cSlave from '../../../host/interfaces/dev/I2cSlave';
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from '../../../host/helpers/helpers';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import IndexedEventEmitter from '../../../host/helpers/IndexedEventEmitter';
+import I2cSlave from 'host/interfaces/dev/I2cSlave';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'host/helpers/helpers';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import IndexedEventEmitter from 'host/helpers/IndexedEventEmitter';
 
 
 const NO_DATA_ADDRESS = 'null';

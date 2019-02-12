@@ -4,9 +4,9 @@ import {
   WatchHandler,
   Digital,
   DigitalInputMode
-} from '../../../host/interfaces/dev/Digital';
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
+} from 'host/interfaces/dev/Digital';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import DriverBase from 'host/baseDrivers/DriverBase';
 
 
 export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {

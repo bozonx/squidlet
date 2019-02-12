@@ -8,20 +8,20 @@
  * * ?Bluetooth
  */
 
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import {firstLetterToUpperCase} from '../../../host/helpers/helpers';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import DuplexDriver from '../../../host/interfaces/DuplexDriver';
-import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../../../host/dict/constants';
-import {DigitalInputMode, DigitalPinMode, Edge} from '../../../host/interfaces/dev/Digital';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import {firstLetterToUpperCase} from 'host/helpers/helpers';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import DuplexDriver from 'host/interfaces/DuplexDriver';
+import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'host/dict/constants';
+import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/Digital';
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import AnalogPins, {AnalogPinHandler, FilterTypes} from './AnalogPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';
-import Logger from '../../../host/interfaces/Logger';
-import {omit} from '../../../host/helpers/lodashLike';
-import {PollProps} from '../../../host/baseDrivers/MasterSlaveBaseNodeDriver';
-import {uint8WordToNum} from '../../../host/helpers/binaryHelpers';
+import Logger from 'host/interfaces/Logger';
+import {omit} from 'host/helpers/lodashLike';
+import {PollProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
+import {uint8WordToNum} from 'host/helpers/binaryHelpers';
 
 
 export type PortExpanderConnection = 'i2c' | 'serial';

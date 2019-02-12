@@ -1,9 +1,9 @@
-import ServiceBase from '../../../host/baseServices/ServiceBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import categories from '../../../host/dict/categories';
-import DeviceData from '../../../host/interfaces/DeviceData';
-import {combineTopic, parseValue, splitTopic} from '../../../host/helpers/helpers';
-import Mqtt from '../../../host/interfaces/dev/Mqtt';
+import ServiceBase from 'host/baseServices/ServiceBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import categories from 'host/dict/categories';
+import DeviceData from 'host/interfaces/DeviceData';
+import {combineTopic, parseValue, splitTopic} from 'host/helpers/helpers';
+import Mqtt from 'host/interfaces/dev/Mqtt';
 
 
 interface Props {

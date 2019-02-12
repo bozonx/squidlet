@@ -1,12 +1,12 @@
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import {DigitalPinOutputDriver} from '../DigitalPin/DigitalPinOutput.driver';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
 import {BlockMode, InitialLevel} from './interfaces/Types';
 import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
-import IndexedEvents from '../../../host/helpers/IndexedEvents';
-import {omit} from '../../../host/helpers/lodashLike';
-import {convertToLevel, invertIfNeed} from '../../../host/helpers/helpers';
+import IndexedEvents from 'host/helpers/IndexedEvents';
+import {omit} from 'host/helpers/lodashLike';
+import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 
 
 type DelayedResultHandler = (err?: Error) => void;

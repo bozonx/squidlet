@@ -1,8 +1,8 @@
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import DuplexDriver, {ReceiveHandler} from '../../../host/interfaces/DuplexDriver';
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from '../../../host/baseDrivers/MasterSlaveBaseNodeDriver';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import DuplexDriver, {ReceiveHandler} from 'host/interfaces/DuplexDriver';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
 
 
 export interface I2cDuplexDriverProps extends MasterSlaveBaseProps {

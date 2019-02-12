@@ -1,10 +1,10 @@
 import {I2cMasterDriver} from './I2cMaster.driver';
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import I2cMaster from '../../../host/interfaces/dev/I2cMaster';
-import {hexStringToHexNum} from '../../../host/helpers/binaryHelpers';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import {omit} from '../../../host/helpers/lodashLike';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from '../../../host/baseDrivers/MasterSlaveBaseNodeDriver';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import I2cMaster from 'host/interfaces/dev/I2cMaster';
+import {hexStringToHexNum} from 'host/helpers/binaryHelpers';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import {omit} from 'host/helpers/lodashLike';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
 import {ImpulseInputDriver} from '../Binary/ImpulseInput.driver';
 
 

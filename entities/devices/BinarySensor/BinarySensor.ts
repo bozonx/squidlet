@@ -1,8 +1,8 @@
-import DeviceBase, {DeviceBaseProps} from '../../../host/baseDevice/DeviceBase';
-import {Data} from '../../../host/baseDevice/DeviceDataManagerBase';
+import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
+import {Data} from 'host/baseDevice/DeviceDataManagerBase';
 import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
-import {DEFAULT_STATUS} from '../../../host/baseDevice/Status';
+import {GetDriverDep} from 'host/entities/EntityBase';
+import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {

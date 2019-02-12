@@ -1,5 +1,5 @@
-import DeviceBase, {DeviceBaseProps} from '../../../host/baseDevice/DeviceBase';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
+import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
+import {GetDriverDep} from 'host/entities/EntityBase';
 import {ExpanderDriverProps, PCF8574Driver} from '../../drivers/Pcf8574/Pcf8574.driver';
 
 

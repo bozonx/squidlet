@@ -1,8 +1,8 @@
-import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import DriverBase from '../../../host/baseDrivers/DriverBase';
-import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from '../../../host/interfaces/dev/Digital';
+import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
+import DriverBase from 'host/baseDrivers/DriverBase';
+import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'host/interfaces/dev/Digital';
 import {PortExpanderDriver} from '../PortExpander/PortExpander.driver';
-import {LENGTH_AND_START_ARR_DIFFERENCE} from '../../../host/dict/constants';
+import {LENGTH_AND_START_ARR_DIFFERENCE} from 'host/dict/constants';
 
 
 interface DigitalPortExpanderDriverProps {
