@@ -1,6 +1,7 @@
 import System from './System';
 import categories from './dict/categories';
 
+
 export default class LogPublisher {
   readonly system: System;
 
@@ -36,20 +37,10 @@ export default class LogPublisher {
   }
 
   private async send(level: string, message: string) {
-
-    // TODO: reveiw
-
-    //this.system.events.emit(categories.logger, level, message);
     this.system.events.emit(categories.logger, level, {
-      category: categories.logger,
-      topic: level,
-      from: 'master',
-      // send to local host
-      to: 'master',
-      payload: message,
+      message,
+      level,
     });
-
-    //await this.system.messenger.emit(categories.logger, level, message);
   }
 
 }
