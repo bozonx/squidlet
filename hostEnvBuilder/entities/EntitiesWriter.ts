@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as rimraf from 'rimraf';
 
 import systemConfig from '../configs/systemConfig';
 import {EntitiesNames} from './EntitiesCollection';
@@ -10,7 +11,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import HostClassNames from '../configSet/HostClassNames';
 import Register from './Register';
 import Logger from '../interfaces/Logger';
-import buildEntityMainFile from './buildEntityMainFile';
+import buildEntityMainFile from '../buildEntityMainFile';
 
 
 /**
@@ -93,10 +94,11 @@ export default class EntitiesWriter {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
     const mainSrcFile = path.resolve(preManifest.baseDir, preManifest.main);
     const mainJsDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
+    const tmpDir = path.join(this.configManager.buildDir, '_tmp/env');
 
-    this.log.info(`>> building main file of entity "${entityName}"`);
-
-    await buildEntityMainFile(mainSrcFile, mainJsDstFile);
+    this.log.info(`- building main file of entity "${entityName}"`);
+    rimraf.sync(`${tmpDir}/**/*`);
+    await buildEntityMainFile(tmpDir, mainSrcFile, mainJsDstFile);
   }
 
 
