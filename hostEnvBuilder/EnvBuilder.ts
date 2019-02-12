@@ -31,6 +31,7 @@ export default class EnvBuilder {
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.entitiesWriter = new EntitiesWriter(
       this.io,
+      this.log,
       this.configManager,
       this.entities.entitiesCollection,
       this.entities.register,

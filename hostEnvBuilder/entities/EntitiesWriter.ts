@@ -10,6 +10,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import HostClassNames from '../configSet/HostClassNames';
 import ManifestBase from '../../host/interfaces/ManifestBase';
 import Register from './Register';
+import Logger from '../interfaces/Logger';
 
 
 /**
@@ -21,6 +22,7 @@ export default class EntitiesWriter {
   private readonly hostClassNames: HostClassNames;
   private readonly register: Register;
   private readonly io: Io;
+  private readonly log: Logger;
   // entities dir in storage
   private get entitiesDstDir(): string {
     return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.rootDirs.entities);
@@ -29,12 +31,14 @@ export default class EntitiesWriter {
 
   constructor(
     io: Io,
+    log: Logger,
     configManager: ConfigManager,
     entitiesCollection: EntitiesCollection,
     register: Register,
     hostClassNames: HostClassNames
   ) {
     this.io = io;
+    this.log = log;
     this.configManager = configManager;
     this.entitiesCollection = entitiesCollection;
     this.register = register;
@@ -90,7 +94,12 @@ export default class EntitiesWriter {
     const mainSrcFile = path.resolve(preManifest.baseDir, preManifest.main);
     const mainJsDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
-    console.log(11111111, mainSrcFile, mainJsDstFile);
+    this.log.info(`>> building main file of entity "${entityName}"`);
+
+    await this.makeEntityJsMinFile(mainSrcFile, mainJsDstFile);
+  }
+
+  private async makeEntityJsMinFile(mainSrcFile: string, mainJsDstFile: string) {
 
     // TODO: !!!!! билдить во временную папку
     // TODO: !!!!! написать в лог что билдится файл
