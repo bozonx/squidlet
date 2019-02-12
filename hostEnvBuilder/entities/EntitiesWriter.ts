@@ -8,9 +8,9 @@ import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import HostClassNames from '../configSet/HostClassNames';
-import ManifestBase from '../../host/interfaces/ManifestBase';
 import Register from './Register';
 import Logger from '../interfaces/Logger';
+import buildEntityMainFile from './buildEntityMainFile';
 
 
 /**
@@ -96,15 +96,9 @@ export default class EntitiesWriter {
 
     this.log.info(`>> building main file of entity "${entityName}"`);
 
-    await this.makeEntityJsMinFile(mainSrcFile, mainJsDstFile);
+    await buildEntityMainFile(mainSrcFile, mainJsDstFile);
   }
 
-  private async makeEntityJsMinFile(mainSrcFile: string, mainJsDstFile: string) {
-
-    // TODO: !!!!! билдить во временную папку
-    // TODO: !!!!! написать в лог что билдится файл
-    // TODO: !!!!! поддержка билда js файлов
-  }
 
   private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {
     if (pluralType === 'devices') {
