@@ -3,6 +3,7 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import DeviceData from 'host/interfaces/DeviceData';
 import {combineTopic, parseValue, splitTopic} from 'host/helpers/helpers';
 import Mqtt from 'host/interfaces/dev/Mqtt';
+import categories from 'host/dict/categories';
 
 
 interface Props {
@@ -74,21 +75,21 @@ export default class MqttSevice extends ServiceBase<Props> {
       // TODO: save id
 
       // listen to publish messages
-      this.env.messenger.subscribeCategory(hostId, categories.externalDataOutcome, handler);
+      this.env.events.addCategoryListener(categories.externalDataOutcome, handler);
     }
   }
 
   /**
    * Process income messages
    */
-  private messagesHandler = (topic: string, data: string): Promise<void> => {
+  private messagesHandler = async (topic: string, data: string): Promise<void> => {
     this.env.log.info(`MQTT income: ${topic} - ${data}`);
 
     // TODO: если data - binary???
     // TODO: что если неизвестный формат или хоста не существует ???
 
     const { id, subTopic } = splitTopic(topic);
-    const toHost = this.env.host.resolveHostIdByEntityId(id);
+    //const toHost = this.env.host.resolveHostIdByEntityId(id);
     const incomeData: DeviceData = {
       id,
       subTopic,
@@ -97,7 +98,7 @@ export default class MqttSevice extends ServiceBase<Props> {
       data: parseValue(data),
     };
 
-    return this.env.messenger.send(toHost, categories.externalDataIncome, id, incomeData);
+    this.env.events.emit(categories.externalDataIncome, id, incomeData);
   }
 
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
