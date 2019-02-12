@@ -16,7 +16,8 @@
     "master": "ts-node ./nodejs/masterIndex.ts",
     "slave": "ts-node ./nodejs/slaveIndex.ts",
     "test": "mocha",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "postuninstall": "cd node_modules; ln -s ../host ./"
   },
   "dependencies": {
     "@babel/core": "^7.2.2",

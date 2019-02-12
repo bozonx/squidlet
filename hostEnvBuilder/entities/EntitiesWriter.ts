@@ -29,6 +29,10 @@ export default class EntitiesWriter {
     return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.rootDirs.entities);
   }
 
+  private get tmpDir() {
+    return path.join(this.configManager.buildDir, '_tmp');
+  }
+
 
   constructor(
     io: Io,
@@ -52,6 +56,9 @@ export default class EntitiesWriter {
    */
   async writeUsed() {
     const usedEntities: EntitiesNames = this.hostClassNames.getEntitiesNames();
+
+    // clear tmp dir
+    rimraf.sync(`${this.tmpDir}/**/*`);
 
     for (let typeName of Object.keys(usedEntities)) {
       const pluralType = typeName as ManifestsTypePluralName;
@@ -94,13 +101,10 @@ export default class EntitiesWriter {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
     const mainSrcFile = path.resolve(preManifest.baseDir, preManifest.main);
     const mainJsDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
-    const tmpDir = path.join(this.configManager.buildDir, '_tmp/env');
 
     this.log.info(`- building main file of entity "${entityName}"`);
-    rimraf.sync(`${tmpDir}/**/*`);
-    await buildEntityMainFile(tmpDir, mainSrcFile, mainJsDstFile);
+    await buildEntityMainFile(pluralType, entityName, this.tmpDir, mainSrcFile, mainJsDstFile);
   }
-
 
   private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {
     if (pluralType === 'devices') {

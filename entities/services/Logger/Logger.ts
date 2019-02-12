@@ -1,8 +1,8 @@
-import ServiceBase from '../../../host/baseServices/ServiceBase';
-import categories from '../../../host/dict/categories';
-import LogLevel from '../../../host/interfaces/LogLevel';
+import ServiceBase from 'host/baseServices/ServiceBase';
+import LogLevel from 'host/interfaces/LogLevel';
+import {LOG_LEVELS} from 'host/dict/constants';
+
 import * as defaultLogger from './defaultLogger';
-import {LOG_LEVELS} from '../../../host/dict/constants';
 
 
 interface Props {
@@ -38,7 +38,7 @@ export default class Logger extends ServiceBase<Props> {
       // listen to allowed levels
       for (let level of allowedLogLevels) {
         // TODO: не использовать messager - use events
-        this.env.messenger.subscribe(hostId, categories.logger, level, handler);
+        //this.env.messenger.subscribe(hostId, categories.logger, level, handler);
       }
     }
   }
