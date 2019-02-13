@@ -18,12 +18,10 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'WallClickSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'WallSwitchSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'WallToggle/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'Pcf8574/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'PortExpanderEsp32/manifest.yaml'));
   // TODO: remove
   await env.addDevice(path.join(devicesRoot, 'FakePeopleCount/manifest.yaml'));
-  // TODO: remove
-  await env.addDevice(path.join(devicesRoot, 'Pcf8574/manifest.yaml'));
-  // TODO: remove
-  await env.addDevice(path.join(devicesRoot, 'PortExpanderEsp32/manifest.yaml'));
 
   // drivers
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.yaml'));
@@ -40,16 +38,10 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'I2c/I2cToMaster.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2c/I2cDuplex.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/SerialDuplex.yaml'));
-
-  // TODO: remove
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_local.yaml'));
-  // TODO: remove
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_pcf8574.yaml'));
-  // TODO: remove
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_portExpander.yaml'));
-  // TODO: remove
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
-  // TODO: remove
   await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));
 
   // network connections drivers
