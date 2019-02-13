@@ -3,7 +3,7 @@ import EntitiesCollection from './EntitiesCollection';
 import ConfigManager from '../ConfigManager';
 import PluginEnv from './PluginEnv';
 import Io from '../Io';
-import systemPlugin from '../systemPlugin';
+import systemEntitiesPlugin from '../../entities/systemEntitiesPlugin';
 import Logger from '../interfaces/Logger';
 
 
@@ -38,7 +38,7 @@ export default class Entities {
    */
   private async registering(): Promise<void> {
     // register system plugin which registering system devices, drivers and services
-    this.register.addPlugin(systemPlugin);
+    this.register.addPlugin(systemEntitiesPlugin);
 
     // register plugins specified in config
     if (this.configManager.plugins) {

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import PluginEnv from './entities/PluginEnv';
+import PluginEnv from '../hostEnvBuilder/entities/PluginEnv';
 
 const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
@@ -8,7 +8,7 @@ const servicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'services');
 //const networkConnectionDriversRoot = path.resolve(__dirname, systemEntitiesRoot, 'network/connections');
 
 
-export default async function systemPlugin (env: PluginEnv) {
+export default async function systemEntitiesPlugin (env: PluginEnv) {
   // devices
   await env.addDevice(path.join(devicesRoot, 'ClickSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'BinarySensor/manifest.yaml'));
