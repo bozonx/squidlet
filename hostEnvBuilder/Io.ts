@@ -32,6 +32,10 @@ export default class Io {
     return fsPromises.copyFile(src, dest);
   }
 
+  async renameFile(src: string, dest: string): Promise<void> {
+    return fsPromises.rename(src, dest);
+  }
+
   mkdir(path: string): Promise<void> {
     return fsPromises.mkdir(path);
   }

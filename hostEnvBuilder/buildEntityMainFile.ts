@@ -10,22 +10,18 @@ export default async function buildEntityMainFile(
   pluralType: ManifestsTypePluralName,
   entityName: string,
   tmpDir: string,
-  mainSrcFile: string,
-  mainJsDstFile: string
+  entitySrcDir: string,
+  entityDstDir: string
 ) {
   const modernJsDir = path.join(tmpDir, 'modern', pluralType, entityName);
   const legacyJsDir = path.join(tmpDir, 'legacy', pluralType, entityName);
-  const minJsDir = path.join(tmpDir, 'min', pluralType, entityName);
+  //const minJsDir = path.join(tmpDir, 'min', pluralType, entityName);
 
   // ts to modern js
-  await compileTs(path.dirname(mainSrcFile), modernJsDir);
+  await compileTs(entitySrcDir, modernJsDir);
   // modern js to ES5
   await compileJs(modernJsDir, legacyJsDir, false);
 
-  // TODO: resolve local dependencies
-
   // minimize
-  await minimize(legacyJsDir, minJsDir);
-
-  // TODO: скопировать с учетом переименования главного файла
+  await minimize(legacyJsDir, entityDstDir);
 }
