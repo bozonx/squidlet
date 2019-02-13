@@ -3,10 +3,8 @@ main: DigitalPinOutput.ts
 type: system
 
 # TODO: remove
-drivers:
-  - Digital_local
-  - Digital_pcf8574
-  - Digital_portExpander
+#drivers:
+#  - Digital_local
 
 props:
   initialLevel:

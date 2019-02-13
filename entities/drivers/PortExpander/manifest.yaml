@@ -1,7 +1,8 @@
 name: PortExpander
 main: PortExpander.ts
 
-#drivers:
+drivers:
+  - Digital_portExpander
 #  - I2cDuplex
 #  - SerialDuplex
 

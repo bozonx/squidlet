@@ -3,5 +3,6 @@ main: Pcf8574.ts
 
 drivers:
   - I2cToSlave
+  - Digital_pcf8574
 
 props: ./props.yaml

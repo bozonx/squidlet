@@ -1,8 +1,7 @@
-import {
+import DigitalDev, {
   DigitalSubDriver,
   Edge,
   WatchHandler,
-  DigitalDev,
   DigitalInputMode
 } from 'host/interfaces/dev/DigitalDev';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';

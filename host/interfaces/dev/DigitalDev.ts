@@ -19,15 +19,15 @@ interface DigitalBase {
   clearAllWatches(): Promise<void>;
 }
 
-// Digital.dev
-export interface DigitalDev extends DigitalBase {
-  setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
-  setupOutput(pin: number, initialValue?: boolean): Promise<void>;
-  getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
-}
-
 export interface DigitalSubDriver extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
   setupOutput(pin: number, initialValue: boolean): Promise<void>;
   // getPinMode isn't used
+}
+
+// Digital.dev
+export default interface DigitalDev extends DigitalBase {
+  setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
+  setupOutput(pin: number, initialValue?: boolean): Promise<void>;
+  getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
 }
