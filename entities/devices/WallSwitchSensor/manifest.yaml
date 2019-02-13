@@ -2,7 +2,7 @@ name: WallSwitchSensor
 type: switch-sensor
 main: ./WallSwitchSensor.ts
 drivers:
-  - BinaryInput.driver
+  - BinaryInput
 
 props: ./props.yaml
 

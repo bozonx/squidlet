@@ -2,7 +2,7 @@ name: WallClickSensor
 main: ./WallClickSensor.ts
 type: switch-sensor
 drivers:
-  - BinaryClick.driver
+  - BinaryClick
 
 props: ./props.yaml
 

@@ -23,7 +23,7 @@ export default class Toggle extends DeviceBase<Props> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.binaryClick = await getDriverDep('BinaryClick.driver')
+    this.depsInstances.binaryClick = await getDriverDep('BinaryClick')
       .getInstance({
         ...this.props,
         // BinaryClick driver doesn't need a block time because it is put in place here

@@ -2,7 +2,7 @@ name: BinarySensor
 type: binary-sensor
 main: ./BinarySensor.ts
 drivers:
-  - BinaryInput.driver
+  - BinaryInput
 
 props: ./props.yaml
 

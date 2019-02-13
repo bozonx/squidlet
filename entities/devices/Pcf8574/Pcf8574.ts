@@ -14,7 +14,7 @@ export default class Pcf8574 extends DeviceBase<Props> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.expander = await getDriverDep('Pcf8574.driver')
+    this.depsInstances.expander = await getDriverDep('Pcf8574')
       .getInstance(this.props);
   }
 

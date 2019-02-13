@@ -3,7 +3,7 @@ type: relay
 main: ./Relay.ts
 
 drivers:
-  - BinaryOutput.driver
+  - BinaryOutput
 
 props: ./props.yaml
 

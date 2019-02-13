@@ -2,7 +2,7 @@ name: ClickSensor
 type: click-sensor
 main: ./ClickSensor.ts
 drivers:
-  - BinaryClick.driver
+  - BinaryClick
 
 props: ./props.yaml
 

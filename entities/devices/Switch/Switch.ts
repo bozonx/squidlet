@@ -22,7 +22,7 @@ export default class Switch extends DeviceBase<Props> {
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.binaryOutput = await getDriverDep('BinaryOutput.driver')
+    this.depsInstances.binaryOutput = await getDriverDep('BinaryOutput')
       .getInstance(this.props);
   }
 

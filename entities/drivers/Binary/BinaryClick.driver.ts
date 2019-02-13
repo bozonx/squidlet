@@ -31,7 +31,7 @@ export class BinaryClickDriver extends DriverBase<BinaryClickDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
+    this.depsInstances.binaryInput = await getDriverDep('BinaryInput')
       .getInstance({
         ...this.props,
         blockTime: 0,

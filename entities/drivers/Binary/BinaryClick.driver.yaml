@@ -1,8 +1,9 @@
 name: BinaryClick.driver
 main: BinaryClick.driver.ts
 type: system
+
 drivers:
-  - BinaryInput.driver
+  - BinaryInput
 
 props:
   # Maximum time of pressed button. It releases after reaching this timeout.

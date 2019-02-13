@@ -1,8 +1,9 @@
 name: BinaryOutput.driver
 main: BinaryOutput.driver.ts
 type: system
+
 drivers:
-  - DigitalPinOutput.driver
+  - DigitalPinOutput
 
 props:
   blockTime:

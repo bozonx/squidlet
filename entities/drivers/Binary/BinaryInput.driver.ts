@@ -32,7 +32,7 @@ export class BinaryInputDriver extends DriverBase<BinaryInputDriverProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
-    this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput.driver')
+    this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput')
       .getInstance({
         ...omit(
           this.props,

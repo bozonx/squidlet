@@ -1,8 +1,9 @@
 name: ImpulseInput.driver
 main: ImpulseInput.driver.ts
 type: system
+
 drivers:
-  - DigitalPinInput.driver
+  - DigitalPinInput
 
 props:
   impulseLength:

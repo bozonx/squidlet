@@ -2,7 +2,7 @@ name: Switch
 type: switch
 main: ./Switch.ts
 drivers:
-  - BinaryOutput.driver
+  - BinaryOutput
 
 props: ./props.yaml
 

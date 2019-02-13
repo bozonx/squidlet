@@ -1,8 +1,9 @@
 name: BinaryInput.driver
 main: BinaryInput.driver.ts
 type: system
+
 drivers:
-  - DigitalPinInput.driver
+  - DigitalPinInput
 
 props:
   # timeout after received signal. At this time it doesn't receive any signals.

@@ -17,7 +17,7 @@ export default class BinarySensor extends DeviceBase<Props> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.binaryInput = await getDriverDep('BinaryInput.driver')
+    this.depsInstances.binaryInput = await getDriverDep('BinaryInput')
       .getInstance(this.props);
   }
 
