@@ -2,8 +2,8 @@ name: Digital_portExpander.driver
 main: Digital_portExpander.driver.ts
 type: system
 
-#drivers:
-#  - PortExpander.driver
+#devices:
+#  - PortExpanderEsp32
 
 props:
   expander:
