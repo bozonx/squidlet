@@ -2,8 +2,8 @@ name: I2cDuplex.driver
 main: I2cDuplex.driver.ts
 type: system
 
-drivers:
-  - I2cToSlave.driver
+#drivers:
+#  - I2cToSlave
 
 props:
   # I2cToSlave

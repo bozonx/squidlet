@@ -4,9 +4,9 @@ type: system
 
 # TODO: remove
 drivers:
-  - Digital_local.driver
-  - Digital_pcf8574.driver
-  - Digital_portExpander.driver
+  - Digital_local
+  - Digital_pcf8574
+  - Digital_portExpander
 
 props:
   edge:

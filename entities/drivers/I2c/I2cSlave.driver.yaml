@@ -1,5 +1,6 @@
 name: I2cSlave.driver
 main: I2cSlave.driver.ts
 type: system
-drivers:
-  - I2cSlave.dev
+
+devs:
+  - I2cSlave

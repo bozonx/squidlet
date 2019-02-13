@@ -1,8 +1,10 @@
 name: SerialDuplex.driver
 main: SerialDuplex.driver.ts
 type: system
-drivers:
-  - Serial.dev
+
+devs:
+  - Serial
+
 props:
   # Number of system UART interface starts from 0
   uartNum:

@@ -1,9 +1,11 @@
 name: I2cToSlave.driver
 main: I2cToSlave.driver.ts
 type: system
+
 drivers:
-  - I2cMaster.driver
-  - ImpulseInput.driver
+  - I2cMaster
+  - ImpulseInput
+
 props:
   bus:
     type: string | number

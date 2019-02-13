@@ -27,11 +27,11 @@ export class I2cToSlaveDriver extends MasterSlaveBaseNodeDriver<I2cToSlaveDriver
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     if (this.props.int) {
-      this.impulseInput = await getDriverDep('ImpulseInput.driver')
+      this.impulseInput = await getDriverDep('ImpulseInput')
         .getInstance(this.props.int || {});
     }
 
-    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.driver')
+    this.depsInstances.i2cMaster = await getDriverDep('I2cMaster')
       .getInstance(omit(this.props,
         'address', 'int', 'poll', 'feedback', 'pollInterval'
       ));

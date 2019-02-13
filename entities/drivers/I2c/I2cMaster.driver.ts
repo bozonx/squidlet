@@ -2,7 +2,6 @@ import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import I2cMaster from 'host/interfaces/dev/I2cMaster';
 import { addFirstItemUint8Arr } from 'host/helpers/helpers';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
 import {DATA_ADDRESS_LENGTH} from 'host/dict/constants';
 
 
@@ -24,8 +23,7 @@ export class I2cMasterDriver extends DriverBase<I2cMasterDriverInstanceProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    //this.depsInstances.i2cMaster = await getDriverDep('I2cMaster.dev');
+  protected willInit = async () => {
     this.depsInstances.i2cMaster = this.env.getDev('I2cMaster');
   }
 

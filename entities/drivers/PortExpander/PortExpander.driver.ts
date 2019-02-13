@@ -112,7 +112,7 @@ export class PortExpanderDriver extends DriverBase<ExpanderDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex.driver`;
+    const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex`;
 
     const props = {
       ...omit(this.props, 'connection', 'digitalPinsCount', 'analogPinsCount'),

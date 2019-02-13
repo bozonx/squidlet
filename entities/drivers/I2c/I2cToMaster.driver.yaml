@@ -1,9 +1,10 @@
 name: I2cToMaster.driver
 main: I2cToMaster.driver.ts
-type: system
+type:
+
 drivers:
-  - I2cSlave.driver
-  - ImpulseInput.driver
+  - I2cSlave
+
 props:
   feedback:
     type: poll | int | none

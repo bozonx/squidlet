@@ -21,11 +21,11 @@ export class I2cDuplexDriver extends DriverBase<I2cDuplexDriverProps> implements
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     if (this.isToSlave()) {
-      this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave.driver')
+      this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave')
         .getInstance(this.props);
     }
     else {
-      this.depsInstances.i2cDriver = await getDriverDep('I2cToMaster.driver')
+      this.depsInstances.i2cDriver = await getDriverDep('I2cToMaster')
         .getInstance(this.props);
     }
   }

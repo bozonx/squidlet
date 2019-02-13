@@ -50,7 +50,7 @@ export class PCF8574Driver extends DriverBase<ExpanderDriverProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave.driver')
+    this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave')
       .getInstance({
         ...this.props,
         poll: [

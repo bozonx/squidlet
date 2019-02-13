@@ -1,8 +1,9 @@
 name: I2cMaster.driver
 main: I2cMaster.driver.ts
 type: system
-drivers:
-  - I2cMaster.dev
+
+devs:
+  - I2cMaster
 
 props:
   bus:
