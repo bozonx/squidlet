@@ -3,10 +3,10 @@ import DriverBase from 'host/baseDrivers/DriverBase';
 import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'host/interfaces/dev/DigitalDev';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from 'host/dict/constants';
 
-import {ExpanderDriverProps, Pcf8574} from '../Pcf8574/Pcf8574';
+import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';
 
 
-interface DigitalPcf8574Props extends ExpanderDriverProps {
+interface DigitalPcf8574Props extends Pcf8574ExpanderProps {
   expander: string;
 }
 

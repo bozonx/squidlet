@@ -12,7 +12,7 @@ describe 'configWorks.EntitiesCollection', ->
           './deviceFile.json'
         ]
         drivers: [
-          'DriverName.driver'
+          'DriverName'
         ]
         props: {
           propsParam: 'value'
@@ -22,7 +22,7 @@ describe 'configWorks.EntitiesCollection', ->
     ]
     @prePreDriverManifest = [
       {
-        name: 'DriverName.driver'
+        name: 'DriverName'
         baseDir: '/myBaseDir'
         main: './main.ts'
         system: true

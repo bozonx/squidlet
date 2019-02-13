@@ -9,7 +9,7 @@ props:
   expander:
     type: string
     required: true
-  # PortExpander.driver
+  # PortExpander driver
   connection:
   # ... connection props
   digitalPinsCount:

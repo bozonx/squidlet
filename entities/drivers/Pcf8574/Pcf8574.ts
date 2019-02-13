@@ -16,7 +16,7 @@ import {I2cToSlave, I2cToSlaveDriverProps} from '../I2c/I2cToSlave';
 
 export type ChangeStateHandler = (targetPin: number, value: boolean) => void;
 
-export interface ExpanderDriverProps extends I2cToSlaveDriverProps {
+export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
 }
 
 
@@ -30,7 +30,7 @@ export const PINS_COUNT = 8;
 export const DATA_LENGTH = 1;
 
 
-export class Pcf8574 extends DriverBase<ExpanderDriverProps> {
+export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // Direction of each pin. By default all the pin directions are undefined
   private readonly directions: Array<number> = [];
   // Bitmask representing the current state of the pins
@@ -73,7 +73,7 @@ export class Pcf8574 extends DriverBase<ExpanderDriverProps> {
       await this.writeToIc(this.currentState);
     }
     catch (err) {
-      this.env.log.error(`PCF8574.driver. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      this.env.log.error(`PCF8574. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
   }
 
@@ -367,7 +367,7 @@ export class Pcf8574 extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  protected validateProps = (props: ExpanderDriverProps): string | undefined => {
+  protected validateProps = (props: Pcf8574ExpanderProps): string | undefined => {
 
     // if(address < 0 || address > 255){
     //   throw new Error('Address out of range');

@@ -26,7 +26,7 @@ const platformConfig: MachineConfig = {
     config: {
     },
     drivers: {
-      'I2cMaster.driver': {
+      'I2cMaster': {
         bus: 1,
       }
     },

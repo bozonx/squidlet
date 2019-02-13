@@ -33,7 +33,7 @@ export type PortExpanderPinMode = DigitalPinMode
   | 'rx'
   | 'tx';
 
-export interface ExpanderDriverProps {
+export interface PortExpanderProps {
   connection: PortExpanderConnection;
   digitalPinsCount: number;
   analogPinsCount: number;
@@ -97,7 +97,7 @@ export const NO_MODE = 0x21;
 
 // TODO: не делать публичное то что не нужно
 
-export class PortExpander extends DriverBase<ExpanderDriverProps> {
+export class PortExpander extends DriverBase<PortExpanderProps> {
   wasIcInited: boolean = false;
   readonly state: State = new State(this);
   // TODO: does it really need?
@@ -346,7 +346,7 @@ export class PortExpander extends DriverBase<ExpanderDriverProps> {
   }
 
 
-  protected validateProps = (props: ExpanderDriverProps): string | undefined => {
+  protected validateProps = (props: PortExpanderProps): string | undefined => {
 
     // if(address < 0 || address > 255){
     //   throw new Error('Address out of range');

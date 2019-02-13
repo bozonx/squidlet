@@ -119,7 +119,7 @@ export default class Destinations {
   }
 
   private generateDriverName(connectionType: string): string {
-    return `${firstLetterToUpperCase(connectionType)}.connection.driver`;
+    return `${firstLetterToUpperCase(connectionType)}.connection`;
   }
 
 }

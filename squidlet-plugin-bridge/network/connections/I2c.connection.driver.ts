@@ -1,6 +1,6 @@
 import MyAddress from '../../../host/interfaces/MyAddress';
 import DriverFactoryBase from '../../../host/baseDrivers/DriverFactoryBase';
-import { I2cDataDriver } from '../../drivers/I2c/I2cData.driver';
+import { I2cDataDriver } from '../../drivers/I2c/I2cData';
 import { uint8ArrayToText, textToUint8Array} from '../../../host/helpers/binaryHelpers';
 import DriverBase from '../../../host/baseDrivers/DriverBase';
 import {GetDriverDep} from '../../../host/entities/EntityBase';
@@ -31,9 +31,9 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     const isMaster = typeof this.props.myAddress.address === 'undefined';
-    const i2cDriverName = (isMaster) ? 'I2cMaster.driver' : 'I2cSlave.driver';
+    const i2cDriverName = (isMaster) ? 'I2cMaster' : 'I2cSlave';
 
-    this.depsInstances.i2cDataDriver = getDriverDep('I2cData.driver')
+    this.depsInstances.i2cDataDriver = getDriverDep('I2cData')
     // TODO: bus will be undefined
       .getInstance({ i2cDriverName, bus: this.props.myAddress.bus });
   }

@@ -1,4 +1,4 @@
-# I2cToSlave.driver
+# I2cToSlave driver
 bus:
 address:
   int:

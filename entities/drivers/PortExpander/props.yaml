@@ -7,7 +7,7 @@ analogPinsCount:
   type: number
   required: true
 
-# I2cNode.driver
+# I2cNode driver
 bus:
 address:
 feedback:

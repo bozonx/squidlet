@@ -22,7 +22,7 @@ describe 'configWorks.Definitions', ->
               }
             }
             drivers: {
-              'Digital.driver': {
+              'Digital': {
                 param: 1
               }
             }
@@ -67,9 +67,9 @@ describe 'configWorks.Definitions', ->
       }
     })
     assert.deepEqual(@definitions.getHostDriversDefinitions('master'), {
-      'Digital.driver': {
-        id: 'Digital.driver'
-        className: 'Digital.driver'
+      'Digital': {
+        id: 'Digital'
+        className: 'Digital'
         props: {
           param: 1
           manifestProp: 'value'
@@ -94,9 +94,9 @@ describe 'configWorks.Definitions', ->
       @entitiesSet = {
         # the same for devices and services
         drivers: {
-          'Some.driver': {
+          'Some': {
             manifest: {
-              name: 'Some.driver'
+              name: 'Some'
             }
             main: './main.ts'
             files: []
@@ -108,8 +108,8 @@ describe 'configWorks.Definitions', ->
       }
       @definitions.driversDefinitions = {
         master: {
-          'Some.driver': {
-            className: 'Some.driver'
+          'Some': {
+            className: 'Some'
           }
         }
       }

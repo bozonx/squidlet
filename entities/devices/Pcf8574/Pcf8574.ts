@@ -1,10 +1,10 @@
 import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
-import {ExpanderDriverProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
+import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
 
 
-interface Props extends DeviceBaseProps, ExpanderDriverProps {
+interface Props extends DeviceBaseProps, Pcf8574ExpanderProps {
 }
 
 

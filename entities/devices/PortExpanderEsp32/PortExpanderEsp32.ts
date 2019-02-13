@@ -2,13 +2,13 @@ import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
 import {
-  ExpanderDriverProps,
+  PortExpanderProps,
   PortExpanderConnection,
   PortExpander
 } from '../../drivers/PortExpander/PortExpander';
 
 
-interface Props extends DeviceBaseProps, ExpanderDriverProps {
+interface Props extends DeviceBaseProps, PortExpanderProps {
   connection: PortExpanderConnection;
 }
 
