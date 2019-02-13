@@ -2,8 +2,8 @@ name: Relay
 type: relay
 main: ./Relay.ts
 
-drivers:
-  - BinaryOutput
+devices:
+  - Switch
 
 props: ./props.yaml
 

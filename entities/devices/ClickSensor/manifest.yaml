@@ -1,6 +1,7 @@
 name: ClickSensor
 type: click-sensor
 main: ./ClickSensor.ts
+
 drivers:
   - BinaryClick
 
