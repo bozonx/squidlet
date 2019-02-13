@@ -4,7 +4,7 @@ import IndexedEvents from 'host/helpers/IndexedEvents';
 
 import {DigitalPinHandler} from './DigitalPins';
 import {AnalogPinHandler} from './AnalogPins';
-import {PortExpanderDriver} from './PortExpander.driver';
+import {PortExpander} from './PortExpander';
 
 
 export type DigitalState = (boolean | undefined)[];
@@ -23,7 +23,7 @@ export interface ExpanderState {
 export default class State {
   readonly digitalEvents = new IndexedEvents<DigitalPinHandler>();
   readonly analogEvents = new IndexedEvents<AnalogPinHandler>();
-  private readonly expander: PortExpanderDriver;
+  private readonly expander: PortExpander;
   private readonly state: ExpanderState = {
     inputs: [],
     outputs: [],
@@ -32,7 +32,7 @@ export default class State {
   };
 
 
-  constructor(expander: PortExpanderDriver) {
+  constructor(expander: PortExpander) {
     this.expander = expander;
   }
 

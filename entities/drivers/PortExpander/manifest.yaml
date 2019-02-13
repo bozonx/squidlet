@@ -1,5 +1,5 @@
-name: PortExpander.driver
-main: PortExpander.driver.ts
+name: PortExpander
+main: PortExpander.ts
 
 #drivers:
 #  - I2cDuplex

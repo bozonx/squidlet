@@ -3,7 +3,7 @@ import {Data} from 'host/baseDevice/DeviceDataManagerBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 
-import {BinaryInputDriver, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput.driver';
+import {BinaryInput, BinaryInputDriverProps} from '../../drivers/Binary/BinaryInput';
 
 
 interface Props extends DeviceBaseProps, BinaryInputDriverProps {
@@ -11,7 +11,7 @@ interface Props extends DeviceBaseProps, BinaryInputDriverProps {
 
 
 export default class BinarySensor extends DeviceBase<Props> {
-  private get binaryInput(): BinaryInputDriver {
+  private get binaryInput(): BinaryInput {
     return this.depsInstances.binaryInput as any;
   }
 

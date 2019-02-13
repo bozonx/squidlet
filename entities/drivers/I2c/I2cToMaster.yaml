@@ -1,0 +1,24 @@
+name: I2cToMaster
+main: I2cToMaster.ts
+type:
+
+drivers:
+  - I2cSlave
+
+props:
+  feedback:
+    type: poll | int | none
+    default: none
+  poll:
+    type: array
+    # TODO: add check for items - {dataAddress: number | string, length: string, interval?: number}
+
+  # props of ImpulseInput driver which will be used for listen to interruption
+  int:
+    type: object
+
+  bus:
+    type: string | number
+  address:
+    type: string | number
+    required: true

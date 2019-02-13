@@ -1,7 +1,7 @@
 import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
-import {ExpanderDriverProps, PCF8574Driver} from '../../drivers/Pcf8574/Pcf8574.driver';
+import {ExpanderDriverProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
 
 
 interface Props extends DeviceBaseProps, ExpanderDriverProps {
@@ -9,7 +9,7 @@ interface Props extends DeviceBaseProps, ExpanderDriverProps {
 
 
 export default class Pcf8574 extends DeviceBase<Props> {
-  get expander(): PCF8574Driver {
+  get expander(): Pcf8574Driver {
     return this.depsInstances.expander as any;
   }
 

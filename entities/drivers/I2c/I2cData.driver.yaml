@@ -1,3 +1,0 @@
-name: I2cData.driver
-main: I2cData.driver.ts
-type: system

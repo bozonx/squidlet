@@ -1,5 +1,5 @@
-name: Storage.driver
-main: Storage.driver.ts
+name: Storage
+main: Storage.ts
 
 devs:
   - Storage

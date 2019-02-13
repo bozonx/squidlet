@@ -1,5 +1,5 @@
-name: Pcf8574.driver
-main: Pcf8574.driver.ts
+name: Pcf8574
+main: Pcf8574.ts
 
 drivers:
   - I2cToSlave

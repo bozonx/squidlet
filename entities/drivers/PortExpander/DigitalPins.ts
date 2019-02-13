@@ -5,8 +5,8 @@ import {getKeyOfObject} from 'host/helpers/helpers';
 import {
   COMMANDS,
   MODES, NO_MODE,
-  PortExpanderDriver,
-} from './PortExpander.driver';
+  PortExpander,
+} from './PortExpander';
 import {DigitalState} from './State';
 
 
@@ -21,10 +21,10 @@ const DIGITAL_VALUE = {
 export default class DigitalPins {
   // pin modes which are set at init time.
   private pinModes: number[] = [];
-  private readonly expander: PortExpanderDriver;
+  private readonly expander: PortExpander;
   
 
-  constructor(expander: PortExpanderDriver) {
+  constructor(expander: PortExpander) {
     this.expander = expander;
   }
 

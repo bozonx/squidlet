@@ -1,6 +1,0 @@
-name: Digital_local.driver
-main: Digital_local.driver.ts
-type: system
-
-devs:
-  - Digital

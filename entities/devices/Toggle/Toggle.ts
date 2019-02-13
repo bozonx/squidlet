@@ -4,7 +4,7 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 
-import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
+import {BinaryClick, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick';
 
 
 interface Props extends DeviceBaseProps, BinaryClickDriverProps {
@@ -17,7 +17,7 @@ export default class Toggle extends DeviceBase<Props> {
   private blockTimeInProgress: boolean = false;
 
 
-  private get binaryClick(): BinaryClickDriver {
+  private get binaryClick(): BinaryClick {
     return this.depsInstances.binaryClick as any;
   }
 

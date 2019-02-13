@@ -5,7 +5,7 @@ import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import Status from 'host/baseDevice/Status';
 
-import {BinaryOutputDriver, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput.driver';
+import {BinaryOutput, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput';
 
 
 interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
@@ -13,7 +13,7 @@ interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
 
 
 export default class Switch extends DeviceBase<Props> {
-  private get binaryOutput(): BinaryOutputDriver {
+  private get binaryOutput(): BinaryOutput {
     return this.depsInstances.binaryOutput as any;
   }
 

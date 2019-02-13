@@ -1,0 +1,12 @@
+name: SerialDuplex
+main: SerialDuplex.ts
+type: system
+
+devs:
+  - Serial
+
+props:
+  # Number of system UART interface starts from 0
+  uartNum:
+    type: number
+    required: true

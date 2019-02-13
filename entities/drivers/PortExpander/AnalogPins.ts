@@ -6,8 +6,8 @@ import {
   COMMANDS,
   MODES, NO_MODE,
   PortExpanderAnalogPinMode,
-  PortExpanderDriver,
-} from './PortExpander.driver';
+  PortExpander,
+} from './PortExpander';
 import {AnalogState} from './State';
 
 
@@ -19,10 +19,10 @@ export type AnalogPinHandler = (targetPin: number, value: number) => void;
 export default class AnalogPins {
   // pin modes which are set at init time.
   private pinModes: number[] = [];
-  private readonly expander: PortExpanderDriver;
+  private readonly expander: PortExpander;
 
   
-  constructor(expander: PortExpanderDriver) {
+  constructor(expander: PortExpander) {
     this.expander = expander;
   }
 

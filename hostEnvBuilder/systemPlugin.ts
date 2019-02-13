@@ -26,34 +26,34 @@ export default async function systemPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'PortExpanderEsp32/manifest.yaml'));
 
   // drivers
-  await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/BinaryOutput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/ImpulseInput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/ImpulseOutput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/BinaryClick.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinInput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinOutput.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cData.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cMaster.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cToSlave.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cSlave.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cToMaster.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cDuplex.driver.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Serial/SerialDuplex.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Binary/BinaryOutput.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Binary/ImpulseInput.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Binary/ImpulseOutput.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Binary/BinaryClick.yaml'));
+  await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinInput.yaml'));
+  await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinOutput.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cData.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cMaster.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cToSlave.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cSlave.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cToMaster.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2c/I2cDuplex.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Serial/SerialDuplex.yaml'));
 
   // TODO: remove
-  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_local.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_local.yaml'));
   // TODO: remove
-  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_pcf8574.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_pcf8574.yaml'));
   // TODO: remove
-  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_portExpander.driver.yaml'));
+  await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_portExpander.yaml'));
   // TODO: remove
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   // TODO: remove
   await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));
 
   // network connections drivers
-  //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection.driver'));
+  //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection'));
 
   // services
   await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));

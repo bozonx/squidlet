@@ -4,8 +4,8 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {
   ExpanderDriverProps,
   PortExpanderConnection,
-  PortExpanderDriver
-} from '../../drivers/PortExpander/PortExpander.driver';
+  PortExpander
+} from '../../drivers/PortExpander/PortExpander';
 
 
 interface Props extends DeviceBaseProps, ExpanderDriverProps {
@@ -14,7 +14,7 @@ interface Props extends DeviceBaseProps, ExpanderDriverProps {
 
 
 export default class PortExpanderEsp32 extends DeviceBase<Props> {
-  get expander(): PortExpanderDriver {
+  get expander(): PortExpander {
     return this.depsInstances.expander as any;
   }
 

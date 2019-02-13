@@ -1,0 +1,24 @@
+name: ImpulseOutput
+main: ImpulseOutput.ts
+type: system
+
+drivers:
+  - DigitalPinOutput
+
+props:
+  impulseLength:
+    type: number
+    default: 20
+  blockTime:
+    type: number
+    default: 0
+  blockMode:
+    type: refuse | defer
+    default: refuse
+  invert:
+    type: boolean
+    default: false
+
+  ### DigitalPin base props
+  pin:
+  source:

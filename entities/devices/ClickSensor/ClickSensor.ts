@@ -4,7 +4,7 @@ import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {omit} from 'host/helpers/lodashLike';
 
-import {BinaryClickDriver, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick.driver';
+import {BinaryClick, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick';
 
 
 
@@ -14,7 +14,7 @@ interface Props extends DeviceBaseProps, BinaryClickDriverProps {
 
 
 export default class ClickSensor extends DeviceBase<Props> {
-  private get binaryClick(): BinaryClickDriver {
+  private get binaryClick(): BinaryClick {
     return this.depsInstances.binaryClick as any;
   }
 

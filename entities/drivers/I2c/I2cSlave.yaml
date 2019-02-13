@@ -1,0 +1,6 @@
+name: I2cSlave
+main: I2cSlave.ts
+type: system
+
+devs:
+  - I2cSlave
