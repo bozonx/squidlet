@@ -8,7 +8,7 @@ import initializationConfig from '../../host/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys.dev';
 import {trimEnd} from '../../host/helpers/lodashLike';
 import systemConfig from '../../host/config/systemConfig';
-import Sys from '../../host/interfaces/dev/Sys';
+import SysDev from '../../host/interfaces/dev/SysDev';
 import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
 
 
@@ -16,7 +16,7 @@ let __configSet: SrcHostEnvSet;
 const initCfg = initializationConfig();
 
 
-export default class SysDev implements Sys {
+export default class SysDev implements SysDev {
   static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
     __configSet = hostConfigSet;
   }

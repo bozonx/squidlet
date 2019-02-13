@@ -1,17 +1,17 @@
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'host/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'host/interfaces/dev/DigitalDev';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from 'host/dict/constants';
 
 import {ExpanderDriverProps, Pcf8574} from '../Pcf8574/Pcf8574';
 
 
-interface DigitalPcf8574DriverProps extends ExpanderDriverProps {
+interface DigitalPcf8574Props extends ExpanderDriverProps {
   expander: string;
 }
 
 
-export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> implements DigitalSubDriver {
+export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements DigitalSubDriver {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];
@@ -109,15 +109,15 @@ export class DigitalPcf8574Driver extends DriverBase<DigitalPcf8574DriverProps> 
   }
 
   private expanderErrMsg(methodWhichCheck: string): string {
-    return `DigitalPcf8574Driver.${methodWhichCheck}: It seems that it calls before Pcf8574 is initialized`;
+    return `DigitalPcf8574.${methodWhichCheck}: It seems that it calls before Pcf8574 is initialized`;
   }
 
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPcf8574Driver> {
+export default class Factory extends DriverFactoryBase<DigitalPcf8574> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = DigitalPcf8574Driver;
+  protected DriverClass = DigitalPcf8574;
 
   /**
    * It generates unique id for DigitalPin input and output driver

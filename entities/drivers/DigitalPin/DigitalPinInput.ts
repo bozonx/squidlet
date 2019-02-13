@@ -1,4 +1,4 @@
-import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'host/interfaces/dev/Digital';
+import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'host/interfaces/dev/DigitalDev';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
@@ -9,7 +9,7 @@ import {resolveDriverName} from './digitalHelpers';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 
 
-export interface DigitalPinInputDriverProps extends DigitalBaseProps {
+export interface DigitalPinInputProps extends DigitalBaseProps {
   // debounce time in ms only for input pins. If not set system defaults will be used.
   edge: Edge;
   // Listen to low, high or both levels. By default is both.
@@ -28,7 +28,7 @@ export interface DigitalPinInputDriverProps extends DigitalBaseProps {
  * This is middleware driver which allows acting with low level drivers as an input pin.
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
-export class DigitalPinInput extends DriverBase<DigitalPinInputDriverProps> {
+export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
   private changeEvents = new IndexedEvents<WatchHandler>();
   private doubleCheckInProgress: boolean = false;
   private lastValue?: boolean;

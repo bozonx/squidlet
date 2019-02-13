@@ -74,7 +74,7 @@ describe 'integration network', ->
       writeTo: (addrHex, data) =>
         @destListenHandler(data)
     }
-    @I2cMaster = {
+    @I2cMasterDev = {
       getInstance: => @I2cMasterDevInstance
     }
 
@@ -82,7 +82,7 @@ describe 'integration network', ->
       listenIncome: (handler) => @destListenHandler = handler
       removeListener: =>
     }
-    @I2cSlave = {
+    @I2cSlaveDev = {
       getInstance: => @I2cSlaveDevInstance
     }
 

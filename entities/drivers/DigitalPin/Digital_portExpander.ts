@@ -1,17 +1,17 @@
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'host/interfaces/dev/Digital';
+import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'host/interfaces/dev/DigitalDev';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from 'host/dict/constants';
 
 import {PortExpander} from '../PortExpander/PortExpander';
 
 
-interface DigitalPortExpanderDriverProps {
+interface DigitalPortExpanderProps {
   expander: string;
 }
 
 
-export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDriverProps> implements DigitalSubDriver {
+export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> implements DigitalSubDriver {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];
@@ -109,15 +109,15 @@ export class DigitalPortExpanderDriver extends DriverBase<DigitalPortExpanderDri
   }
 
   private expanderErrMsg(methodWhichCheck: string): string {
-    return `DigitalPortExpanderDriver.${methodWhichCheck}: It seems that it calls before Pcf8574 is initialized`;
+    return `DigitalPortExpander.${methodWhichCheck}: It seems that it calls before Pcf8574 is initialized`;
   }
 
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPortExpanderDriver> {
+export default class Factory extends DriverFactoryBase<DigitalPortExpander> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = DigitalPortExpanderDriver;
+  protected DriverClass = DigitalPortExpander;
 
   /**
    * It generates unique id for DigitalPin input and output driver

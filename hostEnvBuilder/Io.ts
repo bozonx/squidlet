@@ -5,7 +5,7 @@ import * as shelljs from 'shelljs';
 import * as yaml from 'js-yaml';
 
 import systemConfig from './configs/systemConfig';
-import {Stats} from '../host/interfaces/dev/Storage';
+import {Stats} from '../host/interfaces/dev/StorageDev';
 
 
 export default class Io {

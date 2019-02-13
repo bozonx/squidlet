@@ -12,7 +12,7 @@ import {BlockMode, InitialLevel} from './interfaces/Types';
 
 type DelayedResultHandler = (err?: Error) => void;
 
-export interface BinaryOutputDriverProps extends DigitalBaseProps {
+export interface BinaryOutputProps extends DigitalBaseProps {
   blockTime?: number;
   // if "refuse" - it doesn't write while block time is in progress. It is on default.
   // If "defer" it waits for block time finished and write last value which was tried to set
@@ -23,7 +23,7 @@ export interface BinaryOutputDriverProps extends DigitalBaseProps {
 }
 
 
-export class BinaryOutput extends DriverBase<BinaryOutputDriverProps> {
+export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;

@@ -1,4 +1,4 @@
-export default interface Mqtt {
+export default interface MqttDev {
   isConnected(): boolean;
   publish(topic: string, data: string | Uint8Array | undefined): Promise<void>;
   subscribe(topic: string): Promise<void>;

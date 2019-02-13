@@ -1,12 +1,12 @@
 const gpio = require('gpio');
 
 import {
-  Digital,
+  DigitalDev,
   Edge,
   DigitalPinMode,
   WatchHandler,
   DigitalInputMode
-} from '../../host/interfaces/dev/Digital';
+} from '../../host/interfaces/dev/DigitalDev';
 import DebounceCall from '../../host/helpers/DebounceCall';
 
 
@@ -18,7 +18,7 @@ interface Listener {
 }
 
 
-export default class DigitalDev implements Digital {
+export default class DigitalDev implements DigitalDev {
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
   // debounce times by pin number

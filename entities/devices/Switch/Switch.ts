@@ -5,10 +5,10 @@ import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import Status from 'host/baseDevice/Status';
 
-import {BinaryOutput, BinaryOutputDriverProps} from '../../drivers/Binary/BinaryOutput';
+import {BinaryOutput, BinaryOutputProps} from '../../drivers/Binary/BinaryOutput';
 
 
-interface Props extends DeviceBaseProps, BinaryOutputDriverProps {
+interface Props extends DeviceBaseProps, BinaryOutputProps {
 }
 
 

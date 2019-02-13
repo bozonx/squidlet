@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
-import Sys from '../../host/interfaces/dev/Sys';
+import SysDev from '../../host/interfaces/dev/SysDev';
 import {convertBufferToUint8Array} from '../helpers';
 
 
@@ -13,7 +13,7 @@ export const DEFAULT_ENCODING = 'utf8';
 /**
  * It is a slave's Sys.dev
  */
-export default class SysDev implements Sys {
+export default class SysDev implements SysDev {
   static registerStorageDir(storageDir: string) {
     __storageDir = storageDir;
   }

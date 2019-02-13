@@ -5,7 +5,7 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
 
 
-export interface I2cDuplexDriverProps extends MasterSlaveBaseProps {
+export interface I2cDuplexProps extends MasterSlaveBaseProps {
   // I2C address. Number for direction to slave. Undefined for direction to master
   address: number | undefined;
 
@@ -14,8 +14,8 @@ export interface I2cDuplexDriverProps extends MasterSlaveBaseProps {
 }
 
 
-export class I2cDuplex extends DriverBase<I2cDuplexDriverProps> implements DuplexDriver {
-  private get i2cDriver(): MasterSlaveBaseNodeDriver<I2cDuplexDriverProps> {
+export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDriver {
+  private get i2cDriver(): MasterSlaveBaseNodeDriver<I2cDuplexProps> {
     return this.depsInstances.i2cDriver as any;
   }
 

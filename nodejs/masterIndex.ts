@@ -41,7 +41,7 @@ async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
   // register config set
   (sysMasterDev as any).registerConfigSet(hostConfigSet);
   // replace Sys.dev to Sys.master.dev
-  devsSet['Sys.dev'] = sysMasterDev;
+  devsSet['SysDev.dev'] = sysMasterDev;
 
   await hostSystem.$registerDevSet(devsSet);
 

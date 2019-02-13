@@ -1,4 +1,4 @@
-import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/Digital';
+import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/DigitalDev';
 import {convertBitsToBytes} from 'host/helpers/binaryHelpers';
 import {getKeyOfObject} from 'host/helpers/helpers';
 

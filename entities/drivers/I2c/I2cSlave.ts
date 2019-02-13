@@ -1,4 +1,4 @@
-import I2cSlaveDev from 'host/interfaces/dev/I2cSlave';
+import I2cSlaveDev from 'host/interfaces/dev/I2cSlaveDev';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'host/helpers/helpers';
 import DriverBase from 'host/baseDrivers/DriverBase';
@@ -10,12 +10,12 @@ const REGISTER_LENGTH = 1;
 
 type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
-interface I2cSlaveDriverProps {
+interface I2cSlaveProps {
   bus: number;
 }
 
 
-export class I2cSlave extends DriverBase<I2cSlaveDriverProps> {
+export class I2cSlave extends DriverBase<I2cSlaveProps> {
   private readonly events = new IndexedEventEmitter<SlaveHandler>();
 
   private get i2cSlaveDev(): I2cSlaveDev {
@@ -124,7 +124,7 @@ export class I2cSlave extends DriverBase<I2cSlaveDriverProps> {
     return dataAddress.toString();
   }
 
-  protected validateProps = (props: I2cSlaveDriverProps): string | undefined => {
+  protected validateProps = (props: I2cSlaveProps): string | undefined => {
     if (Number.isInteger(props.bus)) return `Incorrect type bus number "${props.bus}"`;
     //if (Number.isNaN(props.bus)) throw new Error(`Incorrect bus number "${props.bus}"`);
 

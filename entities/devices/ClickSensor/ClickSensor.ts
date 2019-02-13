@@ -4,11 +4,11 @@ import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {omit} from 'host/helpers/lodashLike';
 
-import {BinaryClick, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick';
+import {BinaryClick, BinaryClickProps} from '../../drivers/Binary/BinaryClick';
 
 
 
-interface Props extends DeviceBaseProps, BinaryClickDriverProps {
+interface Props extends DeviceBaseProps, BinaryClickProps {
   publish: 'down' | 'up' | 'both';
 }
 

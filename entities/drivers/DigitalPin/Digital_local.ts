@@ -2,16 +2,16 @@ import {
   DigitalSubDriver,
   Edge,
   WatchHandler,
-  Digital,
+  DigitalDev,
   DigitalInputMode
-} from 'host/interfaces/dev/Digital';
+} from 'host/interfaces/dev/DigitalDev';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
 
 
-export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {
-  private get digitalDev(): Digital {
-    return this.depsInstances.digitalDev as Digital;
+export class DigitalLocal extends DriverBase implements DigitalSubDriver {
+  private get digitalDev(): DigitalDev {
+    return this.depsInstances.digitalDev as DigitalDev;
   }
 
 
@@ -62,7 +62,7 @@ export class DigitalLocalDriver extends DriverBase implements DigitalSubDriver {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalLocalDriver> {
+export default class Factory extends DriverFactoryBase<DigitalLocal> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = DigitalLocalDriver;
+  protected DriverClass = DigitalLocal;
 }

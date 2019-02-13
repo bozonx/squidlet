@@ -1,15 +1,15 @@
 import IndexedEvents from 'host/helpers/IndexedEvents';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {WatchHandler} from 'host/interfaces/dev/Digital';
+import {WatchHandler} from 'host/interfaces/dev/DigitalDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'host/helpers/helpers';
 import {omit} from 'host/helpers/lodashLike';
 
-import {DigitalPinInput, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput';
+import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPin/DigitalPinInput';
 
 
-export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
+export interface BinaryInputProps extends DigitalPinInputProps {
   // in this time driver doesn't receive any data
   blockTime?: number;
   // auto invert if pullup resistor is set. Default is true
@@ -19,7 +19,7 @@ export interface BinaryInputDriverProps extends DigitalPinInputDriverProps {
 }
 
 
-export class BinaryInput extends DriverBase<BinaryInputDriverProps> {
+export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<WatchHandler>();
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;

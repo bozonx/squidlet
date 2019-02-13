@@ -23,7 +23,7 @@
  *     host-hashes.json
  */
 
-import SysDev from './interfaces/dev/Sys';
+import SysDev from './interfaces/dev/SysDev';
 import pathJoin from './helpers/nodeLike';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';

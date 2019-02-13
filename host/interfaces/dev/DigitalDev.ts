@@ -20,7 +20,7 @@ interface DigitalBase {
 }
 
 // Digital.dev
-export interface Digital extends DigitalBase {
+export interface DigitalDev extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
   setupOutput(pin: number, initialValue?: boolean): Promise<void>;
   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;

@@ -2,11 +2,11 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 
 
-import Storage, {Stats} from '../../host/interfaces/dev/Storage';
+import StorageDev, {Stats} from '../../host/interfaces/dev/StorageDev';
 import {convertBufferToUint8Array} from '../helpers';
 
 
-export default class StorageDev implements Storage {
+export default class StorageDev implements StorageDev {
   // TODO: use constant
   private defaultEncode = 'utf8';
 

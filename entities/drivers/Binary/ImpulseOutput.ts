@@ -5,10 +5,10 @@ import {omit} from 'host/helpers/lodashLike';
 import {deferCall, invertIfNeed} from 'host/helpers/helpers';
 
 import {BlockMode} from './interfaces/Types';
-import {DigitalPinOutput, DigitalPinOutputDriverProps} from '../DigitalPin/DigitalPinOutput';
+import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPin/DigitalPinOutput';
 
 
-export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
+export interface ImpulseOutputProps extends DigitalPinOutputProps {
   // time or rising state
   impulseLength: number;
   blockTime: number;
@@ -20,7 +20,7 @@ export interface ImpulseOutputDriverProps extends DigitalPinOutputDriverProps {
 }
 
 
-export class ImpulseOutput extends DriverBase<ImpulseOutputDriverProps> {
+export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private deferredImpulse: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;

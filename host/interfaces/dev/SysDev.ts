@@ -1,4 +1,4 @@
-export default interface Sys {
+export default interface SysDev {
   mkdir(dirName: string): Promise<void>;
   readdir(dirName: string): Promise<string[]>;
   readJsonObjectFile(fileName: string): Promise<{[index: string]: any}>;

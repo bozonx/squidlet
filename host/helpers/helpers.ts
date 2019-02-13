@@ -1,7 +1,7 @@
 import {ALL_TOPICS} from '../dict/constants';
 import systemConfig from '../config/systemConfig';
 import {find, isEmpty, isEqual, isObject, trim, values} from './lodashLike';
-import {Edge} from '../interfaces/dev/Digital';
+import {Edge} from '../interfaces/dev/DigitalDev';
 
 
 export const PATH_SEPARATOR = '/';

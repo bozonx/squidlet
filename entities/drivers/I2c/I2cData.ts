@@ -35,14 +35,14 @@ export interface I2cDriverClass {
   ) => void;
 }
 
-interface I2cDataDriverProps {
+interface I2cDataProps {
   bus: number;
   // name of i2c master or slave driver to use
   i2cDriverName: string;
 }
 
 
-export class I2cData extends DriverBase<I2cDataDriverProps> {
+export class I2cData extends DriverBase<I2cDataProps> {
   private readonly defaultDataMark: number = 0x00;
   private readonly lengthRegister: number = 0x1a;
   private readonly sendDataRegister: number = 0x1b;

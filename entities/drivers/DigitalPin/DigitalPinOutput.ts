@@ -2,13 +2,13 @@ import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {omit} from 'host/helpers/lodashLike';
-import {DigitalSubDriver} from 'host/interfaces/dev/Digital';
+import {DigitalSubDriver} from 'host/interfaces/dev/DigitalDev';
 
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import {resolveDriverName} from './digitalHelpers';
 
 
-export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
+export interface DigitalPinOutputProps extends DigitalBaseProps {
   initialLevel: boolean;
 }
 
@@ -17,7 +17,7 @@ export interface DigitalPinOutputDriverProps extends DigitalBaseProps {
  * This is middleware driver which allows acting with low level drivers as an output pin.
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
-export class DigitalPinOutput extends DriverBase<DigitalPinOutputDriverProps> {
+export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
   private get source(): DigitalSubDriver {
     return this.depsInstances.source as any;
   }

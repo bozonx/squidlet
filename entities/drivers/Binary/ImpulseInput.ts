@@ -1,17 +1,17 @@
 import IndexedEvents from 'host/helpers/IndexedEvents';
-import {WatchHandler} from 'host/interfaces/dev/Digital';
+import {WatchHandler} from 'host/interfaces/dev/DigitalDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import {omit} from 'host/helpers/lodashLike';
 import {isDigitalInputInverted, resolveEdge} from 'host/helpers/helpers';
 
-import {DigitalPinInput, DigitalPinInputDriverProps} from '../DigitalPin/DigitalPinInput';
+import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPin/DigitalPinInput';
 
 
 type RisingHandler = () => void;
 
-export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
+export interface ImpulseInputProps extends DigitalPinInputProps {
   // time between 1 and 0
   impulseLength: number;
   // in this time driver doesn't receive any data
@@ -27,7 +27,7 @@ export interface ImpulseInputDriverProps extends DigitalPinInputDriverProps {
 }
 
 
-export class ImpulseInput extends DriverBase<ImpulseInputDriverProps> {
+export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private readonly risingEvents = new IndexedEvents<RisingHandler>();
   private readonly bothEvents = new IndexedEvents<WatchHandler>();
   //private throttleInProgress: boolean = false;

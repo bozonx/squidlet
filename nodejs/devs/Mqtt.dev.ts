@@ -1,6 +1,6 @@
 import * as mqtt from 'mqtt';
 
-import Mqtt from '../../host/interfaces/dev/Mqtt';
+import MqttDev from '../../host/interfaces/dev/MqttDev';
 
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   port: string;
 }
 
-export class MqttDevConnection implements Mqtt {
+export class MqttDevConnection implements MqttDev {
   connectPromise: Promise<void>;
 
   private _connected: boolean = false;

@@ -1,20 +1,20 @@
 import IndexedEvents from 'host/helpers/IndexedEvents';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {WatchHandler} from 'host/interfaces/dev/Digital';
+import {WatchHandler} from 'host/interfaces/dev/DigitalDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
-import {BinaryInput, BinaryInputDriverProps} from './BinaryInput';
+import {BinaryInput, BinaryInputProps} from './BinaryInput';
 
 
 type Handler = () => void;
 
-export interface BinaryClickDriverProps extends BinaryInputDriverProps {
+export interface BinaryClickProps extends BinaryInputProps {
   releaseTimeoutMs: number;
 }
 
 
-export class BinaryClick extends DriverBase<BinaryClickDriverProps> {
+export class BinaryClick extends DriverBase<BinaryClickProps> {
   private readonly stateEvents = new IndexedEvents<WatchHandler>();
   private readonly downEvents = new IndexedEvents<Handler>();
   private readonly upEvents = new IndexedEvents<Handler>();

@@ -2,11 +2,11 @@ import * as SerialPort from 'serialport';
 
 import {convertBufferToUint8Array} from '../helpers';
 import {textToUint8Array} from '../../host/helpers/binaryHelpers';
-import Serial from '../../host/interfaces/dev/Serial';
+import SerialDev from '../../host/interfaces/dev/SerialDev';
 
 
 
-export default class SerialDev implements Serial {
+export default class SerialDev implements SerialDev {
   private readonly instances: SerialPort[] = [];
 
   // TODO: rise dataString - data as string

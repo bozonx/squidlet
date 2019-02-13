@@ -4,10 +4,10 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 
-import {BinaryClick, BinaryClickDriverProps} from '../../drivers/Binary/BinaryClick';
+import {BinaryClick, BinaryClickProps} from '../../drivers/Binary/BinaryClick';
 
 
-interface Props extends DeviceBaseProps, BinaryClickDriverProps {
+interface Props extends DeviceBaseProps, BinaryClickProps {
   // in this time driver doesn't receive any data
   blockTime: number;
 }
