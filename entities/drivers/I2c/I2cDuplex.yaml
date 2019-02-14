@@ -4,6 +4,7 @@ type: system
 
 #drivers:
 #  - I2cToSlave
+#  - I2cToMaster
 
 props:
   # I2cToSlave

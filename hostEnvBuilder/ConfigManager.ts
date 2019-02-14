@@ -30,7 +30,6 @@ export default class ConfigManager {
   }
 
   private readonly io: Io;
-  //private readonly hostDefaults: {[index: string]: any} = {};
   // unprocessed host config
   private _preHostConfig?: PreHostConfig;
   private _hostConfig?: HostConfig;
@@ -62,7 +61,6 @@ export default class ConfigManager {
     this._hostConfig = this.prepareHostConfig();
 
     appendArray(this.plugins, this.preHostConfig.plugins);
-    //_defaultsDeep(this.hostDefaults, preHostConfig.hostDefaults);
     this._buildDir = this.resolveBuildDir();
 
     delete this.hostConfigOrConfigPath;

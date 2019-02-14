@@ -62,10 +62,6 @@ export default class ConfigsSet {
       drivers: {},
       services: {},
     };
-
-    // TODO: review
-    // TODO: можеть сделать ввиде виртуальной фс ?
-
     const usedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {

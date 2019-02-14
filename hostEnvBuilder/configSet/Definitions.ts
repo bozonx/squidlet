@@ -4,11 +4,11 @@ import _omit = require('lodash/omit');
 import _values = require('lodash/values');
 import _isEmpty = require('lodash/isEmpty');
 
-import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import EntityDefinition from '../../host/interfaces/EntityDefinition';
+import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
-import HostClassNames from './HostClassNames';
 import EntitiesCollection from '../entities/EntitiesCollection';
+import HostClassNames from './HostClassNames';
 import ConfigManager from '../ConfigManager';
 
 
@@ -80,6 +80,9 @@ export default class Definitions {
     const devices: {[index: string]: EntityDefinition} = {};
     const drivers: {[index: string]: EntityDefinition} = {};
     const services: {[index: string]: EntityDefinition} = {};
+
+    // TODO: наверное и all devices class names
+
     const allHostDrivers: string[] = this.hostClassNames.getAllUsedDriversClassNames();
 
     if (this.configManager.preHostConfig.devices) {

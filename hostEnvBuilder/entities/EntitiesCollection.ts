@@ -1,13 +1,13 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 import DeviceManifest from '../../host/interfaces/DeviceManifest';
 import DriverManifest from '../../host/interfaces/DriverManifest';
 import ServiceManifest from '../../host/interfaces/ServiceManifest';
-import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import PreManifestBase from '../interfaces/PreManifestBase';
 import Io from '../Io';
 import Register from './Register';
 
@@ -71,15 +71,15 @@ export default class EntitiesCollection {
     return this.entitiesSet;
   }
 
-  getAllEntitiesNames(): EntitiesNames {
-    const allEntities: SrcEntitiesSet = this.getEntitiesSet();
-
-    return {
-      devices: Object.keys(allEntities.devices),
-      drivers: Object.keys(allEntities.drivers),
-      services: Object.keys(allEntities.services),
-    };
-  }
+  // getAllEntitiesNames(): EntitiesNames {
+  //   const allEntities: SrcEntitiesSet = this.getEntitiesSet();
+  //
+  //   return {
+  //     devices: Object.keys(allEntities.devices),
+  //     drivers: Object.keys(allEntities.drivers),
+  //     services: Object.keys(allEntities.services),
+  //   };
+  // }
 
   getSrcDir(pluralType: ManifestsTypePluralName, name: string): string {
     return this.entitiesSet[pluralType][name].srcDir;
