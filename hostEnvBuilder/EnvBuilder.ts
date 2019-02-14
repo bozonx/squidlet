@@ -4,7 +4,6 @@ import Definitions from './configSet/Definitions';
 import ConfigsSet from './configSet/ConfigsSet';
 import HostsConfigsWriter from './configSet/HostsConfigsWriter';
 import validatePlatformDevs from './validatePlatformDevs';
-import HostClassNames from './configSet/HostClassNames';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
@@ -21,7 +20,6 @@ export default class EnvBuilder {
   private readonly register: Register;
   private readonly usedEntities: UsedEntities;
   private readonly entitiesWriter: EntitiesWriter;
-  private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
   private readonly configsSet: ConfigsSet;
   private readonly hostsConfigWriter: HostsConfigsWriter;
@@ -32,11 +30,9 @@ export default class EnvBuilder {
 
   constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
     this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absBuildDir);
-    //this.entities = new Entities(this.log, this.configManager);
     this.register = new Register(this.io);
     this.usedEntities = new UsedEntities(this.io, this.configManager, this.register);
-    //this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
-    this.pluginEnv = new PluginEnv(this.configManager, this.register, this.entitiesCollection);
+    this.pluginEnv = new PluginEnv(this.configManager, this.register, this.usedEntities);
     this.entitiesWriter = new EntitiesWriter(
       this.io,
       this.log,

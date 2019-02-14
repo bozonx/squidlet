@@ -1,9 +1,9 @@
 import * as EventEmitter from 'events';
 
 import Register from './Register';
-import EntitiesCollection from './EntitiesCollection';
 import ConfigManager from '../ConfigManager';
 import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
+import UsedEntities from './UsedEntities';
 
 
 const AFTER_INIT_EVENT = 'afterInit';
@@ -16,20 +16,20 @@ export default class PluginEnv {
   readonly configManager: ConfigManager;
   private readonly events: EventEmitter = new EventEmitter();
   private readonly register: Register;
-  private readonly entities: EntitiesCollection;
+  private readonly usedEntities: UsedEntities;
 
   constructor(
     configManager: ConfigManager,
     register: Register,
-    entities: EntitiesCollection,
+    usedEntities: UsedEntities,
   ) {
     this.configManager = configManager;
     this.register = register;
-    this.entities = entities;
+    this.usedEntities = usedEntities;
   }
 
   getEntitiesSet(): SrcEntitiesSet {
-    return this.entities.getEntitiesSet();
+    return this.usedEntities.getEntitiesSet();
   }
 
   addPlugin: Register['addPlugin'] = (plugin) => {
