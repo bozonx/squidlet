@@ -9,6 +9,15 @@ import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
 import Io from '../Io';
+import {EntitiesNames} from './EntitiesCollection';
+
+
+// lists of names of all the entities
+export interface EntitiesNames {
+  devices: string[];
+  drivers: string[];
+  services: string[];
+}
 
 
 export default class UsedEntities {
@@ -34,6 +43,38 @@ export default class UsedEntities {
     await this.proceedDefinitions('device', this.configManager.preHostConfig.devices);
     await this.proceedDefinitions('driver', this.configManager.preHostConfig.drivers);
     await this.proceedDefinitions('service', this.configManager.preHostConfig.services);
+  }
+
+  getEntitySet(pluralType: ManifestsTypePluralName, name: string): SrcEntitySet {
+    return this.entitiesSet[pluralType][name];
+  }
+
+  /**
+   * Generate class names of all the used entities
+   */
+  getEntitiesNames(): EntitiesNames {
+    const result: EntitiesNames = {
+      devices: [],
+      drivers: [],
+      services: [],
+    };
+
+    // collect manifest names of used entities
+    const devicesClasses = this.getDevicesClassNames();
+    const allDriversClasses: string[] = this.getAllUsedDriversClassNames();
+    const servicesClasses: string[] = this.getServicesClassNames();
+
+    const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+      for (let className of classes) {
+        result[pluralType].push(className);
+      }
+    };
+
+    collect('devices', devicesClasses);
+    collect('drivers', allDriversClasses);
+    collect('services', servicesClasses);
+
+    return result;
   }
 
 

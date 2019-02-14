@@ -5,13 +5,13 @@ import systemConfig from '../configs/systemConfig';
 import {EntitiesNames} from './EntitiesCollection';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
-import EntitiesCollection from './EntitiesCollection';
 import Io from '../Io';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import HostClassNames from '../configSet/HostClassNames';
 import Register from './Register';
 import Logger from '../interfaces/Logger';
 import buildEntityMainFile from '../buildEntityMainFile';
+import UsedEntities from './UsedEntities';
+import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 
 
 /**
@@ -19,8 +19,7 @@ import buildEntityMainFile from '../buildEntityMainFile';
  */
 export default class EntitiesWriter {
   private readonly configManager: ConfigManager;
-  private readonly entitiesCollection: EntitiesCollection;
-  private readonly hostClassNames: HostClassNames;
+  private readonly usedEntities: UsedEntities;
   private readonly register: Register;
   private readonly io: Io;
   private readonly log: Logger;
@@ -38,16 +37,14 @@ export default class EntitiesWriter {
     io: Io,
     log: Logger,
     configManager: ConfigManager,
-    entitiesCollection: EntitiesCollection,
+    usedEntities: UsedEntities,
     register: Register,
-    hostClassNames: HostClassNames
   ) {
     this.io = io;
     this.log = log;
     this.configManager = configManager;
-    this.entitiesCollection = entitiesCollection;
+    this.usedEntities = usedEntities;
     this.register = register;
-    this.hostClassNames = hostClassNames;
   }
 
 
@@ -55,7 +52,7 @@ export default class EntitiesWriter {
    * Copy used files of entities to storage
    */
   async writeUsed() {
-    const usedEntities: EntitiesNames = this.hostClassNames.getEntitiesNames();
+    const usedEntities: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     // clear tmp dir
     rimraf.sync(`${this.tmpDir}/**/*`);
@@ -71,22 +68,20 @@ export default class EntitiesWriter {
 
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const entitySrcDir = this.entitiesCollection.getSrcDir(pluralType, entityName);
+    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
 
     // write manifest
     await this.io.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
-      this.entitiesCollection.getManifest(pluralType, entityName)
+      entitySet.manifest
     );
 
     // build and write main file if exists
     await this.buildMainFile(pluralType, entityName);
 
     // copy assets
-    const files: string[] = this.entitiesCollection.getFiles(pluralType, entityName);
-
-    for (let relativeFileName of files) {
-      const fromFile = path.resolve(entitySrcDir, relativeFileName);
+    for (let relativeFileName of entitySet.files) {
+      const fromFile = path.resolve(entitySet.srcDir, relativeFileName);
       const toFileName = path.resolve(entityDstDir, relativeFileName);
 
       // make inner dirs
