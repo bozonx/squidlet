@@ -1,36 +1,30 @@
+import _omit = require('lodash/omit');
+import * as path from 'path';
+
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../ConfigManager';
-import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
+import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import PreDeviceManifest from '../interfaces/PreDeviceManifest';
-import PreDriverManifest from '../interfaces/PreDriverManifest';
-import PreServiceManifest from '../interfaces/PreServiceManifest';
-
-
-interface Manifests {
-  devices: {[index: string]: PreDeviceManifest};
-  drivers: {[index: string]: PreDriverManifest};
-  services: {[index: string]: PreServiceManifest};
-}
+import ManifestBase from '../../host/interfaces/ManifestBase';
+import Io from '../Io';
 
 
 export default class UsedEntities {
+  private readonly io: Io;
   private readonly configManager: ConfigManager;
   private readonly register: Register;
-  private manifests: Manifests = {
+  // devs whisch are used, like {devName: true}
+  private usedDevs: {[index: string]: true} = {};
+  private entitiesSet: SrcEntitiesSet = {
     devices: {},
     drivers: {},
     services: {},
   };
-  // private entitiesSet: SrcEntitiesSet = {
-  //   devices: {},
-  //   drivers: {},
-  //   services: {},
-  // };
 
-  constructor(register: Register, configManager: ConfigManager) {
+  constructor(io: Io, register: Register, configManager: ConfigManager) {
+    this.io = io;
     this.register = register;
     this.configManager = configManager;
   }
@@ -42,12 +36,11 @@ export default class UsedEntities {
     await this.proceedDefinitions('service', this.configManager.preHostConfig.services);
   }
 
+
   /**
-   * Proceed definitions of devices of drivers or services specified in host conifg
-   * @param manifestType
-   * @param definitions
+   * Proceed definitions of devices of drivers or services specified in host config
    */
-  async proceedDefinitions(
+  private async proceedDefinitions(
     manifestType: ManifestsTypeName,
     definitions?: {[index: string]: PreEntityDefinition}
   ) {
@@ -60,13 +53,61 @@ export default class UsedEntities {
     }
   }
 
-  async proceedEntity(manifestType: ManifestsTypeName, className: string) {
+  private async proceedEntity(manifestType: ManifestsTypeName, className: string) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
-    const manifest: PreManifestBase = await this.register.getEntityManifest(manifestType, className);
 
-    this.manifests[pluralType][className] = manifest;
+    // skip if it is proceeded
+    if (this.entitiesSet[pluralType][className]) return;
 
-    // TODO: резолвим их зависимости и загружаем
+    const preManifest: PreManifestBase = await this.register.getEntityManifest(manifestType, className);
+
+    // save entity set which is made of manifest
+    this.entitiesSet[pluralType][className] = await this.makeSrcEntitySet(preManifest);
+
+    // resolve devices deps
+    for (let depClassName of preManifest.devices || []) {
+      await this.proceedEntity('device', depClassName);
+    }
+    // resolve drivers deps
+    for (let depClassName of preManifest.drivers || []) {
+      await this.proceedEntity('driver', depClassName);
+    }
+
+    // collect devs
+    for (let depClassName of preManifest.devs || []) {
+      this.usedDevs[depClassName] = true;
+    }
+  }
+
+  private async makeSrcEntitySet(preManifest: PreManifestBase): Promise<SrcEntitySet> {
+    const finalManifest: ManifestBase = await this.finalizeManifest(preManifest);
+
+    return {
+      srcDir: preManifest.baseDir,
+      manifest: finalManifest,
+      main: preManifest.main,
+      files: preManifest.files || [],
+    };
+  }
+
+  private async finalizeManifest(preManifest: PreManifestBase): Promise<ManifestBase> {
+    const finalManifest: ManifestBase = _omit<any>(
+      preManifest,
+      'files',
+      'main',
+      'baseDir',
+      'devices',
+      'drivers',
+      'devs'
+    );
+
+    // load props file
+    if (typeof preManifest.props === 'string') {
+      const propPath = path.join(preManifest.baseDir, preManifest.props);
+      finalManifest.props = await this.io.loadYamlFile(propPath);
+    }
+
+    return finalManifest;
   }
 
 }

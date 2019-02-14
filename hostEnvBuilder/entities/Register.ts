@@ -17,6 +17,13 @@ import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/
 import {Stats} from '../../host/interfaces/dev/StorageDev';
 
 
+// interface Manifests {
+//   devices: {[index: string]: PreDeviceManifest};
+//   drivers: {[index: string]: PreDriverManifest};
+//   services: {[index: string]: PreServiceManifest};
+// }
+
+
 /**
  * Register a new type of device, driver or service
  */
@@ -31,6 +38,11 @@ export default class Register {
   private services: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
   private readonly registeringPromises: Promise<any>[] = [];
 
+  // private manifests: Manifests = {
+  //   devices: {},
+  //   drivers: {},
+  //   services: {},
+  // };
 
   constructor(io: Io) {
     this.io = io;
