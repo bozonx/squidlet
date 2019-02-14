@@ -87,6 +87,7 @@ export default class UsedEntities {
       manifest: finalManifest,
       main: preManifest.main,
       files: preManifest.files || [],
+      system: preManifest.system || false,
     };
   }
 
@@ -95,6 +96,7 @@ export default class UsedEntities {
       preManifest,
       'files',
       'main',
+      'system',
       'baseDir',
       'devices',
       'drivers',

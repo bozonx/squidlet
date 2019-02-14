@@ -11,6 +11,8 @@ export interface SrcEntitySet {
   main?: string;
   // relative paths to entity files
   files: string[];
+  // is it system entity or not
+  system: boolean;
 }
 
 export default interface SrcEntitiesSet {
