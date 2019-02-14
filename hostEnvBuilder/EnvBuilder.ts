@@ -1,4 +1,3 @@
-import Entities from './entities/Entities';
 import ConfigManager from './ConfigManager';
 import UsedEntities from './entities/UsedEntities';
 import Definitions from './configSet/Definitions';
@@ -12,11 +11,13 @@ import Logger from './interfaces/Logger';
 import SrcHostEnvSet from './interfaces/SrcHostEnvSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 import PreHostConfig from './interfaces/PreHostConfig';
+import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
+import Register from './entities/Register';
 
 
 export default class EnvBuilder {
   private readonly configManager: ConfigManager;
-  private readonly entities: Entities;
+  private readonly register: Register;
   private readonly usedEntities: UsedEntities;
   private readonly entitiesWriter: EntitiesWriter;
   private readonly hostClassNames: HostClassNames;
@@ -29,8 +30,9 @@ export default class EnvBuilder {
 
   constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
     this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absBuildDir);
-    this.entities = new Entities(this.log, this.configManager);
-    this.usedEntities = new UsedEntities(this.io, this.configManager, this.entities.register);
+    //this.entities = new Entities(this.log, this.configManager);
+    this.register = new Register(this.io);
+    this.usedEntities = new UsedEntities(this.io, this.configManager, this.register);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.entitiesWriter = new EntitiesWriter(
       this.io,
@@ -58,7 +60,11 @@ export default class EnvBuilder {
 
   async collect() {
     await this.configManager.init();
-    await this.entities.start();
+    this.log.info(`--> Registering plugins, devices, drivers and services`);
+    await this.registering();
+
+    this.log.info(`--> Resolving and preparing entities which is used on host`);
+    await this.usedEntities.generate();
 
     this.log.info(`--> Generating hosts entities definitions`);
     await this.definitions.generate();
@@ -98,6 +104,27 @@ export default class EnvBuilder {
       configs: this.configsSet.getConfigSet(),
       entities: this.configsSet.generateSrcEntitiesSet(),
     };
+  }
+
+
+  /**
+   * Start registering step of initialization
+   */
+  private async registering(): Promise<void> {
+    // register system plugin which registering system devices, drivers and services
+    this.register.addPlugin(systemEntitiesPlugin);
+
+    // register plugins specified in config
+    if (this.configManager.plugins) {
+      for (let pluginPath of this.configManager.plugins) {
+        this.register.addPlugin(pluginPath);
+      }
+    }
+
+    // initialize all the plugins
+    await this.register.initPlugins(this.pluginEnv);
+    // wait for all the registering processes. It needs if plugin doesn't wait for register promise.
+    await Promise.all(this.register.getRegisteringPromises());
   }
 
 }
