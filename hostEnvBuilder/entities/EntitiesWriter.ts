@@ -6,7 +6,6 @@ import {EntitiesNames} from './EntitiesCollection';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
 import Io from '../Io';
-import PreManifestBase from '../interfaces/PreManifestBase';
 import Register from './Register';
 import Logger from '../interfaces/Logger';
 import buildEntityMainFile from '../buildEntityMainFile';
@@ -92,39 +91,31 @@ export default class EntitiesWriter {
   }
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
-    const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
+    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
+
+    // if main file isn't set - do nothing
+    if (!entitySet.main) return;
+
+    //const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const mainDstFile = path.join(entityDstDir, path.parse(preManifest.main).name);
+    const mainDstFile = path.join(entityDstDir, path.parse(entitySet.main).name);
     const renamedMainDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
     this.log.info(`- building main file of entity "${entityName}"`);
-    await buildEntityMainFile(pluralType, entityName, this.tmpDir, preManifest.baseDir, entityDstDir);
+    await buildEntityMainFile(pluralType, entityName, this.tmpDir, entitySet.srcDir, entityDstDir);
     // rename main file
     await this.io.renameFile(mainDstFile, renamedMainDstFile);
   }
 
-  private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {
-    if (pluralType === 'devices') {
-      return this.register.getDevicesPreManifests()[entityName];
-    }
-    else if (pluralType === 'drivers') {
-      return this.register.getDriversPreManifests()[entityName];
-    }
-    // services
-    return this.register.getServicesPreManifests()[entityName];
-  }
-
-  // async writeAll() {
-  //   const allEntities: EntitiesNames = this.entitiesCollection.getAllEntitiesNames();
-  //
-  //   console.log(1111111, allEntities)
-  //
-  //   for (let typeName of Object.keys(allEntities)) {
-  //     const pluralType = typeName as ManifestsTypePluralName;
-  //
-  //     for (let entityName of allEntities[pluralType]) {
-  //       await this.proceedEntity(pluralType, entityName);
-  //     }
+  // private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {
+  //   if (pluralType === 'devices') {
+  //     return this.register.getDevicesPreManifests()[entityName];
   //   }
+  //   else if (pluralType === 'drivers') {
+  //     return this.register.getDriversPreManifests()[entityName];
+  //   }
+  //   // services
+  //   return this.register.getServicesPreManifests()[entityName];
   // }
+
 }
