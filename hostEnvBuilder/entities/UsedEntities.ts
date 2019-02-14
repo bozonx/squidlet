@@ -4,16 +4,31 @@ import ConfigManager from '../ConfigManager';
 import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
+import PreDeviceManifest from '../interfaces/PreDeviceManifest';
+import PreDriverManifest from '../interfaces/PreDriverManifest';
+import PreServiceManifest from '../interfaces/PreServiceManifest';
+
+
+interface Manifests {
+  devices: {[index: string]: PreDeviceManifest};
+  drivers: {[index: string]: PreDriverManifest};
+  services: {[index: string]: PreServiceManifest};
+}
 
 
 export default class UsedEntities {
   private readonly configManager: ConfigManager;
   private readonly register: Register;
-  private entitiesSet: SrcEntitiesSet = {
+  private manifests: Manifests = {
     devices: {},
     drivers: {},
     services: {},
   };
+  // private entitiesSet: SrcEntitiesSet = {
+  //   devices: {},
+  //   drivers: {},
+  //   services: {},
+  // };
 
   constructor(register: Register, configManager: ConfigManager) {
     this.register = register;
@@ -25,8 +40,6 @@ export default class UsedEntities {
     await this.proceedDefinitions('device', this.configManager.preHostConfig.devices);
     await this.proceedDefinitions('driver', this.configManager.preHostConfig.drivers);
     await this.proceedDefinitions('service', this.configManager.preHostConfig.services);
-
-    // TODO: резолвим их зависимости и загружаем
   }
 
   /**
@@ -49,9 +62,11 @@ export default class UsedEntities {
 
   async proceedEntity(manifestType: ManifestsTypeName, className: string) {
     const pluralType = `${manifestType}s` as ManifestsTypePluralName;
+    const manifest: PreManifestBase = await this.register.getEntityManifest(manifestType, className);
 
-    const manifest: PreManifestBase = this.register.getEntityManifest();
-    // TODO: load manifest
+    this.manifests[pluralType][className] = manifest;
+
+    // TODO: резолвим их зависимости и загружаем
   }
 
 }

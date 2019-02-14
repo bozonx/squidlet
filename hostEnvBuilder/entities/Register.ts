@@ -66,7 +66,7 @@ export default class Register {
   }
 
 
-  async getEntityManifest(manifestType: ManifestsTypeName, className: string) {
+  async getEntityManifest(manifestType: ManifestsTypeName, className: string): Promise<PreManifestBase> {
     // TODO: read from memory or from disk if it isn't previously loaded
   }
 
