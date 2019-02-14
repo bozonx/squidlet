@@ -65,6 +65,12 @@ export default class Register {
     return this.registeringPromises;
   }
 
+
+  async getEntityManifest(manifestType: ManifestsTypeName, className: string) {
+    // TODO: read from memory or from disk if it isn't previously loaded
+  }
+
+
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
       // it's path to plugin - let's load it
@@ -117,6 +123,9 @@ export default class Register {
 
 
   private async addEntity<T extends PreManifestBase>(manifestType: ManifestsTypeName, manifest: string | T) {
+
+    // TODO: не загружать прямо сейчас
+
     const resolvePromise: Promise<T> = this.resolveManifest<T>(manifest);
 
     this.registeringPromises.push(resolvePromise);

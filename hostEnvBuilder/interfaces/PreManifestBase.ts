@@ -9,8 +9,13 @@ export default interface PreManifestBase {
   // path to device main file relative to manifest place
   main: string;
 
-  // drivers and devs dependencies - list of drivers names which is used
+  // devices dependencies which entity use
+  devices?: string[];
+  // drivers dependencies which entity use
   drivers?: string[];
+  // devs dependencies which entity use
+  devs?: string[];
+
   // additional files relative to manifest place.
   files?: string[];
   // default properties of instance - can be an object or a path to props yal file

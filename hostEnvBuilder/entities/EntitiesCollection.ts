@@ -97,6 +97,7 @@ export default class EntitiesCollection {
     return this.entitiesSet[pluralType][name].files;
   }
 
+  // TODO: review
   /**
    * Get drivers dependencies. Without devs
    */
@@ -104,6 +105,7 @@ export default class EntitiesCollection {
     return this.dependencies;
   }
 
+  // TODO: review
   /**
    * Get only devs dependencies
    */
