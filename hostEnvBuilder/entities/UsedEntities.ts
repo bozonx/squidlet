@@ -23,7 +23,7 @@ export default class UsedEntities {
     services: {},
   };
 
-  constructor(io: Io, register: Register, configManager: ConfigManager) {
+  constructor(io: Io, configManager: ConfigManager, register: Register) {
     this.io = io;
     this.register = register;
     this.configManager = configManager;

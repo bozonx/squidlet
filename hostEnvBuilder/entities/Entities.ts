@@ -7,6 +7,7 @@ import systemEntitiesPlugin from '../../entities/systemEntitiesPlugin';
 import Logger from '../interfaces/Logger';
 
 
+// TODO: наверное не нужно
 export default class Entities {
   readonly configManager: ConfigManager;
   readonly log: Logger;

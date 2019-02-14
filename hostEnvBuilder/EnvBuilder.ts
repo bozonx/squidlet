@@ -1,5 +1,6 @@
 import Entities from './entities/Entities';
 import ConfigManager from './ConfigManager';
+import UsedEntities from './entities/UsedEntities';
 import Definitions from './configSet/Definitions';
 import ConfigsSet from './configSet/ConfigsSet';
 import HostsConfigsWriter from './configSet/HostsConfigsWriter';
@@ -16,6 +17,7 @@ import PreHostConfig from './interfaces/PreHostConfig';
 export default class EnvBuilder {
   private readonly configManager: ConfigManager;
   private readonly entities: Entities;
+  private readonly usedEntities: UsedEntities;
   private readonly entitiesWriter: EntitiesWriter;
   private readonly hostClassNames: HostClassNames;
   private readonly definitions: Definitions;
@@ -28,6 +30,7 @@ export default class EnvBuilder {
   constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
     this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absBuildDir);
     this.entities = new Entities(this.log, this.configManager);
+    this.usedEntities = new UsedEntities(this.io, this.configManager, this.entities.register);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.entitiesWriter = new EntitiesWriter(
       this.io,
