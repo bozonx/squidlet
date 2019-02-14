@@ -35,7 +35,7 @@ export default class EnvBuilder {
     //this.entities = new Entities(this.log, this.configManager);
     this.register = new Register(this.io);
     this.usedEntities = new UsedEntities(this.io, this.configManager, this.register);
-    this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
+    //this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
     this.pluginEnv = new PluginEnv(this.configManager, this.register, this.entitiesCollection);
     this.entitiesWriter = new EntitiesWriter(
       this.io,
@@ -45,12 +45,7 @@ export default class EnvBuilder {
       this.register
     );
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
-    this.configsSet = new ConfigsSet(
-      this.configManager,
-      this.entities.entitiesCollection,
-      this.hostClassNames,
-      this.definitions
-    );
+    this.configsSet = new ConfigsSet(this.configManager, this.usedEntities, this.definitions);
     this.hostsConfigWriter = new HostsConfigsWriter(
       this.io,
       this.configManager,

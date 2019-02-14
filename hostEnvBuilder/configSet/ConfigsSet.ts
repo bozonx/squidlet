@@ -1,33 +1,25 @@
 import * as path from 'path';
 import _values = require('lodash/values');
 
-import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
+import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 import {EntitiesNames} from '../entities/EntitiesCollection';
 import {sortByIncludeInList} from '../helpers';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import HostClassNames from './HostClassNames';
 import Definitions from './Definitions';
-import EntitiesCollection from '../entities/EntitiesCollection';
 import ConfigManager from '../ConfigManager';
 import HostConfigSet from '../interfaces/HostConfigSet';
+import UsedEntities from '../entities/UsedEntities';
 
 
 export default class ConfigsSet {
   private readonly configManager: ConfigManager;
-  private readonly entitiesCollection: EntitiesCollection;
-  private readonly hostClassNames: HostClassNames;
+  private readonly usedEntities: UsedEntities;
   private readonly definitions: Definitions;
 
 
-  constructor(
-    configManager: ConfigManager,
-    entitiesCollection: EntitiesCollection,
-    hostClassNames: HostClassNames,
-    definitions: Definitions
-  ) {
+  constructor(configManager: ConfigManager, usedEntities: UsedEntities, definitions: Definitions) {
     this.configManager = configManager;
-    this.entitiesCollection = entitiesCollection;
-    this.hostClassNames = hostClassNames;
+    this.usedEntities = usedEntities;
     this.definitions = definitions;
   }
 
@@ -62,19 +54,16 @@ export default class ConfigsSet {
       drivers: {},
       services: {},
     };
-    const usedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
+    const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
       for (let className of classes) {
-        const srcDir = this.entitiesCollection.getSrcDir(pluralType, className);
-        const relativeMain: string | undefined = this.entitiesCollection.getMainFilePath(pluralType, className);
-        const relativeFiles: string[] = this.entitiesCollection.getFiles(pluralType, className);
+        const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, className);
 
         result[pluralType][className] = {
-          srcDir,
-          manifest: this.entitiesCollection.getManifest(pluralType, className),
-          main: relativeMain && path.resolve(srcDir, relativeMain),
-          files: relativeFiles.map((relativeFileName: string) => path.resolve(srcDir, relativeFileName)),
+          ...entitySet,
+          main: entitySet.main && path.resolve(entitySet.srcDir, entitySet.main),
+          files: entitySet.files.map((relativeFileName: string) => path.resolve(entitySet.srcDir, relativeFileName)),
         };
       }
     };
