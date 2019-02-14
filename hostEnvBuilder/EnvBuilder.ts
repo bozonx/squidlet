@@ -13,6 +13,7 @@ import EntitiesWriter from './entities/EntitiesWriter';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
 import Register from './entities/Register';
+import PluginEnv from './entities/PluginEnv';
 
 
 export default class EnvBuilder {
@@ -26,6 +27,7 @@ export default class EnvBuilder {
   private readonly hostsConfigWriter: HostsConfigsWriter;
   private readonly log: Logger = defaultLogger;
   private readonly io = new Io();
+  readonly pluginEnv: PluginEnv;
 
 
   constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string) {
@@ -34,12 +36,13 @@ export default class EnvBuilder {
     this.register = new Register(this.io);
     this.usedEntities = new UsedEntities(this.io, this.configManager, this.register);
     this.hostClassNames = new HostClassNames(this.configManager, this.entities.entitiesCollection);
+    this.pluginEnv = new PluginEnv(this.configManager, this.register, this.entitiesCollection);
     this.entitiesWriter = new EntitiesWriter(
       this.io,
       this.log,
       this.configManager,
       this.entities.entitiesCollection,
-      this.entities.register,
+      this.register,
       this.hostClassNames
     );
     this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
@@ -74,7 +77,7 @@ export default class EnvBuilder {
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
-    this.entities.pluginEnv.$riseAfterInit();
+    this.pluginEnv.$riseAfterInit();
   }
 
   /**
