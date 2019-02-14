@@ -7,9 +7,8 @@ import _isEmpty = require('lodash/isEmpty');
 import EntityDefinition from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
-import EntitiesCollection from '../entities/EntitiesCollection';
-import HostClassNames from './HostClassNames';
 import ConfigManager from '../ConfigManager';
+import UsedEntities from '../entities/UsedEntities';
 
 
 /**
@@ -17,22 +16,16 @@ import ConfigManager from '../ConfigManager';
  */
 export default class Definitions {
   private readonly configManager: ConfigManager;
-  private readonly entitiesCollection: EntitiesCollection;
-  private readonly hostClassNames: HostClassNames;
+  private readonly usedEntities: UsedEntities;
   // definitions like {entityId: Definition}
   private devicesDefinitions: {[index: string]: EntityDefinition} = {};
   private driversDefinitions: {[index: string]: EntityDefinition} = {};
   private servicesDefinitions: {[index: string]: EntityDefinition} = {};
 
 
-  constructor(
-    configManager: ConfigManager,
-    entitiesCollection: EntitiesCollection,
-    hostClassNames: HostClassNames
-  ) {
+  constructor(configManager: ConfigManager, usedEntities: UsedEntities) {
     this.configManager = configManager;
-    this.entitiesCollection = entitiesCollection;
-    this.hostClassNames = hostClassNames;
+    this.usedEntities = usedEntities;
   }
 
 
@@ -142,27 +135,27 @@ export default class Definitions {
   private generateDriverDef(id: string, driverDef?: PreEntityDefinition): EntityDefinition {
     // id and className is the same for drivers
     const className = id;
-    const manifest = this.entitiesCollection.getManifest('drivers', className);
+    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', className);
 
     return {
       id,
       className: className,
       props: _defaultsDeep(
         _cloneDeep(_omit(driverDef, 'className')),
-        this.collectManifestPropsDefaults(manifest.props),
+        this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
   }
 
   private generateServiceDef(id: string, serviceDef: PreEntityDefinition): EntityDefinition {
-    const manifest = this.entitiesCollection.getManifest('services', serviceDef.className);
+    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
 
     return {
       id,
       className: serviceDef.className,
       props: _defaultsDeep(
         _cloneDeep(_omit(serviceDef, 'className')),
-        this.collectManifestPropsDefaults(manifest.props),
+        this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
   }
@@ -171,7 +164,7 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
-    const entities: SrcEntitiesSet = this.entitiesCollection.getEntitiesSet();
+    const entities: SrcEntitiesSet = this.usedEntities.getEntitiesSet();
     const check = (
       entitiesOfType: {[index: string]: SrcEntitySet},
       definitions: {[index: string]: EntityDefinition}

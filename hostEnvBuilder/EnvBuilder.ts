@@ -44,14 +44,9 @@ export default class EnvBuilder {
       this.usedEntities,
       this.register
     );
-    this.definitions = new Definitions(this.configManager, this.entities.entitiesCollection, this.hostClassNames);
+    this.definitions = new Definitions(this.configManager, this.usedEntities);
     this.configsSet = new ConfigsSet(this.configManager, this.usedEntities, this.definitions);
-    this.hostsConfigWriter = new HostsConfigsWriter(
-      this.io,
-      this.configManager,
-      this.hostClassNames,
-      this. configsSet
-    );
+    this.hostsConfigWriter = new HostsConfigsWriter(this.io, this.configManager, this.configsSet);
   }
 
 

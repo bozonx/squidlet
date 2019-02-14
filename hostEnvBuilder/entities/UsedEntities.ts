@@ -45,6 +45,10 @@ export default class UsedEntities {
     await this.proceedDefinitions('service', this.configManager.preHostConfig.services);
   }
 
+  getEntitiesSet(): SrcEntitiesSet {
+    return this.entitiesSet;
+  }
+
   getEntitySet(pluralType: ManifestsTypePluralName, name: string): SrcEntitySet {
     return this.entitiesSet[pluralType][name];
   }

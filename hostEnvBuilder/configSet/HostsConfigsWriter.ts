@@ -3,7 +3,6 @@ import * as path from 'path';
 import systemConfig from '../configs/systemConfig';
 import ConfigManager from '../ConfigManager';
 import Io from '../Io';
-import HostClassNames from './HostClassNames';
 import ConfigsSet from './ConfigsSet';
 import HostConfigSet from '../interfaces/HostConfigSet';
 
@@ -15,19 +14,16 @@ import HostConfigSet from '../interfaces/HostConfigSet';
 export default class HostsConfigsWriter {
   private readonly io: Io;
   private readonly configManager: ConfigManager;
-  private readonly hostClassNames: HostClassNames;
   private readonly configsSet: ConfigsSet;
 
 
   constructor(
     io: Io,
     configManager: ConfigManager,
-    hostClassNames: HostClassNames,
     configsSet: ConfigsSet
   ) {
     this.io = io;
     this.configManager = configManager;
-    this.hostClassNames = hostClassNames;
     this.configsSet = configsSet;
   }
 
