@@ -24,13 +24,14 @@ export default class UsedEntities {
   private readonly io: Io;
   private readonly configManager: ConfigManager;
   private readonly register: Register;
-  // devs whisch are used, like {devName: true}
+  // devs which are used, like {devName: true}
   private usedDevs: {[index: string]: true} = {};
   private entitiesSet: SrcEntitiesSet = {
     devices: {},
     drivers: {},
     services: {},
   };
+
 
   constructor(io: Io, configManager: ConfigManager, register: Register) {
     this.io = io;
