@@ -9,7 +9,6 @@ import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
 import Io from '../Io';
-import {EntitiesNames} from './EntitiesCollection';
 
 
 // lists of names of all the entities
@@ -58,28 +57,34 @@ export default class UsedEntities {
    * Generate class names of all the used entities
    */
   getEntitiesNames(): EntitiesNames {
-    const result: EntitiesNames = {
-      devices: [],
-      drivers: [],
-      services: [],
+    return {
+      devices: Object.keys(this.entitiesSet.devices),
+      drivers: Object.keys(this.entitiesSet.drivers),
+      services: Object.keys(this.entitiesSet.services),
     };
 
-    // collect manifest names of used entities
-    const devicesClasses = this.getDevicesClassNames();
-    const allDriversClasses: string[] = this.getAllUsedDriversClassNames();
-    const servicesClasses: string[] = this.getServicesClassNames();
-
-    const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
-      for (let className of classes) {
-        result[pluralType].push(className);
-      }
-    };
-
-    collect('devices', devicesClasses);
-    collect('drivers', allDriversClasses);
-    collect('services', servicesClasses);
-
-    return result;
+    // const result: EntitiesNames = {
+    //   devices: [],
+    //   drivers: [],
+    //   services: [],
+    // };
+    //
+    // // collect manifest names of used entities
+    // const devicesClasses = this.getDevicesClassNames();
+    // const allDriversClasses: string[] = this.getAllUsedDriversClassNames();
+    // const servicesClasses: string[] = this.getServicesClassNames();
+    //
+    // const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+    //   for (let className of classes) {
+    //     result[pluralType].push(className);
+    //   }
+    // };
+    //
+    // collect('devices', devicesClasses);
+    // collect('drivers', allDriversClasses);
+    // collect('services', servicesClasses);
+    //
+    // return result;
   }
 
 
