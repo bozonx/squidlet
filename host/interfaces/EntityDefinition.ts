@@ -2,6 +2,12 @@ export interface EntityProps {
   [index: string]: any;
 }
 
+export interface EntitiesDefinitions {
+  devices: {[index: string]: EntityDefinition};
+  drivers: {[index: string]: EntityDefinition};
+  services: {[index: string]: EntityDefinition};
+}
+
 
 export default interface EntityDefinition {
   // unique id of entity in group

@@ -1,14 +1,14 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
-import _cloneDeep = require('lodash/cloneDeep');
 import _omit = require('lodash/omit');
 import _values = require('lodash/values');
 import _isEmpty = require('lodash/isEmpty');
 
-import EntityDefinition from '../../host/interfaces/EntityDefinition';
+import EntityDefinition, {EntitiesDefinitions} from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 import ConfigManager from '../ConfigManager';
 import UsedEntities from '../entities/UsedEntities';
+import {EntitiesNames} from '../entities/EntitiesCollection';
 
 
 /**
@@ -44,15 +44,11 @@ export default class Definitions {
   generate() {
     const { devices, drivers, services } = this.prepareEntities();
 
-    if (!_isEmpty(devices)) {
-      this.devicesDefinitions = devices;
-    }
-    if (!_isEmpty(drivers)) {
-      this.driversDefinitions = drivers;
-    }
-    if (!_isEmpty(services)) {
-      this.servicesDefinitions = services;
-    }
+    if (!_isEmpty(devices)) this.devicesDefinitions = devices;
+
+    if (!_isEmpty(drivers)) this.driversDefinitions = drivers;
+
+    if (!_isEmpty(services)) this.servicesDefinitions = services;
 
     // check for definition have a manifest
     this.checkDefinitions();
@@ -60,33 +56,33 @@ export default class Definitions {
 
 
   /**
-   * First step of preparing - makes className and id params to all the entities
-   * and makes devices plain.
-   * And makes props
+   * Make definitions of all the used entities of host
    */
-  private prepareEntities():
-  {
-    devices: {[index: string]: EntityDefinition},
-    drivers: {[index: string]: EntityDefinition},
-    services: {[index: string]: EntityDefinition}
-  } {
+  private prepareEntities(): EntitiesDefinitions {
+    const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
     const devices: {[index: string]: EntityDefinition} = {};
+      // usedEntitiesNames.devices
+      // .map<EntitiesDefinitions>((id: string) => this.generateDeviceDef(id));
     const drivers: {[index: string]: EntityDefinition} = {};
     const services: {[index: string]: EntityDefinition} = {};
 
     // TODO: наверное и all devices class names
 
-    const allHostDrivers: string[] = this.hostClassNames.getAllUsedDriversClassNames();
+    //const allHostDrivers: string[] = this.hostClassNames.getAllUsedDriversClassNames();
 
-    if (this.configManager.preHostConfig.devices) {
-      for (let id of Object.keys(this.configManager.preHostConfig.devices)) {
-        devices[id] = this.generateDeviceDef(
-          id,
-          this.configManager.preHostConfig.devices[id],
-          this.configManager.preHostConfig.devicesDefaults
-        );
-      }
+    for (let id of usedEntitiesNames.devices) {
+      devices[id] = this.generateDeviceDef(id);
     }
+
+    // if (this.configManager.preHostConfig.devices) {
+    //   for (let id of Object.keys(this.configManager.preHostConfig.devices)) {
+    //     devices[id] = this.generateDeviceDef(
+    //       id,
+    //       this.configManager.preHostConfig.devices[id],
+    //       this.configManager.preHostConfig.devicesDefaults
+    //     );
+    //   }
+    // }
 
     // each all drivers of host include dependencies but exclude devs
     for (let entityName of allHostDrivers) {
@@ -109,28 +105,28 @@ export default class Definitions {
     };
   }
 
-  private generateDeviceDef(
-    id: string,
-    deviceDef: PreEntityDefinition,
-    hostDeviceDefaultProps?: {[index: string]: any}
-  ): EntityDefinition {
-    const manifest = this.entitiesCollection.getManifest('devices', deviceDef.className);
+  private generateDeviceDef(id: string): EntityDefinition {
+    const deviceDef: {[index: string]: any} | undefined = this.configManager.preHostConfig.devices[id];
+    const hostDeviceDefaultProps = this.configManager.preHostConfig.devicesDefaults;
+    const className: string = deviceDef.className;
+
+    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('devices', className);
     const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
-      && hostDeviceDefaultProps[deviceDef.className];
+      && hostDeviceDefaultProps[className];
 
     return {
       id,
-      className: deviceDef.className,
+      className,
       props: _defaultsDeep(
-        _cloneDeep(_omit(deviceDef, 'className')),
+        _omit(deviceDef, 'className'),
         deviceHostDefaults,
-        this.collectManifestPropsDefaults(manifest.props),
+        this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
   }
 
   /**
-   * Generate definitions for all the used drivers event it doesn't have a definition.
+   * Generate definitions for all the used drivers even it doesn't have a definition.
    */
   private generateDriverDef(id: string, driverDef?: PreEntityDefinition): EntityDefinition {
     // id and className is the same for drivers
@@ -141,7 +137,8 @@ export default class Definitions {
       id,
       className: className,
       props: _defaultsDeep(
-        _cloneDeep(_omit(driverDef, 'className')),
+        {},
+        _omit(driverDef, 'className'),
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
@@ -154,7 +151,8 @@ export default class Definitions {
       id,
       className: serviceDef.className,
       props: _defaultsDeep(
-        _cloneDeep(_omit(serviceDef, 'className')),
+        {},
+        _omit(serviceDef, 'className'),
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
