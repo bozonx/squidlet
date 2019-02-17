@@ -91,7 +91,9 @@ export default class Definitions {
   }
 
   private generateDeviceDef(id: string): EntityDefinition {
-    if (!this.configManager.preHostConfig.devices) throw new Error(`Can't find definition of device "${id}"`);
+    if (!this.configManager.preHostConfig.devices) {
+      throw new Error(`Can't find definition of device "${id}"`);
+    }
 
     const deviceDef: {[index: string]: any} = this.configManager.preHostConfig.devices[id];
     const hostDeviceDefaultProps = this.configManager.preHostConfig.devicesDefaults;
@@ -117,17 +119,16 @@ export default class Definitions {
   /**
    * Generate definitions for all the used drivers even it doesn't have a definition.
    */
-  private generateDriverDef(id: string): EntityDefinition {
-    const driverDef: PreEntityDefinition = this.configManager.preHostConfig.drivers && this.configManager.preHostConfig.drivers[id];
-    // id and className is the same for drivers
-    const className = id;
-    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', className);
+  private generateDriverDef(className: string): EntityDefinition {
+    const driverDef: PreEntityDefinition | undefined = this.configManager.preHostConfig.drivers
+      && this.configManager.preHostConfig.drivers[className];
+    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('drivers', className);
 
     return {
-      id,
+      // id and className is the same for drivers
+      id: className,
       className: className,
       props: _defaultsDeep(
-        {},
         _omit(driverDef, 'className'),
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
@@ -135,6 +136,10 @@ export default class Definitions {
   }
 
   private generateServiceDef(id: string): EntityDefinition {
+    if (!this.configManager.preHostConfig.services) {
+      throw new Error(`Can't find definition of services "${id}"`);
+    }
+
     const serviceDef: PreEntityDefinition = this.configManager.preHostConfig.services[id];
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
 
@@ -142,7 +147,6 @@ export default class Definitions {
       id,
       className: serviceDef.className,
       props: _defaultsDeep(
-        {},
         _omit(serviceDef, 'className'),
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
@@ -153,6 +157,9 @@ export default class Definitions {
    * Check for definitions classNames exist in manifests.
    */
   private checkDefinitions() {
+
+    // TODO: looks useless
+
     const entities: SrcEntitiesSet = this.usedEntities.getEntitiesSet();
     const check = (
       entitiesOfType: {[index: string]: SrcEntitySet},

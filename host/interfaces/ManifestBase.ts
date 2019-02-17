@@ -4,15 +4,6 @@ export default interface ManifestBase {
   name: string;
   // TODO: может сделать пустым объектом ???
   props?: {[index: string]: any};
-
-  // TODO: поидее в окончательном манифесте это не нужно
-  // // devices dependencies which entity use
-  // devices?: string[];
-  // // drivers dependencies which entity use
-  // drivers?: string[];
-  // // devs dependencies which entity use
-  // devs?: string[];
-
   // custom values of manifest
   [index: string]: any;
 }

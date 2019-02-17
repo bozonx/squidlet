@@ -2,10 +2,10 @@ import _filter = require('lodash/filter');
 import _uniq = require('lodash/uniq');
 import _flatten = require('lodash/flatten');
 
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import ConfigManager from '../ConfigManager';
-import EntitiesCollection, {Dependencies, EntitiesNames} from '../entities/EntitiesCollection';
-import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
+import ConfigManager from '../hostEnvBuilder/ConfigManager';
+import EntitiesCollection, {Dependencies, EntitiesNames} from '../hostEnvBuilder/entities/EntitiesCollection';
+import {SrcEntitySet} from '../hostEnvBuilder/interfaces/SrcEntitiesSet';
 
 
 export default class HostClassNames {
