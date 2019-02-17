@@ -105,7 +105,7 @@ export default class UsedEntities {
     // skip if it is proceeded
     if (this.entitiesSet[pluralType][className]) return;
 
-    const preManifest: PreManifestBase = await this.register.getEntityManifest(manifestType, className);
+    const preManifest: PreManifestBase = this.register.getEntityManifest(pluralType, className);
 
     // save entity set which is made of manifest
     this.entitiesSet[pluralType][className] = await this.makeSrcEntitySet(preManifest);

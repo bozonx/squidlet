@@ -31,11 +31,11 @@ export default class Register {
   private readonly io: Io;
   private readonly plugins: Plugin[] = [];
   // devices manifest by manifest name
-  private devices: Map<string, PreDeviceManifest> = Map<string, PreDeviceManifest>();
+  private devices = Map<string, PreManifestBase>();
   // drivers manifest by manifest name
-  private drivers: Map<string, PreDriverManifest> = Map<string, PreDriverManifest>();
+  private drivers = Map<string, PreManifestBase>();
   // services manifest by manifest name
-  private services: Map<string, PreServiceManifest> = Map<string, PreServiceManifest>();
+  private services = Map<string, PreManifestBase>();
   private readonly registeringPromises: Promise<any>[] = [];
 
   // private manifests: Manifests = {
@@ -49,39 +49,43 @@ export default class Register {
   }
 
 
-  getDevicesPreManifests(): {[index: string]: PreDeviceManifest} {
-    return this.devices.toJS() as any;
-  }
-
-  getDriversPreManifests(): {[index: string]: PreDriverManifest} {
-    return this.drivers.toJS() as any;
-  }
-
-  getServicesPreManifests(): {[index: string]: PreServiceManifest} {
-    return this.services.toJS() as any;
-  }
-
-  getDevicesPreManifestsList(): PreDeviceManifest[] {
-    return _values<any>(this.devices.toJS());
-  }
-
-  getDriversPreManifestsList(): PreDriverManifest[] {
-    return _values<any>(this.drivers.toJS());
-  }
-
-  getServicesPreManifestsList(): PreServiceManifest[] {
-    return _values<any>(this.services.toJS());
-  }
+  // getDevicesPreManifests(): {[index: string]: PreDeviceManifest} {
+  //   return this.devices.toJS() as any;
+  // }
+  //
+  // getDriversPreManifests(): {[index: string]: PreDriverManifest} {
+  //   return this.drivers.toJS() as any;
+  // }
+  //
+  // getServicesPreManifests(): {[index: string]: PreServiceManifest} {
+  //   return this.services.toJS() as any;
+  // }
+  //
+  // getDevicesPreManifestsList(): PreDeviceManifest[] {
+  //   return _values<any>(this.devices.toJS());
+  // }
+  //
+  // getDriversPreManifestsList(): PreDriverManifest[] {
+  //   return _values<any>(this.drivers.toJS());
+  // }
+  //
+  // getServicesPreManifestsList(): PreServiceManifest[] {
+  //   return _values<any>(this.services.toJS());
+  // }
 
   getRegisteringPromises(): Promise<any>[] {
     return this.registeringPromises;
   }
 
+  getEntityManifest(pluralManifestType: ManifestsTypePluralName, className: string): PreManifestBase {
+    const manifest: PreManifestBase | undefined = this[pluralManifestType].get(className);
 
-  async getEntityManifest(manifestType: ManifestsTypeName, className: string): Promise<PreManifestBase> {
-    // TODO: read from memory or from disk if it isn't previously loaded
+    if (!manifest) {
+      throw new Error(`Can't find a manifest of "${pluralManifestType}" "${className}"`);
+    }
+
+    return manifest;
   }
-
 
   addPlugin(plugin: string | Plugin) {
     if (typeof plugin === 'string') {
@@ -135,9 +139,6 @@ export default class Register {
 
 
   private async addEntity<T extends PreManifestBase>(manifestType: ManifestsTypeName, manifest: string | T) {
-
-    // TODO: не загружать прямо сейчас
-
     const resolvePromise: Promise<T> = this.resolveManifest<T>(manifest);
 
     this.registeringPromises.push(resolvePromise);
