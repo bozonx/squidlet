@@ -45,6 +45,10 @@ export default class UsedEntities {
     await this.proceedDefinitions('services', this.configManager.preHostConfig.services);
   }
 
+  getUsedDevs(): string[] {
+    return Object.keys(this.usedDevs);
+  }
+
   getEntitiesSet(): SrcEntitiesSet {
     return this.entitiesSet;
   }

@@ -3,7 +3,6 @@ import UsedEntities from './entities/UsedEntities';
 import Definitions from './configSet/Definitions';
 import ConfigsSet from './configSet/ConfigsSet';
 import HostsConfigsWriter from './configSet/HostsConfigsWriter';
-import validatePlatformDevs from './validatePlatformDevs';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
@@ -13,6 +12,7 @@ import PreHostConfig from './interfaces/PreHostConfig';
 import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
 import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
+import {checkDevs} from '../nodejs/helpers';
 
 
 export default class EnvBuilder {
@@ -58,7 +58,7 @@ export default class EnvBuilder {
     await this.definitions.generate();
 
     this.log.info(`--> Checking platform dev dependencies`);
-    validatePlatformDevs(this);
+    checkDevs(this.configManager.machineConfig.devs, this.usedEntities.getUsedDevs());
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
