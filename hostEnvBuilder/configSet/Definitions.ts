@@ -1,11 +1,10 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _omit = require('lodash/omit');
-import _values = require('lodash/values');
 import _isEmpty = require('lodash/isEmpty');
 
 import EntityDefinition, {EntitiesDefinitions} from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 import ConfigManager from '../ConfigManager';
 import UsedEntities from '../entities/UsedEntities';
 import {EntitiesNames} from '../entities/EntitiesCollection';
@@ -49,9 +48,6 @@ export default class Definitions {
     if (!_isEmpty(drivers)) this.driversDefinitions = drivers;
 
     if (!_isEmpty(services)) this.servicesDefinitions = services;
-
-    // check for definition have a manifest
-    this.checkDefinitions();
   }
 
 
@@ -151,30 +147,6 @@ export default class Definitions {
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
-  }
-
-  /**
-   * Check for definitions classNames exist in manifests.
-   */
-  private checkDefinitions() {
-
-    // TODO: looks useless
-
-    const entities: SrcEntitiesSet = this.usedEntities.getEntitiesSet();
-    const check = (
-      entitiesOfType: {[index: string]: SrcEntitySet},
-      definitions: {[index: string]: EntityDefinition}
-    ) => {
-      for (let entityDef of _values(definitions)) {
-        if (!entitiesOfType[entityDef.className]) {
-          throw new Error(`Can't find an entity "${entityDef.className}" of definition ${JSON.stringify(entityDef)}`);
-        }
-      }
-    };
-
-    check(entities.devices, this.devicesDefinitions);
-    check(entities.drivers, this.driversDefinitions);
-    check(entities.services, this.servicesDefinitions);
   }
 
   private collectManifestPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
