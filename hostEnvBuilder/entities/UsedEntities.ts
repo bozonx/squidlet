@@ -124,6 +124,10 @@ export default class UsedEntities {
     for (let depClassName of preManifest.drivers || []) {
       await this.proceedEntity('driver', depClassName);
     }
+    // resolve drivers deps
+    for (let depClassName of preManifest.services || []) {
+      await this.proceedEntity('service', depClassName);
+    }
 
     // collect devs
     for (let depClassName of preManifest.devs || []) {

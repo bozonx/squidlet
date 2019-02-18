@@ -16,6 +16,8 @@ export default interface PreManifestBase {
   devices?: string[];
   // drivers dependencies which entity use
   drivers?: string[];
+  // services dependencies which entity use
+  serivces?: string[];
   // devs dependencies which entity use
   devs?: string[];
 
