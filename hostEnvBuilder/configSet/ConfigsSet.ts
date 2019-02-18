@@ -80,8 +80,14 @@ export default class ConfigsSet {
    * @returns [systemDrivers, regularDrivers]
    */
   private sortDrivers(): [string[], string[]] {
-    const driversClasses: string[] = this.hostClassNames.getAllUsedDriversClassNames();
-    const allSystemDrivers: string[] = this.entitiesCollection.getSystemDrivers();
+    const driversClasses: string[] = this.usedEntities.getEntitiesNames().drivers;
+    const allSystemDrivers: string[] = [];
+
+    for (let driverName of driversClasses) {
+      const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('drivers', driverName);
+
+      if (entitySet.manifest.system) allSystemDrivers.push(driverName);
+    }
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
   }
@@ -91,20 +97,16 @@ export default class ConfigsSet {
    * @returns [systemServices, regularServices]
    */
   private sortServices(): [string[], string[]] {
-    const servicesClasses: string[] = this.hostClassNames.getServicesClassNames();
-    const allSystemServices: string[] = this.entitiesCollection.getSystemServices();
+    const servicesClasses: string[] = this.usedEntities.getEntitiesNames().services;
+    const allSystemServices: string[] = [];
+
+    for (let serviceName of servicesClasses) {
+      const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', serviceName);
+
+      if (entitySet.manifest.system) allSystemServices.push(serviceName);
+    }
 
     return sortByIncludeInList(servicesClasses, allSystemServices);
   }
 
 }
-
-// generateDstEntitiesSet(hostId: string): EntitiesSet {
-//   const result: EntitiesSet = {
-//     devices: {},
-//     drivers: {},
-//     services: {},
-//   };
-//
-//   return result;
-// }

@@ -53,6 +53,7 @@ export default class UsedEntities {
     return this.entitiesSet[pluralType][name];
   }
 
+  // TODO: может сделать отдельные методы ещё ???
   /**
    * Generate class names of all the used entities
    */
