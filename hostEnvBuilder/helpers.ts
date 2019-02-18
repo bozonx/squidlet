@@ -1,4 +1,5 @@
 import _omit = require('lodash/omit');
+import _difference = require('lodash/difference');
 
 import systemConfig from './configs/systemConfig';
 import {ManifestsTypeName} from '../host/interfaces/ManifestTypes';
@@ -96,6 +97,14 @@ export function collectServicesFromShortcuts(
   }
 
   return services;
+}
+
+export function checkDevs(hostDevs: string[], machineDevs: string[]) {
+  const diff: string[] = _difference(hostDevs, machineDevs);
+
+  if (diff.length) {
+    throw new Error(`There aren't some devs "${JSON.stringify(diff)}" in the selected platform`);
+  }
 }
 
 

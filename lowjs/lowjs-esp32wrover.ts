@@ -12,7 +12,7 @@ const platformConfig: MachineConfig = {
     //'Spi',
     //'Wifi',
     //'Bluetooth',
-    //'I2cMaster',
+    'I2cMaster',
 
     //'Mqtt',
 
@@ -26,7 +26,7 @@ const platformConfig: MachineConfig = {
     config: {
     },
     drivers: {
-      'I2cMaster.driver': {
+      'I2cMaster': {
         bus: 1,
       }
     },

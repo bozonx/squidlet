@@ -12,7 +12,7 @@ import PreHostConfig from './interfaces/PreHostConfig';
 import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
 import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
-import {checkDevs} from '../nodejs/helpers';
+import {checkDevs} from './helpers';
 
 
 export default class EnvBuilder {
@@ -58,7 +58,7 @@ export default class EnvBuilder {
     await this.definitions.generate();
 
     this.log.info(`--> Checking platform dev dependencies`);
-    checkDevs(this.configManager.machineConfig.devs, this.usedEntities.getUsedDevs());
+    checkDevs(this.usedEntities.getUsedDevs(), this.configManager.machineConfig.devs);
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
