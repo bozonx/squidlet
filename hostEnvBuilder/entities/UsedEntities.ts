@@ -1,7 +1,7 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../ConfigManager';
 import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
@@ -40,9 +40,9 @@ export default class UsedEntities {
 
 
   async generate() {
-    await this.proceedDefinitions('device', this.configManager.preHostConfig.devices);
-    await this.proceedDefinitions('driver', this.configManager.preHostConfig.drivers);
-    await this.proceedDefinitions('service', this.configManager.preHostConfig.services);
+    await this.proceedDefinitions('devices', this.configManager.preHostConfig.devices);
+    await this.proceedDefinitions('drivers', this.configManager.preHostConfig.drivers);
+    await this.proceedDefinitions('services', this.configManager.preHostConfig.services);
   }
 
   getEntitiesSet(): SrcEntitiesSet {
@@ -93,7 +93,7 @@ export default class UsedEntities {
    * Proceed definitions of devices of drivers or services specified in host config
    */
   private async proceedDefinitions(
-    manifestType: ManifestsTypeName,
+    pluralType: ManifestsTypePluralName,
     definitions?: {[index: string]: PreEntityDefinition}
   ) {
     if (!definitions) return;
@@ -101,13 +101,11 @@ export default class UsedEntities {
     for (let entityId of Object.keys(definitions)) {
       const className: string = definitions[entityId].className;
 
-      await this.proceedEntity(manifestType, className);
+      await this.proceedEntity(pluralType, className);
     }
   }
 
-  private async proceedEntity(manifestType: ManifestsTypeName, className: string) {
-    const pluralType = `${manifestType}s` as ManifestsTypePluralName;
-
+  private async proceedEntity(pluralType: ManifestsTypePluralName, className: string) {
     // skip if it is proceeded
     if (this.entitiesSet[pluralType][className]) return;
 
@@ -118,15 +116,15 @@ export default class UsedEntities {
 
     // resolve devices deps
     for (let depClassName of preManifest.devices || []) {
-      await this.proceedEntity('device', depClassName);
+      await this.proceedEntity('devices', depClassName);
     }
     // resolve drivers deps
     for (let depClassName of preManifest.drivers || []) {
-      await this.proceedEntity('driver', depClassName);
+      await this.proceedEntity('drivers', depClassName);
     }
     // resolve drivers deps
     for (let depClassName of preManifest.services || []) {
-      await this.proceedEntity('service', depClassName);
+      await this.proceedEntity('services', depClassName);
     }
 
     // collect devs
