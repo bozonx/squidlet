@@ -3,21 +3,21 @@ import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
 
 const platformConfig: PlatformConfig = {
   devs: [
-    'Storage.dev',
-    'Sys.dev',
+    'Storage',
+    'Sys',
     'Sha1',
-    'Digital.dev',
-    //'Pwm.dev',
-    'Serial.dev',
-    //'Spi.dev',
-    //'Wifi.dev',
-    //'Bluetooth.dev',
-    'I2cMaster.dev',
+    'Digital',
+    //'Pwm',
+    'Serial',
+    //'Spi',
+    //'Wifi',
+    //'Bluetooth',
+    'I2cMaster',
 
-    //'I2cSlave.dev',
-    //'Adc.dev',
-    //'Dac.dev',
-    //'Touch.dev',
+    //'I2cSlave',
+    //'Adc',
+    //'Dac',
+    //'Touch',
   ],
 
   hostConfig: {
