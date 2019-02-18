@@ -10,6 +10,7 @@ import {trimEnd} from '../../host/helpers/lodashLike';
 import systemConfig from '../../host/config/systemConfig';
 import SysDev from '../../host/interfaces/dev/SysDev';
 import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import ManifestBase from '../../host/interfaces/ManifestBase';
 
 
 let __configSet: SrcHostEnvSet;
@@ -78,7 +79,13 @@ export default class Sys implements SysDev {
     if (pathSplit[0] === systemConfig.rootDirs.entities) {
       const entityType = pathSplit[1] as ManifestsTypePluralName;
       const entityName: string = pathSplit[2];
+
+      const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
+      const mainFileName: string = manifest.main;
+
       let entityFilePath: string | undefined;
+
+      // TODO: remake
 
       if (pathSplit[3] === initCfg.fileNames.mainJs) {
         // __main.js

@@ -29,6 +29,7 @@ import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
 import System from './System';
 import systemConfig from './config/systemConfig';
+import ManifestBase from './interfaces/ManifestBase';
 
 
 export default class SysFs {
@@ -56,18 +57,13 @@ export default class SysFs {
   }
 
   loadConfig(configName: string): Promise<{[index: string]: any}> {
-
-    // TODO: запретить выход наверх
-
     return this.sysDev.readJsonObjectFile(pathJoin(systemConfig.rootDirs.configs, configName));
   }
 
   async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
-
-    // TODO: запретить выход наверх
-
-    const fileName = this.system.initCfg.fileNames.mainJs;
-    const filePath = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, fileName);
+    const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
+    const mainFileName: string = manifest.main;
+    const filePath = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, mainFileName);
     const module = await this.sysDev.requireFile(filePath);
 
     return module.default;
@@ -76,12 +72,12 @@ export default class SysFs {
   async loadEntityManifest(
     pluralType: ManifestsTypePluralName,
     entityName: string
-  ): Promise<{[index: string]: any}> {
+  ): Promise<ManifestBase> {
     await this.checkEntity(pluralType, entityName);
 
     const pathToFile = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, this.system.initCfg.fileNames.manifest);
 
-    return this.sysDev.readJsonObjectFile(pathToFile);
+    return this.sysDev.readJsonObjectFile(pathToFile) as any;
   }
 
   async loadEntityFile(

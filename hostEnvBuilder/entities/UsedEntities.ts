@@ -143,7 +143,6 @@ export default class UsedEntities {
     return {
       srcDir: preManifest.baseDir,
       manifest: finalManifest,
-      main: preManifest.main,
       files: preManifest.files || [],
       system: preManifest.system || false,
     };
@@ -160,6 +159,11 @@ export default class UsedEntities {
       'drivers',
       'devs'
     );
+
+    if (preManifest.main) {
+      // clear path to main file
+      finalManifest.main = preManifest.main.replace(/^\.+\//, '');
+    }
 
     // load props file
     if (typeof preManifest.props === 'string') {

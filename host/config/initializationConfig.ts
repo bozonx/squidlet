@@ -7,7 +7,7 @@ export default function initializationConfig(): InitializationConfig {
       hostConfig: 'config.json',
       manifest: 'manifest.json',
       // name of built main file of entity
-      mainJs: '__main.js',
+      //mainJs: '__main.js',
 
       // list of system drivers like driverName[]
       systemDrivers: 'systemDrivers.json',

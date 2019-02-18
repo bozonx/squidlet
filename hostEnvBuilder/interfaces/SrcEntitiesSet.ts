@@ -5,10 +5,7 @@ import ServiceManifest from '../../host/interfaces/ServiceManifest';
 
 export interface SrcEntitySet {
   srcDir: string;
-
   manifest: DeviceManifest | DriverManifest | ServiceManifest;
-  // relative path to main file
-  main?: string;
   // relative paths to entity files
   files: string[];
   // is it system entity or not
