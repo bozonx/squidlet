@@ -6,12 +6,4 @@ type: system
 #  - I2cToSlave
 #  - I2cToMaster
 
-props:
-  # I2cToSlave
-  bus:
-  address:
-  # MasterSlaveBaseNodeDriver
-  int:
-  feedback:
-  pollInterval:
-  poll:
+props: props.yaml

@@ -5,4 +5,4 @@ drivers:
   - I2cToSlave
   - Digital_pcf8574
 
-props: ./props.yaml
+props: props.yaml
