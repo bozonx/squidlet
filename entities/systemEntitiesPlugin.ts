@@ -31,12 +31,12 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'Binary/BinaryClick.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinInput.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPin/DigitalPinOutput.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cData.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cMaster.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cToSlave.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cSlave.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cToMaster.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2c/I2cDuplex.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cData/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cMaster/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cToSlave/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cSlave/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cToMaster/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cDuplex/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/SerialDuplex.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_local.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPin/Digital_pcf8574.yaml'));

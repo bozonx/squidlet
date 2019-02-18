@@ -11,7 +11,7 @@ import {Edge} from 'host/interfaces/dev/DigitalDev';
 import DebounceCall from 'host/helpers/DebounceCall';
 import IndexedEvents from 'host/helpers/IndexedEvents';
 
-import {I2cToSlave, I2cToSlaveDriverProps} from '../I2c/I2cToSlave';
+import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
 
 export type ChangeStateHandler = (targetPin: number, value: boolean) => void;
