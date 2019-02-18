@@ -1,15 +1,15 @@
 import _omit = require('lodash/omit');
 import * as path from 'path';
 
-import DeviceManifest from '../../host/interfaces/DeviceManifest';
-import DriverManifest from '../../host/interfaces/DriverManifest';
-import ServiceManifest from '../../host/interfaces/ServiceManifest';
-import ManifestBase from '../../host/interfaces/ManifestBase';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
-import PreManifestBase from '../interfaces/PreManifestBase';
-import Io from '../Io';
-import Register from './Register';
+import DeviceManifest from '../host/interfaces/DeviceManifest';
+import DriverManifest from '../host/interfaces/DriverManifest';
+import ServiceManifest from '../host/interfaces/ServiceManifest';
+import ManifestBase from '../host/interfaces/ManifestBase';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
+import SrcEntitiesSet, {SrcEntitySet} from '../hostEnvBuilder/interfaces/SrcEntitiesSet';
+import PreManifestBase from '../hostEnvBuilder/interfaces/PreManifestBase';
+import Io from '../hostEnvBuilder/Io';
+import Register from '../hostEnvBuilder/entities/Register';
 
 
 // dependencies of entities by class name

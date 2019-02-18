@@ -2,14 +2,13 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 
 import systemConfig from '../configs/systemConfig';
-import {EntitiesNames} from './EntitiesCollection';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import ConfigManager from '../ConfigManager';
 import Io from '../Io';
 import Register from './Register';
 import Logger from '../interfaces/Logger';
 import buildEntityMainFile from '../buildEntityMainFile';
-import UsedEntities from './UsedEntities';
+import UsedEntities, {EntitiesNames} from './UsedEntities';
 import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 
 

@@ -1,15 +1,15 @@
 import _difference = require('lodash/difference');
 
-import {Dependencies, EntitiesNames} from './entities/EntitiesCollection';
 import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
 import EnvBuilder from './EnvBuilder';
+import {EntitiesNames} from './entities/UsedEntities';
 
 
 
 /**
  * Get list of devs used on host
  */
-function getHostDevs(hostEntitiesNames: EntitiesNames, devDeps: Dependencies): string[] {
+function getHostDevs(hostEntitiesNames: EntitiesNames, devDeps: any): string[] {
   const result: {[index: string]: true} = {};
 
   for (let pluralName of Object.keys(hostEntitiesNames)) {

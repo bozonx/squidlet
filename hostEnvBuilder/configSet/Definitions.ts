@@ -6,8 +6,7 @@ import EntityDefinition, {EntitiesDefinitions} from '../../host/interfaces/Entit
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 import ConfigManager from '../ConfigManager';
-import UsedEntities from '../entities/UsedEntities';
-import {EntitiesNames} from '../entities/EntitiesCollection';
+import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 
 
 /**
