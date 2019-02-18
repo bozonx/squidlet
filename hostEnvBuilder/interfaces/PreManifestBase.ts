@@ -6,9 +6,9 @@ export default interface PreManifestBase {
   baseDir: string;
   // Unique name of entity in its type. Usually it is ClassName of main class
   name: string;
-
   // path to device main file relative to manifest place
-  main?: string;
+  main: string;
+
   // is it system entity or not
   system?: boolean;
 

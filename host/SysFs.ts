@@ -9,7 +9,7 @@
  *       devices/
  *         deviceName/
  *           manifest.json
- *           __main.js
+ *           main.js
  *           customFile.json
  *           ...other entity's files
  *       driver/

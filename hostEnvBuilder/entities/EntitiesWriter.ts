@@ -91,10 +91,6 @@ export default class EntitiesWriter {
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
-
-    // if main file isn't set - do nothing
-    if (!entitySet.manifest.main) return;
-
     //const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
     // const mainDstFile = path.join(entityDstDir, path.parse(entitySet.main).name);

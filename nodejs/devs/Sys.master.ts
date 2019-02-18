@@ -10,7 +10,6 @@ import {trimEnd} from '../../host/helpers/lodashLike';
 import systemConfig from '../../host/config/systemConfig';
 import SysDev from '../../host/interfaces/dev/SysDev';
 import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
-import ManifestBase from '../../host/interfaces/ManifestBase';
 
 
 let __configSet: SrcHostEnvSet;
@@ -76,30 +75,25 @@ export default class Sys implements SysDev {
   async requireFile(fileName: string): Promise<any> {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
-    if (pathSplit[0] === systemConfig.rootDirs.entities) {
-      const entityType = pathSplit[1] as ManifestsTypePluralName;
-      const entityName: string = pathSplit[2];
-
-      const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
-      const mainFileName: string = manifest.main;
-
-      let entityFilePath: string | undefined;
-
-      // TODO: remake
-
-      if (pathSplit[3] === initCfg.fileNames.mainJs) {
-        // __main.js
-        entityFilePath = __configSet.entities[entityType][entityName].main;
-      }
-      else {
-        // other entity file
-        entityFilePath = this.getEntityFileAbsPath(fileName);
-      }
-
-      return require(entityFilePath as string);
+    if (pathSplit[0] !== systemConfig.rootDirs.entities) {
+      throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
     }
 
-    throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
+    const entityFilePath: string = this.getEntityFileAbsPath(fileName);
+
+    // const entityType = pathSplit[1] as ManifestsTypePluralName;
+    // const entityName: string = pathSplit[2];
+    // let entityFilePath: string | undefined;
+    // if (pathSplit[3] === initCfg.fileNames.mainJs) {
+    //   // __main.js
+    //   entityFilePath = __configSet.entities[entityType][entityName].main;
+    // }
+    // else {
+    //   // other entity file
+    //   entityFilePath = this.getEntityFileAbsPath(fileName);
+    // }
+
+    return require(entityFilePath as string);
   }
 
 

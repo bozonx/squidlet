@@ -64,7 +64,7 @@ export default class ConfigsSet {
           files: entitySet.files.map((relativeFileName: string) => path.resolve(entitySet.srcDir, relativeFileName)),
           manifest: {
             ...entitySet.manifest,
-            main: entitySet.manifest.main && path.resolve(entitySet.srcDir, entitySet.manifest.main),
+            main: path.join(entitySet.srcDir, entitySet.manifest.main),
           },
         };
       }

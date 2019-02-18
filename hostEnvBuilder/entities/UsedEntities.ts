@@ -152,7 +152,6 @@ export default class UsedEntities {
     const finalManifest: ManifestBase = _omit<any>(
       preManifest,
       'files',
-      'main',
       'system',
       'baseDir',
       'devices',
@@ -160,10 +159,8 @@ export default class UsedEntities {
       'devs'
     );
 
-    if (preManifest.main) {
-      // clear path to main file
-      finalManifest.main = preManifest.main.replace(/^\.+\//, '');
-    }
+    // clear path to main file
+    finalManifest.main = preManifest.main.replace(/^\.+\//, '');
 
     // load props file
     if (typeof preManifest.props === 'string') {
