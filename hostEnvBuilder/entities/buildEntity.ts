@@ -1,12 +1,12 @@
 import * as path from 'path';
 
-import compileTs from '../helpers/buildJs/compileTs';
-import compileJs from '../helpers/buildJs/compileJs';
-import minimize from '../helpers/buildJs/minimize';
-import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
+import compileTs from '../../helpers/buildJs/compileTs';
+import compileJs from '../../helpers/buildJs/compileJs';
+import minimize from '../../helpers/buildJs/minimize';
+import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 
 
-export default async function buildEntityMainFile(
+export default async function buildEntity(
   pluralType: ManifestsTypePluralName,
   entityName: string,
   tmpDir: string,

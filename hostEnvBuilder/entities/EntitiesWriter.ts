@@ -7,7 +7,7 @@ import ConfigManager from '../ConfigManager';
 import Io from '../Io';
 import Register from './Register';
 import Logger from '../interfaces/Logger';
-import buildEntityMainFile from '../buildEntityMainFile';
+import buildEntity from './buildEntity';
 import UsedEntities, {EntitiesNames} from './UsedEntities';
 import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
 
@@ -101,9 +101,9 @@ export default class EntitiesWriter {
     const renamedMainDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
     this.log.info(`- building main file of entity "${entityName}"`);
-    await buildEntityMainFile(pluralType, entityName, this.tmpDir, entitySet.srcDir, entityDstDir);
+    await buildEntity(pluralType, entityName, this.tmpDir, entitySet.srcDir, entityDstDir);
     // rename main file
-    await this.io.renameFile(mainDstFile, renamedMainDstFile);
+    await this.io.renameFile(`${mainDstFile}.js`, renamedMainDstFile);
   }
 
   // private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {
