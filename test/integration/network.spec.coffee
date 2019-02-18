@@ -74,7 +74,7 @@ describe 'integration network', ->
       writeTo: (addrHex, data) =>
         @destListenHandler(data)
     }
-    @I2cMasterDev = {
+    @I2cMaster = {
       getInstance: => @I2cMasterDevInstance
     }
 
@@ -89,7 +89,7 @@ describe 'integration network', ->
     oldGetDriver = @drivers.getDriver.bind(@drivers)
     @drivers.getDriver = (driverName) =>
       if (driverName == 'I2cMaster.dev')
-        return @I2cMasterDev
+        return @I2cMaster
       if (driverName == 'I2cSlave.dev')
         return @I2cSlaveDev
 

@@ -28,13 +28,13 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
 }
 
 export function getMasterSysDev(platformDirName: string): DevClass {
-  const devPath = path.join(platformDirName, DEVS_DIR, 'Sys.master.dev');
+  const devPath = path.join(platformDirName, DEVS_DIR, 'Sys.master');
 
   return require(devPath).default;
 }
 
 /**
- * Make devs collection in memory like {"Digital.dev": DevClass}
+ * Make devs collection in memory like {"Digital": DevClass}
  */
 export function collectDevs(platformDirName: string, machine: string): {[index: string]: DevClass} {
   const machineConfig: MachineConfig = loadMachineConfig(platformDirName, machine);

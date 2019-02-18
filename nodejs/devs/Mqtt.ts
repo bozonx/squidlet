@@ -85,7 +85,7 @@ export class MqttDevConnection implements MqttDev {
 }
 
 
-export default class MqttDev {
+export default class Mqtt {
   connect(params: Props): MqttDevConnection {
     return new MqttDevConnection(params);
   }

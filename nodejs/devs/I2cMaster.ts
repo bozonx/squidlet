@@ -7,7 +7,7 @@ import I2cMasterDev from '../../host/interfaces/dev/I2cMasterDev';
 /**
  * It's raspberry pi implementation of I2C master.
  */
-export default class I2cMasterDev implements I2cMasterDev {
+export default class I2cMaster implements I2cMasterDev {
   private readonly instances: {[index: string]: I2cBus} = {};
 
 

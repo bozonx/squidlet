@@ -5,7 +5,7 @@ import {PATH_SEPARATOR} from '../../host/helpers/helpers';
 import {convertBufferToUint8Array} from '../helpers';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import initializationConfig from '../../host/config/initializationConfig';
-import {DEFAULT_ENCODING} from './Sys.dev';
+import {DEFAULT_ENCODING} from './Sys';
 import {trimEnd} from '../../host/helpers/lodashLike';
 import systemConfig from '../../host/config/systemConfig';
 import SysDev from '../../host/interfaces/dev/SysDev';
@@ -16,7 +16,7 @@ let __configSet: SrcHostEnvSet;
 const initCfg = initializationConfig();
 
 
-export default class SysDev implements SysDev {
+export default class Sys implements SysDev {
   static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
     __configSet = hostConfigSet;
   }

@@ -6,7 +6,7 @@ import StorageDev, {Stats} from '../../host/interfaces/dev/StorageDev';
 import {convertBufferToUint8Array} from '../helpers';
 
 
-export default class StorageDev implements StorageDev {
+export default class Storage implements StorageDev {
   // TODO: use constant
   private defaultEncode = 'utf8';
 

@@ -6,7 +6,7 @@ import SerialDev from '../../host/interfaces/dev/SerialDev';
 
 
 
-export default class SerialDev implements SerialDev {
+export default class Serial implements SerialDev {
   private readonly instances: SerialPort[] = [];
 
   // TODO: rise dataString - data as string
