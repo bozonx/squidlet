@@ -50,4 +50,25 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   // services
   await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Logger/manifest.yaml'));
+
+  // add used on host drivers related on devs
+  env.afterRegistering(() => {
+    const devs: string[] = env.getDevs();
+
+    if (devs.includes('Digital')) {
+      env.addUsedEntity('drivers', 'Digital_local');
+    }
+
+    if (devs.includes('Serial')) {
+      env.addUsedEntity('drivers', 'SerialDuplex');
+    }
+
+    if (devs.includes('I2cMaster')) {
+      env.addUsedEntity('drivers', 'I2cMaster');
+    }
+
+    if (devs.includes('I2cSlave')) {
+      env.addUsedEntity('drivers', 'I2cSlave');
+    }
+  });
 }

@@ -51,6 +51,9 @@ export default class EnvBuilder {
     this.log.info(`--> Registering plugins, devices, drivers and services`);
     await this.registering();
 
+    // call handlers after registering
+    this.pluginEnv.$riseAfterRegistering();
+
     this.log.info(`--> Resolving and preparing entities which is used on host`);
     await this.usedEntities.generate();
 
