@@ -5,14 +5,4 @@ type: system
 #devices:
 #  - PortExpanderEsp32
 
-props:
-  expander:
-    type: string
-    required: true
-  # PortExpander driver
-  connection:
-  # ... connection props
-  digitalPinsCount:
-  analogPinsCount:
-  pollInterval:
-  alogPinsCount:
+props: props.yaml

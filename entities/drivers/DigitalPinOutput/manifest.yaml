@@ -2,11 +2,4 @@ name: DigitalPinOutput
 main: DigitalPinOutput.ts
 type: system
 
-props:
-  initialLevel:
-    type: boolean
-    default: false
-
-  ### DigitalPin base props
-  pin:
-  source:
+props: props.yaml

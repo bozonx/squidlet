@@ -2,23 +2,4 @@ name: DigitalPinInput
 main: DigitalPinInput.ts
 type: system
 
-props:
-  edge:
-    type: rising | falling | both
-    default: both
-  debounce:
-    type: number
-    default: 0
-  doubleCheck:
-    type: boolean
-    default: false
-  pullup:
-    type: boolean
-    default: false
-  pulldown:
-    type: boolean
-    default: false
-
-  ### DigitalPin base props
-  pin:
-  source:
+props: props.yaml

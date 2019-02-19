@@ -1,0 +1,7 @@
+initialLevel:
+  type: boolean
+  default: false
+
+### DigitalPin base props
+pin:
+source:
