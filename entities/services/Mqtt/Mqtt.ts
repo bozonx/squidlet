@@ -1,5 +1,4 @@
 import ServiceBase from 'host/baseServices/ServiceBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
 import DeviceData from 'host/interfaces/DeviceData';
 import {combineTopic, parseValue, splitTopic} from 'host/helpers/helpers';
 import MqttDev from 'host/interfaces/dev/MqttDev';
@@ -14,8 +13,8 @@ interface Props {
 }
 
 export default class MqttSevice extends ServiceBase<Props> {
-  private get mqttDev(): Mqtt {
-    return this.depsInstances.mqttDev as Mqtt;
+  private get mqttDev(): MqttDev {
+    return this.depsInstances.mqttDev as MqttDev;
   }
 
   protected willInit = async () => {

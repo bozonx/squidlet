@@ -59,15 +59,16 @@ export default class ConfigsSet {
       for (let className of classes) {
         const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, className);
 
-        result[pluralType][className] = {
-          ...entitySet,
-          files: entitySet.files.map((relativeFileName: string) => path.resolve(entitySet.srcDir, relativeFileName)),
-          manifest: entitySet.manifest,
-          // manifest: {
-          //   ...entitySet.manifest,
-          //   main: path.join(entitySet.srcDir, entitySet.manifest.main),
-          // },
-        };
+        result[pluralType][className] = entitySet;
+
+        // result[pluralType][className] = {
+        //   ...entitySet,
+        //   files: entitySet.files.map((relativeFileName: string) => path.resolve(entitySet.srcDir, relativeFileName)),
+        //   manifest: {
+        //     ...entitySet.manifest,
+        //     main: path.join(entitySet.srcDir, entitySet.manifest.main),
+        //   },
+        // };
       }
     };
 
