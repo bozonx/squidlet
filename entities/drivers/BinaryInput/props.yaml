@@ -1,0 +1,21 @@
+# timeout after received signal. At this time it doesn't receive any signals.
+blockTime:
+  type: number
+invert:
+  type: boolean
+  default: false
+# In true case it inverts value if pullup resistor is on
+invertOnPullup:
+  type: boolean
+  default: true
+
+### DigitalPinInput driver
+debounce:
+doubleCheck:
+edge:
+pullup:
+pulldown:
+
+### DigitalPin base
+pin:
+source:

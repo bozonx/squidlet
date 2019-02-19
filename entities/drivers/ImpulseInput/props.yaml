@@ -1,0 +1,26 @@
+impulseLength:
+  type: number
+  default: 100
+blockTime:
+  type: number
+  default: 0
+#  throttle:
+#    type: number?
+invertOnPullup:
+  type: boolean
+  default: true
+invert:
+  type: boolean
+  default: false
+
+### DigitalPinInput driver
+debounce:
+  default: 0
+doubleCheck:
+edge:
+pullup:
+pulldown:
+
+### DigitalPin base
+pin:
+source:

@@ -5,28 +5,4 @@ type: system
 drivers:
   - BinaryInput
 
-props:
-  # Maximum time of pressed button. It releases after reaching this timeout.
-  releaseTimeoutMs:
-    type: number
-    default: 10000
-
-  # Block time after keyUp
-  blockTime:
-    type: number
-    default: 0
-
-  # BinaryInput
-  invert:
-  invertOnPullup:
-
-  ### DigitalPinInput driver
-  debounce:
-  doubleCheck:
-  edge:
-  pullup:
-  pulldown:
-
-  ### DigitalPin base props
-  pin:
-  source:
+props: props.yaml
