@@ -38,6 +38,20 @@ export default class IndexedEvents<T extends AnyHandler> {
     }
   }) as T;
 
+  emitSync = ((...args: any[]): Promise<any[]> => {
+    const promises: Promise<any>[] = [];
+
+    for (let handler of this.handlers) {
+      if (!handler) continue;
+
+      const result: any = handler(...args);
+
+      if (typeof result === 'object' && result.then) promises.push(result);
+    }
+
+    return Promise.all(promises);
+  });
+
   /**
    * Register listener and return its index
    */
