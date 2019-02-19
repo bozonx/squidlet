@@ -11,7 +11,7 @@ export const DEFAULT_ENCODING = 'utf8';
 
 
 /**
- * It is a slave's Sys.dev
+ * It is a slave's Sys dev
  */
 export default class Sys implements SysDev {
   static registerStorageDir(storageDir: string) {

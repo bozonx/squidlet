@@ -8,7 +8,7 @@ const platformConfig: MachineConfig = {
     //'Sha1',
     'Digital',
     //'Pwm',
-    'Serial',
+    //'Serial',
     //'Spi',
     //'Wifi',
     //'Bluetooth',

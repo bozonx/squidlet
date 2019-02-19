@@ -76,7 +76,7 @@ export default class Sys implements SysDev {
     const pathSplit = fileName.split(PATH_SEPARATOR);
 
     if (pathSplit[0] !== systemConfig.rootDirs.entities) {
-      throw new Error(`Sys.dev "requireFile": Unsupported system dir "${fileName}" on master`);
+      throw new Error(`Sys dev "requireFile": Unsupported system dir "${fileName}" on master`);
     }
 
     const entityFilePath: string = this.getEntityFileAbsPath(fileName);
@@ -118,27 +118,27 @@ export default class Sys implements SysDev {
 
 
   mkdir(fileName: string): Promise<void> {
-    return Promise.reject(`Method "mkdir" of Sys.dev is not allowed on master`);
+    return Promise.reject(`Method "mkdir" of Sys dev is not allowed on master`);
   }
 
   readdir(dirName: string): Promise<string[]> {
-    return Promise.reject(`Method "readdir" of Sys.dev is not allowed on master`);
+    return Promise.reject(`Method "readdir" of Sys dev is not allowed on master`);
   }
 
   rmdir(dirName: string): Promise<void> {
-    return Promise.reject(`Method "rmdir" of Sys.dev is not allowed on master`);
+    return Promise.reject(`Method "rmdir" of Sys dev is not allowed on master`);
   }
 
   async unlink(fileName: string): Promise<void> {
-    return Promise.reject(`Method "unlink" of Sys.dev is not allowed on master`);
+    return Promise.reject(`Method "unlink" of Sys dev is not allowed on master`);
   }
 
   async writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
-    return Promise.reject(`Method "writeFile" of Sys.dev is not allowed on master`);
+    return Promise.reject(`Method "writeFile" of Sys dev is not allowed on master`);
   }
 
   async exists(fileOrDirName: string): Promise<boolean> {
-    return Promise.reject(`Method "writeFile" of Sys.dev is not allowed on master`);
+    return Promise.reject(`Method "writeFile" of Sys dev is not allowed on master`);
   }
 
 }
