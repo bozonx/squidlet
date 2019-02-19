@@ -2,10 +2,6 @@ name: DigitalPinOutput
 main: DigitalPinOutput.ts
 type: system
 
-# TODO: remove
-#drivers:
-#  - Digital_local
-
 props:
   initialLevel:
     type: boolean

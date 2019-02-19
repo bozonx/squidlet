@@ -3,7 +3,5 @@ main: PortExpander.ts
 
 drivers:
   - Digital_portExpander
-#  - I2cDuplex
-#  - SerialDuplex
 
 props: ./props.yaml

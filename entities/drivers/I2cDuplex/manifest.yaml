@@ -2,8 +2,4 @@ name: I2cDuplex
 main: I2cDuplex.ts
 type: system
 
-#drivers:
-#  - I2cToSlave
-#  - I2cToMaster
-
 props: props.yaml

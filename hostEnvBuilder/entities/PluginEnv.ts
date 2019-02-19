@@ -54,17 +54,16 @@ export default class PluginEnv {
    * Register entity on host.
    * Call it after registering.
    */
-  addUsedEntity(pluralType: ManifestsTypePluralName, className: string) {
-    // TODO: ADD
-    // TODO: check for existance
+  addUsedEntity = async (pluralType: ManifestsTypePluralName, className: string) => {
+    this.usedEntities.addEntity(pluralType, className);
   }
 
   /**
    * Get devs list.
    * Call it after registering.
    */
-  getDevs(): string[] {
-    // TODO: ADD
+  getDevs = (): string[] => {
+    return this.usedEntities.getUsedDevs();
   }
 
   afterInit(handler: () => void) {
@@ -77,10 +76,12 @@ export default class PluginEnv {
 
 
   $riseAfterInit() {
+    // TODO: нужно чтобы все события дожидались промисов
     this.events.emit(AFTER_INIT_EVENT);
   }
 
   $riseAfterRegistering() {
+    // TODO: нужно чтобы все события дожидались промисов
     this.events.emit(AFTER_REGISTERING_EVENT);
   }
 

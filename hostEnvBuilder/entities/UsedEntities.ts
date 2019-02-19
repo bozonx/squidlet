@@ -92,6 +92,13 @@ export default class UsedEntities {
     // return result;
   }
 
+  async addEntity(pluralType: ManifestsTypePluralName, className: string) {
+    // do nothing if it exists
+    //if (this.getEntitySet(pluralType, className)) return;
+
+    await this.proceedEntity(pluralType, className);
+  }
+
 
   /**
    * Proceed definitions of devices of drivers or services specified in host config
