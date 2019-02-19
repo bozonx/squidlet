@@ -5,7 +5,7 @@ import IndexedEvents from 'host/helpers/IndexedEvents';
 import {omit} from 'host/helpers/lodashLike';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 
-import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
+import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
 import {DigitalPinOutput} from '../DigitalPinOutput/DigitalPinOutput';
 import {BlockMode, InitialLevel} from './interfaces/Types';
 

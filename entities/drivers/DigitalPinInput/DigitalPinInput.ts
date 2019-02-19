@@ -5,8 +5,8 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {omit} from 'host/helpers/lodashLike';
 import IndexedEvents from 'host/helpers/IndexedEvents';
 
-import {resolveDriverName} from '../DigitalPin/digitalHelpers';
-import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
+import {resolveDriverName} from '../DigitalPinOutput/digitalHelpers';
+import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
 
 
 export interface DigitalPinInputProps extends DigitalBaseProps {
