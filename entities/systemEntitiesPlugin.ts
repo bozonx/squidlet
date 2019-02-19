@@ -24,11 +24,11 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'FakePeopleCount/manifest.yaml'));
 
   // drivers
-  await env.addDriver(path.join(driversRoot, 'Binary/BinaryInput.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/BinaryOutput.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/ImpulseInput.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/ImpulseOutput.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Binary/BinaryClick.yaml'));
+  await env.addDriver(path.join(driversRoot, 'BinaryInput/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'BinaryOutput/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'ImpulseInput/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'ImpulseOutput/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'BinaryClick/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPinInput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPinOutput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital_local/manifest.yaml'));
