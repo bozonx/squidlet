@@ -4,10 +4,10 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import IndexedEvents from 'host/helpers/IndexedEvents';
 import {omit} from 'host/helpers/lodashLike';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
+import {BlockMode, InitialLevel} from 'host/interfaces/Types';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
 import {DigitalPinOutput} from '../DigitalPinOutput/DigitalPinOutput';
-import {BlockMode, InitialLevel} from '../Binary/interfaces/Types';
 
 
 type DelayedResultHandler = (err?: Error) => void;
