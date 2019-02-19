@@ -1,13 +1,10 @@
+import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import IndexedEvents from '../../host/helpers/IndexedEvents';
 import Register from './Register';
 import ConfigManager from '../ConfigManager';
 import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
 import UsedEntities from './UsedEntities';
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import MachineConfig from '../interfaces/MachineConfig';
-
-
-// const AFTER_INIT_EVENT = 'afterInit';
-// const AFTER_REGISTERING_EVENT = 'afterRegister';
 
 
 /**
@@ -15,7 +12,8 @@ import MachineConfig from '../interfaces/MachineConfig';
  */
 export default class PluginEnv {
   readonly configManager: ConfigManager;
-  //private readonly events: EventEmitter = new EventEmitter();
+  private afterRegisterEvents = new IndexedEvents<() => void>();
+  private afterInitEvents = new IndexedEvents<() => void>();
 
   private readonly register: Register;
   private readonly usedEntities: UsedEntities;
@@ -76,23 +74,21 @@ export default class PluginEnv {
     return this.usedEntities.getUsedDevs();
   }
 
-  afterInit(handler: () => void) {
-    this.events.addListener(AFTER_INIT_EVENT, handler);
-  }
-
   afterRegistering(handler: () => void) {
-    this.events.addListener(AFTER_REGISTERING_EVENT, handler);
+    this.afterRegisterEvents.addListener(handler);
   }
 
-
-  async $riseAfterInit() {
-    // TODO: нужно чтобы все события дожидались промисов
-    await this.events.emitSync(AFTER_INIT_EVENT);
+  afterInit(handler: () => void) {
+    this.afterInitEvents.addListener(handler);
   }
+
 
   async $riseAfterRegistering() {
-    // TODO: нужно чтобы все события дожидались промисов
-    await this.events.emitSync(AFTER_REGISTERING_EVENT);
+    await this.afterRegisterEvents.emitSync();
+  }
+
+  async $riseAfterInit() {
+    await this.afterInitEvents.emitSync();
   }
 
 }

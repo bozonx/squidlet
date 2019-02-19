@@ -52,7 +52,7 @@ export default class EnvBuilder {
     await this.registering();
 
     // call handlers after registering
-    this.pluginEnv.$riseAfterRegistering();
+    await this.pluginEnv.$riseAfterRegistering();
 
     this.log.info(`--> Resolving and preparing entities which is used on host`);
     await this.usedEntities.generate();
@@ -65,7 +65,7 @@ export default class EnvBuilder {
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
-    this.pluginEnv.$riseAfterInit();
+    await this.pluginEnv.$riseAfterInit();
   }
 
   /**
