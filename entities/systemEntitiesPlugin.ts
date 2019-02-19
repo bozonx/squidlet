@@ -53,22 +53,22 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
 
   // add used on host drivers related on devs
   env.afterRegistering(async () => {
-    const devs: string[] = env.getDevs();
+    const machineDevs: string[] = env.getMachineConfig().devs;
 
-    if (devs.includes('Digital')) {
+    if (machineDevs.includes('Digital')) {
       await env.addUsedEntity('drivers', 'Digital_local');
     }
 
-    if (devs.includes('Serial')) {
+    if (machineDevs.includes('Serial')) {
       await env.addUsedEntity('drivers', 'SerialDuplex');
     }
 
-    if (devs.includes('I2cMaster')) {
+    if (machineDevs.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');
       await env.addUsedEntity('drivers', 'I2cToSlave');
     }
 
-    if (devs.includes('I2cSlave')) {
+    if (machineDevs.includes('I2cSlave')) {
       //await env.addUsedEntity('drivers', 'I2cSlave');
       await env.addUsedEntity('drivers', 'I2cToMaster');
     }

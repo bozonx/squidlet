@@ -5,6 +5,7 @@ import ConfigManager from '../ConfigManager';
 import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
 import UsedEntities from './UsedEntities';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import MachineConfig from '../interfaces/MachineConfig';
 
 
 const AFTER_INIT_EVENT = 'afterInit';
@@ -58,13 +59,17 @@ export default class PluginEnv {
     this.usedEntities.addEntity(pluralType, className);
   }
 
-  /**
-   * Get devs list.
-   * Call it after registering.
-   */
-  getDevs = (): string[] => {
-    return this.usedEntities.getUsedDevs();
+  getMachineConfig(): MachineConfig {
+    return this.configManager.machineConfig;
   }
+
+  // /**
+  //  * Get devs list.
+  //  * Call it after registering.
+  //  */
+  // getDevs = (): string[] => {
+  //   return this.usedEntities.getUsedDevs();
+  // }
 
   afterInit(handler: () => void) {
     this.events.addListener(AFTER_INIT_EVENT, handler);
