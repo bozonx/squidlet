@@ -166,6 +166,8 @@ export default class UsedEntities {
       'devs'
     );
 
+    // TODO: clean up it after validation
+
     // clear path to main file
     finalManifest.main = preManifest.main.replace(/^\.+\//, '');
 

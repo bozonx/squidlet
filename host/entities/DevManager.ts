@@ -33,9 +33,7 @@ export default class DevManager {
     }
   }
 
-  getDev<T extends Dev>(shortDevName: string): T {
-    const devName = `${shortDevName}.dev`;
-
+  getDev<T extends Dev>(devName: string): T {
     if (!this.devSet[devName]) {
       throw new Error(`Can't find dev "${devName}"`);
     }
