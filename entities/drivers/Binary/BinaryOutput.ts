@@ -6,7 +6,7 @@ import {omit} from 'host/helpers/lodashLike';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 
 import DigitalBaseProps from '../DigitalPin/interfaces/DigitalBaseProps';
-import {DigitalPinOutput} from '../DigitalPin/DigitalPinOutput';
+import {DigitalPinOutput} from '../DigitalPinOutput/DigitalPinOutput';
 import {BlockMode, InitialLevel} from './interfaces/Types';
 
 

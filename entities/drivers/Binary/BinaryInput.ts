@@ -6,7 +6,7 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'host/helpers/helpers';
 import {omit} from 'host/helpers/lodashLike';
 
-import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPin/DigitalPinInput';
+import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {

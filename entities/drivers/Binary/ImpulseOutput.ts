@@ -5,7 +5,7 @@ import {omit} from 'host/helpers/lodashLike';
 import {deferCall, invertIfNeed} from 'host/helpers/helpers';
 
 import {BlockMode} from './interfaces/Types';
-import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPin/DigitalPinOutput';
+import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPinOutput/DigitalPinOutput';
 
 
 export interface ImpulseOutputProps extends DigitalPinOutputProps {

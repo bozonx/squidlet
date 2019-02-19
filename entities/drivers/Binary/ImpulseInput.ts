@@ -6,7 +6,7 @@ import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import {omit} from 'host/helpers/lodashLike';
 import {isDigitalInputInverted, resolveEdge} from 'host/helpers/helpers';
 
-import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPin/DigitalPinInput';
+import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
 
 
 type RisingHandler = () => void;
