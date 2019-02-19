@@ -21,6 +21,7 @@ export default class PluginEnv {
   private readonly register: Register;
   private readonly usedEntities: UsedEntities;
 
+
   constructor(
     configManager: ConfigManager,
     register: Register,
@@ -31,9 +32,6 @@ export default class PluginEnv {
     this.usedEntities = usedEntities;
   }
 
-  getEntitiesSet(): SrcEntitiesSet {
-    return this.usedEntities.getEntitiesSet();
-  }
 
   addPlugin: Register['addPlugin'] = (plugin) => {
     this.register.addPlugin(plugin);
@@ -63,13 +61,21 @@ export default class PluginEnv {
     return this.configManager.machineConfig;
   }
 
-  // /**
-  //  * Get devs list.
-  //  * Call it after registering.
-  //  */
-  // getDevs = (): string[] => {
-  //   return this.usedEntities.getUsedDevs();
-  // }
+  /**
+   * Get all the used entities on host
+   * Call it after registering.
+   */
+  getEntitiesSet(): SrcEntitiesSet {
+    return this.usedEntities.getEntitiesSet();
+  }
+
+  /**
+   * Get devs list.
+   * Call it after registering.
+   */
+  getDevs = (): string[] => {
+    return this.usedEntities.getUsedDevs();
+  }
 
   afterInit(handler: () => void) {
     this.events.addListener(AFTER_INIT_EVENT, handler);
