@@ -1,7 +1,7 @@
 {
   "name": "squidlet-nodejs",
   "version": "1.4.0",
-  "description": "Start squidlet on nodejs",
+  "description": "Starting squidlet on nodejs",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
   "engines": {
