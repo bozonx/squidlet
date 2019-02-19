@@ -54,7 +54,7 @@ export default class EntityBase<Props = {}> {
       if (errorMsg) throw new Error(errorMsg);
     }
 
-    const getDriverDep: GetDriverDep = await this.getDriverDepCb();
+    const getDriverDep: GetDriverDep = this.getDriverDepCb();
 
     if (this.devicesDidInit) {
       this.env.system.onDevicesInit(async () => {
@@ -94,12 +94,6 @@ export default class EntityBase<Props = {}> {
     }
   }
 
-  // async $riseDidInit() {
-  //   const getDriverDep: GetDriverDep = await this.getDriverDepCb();
-  //
-  //
-  // }
-
   /**
    * Load manifest of this entity
    */
@@ -107,14 +101,8 @@ export default class EntityBase<Props = {}> {
     return this.env.loadManifest(this.className) as Promise<T>;
   }
 
-  private async getDriverDepCb(): Promise<GetDriverDep> {
-    const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
-
+  private getDriverDepCb(): GetDriverDep {
     return (driverName: string): DriverInstance => {
-      if (!manifest.drivers || !manifest.drivers.includes(driverName)) {
-        throw new Error(`Can't find driver "${driverName}"`);
-      }
-
       return this.env.getDriver(driverName);
     };
   }
