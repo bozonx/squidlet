@@ -5,7 +5,7 @@ import {omit} from 'host/helpers/lodashLike';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
 
 import {I2cMaster} from '../I2cMaster/I2cMaster';
-import {ImpulseInput} from '../Binary/ImpulseInput';
+import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
 
 
 export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {

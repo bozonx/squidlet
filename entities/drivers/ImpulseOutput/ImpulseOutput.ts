@@ -4,7 +4,7 @@ import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import {omit} from 'host/helpers/lodashLike';
 import {deferCall, invertIfNeed} from 'host/helpers/helpers';
 
-import {BlockMode} from './interfaces/Types';
+import {BlockMode} from '../Binary/interfaces/Types';
 import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPinOutput/DigitalPinOutput';
 
 

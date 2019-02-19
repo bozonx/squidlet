@@ -3,7 +3,7 @@ import {Data} from 'host/baseDevice/DeviceDataManagerBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 
-import {BinaryInput, BinaryInputProps} from '../../drivers/Binary/BinaryInput';
+import {BinaryInput, BinaryInputProps} from '../../drivers/BinaryInput/BinaryInput';
 
 
 interface Props extends DeviceBaseProps, BinaryInputProps {

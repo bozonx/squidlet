@@ -4,7 +4,7 @@ import {WatchHandler} from 'host/interfaces/dev/DigitalDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
-import {BinaryInput, BinaryInputProps} from './BinaryInput';
+import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
 
 
 type Handler = () => void;

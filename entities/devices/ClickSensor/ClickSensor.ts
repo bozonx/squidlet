@@ -4,7 +4,7 @@ import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 import {GetDriverDep} from 'host/entities/EntityBase';
 import {omit} from 'host/helpers/lodashLike';
 
-import {BinaryClick, BinaryClickProps} from '../../drivers/Binary/BinaryClick';
+import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
 
 

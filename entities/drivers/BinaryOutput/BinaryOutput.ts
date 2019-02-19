@@ -7,7 +7,7 @@ import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
 import {DigitalPinOutput} from '../DigitalPinOutput/DigitalPinOutput';
-import {BlockMode, InitialLevel} from './interfaces/Types';
+import {BlockMode, InitialLevel} from '../Binary/interfaces/Types';
 
 
 type DelayedResultHandler = (err?: Error) => void;

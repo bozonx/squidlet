@@ -4,7 +4,7 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
 import {DEFAULT_STATUS} from 'host/baseDevice/Status';
 
-import {BinaryClick, BinaryClickProps} from '../../drivers/Binary/BinaryClick';
+import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
 
 interface Props extends DeviceBaseProps, BinaryClickProps {
