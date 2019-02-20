@@ -43,6 +43,7 @@ async function init() {
 
   const devsSet: {[index: string]: DevClass} = collectDevs(platformName);
 
+  // TODO: review
   // set storage dir to Sys dev
   (devsSet['Sys'] as any).registerStorageDir(resolvedStorageDir);
 
