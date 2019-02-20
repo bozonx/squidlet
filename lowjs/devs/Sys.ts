@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import SysDev from '../../host/interfaces/dev/SysDev';
-import {convertBufferToUint8Array} from '../helpers';
+import {callPromised, convertBufferToUint8Array} from '../helpers';
 
 
 let __storageDir: string = '';
@@ -66,22 +66,22 @@ export default class Sys implements SysDev {
   }
 
   rmdir(dirName: string): Promise<void> {
-    return fsPromises.rmdir(path.join(__storageDir, dirName));
+    return callPromised(fs.rmdir, path.join(__storageDir, dirName));
   }
 
   unlink(fileName: string): Promise<void> {
-    return fsPromises.unlink(path.join(__storageDir, fileName));
+    return callPromised(fs.unlink, path.join(__storageDir, fileName));
   }
 
   writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
     const filePath = path.join(__storageDir, fileName);
 
     if (typeof data === 'string') {
-      return fsPromises.writeFile(filePath, data, {encoding: DEFAULT_ENCODING});
+      return callPromised(fs.writeFile, filePath, data, {encoding: DEFAULT_ENCODING});
     }
     else {
       // write Uint8Array
-      return fsPromises.writeFile(filePath, data);
+      return callPromised(fs.writeFile, filePath, data);
     }
   }
 
@@ -93,13 +93,14 @@ export default class Sys implements SysDev {
   }
 
 
-  private readFileContent(filePath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(filePath, {encoding: DEFAULT_ENCODING}, (err: Error, fileContent: string) => {
-        if (err) return reject(err);
-
-        resolve(fileContent);
-      });
-    });
-  }
+  // private readFileContent(filePath: string): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     fs.readFile(filePath, {encoding: DEFAULT_ENCODING}, (err: Error, fileContent: string) => {
+  //       if (err) return reject(err);
+  //
+  //       resolve(fileContent);
+  //     });
+  //   });
+  // }
+  //
 }
