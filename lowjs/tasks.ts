@@ -24,11 +24,14 @@ const HOST_DEVS_DIR = 'devs';
 const HOST_DIR = 'host';
 const HOST_ENV = 'env';
 const TMP_ENV = 'tmpEnv';
+const MODULES_DIR = 'node_modules';
+const mainNodeModulesDir = path.resolve(__dirname, '../node_modules');
 
 
 function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
   const devsDstDir: string = path.join(hostBuildDir, HOST_DEVS_DIR);
 
+  rimraf.sync(`${devsDstDir}/**/*`);
   shelljs.mkdir('-p', devsDstDir);
 
   // copy specified devs
@@ -40,11 +43,35 @@ function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string
 }
 
 function copyHost(hostBuildDir: string) {
-  const hostDstDir: string = path.join(hostBuildDir, HOST_DIR);
+  const hostDstDir: string = path.join(hostBuildDir, MODULES_DIR, HOST_DIR);
 
   shelljs.mkdir('-p', hostDstDir);
   rimraf.sync(`${hostDstDir}/**/*`);
   shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
+}
+
+function copyThirdPartyDeps(hostBuildDir: string) {
+  const nodeModules: string = path.join(hostBuildDir, MODULES_DIR);
+  const babelDir = path.join(nodeModules, '@babel');
+  const babelRuntimeHelpersDir = path.join(babelDir, 'runtime/helpers');
+  const babelHelpers = [
+    'interopRequireDefault',
+    'toConsumableArray',
+    'classCallCheck',
+    'createClass',
+    'possibleConstructorReturn',
+    'getPrototypeOf',
+    'inherits',
+  ];
+
+  rimraf.sync(`${babelDir}/**/*`);
+  shelljs.mkdir('-p', babelRuntimeHelpersDir);
+
+  for (let fileName of babelHelpers) {
+    const srcBabelDir = path.resolve(mainNodeModulesDir, '@babel/runtime/helpers', `${fileName}.js`);
+
+    shelljs.cp(srcBabelDir , babelRuntimeHelpersDir);
+  }
 }
 
 async function buildEnv(hostBuildDir: string, envConfigPath: string, envTmpDir: string) {
@@ -90,13 +117,20 @@ gulp.task('build-lowjs', async () => {
     throw new Error(`You have to specify an "id" param in your host config`);
   }
 
+  console.info(`===> Build host ${envConfig.id} to machine ${envConfig.machine}`);
+
   const machineConfigFilePath: string = path.resolve(__dirname, `./lowjs-${envConfig.machine}.ts`);
   const machineConfig: MachineConfig = require(machineConfigFilePath).default;
   const hostBuildDir: string = path.join(buildDir, envConfig.id);
   const envTmpDir: string = path.join(buildDir, TMP_ENV, envConfig.id,);
 
+  console.info(`- copy devs`);
   // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
+  console.info(`- copy host`);
   copyHost(hostBuildDir);
+  console.info(`- copy third party dependencies`);
+  copyThirdPartyDeps(hostBuildDir);
+  console.info(`===> Build configs and entities`);
   await buildEnv(hostBuildDir, envConfigPath, envTmpDir);
 });
