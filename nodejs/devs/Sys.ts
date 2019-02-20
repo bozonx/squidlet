@@ -1,9 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import SysDev from '../../host/interfaces/dev/SysDev';
-import {convertBufferToUint8Array} from '../helpers';
-import {callPromised} from '../helpers';
+import SysDev from '\host/interfaces/dev/SysDev';
+import {convertBufferToUint8Array, callPromised} from '../helpers';
 
 
 let __storageDir: string = '';

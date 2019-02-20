@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import SysDev from '../../host/interfaces/dev/SysDev';
+import SysDev from 'host/interfaces/dev/SysDev';
 import {callPromised, convertBufferToUint8Array} from '../helpers';
 
 
@@ -13,7 +13,9 @@ export const DEFAULT_ENCODING = 'utf8';
  * It is a slave's Sys dev
  */
 export default class Sys implements SysDev {
+
   // TODO: review
+
   static registerStorageDir(storageDir: string) {
     __storageDir = storageDir;
   }
