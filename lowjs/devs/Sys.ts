@@ -23,7 +23,7 @@ export default class Sys implements SysDev {
   }
 
   readdir(dirName: string): Promise<string[]> {
-    return callPromised(fs.readdir, path.join(__storageDir, dirName)) as Promise<string[]>;
+    return callPromised(fs.readdir, path.join(__storageDir, dirName));
   }
 
   async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
@@ -36,7 +36,7 @@ export default class Sys implements SysDev {
   readStringFile(fileName: string): Promise<string> {
     const filePath = path.join(__storageDir, fileName);
 
-    return callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING}) as Promise<string>;
+    return callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
   }
 
   async readBinFile(fileName: string): Promise<Uint8Array> {
@@ -71,20 +71,9 @@ export default class Sys implements SysDev {
 
   async exists(fileOrDirName: string): Promise<boolean> {
 
-    // TODO: use fs promises stat
+    // TODO: use fs stat
 
     return fs.existsSync(path.join(__storageDir, fileOrDirName));
   }
 
-
-  // private readFileContent(filePath: string): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     fs.readFile(filePath, {encoding: DEFAULT_ENCODING}, (err: Error, fileContent: string) => {
-  //       if (err) return reject(err);
-  //
-  //       resolve(fileContent);
-  //     });
-  //   });
-  // }
-  //
 }
