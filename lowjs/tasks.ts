@@ -23,6 +23,7 @@ const hostSrcDir = path.resolve(__dirname, '../build/host/dev');
 const HOST_DEVS_DIR = 'devs';
 const HOST_DIR = 'host';
 const HOST_ENV = 'env';
+const TMP_ENV = 'tmpEnv';
 
 
 function copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
@@ -46,9 +47,9 @@ function copyHost(hostBuildDir: string) {
   shelljs.cp('-Rf', `${hostSrcDir}/*`, hostDstDir);
 }
 
-async function buildEnv(hostBuildDir: string, envConfigPath: string) {
+async function buildEnv(hostBuildDir: string, envConfigPath: string, envTmpDir: string) {
   const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
-  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, envDstDir);
+  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, envTmpDir, envDstDir);
 
   shelljs.mkdir('-p', envDstDir);
   rimraf.sync(`${envDstDir}/**/*`);
@@ -92,9 +93,10 @@ gulp.task('build-lowjs', async () => {
   const machineConfigFilePath: string = path.resolve(__dirname, `./lowjs-${envConfig.machine}.ts`);
   const machineConfig: MachineConfig = require(machineConfigFilePath).default;
   const hostBuildDir: string = path.join(buildDir, envConfig.id);
+  const envTmpDir: string = path.join(buildDir, TMP_ENV, envConfig.id,);
 
   // TODO: use devsMinyDst
   copyDevs(hostBuildDir, machineConfig.devs, buildConfig.devsLegacyDst);
   copyHost(hostBuildDir);
-  await buildEnv(hostBuildDir, envConfigPath);
+  await buildEnv(hostBuildDir, envConfigPath, envTmpDir);
 });

@@ -26,10 +26,6 @@ export default class EntitiesWriter {
     return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.rootDirs.entities);
   }
 
-  private get tmpDir() {
-    return path.join(this.configManager.buildDir, '_tmp');
-  }
-
 
   constructor(
     io: Io,
@@ -53,7 +49,7 @@ export default class EntitiesWriter {
     const usedEntities: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     // clear tmp dir
-    rimraf.sync(`${this.tmpDir}/**/*`);
+    rimraf.sync(`${this.configManager.tmpBuildDir}/**/*`);
 
     for (let typeName of Object.keys(usedEntities)) {
       const pluralType = typeName as ManifestsTypePluralName;
@@ -97,7 +93,7 @@ export default class EntitiesWriter {
     // const renamedMainDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
     this.log.info(`- building main file of entity "${entityName}"`);
-    await buildEntity(pluralType, entityName, this.tmpDir, entitySet.srcDir, entityDstDir);
+    await buildEntity(pluralType, entityName, this.configManager.tmpBuildDir, entitySet.srcDir, entityDstDir);
     // rename main file
     //await this.io.renameFile(`${mainDstFile}.js`, renamedMainDstFile);
   }
