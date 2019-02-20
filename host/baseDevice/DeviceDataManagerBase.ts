@@ -202,7 +202,7 @@ export default abstract class DeviceDataManagerBase {
    * * else get default values from schema
    */
   private async initFirstValue() {
-    let result: Data = this.fetchFirstValue();
+    let result: Data = await this.fetchFirstValue();
 
     this.validateDict(result, `Invalid fetched initial ${this.typeNameOfData} "${JSON.stringify(result)}" of device "${this.deviceId}"`);
     // set to local data
