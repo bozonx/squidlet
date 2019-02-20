@@ -19,28 +19,16 @@ export default class Sys implements SysDev {
   }
 
   mkdir(dirName: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      fs.mkdir(path.join(__storageDir, dirName), (err: Error) => {
-        if (err) return reject(err);
-
-        resolve();
-      });
-    });
+    return callPromised(fs.mkdir, path.join(__storageDir, dirName));
   }
 
   readdir(dirName: string): Promise<string[]> {
-    return new Promise((resolve, reject) => {
-      fs.readdir(path.join(__storageDir, dirName), (err: Error, dirs: string[]) => {
-        if (err) return reject(err);
-
-        resolve(dirs);
-      });
-    });
+    return callPromised(fs.readdir, path.join(__storageDir, dirName)) as Promise<string[]>;
   }
 
   async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
     const filePath = path.join(__storageDir, fileName);
-    const fileContent: string = await this.readFileContent(filePath);
+    const fileContent: string = await callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
 
     return JSON.parse(fileContent);
   }
@@ -48,17 +36,13 @@ export default class Sys implements SysDev {
   readStringFile(fileName: string): Promise<string> {
     const filePath = path.join(__storageDir, fileName);
 
-    return this.readFileContent(filePath);
+    return callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING}) as Promise<string>;
   }
 
   async readBinFile(fileName: string): Promise<Uint8Array> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(path.join(__storageDir, fileName), (err: Error, buffer: Buffer) => {
-        if (err) return reject(err);
+    const buffer: Buffer = await callPromised(fs.readFile, path.join(__storageDir, fileName));
 
-        resolve(convertBufferToUint8Array(buffer));
-      });
-    });
+    return convertBufferToUint8Array(buffer);
   }
 
   async requireFile(fileName: string): Promise<any> {
