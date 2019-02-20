@@ -11,7 +11,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
   }
 
   async initSystemServices() {
-    const systemServicesList: string[] = await this.system.configSet.loadConfig<string[]>(
+    const systemServicesList: string[] = await this.system.envSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(systemServicesList);
@@ -20,7 +20,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
   }
 
   async initRegularServices() {
-    const regularServicesList = await this.system.configSet.loadConfig<string[]>(
+    const regularServicesList = await this.system.envSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(regularServicesList);
@@ -41,7 +41,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
 
 
   private async initServices(servicesIds: string[]) {
-    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+    const definitions = await this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.servicesDefinitions
     );
 
@@ -54,7 +54,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
 
   private async generateServiceIdsList(allowedClassNames: string[]): Promise<string[]> {
     const servicesIds: string[] = [];
-    const definitions = await this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+    const definitions = await this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.servicesDefinitions
     );
 

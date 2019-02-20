@@ -27,7 +27,7 @@ export default class Host {
 
     // TODO: нет смыла это сохранять, лучше каждый раз брать из configSet где будет кэш
 
-    this.hostConfig = await this.system.configSet.loadConfig<HostConfig>(
+    this.hostConfig = await this.system.envSet.loadConfig<HostConfig>(
       this.system.initCfg.fileNames.hostConfig
     );
   }

@@ -37,10 +37,10 @@ describe 'app.ServicesManager', ->
       }
     }
     @servicesManager = new ServicesManager(@system)
-    @system.configSet.loadConfig.onCall(1).returns(@definitions)
+    @system.envSet.loadConfig.onCall(1).returns(@definitions)
 
   it 'initSystemServices() and getDriver', ->
-    @system.configSet.loadConfig.onCall(0).returns([ 'systemService' ])
+    @system.envSet.loadConfig.onCall(0).returns([ 'systemService' ])
 
     await @servicesManager.initSystemServices()
 

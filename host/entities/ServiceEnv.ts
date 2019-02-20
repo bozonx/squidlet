@@ -19,7 +19,7 @@ export default class ServiceEnv extends EnvBase {
   }
 
   async loadManifest(className: string): Promise<ServiceManifest> {
-    return this.system.configSet.loadManifest<ServiceManifest>('services', className);
+    return this.system.envSet.loadManifest<ServiceManifest>('services', className);
   }
 
 }

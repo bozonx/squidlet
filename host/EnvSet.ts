@@ -7,7 +7,7 @@ import {EntityClassType} from './entities/EntityManagerBase';
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-export default class ConfigSet {
+export default class EnvSet {
   private readonly system: System;
 
 

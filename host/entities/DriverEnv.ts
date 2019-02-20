@@ -7,7 +7,7 @@ import EnvBase from './EnvBase';
  */
 export default class DriverEnv  extends EnvBase {
   async loadManifest(driverName: string): Promise<DriverManifest> {
-    return this.system.configSet.loadManifest<DriverManifest>('drivers', driverName);
+    return this.system.envSet.loadManifest<DriverManifest>('drivers', driverName);
   }
 
 }

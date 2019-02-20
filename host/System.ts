@@ -9,7 +9,7 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
-import ConfigSet from './ConfigSet';
+import EnvSet from './EnvSet';
 import DevManager, {DevClass} from './entities/DevManager';
 import SysFs from './SysFs';
 
@@ -20,7 +20,7 @@ export default class System {
   readonly devManager: DevManager;
 
   readonly sysFs: SysFs;
-  readonly configSet: ConfigSet;
+  readonly envSet: EnvSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
 
@@ -50,7 +50,7 @@ export default class System {
     this.devManager = new DevManager();
 
     this.sysFs = new SysFs(this);
-    this.configSet = new ConfigSet(this);
+    this.envSet = new EnvSet(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
 
@@ -65,7 +65,6 @@ export default class System {
       this.devManager.init();
 
       this.log.info(`---> Initializing configs`);
-      //this.configSet.init();
       await this.host.init();
 
       this.log.info(`---> Initializing system drivers`);

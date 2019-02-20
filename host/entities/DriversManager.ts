@@ -15,7 +15,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
 
   async initSystemDrivers(): Promise<void> {
     // get list of system drivers from json file
-    const systemDriversList = await this.system.configSet.loadConfig<string[]>(
+    const systemDriversList = await this.system.envSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.systemDrivers
     );
 
@@ -24,7 +24,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
 
   async initRegularDrivers(): Promise<void> {
     // get list of regular drivers from json file
-    const regularDriversList = await this.system.configSet.loadConfig<string[]>(
+    const regularDriversList = await this.system.envSet.loadConfig<string[]>(
       this.system.initCfg.fileNames.regularDrivers
     );
 
@@ -93,7 +93,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
    * load list of definitions of drivers
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
-    return this.system.configSet.loadConfig<{[index: string]: EntityDefinition}>(
+    return this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
       this.system.initCfg.fileNames.driversDefinitions
     );
   }

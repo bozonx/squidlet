@@ -19,7 +19,7 @@ export default class DeviceEnv extends EnvBase {
   }
 
   async loadManifest(className: string): Promise<DeviceManifest> {
-    return this.system.configSet.loadManifest<DeviceManifest>('devices', className);
+    return this.system.envSet.loadManifest<DeviceManifest>('devices', className);
   }
 
 }

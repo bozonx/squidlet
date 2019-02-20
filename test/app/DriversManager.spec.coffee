@@ -46,7 +46,7 @@ describe 'app.DriversManager', ->
     @driversManager.loadDriversDefinitions = => @definitions
 
   it 'initSystemDrivers() and getDriver', ->
-    @system.configSet.loadConfig = => [ 'System.driver' ];
+    @system.envSet.loadConfig = => [ 'System.driver' ];
 
     await @driversManager.initSystemDrivers()
 
@@ -54,7 +54,7 @@ describe 'app.DriversManager', ->
     sinon.assert.calledOnce(@driversManager.getDriver('System.driver').init)
 
   it 'initRegularDrivers() and getDriver', ->
-    @system.configSet.loadConfig = => [ 'Regular.driver' ];
+    @system.envSet.loadConfig = => [ 'Regular.driver' ];
 
     await @driversManager.initRegularDrivers()
 
