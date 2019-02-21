@@ -12,7 +12,7 @@ export const DEFAULT_ENCODING = 'utf8';
 /**
  * It is a slave's Sys dev
  */
-export default class Sys implements SysDev {
+export default class SysDev implements SysDev {
 
   // TODO: review
 

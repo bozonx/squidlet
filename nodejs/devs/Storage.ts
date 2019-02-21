@@ -65,6 +65,9 @@ export default class Storage implements StorageDev {
   }
 
   async exists(path: string): Promise<boolean> {
+
+    // TODO: use fs stat
+
     return fs.existsSync(path);
   }
 

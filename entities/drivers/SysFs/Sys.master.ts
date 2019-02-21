@@ -5,7 +5,7 @@ import {PATH_SEPARATOR} from '../../../host/helpers/helpers';
 import {convertBufferToUint8Array} from '../../../nodejs/helpers';
 import {ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
 import initializationConfig from '../../../host/config/initializationConfig';
-import {DEFAULT_ENCODING} from './Sys';
+import {DEFAULT_ENCODING} from './Sys-dev';
 import {trimEnd} from '../../../host/helpers/lodashLike';
 import systemConfig from '../../../host/config/systemConfig';
 import SysFsDriver from '../../../host/interfaces/SysFsDriver';

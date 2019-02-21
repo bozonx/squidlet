@@ -1,5 +1,9 @@
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
+import * as path from "path";
+import {callPromised, convertBufferToUint8Array} from '../../../nodejs/helpers';
+import * as fs from "fs";
+import {DEFAULT_ENCODING} from '../SysFs/Sys-dev';
 
 
 export class Storage extends DriverBase {
@@ -106,6 +110,24 @@ export class Storage extends DriverBase {
    */
   async rmRf(pathToFileOrDir: string): Promise<void> {
     // TODO: !!!!
+  }
+
+
+
+  readStringFile(fileName: string): Promise<string> {
+    const filePath = path.join(__storageDir, fileName);
+
+    return callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
+  }
+
+  async readBinFile(fileName: string): Promise<Uint8Array> {
+    const buffer: Buffer = await callPromised(fs.readFile, path.join(__storageDir, fileName));
+
+    return convertBufferToUint8Array(buffer);
+  }
+
+  async requireFile(fileName: string): Promise<any> {
+    return require(path.join(__storageDir, fileName));
   }
 
 }
