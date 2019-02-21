@@ -39,24 +39,46 @@ export default class SysFs extends DriverBase implements SysFsDriver {
     return this.depsInstances.storage as any;
   }
 
+
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.storage = await getDriverDep('Storage');
   }
 
   getHostHashes(): Promise<{[index: string]: any}> {
-    return this.storage.readJsonObjectFile(systemConfig.hashFiles.host);
+    const pathToFile: string = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.hashFiles.host
+    );
+
+    return this.storage.readJsonObjectFile(pathToFile);
   }
 
   getConfigsHashes(): Promise<{[index: string]: any}> {
-    return this.storage.readJsonObjectFile(systemConfig.hashFiles.configs);
+    const pathToFile: string = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.hashFiles.configs
+    );
+
+    return this.storage.readJsonObjectFile(pathToFile);
   }
 
   getEntitiesHashes(): Promise<{[index: string]: any}> {
-    return this.storage.readJsonObjectFile(systemConfig.hashFiles.entities);
+    const pathToFile: string = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.hashFiles.entities
+    );
+
+    return this.storage.readJsonObjectFile(pathToFile);
   }
 
   loadConfig(configName: string): Promise<{[index: string]: any}> {
-    return this.storage.readJsonObjectFile(pathJoin(systemConfig.rootDirs.configs, configName));
+    const pathToFile: string = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.rootDirs.configs,
+      configName
+    );
+
+    return this.storage.readJsonObjectFile(pathToFile);
   }
 
   async loadEntityManifest(
@@ -66,8 +88,10 @@ export default class SysFs extends DriverBase implements SysFsDriver {
     await this.checkEntity(pluralType, entityName);
 
     const pathToFile = pathJoin(
+      this.env.config.config.envSetDir,
       systemConfig.rootDirs.entities,
-      pluralType, entityName,
+      pluralType,
+      entityName,
       // TODO: review
       this.env.system.initCfg.fileNames.manifest
     );
@@ -78,7 +102,13 @@ export default class SysFs extends DriverBase implements SysFsDriver {
   async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
     const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
     const mainFileName: string = manifest.main;
-    const filePath = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, mainFileName);
+    const filePath = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.rootDirs.entities,
+      pluralType,
+      entityName,
+      mainFileName
+    );
     const module = await this.storage.requireFile(filePath);
 
     return module.default;
@@ -91,7 +121,14 @@ export default class SysFs extends DriverBase implements SysFsDriver {
   ): Promise<string> {
     await this.checkEntity(pluralType, entityName, fileName);
 
-    return this.storage.readStringFile(pathJoin(systemConfig.rootDirs.entities, entityName, fileName));
+    const pathToFile: string = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.rootDirs.entities,
+      entityName,
+      fileName
+    );
+
+    return this.storage.readStringFile(pathToFile);
   }
 
   async loadEntityBinFile(
@@ -101,7 +138,14 @@ export default class SysFs extends DriverBase implements SysFsDriver {
   ): Promise<Uint8Array> {
     await this.checkEntity(pluralType, entityName, fileName);
 
-    return this.storage.readBinFile(pathJoin(systemConfig.rootDirs.entities, entityName, fileName));
+    const pathToFile: string = pathJoin(
+      this.env.config.config.envSetDir,
+      systemConfig.rootDirs.entities,
+      entityName,
+      fileName
+    );
+
+    return this.storage.readBinFile(pathToFile);
   }
 
   async writeHostFile(fileName: string, content: string): Promise<void> {

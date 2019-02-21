@@ -5,6 +5,8 @@ import LogLevel from './LogLevel';
 export interface HostConfigConfig {
   // path to dir where will be placed storage of host
   storageDir: string;
+  // path to configs and entities on host
+  envSetDir: string;
   logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
   defaultStatusRepublishIntervalMs: number;
