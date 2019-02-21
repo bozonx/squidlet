@@ -33,7 +33,7 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
   protected didInit = async () => {
     // listen to poll errors and print it to logger
     this.i2cDriver.addPollErrorListener((dataAddressStr: string | number | undefined, err: Error) => {
-      this.env.system.log.error(String(err));
+      this.env.log.error(String(err));
     });
   }
 

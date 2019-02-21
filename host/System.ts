@@ -18,12 +18,10 @@ export default class System {
   readonly events: Events;
   readonly log: Logger;
   readonly devManager: DevManager;
-
   readonly sysFs: SysFs;
   readonly envSet: EnvSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
-
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
 
@@ -48,12 +46,10 @@ export default class System {
     this.events = new Events();
     this.log = new LogPublisher(this);
     this.devManager = new DevManager();
-
     this.sysFs = new SysFs(this);
     this.envSet = new EnvSet(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
-
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
   }

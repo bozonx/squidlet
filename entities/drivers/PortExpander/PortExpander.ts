@@ -101,7 +101,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   wasIcInited: boolean = false;
   readonly state: State = new State(this);
   // TODO: does it really need?
-  readonly log: Logger = this.env.system.log;
+  readonly log: Logger = this.env.log;
   get node(): DuplexDriver {
     return this.depsInstances.node as any;
   }
@@ -133,7 +133,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
     // Listen to received data
     this.node.onReceive((dataAddressStr: number | string | undefined, data: Uint8Array) => {
       if (typeof dataAddressStr === 'undefined') {
-        this.env.system.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
+        this.env.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
       else if (dataAddressStr === INCOME_COMMANDS.newAllDigitalState) {
         this.state.updateDigitalState(data);
@@ -147,7 +147,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
         this.state.setAnalogInput(pinNumber, value);
       }
       else {
-        this.env.system.log.error(`PortExpanderDriver: Unknown command "${dataAddressStr}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
+        this.env.log.error(`PortExpanderDriver: Unknown command "${dataAddressStr}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
     });
   }

@@ -81,7 +81,7 @@ export class SerialDuplex extends DriverBase<SerialNodeProps> implements DuplexD
   onReceive(cb: ReceiveHandler): number {
     const wrapper = (data: Uint8Array) => {
       if (!data.length) {
-        return this.env.system.log.error(`SerialDuplexDriver: Received event without a dataAddress`);
+        return this.env.log.error(`SerialDuplexDriver: Received event without a dataAddress`);
       }
 
       const dataAddress = data[0];
