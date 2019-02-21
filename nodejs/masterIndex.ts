@@ -63,7 +63,7 @@ async function masterStarter () {
   }
 
   // make env builder instance
-  const envBuilder: EnvBuilder = new EnvBuilder(absMasterConfigPath, absBuildDir);
+  const envBuilder: EnvBuilder = new EnvBuilder(absMasterConfigPath, undefined, absBuildDir);
 
   console.info(`===> generate hosts env files and configs`);
 

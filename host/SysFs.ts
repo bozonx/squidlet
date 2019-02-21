@@ -60,15 +60,6 @@ export default class SysFs {
     return this.sysDev.readJsonObjectFile(pathJoin(systemConfig.rootDirs.configs, configName));
   }
 
-  async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
-    const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
-    const mainFileName: string = manifest.main;
-    const filePath = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, mainFileName);
-    const module = await this.sysDev.requireFile(filePath);
-
-    return module.default;
-  }
-
   async loadEntityManifest(
     pluralType: ManifestsTypePluralName,
     entityName: string
@@ -78,6 +69,15 @@ export default class SysFs {
     const pathToFile = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, this.system.initCfg.fileNames.manifest);
 
     return this.sysDev.readJsonObjectFile(pathToFile) as any;
+  }
+
+  async loadEntityMain(pluralType: ManifestsTypePluralName, entityName: string,): Promise<EntityClassType> {
+    const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
+    const mainFileName: string = manifest.main;
+    const filePath = pathJoin(systemConfig.rootDirs.entities, pluralType, entityName, mainFileName);
+    const module = await this.sysDev.requireFile(filePath);
+
+    return module.default;
   }
 
   async loadEntityFile(
