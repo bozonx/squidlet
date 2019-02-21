@@ -1,22 +1,28 @@
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import {PATH_SEPARATOR} from '../../../host/helpers/helpers';
-import {convertBufferToUint8Array} from '../../../nodejs/helpers';
-import {ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
-import initializationConfig from '../../../host/config/initializationConfig';
-import {DEFAULT_ENCODING} from './Sys-dev';
-import {trimEnd} from '../../../host/helpers/lodashLike';
-import systemConfig from '../../../host/config/systemConfig';
-import SysFsDriver from '../../../host/interfaces/SysFsDriver';
-import SrcHostEnvSet from '../../../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import {PATH_SEPARATOR} from 'host/helpers/helpers';
+import {ManifestsTypePluralName} from 'host/interfaces/ManifestTypes';
+import initializationConfig from 'host/config/initializationConfig';
+import {trimEnd} from 'host/helpers/lodashLike';
+import systemConfig from 'host/config/systemConfig';
+import SysFsDriver from 'host/interfaces/SysFsDriver';
+
+import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import DriverBase from '../entities/drivers/SysFs/SysFs';
+import {convertBufferToUint8Array} from './helpers';
 
 
 let __configSet: SrcHostEnvSet;
 const initCfg = initializationConfig();
 
 
-export default class Sys implements SysFsDriver {
+/**
+ * SysFs for master. It uses configs and entities from memory
+ */
+export default class SysFs extends DriverBase implements SysFsDriver {
+
+  // TODO: may be use global
   static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
     __configSet = hostConfigSet;
   }
@@ -117,28 +123,73 @@ export default class Sys implements SysFsDriver {
   }
 
 
-  mkdir(fileName: string): Promise<void> {
-    return Promise.reject(`Method "mkdir" of Sys dev is not allowed on master`);
+  // mkdir(fileName: string): Promise<void> {
+  //   return Promise.reject(`Method "mkdir" of Sys dev is not allowed on master`);
+  // }
+  //
+  // readdir(dirName: string): Promise<string[]> {
+  //   return Promise.reject(`Method "readdir" of Sys dev is not allowed on master`);
+  // }
+  //
+  // rmdir(dirName: string): Promise<void> {
+  //   return Promise.reject(`Method "rmdir" of Sys dev is not allowed on master`);
+  // }
+  //
+  // async unlink(fileName: string): Promise<void> {
+  //   return Promise.reject(`Method "unlink" of Sys dev is not allowed on master`);
+  // }
+  //
+  // async writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
+  //   return Promise.reject(`Method "writeFile" of Sys dev is not allowed on master`);
+  // }
+  //
+  // async exists(fileOrDirName: string): Promise<boolean> {
+  //   return Promise.reject(`Method "writeFile" of Sys dev is not allowed on master`);
+  // }
+
+
+  getHostHashes(): Promise<{[index: string]: any}> {
+    return Promise.reject(`SysFs master: Method "getHostHashes" is not allowed on master`);
   }
 
-  readdir(dirName: string): Promise<string[]> {
-    return Promise.reject(`Method "readdir" of Sys dev is not allowed on master`);
+  getConfigsHashes(): Promise<{[index: string]: any}> {
+    return Promise.reject(`SysFs master: Method "getHostHashes" is not allowed on master`);
   }
 
-  rmdir(dirName: string): Promise<void> {
-    return Promise.reject(`Method "rmdir" of Sys dev is not allowed on master`);
+  getEntitiesHashes(): Promise<{[index: string]: any}> {
+    return Promise.reject(`SysFs master: Method "getEntitiesHashes" is not allowed on master`);
   }
 
-  async unlink(fileName: string): Promise<void> {
-    return Promise.reject(`Method "unlink" of Sys dev is not allowed on master`);
+  async writeHostFile(fileName: string, content: string): Promise<void> {
+    return Promise.reject(`SysFs master: Method "writeHostFile" is not allowed on master`);
   }
 
-  async writeFile(fileName: string, data: string | Uint8Array): Promise<void> {
-    return Promise.reject(`Method "writeFile" of Sys dev is not allowed on master`);
+  async writeConfigFile(fileName: string, content: string): Promise<void> {
+    return Promise.reject(`SysFs master: Method "writeConfigFile" is not allowed on master`);
   }
 
-  async exists(fileOrDirName: string): Promise<boolean> {
-    return Promise.reject(`Method "writeFile" of Sys dev is not allowed on master`);
+  async writeEntityFile(fileName: string, content: string): Promise<void> {
+    return Promise.reject(`SysFs master: Method "writeEntityFile" is not allowed on master`);
+  }
+
+  writeHostHashesFile(content: string): Promise<void> {
+    return Promise.reject(`SysFs master: Method "writeHostHashesFile" is not allowed on master`);
+  }
+
+  writeConfigHashesFile(content: string): Promise<void> {
+    return Promise.reject(`SysFs master: Method "writeConfigHashesFile" is not allowed on master`);
+  }
+
+  writeEntitiesHashesFile(content: string): Promise<void> {
+    return Promise.reject(`SysFs master: Method "writeEntitiesHashesFile" is not allowed on master`);
+  }
+
+  async removeHostFiles(filesList: string[]): Promise<void> {
+    return Promise.reject(`SysFs master: Method "removeHostFiles" is not allowed on master`);
+  }
+
+  async removeEntitiesFiles(filesList: string[]): Promise<void> {
+    return Promise.reject(`SysFs master: Method "removeEntitiesFiles" is not allowed on master`);
   }
 
 }

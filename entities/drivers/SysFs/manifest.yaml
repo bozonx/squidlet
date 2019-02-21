@@ -1,5 +1,6 @@
 name: SysFs
 main: SysFs.ts
+type: system
 
 devs:
   - Storage

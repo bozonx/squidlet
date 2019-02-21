@@ -24,13 +24,14 @@
  */
 
 import DriverBase from 'host/baseDrivers/DriverBase';
-import systemConfig from '../../../host/config/systemConfig';
-import pathJoin from '../../../host/helpers/nodeLike';
-import {ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
-import ManifestBase from '../../../host/interfaces/ManifestBase';
-import {EntityClassType} from '../../../host/entities/EntityManagerBase';
-import SysFsDriver from '../../../host/interfaces/SysFsDriver';
-import {GetDriverDep} from '../../../host/entities/EntityBase';
+import systemConfig from 'host/config/systemConfig';
+import pathJoin from 'host/helpers/nodeLike';
+import {ManifestsTypePluralName} from 'host/interfaces/ManifestTypes';
+import ManifestBase from 'host/interfaces/ManifestBase';
+import {EntityClassType} from 'host/entities/EntityManagerBase';
+import SysFsDriver from 'host/interfaces/SysFsDriver';
+import {GetDriverDep} from 'host/entities/EntityBase';
+
 import {Storage} from '../Storage/Storage';
 
 
@@ -43,6 +44,7 @@ export default class SysFs extends DriverBase implements SysFsDriver {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.storage = await getDriverDep('Storage');
   }
+
 
   getHostHashes(): Promise<{[index: string]: any}> {
     const pathToFile: string = pathJoin(
