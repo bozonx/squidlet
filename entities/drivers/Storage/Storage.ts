@@ -113,6 +113,12 @@ export class Storage extends DriverBase {
   }
 
 
+  async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
+    const filePath = path.join(__storageDir, fileName);
+    const fileContent: string = await callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
+
+    return JSON.parse(fileContent);
+  }
 
   readStringFile(fileName: string): Promise<string> {
     const filePath = path.join(__storageDir, fileName);
