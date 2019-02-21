@@ -30,14 +30,14 @@ import pathJoin from '../../../host/helpers/nodeLike';
 import {ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
 import ManifestBase from '../../../host/interfaces/ManifestBase';
 import {EntityClassType} from '../../../host/entities/EntityManagerBase';
-import SysDev from '../../../host/interfaces/dev/SysDev';
+import SysFsDriver from '../../../host/interfaces/SysFsDriver';
 
 
-export default class SysFs extends DriverBase {
+export default class SysFs extends DriverBase implements SysFsDriver {
   private get storageDev(): StorageDev {
     return this.depsInstances.storageDev as StorageDev;
   }
-  private get sysDev(): SysDev {
+  private get sysDev(): SysFs {
     return this.system.devManager.getDev('Sys');
   }
 
@@ -101,47 +101,47 @@ export default class SysFs extends DriverBase {
     return this.sysDev.readBinFile(pathJoin(systemConfig.rootDirs.entities, entityName, fileName));
   }
 
-  async writeHostFile(fileName: string, content: string) {
+  async writeHostFile(fileName: string, content: string): Promise<void> {
     // TODO: create dir, create or overwrite existing
     // TODO: запретить выход наверх
   }
 
-  async writeConfigFile(fileName: string, content: string) {
+  async writeConfigFile(fileName: string, content: string): Promise<void> {
     // TODO: create dir, create or overwrite existing
     // TODO: запретить выход наверх
   }
 
-  async writeEntityFile(fileName: string, content: string) {
+  async writeEntityFile(fileName: string, content: string): Promise<void> {
     // TODO: create dir, create or overwrite existing
     // TODO: запретить выход наверх
   }
 
-  writeHostHashesFile(content: string) {
+  writeHostHashesFile(content: string): Promise<void> {
     // TODO: запретить выход наверх
 
     return this.sysDev.writeFile(systemConfig.hashFiles.host, content);
   }
 
-  writeConfigHashesFile(content: string) {
+  writeConfigHashesFile(content: string): Promise<void> {
     // TODO: запретить выход наверх
 
     return this.sysDev.writeFile(systemConfig.hashFiles.configs, content);
   }
 
-  writeEntitiesHashesFile(content: string) {
+  writeEntitiesHashesFile(content: string): Promise<void> {
     // TODO: запретить выход наверх
 
     return this.sysDev.writeFile(systemConfig.hashFiles.entities, content);
   }
 
-  async removeHostFiles(filesList: string[]) {
+  async removeHostFiles(filesList: string[]): Promise<void> {
     // TODO: remove these files. They are unused files
     // TODO:  And remove dir if no one file exist
     // TODO: support of removing whole dirs
     // TODO: запретить выход наверх
   }
 
-  async removeEntitesFiles(filesList: string[]) {
+  async removeEntitiesFiles(filesList: string[]): Promise<void> {
     // TODO: remove these files. They are unused files
     // TODO:  And remove dir if no one file exist
     // TODO: support of removing whole dirs
