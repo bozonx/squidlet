@@ -2,7 +2,6 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import ManifestBase from '../interfaces/ManifestBase';
 import Env from '../interfaces/Env';
 import DriverInstance from '../interfaces/DriverInstance';
-import DeviceManifest from '../interfaces/DeviceManifest';
 
 
 export type GetDriverDep = (driverName: string) => DriverInstance;

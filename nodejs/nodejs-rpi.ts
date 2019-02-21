@@ -4,7 +4,6 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 const platformConfig: MachineConfig = {
   devs: [
     'Storage',
-    'Sys',
     //'Sha1',
     'Digital',
     //'Pwm',
