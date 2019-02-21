@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import SysDev from 'host/interfaces/dev/SysDev';
-import {callPromised, convertBufferToUint8Array} from '../helpers';
+import {convertBufferToUint8Array, callPromised} from '../../../nodejs/helpers';
 
 
 let __storageDir: string = '';

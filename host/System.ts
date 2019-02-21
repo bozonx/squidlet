@@ -11,14 +11,12 @@ import eventNames from './dict/eventNames';
 import categories from './dict/categories';
 import EnvSet from './EnvSet';
 import DevManager, {DevClass} from './entities/DevManager';
-import SysFs from './SysFs';
 
 
 export default class System {
   readonly events: Events;
   readonly log: Logger;
   readonly devManager: DevManager;
-  readonly sysFs: SysFs;
   readonly envSet: EnvSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
@@ -46,7 +44,6 @@ export default class System {
     this.events = new Events();
     this.log = new LogPublisher(this);
     this.devManager = new DevManager();
-    this.sysFs = new SysFs(this);
     this.envSet = new EnvSet(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);

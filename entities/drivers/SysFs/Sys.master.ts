@@ -1,15 +1,15 @@
 import * as path from 'path';
 import {promises as fsPromises} from 'fs';
 
-import {PATH_SEPARATOR} from '../../host/helpers/helpers';
-import {convertBufferToUint8Array} from '../helpers';
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import initializationConfig from '../../host/config/initializationConfig';
+import {PATH_SEPARATOR} from '../../../host/helpers/helpers';
+import {convertBufferToUint8Array} from '../../../nodejs/helpers';
+import {ManifestsTypePluralName} from '../../../host/interfaces/ManifestTypes';
+import initializationConfig from '../../../host/config/initializationConfig';
 import {DEFAULT_ENCODING} from './Sys';
-import {trimEnd} from '../../host/helpers/lodashLike';
-import systemConfig from '../../host/config/systemConfig';
-import SysDev from '../../host/interfaces/dev/SysDev';
-import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import {trimEnd} from '../../../host/helpers/lodashLike';
+import systemConfig from '../../../host/config/systemConfig';
+import SysDev from '../../../host/interfaces/dev/SysDev';
+import SrcHostEnvSet from '../../../hostEnvBuilder/interfaces/SrcHostEnvSet';
 
 
 let __configSet: SrcHostEnvSet;
