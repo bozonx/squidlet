@@ -376,6 +376,15 @@ export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
   for (let item of arrToAppend) srcArr.push(item);
 }
 
+export function callPromised(method: Function, ...params: any[]): Promise<any> {
+  return new Promise((resolve, reject) => {
+    method(...params, (err: Error, data: any) => {
+      if (err) return reject(err);
+
+      resolve(data);
+    });
+  });
+}
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;

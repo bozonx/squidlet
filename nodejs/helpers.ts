@@ -7,13 +7,3 @@ export function convertBufferToUint8Array(data: Buffer): Uint8Array {
 
   return uIntArr;
 }
-
-export function callPromised(method: Function, ...params: any[]): Promise<any> {
-  return new Promise((resolve, reject) => {
-    method(...params, (err: Error, data: any) => {
-      if (err) return reject(err);
-
-      resolve(data);
-    });
-  });
-}

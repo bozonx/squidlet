@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 
-import StorageDev, {Stats} from '../../host/interfaces/dev/StorageDev';
-import {callPromised, convertBufferToUint8Array} from '../helpers';
+import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
+import {callPromised} from 'host/helpers/helpers';
+
+import {convertBufferToUint8Array} from '../helpers';
 
 
 export default class Storage implements StorageDev {

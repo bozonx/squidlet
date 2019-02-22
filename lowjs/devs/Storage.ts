@@ -1,7 +1,9 @@
 import * as fs from 'fs';
 
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
-import {callPromised, convertBufferToUint8Array} from '../helpers';
+import {callPromised} from 'host/helpers/helpers';
+
+import {convertBufferToUint8Array} from '../helpers';
 
 
 export default class Storage implements StorageDev {
@@ -65,6 +67,9 @@ export default class Storage implements StorageDev {
   }
 
   async exists(path: string): Promise<boolean> {
+
+    // TODO: use fs stat
+
     return fs.existsSync(path);
   }
 
