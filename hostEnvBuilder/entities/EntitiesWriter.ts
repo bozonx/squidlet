@@ -46,6 +46,10 @@ export default class EntitiesWriter {
    * Copy used files of entities to storage
    */
   async writeUsed() {
+    if (!this.configManager.tmpBuildDir) {
+      throw new Error(`Temporary build dir wasn't specified`);
+    }
+
     const usedEntities: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     // clear tmp dir
@@ -86,6 +90,10 @@ export default class EntitiesWriter {
   }
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
+    if (!this.configManager.tmpBuildDir) {
+      throw new Error(`Temporary build dir wasn't specified`);
+    }
+
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
     //const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);

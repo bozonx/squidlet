@@ -16,7 +16,7 @@ import {loadMachineConfig} from '../helpers/buildHelpers';
 export default class ConfigManager {
   // path to plugins specified in config
   readonly plugins: string[] = [];
-  readonly tmpBuildDir: string;
+  readonly tmpBuildDir?: string;
   get buildDir(): string {
     return this._buildDir as string;
   }
@@ -40,11 +40,11 @@ export default class ConfigManager {
   private _buildDir?: string;
 
 
-  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, tmpBuildDir: string, absBuildDir?: string) {
+  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string, tmpBuildDir?: string) {
     this.io = io;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
-    this.tmpBuildDir = tmpBuildDir;
     this._buildDir = absBuildDir;
+    this.tmpBuildDir = tmpBuildDir;
   }
 
   async init() {

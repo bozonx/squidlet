@@ -28,8 +28,8 @@ export default class EnvBuilder {
   readonly pluginEnv: PluginEnv;
 
 
-  constructor(hostConfigOrConfigPath: string | PreHostConfig, tmpBuildDir: string, absBuildDir?: string) {
-    this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, tmpBuildDir, absBuildDir);
+  constructor(hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string, tmpBuildDir?: string) {
+    this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absBuildDir, tmpBuildDir);
     this.register = new Register(this.io);
     this.usedEntities = new UsedEntities(this.io, this.configManager, this.register);
     this.pluginEnv = new PluginEnv(this.configManager, this.register, this.usedEntities);

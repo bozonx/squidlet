@@ -45,7 +45,7 @@ gulp.task('build-cluster', async () => {
 
     console.info(`===> generating configs and entities of host "${hostId}"`);
 
-    const envBuilder: EnvBuilder = new EnvBuilder(hostConfig, undefined, hostBuildDir);
+    const envBuilder: EnvBuilder = new EnvBuilder(hostConfig, hostBuildDir);
 
     await envBuilder.collect();
     await envBuilder.writeConfigs();

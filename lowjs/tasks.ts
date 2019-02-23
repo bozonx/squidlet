@@ -76,7 +76,7 @@ function copyThirdPartyDeps(hostBuildDir: string) {
 
 async function buildEnv(hostBuildDir: string, envConfigPath: string, envTmpDir: string) {
   const envDstDir: string = path.join(hostBuildDir, HOST_ENV);
-  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, envTmpDir, envDstDir);
+  const envBuilder: EnvBuilder = new EnvBuilder(envConfigPath, envDstDir, envTmpDir);
 
   shelljs.mkdir('-p', envDstDir);
   rimraf.sync(`${envDstDir}/**/*`);
