@@ -115,6 +115,8 @@ export default class ConfigManager {
     // use command argument if specified
     if (this._buildDir) return this._buildDir;
 
+    // TODO: review - use defaultEnvDir
+
     if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
       // use host's storage dir
       const storageDir = this.preHostConfig.config.storageDir;

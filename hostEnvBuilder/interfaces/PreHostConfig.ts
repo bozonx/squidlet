@@ -9,8 +9,10 @@ export default interface PreHostConfig {
   id?: string;
   platform?: Platforms;
   machine?: string;
-  // storage dir which is specified for each platform
-  defaultStorageDir?: string;
+  // default placement of various data dir specific for each platform
+  defaultVarDataDir?: string;
+  // default placement of various data dir specific for each platform
+  defaultEnvSetDir?: string;
 
   plugins?: string[];
 
@@ -18,8 +20,8 @@ export default interface PreHostConfig {
 
   // specific config for each host
   config?: {
-    // path to dir where will be placed storage of host. It can be absolute or relative of master config file
-    storageDir?: string;
+    // path to host's various data dir. It can be absolute or relative of master config file
+    dataDir?: string;
     logLevel?: LogLevel;
     // republish status silently every minute if it hasn't been changed
     defaultStatusRepublishIntervalMs?: number;

@@ -21,7 +21,8 @@ const platformConfig: MachineConfig = {
   ],
 
   hostConfig: {
-    defaultStorageDir: '/storage',
+    defaultVarDataDir: '/varData',
+    defaultEnvSetDir: '/envSet',
     config: {
     },
     drivers: {

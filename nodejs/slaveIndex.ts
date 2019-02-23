@@ -17,6 +17,7 @@ if (!yargs.argv.storage) {
 }
 
 
+// TODO: reveiw
 const resolvedStorageDir: string = path.resolve(process.cwd(), yargs.argv.storage as string);
 
 

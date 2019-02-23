@@ -3,8 +3,8 @@ import LogLevel from './LogLevel';
 
 
 export interface HostConfigConfig {
-  // path to dir where will be placed storage of host
-  storageDir: string;
+  // path to dir where various data will be placed
+  dataDir: string;
   // path to configs and entities on host
   envSetDir: string;
   logLevel: LogLevel;
