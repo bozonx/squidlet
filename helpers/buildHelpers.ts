@@ -27,11 +27,11 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
   return;
 }
 
-export function getMasterSysDev(platformDirName: string): DevClass {
-  const devPath = path.join(platformDirName, DEVS_DIR, 'Sys.master');
-
-  return require(devPath).default;
-}
+// export function getMasterSysDev(platformDirName: string): DevClass {
+//   const devPath = path.join(platformDirName, DEVS_DIR, 'Sys.master');
+//
+//   return require(devPath).default;
+// }
 
 /**
  * Make devs collection in memory like {"Digital": DevClass}

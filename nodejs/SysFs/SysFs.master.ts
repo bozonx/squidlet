@@ -8,9 +8,9 @@ import {trimEnd} from 'host/helpers/lodashLike';
 import systemConfig from 'host/config/systemConfig';
 import SysFsDriver from 'host/interfaces/SysFsDriver';
 
-import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
-import DriverBase from '../entities/drivers/SysFs/SysFs';
-import {convertBufferToUint8Array} from './helpers';
+import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import DriverBase from '../../entities/drivers/SysFs/SysFs';
+import {convertBufferToUint8Array} from '../../host/helpers';
 
 
 let __configSet: SrcHostEnvSet;
@@ -21,8 +21,6 @@ const initCfg = initializationConfig();
  * SysFs for master. It uses configs and entities from memory
  */
 export default class SysFs extends DriverBase implements SysFsDriver {
-
-  // TODO: may be use global
   static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
     __configSet = hostConfigSet;
   }

@@ -10,7 +10,6 @@ import * as path from 'path';
 
 import {
   collectDevs,
-  getMasterSysDev,
   resolveParam,
   resolveParamRequired
 } from '../helpers/buildHelpers';
@@ -19,6 +18,12 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
+//import SysFsMaster from './SysFs/SysFs.master';
+
+
+declare const global: {
+  __HOST_CONFIG_SET: SrcHostEnvSet;
+};
 
 const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 // TODO: change
@@ -33,15 +38,20 @@ async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
 
   const hostSystem: System = new System();
 
+  // SysFsMaster.registerConfigSet(hostConfigSet);
+  // hostConfigSet.entities.drivers['SysFs'].srcDir = SysFsMaster;
+
+  // save host config set to global var
+  global.__HOST_CONFIG_SET = hostConfigSet;
+
   console.info(`--> register platform's devs`);
 
   const devsSet: {[index: string]: DevClass} = collectDevs(__dirname, machine);
-  const sysMasterDev = getMasterSysDev(__dirname);
-
+  //const sysMasterDev = getMasterSysDev(__dirname);
   // register config set
-  (sysMasterDev as any).registerConfigSet(hostConfigSet);
+  //(sysMasterDev as any).registerConfigSet(hostConfigSet);
   // replace Sys dev to Sys.master.dev
-  devsSet['Sys'] = sysMasterDev;
+  //devsSet['Sys'] = sysMasterDev;
 
   await hostSystem.$registerDevSet(devsSet);
 
