@@ -6,58 +6,56 @@ import {callPromised} from 'host/helpers/helpers';
 import {convertBufferToUint8Array} from '../helpers';
 
 
+const DEFAULT_ENCODE = 'utf8';
+
+
 export default class Storage implements StorageDev {
-  // TODO: use constant
-  private defaultEncode = 'utf8';
-
-  // TODO: сделать конструктор который может заменить кодировку
-
-  appendFile(path: string, data: string | Uint8Array): Promise<void> {
+  appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.appendFile, path, data, this.defaultEncode);
+      return callPromised(fs.appendFile, pathTo, data, DEFAULT_ENCODE);
     }
     else {
-      return callPromised(fs.appendFile, path, data);
+      return callPromised(fs.appendFile, pathTo, data);
     }
   }
 
-  mkdir(path: string): Promise<void> {
-    return callPromised(fs.mkdir, path);
+  mkdir(pathTo: string): Promise<void> {
+    return callPromised(fs.mkdir, pathTo);
   }
 
-  readdir(path: string): Promise<string[]> {
-    return callPromised(fs.readdir, path, this.defaultEncode) as Promise<string[]>;
+  readdir(pathTo: string): Promise<string[]> {
+    return callPromised(fs.readdir, pathTo, DEFAULT_ENCODE) as Promise<string[]>;
   }
 
-  readFile(path: string): Promise<string> {
-    return callPromised(fs.readFile, path, this.defaultEncode) as Promise<string>;
+  readFile(pathTo: string): Promise<string> {
+    return callPromised(fs.readFile, pathTo, DEFAULT_ENCODE) as Promise<string>;
   }
 
-  async readBinFile(path: string): Promise<Uint8Array> {
-    const buffer: Buffer = await callPromised(fs.readFile, path);
+  async readBinFile(pathTo: string): Promise<Uint8Array> {
+    const buffer: Buffer = await callPromised(fs.readFile, pathTo);
 
     return convertBufferToUint8Array(buffer);
   }
 
-  rmdir(path: string): Promise<void> {
-    return callPromised(fs.rmdir, path);
+  rmdir(pathTo: string): Promise<void> {
+    return callPromised(fs.rmdir, pathTo);
   }
 
-  unlink(path: string): Promise<void> {
-    return callPromised(fs.unlink, path);
+  unlink(pathTo: string): Promise<void> {
+    return callPromised(fs.unlink, pathTo);
   }
 
-  writeFile(path: string, data: string | Uint8Array): Promise<void> {
+  writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.writeFile, path, data, this.defaultEncode);
+      return callPromised(fs.writeFile, pathTo, data, DEFAULT_ENCODE);
     }
     else {
-      return callPromised(fs.writeFile, path, data);
+      return callPromised(fs.writeFile, pathTo, data);
     }
   }
 
-  async stat(path: string): Promise<Stats> {
-    const stat = await callPromised(fs.stat, path);
+  async stat(pathTo: string): Promise<Stats> {
+    const stat = await callPromised(fs.stat, pathTo);
 
     return {
       size: stat.size,
@@ -66,15 +64,18 @@ export default class Storage implements StorageDev {
     };
   }
 
-  async exists(path: string): Promise<boolean> {
+  async exists(pathTo: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      fs.access(pathTo, fs.constants.F_OK, (err) => {
+        if (err) return resolve(false);
 
-    // TODO: use fs stat
-
-    return fs.existsSync(path);
+        resolve(true);
+      });
+    });
   }
 
 
-  // additional
+  ////// additional
 
   copyFile(src: string, dest: string): Promise<void> {
     return callPromised(fs.copyFile, src, dest);
