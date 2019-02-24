@@ -32,7 +32,7 @@ import {EntityClassType} from 'host/entities/EntityManagerBase';
 import SysFsDriver from 'host/interfaces/SysFsDriver';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
-import {Storage} from '../Storage/Storage';
+import {Storage} from '../entities/drivers/Storage/Storage';
 
 
 export default class SysFs extends DriverBase implements SysFsDriver {

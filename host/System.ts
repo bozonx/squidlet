@@ -53,37 +53,29 @@ export default class System {
 
 
   async start() {
-    //try {
-      this.log.info(`---> Initializing devs`);
-      this.devManager.init();
+    this.log.info(`---> Initializing devs`);
+    this.devManager.init();
 
-      this.log.info(`---> Initializing configs`);
-      await this.host.init();
+    this.log.info(`---> Initializing configs`);
+    await this.host.init();
 
-      this.log.info(`---> Initializing system drivers`);
-      await this.driversManager.initSystemDrivers();
-      this.riseEvent(eventNames.system.systemDriversInitialized);
+    this.log.info(`---> Initializing system drivers`);
+    await this.driversManager.initSystemDrivers();
+    this.riseEvent(eventNames.system.systemDriversInitialized);
 
-      this.log.info(`---> Initializing system services`);
-      await this.servicesManager.initSystemServices();
-      this.riseEvent(eventNames.system.systemServicesInitialized);
+    this.log.info(`---> Initializing system services`);
+    await this.servicesManager.initSystemServices();
+    this.riseEvent(eventNames.system.systemServicesInitialized);
 
-      await this.initTopLayer();
+    await this.initTopLayer();
 
-      this._isAppInitialized = true;
-      this.riseEvent(eventNames.system.appInitialized);
+    this._isAppInitialized = true;
+    this.riseEvent(eventNames.system.appInitialized);
 
-      // remove initialization config
-      delete this.initializationConfig;
+    // remove initialization config
+    delete this.initializationConfig;
 
-      this.log.info(`===> Host initialization has finished`);
-    // }
-    // catch (err) {
-    //
-    //   // TODO: не срабатывает
-    //   //this.log.error(`Can't start host system: ${String(err)}`);
-    //   throw new Error(`Can't start host system: ${String(err)}`);
-    // }
+    this.log.info(`===> Host initialization has finished`);
   }
 
   onDevicesInit(cb: () => void): number {

@@ -24,7 +24,6 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'FakePeopleCount/manifest.yaml'));
 
   // drivers
-  await env.addDriver(path.join(driversRoot, 'SysFs/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'BinaryClick/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'BinaryInput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'BinaryOutput/manifest.yaml'));

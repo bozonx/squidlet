@@ -9,7 +9,7 @@ import systemConfig from 'host/config/systemConfig';
 import SysFsDriver from 'host/interfaces/SysFsDriver';
 
 import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
-import DriverBase from '../../entities/drivers/SysFs/SysFs';
+import DriverBase from '../../host/SysFs';
 import {convertBufferToUint8Array} from '../../host/helpers';
 
 
