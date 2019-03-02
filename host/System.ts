@@ -11,6 +11,7 @@ import eventNames from './dict/eventNames';
 import categories from './dict/categories';
 import EnvSet from './EnvSet';
 import DevManager, {DevClass} from './entities/DevManager';
+import SysFsDriver from './interfaces/SysFsDriver';
 
 
 export default class System {
@@ -37,7 +38,7 @@ export default class System {
   }
 
 
-  constructor() {
+  constructor(devSet: {[index: string]: DevClass}, envSetReplacement?: SysFsDriver) {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
 

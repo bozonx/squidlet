@@ -13,17 +13,23 @@ import DriverBase from '../../host/SysFs';
 import {convertBufferToUint8Array} from '../../host/helpers';
 
 
-let __configSet: SrcHostEnvSet;
+//let __configSet: SrcHostEnvSet;
 const initCfg = initializationConfig();
 
 
 /**
  * SysFs for master. It uses configs and entities from memory
  */
-export default class SysFs extends DriverBase implements SysFsDriver {
-  static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
-    __configSet = hostConfigSet;
+export default class SysFs implements SysFsDriver {
+  private configSet?: SrcHostEnvSet;
+
+  $setConfigSet(configSet: SrcHostEnvSet) {
+    this.configSet = configSet;
   }
+
+  // static registerConfigSet (hostConfigSet: SrcHostEnvSet) {
+  //   __configSet = hostConfigSet;
+  // }
 
 
   async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {

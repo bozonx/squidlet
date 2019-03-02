@@ -35,7 +35,7 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {Storage} from '../entities/drivers/Storage/Storage';
 
 
-export default class SysFs extends DriverBase implements SysFsDriver {
+export default class SysFs implements SysFsDriver {
   private get storage(): Storage {
     return this.depsInstances.storage as any;
   }
