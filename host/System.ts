@@ -44,7 +44,7 @@ export default class System {
 
     this.events = new Events();
     this.log = new LogPublisher(this);
-    this.devManager = new DevManager();
+    this.devManager = new DevManager(devSet);
     this.envSet = new EnvSet(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
@@ -101,9 +101,9 @@ export default class System {
     return this.events.once(categories.system, eventNames.system.appInitialized, cb);
   }
 
-  async $registerDevSet(devs: {[index: string]: DevClass}) {
-    await this.devManager.registerDevSet(devs);
-  }
+  // async $registerDevSet(devs: {[index: string]: DevClass}) {
+  //   await this.devManager.registerDevSet(devs);
+  // }
 
 
   // private async initNetwork(): Promise<void> {

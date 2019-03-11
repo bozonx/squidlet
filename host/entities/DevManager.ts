@@ -1,4 +1,3 @@
-import System from '../System';
 import Dev from '../interfaces/Dev';
 
 
@@ -10,10 +9,11 @@ export default class DevManager {
   private devSet: {[index: string]: Dev} = {};
 
 
-  // constructor(system: System) {
-  //   this.system = system;
-  // }
-
+  constructor(devSet: {[index: string]: DevClass}) {
+    for (let devNme of Object.keys(devSet)) {
+      this.devSet[devNme] = new devSet[devNme]();
+    }
+  }
 
   init() {
     for (let devNme of Object.keys(this.devSet)) {
@@ -23,15 +23,6 @@ export default class DevManager {
     }
   }
 
-  registerDevSet(devSet: {[index: string]: DevClass}) {
-    for (let devNme of Object.keys(devSet)) {
-
-      // TODO: make definition ???
-      //const definition: {id: driverName, className: driverName, props: {}};
-
-      this.devSet[devNme] = new devSet[devNme]();
-    }
-  }
 
   getDev<T extends Dev>(devName: string): T {
     if (!this.devSet[devName]) {

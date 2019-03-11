@@ -19,6 +19,7 @@ import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
 import SysFsMaster from './SysFs/SysFs.master';
+import SysFsDriver from '../host/interfaces/SysFsDriver';
 
 
 declare const global: {
@@ -40,7 +41,7 @@ async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
 
   console.info(`===> initializing host system on machine "${machine}"`);
 
-  const envSetReplacement = new SysFsMaster();
+  const envSetReplacement: SysFsDriver = new SysFsMaster();
 
   envSetReplacement.$setConfigSet(hostConfigSet);
 
