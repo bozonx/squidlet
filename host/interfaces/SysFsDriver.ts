@@ -1,3 +1,6 @@
+// TODO: remove
+
+
 import {ManifestsTypePluralName} from './ManifestTypes';
 import ManifestBase from './ManifestBase';
 import {EntityClassType} from '../entities/EntityManagerBase';

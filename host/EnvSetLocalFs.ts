@@ -8,7 +8,7 @@ import SysFsDriver from './interfaces/SysFsDriver';
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-export default class EnvSet {
+export default class EnvSetLocalFs {
   private readonly system: System;
 
   private get sysFs(): SysFsDriver {

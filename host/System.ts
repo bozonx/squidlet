@@ -9,9 +9,9 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import eventNames from './dict/eventNames';
 import categories from './dict/categories';
-import EnvSet from './EnvSet';
+import EnvSetLocalFs from './EnvSetLocalFs';
 import DevManager, {DevClass} from './entities/DevManager';
-import SysFsDriver from './interfaces/SysFsDriver';
+import EnvSet from './interfaces/EnvSet';
 
 
 export default class System {
@@ -38,14 +38,19 @@ export default class System {
   }
 
 
-  constructor(devSet: {[index: string]: DevClass}, envSetReplacement?: SysFsDriver) {
+  constructor(devSet: {[index: string]: DevClass}, envSetReplacement?: EnvSet) {
+    if (envSetReplacement) {
+      this.envSet = envSetReplacement;
+    }
+    else {
+      this.envSet = new EnvSetLocalFs(this);
+    }
+
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-
     this.events = new Events();
     this.log = new LogPublisher(this);
     this.devManager = new DevManager(devSet);
-    this.envSet = new EnvSet(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);
