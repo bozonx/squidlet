@@ -38,9 +38,9 @@ export default class System {
   }
 
 
-  constructor(devSet: {[index: string]: DevClass}, envSetReplacement?: EnvSet) {
+  constructor(devSet: {[index: string]: DevClass}, envSetReplacement?: new (system: System) => EnvSet) {
     if (envSetReplacement) {
-      this.envSet = envSetReplacement;
+      this.envSet = new envSetReplacement(this);
     }
     else {
       this.envSet = new EnvSetLocalFs(this);

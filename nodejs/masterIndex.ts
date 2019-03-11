@@ -41,11 +41,9 @@ async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
 
   console.info(`===> initializing host system on machine "${machine}"`);
 
-  const envSetReplacement: EnvSet = new EnvSetMemory();
+  EnvSetMemory.$setConfigSet(hostConfigSet);
 
-  envSetReplacement.$setConfigSet(hostConfigSet);
-
-  return new System(devsSet, envSetReplacement);
+  return new System(devsSet, EnvSetMemory);
 
   // save host config set to global var
   //global.__HOST_CONFIG_SET = hostConfigSet;

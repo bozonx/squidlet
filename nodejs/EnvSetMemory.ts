@@ -10,6 +10,10 @@ import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 
 
 export default class EnvSetMemory {
+  static $setConfigSet(hostConfigSet: SrcHostEnvSet) {
+    // TODO: !!!!
+  }
+
   private readonly system: System;
 
   private get sysFs(): SysFsDriver {
@@ -21,10 +25,6 @@ export default class EnvSetMemory {
     this.system = system;
   }
 
-
-  $setConfigSet(hostConfigSet: SrcHostEnvSet) {
-    // TODO: !!!!
-  }
 
   /**
    * Get builtin config
