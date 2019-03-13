@@ -2,7 +2,6 @@
  * Base class for builds which use src files or which use requireJs to load modules.
  */
 import System from './System';
-import SysFsDriver from './interfaces/SysFsDriver';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import ManifestBase from './interfaces/ManifestBase';
 import {EntityClassType} from './entities/EntityManagerBase';
@@ -21,9 +20,8 @@ export default class EnvSetMemory {
   }
 
   private readonly system: System;
-
-  private get sysFs(): SysFsDriver {
-    return this.system.driversManager.getDriver('SysFs');
+  private get devStorage(): StorageDev {
+    return this.system.devManager.getDev('Storage');
   }
 
 
@@ -78,9 +76,8 @@ export default class EnvSetMemory {
     fileName: string
   ): Promise<string> {
     const filePath: string = pathJoin(configSet.entities[pluralType][entityName].srcDir, fileName);
-    const devStorage: StorageDev = this.system.devManager.getDev('Storage');
 
-    return devStorage.readFile(filePath);
+    return this.devStorage.readFile(filePath);
   }
 
   loadEntityBinFile(
@@ -89,9 +86,8 @@ export default class EnvSetMemory {
     fileName: string
   ): Promise<Uint8Array> {
     const filePath: string = pathJoin(configSet.entities[pluralType][entityName].srcDir, fileName);
-    const devStorage: StorageDev = this.system.devManager.getDev('Storage');
 
-    return devStorage.readBinFile(filePath);
+    return this.devStorage.readBinFile(filePath);
   }
 
 }

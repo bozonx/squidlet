@@ -1,9 +1,9 @@
 // TODO: remove
 
 
-import {ManifestsTypePluralName} from './ManifestTypes';
-import ManifestBase from './ManifestBase';
-import {EntityClassType} from '../entities/EntityManagerBase';
+import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
+import ManifestBase from '../host/interfaces/ManifestBase';
+import {EntityClassType} from '../host/entities/EntityManagerBase';
 
 
 export default interface SysFsDriver {
