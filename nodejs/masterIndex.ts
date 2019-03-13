@@ -18,7 +18,6 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
-import EnvSet from '../host/interfaces/EnvSet';
 import EnvSetMemory from './EnvSetMemory';
 
 

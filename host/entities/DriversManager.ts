@@ -91,6 +91,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
 
   /**
    * load list of definitions of drivers
+   * requires config file driversDefinitions.json
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
     return this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(

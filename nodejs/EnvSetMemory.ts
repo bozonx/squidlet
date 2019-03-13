@@ -7,11 +7,16 @@ import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
 import ManifestBase from '../host/interfaces/ManifestBase';
 import {EntityClassType} from '../host/entities/EntityManagerBase';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import {trimEnd} from '../host/helpers/lodashLike';
+import systemConfig from '../host/config/systemConfig';
+
+
+let configSet: SrcHostEnvSet;
 
 
 export default class EnvSetMemory {
   static $setConfigSet(hostConfigSet: SrcHostEnvSet) {
-    // TODO: !!!!
+    configSet = hostConfigSet;
   }
 
   private readonly system: System;
@@ -28,10 +33,15 @@ export default class EnvSetMemory {
 
   /**
    * Get builtin config
-   * @param configName - config name without extension
+   * @param configName - config name with ".json" extension
    */
-  loadConfig<T>(configName: string): Promise<T> {
-    return this.sysFs.loadConfig(configName) as Promise<T>;
+  async loadConfig<T>(configName: string): Promise<T> {
+    const strippedName: string = trimEnd(configName, '.json');
+    const config: any = (configSet.configs as any)[strippedName];
+
+    if (!config) throw new Error(`Can't find config "${configName}"`);
+
+    return config;
   }
 
   /**
@@ -39,8 +49,12 @@ export default class EnvSetMemory {
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
    */
-  loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-    return this.sysFs.loadEntityManifest(pluralType, entityName) as Promise<T>;
+  async loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
+    if (!configSet.entities[pluralType][entityName]) {
+      throw new Error(`EnvSetMemory.loadManifest("${pluralType}", "${entityName}"): Can't find an entity`);
+    }
+
+    return configSet.entities[pluralType][entityName].manifest as T;
   }
 
   /**
@@ -49,7 +63,7 @@ export default class EnvSetMemory {
    * @param entityName - name of entity
    */
   async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
-    return this.sysFs.loadEntityMain(pluralType, entityName) as Promise<T>;
+    //return this.sysFs.loadEntityMain(pluralType, entityName) as Promise<T>;
   }
 
   loadEntityFile(
@@ -57,7 +71,7 @@ export default class EnvSetMemory {
     entityName: string,
     fileName: string
   ): Promise<string> {
-    return this.sysFs.loadEntityFile(pluralType, entityName, fileName);
+    //return this.sysFs.loadEntityFile(pluralType, entityName, fileName);
   }
 
   loadEntityBinFile(
@@ -65,7 +79,7 @@ export default class EnvSetMemory {
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    return this.sysFs.loadEntityBinFile(pluralType, entityName, fileName);
+    //return this.sysFs.loadEntityBinFile(pluralType, entityName, fileName);
   }
 
 }

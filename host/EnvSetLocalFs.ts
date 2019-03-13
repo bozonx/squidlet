@@ -23,7 +23,7 @@ export default class EnvSetLocalFs {
 
   /**
    * Get builtin config
-   * @param configName - config name without extension
+   * @param configName - config name with ".json" extension
    */
   loadConfig<T>(configName: string): Promise<T> {
     return this.sysFs.loadConfig(configName) as Promise<T>;

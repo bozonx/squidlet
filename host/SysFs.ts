@@ -80,6 +80,8 @@ export default class SysFs implements SysFsDriver {
       configName
     );
 
+    // TODO: add extension
+
     return this.storage.readJsonObjectFile(pathToFile);
   }
 
