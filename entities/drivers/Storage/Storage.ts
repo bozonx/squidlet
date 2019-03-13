@@ -1,9 +1,6 @@
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import * as path from "path";
-import {callPromised, convertBufferToUint8Array} from '../../../nodejs/helpers';
-import * as fs from "fs";
-import {DEFAULT_ENCODING} from '../SysFs/Sys-dev';
+import {convertBufferToUint8Array} from '../../../nodejs/helpers';
 
 
 export class Storage extends DriverBase {

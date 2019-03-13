@@ -7,7 +7,7 @@ import ManifestBase from './interfaces/ManifestBase';
 import {EntityClassType} from './entities/EntityManagerBase';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {trimEnd} from './helpers/lodashLike';
-import pathJoin from './helpers/nodeLike';
+import {pathJoin} from './helpers/nodeLike';
 import StorageDev from '../nodejs/devs/Storage';
 import EnvSet from './interfaces/EnvSet';
 

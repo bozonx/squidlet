@@ -5,11 +5,8 @@ import {EntityClassType} from './entities/EntityManagerBase';
 import {Storage} from '../entities/drivers/Storage/Storage';
 import systemConfig from './config/systemConfig';
 import EnvSet from './interfaces/EnvSet';
-import pathJoin from './helpers/nodeLike';
+import {pathJoin} from './helpers/nodeLike';
 import StorageDev from '../nodejs/devs/Storage';
-import * as path from "path";
-import {callPromised} from '../nodejs/helpers';
-import * as fs from "fs";
 
 
 /**
@@ -80,16 +77,15 @@ export default class EnvSetLocalFs implements EnvSet {
     entityName: string,
     fileName: string
   ): Promise<string> {
-    await this.checkEntity(pluralType, entityName, fileName);
+    //await this.checkEntity(pluralType, entityName, fileName);
 
     const pathToFile: string = pathJoin(
-      this.env.config.config.envSetDir,
       systemConfig.rootDirs.entities,
       entityName,
       fileName
     );
 
-    return this.storage.readStringFile(pathToFile);
+    return this.readStringFile(pathToFile);
   }
 
   loadEntityBinFile(
@@ -97,44 +93,29 @@ export default class EnvSetLocalFs implements EnvSet {
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    await this.checkEntity(pluralType, entityName, fileName);
+    //await this.checkEntity(pluralType, entityName, fileName);
 
     const pathToFile: string = pathJoin(
-      this.env.config.config.envSetDir,
+      this.system.host.config.config.envSetDir,
       systemConfig.rootDirs.entities,
       entityName,
       fileName
     );
 
-    return this.storage.readBinFile(pathToFile);
+    return this.devStorage.readBinFile(pathToFile);
   }
 
 
   getHostHashes(): Promise<{[index: string]: any}> {
-    const pathToFile: string = pathJoin(
-      this.env.config.config.envSetDir,
-      systemConfig.hashFiles.host
-    );
-
-    return this.storage.readJsonObjectFile(pathToFile);
+    return this.readJsonObjectFile(systemConfig.hashFiles.host);
   }
 
   getConfigsHashes(): Promise<{[index: string]: any}> {
-    const pathToFile: string = pathJoin(
-      this.env.config.config.envSetDir,
-      systemConfig.hashFiles.configs
-    );
-
-    return this.storage.readJsonObjectFile(pathToFile);
+    return this.readJsonObjectFile(systemConfig.hashFiles.configs);
   }
 
   getEntitiesHashes(): Promise<{[index: string]: any}> {
-    const pathToFile: string = pathJoin(
-      this.env.config.config.envSetDir,
-      systemConfig.hashFiles.entities
-    );
-
-    return this.storage.readJsonObjectFile(pathToFile);
+    return this.readJsonObjectFile(systemConfig.hashFiles.entities);
   }
 
   async writeHostFile(fileName: string, content: string): Promise<void> {
@@ -153,21 +134,30 @@ export default class EnvSetLocalFs implements EnvSet {
   }
 
   writeHostHashesFile(content: string): Promise<void> {
-    // TODO: запретить выход наверх
+    const pathToFile: string = pathJoin(
+      this.system.host.config.config.envSetDir,
+      systemConfig.hashFiles.host
+    );
 
-    return this.storage.writeFile(systemConfig.hashFiles.host, content);
+    return this.devStorage.writeFile(pathToFile, content);
   }
 
   writeConfigHashesFile(content: string): Promise<void> {
-    // TODO: запретить выход наверх
+    const pathToFile: string = pathJoin(
+      this.system.host.config.config.envSetDir,
+      systemConfig.hashFiles.configs
+    );
 
-    return this.storage.writeFile(systemConfig.hashFiles.configs, content);
+    return this.devStorage.writeFile(systemConfig.hashFiles.configs, content);
   }
 
   writeEntitiesHashesFile(content: string): Promise<void> {
-    // TODO: запретить выход наверх
+    const pathToFile: string = pathJoin(
+      this.system.host.config.config.envSetDir,
+      systemConfig.hashFiles.entities
+    );
 
-    return this.storage.writeFile(systemConfig.hashFiles.entities, content);
+    return this.devStorage.writeFile(systemConfig.hashFiles.entities, content);
   }
 
   async removeHostFiles(filesList: string[]): Promise<void> {
@@ -189,11 +179,20 @@ export default class EnvSetLocalFs implements EnvSet {
    * Read json object file relative to envSetDir
    */
   private async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
-    const filePath = path.join(this.system.host.config.config.envSetDir, fileName);
-    const fileContent: string = await this.devStorage.readFile(filePath);
+    const fileContent: string = await this.readStringFile(fileName);
 
     return JSON.parse(fileContent);
   }
+
+  /**
+   * Read string file relative to envSetDir
+   */
+  private async readStringFile(fileName: string): Promise<string> {
+    const filePath = pathJoin(this.system.host.config.config.envSetDir, fileName);
+
+    return this.devStorage.readFile(filePath);
+  }
+
   //
   // private async checkEntity(
   //   pluralType: ManifestsTypePluralName,

@@ -19,7 +19,6 @@ export default interface StorageDev {
   writeFile(path: string, data: string | Uint8Array): Promise<void>;
   stat(path: string): Promise<Stats>;
   exists(path: string): Promise<boolean>;
-  // additional
   copyFile(src: string, dest: string): Promise<void>;
   rename(oldPath: string, newPath: string): Promise<void>;
 }

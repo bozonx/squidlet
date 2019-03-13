@@ -74,9 +74,6 @@ export default class Storage implements StorageDev {
     });
   }
 
-
-  ////// additional
-
   copyFile(src: string, dest: string): Promise<void> {
     return callPromised(fs.copyFile, src, dest);
   }
