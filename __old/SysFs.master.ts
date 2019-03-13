@@ -8,9 +8,9 @@ import {trimEnd} from 'host/helpers/lodashLike';
 import systemConfig from 'host/config/systemConfig';
 import SysFsDriver from 'host/interfaces/SysFsDriver';
 
-import SrcHostEnvSet from '../../hostEnvBuilder/interfaces/SrcHostEnvSet';
-import DriverBase from '../../host/SysFs';
-import {convertBufferToUint8Array} from '../../host/helpers';
+import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import DriverBase from '../host/SysFs';
+import {convertBufferToUint8Array} from '../host/helpers';
 
 
 //let __configSet: SrcHostEnvSet;
@@ -125,6 +125,11 @@ export default class SysFs implements SysFsDriver {
 
     return config;
   }
+
+
+
+
+
 
 
   // mkdir(fileName: string): Promise<void> {

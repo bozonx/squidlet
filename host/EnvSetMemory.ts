@@ -1,15 +1,15 @@
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-import System from '../host/System';
-import SysFsDriver from '../host/interfaces/SysFsDriver';
-import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
-import ManifestBase from '../host/interfaces/ManifestBase';
-import {EntityClassType} from '../host/entities/EntityManagerBase';
+import System from './System';
+import SysFsDriver from './interfaces/SysFsDriver';
+import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
+import ManifestBase from './interfaces/ManifestBase';
+import {EntityClassType} from './entities/EntityManagerBase';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
-import {trimEnd} from '../host/helpers/lodashLike';
-import pathJoin from '../host/helpers/nodeLike';
-import StorageDev from './devs/Storage';
+import {trimEnd} from './helpers/lodashLike';
+import pathJoin from './helpers/nodeLike';
+import StorageDev from '../nodejs/devs/Storage';
 
 
 let configSet: SrcHostEnvSet;

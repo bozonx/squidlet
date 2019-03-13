@@ -18,7 +18,7 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
-import EnvSetMemory from './EnvSetMemory';
+import EnvSetMemory from '../host/EnvSetMemory';
 
 
 declare const global: {
