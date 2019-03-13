@@ -7,6 +7,11 @@ export default interface SystemConfig {
     // services: string;
     // data: string;
   };
+  storageDirs: {
+    common: string;
+    cache: string;
+    logs: string;
+  };
   hashFiles: {
     host: string;
     configs: string;

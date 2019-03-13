@@ -9,6 +9,11 @@ const systemConfig: SystemConfig = {
     configs: 'configs',
     entities: 'entities',
   },
+  storageDirs: {
+    common: 'common',
+    cache: 'cache',
+    logs: 'logs',
+  },
   hashFiles: {
     host: 'host-hashes.json',
     configs: 'configs-hashes.json',

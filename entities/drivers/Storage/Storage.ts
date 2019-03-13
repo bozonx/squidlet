@@ -1,9 +1,15 @@
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import {convertBufferToUint8Array} from '../../../nodejs/helpers';
+import {pathJoin} from '../../../host/helpers/nodeLike';
+import systemConfig from '../../../host/config/systemConfig';
+
+
+// TODO: это файлы постоянного хранения, не кэш и не логи.
+//   В отдельной папку в фс для постоянных файлов
 
 
 export class Storage extends DriverBase {
+  private rootDir: string = '';
   private get storageDev(): StorageDev {
     return this.depsInstances.storageDev as StorageDev;
   }
@@ -11,7 +17,11 @@ export class Storage extends DriverBase {
 
   protected willInit = async () => {
     this.depsInstances.storageDev = this.env.getDev('Storage');
-  }
+    this.rootDir = pathJoin(
+      this.env.config.config.dataDir,
+      systemConfig.storageDirs.common,
+    );
+  };
 
 
   async isDir(pathToDir: string): Promise<boolean> {
