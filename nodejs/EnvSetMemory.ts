@@ -8,7 +8,8 @@ import ManifestBase from '../host/interfaces/ManifestBase';
 import {EntityClassType} from '../host/entities/EntityManagerBase';
 import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {trimEnd} from '../host/helpers/lodashLike';
-import systemConfig from '../host/config/systemConfig';
+import pathJoin from '../host/helpers/nodeLike';
+import StorageDev from './devs/Storage';
 
 
 let configSet: SrcHostEnvSet;
@@ -63,7 +64,12 @@ export default class EnvSetMemory {
    * @param entityName - name of entity
    */
   async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
-    //return this.sysFs.loadEntityMain(pluralType, entityName) as Promise<T>;
+    const filePath: string = pathJoin(
+      configSet.entities[pluralType][entityName].srcDir,
+      configSet.entities[pluralType][entityName].manifest.main,
+    );
+
+    return require(filePath);
   }
 
   loadEntityFile(
@@ -71,7 +77,10 @@ export default class EnvSetMemory {
     entityName: string,
     fileName: string
   ): Promise<string> {
-    //return this.sysFs.loadEntityFile(pluralType, entityName, fileName);
+    const filePath: string = pathJoin(configSet.entities[pluralType][entityName].srcDir, fileName);
+    const devStorage: StorageDev = this.system.devManager.getDev('Storage');
+
+    return devStorage.readFile(filePath);
   }
 
   loadEntityBinFile(
@@ -79,7 +88,10 @@ export default class EnvSetMemory {
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    //return this.sysFs.loadEntityBinFile(pluralType, entityName, fileName);
+    const filePath: string = pathJoin(configSet.entities[pluralType][entityName].srcDir, fileName);
+    const devStorage: StorageDev = this.system.devManager.getDev('Storage');
+
+    return devStorage.readBinFile(filePath);
   }
 
 }
