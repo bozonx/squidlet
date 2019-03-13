@@ -9,12 +9,13 @@ import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
 import {trimEnd} from './helpers/lodashLike';
 import pathJoin from './helpers/nodeLike';
 import StorageDev from '../nodejs/devs/Storage';
+import EnvSet from './interfaces/EnvSet';
 
 
 let configSet: SrcHostEnvSet;
 
 
-export default class EnvSetMemory {
+export default class EnvSetMemory implements EnvSet {
   static $setConfigSet(hostConfigSet: SrcHostEnvSet) {
     configSet = hostConfigSet;
   }

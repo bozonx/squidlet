@@ -2,20 +2,27 @@ import System from './System';
 import ManifestBase from './interfaces/ManifestBase';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
-import pathJoin from '../__old/SysFs';
 import {Storage} from '../entities/drivers/Storage/Storage';
 import systemConfig from './config/systemConfig';
+import EnvSet from './interfaces/EnvSet';
+import pathJoin from './helpers/nodeLike';
+import StorageDev from '../nodejs/devs/Storage';
+import * as path from "path";
+import {callPromised} from '../nodejs/helpers';
+import * as fs from "fs";
 
 
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-export default class EnvSetLocalFs {
+export default class EnvSetLocalFs implements EnvSet {
   private readonly system: System;
-
-  private get storage(): Storage {
-    return this.system.driversManager.getDriver('Storage');
+  private get devStorage(): StorageDev {
+    return this.system.devManager.getDev('Storage');
   }
+  // private get storage(): Storage {
+  //   return this.system.driversManager.getDriver('Storage');
+  // }
 
 
   constructor(system: System) {
@@ -28,15 +35,9 @@ export default class EnvSetLocalFs {
    * @param configName - config name with ".json" extension
    */
   loadConfig<T>(configName: string): Promise<T> {
-    const pathToFile: string = pathJoin(
-      this.env.config.config.envSetDir,
-      systemConfig.rootDirs.configs,
-      configName
-    );
+    const pathToFile: string = pathJoin(systemConfig.rootDirs.configs, configName);
 
-    // TODO: add extension
-
-    return this.storage.readJsonObjectFile(pathToFile);
+    return this.readJsonObjectFile(pathToFile) as Promise<T>;
   }
 
   /**
@@ -45,18 +46,14 @@ export default class EnvSetLocalFs {
    * @param entityName - name of entity
    */
   loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-    await this.checkEntity(pluralType, entityName);
-
     const pathToFile = pathJoin(
-      this.env.config.config.envSetDir,
       systemConfig.rootDirs.entities,
       pluralType,
       entityName,
-      // TODO: review
-      this.env.system.initCfg.fileNames.manifest
+      this.system.initCfg.fileNames.manifest
     );
 
-    return this.storage.readJsonObjectFile(pathToFile) as any;
+    return this.readJsonObjectFile(pathToFile) as Promise<T>;
   }
 
   /**
@@ -65,18 +62,17 @@ export default class EnvSetLocalFs {
    * @param entityName - name of entity
    */
   async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
-    const manifest: ManifestBase = await this.loadEntityManifest(pluralType, entityName);
+    const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
     const mainFileName: string = manifest.main;
     const filePath = pathJoin(
-      this.env.config.config.envSetDir,
+      this.system.host.config.config.envSetDir,
       systemConfig.rootDirs.entities,
       pluralType,
       entityName,
       mainFileName
     );
-    const module = await this.storage.requireFile(filePath);
 
-    return module.default;
+    return require(filePath).default;
   }
 
   loadEntityFile(
@@ -189,14 +185,24 @@ export default class EnvSetLocalFs {
   }
 
 
-  private async checkEntity(
-    pluralType: ManifestsTypePluralName,
-    entityName: string,
-    fileName?: string
-  ) {
+  /**
+   * Read json object file relative to envSetDir
+   */
+  private async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
+    const filePath = path.join(this.system.host.config.config.envSetDir, fileName);
+    const fileContent: string = await this.devStorage.readFile(filePath);
 
-    // TODO: запротить выход наверх, проверить существование entityName
-
+    return JSON.parse(fileContent);
   }
+  //
+  // private async checkEntity(
+  //   pluralType: ManifestsTypePluralName,
+  //   entityName: string,
+  //   fileName?: string
+  // ) {
+  //
+  //   // TODO: запротить выход наверх, проверить существование entityName
+  //
+  // }
 
 }
