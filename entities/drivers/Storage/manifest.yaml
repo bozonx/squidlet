@@ -1,7 +1,0 @@
-name: Storage
-main: Storage.ts
-
-devs:
-  - Storage
-
-props: {}

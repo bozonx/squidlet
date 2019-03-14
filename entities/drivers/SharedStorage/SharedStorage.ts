@@ -7,7 +7,7 @@ import systemConfig from 'host/config/systemConfig';
 /**
  * Shared variable data storage
  */
-export class Storage extends DriverBase {
+export class SharedStorage extends DriverBase {
   private rootDir: string = '';
   private get storageDev(): StorageDev {
     return this.depsInstances.storageDev as StorageDev;

@@ -10,12 +10,14 @@ export default class DevManager {
 
 
   constructor(devSet: {[index: string]: DevClass}) {
+    // make dev instances
     for (let devNme of Object.keys(devSet)) {
       this.devSet[devNme] = new devSet[devNme]();
     }
   }
 
   init() {
+    // call initializing of instances
     for (let devNme of Object.keys(this.devSet)) {
       const dev: Dev = this.devSet[devNme];
 

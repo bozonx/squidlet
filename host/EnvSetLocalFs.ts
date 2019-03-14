@@ -2,7 +2,7 @@ import System from './System';
 import ManifestBase from './interfaces/ManifestBase';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
-import {Storage} from '../entities/drivers/Storage/Storage';
+import {SharedStorage} from '../entities/drivers/SharedStorage/SharedStorage';
 import systemConfig from './config/systemConfig';
 import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';

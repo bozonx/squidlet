@@ -1,0 +1,7 @@
+name: SharedStorage
+main: SharedStorage.ts
+
+devs:
+  - Storage
+
+props: {}
