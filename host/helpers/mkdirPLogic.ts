@@ -1,6 +1,6 @@
 import {PATH_SEPARATOR} from './helpers';
 import {trimEnd} from './lodashLike';
-import {dirname, basename, isAbsolutePath} from './nodeLike';
+import {pathDirname, pathBasename, isAbsolutePath} from './nodeLike';
 
 
 export default async function mkdirPLogic (
@@ -35,8 +35,8 @@ export default async function mkdirPLogic (
     }
     else {
       // split path
-      const shorterPath = dirname(localPathToDir);
-      const lastPart = basename(localPathToDir);
+      const shorterPath = pathDirname(localPathToDir);
+      const lastPart = pathBasename(localPathToDir);
 
       pathParts.push(lastPart);
 

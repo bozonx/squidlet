@@ -20,9 +20,10 @@ export function pathJoin (...paths: string[]): string {
 
 export function isAbsolutePath(pathToDirOrFile: string): boolean {
   return Boolean(pathToDirOrFile.match(/^\//));
+  //return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
 }
 
-export function dirname(pathToDirOrFile: string): string {
+export function pathDirname(pathToDirOrFile: string): string {
   const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
 
   pathParts.pop();
@@ -30,13 +31,8 @@ export function dirname(pathToDirOrFile: string): string {
   return pathParts.join(PATH_SEPARATOR);
 }
 
-export function basename(pathToDirOrFile: string): string {
+export function pathBasename(pathToDirOrFile: string): string {
   const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
 
   return pathParts[pathParts.length - 1];
 }
-
-
-// export function isAbsoluteFileName(fileName: string): boolean {
-//   return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
-// }

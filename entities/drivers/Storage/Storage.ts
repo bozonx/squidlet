@@ -1,7 +1,7 @@
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
 import DriverBase from 'host/baseDrivers/DriverBase';
-import {pathJoin} from '../../../host/helpers/nodeLike';
-import systemConfig from '../../../host/config/systemConfig';
+import {pathDirname, pathJoin} from 'host/helpers/nodeLike';
+import systemConfig from 'host/config/systemConfig';
 
 
 /**
@@ -64,14 +64,6 @@ export class Storage extends DriverBase {
     return this.storageDev.readdir(absPath);
   }
 
-  // TODO: add loadJson
-
-  // /**
-  //  * Read the only files of dir
-  //  */
-  // readDirFiles(pathToDir: string) {
-  // }
-
   writeFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
 
@@ -108,19 +100,24 @@ export class Storage extends DriverBase {
 
   async cp(fromPath: string, toPath: string): Promise<void> {
     // TODO: !!!!
-    // TODO: !!!! support dirs
+    // TODO: !!!! support copying dir recursively
   }
 
   async mv(fromPath: string, toPath: string): Promise<void> {
-    // TODO: !!!!
-    // TODO: !!!! support dirs
+    // TODO: !!!! support moving dir recursively
+
+    const oldAbsPath: string = pathJoin(this.rootDir, fromPath);
+    const newAbsPath: string = pathJoin(this.rootDir, toPath);
+
+    return this.storageDev.rename(oldAbsPath, newAbsPath);
   }
 
   async rename(pathToFileOrDir: string, newName: string): Promise<void> {
-    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir)
-    const fileDir: string = path
+    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
+    const fileDir: string = pathDirname(absPath);
+    const newPath: string = pathJoin(fileDir, newName);
 
-    return this.storageDev.rename(absPath);
+    return this.storageDev.rename(absPath, newPath);
   }
 
   /**
