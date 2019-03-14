@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _values = require('lodash/values');
 import {Map} from 'immutable';
 
 import PreDeviceManifest from '../interfaces/PreDeviceManifest';
@@ -17,13 +16,6 @@ import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/
 import {Stats} from '../../host/interfaces/dev/StorageDev';
 
 
-// interface Manifests {
-//   devices: {[index: string]: PreDeviceManifest};
-//   drivers: {[index: string]: PreDriverManifest};
-//   services: {[index: string]: PreServiceManifest};
-// }
-
-
 /**
  * Register a new type of device, driver or service
  */
@@ -38,40 +30,11 @@ export default class Register {
   private services = Map<string, PreManifestBase>();
   private readonly registeringPromises: Promise<any>[] = [];
 
-  // private manifests: Manifests = {
-  //   devices: {},
-  //   drivers: {},
-  //   services: {},
-  // };
 
   constructor(io: Io) {
     this.io = io;
   }
 
-
-  // getDevicesPreManifests(): {[index: string]: PreDeviceManifest} {
-  //   return this.devices.toJS() as any;
-  // }
-  //
-  // getDriversPreManifests(): {[index: string]: PreDriverManifest} {
-  //   return this.drivers.toJS() as any;
-  // }
-  //
-  // getServicesPreManifests(): {[index: string]: PreServiceManifest} {
-  //   return this.services.toJS() as any;
-  // }
-  //
-  // getDevicesPreManifestsList(): PreDeviceManifest[] {
-  //   return _values<any>(this.devices.toJS());
-  // }
-  //
-  // getDriversPreManifestsList(): PreDriverManifest[] {
-  //   return _values<any>(this.drivers.toJS());
-  // }
-  //
-  // getServicesPreManifestsList(): PreServiceManifest[] {
-  //   return _values<any>(this.services.toJS());
-  // }
 
   getRegisteringPromises(): Promise<any>[] {
     return this.registeringPromises;
@@ -202,8 +165,6 @@ export default class Register {
     }
 
     const resolvedPathToManifest: string = await this.resolveIndexFile(
-      this.io.stat,
-      this.io.exists,
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );
@@ -220,12 +181,10 @@ export default class Register {
   }
 
   private async resolveIndexFile(
-    stat: (path: string) => Promise<Stats>,
-    exists: (path: string) => Promise<boolean>,
     pathToDirOrFile: string,
     indexFileNames: string[]
   ): Promise<string> {
-    if (!(await stat(pathToDirOrFile)).dir) {
+    if (!(await this.io.stat(pathToDirOrFile)).dir) {
       // if it's file - return it
       return pathToDirOrFile;
     }
@@ -234,7 +193,7 @@ export default class Register {
     for (let indexFile of indexFileNames) {
       const fullPath = path.join(pathToDirOrFile, indexFile);
 
-      if (exists(fullPath)) {
+      if (await this.io.exists(fullPath)) {
         return fullPath;
       }
     }

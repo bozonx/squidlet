@@ -34,9 +34,9 @@ describe.only 'envBuilder.Register', ->
     await @register.addService(@entity)
 
     assert.equal(@register.registeringPromises.length, 3)
-    assert.deepEqual(@register.getDevicesPreManifestsList(), [ @entity ])
-    assert.deepEqual(@register.getDriversPreManifestsList(), [ @entity ])
-    assert.deepEqual(@register.getServicesPreManifestsList(), [ @entity ])
+    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @entity)
 
   it 'addDevice, addDriver, addService as a path', ->
     @register.loadManifest = () => @entity
@@ -47,10 +47,20 @@ describe.only 'envBuilder.Register', ->
     await @register.addService(pathTo)
 
     assert.equal(@register.registeringPromises.length, 3)
-    assert.deepEqual(@register.getDevicesPreManifests(), [ @entity ])
-    assert.deepEqual(@register.getDriversPreManifests(), [ @entity ])
-    assert.deepEqual(@register.getServicesPreManifests(), [ @entity ])
+    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @entity)
 
   it "don't add double", ->
     await @register.addDevice(@entity)
     assert.isRejected(@register.addDevice(@entity))
+
+  it "resolveManifest - load from file", ->
+    @register.io.exists = () => Promise.resolve(true)
+    @register.io.stat = () => Promise.resolve({dir: true})
+    @register.io.loadYamlFile = sinon.stub().returns(Promise.resolve(@entity))
+
+    result = await @register.resolveManifest('/path/to/entity')
+
+    assert.deepEqual(result, @entity)
+    sinon.assert.calledWith(@register.io.loadYamlFile, '/path/to/entity/manifest.yaml')
