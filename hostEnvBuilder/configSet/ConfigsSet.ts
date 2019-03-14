@@ -1,4 +1,3 @@
-import * as path from 'path';
 import _values = require('lodash/values');
 
 import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';

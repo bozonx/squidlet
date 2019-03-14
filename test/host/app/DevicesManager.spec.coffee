@@ -1,5 +1,5 @@
-DevicesManager = require('../../host/entities/DevicesManager').default
-initializationConfig = require('../../host/config/initializationConfig').default
+DevicesManager = require('../../../host/entities/DevicesManager').default
+initializationConfig = require('../../../host/config/initializationConfig').default
 
 
 describe 'app.DevicesManager', ->
