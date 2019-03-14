@@ -5,51 +5,6 @@ systemConfig = require('../../hostEnvBuilder/configs/systemConfig').default
 
 describe.only 'envBuilder.ConfigManager', ->
   beforeEach ->
-#    @preMasterHostConfig = {
-#      platform: 'rpi'
-#      config: {
-#        storageDir: '/myDir'
-#      }
-#      devices: {
-#        room1: {
-#          relay: {
-#            device: 'Relay'
-#            pin: 1
-#          }
-#        }
-#      }
-#      drivers: {
-#        'Gpio.driver': {
-#          param: 1
-#        }
-#      }
-#      services: {
-#        backend: {
-#          service: 'Backend'
-#          param: 1
-#        }
-#      }
-#      devicesDefaults: {
-#        Relay: {
-#          baseOne: true
-#        }
-#      }
-#    }
-#    @configManager = {
-#      host: @preMasterHostConfig
-#      hostDefaults: {
-#        hostDefaultParam: 'value'
-#      }
-#    }
-#
-#    @pathToMasterConfig = '/path/to/configWorks.yaml'
-#
-#    # TODO: not safe - may be make new class with cloned prototype
-#    MasterConfig.prototype.getPlatformConfig = => {
-#      devs: ['Storage']
-#      hostConfig: { platformParam: 'value' }
-#    }
-
     @io = {}
     @preHostConfig = {
       id: 'myHost'
@@ -58,6 +13,11 @@ describe.only 'envBuilder.ConfigManager', ->
       config: {
         hostParam: 1
       },
+      devices: {
+        myDevice: {
+          device: 'Switch'
+        }
+      }
     }
     @machineConfig = {
       devs: ['Storage']
@@ -81,10 +41,15 @@ describe.only 'envBuilder.ConfigManager', ->
 
     assert.equal(@configManager.buildDir, @buildDir)
     assert.equal(@configManager.tmpBuildDir, @tmpDir)
-    assert.deepEqual(@configManager.preHostConfig, {
-
+    assert.deepEqual(@configManager.preEntities, {
+      devices: {
+        myDevice: {
+          className: 'Switch'
+        }
+      }
     })
     assert.deepEqual(@configManager.machineConfig, @machineConfig)
+    assert.deepEqual(@configManager.devicesDefaults, {})
 #    assert.deepEqual(@configManager.hostConfig, {
 #
 #    })

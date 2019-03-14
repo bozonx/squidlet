@@ -37,10 +37,10 @@ export default class ConfigManager {
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
   private hostConfigOrConfigPath: string | PreHostConfig;
-  private _buildDir?: string;
+  private readonly _buildDir: string;
 
 
-  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absBuildDir?: string, tmpBuildDir?: string) {
+  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absBuildDir: string, tmpBuildDir?: string) {
     this.io = io;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
     this._buildDir = absBuildDir;
@@ -67,7 +67,8 @@ export default class ConfigManager {
     this._hostConfig = this.prepareHostConfig(normalizedConfig);
 
     appendArray(this.plugins, normalizedConfig.plugins);
-    this._buildDir = this.resolveBuildDir();
+    //this._buildDir = this.resolveBuildDir();
+    //this._buildDir = this.resolveBuildDir();
 
     delete this.hostConfigOrConfigPath;
   }
@@ -114,35 +115,35 @@ export default class ConfigManager {
     );
   }
 
-  private resolveBuildDir(): string {
-    // use command argument if specified
-    if (this._buildDir) return this._buildDir;
-
-    // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
-    //   // use host's storage dir
-    //   const storageDir = this.preHostConfig.config.storageDir;
-    //
-    //   if (path.isAbsolute(storageDir)) {
-    //     // it's an absolute path
-    //     return storageDir;
-    //   }
-    //   else {
-    //     if (typeof this.hostConfigOrConfigPath !== 'string') {
-    //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
-    //     }
-    //
-    //     // storageDir is relative path - make it absolute, use config file dir as a root
-    //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
-    //   }
-    // }
-
-    if (!this.preHostConfig.defaultEnvSetDir) {
-      throw new Error(`defaultEnvSetDir config param hasn't been specified on current platform.`);
-    }
-
-    // use default build dir
-    return this.preHostConfig.defaultEnvSetDir;
-  }
+  // private resolveBuildDir(): string {
+  //   // use command argument if specified
+  //   if (this._buildDir) return this._buildDir;
+  //
+  //   // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
+  //   //   // use host's storage dir
+  //   //   const storageDir = this.preHostConfig.config.storageDir;
+  //   //
+  //   //   if (path.isAbsolute(storageDir)) {
+  //   //     // it's an absolute path
+  //   //     return storageDir;
+  //   //   }
+  //   //   else {
+  //   //     if (typeof this.hostConfigOrConfigPath !== 'string') {
+  //   //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
+  //   //     }
+  //   //
+  //   //     // storageDir is relative path - make it absolute, use config file dir as a root
+  //   //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
+  //   //   }
+  //   // }
+  //
+  //   // if (!this.preHostConfig.defaultEnvSetDir) {
+  //   //   throw new Error(`defaultEnvSetDir config param hasn't been specified on current platform.`);
+  //   // }
+  //   //
+  //   // // use default build dir
+  //   // return this.preHostConfig.defaultEnvSetDir;
+  // }
 
   private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
