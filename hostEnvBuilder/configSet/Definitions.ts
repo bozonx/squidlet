@@ -60,8 +60,8 @@ export default class Definitions {
     const services: {[index: string]: EntityDefinition} = {};
 
     // make devices
-    if (this.configManager.preHostConfig.devices) {
-      for (let id of Object.keys(this.configManager.preHostConfig.devices)) {
+    if (this.configManager.preEntities.devices) {
+      for (let id of Object.keys(this.configManager.preEntities.devices)) {
         devices[id] = this.generateDeviceDef(id);
       }
     }
@@ -72,8 +72,8 @@ export default class Definitions {
     }
 
     // make services
-    if (this.configManager.preHostConfig.services) {
-      for (let entityName of Object.keys(this.configManager.preHostConfig.services)) {
+    if (this.configManager.preEntities.services) {
+      for (let entityName of Object.keys(this.configManager.preEntities.services)) {
         services[entityName] = this.generateServiceDef(entityName);
       }
     }
@@ -86,12 +86,12 @@ export default class Definitions {
   }
 
   private generateDeviceDef(id: string): EntityDefinition {
-    if (!this.configManager.preHostConfig.devices) {
+    if (!this.configManager.preEntities.devices) {
       throw new Error(`Can't find definition of device "${id}"`);
     }
 
-    const deviceDef: {[index: string]: any} = this.configManager.preHostConfig.devices[id];
-    const hostDeviceDefaultProps = this.configManager.preHostConfig.devicesDefaults;
+    const deviceDef: {[index: string]: any} = this.configManager.preEntities.devices[id];
+    const hostDeviceDefaultProps = this.configManager.devicesDefaults;
     const className: string = deviceDef.className;
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('devices', className);
     const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
@@ -115,8 +115,8 @@ export default class Definitions {
    * Generate definitions for all the used drivers even it doesn't have a definition.
    */
   private generateDriverDef(className: string): EntityDefinition {
-    const driverDef: PreEntityDefinition | undefined = this.configManager.preHostConfig.drivers
-      && this.configManager.preHostConfig.drivers[className];
+    const driverDef: PreEntityDefinition | undefined = this.configManager.preEntities.drivers
+      && this.configManager.preEntities.drivers[className];
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('drivers', className);
 
     return {
@@ -131,11 +131,11 @@ export default class Definitions {
   }
 
   private generateServiceDef(id: string): EntityDefinition {
-    if (!this.configManager.preHostConfig.services) {
+    if (!this.configManager.preEntities.services) {
       throw new Error(`Can't find definition of services "${id}"`);
     }
 
-    const serviceDef: PreEntityDefinition = this.configManager.preHostConfig.services[id];
+    const serviceDef: PreEntityDefinition = this.configManager.preEntities.services[id];
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
 
     return {

@@ -11,17 +11,19 @@ import {appendArray} from '../host/helpers/helpers';
 import {servicesShortcut} from './dict/dict';
 import {collectServicesFromShortcuts, convertDefinitions, makeDevicesPlain} from './helpers';
 import {loadMachineConfig} from '../helpers/buildHelpers';
+import PreEntities from './interfaces/PreEntities';
 
 
 export default class ConfigManager {
   // path to plugins specified in config
   readonly plugins: string[] = [];
   readonly tmpBuildDir?: string;
+  // normalized entities from preConfig
+  preEntities: PreEntities = {};
+  // default devices props from preConfig
+  devicesDefaults?: {[index: string]: any};
   get buildDir(): string {
     return this._buildDir as string;
-  }
-  get preHostConfig(): PreHostConfig {
-    return this._preHostConfig as any;
   }
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
@@ -31,8 +33,6 @@ export default class ConfigManager {
   }
 
   private readonly io: Io;
-  // unprocessed host config
-  private _preHostConfig?: PreHostConfig;
   private _hostConfig?: HostConfig;
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
@@ -56,11 +56,17 @@ export default class ConfigManager {
     this._machineConfig = this.loadMachineConfig(preHostConfig);
 
     const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
+    const normalizedConfig: PreHostConfig = this.normalizeHostConfig(mergedConfig);
 
-    this._preHostConfig = this.normalizeHostConfig(mergedConfig);
-    this._hostConfig = this.prepareHostConfig();
+    this.devicesDefaults = normalizedConfig.devicesDefaults;
+    this.preEntities = {
+      devices: normalizedConfig.devices,
+      drivers: normalizedConfig.drivers,
+      services: normalizedConfig.services,
+    };
+    this._hostConfig = this.prepareHostConfig(normalizedConfig);
 
-    appendArray(this.plugins, this.preHostConfig.plugins);
+    appendArray(this.plugins, normalizedConfig.plugins);
     this._buildDir = this.resolveBuildDir();
 
     delete this.hostConfigOrConfigPath;
@@ -103,7 +109,6 @@ export default class ConfigManager {
   private async mergePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
     return _defaultsDeep({},
       preHostConfig,
-      //this.hostDefaults,
       this.machineConfig.hostConfig,
       hostDefaultConfig,
     );
@@ -113,40 +118,38 @@ export default class ConfigManager {
     // use command argument if specified
     if (this._buildDir) return this._buildDir;
 
-    // TODO: review - use defaultEnvDir
+    // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
+    //   // use host's storage dir
+    //   const storageDir = this.preHostConfig.config.storageDir;
+    //
+    //   if (path.isAbsolute(storageDir)) {
+    //     // it's an absolute path
+    //     return storageDir;
+    //   }
+    //   else {
+    //     if (typeof this.hostConfigOrConfigPath !== 'string') {
+    //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
+    //     }
+    //
+    //     // storageDir is relative path - make it absolute, use config file dir as a root
+    //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
+    //   }
+    // }
 
-    if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
-      // use host's storage dir
-      const storageDir = this.preHostConfig.config.storageDir;
-
-      if (path.isAbsolute(storageDir)) {
-        // it's an absolute path
-        return storageDir;
-      }
-      else {
-        if (typeof this.hostConfigOrConfigPath !== 'string') {
-          throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
-        }
-
-        // storageDir is relative path - make it absolute, use config file dir as a root
-        return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
-      }
-    }
-
-    if (!this.preHostConfig.defaultStorageDir) {
-      throw new Error(`defaultStorageDir config param hasn't been specified on current platform.`);
+    if (!this.preHostConfig.defaultEnvSetDir) {
+      throw new Error(`defaultEnvSetDir config param hasn't been specified on current platform.`);
     }
 
     // use default build dir
-    return this.preHostConfig.defaultStorageDir;
+    return this.preHostConfig.defaultEnvSetDir;
   }
 
-  private prepareHostConfig(): HostConfig {
+  private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
-      id: this.preHostConfig.id as string,
-      platform: this.preHostConfig.platform as string,
-      machine: this.preHostConfig.machine as string,
-      config: this.preHostConfig.config as HostConfigConfig,
+      id: normalizedConfig.id as string,
+      platform: normalizedConfig.platform as string,
+      machine: normalizedConfig.machine as string,
+      config: normalizedConfig.config as HostConfigConfig,
     };
   }
 

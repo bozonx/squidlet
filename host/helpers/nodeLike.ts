@@ -18,7 +18,7 @@ export function pathJoin (...paths: string[]): string {
   return prepared.join(SEP);
 }
 
-export function isAbsolutePath(pathToDirOrFile: string): boolean {
+export function pathIsAbsolute(pathToDirOrFile: string): boolean {
   return Boolean(pathToDirOrFile.match(/^\//));
   //return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
 }

@@ -1,6 +1,6 @@
 import {PATH_SEPARATOR} from './helpers';
 import {trimEnd} from './lodashLike';
-import {pathDirname, pathBasename, isAbsolutePath} from './nodeLike';
+import {pathDirname, pathBasename, pathIsAbsolute} from './nodeLike';
 
 
 export default async function mkdirPLogic (
@@ -8,7 +8,7 @@ export default async function mkdirPLogic (
   isDirExists: (dirName: string) => Promise<boolean>,
   mkdir: (dirName: string) => Promise<void>
 ): Promise<boolean> {
-  if (!isAbsolutePath(pathToDir)) {
+  if (!pathIsAbsolute(pathToDir)) {
     throw new Error(`path "${pathToDir}" has to be absolute`);
   }
 

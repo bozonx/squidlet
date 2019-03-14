@@ -81,9 +81,13 @@ describe.only 'envBuilder.ConfigManager', ->
 
     assert.equal(@configManager.buildDir, @buildDir)
     assert.equal(@configManager.tmpBuildDir, @tmpDir)
-    assert.deepEqual(@configManager.preHostConfig, @preHostConfig)
+    assert.deepEqual(@configManager.preHostConfig, {
+
+    })
     assert.deepEqual(@configManager.machineConfig, @machineConfig)
-    assert.deepEqual(@configManager.hostConfig, {})
+#    assert.deepEqual(@configManager.hostConfig, {
+#
+#    })
 
 
 

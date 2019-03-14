@@ -40,9 +40,9 @@ export default class UsedEntities {
 
 
   async generate() {
-    await this.proceedDefinitions('devices', this.configManager.preHostConfig.devices);
-    await this.proceedDefinitions('drivers', this.configManager.preHostConfig.drivers);
-    await this.proceedDefinitions('services', this.configManager.preHostConfig.services);
+    await this.proceedDefinitions('devices', this.configManager.preEntities.devices);
+    await this.proceedDefinitions('drivers', this.configManager.preEntities.drivers);
+    await this.proceedDefinitions('services', this.configManager.preEntities.services);
   }
 
   getUsedDevs(): string[] {
