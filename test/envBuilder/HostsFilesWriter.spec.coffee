@@ -1,9 +1,9 @@
 path = require('path')
 
-HostsFilesWriter = require('../../buildHostEnv/hostEnv/HostsFilesWriter').default
+HostsFilesWriter = require('../../hostEnvBuilder/hostEnv/HostsFilesWriter').default
 
 
-describe 'configWorks.HostsFilesWriter', ->
+describe 'envBuilder.HostsFilesWriter', ->
   beforeEach ->
     @definitionsSet = {
       systemDrivers: 'systemDrivers'

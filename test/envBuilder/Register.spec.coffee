@@ -1,7 +1,7 @@
-Register = require('../../buildHostEnv/entities/Register').default
+Register = require('../../hostEnvBuilder/entities/Register').default
 
 
-describe.only 'configWorks.Register', ->
+describe.only 'envBuilder.Register', ->
   beforeEach ->
     @plugin = sinon.spy()
     @entity = {

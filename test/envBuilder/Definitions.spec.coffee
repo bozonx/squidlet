@@ -1,8 +1,8 @@
-Definitions = require('../../buildHostEnv/hostEnv/Definitions').default
-hostDefaultConfig = require('../../buildHostEnv/configs/hostDefaultConfig').default
+Definitions = require('../../hostEnvBuilder/configSet/Definitions').default
+hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
 
 
-describe 'configWorks.Definitions', ->
+describe 'envBuilder.Definitions', ->
   beforeEach ->
     @main = {
       configManager: {

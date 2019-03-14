@@ -1,9 +1,9 @@
-MasterConfig = require('../../buildHostEnv/MasterConfig').default
-hostDefaultConfig = require('../../buildHostEnv/configs/hostDefaultConfig').default
-systemConfig = require('../../buildHostEnv/configs/systemConfig').default
+MasterConfig = require('../../hostEnvBuilder/ConfigManager').default
+hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
+systemConfig = require('../../hostEnvBuilder/configs/systemConfig').default
 
 
-describe 'configWorks.MasterConfig', ->
+describe 'envBuilder.ConfigManager', ->
   beforeEach ->
     @preMasterHostConfig = {
       platform: 'rpi'
