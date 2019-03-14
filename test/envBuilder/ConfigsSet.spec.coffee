@@ -1,9 +1,9 @@
 path = require('path')
 
-HostsFilesSet = require('../../hostEnvBuilder/hostEnv/HostsFilesSet').default
+HostsFilesSet = require('../../hostEnvBuilder/configSet/ConfigsSet').default
 
 
-describe 'envBuilder.HostsFilesSet', ->
+describe 'envBuilder.ConfigsSet', ->
   beforeEach ->
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
