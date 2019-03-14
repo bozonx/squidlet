@@ -1,4 +1,4 @@
-Switch = require('../../host/src/devices/Switch/Switch').default
+Switch = require('../../../entities/devices/Switch/Switch').default
 
 
 describe 'devices.Switch', ->

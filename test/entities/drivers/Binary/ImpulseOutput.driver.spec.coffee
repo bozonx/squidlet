@@ -1,4 +1,4 @@
-ImpulseOutput = require('../../../host/src/drivers/Binary/ImpulseOutput.driver').default
+ImpulseOutput = require('../../../entities/drivers/Binary/ImpulseOutput.driver').default
 
 
 describe 'ImpulseOutput.driver', ->

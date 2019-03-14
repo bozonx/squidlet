@@ -1,4 +1,4 @@
-BinarySensor = require('../../host/src/devices/BinarySensor/BinarySensor').default
+BinarySensor = require('../../../entities/devices/BinarySensor/BinarySensor').default
 
 
 describe 'devices.BinarySensor', ->

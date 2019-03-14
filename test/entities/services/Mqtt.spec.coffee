@@ -1,4 +1,4 @@
-Mqtt = require('../../host/src/services/Mqtt/Mqtt.ts').default
+Mqtt = require('../../../entities/services/Mqtt/Mqtt.ts').default
 
 
 describe 'services.Mqtt', ->
