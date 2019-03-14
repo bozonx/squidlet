@@ -13,7 +13,6 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import Io from '../Io';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
-import {Stats} from '../../host/interfaces/dev/StorageDev';
 
 
 /**
