@@ -1,5 +1,6 @@
-import {PATH_SEPARATOR, dirname, basename, isAbsolutePath} from './helpers';
+import {PATH_SEPARATOR} from './helpers';
 import {trimEnd} from './lodashLike';
+import {dirname, basename, isAbsolutePath} from './nodeLike';
 
 
 export default async function mkdirPLogic (

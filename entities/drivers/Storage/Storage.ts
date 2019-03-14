@@ -25,34 +25,43 @@ export class Storage extends DriverBase {
 
   async isDir(pathToDir: string): Promise<boolean> {
     const absPath: string = pathJoin(this.rootDir, pathToDir);
-    const stats: Stats = await this.storageDev.stat(pathToDir);
+    const stats: Stats = await this.storageDev.stat(absPath);
 
     return stats.dir;
   }
 
   async isFile(pathToFile: string) {
-    const stats: Stats = await this.storageDev.stat(pathToFile);
+    const absPath: string = pathJoin(this.rootDir, pathToFile);
+    const stats: Stats = await this.storageDev.stat(absPath);
 
     return !stats.dir;
   }
 
   isExists(pathToFileOrDir: string): Promise<boolean> {
-    return this.storageDev.exists(pathToFileOrDir);
+    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
+
+    return this.storageDev.exists(absPath);
   }
 
   readFile(pathToFile: string): Promise<string> {
-    return this.storageDev.readFile(pathToFile);
+    const absPath: string = pathJoin(this.rootDir, pathToFile);
+
+    return this.storageDev.readFile(absPath);
   }
 
   readBinFile(pathToFile: string): Promise<Uint8Array> {
-    return this.storageDev.readBinFile(pathToFile);
+    const absPath: string = pathJoin(this.rootDir, pathToFile);
+
+    return this.storageDev.readBinFile(absPath);
   }
 
   /**
    * Read files and dirs of dir
    */
   readDir(pathToDir: string): Promise<string[]> {
-    return this.storageDev.readdir(pathToDir);
+    const absPath: string = pathJoin(this.rootDir, pathToDir);
+
+    return this.storageDev.readdir(absPath);
   }
 
   // TODO: add loadJson
@@ -64,29 +73,36 @@ export class Storage extends DriverBase {
   // }
 
   writeFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
-    return this.storageDev.writeFile(pathToFile, data);
+    const absPath: string = pathJoin(this.rootDir, pathToFile);
+
+    return this.storageDev.writeFile(absPath, data);
   }
 
   /**
    * Remove only a file of an empty dir
    */
   async rm(pathToFileOrDir: string) {
+    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
     const stats: Stats = await this.storageDev.stat(pathToFileOrDir);
 
     if (stats.dir) {
-      return this.storageDev.rmdir(pathToFileOrDir);
+      return this.storageDev.rmdir(absPath);
     }
     else {
-      return this.storageDev.unlink(pathToFileOrDir);
+      return this.storageDev.unlink(absPath);
     }
   }
 
   appendFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
-    return this.storageDev.appendFile(pathToFile, data);
+    const absPath: string = pathJoin(this.rootDir, pathToFile);
+
+    return this.storageDev.appendFile(absPath, data);
   }
 
   stat(pathToFileOrDir: string): Promise<Stats> {
-    return this.storageDev.stat(pathToFileOrDir);
+    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
+
+    return this.storageDev.stat(absPath);
   }
 
 
@@ -101,8 +117,10 @@ export class Storage extends DriverBase {
   }
 
   async rename(pathToFileOrDir: string, newName: string): Promise<void> {
-    // TODO: !!!!
-    // TODO: !!!! support dirs
+    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir)
+    const fileDir: string = path
+
+    return this.storageDev.rename(absPath);
   }
 
   /**
@@ -120,27 +138,27 @@ export class Storage extends DriverBase {
   }
 
 
-  async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
-    const filePath = path.join(__storageDir, fileName);
-    const fileContent: string = await callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
+  // async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
+  //   const filePath = path.join(__storageDir, fileName);
+  //   const fileContent: string = await callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
+  //
+  //   return JSON.parse(fileContent);
+  // }
+  //
+  // readStringFile(fileName: string): Promise<string> {
+  //   const filePath = path.join(__storageDir, fileName);
+  //
+  //   return callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
+  // }
 
-    return JSON.parse(fileContent);
-  }
+  // async readBinFile(fileName: string): Promise<Uint8Array> {
+  //   const buffer: Buffer = await callPromised(fs.readFile, path.join(__storageDir, fileName));
+  //
+  //   return convertBufferToUint8Array(buffer);
+  // }
 
-  readStringFile(fileName: string): Promise<string> {
-    const filePath = path.join(__storageDir, fileName);
-
-    return callPromised(fs.readFile, filePath, {encoding: DEFAULT_ENCODING});
-  }
-
-  async readBinFile(fileName: string): Promise<Uint8Array> {
-    const buffer: Buffer = await callPromised(fs.readFile, path.join(__storageDir, fileName));
-
-    return convertBufferToUint8Array(buffer);
-  }
-
-  async requireFile(fileName: string): Promise<any> {
-    return require(path.join(__storageDir, fileName));
-  }
+  // async requireFile(fileName: string): Promise<any> {
+  //   return require(path.join(__storageDir, fileName));
+  // }
 
 }

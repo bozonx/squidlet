@@ -240,26 +240,6 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
   return keys[valueIndex];
 }
 
-// TODO: move to nodeLike
-
-export function isAbsolutePath(pathToDirOrFile: string): boolean {
-  return Boolean(pathToDirOrFile.match(/^\//));
-}
-
-export function dirname(pathToDirOrFile: string): string {
-  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
-
-  pathParts.pop();
-
-  return pathParts.join(PATH_SEPARATOR);
-}
-
-export function basename(pathToDirOrFile: string): string {
-  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
-
-  return pathParts[pathParts.length - 1];
-}
-
 /**
  * Deep merge two objects.
  * It mutates target object.

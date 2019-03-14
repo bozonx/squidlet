@@ -1,3 +1,5 @@
+import {PATH_SEPARATOR} from './helpers';
+
 const SEP = '/';
 
 
@@ -15,6 +17,25 @@ export function pathJoin (...paths: string[]): string {
 
   return prepared.join(SEP);
 }
+
+export function isAbsolutePath(pathToDirOrFile: string): boolean {
+  return Boolean(pathToDirOrFile.match(/^\//));
+}
+
+export function dirname(pathToDirOrFile: string): string {
+  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
+
+  pathParts.pop();
+
+  return pathParts.join(PATH_SEPARATOR);
+}
+
+export function basename(pathToDirOrFile: string): string {
+  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
+
+  return pathParts[pathParts.length - 1];
+}
+
 
 // export function isAbsoluteFileName(fileName: string): boolean {
 //   return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
