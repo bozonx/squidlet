@@ -1,4 +1,4 @@
-I2cData = require('../../../entities/drivers/I2c/I2cData.driver').default
+I2cData = require('../../../entities/drivers/I2cData/I2cData').default
 helpers = require('../../../host/helpers/helpers')
 
 

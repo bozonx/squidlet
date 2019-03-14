@@ -1,4 +1,4 @@
-I2cSlave = require('../../../entities/drivers/I2c/I2cSlave.driver').default
+I2cSlave = require('../../../entities/drivers/I2cSlave/I2cSlave').default
 
 
 describe 'I2cSlave.driver', ->

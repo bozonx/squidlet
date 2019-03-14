@@ -1,4 +1,4 @@
-DigitalPinInput = require('../../../entities/drivers/DigitalPin/DigitalPinInput.driver').default
+DigitalPinInput = require('../../../entities/drivers/DigitalPinInput/DigitalPinInput').default
 
 
 describe 'DigitalPinInput.driver', ->

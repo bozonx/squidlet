@@ -1,4 +1,4 @@
-BinaryOutput = require('.../../../entities/drivers/Binary/BinaryOutput.driver').default
+BinaryOutput = require('.../../../entities/drivers/BinaryOutput/BinaryOutput').default
 
 
 describe 'BinaryOutput.driver', ->

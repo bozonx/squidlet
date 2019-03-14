@@ -1,4 +1,4 @@
-BinaryInput = require('../../../entities/drivers/Binary/BinaryInput.driver').default
+BinaryInput = require('../../../entities/drivers/BinaryInput/BinaryInput').default
 
 
 describe 'BinaryInput.driver', ->

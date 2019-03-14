@@ -1,4 +1,4 @@
-ImpulseInput = require('../../../entities/drivers/Binary/ImpulseInput.driver').default
+ImpulseInput = require('../../../entities/drivers/ImpulseInput/ImpulseInput').default
 
 
 describe 'ImpulseInput.driver', ->

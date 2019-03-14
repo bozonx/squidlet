@@ -1,4 +1,4 @@
-I2cMaster = require('../../../entities/drivers/I2c/I2cMaster.driver').default
+I2cMaster = require('../../../entities/drivers/I2cMaster/I2cMaster').default
 
 
 describe 'I2cMaster.driver', ->
