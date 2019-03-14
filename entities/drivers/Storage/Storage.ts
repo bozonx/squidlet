@@ -4,10 +4,9 @@ import {pathJoin} from '../../../host/helpers/nodeLike';
 import systemConfig from '../../../host/config/systemConfig';
 
 
-// TODO: это файлы постоянного хранения, не кэш и не логи.
-//   В отдельной папку в фс для постоянных файлов
-
-
+/**
+ * Shared variable data storage
+ */
 export class Storage extends DriverBase {
   private rootDir: string = '';
   private get storageDev(): StorageDev {
@@ -21,10 +20,11 @@ export class Storage extends DriverBase {
       this.env.config.config.dataDir,
       systemConfig.storageDirs.common,
     );
-  };
+  }
 
 
   async isDir(pathToDir: string): Promise<boolean> {
+    const absPath: string = pathJoin(this.rootDir, pathToDir);
     const stats: Stats = await this.storageDev.stat(pathToDir);
 
     return stats.dir;
