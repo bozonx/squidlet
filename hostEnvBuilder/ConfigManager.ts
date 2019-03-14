@@ -23,11 +23,11 @@ export default class ConfigManager {
   get preHostConfig(): PreHostConfig {
     return this._preHostConfig as any;
   }
-  get hostConfig(): HostConfig {
-    return this._hostConfig as any;
-  }
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
+  }
+  get hostConfig(): HostConfig {
+    return this._hostConfig as any;
   }
 
   private readonly io: Io;
@@ -53,9 +53,7 @@ export default class ConfigManager {
 
     if (validateError) throw new Error(`Invalid host config: ${validateError}`);
 
-    const platformDirName = path.resolve(__dirname, `../${preHostConfig.platform}`);
-
-    this._machineConfig = loadMachineConfig(platformDirName, preHostConfig.machine as string);
+    this._machineConfig = this.loadMachineConfig(preHostConfig);
 
     const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
 
@@ -150,6 +148,12 @@ export default class ConfigManager {
       machine: this.preHostConfig.machine as string,
       config: this.preHostConfig.config as HostConfigConfig,
     };
+  }
+
+  private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
+    const platformDirName = path.resolve(__dirname, `../${preHostConfig.platform}`);
+
+    return loadMachineConfig(platformDirName, preHostConfig.machine as string);
   }
 
 }
