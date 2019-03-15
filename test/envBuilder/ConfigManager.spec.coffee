@@ -3,7 +3,7 @@ hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').de
 systemConfig = require('../../hostEnvBuilder/configs/systemConfig').default
 
 
-describe.only 'envBuilder.ConfigManager', ->
+describe 'envBuilder.ConfigManager', ->
   beforeEach ->
     @io = {}
     @preHostConfig = {
