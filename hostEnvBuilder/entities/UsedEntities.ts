@@ -105,10 +105,8 @@ export default class UsedEntities {
    */
   private async proceedDefinitions(
     pluralType: ManifestsTypePluralName,
-    definitions?: {[index: string]: PreEntityDefinition}
+    definitions: {[index: string]: PreEntityDefinition}
   ) {
-    if (!definitions) return;
-
     for (let entityId of Object.keys(definitions)) {
       const className: string = definitions[entityId].className;
 

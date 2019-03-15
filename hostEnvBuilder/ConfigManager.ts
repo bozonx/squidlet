@@ -19,7 +19,11 @@ export default class ConfigManager {
   readonly plugins: string[] = [];
   readonly tmpBuildDir?: string;
   // normalized entities from preConfig
-  preEntities: PreEntities = {};
+  preEntities: PreEntities = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   get buildDir(): string {
@@ -60,9 +64,9 @@ export default class ConfigManager {
 
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     this.preEntities = {
-      devices: normalizedConfig.devices,
-      drivers: normalizedConfig.drivers,
-      services: normalizedConfig.services,
+      devices: normalizedConfig.devices || {},
+      drivers: normalizedConfig.drivers || {},
+      services: normalizedConfig.services || {},
     };
     this._hostConfig = this.prepareHostConfig(normalizedConfig);
 

@@ -47,6 +47,8 @@ describe.only 'envBuilder.ConfigManager', ->
           className: 'Switch'
         }
       }
+      drivers: {}
+      services: {}
     })
     assert.deepEqual(@configManager.machineConfig, @machineConfig)
     assert.deepEqual(@configManager.devicesDefaults, {})
