@@ -13,6 +13,9 @@ describe.only 'envBuilder.ConfigManager', ->
       config: {
         hostParam: 1
       },
+      devicesDefaults: {
+        defaultParam: 1
+      }
       devices: {
         myDevice: {
           device: 'Switch'
@@ -51,47 +54,27 @@ describe.only 'envBuilder.ConfigManager', ->
       services: {}
     })
     assert.deepEqual(@configManager.machineConfig, @machineConfig)
-    assert.deepEqual(@configManager.devicesDefaults, {})
-#    assert.deepEqual(@configManager.hostConfig, {
-#
-#    })
+    assert.deepEqual(@configManager.devicesDefaults, @preHostConfig.devicesDefaults)
+    assert.deepEqual(@configManager.hostConfig, {
+      config: {
+        defaultConfigRepublishIntervalMs: 600000
+        defaultStatusRepublishIntervalMs: 60000
+        logLevel: 'info'
+        senderResendTimeout: 1
+        senderTimeout: 60
+
+        platformParam: 1
+        hostParam: 1
+      }
+      id: 'myHost'
+      machine: 'rpi'
+      platform: 'nodejs'
+    })
 
 
 
 #  it 'buildDir on init', ->
 #    assert.equal(@configManager.buildDir, '/myDir')
-#
-#  it 'getHostsIds', ->
-#    assert.deepEqual(@configManager.getHostsIds(), [ 'master' ])
-#
-#  it 'getPreHostConfig', ->
-#    assert.deepEqual @configManager.getPreHostConfig('master'), {
-#      @preMasterHostConfig...
-#      hostDefaultConfig...
-#      @configManager.hostDefaults...
-#      @configManager.getPlatformConfig().hostConfig...
-#      config: {
-#        @preMasterHostConfig.config...
-#        hostDefaultConfig.config...
-#        @configManager.hostDefaults.config...
-#        @configManager.getPlatformConfig().hostConfig.config...
-#      }
-#    }
-#
-#  it 'getFinalHostConfig', ->
-#    assert.deepEqual @configManager.getFinalHostConfig('master'), {
-#      id: 'master'
-#      platform: 'rpi'
-#      config: {
-#        @preMasterHostConfig.config...
-#        hostDefaultConfig.config...
-#        @configManager.hostDefaults.config...
-#        @configManager.getPlatformConfig().hostConfig.config...
-#      }
-#    }
-#
-#  it 'getHostPlatformDevs', ->
-#    assert.deepEqual @configManager.getHostPlatformDevs('master'), ['Storage']
 #
 #  it 'buildDir - use defaults if there is not storage dir of configWorks config', ->
 #    @configManager.preHosts.master.config.storageDir = undefined
