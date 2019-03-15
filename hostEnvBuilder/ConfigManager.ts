@@ -26,6 +26,7 @@ export default class ConfigManager {
   };
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
+  // env build dir
   get buildDir(): string {
     return this._buildDir as string;
   }
@@ -41,13 +42,13 @@ export default class ConfigManager {
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
   private hostConfigOrConfigPath: string | PreHostConfig;
-  private readonly _buildDir: string;
+  private _buildDir?: string;
 
 
-  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absBuildDir: string, tmpBuildDir?: string) {
+  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absEnvBuildDir?: string, tmpBuildDir?: string) {
     this.io = io;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
-    this._buildDir = absBuildDir;
+    this._buildDir = absEnvBuildDir;
     this.tmpBuildDir = tmpBuildDir;
   }
 
@@ -69,10 +70,9 @@ export default class ConfigManager {
       services: normalizedConfig.services || {},
     };
     this._hostConfig = this.prepareHostConfig(normalizedConfig);
+    this._buildDir = this.resolveBuildDir(normalizedConfig);
 
     appendArray(this.plugins, normalizedConfig.plugins);
-    //this._buildDir = this.resolveBuildDir();
-    //this._buildDir = this.resolveBuildDir();
 
     delete this.hostConfigOrConfigPath;
   }
@@ -119,35 +119,35 @@ export default class ConfigManager {
     );
   }
 
-  // private resolveBuildDir(): string {
-  //   // use command argument if specified
-  //   if (this._buildDir) return this._buildDir;
-  //
-  //   // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
-  //   //   // use host's storage dir
-  //   //   const storageDir = this.preHostConfig.config.storageDir;
-  //   //
-  //   //   if (path.isAbsolute(storageDir)) {
-  //   //     // it's an absolute path
-  //   //     return storageDir;
-  //   //   }
-  //   //   else {
-  //   //     if (typeof this.hostConfigOrConfigPath !== 'string') {
-  //   //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
-  //   //     }
-  //   //
-  //   //     // storageDir is relative path - make it absolute, use config file dir as a root
-  //   //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
-  //   //   }
-  //   // }
-  //
-  //   // if (!this.preHostConfig.defaultEnvSetDir) {
-  //   //   throw new Error(`defaultEnvSetDir config param hasn't been specified on current platform.`);
-  //   // }
-  //   //
-  //   // // use default build dir
-  //   // return this.preHostConfig.defaultEnvSetDir;
-  // }
+  private resolveBuildDir(normalizedConfig: PreHostConfig): string {
+    // use command argument if specified
+    if (this._buildDir) return this._buildDir;
+
+    // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
+    //   // use host's storage dir
+    //   const storageDir = this.preHostConfig.config.storageDir;
+    //
+    //   if (path.isAbsolute(storageDir)) {
+    //     // it's an absolute path
+    //     return storageDir;
+    //   }
+    //   else {
+    //     if (typeof this.hostConfigOrConfigPath !== 'string') {
+    //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
+    //     }
+    //
+    //     // storageDir is relative path - make it absolute, use config file dir as a root
+    //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
+    //   }
+    // }
+
+    if (!normalizedConfig.config || !normalizedConfig.config.envSetDir) {
+      throw new Error(`envSetDir config param hasn't been specified on current platform.`);
+    }
+
+    // use default build dir
+    return normalizedConfig.config.envSetDir;
+  }
 
   private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {

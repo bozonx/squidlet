@@ -4,9 +4,10 @@ import LogLevel from './LogLevel';
 
 export interface HostConfigConfig {
   // path to dir where various data will be placed
-  dataDir: string;
+  varDataDir: string;
   // path to configs and entities on host
   envSetDir: string;
+
   logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
   defaultStatusRepublishIntervalMs: number;
@@ -16,19 +17,21 @@ export interface HostConfigConfig {
   senderTimeout: number;
   // resend timeout in seconds
   senderResendTimeout: number;
-  drivers: {
-    // debounce of digital input in ms
-    //defaultDigitalPinInputDebounce: number;
-    // default poll interval for master-slave connections
-    //defaultPollInterval: number;
-  };
-  // custom params
-  params: {[index: string]: any};
 
-  network: {
-    routedMessageTTL: number;
-    requestTimeout: number;
-  };
+  // custom params
+  //params: {[index: string]: any};
+
+  // network: {
+  //   routedMessageTTL: number;
+  //   requestTimeout: number;
+  // };
+
+  // drivers: {
+  //   // debounce of digital input in ms
+  //   //defaultDigitalPinInputDebounce: number;
+  //   // default poll interval for master-slave connections
+  //   //defaultPollInterval: number;
+  // };
 }
 
 

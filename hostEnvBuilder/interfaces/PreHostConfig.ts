@@ -9,10 +9,6 @@ export default interface PreHostConfig {
   id?: string;
   platform?: Platforms;
   machine?: string;
-  // default placement of various data dir specific for each platform
-  defaultVarDataDir?: string;
-  // default placement of various data dir specific for each platform
-  defaultEnvSetDir?: string;
 
   plugins?: string[];
 
@@ -21,7 +17,10 @@ export default interface PreHostConfig {
   // specific config for each host
   config?: {
     // path to host's various data dir. It can be absolute or relative of master config file
-    dataDir?: string;
+    varDataDir?: string;
+    // path to host's configs and entities
+    envSetDir?: string;
+
     logLevel?: LogLevel;
     // republish status silently every minute if it hasn't been changed
     defaultStatusRepublishIntervalMs?: number;
@@ -31,8 +30,9 @@ export default interface PreHostConfig {
     senderTimeout?: number;
     // resend timeout in seconds
     senderResendTimeout?: number;
+
     // custom params
-    params?: {[index: string]: any};
+    //params?: {[index: string]: any};
 
     // network?: {
     //   routedMessageTTL: number;

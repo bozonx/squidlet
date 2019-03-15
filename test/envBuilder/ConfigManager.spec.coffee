@@ -25,9 +25,8 @@ describe.only 'envBuilder.ConfigManager', ->
     @machineConfig = {
       devs: ['Storage']
       hostConfig: {
-        defaultVarDataDir: '~/.squidlet/data',
-        defaultEnvSetDir: '~/.squidlet/envSet',
         config: {
+          envSetDir: '/path/to/env'
           platformParam: 1
         },
       }
@@ -35,9 +34,8 @@ describe.only 'envBuilder.ConfigManager', ->
     @buildDir = '/buildDir'
     @tmpDir = '/tmpDir'
 
-    @configManager = new ConfigManager(@io, @preHostConfig, @buildDir, @tmpDir)
-
   it 'init', ->
+    @configManager = new ConfigManager(@io, @preHostConfig, @buildDir, @tmpDir)
     @configManager.loadMachineConfig = () => @machineConfig
 
     await @configManager.init()
@@ -63,6 +61,7 @@ describe.only 'envBuilder.ConfigManager', ->
         senderResendTimeout: 1
         senderTimeout: 60
 
+        envSetDir: @machineConfig.hostConfig.config.envSetDir
         platformParam: 1
         hostParam: 1
       }
@@ -71,20 +70,10 @@ describe.only 'envBuilder.ConfigManager', ->
       platform: 'nodejs'
     })
 
+  it 'use buildDir from config', ->
+    @configManager = new ConfigManager(@io, @preHostConfig)
+    @configManager.loadMachineConfig = () => @machineConfig
 
+    await @configManager.init()
 
-#  it 'buildDir on init', ->
-#    assert.equal(@configManager.buildDir, '/myDir')
-#
-#  it 'buildDir - use defaults if there is not storage dir of configWorks config', ->
-#    @configManager.preHosts.master.config.storageDir = undefined
-#
-#    assert.equal(@configManager.generateBuildDir(@pathToMasterConfig), systemConfig.defaultBuildDir)
-#
-#  it 'buildDir - use configWorks\'s absolute storageDir', ->
-#    assert.equal(@configManager.generateBuildDir(@pathToMasterConfig), @preMasterHostConfig.config.storageDir)
-#
-#  it 'buildDir - use configWorks\'s relative storageDir', ->
-#    @configManager.preHosts.master.config.storageDir = './myDir'
-#
-#    assert.equal(@configManager.generateBuildDir(@pathToMasterConfig), '/path/to/myDir')
+    assert.equal(@configManager.buildDir, @machineConfig.hostConfig.config.envSetDir)

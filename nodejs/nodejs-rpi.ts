@@ -21,9 +21,9 @@ const platformConfig: MachineConfig = {
   ],
 
   hostConfig: {
-    defaultVarDataDir: '~/.squidlet/data',
-    defaultEnvSetDir: '~/.squidlet/envSet',
     config: {
+      varDataDir: '~/.squidlet/data',
+      envSetDir: '~/.squidlet/envSet',
     },
     drivers: {
       'I2cMaster': {

@@ -21,9 +21,9 @@ const platformConfig: MachineConfig = {
   ],
 
   hostConfig: {
-    defaultVarDataDir: '/varData',
-    defaultEnvSetDir: '/envSet',
     config: {
+      varDataDir: '/varData',
+      envSetDir: '/envSet',
     },
     drivers: {
       'I2cMaster': {
