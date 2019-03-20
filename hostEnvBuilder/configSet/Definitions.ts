@@ -67,10 +67,6 @@ export default class Definitions {
     const className: string = deviceDef.className;
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('devices', className);
 
-    // TODO: remake
-    // const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
-    //   && hostDeviceDefaultProps[className];
-
     return {
       id,
       className,
@@ -79,7 +75,7 @@ export default class Definitions {
         _omit(deviceDef, 'className'),
 
         // host's defaults
-        //deviceHostDefaults,
+        hostDeviceDefaultProps && hostDeviceDefaultProps[className],
 
         // manifest's defaults
         this.collectManifestPropsDefaults(entitySet.manifest.props),
