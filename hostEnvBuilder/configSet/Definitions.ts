@@ -1,10 +1,9 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _omit = require('lodash/omit');
-import _isEmpty = require('lodash/isEmpty');
 
 import EntityDefinition, {EntitiesDefinitions} from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet from '../interfaces/SrcEntitiesSet';
 import ConfigManager from '../ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 
@@ -42,11 +41,9 @@ export default class Definitions {
   generate() {
     const { devices, drivers, services } = this.prepareEntities();
 
-    if (!_isEmpty(devices)) this.devicesDefinitions = devices;
-
-    if (!_isEmpty(drivers)) this.driversDefinitions = drivers;
-
-    if (!_isEmpty(services)) this.servicesDefinitions = services;
+    this.devicesDefinitions = devices;
+    this.driversDefinitions = drivers;
+    this.servicesDefinitions = services;
   }
 
 

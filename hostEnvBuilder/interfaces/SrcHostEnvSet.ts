@@ -1,4 +1,4 @@
-import SrcEntitiesSet from './SrcEntitiesSet';
+import {SrcEntitiesSet} from './SrcEntitiesSet';
 import HostConfigSet from './HostConfigSet';
 
 

@@ -1,6 +1,6 @@
 import _values = require('lodash/values');
 
-import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet, {SrcEntitiesSet} from '../interfaces/SrcEntitiesSet';
 import {sortByIncludeInList} from '../helpers';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import Definitions from './Definitions';
@@ -47,6 +47,9 @@ export default class ConfigsSet {
    * Get set of entities of specified host with absolute path to source files.
    */
   generateSrcEntitiesSet(): SrcEntitiesSet {
+
+    // TODO: почему бы не взять одним вызовом из this.usedEntities?
+
     const result: SrcEntitiesSet = {
       devices: {},
       drivers: {},

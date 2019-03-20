@@ -2,7 +2,7 @@ import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import IndexedEvents from '../../host/helpers/IndexedEvents';
 import Register from './Register';
 import ConfigManager from '../ConfigManager';
-import SrcEntitiesSet from '../interfaces/SrcEntitiesSet';
+import {SrcEntitiesSet} from '../interfaces/SrcEntitiesSet';
 import UsedEntities from './UsedEntities';
 import MachineConfig from '../interfaces/MachineConfig';
 

@@ -9,7 +9,7 @@ import Register from './Register';
 import Logger from '../interfaces/Logger';
 import buildEntity from './buildEntity';
 import UsedEntities, {EntitiesNames} from './UsedEntities';
-import {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet from '../interfaces/SrcEntitiesSet';
 
 
 /**

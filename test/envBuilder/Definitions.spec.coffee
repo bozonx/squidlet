@@ -1,5 +1,5 @@
 Definitions = require('../../hostEnvBuilder/configSet/Definitions').default
-hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
+#hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
 
 
 describe.only 'envBuilder.Definitions', ->
@@ -89,36 +89,36 @@ describe.only 'envBuilder.Definitions', ->
 
     sinon.assert.calledOnce(@definitions.checkDefinitions)
 
-  describe 'checkDefinitions', ->
-    beforeEach ->
-      @entitiesSet = {
-        # the same for devices and services
-        drivers: {
-          'Some': {
-            manifest: {
-              name: 'Some'
-            }
-            main: './main.ts'
-            files: []
-          }
-        }
-      }
-      @definitions.main.entities = {
-        getEntitiesSet: => @entitiesSet
-      }
-      @definitions.driversDefinitions = {
-        master: {
-          'Some': {
-            className: 'Some'
-          }
-        }
-      }
-
-    it 'ok', ->
-      assert.doesNotThrow(() =>  @definitions.checkDefinitions())
-
-
-    it 'fail', ->
-      @entitiesSet.drivers = {}
-
-      assert.throws(() => @definitions.checkDefinitions())
+#  describe 'checkDefinitions', ->
+#    beforeEach ->
+#      @entitiesSet = {
+#        # the same for devices and services
+#        drivers: {
+#          'Some': {
+#            manifest: {
+#              name: 'Some'
+#            }
+#            main: './main.ts'
+#            files: []
+#          }
+#        }
+#      }
+#      @definitions.main.entities = {
+#        getEntitiesSet: => @entitiesSet
+#      }
+#      @definitions.driversDefinitions = {
+#        master: {
+#          'Some': {
+#            className: 'Some'
+#          }
+#        }
+#      }
+#
+#    it 'ok', ->
+#      assert.doesNotThrow(() =>  @definitions.checkDefinitions())
+#
+#
+#    it 'fail', ->
+#      @entitiesSet.drivers = {}
+#
+#      assert.throws(() => @definitions.checkDefinitions())

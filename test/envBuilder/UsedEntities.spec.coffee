@@ -131,6 +131,15 @@ describe 'envBuilder.UsedEntities', ->
       }
     })
 
+  it 'generate and getEntitiesNames', ->
+    await @usedEntities.generate()
+
+    assert.deepEqual(@usedEntities.getEntitiesNames(), {
+      devices: ['DeviceClass']
+      drivers: ['DepDriver', 'MyDriver']
+      services: ['MyService']
+    })
+
   it 'generate and getUsedDevs', ->
     await @usedEntities.generate()
 

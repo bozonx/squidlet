@@ -4,7 +4,7 @@ import * as path from 'path';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../ConfigManager';
-import SrcEntitiesSet, {SrcEntitySet} from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet, {SrcEntitiesSet} from '../interfaces/SrcEntitiesSet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
@@ -57,7 +57,6 @@ export default class UsedEntities {
     return this.entitiesSet[pluralType][name];
   }
 
-  // TODO: может сделать отдельные методы ещё ???
   /**
    * Generate class names of all the used entities
    */
