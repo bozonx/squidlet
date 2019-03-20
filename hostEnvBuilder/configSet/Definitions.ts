@@ -1,7 +1,7 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _omit = require('lodash/omit');
 
-import EntityDefinition, {EntitiesDefinitions} from '../../host/interfaces/EntityDefinition';
+import EntityDefinition from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import SrcEntitySet from '../interfaces/SrcEntitiesSet';
 import ConfigManager from '../ConfigManager';
@@ -66,8 +66,10 @@ export default class Definitions {
     const hostDeviceDefaultProps = this.configManager.devicesDefaults;
     const className: string = deviceDef.className;
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('devices', className);
-    const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
-      && hostDeviceDefaultProps[className];
+
+    // TODO: remake
+    // const deviceHostDefaults: {[index: string]: any} | undefined = hostDeviceDefaultProps
+    //   && hostDeviceDefaultProps[className];
 
     return {
       id,
@@ -75,8 +77,10 @@ export default class Definitions {
       props: _defaultsDeep(
         // definition
         _omit(deviceDef, 'className'),
+
         // host's defaults
-        deviceHostDefaults,
+        //deviceHostDefaults,
+
         // manifest's defaults
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),

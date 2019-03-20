@@ -10,25 +10,47 @@ describe.only 'envBuilder.Definitions', ->
       services: ['Logger']
     }
 
+    # manifests
     @entitiesSet = {
       devices: {
-        manifest: {
-          props: {
-
+        Relay: {
+          manifest: {
+            props: {
+              commonProp: {
+                default: 'entity'
+              }
+              entityProp: {
+                default: 1
+              }
+            }
           }
         }
       }
       drivers: {
-        manifest: {
-          props: {
-
+        Digital: {
+          manifest: {
+            props: {
+              commonProp: {
+                default: 'entity'
+              }
+              entityProp: {
+                default: 1
+              }
+            }
           }
         }
       }
       services: {
-        manifest: {
-          props: {
-
+        Logger: {
+          manifest: {
+            props: {
+              commonProp: {
+                default: 'entity'
+              }
+              entityProp: {
+                default: 1
+              }
+            }
           }
         }
       }
@@ -37,28 +59,28 @@ describe.only 'envBuilder.Definitions', ->
     @configManager = {
       preEntities: {
         devices: {
-          room1: {
-            relay: {
-              device: 'Relay'
-              pin: 1
-            }
+          'room1.relay': {
+            className: 'Relay'
+            commonProp: 'def'
+            defProp: 1
           }
         }
         drivers: {
-          'Digital': {
-            driver: 'Digital'
-            param: 1
+          Digital: {
+            className: 'Digital'
+            commonProp: 'def'
+            defProp: 1
           }
         }
         services: {
           logger: {
-            service: 'Logger'
-            param: 1
+            className: 'Logger'
+            commonProp: 'def'
+            defProp: 1
           }
         }
       }
       devicesDefaults: {
-
 #        Relay: {
 #          baseOne: true
 #        }
@@ -84,9 +106,9 @@ describe.only 'envBuilder.Definitions', ->
         id: 'room1.relay'
         className: 'Relay'
         props: {
-          pin: 1
-          baseOne: true
-          manifestProp: 'value'
+          commonProp: 'def'
+          defProp: 1
+          entityProp: 1
         }
       }
     })
@@ -95,23 +117,25 @@ describe.only 'envBuilder.Definitions', ->
         id: 'Digital'
         className: 'Digital'
         props: {
-          param: 1
-          manifestProp: 'value'
+          commonProp: 'def'
+          defProp: 1
+          entityProp: 1
         }
       }
     })
     assert.deepEqual(@definitions.getServicesDefinitions('master'), {
-      backend: {
-        id: 'backend'
-        className: 'Backend'
+      logger: {
+        id: 'logger'
+        className: 'Logger'
         props: {
-          param: 1
-          manifestProp: 'value'
+          commonProp: 'def'
+          defProp: 1
+          entityProp: 1
         }
       }
     })
 
-    sinon.assert.calledOnce(@definitions.checkDefinitions)
+    #sinon.assert.calledOnce(@definitions.checkDefinitions)
 
 #  describe 'checkDefinitions', ->
 #    beforeEach ->
