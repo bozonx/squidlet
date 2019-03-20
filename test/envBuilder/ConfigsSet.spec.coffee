@@ -43,9 +43,9 @@ describe 'envBuilder.ConfigsSet', ->
         getHostPlatformDevs: => ['MyDev.dev']
       }
       definitions: {
-        getHostDevicesDefinitions: () => @devicesDefinitions
-        getHostDriversDefinitions: () => @driversDefinitions
-        getHostServicesDefinitions: () => @servicesDefinitions
+        getDevicesDefinitions: () => @devicesDefinitions
+        getDriversDefinitions: () => @driversDefinitions
+        getServicesDefinitions: () => @servicesDefinitions
       }
       entities: {
         getDependencies: => @dependencies
@@ -161,9 +161,9 @@ describe 'envBuilder.ConfigsSet', ->
           getHostPlatformDevs: => []
         }
         definitions: {
-          getHostDevicesDefinitions: () => @devicesDefinitions
-          getHostDriversDefinitions: () => @driversDefinitions
-          getHostServicesDefinitions: () => {}
+          getDevicesDefinitions: () => @devicesDefinitions
+          getDriversDefinitions: () => @driversDefinitions
+          getServicesDefinitions: () => {}
         }
         entities: {
           getDependencies: => @dependencies

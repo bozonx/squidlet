@@ -37,9 +37,9 @@ export default class ConfigsSet {
       regularDrivers,
       systemServices,
       regularServices,
-      devicesDefinitions: _values(this.definitions.getHostDevicesDefinitions()),
-      driversDefinitions: this.definitions.getHostDriversDefinitions(),
-      servicesDefinitions: this.definitions.getHostServicesDefinitions(),
+      devicesDefinitions: _values(this.definitions.getDevicesDefinitions()),
+      driversDefinitions: this.definitions.getDriversDefinitions(),
+      servicesDefinitions: this.definitions.getServicesDefinitions(),
     };
   }
 

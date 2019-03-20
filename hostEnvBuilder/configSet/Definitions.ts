@@ -26,57 +26,40 @@ export default class Definitions {
   }
 
 
-  getHostDevicesDefinitions(): {[index: string]: EntityDefinition} {
+  getDevicesDefinitions(): {[index: string]: EntityDefinition} {
     return this.devicesDefinitions;
   }
 
-  getHostDriversDefinitions(): {[index: string]: EntityDefinition} {
+  getDriversDefinitions(): {[index: string]: EntityDefinition} {
     return this.driversDefinitions;
   }
 
-  getHostServicesDefinitions(): {[index: string]: EntityDefinition} {
+  getServicesDefinitions(): {[index: string]: EntityDefinition} {
     return this.servicesDefinitions;
   }
-
-  generate() {
-    const { devices, drivers, services } = this.prepareEntities();
-
-    this.devicesDefinitions = devices;
-    this.driversDefinitions = drivers;
-    this.servicesDefinitions = services;
-  }
-
 
   /**
    * Make definitions of all the used entities of host
    */
-  private prepareEntities(): EntitiesDefinitions {
+  generate() {
     const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
-    const devices: {[index: string]: EntityDefinition} = {};
-    const drivers: {[index: string]: EntityDefinition} = {};
-    const services: {[index: string]: EntityDefinition} = {};
 
     // make devices
     for (let id of Object.keys(this.configManager.preEntities.devices)) {
-      devices[id] = this.generateDeviceDef(id);
+      this.devicesDefinitions[id] = this.generateDeviceDef(id);
     }
 
     // make each all drivers of host include dependencies but exclude devs
     for (let entityName of usedEntitiesNames.drivers) {
-      drivers[entityName] = this.generateDriverDef(entityName);
+      this.driversDefinitions[entityName] = this.generateDriverDef(entityName);
     }
 
     // make services
     for (let entityName of Object.keys(this.configManager.preEntities.services)) {
-      services[entityName] = this.generateServiceDef(entityName);
+      this.servicesDefinitions[entityName] = this.generateServiceDef(entityName);
     }
-
-    return {
-      devices,
-      drivers,
-      services,
-    };
   }
+
 
   private generateDeviceDef(id: string): EntityDefinition {
     const deviceDef: {[index: string]: any} = this.configManager.preEntities.devices[id];

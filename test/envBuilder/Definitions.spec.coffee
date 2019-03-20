@@ -4,58 +4,82 @@ Definitions = require('../../hostEnvBuilder/configSet/Definitions').default
 
 describe.only 'envBuilder.Definitions', ->
   beforeEach ->
-    @main = {
-      configManager: {
-        hostDefaults: {
-          hostDefaultParam: 1
+    @entitiesNames = {
+      devices: ['Relay']
+      drivers: ['Digital']
+      services: ['Logger']
+    }
+
+    @entitiesSet = {
+      devices: {
+        manifest: {
+          props: {
+
+          }
         }
-        getHostsIds: => ['master']
-        getPreHostConfig: =>
-          {
-            platform: 'rpi'
-            devices: {
-              room1: {
-                relay: {
-                  device: 'Relay'
-                  pin: 1
-                }
-              }
-            }
-            drivers: {
-              'Digital': {
-                param: 1
-              }
-            }
-            services: {
-              backend: {
-                service: 'Backend'
-                param: 1
-              }
-            }
-            devicesDefaults: {
-              Relay: {
-                baseOne: true
-              }
-            }
-          }
       }
-      entities: {
-        getManifest: =>
-          {
-            props: {
-              manifestProp: 'value'
-            }
+      drivers: {
+        manifest: {
+          props: {
+
           }
+        }
+      }
+      services: {
+        manifest: {
+          props: {
+
+          }
+        }
       }
     }
-    @definitions = new Definitions(@main)
+
+    @configManager = {
+      preEntities: {
+        devices: {
+          room1: {
+            relay: {
+              device: 'Relay'
+              pin: 1
+            }
+          }
+        }
+        drivers: {
+          'Digital': {
+            driver: 'Digital'
+            param: 1
+          }
+        }
+        services: {
+          logger: {
+            service: 'Logger'
+            param: 1
+          }
+        }
+      }
+      devicesDefaults: {
+
+#        Relay: {
+#          baseOne: true
+#        }
+      }
+    }
+
+    @usedEntities = {
+      getEntitiesNames: () => @entitiesNames
+      getEntitySet: (type, name) => @entitiesSet[type][name]
+    }
+
+    @definitions = new Definitions(@configManager, @usedEntities)
+
+  # TODO: test devicesDefaults
 
   it 'generate', ->
-    @definitions.checkDefinitions = sinon.spy()
+    #@definitions.checkDefinitions = sinon.spy()
 
     await @definitions.generate()
 
-    assert.deepEqual(@definitions.getHostDevicesDefinitions('master'), {
+    assert.deepEqual(@definitions.getDevicesDefinitions('master'), {
       'room1.relay': {
         id: 'room1.relay'
         className: 'Relay'
@@ -66,7 +90,7 @@ describe.only 'envBuilder.Definitions', ->
         }
       }
     })
-    assert.deepEqual(@definitions.getHostDriversDefinitions('master'), {
+    assert.deepEqual(@definitions.getDriversDefinitions('master'), {
       'Digital': {
         id: 'Digital'
         className: 'Digital'
@@ -76,7 +100,7 @@ describe.only 'envBuilder.Definitions', ->
         }
       }
     })
-    assert.deepEqual(@definitions.getHostServicesDefinitions('master'), {
+    assert.deepEqual(@definitions.getServicesDefinitions('master'), {
       backend: {
         id: 'backend'
         className: 'Backend'
