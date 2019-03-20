@@ -1,7 +1,7 @@
 UsedEntities = require('../../hostEnvBuilder/entities/UsedEntities').default
 
 
-describe.only 'envBuilder.UsedEntities', ->
+describe 'envBuilder.UsedEntities', ->
   beforeEach ->
     @manifests = {
       devices: {

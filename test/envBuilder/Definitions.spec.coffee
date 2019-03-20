@@ -2,7 +2,7 @@ Definitions = require('../../hostEnvBuilder/configSet/Definitions').default
 hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
 
 
-describe 'envBuilder.Definitions', ->
+describe.only 'envBuilder.Definitions', ->
   beforeEach ->
     @main = {
       configManager: {

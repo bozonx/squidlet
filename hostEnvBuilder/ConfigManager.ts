@@ -2,7 +2,7 @@ import * as path from 'path';
 import _defaultsDeep = require('lodash/defaultsDeep');
 
 import PreHostConfig from './interfaces/PreHostConfig';
-import validateHostConfig from './validateHostConfig';
+import validateHostConfig from './validation/validateHostConfig';
 import HostConfig, {HostConfigConfig} from '../host/interfaces/HostConfig';
 import hostDefaultConfig from './configs/hostDefaultConfig';
 import MachineConfig from './interfaces/MachineConfig';
