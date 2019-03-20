@@ -3,100 +3,68 @@ UsedEntities = require('../../hostEnvBuilder/entities/UsedEntities').default
 
 describe.only 'envBuilder.UsedEntities', ->
   beforeEach ->
-    @preDevicesManifests = [
-      {
-        name: 'DeviceClass'
-        baseDir: '/myBaseDir'
-        main: './main.ts'
-        files: [
-          './deviceFile.json'
-        ]
-        drivers: [
-          'DriverName'
-        ]
-        props: {
-          propsParam: 'value'
-        }
-        extParam: 'value'
-      }
-    ]
-    @prePreDriverManifest = [
-      {
-        name: 'DriverName'
-        baseDir: '/myBaseDir'
-        main: './main.ts'
-        system: true
-        files: [
-          'driverFile.json'
-        ]
-        param: 'value'
-      }
-      # dev
-      {
-        name: 'DevName.dev'
-        dev: true
-        param: 'value'
-      }
-    ]
-    @prePreServiceManifest = [
-      {
-        name: 'ServiceClass'
-        baseDir: '/myBaseDir'
-        main: './main.ts'
-        system: true
-        props: './myProps.yaml'
-        files: [
-          'serviceFile.json'
-        ]
-        drivers: [
-          # dev of platform without a manifest
-          'PlatformDev.dev'
-        ]
-        param: 'value'
-      }
-    ]
-    @finalManifests = {
+    @manifests = {
       devices: {
         DeviceClass: {
           name: 'DeviceClass'
+          main: '../main.ts'
+          baseDir: '/myBaseDir'
+          files: [
+            './deviceFile.json'
+          ]
+          drivers: [
+            'DepDriver'
+          ]
           props: {
-            props: 'value'
+            propsParam: 'value'
           }
-          param: 'value'
+          extParam: 'value'
         }
-      },
+      }
       drivers: {
-        'DriverName.driver': {
-          name: 'DriverName.driver'
-          system: true
-          param: 'value'
+        MyDriver: {
+          name: 'MyDriver'
+          main: './main.ts'
+          baseDir: '/myBaseDir'
+          devs: ['MyDev']
         }
-        'DevName.dev': {
-          name: 'DevName.dev'
-          dev: true
-          param: 'value'
+        DepDriver: {
+          name: 'DepDriver'
+          main: './main.ts'
+          baseDir: '/myBaseDir'
         }
-      },
+      }
       services: {
-        ServiceClass: {
-          name: 'ServiceClass'
+        MyService: {
+          name: 'MyService'
+          main: 'main.ts'
+          baseDir: '/myBaseDir'
           system: true
-          props: {
-            loadedProp: 'value'
-          }
-          param: 'value'
         }
-      },
+      }
     }
 
     @register = {
-      getEntityManifest: () =>
+      getEntityManifest: (pluralType, className) => @manifests[pluralType][className]
     }
+
     @configManager = {
       preEntities: {
-        devices: {}
-        drivers: {}
-        services: {}
+        devices: {
+          myDevice: {
+            className: 'DeviceClass'
+          }
+        }
+        drivers: {
+          MyDriver: {
+            className: 'MyDriver'
+          }
+        }
+        services: {
+          MyService: {
+            className: 'MyService'
+          }
+        }
       }
     }
     @io = {
@@ -106,29 +74,23 @@ describe.only 'envBuilder.UsedEntities', ->
         }
     }
 
-    @entities = new UsedEntities(@io, @configManager, @register)
-
-
+    @usedEntities = new UsedEntities(@io, @configManager, @register)
 
 
   it 'generate and getEntitiesSet', ->
-    @entities.saveEntityToStorage = sinon.stub().returns(Promise.resolve())
+    await @usedEntities.generate()
 
-    await @entities.generate()
-
-    assert.deepEqual(@entities.getEntitiesSet(), {
+    assert.deepEqual(@usedEntities.getEntitiesSet(), {
       devices: {
         DeviceClass: {
           srcDir: '/myBaseDir'
-          main: './main.ts'
           files: [
             './deviceFile.json'
           ]
+          system: false
           manifest: {
-            name: "DeviceClass"
-            drivers: [
-              'DriverName.driver'
-            ]
+            name: 'DeviceClass'
+            main: 'main.ts'
             props: {
               propsParam: 'value'
             }
@@ -137,107 +99,39 @@ describe.only 'envBuilder.UsedEntities', ->
         }
       }
       drivers: {
-        'DevName.dev': {
-          srcDir: undefined
-          main: undefined
+        DepDriver: {
+          srcDir: '/myBaseDir'
           files: []
+          system: false
           manifest: {
-            name: 'DevName.dev'
-            dev: true
-            param: 'value'
+            name: 'DepDriver'
+            main: 'main.ts'
           }
         }
-        'DriverName.driver': {
+        MyDriver: {
           srcDir: '/myBaseDir'
-          main: './main.ts'
-          files: [
-            'driverFile.json'
-          ]
+          files: []
+          system: false
           manifest: {
-            name: 'DriverName.driver'
-            system: true
-            param: 'value'
+            name: 'MyDriver'
+            main: 'main.ts'
           }
         }
       }
       services: {
-        ServiceClass: {
+        MyService: {
           srcDir: '/myBaseDir'
-          main: './main.ts'
-          files: [
-            'serviceFile.json'
-          ]
+          files: []
+          system: true
           manifest: {
-            name: 'ServiceClass'
-            system: true
-            drivers: [
-              'PlatformDev.dev'
-            ]
-            props: {
-              loadedProp: 'value'
-            }
-            param: 'value'
+            name: 'MyService'
+            main: 'main.ts'
           }
         }
       }
     })
 
-  it 'generate and getAllEntitiesNames', ->
-    @entities.saveEntityToStorage = sinon.stub().returns(Promise.resolve())
+  it 'generate and getUsedDevs', ->
+    await @usedEntities.generate()
 
-    await @entities.generate()
-
-    assert.deepEqual @entities.getAllEntitiesNames(), {
-      devices: [ 'DeviceClass' ]
-      drivers: [ 'DriverName.driver', 'DevName.dev' ]
-      services: [ 'ServiceClass' ]
-    }
-
-  it 'generate and getDependencies, getDevDependencies, getSystemDrivers, getSystemServices, getDevs', ->
-    @entities.saveEntityToStorage = sinon.stub().returns(Promise.resolve())
-
-    await @entities.generate()
-
-    assert.deepEqual(@entities.getDependencies(), {
-      devices: {
-        DeviceClass: [ 'DriverName.driver' ]
-      },
-      drivers: {},
-      services: {},
-    })
-
-    assert.deepEqual(@entities.getDevDependencies(), {
-      devices: {},
-      drivers: {},
-      services: {
-        ServiceClass: [ 'PlatformDev.dev' ]
-      },
-    })
-
-    assert.deepEqual(@entities.getDevs(), [
-      'DevName.dev'
-      'PlatformDev.dev'
-    ])
-
-    assert.deepEqual(@entities.getSystemDrivers(), [ 'DriverName.driver' ])
-    assert.deepEqual(@entities.getSystemServices(), [ 'ServiceClass' ])
-
-#  it 'resolveDriversDeps', ->
-#    @entities.unsortedDependencies = {
-#      devices: {}
-#      drivers: {
-#        Driver1: [ 'Driver2' ]
-#      }
-#      services: {}
-#    }
-#
-#    @entities.resolveDriversDeps()
-#
-#    assert.deepEqual(@entities.unsortedDependencies, {
-#      devices: {}
-#      drivers: {
-#        Driver1: [ 'Driver2' ]
-#        Driver2: [ 'Driver3' ]
-#      }
-#      services: {}
-#    })
+    assert.deepEqual(@usedEntities.getUsedDevs(), ['MyDev'])

@@ -67,35 +67,9 @@ export default class UsedEntities {
       drivers: Object.keys(this.entitiesSet.drivers),
       services: Object.keys(this.entitiesSet.services),
     };
-
-    // const result: EntitiesNames = {
-    //   devices: [],
-    //   drivers: [],
-    //   services: [],
-    // };
-    //
-    // // collect manifest names of used entities
-    // const devicesClasses = this.getDevicesClassNames();
-    // const allDriversClasses: string[] = this.getAllUsedDriversClassNames();
-    // const servicesClasses: string[] = this.getServicesClassNames();
-    //
-    // const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
-    //   for (let className of classes) {
-    //     result[pluralType].push(className);
-    //   }
-    // };
-    //
-    // collect('devices', devicesClasses);
-    // collect('drivers', allDriversClasses);
-    // collect('services', servicesClasses);
-    //
-    // return result;
   }
 
   async addEntity(pluralType: ManifestsTypePluralName, className: string) {
-    // do nothing if it exists
-    //if (this.getEntitySet(pluralType, className)) return;
-
     await this.proceedEntity(pluralType, className);
   }
 
