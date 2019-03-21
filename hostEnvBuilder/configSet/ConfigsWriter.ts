@@ -11,7 +11,7 @@ import HostConfigSet from '../interfaces/HostConfigSet';
  * Write all the hosts files to storage.
  * This files will be sent to a slave hosts.
  */
-export default class HostsConfigsWriter {
+export default class ConfigsWriter {
   private readonly io: Io;
   private readonly configManager: ConfigManager;
   private readonly configsSet: ConfigsSet;

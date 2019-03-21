@@ -2,7 +2,7 @@ import ConfigManager from './ConfigManager';
 import UsedEntities from './entities/UsedEntities';
 import Definitions from './configSet/Definitions';
 import ConfigsSet from './configSet/ConfigsSet';
-import HostsConfigsWriter from './configSet/HostsConfigsWriter';
+import ConfigsWriter from './configSet/ConfigsWriter';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
@@ -22,7 +22,7 @@ export default class EnvBuilder {
   private readonly entitiesWriter: EntitiesWriter;
   private readonly definitions: Definitions;
   private readonly configsSet: ConfigsSet;
-  private readonly hostsConfigWriter: HostsConfigsWriter;
+  private readonly configsWriter: ConfigsWriter;
   private readonly log: Logger = defaultLogger;
   private readonly io = new Io();
   readonly pluginEnv: PluginEnv;
@@ -42,7 +42,7 @@ export default class EnvBuilder {
     );
     this.definitions = new Definitions(this.configManager, this.usedEntities);
     this.configsSet = new ConfigsSet(this.configManager, this.usedEntities, this.definitions);
-    this.hostsConfigWriter = new HostsConfigsWriter(this.io, this.configManager, this.configsSet);
+    this.configsWriter = new ConfigsWriter(this.io, this.configManager, this.configsSet);
   }
 
 
@@ -83,7 +83,7 @@ export default class EnvBuilder {
   async writeConfigs() {
     this.log.info(`--> Writing host configs`);
 
-    await this.hostsConfigWriter.write();
+    await this.configsWriter.write();
   }
 
   /**
