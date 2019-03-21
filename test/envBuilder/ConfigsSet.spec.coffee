@@ -3,178 +3,219 @@ path = require('path')
 HostsFilesSet = require('../../hostEnvBuilder/configSet/ConfigsSet').default
 
 
-describe 'envBuilder.ConfigsSet', ->
+describe.only 'envBuilder.ConfigsSet', ->
   beforeEach ->
+
+#    @systemDrivers = [ 'SysDriver' ]
+#    @systemServices = [ 'SysService' ]
+#    @entitySet = {
+#      main: './main.ts'
+#      files: ['./otherFile']
+#      manifest: {manifestParam: 'value'}
+#    }
+#    @entitySetResult = {
+#      main: path.resolve('srcDir', './main.ts')
+#      files: [path.resolve('srcDir', './otherFile')]
+#      manifest: {manifestParam: 'value'}
+#    }
+#
+#    @main = {
+#      configManager: {
+#        getHostsIds: => ['master']
+#        getHostPlatformDevs: => ['MyDev.dev']
+#      }
+#      definitions: {
+#        getDevicesDefinitions: () => @devicesDefinitions
+#        getDriversDefinitions: () => @driversDefinitions
+#        getServicesDefinitions: () => @servicesDefinitions
+#      }
+#      entities: {
+#        getDependencies: => @dependencies
+#        getSystemDrivers: => @systemDrivers
+#        getSystemServices: => @systemServices
+#        getDevs: => [ 'Dev' ]
+#        getSrcDir: => 'srcDir'
+#        getMainFilePath: => @entitySet.main
+#        getFiles: => @entitySet.files
+#        getManifest: => @entitySet.manifest
+#      }
+#    }
+
+
+    @hostConfig = {id: 'myHost'}
     @devicesDefinitions = { device: { id: 'device', className: 'DeviceClass' } }
     @driversDefinitions = {
-      SysDriver: { id: 'SysDriver', className: 'SysDriver', system: true }
+      SysDriver: { id: 'SysDriver', className: 'SysDriver' }
       RegularDriver: { id: 'RegularDriver', className: 'RegularDriver' }
-      OtherDriver: { id: 'OtherDriver', className: 'OtherDriver' }
-      Dev: { id: 'Dev', className: 'Dev', dev: true }
     }
     @servicesDefinitions = {
-      sysService: { id: 'myService', className: 'SysService', system: true }
+      sysService: { id: 'myService', className: 'SysService' }
       regularService: { id: 'myService2', className: 'RegularService' }
     }
-    # without devs
-    @dependencies = {
-      devices: {
-        device: [ 'OtherDriver' ]
+    @entitiesNames = {
+      devices: ['DeviceClass']
+      drivers: ['SysDriver', 'RegularDriver']
+      services: ['SysService', 'RegularService']
+    }
+    @entitiesSet = {
+      devices: {}
+      drivers: {
+        SysDriver: {
+          manifest: {
+            system: true
+          }
+        }
+        RegularDriver: {
+          manifest: {
+          }
+        }
       }
-      drivers: {}
-      services: {}
-    }
-    @systemDrivers = [ 'SysDriver' ]
-    @systemServices = [ 'SysService' ]
-    @entitySet = {
-      main: './main.ts'
-      files: ['./otherFile']
-      manifest: {manifestParam: 'value'}
-    }
-    @entitySetResult = {
-      main: path.resolve('srcDir', './main.ts')
-      files: [path.resolve('srcDir', './otherFile')]
-      manifest: {manifestParam: 'value'}
+      services: {
+        SysService: {
+          manifest: {
+            system: true
+          }
+        }
+        RegularService: {
+          manifest: {
+          }
+        }
+      }
     }
 
-    @main = {
-      configManager: {
-        getHostsIds: => ['master']
-        getHostPlatformDevs: => ['MyDev.dev']
-      }
-      definitions: {
-        getDevicesDefinitions: () => @devicesDefinitions
-        getDriversDefinitions: () => @driversDefinitions
-        getServicesDefinitions: () => @servicesDefinitions
-      }
-      entities: {
-        getDependencies: => @dependencies
-        getSystemDrivers: => @systemDrivers
-        getSystemServices: => @systemServices
-        getDevs: => [ 'Dev' ]
-        getSrcDir: => 'srcDir'
-        getMainFilePath: => @entitySet.main
-        getFiles: => @entitySet.files
-        getManifest: => @entitySet.manifest
-      }
+    @configManager = {
+      hostConfig: @hostConfig
     }
-    @configsSet = new HostsFilesSet(@main)
+
+    @usedEntities = {
+      getEntitiesNames: () => @entitiesNames
+      getEntitySet: (type, name) => @entitiesSet[type][name]
+    }
+
+    @definitions = {
+      getDevicesDefinitions: () => @devicesDefinitions
+      getDriversDefinitions: () => @driversDefinitions
+      getServicesDefinitions: () => @servicesDefinitions
+    }
+
+    @configsSet = new HostsFilesSet(@configManager, @usedEntities, @definitions)
 
 
-  it 'getDefinitionsSet', ->
-    assert.deepEqual @configsSet.getDefinitionsSet('master'), {
-      systemDrivers: @systemDrivers
-      regularDrivers: [ 'RegularDriver', 'OtherDriver' ]
-      systemServices: @systemServices
+  it 'getConfigSet', ->
+    assert.deepEqual @configsSet.getConfigSet(), {
+      config: @hostConfig
+      systemDrivers: [ 'SysDriver' ]
+      regularDrivers: [ 'RegularDriver' ]
+      systemServices: [ 'SysService' ]
       regularServices: [ 'RegularService' ]
 
       devicesDefinitions: Object.values(@devicesDefinitions)
       driversDefinitions: @driversDefinitions
       servicesDefinitions: @servicesDefinitions
     }
-
-  it 'getEntitiesNames', ->
-    assert.deepEqual @configsSet.getEntitiesNames('master'), {
-      devices: [ 'DeviceClass' ]
-      drivers: [ 'SysDriver', 'RegularDriver', 'OtherDriver' ]
-      services: [ 'SysService', 'RegularService' ]
-    }
-
-  it 'generateSrcEntitiesSet', ->
-    assert.deepEqual @configsSet.generateSrcEntitiesSet('master'), {
-      devices: {
-        DeviceClass: {
-          @entitySetResult...
-        }
-      }
-      drivers: {
-        OtherDriver: {
-          @entitySetResult...
-        }
-        RegularDriver: {
-          @entitySetResult...
-        }
-        SysDriver: {
-          @entitySetResult...
-        }
-      }
-      services: {
-        RegularService: {
-          @entitySetResult...
-        }
-        SysService: {
-          @entitySetResult...
-        }
-      }
-    }
-
-  it 'checkPlatformDevDeps - OK situation', ->
-    @main.entities.getDevDependencies = =>
-      {
-        devices: {
-          DeviceClass: [ 'MyDev.dev' ]
-        }
-        drivers: {}
-        services: {}
-      }
-
-    assert.doesNotThrow(() => @configsSet.checkPlatformDevDeps())
-
-  it 'checkPlatformDevDeps - Fail situation', ->
-    @main.entities.getDevDependencies = =>
-      {
-        devices: {
-          DeviceClass: [ 'OtherDev.dev' ]
-        }
-        drivers: {}
-        services: {}
-      }
-
-    assert.throws(
-      () =>
-        @configsSet.checkPlatformDevDeps()
-      'Not registered dev dependencies'
-    )
-
-
-  describe 'recursive dependencies', ->
-    beforeEach ->
-      @devicesDefinitions = {
-        device1: { id: 'device1', className: 'DeviceClass' }
-      }
-      @driversDefinitions = {
-        #Dep1Driver: { id: 'Dep1Driver', className: 'Dep1Driver' }
-      }
-      @dependencies = {
-        devices: {
-          DeviceClass: [ 'Dep1Driver' ]
-        }
-        drivers: {
-          Dep1Driver: [ 'Dep2Driver' ]
-        }
-        services: {}
-      }
-
-      @main = {
-        configManager: {
-          getHostsIds: => ['master']
-          getHostPlatformDevs: => []
-        }
-        definitions: {
-          getDevicesDefinitions: () => @devicesDefinitions
-          getDriversDefinitions: () => @driversDefinitions
-          getServicesDefinitions: () => {}
-        }
-        entities: {
-          getDependencies: => @dependencies
-          getDevs: => []
-        }
-      }
-      @configsSet = new HostsFilesSet(@main)
-
-    it 'getEntitiesNames', ->
-      assert.deepEqual @configsSet.getEntitiesNames('master'), {
-        devices: [ 'DeviceClass' ]
-        drivers: [ 'Dep1Driver', 'Dep2Driver' ]
-        services: []
-      }
+#
+#  it 'getEntitiesNames', ->
+#    assert.deepEqual @configsSet.getEntitiesNames('master'), {
+#      devices: [ 'DeviceClass' ]
+#      drivers: [ 'SysDriver', 'RegularDriver', 'OtherDriver' ]
+#      services: [ 'SysService', 'RegularService' ]
+#    }
+#
+#  it 'generateSrcEntitiesSet', ->
+#    assert.deepEqual @configsSet.generateSrcEntitiesSet('master'), {
+#      devices: {
+#        DeviceClass: {
+#          @entitySetResult...
+#        }
+#      }
+#      drivers: {
+#        OtherDriver: {
+#          @entitySetResult...
+#        }
+#        RegularDriver: {
+#          @entitySetResult...
+#        }
+#        SysDriver: {
+#          @entitySetResult...
+#        }
+#      }
+#      services: {
+#        RegularService: {
+#          @entitySetResult...
+#        }
+#        SysService: {
+#          @entitySetResult...
+#        }
+#      }
+#    }
+#
+#  it 'checkPlatformDevDeps - OK situation', ->
+#    @main.entities.getDevDependencies = =>
+#      {
+#        devices: {
+#          DeviceClass: [ 'MyDev.dev' ]
+#        }
+#        drivers: {}
+#        services: {}
+#      }
+#
+#    assert.doesNotThrow(() => @configsSet.checkPlatformDevDeps())
+#
+#  it 'checkPlatformDevDeps - Fail situation', ->
+#    @main.entities.getDevDependencies = =>
+#      {
+#        devices: {
+#          DeviceClass: [ 'OtherDev.dev' ]
+#        }
+#        drivers: {}
+#        services: {}
+#      }
+#
+#    assert.throws(
+#      () =>
+#        @configsSet.checkPlatformDevDeps()
+#      'Not registered dev dependencies'
+#    )
+#
+#
+#  describe 'recursive dependencies', ->
+#    beforeEach ->
+#      @devicesDefinitions = {
+#        device1: { id: 'device1', className: 'DeviceClass' }
+#      }
+#      @driversDefinitions = {
+#        #Dep1Driver: { id: 'Dep1Driver', className: 'Dep1Driver' }
+#      }
+#      @dependencies = {
+#        devices: {
+#          DeviceClass: [ 'Dep1Driver' ]
+#        }
+#        drivers: {
+#          Dep1Driver: [ 'Dep2Driver' ]
+#        }
+#        services: {}
+#      }
+#
+#      @main = {
+#        configManager: {
+#          getHostsIds: => ['master']
+#          getHostPlatformDevs: => []
+#        }
+#        definitions: {
+#          getDevicesDefinitions: () => @devicesDefinitions
+#          getDriversDefinitions: () => @driversDefinitions
+#          getServicesDefinitions: () => {}
+#        }
+#        entities: {
+#          getDependencies: => @dependencies
+#          getDevs: => []
+#        }
+#      }
+#      @configsSet = new HostsFilesSet(@main)
+#
+#    it 'getEntitiesNames', ->
+#      assert.deepEqual @configsSet.getEntitiesNames('master'), {
+#        devices: [ 'DeviceClass' ]
+#        drivers: [ 'Dep1Driver', 'Dep2Driver' ]
+#        services: []
+#      }
