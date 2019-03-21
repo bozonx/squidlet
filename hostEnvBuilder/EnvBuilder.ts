@@ -93,7 +93,7 @@ export default class EnvBuilder {
   generateSrcConfigSet(): SrcHostEnvSet {
     return {
       configs: this.configsSet.getConfigSet(),
-      entities: this.configsSet.generateSrcEntitiesSet(),
+      entities: this.usedEntities.getEntitiesSet(),
     };
   }
 

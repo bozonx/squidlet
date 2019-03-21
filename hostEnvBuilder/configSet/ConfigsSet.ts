@@ -1,12 +1,11 @@
 import _values = require('lodash/values');
 
-import SrcEntitySet, {SrcEntitiesSet} from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet from '../interfaces/SrcEntitiesSet';
 import {sortByIncludeInList} from '../helpers';
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import Definitions from './Definitions';
 import ConfigManager from '../ConfigManager';
 import HostConfigSet from '../interfaces/HostConfigSet';
-import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
+import UsedEntities from '../entities/UsedEntities';
 
 
 export default class ConfigsSet {
@@ -45,44 +44,6 @@ export default class ConfigsSet {
   }
 
   /**
-   * Get set of entities of specified host with absolute path to source files.
-   */
-  generateSrcEntitiesSet(): SrcEntitiesSet {
-
-    // TODO: почему бы не взять одним вызовом из this.usedEntities?
-
-    const result: SrcEntitiesSet = {
-      devices: {},
-      drivers: {},
-      services: {},
-    };
-    const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
-
-    const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
-      for (let className of classes) {
-        const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, className);
-
-        result[pluralType][className] = entitySet;
-
-        // result[pluralType][className] = {
-        //   ...entitySet,
-        //   files: entitySet.files.map((relativeFileName: string) => path.resolve(entitySet.srcDir, relativeFileName)),
-        //   manifest: {
-        //     ...entitySet.manifest,
-        //     main: path.join(entitySet.srcDir, entitySet.manifest.main),
-        //   },
-        // };
-      }
-    };
-
-    collect('devices', usedEntitiesNames.devices);
-    collect('drivers', usedEntitiesNames.drivers);
-    collect('services', usedEntitiesNames.services);
-
-    return result;
-  }
-
-  /**
    * sort drivers to system and regular
    * @returns [systemDrivers, regularDrivers]
    */
@@ -117,3 +78,38 @@ export default class ConfigsSet {
   }
 
 }
+
+// /**
+//  * Get set of entities of specified host with absolute path to source files.
+//  */
+// generateSrcEntitiesSet(): SrcEntitiesSet {
+//   const result: SrcEntitiesSet = {
+//     devices: {},
+//     drivers: {},
+//     services: {},
+//   };
+//   const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
+//
+//   const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+//     for (let className of classes) {
+//       const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, className);
+//
+//       result[pluralType][className] = entitySet;
+//
+//       // result[pluralType][className] = {
+//       //   ...entitySet,
+//       //   files: entitySet.files.map((relativeFileName: string) => path.resolve(entitySet.srcDir, relativeFileName)),
+//       //   manifest: {
+//       //     ...entitySet.manifest,
+//       //     main: path.join(entitySet.srcDir, entitySet.manifest.main),
+//       //   },
+//       // };
+//     }
+//   };
+//
+//   collect('devices', usedEntitiesNames.devices);
+//   collect('drivers', usedEntitiesNames.drivers);
+//   collect('services', usedEntitiesNames.services);
+//
+//   return result;
+// }

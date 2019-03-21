@@ -3,7 +3,7 @@ path = require('path')
 HostsFilesWriter = require('../../hostEnvBuilder/entities/EntitiesWriter').default
 
 
-describe 'envBuilder.EntitiesWriter', ->
+describe.only 'envBuilder.EntitiesWriter', ->
   beforeEach ->
     @definitionsSet = {
       systemDrivers: 'systemDrivers'
