@@ -44,9 +44,27 @@ describe.only 'envBuilder.ConfigsWriter', ->
         copyFile: sinon.spy()
       }
     }
-    @configsWriter = new HostsConfigsWriter(@main)
 
-    @configsWriter.writeJson = sinon.spy()
+
+    @configSet = {
+
+    }
+
+    @io = {
+      writeJson: sinon.spy()
+    }
+
+    @configManager = {
+      buildDir: '/path/to/buildDir'
+    }
+
+    @configsSet = {
+      getConfigSet: () => @configSet
+    }
+
+    @configsWriter = new HostsConfigsWriter(@io, @configManager, @configsSet)
+
+    #@configsWriter.writeJson = sinon.spy()
 
   it 'writeEntitiesFiles', ->
     await @configsWriter.writeEntitiesFiles()
