@@ -17,11 +17,7 @@ export default class ConfigsWriter {
   private readonly configsSet: ConfigsSet;
 
 
-  constructor(
-    io: Io,
-    configManager: ConfigManager,
-    configsSet: ConfigsSet
-  ) {
+  constructor(io: Io, configManager: ConfigManager, configsSet: ConfigsSet) {
     this.io = io;
     this.configManager = configManager;
     this.configsSet = configsSet;
