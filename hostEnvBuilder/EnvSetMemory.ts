@@ -16,7 +16,7 @@ let configSet: HostEnvSet;
 
 
 export default class EnvSetMemory implements EnvSet {
-  static $setConfigSet(hostConfigSet: HostEnvSet) {
+  static $registerConfigSet(hostConfigSet: HostEnvSet) {
     configSet = hostConfigSet;
   }
 

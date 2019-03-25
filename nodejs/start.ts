@@ -40,25 +40,9 @@ async function prepareHostApp (hostConfigSet: HostEnvSet): Promise<System> {
 
   console.info(`===> initializing host system on machine "${machine}"`);
 
-  EnvSetMemory.$setConfigSet(hostConfigSet);
+  EnvSetMemory.$registerConfigSet(hostConfigSet);
 
   return new System(devsSet, EnvSetMemory);
-
-  // save host config set to global var
-  //global.__HOST_CONFIG_SET = hostConfigSet;
-
-  // SysFsMaster.registerConfigSet(hostConfigSet);
-  // hostConfigSet.entities.drivers['SysFs'].srcDir = SysFsMaster;
-
-  //const sysMasterDev = getMasterSysDev(__dirname);
-  // register config set
-  //(sysMasterDev as any).registerConfigSet(hostConfigSet);
-  // replace Sys dev to Sys.master.dev
-  //devsSet['Sys'] = sysMasterDev;
-
-  //await hostSystem.$registerDevSet(devsSet);
-
-  //return hostSystem;
 }
 
 
@@ -83,10 +67,11 @@ async function masterStarter () {
   await envBuilder.collect();
 
   console.info(`===> generate master config object`);
+
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: HostEnvSet = envBuilder.generateHostEnvSet();
+  const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
   // prepare host app
-  const hostSystem: System = await prepareHostApp(hostConfigSet);
+  const hostSystem: System = await prepareHostApp(hostEnvSet);
 
   console.info(`===> Starting master host system`);
 
