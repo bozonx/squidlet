@@ -1,10 +1,11 @@
 path = require('path')
 
-ConfigsWriter = require('../../hostEnvBuilder/configSet/ConfigsWriter').default
+EntitiesWriter = require('../../hostEnvBuilder/entities/EntitiesWriter').default
 
 
-describe 'envBuilder.ConfigsWriter', ->
+describe.only 'envBuilder.EntitiesWriter', ->
   beforeEach ->
+
     @hostConfigSet = {
       config: 'config'
       systemDrivers: 'systemDrivers'
@@ -28,11 +29,11 @@ describe 'envBuilder.ConfigsWriter', ->
       getConfigSet: () => @hostConfigSet
     }
 
-    @configsWriter = new ConfigsWriter(@io, @configManager, @configsSet)
+    @entitiesWriter = new EntitiesWriter(@io, @configManager, @configsSet)
 
 
   it 'write', ->
-    await @configsWriter.write()
+    await @entitiesWriter.write()
 
     sinon.assert.calledWith(@io.writeJson.getCall(0),
       "#{@configManager.buildDir}/configs/config.json",
@@ -69,4 +70,22 @@ describe 'envBuilder.ConfigsWriter', ->
 #    sinon.assert.calledWith(@io.writeJson.getCall(8),
 #      "/buildDir/hosts/configWorks/usedEntities.json",
 #      @entitiesNames
+#    )
+
+
+#  it 'writeEntitiesFiles', ->
+#    await @entitiesWriter.writeEntitiesFiles()
+#
+#    sinon.assert.calledOnce(@entitiesWriter.writeJson)
+#    sinon.assert.calledOnce(@main.io.mkdirP)
+#    sinon.assert.calledOnce(@main.io.copyFile)
+#
+#    sinon.assert.calledWith(@entitiesWriter.writeJson,
+#      '/buildDir/entities/devices/device1/manifest.json',
+#      {manifestParam: 'value'}
+#    )
+#    sinon.assert.calledWith(@main.io.mkdirP, '/buildDir/entities/devices/device1')
+#    sinon.assert.calledWith(@main.io.copyFile,
+#      path.resolve('srcDir', 'someFile'),
+#      '/buildDir/entities/devices/device1/someFile'
 #    )
