@@ -89,20 +89,29 @@ export default class EntitiesWriter {
   }
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
-    if (!this.configManager.tmpBuildDir) {
-      throw new Error(`Temporary build dir wasn't specified`);
-    }
-
     const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
     //const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
-    const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
+    const entityDstDir: string = path.join(this.entitiesDstDir, pluralType, entityName);
     // const mainDstFile = path.join(entityDstDir, path.parse(entitySet.main).name);
     // const renamedMainDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
     this.log.info(`- building main file of entity "${entityName}"`);
-    await buildEntity(pluralType, entityName, this.configManager.tmpBuildDir, entitySet.srcDir, entityDstDir);
+    await this.buildEntity(pluralType, entityName, entitySet.srcDir, entityDstDir);
     // rename main file
     //await this.io.renameFile(`${mainDstFile}.js`, renamedMainDstFile);
+  }
+
+  private async buildEntity(
+    pluralType: ManifestsTypePluralName,
+    entityName: string,
+    srcDir: string,
+    entityDstDir: string
+  ) {
+    if (!this.configManager.tmpBuildDir) {
+      throw new Error(`Temporary build dir wasn't specified`);
+    }
+
+    return buildEntity(pluralType, entityName, this.configManager.tmpBuildDir, srcDir, entityDstDir);
   }
 
   // private getPreManifest(pluralType: ManifestsTypePluralName, entityName: string): PreManifestBase {

@@ -6,11 +6,54 @@ EntitiesWriter = require('../../hostEnvBuilder/entities/EntitiesWriter').default
 describe.only 'envBuilder.EntitiesWriter', ->
   beforeEach ->
     @entitiesNames = {
-
+      devices: ['MyDevice']
+      drivers: ['MyDriver']
+      services: ['MyService']
     }
 
-    @entitySet = {
-
+    @entitiesSet = {
+      devices: {
+        MyDevice: {
+          srcDir: '/srcDir'
+          manifest: {
+            name: 'MyDevice'
+            main: 'main.ts'
+            props: {
+              manifestProp: 1
+            }
+          }
+          files: []
+          system: false
+        }
+      }
+      drivers: {
+        MyDriver: {
+          srcDir: '/srcDir'
+          manifest: {
+            name: 'MyDriver'
+            main: 'main.ts'
+            props: {
+              manifestProp: 1
+            }
+          }
+          files: []
+          system: true
+        }
+      }
+      services: {
+        MyService: {
+          srcDir: '/srcDir'
+          manifest: {
+            name: 'MyService'
+            main: 'main.ts'
+            props: {
+              manifestProp: 1
+            }
+          }
+          files: []
+          system: false
+        }
+      }
     }
 
     @io = {
@@ -31,28 +74,67 @@ describe.only 'envBuilder.EntitiesWriter', ->
 
     @usedEntities = {
       getEntitiesNames: () => @entitiesNames
-      getEntitySet: () => @entitySet
+      getEntitySet: (type, name) => @entitiesSet[type][name]
     }
 
     @entitiesWriter = new EntitiesWriter(@io, @logger, @configManager, @usedEntities)
 
+    @entitiesWriter.buildEntity = sinon.spy()
 
   it 'writeUsed', ->
-    await @entitiesWriter.writeEntitiesFiles()
+    await @entitiesWriter.writeUsed()
 
-    sinon.assert.calledOnce(@entitiesWriter.writeJson)
-    sinon.assert.calledOnce(@main.io.mkdirP)
-    sinon.assert.calledOnce(@main.io.copyFile)
+    sinon.assert.calledWith(@io.rimraf, "#{@configManager.tmpBuildDir}/**/*")
 
-    sinon.assert.calledWith(@entitiesWriter.writeJson,
-      '/buildDir/entities/devices/device1/manifest.json',
-      {manifestParam: 'value'}
+    #### Devices
+    sinon.assert.calledWith(@io.writeJson.getCall(0),
+      "#{@configManager.buildDir}/entities/devices/MyDevice/manifest.json",
+      @entitiesSet.devices.MyDevice.manifest
     )
-    sinon.assert.calledWith(@main.io.mkdirP, '/buildDir/entities/devices/device1')
-    sinon.assert.calledWith(@main.io.copyFile,
-      path.resolve('srcDir', 'someFile'),
-      '/buildDir/entities/devices/device1/someFile'
+    sinon.assert.calledWith(@entitiesWriter.buildEntity.getCall(0),
+      'devices',
+      'MyDevice'
+      '/srcDir',
+      "#{@configManager.buildDir}/entities/devices/MyDevice"
     )
+
+    #### Drivers
+    sinon.assert.calledWith(@io.writeJson.getCall(1),
+      "#{@configManager.buildDir}/entities/drivers/MyDriver/manifest.json",
+      @entitiesSet.drivers.MyDriver.manifest
+    )
+    sinon.assert.calledWith(@entitiesWriter.buildEntity.getCall(1),
+      'drivers',
+      'MyDriver'
+      '/srcDir',
+      "#{@configManager.buildDir}/entities/drivers/MyDriver"
+    )
+
+    #### Services
+    sinon.assert.calledWith(@io.writeJson.getCall(2),
+      "#{@configManager.buildDir}/entities/services/MyService/manifest.json",
+      @entitiesSet.services.MyService.manifest
+    )
+    sinon.assert.calledWith(@entitiesWriter.buildEntity.getCall(2),
+      'services',
+      'MyService'
+      '/srcDir',
+      "#{@configManager.buildDir}/entities/services/MyService"
+    )
+
+#    sinon.assert.calledOnce(@entitiesWriter.writeJson)
+#    sinon.assert.calledOnce(@main.io.mkdirP)
+#    sinon.assert.calledOnce(@main.io.copyFile)
+#
+#    sinon.assert.calledWith(@entitiesWriter.writeJson,
+#      '/buildDir/entities/devices/device1/manifest.json',
+#      {manifestParam: 'value'}
+#    )
+#    sinon.assert.calledWith(@main.io.mkdirP, '/buildDir/entities/devices/device1')
+#    sinon.assert.calledWith(@main.io.copyFile,
+#      path.resolve('srcDir', 'someFile'),
+#      '/buildDir/entities/devices/device1/someFile'
+#    )
 
 #  it 'write', ->
 #    await @entitiesWriter.write()
