@@ -12,6 +12,18 @@ describe 'envBuilder.helpers', ->
       ]
     )
   it 'makeDevicesPlain', ->
+    preDevices = {
+      room: {
+        device1: {
+          device: 'MyDevice'
+        }
+      }
+    }
+    assert.deepEqual(helpers.makeDevicesPlain(preDevices), {
+      'room.device1': {
+        device: 'MyDevice'
+      },
+    })
 
   it 'convertDefinitions', ->
 

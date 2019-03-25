@@ -31,7 +31,12 @@ export function sortByIncludeInList(wholeSet: string[], targetItems: string[]): 
 }
 
 /**
- * Make devices plain
+ * Make devices plain. Converts {room: {device1: {device: 'MyDevice'}}}
+ * to {
+ *    'room.device1': {
+ *      device: 'MyDevice'
+ *    },
+ *  }
  */
 export function makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: any} {
   if (!preDevices) return {};
