@@ -6,12 +6,17 @@ import {ManifestsTypeName} from '../host/interfaces/ManifestTypes';
 import PreEntityDefinition from './interfaces/PreEntityDefinition';
 
 
-export function sortByIncludeInList(itemsToSearch: string[], listToSearchIn: string[]): [string[], string[]] {
+/**
+ * Return two arrays [included[], notIncluded[]].
+ * @param wholeSet - all items
+ * @param targetItems - target items which will be in "included" array
+ */
+export function sortByIncludeInList(wholeSet: string[], targetItems: string[]): [string[], string[]] {
   const included: string[] = [];
   const notIncluded: string[] = [];
 
-  for (let item of itemsToSearch) {
-    if (listToSearchIn.indexOf(item) >= 0) {
+  for (let item of wholeSet) {
+    if (targetItems.indexOf(item) >= 0) {
       included.push(item);
     }
     else {
