@@ -1,6 +1,6 @@
 import _values = require('lodash/values');
 
-import SrcEntitySet from '../interfaces/HostEntitiesSet';
+import SrcEntitySet from '../interfaces/HostEntitySet';
 import {sortByIncludeInList} from '../helpers';
 import Definitions from './Definitions';
 import ConfigManager from '../ConfigManager';

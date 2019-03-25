@@ -4,7 +4,7 @@ import * as path from 'path';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../ConfigManager';
-import SrcEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitiesSet';
+import SrcEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
@@ -94,7 +94,7 @@ export default class UsedEntities {
     const preManifest: PreManifestBase = this.register.getEntityManifest(pluralType, className);
 
     // save entity set which is made of manifest
-    this.entitiesSet[pluralType][className] = await this.makeSrcEntitySet(preManifest);
+    this.entitiesSet[pluralType][className] = await this.makeEntitySet(preManifest);
 
     // resolve devices deps
     for (let depClassName of preManifest.devices || []) {
@@ -115,7 +115,7 @@ export default class UsedEntities {
     }
   }
 
-  private async makeSrcEntitySet(preManifest: PreManifestBase): Promise<SrcEntitySet> {
+  private async makeEntitySet(preManifest: PreManifestBase): Promise<SrcEntitySet> {
     const finalManifest: ManifestBase = await this.finalizeManifest(preManifest);
 
     return {

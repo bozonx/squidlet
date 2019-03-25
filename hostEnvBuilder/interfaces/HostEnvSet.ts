@@ -1,8 +1,8 @@
-import {HostEntitiesSet} from './HostEntitiesSet';
+import {HostEntitySet} from './HostEntitySet';
 import HostConfigSet from './HostConfigSet';
 
 
 export default interface HostEnvSet {
   configs: HostConfigSet;
-  entities: HostEntitiesSet;
+  entities: HostEntitySet;
 }
