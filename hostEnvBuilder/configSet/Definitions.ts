@@ -3,7 +3,7 @@ import _omit = require('lodash/omit');
 
 import EntityDefinition from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import SrcEntitySet from '../interfaces/HostEntitySet';
+import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 
@@ -65,7 +65,7 @@ export default class Definitions {
     const deviceDef: {[index: string]: any} = this.configManager.preEntities.devices[id];
     const hostDeviceDefaultProps = this.configManager.devicesDefaults;
     const className: string = deviceDef.className;
-    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('devices', className);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', className);
 
     return {
       id,
@@ -88,7 +88,7 @@ export default class Definitions {
    */
   private generateDriverDef(className: string): EntityDefinition {
     const driverDef: PreEntityDefinition = this.configManager.preEntities.drivers[className];
-    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('drivers', className);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', className);
 
     return {
       // id and className is the same for drivers
@@ -103,7 +103,7 @@ export default class Definitions {
 
   private generateServiceDef(id: string): EntityDefinition {
     const serviceDef: PreEntityDefinition = this.configManager.preEntities.services[id];
-    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
 
     return {
       id,

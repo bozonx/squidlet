@@ -4,12 +4,12 @@ import ServiceManifest from '../../host/interfaces/ServiceManifest';
 
 
 export interface HostEntitiesSet {
-  devices: {[index: string]: SrcEntitySet};
-  drivers: {[index: string]: SrcEntitySet};
-  services: {[index: string]: SrcEntitySet};
+  devices: {[index: string]: HostEntitySet};
+  drivers: {[index: string]: HostEntitySet};
+  services: {[index: string]: HostEntitySet};
 }
 
-export default interface SrcEntitySet {
+export default interface HostEntitySet {
   srcDir: string;
   manifest: DeviceManifest | DriverManifest | ServiceManifest;
   // relative paths to entity files

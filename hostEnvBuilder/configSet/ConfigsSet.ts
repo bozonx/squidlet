@@ -1,6 +1,6 @@
 import _values = require('lodash/values');
 
-import SrcEntitySet from '../interfaces/HostEntitySet';
+import HostEntitySet from '../interfaces/HostEntitySet';
 import {sortByIncludeInList} from '../helpers';
 import Definitions from './Definitions';
 import ConfigManager from '../ConfigManager';
@@ -52,7 +52,7 @@ export default class ConfigsSet {
     const allSystemDrivers: string[] = [];
 
     for (let driverName of driversClasses) {
-      const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('drivers', driverName);
+      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', driverName);
 
       if (entitySet.manifest.system) allSystemDrivers.push(driverName);
     }
@@ -69,7 +69,7 @@ export default class ConfigsSet {
     const allSystemServices: string[] = [];
 
     for (let serviceName of servicesClasses) {
-      const entitySet: SrcEntitySet = this.usedEntities.getEntitySet('services', serviceName);
+      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceName);
 
       if (entitySet.manifest.system) allSystemServices.push(serviceName);
     }

@@ -4,7 +4,7 @@ import * as path from 'path';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../ConfigManager';
-import SrcEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
+import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
@@ -53,7 +53,7 @@ export default class UsedEntities {
     return this.entitiesSet;
   }
 
-  getEntitySet(pluralType: ManifestsTypePluralName, name: string): SrcEntitySet {
+  getEntitySet(pluralType: ManifestsTypePluralName, name: string): HostEntitySet {
     return this.entitiesSet[pluralType][name];
   }
 
@@ -115,7 +115,7 @@ export default class UsedEntities {
     }
   }
 
-  private async makeEntitySet(preManifest: PreManifestBase): Promise<SrcEntitySet> {
+  private async makeEntitySet(preManifest: PreManifestBase): Promise<HostEntitySet> {
     const finalManifest: ManifestBase = await this.finalizeManifest(preManifest);
 
     return {

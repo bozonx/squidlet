@@ -7,7 +7,7 @@ import Io from '../Io';
 import Logger from '../interfaces/Logger';
 import buildEntity from './buildEntity';
 import UsedEntities, {EntitiesNames} from './UsedEntities';
-import SrcEntitySet from '../interfaces/HostEntitySet';
+import HostEntitySet from '../interfaces/HostEntitySet';
 
 
 /**
@@ -56,7 +56,7 @@ export default class EntitiesWriter {
 
   private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
     const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
 
     // write manifest
     await this.io.writeJson(
@@ -80,7 +80,7 @@ export default class EntitiesWriter {
   }
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
-    const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
     //const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
     const entityDstDir: string = path.join(this.entitiesDstDir, pluralType, entityName);
     // const mainDstFile = path.join(entityDstDir, path.parse(entitySet.main).name);
