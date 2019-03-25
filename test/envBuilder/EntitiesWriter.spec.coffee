@@ -1,9 +1,7 @@
-path = require('path')
-
 EntitiesWriter = require('../../hostEnvBuilder/entities/EntitiesWriter').default
 
 
-describe.only 'envBuilder.EntitiesWriter', ->
+describe 'envBuilder.EntitiesWriter', ->
   beforeEach ->
     @entitiesNames = {
       devices: ['MyDevice']
@@ -22,7 +20,7 @@ describe.only 'envBuilder.EntitiesWriter', ->
               manifestProp: 1
             }
           }
-          files: []
+          files: ['subDir/someFile.json']
           system: false
         }
       }
@@ -97,6 +95,8 @@ describe.only 'envBuilder.EntitiesWriter', ->
       '/srcDir',
       "#{@configManager.buildDir}/entities/devices/MyDevice"
     )
+    sinon.assert.calledWith(@io.mkdirP, "#{@configManager.buildDir}/entities/devices/MyDevice/subDir")
+    sinon.assert.calledWith(@io.copyFile, '/srcDir/subDir/someFile.json', "#{@configManager.buildDir}/entities/devices/MyDevice/subDir/someFile.json")
 
     #### Drivers
     sinon.assert.calledWith(@io.writeJson.getCall(1),
@@ -121,53 +121,3 @@ describe.only 'envBuilder.EntitiesWriter', ->
       '/srcDir',
       "#{@configManager.buildDir}/entities/services/MyService"
     )
-
-#    sinon.assert.calledOnce(@entitiesWriter.writeJson)
-#    sinon.assert.calledOnce(@main.io.mkdirP)
-#    sinon.assert.calledOnce(@main.io.copyFile)
-#
-#    sinon.assert.calledWith(@entitiesWriter.writeJson,
-#      '/buildDir/entities/devices/device1/manifest.json',
-#      {manifestParam: 'value'}
-#    )
-#    sinon.assert.calledWith(@main.io.mkdirP, '/buildDir/entities/devices/device1')
-#    sinon.assert.calledWith(@main.io.copyFile,
-#      path.resolve('srcDir', 'someFile'),
-#      '/buildDir/entities/devices/device1/someFile'
-#    )
-
-#  it 'write', ->
-#    await @entitiesWriter.write()
-#
-#    sinon.assert.calledWith(@io.writeJson.getCall(0),
-#      "#{@configManager.buildDir}/configs/config.json",
-#      @hostConfigSet.config
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(1),
-#      "#{@configManager.buildDir}/configs/systemDrivers.json",
-#      @hostConfigSet.systemDrivers
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(2),
-#      "#{@configManager.buildDir}/configs/regularDrivers.json",
-#      @hostConfigSet.regularDrivers
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(3),
-#      "#{@configManager.buildDir}/configs/systemServices.json",
-#      @hostConfigSet.systemServices
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(4),
-#      "#{@configManager.buildDir}/configs/regularServices.json",
-#      @hostConfigSet.regularServices
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(5),
-#      "#{@configManager.buildDir}/configs/devicesDefinitions.json",
-#      @hostConfigSet.devicesDefinitions
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(6),
-#      "#{@configManager.buildDir}/configs/driversDefinitions.json",
-#      @hostConfigSet.driversDefinitions
-#    )
-#    sinon.assert.calledWith(@io.writeJson.getCall(7),
-#      "#{@configManager.buildDir}/configs/servicesDefinitions.json",
-#      @hostConfigSet.servicesDefinitions
-#    )
