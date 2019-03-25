@@ -109,7 +109,7 @@ export function collectServicesFromShortcuts(
   return services;
 }
 
-export function checkDevs(hostDevs: string[], machineDevs: string[]) {
+export function checkDevsExistance(hostDevs: string[], machineDevs: string[]) {
   const diff: string[] = _difference(hostDevs, machineDevs);
 
   if (diff.length) {

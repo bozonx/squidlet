@@ -12,7 +12,7 @@ import PreHostConfig from './interfaces/PreHostConfig';
 import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
 import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
-import {checkDevs} from './helpers';
+import {checkDevsExistance} from './helpers';
 
 
 export default class EnvBuilder {
@@ -60,7 +60,7 @@ export default class EnvBuilder {
     await this.definitions.generate();
 
     this.log.info(`--> Checking platform dev dependencies`);
-    checkDevs(this.usedEntities.getUsedDevs(), this.configManager.machineConfig.devs);
+    checkDevsExistance(this.usedEntities.getUsedDevs(), this.configManager.machineConfig.devs);
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
