@@ -3,9 +3,11 @@ import * as fs from 'fs';
 import {promises as fsPromises} from 'fs';
 import * as shelljs from 'shelljs';
 import * as yaml from 'js-yaml';
+import * as rimraf from 'rimraf';
 
 import systemConfig from './configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/StorageDev';
+import * as rimraf from './entities/EntitiesWriter';
 
 
 export default class Io {
@@ -67,6 +69,16 @@ export default class Io {
 
     await this.mkdirP(path.dirname(fileName));
     await this.writeFile(fileName, content);
+  }
+
+  async rimraf(pathTo: string) {
+    return new Promise((resolve, reject) => {
+      rimraf(pathTo, (err: Error) => {
+        if (err) return reject(err);
+
+        resolve();
+      });
+    });
   }
 
 }

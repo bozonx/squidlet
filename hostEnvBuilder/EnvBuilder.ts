@@ -37,8 +37,7 @@ export default class EnvBuilder {
       this.io,
       this.log,
       this.configManager,
-      this.usedEntities,
-      this.register
+      this.usedEntities
     );
     this.definitions = new Definitions(this.configManager, this.usedEntities);
     this.configsSet = new ConfigsSet(this.configManager, this.usedEntities, this.definitions);

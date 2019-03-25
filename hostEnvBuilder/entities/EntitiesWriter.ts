@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as rimraf from 'rimraf';
 
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
@@ -18,7 +17,7 @@ import SrcEntitySet from '../interfaces/SrcEntitiesSet';
 export default class EntitiesWriter {
   private readonly configManager: ConfigManager;
   private readonly usedEntities: UsedEntities;
-  private readonly register: Register;
+  //private readonly register: Register;
   private readonly io: Io;
   private readonly log: Logger;
   // entities dir in storage
@@ -32,13 +31,13 @@ export default class EntitiesWriter {
     log: Logger,
     configManager: ConfigManager,
     usedEntities: UsedEntities,
-    register: Register,
+    //register: Register,
   ) {
     this.io = io;
     this.log = log;
     this.configManager = configManager;
     this.usedEntities = usedEntities;
-    this.register = register;
+    //this.register = register;
   }
 
 
@@ -53,7 +52,7 @@ export default class EntitiesWriter {
     const usedEntities: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     // clear tmp dir
-    rimraf.sync(`${this.configManager.tmpBuildDir}/**/*`);
+    await this.io.rimraf(`${this.configManager.tmpBuildDir}/**/*`);
 
     for (let typeName of Object.keys(usedEntities)) {
       const pluralType = typeName as ManifestsTypePluralName;
