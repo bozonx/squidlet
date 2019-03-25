@@ -58,3 +58,5 @@ describe 'envBuilder.helpers', ->
     })
 
   it 'checkDevsExistance', ->
+    assert.doesNotThrow(() => helpers.checkDevsExistance(['one'], ['one']))
+    assert.throws(() => helpers.checkDevsExistance(['one'], ['two']))
