@@ -4,7 +4,7 @@ import * as path from 'path';
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../ConfigManager';
-import SrcEntitySet, {SrcEntitiesSet} from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitiesSet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
@@ -25,7 +25,7 @@ export default class UsedEntities {
   private readonly register: Register;
   // devs which are used, like {devName: true}
   private usedDevs: {[index: string]: true} = {};
-  private entitiesSet: SrcEntitiesSet = {
+  private entitiesSet: HostEntitiesSet = {
     devices: {},
     drivers: {},
     services: {},
@@ -49,7 +49,7 @@ export default class UsedEntities {
     return Object.keys(this.usedDevs);
   }
 
-  getEntitiesSet(): SrcEntitiesSet {
+  getEntitiesSet(): HostEntitiesSet {
     return this.entitiesSet;
   }
 

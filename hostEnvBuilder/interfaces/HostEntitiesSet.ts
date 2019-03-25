@@ -3,7 +3,7 @@ import DriverManifest from '../../host/interfaces/DriverManifest';
 import ServiceManifest from '../../host/interfaces/ServiceManifest';
 
 
-export interface SrcEntitiesSet {
+export interface HostEntitiesSet {
   devices: {[index: string]: SrcEntitySet};
   drivers: {[index: string]: SrcEntitySet};
   services: {[index: string]: SrcEntitySet};

@@ -3,7 +3,7 @@ import _omit = require('lodash/omit');
 
 import EntityDefinition from '../../host/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import SrcEntitySet from '../interfaces/SrcEntitiesSet';
+import SrcEntitySet from '../interfaces/HostEntitiesSet';
 import ConfigManager from '../ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 

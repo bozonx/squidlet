@@ -1,22 +1,22 @@
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-import System from './System';
-import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
-import ManifestBase from './interfaces/ManifestBase';
-import {EntityClassType} from './entities/EntityManagerBase';
-import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
-import {trimEnd} from './helpers/lodashLike';
-import {pathJoin} from './helpers/nodeLike';
+import System from '../host/System';
+import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
+import ManifestBase from '../host/interfaces/ManifestBase';
+import {EntityClassType} from '../host/entities/EntityManagerBase';
+import HostEnvSet from './interfaces/HostEnvSet';
+import {trimEnd} from '../host/helpers/lodashLike';
+import {pathJoin} from '../host/helpers/nodeLike';
 import StorageDev from '../nodejs/devs/Storage';
-import EnvSet from './interfaces/EnvSet';
+import EnvSet from '../host/interfaces/EnvSet';
 
 
-let configSet: SrcHostEnvSet;
+let configSet: HostEnvSet;
 
 
 export default class EnvSetMemory implements EnvSet {
-  static $setConfigSet(hostConfigSet: SrcHostEnvSet) {
+  static $setConfigSet(hostConfigSet: HostEnvSet) {
     configSet = hostConfigSet;
   }
 

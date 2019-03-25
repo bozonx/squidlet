@@ -2,7 +2,7 @@ import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import IndexedEvents from '../../host/helpers/IndexedEvents';
 import Register from './Register';
 import ConfigManager from '../ConfigManager';
-import {SrcEntitiesSet} from '../interfaces/SrcEntitiesSet';
+import {HostEntitiesSet} from '../interfaces/HostEntitiesSet';
 import UsedEntities from './UsedEntities';
 import MachineConfig from '../interfaces/MachineConfig';
 
@@ -62,7 +62,7 @@ export default class PluginEnv {
    * Get all the used entities on host
    * Call it after registering.
    */
-  getEntitiesSet(): SrcEntitiesSet {
+  getEntitiesSet(): HostEntitiesSet {
     return this.usedEntities.getEntitiesSet();
   }
 

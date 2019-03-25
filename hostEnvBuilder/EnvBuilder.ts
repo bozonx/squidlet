@@ -6,7 +6,7 @@ import ConfigsWriter from './configSet/ConfigsWriter';
 import Io from './Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
-import SrcHostEnvSet from './interfaces/SrcHostEnvSet';
+import HostEnvSet from './interfaces/HostEnvSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 import PreHostConfig from './interfaces/PreHostConfig';
 import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
@@ -89,7 +89,7 @@ export default class EnvBuilder {
    * Generate host config with integrated files set which points to original (ts or js) files.
    * It uses only to start in nodejs environment.
    */
-  generateSrcConfigSet(): SrcHostEnvSet {
+  generateHostEnvSet(): HostEnvSet {
     return {
       configs: this.configsSet.getConfigSet(),
       entities: this.usedEntities.getEntitiesSet(),

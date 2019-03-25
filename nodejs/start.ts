@@ -15,14 +15,14 @@ import {
 } from '../helpers/buildHelpers';
 import System from '../host/System';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import SrcHostEnvSet from '../hostEnvBuilder/interfaces/SrcHostEnvSet';
+import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import {DevClass} from '../host/entities/DevManager';
 
-import EnvSetMemory from '../host/EnvSetMemory';
+import EnvSetMemory from '../hostEnvBuilder/EnvSetMemory';
 
 
 declare const global: {
-  __HOST_CONFIG_SET: SrcHostEnvSet;
+  __HOST_CONFIG_SET: HostEnvSet;
 };
 
 const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
@@ -31,7 +31,7 @@ const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 const debug = true;
 
 
-async function prepareHostApp (hostConfigSet: SrcHostEnvSet): Promise<System> {
+async function prepareHostApp (hostConfigSet: HostEnvSet): Promise<System> {
   const machine: string = hostConfigSet.configs.config.machine;
 
   console.info(`--> making platform's dev set`);
@@ -84,7 +84,7 @@ async function masterStarter () {
 
   console.info(`===> generate master config object`);
   // generate master config js object with paths of master host configs and entities files
-  const hostConfigSet: SrcHostEnvSet = envBuilder.generateSrcConfigSet();
+  const hostConfigSet: HostEnvSet = envBuilder.generateHostEnvSet();
   // prepare host app
   const hostSystem: System = await prepareHostApp(hostConfigSet);
 
