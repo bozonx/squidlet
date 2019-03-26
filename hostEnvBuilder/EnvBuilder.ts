@@ -1,4 +1,4 @@
-import ConfigManager from './ConfigManager';
+import ConfigManager from './hostConfig/ConfigManager';
 import UsedEntities from './entities/UsedEntities';
 import Definitions from './configSet/Definitions';
 import ConfigsSet from './configSet/ConfigsSet';

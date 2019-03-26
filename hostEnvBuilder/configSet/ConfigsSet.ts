@@ -3,7 +3,7 @@ import _values = require('lodash/values');
 import HostEntitySet from '../interfaces/HostEntitySet';
 import {sortByIncludeInList} from '../helpers';
 import Definitions from './Definitions';
-import ConfigManager from '../ConfigManager';
+import ConfigManager from '../hostConfig/ConfigManager';
 import HostConfigSet from '../interfaces/HostConfigSet';
 import UsedEntities from '../entities/UsedEntities';
 

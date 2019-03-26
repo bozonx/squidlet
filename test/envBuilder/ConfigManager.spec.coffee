@@ -1,4 +1,4 @@
-ConfigManager = require('../../hostEnvBuilder/ConfigManager').default
+ConfigManager = require('../../hostEnvBuilder/hostConfig/ConfigManager').default
 hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
 systemConfig = require('../../hostEnvBuilder/configs/systemConfig').default
 

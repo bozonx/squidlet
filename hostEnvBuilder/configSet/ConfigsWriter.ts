@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import ConfigManager from '../ConfigManager';
+import ConfigManager from '../hostConfig/ConfigManager';
 import Io from '../Io';
 import ConfigsSet from './ConfigsSet';
 import HostConfigSet from '../interfaces/HostConfigSet';

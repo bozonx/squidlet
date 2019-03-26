@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import ConfigManager from '../ConfigManager';
+import ConfigManager from '../hostConfig/ConfigManager';
 import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';

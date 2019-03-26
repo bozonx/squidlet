@@ -1,16 +1,16 @@
 import * as path from 'path';
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import PreHostConfig from './interfaces/PreHostConfig';
-import validateHostConfig from './validation/validateHostConfig';
-import HostConfig, {HostConfigConfig} from '../host/interfaces/HostConfig';
-import hostDefaultConfig from './configs/hostDefaultConfig';
-import MachineConfig from './interfaces/MachineConfig';
-import Io from './Io';
-import {appendArray} from '../host/helpers/helpers';
-import {loadMachineConfig} from '../helpers/buildHelpers';
-import PreEntities from './interfaces/PreEntities';
-import normalizeHostConfig from './validation/normalizeHostConfig';
+import PreHostConfig from '../interfaces/PreHostConfig';
+import validateHostConfig from './validateHostConfig';
+import HostConfig, {HostConfigConfig} from '../../host/interfaces/HostConfig';
+import hostDefaultConfig from '../configs/hostDefaultConfig';
+import MachineConfig from '../interfaces/MachineConfig';
+import Io from '../Io';
+import {appendArray} from '../../host/helpers/helpers';
+import {loadMachineConfig} from '../../helpers/buildHelpers';
+import PreEntities from '../interfaces/PreEntities';
+import normalizeHostConfig from './normalizeHostConfig';
 
 
 export default class ConfigManager {
