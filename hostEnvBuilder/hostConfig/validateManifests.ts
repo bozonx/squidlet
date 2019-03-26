@@ -1,5 +1,5 @@
 import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
-import {isBoolean, isObject, isString, isStringArray, required, sequence} from './validationHelpers';
+import {isBoolean, isLocalPath, isObject, isString, isStringArray, required, sequence} from './validationHelpers';
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
@@ -44,7 +44,7 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
 
     () => required(rawManifest.name, 'name'),
     () => isString(rawManifest.main, 'main'),
-    // TODO: проверить чтобы не было выхода наверх
+    () => isLocalPath(rawManifest.main, 'main'),
 
     () => isBoolean(rawManifest.system, 'system'),
 

@@ -1,3 +1,4 @@
+import * as path from 'path';
 import _difference = require('lodash/difference');
 
 
@@ -11,41 +12,41 @@ export function sequence(exprs: (() => string | undefined)[]): string | undefine
   return;
 }
 
-export function required(value: any, paramName: string): string | undefined {
+export function required(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return `${paramName} is required`;
 
   return;
 }
 
-export function isString(value: any, paramName: string): string | undefined {
+export function isString(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (typeof value !== 'string') return `${paramName} is not string`;
 
   return;
 }
 
-export function isNumber(value: any, paramName: string): string | undefined {
+export function isNumber(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (typeof value !== 'number') return `${paramName} is not number`;
 
   return;
 }
 
-export function isBoolean(value: any, paramName: string): string | undefined {
+export function isBoolean(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (typeof value !== 'boolean') return `${paramName} is not boolean`;
 
   return;
 }
 
-export function isObject(value: any, paramName: string): string | undefined {
+export function isObject(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (typeof value !== 'object') return `${paramName} is not object`;
 
   return;
 }
 
-export function isStringArray(value: any, paramName: string): string | undefined {
+export function isStringArray(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (!Array.isArray(value)) return `${paramName} is not a string array`;
 
@@ -56,14 +57,14 @@ export function isStringArray(value: any, paramName: string): string | undefined
   return;
 }
 
-export function oneOf(value: any, allowedValues: any[], paramName: string): string | undefined {
+export function oneOf(value: any | undefined, allowedValues: any[], paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (!allowedValues.includes(value)) return `${paramName} is not one of ${JSON.stringify(allowedValues)}`;
 
   return;
 }
 
-export function whiteList(obj: any, allowedValues: any[], paramName: string): string | undefined {
+export function whiteList(obj: any | undefined, allowedValues: any[], paramName: string): string | undefined {
   if (typeof obj === 'undefined') return;
   else if (typeof obj !== 'object') return `${paramName} is not object!`;
 
@@ -71,6 +72,23 @@ export function whiteList(obj: any, allowedValues: any[], paramName: string): st
 
   if (diff.length) {
     return `${paramName} has not allowed params ${JSON.stringify(diff)}`;
+  }
+
+  return;
+}
+
+
+/**
+ * Not absolute and doesn't contains "../"
+ */
+export function isLocalPath(pathTo: string | undefined, paramName: string): string | undefined {
+  if (typeof pathTo === 'undefined') return;
+
+  if (path.isAbsolute(pathTo)) {
+    return `path "${pathTo}" of "${paramName}" param is absolute but has to be local`;
+  }
+  else if (pathTo.match(/\.\./)) {
+    return `path "${pathTo}" of "${paramName}" param has "..", it isn't allowed`;
   }
 
   return;
