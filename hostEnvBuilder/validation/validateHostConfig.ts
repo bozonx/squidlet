@@ -1,4 +1,12 @@
+import {isString, required, sequence} from './validationHelpers';
+
+
 export default function validateHostConfig(rawConfig: {[index: string]: any}): string | undefined {
+  return sequence([
+    () => required(rawConfig.machine, 'machine'),
+    () => isString(rawConfig.machine, 'machine'),
+  ]);
+
   // TODO: add
   // TODO: validate definitions
 
