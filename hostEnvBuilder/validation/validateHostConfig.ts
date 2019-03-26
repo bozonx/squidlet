@@ -1,23 +1,20 @@
-import {isString, required, sequence} from './validationHelpers';
+import {isString, isStringArray, oneOf, required, sequence} from './validationHelpers';
 
 
 export default function validateHostConfig(rawConfig: {[index: string]: any}): string | undefined {
+  if (typeof rawConfig !== 'object') return 'Host config has to be an object';
+
   return sequence([
+    () => isString(rawConfig.id, 'id'),
+    () => required(rawConfig.platform, 'platform'),
+    () => oneOf(rawConfig.platform, ['nodejs', 'lowjs', 'espruino'], 'platform'),
     () => required(rawConfig.machine, 'machine'),
     () => isString(rawConfig.machine, 'machine'),
+    () => isStringArray(rawConfig.plugins, 'plugins'),
   ]);
-
-  // TODO: add
-  // TODO: validate definitions
-
-  // if (!this.masterConfig.host || this.masterConfig.hosts) {
-  //   throw new Error(`Master config doesn't have "host" or "hosts" params`);
-  // }
-
-  // TODO: platform is requred
-
-  return undefined;
 }
+
+// TODO: validate definitions
 
 // TODO: main files and files of entities должны быть относительные пути
 // TODO: id драйвера должно совпадать с полем driver у definition
