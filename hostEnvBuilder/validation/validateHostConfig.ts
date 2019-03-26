@@ -1,4 +1,4 @@
-import {isString, isNumber, isStringArray, isObject, oneOf, required, sequence} from './validationHelpers';
+import {isString, isNumber, isStringArray, isObject, oneOf, required, sequence, whiteList} from './validationHelpers';
 
 
 function checkBuildConfig(rawConfig: {[index: string]: any}): string | undefined {
@@ -40,10 +40,6 @@ function checkServices(rawConfig: {[index: string]: any}): string | undefined {
   // TODO: add
 }
 
-function checkDevicesDefaults(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
 function checkAutomation(rawConfig: {[index: string]: any}): string | undefined {
   // TODO: add
 }
@@ -79,12 +75,27 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     () => checkDrivers(rawConfig),
     () => checkServices(rawConfig),
 
-    () => checkDevicesDefaults(rawConfig),
+    () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
 
     () => checkAutomation(rawConfig),
     () => checkMqtt(rawConfig),
     () => checkLogger(rawConfig),
 
+    () => whiteList(rawConfig, [
+      'id',
+      'platform',
+      'machine',
+      'plugins',
+      'buildConfig',
+      'config',
+      'devices',
+      'drivers',
+      'services',
+      'devicesDefaults',
+      'automation',
+      'mqtt',
+      'logger',
+    ], 'host config'),
   ]);
 }
 

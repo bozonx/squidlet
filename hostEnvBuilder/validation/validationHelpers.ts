@@ -1,3 +1,5 @@
+import _difference = require('lodash/difference');
+
 
 export function sequence(exprs: (() => string | undefined)[]): string | undefined {
   for (let exp of exprs) {
@@ -50,6 +52,19 @@ export function isStringArray(value: any, paramName: string): string | undefined
 export function oneOf(value: any, allowedValues: any[], paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (!allowedValues.includes(value)) return `${paramName} is not one of ${JSON.stringify(allowedValues)}`;
+
+  return;
+}
+
+export function whiteList(obj: any, allowedValues: any[], paramName: string): string | undefined {
+  if (typeof obj === 'undefined') return;
+  else if (typeof obj !== 'object') return `${paramName} is not object!`;
+
+  const diff: any[] = _difference(Object.keys(obj), allowedValues);
+
+  if (diff.length) {
+    return `${paramName} has not allowed params ${JSON.stringify(diff)}`;
+  }
 
   return;
 }
