@@ -1,5 +1,5 @@
 export default interface BuildConfig {
-  devsModersDst: string;
+  devsModernDst: string;
   devsLegacyDst: string;
   devsMinDst: string;
   devsSrc: string;

@@ -90,11 +90,11 @@ gulp.task('build-lowjs-devs', async () => {
   const buildConfig: BuildConfig = makeBuildConfig(__dirname, buildDir);
 
   // ts to modern js
-  rimraf.sync(`${buildConfig.devsModersDst}/**/*`);
-  await compileTs(buildConfig.devsSrc, buildConfig.devsModersDst);
+  rimraf.sync(`${buildConfig.devsModernDst}/**/*`);
+  await compileTs(buildConfig.devsSrc, buildConfig.devsModernDst);
   // modern js to ES5
   rimraf.sync(`${buildConfig.devsLegacyDst}/**/*`);
-  await compileJs(buildConfig.devsModersDst, buildConfig.devsLegacyDst, false);
+  await compileJs(buildConfig.devsModernDst, buildConfig.devsLegacyDst, false);
   // minimize
   rimraf.sync(`${buildConfig.devsMinDst}/**/*`);
   await minimize(buildConfig.devsLegacyDst, buildConfig.devsMinDst);
