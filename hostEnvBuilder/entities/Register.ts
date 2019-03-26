@@ -10,6 +10,7 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import Io from '../Io';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import validateManifest from '../hostConfig/validateManifests';
 
 
 /**
@@ -103,7 +104,7 @@ export default class Register {
     this.registeringPromises.push(resolvePromise);
 
     const parsedManifest: T = await resolvePromise;
-    const validateError: string | undefined = this.validate(manifestType, parsedManifest);
+    const validateError: string | undefined = validateManifest(manifestType, parsedManifest);
 
     if (validateError) {
       throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
@@ -117,17 +118,6 @@ export default class Register {
     }
 
     this[pluralManifestType] = manifestsOfType.set(parsedManifest.name, parsedManifest);
-  }
-
-  private validate(manifestType: ManifestsTypeName, manifest: {[index: string]: any}): string | undefined {
-    switch (manifestType) {
-      case 'device':
-        return validateDeviceManifest(manifest);
-      case 'driver':
-        return validateDriverManifest(manifest);
-      case 'service':
-        return validateServiceManifest(manifest);
-    }
   }
 
   private async resolveManifest<T extends PreManifestBase>(manifest: string | T): Promise<T> {

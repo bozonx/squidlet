@@ -1,9 +1,11 @@
+import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
+
 export function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
   // TODO: add
   return undefined;
 }
 
-export default function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
+export function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
   // TODO: add
   return undefined;
 }
@@ -28,7 +30,13 @@ export function validateServiceManifest(rawManifest: {[index: string]: any}): st
 }
 
 
-
-export default function validateManifests () {
-
+export default function validateManifest (manifestType: ManifestsTypeName, manifest: {[index: string]: any}): string | undefined {
+  switch (manifestType) {
+    case 'device':
+      return validateDeviceManifest(manifest);
+    case 'driver':
+      return validateDriverManifest(manifest);
+    case 'service':
+      return validateServiceManifest(manifest);
+  }
 }
