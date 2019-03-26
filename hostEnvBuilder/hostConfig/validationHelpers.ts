@@ -31,6 +31,13 @@ export function isNumber(value: any, paramName: string): string | undefined {
   return;
 }
 
+export function isBoolean(value: any, paramName: string): string | undefined {
+  if (typeof value === 'undefined') return;
+  else if (typeof value !== 'boolean') return `${paramName} is not boolean`;
+
+  return;
+}
+
 export function isObject(value: any, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (typeof value !== 'object') return `${paramName} is not object`;

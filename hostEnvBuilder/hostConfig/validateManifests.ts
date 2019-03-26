@@ -1,5 +1,5 @@
 import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
-import {sequence} from './validationHelpers';
+import {isBoolean, isString, isStringArray, required, sequence} from './validationHelpers';
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
@@ -32,8 +32,28 @@ function validateServiceManifest(rawManifest: {[index: string]: any}): string | 
 }
 
 function validateManifestBase(rawManifest: {[index: string]: any}): string | undefined {
-  // TODO: add
-  return undefined;
+  return sequence([
+    () => required(rawManifest.baseDir, 'baseDir'),
+    () => isString(rawManifest.baseDir, 'baseDir'),
+
+    () => required(rawManifest.name, 'name'),
+    () => isString(rawManifest.name, 'name'),
+
+    () => required(rawManifest.name, 'name'),
+    () => isString(rawManifest.main, 'main'),
+    // TODO: проверить чтобы не было выхода наверх
+
+    () => isBoolean(rawManifest.system, 'system'),
+
+    () => isStringArray(rawManifest.devices, 'devices'),
+    () => isStringArray(rawManifest.drivers, 'drivers'),
+    () => isStringArray(rawManifest.services, 'services'),
+    () => isStringArray(rawManifest.devs, 'devs'),
+
+    () => isStringArray(rawManifest.files, 'files'),
+
+    () => isObject(rawManifest.props, 'props'),
+  ]);
 }
 
 
