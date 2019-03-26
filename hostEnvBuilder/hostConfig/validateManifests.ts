@@ -1,7 +1,13 @@
-export default function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
+export function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
   // TODO: add
   return undefined;
 }
+
+export default function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
+  // TODO: add
+  return undefined;
+}
+
 
 // private checkFiles(baseDir: string, paths: string[]): string[] {
 //   return paths.map((item) => {
@@ -15,3 +21,14 @@ export default function validateDeviceManifest(rawManifest: {[index: string]: an
 //     return path.resolve(baseDir, item);
 //   });
 // }
+
+export function validateServiceManifest(rawManifest: {[index: string]: any}): string | undefined {
+  // TODO: add
+  return undefined;
+}
+
+
+
+export default function validateManifests () {
+
+}

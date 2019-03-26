@@ -24,6 +24,9 @@ function checkLogger(rawConfig: {[index: string]: any}): string | undefined {
 }
 
 
+export default function validateDefinitions() {
+
+}
 
 
 // TODO: validate definitions
