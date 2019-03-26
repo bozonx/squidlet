@@ -1,11 +1,13 @@
 import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
+import {sequence} from './validationHelpers';
 
-export function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
+
+function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
   // TODO: add
   return undefined;
 }
 
-export function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
+function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
   // TODO: add
   return undefined;
 }
@@ -24,19 +26,32 @@ export function validateDriverManifest(rawManifest: {[index: string]: any}): str
 //   });
 // }
 
-export function validateServiceManifest(rawManifest: {[index: string]: any}): string | undefined {
+function validateServiceManifest(rawManifest: {[index: string]: any}): string | undefined {
+  // TODO: add
+  return undefined;
+}
+
+function validateManifestBase(rawManifest: {[index: string]: any}): string | undefined {
   // TODO: add
   return undefined;
 }
 
 
-export default function validateManifest (manifestType: ManifestsTypeName, manifest: {[index: string]: any}): string | undefined {
-  switch (manifestType) {
-    case 'device':
-      return validateDeviceManifest(manifest);
-    case 'driver':
-      return validateDriverManifest(manifest);
-    case 'service':
-      return validateServiceManifest(manifest);
-  }
+export default function validateManifest (
+  manifestType: ManifestsTypeName,
+  manifest: {[index: string]: any}
+): string | undefined {
+  return sequence([
+    () => validateManifestBase(manifest),
+    () => {
+      switch (manifestType) {
+        case 'device':
+          return validateDeviceManifest(manifest);
+        case 'driver':
+          return validateDriverManifest(manifest);
+        case 'service':
+          return validateServiceManifest(manifest);
+      }
+    }
+  ]);
 }
