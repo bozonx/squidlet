@@ -1,6 +1,12 @@
 
 export function sequence(exprs: (() => string | undefined)[]): string | undefined {
-  // TODO: make
+  for (let exp of exprs) {
+    const result: string | undefined = exp();
+
+    if (typeof result !== 'undefined') return result;
+  }
+
+  return;
 }
 
 export function required(value: any, paramName: string): string | undefined {
@@ -19,6 +25,13 @@ export function isString(value: any, paramName: string): string | undefined {
 export function isNumber(value: any, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (typeof value !== 'number') return `${paramName} is not number`;
+
+  return;
+}
+
+export function isObject(value: any, paramName: string): string | undefined {
+  if (typeof value === 'undefined') return;
+  else if (typeof value !== 'object') return `${paramName} is not object`;
 
   return;
 }
