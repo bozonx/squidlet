@@ -28,31 +28,6 @@ function checkConfig(rawConfig: {[index: string]: any}): string | undefined {
   ]);
 }
 
-function checkDevices(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkDrivers(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkServices(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkAutomation(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkMqtt(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkLogger(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-
 export default function validateHostConfig(rawConfig: {[index: string]: any}): string | undefined {
   if (typeof rawConfig !== 'object') return 'Host config has to be an object';
 
@@ -71,15 +46,15 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
 
     () => checkConfig(rawConfig),
 
-    () => checkDevices(rawConfig),
-    () => checkDrivers(rawConfig),
-    () => checkServices(rawConfig),
+    () => isObject(rawConfig.devices, 'devices'),
+    () => isObject(rawConfig.drivers, 'drivers'),
+    () => isObject(rawConfig.services, 'services'),
 
     () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
 
-    () => checkAutomation(rawConfig),
-    () => checkMqtt(rawConfig),
-    () => checkLogger(rawConfig),
+    () => isObject(rawConfig.automation, 'automation'),
+    () => isObject(rawConfig.mqtt, 'mqtt'),
+    () => isObject(rawConfig.logger, 'logger'),
 
     () => whiteList(rawConfig, [
       'id',
@@ -98,38 +73,3 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     ], 'host config'),
   ]);
 }
-
-
-
-// TODO: validate definitions
-
-// TODO: main files and files of entities должны быть относительные пути
-// TODO: id драйвера должно совпадать с полем driver у definition
-
-// const recursive = (container, curPath) => {
-//   _.each(container, (item, name) => {
-//     const itemPath = _.trimStart(`${curPath}.${name}`, '.');
-//
-//     if (_.isString(item)) {
-//       // TODO: validate type
-//     }
-//     else if (_.isPlainObject(item) && item.type) {
-//       // TODO: validate type
-//     }
-//     else if (_.isPlainObject(item)) {
-//       recursive(item, itemPath);
-//     }
-//     else {
-//       throw new Error(`Can't parse schema of device ${deviceName}`);
-//     }
-//   });
-//
-// };
-//
-// recursive(schema.params, '');
-
-// TODO: проверить существование файлов из манифеста
-
-// if (!await this.fs.exists(entitySet.main)) {
-//   throw new Error(`Can't find main file "${entitySet.main}"`);
-// }
