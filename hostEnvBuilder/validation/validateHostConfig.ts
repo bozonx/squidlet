@@ -28,6 +28,34 @@ function checkConfig(rawConfig: {[index: string]: any}): string | undefined {
   ]);
 }
 
+function checkDevices(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
+function checkDrivers(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
+function checkServices(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
+function checkDevicesDefaults(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
+function checkAutomation(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
+function checkMqtt(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
+function checkLogger(rawConfig: {[index: string]: any}): string | undefined {
+  // TODO: add
+}
+
 
 export default function validateHostConfig(rawConfig: {[index: string]: any}): string | undefined {
   if (typeof rawConfig !== 'object') return 'Host config has to be an object';
@@ -44,7 +72,18 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     () => isStringArray(rawConfig.plugins, 'plugins'),
 
     () => checkBuildConfig(rawConfig),
+
     () => checkConfig(rawConfig),
+
+    () => checkDevices(rawConfig),
+    () => checkDrivers(rawConfig),
+    () => checkServices(rawConfig),
+
+    () => checkDevicesDefaults(rawConfig),
+
+    () => checkAutomation(rawConfig),
+    () => checkMqtt(rawConfig),
+    () => checkLogger(rawConfig),
 
   ]);
 }

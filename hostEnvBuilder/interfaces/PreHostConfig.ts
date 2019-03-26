@@ -57,5 +57,5 @@ export default interface PreHostConfig {
   // shortcut for logger service
   logger?: {[index: string]: any};
   // shortcut for webApi service
-  webApi?: {[index: string]: any};
+  //webApi?: {[index: string]: any};
 }
