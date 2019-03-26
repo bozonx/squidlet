@@ -8,10 +8,9 @@ import hostDefaultConfig from './configs/hostDefaultConfig';
 import MachineConfig from './interfaces/MachineConfig';
 import Io from './Io';
 import {appendArray} from '../host/helpers/helpers';
-import {servicesShortcut} from './dict/dict';
-import {collectServicesFromShortcuts, convertDefinitions, makeDevicesPlain} from './helpers';
 import {loadMachineConfig} from '../helpers/buildHelpers';
 import PreEntities from './interfaces/PreEntities';
+import normalizeHostConfig from './validation/normalizeHostConfig';
 
 
 export default class ConfigManager {
@@ -61,7 +60,7 @@ export default class ConfigManager {
     this._machineConfig = this.loadMachineConfig(preHostConfig);
 
     const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
-    const normalizedConfig: PreHostConfig = this.normalizeHostConfig(mergedConfig);
+    const normalizedConfig: PreHostConfig = normalizeHostConfig(mergedConfig);
 
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     this.preEntities = {
@@ -88,24 +87,6 @@ export default class ConfigManager {
     else {
       throw new Error(`Unsupported type of host config`);
     }
-  }
-
-  /**
-   * Make devices plain, fill services from shortcuts and convert drivers and devices definitions
-   */
-  private normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const plainDevices: {[index: string]: any} = makeDevicesPlain(preHostConfig.devices);
-
-    return {
-      ...preHostConfig,
-      devices: convertDefinitions('device', plainDevices),
-      drivers: convertDefinitions('driver', preHostConfig.drivers || {}),
-      services: {
-        ...convertDefinitions('service', preHostConfig.services || {}),
-        // make services from shortcut
-        ...collectServicesFromShortcuts(preHostConfig, servicesShortcut),
-      },
-    };
   }
 
   /**
