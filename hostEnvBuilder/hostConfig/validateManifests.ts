@@ -1,15 +1,23 @@
 import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
-import {isBoolean, isString, isStringArray, required, sequence} from './validationHelpers';
+import {isBoolean, isObject, isString, isStringArray, required, sequence} from './validationHelpers';
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
-  // TODO: add
-  return undefined;
+  return sequence([
+    () => required(rawManifest.type, 'type'),
+    () => isString(rawManifest.type, 'type'),
+
+    () => isObject(rawManifest.status, 'status'),
+
+    () => isObject(rawManifest.config, 'config'),
+  ]);
 }
 
 function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
-  // TODO: add
-  return undefined;
+  return sequence([
+    () => required(rawManifest.type, 'type'),
+    () => isString(rawManifest.type, 'type'),
+  ]);
 }
 
 
@@ -25,11 +33,6 @@ function validateDriverManifest(rawManifest: {[index: string]: any}): string | u
 //     return path.resolve(baseDir, item);
 //   });
 // }
-
-function validateServiceManifest(rawManifest: {[index: string]: any}): string | undefined {
-  // TODO: add
-  return undefined;
-}
 
 function validateManifestBase(rawManifest: {[index: string]: any}): string | undefined {
   return sequence([
@@ -50,6 +53,7 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
     () => isStringArray(rawManifest.services, 'services'),
     () => isStringArray(rawManifest.devs, 'devs'),
 
+    // TODO: проверить чтобы не было выхода наверх
     () => isStringArray(rawManifest.files, 'files'),
 
     () => isObject(rawManifest.props, 'props'),
@@ -70,7 +74,8 @@ export default function validateManifest (
         case 'driver':
           return validateDriverManifest(manifest);
         case 'service':
-          return validateServiceManifest(manifest);
+          return;
+          //return validateServiceManifest(manifest);
       }
     }
   ]);
