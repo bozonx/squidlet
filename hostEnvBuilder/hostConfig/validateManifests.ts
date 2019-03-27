@@ -1,5 +1,32 @@
+import _trim = require('lodash/trim');
+
 import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
-import {isBoolean, isLocalPath, isObject, isString, isStringArray, required, sequence} from './validationHelpers';
+import {
+  isBoolean,
+  isLocalPath,
+  isObject,
+  isString,
+  isStringArray,
+  required,
+  sequence, whiteList
+} from './validationHelpers';
+
+
+const basicTypes: string[] = [
+  'string',
+  'string[]',
+  'number',
+  'number[]',
+  'boolean',
+  'boolean[]',
+];
+
+const constants: string[] = [
+  'true',
+  'false',
+  'null',
+  'undefined',
+];
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
@@ -24,6 +51,60 @@ function checkFiles(files: string[] | undefined): string | undefined {
   if (typeof files === 'undefined') return;
 
   return sequence(files.map((file) => () => isLocalPath(file, 'files')));
+}
+
+function checkType(type: string | undefined, ruleName: string): string | undefined {
+  if (typeof type === 'undefined') return;
+  else if (typeof type !== 'string' && typeof type !== 'number') {
+    return `type param of rule "${ruleName}" is not string or number`;
+  }
+
+  const types: string[] = String(type).split('|').map((item) => _trim(item));
+
+  for (let item of types) {
+    // numbers
+    if (!Number.isNaN(Number(item))) continue;
+    // constants
+    else if (constants.includes(item)) continue;
+    // string constants
+    else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) continue;
+    // basic types
+    else if (!basicTypes.includes(item)) {
+      return `type param of rule "${ruleName}" has incorrect type: "${item}"`;
+    }
+  }
+
+  return;
+}
+
+function checkDefault(type: string | undefined, ruleName: string): string | undefined {
+  // TODO: значение должно соответствовать типу
+}
+
+function checkRules(rules: {[index: string]: any} | undefined): string | undefined {
+  if (typeof rules === 'undefined') return;
+
+  for (let ruleName of Object.keys(rules)) {
+    if (typeof rules[ruleName] !== 'object') return `Incorrect type of rule "${ruleName}": "${JSON.stringify(rules[ruleName])}"`;
+
+    const error: string | undefined = sequence([
+      () => required(rules[ruleName].type, `${ruleName}.type`),
+      () => checkType(rules[ruleName].type, ruleName),
+      () => checkDefault(rules[ruleName].default, ruleName),
+      () => isBoolean(rules[ruleName].required, `${ruleName}.required`),
+      () => whiteList(rules[ruleName], [
+        'type',
+        'default',
+        'required',
+      ], ruleName),
+    ]);
+
+    // default
+
+    if (error) return error;
+  }
+
+  return;
 }
 
 function validateManifestBase(rawManifest: {[index: string]: any}): string | undefined {
