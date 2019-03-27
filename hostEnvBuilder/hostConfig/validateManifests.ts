@@ -35,8 +35,10 @@ function validateDeviceManifest(rawManifest: {[index: string]: any}): string | u
     () => isString(rawManifest.type, 'type'),
 
     () => isObject(rawManifest.status, 'status'),
+    () => checkRules(rawManifest.status, 'status'),
 
     () => isObject(rawManifest.config, 'config'),
+    () => checkRules(rawManifest.config, 'config'),
   ]);
 }
 
@@ -79,24 +81,27 @@ function checkType(type: string | undefined, ruleName: string): string | undefin
 
 function checkDefault(type: string | undefined, ruleName: string): string | undefined {
   // TODO: значение должно соответствовать типу
+  return;
 }
 
-function checkRules(rules: {[index: string]: any} | undefined): string | undefined {
+function checkRules(rules: {[index: string]: any} | undefined, paramName: string): string | undefined {
   if (typeof rules === 'undefined') return;
 
   for (let ruleName of Object.keys(rules)) {
-    if (typeof rules[ruleName] !== 'object') return `Incorrect type of rule "${ruleName}": "${JSON.stringify(rules[ruleName])}"`;
+    if (typeof rules[ruleName] !== 'object') {
+      return `Incorrect type of rule "${ruleName}" of param "${paramName}": "${JSON.stringify(rules[ruleName])}"`;
+    }
 
     const error: string | undefined = sequence([
-      () => required(rules[ruleName].type, `${ruleName}.type`),
-      () => checkType(rules[ruleName].type, ruleName),
-      () => checkDefault(rules[ruleName].default, ruleName),
-      () => isBoolean(rules[ruleName].required, `${ruleName}.required`),
+      () => required(rules[ruleName].type, `${paramName}.${ruleName}.type`),
+      () => checkType(rules[ruleName].type, `${paramName}.${ruleName}`),
+      () => checkDefault(rules[ruleName].default, `${paramName}.${ruleName}`),
+      () => isBoolean(rules[ruleName].required, `${paramName}.${ruleName}.required`),
       () => whiteList(rules[ruleName], [
         'type',
         'default',
         'required',
-      ], ruleName),
+      ], `${paramName}.${ruleName}`),
     ]);
 
     // default
@@ -130,6 +135,7 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
     () => checkFiles(rawManifest.files),
 
     () => isObject(rawManifest.props, 'props'),
+    () => checkRules(rawManifest.props, 'props'),
   ]);
 }
 
