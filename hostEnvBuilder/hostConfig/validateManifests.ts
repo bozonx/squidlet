@@ -20,19 +20,11 @@ function validateDriverManifest(rawManifest: {[index: string]: any}): string | u
   ]);
 }
 
+function checkFiles(files: string[] | undefined): string | undefined {
+  if (typeof files === 'undefined') return;
 
-// private checkFiles(baseDir: string, paths: string[]): string[] {
-//   return paths.map((item) => {
-//     if (path.isAbsolute(item)) {
-//       throw new Error(`You must not specify an absolute path of "${item}". Only relative is allowed.`);
-//     }
-//     else if (item.match(/\.\./)) {
-//       throw new Error(`Path "${item}" has to relative to its manifest base dir`);
-//     }
-//
-//     return path.resolve(baseDir, item);
-//   });
-// }
+  return sequence(files.map((file) => () => isLocalPath(file, 'files')));
+}
 
 function validateManifestBase(rawManifest: {[index: string]: any}): string | undefined {
   return sequence([
@@ -53,8 +45,8 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
     () => isStringArray(rawManifest.services, 'services'),
     () => isStringArray(rawManifest.devs, 'devs'),
 
-    // TODO: проверить чтобы не было выхода наверх
     () => isStringArray(rawManifest.files, 'files'),
+    () => checkFiles(rawManifest.files),
 
     () => isObject(rawManifest.props, 'props'),
   ]);
