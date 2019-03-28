@@ -1,13 +1,16 @@
 //const _get = require('lodash/get');
 
+import SchemaElement from '../interfaces/SchemaElement';
+import {ParsedType, parseType} from './typesHelpers';
+
+
 export function validateParam(schema: {[index: string]: any}, pathToParam: string, value: any): string | undefined {
-  return;
+  const itemSchema: SchemaElement | undefined = schema[pathToParam];
 
-  // TODO: !!!!
+  if (!itemSchema) return `Can't find schema param ${pathToParam}`;
 
-  // const itemSchema = _get(schema, pathToParam);
-  //
-  // if (!itemSchema) return `Can't find schema param ${pathToParam}`;
+  const parsedType: ParsedType = parseType(schema[pathToParam].type);
+
   //
   // // если не указан тип - то это значение - тогда по значению можно взять тип
   //

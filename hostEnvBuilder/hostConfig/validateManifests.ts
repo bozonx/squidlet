@@ -10,23 +10,9 @@ import {
   required,
   sequence, whiteList
 } from './validationHelpers';
+import SchemaElement from '../../host/interfaces/SchemaElement';
+import {parseType} from '../../host/helpers/typesHelpers';
 
-
-const basicTypes: string[] = [
-  'string',
-  'string[]',
-  'number',
-  'number[]',
-  'boolean',
-  'boolean[]',
-];
-
-const constants: string[] = [
-  'true',
-  'false',
-  'null',
-  'undefined',
-];
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
@@ -57,23 +43,30 @@ function checkFiles(files: string[] | undefined): string | undefined {
 
 function checkType(type: string | undefined, ruleName: string): string | undefined {
   if (typeof type === 'undefined') return;
-  else if (typeof type !== 'string' && typeof type !== 'number') {
-    return `type param of rule "${ruleName}" is not string or number`;
+  // else if (typeof type !== 'string' && typeof type !== 'number') {
+  //   return `type param of rule "${ruleName}" is not string or number`;
+  // }
+  //
+  // const types: string[] = String(type).split('|').map((item) => _trim(item));
+  //
+  // for (let item of types) {
+  //   // numbers
+  //   if (!Number.isNaN(Number(item))) continue;
+  //   // constants
+  //   else if (constants.includes(item)) continue;
+  //   // string constants
+  //   else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) continue;
+  //   // basic types
+  //   else if (!basicTypes.includes(item)) {
+  //     return `type param of rule "${ruleName}" has incorrect type: "${item}"`;
+  //   }
+  // }
+
+  try {
+    parseType(type);
   }
-
-  const types: string[] = String(type).split('|').map((item) => _trim(item));
-
-  for (let item of types) {
-    // numbers
-    if (!Number.isNaN(Number(item))) continue;
-    // constants
-    else if (constants.includes(item)) continue;
-    // string constants
-    else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) continue;
-    // basic types
-    else if (!basicTypes.includes(item)) {
-      return `type param of rule "${ruleName}" has incorrect type: "${item}"`;
-    }
+  catch (err) {
+    return `Incorrect type "${type}" of rule "${ruleName}": ${String(err)}`;
   }
 
   return;
@@ -84,7 +77,7 @@ function checkDefault(type: string | undefined, ruleName: string): string | unde
   return;
 }
 
-function checkRules(rules: {[index: string]: any} | undefined, paramName: string): string | undefined {
+function checkRules(rules: {[index: string]: SchemaElement} | undefined, paramName: string): string | undefined {
   if (typeof rules === 'undefined') return;
 
   for (let ruleName of Object.keys(rules)) {
