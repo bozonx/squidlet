@@ -11,7 +11,7 @@ import {
   sequence, whiteList
 } from './validationHelpers';
 import SchemaElement from '../../host/interfaces/SchemaElement';
-import {parseType} from '../../host/helpers/typesHelpers';
+import {isValueOfType, parseType} from '../../host/helpers/typesHelpers';
 
 
 
@@ -72,8 +72,13 @@ function checkType(type: string | undefined, ruleName: string): string | undefin
   return;
 }
 
-function checkDefault(type: string | undefined, ruleName: string): string | undefined {
-  // TODO: значение должно соответствовать типу
+function checkDefault(rule: SchemaElement, ruleName: string): string | undefined {
+  if (typeof rule.default === 'undefined') return;
+
+  const error: string | undefined = isValueOfType(rule.type, rule.default);
+
+  if (error) return `Rule's "${ruleName}": "${JSON.stringify(rule)}" default param doesn't correspond to its type`;
+
   return;
 }
 
@@ -88,7 +93,7 @@ function checkRules(rules: {[index: string]: SchemaElement} | undefined, paramNa
     const error: string | undefined = sequence([
       () => required(rules[ruleName].type, `${paramName}.${ruleName}.type`),
       () => checkType(rules[ruleName].type, `${paramName}.${ruleName}`),
-      () => checkDefault(rules[ruleName].default, `${paramName}.${ruleName}`),
+      () => checkDefault(rules[ruleName], `${paramName}.${ruleName}`),
       () => isBoolean(rules[ruleName].required, `${paramName}.${ruleName}.required`),
       () => whiteList(rules[ruleName], [
         'type',

@@ -1,10 +1,10 @@
 import System from '../System';
 import Republish from '../helpers/Republish';
-import {validateParam, validateDict} from '../helpers/validateSchema';
 import PublishParams from '../interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
 import {isEmpty} from '../helpers/lodashLike';
 import {getDifferentKeys} from '../helpers/helpers';
+import {validateParam} from '../helpers/typesHelpers';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
