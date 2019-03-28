@@ -4,7 +4,7 @@ import SchemaElement from '../interfaces/SchemaElement';
 
 export interface ParsedType {
   types: string[];
-  constants: string[];
+  constants: (string | number | boolean | null | undefined)[];
 }
 
 
@@ -17,12 +17,12 @@ const basicTypes: string[] = [
   'boolean[]',
 ];
 
-const constants: string[] = [
-  'true',
-  'false',
-  'null',
-  'undefined',
-];
+// const constants: string[] = [
+//   'true',
+//   'false',
+//   'null',
+//   'undefined',
+// ];
 
 
 export function parseType(type: string | number | boolean | undefined): ParsedType {
@@ -39,9 +39,13 @@ export function parseType(type: string | number | boolean | undefined): ParsedTy
 
   for (let item of types) {
     // numbers
-    if (!Number.isNaN(Number(item))) result.constants.push(item);
+    if (!Number.isNaN(Number(item))) result.constants.push(Number(item));
     // constants
-    else if (constants.includes(item)) result.constants.push(item);
+    //else if (constants.includes(item)) result.constants.push(item);
+    else if (item === 'true') result.constants.push(true);
+    else if (item === 'false') result.constants.push(false);
+    else if (item === 'null') result.constants.push(null);
+    else if (item === 'undefined') result.constants.push(undefined);
     // string constants
     else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) result.constants.push(item);
     // basic types
@@ -56,9 +60,20 @@ export function parseType(type: string | number | boolean | undefined): ParsedTy
   return result;
 }
 
-export function isValueOfType(type: string, value: any): string | undefined {
-  const parsedType: ParsedType = parseType(type);
+export function isValueOfType(fullType: string, value: any): string | undefined {
+  const parsedType: ParsedType = parseType(fullType);
 
+  // check types
+  for (let type of parsedType.types) {
+    if (typeof value === type) return;
+  }
+
+  // check constants
+  for (let constant of parsedType.constants) {
+    if (value === constant) return;
+  }
+
+  return `value "${JSON.stringify(value)}" doesn't correspond to type "${fullType}"`;
 }
 
 export function validateParam(schema: {[index: string]: any}, pathToParam: string, value: any): string | undefined {
