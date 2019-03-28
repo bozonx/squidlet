@@ -297,7 +297,13 @@ export default abstract class DeviceDataManagerBase {
   }
 
   private validateDict(dict: {[index: string]: any}, errorMsg: string) {
-    const validateError: string | undefined = validateDict(this.schema, dict);
+    let validateError: string | undefined;
+
+    for (let paramName of Object.keys(dict)) {
+      validateError = validateParam(this.schema, paramName, dict[paramName]);
+
+      if (validateError) break;
+    }
 
     if (validateError) {
       const completeErrMsg = `${errorMsg}: ${validateError}`;

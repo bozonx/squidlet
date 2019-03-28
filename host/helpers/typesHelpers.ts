@@ -27,7 +27,7 @@ const basicTypes: string[] = [
 
 export function parseType(type: string | number | boolean | undefined): ParsedType {
   if (typeof type === 'undefined') throw new  Error(`Type is required`);
-  if (
+  else if (
     (typeof type !== 'string' && typeof type !== 'number' && typeof type !== 'boolean')
     || type === ''
   ) {
@@ -53,7 +53,7 @@ export function parseType(type: string | number | boolean | undefined): ParsedTy
       result.types.push(item);
     }
     else {
-      throw new Error(`unsupported type "${item}" of "${type}"`;
+      throw new Error(`unsupported type "${item}" of "${type}"`);
     }
   }
 
@@ -79,13 +79,13 @@ export function isValueOfType(fullType: string, value: any): string | undefined 
 export function validateParam(schema: {[index: string]: any}, pathToParam: string, value: any): string | undefined {
   const itemSchema: SchemaElement | undefined = schema[pathToParam];
 
-  if (!itemSchema) return `Can't find schema param ${pathToParam}`;
+  if (!itemSchema) return `Can't find schema's param ${pathToParam}`;
 
   return isValueOfType(schema[pathToParam].type, value);
 }
 
-export function validateDict(schema: {[index: string]: any}, dict: {[index: string]: any}): string | undefined {
-  return;
-
-  // TODO: !!!!
-}
+// export function validateDict(schema: {[index: string]: any}, dict: {[index: string]: any}): string | undefined {
+//   return;
+//
+//   // TODO: !!!!
+// }

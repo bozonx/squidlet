@@ -9,7 +9,7 @@ import './helpers/mkdirPLogic';
 import './helpers/Polling';
 import './helpers/Republish';
 import './helpers/Sender';
-import './helpers/validateSchema';
+import './helpers/typesHelpers';
 import './helpers/validators';
 // Import entities base which will copy to final tree
 import './baseDevice/DeviceBase';
