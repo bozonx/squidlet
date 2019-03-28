@@ -1,5 +1,3 @@
-import _trim = require('lodash/trim');
-
 import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
 import {
   isBoolean,
@@ -43,24 +41,6 @@ function checkFiles(files: string[] | undefined): string | undefined {
 
 function checkType(type: string | undefined, ruleName: string): string | undefined {
   if (typeof type === 'undefined') return;
-  // else if (typeof type !== 'string' && typeof type !== 'number') {
-  //   return `type param of rule "${ruleName}" is not string or number`;
-  // }
-  //
-  // const types: string[] = String(type).split('|').map((item) => _trim(item));
-  //
-  // for (let item of types) {
-  //   // numbers
-  //   if (!Number.isNaN(Number(item))) continue;
-  //   // constants
-  //   else if (constants.includes(item)) continue;
-  //   // string constants
-  //   else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) continue;
-  //   // basic types
-  //   else if (!basicTypes.includes(item)) {
-  //     return `type param of rule "${ruleName}" has incorrect type: "${item}"`;
-  //   }
-  // }
 
   try {
     parseType(type);

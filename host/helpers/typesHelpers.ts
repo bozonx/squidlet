@@ -17,13 +17,6 @@ const basicTypes: string[] = [
   'boolean[]',
 ];
 
-// const constants: string[] = [
-//   'true',
-//   'false',
-//   'null',
-//   'undefined',
-// ];
-
 
 export function parseType(type: string | number | boolean | undefined): ParsedType {
   if (typeof type === 'undefined') throw new  Error(`Type is required`);
@@ -83,9 +76,3 @@ export function validateParam(schema: {[index: string]: any}, pathToParam: strin
 
   return isValueOfType(schema[pathToParam].type, value);
 }
-
-// export function validateDict(schema: {[index: string]: any}, dict: {[index: string]: any}): string | undefined {
-//   return;
-//
-//   // TODO: !!!!
-// }
