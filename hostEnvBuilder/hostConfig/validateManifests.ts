@@ -6,10 +6,11 @@ import {
   isString,
   isStringArray,
   required,
-  sequence, whiteList
+  sequence
 } from './validationHelpers';
 import SchemaElement from '../../host/interfaces/SchemaElement';
 import {isValueOfType, parseType} from '../../host/helpers/typesHelpers';
+import {whiteList} from '../../host/helpers/validate';
 
 
 

@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _difference = require('lodash/difference');
 
 
 export function sequence(exprs: (() => string | undefined)[]): string | undefined {
@@ -60,19 +59,6 @@ export function isStringArray(value: any | undefined, paramName: string): string
 export function oneOf(value: any | undefined, allowedValues: any[], paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (!allowedValues.includes(value)) return `${paramName} is not one of ${JSON.stringify(allowedValues)}`;
-
-  return;
-}
-
-export function whiteList(obj: any | undefined, allowedValues: any[], paramName: string): string | undefined {
-  if (typeof obj === 'undefined') return;
-  else if (typeof obj !== 'object') return `${paramName} is not object!`;
-
-  const diff: any[] = _difference(Object.keys(obj), allowedValues);
-
-  if (diff.length) {
-    return `${paramName} has not allowed params ${JSON.stringify(diff)}`;
-  }
 
   return;
 }

@@ -3,6 +3,8 @@ import DriverEnv from '../entities/DriverEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import {mergeDeep} from '../helpers/helpers';
+import DriverManifest from '../interfaces/DriverManifest';
+import validateProps from '../helpers/validate';
 
 
 /**
@@ -27,6 +29,8 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
+    await this.validateInstanceProps(instanceProps);
+
     // combined instance and definition props
     const props: {[index: string]: any} = mergeDeep({}, this.definition.props, instanceProps);
     const instanceId: string | undefined = this.getInstanceId(props);
@@ -81,6 +85,14 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
     if (instance.init) await instance.init();
 
     return instance;
+  }
+
+  private async validateInstanceProps(instanceProps: {[index: string]: any}) {
+    const manifest: DriverManifest = await this.env.loadManifest(this.id);
+    // TODO: get manifest
+    const validationErr: string | undefined = validateProps(instanceProps, manifest.props);
+
+    // TODO: validate required
   }
 
 }
