@@ -3,7 +3,7 @@ import {whiteList} from './validationHelpers';
 import {isValueOfType} from '../../host/helpers/typesHelpers';
 
 
-export default function validateProps(
+export default function validateProps (
   props: {[index: string]: any},
   schema?: {[index: string]: SchemaElement}
 ): string | undefined {
