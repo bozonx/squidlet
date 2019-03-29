@@ -6,7 +6,7 @@ import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
-import validateProps from '../../host/helpers/validate';
+import {validateProps} from '../../host/helpers/validate';
 
 
 /**

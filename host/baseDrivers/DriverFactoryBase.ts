@@ -4,7 +4,7 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import {mergeDeep} from '../helpers/helpers';
 import DriverManifest from '../interfaces/DriverManifest';
-import validateProps from '../helpers/validate';
+import {validateProps, validateRequired} from '../helpers/validate';
 
 
 /**
@@ -29,11 +29,11 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
-    await this.validateInstanceProps(instanceProps);
-
     // combined instance and definition props
     const props: {[index: string]: any} = mergeDeep({}, this.definition.props, instanceProps);
     const instanceId: string | undefined = this.getInstanceId(props);
+
+    await this.validateInstanceProps(instanceProps, props);
 
     if (typeof instanceId === 'undefined') {
       // just create always new instance and don't save
@@ -87,12 +87,20 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
     return instance;
   }
 
-  private async validateInstanceProps(instanceProps: {[index: string]: any}) {
+  private async validateInstanceProps(
+    instanceProps: {[index: string]: any},
+    mergedProps: {[index: string]: any}
+  ) {
     const manifest: DriverManifest = await this.env.loadManifest(this.id);
-    // TODO: get manifest
-    const validationErr: string | undefined = validateProps(instanceProps, manifest.props);
 
-    // TODO: validate required
+    if (!manifest.props) return;
+
+    const validationErr: string | undefined = validateProps(instanceProps, manifest.props)
+      || validateRequired(mergedProps, manifest.props);
+
+    if (validationErr) {
+      throw new Error(`Can't make instance of driver "${this.id}": ${validationErr}`);
+    }
   }
 
 }

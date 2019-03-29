@@ -2,7 +2,7 @@ import SchemaElement from '../interfaces/SchemaElement';
 import {isValueOfType} from './typesHelpers';
 
 
-export function validate (
+export function validateProps (
   props: {[index: string]: any},
   schema?: {[index: string]: SchemaElement}
 ): string | undefined {
@@ -16,6 +16,21 @@ export function validate (
     const typeErr: string | undefined = isValueOfType(schema[name].type, props[name]);
 
     if (typeErr) return `prop "${name}": typeErr`;
+  }
+
+  return;
+}
+
+export function validateRequired (
+  props: {[index: string]: any},
+  schema?: {[index: string]: SchemaElement}
+): string | undefined {
+  if (!schema) return;
+
+  for (let name of Object.keys(schema)) {
+    if (schema[name].required && typeof props[name] === 'undefined') {
+      return `prop "${name}" is required`;
+    }
   }
 
   return;
