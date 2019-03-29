@@ -1,3 +1,4 @@
+import SchemaElement from '../../host/interfaces/SchemaElement';
 
 function checkDevices(rawConfig: {[index: string]: any}): string | undefined {
   // TODO: add
@@ -24,8 +25,15 @@ function checkLogger(rawConfig: {[index: string]: any}): string | undefined {
 }
 
 
-export default function validateDefinitions() {
+export default function validateProps(
+  props: {[index: string]: any},
+  schema?: {[index: string]: SchemaElement}
+): string | undefined {
+  if (!schema) return;
 
+
+
+  return;
 }
 
 

@@ -6,6 +6,7 @@ import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
+import validateProps from '../hostConfig/validateDefinitions';
 
 
 /**
@@ -66,13 +67,19 @@ export default class Definitions {
     const hostDeviceDefaultProps = this.configManager.devicesDefaults;
     const className: string = deviceDef.className;
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', className);
+    const definitionProps: {[index: string]: any} = _omit(deviceDef, 'className');
+    const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
+
+    if (validationError) {
+      throw new Error(`Definition of device "${id}" is incorrect: ${validationError}`);
+    }
 
     return {
       id,
       className,
       props: _defaultsDeep(
         // definition
-        _omit(deviceDef, 'className'),
+        definitionProps,
 
         // host's defaults
         hostDeviceDefaultProps && hostDeviceDefaultProps[className],
@@ -89,13 +96,19 @@ export default class Definitions {
   private generateDriverDef(className: string): EntityDefinition {
     const driverDef: PreEntityDefinition = this.configManager.preEntities.drivers[className];
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', className);
+    const definitionProps: {[index: string]: any} = _omit(driverDef, 'className');
+    const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
+
+    if (validationError) {
+      throw new Error(`Definition of driver "${className}" is incorrect: ${validationError}`);
+    }
 
     return {
       // id and className is the same for drivers
       id: className,
       className: className,
       props: _defaultsDeep(
-        _omit(driverDef, 'className'),
+        definitionProps,
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
@@ -104,12 +117,18 @@ export default class Definitions {
   private generateServiceDef(id: string): EntityDefinition {
     const serviceDef: PreEntityDefinition = this.configManager.preEntities.services[id];
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
+    const definitionProps: {[index: string]: any} = _omit(serviceDef, 'className');
+    const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
+
+    if (validationError) {
+      throw new Error(`Definition of driver "${id}" is incorrect: ${validationError}`);
+    }
 
     return {
       id,
       className: serviceDef.className,
       props: _defaultsDeep(
-        _omit(serviceDef, 'className'),
+        definitionProps,
         this.collectManifestPropsDefaults(entitySet.manifest.props),
       ),
     };
