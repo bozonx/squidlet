@@ -1,5 +1,6 @@
 import SchemaElement from '../interfaces/SchemaElement';
 import {isValueOfType} from './typesHelpers';
+import {difference} from './lodashLike';
 
 
 export function validateProps (
@@ -40,7 +41,7 @@ export function whiteList(obj: any | undefined, allowedValues: any[], paramName:
   if (typeof obj === 'undefined') return;
   else if (typeof obj !== 'object') return `${paramName} is not object!`;
 
-  const diff: any[] = _difference(Object.keys(obj), allowedValues);
+  const diff: any[] = difference(Object.keys(obj), allowedValues);
 
   if (diff.length) {
     return `${paramName} has not allowed params ${JSON.stringify(diff)}`;
