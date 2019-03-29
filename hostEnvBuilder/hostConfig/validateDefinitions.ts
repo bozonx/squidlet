@@ -1,28 +1,29 @@
 import SchemaElement from '../../host/interfaces/SchemaElement';
 
-function checkDevices(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
 
-function checkDrivers(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: проверить что есть такой драйвер
-}
-
-function checkServices(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkAutomation(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkMqtt(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
-
-function checkLogger(rawConfig: {[index: string]: any}): string | undefined {
-  // TODO: add
-}
+// function checkDevices(rawConfig: {[index: string]: any}): string | undefined {
+//   // TODO: add
+// }
+//
+// function checkDrivers(rawConfig: {[index: string]: any}): string | undefined {
+//   // TODO: проверить что есть такой драйвер
+// }
+//
+// function checkServices(rawConfig: {[index: string]: any}): string | undefined {
+//   // TODO: add
+// }
+//
+// function checkAutomation(rawConfig: {[index: string]: any}): string | undefined {
+//   // TODO: add
+// }
+//
+// function checkMqtt(rawConfig: {[index: string]: any}): string | undefined {
+//   // TODO: add
+// }
+//
+// function checkLogger(rawConfig: {[index: string]: any}): string | undefined {
+//   // TODO: add
+// }
 
 
 export default function validateProps(
