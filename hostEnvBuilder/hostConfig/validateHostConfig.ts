@@ -43,19 +43,18 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
 
     () => isStringArray(rawConfig.plugins, 'plugins'),
 
-    () => checkBuildConfig(rawConfig),
-
-    () => checkConfig(rawConfig),
-
     () => isObject(rawConfig.devices, 'devices'),
     () => isObject(rawConfig.drivers, 'drivers'),
     () => isObject(rawConfig.services, 'services'),
-
-    () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
-
     () => isObject(rawConfig.automation, 'automation'),
     () => isObject(rawConfig.mqtt, 'mqtt'),
     () => isObject(rawConfig.logger, 'logger'),
+
+    () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
+
+    () => checkBuildConfig(rawConfig),
+
+    () => checkConfig(rawConfig),
 
     () => whiteList(rawConfig, [
       'id',

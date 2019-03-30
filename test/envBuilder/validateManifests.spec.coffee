@@ -1,7 +1,7 @@
-helpers = require('../../hostEnvBuilder/hostConfig/validateManifests')
+validateManifests = require('../../hostEnvBuilder/hostConfig/validateManifests').default
 
 
-describe 'envBuilder.validateManifests', ->
+describe.only 'envBuilder.validateManifests', ->
   beforeEach ->
 
   it '...', ->
