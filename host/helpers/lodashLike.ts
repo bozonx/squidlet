@@ -156,5 +156,18 @@ export function isPlainObject(obj: any): boolean {
 }
 
 export function difference(testArr: any[], samples: any[]): any[] {
-  
+  if (typeof testArr === 'undefined' || !testArr.length) return [];
+  else if (typeof samples === 'undefined' || !samples.length) return testArr;
+
+  const diffArr: any[] = [];
+
+  for (let item of testArr) {
+    if (typeof item === 'undefined') continue;
+
+    if (samples.indexOf(item) === -1) {
+      diffArr.push(item);
+    }
+  }
+
+  return diffArr;
 }
