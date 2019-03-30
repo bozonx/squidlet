@@ -1,8 +1,6 @@
 helpers = require('../../hostEnvBuilder/helpers')
 
 describe 'envBuilder.helpers', ->
-  beforeEach ->
-
   it 'sortByIncludeInList', ->
     assert.deepEqual(
       helpers.sortByIncludeInList(['three', 'one', 'four', 'two'], ['one', 'two']),
