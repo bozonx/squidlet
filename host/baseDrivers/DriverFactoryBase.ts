@@ -4,7 +4,7 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
 import {mergeDeep} from '../helpers/helpers';
 import DriverManifest from '../interfaces/DriverManifest';
-import {validateProps, validateRequired} from '../helpers/validate';
+import {validateProps, validateRequiredProps} from '../helpers/validate';
 
 
 /**
@@ -96,7 +96,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
     if (!manifest.props) return;
 
     const validationErr: string | undefined = validateProps(instanceProps, manifest.props)
-      || validateRequired(mergedProps, manifest.props);
+      || validateRequiredProps(mergedProps, manifest.props);
 
     if (validationErr) {
       throw new Error(`Can't make instance of driver "${this.id}": ${validationErr}`);

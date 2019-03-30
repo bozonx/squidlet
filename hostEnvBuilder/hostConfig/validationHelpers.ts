@@ -63,7 +63,6 @@ export function oneOf(value: any | undefined, allowedValues: any[], paramName: s
   return;
 }
 
-
 /**
  * Not absolute and doesn't contains "../"
  */

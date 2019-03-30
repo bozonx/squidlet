@@ -22,7 +22,7 @@ export function validateProps (
   return;
 }
 
-export function validateRequired (
+export function validateRequiredProps (
   props: {[index: string]: any},
   schema?: {[index: string]: SchemaElement}
 ): string | undefined {
