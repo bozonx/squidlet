@@ -81,10 +81,16 @@ describe.only 'envBuilder.validateManifests', ->
         default: 'str'
       }
     } }))
-    # one of compund type
+    # one of compound type
     assert.isUndefined(validate('service', { @manifest..., props: {
       param: {
         type: 'number | string'
+        default: 5
+      }
+    } }))
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'number | 5'
         default: 5
       }
     } }))
@@ -92,5 +98,32 @@ describe.only 'envBuilder.validateManifests', ->
       param: {
         type: 'number | string'
         default: true
+      }
+    } }))
+    # boolean constant type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'true'
+        default: true
+      }
+    } }))
+    # null constant type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'null | string'
+        default: null
+      }
+    } }))
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'undefined | string'
+        default: undefined
+      }
+    } }))
+    # string constant type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: '"const"'
+        default: 'const'
       }
     } }))

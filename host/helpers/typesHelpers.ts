@@ -40,7 +40,9 @@ export function parseType(type: string | number | boolean | undefined): ParsedTy
     else if (item === 'null') result.constants.push(null);
     else if (item === 'undefined') result.constants.push(undefined);
     // string constants
-    else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) result.constants.push(item);
+    else if (item.match(/^['"][\w\d\s\-\_\$]+['"]$/)) result.constants.push(
+      item.replace(/\'|\"/g, '')
+    );
     // basic types
     else if (basicTypes.includes(item)) {
       result.types.push(item);
