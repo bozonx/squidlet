@@ -15,16 +15,20 @@ describe 'envBuilder.validateManifests', ->
     assert.isString(validate('device', { @manifest... }))
     assert.isString(validate('device', { @manifest..., type: 5 }))
     # status
-    assert.isUndefined(validate('device', { @manifest..., status: {type: 'number'}, type: 'str' }))
+    assert.isUndefined(validate('device', { @manifest..., status: {
+      param: { type: 'number' }
+    }, type: 'str' }))
     assert.isString(validate('device', { @manifest..., status: 5, type: 'str' }))
     assert.isString(validate('device', { @manifest..., status: {
-      type: 'unknown'
+      param: { type: 'unknown' }
     }, type: 'str' }))
     # config
-    assert.isUndefined(validate('device', { @manifest..., config: {type: 'number'}, type: 'str' }))
+    assert.isUndefined(validate('device', { @manifest..., config: {
+      param: { type: 'string' }
+    }, type: 'str' }))
     assert.isString(validate('device', { @manifest..., config: 5, type: 'str' }))
     assert.isString(validate('device', { @manifest..., config: {
-      type: 'unknown'
+      param: { type: 'unknown' }
     }, type: 'str' }))
 
   it 'driver', ->

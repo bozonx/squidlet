@@ -16,10 +16,15 @@ describe 'envBuilder.Definitions', ->
           manifest: {
             props: {
               commonProp: {
+                type: 'string'
                 default: 'entity'
               }
               entityProp: {
+                type: 'number'
                 default: 1
+              }
+              defProp: {
+                type: 'number'
               }
             }
           }
@@ -30,10 +35,15 @@ describe 'envBuilder.Definitions', ->
           manifest: {
             props: {
               commonProp: {
+                type: 'string'
                 default: 'entity'
               }
               entityProp: {
+                type: 'number'
                 default: 1
+              }
+              defProp: {
+                type: 'number'
               }
             }
           }
@@ -44,10 +54,15 @@ describe 'envBuilder.Definitions', ->
           manifest: {
             props: {
               commonProp: {
+                type: 'string'
                 default: 'entity'
               }
               entityProp: {
+                type: 'number'
                 default: 1
+              }
+              defProp: {
+                type: 'number'
               }
             }
           }
