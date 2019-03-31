@@ -6,6 +6,7 @@ describe 'envBuilder.Register', ->
     @plugin = sinon.spy()
     @entity = {
       name: 'EntityName'
+      type: 'some'
       baseDir: 'myDir'
       main: './mainFile.ts'
     }
