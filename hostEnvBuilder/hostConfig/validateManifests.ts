@@ -99,7 +99,7 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
     () => required(rawManifest.name, 'name'),
     () => isString(rawManifest.name, 'name'),
 
-    () => required(rawManifest.name, 'name'),
+    () => required(rawManifest.main, 'main'),
     () => isString(rawManifest.main, 'main'),
     () => isLocalPath(rawManifest.main, 'main'),
 
