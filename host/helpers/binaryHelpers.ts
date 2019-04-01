@@ -8,13 +8,13 @@ import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
  */
 export function hexToBytes(hex: string): Uint8Array {
   if (hex.length < 2) throw new Error(`Incorrect length of hex data`);
-  if (hex.length / 2 !== Math.ceil(hex.length / 2)) {
+  else if (hex.length / 2 !== Math.ceil(hex.length / 2)) {
     throw new Error(`Incorrect length of hex data. It has to be even`);
   }
 
   const result: Uint8Array = new Uint8Array(hex.length / 2);
 
-  for(let i = 0; i < hex.length; i += 2) {
+  for (let i = 0; i < hex.length; i += 2) {
     const byte = hex[i] + hex[i + 1];
     result[i / 2] = parseInt(byte, 16);
   }
@@ -114,7 +114,7 @@ export function uint8WordToNum(word: Uint8Array): number {
 /**
  * Converts [true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false] > [255,0]
  */
-export function convertBitsToBytes(bits: (boolean | undefined)[], bitsCount: number): Uint8Array {
+export function bitsToBytes(bits: (boolean | undefined)[], bitsCount: number): Uint8Array {
 
   // TODO: fix
 
@@ -136,7 +136,7 @@ export function convertBitsToBytes(bits: (boolean | undefined)[], bitsCount: num
 /**
  * Converts [255,0] > [true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false]
  */
-export function convertBytesToBits(bytes: Uint8Array): boolean[] {
+export function bytesToBits(bytes: Uint8Array): boolean[] {
 
   // TODO: fix
 

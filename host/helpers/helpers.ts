@@ -64,19 +64,6 @@ export function parseValue(rawValue: any): any {
   return rawValue;
 }
 
-export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        resolve(await cb());
-      }
-      catch(err) {
-        reject(err);
-      }
-    }, delayMs);
-  });
-}
-
 export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
   // twice inverting on pullup if allowed
   if (pullup && invertOnPullup) {
@@ -138,6 +125,20 @@ export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
 // export function validateMessage(message: Message) {
 //   return message && message.category && message.topic && message.from && message.to;
 // }
+
+export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+  // TODO: rerutn an object and add method - cancel
+  return new Promise<T>((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        resolve(await cb());
+      }
+      catch(err) {
+        reject(err);
+      }
+    }, delayMs);
+  });
+}
 
 
 export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {

@@ -1,5 +1,5 @@
 import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/DigitalDev';
-import {convertBitsToBytes} from 'host/helpers/binaryHelpers';
+import {bitsToBytes} from 'host/helpers/binaryHelpers';
 import {getKeyOfObject} from 'host/helpers/collections';
 
 import {
@@ -179,7 +179,7 @@ export default class DigitalPins {
    * Write all the values of digital output pins to IC.
    */
   async writeOutputStateToIc() {
-    const dataToSend: Uint8Array = convertBitsToBytes(
+    const dataToSend: Uint8Array = bitsToBytes(
       this.expander.state.getAllState().outputs,
       this.expander.props.digitalPinsCount
     );

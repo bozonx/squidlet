@@ -1,6 +1,9 @@
-import {difference, find, isEqual, isObject, trim, values} from './lodashLike';
+import {find, isEqual, isObject, trim, values} from './lodashLike';
 
 
+/**
+ * Make a new Uint8Array without the first item
+ */
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
   if (!isUint8Array(arr)) {
     throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
@@ -16,6 +19,9 @@ export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
   return result;
 }
 
+/**
+ * Make a new Uint8Array with the new item on the first position and other items is moved right
+ */
 export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
   if (!isUint8Array(arr)) {
     throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
