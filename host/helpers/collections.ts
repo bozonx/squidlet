@@ -60,6 +60,23 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
 }
 
 /**
+ * Compare 2 objects and collect keys which are different.
+ * PartialObj can omit some props of sourceObj
+ * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
+ */
+export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: {[index: string]: any}): string[] {
+  const diffKeys: string[] = [];
+
+  for (let key of Object.keys(sourceObj)) {
+    if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
+      diffKeys.push(key);
+    }
+  }
+
+  return diffKeys;
+}
+
+/**
  * Deep merge two objects.
  * It mutates target object.
  * To not mutate first object use it this way `mergeDeep({}, defaultValues, newValues)`
@@ -84,23 +101,6 @@ export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: s
   }
 
   return mergeDeep(target, ...sources);
-}
-
-/**
- * Compare 2 objects and collect keys which are different.
- * PartialObj can omit some props of sourceObj
- * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
- */
-export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: {[index: string]: any}): string[] {
-  const diffKeys: string[] = [];
-
-  for (let key of Object.keys(sourceObj)) {
-    if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
-      diffKeys.push(key);
-    }
-  }
-
-  return diffKeys;
 }
 
 /**

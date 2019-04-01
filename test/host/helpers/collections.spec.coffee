@@ -22,3 +22,23 @@ describe.only 'helpers.collections', ->
     uint = new Uint8Array(1)
     assert.isTrue(collections.isUint8Array(uint))
     assert.isFalse(collections.isUint8Array([]))
+
+  it 'appendArray', ->
+    arr = [1]
+    collections.appendArray(arr, [2])
+    assert.deepEqual(arr, [1,2])
+
+  it 'updateArray', ->
+    arr = [0,1,2]
+    collections.updateArray(arr, ['a', 'b'])
+    assert.deepEqual(arr, ['a', 'b', 2])
+    # overflow
+    arr = [0]
+    collections.updateArray(arr, [1,2])
+    assert.deepEqual(arr, [1,2])
+    # skip empty
+    arr = [0,1,2]
+    arr2 = []
+    arr2[2] = 5
+    collections.updateArray(arr, arr2)
+    assert.deepEqual(arr, [0,1,5])
