@@ -1,8 +1,6 @@
 import {isUint8Array} from './helpers';
 
 
-// TODO: test
-
 /**
  * When undefined, null, '', [] or {}.
  * 0 is not empty!
@@ -33,6 +31,9 @@ export function omit(obj: {[index: string]: any}, ...propToExclude: string[]): {
 }
 
 export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any | undefined): any | undefined {
+
+  // TODO: fix and review
+
   if (typeof collection === 'undefined' || collection === null) {
     return;
   }
