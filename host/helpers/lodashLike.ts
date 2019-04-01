@@ -31,9 +31,6 @@ export function omit(obj: {[index: string]: any}, ...propToExclude: string[]): {
 }
 
 export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
-
-  // TODO: fix and review
-
   if (typeof collection === 'undefined' || collection === null) {
     return;
   }

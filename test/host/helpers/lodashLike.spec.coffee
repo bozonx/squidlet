@@ -31,3 +31,15 @@ describe.only 'helpers.lodashLike', ->
     assert.equal(lodashLike.find(['a', 'b'], arrCb), 'b')
     # array - not found
     assert.isUndefined(lodashLike.find(['a', 'c'], arrCb))
+
+  it 'trimStart', ->
+    assert.equal(lodashLike.trimStart('  a  '), 'a  ')
+
+  it 'trimEnd', ->
+    assert.equal(lodashLike.trimEnd('  a  '), '  a')
+
+  it 'trim', ->
+    assert.equal(lodashLike.trim('  a  '), 'a')
+
+  it 'padStart', ->
+    assert.equal(lodashLike.padStart('11', 8, '0'), '00000011')
