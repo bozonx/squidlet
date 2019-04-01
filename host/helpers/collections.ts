@@ -45,6 +45,9 @@ export function updateArray(arrToUpdate: any[], newValues: any[]): void {
   for (let index in newValues) arrToUpdate[index] = newValues[index];
 }
 
+
+
+// TODO: test
 /**
  * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
  */
@@ -59,6 +62,7 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
   return keys[valueIndex];
 }
 
+// TODO: test
 /**
  * Compare 2 objects and collect keys which are different.
  * PartialObj can omit some props of sourceObj
