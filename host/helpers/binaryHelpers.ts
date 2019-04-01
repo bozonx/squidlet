@@ -60,10 +60,6 @@ export function hexStringToHexNum(hexString: string | number | undefined): numbe
  * Number are always 8.
  */
 export function byteToString(hexValue: number): string {
-
-  // TODO: fix
-
-  // convert 4 to "00000100"
   return padStart( hexValue.toString(2), 8, '0' );
 }
 
@@ -73,17 +69,14 @@ export function byteToString(hexValue: number): string {
  * Number are always 8.
  */
 export function byteToBinArr(hexValue: number): boolean[] {
-
-  // TODO: fix
-
   // convert 4 to ""00000100""
   const binStr: string = byteToString(hexValue);
   // like ["1", "1", "1", "1", "1", "1", "1", "1"]
   const binSplitStr: string[] = binStr.split('');
   const result: boolean[] = new Array(8);
 
-  for (let itemStr of binSplitStr) {
-    result.push( Boolean( parseInt(itemStr) ) );
+  for (let i = 0; i < 8; i++) {
+    result[i] = Boolean( parseInt(binSplitStr[i]) );
   }
 
   return result;

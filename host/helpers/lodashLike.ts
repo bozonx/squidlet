@@ -73,10 +73,13 @@ export function trim(src: string, char: string = ' '): string {
   return trimEnd( trimStart(src, char), char);
 }
 
-export function padStart(srcString: string, repeatNum: number = 0, chars: string = ' ') {
+export function padStart(srcString: string, length: number = 0, chars: string = ' ') {
   let result = '';
+  const repeats = length - srcString.length;
 
-  for (let i = 0; i < repeatNum; i ++) result += chars;
+  if (repeats <= 0) return srcString;
+
+  for (let i = 0; i < repeats; i ++) result += chars;
 
   return `${result}${srcString}`;
 }

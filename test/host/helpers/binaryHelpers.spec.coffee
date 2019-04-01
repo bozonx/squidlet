@@ -1,7 +1,7 @@
 helpers = require('../../../host/helpers/binaryHelpers')
 
 
-describe 'helpers.binaryHelpers', ->
+describe.only 'helpers.binaryHelpers', ->
   it 'hexToBytes', ->
     assert.deepEqual(helpers.hexToBytes('ffff'), new Uint8Array([ 255, 255 ]))
     assert.deepEqual(helpers.hexToBytes('0102'), new Uint8Array([ 1, 2 ]))
@@ -17,11 +17,11 @@ describe 'helpers.binaryHelpers', ->
   it 'hexStringToHexNum', ->
     assert.equal(helpers.hexNumToHexString('01'), 1)
 
-#  it 'byteToString', ->
-#    assert.equal(helpers.byteToString(4), '00000100')
+  it 'byteToString', ->
+    assert.equal(helpers.byteToString(4), '00000100')
 
-#  it 'byteToBinArr', ->
-#    assert.equal(helpers.byteToBinArr(4), [false, false, false, false, false, true, false, false])
+  it 'byteToBinArr', ->
+    assert.deepEqual(helpers.byteToBinArr(4), [false, false, false, false, false, true, false, false])
 
   it 'numToWord', ->
     assert.equal(helpers.numToWord(65535), 'ffff')
