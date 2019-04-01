@@ -12,11 +12,12 @@ enum CURRENT_POLL_ENUM {
 type PollHandler = (err: Error, result: any) => void;
 type MethodWhichPoll = () => Promise<any>;
 type MethodWrapper = () => void;
-// [ intervalId, MethodWrapper, pollInterval ]
+// [ intervalId, methodWhichPoll, MethodWrapper, pollInterval ]
 type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 
 
-// TODO: проверить что не будут выполняться другие poll пока выполняется текущий
+// TODO: проверить что не будут выполняться другие poll пока выполняется текущий (если завис)
+// TODO: можно перерефакторить чтобы был отдельный класс poll без указания id - всегда 1 methodWhichPoll
 
 
 export default class Polling {
@@ -80,41 +81,38 @@ export default class Polling {
   /**
    * Restart polling and return data of first poll
    */
-  async restart(uniqId: string | undefined): Promise<any> {
-
-    // TODO: test
-
+  async restart(uniqId?: string): Promise<any> {
     const id = this.resolveId(uniqId);
 
     if (!this.currentPolls[id]) {
       throw new Error(`Can't restart polling of "${uniqId}" because it hasn't been started yet`);
     }
 
-    const current: CurrentPoll = this.currentPolls[id];
     let result: any;
 
-    // stop polling
-    this.stop(id);
+    // clear interval
+    clearInterval(this.currentPolls[id][CURRENT_POLL_ENUM.intervalId]);
 
     // make first poll
+    //this.currentPolls[id][CURRENT_POLL_ENUM.methodWrapper]();
+
     try {
-      result = await current[CURRENT_POLL_ENUM.methodWrapper];
+      result = await this.currentPolls[id][CURRENT_POLL_ENUM.methodWrapper]();
     }
     catch(err) {
       // start polling any way
-      this.start(current[CURRENT_POLL_ENUM.methodWhichPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
+      this.renewInterval(id);
 
       throw err;
     }
 
     // start interval
-    this.start(current[CURRENT_POLL_ENUM.methodWhichPoll], current[CURRENT_POLL_ENUM.pollInterval], id);
+    this.renewInterval(id);
 
     return result;
-
   }
 
-  stop(uniqId: string | undefined) {
+  stop(uniqId?: string) {
     const id = this.resolveId(uniqId);
 
     if (typeof this.currentPolls[id] !== 'undefined') {
@@ -126,6 +124,13 @@ export default class Polling {
 
   private resolveId(uniqId: string | undefined): string {
     return uniqId || DEFAULT_ID;
+  }
+
+  private renewInterval(id: string) {
+    this.currentPolls[id][CURRENT_POLL_ENUM.intervalId] = setInterval(
+      this.currentPolls[id][CURRENT_POLL_ENUM.methodWrapper],
+      this.currentPolls[id][CURRENT_POLL_ENUM.pollInterval]
+    );
   }
 
 }
