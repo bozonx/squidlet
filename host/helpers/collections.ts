@@ -1,4 +1,4 @@
-import {find, isEqual, isObject, trim, values} from './lodashLike';
+import {difference, find, isEqual, isObject, trim, values} from './lodashLike';
 
 
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
@@ -36,12 +36,18 @@ export function isUint8Array(value: any): boolean {
   return value.constructor === Uint8Array;
 }
 
+/**
+ * Concat arrays but not create a new one, it mutates the srcArr.
+ */
 export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
   if (!arrToAppend) return;
 
   for (let item of arrToAppend) srcArr.push(item);
 }
 
+/**
+ * Replace values if array. It mutates an "arrToUpdate" array.
+ */
 export function updateArray(arrToUpdate: any[], newValues: any[]): void {
   for (let index in newValues) arrToUpdate[index] = newValues[index];
 }
@@ -67,15 +73,11 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
 }
 
 /**
- * Compare 2 objects and collect keys which are different.
+ * Compare 2 objects and collect keys whose VALUES are different (not equals to the same key in the sourceObj).
  * PartialObj can omit some props of sourceObj
  * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
  */
 export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: {[index: string]: any}): string[] {
-
-  // TODO: test
-  // TODO: maybe use lodash difference ???
-
   const diffKeys: string[] = [];
 
   for (let key of Object.keys(sourceObj)) {

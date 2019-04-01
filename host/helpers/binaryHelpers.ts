@@ -1,6 +1,6 @@
 import {padStart} from './lodashLike';
 //import {TextDecoder, TextEncoder} from 'text-encoding';
-import {ASCII_NUMERIC_OFFSET, BYTES_IN_WORD} from '../dict/constants';
+import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
 
 
 /**
@@ -73,9 +73,9 @@ export function byteToBinArr(hexValue: number): boolean[] {
   const binStr: string = byteToString(hexValue);
   // like ["1", "1", "1", "1", "1", "1", "1", "1"]
   const binSplitStr: string[] = binStr.split('');
-  const result: boolean[] = new Array(8);
+  const result: boolean[] = new Array(BITS_IN_BYTE);
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < BITS_IN_BYTE; i++) {
     result[i] = Boolean( parseInt(binSplitStr[i]) );
   }
 

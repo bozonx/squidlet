@@ -46,3 +46,6 @@ describe.only 'helpers.collections', ->
   it 'getKeyOfObject', ->
     assert.equal(collections.getKeyOfObject({a: 1, b: 2}, 2), 'b')
     assert.isUndefined(collections.getKeyOfObject({a: 1, b: 2}, 3))
+
+  it 'getDifferentKeys', ->
+    assert.deepEqual(collections.getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}), ['b'])

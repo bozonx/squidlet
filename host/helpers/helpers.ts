@@ -7,6 +7,133 @@ import {Edge} from '../interfaces/dev/DigitalDev';
 export const PATH_SEPARATOR = '/';
 
 
+export function convertToLevel(value: any): boolean {
+  return value === true
+    || value === 1
+    || value === 'high'
+    || value === 'true'
+    || value === '1'
+    || value === 'ON' || value === 'on' || value === 'On';
+}
+
+export function parseValue(rawValue: any): any {
+  if (typeof rawValue === 'undefined') {
+    return;
+  }
+  if (rawValue === null) {
+    return null;
+  }
+  else if (typeof rawValue === 'boolean') {
+    return rawValue;
+  }
+  else if (rawValue === 'true') {
+    return true;
+  }
+  else if (rawValue === 'false') {
+    return false;
+  }
+  else if (rawValue === 'undefined') {
+    return undefined;
+  }
+  else if (rawValue === 'null') {
+    return null;
+  }
+  else if (rawValue === 'NaN') {
+    return NaN;
+  }
+  else if (rawValue === '') {
+    return '';
+  }
+  // it is for - 2. strings
+  else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
+    return rawValue;
+  }
+
+  const toNumber = Number(rawValue);
+
+  if (!Number.isNaN(toNumber)) {
+    // it's number
+    return toNumber;
+  }
+
+  if (typeof rawValue === 'string') {
+    return rawValue;
+  }
+
+  // array or object - as is
+  return rawValue;
+}
+
+export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        resolve(await cb());
+      }
+      catch(err) {
+        reject(err);
+      }
+    }, delayMs);
+  });
+}
+
+export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
+  // twice inverting on pullup if allowed
+  if (pullup && invertOnPullup) {
+    return !invert;
+  }
+
+  // in other cases - use invert prop
+  return invert;
+}
+
+export function callPromised(method: Function, ...params: any[]): Promise<any> {
+  return new Promise((resolve, reject) => {
+    method(...params, (err: Error, data: any) => {
+      if (err) return reject(err);
+
+      resolve(data);
+    });
+  });
+}
+
+export function firstLetterToUpperCase(value: string): string {
+  if (!value) return value;
+
+  const split: string[] = value.split('');
+
+  split[0] = split[0].toUpperCase();
+
+  return split.join('');
+}
+
+export function invertIfNeed(value: boolean, invert?: boolean): boolean {
+  if (invert) return !value;
+
+  return value;
+}
+
+export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
+
+  // TODO: test
+
+  if (!edge) {
+    return 'both';
+  }
+  else if (inverted && edge === 'rising') {
+    return 'falling';
+  }
+  else if (inverted && edge === 'falling') {
+    return 'rising';
+  }
+
+  return edge;
+}
+
+
+
+
+
 // // TODO: move to separate file
 // export function validateMessage(message: Message) {
 //   return message && message.category && message.topic && message.from && message.to;
@@ -101,130 +228,6 @@ export function callOnDifferentValues(
       cb(index, arr1[index], arr2[index]);
     }
   }
-}
-
-
-export function convertToLevel(value: any): boolean {
-  return value === true
-    || value === 1
-    || value === 'high'
-    || value === 'true'
-    || value === '1'
-    || value === 'ON' || value === 'on' || value === 'On';
-}
-
-export function parseValue(rawValue: any): any {
-  if (typeof rawValue === 'undefined') {
-    return;
-  }
-  if (rawValue === null) {
-    return null;
-  }
-  else if (typeof rawValue === 'boolean') {
-    return rawValue;
-  }
-  else if (rawValue === 'true') {
-    return true;
-  }
-  else if (rawValue === 'false') {
-    return false;
-  }
-  else if (rawValue === 'undefined') {
-    return undefined;
-  }
-  else if (rawValue === 'null') {
-    return null;
-  }
-  else if (rawValue === 'NaN') {
-    return NaN;
-  }
-  else if (rawValue === '') {
-    return '';
-  }
-  // it is for - 2. strings
-  else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
-    return rawValue;
-  }
-
-  const toNumber = Number(rawValue);
-
-  if (!Number.isNaN(toNumber)) {
-    // it's number
-    return toNumber;
-  }
-
-  if (typeof rawValue === 'string') {
-    return rawValue;
-  }
-
-  // array or object - as is
-  return rawValue;
-}
-
-export function firstLetterToUpperCase(value: string): string {
-  if (!value) return value;
-
-  const split: string[] = value.split('');
-
-  split[0] = split[0].toUpperCase();
-
-  return split.join('');
-}
-
-export function invertIfNeed(value: boolean, invert?: boolean): boolean {
-  if (invert) return !value;
-
-  return value;
-}
-
-export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
-
-  // TODO: test
-
-  if (!edge) {
-    return 'both';
-  }
-  else if (inverted && edge === 'rising') {
-    return 'falling';
-  }
-  else if (inverted && edge === 'falling') {
-    return 'rising';
-  }
-
-  return edge;
-}
-
-export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        resolve(await cb());
-      }
-      catch(err) {
-        reject(err);
-      }
-    }, delayMs);
-  });
-}
-
-export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
-  // twice inverting on pullup if allowed
-  if (pullup && invertOnPullup) {
-    return !invert;
-  }
-
-  // in other cases - use invert prop
-  return invert;
-}
-
-export function callPromised(method: Function, ...params: any[]): Promise<any> {
-  return new Promise((resolve, reject) => {
-    method(...params, (err: Error, data: any) => {
-      if (err) return reject(err);
-
-      resolve(data);
-    });
-  });
 }
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
