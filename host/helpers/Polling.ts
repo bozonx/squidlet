@@ -17,7 +17,6 @@ type CurrentPoll = [any, MethodWhichPoll, MethodWrapper, number];
 
 
 // TODO: проверить что не будут выполняться другие poll пока выполняется текущий
-// TODO: проверить как будет работать с очередью
 
 
 export default class Polling {
