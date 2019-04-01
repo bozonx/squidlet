@@ -1,7 +1,7 @@
 lodashLike = require('../../../host/helpers/lodashLike')
 
 
-describe.only 'helpers.lodashLike', ->
+describe 'helpers.lodashLike', ->
   it 'isEmpty', ->
     assert.equal(lodashLike.isEmpty(undefined), true)
     assert.equal(lodashLike.isEmpty(null), true)
@@ -103,3 +103,9 @@ describe.only 'helpers.lodashLike', ->
     assert.isFalse(lodashLike.isPlainObject(undefined))
     assert.isFalse(lodashLike.isPlainObject(null))
     assert.isFalse(lodashLike.isPlainObject(0))
+
+  it 'difference', ->
+    assert.deepEqual(lodashLike.difference([1,4], [1,2,3]), [4])
+    assert.deepEqual(lodashLike.difference([1,3], [1,2,3]), [])
+    assert.deepEqual(lodashLike.difference([], [1,2,3]), [])
+    assert.deepEqual(lodashLike.difference([1,4], []), [1,4])
