@@ -38,6 +38,22 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
   return result;
 }
 
+export function isUint8Array(value: any): boolean {
+  if (typeof value !== 'object') return false;
+
+  return value.constructor === Uint8Array;
+}
+
+export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
+  if (!arrToAppend) return;
+
+  for (let item of arrToAppend) srcArr.push(item);
+}
+
+export function updateArray(arrToUpdate: any[], newValues: any[]): void {
+  for (let index in newValues) arrToUpdate[index] = newValues[index];
+}
+
 
 export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
 
@@ -113,46 +129,6 @@ export function splitLastElement(
     rest: split.join(separator),
   };
 }
-
-/**
- * It works with common structures like
- *     {
- *       parent: {
- *         prop: 'value'
- *       }
- *     }
- * @param rootObject
- * @param {function} cb - callback like (items, pathToItem) => {}.
- *                        If it returns false it means don't go deeper.
- */
-export function findRecursively(rootObject: object, cb: (item: any, itemPath: string) => boolean) {
-
-  // TODO: test, review
-
-  const recursive = (obj: object, rootPath: string): object | undefined => {
-    return find(obj, (item: any, name: string | number): any => {
-      const itemPath = trim(`${rootPath}.${name}`, '.');
-      const cbResult = cb(item, itemPath);
-
-      if (typeof cbResult === 'undefined') {
-        // go deeper
-        return recursive(item, itemPath);
-      }
-      else if (cbResult === false) {
-        // don't go deeper
-        return;
-      }
-      else {
-        // found - stop search
-        //return cbResult;
-        return true;
-      }
-    });
-  };
-
-  return recursive(rootObject, '');
-}
-
 
 export function callOnDifferentValues(
   arr1: any[],
@@ -267,12 +243,6 @@ export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: s
   return mergeDeep(target, ...sources);
 }
 
-export function isUint8Array(value: any): boolean {
-  if (typeof value !== 'object') return false;
-
-  return value.constructor === Uint8Array;
-}
-
 export function firstLetterToUpperCase(value: string): string {
   if (!value) return value;
 
@@ -281,10 +251,6 @@ export function firstLetterToUpperCase(value: string): string {
   split[0] = split[0].toUpperCase();
 
   return split.join('');
-}
-
-export function updateArray(arrToUpdate: any[], newValues: any[]): void {
-  for (let index in newValues) arrToUpdate[index] = newValues[index];
 }
 
 export function invertIfNeed(value: boolean, invert?: boolean): boolean {
@@ -350,12 +316,6 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
-export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
-  if (!arrToAppend) return;
-
-  for (let item of arrToAppend) srcArr.push(item);
-}
-
 export function callPromised(method: Function, ...params: any[]): Promise<any> {
   return new Promise((resolve, reject) => {
     method(...params, (err: Error, data: any) => {
@@ -365,6 +325,46 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
     });
   });
 }
+
+/**
+ * It works with common structures like
+ *     {
+ *       parent: {
+ *         prop: 'value'
+ *       }
+ *     }
+ * @param rootObject
+ * @param {function} cb - callback like (items, pathToItem) => {}.
+ *                        If it returns false it means don't go deeper.
+ */
+export function findRecursively(rootObject: object, cb: (item: any, itemPath: string) => boolean) {
+
+  // TODO: test, review
+
+  const recursive = (obj: object, rootPath: string): object | undefined => {
+    return find(obj, (item: any, name: string | number): any => {
+      const itemPath = trim(`${rootPath}.${name}`, '.');
+      const cbResult = cb(item, itemPath);
+
+      if (typeof cbResult === 'undefined') {
+        // go deeper
+        return recursive(item, itemPath);
+      }
+      else if (cbResult === false) {
+        // don't go deeper
+        return;
+      }
+      else {
+        // found - stop search
+        //return cbResult;
+        return true;
+      }
+    });
+  };
+
+  return recursive(rootObject, '');
+}
+
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;
