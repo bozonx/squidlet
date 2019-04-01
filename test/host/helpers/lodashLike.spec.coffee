@@ -93,3 +93,13 @@ describe.only 'helpers.lodashLike', ->
     assert.isFalse(lodashLike.isObject(undefined))
     assert.isFalse(lodashLike.isObject(null))
     assert.isFalse(lodashLike.isObject(0))
+
+  it 'isPlainObject', ->
+    cl = () ->
+    assert.isTrue(lodashLike.isPlainObject({}))
+    assert.isFalse(lodashLike.isPlainObject(new cl()))
+    assert.isFalse(lodashLike.isPlainObject([]))
+    assert.isFalse(lodashLike.isPlainObject(''))
+    assert.isFalse(lodashLike.isPlainObject(undefined))
+    assert.isFalse(lodashLike.isPlainObject(null))
+    assert.isFalse(lodashLike.isPlainObject(0))
