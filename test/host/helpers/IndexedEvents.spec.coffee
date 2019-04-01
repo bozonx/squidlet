@@ -9,9 +9,17 @@ describe.only 'helpers.IndexedEvents', ->
   it "addListener and emit", ->
     @events.addListener(@handler)
     @events.emit(1)
+    @events.emit(1)
+
+    sinon.assert.calledTwice(@handler)
+    sinon.assert.calledWith(@handler, 1)
+
+  it "once", ->
+    @events.once(@handler)
+    @events.emit()
+    @events.emit()
 
     sinon.assert.calledOnce(@handler)
-    sinon.assert.calledWith(@handler, 1)
 
   it "removeListener", ->
     handler2 = sinon.spy()
@@ -33,3 +41,14 @@ describe.only 'helpers.IndexedEvents', ->
     sinon.assert.notCalled(@handler)
     sinon.assert.notCalled(handler2)
 
+  it "getHandlers", ->
+    @events.addListener(@handler)
+
+    assert.deepEqual(@events.getHandlers(), [@handler])
+
+  it "hasListeners", ->
+    assert.isFalse(@events.hasListeners())
+
+    @events.addListener(@handler)
+
+    assert.isTrue(@events.hasListeners())

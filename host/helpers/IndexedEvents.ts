@@ -1,9 +1,6 @@
 import {LENGTH_AND_START_ARR_DIFFERENCE} from '../dict/constants';
 
 
-// export type EventHandler = (...args: any[]) => void;
-// type Handlers = Array<EventHandler | undefined>;
-
 export type AnyHandler = (...args: any[]) => void;
 
 
@@ -18,7 +15,7 @@ export default class IndexedEvents<T extends AnyHandler> {
     return this.handlers;
   }
 
-  hasListeners() {
+  hasListeners(): boolean {
     let hasInstance: boolean = false;
 
     for (let handler of this.handlers) {
