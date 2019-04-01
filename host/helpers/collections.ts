@@ -2,8 +2,9 @@ import {find, isEqual, isObject, trim, values} from './lodashLike';
 
 
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
-
-  // TODO: test
+  if (!isUint8Array(arr)) {
+    throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
+  }
 
   const shift = 1;
   const result = new Uint8Array(arr.length - shift);
@@ -16,8 +17,9 @@ export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
 }
 
 export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
-
-  // TODO: test
+  if (!isUint8Array(arr)) {
+    throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
+  }
 
   const itemsToAdd = 1;
   const result = new Uint8Array(arr.length + itemsToAdd);
