@@ -1,7 +1,7 @@
 helpers = require('../../../host/helpers/binaryHelpers')
 
 
-describe.only 'helpers.binaryHelpers', ->
+describe 'helpers.binaryHelpers', ->
   it 'hexToBytes', ->
     assert.deepEqual(helpers.hexToBytes('ffff'), new Uint8Array([ 255, 255 ]))
     assert.deepEqual(helpers.hexToBytes('0102'), new Uint8Array([ 1, 2 ]))

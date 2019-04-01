@@ -1,7 +1,7 @@
 lodashLike = require('../../../host/helpers/lodashLike')
 
 
-describe 'helpers.lodashLike', ->
+describe.only 'helpers.lodashLike', ->
   it 'isEmpty', ->
     assert.equal(lodashLike.isEmpty(undefined), true)
     assert.equal(lodashLike.isEmpty(null), true)
@@ -43,3 +43,6 @@ describe 'helpers.lodashLike', ->
 
   it 'padStart', ->
     assert.equal(lodashLike.padStart('11', 8, '0'), '00000011')
+
+  it 'last', ->
+    assert.equal(lodashLike.last([0,1,2]), 2)
