@@ -145,6 +145,9 @@ export function isEqual(first: any, second: any): boolean {
   return JSON.stringify(first) === JSON.stringify(second);
 }
 
+/**
+ * Is an object, not an array
+ */
 export function isObject(item: any): boolean {
   return (item && typeof item === 'object' && !Array.isArray(item));
 }
