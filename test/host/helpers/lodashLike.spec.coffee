@@ -20,7 +20,14 @@ describe.only 'helpers.lodashLike', ->
   it 'omit', ->
     assert.deepEqual(lodashLike.omit({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
 
-#  it 'find', ->
-#    cb = (item, index) => item == 1
-#    assert.deepEqual(lodashLike.find({a: 0, b: 1}, cb), 1)
-#    # TODO: test array
+  it 'find', ->
+    # object
+    objCb = (item, index) => item == 1
+    assert.equal(lodashLike.find({a: 0, b: 1}, objCb), 1)
+    # object - not found
+    assert.isUndefined(lodashLike.find({a: 0, b: 2}, objCb))
+    # array
+    arrCb = (item, index) => item == 'b'
+    assert.equal(lodashLike.find(['a', 'b'], arrCb), 'b')
+    # array - not found
+    assert.isUndefined(lodashLike.find(['a', 'c'], arrCb))

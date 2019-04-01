@@ -30,7 +30,7 @@ export function omit(obj: {[index: string]: any}, ...propToExclude: string[]): {
   return result;
 }
 
-export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any | undefined): any | undefined {
+export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
 
   // TODO: fix and review
 
@@ -41,14 +41,14 @@ export function find(collection: any[] | {[index: string]: any}, cb: (item: any,
     for (let index in collection) {
       const result: any | undefined = cb(collection[index], parseInt(index));
 
-      if (result) return result;
+      if (result) return collection[index];
     }
   }
   else if (typeof collection === 'object') {
     for (let key of Object.keys(collection)) {
-      const result: any | undefined = cb(collection[key], key);
+      const result: any = cb(collection[key], key);
 
-      if (result) return result;
+      if (result) return collection[key];
     }
   }
   else {
