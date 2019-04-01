@@ -3,7 +3,7 @@ import Republish from '../helpers/Republish';
 import PublishParams from '../interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
 import {isEmpty} from '../helpers/lodashLike';
-import {getDifferentKeys} from '../helpers/helpers';
+import {getDifferentKeys} from '../helpers/collections';
 import {validateParam} from '../helpers/typesHelpers';
 
 

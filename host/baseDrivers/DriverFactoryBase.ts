@@ -2,7 +2,7 @@ import DriverBase from './DriverBase';
 import DriverEnv from '../entities/DriverEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
-import {mergeDeep} from '../helpers/helpers';
+import {mergeDeep} from '../helpers/collections';
 import DriverManifest from '../interfaces/DriverManifest';
 import {validateProps, validateRequiredProps} from '../helpers/validate';
 

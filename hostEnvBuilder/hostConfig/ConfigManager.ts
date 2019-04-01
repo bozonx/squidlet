@@ -7,7 +7,7 @@ import HostConfig, {HostConfigConfig} from '../../host/interfaces/HostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
 import Io from '../Io';
-import {appendArray} from '../../host/helpers/helpers';
+import {appendArray} from '../../host/helpers/collections';
 import {loadMachineConfig} from '../../helpers/buildHelpers';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';

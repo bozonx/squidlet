@@ -1,6 +1,6 @@
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
 import I2cMasterDev from 'host/interfaces/dev/I2cMasterDev';
-import { addFirstItemUint8Arr } from 'host/helpers/helpers';
+import { addFirstItemUint8Arr } from 'host/helpers/collections';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import {DATA_ADDRESS_LENGTH} from 'host/dict/constants';
 
