@@ -149,7 +149,7 @@ export function isEqual(first: any, second: any): boolean {
  * Is an object, not an array
  */
 export function isObject(item: any): boolean {
-  return (item && typeof item === 'object' && !Array.isArray(item));
+  return item && typeof item === 'object' && !Array.isArray(item) || false;
 }
 
 export function isPlainObject(obj: any): boolean {
