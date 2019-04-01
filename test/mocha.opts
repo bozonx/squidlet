@@ -4,4 +4,4 @@
 --require coffeescript/register
 --require ts-node/register
 --require ./test/main.coffee
-test/envBuilder/**/*.spec.coffee
+test/**/*.spec.coffee
