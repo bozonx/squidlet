@@ -21,6 +21,12 @@ describe.only 'helpers.IndexedEvents', ->
 
     sinon.assert.calledOnce(@handler)
 
+  it "emitSync", ->
+    @events.addListener(() => Promise.resolve(1))
+    @events.addListener(() => Promise.resolve(2))
+
+    assert.deepEqual(await @events.emitSync(), [1, 2])
+
   it "removeListener", ->
     handler2 = sinon.spy()
     index = @events.addListener(@handler)
