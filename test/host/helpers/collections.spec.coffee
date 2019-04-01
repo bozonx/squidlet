@@ -42,3 +42,7 @@ describe.only 'helpers.collections', ->
     arr2[2] = 5
     collections.updateArray(arr, arr2)
     assert.deepEqual(arr, [0,1,5])
+
+  it 'getKeyOfObject', ->
+    assert.equal(collections.getKeyOfObject({a: 1, b: 2}, 2), 'b')
+    assert.isUndefined(collections.getKeyOfObject({a: 1, b: 2}, 3))

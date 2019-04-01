@@ -29,6 +29,7 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
   return result;
 }
 
+
 export function isUint8Array(value: any): boolean {
   if (typeof value !== 'object') return false;
 
@@ -46,29 +47,35 @@ export function updateArray(arrToUpdate: any[], newValues: any[]): void {
 }
 
 
-
-// TODO: test
 /**
+ * Get key by value
  * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
  */
 export function getKeyOfObject(obj: {[index: string]: any}, value: any): string | undefined {
+  if (!isObject(obj)) {
+    throw new Error(`collection.getKeyOfObject: obj param has to be an object!`);
+  }
+
   const valuesOfObj: any[] = values(obj);
   const keys: string[] = Object.keys(obj);
   const valueIndex: number = valuesOfObj.indexOf(value);
 
-  // if -1 - din't find
+  // if -1 - didn't find
   if (valueIndex < 0) return;
 
   return keys[valueIndex];
 }
 
-// TODO: test
 /**
  * Compare 2 objects and collect keys which are different.
  * PartialObj can omit some props of sourceObj
  * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
  */
 export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: {[index: string]: any}): string[] {
+
+  // TODO: test
+  // TODO: maybe use lodash difference ???
+
   const diffKeys: string[] = [];
 
   for (let key of Object.keys(sourceObj)) {
@@ -88,6 +95,7 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
 export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: string]: any}[]): {[index: string]: any} {
 
   // TODO: test - проверить чтобы не мутировалось если передан первым параметр объект
+  // TODO: test - почему не defultsDeep ????
 
   if (!sources.length) return target;
 
