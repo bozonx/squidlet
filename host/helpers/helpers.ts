@@ -268,7 +268,7 @@ export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: s
 }
 
 export function isUint8Array(value: any): boolean {
-  if (typeof value === 'object') return false;
+  if (typeof value !== 'object') return false;
 
   return value.constructor === Uint8Array;
 }

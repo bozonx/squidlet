@@ -46,3 +46,15 @@ describe.only 'helpers.lodashLike', ->
 
   it 'last', ->
     assert.equal(lodashLike.last([0,1,2]), 2)
+
+  it 'cloneDeep', ->
+    obj = {a: 1}
+    assert.isFalse(lodashLike.cloneDeep(obj) == obj)
+    assert.deepEqual(lodashLike.cloneDeep(obj), obj)
+    arr = ['a']
+    assert.isFalse(lodashLike.cloneDeep(arr) == arr)
+    assert.deepEqual(lodashLike.cloneDeep(arr), arr)
+    uint = new Uint8Array(1)
+    uint[0] = 255
+    assert.isFalse(lodashLike.cloneDeep(uint) == uint)
+    assert.deepEqual(lodashLike.cloneDeep(uint), uint)
