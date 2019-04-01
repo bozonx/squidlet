@@ -2,7 +2,7 @@ import DuplexDriver, {ReceiveHandler} from 'host/interfaces/DuplexDriver';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import SerialDev from 'host/interfaces/dev/SerialDev';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'host/helpers/helpers';
+import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'host/helpers/collections';
 import {DATA_ADDRESS_LENGTH} from 'host/dict/constants';
 import {hexStringToHexNum} from 'host/helpers/binaryHelpers';
 

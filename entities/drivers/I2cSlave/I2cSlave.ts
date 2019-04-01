@@ -1,6 +1,6 @@
 import I2cSlaveDev from 'host/interfaces/dev/I2cSlaveDev';
 import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'host/helpers/helpers';
+import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'host/helpers/collections';
 import DriverBase from 'host/baseDrivers/DriverBase';
 import IndexedEventEmitter from 'host/helpers/IndexedEventEmitter';
 

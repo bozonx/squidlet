@@ -1,4 +1,4 @@
-import {withoutFirstItemUint8Arr} from 'host/helpers/helpers';
+import {withoutFirstItemUint8Arr} from 'host/helpers/collections';
 import {
   hexToBytes,
   bytesToHexString,
