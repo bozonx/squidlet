@@ -13,8 +13,8 @@ export function pathJoin (...paths: string[]): string {
   for (let i = 0; i < paths.length; i++) {
     let cleared: string;
 
-    if (typeof paths[i] !== 'undefined') {
-      throw new Error(`pathJoin: paths has to be strings`);
+    if (typeof paths[i] !== 'string') {
+      throw new Error(`pathJoin: paths have to be strings`);
     }
     else if (i === 0) {
       const regexp = `\\${SEP}$`;
@@ -34,8 +34,11 @@ export function pathJoin (...paths: string[]): string {
 }
 
 export function pathIsAbsolute(pathToDirOrFile: string): boolean {
-  return Boolean(pathToDirOrFile.match(/^\//));
-  //return fileName.indexOf('/') === 0 || fileName.indexOf('`') === 0;
+  if (typeof pathToDirOrFile !== 'string') {
+    throw new Error(`pathIsAbsolute: path has to be a string`);
+  }
+
+  return pathToDirOrFile.indexOf('/') === 0 || pathToDirOrFile.indexOf('~') === 0;
 }
 
 export function pathDirname(pathToDirOrFile: string): string {
