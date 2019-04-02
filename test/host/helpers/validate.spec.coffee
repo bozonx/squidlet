@@ -50,4 +50,13 @@ describe.only 'helpers.validate', ->
     }
 
     assert.isUndefined(validate.validateRequiredProps(props, schema));
+    assert.isUndefined(validate.validateRequiredProps(props, {
+      param: {
+        type: 'number'
+      }
+    }));
     assert.isString(validate.validateRequiredProps({}, schema));
+
+  it "whiteList", ->
+    assert.isUndefined(validate.whiteList({a: 1, b: 2}, ['a', 'b', 'c'], 'param'));
+    assert.isString(validate.whiteList({a: 1, b: 2}, ['a'], 'param'));
