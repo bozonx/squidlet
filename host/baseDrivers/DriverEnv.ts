@@ -1,5 +1,5 @@
 import DriverManifest from '../interfaces/DriverManifest';
-import EnvBase from './EnvBase';
+import EnvBase from '../entities/EnvBase';
 
 
 /**

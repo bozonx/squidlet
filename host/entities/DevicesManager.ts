@@ -1,6 +1,6 @@
 import DeviceInstance from '../interfaces/DeviceInstance';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DeviceEnv from './DeviceEnv';
+import DeviceEnv from '../baseDevice/DeviceEnv';
 import EntityManagerBase from './EntityManagerBase';
 import System from '../System';
 

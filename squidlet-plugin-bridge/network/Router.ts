@@ -1,6 +1,6 @@
 import IndexedEvents from '../../host/helpers/IndexedEvents';
 import Network from './';
-import DriverEnv from '../../host/entities/DriverEnv';
+import DriverEnv from '../../host/baseDrivers/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';

@@ -1,6 +1,6 @@
 import EntityBase from '../entities/EntityBase';
 import {EntityProps} from '../interfaces/EntityDefinition';
-import ServiceEnv from '../entities/ServiceEnv';
+import ServiceEnv from './ServiceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 
 

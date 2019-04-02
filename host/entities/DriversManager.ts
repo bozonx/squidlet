@@ -1,7 +1,7 @@
 import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverInstance from '../interfaces/DriverInstance';
-import DriverEnv from './DriverEnv';
+import DriverEnv from '../baseDrivers/DriverEnv';
 import EntityManagerBase from './EntityManagerBase';
 
 

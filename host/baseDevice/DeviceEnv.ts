@@ -1,5 +1,5 @@
-import ServiceManifest from '../interfaces/ServiceManifest';
-import EnvBase from './EnvBase';
+import DeviceManifest from '../interfaces/DeviceManifest';
+import EnvBase from '../entities/EnvBase';
 import Events from '../Events';
 import Host from '../Host';
 import System from '../System';
@@ -8,7 +8,7 @@ import System from '../System';
 /**
  * It is environment for devices and services
  */
-export default class ServiceEnv extends EnvBase {
+export default class DeviceEnv extends EnvBase {
   readonly events: Events;
   readonly host: Host;
 
@@ -18,8 +18,8 @@ export default class ServiceEnv extends EnvBase {
     this.host = system.host;
   }
 
-  async loadManifest(className: string): Promise<ServiceManifest> {
-    return this.system.envSet.loadManifest<ServiceManifest>('services', className);
+  async loadManifest(className: string): Promise<DeviceManifest> {
+    return this.system.envSet.loadManifest<DeviceManifest>('devices', className);
   }
 
 }

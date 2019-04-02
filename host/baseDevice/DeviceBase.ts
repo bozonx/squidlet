@@ -5,7 +5,7 @@ import PublishParams from '../interfaces/PublishParams';
 import {EntityProps} from '../interfaces/EntityDefinition';
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
-import DeviceEnv from '../entities/DeviceEnv';
+import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import categories from '../dict/categories';
 import DeviceData from '../interfaces/DeviceData';

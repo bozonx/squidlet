@@ -1,8 +1,7 @@
 Republish = require('../../../host/helpers/Republish').default;
 
 
-describe.only 'helpers.Republish', ->
-  beforeEach ->
+describe 'helpers.Republish', ->
 
   it "start and stop", ->
     handler = sinon.spy()

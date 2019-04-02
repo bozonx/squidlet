@@ -1,6 +1,6 @@
 import EntityBase from '../entities/EntityBase';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverEnv from '../entities/DriverEnv';
+import DriverEnv from './DriverEnv';
 import Sender from '../helpers/Sender';
 
 

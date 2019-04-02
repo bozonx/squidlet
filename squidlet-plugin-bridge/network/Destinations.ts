@@ -1,5 +1,5 @@
 import IndexedEvents from '../../host/helpers/IndexedEvents';
-import DriverEnv from '../../host/entities/DriverEnv';
+import DriverEnv from '../../host/baseDrivers/DriverEnv';
 import Connection from './interfaces/Connection';
 import MyAddress from '../../host/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
