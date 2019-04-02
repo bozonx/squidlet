@@ -4,7 +4,7 @@ import PublishParams from '../interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
 import {isEmpty} from '../helpers/lodashLike';
 import {getDifferentKeys} from '../helpers/collections';
-import {validateParam} from '../helpers/typesHelpers';
+import {validateParam} from '../helpers/validate';
 
 
 export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;

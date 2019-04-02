@@ -9,8 +9,8 @@ import {
   sequence
 } from './validationHelpers';
 import SchemaElement from '../../host/interfaces/SchemaElement';
-import {isValueOfType, parseType} from '../../host/helpers/typesHelpers';
-import {whiteList} from '../../host/helpers/validate';
+import {parseType} from '../../host/helpers/typesHelpers';
+import {isValueOfType, whiteList} from '../../host/helpers/validate';
 
 
 

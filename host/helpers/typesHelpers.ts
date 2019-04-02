@@ -1,5 +1,4 @@
 import {trim} from './lodashLike';
-import SchemaElement from '../interfaces/SchemaElement';
 
 
 export interface ParsedType {
@@ -53,28 +52,4 @@ export function parseType(type: string | number | boolean | undefined): ParsedTy
   }
 
   return result;
-}
-
-export function isValueOfType(fullType: string, value: any): string | undefined {
-  const parsedType: ParsedType = parseType(fullType);
-
-  // check types
-  for (let type of parsedType.types) {
-    if (typeof value === type) return;
-  }
-
-  // check constants
-  for (let constant of parsedType.constants) {
-    if (value === constant) return;
-  }
-
-  return `value "${JSON.stringify(value)}" doesn't correspond to type "${fullType}"`;
-}
-
-export function validateParam(schema: {[index: string]: any}, pathToParam: string, value: any): string | undefined {
-  const itemSchema: SchemaElement | undefined = schema[pathToParam];
-
-  if (!itemSchema) return `Can't find schema's param ${pathToParam}`;
-
-  return isValueOfType(schema[pathToParam].type, value);
 }
