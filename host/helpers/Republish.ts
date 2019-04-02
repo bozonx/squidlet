@@ -2,6 +2,7 @@ export default class Republish {
   private readonly republishInterval: number = 0;
   private intervalId: any;
 
+
   constructor(republishInterval: number) {
     this.republishInterval = republishInterval;
   }
@@ -22,6 +23,7 @@ export default class Republish {
 
   stop() {
     clearInterval(this.intervalId);
+    delete this.intervalId;
   }
 
 }
