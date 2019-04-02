@@ -32,3 +32,13 @@ describe.only 'helpers.typesHelpers', ->
     assert.isString(types.isValueOfType('string | number', false));
     assert.isString(types.isValueOfType('string | 5', 6));
     assert.isString(types.isValueOfType('number | "str"', 'strrr'));
+    assert.isString(types.isValueOfType('number | "str"', undefined));
+
+  it "validateParam", ->
+    schema = {
+      param: {
+        type: 'number'
+      }
+    }
+    assert.isUndefined(types.validateParam(schema, 'param', 5));
+    assert.isString(types.validateParam(schema, 'param', false));
