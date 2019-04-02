@@ -17,6 +17,9 @@ export const basicTypes: string[] = [
 ];
 
 
+/**
+ * Read type and decide is it type or constant
+ */
 export function parseType(type: string | number | boolean | undefined): ParsedType {
   if (typeof type === 'undefined') throw new  Error(`Type is required`);
   else if (

@@ -25,3 +25,15 @@ describe.only 'helpers.validate', ->
     assert.isString(validate.validateParam(schema, 'param', false));
 
   it "validateProps", ->
+    props = {
+      param: 5
+    }
+    schema = {
+      param: {
+        type: 'number'
+      }
+    }
+
+    assert.isUndefined(validate.validateProps(props, schema));
+    assert.isString(validate.validateProps({param: 'str'}, schema));
+    assert.isString(validate.validateProps({oddParam: 'str'}, schema));

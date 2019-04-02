@@ -3,6 +3,9 @@ import {ParsedType, parseType} from './typesHelpers';
 import {difference} from './lodashLike';
 
 
+/**
+ * Does specified value correspond to specified type
+ */
 export function isValueOfType(fullType: string, value: any): string | undefined {
   const parsedType: ParsedType = parseType(fullType);
 
@@ -19,6 +22,9 @@ export function isValueOfType(fullType: string, value: any): string | undefined 
   return `value "${JSON.stringify(value)}" doesn't correspond to type "${fullType}"`;
 }
 
+/**
+ * Validate value which corresponds to part of schema
+ */
 export function validateParam(schema: {[index: string]: any}, pathToParam: string, value: any): string | undefined {
   const itemSchema: SchemaElement | undefined = schema[pathToParam];
 
@@ -27,6 +33,9 @@ export function validateParam(schema: {[index: string]: any}, pathToParam: strin
   return isValueOfType(schema[pathToParam].type, value);
 }
 
+/**
+ * Validate props using its schema
+ */
 export function validateProps (
   props: {[index: string]: any},
   schema?: {[index: string]: SchemaElement}
