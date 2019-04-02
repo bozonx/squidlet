@@ -1,3 +1,7 @@
+/**
+ * It call specified callback on specified interval.
+ * A new start means - clear previous interval and start a new one.
+ */
 export default class Republish {
   private readonly republishInterval: number = 0;
   private intervalId: any;
