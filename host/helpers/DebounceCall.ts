@@ -1,5 +1,6 @@
 /**
  * Call only the LAST callback of specified id.
+ * Timer sets up on the first call and the next calls don't increase it!
  */
 export default class DebounceCall {
   private debounceTimeouts: {[index: string]: any} = {};

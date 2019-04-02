@@ -20,3 +20,15 @@ describe.only 'helpers.DebounceCall', ->
     sinon.assert.calledOnce(@cb2)
 
     clock.restore()
+
+  it "clear", ->
+    clock = sinon.useFakeTimers()
+
+    @debounceCall.invoke(@id, 1000, @cb1)
+    @debounceCall.clear(@id)
+
+    clock.tick(1000)
+
+    sinon.assert.notCalled(@cb1)
+
+    clock.restore()
