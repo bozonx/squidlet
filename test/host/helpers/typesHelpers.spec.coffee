@@ -11,8 +11,8 @@ describe.only 'helpers.typesHelpers', ->
       types: []
       constants: [1]
     })
-    assert.deepEqual(types.parseType('string | string[] | number | number[] | boolean | boolean[]'), {
-      types: ['string', 'string[]', 'number', 'number[]', 'boolean', 'boolean[]']
+    assert.deepEqual(types.parseType(types.basicTypes.join('|')), {
+      types: types.basicTypes
       constants: []
     })
     assert.deepEqual(types.parseType('string | 1 | true | false | null | undefined | "str"'), {
@@ -20,3 +20,15 @@ describe.only 'helpers.typesHelpers', ->
       constants: [ 1, true, false, null, undefined, 'str' ]
     })
     assert.throws(() => types.parseType('stringer'))
+
+  it "isValueOfType", ->
+    assert.isUndefined(types.isValueOfType('string', 'str'));
+    assert.isUndefined(types.isValueOfType('number', 5));
+    assert.isUndefined(types.isValueOfType('string | number', 5));
+    assert.isUndefined(types.isValueOfType('string | 5', 5));
+    assert.isUndefined(types.isValueOfType('number | "str"', 'str'));
+    assert.isString(types.isValueOfType('string', 5));
+    assert.isString(types.isValueOfType('number', 'str'));
+    assert.isString(types.isValueOfType('string | number', false));
+    assert.isString(types.isValueOfType('string | 5', 6));
+    assert.isString(types.isValueOfType('number | "str"', 'strrr'));

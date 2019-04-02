@@ -8,7 +8,7 @@ export interface ParsedType {
 }
 
 
-const basicTypes: string[] = [
+export const basicTypes: string[] = [
   'string',
   'string[]',
   'number',
