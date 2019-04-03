@@ -38,6 +38,9 @@ export function parseValue(rawValue: any): any {
   else if (rawValue === 'null') {
     return null;
   }
+  else if (Number.isNaN(rawValue)) {
+    return NaN;
+  }
   else if (rawValue === 'NaN') {
     return NaN;
   }

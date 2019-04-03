@@ -2,4 +2,34 @@ helpers = require('../../../host/helpers/helpers')
 
 
 describe.only 'helpers.helpers', ->
-  it '...', ->
+  it 'convertToLevel', ->
+    assert.isTrue(helpers.convertToLevel(true))
+    assert.isTrue(helpers.convertToLevel(1))
+    assert.isTrue(helpers.convertToLevel('high'))
+    assert.isTrue(helpers.convertToLevel('true'))
+    assert.isTrue(helpers.convertToLevel('1'))
+    assert.isTrue(helpers.convertToLevel('ON'))
+    assert.isTrue(helpers.convertToLevel('On'))
+    assert.isTrue(helpers.convertToLevel('on'))
+    assert.isFalse(helpers.convertToLevel(false))
+    assert.isFalse(helpers.convertToLevel(0))
+    assert.isFalse(helpers.convertToLevel(5))
+    assert.isFalse(helpers.convertToLevel('low, off and other...'))
+
+  it 'convertToLevel', ->
+    assert.isUndefined(helpers.parseValue(undefined))
+    assert.isUndefined(helpers.parseValue('undefined'))
+    assert.isNull(helpers.parseValue(null))
+    assert.isNull(helpers.parseValue('null'))
+    assert.isTrue(helpers.parseValue(true))
+    assert.isFalse(helpers.parseValue(false))
+    assert.isTrue(helpers.parseValue('true'))
+    assert.isFalse(helpers.parseValue('false'))
+    assert.isNaN(helpers.parseValue(NaN))
+    assert.isNaN(helpers.parseValue('NaN'))
+    assert.equal(helpers.parseValue(''), '')
+    assert.equal(helpers.parseValue('str'), 'str')
+    #assert.deepEqual(helpers.parseValue([]), [])
+    assert.deepEqual(helpers.parseValue({}), {})
+    assert.equal(helpers.parseValue(0), 0)
+    assert.equal(helpers.parseValue(0.5), 0.5)
