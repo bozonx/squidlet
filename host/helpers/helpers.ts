@@ -7,6 +7,9 @@ import {Edge} from '../interfaces/dev/DigitalDev';
 export const PATH_SEPARATOR = '/';
 
 
+/**
+ * Convert value like 'on', 'true', 1, true, ... to boolean
+ */
 export function convertToLevel(value: any): boolean {
   return value === true
     || value === 1
@@ -16,6 +19,9 @@ export function convertToLevel(value: any): boolean {
     || value === 'ON' || value === 'on' || value === 'On';
 }
 
+/**
+ * Parse string numbers and constants to pure numbers and constants
+ */
 export function parseValue(rawValue: any): any {
   if (
     typeof rawValue === 'undefined'
@@ -61,6 +67,10 @@ export function parseValue(rawValue: any): any {
   return rawValue;
 }
 
+/**
+ * Is actually inverted.
+ * Pullup inverts only if invertOnPullup is set.
+ */
 export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
   // twice inverting on pullup if allowed
   if (pullup && invertOnPullup) {
@@ -71,26 +81,19 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
-export function firstLetterToUpperCase(value: string): string {
-  if (!value) return value;
-
-  const split: string[] = value.split('');
-
-  split[0] = split[0].toUpperCase();
-
-  return split.join('');
-}
-
+/**
+ * It it needs to invert
+ */
 export function invertIfNeed(value: boolean, invert?: boolean): boolean {
   if (invert) return !value;
 
   return value;
 }
 
+/**
+ * Resolve inverted edge.
+ */
 export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
-
-  // TODO: test
-
   if (!edge) {
     return 'both';
   }
@@ -102,6 +105,19 @@ export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
   }
 
   return edge;
+}
+
+/**
+ * Turn only the first letter to upper case
+ */
+export function firstLetterToUpperCase(value: string): string {
+  if (!value) return value;
+
+  const split: string[] = value.split('');
+
+  split[0] = split[0].toUpperCase();
+
+  return split.join('');
 }
 
 export function callPromised(method: Function, ...params: any[]): Promise<any> {

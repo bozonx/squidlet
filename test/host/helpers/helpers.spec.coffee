@@ -49,3 +49,25 @@ describe.only 'helpers.helpers', ->
     assert.isTrue(helpers.isDigitalInputInverted(false, true, true))
     # don't use pullup
     assert.isTrue(helpers.isDigitalInputInverted(true, false, true))
+
+  it 'invertIfNeed', ->
+    assert.isTrue(helpers.invertIfNeed(true, false))
+    assert.isTrue(helpers.invertIfNeed(false, true))
+    assert.isFalse(helpers.invertIfNeed(false, false))
+    assert.isFalse(helpers.invertIfNeed(true, true))
+
+  it 'resolveEdge', ->
+    assert.equal(helpers.resolveEdge(undefined), 'both')
+    assert.equal(helpers.resolveEdge(undefined, true), 'both')
+    assert.equal(helpers.resolveEdge('both'), 'both')
+    assert.equal(helpers.resolveEdge('both', true), 'both')
+    assert.equal(helpers.resolveEdge('rising', false), 'rising')
+    assert.equal(helpers.resolveEdge('falling', false), 'falling')
+    #invert
+    assert.equal(helpers.resolveEdge('rising', true), 'falling')
+    assert.equal(helpers.resolveEdge('falling', true), 'rising')
+
+  it 'firstLetterToUpperCase', ->
+    assert.equal(helpers.firstLetterToUpperCase('str str'), 'Str str')
+    assert.equal(helpers.firstLetterToUpperCase('strStr'), 'StrStr')
+    assert.equal(helpers.firstLetterToUpperCase('5str'), '5str')
