@@ -131,6 +131,7 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
 }
 
 
+///////////////////// TODO test it
 
 
 

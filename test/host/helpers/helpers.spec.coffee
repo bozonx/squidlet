@@ -71,3 +71,16 @@ describe.only 'helpers.helpers', ->
     assert.equal(helpers.firstLetterToUpperCase('str str'), 'Str str')
     assert.equal(helpers.firstLetterToUpperCase('strStr'), 'StrStr')
     assert.equal(helpers.firstLetterToUpperCase('5str'), '5str')
+
+  it 'callPromised', ->
+    data = 'param1'
+    method = (param, cb) => cb(null, param)
+    promised = helpers.callPromised(method, data)
+
+    assert.equal(await promised, data);
+
+    # check error
+    errMethod = (param, cb) => cb('err')
+    promised = helpers.callPromised(errMethod, data)
+
+    assert.isRejected(promised);
