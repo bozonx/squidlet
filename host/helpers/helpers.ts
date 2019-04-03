@@ -71,16 +71,6 @@ export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean,
   return invert;
 }
 
-export function callPromised(method: Function, ...params: any[]): Promise<any> {
-  return new Promise((resolve, reject) => {
-    method(...params, (err: Error, data: any) => {
-      if (err) return reject(err);
-
-      resolve(data);
-    });
-  });
-}
-
 export function firstLetterToUpperCase(value: string): string {
   if (!value) return value;
 
@@ -112,6 +102,16 @@ export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
   }
 
   return edge;
+}
+
+export function callPromised(method: Function, ...params: any[]): Promise<any> {
+  return new Promise((resolve, reject) => {
+    method(...params, (err: Error, data: any) => {
+      if (err) return reject(err);
+
+      resolve(data);
+    });
+  });
 }
 
 
