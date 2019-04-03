@@ -11,3 +11,9 @@ describe.only 'helpers.nodeLike', ->
     assert.isFalse(nodeLike.pathIsAbsolute('./path'))
     assert.isFalse(nodeLike.pathIsAbsolute('path'))
     assert.isFalse(nodeLike.pathIsAbsolute('../path'))
+
+  it "pathDirname", ->
+    assert.equal(nodeLike.pathDirname('/path/to/dir/'), '/path/to')
+
+  it "pathBasename", ->
+    assert.equal(nodeLike.pathBasename('/path/to/dir'), 'dir')

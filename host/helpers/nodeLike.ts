@@ -1,4 +1,5 @@
 import {PATH_SEPARATOR} from './helpers';
+import {trimEnd} from './lodashLike';
 
 const SEP = '/';
 
@@ -42,7 +43,7 @@ export function pathIsAbsolute(pathToDirOrFile: string): boolean {
 }
 
 export function pathDirname(pathToDirOrFile: string): string {
-  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
+  const pathParts: string[] = trimEnd(pathToDirOrFile, SEP).split(PATH_SEPARATOR);
 
   pathParts.pop();
 
