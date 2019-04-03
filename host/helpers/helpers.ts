@@ -17,13 +17,13 @@ export function convertToLevel(value: any): boolean {
 }
 
 export function parseValue(rawValue: any): any {
-  if (typeof rawValue === 'undefined') {
-    return;
-  }
-  if (rawValue === null) {
-    return null;
-  }
-  else if (typeof rawValue === 'boolean') {
+  if (
+    typeof rawValue === 'undefined'
+    || rawValue === null
+    || typeof rawValue === 'boolean'
+    || Number.isNaN(rawValue)
+    || rawValue === ''
+  ) {
     return rawValue;
   }
   else if (rawValue === 'true') {
@@ -38,21 +38,15 @@ export function parseValue(rawValue: any): any {
   else if (rawValue === 'null') {
     return null;
   }
-  else if (Number.isNaN(rawValue)) {
-    return NaN;
-  }
   else if (rawValue === 'NaN') {
     return NaN;
-  }
-  else if (rawValue === '') {
-    return '';
   }
   // it is for - 2. strings
   else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
     return rawValue;
   }
 
-  const toNumber = Number(rawValue);
+  const toNumber = parseFloat(rawValue);
 
   if (!Number.isNaN(toNumber)) {
     // it's number
