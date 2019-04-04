@@ -70,11 +70,11 @@ export default class Definitions {
     const className: string = deviceDef.className;
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', className);
     const definitionProps: {[index: string]: any} = _omit(deviceDef, 'className');
-    const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
-
-    if (validationError) {
-      throw new Error(`Definition of device "${id}" is incorrect: ${validationError}`);
-    }
+    // const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
+    //
+    // if (validationError) {
+    //   throw new Error(`Definition of device "${id}" is incorrect: ${validationError}`);
+    // }
 
     return {
       id,
@@ -99,11 +99,11 @@ export default class Definitions {
     const driverDef: PreEntityDefinition = this.configManager.preEntities.drivers[className];
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', className);
     const definitionProps: {[index: string]: any} = _omit(driverDef, 'className');
-    const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
-
-    if (validationError) {
-      throw new Error(`Definition of driver "${className}" is incorrect: ${validationError}`);
-    }
+    // const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
+    //
+    // if (validationError) {
+    //   throw new Error(`Definition of driver "${className}" is incorrect: ${validationError}`);
+    // }
 
     return {
       // id and className is the same for drivers
@@ -120,11 +120,11 @@ export default class Definitions {
     const serviceDef: PreEntityDefinition = this.configManager.preEntities.services[id];
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
     const definitionProps: {[index: string]: any} = _omit(serviceDef, 'className');
-    const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
-
-    if (validationError) {
-      throw new Error(`Definition of driver "${id}" is incorrect: ${validationError}`);
-    }
+    // const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
+    //
+    // if (validationError) {
+    //   throw new Error(`Definition of driver "${id}" is incorrect: ${validationError}`);
+    // }
 
     return {
       id,
@@ -157,11 +157,11 @@ export default class Definitions {
 
     for (let deviceClassName of Object.keys(defaults)) {
       const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', deviceClassName);
-      const validationError: string | undefined = validateProps(defaults[deviceClassName], entitySet.manifest.props);
-
-      if (validationError) {
-        throw new Error(`Invalid device prop of "${deviceClassName}" of devicesDefaults of host config: ${validationError}`);
-      }
+      // const validationError: string | undefined = validateProps(defaults[deviceClassName], entitySet.manifest.props);
+      //
+      // if (validationError) {
+      //   throw new Error(`Invalid device prop of "${deviceClassName}" of devicesDefaults of host config: ${validationError}`);
+      // }
     }
   }
 
