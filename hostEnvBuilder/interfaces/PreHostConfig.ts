@@ -48,7 +48,7 @@ export default interface PreHostConfig {
   services?: {[index: string]: any};
 
   // override default props of devices by device class name
-  devicesDefaults?: {[index: string]: any};
+  devicesDefaults?: {[index: string]: {[index: string]: any}};
 
   // shortcut for automation service
   automation?: {[index: string]: any};

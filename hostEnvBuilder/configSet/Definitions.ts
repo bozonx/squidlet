@@ -45,6 +45,8 @@ export default class Definitions {
   generate() {
     const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
 
+    this.validateDevicesDefault();
+
     // make devices
     for (let id of Object.keys(this.configManager.preEntities.devices)) {
       this.devicesDefinitions[id] = this.generateDeviceDef(id);
@@ -146,6 +148,21 @@ export default class Definitions {
     }
 
     return result;
+  }
+
+  private validateDevicesDefault() {
+    const defaults: {[index: string]: {[index: string]: any}} | undefined = this.configManager.devicesDefaults;
+
+    if (!defaults) return;
+
+    for (let deviceClassName of Object.keys(defaults)) {
+      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', deviceClassName);
+      const validationError: string | undefined = validateProps(defaults[deviceClassName], entitySet.manifest.props);
+
+      if (validationError) {
+        throw new Error(`Invalid device prop of "${deviceClassName}" of devicesDefaults of host config: ${validationError}`);
+      }
+    }
   }
 
 }
