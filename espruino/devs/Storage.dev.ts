@@ -14,7 +14,7 @@
 //import * as fs from 'fs';
 const fs = require('fs');
 
-import Storage, {Stats} from '../../../host/src/app/interfaces/dev/Storage';
+import Storage, {Stats} from 'host/src/app/interfaces/dev/Storage';
 
 
 export default class StorageDev implements Storage {
