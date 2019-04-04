@@ -1,7 +1,7 @@
 helpers = require('../../../host/helpers/helpers')
 
 
-describe.only 'helpers.helpers', ->
+describe 'helpers.helpers', ->
   it 'convertToLevel', ->
     assert.isTrue(helpers.convertToLevel(true))
     assert.isTrue(helpers.convertToLevel(1))

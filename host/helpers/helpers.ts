@@ -201,16 +201,8 @@ export function makeEventName(category: string, topic: string = ALL_TOPICS, ...o
 }
 
 
-
-///////////////////// TODO test it
-
-
-
-// // TODO: move to separate file
-// export function validateMessage(message: Message) {
-//   return message && message.category && message.topic && message.from && message.to;
-// }
-
+// TODO: review
+// TODO: test
 export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
   // TODO: rerutn an object and add method - cancel
   return new Promise<T>((resolve, reject) => {
@@ -226,6 +218,7 @@ export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
 }
 
 // TODO: review
+// TODO: test
 export function callOnDifferentValues(
   arr1: any[],
   arr2: any[],
@@ -246,4 +239,8 @@ export function callOnDifferentValues(
 //   else if (!value && edge === 'falling') return true;
 //
 //   return false;
+// }
+
+// export function validateMessage(message: Message) {
+//   return message && message.category && message.topic && message.from && message.to;
 // }
