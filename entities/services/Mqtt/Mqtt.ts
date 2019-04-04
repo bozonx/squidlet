@@ -88,6 +88,9 @@ export default class MqttSevice extends ServiceBase<Props> {
     // TODO: что если неизвестный формат или хоста не существует ???
 
     const [ id, subTopic ] = splitTopicId(topic);
+
+    if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
+
     //const toHost = this.env.host.resolveHostIdByEntityId(id);
     const incomeData: DeviceData = {
       id,

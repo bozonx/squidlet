@@ -137,9 +137,6 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
  * Join topic paths using special path separator
  */
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
-
-  // TODO: test
-
   if (isEmpty(subPaths)) return basePath;
 
   return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
@@ -148,7 +145,7 @@ export function combineTopic(basePath: string, ...subPaths: Array<string>): stri
 /**
  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
  */
-export function splitTopicId(topic: string): [ string, string ] {
+export function splitTopicId(topic: string): [ string, string | undefined ] {
   return splitFirstElement(topic, systemConfig.topicSeparator);
 }
 
@@ -158,8 +155,9 @@ export function splitTopicId(topic: string): [ string, string ] {
 export function splitFirstElement(
   fullPath: string,
   separator: string
-): [ string, string ] {
-  if (!fullPath) throw new Error(`fullPath param is empty`);
+): [ string, string | undefined ] {
+  if (!fullPath) throw new Error(`fullPath param is required`);
+  if (!separator) throw new Error(`separator is required`);
 
   const split: string[] = fullPath.split(separator);
   const first: string = split[0];
@@ -167,33 +165,27 @@ export function splitFirstElement(
   return [ first, split.slice(1).join(separator) ];
 }
 
+/**
+ * Split last part of path. 'path/to/dest' => [ 'dest', 'path/to' ]
+ */
 export function splitLastElement(
   fullPath: string,
   separator: string
-): { last: string, rest: string | undefined } {
-
-  // TODO: review
-  // TODO: test
-
-  if (!fullPath) throw new Error(`fullPath param is empty`);
+): [ string, string | undefined ] {
+  if (!fullPath) throw new Error(`fullPath param is required`);
+  if (!separator) throw new Error(`separator is required`);
 
   const split = fullPath.split(separator);
   const last: string = split[split.length - 1];
 
   if (split.length === 1) {
-    return {
-      last: fullPath,
-      rest: undefined,
-    };
+    return [ fullPath, undefined ];
   }
 
   // remove last element from path
   split.pop();
 
-  return {
-    last,
-    rest: split.join(separator),
-  };
+  return [ last, split.join(separator) ];
 }
 
 
