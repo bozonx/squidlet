@@ -63,7 +63,7 @@ describe.only 'helpers.helpers', ->
     assert.equal(helpers.resolveEdge('both', true), 'both')
     assert.equal(helpers.resolveEdge('rising', false), 'rising')
     assert.equal(helpers.resolveEdge('falling', false), 'falling')
-    #invert
+    # invert
     assert.equal(helpers.resolveEdge('rising', true), 'falling')
     assert.equal(helpers.resolveEdge('falling', true), 'rising')
 
@@ -84,3 +84,12 @@ describe.only 'helpers.helpers', ->
     promised = helpers.callPromised(errMethod, data)
 
     assert.isRejected(promised);
+
+  it 'combineTopic', ->
+    assert.equal(helpers.combineTopic('first', 'second', 'third'), 'first/second/third')
+
+  it 'splitTopicId', ->
+    assert.deepEqual(helpers.splitTopicId('id/sub/deeper'), [ 'id', 'sub/deeper' ])
+
+  it 'splitFirstElement', ->
+    assert.deepEqual(helpers.splitFirstElement('path/to/dest', '/'), [ 'path', 'to/dest' ])

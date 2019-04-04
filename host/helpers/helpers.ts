@@ -120,6 +120,9 @@ export function firstLetterToUpperCase(value: string): string {
   return split.join('');
 }
 
+/**
+ * Call error-first callback functions like a promised
+ */
 export function callPromised(method: Function, ...params: any[]): Promise<any> {
   return new Promise((resolve, reject) => {
     method(...params, (err: Error, data: any) => {
@@ -130,38 +133,9 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
   });
 }
 
-
-///////////////////// TODO test it
-
-
-
-// // TODO: move to separate file
-// export function validateMessage(message: Message) {
-//   return message && message.category && message.topic && message.from && message.to;
-// }
-
-export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-  // TODO: rerutn an object and add method - cancel
-  return new Promise<T>((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        resolve(await cb());
-      }
-      catch(err) {
-        reject(err);
-      }
-    }, delayMs);
-  });
-}
-
-
-export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
-
-  // TODO: test
-
-  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
-}
-
+/**
+ * Join topic paths using special path separator
+ */
 export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
 
   // TODO: test
@@ -171,34 +145,26 @@ export function combineTopic(basePath: string, ...subPaths: Array<string>): stri
   return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
 }
 
-export function splitTopic(topic: string): { id: string, subTopic: string } {
-
-  // TODO: test
-
-  const { first, rest } = splitFirstElement(topic, systemConfig.topicSeparator);
-
-  return {
-    id: first,
-    subTopic: rest,
-  };
+/**
+ * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
+ */
+export function splitTopicId(topic: string): [ string, string ] {
+  return splitFirstElement(topic, systemConfig.topicSeparator);
 }
 
+/**
+ * Split first element of path using separator. 'path/to/dest' => [ 'path', 'to/dest' ]
+ */
 export function splitFirstElement(
   fullPath: string,
   separator: string
-): { first: string, rest: string } {
-
-  // TODO: test
-
+): [ string, string ] {
   if (!fullPath) throw new Error(`fullPath param is empty`);
 
   const split: string[] = fullPath.split(separator);
   const first: string = split[0];
 
-  return {
-    first,
-    rest: split.slice(1).join(separator),
-  };
+  return [ first, split.slice(1).join(separator) ];
 }
 
 export function splitLastElement(
@@ -228,6 +194,37 @@ export function splitLastElement(
     last,
     rest: split.join(separator),
   };
+}
+
+
+///////////////////// TODO test it
+
+
+
+// // TODO: move to separate file
+// export function validateMessage(message: Message) {
+//   return message && message.category && message.topic && message.from && message.to;
+// }
+
+export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+  // TODO: rerutn an object and add method - cancel
+  return new Promise<T>((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        resolve(await cb());
+      }
+      catch(err) {
+        reject(err);
+      }
+    }, delayMs);
+  });
+}
+
+export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
+
+  // TODO: test
+
+  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
 }
 
 // TODO: review

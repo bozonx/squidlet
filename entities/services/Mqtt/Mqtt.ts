@@ -1,6 +1,6 @@
 import ServiceBase from 'host/baseServices/ServiceBase';
 import DeviceData from 'host/interfaces/DeviceData';
-import {combineTopic, parseValue, splitTopic} from 'host/helpers/helpers';
+import {combineTopic, parseValue, splitTopicId} from 'host/helpers/helpers';
 import MqttDev from 'host/interfaces/dev/MqttDev';
 import categories from 'host/dict/categories';
 
@@ -87,7 +87,7 @@ export default class MqttSevice extends ServiceBase<Props> {
     // TODO: если data - binary???
     // TODO: что если неизвестный формат или хоста не существует ???
 
-    const { id, subTopic } = splitTopic(topic);
+    const [ id, subTopic ] = splitTopicId(topic);
     //const toHost = this.env.host.resolveHostIdByEntityId(id);
     const incomeData: DeviceData = {
       id,
