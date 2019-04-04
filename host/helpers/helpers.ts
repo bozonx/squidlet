@@ -162,6 +162,10 @@ export function splitFirstElement(
   const split: string[] = fullPath.split(separator);
   const first: string = split[0];
 
+  if (split.length === 1) {
+    return [ fullPath, undefined ];
+  }
+
   return [ first, split.slice(1).join(separator) ];
 }
 

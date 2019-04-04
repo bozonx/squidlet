@@ -93,8 +93,8 @@ describe.only 'helpers.helpers', ->
 
   it 'splitFirstElement', ->
     assert.deepEqual(helpers.splitFirstElement('path/to/dest', '/'), [ 'path', 'to/dest' ])
-    assert.deepEqual(helpers.splitFirstElement('path', '/'), [ 'path' ])
+    assert.deepEqual(helpers.splitFirstElement('path', '/'), [ 'path', undefined ])
 
-  it 'splitFirstElement', ->
-    assert.deepEqual(helpers.splitFirstElement('path/to/dest', '/'), [ 'dest', 'path/to' ])
-    assert.deepEqual(helpers.splitFirstElement('path', '/'), [ 'path' ])
+  it 'splitLastElement', ->
+    assert.deepEqual(helpers.splitLastElement('path/to/dest', '/'), [ 'dest', 'path/to' ])
+    assert.deepEqual(helpers.splitLastElement('path', '/'), [ 'path', undefined ])
