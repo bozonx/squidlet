@@ -7,7 +7,6 @@ import * as rimraf from 'rimraf';
 
 import systemConfig from './configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/StorageDev';
-import * as rimraf from './entities/EntitiesWriter';
 
 
 export default class Io {
