@@ -140,7 +140,7 @@ export default class ConfigManager {
   }
 
   private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
-    const platformDirName = path.resolve(__dirname, `../${preHostConfig.platform}`);
+    const platformDirName = path.resolve(__dirname, `../../${preHostConfig.platform}`);
 
     return loadMachineConfig(platformDirName, preHostConfig.machine as string);
   }

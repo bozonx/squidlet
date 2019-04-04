@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import {promises as fsPromises} from 'fs';
 import * as shelljs from 'shelljs';
 import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
 import systemConfig from './configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/StorageDev';
+import {callPromised} from '../host/helpers/helpers';
 
 
 export default class Io {
@@ -16,29 +16,25 @@ export default class Io {
     return this.yamlToJs(yamlContent);
   }
 
-  getFileContent(path: string): Promise<string> {
-    return fsPromises.readFile(path, systemConfig.filesEncode) as Promise<string>;
+  getFileContent(pathTo: string): Promise<string> {
+    return callPromised(fs.readFile, pathTo, systemConfig.filesEncode) as Promise<string>;
   }
 
-  async writeFile(path: string, data: string | Uint8Array): Promise<void> {
+  async writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return fsPromises.writeFile(path, data, systemConfig.filesEncode);
+      return callPromised(fs.writeFile, pathTo, data, systemConfig.filesEncode);
     }
     else {
-      return fsPromises.writeFile(path, data);
+      return callPromised(fs.writeFile, pathTo, data);
     }
   }
 
   async copyFile(src: string, dest: string): Promise<void> {
-    return fsPromises.copyFile(src, dest);
+    return callPromised(fs.copyFile, src, dest);
   }
 
-  async renameFile(src: string, dest: string): Promise<void> {
-    return fsPromises.rename(src, dest);
-  }
-
-  mkdir(path: string): Promise<void> {
-    return fsPromises.mkdir(path);
+  mkdir(pathTo: string): Promise<void> {
+    return callPromised(fs.mkdir, pathTo);
   }
 
   async mkdirP(dirName: string): Promise<void> {
@@ -53,8 +49,8 @@ export default class Io {
     return fs.existsSync(path);
   }
 
-  async stat(path: string): Promise<Stats> {
-    const stat = await fsPromises.stat(path);
+  async stat(pathTo: string): Promise<Stats> {
+    const stat = await callPromised(fs.stat, pathTo);
 
     return {
       size: stat.size,
@@ -81,6 +77,11 @@ export default class Io {
   }
 
 }
+
+
+// async renameFile(src: string, dest: string): Promise<void> {
+//   return callPromised(fs.rename, oldPath, newPath);
+// }
 
 // loadYamlFileSync(fullPath: string): object {
 //   const yamlContent = fs.readFileSync(fullPath, 'utf8');
