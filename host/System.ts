@@ -38,7 +38,10 @@ export default class System {
   }
 
 
-  constructor(devSet: {[index: string]: DevClass}, envSetReplacement?: new (system: System) => EnvSet) {
+  constructor(
+    devSet: {[index: string]: DevClass},
+    envSetReplacement?: new (system: System) => EnvSet
+  ) {
     if (envSetReplacement) {
       this.envSet = new envSetReplacement(this);
     }
@@ -59,17 +62,17 @@ export default class System {
 
 
   async start() {
-    this.log.info(`---> Initializing devs`);
+    console.info(`---> Initializing devs`);
     this.devManager.init();
 
-    this.log.info(`---> Initializing configs`);
+    console.info(`---> Initializing configs`);
     await this.host.init();
 
-    this.log.info(`---> Initializing system drivers`);
+    console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();
     this.riseEvent(eventNames.system.systemDriversInitialized);
 
-    this.log.info(`---> Initializing system services`);
+    console.info(`---> Initializing system services`);
     await this.servicesManager.initSystemServices();
     this.riseEvent(eventNames.system.systemServicesInitialized);
 
@@ -81,7 +84,7 @@ export default class System {
     // remove initialization config
     delete this.initializationConfig;
 
-    this.log.info(`===> Host initialization has finished`);
+    console.info(`===> Host initialization has finished`);
   }
 
   onDevicesInit(cb: () => void): number {
@@ -112,11 +115,11 @@ export default class System {
 
 
   // private async initNetwork(): Promise<void> {
-  //   this.log.info(`---> Initializing network`);
+  //   console.info(`---> Initializing network`);
   //   this.network.init(this.host.id, this.host.networkConfig);
   //   this.riseEvent(eventNames.system.networkInitialized);
   //
-  //   this.log.info(`---> Initializing messenger`);
+  //   console.info(`---> Initializing messenger`);
   //   this.messenger.init();
   //   this.devices.init();
   //   this.riseEvent(eventNames.system.messengerInitialized);
@@ -126,11 +129,11 @@ export default class System {
    * Init top layer - devices, regular drivers and regular services
    */
   private async initTopLayer(): Promise<void> {
-    this.log.info(`---> Initializing regular drivers`);
+    console.info(`---> Initializing regular drivers`);
     await this.driversManager.initRegularDrivers();
-    this.log.info(`---> Initializing regular services`);
+    console.info(`---> Initializing regular services`);
     await this.servicesManager.initRegularServices();
-    this.log.info(`---> Initializing devices`);
+    console.info(`---> Initializing devices`);
     await this.devicesManager.init();
     this._isDevicesInitialized = true;
     this.riseEvent(eventNames.system.devicesManagerInitialized);

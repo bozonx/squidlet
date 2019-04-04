@@ -1,5 +1,7 @@
 name: Logger
 main: ./Logger.ts
+type: system
+
 props:
   # List of hosts which will be listened to. By default - all the hosts (an empty array)
   listenHosts:
