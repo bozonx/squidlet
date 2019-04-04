@@ -1,4 +1,4 @@
-import { generateEventName } from './helpers/helpers';
+import { makeEventName } from './helpers/helpers';
 import IndexedEventEmitter from './helpers/IndexedEventEmitter';
 
 
@@ -8,7 +8,7 @@ export default class Events {
 
 
   emit(category: string, topic: string, data?: any): void {
-    const eventName = generateEventName(category, topic);
+    const eventName = makeEventName(category, topic);
 
     this.events.emit(eventName, data);
     // emit category listeners
@@ -19,14 +19,14 @@ export default class Events {
    * Listen for local messages of certain category.
    */
   addListener(category: string, topic: string, handler: (data: any) => void): number {
-    const eventName = generateEventName(category, topic);
+    const eventName = makeEventName(category, topic);
 
     // listen to local events
     return this.events.addListener(eventName, handler);
   }
 
   once(category: string, topic: string, handler: (data: any) => void): number {
-    const eventName = generateEventName(category, topic);
+    const eventName = makeEventName(category, topic);
 
     // listen to local event once
     return this.events.once(eventName, handler);
@@ -41,13 +41,13 @@ export default class Events {
   }
 
   removeListener(category: string, topic: string, handlerIndex: number): void {
-    const eventName = generateEventName(category, topic);
+    const eventName = makeEventName(category, topic);
 
     this.events.removeListener(eventName, handlerIndex);
   }
 
   removeAllListeners(category: string, topic: string): void {
-    const eventName = generateEventName(category, topic);
+    const eventName = makeEventName(category, topic);
 
     this.events.removeAllListeners(eventName);
   }

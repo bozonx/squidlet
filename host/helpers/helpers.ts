@@ -192,6 +192,15 @@ export function splitLastElement(
   return [ last, split.join(separator) ];
 }
 
+/**
+ * Make combined event name which is used in host's event system.
+ * makeEventName('cat', 'topic', 'name', 'otherName') => 'cat|topic|name|otherName'
+ */
+export function makeEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
+  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
+}
+
+
 
 ///////////////////// TODO test it
 
@@ -214,13 +223,6 @@ export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
       }
     }, delayMs);
   });
-}
-
-export function generateEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
-
-  // TODO: test
-
-  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
 }
 
 // TODO: review
