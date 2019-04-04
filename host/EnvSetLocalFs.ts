@@ -2,7 +2,6 @@ import System from './System';
 import ManifestBase from './interfaces/ManifestBase';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
-import {SharedStorage} from '../entities/drivers/SharedStorage/SharedStorage';
 import systemConfig from './config/systemConfig';
 import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';
@@ -105,60 +104,60 @@ export default class EnvSetLocalFs implements EnvSet {
     return this.devStorage.readBinFile(pathToFile);
   }
 
-
-  getHostHashes(): Promise<{[index: string]: any}> {
-    return this.readJsonObjectFile(systemConfig.hashFiles.host);
-  }
-
-  getConfigsHashes(): Promise<{[index: string]: any}> {
-    return this.readJsonObjectFile(systemConfig.hashFiles.configs);
-  }
-
-  getEntitiesHashes(): Promise<{[index: string]: any}> {
-    return this.readJsonObjectFile(systemConfig.hashFiles.entities);
-  }
-
-  async writeHostFile(fileName: string, content: string): Promise<void> {
-    // TODO: create dir, create or overwrite existing
-    // TODO: запретить выход наверх
-  }
-
-  async writeConfigFile(fileName: string, content: string): Promise<void> {
-    // TODO: create dir, create or overwrite existing
-    // TODO: запретить выход наверх
-  }
-
-  async writeEntityFile(fileName: string, content: string): Promise<void> {
-    // TODO: create dir, create or overwrite existing
-    // TODO: запретить выход наверх
-  }
-
-  writeHostHashesFile(content: string): Promise<void> {
-    const pathToFile: string = pathJoin(
-      this.system.host.config.config.envSetDir,
-      systemConfig.hashFiles.host
-    );
-
-    return this.devStorage.writeFile(pathToFile, content);
-  }
-
-  writeConfigHashesFile(content: string): Promise<void> {
-    const pathToFile: string = pathJoin(
-      this.system.host.config.config.envSetDir,
-      systemConfig.hashFiles.configs
-    );
-
-    return this.devStorage.writeFile(systemConfig.hashFiles.configs, content);
-  }
-
-  writeEntitiesHashesFile(content: string): Promise<void> {
-    const pathToFile: string = pathJoin(
-      this.system.host.config.config.envSetDir,
-      systemConfig.hashFiles.entities
-    );
-
-    return this.devStorage.writeFile(systemConfig.hashFiles.entities, content);
-  }
+  //
+  // getHostHashes(): Promise<{[index: string]: any}> {
+  //   return this.readJsonObjectFile(systemConfig.hashFiles.host);
+  // }
+  //
+  // getConfigsHashes(): Promise<{[index: string]: any}> {
+  //   return this.readJsonObjectFile(systemConfig.hashFiles.configs);
+  // }
+  //
+  // getEntitiesHashes(): Promise<{[index: string]: any}> {
+  //   return this.readJsonObjectFile(systemConfig.hashFiles.entities);
+  // }
+  //
+  // async writeHostFile(fileName: string, content: string): Promise<void> {
+  //   // TODO: create dir, create or overwrite existing
+  //   // TODO: запретить выход наверх
+  // }
+  //
+  // async writeConfigFile(fileName: string, content: string): Promise<void> {
+  //   // TODO: create dir, create or overwrite existing
+  //   // TODO: запретить выход наверх
+  // }
+  //
+  // async writeEntityFile(fileName: string, content: string): Promise<void> {
+  //   // TODO: create dir, create or overwrite existing
+  //   // TODO: запретить выход наверх
+  // }
+  //
+  // writeHostHashesFile(content: string): Promise<void> {
+  //   const pathToFile: string = pathJoin(
+  //     this.system.host.config.config.envSetDir,
+  //     systemConfig.hashFiles.host
+  //   );
+  //
+  //   return this.devStorage.writeFile(pathToFile, content);
+  // }
+  //
+  // writeConfigHashesFile(content: string): Promise<void> {
+  //   const pathToFile: string = pathJoin(
+  //     this.system.host.config.config.envSetDir,
+  //     systemConfig.hashFiles.configs
+  //   );
+  //
+  //   return this.devStorage.writeFile(systemConfig.hashFiles.configs, content);
+  // }
+  //
+  // writeEntitiesHashesFile(content: string): Promise<void> {
+  //   const pathToFile: string = pathJoin(
+  //     this.system.host.config.config.envSetDir,
+  //     systemConfig.hashFiles.entities
+  //   );
+  //
+  //   return this.devStorage.writeFile(systemConfig.hashFiles.entities, content);
+  // }
 
   async removeHostFiles(filesList: string[]): Promise<void> {
     // TODO: remove these files. They are unused files

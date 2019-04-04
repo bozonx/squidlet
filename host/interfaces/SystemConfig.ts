@@ -12,16 +12,16 @@ export default interface SystemConfig {
     cache: string;
     logs: string;
   };
-  hashFiles: {
-    host: string;
-    configs: string;
-    entities: string;
-  };
-  entitiesDirs: {
-    devices: string;
-    drivers: string;
-    services: string;
-  };
+  // hashFiles: {
+  //   host: string;
+  //   configs: string;
+  //   entities: string;
+  // };
+  // entitiesDirs: {
+  //   devices: string;
+  //   drivers: string;
+  //   services: string;
+  // };
   deviceIdSeparator: string;
   topicSeparator: string;
   eventNameSeparator: string;
