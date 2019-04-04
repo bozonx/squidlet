@@ -31,11 +31,10 @@ const HOSTS_BUILD_DEFAULT_DIR = '../build/env';
 const debug = true;
 
 
-async function prepareHostApp (hostConfigSet: HostEnvSet): Promise<System> {
-  const machine: string = hostConfigSet.configs.config.machine;
-
+function prepareHostApp (hostConfigSet: HostEnvSet): System {
   console.info(`--> making platform's dev set`);
 
+  const machine: string = hostConfigSet.configs.config.machine;
   const devsSet: {[index: string]: DevClass} = collectDevs(__dirname, machine);
 
   console.info(`===> initializing host system on machine "${machine}"`);
@@ -71,7 +70,7 @@ async function masterStarter () {
   // generate master config js object with paths of master host configs and entities files
   const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
   // prepare host app
-  const hostSystem: System = await prepareHostApp(hostEnvSet);
+  const hostSystem: System = prepareHostApp(hostEnvSet);
 
   console.info(`===> Starting master host system`);
 
