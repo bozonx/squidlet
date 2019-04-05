@@ -15,6 +15,7 @@
     "sourceMap": true,
     //"rootDir": "host",
     "strict": true,
+    "resolveJsonModule": true,
     "target": "es5"
   },
   "exclude": ["build", "node_modules"]

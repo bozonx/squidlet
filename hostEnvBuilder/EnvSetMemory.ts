@@ -68,7 +68,19 @@ export default class EnvSetMemory implements EnvSet {
       configSet.entities[pluralType][entityName].manifest.main,
     );
 
-    return require(filePath);
+    try {
+      return require(filePath).default;
+
+      //import * as ts from 'typescript';
+      //import tsOptions from '../tsconfig.json';
+      //const tsOptions = require('../tsconfig.json');
+      // const content = await this.devStorage.readFile(filePath);
+      // let result = ts.transpile(content, tsOptions);
+      // return eval(result);
+    }
+    catch (err) {
+      throw new Error(`Tried to load entity "${pluralType}/${entityName}" main file "${filePath}": ${err}`);
+    }
   }
 
   loadEntityFile(
