@@ -342,7 +342,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       return false;
     }
-    else if (!this.env.isInitialized) {
+    else if (!this.env.system.isInitialized) {
       this.env.log.warn(`PCF8574Driver.${methodWhichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
