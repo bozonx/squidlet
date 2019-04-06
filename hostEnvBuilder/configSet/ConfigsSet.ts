@@ -54,7 +54,7 @@ export default class ConfigsSet {
     for (let driverName of driversClasses) {
       const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', driverName);
 
-      if (entitySet.manifest.system) allSystemDrivers.push(driverName);
+      if (entitySet.system) allSystemDrivers.push(driverName);
     }
 
     return sortByIncludeInList(driversClasses, allSystemDrivers);
@@ -71,7 +71,7 @@ export default class ConfigsSet {
     for (let serviceName of servicesClasses) {
       const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceName);
 
-      if (entitySet.manifest.system) allSystemServices.push(serviceName);
+      if (entitySet.system) allSystemServices.push(serviceName);
     }
 
     return sortByIncludeInList(servicesClasses, allSystemServices);

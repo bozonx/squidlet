@@ -24,8 +24,8 @@ describe 'envBuilder.ConfigsSet', ->
       devices: {}
       drivers: {
         SysDriver: {
+          system: true
           manifest: {
-            system: true
           }
         }
         RegularDriver: {
@@ -35,8 +35,8 @@ describe 'envBuilder.ConfigsSet', ->
       }
       services: {
         SysService: {
+          system: true
           manifest: {
-            system: true
           }
         }
         RegularService: {
