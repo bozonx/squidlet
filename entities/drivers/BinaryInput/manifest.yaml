@@ -1,6 +1,6 @@
 name: BinaryInput
 main: BinaryInput.ts
-type: system
+system: true
 
 drivers:
   - DigitalPinInput

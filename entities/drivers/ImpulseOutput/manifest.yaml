@@ -1,6 +1,6 @@
 name: ImpulseOutput
 main: ImpulseOutput.ts
-type: system
+system: true
 
 drivers:
   - DigitalPinOutput

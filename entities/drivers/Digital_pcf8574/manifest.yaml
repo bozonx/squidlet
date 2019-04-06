@@ -1,6 +1,6 @@
 name: Digital_pcf8574
 main: Digital_pcf8574.ts
-type: system
+system: true
 
 devices:
   - Pcf8574

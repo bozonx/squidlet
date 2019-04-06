@@ -1,6 +1,6 @@
 name: SerialDuplex
 main: SerialDuplex.ts
-type: system
+system: true
 
 devs:
   - Serial

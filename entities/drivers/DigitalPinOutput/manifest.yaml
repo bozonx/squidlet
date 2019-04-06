@@ -1,5 +1,5 @@
 name: DigitalPinOutput
 main: DigitalPinOutput.ts
-type: system
+system: true
 
 props: props.yaml

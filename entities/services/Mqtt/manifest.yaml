@@ -1,6 +1,6 @@
 name: Mqtt
 main: ./Mqtt.ts
-type: system
+system: true
 
 devs:
   - Mqtt

@@ -1,6 +1,6 @@
 name: ImpulseInput
 main: ImpulseInput.ts
-type: system
+system: true
 
 drivers:
   - DigitalPinInput

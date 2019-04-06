@@ -1,6 +1,6 @@
 name: I2cMaster
 main: I2cMaster.ts
-type: system
+system: true
 
 devs:
   - I2cMaster

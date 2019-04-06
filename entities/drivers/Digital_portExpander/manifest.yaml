@@ -1,6 +1,6 @@
 name: Digital_portExpander
 main: Digital_portExpander.ts
-type: system
+system: true
 
 #devices:
 #  - PortExpanderEsp32

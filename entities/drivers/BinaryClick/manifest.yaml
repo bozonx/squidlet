@@ -1,6 +1,6 @@
 name: BinaryClick
 main: BinaryClick.ts
-type: system
+system: true
 
 drivers:
   - BinaryInput

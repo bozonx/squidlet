@@ -1,6 +1,6 @@
 name: I2cToMaster
 main: I2cToMaster.ts
-type:
+system: true
 
 drivers:
   - I2cSlave

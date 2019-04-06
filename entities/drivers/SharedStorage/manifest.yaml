@@ -1,5 +1,6 @@
 name: SharedStorage
 main: SharedStorage.ts
+system: true
 
 devs:
   - Storage

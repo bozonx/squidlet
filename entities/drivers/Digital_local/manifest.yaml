@@ -1,6 +1,6 @@
 name: Digital_local
 main: Digital_local.ts
-type: system
+system: true
 
 devs:
   - Digital

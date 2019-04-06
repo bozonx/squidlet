@@ -1,6 +1,6 @@
 name: BinaryOutput
 main: BinaryOutput.ts
-type: system
+system: true
 
 drivers:
   - DigitalPinOutput
