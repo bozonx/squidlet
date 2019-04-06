@@ -7,10 +7,12 @@ describe.only 'envBuilder.Register', ->
     @entity = {
       name: 'EntityName'
       # TODO: why???
-      type: 'some'
-      # TODO: why???
       baseDir: 'myDir'
       main: './mainFile.ts'
+    }
+    @deviceEntity = {
+      @entity...
+      type: 'some'
     }
     @main = {}
     @register = new Register(@main)
@@ -32,17 +34,17 @@ describe.only 'envBuilder.Register', ->
     assert.deepEqual(@register.plugins, [@plugin])
 
   it 'addDevice, addDriver, addService as an object', ->
-    await @register.addDevice(@entity)
+    await @register.addDevice(@deviceEntity)
     await @register.addDriver(@entity)
     await @register.addService(@entity)
 
     assert.equal(@register.registeringPromises.length, 3)
-    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @deviceEntity)
     assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), @entity)
     assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @entity)
 
   it 'addDevice, addDriver, addService as a path', ->
-    @register.loadManifest = () => @entity
+    @register.loadManifest = () => @deviceEntity
     pathTo = '/path/to/entity'
 
     await @register.addDevice(pathTo)
@@ -50,13 +52,13 @@ describe.only 'envBuilder.Register', ->
     await @register.addService(pathTo)
 
     assert.equal(@register.registeringPromises.length, 3)
-    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @entity)
-    assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), @entity)
-    assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @deviceEntity)
+    assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), @deviceEntity)
+    assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @deviceEntity)
 
   it "don't add double", ->
-    await @register.addDevice(@entity)
-    assert.isRejected(@register.addDevice(@entity))
+    await @register.addDriver(@entity)
+    assert.isRejected(@register.addDriver(@entity))
 
   it "resolveManifest - load from file", ->
     @register.io.exists = () => Promise.resolve(true)
