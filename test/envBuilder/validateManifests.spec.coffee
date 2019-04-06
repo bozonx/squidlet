@@ -4,7 +4,7 @@ validate = require('../../hostEnvBuilder/hostConfig/validateManifests').default
 describe 'envBuilder.validateManifests', ->
   beforeEach ->
     @manifest = {
-      baseDir: 'str'
+      #baseDir: 'str'
       name: 'str'
       main: './main.ts'
     }
@@ -52,12 +52,12 @@ describe 'envBuilder.validateManifests', ->
     }))
 
   it 'base params - required', ->
-    assert.isString(validate('service', { @manifest..., baseDir: undefined }))
+    #assert.isString(validate('service', { @manifest..., baseDir: undefined }))
     assert.isString(validate('service', { @manifest..., name: undefined }))
     assert.isString(validate('service', { @manifest..., main: undefined }))
 
   it 'base params - types', ->
-    assert.isString(validate('service', { @manifest..., baseDir: 5 }))
+    #assert.isString(validate('service', { @manifest..., baseDir: 5 }))
     assert.isString(validate('service', { @manifest..., name: 5 }))
     assert.isString(validate('service', { @manifest..., main: 5 }))
     assert.isString(validate('service', { @manifest..., system: 5 }))

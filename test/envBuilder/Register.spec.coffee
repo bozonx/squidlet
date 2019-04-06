@@ -6,8 +6,7 @@ describe.only 'envBuilder.Register', ->
     @plugin = sinon.spy()
     @entity = {
       name: 'EntityName'
-      # TODO: why???
-      baseDir: 'myDir'
+      #baseDir: 'myDir'
       main: './mainFile.ts'
     }
     @deviceEntity = {
@@ -34,14 +33,14 @@ describe.only 'envBuilder.Register', ->
     assert.deepEqual(@register.plugins, [@plugin])
 
   it 'addDevice, addDriver, addService as an object', ->
-    await @register.addDevice(@deviceEntity)
-    await @register.addDriver(@entity)
-    await @register.addService(@entity)
+    await @register.addDevice({ @deviceEntity..., baseDir: 'some' })
+    await @register.addDriver({ @entity..., baseDir: 'some' })
+    await @register.addService({ @entity..., baseDir: 'some' })
 
     assert.equal(@register.registeringPromises.length, 3)
-    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), @deviceEntity)
-    assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), @entity)
-    assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @entity)
+    assert.deepEqual(@register.getEntityManifest('devices', 'EntityName'), {@deviceEntity..., baseDir: 'some' })
+    assert.deepEqual(@register.getEntityManifest('drivers', 'EntityName'), {@entity..., baseDir: 'some' })
+    assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), {@entity..., baseDir: 'some' })
 
   it 'addDevice, addDriver, addService as a path', ->
     @register.loadManifest = () => @deviceEntity
@@ -57,8 +56,8 @@ describe.only 'envBuilder.Register', ->
     assert.deepEqual(@register.getEntityManifest('services', 'EntityName'), @deviceEntity)
 
   it "don't add double", ->
-    await @register.addDriver(@entity)
-    assert.isRejected(@register.addDriver(@entity))
+    await @register.addDriver({ @entity..., baseDir: 'some' })
+    assert.isRejected(@register.addDriver({ @entity..., baseDir: 'some' }))
 
   it "resolveManifest - load from file", ->
     @register.io.exists = () => Promise.resolve(true)

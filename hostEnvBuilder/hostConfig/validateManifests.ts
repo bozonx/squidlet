@@ -93,8 +93,8 @@ function checkRules(rules: {[index: string]: SchemaElement} | undefined, paramNa
 
 function validateManifestBase(rawManifest: {[index: string]: any}): string | undefined {
   return sequence([
-    () => required(rawManifest.baseDir, 'baseDir'),
-    () => isString(rawManifest.baseDir, 'baseDir'),
+    // () => required(rawManifest.baseDir, 'baseDir'),
+    // () => isString(rawManifest.baseDir, 'baseDir'),
 
     () => required(rawManifest.name, 'name'),
     () => isString(rawManifest.name, 'name'),
