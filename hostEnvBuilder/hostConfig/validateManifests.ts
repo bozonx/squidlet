@@ -27,12 +27,12 @@ function validateDeviceManifest(rawManifest: {[index: string]: any}): string | u
   ]);
 }
 
-function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
-  return sequence([
-    () => required(rawManifest.type, 'type'),
-    () => isString(rawManifest.type, 'type'),
-  ]);
-}
+// function validateDriverManifest(rawManifest: {[index: string]: any}): string | undefined {
+//   return sequence([
+//     () => required(rawManifest.type, 'type'),
+//     () => isString(rawManifest.type, 'type'),
+//   ]);
+// }
 
 function checkFiles(files: string[] | undefined): string | undefined {
   if (typeof files === 'undefined') return;
@@ -126,15 +126,17 @@ export default function validateManifest (
   return sequence([
     () => validateManifestBase(manifest),
     () => {
-      switch (manifestType) {
-        case 'device':
-          return validateDeviceManifest(manifest);
-        case 'driver':
-          return validateDriverManifest(manifest);
-        case 'service':
-          return;
-          //return validateServiceManifest(manifest);
-      }
+      if (manifestType === 'device') return validateDeviceManifest(manifest);
+
+      return;
+      // switch (manifestType) {
+      //   case 'device':
+      //     return validateDeviceManifest(manifest);
+      //   case 'driver':
+      //     return validateDriverManifest(manifest);
+      //   case 'service':
+      //     return validateServiceManifest(manifest);
+      // }
     }
   ]);
 }
