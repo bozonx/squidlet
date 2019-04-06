@@ -11,6 +11,7 @@ import Io from '../Io';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import validateManifest from '../hostConfig/validateManifests';
+import {clearRelativePath} from '../helpers';
 
 
 /**
@@ -142,18 +143,25 @@ export default class Register {
       throw new Error(`Incorrect type of manifest: ${JSON.stringify(manifest)}`);
     }
 
-    return this.loadPropsIfNeed<T>(parsedManifest);
+    return this.normalizeManifest<T>(parsedManifest);
   }
 
-  /**
-   * Load props file if it set as a path to yaml file
-   */
-  private async loadPropsIfNeed<T extends PreManifestBase>(preManifest: T): Promise<T> {
-    // load props file
+  private async normalizeManifest<T extends PreManifestBase>(preManifest: T): Promise<T> {
+    // Load props file if it set as a path to yaml file
     if (typeof preManifest.props === 'string') {
       const propPath = path.resolve(preManifest.baseDir, preManifest.props);
 
       preManifest.props = await this.io.loadYamlFile(propPath);
+    }
+
+    // clear path to main file
+    preManifest.main = clearRelativePath(preManifest.main);
+
+    // clear paths in files
+    if (preManifest.files) {
+      for (let index in preManifest.files) {
+        preManifest.files[index] = clearRelativePath(preManifest.files[index]);
+      }
     }
 
     return preManifest;

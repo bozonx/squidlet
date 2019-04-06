@@ -1,5 +1,4 @@
 import _omit = require('lodash/omit');
-import * as path from 'path';
 
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
@@ -8,7 +7,6 @@ import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
-import Io from '../Io';
 
 
 // lists of names of all the entities
@@ -20,7 +18,6 @@ export interface EntitiesNames {
 
 
 export default class UsedEntities {
-  private readonly io: Io;
   private readonly configManager: ConfigManager;
   private readonly register: Register;
   // devs which are used, like {devName: true}
@@ -32,8 +29,7 @@ export default class UsedEntities {
   };
 
 
-  constructor(io: Io, configManager: ConfigManager, register: Register) {
-    this.io = io;
+  constructor(configManager: ConfigManager, register: Register) {
     this.register = register;
     this.configManager = configManager;
   }
@@ -137,16 +133,7 @@ export default class UsedEntities {
       'devs'
     );
 
-    // TODO: clean up it after validation
-
-    // clear path to main file
-    finalManifest.main = preManifest.main.replace(/^\.+\//, '');
-
-    // load props file
-    if (typeof preManifest.props === 'string') {
-      const propPath = path.join(preManifest.baseDir, preManifest.props);
-      finalManifest.props = await this.io.loadYamlFile(propPath);
-    }
+    // TODO: merge props with its base props
 
     return finalManifest;
   }

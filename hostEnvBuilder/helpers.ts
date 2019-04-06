@@ -32,3 +32,7 @@ export function checkDevsExistance(hostDevs: string[], machineDevs: string[]) {
     throw new Error(`There aren't some devs "${JSON.stringify(diff)}" in the selected platform`);
   }
 }
+
+export function clearRelativePath(rawPath: string): string {
+  return rawPath.replace(/^\.+\//, '');
+}
