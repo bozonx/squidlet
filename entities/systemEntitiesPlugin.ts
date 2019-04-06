@@ -40,7 +40,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'I2cSlave/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cToMaster/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cDuplex/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'SerialDuplex/SerialDuplex.yaml'));
+  await env.addDriver(path.join(driversRoot, 'SerialDuplex/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SharedStorage/manifest.yaml'));

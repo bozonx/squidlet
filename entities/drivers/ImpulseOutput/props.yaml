@@ -5,7 +5,7 @@ blockTime:
   type: number
   default: 0
 blockMode:
-  type: refuse | defer
+  type: '"refuse" | "defer"'
   default: refuse
 invert:
   type: boolean

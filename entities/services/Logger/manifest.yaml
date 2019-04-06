@@ -1,5 +1,5 @@
 name: Logger
-main: ./Logger.ts
+main: Logger.ts
 system: true
 
 props:

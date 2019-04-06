@@ -1,5 +1,5 @@
 feedback:
-  type: poll | int | none
+  type: '"poll" | "int" | "none"'
   default: none
 poll:
   type: array

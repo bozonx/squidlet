@@ -1,6 +1,6 @@
 name: Toggle
 type: toggle
-main: ./Toggle.ts
+main: Toggle.ts
 drivers:
   - BinaryClick
 

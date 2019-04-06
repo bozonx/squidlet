@@ -1,5 +1,5 @@
 edge:
-  type: rising | falling | both
+  type: '"rising" | "falling" | "both"'
   default: both
 debounce:
   type: number

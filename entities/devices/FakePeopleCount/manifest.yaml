@@ -1,6 +1,6 @@
 name: FakePeopleCount
 type: none
-main: ./FakePeopleCount.ts
+main: FakePeopleCount.ts
 
 status:
   default:

@@ -1,6 +1,6 @@
 name: WallSwitchSensor
 type: switch-sensor
-main: ./WallSwitchSensor.ts
+main: WallSwitchSensor.ts
 
 devices:
   - BinarySensor

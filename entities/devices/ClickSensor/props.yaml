@@ -1,7 +1,7 @@
 # Publish logical 1 on down or up events. Or publish 1 and 0 which are represent the state of button
 publish:
-  type: down | up | both
-  default: state
+  type: '"down" | "up" | "both"'
+  default: both
 
 # BinaryInput
 blockTime:

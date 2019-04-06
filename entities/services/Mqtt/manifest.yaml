@@ -1,5 +1,5 @@
 name: Mqtt
-main: ./Mqtt.ts
+main: Mqtt.ts
 system: true
 
 devs:
@@ -8,15 +8,15 @@ devs:
 props:
   # protocol which is used to connect to mqtt broker (http|https)
   protocol:
-    type: http|https
+    type: '"http" | "https"'
     default: http
   # hostname of mqtt broker
   host:
-    type: ?string
+    type: string
     default: localhost
   # port of mqtt broker
   port:
-    type: ?number
+    type: number
     default: 1883
   # List of hosts which will be listened to. By default - all the hosts (an empty array)
   listenHosts:

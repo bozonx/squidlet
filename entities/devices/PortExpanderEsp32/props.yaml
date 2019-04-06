@@ -1,4 +1,5 @@
 digitalPinsCount: 16
 analogPinsCount: 4
-connection: i2c|serial
+connection:
+  type: '"i2c" | "serial"'
 # ... connection props

@@ -1,6 +1,6 @@
 name: Relay
 type: relay
-main: ./Relay.ts
+main: Relay.ts
 
 devices:
   - Switch

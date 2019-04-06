@@ -1,6 +1,6 @@
 name: BinarySensor
 type: binary-sensor
-main: ./BinarySensor.ts
+main: BinarySensor.ts
 
 drivers:
   - BinaryInput

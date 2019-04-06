@@ -1,6 +1,6 @@
 name: Pcf8574
 type: expander
-main: ./Pcf8574.ts
+main: Pcf8574.ts
 
 drivers:
   - Pcf8574

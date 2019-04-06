@@ -1,6 +1,6 @@
 name: WallClickSensor
-main: ./WallClickSensor.ts
 type: switch-sensor
+main: WallClickSensor.ts
 
 devices:
   - ClickSensor
