@@ -33,6 +33,10 @@ export function checkDevsExistance(hostDevs: string[], machineDevs: string[]) {
   }
 }
 
+/**
+ * Clear
+ * @param rawPath
+ */
 export function clearRelativePath(rawPath: string): string {
-  return rawPath.replace(/^\.+\//, '');
+  return rawPath.replace(/\.{1,2}\//g, '');
 }
