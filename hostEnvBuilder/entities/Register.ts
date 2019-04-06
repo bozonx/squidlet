@@ -104,11 +104,11 @@ export default class Register {
     this.registeringPromises.push(resolvePromise);
 
     const parsedManifest: T = await resolvePromise;
-    // const validateError: string | undefined = validateManifest(manifestType, parsedManifest);
-    //
-    // if (validateError) {
-    //   throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
-    // }
+    const validateError: string | undefined = validateManifest(manifestType, parsedManifest);
+
+    if (validateError) {
+      throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
+    }
 
     const pluralManifestType = `${manifestType}s` as ManifestsTypePluralName;
     const manifestsOfType = this[pluralManifestType] as Map<string, T>;
@@ -124,7 +124,7 @@ export default class Register {
     let parsedManifest: T;
 
     if (typeof manifest === 'string') {
-      // it's path to manifest - let's load it
+      // it's path to manifest or dir where manifests is placed - let's load it
       // it adds a baseDir param
       parsedManifest = await this.loadManifest<T>(manifest);
     }
@@ -142,7 +142,21 @@ export default class Register {
       throw new Error(`Incorrect type of manifest: ${JSON.stringify(manifest)}`);
     }
 
-    return parsedManifest;
+    return this.loadPropsIfNeed<T>(parsedManifest);
+  }
+
+  /**
+   * Load props file if it set as a path to yaml file
+   */
+  private async loadPropsIfNeed<T extends PreManifestBase>(preManifest: T): Promise<T> {
+    // load props file
+    if (typeof preManifest.props === 'string') {
+      const propPath = path.resolve(preManifest.baseDir, preManifest.props);
+
+      preManifest.props = await this.io.loadYamlFile(propPath);
+    }
+
+    return preManifest;
   }
 
   private async loadManifest<T extends PreManifestBase>(pathToDirOrFile: string): Promise<T> {

@@ -1,12 +1,14 @@
 Register = require('../../hostEnvBuilder/entities/Register').default
 
 
-describe 'envBuilder.Register', ->
+describe.only 'envBuilder.Register', ->
   beforeEach ->
     @plugin = sinon.spy()
     @entity = {
       name: 'EntityName'
+      # TODO: why???
       type: 'some'
+      # TODO: why???
       baseDir: 'myDir'
       main: './mainFile.ts'
     }
@@ -65,3 +67,27 @@ describe 'envBuilder.Register', ->
 
     assert.deepEqual(result, @entity)
     sinon.assert.calledWith(@register.io.loadYamlFile, '/path/to/entity/manifest.yaml')
+
+  it "resolveManifest - load props from file", ->
+    @register.io.exists = () => Promise.resolve(true)
+    @register.io.stat = () => Promise.resolve({dir: true})
+    @register.io.loadYamlFile = sinon.stub().returns(Promise.resolve({
+      param: 1
+    }))
+
+    result = await @register.resolveManifest({
+      name: 'EntityName'
+      baseDir: '/myDir'
+      main: './mainFile.ts'
+      props: './props.yaml'
+    })
+
+    assert.deepEqual(result, {
+      name: 'EntityName'
+      baseDir: '/myDir'
+      main: './mainFile.ts'
+      props: {
+        param: 1
+      }
+    })
+    sinon.assert.calledWith(@register.io.loadYamlFile, '/myDir/props.yaml')
