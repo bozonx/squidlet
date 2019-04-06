@@ -7,7 +7,7 @@ describe 'envBuilder.UsedEntities', ->
       devices: {
         DeviceClass: {
           name: 'DeviceClass'
-          main: '../main.ts'
+          main: 'main.ts'
           baseDir: '/myBaseDir'
           files: [
             './deviceFile.json'
@@ -24,13 +24,13 @@ describe 'envBuilder.UsedEntities', ->
       drivers: {
         MyDriver: {
           name: 'MyDriver'
-          main: './main.ts'
+          main: 'main.ts'
           baseDir: '/myBaseDir'
           devs: ['MyDev']
         }
         DepDriver: {
           name: 'DepDriver'
-          main: './main.ts'
+          main: 'main.ts'
           baseDir: '/myBaseDir'
         }
       }
@@ -74,7 +74,7 @@ describe 'envBuilder.UsedEntities', ->
         }
     }
 
-    @usedEntities = new UsedEntities(@io, @configManager, @register)
+    @usedEntities = new UsedEntities(@configManager, @register)
 
 
   it 'generate and getEntitiesSet', ->

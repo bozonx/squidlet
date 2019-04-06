@@ -1,13 +1,13 @@
 Register = require('../../hostEnvBuilder/entities/Register').default
 
 
-describe 'envBuilder.Register', ->
+describe.only 'envBuilder.Register', ->
   beforeEach ->
     @plugin = sinon.spy()
     @entity = {
       name: 'EntityName'
       #baseDir: 'myDir'
-      main: './mainFile.ts'
+      main: 'mainFile.ts'
     }
     @deviceEntity = {
       @entity...
@@ -80,13 +80,15 @@ describe 'envBuilder.Register', ->
       name: 'EntityName'
       baseDir: '/myDir'
       main: './mainFile.ts'
+      files: ['./file.json']
       props: './props.yaml'
     })
 
     assert.deepEqual(result, {
       name: 'EntityName'
       baseDir: '/myDir'
-      main: './mainFile.ts'
+      main: 'mainFile.ts'
+      files: ['file.json']
       props: {
         param: 1
       }
