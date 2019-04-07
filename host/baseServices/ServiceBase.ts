@@ -1,14 +1,9 @@
 import EntityBase from '../entities/EntityBase';
-import {EntityProps} from '../interfaces/EntityDefinition';
 import ServiceEnv from './ServiceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 
 
-export interface ServiceBaseProps extends EntityProps {
-}
-
-
-export default class ServiceBase<Props extends ServiceBaseProps> extends EntityBase<Props> {
+export default class ServiceBase<Props extends {[index: string]: any;}> extends EntityBase<Props> {
   protected readonly env: ServiceEnv;
 
   constructor(definition: EntityDefinition, env: ServiceEnv) {

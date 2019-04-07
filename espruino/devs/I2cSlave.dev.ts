@@ -1,12 +1,11 @@
 import DriverEnv from '../../../host/src/app/entities/DriverEnv';
-import {EntityProps} from '../../../host/src/app/interfaces/EntityDefinition';
 
 
 // TODO: иснтанс не нужен. инстансы i2c-bus можно хранить в модуле
 
 
 export default class I2cSlaveDev {
-  constructor(props: EntityProps, env: DriverEnv, bus: number) {
+  constructor(props: {[index: string]: any;}, env: DriverEnv, bus: number) {
   }
 
   async send(bus: string, data: Uint8Array): Promise<void> {

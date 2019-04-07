@@ -1,7 +1,3 @@
-export interface EntityProps {
-  [index: string]: any;
-}
-
 export interface EntitiesDefinitions {
   devices: {[index: string]: EntityDefinition};
   drivers: {[index: string]: EntityDefinition};
@@ -15,5 +11,5 @@ export default interface EntityDefinition {
   // name of class which will be used
   className: string;
   // instance params
-  props: EntityProps;
+  props: {[index: string]: any;};
 }
