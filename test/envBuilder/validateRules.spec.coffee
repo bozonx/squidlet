@@ -1,7 +1,7 @@
 validate = require('../../hostEnvBuilder/hostConfig/validateManifests').default
 
 
-describe 'envBuilder.validateManifests', ->
+describe.only 'envBuilder.validateManifests', ->
   beforeEach ->
     @manifest = {
       #baseDir: 'str'
@@ -75,3 +75,81 @@ describe 'envBuilder.validateManifests', ->
   it 'base params - files local path', ->
     assert.isString(validate('service', { @manifest..., files: ['/file'] }))
     assert.isString(validate('service', { @manifest..., files: ['../file'] }))
+
+  it 'base params - props', ->
+    # required type
+    assert.isString(validate('service', { @manifest..., props: {param: {}} }))
+    # unknown type
+    assert.isString(validate('service', { @manifest..., props: {param: { type: 'unknown' }} }))
+    assert.isString(validate('service', { @manifest..., props: {param: { type: 'str'}} }))
+    # required param
+    assert.isString(validate('service', { @manifest..., props: {param: {
+      type: 'number'
+      required: 5
+    }} }))
+    # white list
+    assert.isString(validate('service', { @manifest..., props: {param: {
+      type: 'number'
+      odd: 'str'
+    }} }))
+
+  it 'base params - props default', ->
+    # default has to be the same type as a type param
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'number'
+        default: 5
+      }
+    } }))
+    assert.isString(validate('service', { @manifest..., props: {
+      param: {
+        type: 'number'
+        default: 'str'
+      }
+    } }))
+    # one of compound type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'number | string'
+        default: 5
+      }
+    } }))
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'number | 5'
+        default: 5
+      }
+    } }))
+    assert.isString(validate('service', { @manifest..., props: {
+      param: {
+        type: 'number | string'
+        default: true
+      }
+    } }))
+    # boolean constant type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'true'
+        default: true
+      }
+    } }))
+    # null constant type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'null | string'
+        default: null
+      }
+    } }))
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: 'undefined | string'
+        default: undefined
+      }
+    } }))
+    # string constant type
+    assert.isUndefined(validate('service', { @manifest..., props: {
+      param: {
+        type: '"const"'
+        default: 'const'
+      }
+    } }))
