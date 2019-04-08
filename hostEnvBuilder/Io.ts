@@ -1,19 +1,19 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as shelljs from 'shelljs';
-import * as yaml from 'js-yaml';
 import * as rimraf from 'rimraf';
 
 import systemConfig from './configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/StorageDev';
 import {callPromised} from '../host/helpers/helpers';
+import {yamlToJs} from './helpers';
 
 
 export default class Io {
   async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
     const yamlContent: string = await this.getFileContent(fullPath);
 
-    return this.yamlToJs(yamlContent);
+    return yamlToJs(yamlContent);
   }
 
   getFileContent(pathTo: string): Promise<string> {
@@ -39,10 +39,6 @@ export default class Io {
 
   async mkdirP(dirName: string): Promise<void> {
     shelljs.mkdir('-p', dirName);
-  }
-
-  yamlToJs(yamlString: string): any {
-    return yaml.safeLoad(yamlString);
   }
 
   async exists(path: string): Promise<boolean> {
