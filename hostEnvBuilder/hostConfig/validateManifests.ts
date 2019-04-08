@@ -8,7 +8,7 @@ import {
   required,
   sequence
 } from './validationHelpers';
-import {checkRules} from './validateRules';
+import validateRules from './validateRules';
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
@@ -17,10 +17,10 @@ function validateDeviceManifest(rawManifest: {[index: string]: any}): string | u
     () => isString(rawManifest.type, 'type'),
 
     () => isObject(rawManifest.status, 'status'),
-    () => checkRules(rawManifest.status, 'status'),
+    () => validateRules(rawManifest.status, 'status'),
 
     () => isObject(rawManifest.config, 'config'),
-    () => checkRules(rawManifest.config, 'config'),
+    () => validateRules(rawManifest.config, 'config'),
   ]);
 }
 

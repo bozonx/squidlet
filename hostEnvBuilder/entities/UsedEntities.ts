@@ -9,6 +9,7 @@ import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
 import SchemaElement from '../../host/interfaces/SchemaElement';
+import validateRules from '../hostConfig/validateRules';
 
 
 const baseParamName = '$base';
@@ -148,7 +149,18 @@ export default class UsedEntities {
       throw new Error(`Can't merge props of "${preManifest.name}": ${err}`);
     }
 
-    if (props) finalManifest.props = props;
+    if (props) {
+      // const validateError: string | undefined = validateRules(
+      //   props,
+      //   `${preManifest.name}.props`
+      // );
+      //
+      // if (validateError) {
+      //   throw new Error(`Invalid props of ${preManifest.name}: ${validateError}`);
+      // }
+
+      finalManifest.props = props;
+    }
 
     return finalManifest;
   }

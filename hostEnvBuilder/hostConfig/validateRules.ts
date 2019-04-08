@@ -33,7 +33,7 @@ function checkDefault(rule: SchemaElement, ruleName: string): string | undefined
 }
 
 
-export function checkRules(rules: {[index: string]: SchemaElement} | undefined, paramName: string): string | undefined {
+export default function validateRules(rules: {[index: string]: SchemaElement} | undefined, paramName: string): string | undefined {
   if (typeof rules === 'undefined') return;
 
   for (let ruleName of Object.keys(rules)) {
