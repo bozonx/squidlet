@@ -138,7 +138,16 @@ export default class UsedEntities {
       'devs'
     );
 
-    finalManifest.props = this.mergePropsSchema(preManifest.props);
+    let props: {[index: string]: SchemaElement} | undefined;
+
+    try {
+      props = this.mergePropsSchema(preManifest.props);
+    }
+    catch (err) {
+      throw new Error(`Can't merge props of "${preManifest.name}": ${err}`);
+    }
+
+    if (props) finalManifest.props = props;
 
     return finalManifest;
   }

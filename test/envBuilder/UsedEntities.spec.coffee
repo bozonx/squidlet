@@ -1,7 +1,7 @@
 UsedEntities = require('../../hostEnvBuilder/entities/UsedEntities').default
 
 
-describe 'envBuilder.UsedEntities', ->
+describe.only 'envBuilder.UsedEntities', ->
   beforeEach ->
     @manifests = {
       devices: {
@@ -144,3 +144,7 @@ describe 'envBuilder.UsedEntities', ->
     await @usedEntities.generate()
 
     assert.deepEqual(@usedEntities.getUsedDevs(), ['MyDev'])
+
+  it 'merge entities', ->
+    await @usedEntities.generate()
+
