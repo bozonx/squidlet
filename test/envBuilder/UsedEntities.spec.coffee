@@ -16,7 +16,7 @@ describe.only 'envBuilder.UsedEntities', ->
             'DepDriver'
           ]
           props: {
-            propsParam: 'value'
+            propsParam: { type: 'string', default: 'value' }
           }
           extParam: 'value'
         }
@@ -92,7 +92,7 @@ describe.only 'envBuilder.UsedEntities', ->
             name: 'DeviceClass'
             main: 'main.ts'
             props: {
-              propsParam: 'value'
+              propsParam: { type: 'string', default: 'value' }
             }
             extParam: "value"
           }
@@ -148,19 +148,37 @@ describe.only 'envBuilder.UsedEntities', ->
   it 'mergePropsSchema', ->
     @manifests.devices.DeviceClass.props = {
       $base: 'drivers.MyDriver'
-      topParam: 'top'
+      topParam: {
+        type: 'string'
+        default: 'top'
+      }
     }
 
     @manifests.drivers.MyDriver.props = {
       $base: 'services.MyService'
-      topParam: 'mid'
-      midParam: 'mid'
+      topParam: {
+        type: 'string'
+        default: 'mid'
+      }
+      midParam: {
+        type: 'string'
+        default: 'mid'
+      }
     }
 
     @manifests.services.MyService.props = {
-      topParam: 'bottom'
-      midParam: 'bottom'
-      bottomParam: 'bottom'
+      topParam: {
+        type: 'string'
+        default: 'bottom'
+      }
+      midParam: {
+        type: 'string'
+        default: 'bottom'
+      }
+      bottomParam: {
+        type: 'string'
+        default: 'bottom'
+      }
     }
 
     await @usedEntities.generate()
@@ -177,9 +195,18 @@ describe.only 'envBuilder.UsedEntities', ->
             name: 'DeviceClass'
             main: 'main.ts'
             props: {
-              topParam: 'top'
-              midParam: 'mid'
-              bottomParam: 'bottom'
+              topParam: {
+                type: 'string'
+                default: 'top'
+              }
+              midParam: {
+                type: 'string'
+                default: 'mid'
+              }
+              bottomParam: {
+                type: 'string'
+                default: 'bottom'
+              }
             }
             extParam: "value"
           }
@@ -203,9 +230,18 @@ describe.only 'envBuilder.UsedEntities', ->
             name: 'MyDriver'
             main: 'main.ts'
             props: {
-              topParam: 'mid'
-              midParam: 'mid'
-              bottomParam: 'bottom'
+              topParam: {
+                type: 'string'
+                default: 'mid'
+              }
+              midParam: {
+                type: 'string'
+                default: 'mid'
+              }
+              bottomParam: {
+                type: 'string'
+                default: 'bottom'
+              }
             }
           }
         }
@@ -219,9 +255,18 @@ describe.only 'envBuilder.UsedEntities', ->
             name: 'MyService'
             main: 'main.ts'
             props: {
-              topParam: 'bottom'
-              midParam: 'bottom'
-              bottomParam: 'bottom'
+              topParam: {
+                type: 'string'
+                default: 'bottom'
+              }
+              midParam: {
+                type: 'string'
+                default: 'bottom'
+              }
+              bottomParam: {
+                type: 'string'
+                default: 'bottom'
+              }
             }
           }
         }

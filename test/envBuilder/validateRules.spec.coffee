@@ -1,7 +1,7 @@
 validate = require('../../hostEnvBuilder/hostConfig/validateRules').default
 
 
-describe.only 'envBuilder.validateRules', ->
+describe 'envBuilder.validateRules', ->
   beforeEach ->
     @manifest = {
       #baseDir: 'str'

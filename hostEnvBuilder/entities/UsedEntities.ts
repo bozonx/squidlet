@@ -150,14 +150,14 @@ export default class UsedEntities {
     }
 
     if (props) {
-      // const validateError: string | undefined = validateRules(
-      //   props,
-      //   `${preManifest.name}.props`
-      // );
-      //
-      // if (validateError) {
-      //   throw new Error(`Invalid props of ${preManifest.name}: ${validateError}`);
-      // }
+      const validateError: string | undefined = validateRules(
+        props,
+        `${preManifest.name}.props`
+      );
+
+      if (validateError) {
+        throw new Error(`Invalid props of ${preManifest.name}: ${validateError}`);
+      }
 
       finalManifest.props = props;
     }
