@@ -106,13 +106,11 @@ export default class Register {
 
     const parsedManifest: T = await resolvePromise;
 
-    // TODO: uncomment !!!!
+    const validateError: string | undefined = validateManifest(manifestType, parsedManifest);
 
-    // const validateError: string | undefined = validateManifest(manifestType, parsedManifest);
-    //
-    // if (validateError) {
-    //   throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
-    // }
+    if (validateError) {
+      throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
+    }
 
     const pluralManifestType = `${manifestType}s` as ManifestsTypePluralName;
     const manifestsOfType = this[pluralManifestType] as Map<string, T>;
