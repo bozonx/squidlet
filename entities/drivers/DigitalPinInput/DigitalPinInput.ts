@@ -5,7 +5,6 @@ import {GetDriverDep} from 'host/entities/EntityBase';
 import {omit} from 'host/helpers/lodashLike';
 import IndexedEvents from 'host/helpers/IndexedEvents';
 
-import {resolveDriverName} from '../DigitalPinOutput/digitalHelpers';
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
 
 
@@ -43,7 +42,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
     // the second check is half of a debounce time
     this.secondCheckTimeout = Math.ceil((this.props.debounce || 0) / 2);
 
-    const driverName = resolveDriverName(this.props.source);
+    const driverName = `Digital_${this.props.source}`;
 
     this.depsInstances.source = await getDriverDep(driverName)
       .getInstance(omit(

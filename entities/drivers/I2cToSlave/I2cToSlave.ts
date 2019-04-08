@@ -154,7 +154,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
   protected validateProps = (props: I2cToSlaveDriverProps): string | undefined => {
 
-    // TODO; validate
+    // TODO; validate poll props
 
     return;
   }

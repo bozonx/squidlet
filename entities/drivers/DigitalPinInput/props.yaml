@@ -15,5 +15,9 @@ pulldown:
   default: false
 
 ### DigitalPin base props
-pin: {}
-source: {}
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'

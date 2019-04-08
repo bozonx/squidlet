@@ -5,7 +5,6 @@ import {omit} from 'host/helpers/lodashLike';
 import {DigitalSubDriver} from 'host/interfaces/dev/DigitalDev';
 
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
-import {resolveDriverName} from './digitalHelpers';
 
 
 export interface DigitalPinOutputProps extends DigitalBaseProps {
@@ -24,7 +23,7 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    const driverName = resolveDriverName(this.props.source);
+    const driverName = `Digital_${this.props.source}`;
 
     this.depsInstances.source = await getDriverDep(driverName)
       .getInstance(omit(this.props, 'initialLevel', 'pin', 'source'));
