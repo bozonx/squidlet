@@ -2,14 +2,14 @@
 # timeout after switching. At this time it doesn't receive any signals.
 blockTime:
   default: 0
-blockMode:
-invert:
-initial:
+blockMode: {}
+invert: {}
+initial: {}
 
 ### DigitalPin base props
-pin:
-sorce:
+pin: {}
+sorce: {}
 
 ### Device base props
-statusRepublishInterval:
-configRepublishInterval:
+statusRepublishInterval: {}
+configRepublishInterval: {}

@@ -2,8 +2,8 @@ expander:
   type: string
   required: true
 # PCF8574 driver
-bus:
-address:
-feedback:
-pollInterval:
-int:
+bus: {}
+address: {}
+feedback: {}
+pollInterval: {}
+int: {}

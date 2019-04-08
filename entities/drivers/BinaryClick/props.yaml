@@ -9,16 +9,16 @@ blockTime:
   default: 0
 
 # BinaryInput
-invert:
-invertOnPullup:
+invert: {}
+invertOnPullup: {}
 
 ### DigitalPinInput driver
-debounce:
-doubleCheck:
-edge:
-pullup:
-pulldown:
+debounce: {}
+doubleCheck: {}
+edge: {}
+pullup: {}
+pulldown: {}
 
 ### DigitalPin base props
-pin:
-source:
+pin: {}
+source: {}

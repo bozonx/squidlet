@@ -1,4 +1,5 @@
-connection: i2c|serial
+connection:
+  type: '"i2c" | "serial"'
 # ... connection props
 digitalPinsCount:
   type: number
@@ -8,9 +9,9 @@ analogPinsCount:
   required: true
 
 # I2cNode driver
-bus:
-address:
-feedback:
+bus: {}
+address: {}
+feedback: {}
 pollInterval:
   default: 100
-int:
+int: {}

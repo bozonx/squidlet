@@ -10,12 +10,12 @@ invertOnPullup:
   default: true
 
 ### DigitalPinInput driver
-debounce:
-doubleCheck:
-edge:
-pullup:
-pulldown:
+debounce: {}
+doubleCheck: {}
+edge: {}
+pullup: {}
+pulldown: {}
 
 ### DigitalPin base
-pin:
-source:
+pin: {}
+source: {}

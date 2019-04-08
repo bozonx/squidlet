@@ -1,22 +1,22 @@
 ### BinaryInput driver
 blockTime:
   default: 300
-invert:
-invertOnPullup:
+invert: {}
+invertOnPullup: {}
 
 ### DigitalPinInput driver
 debounce:
   default: 100
 doubleCheck:
   default: true
-edge:
-pullup:
-pulldown:
+edge: {}
+pullup: {}
+pulldown: {}
 
 ### DigitalPin base
-pin:
-sorce:
+pin: {}
+sorce: {}
 
 ### Device base props
-statusRepublishInterval:
-configRepublishInterval:
+statusRepublishInterval: {}
+configRepublishInterval: {}

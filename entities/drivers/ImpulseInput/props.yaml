@@ -16,11 +16,11 @@ invert:
 ### DigitalPinInput driver
 debounce:
   default: 0
-doubleCheck:
-edge:
-pullup:
-pulldown:
+doubleCheck: {}
+edge: {}
+pullup: {}
+pulldown: {}
 
 ### DigitalPin base
-pin:
-source:
+pin: {}
+source: {}

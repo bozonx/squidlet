@@ -1,8 +1,8 @@
 # I2cToSlave
-bus:
-address:
+bus: {}
+address: {}
 # MasterSlaveBaseNodeDriver
-int:
-feedback:
-pollInterval:
-poll:
+int: {}
+feedback: {}
+pollInterval: {}
+poll: {}

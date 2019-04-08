@@ -1,5 +1,9 @@
-digitalPinsCount: 16
-analogPinsCount: 4
+digitalPinsCount:
+  type: number
+  default: 16
+analogPinsCount:
+  type: number
+    default: 4
 connection:
   type: '"i2c" | "serial"'
 # ... connection props

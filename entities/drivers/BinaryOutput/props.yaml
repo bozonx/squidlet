@@ -11,5 +11,5 @@ initial:
   default: 0
 
 ### DigitalPin base props
-pin:
-source:
+pin: {}
+source: {}

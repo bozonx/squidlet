@@ -2,8 +2,8 @@ expander:
   type: string
   required: true
 # PortExpander driver
-connection:
+connection: {}
 # ... connection props
-digitalPinsCount:
-analogPinsCount:
-pollInterval:
+digitalPinsCount: {}
+analogPinsCount: {}
+pollInterval: {}

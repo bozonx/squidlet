@@ -1,6 +1,6 @@
 helpers = require('../../hostEnvBuilder/helpers')
 
-describe.only 'envBuilder.helpers', ->
+describe 'envBuilder.helpers', ->
   it 'sortByIncludeInList', ->
     assert.deepEqual(
       helpers.sortByIncludeInList(['three', 'one', 'four', 'two'], ['one', 'two']),
@@ -21,36 +21,47 @@ describe.only 'envBuilder.helpers', ->
     assert.equal(helpers.clearRelativePath('../rel/../to'), 'rel/to')
 
   it 'yamlToJs', ->
+#    testYaml = '''
+#      emptyObj: {}
+#      arr: []
+#      empty: !!js/undefined
+#
+#
+#      obj:
+#        param: 1
+#        emptyParam:
+#
+#      objWillBeEmpty:
+#        param:
+#          emptyParam:
+#
+#      emptyStr: ''
+#      null: null
+#      undefined: undefined
+#      string: 'str'
+#      num: 0
+#      emptyEnd: ~
+#    ''';
+
     testYaml = '''
       emptyObj: {}
       arr: []
-      empty:
-
-
-      obj:
-        param: 1
-        emptyParam:
-
-      objWillBeEmpty:
-        param:
-          emptyParam:
-
       emptyStr: ''
       null: null
       undefined: undefined
       string: 'str'
       num: 0
-      empty2:
+      empty: ~
     ''';
 
     assert.deepEqual(helpers.yamlToJs(testYaml), {
       emptyObj: {}
       arr: []
-      obj: {param: 1}
-      #empty: undefined
       emptyStr: ''
       null: null
       undefined: 'undefined'
       string: 'str'
       num: 0
+      # !!! empty node is null !
+      empty: null
     });

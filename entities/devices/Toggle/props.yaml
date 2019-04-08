@@ -3,22 +3,22 @@ blockTime:
   default: 50
 
 ### BinaryInput driver props
-invert:
-invertOnPullup:
+invert: {}
+invertOnPullup: {}
 
 ### DigitalPinInput driver
 # debounce time in ms
 debounce:
   default: 25
-doubleCheck:
-edge:
-pullup:
-pulldown:
+doubleCheck: {}
+edge: {}
+pullup: {}
+pulldown: {}
 
 ### DigitalPin base props
-pin:
-source:
+pin: {}
+source: {}
 
 ### Device base props
-statusRepublishInterval:
-configRepublishInterval:
+statusRepublishInterval: {}
+configRepublishInterval: {}
