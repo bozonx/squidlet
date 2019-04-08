@@ -1,3 +1,5 @@
+$base: 'drivers.DigitalPinInput'
+
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   type: number
@@ -9,13 +11,14 @@ invertOnPullup:
   type: boolean
   default: true
 
+###### Other props
 ### DigitalPinInput driver
-debounce: {}
-doubleCheck: {}
-edge: {}
-pullup: {}
-pulldown: {}
-
-### DigitalPin base
-pin: {}
-source: {}
+# debounce: {}
+# doubleCheck: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+#
+#### DigitalPin base
+# pin: {}
+# source: {}

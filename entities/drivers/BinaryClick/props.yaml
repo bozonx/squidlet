@@ -1,3 +1,5 @@
+$base: 'drivers.BinaryInput'
+
 # Maximum time of pressed button. It releases after reaching this timeout.
 releaseTimeoutMs:
   type: number
@@ -8,17 +10,22 @@ blockTime:
   type: number
   default: 0
 
-# BinaryInput
-invert: {}
-invertOnPullup: {}
-
+###### Other props
+### BinaryInput driver props
+# invert: {}
+# invertOnPullup: {}
+#
 ### DigitalPinInput driver
-debounce: {}
-doubleCheck: {}
-edge: {}
-pullup: {}
-pulldown: {}
-
-### DigitalPin base props
-pin: {}
-source: {}
+# debounce: {}
+# doubleCheck: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+#
+#### DigitalPin base props
+# pin: {}
+# sorce: {}
+#
+#### Device base props
+# statusRepublishInterval: {}
+# configRepublishInterval: {}

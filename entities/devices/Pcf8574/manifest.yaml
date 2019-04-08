@@ -5,4 +5,16 @@ main: Pcf8574.ts
 drivers:
   - Pcf8574
 
-props: ./props.yaml
+props:
+  $base: 'drivers.Pcf8574'
+
+  ###### Other props
+  ### I2cToSlaveDriverProps
+  # bus: {}
+  # address: {}
+  #
+  ## MasterSlaveBusProps
+  # int: {}
+  # poll: {}
+  # feedback: {}
+  # pollInterval: {}

@@ -1,9 +1,0 @@
-# I2cToSlaveDriverProps
-bus: {}
-address: {}
-
-# MasterSlaveBusProps
-int: {}
-poll: {}
-feedback: {}
-pollInterval: {}

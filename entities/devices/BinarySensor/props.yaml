@@ -1,24 +1,28 @@
-### BinaryInput driver props
+$base: 'drivers.BinaryInput'
 
-# timeout after received signal. At this time it doesn't receive any signals.
+# see BinaryInput.blockTime
 blockTime:
   default: 50
-invert: {}
-invertOnPullup: {}
 
-### DigitalPinInput driver
-# debounce time in ms
+# see DigitalPinInput.debounce
 debounce:
   default: 25
-doubleCheck: {}
-edge: {}
-pullup: {}
-pulldown: {}
 
-### DigitalPin base props
-pin: {}
-sorce: {}
-
-### Device base props
-statusRepublishInterval: {}
-configRepublishInterval: {}
+###### Other props
+### BinaryInput driver props
+# invert: {}
+# invertOnPullup: {}
+#
+### DigitalPinInput driver
+# doubleCheck: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+#
+#### DigitalPin base props
+# pin: {}
+# sorce: {}
+#
+#### Device base props
+# statusRepublishInterval: {}
+# configRepublishInterval: {}
