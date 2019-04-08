@@ -11,6 +11,9 @@ export function isValueOfType(fullType: string, value: any): string | undefined 
 
   // check types
   for (let type of parsedType.types) {
+
+    // TODO: поддержка массивов - string[], number[], boolean[], object[]
+
     if (typeof value === type) return;
   }
 

@@ -14,6 +14,8 @@ export const basicTypes: string[] = [
   'number[]',
   'boolean',
   'boolean[]',
+  'object',
+  'object[]',
 ];
 
 
