@@ -1,7 +1,7 @@
-validate = require('../../hostEnvBuilder/hostConfig/validateManifests').default
+validate = require('../../hostEnvBuilder/hostConfig/validateRules').default
 
 
-describe.only 'envBuilder.validateManifests', ->
+describe 'envBuilder.validateRules', ->
   beforeEach ->
     @manifest = {
       #baseDir: 'str'

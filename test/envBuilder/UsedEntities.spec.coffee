@@ -145,6 +145,26 @@ describe.only 'envBuilder.UsedEntities', ->
 
     assert.deepEqual(@usedEntities.getUsedDevs(), ['MyDev'])
 
-  it 'merge entities', ->
-    await @usedEntities.generate()
+  it 'mergePropsSchema', ->
+    props = {
+      $base: 'drivers.MyDriver'
+      topParam: 'top'
+    }
 
+    @manifests.drivers.MyDriver.props = {
+      $base: 'services.MyService'
+      topParam: 'mid'
+      midParam: 'mid'
+    }
+
+    @manifests.services.MyService.props = {
+      topParam: 'bottom'
+      midParam: 'bottom'
+      bottomParam: 'bottom'
+    }
+
+    assert.deepEqual(@usedEntities.mergePropsSchema(props), {
+      topParam: 'top'
+      midParam: 'mid'
+      bottomParam: 'bottom'
+    })

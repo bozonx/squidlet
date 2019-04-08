@@ -135,7 +135,8 @@ export default class UsedEntities {
       'baseDir',
       'devices',
       'drivers',
-      'devs'
+      'devs',
+      'props'
     );
 
     let props: {[index: string]: SchemaElement} | undefined;
