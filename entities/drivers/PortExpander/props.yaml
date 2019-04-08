@@ -1,5 +1,6 @@
 connection:
   type: '"i2c" | "serial"'
+  required: true
 # ... connection props
 digitalPinsCount:
   type: number

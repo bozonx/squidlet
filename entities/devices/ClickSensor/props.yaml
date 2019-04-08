@@ -6,6 +6,9 @@ publish:
   default: both
 
 ###### Other props
+### BinaryClick driver
+# releaseTimeoutMs: {}
+#
 ### BinaryInput driver props
 # blockTime: {}
 # invert: {}

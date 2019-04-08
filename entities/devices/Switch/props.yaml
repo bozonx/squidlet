@@ -1,15 +1,20 @@
-### BinaryOutput driver
+$base: 'drivers.BinaryOutput'
+
 # timeout after switching. At this time it doesn't receive any signals.
+# see BinaryOutput driver.
 blockTime:
   default: 0
-blockMode: {}
-invert: {}
-initial: {}
 
+###### Other props
+### BinaryOutput driver
+# blockMode: {}
+# invert: {}
+# initial: {}
+#
 ### DigitalPin base props
-pin: {}
-sorce: {}
-
+# pin: {}
+# sorce: {}
+#
 ### Device base props
-statusRepublishInterval: {}
-configRepublishInterval: {}
+# statusRepublishInterval: {}
+# configRepublishInterval: {}

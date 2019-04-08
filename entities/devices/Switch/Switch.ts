@@ -16,10 +16,10 @@ export default class Switch extends DeviceBase<Props> {
   private get binaryOutput(): BinaryOutput {
     return this.depsInstances.binaryOutput as any;
   }
-
   protected get status(): Status {
     return this._status as Status;
   }
+
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryOutput = await getDriverDep('BinaryOutput')
