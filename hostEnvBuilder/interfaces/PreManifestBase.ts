@@ -24,7 +24,8 @@ export default interface PreManifestBase {
   // additional files relative to manifest place.
   files?: string[];
   // default properties of instance - can be an object or a path to props yal file
-  props?: {[index: string]: any} | string;
+  // it can be a string - it points to local yaml file with props
+  props?: {[index: string]: any};
 
   // custom values of manifest
   //[index: string]: any;

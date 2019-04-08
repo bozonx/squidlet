@@ -1,4 +1,5 @@
 import _omit = require('lodash/omit');
+import _defaultsDeep = require('lodash/defaultsDeep');
 
 import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
@@ -7,6 +8,10 @@ import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../host/interfaces/ManifestBase';
+import SchemaElement from '../../host/interfaces/SchemaElement';
+
+
+const baseParamName = '$base';
 
 
 // lists of names of all the entities
@@ -133,9 +138,55 @@ export default class UsedEntities {
       'devs'
     );
 
-    // TODO: merge props with its base props
+    finalManifest.props = this.mergePropsSchema(preManifest.props);
 
     return finalManifest;
+  }
+
+  /**
+   * Read $base param and merge props with base props
+   */
+  private mergePropsSchema(props: {[index: string]: any} | undefined): {[index: string]: SchemaElement} | undefined {
+    if (!props) return;
+    // no necessary to merge
+    if (!props[baseParamName]) return props;
+
+    const [rawPluralType, entityName] = props[baseParamName].split('.');
+    const pluralType: ManifestsTypePluralName = rawPluralType;
+    const topLayer = _omit(props, baseParamName);
+
+    if (!pluralType || !entityName) {
+      throw new Error(`Invalid "$base" param of props. "${JSON.stringify(props)}"`);
+    }
+
+    const bottomLayer: {[index: string]: SchemaElement} | undefined = this.resolveEntityProps(
+      pluralType,
+      entityName
+    );
+
+    if (typeof bottomLayer === 'undefined') return topLayer;
+
+    // merge
+    return _defaultsDeep({} , topLayer, bottomLayer);
+  }
+
+  private resolveEntityProps(
+    pluralType: ManifestsTypePluralName,
+    entityName: string
+  ): {[index: string]: SchemaElement} | undefined {
+    const entitySet: HostEntitySet | undefined = this.entitiesSet[pluralType][entityName];
+
+    // try to get previously resolved entity
+    // return props or undefined
+    if (entitySet) return entitySet.manifest.props;
+
+    // else get from register
+
+    const manifest: PreManifestBase = this.register.getEntityManifest(pluralType, entityName);
+
+    if (!manifest.props) return;
+
+    return this.mergePropsSchema(manifest.props);
   }
 
 }
