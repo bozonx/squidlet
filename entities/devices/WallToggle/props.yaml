@@ -1,25 +1,34 @@
+$base: 'devices.Toggle'
+
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   default: 500
 
-### BinaryInput driver props
-invert: {}
-invertOnPullup: {}
-
-### DigitalPinInput driver
-# debounce time in ms
+# see DigitalPinInput driver
 debounce:
   default: 25
 doubleCheck:
   default: true
-edge: {}
-pullup: {}
-pulldown: {}
 
-### DigitalPin base props
-pin: {}
-source: {}
-
-### Device base props
-statusRepublishInterval: {}
-configRepublishInterval: {}
+###### Other props
+### BinaryClick driver
+# releaseTimeoutMs: {}
+#
+### BinaryInput driver props
+# invert: {}
+# invertOnPullup: {}
+#
+### DigitalPinInput driver
+# debounce: {}
+# doubleCheck: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+#
+#### DigitalPin base props
+# pin: {}
+# sorce: {}
+#
+#### Device base props
+# statusRepublishInterval: {}
+# configRepublishInterval: {}

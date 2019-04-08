@@ -1,26 +1,39 @@
-# ClickSensor
+$base: 'devices.ClickSensor'
+
+# see ClickSensor
 publish:
   default: up
 
-### BinaryInput driver
+# see BinaryInput driver
 blockTime:
   default: 300
-invert: {}
-invertOnPullup: {}
 
-### DigitalPinInput driver
+# see DigitalPinInput driver
 debounce:
   default: 50
 doubleCheck:
   default: true
-edge: {}
-pullup: {}
-pulldown: {}
 
-### DigitalPin base props
-pin: {}
-sorce: {}
-
-### Device base props
-statusRepublishInterval: {}
-configRepublishInterval: {}
+###### Other props
+### BinaryClick driver
+# releaseTimeoutMs: {}
+#
+### BinaryInput driver props
+# blockTime: {}
+# invert: {}
+# invertOnPullup: {}
+#
+### DigitalPinInput driver
+# debounce: {}
+# doubleCheck: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+#
+#### DigitalPin base props
+# pin: {}
+# sorce: {}
+#
+#### Device base props
+# statusRepublishInterval: {}
+# configRepublishInterval: {}

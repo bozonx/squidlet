@@ -1,10 +1,10 @@
 $base: 'drivers.BinaryInput'
 
-# see BinaryInput.blockTime
+# see BinaryInput driver
 blockTime:
   default: 50
 
-# see DigitalPinInput.debounce
+# see DigitalPinInput driver
 debounce:
   default: 25
 
