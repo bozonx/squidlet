@@ -60,12 +60,3 @@ export function checkRules(rules: {[index: string]: SchemaElement} | undefined, 
 
   return;
 }
-
-export default function validateManifest (
-  manifestType: ManifestsTypeName,
-  manifest: {[index: string]: any}
-): string | undefined {
-  return sequence([
-    () => checkRules(rawManifest.props, 'props'),
-  ]);
-}

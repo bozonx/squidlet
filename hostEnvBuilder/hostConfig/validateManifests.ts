@@ -8,7 +8,7 @@ import {
   required,
   sequence
 } from './validationHelpers';
-import {checkRules} from './validateProps';
+import {checkRules} from './validateRules';
 
 
 function validateDeviceManifest(rawManifest: {[index: string]: any}): string | undefined {
