@@ -56,6 +56,4 @@ export default interface PreHostConfig {
   mqtt?: {[index: string]: any};
   // shortcut for logger service
   logger?: {[index: string]: any};
-  // shortcut for webApi service
-  //webApi?: {[index: string]: any};
 }

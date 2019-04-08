@@ -1,51 +1,92 @@
-normalize = require('../../hostEnvBuilder/hostConfig/normalizeHostConfig')
+normalize = require('../../hostEnvBuilder/hostConfig/normalizeHostConfig').default
 
 
 describe 'envBuilder.normalizeHostConfig', ->
-  beforeEach ->
-
-  it 'makeDevicesPlain', ->
-    preDevices = {
-      room: {
-        device1: {
-          device: 'MyDevice'
+  it 'devices, drviers and services', ->
+    hostConfig = {
+      devices: {
+        room: {
+          myDevice: {
+            device: 'DeviceClass'
+            param: 1
+          }
+        }
+      }
+      drivers: {
+        MyDriver: {
+          param: 1
+        }
+      }
+      services: {
+        myService: {
+          service: 'ServiceClass'
+          param: 1
         }
       }
     }
-    assert.deepEqual(normalize.makeDevicesPlain(preDevices), {
-      'room.device1': {
-        device: 'MyDevice'
-      },
+
+    assert.deepEqual(normalize(hostConfig), {
+      devices: {
+        'room.myDevice': {
+          className: 'DeviceClass'
+          param: 1
+        }
+      }
+      drivers: {
+        MyDriver: {
+          className: 'MyDriver'
+          param: 1
+        }
+      }
+      services: {
+        myService: {
+          className: 'ServiceClass'
+          param: 1
+        }
+      }
     })
 
-  it 'convertDefinitions', ->
-    preDefinitions = {
-      'room.device1': {
-        device: 'MyDevice'
+  it 'services shortcuts', ->
+    hostConfig = {
+      devices: {}
+      drivers: {}
+      services: {
+        myService: {
+          service: 'ServiceClass'
+          param: 1
+        }
+      }
+
+      automation: {
         param: 1
       }
-    }
-    assert.deepEqual(normalize.convertDefinitions('device', preDefinitions), {
-      'room.device1': {
-        className: 'MyDevice'
-        param: 1
-      },
-    })
-
-  it 'collectServicesFromShortcuts', ->
-    preHostConfig = {
       mqtt: {
-        param: 1
+        param: 2
+      }
+      logger: {
+        param: 3
       }
     }
 
-    servicesShortcut = {
-      mqtt: 'Mqtt'
-    }
-
-    assert.deepEqual(normalize.collectServicesFromShortcuts(preHostConfig, servicesShortcut), {
-      mqtt: {
-        className: 'Mqtt'
-        param: 1
+    assert.deepEqual(normalize(hostConfig), {
+      devices: {}
+      drivers: {}
+      services: {
+        myService: {
+          className: 'ServiceClass'
+          param: 1
+        }
+        automation: {
+          className: 'Automation'
+          param: 1
+        }
+        mqtt: {
+          className: 'Mqtt'
+          param: 2
+        }
+        logger: {
+          className: 'Logger'
+          param: 3
+        }
       }
     })

@@ -15,7 +15,7 @@ import PreEntityDefinition from '../interfaces/PreEntityDefinition';
  *    },
  *  }
  */
-export function makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: any} {
+function makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]: any} {
   if (!preDevices) return {};
 
   const result: {[index: string]: any} = {};
@@ -49,7 +49,7 @@ export function makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: 
 /**
  * Convert definition line { device: MyClass, ... } to { className: MyClass, ... }
  */
-export function convertDefinitions(
+function convertDefinitions(
   type: ManifestsTypeName,
   preDefinitions: {[index: string]: any}
 ): {[index: string]: PreEntityDefinition} {
@@ -68,7 +68,7 @@ export function convertDefinitions(
 /**
  * Generate service from shortcuts like 'automation', 'logger' etc.
  */
-export function collectServicesFromShortcuts(
+function collectServicesFromShortcuts(
   preHostConfig: {[index: string]: any},
   servicesShortcut: {[index: string]: string}
 ): {[index: string]: PreEntityDefinition} {
@@ -107,7 +107,7 @@ export default function normalizeHostConfig(preHostConfig: PreHostConfig): PreHo
   const plainDevices: {[index: string]: any} = makeDevicesPlain(preHostConfig.devices);
 
   return {
-    ...preHostConfig,
+    ..._omit(preHostConfig, Object.keys(servicesShortcut)),
     devices: convertDefinitions('device', plainDevices),
     drivers: convertDefinitions('driver', preHostConfig.drivers || {}),
     services: {
