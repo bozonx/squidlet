@@ -1,3 +1,5 @@
+$base: 'drivers.DigitalPinOutput'
+
 impulseLength:
   type: number
   default: 20
@@ -11,6 +13,9 @@ invert:
   type: boolean
   default: false
 
-### DigitalPin base props
-pin: {}
-source: {}
+### DigitalPinOutput driver props
+# initialLevel - don't use it, it will be calculated and reassigned
+#
+#### DigitalPin base props
+#pin: {}
+#source: {}

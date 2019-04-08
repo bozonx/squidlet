@@ -5,4 +5,7 @@ system: true
 #devices:
 #  - PortExpanderEsp32
 
-props: props.yaml
+props:
+  expander:
+    type: string
+    required: true

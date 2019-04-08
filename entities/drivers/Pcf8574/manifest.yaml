@@ -5,4 +5,14 @@ drivers:
   - I2cToSlave
   - Digital_pcf8574
 
-props: props.yaml
+props:
+  $base: 'drivers.I2cToSlave'
+
+  ### I2cToSlave driver props
+  #bus: {}
+  #address: {}
+  #int: {}
+  #feedback: {}
+  #pollInterval:
+  #  default: 100
+  #poll: {}

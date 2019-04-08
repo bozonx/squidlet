@@ -1,3 +1,5 @@
+$base: 'drivers.DigitalPinInput'
+
 impulseLength:
   type: number
   default: 100
@@ -6,21 +8,24 @@ blockTime:
   default: 0
 #  throttle:
 #    type: number?
-invertOnPullup:
-  type: boolean
-  default: true
 invert:
   type: boolean
   default: false
+invertOnPullup:
+  type: boolean
+  default: true
 
-### DigitalPinInput driver
+# see DigitalPinInput driver
 debounce:
   default: 0
-doubleCheck: {}
-edge: {}
-pullup: {}
-pulldown: {}
 
-### DigitalPin base
-pin: {}
-source: {}
+###### Other props
+### DigitalPinInput driver
+# doubleCheck: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+#
+#### DigitalPin base
+# pin: {}
+# source: {}

@@ -4,3 +4,8 @@ system: true
 
 devs:
   - I2cSlave
+
+props:
+  bus:
+    type: string | number
+    required: true

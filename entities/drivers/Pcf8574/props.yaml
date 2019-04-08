@@ -1,8 +1,0 @@
-# I2cToSlave driver
-bus: {}
-address: {}
-int: {}
-feedback: {}
-pollInterval:
-  default: 100
-poll: {}

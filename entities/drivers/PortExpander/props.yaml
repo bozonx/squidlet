@@ -13,7 +13,7 @@ analogPinsCount:
 pollInterval:
   default: 100
 
-### Other props
+### Connection params
 #bus: {}
 #address: {}
 #feedback: {}
