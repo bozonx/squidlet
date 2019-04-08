@@ -146,7 +146,7 @@ describe.only 'envBuilder.UsedEntities', ->
     assert.deepEqual(@usedEntities.getUsedDevs(), ['MyDev'])
 
   it 'mergePropsSchema', ->
-    props = {
+    @manifests.devices.DeviceClass.props = {
       $base: 'drivers.MyDriver'
       topParam: 'top'
     }
@@ -163,8 +163,67 @@ describe.only 'envBuilder.UsedEntities', ->
       bottomParam: 'bottom'
     }
 
-    assert.deepEqual(@usedEntities.mergePropsSchema(props), {
-      topParam: 'top'
-      midParam: 'mid'
-      bottomParam: 'bottom'
+    await @usedEntities.generate()
+
+    assert.deepEqual(@usedEntities.getEntitiesSet(), {
+      devices: {
+        DeviceClass: {
+          srcDir: '/myBaseDir'
+          files: [
+            './deviceFile.json'
+          ]
+          system: false
+          manifest: {
+            name: 'DeviceClass'
+            main: 'main.ts'
+            props: {
+              topParam: 'top'
+              midParam: 'mid'
+              bottomParam: 'bottom'
+            }
+            extParam: "value"
+          }
+        }
+      }
+      drivers: {
+        DepDriver: {
+          srcDir: '/myBaseDir'
+          files: []
+          system: false
+          manifest: {
+            name: 'DepDriver'
+            main: 'main.ts'
+          }
+        }
+        MyDriver: {
+          srcDir: '/myBaseDir'
+          files: []
+          system: false
+          manifest: {
+            name: 'MyDriver'
+            main: 'main.ts'
+            props: {
+              topParam: 'mid'
+              midParam: 'mid'
+              bottomParam: 'bottom'
+            }
+          }
+        }
+      }
+      services: {
+        MyService: {
+          srcDir: '/myBaseDir'
+          files: []
+          system: true
+          manifest: {
+            name: 'MyService'
+            main: 'main.ts'
+            props: {
+              topParam: 'bottom'
+              midParam: 'bottom'
+              bottomParam: 'bottom'
+            }
+          }
+        }
+      }
     })
