@@ -8,10 +8,12 @@ analogPinsCount:
   type: number
   required: true
 
-# I2cNode driver
-bus: {}
-address: {}
-feedback: {}
+# I2cNode driver (i2c, serial, etc)
 pollInterval:
   default: 100
-int: {}
+
+### Other props
+#bus: {}
+#address: {}
+#feedback: {}
+#int: {}

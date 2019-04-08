@@ -1,3 +1,5 @@
+$base: 'drivers.PortExpander'
+
 digitalPinsCount:
   type: number
   default: 16
