@@ -10,6 +10,8 @@ export default {
   updater: {
     versionsRequest: 'updater.versionsRequest',
     versionsResponse: 'updater.versionsResponse',
+    updateConfigs: 'updater.updateConfigs',
+    updateConfigsResult: 'updater.updateConfigsResult',
     updateEntity: 'updater.updateEntity',
     updateEntityResult: 'updater.updateEntityResult',
     updateHost: 'updater.updateHost',

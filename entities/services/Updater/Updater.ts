@@ -39,6 +39,7 @@ export default class Updater extends ServiceBase<Props> {
 
   private listen() {
     this.env.events.addListener(categories.updater, topics.updater.versionsRequest, this.onAskVersions);
+    this.env.events.addListener(categories.updater, topics.updater.updateConfigs, this.onUpdateConfigs);
     this.env.events.addListener(categories.updater, topics.updater.updateEntity, this.onUpdateEntity);
     this.env.events.addListener(categories.updater, topics.updater.updateHost, this.onUpdateHost);
     this.env.events.addListener(categories.updater, topics.updater.updateFile, this.onUpdateFile);
@@ -51,6 +52,15 @@ export default class Updater extends ServiceBase<Props> {
     const versions = 'versions';
 
     this.env.events.emit(categories.updater, topics.updater.versionsResponse, versions);
+  }
+
+  private onUpdateConfigs = (data: Uint8Array) => {
+    // TODO: unpack to tmp dir, and replace real configs dir
+    console.log('----- onUpdateConfigs', data);
+
+    const result: number = UPDATER_STATUS.ok;
+
+    this.env.events.emit(categories.updater, topics.updater.updateConfigsResult, result);
   }
 
   private onUpdateEntity = (data: UpdateEntityData) => {
