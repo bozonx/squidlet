@@ -113,11 +113,10 @@ export function uint8WordToNum(word: Uint8Array): number {
 
 /**
  * Converts [true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false] > [255,0]
+ * To be sure that array of bits have strict length use helpers.setArrayDimension()
  */
-export function bitsToBytes(bits: (boolean | undefined)[], bitsCount: number): Uint8Array {
-
-  // TODO: fix
-
+export function bitsToBytes(bits: (boolean | undefined)[]): Uint8Array {
+  const bitsCount: number = bits.length;
   const numOfBytes: number = Math.ceil(bitsCount / 8);
   const result: Uint8Array = new Uint8Array(numOfBytes);
 
@@ -137,13 +136,8 @@ export function bitsToBytes(bits: (boolean | undefined)[], bitsCount: number): U
  * Converts [255,0] > [true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false]
  */
 export function bytesToBits(bytes: Uint8Array): boolean[] {
-
-  // TODO: fix
-
   if (!bytes.length) return [];
 
-  //const bitsLength: number = bytes.length * 8;
-  //new Array<boolean>(bitsLength)
   let result: boolean[] = [];
 
   for (let index of bytes.keys()) {

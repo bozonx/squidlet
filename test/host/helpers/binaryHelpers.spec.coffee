@@ -35,17 +35,23 @@ describe 'helpers.binaryHelpers', ->
     assert.deepEqual(helpers.uint8WordToNum(new Uint8Array([ 255, 255 ])), 65535)
     assert.deepEqual(helpers.uint8WordToNum(new Uint8Array([ 0, 1 ])), 1)
 
-#  it 'bitsToBytes', ->
-#    assert.deepEqual(
-#      helpers.bitsToBytes([true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false]),
-#      new Uint8Array([ 255, 255 ])
-#    )
-#
-#  it 'bytesToBits', ->
-#    assert.deepEqual(
-#      helpers.bytesToBits(new Uint8Array([ 255, 255 ])),
-#      [true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false]
-#    )
+  it 'bitsToBytes', ->
+    assert.deepEqual(
+      helpers.bitsToBytes([
+        true,true,true,true,true,true,true,true,
+        false,false,false,false,false,false,false,false
+      ]),
+      new Uint8Array([ 255, 0 ])
+    )
+
+  it 'bytesToBits', ->
+    assert.deepEqual(
+      helpers.bytesToBits(new Uint8Array([ 255, 0 ])),
+      [
+        true,true,true,true,true,true,true,true,
+        false,false,false,false,false,false,false,false
+      ]
+    )
 
   it 'updateBitInByte', ->
     assert.equal(helpers.updateBitInByte(0, 2 , true), 4)

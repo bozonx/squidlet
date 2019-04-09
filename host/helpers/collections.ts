@@ -58,6 +58,18 @@ export function updateArray(arrToUpdate: any[], newValues: any[]): void {
   for (let index in newValues) arrToUpdate[index] = newValues[index];
 }
 
+/**
+ * Make new array with specified dimension.
+ * If arr smaller than count then odd items will be empty
+ * If arr bigger than count then odd items will be omitted
+ */
+export function setArrayDimension(arr: any[], count: number): any[] {
+  const result: any[] = new Array(count);
+
+  for (let i = 0; i < count; i++) result[i] = arr[i];
+
+  return result;
+}
 
 /**
  * Get key by value

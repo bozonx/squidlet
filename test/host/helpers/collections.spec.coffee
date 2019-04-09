@@ -43,6 +43,11 @@ describe 'helpers.collections', ->
     collections.updateArray(arr, arr2)
     assert.deepEqual(arr, [0,1,5])
 
+  it 'setArrayDimension', ->
+    assert.deepEqual(collections.setArrayDimension([0,1], 2), [0,1]);
+    assert.deepEqual(collections.setArrayDimension([0], 2), [0, undefined]);
+    assert.deepEqual(collections.setArrayDimension([0, 1, 2], 2), [0, 1]);
+
   it 'getKeyOfObject', ->
     assert.equal(collections.getKeyOfObject({a: 1, b: 2}, 2), 'b')
     assert.isUndefined(collections.getKeyOfObject({a: 1, b: 2}, 3))
