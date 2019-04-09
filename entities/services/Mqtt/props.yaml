@@ -1,0 +1,16 @@
+# protocol which is used to connect to mqtt broker (http|https)
+protocol:
+  type: '"http" | "https"'
+  default: http
+# hostname of mqtt broker
+host:
+  type: string
+  default: localhost
+# port of mqtt broker
+port:
+  type: number
+  default: 1883
+## List of hosts which will be listened to. By default - all the hosts (an empty array)
+#listenHosts:
+#  type: string[]
+#  default: []

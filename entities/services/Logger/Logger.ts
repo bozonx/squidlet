@@ -7,7 +7,7 @@ import * as defaultLogger from './defaultLogger';
 
 
 interface Props {
-  listenHosts: string[];
+  //listenHosts: string[];
 }
 
 export default class Logger extends ServiceBase<Props> {
@@ -22,9 +22,11 @@ export default class Logger extends ServiceBase<Props> {
 
   private listenHosts() {
     // get hosts list from props or use all the hosts
-    const hosts: string[] = (this.props.listenHosts.length)
-      ? this.props.listenHosts
-      : this.env.host.getAllTheHostsIds();
+    // const hosts: string[] = (this.props.listenHosts.length)
+    //   ? this.props.listenHosts
+    //   : this.env.host.getAllTheHostsIds();
+
+    const hosts: string[] = ['master'];
 
     for (let hostId of hosts) {
       const allowedLogLevels: string[] = this.calcLogLevel(this.env.host.config.config.logLevel);

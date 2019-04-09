@@ -9,7 +9,7 @@ interface Props {
   protocol: string;
   host: string;
   port: string;
-  listenHosts: string[];
+  //listenHosts: string[];
 }
 
 export default class MqttSevice extends ServiceBase<Props> {
@@ -59,9 +59,11 @@ export default class MqttSevice extends ServiceBase<Props> {
    */
   private listenHostsPublishes() {
     // get hosts list from props or use all the hosts
-    const hosts: string[] = (this.props.listenHosts.length)
-      ? this.props.listenHosts
-      : this.env.host.getAllTheHostsIds();
+    // const hosts: string[] = (this.props.listenHosts.length)
+    //   ? this.props.listenHosts
+    //   : this.env.host.getAllTheHostsIds();
+
+    const hosts: string[] = ['master'];
 
     for (let hostId of hosts) {
       // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
