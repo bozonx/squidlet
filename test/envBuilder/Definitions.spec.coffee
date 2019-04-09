@@ -26,6 +26,9 @@ describe.only 'envBuilder.Definitions', ->
               defProp: {
                 type: 'number'
               }
+              hostProp: {
+                type: 'number'
+              }
             }
           }
         }
