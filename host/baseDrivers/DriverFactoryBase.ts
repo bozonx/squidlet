@@ -33,6 +33,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
     const props: {[index: string]: any} = mergeDeep({}, this.definition.props, instanceProps);
     const instanceId: string | undefined = this.getInstanceId(props);
 
+    // TODO: uncomment
     //await this.validateInstanceProps(instanceProps, props);
 
     if (typeof instanceId === 'undefined') {

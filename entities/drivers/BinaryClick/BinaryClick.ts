@@ -5,6 +5,7 @@ import DriverBase from 'host/baseDrivers/DriverBase';
 import {GetDriverDep} from 'host/entities/EntityBase';
 
 import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
+import {omit} from '../../../host/helpers/lodashLike';
 
 
 type Handler = () => void;
@@ -33,7 +34,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput')
       .getInstance({
-        ...this.props,
+        ...omit(this.props, 'releaseTimeoutMs'),
         blockTime: 0,
       });
   }
