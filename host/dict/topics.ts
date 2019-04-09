@@ -11,6 +11,5 @@ export default {
     updateEntity: 'updater.updateEntity',
     updateHost: 'updater.updateHost',
     updateFile: 'updater.updateFile',
-    removeFile: 'updater.removeFile',
   },
 };
