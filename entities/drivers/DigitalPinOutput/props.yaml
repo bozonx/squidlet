@@ -9,3 +9,5 @@ pin:
 source:
   type: string
   default: 'local'
+expander:
+  type: string
