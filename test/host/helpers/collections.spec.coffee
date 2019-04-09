@@ -1,7 +1,7 @@
 collections = require('../../../host/helpers/collections')
 
 
-describe.only 'helpers.collections', ->
+describe 'helpers.collections', ->
   it 'withoutFirstItemUint8Arr', ->
     uint = new Uint8Array(2)
     uint[0] = 127

@@ -4,7 +4,7 @@ import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from './DriverBase';
 import DriverEnv from './DriverEnv';
 import {validateProps, validateRequiredProps} from '../helpers/validate';
-import {defaultsDeep} from '../helpers/lodashLike';
+import {mergeDeep} from '../helpers/collections';
 
 
 /**
@@ -30,7 +30,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     // combined instance and definition props
-    const props: {[index: string]: any} = defaultsDeep({}, this.definition.props, instanceProps);
+    const props: {[index: string]: any} = mergeDeep(instanceProps, this.definition.props);
     const instanceId: string | undefined = this.getInstanceId(props);
 
     await this.validateInstanceProps(instanceProps, props);

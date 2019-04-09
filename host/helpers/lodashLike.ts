@@ -176,29 +176,29 @@ export function difference(testArr: any[], samples: any[]): any[] {
   return diffArr;
 }
 
-/**
- * Deep merge two objects.
- * It mutates target object.
- * To not mutate first object use it this way `defaultsDeep({}, defaultValues, newValues)`
- */
-export function defaultsDeep(target: {[index: string]: any}, ...sources: {[index: string]: any}[]): {[index: string]: any} {
-
-  // TODO: test - проверить чтобы не мутировалось если передан первым параметр объект
-
-  if (!sources.length) return target;
-
-  const source = sources.shift() as {[index: string]: any};
-
-  if (isObject(target) && isObject(source)) {
-    for (const key in source) {
-      if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        defaultsDeep(target[key], source[key]);
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    }
-  }
-
-  return defaultsDeep(target, ...sources);
-}
+// /**
+//  * Deep merge two objects.
+//  * It mutates target object.
+//  * To not mutate first object use it this way `defaultsDeep({}, defaultValues, newValues)`
+//  */
+// export function defaultsDeep(target: {[index: string]: any}, ...sources: {[index: string]: any}[]): {[index: string]: any} {
+//   if (!sources.length) return target;
+//
+//   // get the first of sources and remove it from sources
+//   const source: {[index: string]: any} | undefined = sources.shift() as {[index: string]: any};
+//
+//   if (!isPlainObject(target) || !isPlainObject(source)) return target;
+//
+//   for (const key of  Object.keys(source)) {
+//     if (isPlainObject(source[key])) {
+//       // go deeper
+//       if (!target[key]) Object.assign(target, { [key]: {} });
+//       defaultsDeep(target[key], source[key]);
+//     }
+//     else {
+//       Object.assign(target, { [key]: source[key] });
+//     }
+//   }
+//
+//   return defaultsDeep(target, ...sources);
+// }
