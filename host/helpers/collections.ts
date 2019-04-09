@@ -107,70 +107,42 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
   return diffKeys;
 }
 
-/**
- * Deep merge two objects.
- * It mutates target object.
- * To not mutate first object use it this way `mergeDeep({}, defaultValues, newValues)`
- */
-export function mergeDeep(target: {[index: string]: any}, ...sources: {[index: string]: any}[]): {[index: string]: any} {
-
-  // TODO: test - проверить чтобы не мутировалось если передан первым параметр объект
-  // TODO: test - почему не defultsDeep ????
-
-  if (!sources.length) return target;
-
-  const source = sources.shift() as {[index: string]: any};
-
-  if (isObject(target) && isObject(source)) {
-    for (const key in source) {
-      if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        mergeDeep(target[key], source[key]);
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    }
-  }
-
-  return mergeDeep(target, ...sources);
-}
-
-/**
- * It works with common structures like
- *     {
- *       parent: {
- *         prop: 'value'
- *       }
- *     }
- * @param rootObject
- * @param {function} cb - callback like (items, pathToItem) => {}.
- *                        If it returns false it means don't go deeper.
- */
-export function findRecursively(rootObject: object, cb: (item: any, itemPath: string) => boolean) {
-
-  // TODO: test, review
-
-  const recursive = (obj: object, rootPath: string): object | undefined => {
-    return find(obj, (item: any, name: string | number): any => {
-      const itemPath = trim(`${rootPath}.${name}`, '.');
-      const cbResult = cb(item, itemPath);
-
-      if (typeof cbResult === 'undefined') {
-        // go deeper
-        return recursive(item, itemPath);
-      }
-      else if (cbResult === false) {
-        // don't go deeper
-        return;
-      }
-      else {
-        // found - stop search
-        //return cbResult;
-        return true;
-      }
-    });
-  };
-
-  return recursive(rootObject, '');
-}
-
+// /**
+//  * It works with common structures like
+//  *     {
+//  *       parent: {
+//  *         prop: 'value'
+//  *       }
+//  *     }
+//  * @param rootObject
+//  * @param {function} cb - callback like (items, pathToItem) => {}.
+//  *                        If it returns false it means don't go deeper.
+//  */
+// export function findRecursively(rootObject: object, cb: (item: any, itemPath: string) => boolean) {
+//
+//   // TODO: test, review
+//
+//   const recursive = (obj: object, rootPath: string): object | undefined => {
+//     return find(obj, (item: any, name: string | number): any => {
+//       const itemPath = trim(`${rootPath}.${name}`, '.');
+//       const cbResult = cb(item, itemPath);
+//
+//       if (typeof cbResult === 'undefined') {
+//         // go deeper
+//         return recursive(item, itemPath);
+//       }
+//       else if (cbResult === false) {
+//         // don't go deeper
+//         return;
+//       }
+//       else {
+//         // found - stop search
+//         //return cbResult;
+//         return true;
+//       }
+//     });
+//   };
+//
+//   return recursive(rootObject, '');
+// }
+//

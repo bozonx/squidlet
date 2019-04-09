@@ -175,3 +175,30 @@ export function difference(testArr: any[], samples: any[]): any[] {
 
   return diffArr;
 }
+
+/**
+ * Deep merge two objects.
+ * It mutates target object.
+ * To not mutate first object use it this way `defaultsDeep({}, defaultValues, newValues)`
+ */
+export function defaultsDeep(target: {[index: string]: any}, ...sources: {[index: string]: any}[]): {[index: string]: any} {
+
+  // TODO: test - проверить чтобы не мутировалось если передан первым параметр объект
+
+  if (!sources.length) return target;
+
+  const source = sources.shift() as {[index: string]: any};
+
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!target[key]) Object.assign(target, { [key]: {} });
+        defaultsDeep(target[key], source[key]);
+      } else {
+        Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+
+  return defaultsDeep(target, ...sources);
+}

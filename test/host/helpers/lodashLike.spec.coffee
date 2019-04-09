@@ -1,7 +1,7 @@
 lodashLike = require('../../../host/helpers/lodashLike')
 
 
-describe 'helpers.lodashLike', ->
+describe.only 'helpers.lodashLike', ->
   it 'isEmpty', ->
     assert.equal(lodashLike.isEmpty(undefined), true)
     assert.equal(lodashLike.isEmpty(null), true)
@@ -109,3 +109,17 @@ describe 'helpers.lodashLike', ->
     assert.deepEqual(lodashLike.difference([1,3], [1,2,3]), [])
     assert.deepEqual(lodashLike.difference([], [1,2,3]), [])
     assert.deepEqual(lodashLike.difference([1,4], []), [1,4])
+
+  it 'defaultsDeep', ->
+    mutated = {}
+    top = {top: 'top'}
+    mid = {top: 'mid', mid: 'mid'}
+    bottom = {top: 'bottom', mid: 'bottom', bottom: 'bottom'}
+    result = {top: 'top', mid: 'mid', bottom: 'bottom'}
+    assert.deepEqual( lodashLike.defaultsDeep(mutated, top, mid, bottom), result )
+    # top wasn't mutated
+    assert.deepEqual(top, {top: 'top'})
+    # mutated
+    assert.deepEqual(mutated, result)
+    # simple mutated
+    assert.deepEqual( lodashLike.defaultsDeep({top: 'top'}, mid), {top: 'top', mid: 'mid'} )
