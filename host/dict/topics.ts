@@ -8,8 +8,13 @@ export default {
     appInitialized: 'system.appInitialized',
   },
   updater: {
+    versionsRequest: 'updater.versionsRequest',
+    versionsResponse: 'updater.versionsResponse',
     updateEntity: 'updater.updateEntity',
+    updateEntityResult: 'updater.updateEntityResult',
     updateHost: 'updater.updateHost',
+    updateHostResult: 'updater.updateHostResult',
     updateFile: 'updater.updateFile',
+    updateFileResult: 'updater.updateFileResult',
   },
 };
