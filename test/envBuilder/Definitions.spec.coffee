@@ -1,7 +1,7 @@
 Definitions = require('../../hostEnvBuilder/configSet/Definitions').default
 
 
-describe.only 'envBuilder.Definitions', ->
+describe 'envBuilder.Definitions', ->
   beforeEach ->
     @entitiesNames = {
       devices: ['Relay']

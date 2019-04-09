@@ -3,6 +3,22 @@ import {ParsedType, parseType} from './typesHelpers';
 import {difference} from './lodashLike';
 
 
+function isCorrectTypedArray(type: string, arr: any[]): boolean {
+  if (!Array.isArray(arr)) return false;
+
+  //const typeOfItems: string = type.replace(/\[]/, '');
+  const lengthOfBraces = 2;
+  const typeOfItems: string = type.slice(0, type.length - lengthOfBraces);
+
+  // if one of item doesn't correspond to specified type - it isn't a expected typed array
+  for (let item of arr) {
+    if (typeof item !== typeOfItems) return false;
+  }
+
+  return true;
+}
+
+
 /**
  * Does specified value correspond to specified type
  */
@@ -11,8 +27,12 @@ export function isValueOfType(fullType: string, value: any): string | undefined 
 
   // check types
   for (let type of parsedType.types) {
+    if (type.indexOf('[]') > -1) {
+      const isCorrectArray: boolean = isCorrectTypedArray(type, value);
 
-    // TODO: поддержка массивов - string[], number[], boolean[], object[]
+      // if it correspond to array type = it's ok
+      if (isCorrectArray) return;
+    }
 
     if (typeof value === type) return;
   }
