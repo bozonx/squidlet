@@ -1,7 +1,7 @@
 collections = require('../../../host/helpers/collections')
 
 
-describe 'helpers.collections', ->
+describe.only 'helpers.collections', ->
   it 'withoutFirstItemUint8Arr', ->
     uint = new Uint8Array(2)
     uint[0] = 127
@@ -54,3 +54,11 @@ describe 'helpers.collections', ->
 
   it 'getDifferentKeys', ->
     assert.deepEqual(collections.getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}), ['b'])
+
+  it 'mergeDeep', ->
+    top = {top: 'top', nested: {nestedTop: 'top'}}
+    bottom = {top: 'bottom', bottom: 'bottom', nested: {nestedTop: 'bottom', nestedBottom: 'bottom'}}
+    result = {top: 'top', bottom: 'bottom', nested: {nestedTop: 'top', nestedBottom: 'bottom'}}
+    assert.deepEqual(collections.mergeDeep(top, bottom), result)
+    # not mutated
+    assert.deepEqual(top, {top: 'top', nested: {nestedTop: 'top'}})

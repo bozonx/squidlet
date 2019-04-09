@@ -1,4 +1,4 @@
-import {find, isEqual, isObject, trim, values} from './lodashLike';
+import {cloneDeep, find, isEqual, isObject, isPlainObject, trim, values} from './lodashLike';
 
 
 /**
@@ -105,6 +105,32 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
   }
 
   return diffKeys;
+}
+
+/**
+ * Merges two objects deeply. It doesn't mutate any object.
+ */
+export function mergeDeep(
+  top: {[index: string]: any} | undefined,
+  bottom: {[index: string]: any} | undefined
+): {[index: string]: any} {
+  if (typeof top === 'undefined') return {};
+  if (typeof bottom === 'undefined') return top;
+
+  const result: {[index: string]: any} = cloneDeep(top);
+
+  for (let key of Object.keys(bottom)) {
+    if (typeof result[key] === 'undefined') {
+      // set value which is absent on top
+      result[key] = bottom[key];
+    }
+    else if (isPlainObject(result[key]) && isPlainObject(bottom[key])) {
+      result[key] = mergeDeep(result[key], bottom[key]);
+    }
+    // else - skip
+  }
+
+  return result;
 }
 
 // /**
