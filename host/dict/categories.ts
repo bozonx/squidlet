@@ -10,4 +10,5 @@ export default {
   // data from mqtt or backend moves to this category
   externalDataIncome: 'externalDataIncome',
   logger: 'logger',
+  updater: 'updater',
 };

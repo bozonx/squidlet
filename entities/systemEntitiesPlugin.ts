@@ -51,6 +51,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   // services
   await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Logger/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'Udater/manifest.yaml'));
 
   // add used on host drivers related on devs
   env.afterRegistering(async () => {
