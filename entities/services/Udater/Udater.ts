@@ -1,6 +1,7 @@
 import ServiceBase from 'host/baseServices/ServiceBase';
 import LogLevel from 'host/interfaces/LogLevel';
 import categories from 'host/dict/categories';
+import topics from 'host/dict/topics';
 
 
 interface Props {
@@ -17,7 +18,10 @@ export default class Udater extends ServiceBase<Props> {
 
 
   private listen() {
-    this.env.events.addListener(categories.updater, level, this.logEventsHandler);
+    this.env.events.addListener(categories.updater, topics.updater.updateEntity, this.onUpdateEntity);
+    this.env.events.addListener(categories.updater, topics.updater.updateHost, this.onUpdateHost);
+    this.env.events.addListener(categories.updater, topics.updater.updateFile, this.onUpdateFile);
+    this.env.events.addListener(categories.updater, topics.updater.removeFile, this.onRemove);
 
     // const hosts: string[] = ['master'];
     //
@@ -30,8 +34,16 @@ export default class Udater extends ServiceBase<Props> {
     // }
   }
 
-  private logEventsHandler = (data: {level: LogLevel, message: string}) => {
-    defaultLogger[data.level](data.message);
+  private onUpdateEntity = (data: null) => {
+  }
+
+  private onUpdateHost = (data: null) => {
+  }
+
+  private onUpdateFile = (data: null) => {
+  }
+
+  private onRemove = (data: null) => {
   }
 
 }

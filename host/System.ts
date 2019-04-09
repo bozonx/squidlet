@@ -7,7 +7,7 @@ import ServicesManager from './entities/ServicesManager';
 import Logger from './interfaces/Logger';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
-import eventNames from './dict/eventNames';
+import topics from './dict/topics';
 import categories from './dict/categories';
 import EnvSetLocalFs from './EnvSetLocalFs';
 import DevManager, {DevClass} from './entities/DevManager';
@@ -70,16 +70,16 @@ export default class System {
 
     console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();
-    this.riseEvent(eventNames.system.systemDriversInitialized);
+    this.riseEvent(topics.system.systemDriversInitialized);
 
     console.info(`---> Initializing system services`);
     await this.servicesManager.initSystemServices();
-    this.riseEvent(eventNames.system.systemServicesInitialized);
+    this.riseEvent(topics.system.systemServicesInitialized);
 
     await this.initTopLayer();
 
     this._isAppInitialized = true;
-    this.riseEvent(eventNames.system.appInitialized);
+    this.riseEvent(topics.system.appInitialized);
 
     // remove initialization config
     delete this.initializationConfig;
@@ -95,7 +95,7 @@ export default class System {
       return -1;
     }
 
-    return this.events.once(categories.system, eventNames.system.devicesManagerInitialized, cb);
+    return this.events.once(categories.system, topics.system.devicesManagerInitialized, cb);
   }
 
   onAppInit(cb: () => void): number {
@@ -106,7 +106,7 @@ export default class System {
       return -1;
     }
 
-    return this.events.once(categories.system, eventNames.system.appInitialized, cb);
+    return this.events.once(categories.system, topics.system.appInitialized, cb);
   }
 
   // async $registerDevSet(devs: {[index: string]: DevClass}) {
@@ -117,12 +117,12 @@ export default class System {
   // private async initNetwork(): Promise<void> {
   //   console.info(`---> Initializing network`);
   //   this.network.init(this.host.id, this.host.networkConfig);
-  //   this.riseEvent(eventNames.system.networkInitialized);
+  //   this.riseEvent(topics.system.networkInitialized);
   //
   //   console.info(`---> Initializing messenger`);
   //   this.messenger.init();
   //   this.devices.init();
-  //   this.riseEvent(eventNames.system.messengerInitialized);
+  //   this.riseEvent(topics.system.messengerInitialized);
   // }
 
   /**
@@ -136,7 +136,7 @@ export default class System {
     console.info(`---> Initializing devices`);
     await this.devicesManager.init();
     this._isDevicesInitialized = true;
-    this.riseEvent(eventNames.system.devicesManagerInitialized);
+    this.riseEvent(topics.system.devicesManagerInitialized);
   }
 
   private riseEvent(eventName: string) {
