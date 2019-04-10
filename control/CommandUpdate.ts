@@ -6,6 +6,7 @@ import GroupConfigParser from './GroupConfigParser';
 import Io from '../hostEnvBuilder/Io';
 import BuildHostEnv from './BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
+import BuildHostDist from './BuildHostDist';
 
 
 interface UpdateCommandParams {
@@ -22,6 +23,7 @@ export default class CommandUpdate {
     this.params.groupConfigPath
   );
   private dirs: ResolveDirs = new ResolveDirs();
+  private readonly buildHostDist: BuildHostDist = new BuildHostDist(this.io);
 
 
   constructor() {
@@ -35,6 +37,8 @@ export default class CommandUpdate {
 
     // clear whole tmp dir
     await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
+
+    await this.buildHostDist.build();
 
     // update only specified host
     if (this.params.hostName) {
