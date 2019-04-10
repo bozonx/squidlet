@@ -27,8 +27,10 @@ export default class GroupConfigParser {
   }
 
 
-  constructor(groupConfigPath: string, io: Io) {
+  constructor(io: Io, groupConfigPath: string, buildDirArg?: string, tmpDirArg?: string) {
     this.groupConfigPath = groupConfigPath;
+    this._buildDir = buildDirArg;
+    this._tmpDir = tmpDirArg;
     this.io = io;
   }
 
@@ -39,8 +41,8 @@ export default class GroupConfigParser {
 
     this.plugins = preGroupConfig.plugins;
     this.hostDefaults = preGroupConfig.hostDefaults;
-    this._buildDir = this.resolvePath('build-dir', preGroupConfig.buildDir);
-    this._tmpDir = this.resolvePath('tmp-dir', preGroupConfig.tmpDir);
+    this._buildDir = this.resolvePath(preGroupConfig.buildDir, this._buildDir);
+    this._tmpDir = this.resolvePath(preGroupConfig.tmpDir, this._tmpDir);
 
     if (!this._buildDir) {
       throw new Error(`You have to specify a buildDir in group config or as a command argument or environment variable`);
@@ -88,11 +90,12 @@ export default class GroupConfigParser {
     return preparedHostConfig;
   }
 
-  private resolvePath(argParamName: string, pathInConfig?: string): string {
-    // TODO: make it
+  private resolvePath(pathInConfig?: string, argPath?: string): string | undefined {
+    if (pathInConfig) {
+      return path.resolve(path.dirname(this.groupConfigPath), pathInConfig);
+    }
 
-    //   const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
-//   const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
+    return argPath;
   }
 
   private validate(preGroupConfig: {[index: string]: any}) {
