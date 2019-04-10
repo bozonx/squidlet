@@ -1,8 +1,11 @@
+import * as path from 'path';
+
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import Io from '../hostEnvBuilder/Io';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
-export default class UpdateHost {
+export default class BuildHost {
   private readonly preHostConfig: PreHostConfig;
   private readonly buildDir: string;
   private readonly tmpDir: string;
@@ -22,10 +25,21 @@ export default class UpdateHost {
     this.io = io;
   }
 
-  async update() {
-    // TODO: call HostClient methods to update
+  async build() {
+    const hostBuildDir: string = path.join(this.buildDir, this.hostId);
 
-    console.log(1111111111, this.preHostConfig);
+    await this.io.mkdirP(hostBuildDir);
+    await this.io.rimraf(`${hostBuildDir}/**/*`);
+
+    console.info(`===> generating configs and entities of host "${this.hostId}"`);
+
+    // TODO: use tmpDir
+
+    const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, hostBuildDir);
+
+    await envBuilder.collect();
+    await envBuilder.writeConfigs();
+    await envBuilder.writeEntities();
   }
 
 }

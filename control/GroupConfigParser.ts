@@ -14,10 +14,16 @@ export default class GroupConfigParser {
   private readonly preHostsConfigs: {[index: string]: PreHostConfig} = {};
   private plugins?: string[];
   private hostDefaults?: {[index: string]: any};
-  private buildDir?: string;
-  private tmpDir?: string;
+  private _buildDir?: string;
+  private _tmpDir?: string;
   get hosts(): {[index: string]: PreHostConfig} {
     return this.preHostsConfigs;
+  }
+  get buildDir(): string {
+    return this._buildDir as any;
+  }
+  get tmpDir(): string {
+    return this._tmpDir as any;
   }
 
 
@@ -33,15 +39,15 @@ export default class GroupConfigParser {
 
     this.plugins = preGroupConfig.plugins;
     this.hostDefaults = preGroupConfig.hostDefaults;
-    this.buildDir = this.resolvePath('build-dir', preGroupConfig.buildDir);
-    this.tmpDir = this.resolvePath('tmp-dir', preGroupConfig.tmpDir);
+    this._buildDir = this.resolvePath('build-dir', preGroupConfig.buildDir);
+    this._tmpDir = this.resolvePath('tmp-dir', preGroupConfig.tmpDir);
 
-    if (!this.buildDir) {
-      throw new Error(`You have to specify a buildDir in group config or as a command argument`);
+    if (!this._buildDir) {
+      throw new Error(`You have to specify a buildDir in group config or as a command argument or environment variable`);
     }
 
-    if (!this.tmpDir) {
-      this.tmpDir = path.join(this.buildDir, '__tmp');
+    if (!this._tmpDir) {
+      this._tmpDir = path.join(this.buildDir, '__tmp');
     }
 
     await this.makeHosts(preGroupConfig as GroupConfig);
@@ -83,6 +89,8 @@ export default class GroupConfigParser {
   }
 
   private resolvePath(argParamName: string, pathInConfig?: string): string {
+    // TODO: make it
+
     //   const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
 //   const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
   }
