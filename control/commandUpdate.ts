@@ -44,6 +44,9 @@ export default async function commandUpdate() {
 
   await groupConfig.init();
 
+  // clear whole tmp dir
+  await io.rimraf(`${groupConfig.tmpDir}/**/*`);
+
   // update only specified host
   if (hostName) {
     if (!groupConfig.hosts[hostName]) {

@@ -7,8 +7,8 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 export default class BuildHost {
   private readonly preHostConfig: PreHostConfig;
-  private readonly buildDir: string;
-  private readonly tmpDir: string;
+  private readonly hostBuildDir: string;
+  private readonly hostTmpDir: string;
   private readonly hostId: string;
   private readonly io: Io;
 
@@ -20,20 +20,17 @@ export default class BuildHost {
 
     this.hostId = preHostConfig.id;
     this.preHostConfig = preHostConfig;
-    this.buildDir = path.join(buildDir, this.hostId);
-    this.tmpDir = path.join(tmpDir, this.hostId);
+    this.hostBuildDir = path.join(buildDir, this.hostId);
+    this.hostTmpDir = path.join(tmpDir, this.hostId);
     this.io = io;
   }
 
   async build() {
-    await this.io.mkdirP(this.buildDir);
-    await this.io.rimraf(`${this.buildDir}/**/*`);
-    await this.io.mkdirP(this.tmpDir);
-    await this.io.rimraf(`${this.tmpDir}/**/*`);
+    await this.io.mkdirP(this.hostBuildDir);
+    //await this.io.rimraf(`${this.hostBuildDir}/**/*`);
+    await this.io.mkdirP(this.hostTmpDir);
 
-    console.info(`===> generating configs and entities of host "${this.hostId}"`);
-
-    const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, this.buildDir, this.tmpDir);
+    const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, this.hostBuildDir, this.hostTmpDir);
 
     await envBuilder.collect();
     await envBuilder.writeConfigs();
