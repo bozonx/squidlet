@@ -1,3 +1,4 @@
+import * as path from 'path';
 import _isPlainObject = require('lodash/isPlainObject');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
@@ -13,6 +14,8 @@ export default class GroupConfigParser {
   private readonly preHostsConfigs: {[index: string]: PreHostConfig} = {};
   private plugins?: string[];
   private hostDefaults?: {[index: string]: any};
+  private buildDir?: string;
+  private tmpDir?: string;
   get hosts(): {[index: string]: PreHostConfig} {
     return this.preHostsConfigs;
   }
@@ -30,6 +33,16 @@ export default class GroupConfigParser {
 
     this.plugins = preGroupConfig.plugins;
     this.hostDefaults = preGroupConfig.hostDefaults;
+    this.buildDir = this.resolvePath('build-dir', preGroupConfig.buildDir);
+    this.tmpDir = this.resolvePath('tmp-dir', preGroupConfig.tmpDir);
+
+    if (!this.buildDir) {
+      throw new Error(`You have to specify a buildDir in group config or as a command argument`);
+    }
+
+    if (!this.tmpDir) {
+      this.tmpDir = path.join(this.buildDir, '__tmp');
+    }
 
     await this.makeHosts(preGroupConfig as GroupConfig);
   }
@@ -69,12 +82,25 @@ export default class GroupConfigParser {
     return preparedHostConfig;
   }
 
+  private resolvePath(argParamName: string, pathInConfig?: string): string {
+    //   const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
+//   const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
+  }
+
   private validate(preGroupConfig: {[index: string]: any}) {
     if (!preGroupConfig.hosts) {
       throw new Error(`You have to specify a "hosts" param with list of hosts`);
     }
     else if (!Array.isArray(preGroupConfig.hosts)) {
       throw new Error(`"hosts" param of group config has to be an array`);
+    }
+    // buildDir
+    else if (preGroupConfig.buildDir && typeof preGroupConfig.buildDir !== 'string') {
+      throw new Error(`"buildDir" param of group config has to be a string`);
+    }
+    // tmpDir
+    else if (preGroupConfig.tmpDir && typeof preGroupConfig.tmpDir !== 'string') {
+      throw new Error(`"tmpDir" param of group config has to be a string`);
     }
     // plugins
     else if (preGroupConfig.plugins && !Array.isArray(preGroupConfig.plugins)) {

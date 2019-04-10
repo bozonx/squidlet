@@ -10,9 +10,11 @@ const io = new Io();
 
 
 async function updateHost(hostConfig: PreHostConfig) {
-  const updateHost: UpdateHost = new UpdateHost(hostConfig);
+  const updateHost: UpdateHost = new UpdateHost(hostConfig, io);
 
-  console.info(`==> updating host "${hostConfig.id}"`);
+  console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
+  await updateHost.buildHostEnv();
+  console.info(`===> updating host "${hostConfig.id}"`);
   await updateHost.update();
 }
 
