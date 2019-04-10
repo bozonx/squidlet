@@ -1,32 +1,28 @@
-/**
- * MainHostsEnv file which starts on microController's system boot.
- */
+// Import helpers and base classes which will be copied to a final tree
+// commented imports are used in host and will be in the tree anyway
 
-// Import helpers which will copy to final tree
-import './helpers/binaryHelpers';
+//import './helpers/binaryHelpers';
+//import './helpers/collections';
 import './helpers/DebounceCall';
+// import './helpers/helpers';
+// import './helpers/IndexedEventEmitter';
+// import './helpers/IndexedEvents';
+// import './helpers/lodashLike';
 import './helpers/mkdirPLogic';
-import './helpers/Polling';
-import './helpers/Republish';
-import './helpers/Sender';
-import './helpers/typesHelpers';
-import './helpers/validators';
-// Import entities base which will copy to final tree
+//import './helpers/nodeLike';
+//import './helpers/Polling';
+//import './helpers/Republish';
+//import './helpers/Sender';
+//import './helpers/typesHelpers';
+//import './helpers/validate';
+
+// base classes
 import './baseDevice/DeviceBase';
-import './baseDrivers/DriverBase';
+//import './baseDrivers/DriverBase';
 import './baseDrivers/DriverFactoryBase';
 import './baseDrivers/MasterSlaveBaseNodeDriver';
 import './baseServices/ServiceBase';
 
 import System from './System';
 
-
-// TODO: not read devset
-const devSet = {};
-
-const system = new System(devSet);
-
-system.start()
-  .catch((err: Error) => {
-    console.log(`Uncaught error: ${String(err)}`);
-  });
+export default System;
