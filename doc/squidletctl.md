@@ -10,6 +10,11 @@ Update specified host of group config
 
     squidlet update myHost ./groupConfig.yaml
     
+Also you can specify next params:
+
+* --build-dir or BUILD_DIR env variable - path to dir where hosts files will be placed
+* --tmp-dir or TMP_DIR env variable - path to dir where temporary will be placed 
+
 
 ### Group config yaml file
 

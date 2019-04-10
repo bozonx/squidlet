@@ -1,6 +1,6 @@
 import * as yargs from 'yargs';
 
-import commandUpdate from './commandUpdate';
+import CommandUpdate from './CommandUpdate';
 
 
 export default async function resolveCommand() {
@@ -11,7 +11,9 @@ export default async function resolveCommand() {
   const COMMAND: string = yargs.argv._[0];
 
   if (COMMAND === 'update') {
-    return commandUpdate();
+    const commandUpdate: CommandUpdate = new CommandUpdate();
+
+    return commandUpdate.start();
   }
 
 }
