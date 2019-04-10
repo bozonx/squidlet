@@ -8,10 +8,10 @@ import * as rimraf from 'rimraf';
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
-import {resolveParamRequired} from './helpers/buildHelpers';
-import EnvBuilder from './hostEnvBuilder/EnvBuilder';
-import PreHostConfig from './hostEnvBuilder/interfaces/PreHostConfig';
-import GroupConfig from './control/interfaces/GroupConfig';
+import {resolveParamRequired} from '../helpers/buildHelpers';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import GroupConfig from './interfaces/GroupConfig';
 
 
 function makeHostConfig(hostId: string, clusterConfig: GroupConfig): PreHostConfig {
