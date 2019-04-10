@@ -25,35 +25,28 @@ async function updateHost(hostConfig: PreHostConfig, buildDir: string, tmpDir: s
 }
 
 function resolveParams(): UpdateCommandParams {
-  let hostName: string | undefined;
-  let groupConfigPath: string;
-  let buildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
-  let tmpDir: string | undefined = process.env.TMP_DIR || <string>yargs.argv['tmp-dir'];
+  const result: UpdateCommandParams = {
+    // if specified only group config
+    groupConfigPath: yargs.argv._[1],
+    buildDir: process.env.BUILD_DIR || <string | undefined>yargs.argv['build-dir'],
+    tmpDir: process.env.TMP_DIR || <string | undefined>yargs.argv['tmp-dir'],
+  };
 
-  // specified only group config
-  if (yargs.argv._[1] && !yargs.argv._[2]) {
-    groupConfigPath = yargs.argv._[1];
-  }
   // specified host name and group config
-  else if (yargs.argv._[1] && yargs.argv._[2]) {
-    hostName = yargs.argv._[1];
-    groupConfigPath = yargs.argv._[2];
+  if (yargs.argv._[1] && yargs.argv._[2]) {
+    result.hostName = yargs.argv._[1];
+    result.groupConfigPath = yargs.argv._[2];
   }
-  else {
+  else if (!yargs.argv._[1] && !yargs.argv._[2]) {
     throw new Error(`You should specify a group config path`);
   }
 
   // resolve relative buildDir
-  if (buildDir) buildDir = path.resolve(process.cwd(), buildDir);
+  if (result.buildDir) result.buildDir = path.resolve(process.cwd(), result.buildDir);
   // resolve relative tmpDir
-  if (tmpDir) tmpDir = path.resolve(process.cwd(), tmpDir);
+  if (result.tmpDir) result.tmpDir = path.resolve(process.cwd(), result.tmpDir);
 
-  return {
-    hostName,
-    groupConfigPath,
-    buildDir,
-    tmpDir,
-  };
+  return result;
 }
 
 export default async function commandUpdate() {
