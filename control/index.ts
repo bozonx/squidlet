@@ -1,7 +1,7 @@
-import start from './start';
+import resolveCommand from './resolveCommand';
 
 
-start()
+resolveCommand()
   .catch((err) => {
     console.error(err);
 

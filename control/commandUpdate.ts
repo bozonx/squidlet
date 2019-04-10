@@ -1,7 +1,8 @@
 import * as yargs from 'yargs';
-import GroupConfig from './GroupConfig';
-import UpdateHost from './UpdateHost';
+
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import UpdateHost from './UpdateHost';
+import GroupConfig from './GroupConfig';
 
 
 async function updateHost(hostConfig: PreHostConfig) {
@@ -11,7 +12,8 @@ async function updateHost(hostConfig: PreHostConfig) {
   await updateHost.update();
 }
 
-async function runUpdate() {
+
+export default async function commandUpdate() {
   let hostName: string | undefined;
   let groupConfigPath: string;
 
@@ -32,26 +34,15 @@ async function runUpdate() {
 
   await groupConfig.init();
 
+  // update only specified host
   if (hostName) {
     await updateHost(groupConfig.hosts[hostName]);
   }
+  // update all the hosts
   else {
     for (let currentHostName of Object.keys(groupConfig.hosts)) {
       await updateHost(groupConfig.hosts[currentHostName]);
     }
-  }
-}
-
-
-export default async function start() {
-  if (!yargs.argv._.length) {
-    throw new Error(`You should specify a command`);
-  }
-
-  const COMMAND: string = yargs.argv._[0];
-
-  if (COMMAND === 'update') {
-    return runUpdate();
   }
 
 }
