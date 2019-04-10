@@ -9,6 +9,8 @@ export default class UpdateHost {
 
   async update() {
     // TODO: make EnvSet instance
+
+    console.log(1111111111, this.preHostConfig)
   }
 
 }

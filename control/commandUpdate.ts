@@ -22,7 +22,7 @@ export default async function commandUpdate() {
     groupConfigPath = yargs.argv._[1];
   }
   // specified host name and group config
-  else if (!yargs.argv._[1] && !yargs.argv._[2]) {
+  else if (yargs.argv._[1] && yargs.argv._[2]) {
     hostName = yargs.argv._[1];
     groupConfigPath = yargs.argv._[2];
   }
@@ -36,6 +36,10 @@ export default async function commandUpdate() {
 
   // update only specified host
   if (hostName) {
+    if (!groupConfig.hosts[hostName]) {
+      throw new Error(`Can't find host "${hostName}" in group config`);
+    }
+
     await updateHost(groupConfig.hosts[hostName]);
   }
   // update all the hosts
