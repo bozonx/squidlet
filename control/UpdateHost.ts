@@ -10,7 +10,7 @@ export default class UpdateHost {
   private readonly io: Io;
 
 
-  constructor(preHostConfig: PreHostConfig, buildDir: string, tmpDir: string, io: Io) {
+  constructor(io: Io, preHostConfig: PreHostConfig, buildDir: string, tmpDir: string) {
     if (!preHostConfig.id) {
       throw new Error(`Host has to have an id param`);
     }

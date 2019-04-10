@@ -76,12 +76,22 @@ export default class CommandUpdate {
 
 
   private async updateHost(hostConfig: PreHostConfig) {
-    const buildHost: BuildHost = new BuildHost(hostConfig, buildDir, tmpDir, this.io);
+    const buildHost: BuildHost = new BuildHost(
+      this.io,
+      hostConfig,
+      this.dirs.hostsEnvBuildDir,
+      this.dirs.hostsEnvTmpDir
+    );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
     await buildHost.build();
 
-    const updateHost: UpdateHost = new UpdateHost(hostConfig, buildDir, tmpDir, this.io);
+    const updateHost: UpdateHost = new UpdateHost(
+      this.io,
+      hostConfig,
+      this.dirs.hostsEnvBuildDir,
+      this.dirs.hostsEnvTmpDir
+    );
 
     console.info(`===> updating host "${hostConfig.id}"`);
     await updateHost.update();
