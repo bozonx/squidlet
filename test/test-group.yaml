@@ -1,16 +1,18 @@
 plugins: []
 
+hostDefaults: {}
+
 hosts:
-  master:
-    platform: lowjs
-    machine: esp32wrover
+  - id: testHost
+    platform: nodejs
+    machine: x86
     config:
+      someParam: 1
       #storageDir: './masterStorage'
 
-    logger:
+    #logger: {}
 
     devices:
       bedroom:
         people-count-sensor:
           device: FakePeopleCount
-hostDefaults:

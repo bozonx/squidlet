@@ -62,8 +62,8 @@ export default class GroupConfigParser {
 
     // TODO: проверку на уникальность делать после резолва
     preparedHostConfig.plugins = _uniq([
-      ...preparedHostConfig.plugins,
-      ...this.plugins,
+      ...preparedHostConfig.plugins || [],
+      ...this.plugins || [],
     ]);
 
     return preparedHostConfig;
