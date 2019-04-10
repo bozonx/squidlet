@@ -1,6 +1,6 @@
 # Squidlet control script
 
-## Update host
+## Update hosts
 
 Update all the hosts of group config
 

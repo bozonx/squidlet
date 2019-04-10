@@ -7,6 +7,9 @@ import minimize from '../helpers/buildJs/minimize';
 import Io from '../hostEnvBuilder/Io';
 
 
+const hostSrc = path.resolve(__dirname, '../host');
+
+
 export default class BuildHostDist {
   private readonly io: Io;
 
@@ -15,29 +18,25 @@ export default class BuildHostDist {
     this.io = io;
   }
 
-  async build() {
+  async build(buildDir: string, tmpDir: string) {
+    const modernDst = path.join(tmpDir, 'modern');
+    const legacyDst = path.join(tmpDir, 'legacy');
+    const treeDst = path.join(tmpDir, 'tree');
 
-    // TODO: use specified paths
-
-    const HOST_SRC_DIR = path.resolve(__dirname, 'host');
-    const BUILD_DIR = path.resolve(__dirname, 'build/host');
-    const MODERN_DST_DIR = path.join(BUILD_DIR, 'modern');
-    const LEGACY_DST_DIR = path.join(BUILD_DIR, 'legacy');
-    const DEV_DST_DIR = path.join(BUILD_DIR, 'dev');
-    const MIN_DST_DIR = path.join(BUILD_DIR, 'min');
+    // TODO: check version and update only if version is different
 
     // ts to modern js
-    await this.io.rimraf(`${MODERN_DST_DIR}/**/*`);
-    await compileTs(HOST_SRC_DIR, MODERN_DST_DIR);
+    await this.io.rimraf(`${modernDst}/**/*`);
+    await compileTs(hostSrc, modernDst);
     // modern js to ES5
-    await this.io.rimraf(`${LEGACY_DST_DIR}/**/*`);
-    await compileJs(MODERN_DST_DIR, LEGACY_DST_DIR, false);
+    await this.io.rimraf(`${legacyDst}/**/*`);
+    await compileJs(modernDst, legacyDst, false);
     // Get only used files
-    await this.io.rimraf(`${DEV_DST_DIR}/**/*`);
-    await modulesTree(LEGACY_DST_DIR, DEV_DST_DIR);
+    await this.io.rimraf(`${treeDst}/**/*`);
+    await modulesTree(legacyDst, treeDst);
     // minimize
-    await this.io.rimraf(`${MIN_DST_DIR}/**/*`);
-    await minimize(DEV_DST_DIR, MIN_DST_DIR);
+    await this.io.rimraf(`${buildDir}/**/*`);
+    await minimize(treeDst, buildDir);
   }
 
 }

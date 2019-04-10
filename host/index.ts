@@ -21,7 +21,10 @@ import './baseServices/ServiceBase';
 import System from './System';
 
 
-const system = new System();
+// TODO: not read devset
+const devSet = {};
+
+const system = new System(devSet);
 
 system.start()
   .catch((err: Error) => {

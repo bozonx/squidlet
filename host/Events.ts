@@ -3,8 +3,7 @@ import IndexedEventEmitter from './helpers/IndexedEventEmitter';
 
 
 export default class Events {
-  // TODO: add handler type
-  private readonly events = new IndexedEventEmitter();
+  private readonly events = new IndexedEventEmitter<(data: any) => void>();
 
 
   emit(category: string, topic: string, data?: any): void {

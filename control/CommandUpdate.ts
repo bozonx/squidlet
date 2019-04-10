@@ -26,10 +26,6 @@ export default class CommandUpdate {
   private readonly buildHostDist: BuildHostDist = new BuildHostDist(this.io);
 
 
-  constructor() {
-  }
-
-
   async start() {
     await this.groupConfig.init();
 
@@ -38,7 +34,8 @@ export default class CommandUpdate {
     // clear whole tmp dir
     await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
 
-    await this.buildHostDist.build();
+    console.info(`===> Building host system`);
+    await this.buildHostDist.build(this.dirs.hostDistBuildDir, this.dirs.hostDistTmpDir);
 
     // update only specified host
     if (this.params.hostName) {
