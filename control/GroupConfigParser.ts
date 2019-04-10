@@ -1,4 +1,3 @@
-import * as path from 'path';
 import _isPlainObject = require('lodash/isPlainObject');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
@@ -9,48 +8,32 @@ import GroupConfig from './interfaces/GroupConfig';
 
 
 export default class GroupConfigParser {
-  private readonly groupConfigPath: string;
+  buildDir?: string;
+  tmpDir?: string;
+  readonly groupConfigPath: string;
   private readonly io: Io;
   private readonly preHostsConfigs: {[index: string]: PreHostConfig} = {};
   private plugins?: string[];
   private hostDefaults?: {[index: string]: any};
-  private _buildDir?: string;
-  private _tmpDir?: string;
   get hosts(): {[index: string]: PreHostConfig} {
     return this.preHostsConfigs;
   }
-  get buildDir(): string {
-    return this._buildDir as any;
-  }
-  get tmpDir(): string {
-    return this._tmpDir as any;
-  }
 
 
-  constructor(io: Io, groupConfigPath: string, buildDirArg?: string, tmpDirArg?: string) {
+  constructor(io: Io, groupConfigPath: string) {
     this.groupConfigPath = groupConfigPath;
-    this._buildDir = buildDirArg;
-    this._tmpDir = tmpDirArg;
     this.io = io;
   }
 
   async init() {
-    const preGroupConfig: {[index: string]: any} = await this.io.loadYamlFile(this.groupConfigPath);
+    const preGroupConfig = (await this.io.loadYamlFile(this.groupConfigPath)) as GroupConfig;
 
     this.validate(preGroupConfig);
 
     this.plugins = preGroupConfig.plugins;
     this.hostDefaults = preGroupConfig.hostDefaults;
-    this._buildDir = this.resolvePath(preGroupConfig.buildDir, this._buildDir);
-    this._tmpDir = this.resolvePath(preGroupConfig.tmpDir, this._tmpDir);
-
-    if (!this._buildDir) {
-      throw new Error(`You have to specify a buildDir in group config or as a command argument or environment variable`);
-    }
-
-    if (!this._tmpDir) {
-      this._tmpDir = path.join(this.buildDir, '__tmp');
-    }
+    this.buildDir = preGroupConfig.buildDir;
+    this.tmpDir = preGroupConfig.tmpDir;
 
     await this.makeHosts(preGroupConfig as GroupConfig);
   }
@@ -90,15 +73,7 @@ export default class GroupConfigParser {
     return preparedHostConfig;
   }
 
-  private resolvePath(pathInConfig?: string, argPath?: string): string | undefined {
-    if (pathInConfig) {
-      return path.resolve(path.dirname(this.groupConfigPath), pathInConfig);
-    }
-
-    return argPath;
-  }
-
-  private validate(preGroupConfig: {[index: string]: any}) {
+  private validate(preGroupConfig: GroupConfig) {
     if (!preGroupConfig.hosts) {
       throw new Error(`You have to specify a "hosts" param with list of hosts`);
     }

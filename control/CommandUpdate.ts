@@ -7,42 +7,45 @@ import GroupConfigParser from './GroupConfigParser';
 import Io from '../hostEnvBuilder/Io';
 import BuildHost from './BuildHost';
 import UpdateCommandParams from './interfaces/UpdateCommandParams';
+import ResolveDirs from './ResolveDirs';
 
 
 export default class CommandUpdate {
-  private io: Io = new Io();
+  private readonly io: Io = new Io();
+  private readonly params: UpdateCommandParams = this.resolveParams();
+  private readonly groupConfig: GroupConfigParser = new GroupConfigParser(
+    this.io,
+    this.params.groupConfigPath
+  );
+  private dirs: ResolveDirs = new ResolveDirs();
+
 
   constructor() {
   }
 
-  async start() {
-    const params: UpdateCommandParams = this.resolveParams();
-    const groupConfig: GroupConfigParser = new GroupConfigParser(
-      this.io,
-      params.groupConfigPath,
-      params.buildDir,
-      params.tmpDir
-    );
 
-    await groupConfig.init();
+  async start() {
+    await this.groupConfig.init();
+
+    this.dirs.resolve(this.groupConfig, this.params.buildDir, this.params.tmpDir);
+
     // clear whole tmp dir
-    await this.io.rimraf(`${groupConfig.tmpDir}/**/*`);
+    await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
 
     // update only specified host
-    if (params.hostName) {
-      if (!groupConfig.hosts[params.hostName]) {
-        throw new Error(`Can't find host "${params.hostName}" in group config`);
+    if (this.params.hostName) {
+      if (!this.groupConfig.hosts[this.params.hostName]) {
+        throw new Error(`Can't find host "${this.params.hostName}" in group config`);
       }
 
-      await this.updateHost(groupConfig.hosts[params.hostName], groupConfig.buildDir, groupConfig.tmpDir);
+      await this.updateHost(this.groupConfig.hosts[this.params.hostName]);
     }
     // update all the hosts
     else {
-      for (let currentHostName of Object.keys(groupConfig.hosts)) {
-        await this.updateHost(groupConfig.hosts[currentHostName], groupConfig.buildDir, groupConfig.tmpDir);
+      for (let currentHostName of Object.keys(this.groupConfig.hosts)) {
+        await this.updateHost(this.groupConfig.hosts[currentHostName]);
       }
     }
-
   }
 
 
@@ -72,7 +75,7 @@ export default class CommandUpdate {
   }
 
 
-  private async updateHost(hostConfig: PreHostConfig, buildDir: string, tmpDir: string) {
+  private async updateHost(hostConfig: PreHostConfig) {
     const buildHost: BuildHost = new BuildHost(hostConfig, buildDir, tmpDir, this.io);
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
