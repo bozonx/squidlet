@@ -2,7 +2,11 @@ import * as yargs from 'yargs';
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
-import GroupConfig from './GroupConfig';
+import GroupConfigParser from './GroupConfigParser';
+import Io from '../hostEnvBuilder/Io';
+
+
+const io = new Io();
 
 
 async function updateHost(hostConfig: PreHostConfig) {
@@ -30,7 +34,7 @@ export default async function commandUpdate() {
     throw new Error(`You should specify a group config path`);
   }
 
-  const groupConfig: GroupConfig = new GroupConfig(groupConfigPath);
+  const groupConfig: GroupConfigParser = new GroupConfigParser(groupConfigPath, io);
 
   await groupConfig.init();
 
