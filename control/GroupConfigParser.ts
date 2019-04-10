@@ -1,4 +1,6 @@
 import _isPlainObject = require('lodash/isPlainObject');
+import _defaultsDeep = require('lodash/defaultsDeep');
+import _uniq = require('lodash/uniq');
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import Io from '../hostEnvBuilder/Io';
@@ -34,23 +36,37 @@ export default class GroupConfigParser {
 
 
   private async makeHosts(preGroupConfig: GroupConfig) {
-    for (let hostConfig of preGroupConfig.hosts) {
-      if (typeof hostConfig === 'string') {
-        const loadedHostConfig: PreHostConfig = await this.io.loadYamlFile(hostConfig);
+    for (let hostConfigPathOrObj of preGroupConfig.hosts) {
+      let hostConfig: PreHostConfig;
 
-        this.makeHostConfig(loadedHostConfig);
+      if (typeof hostConfigPathOrObj === 'string') {
+        hostConfig = await this.io.loadYamlFile(hostConfigPathOrObj);
       }
-      else if (_isPlainObject(hostConfig)) {
-        this.makeHostConfig(hostConfig);
+      else if (_isPlainObject(hostConfigPathOrObj)) {
+        hostConfig = hostConfigPathOrObj;
       }
       else {
         throw new Error(`Host config has to be a path to yaml file or an object`);
       }
+
+      if (!hostConfig.id) {
+        throw new Error(`Host does't have an id: ${JSON.stringify(hostConfigPathOrObj)}`);
+      }
+
+      this.hosts[hostConfig.id] = this.makeHostConfig(hostConfig);
     }
   }
 
-  private makeHostConfig(hostConfig: PreHostConfig) {
-    this.preHostsConfigs['host'] = {id: 'host'};
+  private makeHostConfig(hostConfig: PreHostConfig): PreHostConfig {
+    const preparedHostConfig: PreHostConfig = _defaultsDeep({}, hostConfig, this.hostDefaults);
+
+    // TODO: проверку на уникальность делать после резолва
+    preparedHostConfig.plugins = _uniq([
+      ...preparedHostConfig.plugins,
+      ...this.plugins,
+    ]);
+
+    return preparedHostConfig;
   }
 
   private validate(preGroupConfig: {[index: string]: any}) {
@@ -60,8 +76,14 @@ export default class GroupConfigParser {
     else if (!Array.isArray(preGroupConfig.hosts)) {
       throw new Error(`"hosts" param of group config has to be an array`);
     }
-
-    // TODO: test plugins and defaults
+    // plugins
+    else if (preGroupConfig.plugins && !Array.isArray(preGroupConfig.plugins)) {
+      throw new Error(`"plugins" param of group config has to be an array`);
+    }
+    // hostDefaults
+    else if (preGroupConfig.hostDefaults && !_isPlainObject(preGroupConfig.hostDefaults)) {
+      throw new Error(`"plugins" param of group config has to be an array`);
+    }
   }
 
 }
