@@ -1,1 +1,9 @@
-console.log(1111111111, process.argv)
+import start from './start';
+
+
+start()
+  .catch((err) => {
+    console.error(err);
+
+    process.exit(2);
+  });
