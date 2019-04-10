@@ -2,10 +2,10 @@ import * as path from 'path';
 import * as gulp from 'gulp';
 import * as rimraf from 'rimraf';
 
-import compileTs from './helpers/buildJs/compileTs';
-import compileJs from './helpers/buildJs/compileJs';
-import minimize from './helpers/buildJs/minimize';
-import modulesTree from './helpers/buildJs/modulesTree';
+import compileTs from '../helpers/buildJs/compileTs';
+import compileJs from '../helpers/buildJs/compileJs';
+import minimize from '../helpers/buildJs/minimize';
+import modulesTree from '../helpers/buildJs/modulesTree';
 
 
 const HOST_SRC_DIR = path.resolve(__dirname, 'host');

@@ -5,7 +5,7 @@ import Io from '../hostEnvBuilder/Io';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
-export default class BuildHost {
+export default class BuildHostEnv {
   private readonly preHostConfig: PreHostConfig;
   private readonly hostBuildDir: string;
   private readonly hostTmpDir: string;
