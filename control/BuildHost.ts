@@ -18,24 +18,22 @@ export default class BuildHost {
       throw new Error(`Host has to have an id param`);
     }
 
-    this.preHostConfig = preHostConfig;
-    this.buildDir = buildDir;
-    this.tmpDir = tmpDir;
     this.hostId = preHostConfig.id;
+    this.preHostConfig = preHostConfig;
+    this.buildDir = path.join(buildDir, this.hostId);
+    this.tmpDir = path.join(tmpDir, this.hostId);
     this.io = io;
   }
 
   async build() {
-    const hostBuildDir: string = path.join(this.buildDir, this.hostId);
-
-    await this.io.mkdirP(hostBuildDir);
-    await this.io.rimraf(`${hostBuildDir}/**/*`);
+    await this.io.mkdirP(this.buildDir);
+    await this.io.rimraf(`${this.buildDir}/**/*`);
+    await this.io.mkdirP(this.tmpDir);
+    await this.io.rimraf(`${this.tmpDir}/**/*`);
 
     console.info(`===> generating configs and entities of host "${this.hostId}"`);
 
-    // TODO: use tmpDir
-
-    const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, hostBuildDir);
+    const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, this.buildDir, this.tmpDir);
 
     await envBuilder.collect();
     await envBuilder.writeConfigs();
