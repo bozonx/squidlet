@@ -11,10 +11,10 @@ import _uniq = require('lodash/uniq');
 import {resolveParamRequired} from './helpers/buildHelpers';
 import EnvBuilder from './hostEnvBuilder/EnvBuilder';
 import PreHostConfig from './hostEnvBuilder/interfaces/PreHostConfig';
-import ClusterConfig from './hostEnvBuilder/interfaces/ClusterConfig';
+import GroupConfig from './control/interfaces/GroupConfig';
 
 
-function makeHostConfig(hostId: string, clusterConfig: ClusterConfig): PreHostConfig {
+function makeHostConfig(hostId: string, clusterConfig: GroupConfig): PreHostConfig {
   const mergedConfig: PreHostConfig = _defaultsDeep({}, clusterConfig.hosts[hostId], clusterConfig.hostDefaults);
 
   mergedConfig.plugins = _uniq([
@@ -32,7 +32,7 @@ gulp.task('build-cluster', async () => {
   const absConfigPath = path.resolve(process.cwd(), resolvedConfigPath);
   const relativeBuildDir: string | undefined = process.env.BUILD_DIR || <string>yargs.argv['build-dir'];
   const buildDir: string | undefined = relativeBuildDir && path.resolve(process.cwd(), relativeBuildDir);
-  const clusterConfig: ClusterConfig = yaml.load(fs.readFileSync(absConfigPath, {encoding : 'utf8'}));
+  const clusterConfig: GroupConfig = yaml.load(fs.readFileSync(absConfigPath, {encoding : 'utf8'}));
 
   // Build each host
 
