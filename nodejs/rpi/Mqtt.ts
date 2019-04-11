@@ -1,3 +1,7 @@
+/**
+ * The same for rpi and x86
+ */
+
 import * as mqtt from 'Mqtt';
 
 import MqttDev from '../../host/interfaces/dev/MqttDev';
