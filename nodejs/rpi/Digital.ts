@@ -1,3 +1,4 @@
+// @ts-ignore
 import {Gpio} from 'pigpio';
 
 import DigitalDev, {

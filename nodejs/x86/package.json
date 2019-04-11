@@ -11,6 +11,7 @@
     "mqtt": "^2.18.8"
   },
   "devDependencies": {
+    "@types/mqtt": "^2.5.0",
     "@types/node": "^11.13.4"
   }
 }

@@ -17,6 +17,7 @@
     "@types/i2c-bus": "^1.0.18",
     "@types/pigpio": "^0.4.2",
     "@types/serialport": "^6.0.4",
+    "@types/mqtt": "^2.5.0",
     "@types/node": "^11.13.4"
   }
 }

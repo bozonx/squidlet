@@ -1,8 +1,9 @@
+// @ts-ignore
 import * as SerialPort from 'serialport';
 
 import {convertBufferToUint8Array} from '../helpers';
 import {textToUint8Array} from '../../host/helpers/binaryHelpers';
-import SerialDev from '../../host/interfaces/dev/SerialDev';
+import SerialDev, {BaudRate, EventName, Options} from '../../host/interfaces/dev/SerialDev';
 
 
 

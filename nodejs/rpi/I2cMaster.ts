@@ -1,3 +1,4 @@
+// @ts-ignore
 import {I2cBus, openSync} from 'i2c-bus';
 
 import {convertBufferToUint8Array} from '../helpers';
