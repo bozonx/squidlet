@@ -13,3 +13,6 @@ export const PLATFORM_DEVS_DIR = 'devs';
 export const BUILD_HOSTS_DIR = 'hosts';
 export const BUILD_SYSTEM_DIR = 'system';
 export const BUILD_DEVS_DIR = 'devs';
+
+// devs dir on host root
+//export const HOST_DEVS_DIR = 'devs';

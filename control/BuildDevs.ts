@@ -7,7 +7,14 @@ import minimize from '../buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {loadMachineConfig, resolvePlatformDir} from './helpers';
-import {BUILD_DEVS_DIR, DEV_SET_FILE, LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
+import {
+  BUILD_DEVS_DIR,
+  DEV_SET_FILE,
+  LEGACY_DIR,
+  MIN_DIR,
+  MODERN_DIR,
+  PLATFORM_DEVS_DIR
+} from './constants';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 
@@ -87,7 +94,12 @@ export default class BuildDevs {
     const indexFilePath: string = path.join(this.devsBuildDir, DEV_SET_FILE);
     const devs: string[] = [];
 
-    // TODO: make it
+    for (let devName of machineConfig.devs) {
+      const devFile = `./${devName}.js`;
+      const devString = `${devName}: require("${devFile}")`;
+
+      devs.push(devString);
+    }
 
     const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};`;
 
