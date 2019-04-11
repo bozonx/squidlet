@@ -3,3 +3,12 @@
 
 // TODO: если нету system - то билдится он и env set с конфигом по умолчанию
 // TODO: запускается System с этим devset
+
+async function start () {
+
+}
+
+start()
+  .catch((err) => {
+    console.error(err);
+  });

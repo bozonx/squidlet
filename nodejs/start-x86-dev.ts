@@ -4,3 +4,11 @@
 // TODO: билдится конфиг хоста
 // TODO: system и entities - запускаются прямо из репозитория
 
+async function start () {
+
+}
+
+start()
+  .catch((err) => {
+    console.error(err);
+  });
