@@ -5,6 +5,7 @@ import compileJs from '../buildToJs/compileJs';
 import modulesTree from '../buildToJs/modulesTree';
 import minimize from '../buildToJs/minimize';
 import Io from '../hostEnvBuilder/Io';
+import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from './constants';
 
 
 const hostSrc = path.resolve(__dirname, '../host');
@@ -19,9 +20,9 @@ export default class BuildHostDist {
   }
 
   async build(buildDir: string, tmpDir: string) {
-    const modernDst = path.join(tmpDir, 'modern');
-    const legacyDst = path.join(tmpDir, 'legacy');
-    const treeDst = path.join(tmpDir, 'tree');
+    const modernDst = path.join(tmpDir, MODERN_DIR);
+    const legacyDst = path.join(tmpDir, LEGACY_DIR);
+    const treeDst = path.join(tmpDir, TREE_DIR);
 
     // TODO: check version and update only if version is different
 

@@ -9,6 +9,9 @@ import minimize from '../buildToJs/minimize';
 import * as rimraf from '../lowjs/tasks';
 import * as shelljs from 'shelljs';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
+import {loadMachineConfig, resolvePlatformDir} from './helpers';
+import Platforms from '../hostEnvBuilder/interfaces/Platforms';
+import {LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
 
 
 const hostSrc = path.resolve(__dirname, '../host');
@@ -22,11 +25,15 @@ export default class BuildDevs {
     this.io = io;
   }
 
-  async build(machine: string, buildDir: string, tmpDir: string) {
-    console.info(`===> Build host ${envConfig.id} to machine ${envConfig.machine}`);
+  async build(platform: Platforms, machine: string, buildDir: string, tmpDir: string) {
+    console.info(`--> Build devs of platrorm: "${platform}", machine ${machine}`);
 
-    const machineConfigFilePath: string = path.resolve(__dirname, `./lowjs-${envConfig.machine}.ts`);
-    const machineConfig: MachineConfig = require(machineConfigFilePath).default;
+    const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
+
+    const devsSrc = path.join(resolvePlatformDir(platform), PLATFORM_DEVS_DIR);
+    const modernDst = path.join(tmpDir, MODERN_DIR);
+    const legacyDst = path.join(tmpDir, LEGACY_DIR);
+    const minDst = path.join(tmpDir, MIN_DIR);
 
     /*
     {
@@ -38,14 +45,14 @@ export default class BuildDevs {
     */
 
     // ts to modern js
-    await this.io.rimraf(`${buildConfig.devsModernDst}/**/*`);
-    await compileTs(buildConfig.devsSrc, buildConfig.devsModernDst);
+    await this.io.rimraf(`${modernDst}/**/*`);
+    await compileTs(buildConfig.devsSrc, modernDst);
     // modern js to ES5
-    await this.io.rimraf(`${buildConfig.devsLegacyDst}/**/*`);
-    await compileJs(buildConfig.devsModernDst, buildConfig.devsLegacyDst, false);
+    await this.io.rimraf(`${legacyDst}/**/*`);
+    await compileJs(modernDst, legacyDst, false);
     // minimize
-    await this.io.rimraf(`${buildConfig.devsMinDst}/**/*`);
-    await minimize(buildConfig.devsLegacyDst, buildConfig.devsMinDst);
+    await this.io.rimraf(`${minDst}/**/*`);
+    await minimize(legacyDst, minDst);
   }
 
   copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {

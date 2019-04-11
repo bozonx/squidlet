@@ -5,13 +5,13 @@ const platformConfig: MachineConfig = {
   devs: [
     'Storage',
     //'Sha1',
-    'Digital',
+    //'Digital',
     //'Pwm',
-    'Serial',
+    //'Serial',
     //'Spi',
     //'Wifi',
     //'Bluetooth',
-    'I2cMaster',
+    //'I2cMaster',
 
     'Mqtt',
 
