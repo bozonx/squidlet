@@ -1,20 +1,13 @@
 import * as path from 'path';
 
 import Io from '../hostEnvBuilder/Io';
-import BuildConfig from '../hostEnvBuilder/interfaces/BuildConfig';
-import makeBuildConfig from '../buildToJs/buildConfig';
 import compileTs from '../buildToJs/compileTs';
 import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';
-import * as rimraf from '../lowjs/tasks';
-import * as shelljs from 'shelljs';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
-import {loadMachineConfig, resolvePlatformDir} from './helpers';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
+import {loadMachineConfig, resolvePlatformDir} from './helpers';
 import {LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
-
-
-const hostSrc = path.resolve(__dirname, '../host');
 
 
 export default class BuildDevs {
@@ -30,23 +23,20 @@ export default class BuildDevs {
 
     const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
 
+    await this.buildDevs(platform, tmpDir);
+    await this.copyDevs(machineConfig, buildDir, tmpDir);
+    await this.makeDevSet(machineConfig);
+  }
+
+  private async buildDevs(platform: Platforms, tmpDir: string) {
     const devsSrc = path.join(resolvePlatformDir(platform), PLATFORM_DEVS_DIR);
     const modernDst = path.join(tmpDir, MODERN_DIR);
     const legacyDst = path.join(tmpDir, LEGACY_DIR);
     const minDst = path.join(tmpDir, MIN_DIR);
 
-    /*
-    {
-      devsModernDst: path.resolve(buildDir, `./_devs_modern`),
-      devsLegacyDst: path.resolve(buildDir, `./_devs_legacy`),
-      devsMinDst: path.resolve(buildDir, `./_devs_min`),
-      devsSrc: path.resolve(rootDir, './devs'),
-    }
-    */
-
     // ts to modern js
     await this.io.rimraf(`${modernDst}/**/*`);
-    await compileTs(buildConfig.devsSrc, modernDst);
+    await compileTs(devsSrc, modernDst);
     // modern js to ES5
     await this.io.rimraf(`${legacyDst}/**/*`);
     await compileJs(modernDst, legacyDst, false);
@@ -55,18 +45,22 @@ export default class BuildDevs {
     await minimize(legacyDst, minDst);
   }
 
-  copyDevs(hostBuildDir: string, machineDevs: string[], devSrcDir: string) {
-    const devsDstDir: string = path.join(hostBuildDir, HOST_DEVS_DIR);
+  private async copyDevs(machineConfig: MachineConfig, buildDir: string, tmpDir: string) {
+    const minDst = path.join(tmpDir, MIN_DIR);
 
-    rimraf.sync(`${devsDstDir}/**/*`);
-    shelljs.mkdir('-p', devsDstDir);
+    await this.io.rimraf(`${buildDir}/**/*`);
+    await this.io.mkdirP(buildDir);
 
     // copy specified devs
-    for (let devName of machineDevs) {
-      const devSrcFile: string = path.join(devSrcDir, `${devName}.js`);
+    for (let devName of machineConfig.devs) {
+      const devSrcFile: string = path.join(minDst, `${devName}.js`);
 
-      shelljs.cp('-f', devSrcFile, devsDstDir);
+      await this.io.copyFile(devSrcFile, buildDir);
     }
+  }
+
+  private async makeDevSet(machineConfig: MachineConfig) {
+    // TODO: make it
   }
 
 }
