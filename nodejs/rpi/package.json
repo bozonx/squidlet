@@ -7,19 +7,16 @@
   "engines": {
     "node": ">=10.9.0"
   },
-  "license": "MIT",
-  "scripts": {
-  },
   "dependencies": {
     "i2c-bus": "^4.0.1",
     "pigpio": "^1.1.4",
-    "mqtt": "^2.18.8",
+    "mqtt": "^2.18.8",,
     "serialport": "^7.0.2"
   },
   "devDependencies": {
     "@types/i2c-bus": "^1.0.18",
     "@types/pigpio": "^0.4.2",
     "@types/serialport": "^6.0.4",
-    "@types/node": "^10.12.12"
+    "@types/node": "^11.13.4"
   }
 }

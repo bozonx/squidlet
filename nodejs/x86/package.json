@@ -7,13 +7,10 @@
   "engines": {
     "node": ">=10.9.0"
   },
-  "license": "MIT",
-  "scripts": {
-  },
   "dependencies": {
-    "mqtt": "^2.18.8",
+    "mqtt": "^2.18.8"
   },
   "devDependencies": {
-    "@types/node": "^10.12.12"
+    "@types/node": "^11.13.4"
   }
 }
