@@ -1,4 +1,3 @@
-import * as path from 'path';
 import _defaultsDeep = require('lodash/defaultsDeep');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
@@ -140,9 +139,11 @@ export default class ConfigManager {
   }
 
   private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
-    const platformDirName = path.resolve(__dirname, `../../${preHostConfig.platform}`);
+    if (!preHostConfig.platform) {
+      throw new Error(`Platform param has to be specified in host config`);
+    }
 
-    return loadMachineConfig(platformDirName, preHostConfig.machine as string);
+    return loadMachineConfig(preHostConfig.platform, preHostConfig.machine as string);
   }
 
 }

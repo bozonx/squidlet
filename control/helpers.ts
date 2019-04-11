@@ -5,13 +5,12 @@ import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 
 
 export function resolvePlatformDir(platform: Platforms): string {
-  // TODO: !!!!
+  return path.resolve(__dirname, `../${platform}`);
 }
 
 export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
-  const machineConfigFilePath: string = path.resolve(__dirname, `./lowjs-${envConfig.machine}.ts`);
-  // TODO: брать только имя платформы - папку определять самому
-  const machineConfigPath = path.join(platformDirName, `${path.basename(platformDirName)}-${machine}`);
+  const platformDir: string = resolvePlatformDir(platform);
+  const machineConfigPath = path.join(platformDir, `${platform}-${machine}`);
 
   return require(machineConfigPath).default;
 }
