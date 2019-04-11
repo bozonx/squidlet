@@ -38,6 +38,9 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
  * Make devs collection in memory like {"Digital": DevClass}
  */
 export function collectDevs(platformDirName: string, machine: string): {[index: string]: DevClass} {
+
+  // TODO: review
+
   const machineConfig: MachineConfig = loadMachineConfig(platformDirName, machine);
   const platformDevs: string[] = machineConfig.devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};

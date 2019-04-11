@@ -18,6 +18,7 @@ export default class BuildDevs {
     this.io = io;
   }
 
+
   async build(platform: Platforms, machine: string, buildDir: string, tmpDir: string) {
     console.info(`--> Build devs of platrorm: "${platform}", machine ${machine}`);
 
