@@ -2,7 +2,8 @@ import * as path from 'path';
 import * as yargs from 'yargs';
 import {DevClass} from '../host/entities/DevManager';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
-import {loadMachineConfig} from '../control/helpers';
+import {loadMachineConfig, resolvePlatformDir} from '../control/helpers';
+import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 
 
 const DEVS_DIR = 'devs';
@@ -37,11 +38,9 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
 /**
  * Make devs collection in memory like {"Digital": DevClass}
  */
-export function collectDevs(platformDirName: string, machine: string): {[index: string]: DevClass} {
-
-  // TODO: review
-
-  const machineConfig: MachineConfig = loadMachineConfig(platformDirName, machine);
+export function collectDevs(platform: Platforms, machine: string): {[index: string]: DevClass} {
+  const platformDirName: string = resolvePlatformDir(platform);
+  const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
   const platformDevs: string[] = machineConfig.devs;
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 

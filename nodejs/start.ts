@@ -35,7 +35,7 @@ function prepareHostApp (hostConfigSet: HostEnvSet): System {
   console.info(`--> making platform's dev set`);
 
   const machine: string = hostConfigSet.configs.config.machine;
-  const devsSet: {[index: string]: DevClass} = collectDevs(__dirname, machine);
+  const devsSet: {[index: string]: DevClass} = collectDevs(hostConfigSet.configs.config.platform, machine);
 
   console.info(`===> initializing host system on machine "${machine}"`);
 

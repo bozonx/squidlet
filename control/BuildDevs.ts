@@ -7,7 +7,7 @@ import minimize from '../buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {loadMachineConfig, resolvePlatformDir} from './helpers';
-import {LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
+import {DEV_SET_FILE, LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
 
 
 export default class BuildDevs {
@@ -26,7 +26,7 @@ export default class BuildDevs {
 
     await this.buildDevs(platform, tmpDir);
     await this.copyDevs(machineConfig, buildDir, tmpDir);
-    await this.makeDevSet(machineConfig);
+    await this.makeDevSet(machineConfig, buildDir);
   }
 
   private async buildDevs(platform: Platforms, tmpDir: string) {
@@ -60,8 +60,15 @@ export default class BuildDevs {
     }
   }
 
-  private async makeDevSet(machineConfig: MachineConfig) {
+  private async makeDevSet(machineConfig: MachineConfig, buildDir: string) {
+    const indexFilePath: string = path.join(buildDir, DEV_SET_FILE);
+    const devs: string[] = [];
+
     // TODO: make it
+
+    const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};`;
+
+    await this.io.writeFile(indexFilePath, devSet);
   }
 
 }
