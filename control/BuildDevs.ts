@@ -13,8 +13,8 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 export default class BuildDevs {
   private readonly preHostConfig: PreHostConfig;
-  private readonly hostBuildDir: string;
-  private readonly hostTmpDir: string;
+  private readonly devsBuildDir: string;
+  private readonly devsTmpDir: string;
   private readonly hostId: string;
   private readonly platform: Platforms;
   private readonly machine: string;
@@ -36,8 +36,8 @@ export default class BuildDevs {
     this.platform = preHostConfig.platform;
     this.machine = preHostConfig.machine;
     this.preHostConfig = preHostConfig;
-    this.hostBuildDir = path.join(hostsBuildDir, this.hostId, BUILD_DEVS_DIR);
-    this.hostTmpDir = path.join(hostsTmpDir, this.hostId, BUILD_DEVS_DIR);
+    this.devsBuildDir = path.join(hostsBuildDir, this.hostId, BUILD_DEVS_DIR);
+    this.devsTmpDir = path.join(hostsTmpDir, this.hostId, BUILD_DEVS_DIR);
     this.io = io;
   }
 
@@ -47,16 +47,16 @@ export default class BuildDevs {
 
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
-    await this.buildDevs(tmpDir);
-    await this.copyDevs(machineConfig, buildDir, tmpDir);
-    await this.makeDevSet(machineConfig, buildDir);
+    await this.buildDevs();
+    await this.copyDevs(machineConfig);
+    await this.makeDevSet(machineConfig);
   }
 
-  private async buildDevs(tmpDir: string) {
+  private async buildDevs() {
     const devsSrc = path.join(resolvePlatformDir(this.platform), PLATFORM_DEVS_DIR);
-    const modernDst = path.join(tmpDir, MODERN_DIR);
-    const legacyDst = path.join(tmpDir, LEGACY_DIR);
-    const minDst = path.join(tmpDir, MIN_DIR);
+    const modernDst = path.join(this.devsTmpDir, MODERN_DIR);
+    const legacyDst = path.join(this.devsTmpDir, LEGACY_DIR);
+    const minDst = path.join(this.devsTmpDir, MIN_DIR);
 
     // ts to modern js
     await this.io.rimraf(`${modernDst}/**/*`);
@@ -69,22 +69,22 @@ export default class BuildDevs {
     await minimize(legacyDst, minDst);
   }
 
-  private async copyDevs(machineConfig: MachineConfig, buildDir: string, tmpDir: string) {
-    const minDst = path.join(tmpDir, MIN_DIR);
+  private async copyDevs(machineConfig: MachineConfig) {
+    const minDst = path.join(this.devsTmpDir, MIN_DIR);
 
-    await this.io.rimraf(`${buildDir}/**/*`);
-    await this.io.mkdirP(buildDir);
+    await this.io.rimraf(`${this.devsBuildDir}/**/*`);
+    await this.io.mkdirP(this.devsBuildDir);
 
     // copy specified devs
     for (let devName of machineConfig.devs) {
       const devSrcFile: string = path.join(minDst, `${devName}.js`);
 
-      await this.io.copyFile(devSrcFile, buildDir);
+      await this.io.copyFile(devSrcFile, this.devsBuildDir);
     }
   }
 
-  private async makeDevSet(machineConfig: MachineConfig, buildDir: string) {
-    const indexFilePath: string = path.join(buildDir, DEV_SET_FILE);
+  private async makeDevSet(machineConfig: MachineConfig) {
+    const indexFilePath: string = path.join(this.devsBuildDir, DEV_SET_FILE);
     const devs: string[] = [];
 
     // TODO: make it

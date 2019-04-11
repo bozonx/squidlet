@@ -10,6 +10,7 @@ import {appendArray} from '../../host/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig} from '../../control/helpers';
+import Platforms from '../interfaces/Platforms';
 
 
 export default class ConfigManager {
@@ -131,10 +132,10 @@ export default class ConfigManager {
 
   private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
-      id: normalizedConfig.id as string,
-      platform: normalizedConfig.platform as string,
-      machine: normalizedConfig.machine as string,
-      config: normalizedConfig.config as HostConfigConfig,
+      id: normalizedConfig.id as any,
+      platform: normalizedConfig.platform as any,
+      machine: normalizedConfig.machine as any,
+      config: normalizedConfig.config as any,
     };
   }
 
