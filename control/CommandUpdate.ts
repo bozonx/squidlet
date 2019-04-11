@@ -76,38 +76,18 @@ export default class CommandUpdate {
   private async updateHost(hostConfig: PreHostConfig) {
     await this.buildHostDevs(hostConfig);
     await this.buildHostEnv(hostConfig);
+    await this.uploadToHost(hostConfig);
+  }
 
-    const updateHost: UpdateHost = new UpdateHost(
+  private async buildHostDevs(hostConfig: PreHostConfig) {
+    const buildDevs: BuildDevs = new BuildDevs(
       this.io,
       hostConfig,
       this.dirs.hostsBuildDir,
       this.dirs.hostsTmpDir
     );
 
-    console.info(`===> updating host "${hostConfig.id}"`);
-    await updateHost.update();
-  }
-
-  private async buildHostDevs(hostConfig: PreHostConfig) {
-
-    // TODO: какие dirs передать
-
-    const buildDevs: BuildDevs = new BuildDevs(
-      this.io,
-      hostConfig.platform,
-      hostConfig.machine,
-      this.dirs.systemBuildDir,
-      this.dirs.systemTmpDir
-    );
-
     console.info(`===> Building devs`);
-
-    if (!hostConfig.platform) {
-      throw new Error(`Host config doesn't have a platform param`);
-    }
-    else if (!hostConfig.machine) {
-      throw new Error(`Host config doesn't have a machine param`);
-    }
 
     await buildDevs.build();
   }
@@ -122,7 +102,18 @@ export default class CommandUpdate {
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
     await buildHostEnv.build();
+  }
 
+  private async uploadToHost(hostConfig: PreHostConfig) {
+    const updateHost: UpdateHost = new UpdateHost(
+      this.io,
+      hostConfig,
+      this.dirs.buildDir,
+      this.dirs.tmpDir
+    );
+
+    console.info(`===> updating host "${hostConfig.id}"`);
+    await updateHost.update();
   }
 
 }

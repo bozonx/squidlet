@@ -7,30 +7,53 @@ import minimize from '../buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {loadMachineConfig, resolvePlatformDir} from './helpers';
-import {DEV_SET_FILE, LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
+import {BUILD_DEVS_DIR, DEV_SET_FILE, LEGACY_DIR, MIN_DIR, MODERN_DIR, PLATFORM_DEVS_DIR} from './constants';
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 export default class BuildDevs {
+  private readonly preHostConfig: PreHostConfig;
+  private readonly hostBuildDir: string;
+  private readonly hostTmpDir: string;
+  private readonly hostId: string;
+  private readonly platform: Platforms;
+  private readonly machine: string;
   private readonly io: Io;
 
 
-  constructor(io: Io, platform: Platforms, machine: string, buildDir: string, tmpDir: string) {
+  constructor(io: Io, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
+    if (!preHostConfig.id) {
+      throw new Error(`Host has to have an id param`);
+    }
+    else if (!preHostConfig.platform) {
+      throw new Error(`Host config doesn't have a platform param`);
+    }
+    else if (!preHostConfig.machine) {
+      throw new Error(`Host config doesn't have a machine param`);
+    }
+
+    this.hostId = preHostConfig.id;
+    this.platform = preHostConfig.platform;
+    this.machine = preHostConfig.machine;
+    this.preHostConfig = preHostConfig;
+    this.hostBuildDir = path.join(hostsBuildDir, this.hostId, BUILD_DEVS_DIR);
+    this.hostTmpDir = path.join(hostsTmpDir, this.hostId, BUILD_DEVS_DIR);
     this.io = io;
   }
 
 
   async build() {
-    console.info(`--> Build devs of platrorm: "${platform}", machine ${machine}`);
+    console.info(`--> Build devs of platform: "${this.platform}", machine ${this.machine}`);
 
-    const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
+    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
-    await this.buildDevs(platform, tmpDir);
+    await this.buildDevs(tmpDir);
     await this.copyDevs(machineConfig, buildDir, tmpDir);
     await this.makeDevSet(machineConfig, buildDir);
   }
 
-  private async buildDevs(platform: Platforms, tmpDir: string) {
-    const devsSrc = path.join(resolvePlatformDir(platform), PLATFORM_DEVS_DIR);
+  private async buildDevs(tmpDir: string) {
+    const devsSrc = path.join(resolvePlatformDir(this.platform), PLATFORM_DEVS_DIR);
     const modernDst = path.join(tmpDir, MODERN_DIR);
     const legacyDst = path.join(tmpDir, LEGACY_DIR);
     const minDst = path.join(tmpDir, MIN_DIR);

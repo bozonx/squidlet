@@ -13,15 +13,15 @@ export default class BuildHostEnv {
   private readonly io: Io;
 
 
-  constructor(io: Io, preHostConfig: PreHostConfig, buildDir: string, tmpDir: string) {
+  constructor(io: Io, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
     if (!preHostConfig.id) {
       throw new Error(`Host has to have an id param`);
     }
 
     this.hostId = preHostConfig.id;
     this.preHostConfig = preHostConfig;
-    this.hostBuildDir = path.join(buildDir, this.hostId);
-    this.hostTmpDir = path.join(tmpDir, this.hostId);
+    this.hostBuildDir = path.join(hostsBuildDir, this.hostId);
+    this.hostTmpDir = path.join(hostsTmpDir, this.hostId);
     this.io = io;
   }
 
