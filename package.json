@@ -10,8 +10,6 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "build-lowjs-devs": "gulp build-lowjs-devs",
-    "build-lowjs": "gulp build-lowjs",
     "start": "ts-node ./nodejs/start.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json",
