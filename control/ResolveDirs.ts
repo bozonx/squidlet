@@ -14,8 +14,8 @@ interface ArgsDirs {
 export default class ResolveDirs {
   buildDir: string = '';
   tmpDir: string = '';
-  hostDistBuildDir: string = '';
-  hostDistTmpDir: string = '';
+  systemBuildDir: string = '';
+  systemTmpDir: string = '';
   hostsBuildDir: string = '';
   hostsTmpDir: string = '';
 
@@ -34,8 +34,8 @@ export default class ResolveDirs {
 
     this.buildDir = buildDir;
     this.tmpDir = tmpDir;
-    this.hostDistBuildDir = path.join(this.buildDir, BUILD_SYSTEM_DIR);
-    this.hostDistTmpDir = path.join(this.tmpDir, BUILD_SYSTEM_DIR);
+    this.systemBuildDir = path.join(this.buildDir, BUILD_SYSTEM_DIR);
+    this.systemTmpDir = path.join(this.tmpDir, BUILD_SYSTEM_DIR);
     this.hostsBuildDir = path.join(this.buildDir, BUILD_HOSTS_DIR);
     this.hostsTmpDir = path.join(this.tmpDir, BUILD_HOSTS_DIR);
   }

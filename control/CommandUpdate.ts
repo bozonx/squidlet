@@ -36,7 +36,7 @@ export default class CommandUpdate {
     await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
 
     console.info(`===> Building system`);
-    await this.buildSystem.build(this.dirs.hostDistBuildDir, this.dirs.hostDistTmpDir);
+    await this.buildSystem.build(this.dirs.systemBuildDir, this.dirs.systemTmpDir);
 
     // update only specified host
     if (this.params.hostName) {
@@ -74,6 +74,21 @@ export default class CommandUpdate {
   }
 
   private async updateHost(hostConfig: PreHostConfig) {
+    await this.buildHostDevs(hostConfig);
+    await this.buildHostEnv(hostConfig);
+
+    const updateHost: UpdateHost = new UpdateHost(
+      this.io,
+      hostConfig,
+      this.dirs.hostsBuildDir,
+      this.dirs.hostsTmpDir
+    );
+
+    console.info(`===> updating host "${hostConfig.id}"`);
+    await updateHost.update();
+  }
+
+  private async buildHostDevs(hostConfig: PreHostConfig) {
 
     // TODO: какие dirs передать
 
@@ -81,8 +96,8 @@ export default class CommandUpdate {
       this.io,
       hostConfig.platform,
       hostConfig.machine,
-      this.dirs.hostDistBuildDir,
-      this.dirs.hostDistTmpDir
+      this.dirs.systemBuildDir,
+      this.dirs.systemTmpDir
     );
 
     console.info(`===> Building devs`);
@@ -95,26 +110,19 @@ export default class CommandUpdate {
     }
 
     await buildDevs.build();
+  }
 
+  private async buildHostEnv(hostConfig: PreHostConfig) {
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
-      this.dirs.hostsEnvBuildDir,
+      this.dirs.hostsBuildDir,
       this.dirs.hostsTmpDir
     );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
     await buildHostEnv.build();
 
-    const updateHost: UpdateHost = new UpdateHost(
-      this.io,
-      hostConfig,
-      this.dirs.hostsEnvBuildDir,
-      this.dirs.hostsTmpDir
-    );
-
-    console.info(`===> updating host "${hostConfig.id}"`);
-    await updateHost.update();
   }
 
 }
