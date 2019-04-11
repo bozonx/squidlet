@@ -1,5 +1,6 @@
 //import Platforms from '../../../../configWorks/interfaces/Platforms';
 import LogLevel from './LogLevel';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 export interface HostConfigConfig {
@@ -38,7 +39,7 @@ export interface HostConfigConfig {
 export default interface HostConfig {
   // id of host e.g master
   id: string;
-  platform: string;
+  platform: Platforms;
   machine: string;
   //platform: Platforms;
   // specific config for each host

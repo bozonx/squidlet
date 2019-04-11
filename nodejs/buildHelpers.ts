@@ -29,12 +29,6 @@ export function resolveParam(envParamName: string, argParamName?: string): strin
   return;
 }
 
-// export function getMasterSysDev(platformDirName: string): DevClass {
-//   const devPath = path.join(platformDirName, DEVS_DIR, 'Sys.master');
-//
-//   return require(devPath).default;
-// }
-
 /**
  * Make devs collection in memory like {"Digital": DevClass}
  */
@@ -53,6 +47,13 @@ export function collectDevs(platform: Platforms, machine: string): {[index: stri
 
   return devsSet;
 }
+
+
+// export function getMasterSysDev(platformDirName: string): DevClass {
+//   const devPath = path.join(platformDirName, DEVS_DIR, 'Sys.master');
+//
+//   return require(devPath).default;
+// }
 
 // export function clearDir(dirName: string) {
 //   shelljs.rm('-rf', path.join(dirName, '*'));
