@@ -8,9 +8,9 @@ import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
 import Io from '../Io';
 import {appendArray} from '../../host/helpers/collections';
-import {loadMachineConfig} from '../../helpers/buildHelpers';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
+import {loadMachineConfig} from '../../control/helpers';
 
 
 export default class ConfigManager {

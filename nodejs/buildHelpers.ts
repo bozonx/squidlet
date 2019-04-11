@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as yargs from 'yargs';
 import {DevClass} from '../host/entities/DevManager';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
+import {loadMachineConfig} from '../control/helpers';
 
 
 const DEVS_DIR = 'devs';
@@ -49,12 +50,6 @@ export function collectDevs(platformDirName: string, machine: string): {[index: 
   }
 
   return devsSet;
-}
-
-export function loadMachineConfig(platformDirName: string, machine: string): MachineConfig {
-  const machineConfigPath = path.join(platformDirName, `${path.basename(platformDirName)}-${machine}`);
-
-  return require(machineConfigPath).default;
 }
 
 // export function clearDir(dirName: string) {

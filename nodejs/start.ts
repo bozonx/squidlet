@@ -12,7 +12,7 @@ import {
   collectDevs,
   resolveParam,
   resolveParamRequired
-} from '../helpers/buildHelpers';
+} from './buildHelpers';
 import System from '../host/System';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';

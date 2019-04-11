@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as rimraf from '../lowjs/tasks';
 import * as shelljs from 'shelljs';
 import Io from '../hostEnvBuilder/Io';
 
@@ -18,6 +17,9 @@ export default class BuildThirdPartyDeps {
 
 
   async build(hostBuildDir: string) {
+
+    // TODO: remake
+
     const nodeModules: string = path.join(hostBuildDir, MODULES_DIR);
     const babelDir = path.join(nodeModules, '@babel');
     const babelRuntimeHelpersDir = path.join(babelDir, 'runtime/helpers');
