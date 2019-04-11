@@ -6,7 +6,7 @@ import GroupConfigParser from './GroupConfigParser';
 import Io from '../hostEnvBuilder/Io';
 import BuildHostEnv from './BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
-import BuildHostDist from './BuildHostDist';
+import BuildSystem from './BuildSystem';
 import BuildDevs from './BuildDevs';
 
 
@@ -24,7 +24,7 @@ export default class CommandUpdate {
     this.params.groupConfigPath
   );
   private dirs: ResolveDirs = new ResolveDirs();
-  private readonly buildHostDist: BuildHostDist = new BuildHostDist(this.io);
+  private readonly buildSystem: BuildSystem = new BuildSystem(this.io);
 
 
   async start() {
@@ -36,7 +36,7 @@ export default class CommandUpdate {
     await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
 
     console.info(`===> Building system`);
-    await this.buildHostDist.build(this.dirs.hostDistBuildDir, this.dirs.hostDistTmpDir);
+    await this.buildSystem.build(this.dirs.hostDistBuildDir, this.dirs.hostDistTmpDir);
 
     // update only specified host
     if (this.params.hostName) {

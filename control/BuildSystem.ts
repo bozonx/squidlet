@@ -8,10 +8,10 @@ import Io from '../hostEnvBuilder/Io';
 import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from './constants';
 
 
-const hostSrc = path.resolve(__dirname, '../host');
+const systemSrc = path.resolve(__dirname, '../host');
 
 
-export default class BuildHostDist {
+export default class BuildSystem {
   private readonly io: Io;
 
 
@@ -28,7 +28,7 @@ export default class BuildHostDist {
 
     // ts to modern js
     await this.io.rimraf(`${modernDst}/**/*`);
-    await compileTs(hostSrc, modernDst);
+    await compileTs(systemSrc, modernDst);
     // modern js to ES5
     await this.io.rimraf(`${legacyDst}/**/*`);
     await compileJs(modernDst, legacyDst, false);
