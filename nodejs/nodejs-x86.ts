@@ -11,7 +11,8 @@ const platformConfig: MachineConfig = {
     //'Spi',
     //'Wifi',
     //'Bluetooth',
-    //'I2cMaster',
+    // TODO: comment
+    'I2cMaster',
 
     'Mqtt',
 

@@ -2,10 +2,7 @@ import * as path from 'path';
 import * as yargs from 'yargs';
 
 import GroupConfigParser from './GroupConfigParser';
-
-
-const hostsDir = 'hosts';
-const hostDistDir = 'hostDist';
+import {BUILD_HOSTS_DIR, BUILD_SYSTEM_DIR} from './constants';
 
 
 interface ArgsDirs {
@@ -19,8 +16,8 @@ export default class ResolveDirs {
   tmpDir: string = '';
   hostDistBuildDir: string = '';
   hostDistTmpDir: string = '';
-  hostsEnvBuildDir: string = '';
-  hostsEnvTmpDir: string = '';
+  hostsBuildDir: string = '';
+  hostsTmpDir: string = '';
 
   resolve(groupConfig: GroupConfigParser) {
     const args: ArgsDirs = this.resolveArgs();
@@ -37,10 +34,10 @@ export default class ResolveDirs {
 
     this.buildDir = buildDir;
     this.tmpDir = tmpDir;
-    this.hostDistBuildDir = path.join(this.buildDir, hostDistDir);
-    this.hostDistTmpDir = path.join(this.tmpDir, hostDistDir);
-    this.hostsEnvBuildDir = path.join(this.buildDir, hostsDir);
-    this.hostsEnvTmpDir = path.join(this.tmpDir, hostsDir);
+    this.hostDistBuildDir = path.join(this.buildDir, BUILD_SYSTEM_DIR);
+    this.hostDistTmpDir = path.join(this.tmpDir, BUILD_SYSTEM_DIR);
+    this.hostsBuildDir = path.join(this.buildDir, BUILD_HOSTS_DIR);
+    this.hostsTmpDir = path.join(this.tmpDir, BUILD_HOSTS_DIR);
   }
 
 

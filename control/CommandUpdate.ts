@@ -7,6 +7,7 @@ import Io from '../hostEnvBuilder/Io';
 import BuildHostEnv from './BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
 import BuildHostDist from './BuildHostDist';
+import BuildDevs from './BuildDevs';
 
 
 interface UpdateCommandParams {
@@ -34,7 +35,7 @@ export default class CommandUpdate {
     // clear whole tmp dir
     await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
 
-    console.info(`===> Building host system`);
+    console.info(`===> Building system`);
     await this.buildHostDist.build(this.dirs.hostDistBuildDir, this.dirs.hostDistTmpDir);
 
     // update only specified host
@@ -73,11 +74,33 @@ export default class CommandUpdate {
   }
 
   private async updateHost(hostConfig: PreHostConfig) {
+
+    // TODO: какие dirs передать
+
+    const buildDevs: BuildDevs = new BuildDevs(
+      this.io,
+      hostConfig.platform,
+      hostConfig.machine,
+      this.dirs.hostDistBuildDir,
+      this.dirs.hostDistTmpDir
+    );
+
+    console.info(`===> Building devs`);
+
+    if (!hostConfig.platform) {
+      throw new Error(`Host config doesn't have a platform param`);
+    }
+    else if (!hostConfig.machine) {
+      throw new Error(`Host config doesn't have a machine param`);
+    }
+
+    await buildDevs.build();
+
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
       this.dirs.hostsEnvBuildDir,
-      this.dirs.hostsEnvTmpDir
+      this.dirs.hostsTmpDir
     );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
@@ -87,7 +110,7 @@ export default class CommandUpdate {
       this.io,
       hostConfig,
       this.dirs.hostsEnvBuildDir,
-      this.dirs.hostsEnvTmpDir
+      this.dirs.hostsTmpDir
     );
 
     console.info(`===> updating host "${hostConfig.id}"`);

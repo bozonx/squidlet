@@ -9,3 +9,6 @@ export const DEV_SET_FILE = 'index.js';
 export const PLATFORM_DEVS_DIR = 'devs';
 // dir with compiled devs and devSet on host
 //export const HOST_DEVS_DIR = 'devs';
+
+export const BUILD_HOSTS_DIR = 'hosts';
+export const BUILD_SYSTEM_DIR = 'system';

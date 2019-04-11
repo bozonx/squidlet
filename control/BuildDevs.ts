@@ -14,12 +14,12 @@ export default class BuildDevs {
   private readonly io: Io;
 
 
-  constructor(io: Io) {
+  constructor(io: Io, platform: Platforms, machine: string, buildDir: string, tmpDir: string) {
     this.io = io;
   }
 
 
-  async build(platform: Platforms, machine: string, buildDir: string, tmpDir: string) {
+  async build() {
     console.info(`--> Build devs of platrorm: "${platform}", machine ${machine}`);
 
     const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
