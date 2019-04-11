@@ -2,10 +2,10 @@ import * as path from 'path';
 
 import Io from '../hostEnvBuilder/Io';
 import BuildConfig from '../hostEnvBuilder/interfaces/BuildConfig';
-import makeBuildConfig from '../helpers/buildJs/buildConfig';
-import compileTs from '../helpers/buildJs/compileTs';
-import compileJs from '../helpers/buildJs/compileJs';
-import minimize from '../helpers/buildJs/minimize';
+import makeBuildConfig from '../buildToJs/buildConfig';
+import compileTs from '../buildToJs/compileTs';
+import compileJs from '../buildToJs/compileJs';
+import minimize from '../buildToJs/minimize';
 import * as rimraf from '../lowjs/tasks';
 import * as shelljs from 'shelljs';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
