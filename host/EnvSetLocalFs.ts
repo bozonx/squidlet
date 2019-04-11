@@ -5,7 +5,7 @@ import {EntityClassType} from './entities/EntityManagerBase';
 import systemConfig from './config/systemConfig';
 import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';
-import StorageDev from '../nodejs/devs/Storage';
+import StorageDev from '../nodejs/rpi/Storage';
 
 
 /**

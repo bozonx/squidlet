@@ -1,4 +1,4 @@
-import * as mqtt from 'mqtt';
+import * as mqtt from 'Mqtt';
 
 import MqttDev from '../../host/interfaces/dev/MqttDev';
 

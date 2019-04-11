@@ -8,7 +8,7 @@ import {EntityClassType} from '../host/entities/EntityManagerBase';
 import HostEnvSet from './interfaces/HostEnvSet';
 import {trimEnd} from '../host/helpers/lodashLike';
 import {pathJoin} from '../host/helpers/nodeLike';
-import StorageDev from '../nodejs/devs/Storage';
+import StorageDev from '../nodejs/rpi/Storage';
 import EnvSet from '../host/interfaces/EnvSet';
 
 
