@@ -1,3 +1,7 @@
+/**
+ * The same file for lowjs and nodejs
+ */
+
 import * as fs from 'fs';
 
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
