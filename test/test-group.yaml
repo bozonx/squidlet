@@ -6,6 +6,8 @@ hosts:
   - id: testHost
     platform: nodejs
     machine: x86
+    #platform: lowjs
+    #machine: esp32wrover
     config:
       someParam: 1
       #storageDir: './masterStorage'

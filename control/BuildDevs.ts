@@ -84,9 +84,11 @@ export default class BuildDevs {
 
     // copy specified devs
     for (let devName of machineConfig.devs) {
-      const devSrcFile: string = path.join(minDst, `${devName}.js`);
+      const fileName = `${devName}.js`;
+      const devSrcFile: string = path.join(minDst, fileName);
+      const devDstFile: string = path.join(this.devsBuildDir, fileName);
 
-      await this.io.copyFile(devSrcFile, this.devsBuildDir);
+      await this.io.copyFile(devSrcFile, devDstFile);
     }
   }
 
@@ -101,7 +103,7 @@ export default class BuildDevs {
       devs.push(devString);
     }
 
-    const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};`;
+    const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};\n`;
 
     await this.io.writeFile(indexFilePath, devSet);
   }

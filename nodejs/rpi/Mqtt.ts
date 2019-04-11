@@ -2,6 +2,7 @@
  * The same for rpi and x86
  */
 
+// @ts-ignore
 import * as mqtt from 'Mqtt';
 
 import MqttDev from '../../host/interfaces/dev/MqttDev';
