@@ -8,12 +8,15 @@ import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';
 
 
+const systemClassFileName = 'System';
+
+
 export default class Starter {
   private readonly io: Io = new Io();
   private readonly args: ResolveArgs;
   private readonly groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.args.configPath);
   private readonly props: Props = new Props(this.args, this.groupConfig);
-  private readonly devSet: DevsSet = new DevsSet();
+  private readonly devSet: DevsSet = new DevsSet(this.io, this.props);
 
 
   constructor(args: ResolveArgs) {
@@ -27,7 +30,7 @@ export default class Starter {
     this.props.resolve();
 
     console.info(`===> making platform's dev set`);
-    this.devSet.collect();
+    await this.devSet.collect();
   }
 
 
@@ -37,7 +40,14 @@ export default class Starter {
   }
 
   async buildInitialProdSystem() {
-    // TODO: если нету system - то билдится он и env set с конфигом по умолчанию
+    const pathToSystemDir = this.getPathToProdSystemDir();
+
+    if (!await this.io.exists(pathToSystemDir)) {
+      // TODO: билд system
+      // TODO: билд env set с конфигом по умолчанию
+    }
+
+    // else if it exists - do nothing
   }
 
   async buildDevelopEnvSet() {
@@ -45,7 +55,7 @@ export default class Starter {
   }
 
   async startProdSystem() {
-    const pathToSystem = path.join(this.props.workDir, systemConfig.rootDirs.host, 'System');
+    const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const system = new System(this.devSet.devSet);
 
@@ -57,6 +67,11 @@ export default class Starter {
     const system = new System(this.devSet.devSet);
 
     return system.start();
+  }
+
+
+  private getPathToProdSystemDir(): string {
+    return path.join(this.props.workDir, systemConfig.rootDirs.host);
   }
 
 }

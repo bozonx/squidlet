@@ -1,35 +1,33 @@
 import * as path from 'path';
 
-import {loadMachineConfig, resolvePlatformDir} from '../../control/helpers';
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import {DevClass} from '../../host/entities/DevManager';
-
-
-const DEVS_DIR = 'devs';
+import Props from './Props';
+import {HOST_DEVS_DIR} from '../../control/constants';
+import Io from '../../hostEnvBuilder/Io';
 
 
 export default class DevsSet {
   devSet: {[index: string]: DevClass} = {};
+  private readonly io: Io;
+  private readonly props: Props;
 
 
-  constructor() {
+  constructor(io: Io, props: Props) {
+    this.io = io;
+    this.props = props;
   }
 
 
-  collect() {
-
-    // TODO: лучше просто считать из папки все devs
-
-    const platformDirName: string = resolvePlatformDir(platform);
-    const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
-    const platformDevs: string[] = machineConfig.devs;
+  async collect() {
+    const devsDir = path.join(__dirname, '../', this.props.machine, HOST_DEVS_DIR);
+    const devsFiles: string[] = await this.io.readdir(devsDir);
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 
-    for (let devName of platformDevs) {
-      const fullDevName = devName;
-      const devPath = path.join(platformDirName, DEVS_DIR, fullDevName);
+    for (let devFileName of devsFiles) {
+      const devName = path.parse(devFileName).name;
+      const devPath = path.join(devsDir, devFileName);
 
-      devsSet[fullDevName] = require(devPath).default;
+      devsSet[devName] = require(devPath).default;
     }
 
     return devsSet;

@@ -41,6 +41,10 @@ export default class Io {
     shelljs.mkdir('-p', dirName);
   }
 
+  readdir(pathTo: string): Promise<string[]> {
+    return callPromised(fs.readdir, pathTo, systemConfig.filesEncode) as Promise<string[]>;
+  }
+
   async exists(path: string): Promise<boolean> {
     return fs.existsSync(path);
   }
