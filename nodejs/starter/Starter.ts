@@ -1,16 +1,16 @@
 import Io from '../../hostEnvBuilder/Io';
 import ResolveArgs from './ResolveArgs';
 import GroupConfigParser from '../../control/GroupConfigParser';
-import ResolveDirs from './ResolveDirs';
+import Props from './Props';
 import DevsSet from './DevsSet';
 
 
 export default class Starter {
-  private io: Io = new Io();
+  private readonly io: Io = new Io();
   private readonly args: ResolveArgs;
-  private groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.params.configPath);
-  private dirs: ResolveDirs = new ResolveDirs();
-  private devSet: DevsSet = new DevsSet();
+  private readonly groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.params.configPath);
+  private readonly props: Props = new Props(this.args, this.groupConfig);
+  private readonly devSet: DevsSet = new DevsSet();
 
 
   constructor(args: ResolveArgs) {
@@ -21,16 +21,7 @@ export default class Starter {
     console.info(`===> resolving config`);
     await this.groupConfig.init();
 
-    this.dirs.resolve();
-
-    //const hostConfig: PreHostConfig = this.groupConfig.getHostConfig(this.params.hostName);
-
-    // if (!hostConfig.platform) {
-    //   throw new Error(`Param "platform" is required on host config "${hostConfig.id}"`);
-    // }
-    // else if (!hostConfig.machine) {
-    //   throw new Error(`Param "machine" is required on host config "${hostConfig.id}"`);
-    // }
+    this.props.resolve();
 
     console.info(`===> making platform's dev set`);
     this.devSet.collect();
