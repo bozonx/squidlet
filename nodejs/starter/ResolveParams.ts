@@ -8,7 +8,9 @@ export interface Params {
 
 
 export default class ResolveParams {
-
+  configPath: string = '';
+  hostName?: string;
+  workDir?: string;
 
   constructor() {
 

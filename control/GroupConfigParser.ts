@@ -39,6 +39,10 @@ export default class GroupConfigParser {
   }
 
 
+  getHostConfig(hostName: string | undefined): PreHostConfig {
+    // TODO: return host config or the first host config of set
+  }
+
   private async makeHosts(preGroupConfig: GroupConfig) {
     for (let hostConfigPathOrObj of preGroupConfig.hosts) {
       let hostConfig: PreHostConfig;

@@ -6,7 +6,12 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {DevClass} from '../../host/entities/DevManager';
 
 
+const DEVS_DIR = 'devs';
+
+
 export default class DevsSet {
+  devSet: {[index: string]: DevClass} = {};
+
   private readonly platform: Platforms;
   private readonly machine: string;
 
@@ -17,7 +22,10 @@ export default class DevsSet {
   }
 
 
-  collect(): {[index: string]: DevClass} {
+  collect() {
+
+    // TODO: лучше просто считать из папки все devs
+
     const platformDirName: string = resolvePlatformDir(platform);
     const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
     const platformDevs: string[] = machineConfig.devs;

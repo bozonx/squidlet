@@ -6,7 +6,6 @@ import {loadMachineConfig, resolvePlatformDir} from '../../control/helpers';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
-const DEVS_DIR = 'devs';
 
 
 export function resolveParamRequired(envParamName: string, argParamName?: string): string {
