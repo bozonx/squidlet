@@ -12,13 +12,8 @@ const DEVS_DIR = 'devs';
 export default class DevsSet {
   devSet: {[index: string]: DevClass} = {};
 
-  private readonly platform: Platforms;
-  private readonly machine: string;
 
-
-  constructor(platform: Platforms, machine: string) {
-    this.platform = platform;
-    this.machine = machine;
+  constructor() {
   }
 
 
