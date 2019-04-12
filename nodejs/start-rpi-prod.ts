@@ -1,11 +1,18 @@
-// TODO: делается npm i в папку с devs
-// TODO: собирается devSet через require
+import ResolveParams from './starter/ResolveParams';
+import Starter from './starter/Starter';
 
-// TODO: если нету system - то билдится он и env set с конфигом по умолчанию
-// TODO: запускается System с этим devset
 
 async function start () {
+  const params: ResolveParams = new ResolveParams();
 
+  params.resolve();
+
+  const starter: Starter = new Starter(params);
+
+  await starter.init();
+  await starter.installModules();
+  await starter.buildInitialSystem();
+  await starter.startProdSystem();
 }
 
 start()

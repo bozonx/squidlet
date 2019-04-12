@@ -50,4 +50,12 @@ export default class Starter {
     // TODO: запускается System из workDir с этим devset
   }
 
+  async buildDevelopEnvSet() {
+    // TODO: сбилдить конфиги хоста где указанны пути к реальному главному ts файлу
+  }
+
+  async startDevelopSystem() {
+    // TODO:
+  }
+
 }
