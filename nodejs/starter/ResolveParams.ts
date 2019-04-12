@@ -1,4 +1,4 @@
-import {resolveParam, resolveParamRequired} from './buildHelpers';
+import * as yargs from 'yargs';
 
 
 export interface Params {
@@ -12,20 +12,28 @@ export default class ResolveParams {
   hostName?: string;
   workDir?: string;
 
-  constructor() {
-
-  }
 
   resolve() {
-    // TODO: конфиг - позиционный параметр
-    // TODO: конфиг - группы или хоста???
-    const configPath: string = resolveParamRequired('CONFIG', 'config');
-    const workDir: string | undefined = resolveParam('WORK_DIR', 'work-dir');
+    if (!yargs.argv._[0]) {
+      throw new Error(`You have to specify a host config or group config and host name.`);
+    }
 
-    return {
-      configPath,
-      workDir,
-    };
+    this.configPath = yargs.argv._[0];
+    this.workDir = this.resolveParam('WORK_DIR', 'work-dir');
+    this.hostName = yargs.argv.name as any;
+  }
+
+
+  private resolveParam(envParamName: string, argParamName?: string): string | undefined {
+    if (process.env[envParamName]) {
+      return process.env[envParamName];
+    }
+
+    else if (argParamName && yargs.argv[argParamName]) {
+      return yargs.argv[argParamName] as string;
+    }
+
+    return;
   }
 
 }

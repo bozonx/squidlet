@@ -3,55 +3,34 @@
 Easy make IoT devices and local net of devices which can be managed by master
 
 
-## Build host's files
-
-    yarn build-host
-
-
-## Lowjs
-
-### Build devs
-
-   yarn build-lowjs-devs
-
-### Build host
-
-    yarn build-lowjs --config=./my-host.yaml
-
-
 ## Nodejs
  
-### raspberry pi
+### Start production host
 
-    sudo apt-get update
-    sudo apt-get install pigpio
+x86 machine
+
+    npm run x86-prod [--work-dir] [--name] ./groupOrHostConfig.yaml
     
-    cd nodejs
-    yarn
+Raspberry pi
+
+    npm run rpi-prod [--work-dir] [--name] ./groupOrHostConfig.yaml
+
+### Start development host
+ 
+x86 machine
+
+    npm start [--work-dir] [--name] ./groupOrHostConfig.yaml
     
-    cd ..
-    
-    yarn master
+Raspberry pi
 
+    npm run rpi-dev [--work-dir] [--name] ./groupOrHostConfig.yaml
 
-## Build cluster
+### Parameters
 
-Config looks like that:
-
-    # List of common plugins
-    plugins:
-      - /path/to/plugin.ts
-      
-    # Default host config which will be merged to each host
-    hostDefaults:
-      devices:
-        ...some devices definitions
-    
-    # Hosts configs by host id
-    hosts:
-      hostOne: ./hostOne.yaml
-
-Build it
-
-    yarn build-cluster --config=./path/to/clusterConfig.yaml --build-dir=./my/dir
-    
+* ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
+  If group config is specified you should specify a host name (--name argument)
+  instead the first host will be taken.
+* --work-dir or WORK_DIR env variable points dir where configs, entities, system
+  and variable files will be placed
+* --name uses only if group config is specified
+  and selects a host config from group config

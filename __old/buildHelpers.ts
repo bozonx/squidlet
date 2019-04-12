@@ -1,32 +1,32 @@
-import * as path from 'path';
-import * as yargs from 'yargs';
-import {DevClass} from '../../host/entities/DevManager';
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import {loadMachineConfig, resolvePlatformDir} from '../../control/helpers';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+// import * as path from 'path';
+// import * as yargs from 'yargs';
+// import {DevClass} from '../../host/entities/DevManager';
+// import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+// import {loadMachineConfig, resolvePlatformDir} from '../../control/helpers';
+// import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+//
 
 
 
-
-export function resolveParamRequired(envParamName: string, argParamName?: string): string {
-  const resolved: string | undefined = resolveParam(envParamName, argParamName);
-
-  if (resolved) return resolved;
-
-  throw new Error(`You have to specify env variable ${envParamName}=... or argument --${argParamName}=...`);
-}
-
-export function resolveParam(envParamName: string, argParamName?: string): string | undefined {
-  if (process.env[envParamName]) {
-    return process.env.CONFIG;
-  }
-
-  else if (argParamName && yargs.argv[argParamName]) {
-    return yargs.argv.config as string;
-  }
-
-  return;
-}
+// export function resolveParamRequired(envParamName: string, argParamName?: string): string {
+//   const resolved: string | undefined = resolveParam(envParamName, argParamName);
+//
+//   if (resolved) return resolved;
+//
+//   throw new Error(`You have to specify env variable ${envParamName}=... or argument --${argParamName}=...`);
+// }
+//
+// export function resolveParam(envParamName: string, argParamName?: string): string | undefined {
+//   if (process.env[envParamName]) {
+//     return process.env.CONFIG;
+//   }
+//
+//   else if (argParamName && yargs.argv[argParamName]) {
+//     return yargs.argv.config as string;
+//   }
+//
+//   return;
+// }
 
 // /**
 //  * Make devs collection in memory like {"Digital": DevClass}
