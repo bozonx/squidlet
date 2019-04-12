@@ -26,16 +26,32 @@ export default class Props {
   resolve() {
     this._hostConfig = this.groupConfig.getHostConfig(this.args.hostName);
 
-    // TODO: workDir
-    // TODO: hostId
 
-    if (!this.hostConfig.platform) {
-      throw new Error(`Param "platform" is required on host config "${this.hostId}"`);
-    }
-    else if (!this.hostConfig.machine) {
-      throw new Error(`Param "machine" is required on host config "${this.hostId}"`);
-    }
+    this.validate();
 
+    // TODO: брать workDir из host config
+
+    this.workDir = this.args.workDir;
+    this.machine = this.args.machine;
+    this.hostId = this.hostConfig.id as any;
+  }
+
+  validate() {
+    if (!this._hostConfig) {
+      throw new Error(`You have to define host config`);
+    }
+    else if (!this._hostConfig.id) {
+      throw new Error(`You have to specify an host id in your host config`);
+    }
+    else if (this.args.hostName && this.args.hostName !== this.hostConfig.id) {
+      throw new Error(`Param "id" of host config "${this.hostId}" is not as specified as a command argument "${this.args.hostName}"`);
+    }
+    else if (this.platform !== this.hostConfig.platform) {
+      throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
+    }
+    else if (this.args.machine !== this.hostConfig.machine) {
+      throw new Error(`Param "machine" of host config "${this.hostId}" is not a "${this.args.machine}"`);
+    }
   }
 
 }

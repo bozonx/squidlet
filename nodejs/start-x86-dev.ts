@@ -3,7 +3,7 @@ import Starter from './starter/Starter';
 
 
 async function start () {
-  const args: ResolveArgs = new ResolveArgs();
+  const args: ResolveArgs = new ResolveArgs('x86');
 
   args.resolve();
 

@@ -5,9 +5,15 @@ import * as yargs from 'yargs';
  * Resolve arguments or env variable
  */
 export default class ResolveArgs {
+  readonly machine: string;
   configPath: string = '';
   hostName?: string;
   workDir?: string;
+
+
+  constructor(machine: string) {
+    this.machine = machine;
+  }
 
 
   resolve() {

@@ -27,6 +27,7 @@ export default class Starter {
     this.devSet.collect();
   }
 
+
   async installModules() {
     console.info(`===> Install npm modules`);
     // TODO: делается npm i в папку с devs если нужно
