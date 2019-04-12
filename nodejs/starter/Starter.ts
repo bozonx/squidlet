@@ -41,7 +41,7 @@ export default class Starter {
     // TODO: делается npm i в папку с devs если нужно
   }
 
-  async buildInitialSystem() {
+  async buildInitialProdSystem() {
     // TODO: если нету system - то билдится он и env set с конфигом по умолчанию
   }
 

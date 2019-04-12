@@ -1,9 +1,3 @@
-// TODO: делается npm i в папку с devs
-// TODO: собирается devSet через require
-
-// TODO: билдится конфиг хоста
-// TODO: system и entities - запускаются прямо из репозитория
-
 import ResolveParams from './starter/ResolveParams';
 import Starter from './starter/Starter';
 

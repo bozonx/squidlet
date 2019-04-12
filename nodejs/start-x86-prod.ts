@@ -11,7 +11,7 @@ async function start () {
 
   await starter.init();
   await starter.installModules();
-  await starter.buildInitialSystem();
+  await starter.buildInitialProdSystem();
   await starter.startProdSystem();
 }
 
