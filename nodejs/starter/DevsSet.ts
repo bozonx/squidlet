@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import {loadMachineConfig, resolvePlatformDir} from '../../control/helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {DevClass} from '../../host/entities/DevManager';
 
 

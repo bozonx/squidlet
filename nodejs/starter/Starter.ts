@@ -11,7 +11,7 @@ import systemConfig from '../../host/config/systemConfig';
 export default class Starter {
   private readonly io: Io = new Io();
   private readonly args: ResolveArgs;
-  private readonly groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.params.configPath);
+  private readonly groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.args.configPath);
   private readonly props: Props = new Props(this.args, this.groupConfig);
   private readonly devSet: DevsSet = new DevsSet();
 

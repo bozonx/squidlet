@@ -6,8 +6,8 @@ import DigitalDev, {
   DigitalPinMode,
   WatchHandler,
   DigitalInputMode
-} from '../../host/interfaces/dev/DigitalDev';
-import DebounceCall from '../../host/helpers/DebounceCall';
+} from '../../../host/interfaces/dev/DigitalDev';
+import DebounceCall from '../../../host/helpers/DebounceCall';
 
 
 type GpioHandler = (level: number) => void;
