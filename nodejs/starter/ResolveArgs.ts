@@ -1,13 +1,10 @@
 import * as yargs from 'yargs';
 
 
-export interface Params {
-  configPath: string;
-  workDir: string | undefined;
-}
-
-
-export default class ResolveParams {
+/**
+ * Resolve arguments or env variable
+ */
+export default class ResolveArgs {
   configPath: string = '';
   hostName?: string;
   workDir?: string;

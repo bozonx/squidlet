@@ -1,5 +1,5 @@
 import Io from '../../hostEnvBuilder/Io';
-import ResolveParams from './ResolveParams';
+import ResolveArgs from './ResolveArgs';
 import GroupConfigParser from '../../control/GroupConfigParser';
 import ResolveDirs from './ResolveDirs';
 import DevsSet from './DevsSet';
@@ -7,14 +7,14 @@ import DevsSet from './DevsSet';
 
 export default class Starter {
   private io: Io = new Io();
-  private readonly params: ResolveParams;
+  private readonly args: ResolveArgs;
   private groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.params.configPath);
   private dirs: ResolveDirs = new ResolveDirs();
   private devSet: DevsSet = new DevsSet();
 
 
-  constructor(params: ResolveParams) {
-    this.params = params;
+  constructor(args: ResolveArgs) {
+    this.args = args;
   }
 
   async init() {

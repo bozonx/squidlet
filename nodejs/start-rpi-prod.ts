@@ -1,13 +1,13 @@
-import ResolveParams from './starter/ResolveParams';
+import ResolveArgs from './starter/ResolveArgs';
 import Starter from './starter/Starter';
 
 
 async function start () {
-  const params: ResolveParams = new ResolveParams();
+  const args: ResolveArgs = new ResolveArgs();
 
-  params.resolve();
+  args.resolve();
 
-  const starter: Starter = new Starter(params);
+  const starter: Starter = new Starter(args);
 
   await starter.init();
   await starter.installModules();
