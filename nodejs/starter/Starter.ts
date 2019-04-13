@@ -13,7 +13,6 @@ import BuildHostEnv from '../../control/BuildHostEnv';
 
 
 const systemClassFileName = 'System';
-const initalHostConfigPath = '../../shared/initialHostConfig.yaml';
 
 
 export default class Starter {
@@ -52,12 +51,12 @@ export default class Starter {
 
     await this.buildSystem();
 
-    const initialHostConfigPath: string = path.resolve(__dirname, initalHostConfigPath);
-    const initialHostConfig: PreHostConfig = await this.io.loadYamlFile(initialHostConfigPath);
-
-    // TODO: generae id or special guid
-    initialHostConfig.platform = this.props.platform;
-    initialHostConfig.machine = this.props.machine;
+    const initialHostConfig: PreHostConfig = {
+      // TODO: generae id or special guid
+      id: 'initialHost',
+      platform: this.props.platform,
+      machine: this.props.machine,
+    }
 
     await this.buildHostEnv(initialHostConfig);
   }
@@ -110,3 +109,9 @@ export default class Starter {
   }
 
 }
+
+//const initalHostConfigPath = '../../shared/initialHostConfig.yaml';
+// const initialHostConfigPath: string = path.resolve(__dirname, initalHostConfigPath);
+// const initialHostConfig: PreHostConfig = await this.io.loadYamlFile(initialHostConfigPath);
+// initialHostConfig.platform = this.props.platform;
+// initialHostConfig.machine = this.props.machine;
