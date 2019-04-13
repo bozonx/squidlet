@@ -8,6 +8,8 @@ import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';
 import BuildSystem from '../../control/BuildSystem';
 import {BUILD_SYSTEM_DIR} from '../../control/constants';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import BuildHostEnv from '../../control/BuildHostEnv';
 
 
 const systemClassFileName = 'System';
@@ -84,6 +86,18 @@ export default class Starter {
 
     console.info(`===> Building system`);
     await buildSystem.build(systemBuildDir, systemTmpDir);
+  }
+
+  private async buildHostEnv(hostConfig: PreHostConfig) {
+    const buildHostEnv: BuildHostEnv = new BuildHostEnv(
+      this.io,
+      hostConfig,
+      this.dirs.hostsBuildDir,
+      this.dirs.hostsTmpDir
+    );
+
+    console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
+    await buildHostEnv.build();
   }
 
 }

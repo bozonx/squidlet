@@ -1,4 +1,5 @@
 import * as yargs from 'yargs';
+import * as path from 'path';
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
@@ -92,11 +93,17 @@ export default class CommandUpdate {
   }
 
   private async buildHostEnv(hostConfig: PreHostConfig) {
+    if (!hostConfig.id) {
+      throw new Error(`Host has to have an id param`);
+    }
+
+    const hostBuildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id);
+    const hostTmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
-      this.dirs.hostsBuildDir,
-      this.dirs.hostsTmpDir
+      hostBuildDir,
+      hostTmpDir
     );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
