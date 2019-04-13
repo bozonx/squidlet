@@ -32,7 +32,7 @@ export default class CommandUpdate {
     await this.groupConfig.init();
 
     // clear whole tmp dir
-    await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
+    await this.io.rimraf(`${this.dirs.tmpDir}/**/*`);
 
     console.info(`===> Building system`);
     await this.buildSystem.build(this.dirs.systemBuildDir, this.dirs.systemTmpDir);

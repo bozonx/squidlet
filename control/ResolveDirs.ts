@@ -1,15 +1,8 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import GroupConfigParser from './GroupConfigParser';
 import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR, BUILD_SYSTEM_DIR} from './constants';
 import {resolveSquidletRoot} from './helpers';
-
-
-interface ArgsDirs {
-  buildDir: string | undefined;
-  tmpDir: string | undefined;
-}
 
 
 export default class ResolveDirs {
@@ -55,6 +48,11 @@ export default class ResolveDirs {
 }
 
 
+
+// interface ArgsDirs {
+//   buildDir: string | undefined;
+//   tmpDir: string | undefined;
+// }
 
 // const configBase: string = path.dirname(groupConfig.groupConfigPath);
 // const buildDir: string | undefined = this.resolvePath(configBase, groupConfig.buildDir, args.buildDir);
