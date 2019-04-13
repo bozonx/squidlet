@@ -42,7 +42,20 @@ export default class GroupConfigParser {
 
 
   getHostConfig(hostName: string | undefined): PreHostConfig {
-    // TODO: return host config or the first host config of set
+    if (typeof hostName === 'undefined') {
+      const hostNames: string[] = Object.keys(this.hosts);
+
+      if (!hostNames.length) {
+        throw new Error(`There aren't any hosts in a group config`);
+      }
+
+      return this.hosts[hostNames[0]];
+    }
+    else if (this.hosts[hostName]) {
+      return this.hosts[hostName];
+    }
+
+    throw new Error(`Can't find host "${hostName}" in a group config`);
   }
 
   private async makeHosts(preGroupConfig: GroupConfig) {
