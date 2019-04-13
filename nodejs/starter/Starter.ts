@@ -7,12 +7,13 @@ import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';
 import BuildSystem from '../../control/BuildSystem';
-import {BUILD_SYSTEM_DIR} from '../../control/constants';
+import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../control/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../control/BuildHostEnv';
 
 
 const systemClassFileName = 'System';
+const initalHostConfigPath = '../../shared/initialHostConfig.yaml';
 
 
 export default class Starter {
@@ -51,8 +52,14 @@ export default class Starter {
 
     await this.buildSystem();
 
+    const initialHostConfigPath: string = path.resolve(__dirname, initalHostConfigPath);
+    const initialHostConfig: PreHostConfig = await this.io.loadYamlFile(initialHostConfigPath);
 
-    // TODO: билд env set с конфигом по умолчанию
+    // TODO: generae id or special guid
+    initialHostConfig.platform = this.props.platform;
+    initialHostConfig.machine = this.props.machine;
+
+    await this.buildHostEnv(initialHostConfig);
   }
 
   async buildDevelopEnvSet() {
@@ -89,11 +96,13 @@ export default class Starter {
   }
 
   private async buildHostEnv(hostConfig: PreHostConfig) {
+    const hostBuildDir = path.join(this.props.envSetDir);
+    const hostTmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
-      this.dirs.hostsBuildDir,
-      this.dirs.hostsTmpDir
+      hostBuildDir,
+      hostTmpDir
     );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
