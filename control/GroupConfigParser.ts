@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import _isPlainObject = require('lodash/isPlainObject');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
@@ -57,11 +59,9 @@ export default class GroupConfigParser {
         throw new Error(`Host config has to be a path to yaml file or an object`);
       }
 
-      if (!hostConfig.id) {
-        throw new Error(`Host does't have an id: ${JSON.stringify(hostConfigPathOrObj)}`);
-      }
+      this.validateHostConfig(hostConfig);
 
-      this.hosts[hostConfig.id] = this.makeHostConfig(hostConfig);
+      this.hosts[hostConfig.id as string] = this.makeHostConfig(hostConfig);
     }
   }
 
@@ -99,6 +99,24 @@ export default class GroupConfigParser {
     // hostDefaults
     else if (preGroupConfig.hostDefaults && !_isPlainObject(preGroupConfig.hostDefaults)) {
       throw new Error(`"plugins" param of group config has to be an array`);
+    }
+  }
+
+  private validateHostConfig(hostConfig: PreHostConfig) {
+    if (!hostConfig.id) {
+      throw new Error(`Host does't have an id: ${JSON.stringify(hostConfig)}`);
+    }
+
+    if (hostConfig.config) {
+      if (hostConfig.config.envSetDir && !path.isAbsolute(hostConfig.config.envSetDir)) {
+        throw new Error(`Host's config path "config.envSetDir" has to be an absolute`);
+      }
+      else if (hostConfig.config.varDataDir && !path.isAbsolute(hostConfig.config.varDataDir)) {
+        throw new Error(`Host's config path "config.varDataDir" has to be an absolute`);
+      }
+      else if (hostConfig.config.tmpDir && !path.isAbsolute(hostConfig.config.tmpDir)) {
+        throw new Error(`Host's config path "config.tmpDir" has to be an absolute`);
+      }
     }
   }
 

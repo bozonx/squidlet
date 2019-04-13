@@ -59,19 +59,6 @@ export default class Props {
     else if (this.args.machine !== this.hostConfig.machine) {
       throw new Error(`Param "machine" of host config "${this.hostId}" is not a "${this.args.machine}"`);
     }
-
-    if (this._hostConfig.config) {
-      if (this._hostConfig.config.envSetDir && !path.isAbsolute(this._hostConfig.config.envSetDir)) {
-        throw new Error(`Host's config path "config.envSetDir" has to be an absolute`);
-      }
-      else if (this._hostConfig.config.varDataDir && !path.isAbsolute(this._hostConfig.config.varDataDir)) {
-        throw new Error(`Host's config path "config.varDataDir" has to be an absolute`);
-      }
-      else if (this._hostConfig.config.tmpDir && !path.isAbsolute(this._hostConfig.config.tmpDir)) {
-        throw new Error(`Host's config path "config.tmpDir" has to be an absolute`);
-      }
-    }
-
   }
 
   /**

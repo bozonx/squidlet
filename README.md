@@ -30,6 +30,6 @@ Raspberry pi
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
-* SQUIDLET_ROOT env variable points to root where hosts' file and builds are placed
+* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
 * --name uses only if group config is specified
   and selects a host config from group config
