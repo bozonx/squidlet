@@ -1,4 +1,5 @@
 export default interface SystemConfig {
+  // TODO: rename to envSetDirs
   rootDirs: {
     host: string;
     configs: string;

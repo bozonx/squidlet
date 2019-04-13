@@ -20,6 +20,8 @@ export default interface PreHostConfig {
     varDataDir?: string;
     // path to host's configs and entities
     envSetDir?: string;
+    // path to tmp dir
+    tmpDir?: string;
 
     logLevel?: LogLevel;
     // republish status silently every minute if it hasn't been changed

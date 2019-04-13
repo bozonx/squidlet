@@ -71,7 +71,7 @@ export default class Starter {
 
 
   private getPathToProdSystemDir(): string {
-    return path.join(this.props.workDir, systemConfig.rootDirs.host);
+    return path.join(this.props.envSetDir, systemConfig.rootDirs.host);
   }
 
 }
