@@ -35,7 +35,14 @@ export default class Props {
 
     this.machine = this.args.machine;
     this.hostId = this.hostConfig.id as any;
-    this.workDir = path.join(this.args.squidletRoot, HOSTS_WORK_DIRS, this.hostId);
+
+    if (this.args.workDir) {
+      this.workDir = this.args.workDir;
+    }
+    else {
+      // else use under a $SQUIDLET_ROOT
+      this.workDir = path.join(this.args.squidletRoot, HOSTS_WORK_DIRS, this.hostId);
+    }
 
     this.setPathsToHostConfig();
 

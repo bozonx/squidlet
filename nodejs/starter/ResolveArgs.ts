@@ -10,6 +10,7 @@ export default class ResolveArgs {
   readonly machine: string;
   configPath: string = '';
   squidletRoot: string = '';
+  workDir?: string;
   hostName?: string;
 
 
@@ -25,6 +26,12 @@ export default class ResolveArgs {
 
     this.configPath = yargs.argv._[0];
     this.squidletRoot = this.resolveSquidletRoot();
+
+    // TODO: проверить что будет именно workDir а не work-dir
+    if (yargs.argv.workDir) {
+      this.workDir = path.resolve(process.cwd(), yargs.argv.workDir as string);
+    }
+
     this.hostName = yargs.argv.name as any;
   }
 
