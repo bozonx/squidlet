@@ -1,6 +1,5 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
-import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from '../../control/constants';
 import {resolveSquidletRoot} from '../../control/helpers';
 
 

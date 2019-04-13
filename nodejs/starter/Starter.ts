@@ -6,6 +6,8 @@ import GroupConfigParser from '../../control/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';
+import BuildSystem from '../../control/BuildSystem';
+import {BUILD_SYSTEM_DIR} from '../../control/constants';
 
 
 const systemClassFileName = 'System';
@@ -42,12 +44,13 @@ export default class Starter {
   async buildInitialProdSystem() {
     const pathToSystemDir = this.getPathToProdSystemDir();
 
-    if (!await this.io.exists(pathToSystemDir)) {
-      // TODO: билд system
-      // TODO: билд env set с конфигом по умолчанию
-    }
-
     // else if it exists - do nothing
+    if (await this.io.exists(pathToSystemDir)) return;
+
+    await this.buildSystem();
+
+
+    // TODO: билд env set с конфигом по умолчанию
   }
 
   async buildDevelopEnvSet() {
@@ -72,6 +75,15 @@ export default class Starter {
 
   private getPathToProdSystemDir(): string {
     return path.join(this.props.envSetDir, systemConfig.rootDirs.host);
+  }
+
+  private async buildSystem() {
+    const systemBuildDir = this.getPathToProdSystemDir();
+    const systemTmpDir = path.join(this.props.tmpDir, BUILD_SYSTEM_DIR);
+    const buildSystem: BuildSystem = new BuildSystem(this.io);
+
+    console.info(`===> Building system`);
+    await buildSystem.build(systemBuildDir, systemTmpDir);
   }
 
 }

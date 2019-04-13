@@ -10,6 +10,7 @@ import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from 
 export default class Props {
   workDir: string = '';
   envSetDir: string = '';
+  tmpDir: string = '';
   platform: Platforms = 'nodejs';
   machine: string = '';
   hostId: string = '';
@@ -47,6 +48,7 @@ export default class Props {
     this.setPathsToHostConfig();
 
     this.envSetDir = (this.hostConfig.config as any).envSetDir;
+    this.tmpDir = (this.hostConfig.config as any).tmpDir;
   }
 
 
