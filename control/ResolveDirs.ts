@@ -2,7 +2,8 @@ import * as path from 'path';
 import * as yargs from 'yargs';
 
 import GroupConfigParser from './GroupConfigParser';
-import {BUILD_HOSTS_DIR, BUILD_SYSTEM_DIR} from './constants';
+import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR, BUILD_SYSTEM_DIR} from './constants';
+import {resolveSquidletRoot} from './helpers';
 
 
 interface ArgsDirs {
@@ -12,47 +13,35 @@ interface ArgsDirs {
 
 
 export default class ResolveDirs {
-  buildDir: string = '';
+  workDir: string = '';
   tmpDir: string = '';
   systemBuildDir: string = '';
   systemTmpDir: string = '';
   hostsBuildDir: string = '';
   hostsTmpDir: string = '';
 
-  resolve(groupConfig: GroupConfigParser) {
-    const args: ArgsDirs = this.resolveArgs();
-    const configBase: string = path.dirname(groupConfig.groupConfigPath);
-    const buildDir: string | undefined = this.resolvePath(configBase, groupConfig.buildDir, args.buildDir);
-    let tmpDir: string | undefined = this.resolvePath(configBase, groupConfig.tmpDir, args.tmpDir);
-
-    if (!buildDir) {
-      throw new Error(`You have to specify a buildDir in group config or as a command argument or environment variable`);
-    }
-
-    // set tmp dir by default
-    if (!tmpDir) tmpDir = path.join(buildDir, '__tmp');
-
-    this.buildDir = buildDir;
-    this.tmpDir = tmpDir;
-    this.systemBuildDir = path.join(this.buildDir, BUILD_SYSTEM_DIR);
+  resolve() {
+    this.workDir = this.resolveWorkDir();
+    this.tmpDir = path.join(this.workDir, '__tmp');
+    this.systemBuildDir = path.join(this.workDir, BUILD_SYSTEM_DIR);
     this.systemTmpDir = path.join(this.tmpDir, BUILD_SYSTEM_DIR);
-    this.hostsBuildDir = path.join(this.buildDir, BUILD_HOSTS_DIR);
+    this.hostsBuildDir = path.join(this.workDir, BUILD_HOSTS_DIR);
     this.hostsTmpDir = path.join(this.tmpDir, BUILD_HOSTS_DIR);
   }
 
 
-  private resolveArgs(): ArgsDirs {
-    const args: ArgsDirs = {
-      buildDir: process.env.BUILD_DIR || <string | undefined>yargs.argv['build-dir'],
-      tmpDir: process.env.TMP_DIR || <string | undefined>yargs.argv['tmp-dir'],
-    };
+  private resolveWorkDir(): string {
+    let workDirArg: string | undefined = <string | undefined>yargs.argv['build-dir'];
 
-    // resolve relative buildDir
-    if (args.buildDir) args.buildDir = path.resolve(process.cwd(), args.buildDir);
-    // resolve relative tmpDir
-    if (args.tmpDir) args.tmpDir = path.resolve(process.cwd(), args.tmpDir);
+    if (workDirArg) {
+      // if it set as an argument - make it absolute
+      return path.resolve(process.cwd(), workDirArg);
+    }
 
-    return args;
+    // or make default path using $SQUIDLET_ROOT
+    const squidletRoot: string = resolveSquidletRoot();
+
+    return path.join(squidletRoot, BUILD_ROOT_DIR);
   }
 
   private resolvePath(configBase: string, pathInConfig?: string, argPath?: string): string | undefined {
@@ -64,3 +53,24 @@ export default class ResolveDirs {
   }
 
 }
+
+
+
+// const configBase: string = path.dirname(groupConfig.groupConfigPath);
+// const buildDir: string | undefined = this.resolvePath(configBase, groupConfig.buildDir, args.buildDir);
+// if (!buildDir) {
+//   throw new Error(`You have to specify a buildDir in group config or as a command argument or environment variable`);
+// }
+// private resolveArgs(): ArgsDirs {
+//   const args: ArgsDirs = {
+//     buildDir: process.env.BUILD_DIR || <string | undefined>yargs.argv['build-dir'],
+//     tmpDir: process.env.TMP_DIR || <string | undefined>yargs.argv['tmp-dir'],
+//   };
+//
+//   // resolve relative buildDir
+//   if (args.buildDir) args.buildDir = path.resolve(process.cwd(), args.buildDir);
+//   // resolve relative tmpDir
+//   if (args.tmpDir) args.tmpDir = path.resolve(process.cwd(), args.tmpDir);
+//
+//   return args;
+// }

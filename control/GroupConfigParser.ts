@@ -10,8 +10,6 @@ import GroupConfig from './interfaces/GroupConfig';
 
 
 export default class GroupConfigParser {
-  buildDir?: string;
-  tmpDir?: string;
   readonly groupConfigPath: string;
   private readonly io: Io;
   private readonly preHostsConfigs: {[index: string]: PreHostConfig} = {};
@@ -34,8 +32,6 @@ export default class GroupConfigParser {
 
     this.plugins = preGroupConfig.plugins;
     this.hostDefaults = preGroupConfig.hostDefaults;
-    this.buildDir = preGroupConfig.buildDir;
-    this.tmpDir = preGroupConfig.tmpDir;
 
     await this.makeHosts(preGroupConfig as GroupConfig);
   }
@@ -96,14 +92,6 @@ export default class GroupConfigParser {
     }
     else if (!Array.isArray(preGroupConfig.hosts)) {
       throw new Error(`"hosts" param of group config has to be an array`);
-    }
-    // buildDir
-    else if (preGroupConfig.buildDir && typeof preGroupConfig.buildDir !== 'string') {
-      throw new Error(`"buildDir" param of group config has to be a string`);
-    }
-    // tmpDir
-    else if (preGroupConfig.tmpDir && typeof preGroupConfig.tmpDir !== 'string') {
-      throw new Error(`"tmpDir" param of group config has to be a string`);
     }
     // plugins
     else if (preGroupConfig.plugins && !Array.isArray(preGroupConfig.plugins)) {

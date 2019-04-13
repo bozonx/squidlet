@@ -28,9 +28,8 @@ export default class CommandUpdate {
 
 
   async start() {
+    this.dirs.resolve();
     await this.groupConfig.init();
-
-    this.dirs.resolve(this.groupConfig);
 
     // clear whole tmp dir
     await this.io.rimraf(`${this.groupConfig.tmpDir}/**/*`);
@@ -108,7 +107,7 @@ export default class CommandUpdate {
     const updateHost: UpdateHost = new UpdateHost(
       this.io,
       hostConfig,
-      this.dirs.buildDir,
+      this.dirs.workDir,
       this.dirs.tmpDir
     );
 
