@@ -16,3 +16,7 @@ export const BUILD_DEVS_DIR = 'devs';
 
 // devs dir on host root
 export const HOST_DEVS_DIR = 'devs';
+
+export const HOME_SHARE_DIR = '.local/share';
+// root dir in $HOME/.local/share
+export const SQUIDLET_ROOT_DIR_NAME = 'squidlet';
