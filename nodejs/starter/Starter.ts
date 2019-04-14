@@ -6,10 +6,10 @@ import GroupConfigParser from '../../control/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';
-import BuildSystem from '../../control/BuildSystem';
+import BuildSystem from '../../shared/BuildSystem';
 import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../control/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import BuildHostEnv from '../../control/BuildHostEnv';
+import BuildHostEnv from '../../shared/BuildHostEnv';
 
 
 const systemClassFileName = 'System';

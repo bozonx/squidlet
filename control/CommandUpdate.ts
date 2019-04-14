@@ -5,9 +5,9 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
 import GroupConfigParser from './GroupConfigParser';
 import Io from '../shared/Io';
-import BuildHostEnv from './BuildHostEnv';
+import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
-import BuildSystem from './BuildSystem';
+import BuildSystem from '../shared/BuildSystem';
 import BuildDevs from './BuildDevs';
 
 

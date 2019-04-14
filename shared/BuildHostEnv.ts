@@ -1,5 +1,5 @@
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import Io from '../shared/Io';
+import Io from './Io';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
