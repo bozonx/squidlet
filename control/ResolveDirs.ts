@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR, BUILD_SYSTEM_DIR} from './constants';
+import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR, BUILD_SYSTEM_DIR} from '../shared/constants';
 import {resolveSquidletRoot} from './helpers';
 
 

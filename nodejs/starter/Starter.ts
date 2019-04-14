@@ -7,7 +7,7 @@ import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';
 import BuildSystem from '../../shared/BuildSystem';
-import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../control/constants';
+import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 

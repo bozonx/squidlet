@@ -5,7 +5,7 @@ import compileJs from './buildToJs/compileJs';
 import modulesTree from './buildToJs/modulesTree';
 import minimize from './buildToJs/minimize';
 import Io from './Io';
-import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from '../control/constants';
+import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from './constants';
 
 
 const systemSrc = path.resolve(__dirname, '../host');

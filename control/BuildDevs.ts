@@ -14,7 +14,7 @@ import {
   MIN_DIR,
   MODERN_DIR,
   PLATFORM_DEVS_DIR
-} from './constants';
+} from '../shared/constants';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 

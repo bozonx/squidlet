@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import {DevClass} from '../../host/entities/DevManager';
 import Props from './Props';
-import {HOST_DEVS_DIR} from '../../control/constants';
+import {HOST_DEVS_DIR} from '../../shared/constants';
 import Io from '../../shared/Io';
 
 

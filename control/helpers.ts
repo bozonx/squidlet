@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
-import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
+import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from '../shared/constants';
 
 
 export function resolvePlatformDir(platform: Platforms): string {
