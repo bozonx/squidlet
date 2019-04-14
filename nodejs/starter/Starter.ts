@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import Io from '../../shared/Io';
 import ResolveArgs from './ResolveArgs';
-import GroupConfigParser from '../../control/GroupConfigParser';
+import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../host/config/systemConfig';

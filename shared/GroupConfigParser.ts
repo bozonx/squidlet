@@ -5,7 +5,7 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import Io from '../shared/Io';
+import Io from './Io';
 import GroupConfig from './interfaces/GroupConfig';
 
 

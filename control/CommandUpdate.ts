@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
-import GroupConfigParser from './GroupConfigParser';
+import GroupConfigParser from '../shared/GroupConfigParser';
 import Io from '../shared/Io';
 import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
