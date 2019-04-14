@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as shelljs from 'shelljs';
-import Io from '../hostEnvBuilder/Io';
+import Io from '../shared/Io';
 
 
 const MODULES_DIR = 'node_modules';

@@ -4,7 +4,7 @@ import * as path from 'path';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
 import GroupConfigParser from './GroupConfigParser';
-import Io from '../hostEnvBuilder/Io';
+import Io from '../shared/Io';
 import BuildHostEnv from './BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
 import BuildSystem from './BuildSystem';

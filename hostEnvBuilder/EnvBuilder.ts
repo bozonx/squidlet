@@ -3,7 +3,7 @@ import UsedEntities from './entities/UsedEntities';
 import Definitions from './configSet/Definitions';
 import ConfigsSet from './configSet/ConfigsSet';
 import ConfigsWriter from './configSet/ConfigsWriter';
-import Io from './Io';
+import Io from '../shared/Io';
 import * as defaultLogger from './defaultLogger';
 import Logger from './interfaces/Logger';
 import HostEnvSet from './interfaces/HostEnvSet';

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io from '../../hostEnvBuilder/Io';
+import Io from '../../shared/Io';
 import ResolveArgs from './ResolveArgs';
 import GroupConfigParser from '../../control/GroupConfigParser';
 import Props from './Props';

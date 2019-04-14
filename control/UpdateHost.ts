@@ -1,5 +1,5 @@
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import Io from '../hostEnvBuilder/Io';
+import Io from '../shared/Io';
 
 
 export default class UpdateHost {

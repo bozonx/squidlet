@@ -3,10 +3,10 @@ import * as fs from 'fs';
 import * as shelljs from 'shelljs';
 import * as rimraf from 'rimraf';
 
-import systemConfig from './configs/systemConfig';
+import systemConfig from '../hostEnvBuilder/configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/StorageDev';
 import {callPromised} from '../host/helpers/helpers';
-import {yamlToJs} from './helpers';
+import {yamlToJs} from '../host/helpers';
 
 
 export default class Io {

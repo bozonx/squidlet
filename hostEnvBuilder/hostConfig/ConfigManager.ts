@@ -5,7 +5,7 @@ import validateHostConfig from './validateHostConfig';
 import HostConfig, {HostConfigConfig} from '../../host/interfaces/HostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
-import Io from '../Io';
+import Io from '../../shared/Io';
 import {appendArray} from '../../host/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';

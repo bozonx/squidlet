@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io from '../hostEnvBuilder/Io';
+import Io from '../shared/Io';
 import compileTs from '../buildToJs/compileTs';
 import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';
