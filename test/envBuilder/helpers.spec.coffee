@@ -20,7 +20,7 @@ describe 'envBuilder.helpers', ->
     assert.equal(helpers.clearRelativePath('../rel'), 'rel')
     assert.equal(helpers.clearRelativePath('../rel/../to'), 'rel/to')
 
-  it 'yamlToJs', ->
+ # it 'yamlToJs', ->
 #    testYaml = '''
 #      emptyObj: {}
 #      arr: []
@@ -42,26 +42,26 @@ describe 'envBuilder.helpers', ->
 #      num: 0
 #      emptyEnd: ~
 #    ''';
-
-    testYaml = '''
-      emptyObj: {}
-      arr: []
-      emptyStr: ''
-      null: null
-      undefined: undefined
-      string: 'str'
-      num: 0
-      empty: ~
-    ''';
-
-    assert.deepEqual(helpers.yamlToJs(testYaml), {
-      emptyObj: {}
-      arr: []
-      emptyStr: ''
-      null: null
-      undefined: 'undefined'
-      string: 'str'
-      num: 0
-      # !!! empty node is null !
-      empty: null
-    });
+#
+#    testYaml = '''
+#      emptyObj: {}
+#      arr: []
+#      emptyStr: ''
+#      null: null
+#      undefined: undefined
+#      string: 'str'
+#      num: 0
+#      empty: ~
+#    ''';
+#
+#    assert.deepEqual(helpers.yamlToJs(testYaml), {
+#      emptyObj: {}
+#      arr: []
+#      emptyStr: ''
+#      null: null
+#      undefined: 'undefined'
+#      string: 'str'
+#      num: 0
+#      # !!! empty node is null !
+#      empty: null
+#    });

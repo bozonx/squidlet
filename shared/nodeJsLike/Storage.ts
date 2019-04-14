@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import StorageDev, {Stats} from 'host/interfaces/dev/StorageDev';
 import {callPromised} from 'host/helpers/helpers';
 
-import {convertBufferToUint8Array} from '../../lowjs/helpers';
+import {convertBufferToUint8Array} from '../../shared/nodeJsLike/helpers';
 
 
 const DEFAULT_ENCODE = 'utf8';

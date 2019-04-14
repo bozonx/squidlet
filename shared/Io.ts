@@ -2,18 +2,18 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as shelljs from 'shelljs';
 import * as rimraf from 'rimraf';
+import * as yaml from 'js-yaml';
 
 import systemConfig from '../hostEnvBuilder/configs/systemConfig';
 import {Stats} from '../host/interfaces/dev/StorageDev';
 import {callPromised} from '../host/helpers/helpers';
-import {yamlToJs} from '../host/helpers';
 
 
 export default class Io {
   async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
     const yamlContent: string = await this.getFileContent(fullPath);
 
-    return yamlToJs(yamlContent);
+    return yaml.safeLoad(yamlContent);
   }
 
   getFileContent(pathTo: string): Promise<string> {
