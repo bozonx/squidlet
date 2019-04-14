@@ -1,9 +1,9 @@
 import * as path from 'path';
 
-import compileTs from '../buildToJs/compileTs';
-import compileJs from '../buildToJs/compileJs';
-import modulesTree from '../buildToJs/modulesTree';
-import minimize from '../buildToJs/minimize';
+import compileTs from './buildToJs/compileTs';
+import compileJs from './buildToJs/compileJs';
+import modulesTree from './buildToJs/modulesTree';
+import minimize from './buildToJs/minimize';
 import Io from './Io';
 import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from '../control/constants';
 

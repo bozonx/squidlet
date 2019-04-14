@@ -1,9 +1,9 @@
 import * as path from 'path';
 
 import Io from '../shared/Io';
-import compileTs from '../buildToJs/compileTs';
-import compileJs from '../buildToJs/compileJs';
-import minimize from '../buildToJs/minimize';
+import compileTs from '../shared/buildToJs/compileTs';
+import compileJs from '../shared/buildToJs/compileJs';
+import minimize from '../shared/buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {loadMachineConfig, resolvePlatformDir} from './helpers';
