@@ -6,7 +6,7 @@ import compileJs from '../shared/buildToJs/compileJs';
 import minimize from '../shared/buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
-import {loadMachineConfig, resolvePlatformDir} from './helpers';
+import {loadMachineConfig, resolvePlatformDir} from '../shared/helpers';
 import {
   BUILD_DEVS_DIR,
   DEV_SET_FILE,

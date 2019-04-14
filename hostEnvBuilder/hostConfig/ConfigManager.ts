@@ -9,7 +9,7 @@ import Io from '../../shared/Io';
 import {appendArray} from '../../host/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig} from '../../control/helpers';
+import {loadMachineConfig} from '../../shared/helpers';
 import Platforms from '../interfaces/Platforms';
 
 

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
-import {resolveSquidletRoot} from '../../control/helpers';
+import {resolveSquidletRoot} from '../../shared/helpers';
 
 
 /**
