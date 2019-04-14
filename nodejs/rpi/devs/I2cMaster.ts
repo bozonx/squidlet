@@ -1,7 +1,7 @@
 // @ts-ignore
 import {I2cBus, openSync} from 'i2c-bus';
 
-import {convertBufferToUint8Array} from '../../helpers';
+import {convertBufferToUint8Array} from '../../../shared/nodeJsLike/helpers';
 import I2cMasterDev from '../../../host/interfaces/dev/I2cMasterDev';
 
 
