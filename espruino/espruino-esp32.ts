@@ -1,7 +1,7 @@
-import PlatformConfig from '../buildHostEnv/interfaces/PlatformConfig';
+import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
-const platformConfig: PlatformConfig = {
+const machineConfig: MachineConfig = {
   devs: [
     'Storage',
     'Sys',
@@ -27,4 +27,4 @@ const platformConfig: PlatformConfig = {
   }
 };
 
-export default platformConfig;
+export default machineConfig;

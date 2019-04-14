@@ -1,4 +1,4 @@
-import Digital, {Edge, DigitalPinMode, WatchHandler} from '../../../host/src/app/interfaces/dev/Digital';
+import Digital, {Edge, DigitalPinMode, WatchHandler} from 'host/interfaces/dev/Digital';
 
 
 declare function getPinMode(pin: number): DigitalPinMode | undefined;

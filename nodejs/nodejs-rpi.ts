@@ -1,7 +1,7 @@
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
-const platformConfig: MachineConfig = {
+const machineConfig: MachineConfig = {
   // devs: [
   //   'Storage',
   //   //'Sha1',
@@ -34,4 +34,4 @@ const platformConfig: MachineConfig = {
   }
 };
 
-export default platformConfig;
+export default machineConfig;
