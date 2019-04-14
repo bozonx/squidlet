@@ -5,7 +5,7 @@
 // @ts-ignore
 import * as mqtt from 'Mqtt';
 
-import MqttDev from '../../../host/interfaces/dev/MqttDev';
+import MqttDev from '../../host/interfaces/dev/MqttDev';
 
 
 interface Props {

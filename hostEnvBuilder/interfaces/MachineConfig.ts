@@ -2,6 +2,6 @@ import PreHostConfig from './PreHostConfig';
 
 
 export default interface MachineConfig {
-  devs?: string[];
+  devs: string[];
   hostConfig: PreHostConfig;
 }
