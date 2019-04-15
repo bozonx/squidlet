@@ -31,7 +31,7 @@ export default class EnvSetLocalFs implements EnvSet {
    * @param configName - config name with ".json" extension
    */
   loadConfig<T>(configName: string): Promise<T> {
-    const pathToFile: string = pathJoin(systemConfig.rootDirs.configs, configName);
+    const pathToFile: string = pathJoin(systemConfig.envSetDirs.configs, configName);
 
     return this.readJsonObjectFile(pathToFile) as Promise<T>;
   }
@@ -43,7 +43,7 @@ export default class EnvSetLocalFs implements EnvSet {
    */
   loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
     const pathToFile = pathJoin(
-      systemConfig.rootDirs.entities,
+      systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
       this.system.initCfg.fileNames.manifest
@@ -62,7 +62,7 @@ export default class EnvSetLocalFs implements EnvSet {
     const mainFileName: string = manifest.main;
     const filePath = pathJoin(
       this.system.host.config.config.envSetDir,
-      systemConfig.rootDirs.entities,
+      systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
       mainFileName
@@ -79,7 +79,7 @@ export default class EnvSetLocalFs implements EnvSet {
     //await this.checkEntity(pluralType, entityName, fileName);
 
     const pathToFile: string = pathJoin(
-      systemConfig.rootDirs.entities,
+      systemConfig.envSetDirs.entities,
       entityName,
       fileName
     );
@@ -96,7 +96,7 @@ export default class EnvSetLocalFs implements EnvSet {
 
     const pathToFile: string = pathJoin(
       this.system.host.config.config.envSetDir,
-      systemConfig.rootDirs.entities,
+      systemConfig.envSetDirs.entities,
       entityName,
       fileName
     );

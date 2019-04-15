@@ -3,7 +3,8 @@ import SystemConfig from '../interfaces/SystemConfig';
 
 const systemConfig: SystemConfig = {
   // dirs of file system root
-  rootDirs: {
+  envSetDirs: {
+    // TODO: rename to system
     // files which received from master
     host: 'host',
     configs: 'configs',

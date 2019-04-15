@@ -32,7 +32,7 @@ export default class ConfigsWriter {
     //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
     const buildDir = this.configManager.buildDir;
     const fileNames = systemConfig.hostInitCfg.fileNames;
-    const configDir = path.join(buildDir, systemConfig.hostSysCfg.rootDirs.configs);
+    const configDir = path.join(buildDir, systemConfig.hostSysCfg.envSetDirs.configs);
 
     // write host's config
     await this.io.writeJson(

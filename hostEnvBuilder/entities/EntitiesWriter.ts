@@ -20,7 +20,7 @@ export default class EntitiesWriter {
   private readonly log: Logger;
   // entities dir in storage
   private get entitiesDstDir(): string {
-    return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.rootDirs.entities);
+    return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.envSetDirs.entities);
   }
 
 
