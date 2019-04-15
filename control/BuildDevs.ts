@@ -6,7 +6,7 @@ import compileJs from '../shared/buildToJs/compileJs';
 import minimize from '../shared/buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
-import {loadMachineConfig, resolvePlatformDir} from '../shared/helpers';
+import {loadMachineConfig, parseDevName, resolvePlatformDir} from '../shared/helpers';
 import {
   BUILD_DEVS_DIR,
   DEV_SET_FILE,
@@ -110,8 +110,8 @@ export default class BuildDevs {
     const devs: string[] = [];
 
     for (let devPath of machineConfig.devs) {
-      const devFile = `./${devName}.js`;
-      const devString = `${devName}: require("${devFile}")`;
+      const devName: string = parseDevName(devPath);
+      const devString = `${devName}: require("./${devName}")`;
 
       devs.push(devString);
     }
