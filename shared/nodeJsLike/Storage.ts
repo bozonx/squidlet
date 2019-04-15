@@ -6,7 +6,6 @@ import * as fs from 'fs';
 
 import StorageDev, {Stats} from 'system/interfaces/dev/StorageDev';
 import {callPromised} from 'system/helpers/helpers';
-
 import {convertBufferToUint8Array} from '../../shared/nodeJsLike/helpers';
 
 
@@ -69,7 +68,7 @@ export default class Storage implements StorageDev {
       size: stat.size,
       dir: stat.isDirectory(),
       symbolicLink: stat.isSymbolicLink(),
-      mtime: stat.mtimeMs,
+      mtime: stat.mtime.getTime(),
     };
   }
 

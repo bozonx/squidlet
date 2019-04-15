@@ -2,8 +2,8 @@
 import * as SerialPort from 'serialport';
 
 import {convertBufferToUint8Array} from '../../shared/nodeJsLike/helpers';
-import {textToUint8Array} from '../../system/helpers/binaryHelpers';
-import SerialDev, {BaudRate, EventName, Options} from '../../system/interfaces/dev/SerialDev';
+import {textToUint8Array} from 'system/helpers/binaryHelpers';
+import SerialDev, {BaudRate, EventName, Options} from 'system/interfaces/dev/SerialDev';
 
 
 

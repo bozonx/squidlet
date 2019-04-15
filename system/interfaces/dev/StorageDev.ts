@@ -4,8 +4,7 @@ export interface Stats {
   // is it dir or file
   dir: boolean;
   symbolicLink: boolean;
-  // modified time
-  // TODO: какой всетаки формат? - в nodejs mtimeMs - number - 1318289051000.1
+  // modified time - number of milliseconds elapsed since 1 January 1970 00:00:00 UTC
   mtime: number;
 }
 
@@ -14,7 +13,13 @@ export default interface StorageDev {
   mkdir(path: string): Promise<void>;
   readdir(path: string): Promise<string[]>;
   readFile(path: string): Promise<string>;
+
+  /**
+   * You should pass only symlink. Resolve it by using stat().
+   * It returns relative or absolute path to target file
+   */
   readlink(pathTo: string): Promise<string>;
+
   readBinFile(path: string): Promise<Uint8Array>;
   rmdir(path: string): Promise<void>;
   unlink(path: string): Promise<void>;

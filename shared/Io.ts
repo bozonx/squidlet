@@ -61,7 +61,7 @@ export default class Io {
       size: stat.size,
       dir: stat.isDirectory(),
       symbolicLink: stat.isSymbolicLink(),
-      mtime: stat.mtimeMs,
+      mtime: stat.mtime.getTime(),
     };
   }
 

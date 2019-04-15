@@ -48,7 +48,7 @@ export default class BuildDevs {
 
 
   async build() {
-    console.info(`--> Build devs of platform: "${this.platform}", machine ${this.machine}`);
+    console.info(`--> Build devs of platform: "${this.platform}", machine "${this.machine}"`);
 
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
@@ -70,14 +70,14 @@ export default class BuildDevs {
 
     // copy specified devs
     for (let devPath of machineConfig.devs) {
-      const devSrcFile: string = path.resolve(platformDir, devPath);
-
-      // TODO: resolve sym link of devSrcFile
-
-      console.log(1111111111111,  await this.io.readlink(devSrcFile));
-
-
+      let devSrcFile: string = path.resolve(platformDir, devPath);
       const devDstFile: string = path.join(usedDevsDir, path.basename(devPath));
+      const isSymLink: boolean = (await this.io.stat(devSrcFile)).symbolicLink;
+
+      if (isSymLink) {
+        const linkTo: string = await this.io.readlink(devSrcFile);
+        devSrcFile = path.resolve(path.dirname(devSrcFile), linkTo);
+      }
 
       await this.io.copyFile(devSrcFile, devDstFile);
     }
