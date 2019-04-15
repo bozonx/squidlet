@@ -3,7 +3,7 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 const machineConfig: MachineConfig = {
   devs: [
-    //'Storage',
+    '../shared/nodeJsLike/Storage.ts',
     //'Sha1',
     './devs/Digital.ts',
     //'Pwm',

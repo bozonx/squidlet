@@ -54,6 +54,7 @@ export default class BuildDevs {
 
     await this.copyDevs(machineConfig);
     await this.buildDevs();
+    await this.copySupportFiles(machineConfig);
     await this.makeDevSetIndex(machineConfig);
   }
 
@@ -102,6 +103,15 @@ export default class BuildDevs {
     // minimize
     await this.io.rimraf(`${this.devsBuildDir}/**/*`);
     await minimize(legacyDst, this.devsBuildDir);
+  }
+
+  /**
+   * Copy support files
+   */
+  private async copySupportFiles(machineConfig: MachineConfig) {
+    for (let supportFilePath of machineConfig.devsSupportFiles) {
+
+    }
   }
 
   /**
