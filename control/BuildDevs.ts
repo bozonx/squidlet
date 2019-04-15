@@ -91,8 +91,6 @@ export default class BuildDevs {
     const modernDst = path.join(this.devsTmpDir, MODERN_DIR);
     const legacyDst = path.join(this.devsTmpDir, LEGACY_DIR);
 
-    // TODO: support dependencies (helpers)
-
     // ts to modern js
     await this.io.rimraf(`${modernDst}/**/*`);
     await compileTs(original, modernDst);

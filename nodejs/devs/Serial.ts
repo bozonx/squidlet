@@ -1,9 +1,10 @@
 // @ts-ignore
 import * as SerialPort from 'serialport';
 
-import {convertBufferToUint8Array} from '../../shared/nodeJsLike/helpers';
 import {textToUint8Array} from 'system/helpers/binaryHelpers';
 import SerialDev, {BaudRate, EventName, Options} from 'system/interfaces/dev/SerialDev';
+
+const {convertBufferToUint8Array} = require('./helpers');
 
 
 

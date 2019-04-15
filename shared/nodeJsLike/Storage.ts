@@ -6,7 +6,8 @@ import * as fs from 'fs';
 
 import StorageDev, {Stats} from 'system/interfaces/dev/StorageDev';
 import {callPromised} from 'system/helpers/helpers';
-import {convertBufferToUint8Array} from './helpers';
+
+const {convertBufferToUint8Array} = require('./helpers');
 
 
 const DEFAULT_ENCODE = 'utf8';

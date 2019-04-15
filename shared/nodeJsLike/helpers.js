@@ -1,11 +1,13 @@
-module.exports = function convertBufferToUint8Array(data) {
-  const uIntArr = new Uint8Array(data.length);
+module.exports = {
+  convertBufferToUint8Array: function (data) {
+    const uIntArr = new Uint8Array(data.length);
 
-  for(let i = 0; i < data.length; i++) {
-    uIntArr[i] = data.readInt8(i);
-  }
+    for(let i = 0; i < data.length; i++) {
+      uIntArr[i] = data.readInt8(i);
+    }
 
-  return uIntArr;
+    return uIntArr;
+  },
 };
 
 
