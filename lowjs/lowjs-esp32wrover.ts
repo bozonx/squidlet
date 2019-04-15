@@ -19,6 +19,9 @@ const machineConfig: MachineConfig = {
     //'Dac',
     //'I2cSlave',
   ],
+  devsSupportFiles: [
+    '../shared/nodeJsLike/helpers.js',
+  ],
 
   hostConfig: {
     config: {

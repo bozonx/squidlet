@@ -3,13 +3,12 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 const machineConfig: MachineConfig = {
   devs: [
+    './devs/Mqtt.ts',
     '../shared/nodeJsLike/Storage.ts',
     //'Sha1',
     //'Serial',
     //'Wifi',
     //'Bluetooth',
-
-    './devs/Mqtt.ts',
   ],
   devsSupportFiles: [
     './x86/package.json',
@@ -17,16 +16,15 @@ const machineConfig: MachineConfig = {
   ],
 
   hostConfig: {
-    config: {
-      varDataDir: '~/.squidlet/data',
-      envSetDir: '~/.squidlet/envSet',
-    },
-    drivers: {
-      'I2cMaster': {
-        bus: 1,
-      }
-    },
-
+    // config: {
+    //   varDataDir: '~/.squidlet/data',
+    //   envSetDir: '~/.squidlet/envSet',
+    // },
+    // drivers: {
+    //   'I2cMaster': {
+    //     bus: 1,
+    //   }
+    // },
   }
 };
 
