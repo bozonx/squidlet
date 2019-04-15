@@ -2,15 +2,14 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
 import validateHostConfig from './validateHostConfig';
-import HostConfig, {HostConfigConfig} from '../../host/interfaces/HostConfig';
+import HostConfig from '../../host/interfaces/HostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
 import Io from '../../shared/Io';
 import {appendArray} from '../../host/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig, parseDevName} from '../../shared/helpers';
-import Platforms from '../interfaces/Platforms';
+import {loadMachineConfig, makeDevNames} from '../../shared/helpers';
 
 
 export default class ConfigManager {
@@ -78,7 +77,7 @@ export default class ConfigManager {
 
 
   getMachineDevs(): string[] {
-    return this.machineConfig.devs.map((devPath) => parseDevName(devPath));
+    return makeDevNames(this.machineConfig.devs);
   }
 
   private async resolveHostConfig(): Promise<PreHostConfig> {

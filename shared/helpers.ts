@@ -5,12 +5,22 @@ import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 
 
+/**
+ * Make dev name from dev path
+ */
 export function parseDevName(pathToDev: string): string {
   const parsed = path.parse(pathToDev);
 
   if (!parsed.name) throw new Error(`Can't parse dev name of path "${pathToDev}"`);
 
   return parsed.name;
+}
+
+/**
+ * Make list of dev names from list of dev paths.
+ */
+export function makeDevNames(devPaths: string[]): string[] {
+  return devPaths.map((devPath) => parseDevName(devPath));
 }
 
 export function resolvePlatformDir(platform: Platforms): string {

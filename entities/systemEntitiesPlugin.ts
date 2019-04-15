@@ -1,5 +1,6 @@
 import * as path from 'path';
 import PluginEnv from '../hostEnvBuilder/entities/PluginEnv';
+import {makeDevNames} from '../shared/helpers';
 
 const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
@@ -55,7 +56,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
 
   // add used on host drivers related on devs
   env.afterRegistering(async () => {
-    const machineDevs: string[] = env.getMachineConfig().devs;
+    const machineDevs: string[] = makeDevNames(env.getMachineConfig().devs);
 
     if (machineDevs.includes('Digital')) {
       await env.addUsedEntity('drivers', 'Digital_local');

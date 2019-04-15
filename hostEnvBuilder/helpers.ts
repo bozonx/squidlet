@@ -1,5 +1,4 @@
 import _difference = require('lodash/difference');
-import * as yaml from 'js-yaml';
 
 
 /**
