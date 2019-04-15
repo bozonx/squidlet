@@ -38,9 +38,14 @@ export default class Starter {
   }
 
 
-  async installModules() {
+  async installDevModules() {
     console.info(`===> Install npm modules`);
-    // TODO: делается npm i в папку с devs если нужно
+    // TODO: в dev режиме делается npm i в папку с x86 или rpi
+  }
+
+  async installProdModules() {
+    console.info(`===> Install npm modules`);
+    // TODO: в прод режиме делается npm i в папку devs в envset папке
   }
 
   async buildInitialProdSystem() {

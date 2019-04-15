@@ -10,7 +10,7 @@ async function start () {
   const starter: Starter = new Starter(args);
 
   await starter.init();
-  await starter.installModules();
+  await starter.installProdModules();
   await starter.buildInitialProdSystem();
   await starter.startProdSystem();
 }

@@ -21,7 +21,7 @@ const machineConfig: MachineConfig = {
   ],
   devsSupportFiles: [
     './rpi/package.json',
-    '../shared/nodeJsLike/helper.js',
+    '../shared/nodeJsLike/helpers.js',
   ],
 
   hostConfig: {

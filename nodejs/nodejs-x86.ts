@@ -13,7 +13,7 @@ const machineConfig: MachineConfig = {
   ],
   devsSupportFiles: [
     './x86/package.json',
-    '../shared/nodeJsLike/helper.js',
+    '../shared/nodeJsLike/helpers.js',
   ],
 
   hostConfig: {
