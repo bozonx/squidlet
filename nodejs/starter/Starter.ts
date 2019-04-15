@@ -10,6 +10,7 @@ import BuildSystem from '../../shared/BuildSystem';
 import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
+import {DevClass} from '../../system/entities/DevManager';
 
 
 const systemClassFileName = 'System';
@@ -37,9 +38,6 @@ export default class Starter {
     await this.groupConfig.init();
 
     this.props.resolve();
-
-    console.info(`===> making platform's dev set`);
-    await this.devSet.collect();
   }
 
 
@@ -76,16 +74,22 @@ export default class Starter {
   }
 
   async startProdSystem() {
+    console.info(`===> making platform's dev set`);
+
+    const devSet: {[index: string]: DevClass} = await this.devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
-    const system = new System(this.devSet.devSet);
+    const system = new System(devSet);
 
     return system.start();
   }
 
   async startDevelopSystem() {
+    console.info(`===> making platform's dev set`);
+
+    const devSet: {[index: string]: DevClass} = await this.devSet.makeDevelopDevSet();
     const System = require(`../../system`).default;
-    const system = new System(this.devSet.devSet);
+    const system = new System(devSet);
 
     return system.start();
   }

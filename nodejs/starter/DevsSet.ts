@@ -3,10 +3,11 @@ import * as path from 'path';
 import {DevClass} from '../../system/entities/DevManager';
 import Io from '../../shared/Io';
 import systemConfig from '../../system/config/systemConfig';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import {loadMachineConfig, parseDevName} from '../../shared/helpers';
 
 
 export default class DevsSet {
-  devSet: {[index: string]: DevClass} = {};
   private readonly io: Io;
   private readonly machine: string;
 
@@ -17,10 +18,20 @@ export default class DevsSet {
   }
 
 
-  async collect() {
+  async makeProdDevSet(): {[index: string]: DevClass} {
+    const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+
+    for (let devPath of machineConfig.devs) {
+      const devName: string = parseDevName(devPath);
+
+    }
+
+    // TODO: remake
+
     const devsDir = path.join(__dirname, '../', this.machine, systemConfig.envSetDirs.system);
     const devsFiles: string[] = await this.io.readdir(devsDir);
-    const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+
 
     for (let devFileName of devsFiles) {
       const devName = path.parse(devFileName).name;
@@ -30,6 +41,10 @@ export default class DevsSet {
     }
 
     return devsSet;
+  }
+
+  async makeDevelopDevSet(): {[index: string]: DevClass} {
+    // TODO: собрать dev devset
   }
 
 }
