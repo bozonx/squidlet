@@ -1,11 +1,9 @@
 export default interface SystemConfig {
   envSetDirs: {
-    host: string;
+    system: string;
     configs: string;
     entities: string;
-    // devices: string;
-    // services: string;
-    // data: string;
+    devs: string;
   };
   storageDirs: {
     common: string;

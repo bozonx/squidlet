@@ -6,9 +6,10 @@ const systemConfig: SystemConfig = {
   envSetDirs: {
     // TODO: rename to system
     // files which received from master
-    host: 'host',
+    system: 'system',
     configs: 'configs',
     entities: 'entities',
+    devs: 'devs',
   },
   // dirs under varDataDir which is set in host config
   storageDirs: {

@@ -82,7 +82,7 @@ export default class Starter {
 
 
   private getPathToProdSystemDir(): string {
-    return path.join(this.props.envSetDir, systemConfig.envSetDirs.host);
+    return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
   private async buildSystem() {

@@ -2,8 +2,8 @@ import * as path from 'path';
 
 import {DevClass} from '../../host/entities/DevManager';
 import Props from './Props';
-import {HOST_DEVS_DIR} from '../../shared/constants';
 import Io from '../../shared/Io';
+import systemConfig from '../../host/config/systemConfig';
 
 
 export default class DevsSet {
@@ -19,7 +19,7 @@ export default class DevsSet {
 
 
   async collect() {
-    const devsDir = path.join(__dirname, '../', this.props.machine, HOST_DEVS_DIR);
+    const devsDir = path.join(__dirname, '../', this.props.machine, systemConfig.envSetDirs.system);
     const devsFiles: string[] = await this.io.readdir(devsDir);
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 
