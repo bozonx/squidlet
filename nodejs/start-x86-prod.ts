@@ -5,8 +5,8 @@ async function start () {
   const starter: Starter = new Starter('x86');
 
   await starter.init();
-  await starter.installProdModules();
   await starter.buildInitialProdSystem();
+  await starter.installProdModules();
   await starter.startProdSystem();
 }
 

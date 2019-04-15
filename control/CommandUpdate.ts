@@ -33,7 +33,7 @@ export default class CommandUpdate {
     this.dirs.resolve();
     await this.groupConfig.init();
 
-    console.info(`Building into ${this.dirs.workDir}`);
+    console.info(`Using working dir ${this.dirs.workDir}`);
 
     // clear whole tmp dir
     await this.io.rimraf(`${this.dirs.tmpDir}/**/*`);

@@ -35,10 +35,12 @@ export default class Starter {
   }
 
   async init() {
-    console.info(`===> resolving config`);
     await this.groupConfig.init();
 
     this.props.resolve();
+
+    console.info(`Using working dir ${this.props.workDir}`);
+    console.info(`Using host ${this.props.hostConfig.id}`);
   }
 
 
