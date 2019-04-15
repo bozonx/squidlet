@@ -9,7 +9,7 @@ import Io from '../../shared/Io';
 import {appendArray} from '../../host/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig} from '../../shared/helpers';
+import {loadMachineConfig, parseDevName} from '../../shared/helpers';
 import Platforms from '../interfaces/Platforms';
 
 
@@ -76,6 +76,10 @@ export default class ConfigManager {
     delete this.hostConfigOrConfigPath;
   }
 
+
+  getMachineDevs(): string[] {
+    return this.machineConfig.devs.map((devPath) => parseDevName(devPath));
+  }
 
   private async resolveHostConfig(): Promise<PreHostConfig> {
     if (typeof this.hostConfigOrConfigPath === 'string') {

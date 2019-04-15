@@ -63,7 +63,7 @@ export default class EnvBuilder {
     await this.definitions.generate();
 
     this.log.info(`--> Checking platform dev dependencies`);
-    checkDevsExistance(this.usedEntities.getUsedDevs(), this.configManager.machineConfig.devs);
+    checkDevsExistance(this.usedEntities.getUsedDevs(), this.configManager.getMachineDevs());
 
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
