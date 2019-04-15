@@ -31,7 +31,7 @@ export default class Starter {
     this.args = new ResolveArgs();
     this.groupConfig = new GroupConfigParser(this.io, this.args.configPath);
     this.props = new Props(this.args, this.groupConfig);
-    this.devSet = new DevsSet(this.io, this.props.platform, this.machine);
+    this.devSet = new DevsSet(this.io, this.props.platform, this.machine, this.props.workDir);
   }
 
   async init() {
