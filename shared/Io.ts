@@ -85,16 +85,6 @@ export default class Io {
 }
 
 
-// async renameFile(src: string, dest: string): Promise<void> {
-//   return callPromised(fs.rename, oldPath, newPath);
-// }
-
-// loadYamlFileSync(fullPath: string): object {
-//   const yamlContent = fs.readFileSync(fullPath, 'utf8');
-//
-//   return yamlToJs(yamlContent);
-// }
-
 // /**
 //  * Configure master to slaves connections.
 //  */

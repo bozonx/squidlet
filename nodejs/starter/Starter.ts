@@ -17,14 +17,19 @@ const systemClassFileName = 'System';
 
 export default class Starter {
   private readonly io: Io = new Io();
+  private readonly machine: string;
   private readonly args: ResolveArgs;
-  private readonly groupConfig: GroupConfigParser = new GroupConfigParser(this.io, this.args.configPath);
-  private readonly props: Props = new Props(this.args, this.groupConfig);
-  private readonly devSet: DevsSet = new DevsSet(this.io, this.props);
+  private readonly groupConfig: GroupConfigParser;
+  private readonly props: Props;
+  private readonly devSet: DevsSet;
 
 
-  constructor(args: ResolveArgs) {
-    this.args = args;
+  constructor(machine: string) {
+    this.machine = machine;
+    this.args = new ResolveArgs();
+    this.groupConfig = new GroupConfigParser(this.io, this.args.configPath);
+    this.props = new Props(this.args, this.groupConfig);
+    this.devSet = new DevsSet(this.io, this.machine);
   }
 
   async init() {
@@ -60,8 +65,8 @@ export default class Starter {
       // TODO: generae id or special guid
       id: 'initialHost',
       platform: this.props.platform,
-      machine: this.props.machine,
-    }
+      machine: this.machine,
+    };
 
     await this.buildHostEnv(initialHostConfig);
   }

@@ -12,7 +12,6 @@ export default class Props {
   envSetDir: string = '';
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
-  machine: string = '';
   hostId: string = '';
   private readonly groupConfig: GroupConfigParser;
   private readonly args: ResolveArgs;
@@ -28,13 +27,13 @@ export default class Props {
     this.groupConfig = groupConfig;
   }
 
+
   resolve() {
     this._hostConfig = this.groupConfig.getHostConfig(this.args.hostName);
 
 
     this.validate();
 
-    this.machine = this.args.machine;
     this.hostId = this.hostConfig.id as any;
 
     if (this.args.workDir) {
@@ -64,9 +63,6 @@ export default class Props {
     }
     else if (this.platform !== this.hostConfig.platform) {
       throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
-    }
-    else if (this.args.machine !== this.hostConfig.machine) {
-      throw new Error(`Param "machine" of host config "${this.hostId}" is not a "${this.args.machine}"`);
     }
   }
 
