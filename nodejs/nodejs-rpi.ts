@@ -3,17 +3,17 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 const machineConfig: MachineConfig = {
   devs: [
-    './devs/Storage',
+    './devs/Storage.ts',
     //'Sha1',
-    './devs/Digital',
+    './devs/Digital.ts',
     //'Pwm',
     //'Serial',
     //'Spi',
     //'Wifi',
     //'Bluetooth',
-    './devs/I2cMaster',
+    './devs/I2cMaster.ts',
 
-    './devs/Mqtt',
+    './devs/Mqtt.ts',
 
     //'Adc',
     //'Dac',

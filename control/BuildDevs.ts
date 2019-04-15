@@ -11,9 +11,7 @@ import {
   BUILD_DEVS_DIR,
   DEV_SET_FILE,
   LEGACY_DIR,
-  MIN_DIR,
-  MODERN_DIR,
-  PLATFORM_DEVS_DIR
+  MODERN_DIR, ORIGINAL_DIR,
 } from '../shared/constants';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
@@ -54,49 +52,64 @@ export default class BuildDevs {
 
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
-    await this.buildDevs();
     await this.copyDevs(machineConfig);
-    await this.makeDevSet(machineConfig);
+    await this.buildDevs();
+    await this.makeDevSetIndex(machineConfig);
   }
 
-  private async buildDevs() {
-    const devsSrc = path.join(resolvePlatformDir(this.platform), PLATFORM_DEVS_DIR);
-    const modernDst = path.join(this.devsTmpDir, MODERN_DIR);
-    const legacyDst = path.join(this.devsTmpDir, LEGACY_DIR);
-    const minDst = path.join(this.devsTmpDir, MIN_DIR);
 
-    // ts to modern js
-    await this.io.rimraf(`${modernDst}/**/*`);
-    await compileTs(devsSrc, modernDst);
-    // modern js to ES5
-    await this.io.rimraf(`${legacyDst}/**/*`);
-    await compileJs(modernDst, legacyDst, false);
-    // minimize
-    await this.io.rimraf(`${minDst}/**/*`);
-    await minimize(legacyDst, minDst);
-  }
-
+  /**
+   * Copy only used devs
+   */
   private async copyDevs(machineConfig: MachineConfig) {
-    const minDst = path.join(this.devsTmpDir, MIN_DIR);
+    const usedDevsDir = path.join(this.devsTmpDir, ORIGINAL_DIR);
+    const platformDir = resolvePlatformDir(this.platform);
 
-    await this.io.rimraf(`${this.devsBuildDir}/**/*`);
-    await this.io.mkdirP(this.devsBuildDir);
+    await this.io.rimraf(`${usedDevsDir}/**/*`);
+    await this.io.mkdirP(usedDevsDir);
 
     // copy specified devs
-    for (let devName of machineConfig.devs) {
-      const fileName = `${devName}.js`;
-      const devSrcFile: string = path.join(minDst, fileName);
-      const devDstFile: string = path.join(this.devsBuildDir, fileName);
+    for (let devPath of machineConfig.devs) {
+      const devSrcFile: string = path.resolve(platformDir, devPath);
+
+      // TODO: resolve sym link of devSrcFile
+
+
+      const devDstFile: string = path.join(usedDevsDir, path.basename(devPath));
 
       await this.io.copyFile(devSrcFile, devDstFile);
     }
   }
 
-  private async makeDevSet(machineConfig: MachineConfig) {
+  /**
+   * Build devs from whole original dir to envset/devs
+   */
+  private async buildDevs() {
+    const original = path.join(this.devsTmpDir, ORIGINAL_DIR);
+    const modernDst = path.join(this.devsTmpDir, MODERN_DIR);
+    const legacyDst = path.join(this.devsTmpDir, LEGACY_DIR);
+
+    // TODO: support dependencies (helpers)
+
+    // ts to modern js
+    await this.io.rimraf(`${modernDst}/**/*`);
+    await compileTs(original, modernDst);
+    // modern js to ES5
+    await this.io.rimraf(`${legacyDst}/**/*`);
+    await compileJs(modernDst, legacyDst, false);
+    // minimize
+    await this.io.rimraf(`${this.devsBuildDir}/**/*`);
+    await minimize(legacyDst, this.devsBuildDir);
+  }
+
+  /**
+   * Make index.js which requires all the devs.
+   */
+  private async makeDevSetIndex(machineConfig: MachineConfig) {
     const indexFilePath: string = path.join(this.devsBuildDir, DEV_SET_FILE);
     const devs: string[] = [];
 
-    for (let devName of machineConfig.devs) {
+    for (let devPath of machineConfig.devs) {
       const devFile = `./${devName}.js`;
       const devString = `${devName}: require("${devFile}")`;
 
