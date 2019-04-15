@@ -14,6 +14,7 @@ import {
   MODERN_DIR, ORIGINAL_DIR,
 } from '../shared/constants';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import {Stats} from '../system/interfaces/dev/StorageDev';
 
 
 export default class BuildDevs {
@@ -52,6 +53,9 @@ export default class BuildDevs {
 
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
+    await this.io.rimraf(`${this.devsBuildDir}/**/*`);
+    await this.io.mkdirP(this.devsBuildDir);
+
     await this.copyDevs(machineConfig);
     await this.buildDevs();
     await this.copySupportFiles(machineConfig);
@@ -71,16 +75,11 @@ export default class BuildDevs {
 
     // copy specified devs
     for (let devPath of machineConfig.devs) {
-      let devSrcFile: string = path.resolve(platformDir, devPath);
-      const devDstFile: string = path.join(usedDevsDir, path.basename(devPath));
-      const isSymLink: boolean = (await this.io.stat(devSrcFile)).symbolicLink;
+      const absFilePath: string = path.resolve(platformDir, devPath);
+      const srcFile: string = await this.resolveFileTargetPath(absFilePath);
+      const dstFile: string = path.join(usedDevsDir, path.basename(devPath));
 
-      if (isSymLink) {
-        const linkTo: string = await this.io.readlink(devSrcFile);
-        devSrcFile = path.resolve(path.dirname(devSrcFile), linkTo);
-      }
-
-      await this.io.copyFile(devSrcFile, devDstFile);
+      await this.io.copyFile(srcFile, dstFile);
     }
   }
 
@@ -101,7 +100,6 @@ export default class BuildDevs {
     await this.io.rimraf(`${legacyDst}/**/*`);
     await compileJs(modernDst, legacyDst, false);
     // minimize
-    await this.io.rimraf(`${this.devsBuildDir}/**/*`);
     await minimize(legacyDst, this.devsBuildDir);
   }
 
@@ -109,8 +107,16 @@ export default class BuildDevs {
    * Copy support files
    */
   private async copySupportFiles(machineConfig: MachineConfig) {
-    for (let supportFilePath of machineConfig.devsSupportFiles) {
+    if (!machineConfig.devsSupportFiles) return;
 
+    const platformDir = resolvePlatformDir(this.platform);
+
+    for (let supportFilePath of machineConfig.devsSupportFiles) {
+      const absFilePath: string = path.resolve(platformDir, supportFilePath);
+      const srcFile: string = await this.resolveFileTargetPath(absFilePath);
+      const dstFile: string = path.join(this.devsBuildDir, path.basename(supportFilePath));
+
+      await this.io.copyFile(srcFile, dstFile);
     }
   }
 
@@ -131,6 +137,20 @@ export default class BuildDevs {
     const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};\n`;
 
     await this.io.writeFile(indexFilePath, devSet);
+  }
+
+  /**
+   * If it is a sym link - it returns an absolute path to its target.
+   * If it a regular file - it returns filePath as is.
+   */
+  private async resolveFileTargetPath(filePath: string): Promise<string> {
+    const stat: Stats = await this.io.stat(filePath);
+
+    if (!stat.symbolicLink) return filePath;
+
+    const linkTo: string = await this.io.readlink(filePath);
+
+    return path.resolve(path.dirname(filePath), linkTo);
   }
 
 }
