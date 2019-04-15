@@ -28,7 +28,7 @@ class Collect {
     this.dstDir = dstDir;
     this.buildConfig = yaml.load(fs.readFileSync(buildConfigYaml, 'utf8'));
 
-    this.validateBuildConfig();
+    //this.validateBuildConfig();
   }
 
   async collect() {
@@ -45,20 +45,20 @@ class Collect {
     await this.makeDepsBundle();
   }
 
-  private validateBuildConfig() {
-    if (!_.isPlainObject(this.buildConfig)) {
-      throw new Error(`BuildConfig ${this.buildConfigYaml} has to be an object`);
-    }
-    else if (!this.buildConfig.moduleRoots) {
-      throw new Error(`There isn't "moduleRoots" param in buildConfig ${this.buildConfigYaml}`);
-    }
-    else if (!_.isArray(this.buildConfig.moduleRoots)) {
-      throw new Error(`Parameter "moduleRoots" in buildConfig ${this.buildConfigYaml} has to be an array`);
-    }
-    else if (this.buildConfig.dependencies && !_.isArray(this.buildConfig.dependencies)) {
-      throw new Error(`Parameter "dependencies" in buildConfig ${this.buildConfigYaml} has to be an array`);
-    }
-  }
+  // private validateBuildConfig() {
+  //   if (!_.isPlainObject(this.buildConfig)) {
+  //     throw new Error(`BuildConfig ${this.buildConfigYaml} has to be an object`);
+  //   }
+  //   else if (!this.buildConfig.moduleRoots) {
+  //     throw new Error(`There isn't "moduleRoots" param in buildConfig ${this.buildConfigYaml}`);
+  //   }
+  //   else if (!_.isArray(this.buildConfig.moduleRoots)) {
+  //     throw new Error(`Parameter "moduleRoots" in buildConfig ${this.buildConfigYaml} has to be an array`);
+  //   }
+  //   else if (this.buildConfig.dependencies && !_.isArray(this.buildConfig.dependencies)) {
+  //     throw new Error(`Parameter "dependencies" in buildConfig ${this.buildConfigYaml} has to be an array`);
+  //   }
+  // }
 
   private async resolveModuleMainFile(moduleOrFileName: string): Promise<string> {
     if (!_.isString(moduleOrFileName)) {

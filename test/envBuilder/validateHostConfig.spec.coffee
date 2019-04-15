@@ -53,23 +53,23 @@ describe 'envBuilder.validateHostConfig', ->
     # not object
     assert.isString(validateHostConfig({ @hostConfig..., devicesDefaults: 'str' }))
 
-  it 'buildConfig', ->
-    # success
-    assert.isUndefined(validateHostConfig({ @hostConfig..., buildConfig: {} }))
-    # not object
-    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: 'str' }))
-    # success
-    assert.isUndefined(validateHostConfig({ @hostConfig..., buildConfig: {
-      devsModernDst: 'str'
-      devsLegacyDst: 'str'
-      devsMinDst: 'str'
-      devsSrc: 'str'
-    } }))
-    # incorrect types
-    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsModernDst: 5} }))
-    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsLegacyDst: 5} }))
-    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsMinDst: 5} }))
-    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsSrc: 5} }))
+#  it 'buildConfig', ->
+#    # success
+#    assert.isUndefined(validateHostConfig({ @hostConfig..., buildConfig: {} }))
+#    # not object
+#    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: 'str' }))
+#    # success
+#    assert.isUndefined(validateHostConfig({ @hostConfig..., buildConfig: {
+#      devsModernDst: 'str'
+#      devsLegacyDst: 'str'
+#      devsMinDst: 'str'
+#      devsSrc: 'str'
+#    } }))
+#    # incorrect types
+#    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsModernDst: 5} }))
+#    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsLegacyDst: 5} }))
+#    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsMinDst: 5} }))
+#    assert.isString(validateHostConfig({ @hostConfig..., buildConfig: {devsSrc: 5} }))
 
   it 'config', ->
     # success

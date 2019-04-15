@@ -4,3 +4,4 @@ export default interface BuildConfig {
   devsMinDst: string;
   devsSrc: string;
 }
+

@@ -2,17 +2,17 @@ import {isString, isNumber, isStringArray, isObject, oneOf, required, sequence} 
 import {whiteList} from '../../host/helpers/validate';
 
 
-function checkBuildConfig(rawConfig: {[index: string]: any}): string | undefined {
-  if (typeof rawConfig.buildConfig === 'undefined') return;
-
-  return sequence([
-    () => isObject(rawConfig.buildConfig, 'buildConfig'),
-    () => isString(rawConfig.buildConfig.devsModernDst, 'buildConfig.devsModernDst'),
-    () => isString(rawConfig.buildConfig.devsLegacyDst, 'buildConfig.devsLegacyDst'),
-    () => isString(rawConfig.buildConfig.devsMinDst, 'buildConfig.devsMinDst'),
-    () => isString(rawConfig.buildConfig.devsSrc, 'buildConfig.devsSrc'),
-  ]);
-}
+// function checkBuildConfig(rawConfig: {[index: string]: any}): string | undefined {
+//   if (typeof rawConfig.buildConfig === 'undefined') return;
+//
+//   return sequence([
+//     () => isObject(rawConfig.buildConfig, 'buildConfig'),
+//     () => isString(rawConfig.buildConfig.devsModernDst, 'buildConfig.devsModernDst'),
+//     () => isString(rawConfig.buildConfig.devsLegacyDst, 'buildConfig.devsLegacyDst'),
+//     () => isString(rawConfig.buildConfig.devsMinDst, 'buildConfig.devsMinDst'),
+//     () => isString(rawConfig.buildConfig.devsSrc, 'buildConfig.devsSrc'),
+//   ]);
+// }
 
 function checkConfig(rawConfig: {[index: string]: any}): string | undefined {
   if (typeof rawConfig.config === 'undefined') return;
@@ -52,7 +52,7 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
 
     () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
 
-    () => checkBuildConfig(rawConfig),
+    //() => checkBuildConfig(rawConfig),
 
     () => checkConfig(rawConfig),
 
@@ -61,7 +61,7 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
       'platform',
       'machine',
       'plugins',
-      'buildConfig',
+      //'buildConfig',
       'config',
       'devices',
       'drivers',

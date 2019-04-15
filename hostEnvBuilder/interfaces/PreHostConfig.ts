@@ -1,6 +1,5 @@
 import Platforms from './Platforms';
 import LogLevel from '../../host/interfaces/LogLevel';
-import BuildConfig from './BuildConfig';
 
 
 // raw host config specified in master config
@@ -12,7 +11,7 @@ export default interface PreHostConfig {
 
   plugins?: string[];
 
-  buildConfig?: BuildConfig;
+  //buildConfig?: BuildConfig;
 
   // specific config for each host
   config?: {
