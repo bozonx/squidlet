@@ -66,7 +66,11 @@ export default class Starter {
       machine: this.machine,
     };
 
+    // build config and entities
     await this.buildHostEnv(initialHostConfig);
+    // build devs
+    // TODO: build devs
+    //await this.devSet.makeProdDevSet();
   }
 
   async buildDevelopEnvSet() {
@@ -76,6 +80,7 @@ export default class Starter {
   async startProdSystem() {
     console.info(`===> making platform's dev set`);
 
+    // TODO: !!!!!
     const devSet: {[index: string]: DevClass} = await this.devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
