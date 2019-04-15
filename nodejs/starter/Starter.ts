@@ -7,10 +7,11 @@ import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../system/config/systemConfig';
 import BuildSystem from '../../shared/BuildSystem';
-import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../shared/constants';
+import {BUILD_DEVS_DIR, BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
+import BuildDevs from '../../shared/BuildDevs';
 
 
 const systemClassFileName = 'System';
@@ -69,8 +70,7 @@ export default class Starter {
     // build config and entities
     await this.buildHostEnv(initialHostConfig);
     // build devs
-    // TODO: build devs
-    //await this.devSet.makeProdDevSet();
+    await this.buildHostDevs(initialHostConfig);
   }
 
   async buildDevelopEnvSet() {
@@ -125,6 +125,22 @@ export default class Starter {
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
     await buildHostEnv.build();
+  }
+
+  private async buildHostDevs(hostConfig: PreHostConfig) {
+    const buildDir = path.join(hostsBuildDir, this.hostId, BUILD_DEVS_DIR);
+    const tmpDir = path.join(hostsTmpDir, this.hostId, BUILD_DEVS_DIR);
+
+    const buildDevs: BuildDevs = new BuildDevs(
+      this.io,
+      hostConfig,
+      this.dirs.hostsBuildDir,
+      this.dirs.hostsTmpDir
+    );
+
+    console.info(`===> Building devs`);
+
+    await buildDevs.build();
   }
 
 }

@@ -8,7 +8,7 @@ import Io from '../shared/Io';
 import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
-import BuildDevs from './BuildDevs';
+import BuildDevs from '../shared/BuildDevs';
 
 
 interface UpdateCommandParams {
