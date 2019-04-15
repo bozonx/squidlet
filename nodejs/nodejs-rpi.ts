@@ -19,6 +19,10 @@ const machineConfig: MachineConfig = {
     //'Dac',
     //'I2cSlave',
   ],
+  devsSupportFiles: [
+    './rpi/package.json',
+    '../shared/nodeJsLike/helper.js',
+  ],
 
   hostConfig: {
     // config: {

@@ -11,6 +11,10 @@ const machineConfig: MachineConfig = {
 
     './devs/Mqtt.ts',
   ],
+  devsSupportFiles: [
+    './x86/package.json',
+    '../shared/nodeJsLike/helper.js',
+  ],
 
   hostConfig: {
     config: {
