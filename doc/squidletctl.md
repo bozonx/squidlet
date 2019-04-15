@@ -14,7 +14,7 @@ Also you can specify the next params:
 
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
 * --work-dir - path to dir where hosts and tmp files will be placed
-  By default it is upder $SQUIDLET_ROOT dir
+  By default it is under $SQUIDLET_ROOT dir
 * SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
 
 

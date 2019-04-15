@@ -24,7 +24,7 @@ export default class ResolveDirs {
 
 
   private resolveWorkDir(): string {
-    let workDirArg: string | undefined = <string | undefined>yargs.argv['build-dir'];
+    let workDirArg: string | undefined = <string | undefined>yargs.argv['work-dir'];
 
     if (workDirArg) {
       // if it set as an argument - make it absolute

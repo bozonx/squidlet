@@ -21,9 +21,8 @@ export default class ResolveArgs {
     this.configPath = yargs.argv._[0];
     this.squidletRoot = resolveSquidletRoot();
 
-    // TODO: проверить что будет именно workDir а не work-dir
-    if (yargs.argv.workDir) {
-      this.workDir = path.resolve(process.cwd(), yargs.argv.workDir as string);
+    if (yargs.argv['work-dir']) {
+      this.workDir = path.resolve(process.cwd(), yargs.argv['work-dir'] as string);
     }
 
     this.hostName = yargs.argv.name as any;
