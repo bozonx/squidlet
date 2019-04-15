@@ -1,5 +1,5 @@
 import Platforms from './Platforms';
-import LogLevel from '../../host/interfaces/LogLevel';
+import LogLevel from '../../system/interfaces/LogLevel';
 
 
 // raw host config specified in master config

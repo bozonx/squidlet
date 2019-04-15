@@ -11,7 +11,7 @@ import collectDependencies from '../squidlet-starter/buildJs/collectDependencies
 import minimize from '../squidlet-starter/buildJs/minimize';
 import prepareToFlash from './src/prepareToFlash';
 import upload from './src/upload';
-import {initEnvFilesBuilder, resolveParam} from '../host/src/helpers';
+import {initEnvFilesBuilder, resolveParam} from '../../system/src/helpers';
 
 
 // TODO: получить из агрументов

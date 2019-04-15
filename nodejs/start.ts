@@ -13,10 +13,10 @@ import {
   resolveParam,
   resolveParamRequired
 } from './starter/buildHelpers';
-import System from '../host/System';
+import System from '../system/System';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-import {DevClass} from '../host/entities/DevManager';
+import {DevClass} from '../system/entities/DevManager';
 
 import EnvSetMemory from '../hostEnvBuilder/EnvSetMemory';
 

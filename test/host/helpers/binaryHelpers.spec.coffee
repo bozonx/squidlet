@@ -1,4 +1,4 @@
-helpers = require('../../../host/helpers/binaryHelpers')
+helpers = require('../../../system/helpers/binaryHelpers')
 
 
 describe 'helpers.binaryHelpers', ->

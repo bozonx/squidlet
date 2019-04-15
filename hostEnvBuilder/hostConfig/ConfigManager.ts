@@ -2,11 +2,11 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
 import validateHostConfig from './validateHostConfig';
-import HostConfig from '../../host/interfaces/HostConfig';
+import HostConfig from '../../system/interfaces/HostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
 import Io from '../../shared/Io';
-import {appendArray} from '../../host/helpers/collections';
+import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig, makeDevNames} from '../../shared/helpers';

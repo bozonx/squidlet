@@ -8,17 +8,17 @@
  * * ?Bluetooth
  */
 
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import {firstLetterToUpperCase} from 'host/helpers/helpers';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import DuplexDriver from 'host/interfaces/DuplexDriver';
-import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'host/dict/constants';
-import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/DigitalDev';
-import Logger from 'host/interfaces/Logger';
-import {omit} from 'host/helpers/lodashLike';
-import {PollProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
-import {uint8WordToNum} from 'host/helpers/binaryHelpers';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import {firstLetterToUpperCase} from 'system/helpers/helpers';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import DuplexDriver from 'system/interfaces/DuplexDriver';
+import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';
+import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/dev/DigitalDev';
+import Logger from 'system/interfaces/Logger';
+import {omit} from 'system/helpers/lodashLike';
+import {PollProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';
+import {uint8WordToNum} from 'system/helpers/binaryHelpers';
 
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';

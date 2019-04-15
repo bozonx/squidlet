@@ -1,14 +1,14 @@
 import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../hostConfig/ConfigManager';
 import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import ManifestBase from '../../host/interfaces/ManifestBase';
-import SchemaElement from '../../host/interfaces/SchemaElement';
+import ManifestBase from '../../system/interfaces/ManifestBase';
+import SchemaElement from '../../system/interfaces/SchemaElement';
 import validateRules from '../hostConfig/validateRules';
 
 

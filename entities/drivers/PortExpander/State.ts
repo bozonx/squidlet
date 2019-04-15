@@ -1,6 +1,6 @@
-import {callOnDifferentValues} from 'host/helpers/helpers';
-import {bytesToBits} from 'host/helpers/binaryHelpers';
-import IndexedEvents from 'host/helpers/IndexedEvents';
+import {callOnDifferentValues} from 'system/helpers/helpers';
+import {bytesToBits} from 'system/helpers/binaryHelpers';
+import IndexedEvents from 'system/helpers/IndexedEvents';
 
 import {DigitalPinHandler} from './DigitalPins';
 import {AnalogPinHandler} from './AnalogPins';

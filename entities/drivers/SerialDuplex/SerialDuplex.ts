@@ -1,10 +1,10 @@
-import DuplexDriver, {ReceiveHandler} from 'host/interfaces/DuplexDriver';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import SerialDev from 'host/interfaces/dev/SerialDev';
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'host/helpers/collections';
-import {DATA_ADDRESS_LENGTH} from 'host/dict/constants';
-import {hexStringToHexNum} from 'host/helpers/binaryHelpers';
+import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import SerialDev from 'system/interfaces/dev/SerialDev';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/helpers/collections';
+import {DATA_ADDRESS_LENGTH} from 'system/dict/constants';
+import {hexStringToHexNum} from 'system/helpers/binaryHelpers';
 
 
 export interface SerialNodeProps {

@@ -2,10 +2,10 @@
  * This is system config for master configurator and host
  */
 
-import initializationConfig from '../../host/config/initializationConfig';
-import InitializationConfig from '../../host/interfaces/InitializationConfig';
-import systemConfig from '../../host/config/systemConfig';
-import SystemConfig from '../../host/interfaces/SystemConfig';
+import initializationConfig from '../../system/config/initializationConfig';
+import InitializationConfig from '../../system/interfaces/InitializationConfig';
+import systemConfig from '../../system/config/systemConfig';
+import SystemConfig from '../../system/interfaces/SystemConfig';
 
 
 const hostInitCfg: InitializationConfig = initializationConfig();

@@ -1,5 +1,5 @@
-import HostConfig from '../../host/interfaces/HostConfig';
-import EntityDefinition from '../../host/interfaces/EntityDefinition';
+import HostConfig from '../../system/interfaces/HostConfig';
+import EntityDefinition from '../../system/interfaces/EntityDefinition';
 
 
 export default interface HostConfigSet {

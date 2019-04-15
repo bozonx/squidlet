@@ -1,9 +1,9 @@
-import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
-import {convertToLevel} from 'host/helpers/helpers';
-import {Data} from 'host/baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from 'host/baseDevice/Status';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import Status from 'host/baseDevice/Status';
+import DeviceBase, {DeviceBaseProps} from 'system/baseDevice/DeviceBase';
+import {convertToLevel} from 'system/helpers/helpers';
+import {Data} from 'system/baseDevice/DeviceDataManagerBase';
+import {DEFAULT_STATUS} from 'system/baseDevice/Status';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import Status from 'system/baseDevice/Status';
 
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';
 

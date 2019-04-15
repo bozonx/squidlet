@@ -3,7 +3,7 @@ import * as path from 'path';
 import compileTs from '../../shared/buildToJs/compileTs';
 import compileJs from '../../shared/buildToJs/compileJs';
 import minimize from '../../shared/buildToJs/minimize';
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 
 
 export default async function buildEntity(

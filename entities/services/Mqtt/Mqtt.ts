@@ -1,8 +1,8 @@
-import ServiceBase from 'host/baseServices/ServiceBase';
-import DeviceData from 'host/interfaces/DeviceData';
-import {combineTopic, parseValue, splitTopicId} from 'host/helpers/helpers';
-import MqttDev from 'host/interfaces/dev/MqttDev';
-import categories from 'host/dict/categories';
+import ServiceBase from 'system/baseServices/ServiceBase';
+import DeviceData from 'system/interfaces/DeviceData';
+import {combineTopic, parseValue, splitTopicId} from 'system/helpers/helpers';
+import MqttDev from 'system/interfaces/dev/MqttDev';
+import categories from 'system/dict/categories';
 
 
 interface Props {

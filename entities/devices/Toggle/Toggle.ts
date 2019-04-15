@@ -1,8 +1,8 @@
-import {Data} from 'host/baseDevice/DeviceDataManagerBase';
-import DeviceBase, {DeviceBaseProps} from 'host/baseDevice/DeviceBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
-import {DEFAULT_STATUS} from 'host/baseDevice/Status';
+import {Data} from 'system/baseDevice/DeviceDataManagerBase';
+import DeviceBase, {DeviceBaseProps} from 'system/baseDevice/DeviceBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
+import {DEFAULT_STATUS} from 'system/baseDevice/Status';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 

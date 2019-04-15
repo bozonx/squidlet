@@ -1,6 +1,6 @@
-import {DigitalInputMode, DigitalPinMode, Edge} from 'host/interfaces/dev/DigitalDev';
-import {bitsToBytes} from 'host/helpers/binaryHelpers';
-import {getKeyOfObject, setArrayDimension} from 'host/helpers/collections';
+import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/dev/DigitalDev';
+import {bitsToBytes} from 'system/helpers/binaryHelpers';
+import {getKeyOfObject, setArrayDimension} from 'system/helpers/collections';
 
 import {
   COMMANDS,

@@ -1,9 +1,9 @@
-import DriverBase from 'host/baseDrivers/DriverBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {omit} from 'host/helpers/lodashLike';
-import {deferCall, invertIfNeed} from 'host/helpers/helpers';
-import {BlockMode} from 'host/interfaces/Types';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {omit} from 'system/helpers/lodashLike';
+import {deferCall, invertIfNeed} from 'system/helpers/helpers';
+import {BlockMode} from 'system/interfaces/Types';
 
 import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPinOutput/DigitalPinOutput';
 

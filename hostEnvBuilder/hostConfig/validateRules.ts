@@ -1,12 +1,12 @@
-import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
 import {
   isBoolean,
   required,
   sequence
 } from './validationHelpers';
-import SchemaElement from '../../host/interfaces/SchemaElement';
-import {parseType} from '../../host/helpers/typesHelpers';
-import {isValueOfType, whiteList} from '../../host/helpers/validate';
+import SchemaElement from '../../system/interfaces/SchemaElement';
+import {parseType} from '../../system/helpers/typesHelpers';
+import {isValueOfType, whiteList} from '../../system/helpers/validate';
 
 
 function checkType(type: string | undefined, ruleName: string): string | undefined {

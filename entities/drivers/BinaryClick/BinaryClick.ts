@@ -1,11 +1,11 @@
-import IndexedEvents from 'host/helpers/IndexedEvents';
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {WatchHandler} from 'host/interfaces/dev/DigitalDev';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
+import IndexedEvents from 'system/helpers/IndexedEvents';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {WatchHandler} from 'system/interfaces/dev/DigitalDev';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
 
 import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
-import {omit} from '../../../host/helpers/lodashLike';
+import {omit} from '../../../system/helpers/lodashLike';
 
 
 type Handler = () => void;

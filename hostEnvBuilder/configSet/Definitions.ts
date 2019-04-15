@@ -1,12 +1,12 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _omit = require('lodash/omit');
 
-import EntityDefinition from '../../host/interfaces/EntityDefinition';
+import EntityDefinition from '../../system/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
-import {validateProps} from '../../host/helpers/validate';
+import {validateProps} from '../../system/helpers/validate';
 
 
 /**

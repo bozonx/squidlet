@@ -1,4 +1,4 @@
-validate = require('../../../host/helpers/validate');
+validate = require('../../../system/helpers/validate');
 
 
 describe 'helpers.validate', ->

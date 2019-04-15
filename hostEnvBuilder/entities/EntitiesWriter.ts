@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import ConfigManager from '../hostConfig/ConfigManager';
 import Io from '../../shared/Io';
 import Logger from '../interfaces/Logger';

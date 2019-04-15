@@ -1,15 +1,15 @@
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-import System from '../host/System';
-import {ManifestsTypePluralName} from '../host/interfaces/ManifestTypes';
-import ManifestBase from '../host/interfaces/ManifestBase';
-import {EntityClassType} from '../host/entities/EntityManagerBase';
+import System from '../system/System';
+import {ManifestsTypePluralName} from '../system/interfaces/ManifestTypes';
+import ManifestBase from '../system/interfaces/ManifestBase';
+import {EntityClassType} from '../system/entities/EntityManagerBase';
 import HostEnvSet from './interfaces/HostEnvSet';
-import {trimEnd} from '../host/helpers/lodashLike';
-import {pathJoin} from '../host/helpers/nodeLike';
+import {trimEnd} from '../system/helpers/lodashLike';
+import {pathJoin} from '../system/helpers/nodeLike';
 import StorageDev from '../nodejs/rpi/Storage';
-import EnvSet from '../host/interfaces/EnvSet';
+import EnvSet from '../system/interfaces/EnvSet';
 
 
 let configSet: HostEnvSet;

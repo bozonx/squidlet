@@ -1,4 +1,4 @@
-Republish = require('../../../host/helpers/Republish').default;
+Republish = require('../../../system/helpers/Republish').default;
 
 
 describe 'helpers.Republish', ->

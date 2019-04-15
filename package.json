@@ -15,7 +15,7 @@
     "rpi-prod": "ts-node ./nodejs/start-rpi-prod.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json",
-    "postinstall": "cd node_modules && ln -s ../host ./"
+    "postinstall": "cd node_modules && ln -s ../system ./"
   },
   "dependencies": {
     "@babel/core": "^7.4.3",

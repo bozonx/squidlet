@@ -1,4 +1,4 @@
-nodeLike = require('../../../host/helpers/nodeLike');
+nodeLike = require('../../../system/helpers/nodeLike');
 
 
 describe 'helpers.nodeLike', ->

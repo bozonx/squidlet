@@ -1,4 +1,4 @@
-import I2cMasterDev from 'host/interfaces/dev/I2cMasterDev';
+import I2cMasterDev from 'system/interfaces/dev/I2cMasterDev';
 
 
 /**

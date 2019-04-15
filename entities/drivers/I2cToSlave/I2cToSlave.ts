@@ -1,8 +1,8 @@
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {hexStringToHexNum} from 'host/helpers/binaryHelpers';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import {omit} from 'host/helpers/lodashLike';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'host/baseDrivers/MasterSlaveBaseNodeDriver';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {hexStringToHexNum} from 'system/helpers/binaryHelpers';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import {omit} from 'system/helpers/lodashLike';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';
 
 import {I2cMaster} from '../I2cMaster/I2cMaster';
 import {ImpulseInput} from '../ImpulseInput/ImpulseInput';

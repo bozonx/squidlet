@@ -1,13 +1,13 @@
-import {withoutFirstItemUint8Arr} from 'host/helpers/collections';
+import {withoutFirstItemUint8Arr} from 'system/helpers/collections';
 import {
   hexToBytes,
   bytesToHexString,
   numToWord,
   hexStringToHexNum
-} from 'host/helpers/binaryHelpers';
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
+} from 'system/helpers/binaryHelpers';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
 
 
 const MAX_BLOCK_LENGTH = 65535;

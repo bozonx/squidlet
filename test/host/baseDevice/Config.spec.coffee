@@ -1,4 +1,4 @@
-Config = require('../../../host/baseDevice/Config').default
+Config = require('../../../system/baseDevice/Config').default
 
 
 describe 'baseDevice.Config', ->

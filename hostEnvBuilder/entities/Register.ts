@@ -9,7 +9,7 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import Io from '../../shared/Io';
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypeName, ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import validateManifest from '../hostConfig/validateManifests';
 import {clearRelativePath} from '../helpers';
 

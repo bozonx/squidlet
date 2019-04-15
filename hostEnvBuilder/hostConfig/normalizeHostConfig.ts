@@ -3,7 +3,7 @@ import _omit = require('lodash/omit');
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {servicesShortcut} from '../dict/dict';
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 
 

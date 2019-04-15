@@ -1,7 +1,7 @@
-import ServiceBase from 'host/baseServices/ServiceBase';
-import LogLevel from 'host/interfaces/LogLevel';
-import {LOG_LEVELS} from 'host/dict/constants';
-import categories from 'host/dict/categories';
+import ServiceBase from 'system/baseServices/ServiceBase';
+import LogLevel from 'system/interfaces/LogLevel';
+import {LOG_LEVELS} from 'system/dict/constants';
+import categories from 'system/dict/categories';
 
 import * as defaultLogger from './defaultLogger';
 

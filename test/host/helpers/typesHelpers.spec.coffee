@@ -1,4 +1,4 @@
-types = require('../../../host/helpers/typesHelpers');
+types = require('../../../system/helpers/typesHelpers');
 
 
 describe 'helpers.typesHelpers', ->

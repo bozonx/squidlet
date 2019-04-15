@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 const esp = require('espruino');
 
-const {stringify} = require('../../../host/helpers');
+const {stringify} = require('../../../system/helpers');
 
 
 const fsPromises = fs.promises;

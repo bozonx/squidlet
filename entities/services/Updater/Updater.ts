@@ -1,7 +1,7 @@
-import ServiceBase from 'host/baseServices/ServiceBase';
-import categories from 'host/dict/categories';
-import topics from 'host/dict/topics';
-import {ManifestsTypeName} from 'host/interfaces/ManifestTypes';
+import ServiceBase from 'system/baseServices/ServiceBase';
+import categories from 'system/dict/categories';
+import topics from 'system/dict/topics';
+import {ManifestsTypeName} from 'system/interfaces/ManifestTypes';
 
 
 enum UPDATER_STATUS {

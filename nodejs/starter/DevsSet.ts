@@ -1,9 +1,9 @@
 import * as path from 'path';
 
-import {DevClass} from '../../host/entities/DevManager';
+import {DevClass} from '../../system/entities/DevManager';
 import Props from './Props';
 import Io from '../../shared/Io';
-import systemConfig from '../../host/config/systemConfig';
+import systemConfig from '../../system/config/systemConfig';
 
 
 export default class DevsSet {

@@ -3,13 +3,13 @@
  * Handling a PCF8574/PCF8574A IC.
  */
 
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import {byteToBinArr, getBitFromByte, updateBitInByte} from 'host/helpers/binaryHelpers';
-import {Edge} from 'host/interfaces/dev/DigitalDev';
-import DebounceCall from 'host/helpers/DebounceCall';
-import IndexedEvents from 'host/helpers/IndexedEvents';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/helpers/binaryHelpers';
+import {Edge} from 'system/interfaces/dev/DigitalDev';
+import DebounceCall from 'system/helpers/DebounceCall';
+import IndexedEvents from 'system/helpers/IndexedEvents';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 

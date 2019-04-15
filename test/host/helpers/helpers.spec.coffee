@@ -1,4 +1,4 @@
-helpers = require('../../../host/helpers/helpers')
+helpers = require('../../../system/helpers/helpers')
 
 
 describe 'helpers.helpers', ->

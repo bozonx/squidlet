@@ -5,8 +5,8 @@ import * as rimraf from 'rimraf';
 import * as yaml from 'js-yaml';
 
 import systemConfig from '../hostEnvBuilder/configs/systemConfig';
-import {Stats} from '../host/interfaces/dev/StorageDev';
-import {callPromised} from '../host/helpers/helpers';
+import {Stats} from '../system/interfaces/dev/StorageDev';
+import {callPromised} from '../system/helpers/helpers';
 
 
 export default class Io {

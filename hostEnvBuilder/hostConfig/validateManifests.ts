@@ -1,4 +1,4 @@
-import {ManifestsTypeName} from '../../host/interfaces/ManifestTypes';
+import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
 import {
   isBoolean,
   isLocalPath,

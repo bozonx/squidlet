@@ -1,4 +1,4 @@
-lodashLike = require('../../../host/helpers/lodashLike')
+lodashLike = require('../../../system/helpers/lodashLike')
 
 
 describe 'helpers.lodashLike', ->

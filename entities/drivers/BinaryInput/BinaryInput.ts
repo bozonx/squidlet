@@ -1,10 +1,10 @@
-import IndexedEvents from 'host/helpers/IndexedEvents';
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import {WatchHandler} from 'host/interfaces/dev/DigitalDev';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'host/helpers/helpers';
-import {omit} from 'host/helpers/lodashLike';
+import IndexedEvents from 'system/helpers/IndexedEvents';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import {WatchHandler} from 'system/interfaces/dev/DigitalDev';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/helpers/helpers';
+import {omit} from 'system/helpers/lodashLike';
 
 import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
 

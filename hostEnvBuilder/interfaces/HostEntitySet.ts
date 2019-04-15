@@ -1,6 +1,6 @@
-import DeviceManifest from '../../host/interfaces/DeviceManifest';
-import DriverManifest from '../../host/interfaces/DriverManifest';
-import ServiceManifest from '../../host/interfaces/ServiceManifest';
+import DeviceManifest from '../../system/interfaces/DeviceManifest';
+import DriverManifest from '../../system/interfaces/DriverManifest';
+import ServiceManifest from '../../system/interfaces/ServiceManifest';
 
 
 export interface HostEntitiesSet {

@@ -3,9 +3,9 @@ import DigitalDev, {
   Edge,
   WatchHandler,
   DigitalInputMode
-} from 'host/interfaces/dev/DigitalDev';
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import DriverBase from 'host/baseDrivers/DriverBase';
+} from 'system/interfaces/dev/DigitalDev';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import DriverBase from 'system/baseDrivers/DriverBase';
 
 
 export class DigitalLocal extends DriverBase implements DigitalSubDriver {

@@ -5,7 +5,7 @@ import ResolveArgs from './ResolveArgs';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
-import systemConfig from '../../host/config/systemConfig';
+import systemConfig from '../../system/config/systemConfig';
 import BuildSystem from '../../shared/BuildSystem';
 import {BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
@@ -74,7 +74,7 @@ export default class Starter {
   }
 
   async startDevelopSystem() {
-    const System = require(`../../host/System`).default;
+    const System = require(`../../system`).default;
     const system = new System(this.devSet.devSet);
 
     return system.start();

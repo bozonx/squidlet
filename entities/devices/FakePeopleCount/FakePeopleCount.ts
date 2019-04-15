@@ -1,6 +1,6 @@
 // TODO: remove
 
-import DeviceBase from 'host/baseDevice/DeviceBase';
+import DeviceBase from 'system/baseDevice/DeviceBase';
 
 
 interface Props {

@@ -1,10 +1,10 @@
-import DriverFactoryBase from 'host/baseDrivers/DriverFactoryBase';
-import DriverBase from 'host/baseDrivers/DriverBase';
-import {GetDriverDep} from 'host/entities/EntityBase';
-import IndexedEvents from 'host/helpers/IndexedEvents';
-import {omit} from 'host/helpers/lodashLike';
-import {convertToLevel, invertIfNeed} from 'host/helpers/helpers';
-import {BlockMode, InitialLevel} from 'host/interfaces/Types';
+import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import DriverBase from 'system/baseDrivers/DriverBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import IndexedEvents from 'system/helpers/IndexedEvents';
+import {omit} from 'system/helpers/lodashLike';
+import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
+import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
 import {DigitalPinOutput} from '../DigitalPinOutput/DigitalPinOutput';
