@@ -31,7 +31,6 @@ export default class Props {
   resolve() {
     this._hostConfig = this.groupConfig.getHostConfig(this.args.hostName);
 
-
     this.validate();
 
     this.hostId = this.hostConfig.id as any;
