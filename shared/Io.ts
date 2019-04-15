@@ -45,16 +45,22 @@ export default class Io {
     return callPromised(fs.readdir, pathTo, systemConfig.filesEncode) as Promise<string[]>;
   }
 
+  readlink(pathTo: string): Promise<string> {
+    return callPromised(fs.readlink, pathTo);
+  }
+
+
   async exists(path: string): Promise<boolean> {
     return fs.existsSync(path);
   }
 
   async stat(pathTo: string): Promise<Stats> {
-    const stat = await callPromised(fs.stat, pathTo);
+    const stat = await callPromised(fs.lstat, pathTo);
 
     return {
       size: stat.size,
       dir: stat.isDirectory(),
+      symbolicLink: stat.isSymbolicLink(),
       mtime: stat.mtimeMs,
     };
   }

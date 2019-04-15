@@ -35,6 +35,10 @@ export default class Storage implements StorageDev {
     return callPromised(fs.readFile, pathTo, DEFAULT_ENCODE) as Promise<string>;
   }
 
+  readlink(pathTo: string): Promise<string> {
+    return callPromised(fs.readlink, pathTo);
+  }
+
   async readBinFile(pathTo: string): Promise<Uint8Array> {
     const buffer: Buffer = await callPromised(fs.readFile, pathTo);
 
@@ -59,11 +63,12 @@ export default class Storage implements StorageDev {
   }
 
   async stat(pathTo: string): Promise<Stats> {
-    const stat = await callPromised(fs.stat, pathTo);
+    const stat = await callPromised(fs.lstat, pathTo);
 
     return {
       size: stat.size,
       dir: stat.isDirectory(),
+      symbolicLink: stat.isSymbolicLink(),
       mtime: stat.mtimeMs,
     };
   }

@@ -74,6 +74,8 @@ export default class BuildDevs {
 
       // TODO: resolve sym link of devSrcFile
 
+      console.log(1111111111111,  await this.io.readlink(devSrcFile));
+
 
       const devDstFile: string = path.join(usedDevsDir, path.basename(devPath));
 
