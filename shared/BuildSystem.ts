@@ -8,7 +8,7 @@ import Io from './Io';
 import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from './constants';
 
 
-const systemSrc = path.resolve(__dirname, '../host');
+const systemSrc = path.resolve(__dirname, '../system');
 
 
 export default class BuildSystem {
