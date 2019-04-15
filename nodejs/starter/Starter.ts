@@ -68,7 +68,7 @@ export default class Starter {
     };
 
     // build config and entities
-    await this.buildHostEnv(initialHostConfig);
+    await this.buildEnvSet(initialHostConfig);
     // build devs
     await this.buildHostDevs(initialHostConfig);
   }
@@ -113,14 +113,14 @@ export default class Starter {
     await buildSystem.build(systemBuildDir, systemTmpDir);
   }
 
-  private async buildHostEnv(hostConfig: PreHostConfig) {
-    const hostBuildDir = path.join(this.props.envSetDir);
-    const hostTmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+  private async buildEnvSet(hostConfig: PreHostConfig) {
+    const buildDir = path.join(this.props.envSetDir);
+    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
-      hostBuildDir,
-      hostTmpDir
+      buildDir,
+      tmpDir
     );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
@@ -128,14 +128,13 @@ export default class Starter {
   }
 
   private async buildHostDevs(hostConfig: PreHostConfig) {
-    const buildDir = path.join(hostsBuildDir, this.hostId, BUILD_DEVS_DIR);
-    const tmpDir = path.join(hostsTmpDir, this.hostId, BUILD_DEVS_DIR);
-
+    const buildDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
+    const tmpDir = path.join(this.props.tmpDir, BUILD_DEVS_DIR);
     const buildDevs: BuildDevs = new BuildDevs(
       this.io,
       hostConfig,
-      this.dirs.hostsBuildDir,
-      this.dirs.hostsTmpDir
+      buildDir,
+      tmpDir
     );
 
     console.info(`===> Building devs`);

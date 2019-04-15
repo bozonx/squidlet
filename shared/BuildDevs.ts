@@ -8,10 +8,10 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {loadMachineConfig, parseDevName, resolvePlatformDir} from './helpers';
 import {
-  BUILD_DEVS_DIR,
   DEV_SET_FILE,
   LEGACY_DIR,
-  MODERN_DIR, ORIGINAL_DIR,
+  MODERN_DIR,
+  ORIGINAL_DIR,
 } from './constants';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import {Stats} from '../system/interfaces/dev/StorageDev';
@@ -21,29 +21,24 @@ export default class BuildDevs {
   private readonly preHostConfig: PreHostConfig;
   private readonly devsBuildDir: string;
   private readonly devsTmpDir: string;
-  private readonly hostId: string;
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly io: Io;
 
 
   constructor(io: Io, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
-    if (!preHostConfig.id) {
-      throw new Error(`Host has to have an id param`);
-    }
-    else if (!preHostConfig.platform) {
+    if (!preHostConfig.platform) {
       throw new Error(`Host config doesn't have a platform param`);
     }
     else if (!preHostConfig.machine) {
       throw new Error(`Host config doesn't have a machine param`);
     }
 
-    this.hostId = preHostConfig.id;
     this.platform = preHostConfig.platform;
     this.machine = preHostConfig.machine;
     this.preHostConfig = preHostConfig;
-    this.devsBuildDir = path.join(hostsBuildDir, this.hostId, BUILD_DEVS_DIR);
-    this.devsTmpDir = path.join(hostsTmpDir, this.hostId, BUILD_DEVS_DIR);
+    this.devsBuildDir = hostsBuildDir;
+    this.devsTmpDir = hostsTmpDir;
     this.io = io;
   }
 

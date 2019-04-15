@@ -9,6 +9,7 @@ import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
 import BuildDevs from '../shared/BuildDevs';
+import {BUILD_DEVS_DIR} from '../shared/constants';
 
 
 interface UpdateCommandParams {
@@ -74,17 +75,23 @@ export default class CommandUpdate {
   }
 
   private async updateHost(hostConfig: PreHostConfig) {
-    await this.buildHostDevs(hostConfig);
-    await this.buildHostEnv(hostConfig);
+    await this.buildDevs(hostConfig);
+    await this.buildEnvSet(hostConfig);
     await this.uploadToHost(hostConfig);
   }
 
-  private async buildHostDevs(hostConfig: PreHostConfig) {
+  private async buildDevs(hostConfig: PreHostConfig) {
+    if (!hostConfig.id) {
+      throw new Error(`Host has to have an id param`);
+    }
+
+    const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_DEVS_DIR);
+    const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_DEVS_DIR);
     const buildDevs: BuildDevs = new BuildDevs(
       this.io,
       hostConfig,
-      this.dirs.hostsBuildDir,
-      this.dirs.hostsTmpDir
+      buildDir,
+      tmpDir
     );
 
     console.info(`===> Building devs`);
@@ -92,7 +99,7 @@ export default class CommandUpdate {
     await buildDevs.build();
   }
 
-  private async buildHostEnv(hostConfig: PreHostConfig) {
+  private async buildEnvSet(hostConfig: PreHostConfig) {
     if (!hostConfig.id) {
       throw new Error(`Host has to have an id param`);
     }
