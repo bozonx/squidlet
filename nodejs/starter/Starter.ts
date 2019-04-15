@@ -31,7 +31,7 @@ export default class Starter {
     this.args = new ResolveArgs();
     this.groupConfig = new GroupConfigParser(this.io, this.args.configPath);
     this.props = new Props(this.args, this.groupConfig);
-    this.devSet = new DevsSet(this.io, this.machine);
+    this.devSet = new DevsSet(this.io, this.props.platform, this.machine);
   }
 
   async init() {
@@ -80,7 +80,6 @@ export default class Starter {
   async startProdSystem() {
     console.info(`===> making platform's dev set`);
 
-    // TODO: !!!!!
     const devSet: {[index: string]: DevClass} = await this.devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
