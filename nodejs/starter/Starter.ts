@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import Io from '../../shared/Io';
-import ResolveArgs from './ResolveArgs';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
@@ -14,25 +13,28 @@ import {DevClass} from '../../system/entities/DevManager';
 import BuildDevs from '../../shared/BuildDevs';
 
 
+// interface StarterArgs {
+//   configPath: string;
+//   workDir?: string;
+//   hostName?: string;
+// }
+
+
 const systemClassFileName = 'System';
 
 
 export default class Starter {
   private readonly io: Io = new Io();
   private readonly machine: string;
-  private readonly args: ResolveArgs;
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
   private readonly devSet: DevsSet;
 
 
-  constructor(machine: string, configPath: string, hostName?: string) {
+  constructor(machine: string, configPath: string, hostName?: string, workDir?: string) {
     this.machine = machine;
-    // TODO: remove
-    this.args = new ResolveArgs();
     this.groupConfig = new GroupConfigParser(this.io, configPath);
-    // TODO: add hostName
-    this.props = new Props(this.args, this.groupConfig);
+    this.props = new Props(this.groupConfig, hostName, workDir);
     this.devSet = new DevsSet(this.io, this.props.platform, this.machine, this.props.workDir);
   }
 

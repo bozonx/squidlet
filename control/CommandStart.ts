@@ -31,6 +31,7 @@ export default class CommandStart {
 
   async start() {
     const machine: string = await this.resolveMachine();
+    // TODO: add workDir
     const starter: Starter = new Starter(machine, this.configPath, this.args.name);
 
     await starter.init();
@@ -44,6 +45,7 @@ export default class CommandStart {
   }
 
 
+  // TODO: move to starter
   private async resolveMachine(): Promise<string> {
     if (this.args.machine) return this.args.machine;
 

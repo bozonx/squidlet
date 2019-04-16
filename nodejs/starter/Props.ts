@@ -5,6 +5,7 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import ResolveArgs from './ResolveArgs';
 import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from '../../shared/constants';
+import {resolveSquidletRoot} from '../../shared/helpers';
 
 
 export default class Props {
@@ -13,8 +14,10 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
+
+  private readonly argHostName?: string;
+  private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
-  private readonly args: ResolveArgs;
   private _hostConfig?: PreHostConfig;
 
   get hostConfig(): PreHostConfig {
@@ -22,25 +25,27 @@ export default class Props {
   }
 
 
-  constructor(args: ResolveArgs, groupConfig: GroupConfigParser) {
-    this.args = args;
+  constructor(groupConfig: GroupConfigParser, argHostName?: string, argWorkDir?: string) {
     this.groupConfig = groupConfig;
+    this.argHostName = argHostName;
+    this.argWorkDir = argWorkDir;
   }
 
 
   resolve() {
-    this._hostConfig = this.groupConfig.getHostConfig(this.args.hostName);
+    this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
 
     this.validate();
 
     this.hostId = this.hostConfig.id as any;
 
-    if (this.args.workDir) {
-      this.workDir = this.args.workDir;
+    if (this.argWorkDir) {
+      this.workDir = path.resolve(process.cwd(), this.argWorkDir);
     }
     else {
+      const squidletRoot: string = resolveSquidletRoot();
       // else use under a $SQUIDLET_ROOT
-      this.workDir = path.join(this.args.squidletRoot, HOSTS_WORK_DIRS, this.hostId);
+      this.workDir = path.join(squidletRoot, HOSTS_WORK_DIRS, this.hostId);
     }
 
     this.setPathsToHostConfig();
@@ -57,7 +62,7 @@ export default class Props {
     else if (!this._hostConfig.id) {
       throw new Error(`You have to specify an host id in your host config`);
     }
-    else if (this.args.hostName && this.args.hostName !== this.hostConfig.id) {
+    else if (this.argHostName && this.argHostName !== this.hostConfig.id) {
       throw new Error(`Param "id" of host config "${this.hostId}" is not as specified as a command argument "${this.args.hostName}"`);
     }
     else if (this.platform !== this.hostConfig.platform) {
