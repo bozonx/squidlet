@@ -1,4 +1,3 @@
-import * as yargs from 'yargs';
 import * as path from 'path';
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
@@ -19,6 +18,7 @@ interface UpdateCommandParams {
 
 
 export default class CommandUpdate {
+  private readonly positionArgs: string[];
   private readonly io: Io = new Io();
   private readonly params: UpdateCommandParams = this.resolveParams();
   private readonly groupConfig: GroupConfigParser = new GroupConfigParser(
@@ -27,6 +27,11 @@ export default class CommandUpdate {
   );
   private dirs: ResolveDirs = new ResolveDirs();
   private readonly buildSystem: BuildSystem = new BuildSystem(this.io);
+
+
+  constructor(positionArgs: string[]) {
+    this.positionArgs = positionArgs;
+  }
 
 
   async start() {
@@ -60,16 +65,16 @@ export default class CommandUpdate {
 
   private resolveParams(): UpdateCommandParams {
     // specified only config group path
-    if (yargs.argv._[1] && !yargs.argv._[2]) {
+    if (this.positionArgs[0] && !this.positionArgs[1]) {
       return {
-        groupConfigPath: yargs.argv._[1],
+        groupConfigPath: this.positionArgs[0],
       };
     }
     // specified host name and group config
-    else if (yargs.argv._[1] && yargs.argv._[2]) {
+    else if (this.positionArgs[0] && this.positionArgs[1]) {
       return {
-        hostName: yargs.argv._[1],
-        groupConfigPath: yargs.argv._[2],
+        hostName: this.positionArgs[0],
+        groupConfigPath: this.positionArgs[1],
       };
     }
 
