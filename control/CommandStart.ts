@@ -29,7 +29,7 @@ export default class CommandStart {
   async start() {
     const starter: Starter = new Starter(
       this.configPath,
-      this.args.machine,
+      this.args.machine as any,
       this.args.name,
       this.args.workDir
     );

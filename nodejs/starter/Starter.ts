@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io, {SpawnCmdResult} from '../../shared/Io';
+import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
@@ -11,14 +11,7 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
 import BuildDevs from '../../shared/BuildDevs';
-import Machines from '../interfaces/machines';
-
-
-// interface StarterArgs {
-//   configPath: string;
-//   workDir?: string;
-//   hostName?: string;
-// }
+import NodejsMachines from '../interfaces/NodejsMachines';
 
 
 const systemClassFileName = 'System';
@@ -30,19 +23,14 @@ export default class Starter {
   private readonly props: Props;
 
 
-  constructor(configPath: string, machine?: Machines, hostName?: string, workDir?: string) {
+  constructor(configPath: string, machine?: NodejsMachines, hostName?: string, workDir?: string) {
     this.groupConfig = new GroupConfigParser(this.io, configPath);
-    this.props = new Props(this.groupConfig, machine, hostName, workDir);
+    this.props = new Props(this.io, this.groupConfig, machine, hostName, workDir);
   }
 
   async init() {
     await this.groupConfig.init();
-
-    this.props.resolve();
-
-    console.log(11111111111, this.props)
-    // TODO: remove
-    throw new Error('999999999999999');
+    await this.props.resolve();
 
     console.info(`Using working dir ${this.props.workDir}`);
     console.info(`Using host ${this.props.hostConfig.id}`);

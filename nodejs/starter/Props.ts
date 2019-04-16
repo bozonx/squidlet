@@ -1,13 +1,13 @@
 import _trim = require('lodash/trim');
 import * as path from 'path';
 
+import Io, {SpawnCmdResult} from '../../shared/Io';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from '../../shared/constants';
 import {resolveSquidletRoot} from '../../shared/helpers';
-import {SpawnCmdResult} from '../../shared/Io';
-import Machines from '../interfaces/machines';
+import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 
 
 export default class Props {
@@ -19,19 +19,21 @@ export default class Props {
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
   }
-  get machine(): Machines {
+  get machine(): NodejsMachines {
     return this._machine as any;
   }
 
-  private readonly argMachine?: string;
+  private readonly io: Io;
+  private readonly argMachine?: NodejsMachines;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
   private _hostConfig?: PreHostConfig;
-  private _machine?: Machines;
+  private _machine?: NodejsMachines;
 
 
-  constructor(groupConfig: GroupConfigParser, argMachine?: Machines, argHostName?: string, argWorkDir?: string) {
+  constructor(io: Io, groupConfig: GroupConfigParser, argMachine?: NodejsMachines, argHostName?: string, argWorkDir?: string) {
+    this.io = io;
     this.groupConfig = groupConfig;
     this.argMachine = argMachine;
     this.argHostName = argHostName;
@@ -39,15 +41,13 @@ export default class Props {
   }
 
 
-  resolve() {
-    this._machine = this.resolveMachine();
+  async resolve() {
+    this._machine = await this.resolveMachine();
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
 
     this.validate();
 
     this.hostId = this.hostConfig.id as any;
-
-    // TODO: resolve machine
 
     if (this.argWorkDir) {
       this.workDir = path.resolve(process.cwd(), this.argWorkDir);
@@ -103,9 +103,14 @@ export default class Props {
     }
   }
 
-  private async resolveMachine(): Promise<Machines> {
-    // TODO: validate
-    if (this.args.machine) return this.args.machine;
+  private async resolveMachine(): Promise<NodejsMachines> {
+    if (this.argMachine) {
+      if (!nodejsSupportedMachines.includes(this.argMachine)) {
+        throw new Error(`Unsupported machine type "${this.argMachine}"`);
+      }
+
+      return this.argMachine;
+    }
 
     const spawnResult: SpawnCmdResult = await this.io.spawnCmd('hostnamectl');
 
@@ -115,21 +120,7 @@ export default class Props {
 
     const {os, arch} = this.parseHostNameCtlResult(spawnResult.stdout.join('\n'));
 
-    if (arch.match(/x86/)) {
-      // no matter which OS and 32 or 64 bits
-      return 'x86';
-    }
-    else if (arch === 'arm') {
-      // TODO: use cpuinfo to resolve Revision or other method
-      if (os.match(/Raspbian/)) {
-        return 'rpi';
-      }
-      else {
-        return 'arm';
-      }
-    }
-
-    throw new Error(`Unsupported architecture "${arch}"`);
+    return this.resolveMachineByOsAndArch(os, arch);
   }
 
   private parseHostNameCtlResult(stdout: string): {os: string, arch: string} {
@@ -147,6 +138,24 @@ export default class Props {
       os: _trim(osMatch[1]),
       arch: architectureMatch[1],
     };
+  }
+
+  private resolveMachineByOsAndArch(os: string, arch: string): NodejsMachines {
+    if (arch.match(/x86/)) {
+      // no matter which OS and 32 or 64 bits
+      return 'x86';
+    }
+    else if (arch === 'arm') {
+      // TODO: use cpuinfo to resolve Revision or other method
+      if (os.match(/Raspbian/)) {
+        return 'rpi';
+      }
+      else {
+        return 'arm';
+      }
+    }
+
+    throw new Error(`Unsupported architecture "${arch}"`);
   }
 
 }
