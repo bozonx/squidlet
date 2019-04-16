@@ -9,10 +9,6 @@
   },
   "license": "MIT",
   "scripts": {
-    "start":    "ts-node ./nodejs/start-x86-dev.ts",
-    "x86-prod": "ts-node ./nodejs/start-x86-prod.ts",
-    "rpi-dev":  "ts-node ./nodejs/start-rpi-dev.ts",
-    "rpi-prod": "ts-node ./nodejs/start-rpi-prod.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json",
     "postinstall": "cd node_modules && ln -s ../system ./"

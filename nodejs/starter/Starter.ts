@@ -39,10 +39,27 @@ export default class Starter {
 
     this.props.resolve();
 
+    // TODO: remove
+    throw new Error('999999999999999');
+
     console.info(`Using working dir ${this.props.workDir}`);
     console.info(`Using host ${this.props.hostConfig.id}`);
   }
 
+
+  async startDev() {
+    await starter.init();
+    await starter.buildDevelopEnvSet();
+    await starter.installDevModules();
+    await starter.startDevelopSystem();
+  }
+
+  async startProd() {
+    await starter.init();
+    await starter.buildInitialProdSystem();
+    await starter.installProdModules();
+    await starter.startProdSystem();
+  }
 
   async installDevModules() {
     console.info(`===> Install npm modules`);
