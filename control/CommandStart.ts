@@ -13,7 +13,7 @@ interface CommandStartArgs {
 
 export default class CommandStart {
   private readonly args: CommandStartArgs;
-  private readonly groupConfigPath: string;
+  private readonly configPath: string;
   private readonly isProd: boolean;
   private readonly io: Io = new Io();
 
@@ -24,16 +24,14 @@ export default class CommandStart {
     }
 
     this.args = args;
-    this.groupConfigPath = positionArgs[0];
+    this.configPath = positionArgs[0];
     this.isProd = Boolean(args.prod);
   }
 
 
   async start() {
     const machine: string = await this.resolveMachine();
-    const starter: Starter = new Starter(machine);
-
-    // TODO: как использовать groupConfigPath и name????
+    const starter: Starter = new Starter(machine, this.configPath, this.args.name);
 
     await starter.init();
 
@@ -55,19 +53,7 @@ export default class CommandStart {
       throw new Error(`Can't execute a "hostnamectl" command: ${spawnResult.stderr.join('\n')}`);
     }
 
-    const stdout: string = spawnResult.stdout.join('\n');
-    const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
-    const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
-
-    if (!osMatch) {
-      throw new Error(`Can't resolve an operating system of the machine`);
-    }
-    else if (!architectureMatch) {
-      throw new Error(`Can't resolve an architecture of the machine`);
-    }
-
-    const os: string = _trim(osMatch[1]);
-    const arch: string = architectureMatch[1];
+    const {os, arch} = this.parseHostNameCtlResult(spawnResult.stdout.join('\n'));
 
     if (arch.match(/x86/)) {
       // no matter which OS and 32 or 64 bits
@@ -82,9 +68,25 @@ export default class CommandStart {
         return 'arm';
       }
     }
-    else {
-      throw new Error(`Unsupported architecture "${arch}"`);
+
+    throw new Error(`Unsupported architecture "${arch}"`);
+  }
+
+  private parseHostNameCtlResult(stdout: string): {os: string, arch: string} {
+    const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
+    const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
+
+    if (!osMatch) {
+      throw new Error(`Can't resolve an operating system of the machine`);
     }
+    else if (!architectureMatch) {
+      throw new Error(`Can't resolve an architecture of the machine`);
+    }
+
+    return {
+      os: _trim(osMatch[1]),
+      arch: architectureMatch[1],
+    };
   }
 
 }

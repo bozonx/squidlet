@@ -26,10 +26,12 @@ export default class Starter {
   private readonly devSet: DevsSet;
 
 
-  constructor(machine: string) {
+  constructor(machine: string, configPath: string, hostName?: string) {
     this.machine = machine;
+    // TODO: remove
     this.args = new ResolveArgs();
-    this.groupConfig = new GroupConfigParser(this.io, this.args.configPath);
+    this.groupConfig = new GroupConfigParser(this.io, configPath);
+    // TODO: add hostName
     this.props = new Props(this.args, this.groupConfig);
     this.devSet = new DevsSet(this.io, this.props.platform, this.machine, this.props.workDir);
   }
