@@ -1,8 +1,12 @@
 import * as path from 'path';
-import * as yargs from 'yargs';
 
 import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR, BUILD_SYSTEM_DIR} from '../shared/constants';
 import {resolveSquidletRoot} from '../shared/helpers';
+
+
+export interface Args {
+  workDir: string;
+}
 
 
 export default class ResolveDirs {
@@ -12,6 +16,13 @@ export default class ResolveDirs {
   systemTmpDir: string = '';
   hostsBuildDir: string = '';
   hostsTmpDir: string = '';
+  private readonly args: Args;
+
+
+  constructor(args: Args) {
+    this.args = args;
+  }
+
 
   resolve() {
     this.workDir = this.resolveWorkDir();
@@ -24,7 +35,7 @@ export default class ResolveDirs {
 
 
   private resolveWorkDir(): string {
-    let workDirArg: string | undefined = <string | undefined>yargs.argv['work-dir'];
+    let workDirArg: string | undefined = this.args.workDir;
 
     if (workDirArg) {
       // if it set as an argument - make it absolute
@@ -37,13 +48,6 @@ export default class ResolveDirs {
     return path.join(squidletRoot, BUILD_ROOT_DIR);
   }
 
-  private resolvePath(configBase: string, pathInConfig?: string, argPath?: string): string | undefined {
-    if (pathInConfig) {
-      return path.resolve(configBase, pathInConfig);
-    }
-
-    return argPath;
-  }
 
 }
 
@@ -52,6 +56,14 @@ export default class ResolveDirs {
 // interface ArgsDirs {
 //   buildDir: string | undefined;
 //   tmpDir: string | undefined;
+// }
+
+// private resolvePath(configBase: string, pathInConfig?: string, argPath?: string): string | undefined {
+//   if (pathInConfig) {
+//     return path.resolve(configBase, pathInConfig);
+//   }
+//
+//   return argPath;
 // }
 
 // const configBase: string = path.dirname(groupConfig.groupConfigPath);

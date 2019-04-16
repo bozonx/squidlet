@@ -5,7 +5,7 @@ import UpdateHost from './UpdateHost';
 import GroupConfigParser from '../shared/GroupConfigParser';
 import Io from '../shared/Io';
 import BuildHostEnv from '../shared/BuildHostEnv';
-import ResolveDirs from './ResolveDirs';
+import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
 import BuildDevs from '../shared/BuildDevs';
 import {BUILD_DEVS_DIR} from '../shared/constants';
@@ -25,15 +25,13 @@ export default class CommandUpdate {
     this.io,
     this.params.groupConfigPath
   );
-  private dirs: ResolveDirs = new ResolveDirs();
+  private readonly dirs: ResolveDirs;
   private readonly buildSystem: BuildSystem = new BuildSystem(this.io);
 
 
-  constructor(positionArgs: string[], args: {[index: string]: any}) {
+  constructor(positionArgs: string[], args: Args) {
     this.positionArgs = positionArgs;
-
-    // TODO: use args !!!!
-
+    this.dirs = new ResolveDirs(args);
   }
 
 
