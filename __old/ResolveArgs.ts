@@ -4,7 +4,7 @@
 
 import * as path from 'path';
 import * as yargs from 'yargs';
-import {resolveSquidletRoot} from '../../shared/helpers';
+import {resolveSquidletRoot} from '../shared/helpers';
 
 
 

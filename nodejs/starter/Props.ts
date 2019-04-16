@@ -3,7 +3,7 @@ import * as path from 'path';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import ResolveArgs from './ResolveArgs';
+import ResolveArgs from '../../__old/ResolveArgs';
 import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from '../../shared/constants';
 import {resolveSquidletRoot} from '../../shared/helpers';
 
