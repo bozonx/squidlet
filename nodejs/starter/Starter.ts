@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _trim = require('lodash/trim');
 
 import Io, {SpawnCmdResult} from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -12,6 +11,7 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
 import BuildDevs from '../../shared/BuildDevs';
+import Machines from '../interfaces/machines';
 
 
 // interface StarterArgs {
@@ -30,7 +30,7 @@ export default class Starter {
   private readonly props: Props;
 
 
-  constructor(configPath: string, machine?: string, hostName?: string, workDir?: string) {
+  constructor(configPath: string, machine?: Machines, hostName?: string, workDir?: string) {
     this.groupConfig = new GroupConfigParser(this.io, configPath);
     this.props = new Props(this.groupConfig, machine, hostName, workDir);
   }

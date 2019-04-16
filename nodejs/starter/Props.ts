@@ -1,3 +1,4 @@
+import _trim = require('lodash/trim');
 import * as path from 'path';
 
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
@@ -6,11 +7,11 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from '../../shared/constants';
 import {resolveSquidletRoot} from '../../shared/helpers';
 import {SpawnCmdResult} from '../../shared/Io';
+import Machines from '../interfaces/machines';
 
 
 export default class Props {
   workDir: string = '';
-  machine: string = '';
   envSetDir: string = '';
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
@@ -18,15 +19,19 @@ export default class Props {
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
   }
+  get machine(): Machines {
+    return this._machine as any;
+  }
 
   private readonly argMachine?: string;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
   private _hostConfig?: PreHostConfig;
+  private _machine?: Machines;
 
 
-  constructor(groupConfig: GroupConfigParser, argMachine?: string, argHostName?: string, argWorkDir?: string) {
+  constructor(groupConfig: GroupConfigParser, argMachine?: Machines, argHostName?: string, argWorkDir?: string) {
     this.groupConfig = groupConfig;
     this.argMachine = argMachine;
     this.argHostName = argHostName;
