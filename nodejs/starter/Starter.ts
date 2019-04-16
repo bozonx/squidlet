@@ -48,30 +48,29 @@ export default class Starter {
 
 
   async startDev() {
-    await starter.init();
-    await starter.buildDevelopEnvSet();
-    await starter.installDevModules();
-    await starter.startDevelopSystem();
+    await this.buildDevelopEnvSet();
+    await this.installDevModules();
+    await this.startDevelopSystem();
   }
 
   async startProd() {
-    await starter.init();
-    await starter.buildInitialProdSystem();
-    await starter.installProdModules();
-    await starter.startProdSystem();
+    await this.buildInitialProdSystem();
+    await this.installProdModules();
+    await this.startProdSystem();
   }
 
-  async installDevModules() {
+
+  private async installDevModules() {
     console.info(`===> Install npm modules`);
     // TODO: в dev режиме делается npm i в папку с x86 или rpi
   }
 
-  async installProdModules() {
+  private async installProdModules() {
     console.info(`===> Install npm modules`);
     // TODO: в прод режиме делается npm i в папку devs в envset папке
   }
 
-  async buildInitialProdSystem() {
+  private async buildInitialProdSystem() {
     const pathToSystemDir = this.getPathToProdSystemDir();
 
     // else if it exists - do nothing
@@ -92,11 +91,11 @@ export default class Starter {
     await this.buildHostDevs(initialHostConfig);
   }
 
-  async buildDevelopEnvSet() {
+  private async buildDevelopEnvSet() {
     // TODO: сбилдить конфиги хоста где указанны пути к реальному главному ts файлу
   }
 
-  async startProdSystem() {
+  private async startProdSystem() {
     console.info(`===> making platform's dev set`);
 
     const devSet: {[index: string]: DevClass} = await this.devSet.makeProdDevSet();
@@ -107,7 +106,7 @@ export default class Starter {
     return system.start();
   }
 
-  async startDevelopSystem() {
+  private async startDevelopSystem() {
     console.info(`===> making platform's dev set`);
 
     const devSet: {[index: string]: DevClass} = await this.devSet.makeDevelopDevSet();

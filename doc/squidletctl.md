@@ -36,17 +36,12 @@ Also you can specify the next params:
  
 ### Start production host
 
-x86 machine
-
-    squidlet start x86 [--prod] [--work-dir] [--name] ./groupOrHostConfig.yaml
-    
-Raspberry pi
-
-    squidlet start rpi [--prod] [--work-dir] [--name] ./groupOrHostConfig.yaml
+    squidlet start [--machine=x86 | rpi] [--prod] [--work-dir] [--name] ./groupOrHostConfig.yaml
 
 ### Parameters
 
-* x86 or rpi means which machine is used
+* --machine can be x86 or rpi. It means which machine is used.
+  It tries recognize it if this argument isn't set
 * --prod - if set then production version will be used instead development if isn't set
 * --work-dir - set working dir for host where envset, data and tmp dirs will be placed.
   By default it is upder $SQUIDLET_ROOT dir

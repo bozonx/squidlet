@@ -8,39 +8,42 @@ import Starter from '../nodejs/starter/Starter';
 
 
 export default class CommandStart {
-  private readonly positionArgs: string[];
+  //private readonly positionArgs: string[];
   private readonly groupConfigPath: string;
+  private readonly isProd: boolean;
   private readonly io: Io = new Io();
 
 
-  constructor(positionArgs: string[]) {
+  constructor(positionArgs: string[], args: {[index: string]: string}) {
     if (positionArgs.length !== 2) {
       throw new Error(`You should specify a group config path`);
     }
 
-    this.positionArgs = positionArgs;
+    //this.positionArgs = positionArgs;
     this.groupConfigPath = positionArgs[0];
-    this.groupConfigPath = positionArgs[1];
+    this.isProd = Boolean(args.prod);
   }
 
 
   async start() {
-    // TODO: resolve machine
+    const machine: string = await this.resolveMachine();
     // TODO: resolve dev or prod
 
-    const starter: Starter = new Starter('x86');
+    const starter: Starter = new Starter(machine);
 
-    // start()
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
+    await starter.init();
 
-    /*
-    "start":    "ts-node ./nodejs/start-x86-dev.ts",
-    "x86-prod": "ts-node ./nodejs/start-x86-prod.ts",
-    "rpi-dev":  "ts-node ./nodejs/start-rpi-dev.ts",
-    "rpi-prod": "ts-node ./nodejs/start-rpi-prod.ts",
-     */
+    if (this.isProd) {
+      await starter.startProd();
+    }
+    else {
+      await starter.startDev();
+    }
+  }
+
+
+  private async resolveMachine(): Promise<string> {
+    // TODO: resolve machine
   }
 
 }
