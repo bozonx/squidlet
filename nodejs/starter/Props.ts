@@ -40,6 +40,7 @@ export default class Props {
 
 
   resolve() {
+    this._machine = this.resolveMachine();
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
 
     this.validate();
@@ -102,7 +103,8 @@ export default class Props {
     }
   }
 
-  private async resolveMachine(): Promise<string> {
+  private async resolveMachine(): Promise<Machines> {
+    // TODO: validate
     if (this.args.machine) return this.args.machine;
 
     const spawnResult: SpawnCmdResult = await this.io.spawnCmd('hostnamectl');
