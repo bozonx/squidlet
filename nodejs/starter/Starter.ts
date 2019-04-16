@@ -26,17 +26,13 @@ const systemClassFileName = 'System';
 
 export default class Starter {
   private readonly io: Io = new Io();
-  private readonly machine: string;
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
-  private readonly devSet: DevsSet;
 
 
   constructor(configPath: string, machine?: string, hostName?: string, workDir?: string) {
-    this.machine = machine;
     this.groupConfig = new GroupConfigParser(this.io, configPath);
-    this.props = new Props(this.groupConfig, hostName, workDir);
-    this.devSet = new DevsSet(this.io, this.props.platform, this.machine, this.props.workDir);
+    this.props = new Props(this.groupConfig, machine, hostName, workDir);
   }
 
   async init() {
@@ -44,6 +40,7 @@ export default class Starter {
 
     this.props.resolve();
 
+    console.log(11111111111, this.props)
     // TODO: remove
     throw new Error('999999999999999');
 
@@ -87,7 +84,7 @@ export default class Starter {
       // TODO: generae id or special guid
       id: 'initialHost',
       platform: this.props.platform,
-      machine: this.machine,
+      machine: this.props.machine,
     };
 
     // build config and entities
@@ -103,10 +100,16 @@ export default class Starter {
   private async startProdSystem() {
     console.info(`===> making platform's dev set`);
 
-    const devSet: {[index: string]: DevClass} = await this.devSet.makeProdDevSet();
+    const devSet: DevsSet = new DevsSet(
+      this.io,
+      this.props.platform,
+      this.props.machine,
+      this.props.workDir
+    );
+    const completedDevSet: {[index: string]: DevClass} = await devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
-    const system = new System(devSet);
+    const system = new System(completedDevSet);
 
     return system.start();
   }
@@ -114,9 +117,15 @@ export default class Starter {
   private async startDevelopSystem() {
     console.info(`===> making platform's dev set`);
 
-    const devSet: {[index: string]: DevClass} = await this.devSet.makeDevelopDevSet();
+    const devSet: DevsSet = new DevsSet(
+      this.io,
+      this.props.platform,
+      this.props.machine,
+      this.props.workDir
+    );
+    const completedDevSet: {[index: string]: DevClass} = await devSet.makeDevelopDevSet();
     const System = require(`../../system`).default;
-    const system = new System(devSet);
+    const system = new System(completedDevSet);
 
     return system.start();
   }
@@ -162,51 +171,6 @@ export default class Starter {
     console.info(`===> Building devs`);
 
     await buildDevs.build();
-  }
-
-  private async resolveMachine(): Promise<string> {
-    if (this.args.machine) return this.args.machine;
-
-    const spawnResult: SpawnCmdResult = await this.io.spawnCmd('hostnamectl');
-
-    if (spawnResult.status !== 0) {
-      throw new Error(`Can't execute a "hostnamectl" command: ${spawnResult.stderr.join('\n')}`);
-    }
-
-    const {os, arch} = this.parseHostNameCtlResult(spawnResult.stdout.join('\n'));
-
-    if (arch.match(/x86/)) {
-      // no matter which OS and 32 or 64 bits
-      return 'x86';
-    }
-    else if (arch === 'arm') {
-      // TODO: use cpuinfo to resolve Revision or other method
-      if (os.match(/Raspbian/)) {
-        return 'rpi';
-      }
-      else {
-        return 'arm';
-      }
-    }
-
-    throw new Error(`Unsupported architecture "${arch}"`);
-  }
-
-  private parseHostNameCtlResult(stdout: string): {os: string, arch: string} {
-    const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
-    const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
-
-    if (!osMatch) {
-      throw new Error(`Can't resolve an operating system of the machine`);
-    }
-    else if (!architectureMatch) {
-      throw new Error(`Can't resolve an architecture of the machine`);
-    }
-
-    return {
-      os: _trim(osMatch[1]),
-      arch: architectureMatch[1],
-    };
   }
 
 }
