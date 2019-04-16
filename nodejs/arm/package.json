@@ -1,0 +1,16 @@
+{
+  "name": "squidlet-nodejs-x86",
+  "version": "1.5.0",
+  "description": "Starting squidlet on nodejs",
+  "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
+  "repository": "git@github.com:bozonx/squidlet.git",
+  "engines": {
+    "node": ">=10.9.0"
+  },
+  "dependencies": {
+    "mqtt": "^2.18.8"
+  },
+  "devDependencies": {
+    "@types/node": "^11.13.4"
+  }
+}

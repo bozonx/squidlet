@@ -29,8 +29,11 @@ export default class CommandUpdate {
   private readonly buildSystem: BuildSystem = new BuildSystem(this.io);
 
 
-  constructor(positionArgs: string[]) {
+  constructor(positionArgs: string[], args: {[index: string]: any}) {
     this.positionArgs = positionArgs;
+
+    // TODO: use args !!!!
+
   }
 
 
