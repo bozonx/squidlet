@@ -8,8 +8,8 @@ import {EntityClassType} from '../system/entities/EntityManagerBase';
 import HostEnvSet from './interfaces/HostEnvSet';
 import {trimEnd} from '../system/helpers/lodashLike';
 import {pathJoin} from '../system/helpers/nodeLike';
-import StorageDev from '../nodejs/rpi/Storage';
 import EnvSet from '../system/interfaces/EnvSet';
+import StorageDev from '../system/interfaces/dev/StorageDev';
 
 
 let configSet: HostEnvSet;
@@ -70,13 +70,6 @@ export default class EnvSetMemory implements EnvSet {
 
     try {
       return require(filePath).default;
-
-      //import * as ts from 'typescript';
-      //import tsOptions from '../tsconfig.json';
-      //const tsOptions = require('../tsconfig.json');
-      // const content = await this.devStorage.readFile(filePath);
-      // let result = ts.transpile(content, tsOptions);
-      // return eval(result);
     }
     catch (err) {
       throw new Error(`Tried to load entity "${pluralType}/${entityName}" main file "${filePath}": ${err}`);

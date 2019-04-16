@@ -29,9 +29,9 @@ export default class CommandUpdate {
   private readonly buildSystem: BuildSystem = new BuildSystem(this.io);
 
 
-  constructor(positionArgs: string[], args: Args) {
+  constructor(positionArgs: string[], args: {[index: string]: any}) {
     this.positionArgs = positionArgs;
-    this.dirs = new ResolveDirs(args);
+    this.dirs = new ResolveDirs(args as Args);
   }
 
 
