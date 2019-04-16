@@ -14,16 +14,16 @@ export default async function resolveCommand() {
   }
 
   const COMMAND: string = positionArgs[0];
-  const positonArgsRest: string[] = positionArgs.slice(1, positionArgs.length);
+  const positionArgsRest: string[] = positionArgs.slice(1, positionArgs.length);
 
   if (COMMAND === 'update') {
-    const commandUpdate: CommandUpdate = new CommandUpdate(positonArgsRest, args);
+    const commandUpdate: CommandUpdate = new CommandUpdate(positionArgsRest, args);
 
     return commandUpdate.start();
   }
 
   if (COMMAND === 'start') {
-    const commandUpdate: CommandStart = new CommandStart(positonArgsRest, args);
+    const commandUpdate: CommandStart = new CommandStart(positionArgsRest, args);
 
     return commandUpdate.start();
   }

@@ -3,7 +3,6 @@ import * as path from 'path';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import ResolveArgs from '../../__old/ResolveArgs';
 import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from '../../shared/constants';
 import {resolveSquidletRoot} from '../../shared/helpers';
 
@@ -14,15 +13,14 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
+  get hostConfig(): PreHostConfig {
+    return this._hostConfig as any;
+  }
 
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
   private _hostConfig?: PreHostConfig;
-
-  get hostConfig(): PreHostConfig {
-    return this._hostConfig as any;
-  }
 
 
   constructor(groupConfig: GroupConfigParser, argHostName?: string, argWorkDir?: string) {
@@ -43,8 +41,9 @@ export default class Props {
       this.workDir = path.resolve(process.cwd(), this.argWorkDir);
     }
     else {
-      const squidletRoot: string = resolveSquidletRoot();
       // else use under a $SQUIDLET_ROOT
+      const squidletRoot: string = resolveSquidletRoot();
+
       this.workDir = path.join(squidletRoot, HOSTS_WORK_DIRS, this.hostId);
     }
 
@@ -63,7 +62,8 @@ export default class Props {
       throw new Error(`You have to specify an host id in your host config`);
     }
     else if (this.argHostName && this.argHostName !== this.hostConfig.id) {
-      throw new Error(`Param "id" of host config "${this.hostId}" is not as specified as a command argument "${this.args.hostName}"`);
+      throw new Error(`Param "id" of host config "${this.hostId}" is not as specified as`
+        + ` a command argument "${this.argHostName}"`);
     }
     else if (this.platform !== this.hostConfig.platform) {
       throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);

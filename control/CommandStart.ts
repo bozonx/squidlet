@@ -1,4 +1,3 @@
-import Io from '../shared/Io';
 import Starter from '../nodejs/starter/Starter';
 
 
@@ -11,10 +10,9 @@ interface CommandStartArgs {
 
 
 export default class CommandStart {
-  private readonly args: CommandStartArgs;
   private readonly configPath: string;
+  private readonly args: CommandStartArgs;
   private readonly isProd: boolean;
-  private readonly io: Io = new Io();
 
 
   constructor(positionArgs: string[], args: CommandStartArgs) {
@@ -22,8 +20,8 @@ export default class CommandStart {
       throw new Error(`You should specify a group config path`);
     }
 
-    this.args = args;
     this.configPath = positionArgs[0];
+    this.args = args;
     this.isProd = Boolean(args.prod);
   }
 
@@ -38,12 +36,10 @@ export default class CommandStart {
 
     await starter.init();
 
-    if (this.isProd) {
-      await starter.startProd();
-    }
-    else {
-      await starter.startDev();
-    }
+    // run prod is specified
+    if (this.isProd) return starter.startProd();
+    // or run dev
+    return starter.startDev();
   }
 
 }
