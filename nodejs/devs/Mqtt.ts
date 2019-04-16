@@ -3,7 +3,7 @@
  */
 
 // @ts-ignore
-import * as mqtt from 'Mqtt';
+import * as mqtt from 'mqtt';
 
 import MqttDev from 'system/interfaces/dev/MqttDev';
 
