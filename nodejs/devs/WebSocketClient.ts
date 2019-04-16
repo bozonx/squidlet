@@ -1,12 +1,12 @@
 import * as WebSocket from 'ws';
 
-import WebSocketClientDev, {WSClientDev} from '../../system/interfaces/dev/WebSocketClientDev';
+import WebSocketClientDev, {WebSocketClientProps, WSClientDev} from '../../system/interfaces/dev/WebSocketClientDev';
 
 
 export class WSClient implements WSClientDev {
   private readonly client: WebSocket;
 
-  constructor() {
+  constructor(props: WebSocketClientProps) {
     this.client = new WebSocket('ws://www.host.com/path', {
     });
   }
@@ -26,5 +26,7 @@ export class WSClient implements WSClientDev {
 }
 
 export default class WebSocketClient implements WebSocketClientDev {
-  // TODO: !!!!
+  newClient(props: WebSocketClientProps): WSClient {
+    return new WSClient(props);
+  }
 }
