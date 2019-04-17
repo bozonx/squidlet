@@ -4,12 +4,14 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 const machineConfig: MachineConfig = {
   devs: [
     '../shared/nodeJsLike/Storage.ts',
+    '../shared/nodeJsLike/WebSocketClient.js',
+    '../shared/nodeJsLike/WebSocketServer.js',
     //'Sha1',
     './devs/Digital.ts',
     //'Pwm',
     //'Serial',
     //'Spi',
-    //'Wifi',
+    './devs/Wifi',
     //'Bluetooth',
     './devs/I2cMaster.ts',
 

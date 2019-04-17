@@ -5,6 +5,8 @@ const machineConfig: MachineConfig = {
   devs: [
     './devs/Mqtt.ts',
     '../shared/nodeJsLike/Storage.ts',
+    '../shared/nodeJsLike/WebSocketClient.js',
+    '../shared/nodeJsLike/WebSocketServer.js',
     //'Sha1',
     //'Serial',
     //'Wifi',
