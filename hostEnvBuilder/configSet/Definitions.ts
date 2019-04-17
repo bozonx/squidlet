@@ -7,6 +7,7 @@ import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 import {validateProps} from '../../system/helpers/validate';
+import DevsDefinitions from '../../system/interfaces/DevsDefinitions';
 
 
 /**
@@ -37,6 +38,10 @@ export default class Definitions {
 
   getServicesDefinitions(): {[index: string]: EntityDefinition} {
     return this.servicesDefinitions;
+  }
+
+  getDevsDefinitions(): DevsDefinitions {
+    return this.configManager.devsDefinitions;
   }
 
   /**

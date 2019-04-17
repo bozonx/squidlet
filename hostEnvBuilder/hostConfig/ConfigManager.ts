@@ -10,6 +10,7 @@ import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig, makeDevNames} from '../../shared/helpers';
+import DevsDefinitions from '../../system/interfaces/DevsDefinitions';
 
 
 export default class ConfigManager {
@@ -22,6 +23,7 @@ export default class ConfigManager {
     drivers: {},
     services: {},
   };
+  devsDefinitions: DevsDefinitions;
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   // env build dir
@@ -64,6 +66,7 @@ export default class ConfigManager {
     const normalizedConfig: PreHostConfig = normalizeHostConfig(mergedConfig);
 
     this.devicesDefaults = normalizedConfig.devicesDefaults;
+    this.devsDefinitions = normalizedConfig.devs || {};
     this.preEntities = {
       devices: normalizedConfig.devices || {},
       drivers: normalizedConfig.drivers || {},
