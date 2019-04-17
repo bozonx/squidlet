@@ -1,3 +1,3 @@
-export default interface DevDefinitions {
+export default interface DevsDefinitions {
   [index: string]: {[index: string]: any};
 }
