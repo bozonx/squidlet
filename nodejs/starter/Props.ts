@@ -16,7 +16,6 @@ import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachi
 
 export default class Props {
   workDir: string = '';
-  varDataDir: string = '';
   envSetDir: string = '';
   tmpDir: string = '';
   platform: Platforms = 'nodejs';

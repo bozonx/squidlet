@@ -56,14 +56,18 @@ export default class Starter {
   }
 
 
-  private async installDevModules() {
-    console.info(`===> Install npm modules`);
-    // TODO: в dev режиме делается npm i в папку с x86 или rpi
-  }
-
   private async installProdModules() {
     console.info(`===> Install npm modules`);
-    // TODO: в прод режиме делается npm i в папку devs в envset папке
+    const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
+
+    await this.io.spawnCmd('npm install', cwd);
+  }
+
+  private async installDevModules() {
+    console.info(`===> Install npm modules`);
+    const cwd: string = path.resolve(__dirname, '../', this.props.machine);
+
+    await this.io.spawnCmd('npm install', cwd);
   }
 
   private async buildInitialProdSystem() {
@@ -121,11 +125,11 @@ export default class Starter {
     );
     const completedDevSet: {[index: string]: DevClass} = await devSet.makeDevelopDevSet();
     const System = require(`../../system`).default;
+    const systemConfigExtend = this.makeSystemConfigExtend();
 
-    // TODO: pass a system paths
     // TODO: pass a memory EnvSet manager
 
-    const system = new System(completedDevSet);
+    const system = new System(completedDevSet, systemConfigExtend);
 
     return system.start();
   }
@@ -159,7 +163,7 @@ export default class Starter {
   }
 
   private async buildHostDevs(hostConfig: PreHostConfig) {
-    const buildDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
+    const buildDir = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_DEVS_DIR);
     const buildDevs: BuildDevs = new BuildDevs(
       this.io,
