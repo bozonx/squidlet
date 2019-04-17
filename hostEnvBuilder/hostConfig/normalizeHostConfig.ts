@@ -1,7 +1,8 @@
 import _omit = require('lodash/omit');
+import _cloneDeep = require('lodash/cloneDeep');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
-import {servicesShortcut} from '../dict/dict';
+import {defaultServices, servicesShortcut} from '../dict/dict';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
@@ -99,21 +100,50 @@ function getDefinitionClassName(type: ManifestsTypeName, id: string, preDefiniti
   return preDefinitions[type];
 }
 
+function makeDefaultServices(
+  preHostConfig: PreHostConfig,
+  existentServices: {[index: string]: any}
+): {[index: string]: any} {
+  const fullServices: {[index: string]: any} = _cloneDeep(existentServices);
+
+  for(let serviceId of defaultServices) {
+    // if it has a definition of is disabled - do nothing
+    if (fullServices[serviceId] || (preHostConfig as any)[serviceId] === null) continue;
+
+    const serviceClassName: string | undefined = servicesShortcut[serviceId];
+
+    if (!serviceClassName) {
+      throw new Error(`Can't find full service name of "${serviceId}"`);
+    }
+
+    // make default service definition if is hasn't been defined
+    fullServices[serviceId] = {
+      className: serviceClassName,
+    };
+  }
+
+  return fullServices;
+}
+
 
 /**
  * Make devices plain, fill services from shortcuts and convert drivers and devices definitions
  */
 export default function normalizeHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
   const plainDevices: {[index: string]: any} = makeDevicesPlain(preHostConfig.devices);
+  const services = {
+    ...convertDefinitions('service', preHostConfig.services || {}),
+    // make services from shortcut
+    ...collectServicesFromShortcuts(preHostConfig, servicesShortcut),
+  };
 
   return {
     ..._omit(preHostConfig, Object.keys(servicesShortcut)),
     devices: convertDefinitions('device', plainDevices),
     drivers: convertDefinitions('driver', preHostConfig.drivers || {}),
-    services: {
-      ...convertDefinitions('service', preHostConfig.services || {}),
-      // make services from shortcut
-      ...collectServicesFromShortcuts(preHostConfig, servicesShortcut),
-    },
+
+    // TODO: test it
+
+    services: makeDefaultServices(preHostConfig, services),
   };
 }
