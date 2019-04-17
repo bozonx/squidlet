@@ -39,6 +39,10 @@ describe 'envBuilder.normalizeHostConfig', ->
         }
       }
       services: {
+        # default service
+        logger: {
+          className: 'Logger'
+        }
         myService: {
           className: 'ServiceClass'
           param: 1

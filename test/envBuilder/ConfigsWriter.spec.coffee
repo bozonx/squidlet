@@ -3,7 +3,7 @@ path = require('path')
 ConfigsWriter = require('../../hostEnvBuilder/configSet/ConfigsWriter').default
 
 
-describe.only 'envBuilder.ConfigsWriter', ->
+describe 'envBuilder.ConfigsWriter', ->
   beforeEach ->
     @hostConfigSet = {
       config: 'config'
@@ -14,6 +14,7 @@ describe.only 'envBuilder.ConfigsWriter', ->
       devicesDefinitions: 'devicesDefinitions'
       driversDefinitions: 'driversDefinitions'
       servicesDefinitions: 'servicesDefinitions'
+      devsDefinitions: 'devsDefinitions'
     }
 
     @io = {
@@ -65,6 +66,10 @@ describe.only 'envBuilder.ConfigsWriter', ->
     sinon.assert.calledWith(@io.writeJson.getCall(7),
       "#{@configManager.buildDir}/configs/servicesDefinitions.json",
       @hostConfigSet.servicesDefinitions
+    )
+    sinon.assert.calledWith(@io.writeJson.getCall(8),
+      "#{@configManager.buildDir}/configs/devsDefinitions.json",
+      @hostConfigSet.devsDefinitions
     )
 #    sinon.assert.calledWith(@io.writeJson.getCall(8),
 #      "/buildDir/hosts/configWorks/usedEntities.json",

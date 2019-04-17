@@ -45,6 +45,9 @@ describe 'envBuilder.ConfigsSet', ->
         }
       }
     }
+    @devsDefinitions = {
+      MyDev: { param: 1 }
+    }
 
     @configManager = {
       hostConfig: @hostConfig
@@ -59,6 +62,7 @@ describe 'envBuilder.ConfigsSet', ->
       getDevicesDefinitions: () => @devicesDefinitions
       getDriversDefinitions: () => @driversDefinitions
       getServicesDefinitions: () => @servicesDefinitions
+      getDevsDefinitions: () => @devsDefinitions
     }
 
     @configsSet = new HostsFilesSet(@configManager, @usedEntities, @definitions)
@@ -75,4 +79,5 @@ describe 'envBuilder.ConfigsSet', ->
       devicesDefinitions: Object.values(@devicesDefinitions)
       driversDefinitions: @driversDefinitions
       servicesDefinitions: @servicesDefinitions
+      devsDefinitions: @devsDefinitions
     }
