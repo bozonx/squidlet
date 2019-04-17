@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io from '../../shared/Io';
+import Io, {SpawnCmdResult} from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
@@ -60,14 +60,14 @@ export default class Starter {
     console.info(`===> Install npm modules`);
     const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
 
-    await this.io.spawnCmd('npm install', cwd);
+    await this.installNpmModules(cwd);
   }
 
   private async installDevModules() {
     console.info(`===> Install npm modules`);
     const cwd: string = path.resolve(__dirname, '../', this.props.machine);
 
-    await this.io.spawnCmd('npm install', cwd);
+    await this.installNpmModules(cwd);
   }
 
   private async buildInitialProdSystem() {
@@ -102,7 +102,7 @@ export default class Starter {
       this.io,
       this.props.platform,
       this.props.machine,
-      this.props.workDir
+      this.props.envSetDir
     );
     const completedDevSet: {[index: string]: DevClass} = await devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
@@ -121,7 +121,7 @@ export default class Starter {
       this.io,
       this.props.platform,
       this.props.machine,
-      this.props.workDir
+      this.props.envSetDir
     );
     const completedDevSet: {[index: string]: DevClass} = await devSet.makeDevelopDevSet();
     const System = require(`../../system`).default;
@@ -185,6 +185,14 @@ export default class Starter {
         tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
       },
     };
+  }
+
+  private async installNpmModules(cwd: string) {
+    const result: SpawnCmdResult = await this.io.spawnCmd('npm install', cwd);
+
+    if (result.status) {
+      throw new Error(`Can't install npm modules:\n${result.stderr}`);
+    }
   }
 
 }
