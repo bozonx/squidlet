@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import _isPlainObject = require('lodash/isPlainObject');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
@@ -26,14 +24,31 @@ export default class GroupConfigParser {
   }
 
   async init() {
-    const preGroupConfig = (await this.io.loadYamlFile(this.groupConfigPath)) as GroupConfig;
+    const preConfig = await this.io.loadYamlFile(this.groupConfigPath) as any;
 
-    this.validate(preGroupConfig);
+    if (!_isPlainObject(preConfig)) {
+      throw new Error(`Config has to be an object`);
+    }
 
-    this.plugins = preGroupConfig.plugins;
-    this.hostDefaults = preGroupConfig.hostDefaults;
+    if (preConfig.hosts) {
+      const preGroupConfig: GroupConfig = preConfig;
+      // it's a group config
+      this.validate(preGroupConfig);
 
-    await this.makeHosts(preGroupConfig as GroupConfig);
+      this.plugins = preGroupConfig.plugins;
+      this.hostDefaults = preGroupConfig.hostDefaults;
+
+      await this.makeHosts(preGroupConfig as GroupConfig);
+    }
+    else {
+      // it's just a host config
+      const preHostConfig: PreHostConfig = preConfig;
+
+      this.validateHostConfig(preHostConfig);
+
+      this.plugins = preHostConfig.plugins;
+      this.hosts[preHostConfig.id as string] = preHostConfig;
+    }
   }
 
 
@@ -88,9 +103,13 @@ export default class GroupConfigParser {
 
   private validate(preGroupConfig: GroupConfig) {
     if (!preGroupConfig.hosts) {
-      throw new Error(`You have to specify a "hosts" param with list of hosts`);
+      //throw new Error(`You have to specify a "hosts" param with list of hosts`);
+
+      // it's a just host config
+      return;
     }
-    else if (!Array.isArray(preGroupConfig.hosts)) {
+
+    if (!Array.isArray(preGroupConfig.hosts)) {
       throw new Error(`"hosts" param of group config has to be an array`);
     }
     // plugins
