@@ -84,27 +84,6 @@ export default class Props {
     }
   }
 
-  // /**
-  //  * Set config paths relative to squidlet work dir if it doesn't set.
-  //  */
-  // private setPathsToHostConfig() {
-  //   if (!this.hostConfig.config) {
-  //     this.hostConfig.config = {};
-  //   }
-  //
-  //   if (!this.hostConfig.config.envSetDir) {
-  //     this.hostConfig.config.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
-  //   }
-  //
-  //   if (!this.hostConfig.config.varDataDir) {
-  //     this.hostConfig.config.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
-  //   }
-  //
-  //   if (!this.hostConfig.config.tmpDir) {
-  //     this.hostConfig.config.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
-  //   }
-  // }
-
   private async resolveMachine(): Promise<NodejsMachines> {
     if (this.argMachine) {
       if (!nodejsSupportedMachines.includes(this.argMachine)) {
@@ -161,3 +140,24 @@ export default class Props {
   }
 
 }
+
+// /**
+//  * Set config paths relative to squidlet work dir if it doesn't set.
+//  */
+// private setPathsToHostConfig() {
+//   if (!this.hostConfig.config) {
+//     this.hostConfig.config = {};
+//   }
+//
+//   if (!this.hostConfig.config.envSetDir) {
+//     this.hostConfig.config.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
+//   }
+//
+//   if (!this.hostConfig.config.varDataDir) {
+//     this.hostConfig.config.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
+//   }
+//
+//   if (!this.hostConfig.config.tmpDir) {
+//     this.hostConfig.config.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+//   }
+// }
