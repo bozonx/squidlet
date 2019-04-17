@@ -28,10 +28,7 @@ export default class EnvBuilder {
   readonly pluginEnv: PluginEnv;
 
 
-  constructor(hostConfigOrConfigPath: string | PreHostConfig, absEnvBuildDir?: string, tmpBuildDir?: string) {
-
-    // TODO: absEnvBuildDir и tmpBuildDir сделать обязательными
-
+  constructor(hostConfigOrConfigPath: string | PreHostConfig, absEnvBuildDir: string, tmpBuildDir: string) {
     this.configManager = new ConfigManager(this.io, hostConfigOrConfigPath, absEnvBuildDir, tmpBuildDir);
     this.register = new Register(this.io);
     this.usedEntities = new UsedEntities(this.configManager, this.register);

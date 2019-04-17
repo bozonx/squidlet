@@ -15,7 +15,7 @@ import {loadMachineConfig, makeDevNames} from '../../shared/helpers';
 export default class ConfigManager {
   // path to plugins specified in config
   readonly plugins: string[] = [];
-  readonly tmpBuildDir?: string;
+  readonly tmpBuildDir: string;
   // normalized entities from preConfig
   preEntities: PreEntities = {
     devices: {},
@@ -25,9 +25,7 @@ export default class ConfigManager {
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   // env build dir
-  get buildDir(): string {
-    return this._buildDir as string;
-  }
+  buildDir: string;
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
   }
@@ -40,13 +38,17 @@ export default class ConfigManager {
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
   private hostConfigOrConfigPath: string | PreHostConfig;
-  private _buildDir?: string;
 
 
-  constructor(io: Io, hostConfigOrConfigPath: string | PreHostConfig, absEnvBuildDir?: string, tmpBuildDir?: string) {
+  constructor(
+    io: Io,
+    hostConfigOrConfigPath: string | PreHostConfig,
+    absEnvBuildDir: string,
+    tmpBuildDir: string
+  ) {
     this.io = io;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
-    this._buildDir = absEnvBuildDir;
+    this.buildDir = absEnvBuildDir;
     this.tmpBuildDir = tmpBuildDir;
   }
 
@@ -68,7 +70,6 @@ export default class ConfigManager {
       services: normalizedConfig.services || {},
     };
     this._hostConfig = this.prepareHostConfig(normalizedConfig);
-    this._buildDir = this.resolveBuildDir(normalizedConfig);
 
     appendArray(this.plugins, normalizedConfig.plugins);
 
@@ -103,38 +104,6 @@ export default class ConfigManager {
     );
   }
 
-  private resolveBuildDir(normalizedConfig: PreHostConfig): string {
-    // use command argument if specified
-    if (this._buildDir) return this._buildDir;
-
-    // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
-    //   // use host's storage dir
-    //   const storageDir = this.preHostConfig.config.storageDir;
-    //
-    //   if (path.isAbsolute(storageDir)) {
-    //     // it's an absolute path
-    //     return storageDir;
-    //   }
-    //   else {
-    //     if (typeof this.hostConfigOrConfigPath !== 'string') {
-    //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
-    //     }
-    //
-    //     // storageDir is relative path - make it absolute, use config file dir as a root
-    //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
-    //   }
-    // }
-
-    if (!normalizedConfig.config || !normalizedConfig.config.envSetDir) {
-      throw new Error(`envSetDir config param hasn't been specified on current platform.`);
-    }
-
-    // TODO: review
-
-    // use default build dir
-    return normalizedConfig.config.envSetDir;
-  }
-
   private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
       id: normalizedConfig.id as any,
@@ -153,3 +122,36 @@ export default class ConfigManager {
   }
 
 }
+
+
+// private resolveBuildDir(normalizedConfig: PreHostConfig): string {
+//   // use command argument if specified
+//   if (this._buildDir) return this._buildDir;
+//
+//   // if (this.preHostConfig.config && this.preHostConfig.config.storageDir) {
+//   //   // use host's storage dir
+//   //   const storageDir = this.preHostConfig.config.storageDir;
+//   //
+//   //   if (path.isAbsolute(storageDir)) {
+//   //     // it's an absolute path
+//   //     return storageDir;
+//   //   }
+//   //   else {
+//   //     if (typeof this.hostConfigOrConfigPath !== 'string') {
+//   //       throw new Error(`Can't resolve storage dir. There isn't a relative host config path`);
+//   //     }
+//   //
+//   //     // storageDir is relative path - make it absolute, use config file dir as a root
+//   //     return path.resolve(path.dirname(this.hostConfigOrConfigPath), storageDir);
+//   //   }
+//   // }
+//
+//   if (!normalizedConfig.config || !normalizedConfig.config.envSetDir) {
+//     throw new Error(`envSetDir config param hasn't been specified on current platform.`);
+//   }
+//
+//   // TODO: review
+//
+//   // use default build dir
+//   return normalizedConfig.config.envSetDir;
+// }

@@ -10,7 +10,7 @@ import {
   BUILD_DEVS_DIR,
   BUILD_SYSTEM_DIR,
   HOST_ENVSET_DIR,
-  HOST_TMP_DIR, HOST_TMP_HOST_DIR,
+  HOST_TMP_HOST_DIR,
   HOST_VAR_DATA_DIR
 } from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
