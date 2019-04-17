@@ -47,7 +47,7 @@ export default class Starter {
 
 
   async startDev() {
-    await this.buildDevelopEnvSet();
+    //await this.buildDevelopEnvSet();
     await this.installDevModules();
     await this.startDevelopSystem();
   }
@@ -94,9 +94,9 @@ export default class Starter {
     await this.buildHostDevs(initialHostConfig);
   }
 
-  private async buildDevelopEnvSet() {
-    // TODO: сбилдить конфиги хоста где указанны пути к реальному главному ts файлу
-  }
+  // private async buildDevelopEnvSet() {
+  //   // TODO: сбилдить конфиги хоста где указанны пути к реальному главному ts файлу
+  // }
 
   private async startProdSystem() {
     console.info(`===> making platform's dev set`);
@@ -131,6 +131,7 @@ export default class Starter {
     const systemConfigExtend = this.makeSystemConfigExtend();
 
     // TODO: review
+    // TODO: нужна ли build dir и tmp dir ???
 
     const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, '', '');
 
@@ -139,6 +140,8 @@ export default class Starter {
     await envBuilder.collect();
 
     console.info(`===> generate master config object`);
+
+
 
     const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
 
