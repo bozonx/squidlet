@@ -1,5 +1,5 @@
 export default interface Dev {
-  init?: () => void;
-  configure?: (params: {[index: string]: any}) => void;
+  init?: () => Promise<void>;
+  configure?: (params: {[index: string]: any}) => Promise<void>;
   [index: string]: any;
 }

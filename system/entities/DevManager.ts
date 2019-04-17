@@ -25,9 +25,22 @@ export default class DevManager {
     for (let devNme of Object.keys(this.devSet)) {
       const dev: Dev = this.devSet[devNme];
 
-      if (dev.init) dev.init();
+      if (dev.init) await dev.init();
     }
 
+    return this.configureDevs();
+  }
+
+  getDev<T extends Dev>(devName: string): T {
+    if (!this.devSet[devName]) {
+      throw new Error(`Can't find dev "${devName}"`);
+    }
+
+    return this.devSet[devName] as T;
+  }
+
+
+  private async configureDevs() {
     const devsParams = await this.system.envSet.loadConfig<DevsDefinitions>(
       this.system.initCfg.fileNames.devsDefinitions
     );
@@ -45,16 +58,8 @@ export default class DevManager {
         continue;
       }
 
-      dev.configure(devsParams[devNme]);
+      await dev.configure(devsParams[devNme]);
     }
-  }
-
-  getDev<T extends Dev>(devName: string): T {
-    if (!this.devSet[devName]) {
-      throw new Error(`Can't find dev "${devName}"`);
-    }
-
-    return this.devSet[devName] as T;
   }
 
 }
