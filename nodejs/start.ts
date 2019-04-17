@@ -41,7 +41,7 @@ function prepareHostApp (hostConfigSet: HostEnvSet): System {
 
   EnvSetMemory.$registerConfigSet(hostConfigSet);
 
-  return new System(devsSet, EnvSetMemory);
+  return new System(devsSet, {}, EnvSetMemory);
 }
 
 

@@ -18,6 +18,9 @@ import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
 import BuildDevs from '../../shared/BuildDevs';
 import NodejsMachines from '../interfaces/NodejsMachines';
+import EnvSetMemory from '../../hostEnvBuilder/EnvSetMemory';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 
 
 const systemClassFileName = 'System';
@@ -39,7 +42,7 @@ export default class Starter {
     await this.props.resolve();
 
     console.info(`Using working dir ${this.props.workDir}`);
-    console.info(`Using host ${this.props.hostConfig.id}`);
+    console.info(`Using host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
   }
 
 
@@ -127,9 +130,23 @@ export default class Starter {
     const System = require(`../../system`).default;
     const systemConfigExtend = this.makeSystemConfigExtend();
 
-    // TODO: pass a memory EnvSet manager
+    // TODO: review
 
-    const system = new System(completedDevSet, systemConfigExtend);
+    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, '', '');
+
+    console.info(`===> generate hosts env files and configs`);
+
+    await envBuilder.collect();
+
+    console.info(`===> generate master config object`);
+
+    const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
+
+    console.info(`===> initializing host system on machine`);
+
+    EnvSetMemory.$registerConfigSet(hostEnvSet);
+
+    const system = new System(completedDevSet, systemConfigExtend, EnvSetMemory);
 
     return system.start();
   }
