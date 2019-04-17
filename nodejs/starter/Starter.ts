@@ -6,7 +6,13 @@ import Props from './Props';
 import DevsSet from './DevsSet';
 import systemConfig from '../../system/config/systemConfig';
 import BuildSystem from '../../shared/BuildSystem';
-import {BUILD_DEVS_DIR, BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../../shared/constants';
+import {
+  BUILD_DEVS_DIR,
+  BUILD_SYSTEM_DIR,
+  HOST_ENVSET_DIR,
+  HOST_TMP_DIR, HOST_TMP_HOST_DIR,
+  HOST_VAR_DATA_DIR
+} from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
@@ -97,7 +103,9 @@ export default class Starter {
     const completedDevSet: {[index: string]: DevClass} = await devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
-    const system = new System(completedDevSet);
+    const systemConfigExtend = this.makeSystemConfigExtend();
+    // make system instance
+    const system = new System(completedDevSet, systemConfigExtend);
 
     return system.start();
   }
@@ -113,6 +121,10 @@ export default class Starter {
     );
     const completedDevSet: {[index: string]: DevClass} = await devSet.makeDevelopDevSet();
     const System = require(`../../system`).default;
+
+    // TODO: pass a system paths
+    // TODO: pass a memory EnvSet manager
+
     const system = new System(completedDevSet);
 
     return system.start();
@@ -159,6 +171,16 @@ export default class Starter {
     console.info(`===> Building devs`);
 
     await buildDevs.build();
+  }
+
+  private makeSystemConfigExtend(): {[index: string]: any} {
+    return {
+      rootDirs: {
+        envSet: this.props.envSetDir,
+        varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
+        tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
+      },
+    };
   }
 
 }

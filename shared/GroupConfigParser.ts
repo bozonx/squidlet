@@ -108,19 +108,17 @@ export default class GroupConfigParser {
       throw new Error(`Host does't have an id: ${JSON.stringify(hostConfig)}`);
     }
 
-    // TODO: review
-
-    if (hostConfig.config) {
-      if (hostConfig.config.envSetDir && !path.isAbsolute(hostConfig.config.envSetDir)) {
-        throw new Error(`Host's config path "config.envSetDir" has to be an absolute`);
-      }
-      else if (hostConfig.config.varDataDir && !path.isAbsolute(hostConfig.config.varDataDir)) {
-        throw new Error(`Host's config path "config.varDataDir" has to be an absolute`);
-      }
-      else if (hostConfig.config.tmpDir && !path.isAbsolute(hostConfig.config.tmpDir)) {
-        throw new Error(`Host's config path "config.tmpDir" has to be an absolute`);
-      }
-    }
+    // if (hostConfig.config) {
+    //   if (hostConfig.config.envSetDir && !path.isAbsolute(hostConfig.config.envSetDir)) {
+    //     throw new Error(`Host's config path "config.envSetDir" has to be an absolute`);
+    //   }
+    //   else if (hostConfig.config.varDataDir && !path.isAbsolute(hostConfig.config.varDataDir)) {
+    //     throw new Error(`Host's config path "config.varDataDir" has to be an absolute`);
+    //   }
+    //   else if (hostConfig.config.tmpDir && !path.isAbsolute(hostConfig.config.tmpDir)) {
+    //     throw new Error(`Host's config path "config.tmpDir" has to be an absolute`);
+    //   }
+    // }
   }
 
 }

@@ -21,3 +21,5 @@ export const HOSTS_WORK_DIRS = 'workdirs';
 export const HOST_ENVSET_DIR = 'envset';
 export const HOST_VAR_DATA_DIR = 'data';
 export const HOST_TMP_DIR = 'tmp';
+// tmp dir of host under tmp dir (HOST_TMP_DIR)
+export const HOST_TMP_HOST_DIR = 'host';

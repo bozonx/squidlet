@@ -5,13 +5,18 @@ import Io, {SpawnCmdResult} from '../../shared/Io';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import {HOST_ENVSET_DIR, HOST_TMP_DIR, HOST_VAR_DATA_DIR, HOSTS_WORK_DIRS} from '../../shared/constants';
+import {
+  HOST_ENVSET_DIR,
+  HOST_TMP_DIR,
+  HOSTS_WORK_DIRS
+} from '../../shared/constants';
 import {resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 
 
 export default class Props {
   workDir: string = '';
+  varDataDir: string = '';
   envSetDir: string = '';
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
@@ -59,12 +64,8 @@ export default class Props {
       this.workDir = path.join(squidletRoot, HOSTS_WORK_DIRS, this.hostId);
     }
 
-    this.setPathsToHostConfig();
-
-    // TODO: review
-
-    this.envSetDir = (this.hostConfig.config as any).envSetDir;
-    this.tmpDir = (this.hostConfig.config as any).tmpDir;
+    this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
+    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
   }
 
 
@@ -84,26 +85,26 @@ export default class Props {
     }
   }
 
-  /**
-   * Set config paths relative to squidlet work dir if it doesn't set.
-   */
-  private setPathsToHostConfig() {
-    if (!this.hostConfig.config) {
-      this.hostConfig.config = {};
-    }
-
-    if (!this.hostConfig.config.envSetDir) {
-      this.hostConfig.config.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
-    }
-
-    if (!this.hostConfig.config.varDataDir) {
-      this.hostConfig.config.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
-    }
-
-    if (!this.hostConfig.config.tmpDir) {
-      this.hostConfig.config.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
-    }
-  }
+  // /**
+  //  * Set config paths relative to squidlet work dir if it doesn't set.
+  //  */
+  // private setPathsToHostConfig() {
+  //   if (!this.hostConfig.config) {
+  //     this.hostConfig.config = {};
+  //   }
+  //
+  //   if (!this.hostConfig.config.envSetDir) {
+  //     this.hostConfig.config.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
+  //   }
+  //
+  //   if (!this.hostConfig.config.varDataDir) {
+  //     this.hostConfig.config.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
+  //   }
+  //
+  //   if (!this.hostConfig.config.tmpDir) {
+  //     this.hostConfig.config.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+  //   }
+  // }
 
   private async resolveMachine(): Promise<NodejsMachines> {
     if (this.argMachine) {
