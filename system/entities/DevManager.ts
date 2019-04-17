@@ -1,5 +1,6 @@
 import Dev from '../interfaces/Dev';
 import System from '../System';
+import DevDefinitions from '../interfaces/DevDefinitions';
 
 
 export type DevClass = new () => Dev;
@@ -27,7 +28,7 @@ export default class DevManager {
       if (dev.init) dev.init();
     }
 
-    const devsParams = await this.system.envSet.loadConfig<{[index: string]: any}>(
+    const devsParams = await this.system.envSet.loadConfig<DevDefinitions>(
       this.system.initCfg.fileNames.devsDefinitions
     );
 

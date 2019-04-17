@@ -1,5 +1,6 @@
 import HostConfig from '../../system/interfaces/HostConfig';
 import EntityDefinition from '../../system/interfaces/EntityDefinition';
+import DevDefinitions from '../../system/interfaces/DevDefinitions';
 
 
 export default interface HostConfigSet {
@@ -20,4 +21,6 @@ export default interface HostConfigSet {
   driversDefinitions: {[index: string]: EntityDefinition};
   // list of services definitions
   servicesDefinitions: {[index: string]: EntityDefinition};
+  // list of services definitions
+  devsDefinitions: DevDefinitions;
 }

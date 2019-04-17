@@ -47,6 +47,7 @@ export default class ConfigsWriter {
     await this.io.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostConfigSet.devicesDefinitions);
     await this.io.writeJson(path.join(configDir, fileNames.driversDefinitions), hostConfigSet.driversDefinitions);
     await this.io.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostConfigSet.servicesDefinitions);
+    await this.io.writeJson(path.join(configDir, fileNames.devsDefinitions), hostConfigSet.devsDefinitions);
     // TODO: does it really need????
     // write list of entities names
     //await this.writeJson(path.join(buildDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);
