@@ -86,10 +86,10 @@ describe 'helpers.helpers', ->
     assert.isRejected(promised);
 
   it 'combineTopic', ->
-    assert.equal(helpers.combineTopic('first', 'second', 'third'), 'first/second/third')
+    assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
 
   it 'splitTopicId', ->
-    assert.deepEqual(helpers.splitTopicId('id/sub/deeper'), [ 'id', 'sub/deeper' ])
+    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
 
   it 'splitFirstElement', ->
     assert.deepEqual(helpers.splitFirstElement('path/to/dest', '/'), [ 'path', 'to/dest' ])

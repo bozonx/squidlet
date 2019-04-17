@@ -60,7 +60,7 @@ export default class Status extends DeviceDataManagerBase {
       return;
     }
 
-    const subStatus = combineTopic(this.typeNameOfData, statusName);
+    const subStatus = combineTopic(this.system.systemConfig.topicSeparator, this.typeNameOfData, statusName);
 
     this.publishEvents.emit(subStatus, value, params);
   }

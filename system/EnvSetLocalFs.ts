@@ -2,7 +2,6 @@ import System from './System';
 import ManifestBase from './interfaces/ManifestBase';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
-import systemConfig from './config/systemConfig';
 import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';
 import StorageDev from './interfaces/dev/StorageDev';
@@ -28,7 +27,10 @@ export default class EnvSetLocalFs implements EnvSet {
    * @param configName - config name with ".json" extension
    */
   loadConfig<T>(configName: string): Promise<T> {
-    const pathToFile: string = pathJoin(systemConfig.envSetDirs.configs, configName);
+    const pathToFile: string = pathJoin(
+      this.system.systemConfig.envSetDirs.configs,
+      configName
+    );
 
     return this.readJsonObjectFile(pathToFile) as Promise<T>;
   }
@@ -40,7 +42,7 @@ export default class EnvSetLocalFs implements EnvSet {
    */
   loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
     const pathToFile = pathJoin(
-      systemConfig.envSetDirs.entities,
+      this.system.systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
       this.system.initCfg.fileNames.manifest
@@ -58,8 +60,8 @@ export default class EnvSetLocalFs implements EnvSet {
     const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
     const mainFileName: string = manifest.main;
     const filePath = pathJoin(
-      this.system.host.config.config.envSetDir,
-      systemConfig.envSetDirs.entities,
+      this.system.systemConfig.rootDirs.envSet,
+      this.system.systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
       mainFileName
@@ -76,7 +78,7 @@ export default class EnvSetLocalFs implements EnvSet {
     //await this.checkEntity(pluralType, entityName, fileName);
 
     const pathToFile: string = pathJoin(
-      systemConfig.envSetDirs.entities,
+      this.system.systemConfig.envSetDirs.entities,
       entityName,
       fileName
     );
@@ -92,8 +94,8 @@ export default class EnvSetLocalFs implements EnvSet {
     //await this.checkEntity(pluralType, entityName, fileName);
 
     const pathToFile: string = pathJoin(
-      this.system.host.config.config.envSetDir,
-      systemConfig.envSetDirs.entities,
+      this.system.systemConfig.rootDirs.envSet,
+      this.system.systemConfig.envSetDirs.entities,
       entityName,
       fileName
     );
@@ -115,7 +117,7 @@ export default class EnvSetLocalFs implements EnvSet {
    * Read string file relative to envSetDir
    */
   private async readStringFile(fileName: string): Promise<string> {
-    const filePath = pathJoin(this.system.host.config.config.envSetDir, fileName);
+    const filePath = pathJoin(this.system.systemConfig.rootDirs.envSet, fileName);
 
     return this.devStorage.readFile(filePath);
   }

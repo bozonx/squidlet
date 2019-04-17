@@ -1,7 +1,6 @@
 import StorageDev, {Stats} from 'system/interfaces/dev/StorageDev';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {pathDirname, pathJoin} from 'system/helpers/nodeLike';
-import systemConfig from 'system/config/systemConfig';
 
 
 /**
@@ -17,10 +16,8 @@ export class SharedStorage extends DriverBase {
   protected willInit = async () => {
     this.depsInstances.storageDev = this.env.getDev('Storage');
     this.rootDir = pathJoin(
-
-      // TODO: review
-      this.env.config.config.varDataDir,
-      systemConfig.storageDirs.common,
+      this.env.system.systemConfig.rootDirs.varData,
+      this.env.system.systemConfig.storageDirs.common,
     );
   }
 

@@ -1,5 +1,4 @@
 import {ALL_TOPICS} from '../dict/constants';
-import systemConfig from '../config/systemConfig';
 import {isEmpty} from './lodashLike';
 import {Edge} from '../interfaces/dev/DigitalDev';
 
@@ -136,17 +135,17 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
 /**
  * Join topic paths using special path separator
  */
-export function combineTopic(basePath: string, ...subPaths: Array<string>): string {
+export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string>): string {
   if (isEmpty(subPaths)) return basePath;
 
-  return [ basePath, ...subPaths ].join(systemConfig.topicSeparator);
+  return [ basePath, ...subPaths ].join(topicSeparator);
 }
 
 /**
  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
  */
-export function splitTopicId(topic: string): [ string, string | undefined ] {
-  return splitFirstElement(topic, systemConfig.topicSeparator);
+export function splitTopicId(topicSeparator: string, topic: string): [ string, string | undefined ] {
+  return splitFirstElement(topic, topicSeparator);
 }
 
 /**

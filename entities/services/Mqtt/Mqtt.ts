@@ -89,7 +89,7 @@ export default class MqttSevice extends ServiceBase<Props> {
     // TODO: если data - binary???
     // TODO: что если неизвестный формат или хоста не существует ???
 
-    const [ id, subTopic ] = splitTopicId(topic);
+    const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
 
     if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
 
@@ -106,7 +106,7 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
-    const topic: string = combineTopic(data.id, data.subTopic);
+    const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, data.id, data.subTopic);
 
     if (data.params && data.params.isRepeat) {
       this.env.log.debug(`MQTT outcome (republish): ${topic} - ${JSON.stringify(data.data)}`);
@@ -123,7 +123,7 @@ export default class MqttSevice extends ServiceBase<Props> {
 
     for (let deviceId of Object.keys(devicesActions)) {
       for (let action of devicesActions[deviceId]) {
-        const topic: string = combineTopic(deviceId, action);
+        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, action);
 
         this.env.log.info(`MQTT subscribe: ${topic}`);
 
