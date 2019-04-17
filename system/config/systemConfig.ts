@@ -2,6 +2,12 @@ import SystemConfig from '../interfaces/SystemConfig';
 
 
 const systemConfig: SystemConfig = {
+  // default root dirs on micro controller
+  rootDirs: {
+    envSet: '/envSet',
+    varData: '/varData',
+    tmp: '/tmp',
+  },
   // dirs of file system root
   envSetDirs: {
     // TODO: rename to system

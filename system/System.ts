@@ -12,6 +12,9 @@ import categories from './dict/categories';
 import EnvSetLocalFs from './EnvSetLocalFs';
 import DevManager, {DevClass} from './entities/DevManager';
 import EnvSet from './interfaces/EnvSet';
+import SystemConfig from './interfaces/SystemConfig';
+import {mergeDeep} from './helpers/collections';
+import systemConfig from './config/systemConfig';
 
 
 export default class System {
@@ -23,6 +26,7 @@ export default class System {
   readonly driversManager: DriversManager;
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
+  readonly systemConfig: SystemConfig;
 
   private _isDevicesInitialized: boolean = false;
   private _isAppInitialized: boolean = false;
@@ -40,6 +44,7 @@ export default class System {
 
   constructor(
     devSet: {[index: string]: DevClass},
+    systemConfigExtend?: {[index: string]: any},
     envSetReplacement?: new (system: System) => EnvSet
   ) {
     if (envSetReplacement) {
@@ -48,6 +53,8 @@ export default class System {
     else {
       this.envSet = new EnvSetLocalFs(this);
     }
+
+    this.systemConfig = mergeDeep(systemConfigExtend, systemConfig) as any;
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();

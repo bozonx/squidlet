@@ -108,6 +108,8 @@ export default class GroupConfigParser {
       throw new Error(`Host does't have an id: ${JSON.stringify(hostConfig)}`);
     }
 
+    // TODO: review
+
     if (hostConfig.config) {
       if (hostConfig.config.envSetDir && !path.isAbsolute(hostConfig.config.envSetDir)) {
         throw new Error(`Host's config path "config.envSetDir" has to be an absolute`);

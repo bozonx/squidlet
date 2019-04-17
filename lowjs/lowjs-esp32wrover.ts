@@ -24,10 +24,6 @@ const machineConfig: MachineConfig = {
   ],
 
   hostConfig: {
-    config: {
-      varDataDir: '/varData',
-      envSetDir: '/envSet',
-    },
     drivers: {
       'I2cMaster': {
         bus: 1,

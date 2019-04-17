@@ -15,6 +15,7 @@ export default class Host {
     return this.hostConfig as HostConfig;
   }
 
+
   constructor(system: System) {
     this.system = system;
   }

@@ -15,13 +15,6 @@ export default interface PreHostConfig {
 
   // specific config for each host
   config?: {
-    // path to host's various data dir. It can be absolute or relative of master config file
-    varDataDir?: string;
-    // path to host's configs and entities
-    envSetDir?: string;
-    // path to tmp dir
-    tmpDir?: string;
-
     logLevel?: LogLevel;
     // republish status silently every minute if it hasn't been changed
     defaultStatusRepublishIntervalMs?: number;

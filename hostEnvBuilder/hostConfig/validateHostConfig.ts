@@ -19,8 +19,8 @@ function checkConfig(rawConfig: {[index: string]: any}): string | undefined {
 
   return sequence([
     () => isObject(rawConfig.config, 'config'),
-    () => isString(rawConfig.config.varDataDir, 'config.varDataDir'),
-    () => isString(rawConfig.config.envSetDir, 'config.envSetDir'),
+    // () => isString(rawConfig.config.varDataDir, 'config.varDataDir'),
+    // () => isString(rawConfig.config.envSetDir, 'config.envSetDir'),
     () => oneOf(rawConfig.config.logLevel, ['debug', 'verbose', 'info', 'warn', 'error', 'fatal'], 'config.logLevel'),
     () => isNumber(rawConfig.config.defaultStatusRepublishIntervalMs, 'config.defaultStatusRepublishIntervalMs'),
     () => isNumber(rawConfig.config.defaultConfigRepublishIntervalMs, 'config.defaultConfigRepublishIntervalMs'),

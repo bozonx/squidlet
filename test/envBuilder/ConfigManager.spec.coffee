@@ -26,7 +26,7 @@ describe 'envBuilder.ConfigManager', ->
       devs: ['Storage']
       hostConfig: {
         config: {
-          envSetDir: '/path/to/env'
+          #envSetDir: '/path/to/env'
           platformParam: 1
         },
       }
@@ -61,7 +61,7 @@ describe 'envBuilder.ConfigManager', ->
         senderResendTimeout: 1
         senderTimeout: 60
 
-        envSetDir: @machineConfig.hostConfig.config.envSetDir
+        #envSetDir: @machineConfig.hostConfig.config.envSetDir
         platformParam: 1
         hostParam: 1
       }
@@ -75,5 +75,7 @@ describe 'envBuilder.ConfigManager', ->
     @configManager.loadMachineConfig = () => @machineConfig
 
     await @configManager.init()
+
+    # TODO: review envSetDir
 
     assert.equal(@configManager.buildDir, @machineConfig.hostConfig.config.envSetDir)

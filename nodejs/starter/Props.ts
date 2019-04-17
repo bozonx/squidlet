@@ -61,6 +61,8 @@ export default class Props {
 
     this.setPathsToHostConfig();
 
+    // TODO: review
+
     this.envSetDir = (this.hostConfig.config as any).envSetDir;
     this.tmpDir = (this.hostConfig.config as any).tmpDir;
   }

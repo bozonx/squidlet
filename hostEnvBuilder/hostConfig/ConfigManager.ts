@@ -129,6 +129,8 @@ export default class ConfigManager {
       throw new Error(`envSetDir config param hasn't been specified on current platform.`);
     }
 
+    // TODO: review
+
     // use default build dir
     return normalizedConfig.config.envSetDir;
   }

@@ -108,13 +108,14 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
 }
 
 /**
- * Merges two objects deeply. It doesn't mutate any object.
+ * Merges two objects deeply.
+ * It doesn't mutate any object.
  */
 export function mergeDeep(
   top: {[index: string]: any} | undefined,
   bottom: {[index: string]: any} | undefined
 ): {[index: string]: any} {
-  if (typeof top === 'undefined') return {};
+  if (typeof top === 'undefined') return bottom || {};
   if (typeof bottom === 'undefined') return top;
 
   const result: {[index: string]: any} = cloneDeep(top);
