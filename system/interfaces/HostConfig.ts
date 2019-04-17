@@ -4,11 +4,6 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 export interface HostConfigConfig {
-  // path to dir where various data will be placed
-  varDataDir: string;
-  // path to configs and entities on host
-  envSetDir: string;
-
   logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
   defaultStatusRepublishIntervalMs: number;

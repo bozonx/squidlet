@@ -16,15 +16,6 @@ const machineConfig: MachineConfig = {
   ],
 
   hostConfig: {
-    // config: {
-    //   varDataDir: '~/.squidlet/data',
-    //   envSetDir: '~/.squidlet/envSet',
-    // },
-    // drivers: {
-    //   'I2cMaster': {
-    //     bus: 1,
-    //   }
-    // },
   }
 };
 

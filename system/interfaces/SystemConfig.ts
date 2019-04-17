@@ -1,11 +1,11 @@
 export default interface SystemConfig {
   rootDirs: {
     // path to host's configs and entities
-    envSet?: string;
+    envSet: string;
     // path to host's various data dir. It can be absolute or relative of master config file
-    varData?: string;
+    varData: string;
     // path to tmp dir
-    tmp?: string;
+    tmp: string;
   };
   envSetDirs: {
     system: string;
