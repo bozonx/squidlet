@@ -3,7 +3,7 @@ path = require('path')
 ConfigsWriter = require('../../hostEnvBuilder/configSet/ConfigsWriter').default
 
 
-describe 'envBuilder.ConfigsWriter', ->
+describe.only 'envBuilder.ConfigsWriter', ->
   beforeEach ->
     @hostConfigSet = {
       config: 'config'

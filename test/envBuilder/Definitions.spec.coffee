@@ -103,6 +103,9 @@ describe 'envBuilder.Definitions', ->
           hostProp: 1
         }
       }
+      devsDefinitions: {
+        MyDev: { param: 1 }
+      }
     }
 
     @usedEntities = {
@@ -116,7 +119,7 @@ describe 'envBuilder.Definitions', ->
   it 'generate', ->
     await @definitions.generate()
 
-    assert.deepEqual(@definitions.getDevicesDefinitions('master'), {
+    assert.deepEqual(@definitions.getDevicesDefinitions(), {
       'room1.relay': {
         id: 'room1.relay'
         className: 'Relay'
@@ -128,7 +131,7 @@ describe 'envBuilder.Definitions', ->
         }
       }
     })
-    assert.deepEqual(@definitions.getDriversDefinitions('master'), {
+    assert.deepEqual(@definitions.getDriversDefinitions(), {
       'Digital': {
         id: 'Digital'
         className: 'Digital'
@@ -139,7 +142,7 @@ describe 'envBuilder.Definitions', ->
         }
       }
     })
-    assert.deepEqual(@definitions.getServicesDefinitions('master'), {
+    assert.deepEqual(@definitions.getServicesDefinitions(), {
       logger: {
         id: 'logger'
         className: 'Logger'
@@ -149,4 +152,7 @@ describe 'envBuilder.Definitions', ->
           entityProp: 1
         }
       }
+    })
+    assert.deepEqual(@definitions.getDevsDefinitions(), {
+      MyDev: { param: 1 }
     })
