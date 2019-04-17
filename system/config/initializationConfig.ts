@@ -25,6 +25,8 @@ export default function initializationConfig(): InitializationConfig {
       driversDefinitions: 'driversDefinitions.json',
       // definitions of services like {serviceId: ServiceDefinition}
       servicesDefinitions: 'servicesDefinitions.json',
+      // params which will be sent to dev.configure()
+      devsDefinitions: 'devsDefinitions.json',
     },
   };
 }

@@ -58,7 +58,7 @@ export default class System {
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.devManager = new DevManager(devSet);
+    this.devManager = new DevManager(this, devSet);
     this.events = new Events(this.systemConfig.eventNameSeparator);
     this.log = new LogPublisher(this);
     this.host = new Host(this);
@@ -70,7 +70,7 @@ export default class System {
 
   async start() {
     console.info(`---> Initializing devs`);
-    this.devManager.init();
+    await this.devManager.init();
 
     console.info(`---> Initializing configs`);
     await this.host.init();

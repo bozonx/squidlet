@@ -13,5 +13,6 @@ export default interface InitializationConfig {
     devicesDefinitions: string;
     driversDefinitions: string;
     servicesDefinitions: string;
+    devsDefinitions: string;
   };
 }
