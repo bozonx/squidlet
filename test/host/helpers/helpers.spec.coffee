@@ -100,5 +100,5 @@ describe 'helpers.helpers', ->
     assert.deepEqual(helpers.splitLastElement('path', '/'), [ 'path', undefined ])
 
   it 'makeEventName', ->
-    assert.equal(helpers.makeEventName('cat', 'topic', 'name', 'otherName'), 'cat|topic|name|otherName')
-    assert.equal(helpers.makeEventName('cat', undefined, 'name'), 'cat|*|name')
+    assert.equal(helpers.makeEventName('|', 'cat', 'topic', 'name', 'otherName'), 'cat|topic|name|otherName')
+    assert.equal(helpers.makeEventName('|', 'cat', undefined, 'name'), 'cat|*|name')

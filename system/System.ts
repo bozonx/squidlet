@@ -59,7 +59,7 @@ export default class System {
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
     this.devManager = new DevManager(devSet);
-    this.events = new Events();
+    this.events = new Events(this.systemConfig.eventNameSeparator);
     this.log = new LogPublisher(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);

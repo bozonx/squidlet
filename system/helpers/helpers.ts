@@ -195,8 +195,8 @@ export function splitLastElement(
  * Make combined event name which is used in host's event system.
  * makeEventName('cat', 'topic', 'name', 'otherName') => 'cat|topic|name|otherName'
  */
-export function makeEventName(category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
-  return [ category, topic, ...others ].join(systemConfig.eventNameSeparator);
+export function makeEventName(eventNameSeparator: string, category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
+  return [ category, topic, ...others ].join(eventNameSeparator);
 }
 
 
