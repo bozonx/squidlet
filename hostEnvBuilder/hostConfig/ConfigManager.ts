@@ -23,7 +23,7 @@ export default class ConfigManager {
     drivers: {},
     services: {},
   };
-  devsDefinitions: DevsDefinitions;
+  devsDefinitions: DevsDefinitions = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   // env build dir
@@ -66,7 +66,7 @@ export default class ConfigManager {
     const normalizedConfig: PreHostConfig = normalizeHostConfig(mergedConfig);
 
     this.devicesDefaults = normalizedConfig.devicesDefaults;
-    this.devsDefinitions = normalizedConfig.devs || {};
+    if (normalizedConfig.devs) this.devsDefinitions = normalizedConfig.devs;
     this.preEntities = {
       devices: normalizedConfig.devices || {},
       drivers: normalizedConfig.drivers || {},
