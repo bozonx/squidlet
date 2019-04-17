@@ -1,6 +1,4 @@
 ConfigManager = require('../../hostEnvBuilder/hostConfig/ConfigManager').default
-hostDefaultConfig = require('../../hostEnvBuilder/configs/hostDefaultConfig').default
-systemConfig = require('../../hostEnvBuilder/configs/systemConfig').default
 
 
 describe 'envBuilder.ConfigManager', ->
@@ -21,14 +19,23 @@ describe 'envBuilder.ConfigManager', ->
           device: 'Switch'
         }
       }
+      devs: {
+        MyDev: { topParam: 1 }
+      }
     }
     @machineConfig = {
-      devs: ['Storage']
+      devs: ['./Storage.ts']
+      devsSupportFiles: [
+        './package.json'
+      ]
       hostConfig: {
         config: {
           #envSetDir: '/path/to/env'
           platformParam: 1
         },
+        devs: {
+          MyDev: { topParam: 2, bottomParam: 2 }
+        }
       }
     }
     @buildDir = '/buildDir'
@@ -49,7 +56,15 @@ describe 'envBuilder.ConfigManager', ->
         }
       }
       drivers: {}
-      services: {}
+      services: {
+        # default service
+        logger: {
+          className: 'Logger'
+        }
+      }
+    })
+    assert.deepEqual(@configManager.devsDefinitions, {
+      MyDev: { topParam: 1, bottomParam: 2 }
     })
     assert.deepEqual(@configManager.machineConfig, @machineConfig)
     assert.deepEqual(@configManager.devicesDefaults, @preHostConfig.devicesDefaults)
