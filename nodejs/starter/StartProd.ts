@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io, {SpawnCmdResult} from '../../shared/Io';
+import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import DevsSet from './DevsSet';
@@ -10,23 +10,19 @@ import {
   BUILD_DEVS_DIR,
   BUILD_SYSTEM_DIR,
   HOST_ENVSET_DIR,
-  HOST_TMP_HOST_DIR,
-  HOST_VAR_DATA_DIR
 } from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
 import BuildDevs from '../../shared/BuildDevs';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import EnvSetMemory from '../../hostEnvBuilder/EnvSetMemory';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import {installNpmModules, makeSystemConfigExtend} from './helpers';
 
 
 const systemClassFileName = 'System';
 
 
-export default class Starter {
+export default class StartProd {
   private readonly io: Io = new Io();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
@@ -46,13 +42,7 @@ export default class Starter {
   }
 
 
-  async startDev() {
-    //await this.buildDevelopEnvSet();
-    await this.installDevModules();
-    await this.startDevelopSystem();
-  }
-
-  async startProd() {
+  async start() {
     await this.buildInitialProdSystem();
     await this.installProdModules();
     await this.startProdSystem();
@@ -63,14 +53,7 @@ export default class Starter {
     console.info(`===> Install npm modules`);
     const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
 
-    await this.installNpmModules(cwd);
-  }
-
-  private async installDevModules() {
-    console.info(`===> Install npm modules`);
-    const cwd: string = path.resolve(__dirname, '../', this.props.machine);
-
-    await this.installNpmModules(cwd);
+    await installNpmModules(this.io, cwd);
   }
 
   private async buildInitialProdSystem() {
@@ -94,10 +77,6 @@ export default class Starter {
     await this.buildHostDevs(initialHostConfig);
   }
 
-  // private async buildDevelopEnvSet() {
-  //   // TODO: сбилдить конфиги хоста где указанны пути к реальному главному ts файлу
-  // }
-
   private async startProdSystem() {
     console.info(`===> making platform's dev set`);
 
@@ -110,50 +89,12 @@ export default class Starter {
     const completedDevSet: {[index: string]: DevClass} = await devSet.makeProdDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
-    const systemConfigExtend = this.makeSystemConfigExtend();
+    const systemConfigExtend = makeSystemConfigExtend(this.props);
     // make system instance
     const system = new System(completedDevSet, systemConfigExtend);
 
     return system.start();
   }
-
-  private async startDevelopSystem() {
-    console.info(`===> making platform's dev set`);
-
-    const devSet: DevsSet = new DevsSet(
-      this.io,
-      this.props.platform,
-      this.props.machine,
-      this.props.envSetDir
-    );
-    const completedDevSet: {[index: string]: DevClass} = await devSet.makeDevelopDevSet();
-    const System = require(`../../system`).default;
-    const systemConfigExtend = this.makeSystemConfigExtend();
-
-    // TODO: review
-    // TODO: нужна ли build dir и tmp dir ???
-
-    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, '', '');
-
-    console.info(`===> generate hosts env files and configs`);
-
-    await envBuilder.collect();
-
-    console.info(`===> generate master config object`);
-
-
-
-    const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
-
-    console.info(`===> initializing host system on machine`);
-
-    EnvSetMemory.$registerConfigSet(hostEnvSet);
-
-    const system = new System(completedDevSet, systemConfigExtend, EnvSetMemory);
-
-    return system.start();
-  }
-
 
   private getPathToProdSystemDir(): string {
     return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
@@ -195,24 +136,6 @@ export default class Starter {
     console.info(`===> Building devs`);
 
     await buildDevs.build();
-  }
-
-  private makeSystemConfigExtend(): {[index: string]: any} {
-    return {
-      rootDirs: {
-        envSet: this.props.envSetDir,
-        varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
-        tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
-      },
-    };
-  }
-
-  private async installNpmModules(cwd: string) {
-    const result: SpawnCmdResult = await this.io.spawnCmd('npm install', cwd);
-
-    if (result.status) {
-      throw new Error(`Can't install npm modules:\n${result.stderr}`);
-    }
   }
 
 }

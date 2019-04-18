@@ -1,4 +1,5 @@
-import Starter from '../nodejs/starter/Starter';
+import StartDevelop from '../nodejs/starter/StartDevelop';
+import StartProd from '../nodejs/starter/StartProd';
 
 
 interface CommandStartArgs {
@@ -27,7 +28,23 @@ export default class CommandStart {
 
 
   async start() {
-    const starter: Starter = new Starter(
+    // run prod is specified
+    if (this.isProd) {
+      const starter: StartProd = new StartProd(
+        this.configPath,
+        this.args.machine as any,
+        this.args.name,
+        this.args.workDir
+      );
+
+      await starter.init();
+      await starter.start();
+
+      return;
+    }
+
+    // or run dev
+    const starter: StartDevelop = new StartDevelop(
       this.configPath,
       this.args.machine as any,
       this.args.name,
@@ -35,11 +52,7 @@ export default class CommandStart {
     );
 
     await starter.init();
-
-    // run prod is specified
-    if (this.isProd) return starter.startProd();
-    // or run dev
-    return starter.startDev();
+    await starter.start();
   }
 
 }
