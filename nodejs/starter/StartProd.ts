@@ -110,12 +110,11 @@ export default class StartProd {
   }
 
   private async buildEnvSet(hostConfig: PreHostConfig) {
-    const buildDir = path.join(this.props.envSetDir);
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
-      buildDir,
+      this.props.envSetDir,
       tmpDir
     );
 

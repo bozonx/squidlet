@@ -10,6 +10,7 @@ import EnvSetMemory from '../../hostEnvBuilder/EnvSetMemory';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
+import {HOST_ENVSET_DIR} from '../../shared/constants';
 
 
 export default class StartDevelop {
@@ -58,10 +59,16 @@ export default class StartDevelop {
     const System = require(`../../system`).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
 
-    // TODO: review
-    // TODO: нужна ли build dir и tmp dir ???
+    await this.configureEnvSet();
 
-    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, '', '');
+    const system = new System(completedDevSet, systemConfigExtend, EnvSetMemory);
+
+    return system.start();
+  }
+
+  private async configureEnvSet() {
+    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
     console.info(`===> generate hosts env files and configs`);
 
@@ -69,17 +76,11 @@ export default class StartDevelop {
 
     console.info(`===> generate master config object`);
 
-
-
     const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
 
     console.info(`===> initializing host system on machine`);
 
     EnvSetMemory.$registerConfigSet(hostEnvSet);
-
-    const system = new System(completedDevSet, systemConfigExtend, EnvSetMemory);
-
-    return system.start();
   }
 
 }
