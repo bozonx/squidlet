@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as ts from 'typescript';
 
 import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -92,8 +93,9 @@ export default class StartDevelop {
       const devName: string = parseDevName(devPath);
       const devAbsPath = path.resolve(platformDir, devPath);
       const moduleContent: string = await this.io.getFileContent(devAbsPath);
+      const compinedModuleContent: string = ts.transpile(module);
 
-      devsSet[devName] = machineEvalModule(moduleContent);
+      devsSet[devName] = machineEvalModule(compinedModuleContent);
     }
 
     return devsSet;
