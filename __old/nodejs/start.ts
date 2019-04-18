@@ -13,12 +13,12 @@ import {
   resolveParam,
   resolveParamRequired
 } from './starter/buildHelpers';
-import System from '../system/System';
-import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-import {DevClass} from '../system/entities/DevManager';
+import System from '../../system/System';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import {DevClass} from '../../system/entities/DevManager';
 
-import EnvSetMemory from '../hostEnvBuilder/EnvSetMemory';
+import EnvSetMemory from '../../hostEnvBuilder/EnvSetMemory';
 
 
 declare const global: {
