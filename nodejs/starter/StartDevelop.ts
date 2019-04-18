@@ -87,13 +87,13 @@ export default class StartDevelop {
     const platformDir = resolvePlatformDir(this.props.platform);
     const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
     const evalModulePath: string = path.join(platformDir, this.props.machine, 'evalModule');
-    const machineEvalModule: any = require(evalModulePath).default;
+    const machineEvalModule: any = require(evalModulePath);
 
     for (let devPath of machineConfig.devs) {
       const devName: string = parseDevName(devPath);
       const devAbsPath = path.resolve(platformDir, devPath);
       const moduleContent: string = await this.io.getFileContent(devAbsPath);
-      const compinedModuleContent: string = ts.transpile(module);
+      const compinedModuleContent: string = ts.transpile(moduleContent);
 
       devsSet[devName] = machineEvalModule(compinedModuleContent);
     }
