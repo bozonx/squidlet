@@ -40,6 +40,9 @@ export default class DevsSet {
   }
 
   async makeDevelopDevSet(): Promise<{[index: string]: DevClass}> {
+
+    // TODO: загрузить все что есть в папке devs текущей машины
+
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
     const platformDir = resolvePlatformDir(this.platform);
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);

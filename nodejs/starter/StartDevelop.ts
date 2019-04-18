@@ -12,9 +12,6 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 
 
-const systemClassFileName = 'System';
-
-
 export default class StartDevelop {
   private readonly io: Io = new Io();
   private readonly groupConfig: GroupConfigParser;
@@ -36,24 +33,19 @@ export default class StartDevelop {
 
 
   async start() {
-    //await this.buildDevelopEnvSet();
-    await this.installDevModules();
-    await this.startDevelopSystem();
+    await this.installModules();
+    await this.startSystem();
   }
 
 
-  private async installDevModules() {
+  private async installModules() {
     console.info(`===> Install npm modules`);
     const cwd: string = path.resolve(__dirname, '../', this.props.machine);
 
     await installNpmModules(this.io, cwd);
   }
 
-  // private async buildDevelopEnvSet() {
-  //   // TODO: сбилдить конфиги хоста где указанны пути к реальному главному ts файлу
-  // }
-
-  private async startDevelopSystem() {
+  private async startSystem() {
     console.info(`===> making platform's dev set`);
 
     const devSet: DevsSet = new DevsSet(
@@ -90,11 +82,4 @@ export default class StartDevelop {
     return system.start();
   }
 
-
 }
-
-//const initalHostConfigPath = '../../shared/initialHostConfig.yaml';
-// const initialHostConfigPath: string = path.resolve(__dirname, initalHostConfigPath);
-// const initialHostConfig: PreHostConfig = await this.io.loadYamlFile(initialHostConfigPath);
-// initialHostConfig.platform = this.props.platform;
-// initialHostConfig.machine = this.props.machine;

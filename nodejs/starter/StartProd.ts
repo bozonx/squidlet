@@ -43,20 +43,20 @@ export default class StartProd {
 
 
   async start() {
-    await this.buildInitialProdSystem();
-    await this.installProdModules();
-    await this.startProdSystem();
+    await this.buildInitialSystem();
+    await this.installModules();
+    await this.startSystem();
   }
 
 
-  private async installProdModules() {
+  private async installModules() {
     console.info(`===> Install npm modules`);
     const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
 
     await installNpmModules(this.io, cwd);
   }
 
-  private async buildInitialProdSystem() {
+  private async buildInitialSystem() {
     const pathToSystemDir = this.getPathToProdSystemDir();
 
     // else if it exists - do nothing
@@ -77,7 +77,7 @@ export default class StartProd {
     await this.buildHostDevs(initialHostConfig);
   }
 
-  private async startProdSystem() {
+  private async startSystem() {
     console.info(`===> making platform's dev set`);
 
     const devSet: DevsSet = new DevsSet(
@@ -139,9 +139,3 @@ export default class StartProd {
   }
 
 }
-
-//const initalHostConfigPath = '../../shared/initialHostConfig.yaml';
-// const initialHostConfigPath: string = path.resolve(__dirname, initalHostConfigPath);
-// const initialHostConfig: PreHostConfig = await this.io.loadYamlFile(initialHostConfigPath);
-// initialHostConfig.platform = this.props.platform;
-// initialHostConfig.machine = this.props.machine;
