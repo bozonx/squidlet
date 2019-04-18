@@ -39,22 +39,35 @@ export default class DevsSet {
     return devsSet;
   }
 
+  /**
+   * Read a whole directory 'devs' of platform and load all the it's files
+   */
   async makeDevelopDevSet(): Promise<{[index: string]: DevClass}> {
-
-    // TODO: загрузить все что есть в папке devs текущей машины
-
+    const platformDirName: string = resolvePlatformDir(this.platform);
+    const devsDir: string = path.join(platformDirName, 'devs');
+    const devsFileNames: string[] = await this.io.readdir(devsDir);
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    const platformDir = resolvePlatformDir(this.platform);
-    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
-    for (let devPath of machineConfig.devs) {
-      const devName: string = parseDevName(devPath);
-      const devAbsPath = path.resolve(platformDir, devPath);
+    for (let fullDevName of devsFileNames) {
+      const devPath = path.join(devsDir, fullDevName);
 
-      devsSet[devName] = require(devAbsPath).default;
+      devsSet[fullDevName] = require(devPath).default;
     }
 
     return devsSet;
+
+    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    // const platformDir = resolvePlatformDir(this.platform);
+    // const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+    //
+    // for (let devPath of machineConfig.devs) {
+    //   const devName: string = parseDevName(devPath);
+    //   const devAbsPath = path.resolve(platformDir, devPath);
+    //
+    //   devsSet[devName] = require(devAbsPath).default;
+    // }
+    //
+    // return devsSet;
   }
 
 }

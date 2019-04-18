@@ -1,4 +1,5 @@
-import * as path from "path";
+import * as path from 'path';
+
 import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import Io, {SpawnCmdResult} from '../../shared/Io';
 import Props from './Props';
@@ -14,7 +15,7 @@ export function makeSystemConfigExtend(props: Props): {[index: string]: any} {
   };
 }
 
-export async function installNpmModules(id: Io, cwd: string) {
+export async function installNpmModules(io: Io, cwd: string) {
   const result: SpawnCmdResult = await io.spawnCmd('npm install', cwd);
 
   if (result.status) {
