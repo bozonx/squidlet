@@ -3,7 +3,6 @@ import * as path from 'path';
 import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
-import DevsSet from './DevsSet';
 import systemConfig from '../../system/config/systemConfig';
 import BuildSystem from '../../shared/BuildSystem';
 import {
@@ -17,6 +16,8 @@ import {DevClass} from '../../system/entities/DevManager';
 import BuildDevs from '../../shared/BuildDevs';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import {loadMachineConfig, parseDevName} from '../../shared/helpers';
 
 
 const systemClassFileName = 'System';
@@ -80,13 +81,7 @@ export default class StartProd {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const devSet: DevsSet = new DevsSet(
-      this.io,
-      this.props.platform,
-      this.props.machine,
-      this.props.envSetDir
-    );
-    const completedDevSet: {[index: string]: DevClass} = await devSet.makeProdDevSet();
+    const completedDevSet: {[index: string]: DevClass} = await this.makeDevSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
@@ -135,6 +130,22 @@ export default class StartProd {
     console.info(`===> Building devs`);
 
     await buildDevs.build();
+  }
+
+  private async makeDevSet(): Promise<{[index: string]: DevClass}> {
+    const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    const envSetDevsDir = path.join(this.workDir, BUILD_DEVS_DIR);
+    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+
+    for (let devPath of machineConfig.devs) {
+      const devName: string = parseDevName(devPath);
+      const devFileName: string = `${devName}.js`;
+      const devAbsPath: string = path.join(envSetDevsDir, devFileName);
+
+      devsSet[devName] = require(devAbsPath).default;
+    }
+
+    return devsSet;
   }
 
 }

@@ -3,7 +3,6 @@ import * as path from 'path';
 import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
-import DevsSet from './DevsSet';
 import {DevClass} from '../../system/entities/DevManager';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import EnvSetMemory from '../../hostEnvBuilder/EnvSetMemory';
@@ -11,6 +10,8 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import {HOST_ENVSET_DIR} from '../../shared/constants';
+import {loadMachineConfig, parseDevName, resolvePlatformDir} from '../../shared/helpers';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 
 
 export default class StartDevelop {
@@ -49,13 +50,7 @@ export default class StartDevelop {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const devSet: DevsSet = new DevsSet(
-      this.io,
-      this.props.platform,
-      this.props.machine,
-      this.props.envSetDir
-    );
-    const completedDevSet: {[index: string]: DevClass} = await devSet.makeDevelopDevSet();
+    const completedDevSet: {[index: string]: DevClass} = await this.makeDevSet();
     const System = require(`../../system`).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
 
@@ -81,6 +76,53 @@ export default class StartDevelop {
     console.info(`===> initializing host system on machine`);
 
     EnvSetMemory.$registerConfigSet(hostEnvSet);
+  }
+
+  /**
+   * Read a whole directory 'devs' of platform and load all the it's files
+   */
+  private async makeDevSet(): Promise<{[index: string]: DevClass}> {
+    const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    const platformDir = resolvePlatformDir(this.props.platform);
+    const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
+    const evalModulePath: string = path.join(platformDir, this.props.machine, 'evalModule');
+    const machineEvalModule: any = require(evalModulePath).default;
+
+    for (let devPath of machineConfig.devs) {
+      const devName: string = parseDevName(devPath);
+      const devAbsPath = path.resolve(platformDir, devPath);
+      const moduleContent: string = await this.io.getFileContent(devAbsPath);
+
+      devsSet[devName] = machineEvalModule(moduleContent);
+    }
+
+    return devsSet;
+
+    // const platformDirName: string = resolvePlatformDir(this.platform);
+    // const devsDir: string = path.join(platformDirName, 'devs');
+    // const devsFileNames: string[] = await this.io.readdir(devsDir);
+    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    //
+    // for (let fullDevName of devsFileNames) {
+    //   const devPath = path.join(devsDir, fullDevName);
+    //
+    //   devsSet[fullDevName] = require(devPath).default;
+    // }
+    //
+    // return devsSet;
+
+    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    // const platformDir = resolvePlatformDir(this.platform);
+    // const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+    //
+    // for (let devPath of machineConfig.devs) {
+    //   const devName: string = parseDevName(devPath);
+    //   const devAbsPath = path.resolve(platformDir, devPath);
+    //
+    //   devsSet[devName] = require(devAbsPath).default;
+    // }
+    //
+    // return devsSet;
   }
 
 }
