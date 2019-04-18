@@ -14,29 +14,29 @@ export class WSServer implements WSSeverDev {
   }
 
 
-  onClose(cb: () => void) {
-    this.server.on('close', cb);
-  }
-
-  onConnection(cb: () => void) {
-    this.server.on('connection', cb);
-  }
-
-  onListening(cb: () => void) {
-    this.server.on('listening', cb);
-  }
+  // onClose(cb: () => void) {
+  //   this.server.on('close', cb);
+  // }
+  //
+  // onConnection(cb: () => void) {
+  //   this.server.on('connection', cb);
+  // }
+  //
+  // onListening(cb: () => void) {
+  //   this.server.on('listening', cb);
+  // }
 
   onMessage(cb: (data: any) => void) {
     // TODO: может навешивать только после on connection ????
     this.server.on('message', cb);
   }
 
-  onError(cb: (err: Error) => void) {
-    this.server.on('error', cb);
-  }
+  // onError(cb: (err: Error) => void) {
+  //   this.server.on('error', cb);
+  // }
 
   send(data: any) {
-    this.server.send(data);
+    //this.server.send(data);
   }
 
 }

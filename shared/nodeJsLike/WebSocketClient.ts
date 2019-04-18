@@ -11,12 +11,20 @@ export class WSClient implements WSClientDev {
     });
   }
 
-  onOpen(cb: () => void) {
-    this.client.on('open', cb);
+  // onOpen(cb: () => void) {
+  //   this.client.on('open', cb);
+  // }
+
+  onClose(cb: () => void) {
+    //this.client.on('open', cb);
   }
 
   onMessage(cb: (data: any) => void) {
     this.client.on('message', cb);
+  }
+
+  onError(cb: (err: Error) => void) {
+    this.client.on('error', cb);
   }
 
   send(data: any) {

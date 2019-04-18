@@ -6,7 +6,7 @@ export interface WebSocketServerProps {
 }
 
 export interface WSSeverDev {
-  onOpen(cb: () => void): void;
+  //onOpen(cb: () => void): void;
   onMessage(cb: (data: any) => void): void;
   send(data: any): void;
 }
