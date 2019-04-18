@@ -43,18 +43,34 @@ export default class DevsSet {
    * Read a whole directory 'devs' of platform and load all the it's files
    */
   async makeDevelopDevSet(): Promise<{[index: string]: DevClass}> {
-    const platformDirName: string = resolvePlatformDir(this.platform);
-    const devsDir: string = path.join(platformDirName, 'devs');
-    const devsFileNames: string[] = await this.io.readdir(devsDir);
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    const platformDir = resolvePlatformDir(this.platform);
+    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+    const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule.ts');
+    const machineEvalModule: any = require(evalModulePath).default;
 
-    for (let fullDevName of devsFileNames) {
-      const devPath = path.join(devsDir, fullDevName);
+    for (let devPath of machineConfig.devs) {
+      const devName: string = parseDevName(devPath);
+      const devAbsPath = path.resolve(platformDir, devPath);
+      const moduleContent: string = await this.io.getFileContent(devAbsPath);
 
-      devsSet[fullDevName] = require(devPath).default;
+      devsSet[devName] = machineEvalModule(moduleContent).default;
     }
 
     return devsSet;
+
+    // const platformDirName: string = resolvePlatformDir(this.platform);
+    // const devsDir: string = path.join(platformDirName, 'devs');
+    // const devsFileNames: string[] = await this.io.readdir(devsDir);
+    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    //
+    // for (let fullDevName of devsFileNames) {
+    //   const devPath = path.join(devsDir, fullDevName);
+    //
+    //   devsSet[fullDevName] = require(devPath).default;
+    // }
+    //
+    // return devsSet;
 
     // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
     // const platformDir = resolvePlatformDir(this.platform);
