@@ -42,8 +42,12 @@ export default class StartDevelop {
 
 
   private async installModules() {
-    console.info(`===> Install npm modules`);
     const cwd: string = path.resolve(__dirname, '../', this.props.machine);
+
+    // do not install node modules if they have been installed previously
+    if (this.io.exists(path.join(cwd, 'node_modules'))) return;
+
+    console.info(`===> Install npm modules`);
 
     await installNpmModules(this.io, cwd);
   }
