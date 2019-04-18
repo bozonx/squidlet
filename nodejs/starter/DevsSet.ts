@@ -46,7 +46,7 @@ export default class DevsSet {
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
     const platformDir = resolvePlatformDir(this.platform);
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
-    const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule.ts');
+    const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule');
     const machineEvalModule: any = require(evalModulePath).default;
 
     for (let devPath of machineConfig.devs) {
@@ -54,7 +54,9 @@ export default class DevsSet {
       const devAbsPath = path.resolve(platformDir, devPath);
       const moduleContent: string = await this.io.getFileContent(devAbsPath);
 
-      devsSet[devName] = machineEvalModule(moduleContent).default;
+      devsSet[devName] = machineEvalModule(moduleContent);
+
+      console.log(111111111, devsSet[devName])
     }
 
     return devsSet;
