@@ -134,8 +134,8 @@ export default class StartProd {
 
   private async makeDevSet(): Promise<{[index: string]: DevClass}> {
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    const envSetDevsDir = path.join(this.workDir, BUILD_DEVS_DIR);
-    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+    const envSetDevsDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
+    const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
 
     for (let devPath of machineConfig.devs) {
       const devName: string = parseDevName(devPath);
