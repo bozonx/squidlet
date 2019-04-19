@@ -16,7 +16,7 @@
 // @ts-ignore
 const pigpio = require('pigpio-client').pigpio({
   //host: '0.0.0.0'
-  timeout: 1,
+  //timeout: 1,
 });
 
 import DigitalDev, {
@@ -43,7 +43,7 @@ const connectionPromise = new Promise((resolve, reject) => {
 
   pigpio.once('connected', (info: {[index: string]: string}) => {
     // display information on pigpio and connection status
-    console.log('> has been connected successfully to the pigpio daemon');
+    console.log('SUCCESS: has been connected successfully to the pigpio daemon');
 
     wasConnected = true;
     resolve();
@@ -105,6 +105,11 @@ export default class Digital implements DigitalDev {
     else if (inputMode === 'input_pulldown') {
       await callPromised(pinInstance.pullUpDown, 1);
     }
+
+
+    // Returns a numbr - 0 for input
+    console.log('--------- mode', await callPromised(this.pinInstances[pin].modeGet));
+
   }
 
   /**
@@ -114,8 +119,6 @@ export default class Digital implements DigitalDev {
   async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
     this.pinInstances[pin] = pigpio.gpio(pin);
     await callPromised(this.pinInstances[pin].modeSet, 'output');
-
-    console.log('--------- mode', callPromised(this.pinInstances[pin].modeGet));
 
     // set initial value if is set
     if (typeof initialValue !== 'undefined') await callPromised(this.write, pin, initialValue);
@@ -163,8 +166,6 @@ export default class Digital implements DigitalDev {
     const pinInstance = this.getPinInstance('setWatch', pin);
 
     const handlerWrapper: GpioHandler = (level: number, tick: number) => {
-      console.log(`=========== Button changed to ${level} at ${tick} usec`);
-
       const value: boolean = Boolean(level);
 
       // if undefined or 0 - call handler immediately
@@ -212,33 +213,6 @@ export default class Digital implements DigitalDev {
   }
 
 
-  // private convertMode(pinMode: DigitalPinMode): {mode: number, pullUpDown: number} {
-  //   switch (pinMode) {
-  //     case ('input'):
-  //       return {
-  //         mode: Gpio.INPUT,
-  //         pullUpDown: Gpio.PUD_OFF,
-  //       };
-  //     case ('input_pullup'):
-  //       return {
-  //         mode: Gpio.INPUT,
-  //         pullUpDown: Gpio.PUD_UP,
-  //       };
-  //     case ('input_pulldown'):
-  //       return {
-  //         mode: Gpio.INPUT,
-  //         pullUpDown: Gpio.PUD_DOWN,
-  //       };
-  //     case ('output'):
-  //       return {
-  //         mode: Gpio.OUTPUT,
-  //         pullUpDown: Gpio.PUD_OFF,
-  //       };
-  //     default:
-  //       throw new Error(`Unknown mode "${pinMode}"`);
-  //   }
-  // }
-  //
   // private resolveEdge(edge?: Edge): number {
   //   if (edge === 'rising') {
   //     return Gpio.RISING_EDGE;

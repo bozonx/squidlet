@@ -38,8 +38,8 @@ export default class StartProd {
     await this.groupConfig.init();
     await this.props.resolve();
 
-    console.info(`Using working dir ${this.props.workDir}`);
-    console.info(`Using host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
+    console.info(`Use working dir ${this.props.workDir}`);
+    console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
   }
 
 
