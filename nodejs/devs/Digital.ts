@@ -1,5 +1,23 @@
+/*
+ * It uses a pigpiod daemon.
+ *
+ * Control pigpiod:
+ *
+ * Run in foreground
+ *     sudo pigpiod -g
+ *
+ * start a daemon
+ *     sudo pigpiod
+ *
+ * stop a daemon
+ *     sudo killall pigpiod
+ */
+
 // @ts-ignore
-const pigpio = require('pigpio-client').pigpio({host: '0.0.0.0'});
+const pigpio = require('pigpio-client').pigpio({
+  //host: '0.0.0.0'
+  timeout: 1,
+});
 
 import DigitalDev, {
   Edge,
@@ -19,6 +37,36 @@ interface Listener {
 }
 
 const CONNECTION_TIMEOUT = 60000;
+let wasConnected = false;
+const connectionPromise = new Promise((resolve, reject) => {
+  console.log(`... Connecting to pigpiod daemon`);
+
+  pigpio.once('connected', (info: {[index: string]: string}) => {
+    // display information on pigpio and connection status
+    console.log('> has been connected successfully to the pigpio daemon');
+
+    wasConnected = true;
+    resolve();
+  });
+
+  // Errors are emitted unless you provide API with callback.
+  pigpio.on('error', (err: {message: string})=> {
+    console.error('Application received error: ', err.message); // or err.stack
+
+    if (!wasConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
+  });
+
+  pigpio.on('disconnected', (reason: string) => {
+    console.log('App received disconnected event, reason: ', reason);
+    console.log('App reconnecting in 1 sec');
+    setTimeout( pigpio.connect, 1000, {host: 'raspberryHostIP'});
+  });
+
+  setTimeout(() => {
+    if (wasConnected) return;
+    reject(`Can't connect to pigpiod, timeout has been exceeded`);
+  }, CONNECTION_TIMEOUT);
+});
 
 
 // TODO: все выводы в log выводить в системный логгер (возможно через события)
@@ -33,37 +81,7 @@ export default class Digital implements DigitalDev {
 
 
   async init() {
-    let wasConnected = false;
-
-    return new Promise((resolve, reject) => {
-      console.log(`... Connecting to pigpiod daemon`);
-
-      pigpio.once('connected', (info: {[index: string]: any}) => {
-        // display information on pigpio and connection status
-        console.log(JSON.stringify(info,null,2));
-
-        wasConnected = true;
-        resolve();
-      });
-
-      // Errors are emitted unless you provide API with callback.
-      pigpio.on('error', (err: {message: string})=> {
-        console.error('Application received error: ', err.message); // or err.stack
-
-        if (!wasConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
-      });
-
-      pigpio.on('disconnected', (reason: string) => {
-        console.log('App received disconnected event, reason: ', reason);
-        console.log('App reconnecting in 1 sec');
-        setTimeout( pigpio.connect, 1000, {host: 'raspberryHostIP'});
-      });
-
-      setTimeout(() => {
-        if (wasConnected) return;
-        reject(`Can't connect to pigpiod, timeout has been exceeded`);
-      }, CONNECTION_TIMEOUT);
-    });
+    await connectionPromise;
   }
 
 
@@ -128,9 +146,8 @@ export default class Digital implements DigitalDev {
   async read(pin: number): Promise<boolean> {
     const pinInstance = this.getPinInstance('read', pin);
 
+    // returns 0 or 1
     const result: number = await callPromised(pinInstance.read);
-
-    console.log('--------- read', result);
 
     return Boolean(result);
   }
