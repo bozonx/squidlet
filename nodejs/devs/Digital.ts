@@ -8,6 +8,7 @@ import DigitalDev, {
   DigitalInputMode
 } from 'system/interfaces/dev/DigitalDev';
 import DebounceCall from 'system/helpers/DebounceCall';
+import {callPromised} from 'system/helpers/helpers';
 
 
 type GpioHandler = (level: number) => void;
@@ -22,7 +23,7 @@ interface Listener {
 
 
 export default class Digital implements DigitalDev {
-  private readonly pinInstances: {[index: string]: Gpio} = {};
+  private readonly pinInstances: {[index: string]: any} = {};
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
   // debounce times by pin number
@@ -63,14 +64,21 @@ export default class Digital implements DigitalDev {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
-    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(inputMode);
     // save debounce time
     this.debounceTimes[pin] = debounce;
-    // make a new instance of Gpio
-    this.pinInstances[pin] = new Gpio(pin, {
-      ...convertedMode,
-      edge: this.resolveEdge(edge),
-    });
+
+    // TODO: edge - this.resolveEdge(edge),
+
+    const pinInstance = pigpio.gpio(pin);
+    this.pinInstances[pin] = pinInstance;
+    await callPromised(pinInstance.modeSet, 'input');
+
+    if (inputMode === 'input_pullup') {
+      await callPromised(pinInstance.pullUpDown, 2);
+    }
+    else if (inputMode === 'input_pulldown') {
+      await callPromised(pinInstance.pullUpDown, 1);
+    }
   }
 
   /**
@@ -78,11 +86,8 @@ export default class Digital implements DigitalDev {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
-    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode('output');
-
-    this.pinInstances[pin] = new Gpio(pin, {
-      ...convertedMode,
-    });
+    this.pinInstances[pin] = pigpio.gpio(pin);
+    this.pinInstances[pin].modeSet('output');
 
     // set initial value if is set
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
@@ -96,14 +101,16 @@ export default class Digital implements DigitalDev {
     const pinInstance = this.getPinInstance('getPinMode', pin);
     const modeConst: number = pinInstance.getMode();
 
-    if (modeConst === Gpio.INPUT) {
-      return 'input';
+    // TODO: do it
 
-      // TODO: add support of input_pullup and input_pulldown
-    }
-    else if (modeConst === Gpio.OUTPUT) {
-      return 'output';
-    }
+    // if (modeConst === Gpio.INPUT) {
+    //   return 'input';
+    //
+    //   // TODO: add support of input_pullup and input_pulldown
+    // }
+    // else if (modeConst === Gpio.OUTPUT) {
+    //   return 'output';
+    // }
 
     return;
   }
@@ -117,6 +124,12 @@ export default class Digital implements DigitalDev {
   async write(pin: number, value: boolean): Promise<void> {
     const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
+
+    return callPromised(pinInstance.write, numValue);
+  }
+
+  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+
 
 
     /*
@@ -135,10 +148,7 @@ export default class Digital implements DigitalDev {
         });
      */
 
-    pinInstance.digitalWrite(numValue);
-  }
 
-  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
     const pinInstance = this.getPinInstance('setWatch', pin);
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);
@@ -187,45 +197,45 @@ export default class Digital implements DigitalDev {
   }
 
 
-  private convertMode(pinMode: DigitalPinMode): {mode: number, pullUpDown: number} {
-    switch (pinMode) {
-      case ('input'):
-        return {
-          mode: Gpio.INPUT,
-          pullUpDown: Gpio.PUD_OFF,
-        };
-      case ('input_pullup'):
-        return {
-          mode: Gpio.INPUT,
-          pullUpDown: Gpio.PUD_UP,
-        };
-      case ('input_pulldown'):
-        return {
-          mode: Gpio.INPUT,
-          pullUpDown: Gpio.PUD_DOWN,
-        };
-      case ('output'):
-        return {
-          mode: Gpio.OUTPUT,
-          pullUpDown: Gpio.PUD_OFF,
-        };
-      default:
-        throw new Error(`Unknown mode "${pinMode}"`);
-    }
-  }
+  // private convertMode(pinMode: DigitalPinMode): {mode: number, pullUpDown: number} {
+  //   switch (pinMode) {
+  //     case ('input'):
+  //       return {
+  //         mode: Gpio.INPUT,
+  //         pullUpDown: Gpio.PUD_OFF,
+  //       };
+  //     case ('input_pullup'):
+  //       return {
+  //         mode: Gpio.INPUT,
+  //         pullUpDown: Gpio.PUD_UP,
+  //       };
+  //     case ('input_pulldown'):
+  //       return {
+  //         mode: Gpio.INPUT,
+  //         pullUpDown: Gpio.PUD_DOWN,
+  //       };
+  //     case ('output'):
+  //       return {
+  //         mode: Gpio.OUTPUT,
+  //         pullUpDown: Gpio.PUD_OFF,
+  //       };
+  //     default:
+  //       throw new Error(`Unknown mode "${pinMode}"`);
+  //   }
+  // }
+  //
+  // private resolveEdge(edge?: Edge): number {
+  //   if (edge === 'rising') {
+  //     return Gpio.RISING_EDGE;
+  //   }
+  //   else if (edge === 'falling') {
+  //     return Gpio.FALLING_EDGE;
+  //   }
+  //
+  //   return Gpio.EITHER_EDGE;
+  // }
 
-  private resolveEdge(edge?: Edge): number {
-    if (edge === 'rising') {
-      return Gpio.RISING_EDGE;
-    }
-    else if (edge === 'falling') {
-      return Gpio.FALLING_EDGE;
-    }
-
-    return Gpio.EITHER_EDGE;
-  }
-
-  private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
+  private getPinInstance(methodWhichAsk: string, pin: number): any {
     if (!this.pinInstances[pin]) {
       throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }

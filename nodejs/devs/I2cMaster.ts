@@ -1,4 +1,3 @@
-// @ts-ignore
 import {I2cBus, openSync} from 'i2c-bus';
 
 import I2cMasterDev from 'system/interfaces/dev/I2cMasterDev';

@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/helpers/binaryHelpers';
