@@ -10,6 +10,7 @@
   "dependencies": {
     "i2c-bus": "^4.0.1",
     "pigpio": "^1.1.4",
+    "pigpio-client": "^1.1.0",
     "mqtt": "^2.18.8",
     "serialport": "^7.0.2"
   },

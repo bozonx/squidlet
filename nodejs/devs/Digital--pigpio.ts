@@ -1,5 +1,5 @@
 // @ts-ignore
-const pigpio = require('pigpio-client').pigpio({host: 'localhost'});
+import {Gpio} from 'pigpio';
 
 import DigitalDev, {
   Edge,
@@ -18,44 +18,12 @@ interface Listener {
 }
 
 
-// TODO: все выводы в log выводить в системный логгер (возможно через события)
-
-
 export default class Digital implements DigitalDev {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
   // debounce times by pin number
   private debounceTimes: {[index: string]: number | undefined} = {};
-
-
-  async init() {
-    let wasConnected = false;
-
-    return new Promise((resolve, reject) => {
-      pigpio.once('connected', (info: {[index: string]: any}) => {
-        // display information on pigpio and connection status
-        console.log(JSON.stringify(info,null,2));
-
-        wasConnected = true;
-        resolve();
-      });
-
-      // Errors are emitted unless you provide API with callback.
-      pigpio.on('error', (err: {message: string})=> {
-        console.error('Application received error: ', err.message); // or err.stack
-
-        if (!wasConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
-      });
-
-      pigpio.on('disconnected', (reason: string) => {
-        console.log('App received disconnected event, reason: ', reason);
-        console.log('App reconnecting in 1 sec');
-        setTimeout( pigpio.connect, 1000, {host: 'raspberryHostIP'});
-      });
-
-    });
-  }
 
 
   /**
@@ -117,23 +85,6 @@ export default class Digital implements DigitalDev {
   async write(pin: number, value: boolean): Promise<void> {
     const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
-
-
-    /*
-        // control an LED on GPIO 25
-        const LED = pigpio.gpio(25);
-        LED.modeSet('output');
-        LED.write(1); // turn on LED
-        LED.write(0); // turn off
-        LED.analogWrite(128); // set to 50% duty cycle (out of 255)
-
-        // get events from a button on GPIO 17
-        const Button = pigpio.gpio(17);
-        Button.modeSet('input');
-        Button.notify((level, tick)=> {
-          console.log(`Button changed to ${level} at ${tick} usec`)
-        });
-     */
 
     pinInstance.digitalWrite(numValue);
   }
