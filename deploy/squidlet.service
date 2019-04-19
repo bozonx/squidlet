@@ -3,7 +3,7 @@ Description=Squidlet iot control system
 After=networking.service
 
 [Service]
-User=root
+User=pi
 Restart=always
 RestartSec=10
 ExecStart=/home/pi/squidlet/squidletctl start /home/pi/home/hostConfig.yaml

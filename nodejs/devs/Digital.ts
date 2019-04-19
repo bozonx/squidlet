@@ -1,5 +1,5 @@
 // @ts-ignore
-const pigpio = require('pigpio-client').pigpio({host: 'localhost'});
+const pigpio = require('pigpio-client').pigpio({host: '0.0.0.0'});
 
 import DigitalDev, {
   Edge,
@@ -11,12 +11,14 @@ import DebounceCall from 'system/helpers/DebounceCall';
 import {callPromised} from 'system/helpers/helpers';
 
 
-type GpioHandler = (level: number) => void;
+type GpioHandler = (level: number, tick: number) => void;
 
 interface Listener {
   pin: number;
   handler: GpioHandler;
 }
+
+const CONNECTION_TIMEOUT = 60000;
 
 
 // TODO: все выводы в log выводить в системный логгер (возможно через события)
@@ -34,6 +36,8 @@ export default class Digital implements DigitalDev {
     let wasConnected = false;
 
     return new Promise((resolve, reject) => {
+      console.log(`... Connecting to pigpiod daemon`);
+
       pigpio.once('connected', (info: {[index: string]: any}) => {
         // display information on pigpio and connection status
         console.log(JSON.stringify(info,null,2));
@@ -55,6 +59,10 @@ export default class Digital implements DigitalDev {
         setTimeout( pigpio.connect, 1000, {host: 'raspberryHostIP'});
       });
 
+      setTimeout(() => {
+        if (wasConnected) return;
+        reject(`Can't connect to pigpiod, timeout has been exceeded`);
+      }, CONNECTION_TIMEOUT);
     });
   }
 
@@ -87,10 +95,12 @@ export default class Digital implements DigitalDev {
    */
   async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
     this.pinInstances[pin] = pigpio.gpio(pin);
-    this.pinInstances[pin].modeSet('output');
+    await callPromised(this.pinInstances[pin].modeSet, 'output');
+
+    console.log('--------- mode', callPromised(this.pinInstances[pin].modeGet));
 
     // set initial value if is set
-    if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
+    if (typeof initialValue !== 'undefined') await callPromised(this.write, pin, initialValue);
   }
 
   /**
@@ -118,7 +128,11 @@ export default class Digital implements DigitalDev {
   async read(pin: number): Promise<boolean> {
     const pinInstance = this.getPinInstance('read', pin);
 
-    return Boolean(pinInstance.digitalRead());
+    const result: number = await callPromised(pinInstance.read);
+
+    console.log('--------- read', result);
+
+    return Boolean(result);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
@@ -129,28 +143,11 @@ export default class Digital implements DigitalDev {
   }
 
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-
-
-
-    /*
-        // control an LED on GPIO 25
-        const LED = pigpio.gpio(25);
-        LED.modeSet('output');
-        LED.write(1); // turn on LED
-        LED.write(0); // turn off
-        LED.analogWrite(128); // set to 50% duty cycle (out of 255)
-
-        // get events from a button on GPIO 17
-        const Button = pigpio.gpio(17);
-        Button.modeSet('input');
-        Button.notify((level, tick)=> {
-          console.log(`Button changed to ${level} at ${tick} usec`)
-        });
-     */
-
-
     const pinInstance = this.getPinInstance('setWatch', pin);
-    const handlerWrapper: GpioHandler = (level: number) => {
+
+    const handlerWrapper: GpioHandler = (level: number, tick: number) => {
+      console.log(`=========== Button changed to ${level} at ${tick} usec`);
+
       const value: boolean = Boolean(level);
 
       // if undefined or 0 - call handler immediately
@@ -169,7 +166,8 @@ export default class Digital implements DigitalDev {
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
     // start listen
-    pinInstance.on('interrupt', handlerWrapper);
+    pinInstance.notify(handlerWrapper);
+
     // return an index
     return this.alertListeners.length - 1;
   }
@@ -185,7 +183,7 @@ export default class Digital implements DigitalDev {
     const {pin, handler} = this.alertListeners[id];
     const pinInstance = this.getPinInstance('clearWatch', pin);
 
-    pinInstance.off('interrupt', handler);
+    pinInstance.endNotify(handler);
 
     delete this.alertListeners[id];
   }

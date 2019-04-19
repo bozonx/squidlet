@@ -1,7 +1,7 @@
 export type WatchHandler = (state: boolean) => void;
 export type DigitalInputMode = 'input'
   | 'input_pullup'
-  | 'input_pullup';
+  | 'input_pulldown';
 export type DigitalPinMode = DigitalInputMode | 'output';
 export type Edge = 'rising' | 'falling' | 'both';
 
