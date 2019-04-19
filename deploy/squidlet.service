@@ -1,0 +1,12 @@
+[Unit]
+Description=Squidlet iot control system
+After=networking.service
+
+[Service]
+User=root
+Restart=always
+RestartSec=10
+ExecStart=/home/pi/squidlet/squidletctl start /home/pi/home/hostConfig.yaml
+
+[Install]
+WantedBy=multi-user.target

@@ -42,14 +42,15 @@ export default class StartDevelop {
 
 
   private async installModules() {
-    const cwd: string = path.resolve(__dirname, '../', this.props.machine);
+    const platformDir = resolvePlatformDir(this.props.platform);
+    const machineCwd: string = path.join(platformDir, this.props.machine);
 
     // do not install node modules if they have been installed previously
-    if (this.io.exists(path.join(cwd, 'node_modules'))) return;
+    if (await this.io.exists(path.join(machineCwd, 'node_modules'))) return;
 
     console.info(`===> Install npm modules`);
 
-    await installNpmModules(this.io, cwd);
+    await installNpmModules(this.io, machineCwd);
   }
 
   private async startSystem() {
@@ -78,7 +79,7 @@ export default class StartDevelop {
 
     const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
 
-    console.info(`===> initializing host system on machine`);
+    console.info(`===> initializing system`);
 
     EnvSetMemory.$registerConfigSet(hostEnvSet);
   }
