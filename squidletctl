@@ -1,4 +1,15 @@
-#!/usr/bin/env node
+#!/usr/bin/env bash
 
-require('ts-node/register');
-require('./control/index.ts');
+DIRNAME=$(dirname $0)
+export NODE_PATH=${DIRNAME}/node_modules:${NODE_PATH}
+
+export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+/usr/bin/env node ${DIRNAME}/squidletctl.js ${@}
+
+#/home/pi/.nvm/versions/node/v11.13.0/bin/node ${DIRNAME}/squidletctl.js ${@}
+
+###  #!/usr/bin/env node
+
+#require('ts-node/register');
+#require('./control/index.ts');

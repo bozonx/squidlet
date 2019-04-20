@@ -3207,6 +3207,11 @@ pify@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
 
+pigpio-client@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/pigpio-client/-/pigpio-client-1.1.0.tgz#9cc0299ed3ce95459425cd6ef19cf351f83f05a2"
+  integrity sha512-Sno8P+tS5+q+EYhfxB6PKX6uInS7iKyDKMrEtT+5ZjiDn46lI1DFWAYvGNbReMPme6rPZozmp/h4gwBfZKQFGw==
+
 pinkie-promise@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/pinkie-promise/-/pinkie-promise-2.0.1.tgz#2135d6dfa7a358c069ac9b178776288228450ffa"

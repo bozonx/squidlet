@@ -130,20 +130,19 @@ export default class Digital implements DigitalDev {
    */
   async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
     const pinInstance = this.getPinInstance('getPinMode', pin);
-    const modeConst: number = pinInstance.getMode();
+    const modeConst: number = await callPromised(pinInstance.modeGet);
 
-    // TODO: do it
+    if (modeConst === 0) {
+      return 'input';
 
-    // if (modeConst === Gpio.INPUT) {
-    //   return 'input';
-    //
-    //   // TODO: add support of input_pullup and input_pulldown
-    // }
-    // else if (modeConst === Gpio.OUTPUT) {
-    //   return 'output';
-    // }
+      // TODO: add support of input_pullup and input_pulldown
+    }
+    else {
 
-    return;
+      // TODO: which const in output ????
+
+      return 'output';
+    }
   }
 
   async read(pin: number): Promise<boolean> {
