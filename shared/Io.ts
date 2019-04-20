@@ -58,6 +58,9 @@ export default class Io {
     return callPromised(fs.readlink, pathTo);
   }
 
+  symlink(from: string, to: string): Promise<void> {
+    return callPromised(fs.symlink, from, to);
+  }
 
   async exists(path: string): Promise<boolean> {
     return fs.existsSync(path);

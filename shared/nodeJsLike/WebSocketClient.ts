@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 
-import WebSocketClientDev, {WebSocketClientProps, WSClientDev} from '../../system/interfaces/dev/WebSocketClientDev';
+import WebSocketClientDev, {WebSocketClientProps, WSClientDev} from 'system/interfaces/dev/WebSocketClientDev';
 
 
 export class WSClient implements WSClientDev {

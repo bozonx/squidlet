@@ -17,7 +17,7 @@ import BuildDevs from '../../shared/BuildDevs';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import {loadMachineConfig, parseDevName} from '../../shared/helpers';
+import {loadMachineConfig, parseDevName, resolvePlatformDir} from '../../shared/helpers';
 
 
 const systemClassFileName = 'System';
@@ -44,17 +44,35 @@ export default class StartProd {
 
 
   async start() {
-    await this.buildInitialSystem();
     await this.installModules();
+    await this.buildInitialSystem();
     await this.startSystem();
   }
 
 
   private async installModules() {
+
+    // TODO: review
+
+    // copy package.json
+    const platformDir: string = resolvePlatformDir(this.props.platform);
+    const machineDir: string = path.join(platformDir, this.props.machine);
+
+    await this.io.mkdirP(this.props.workDir);
+    await this.io.copyFile(
+      path.join(machineDir, 'package.json'),
+      path.join(this.props.workDir, 'package.json')
+    );
+
     console.info(`===> Install npm modules`);
-    const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
+    const cwd: string = path.join(this.props.workDir);
+    //const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
 
     await installNpmModules(this.io, cwd);
+    await this.io.symlink(
+      this.getPathToProdSystemDir(),
+      path.join(this.props.workDir, 'node_modules', 'system')
+    );
   }
 
   private async buildInitialSystem() {
@@ -75,7 +93,7 @@ export default class StartProd {
     // build config and entities
     await this.buildEnvSet(initialHostConfig);
     // build devs
-    await this.buildHostDevs(initialHostConfig);
+    await this.buildDevs(initialHostConfig);
   }
 
   private async startSystem() {
@@ -117,7 +135,7 @@ export default class StartProd {
     await buildHostEnv.build();
   }
 
-  private async buildHostDevs(hostConfig: PreHostConfig) {
+  private async buildDevs(hostConfig: PreHostConfig) {
     const buildDir = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_DEVS_DIR);
     const buildDevs: BuildDevs = new BuildDevs(

@@ -1,4 +1,4 @@
-import WifiDev, {WifiParams} from '../../system/interfaces/dev/WifiDev';
+import WifiDev, {WifiParams} from 'system/interfaces/dev/WifiDev';
 
 
 export default class Wifi implements WifiDev {

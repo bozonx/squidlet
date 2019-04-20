@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 
-import WebSocketServerDev, {WebSocketServerProps, WSSeverDev} from '../../system/interfaces/dev/WebSocketServerDev';
+import WebSocketServerDev, {WebSocketServerProps, WSSeverDev} from 'system/interfaces/dev/WebSocketServerDev';
 
 
 export class WSServer implements WSSeverDev {
