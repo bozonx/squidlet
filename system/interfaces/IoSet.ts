@@ -5,13 +5,21 @@ export type IoMessageType = 'call' | 'result' | 'listenCb' | 'removeCbListener';
 
 export interface CallMethodPayload {
   hostId: string;
+  ioName: string;
   method: string;
   args: Primitives[];
 }
 
+export interface ResultPayload {
+  ioName: string;
+  method: string;
+  error: string | undefined;
+  result: Primitives;
+}
+
 export interface IoSetMessage {
   type: IoMessageType;
-  payload: CallMethodPayload;
+  payload: CallMethodPayload | ResultPayload;
 }
 
 export interface IoDefinition {

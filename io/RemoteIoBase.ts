@@ -1,10 +1,10 @@
-import IoSet, {IoDefinition} from '../system/interfaces/IoSet';
+import IoSet, {IoDefinition, IoSetMessage, ResultPayload} from '../system/interfaces/IoSet';
 import System from '../system/System';
 import {Primitives} from '../system/interfaces/Types';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
-type ResultHandler = (resultIoName: string, resultMethod: string, err: string | null, data: any) => void;
+type ResultHandler = (resultIoName: string, resultMethod: string, error: string | undefined, result: any) => void;
 
 
 export default abstract class RemoteIoBase implements IoSet {
@@ -72,6 +72,14 @@ export default abstract class RemoteIoBase implements IoSet {
     // TODO: do it
   }
 
+  protected resolveIncomeMessage(message: IoSetMessage) {
+    if (message.type === 'result') {
+      const payload = message.payload as ResultPayload;
+
+      this.resultMessages.emit(payload.ioName, payload.method, payload.error, payload.result);
+    }
+  }
+
   /**
    * Wait while response of method is received
    */
@@ -79,14 +87,14 @@ export default abstract class RemoteIoBase implements IoSet {
     return new Promise((resolve, reject) => {
       let wasFulfilled: boolean = false;
       let handlerIndex: number;
-      const handler = (resultIoName: string, resultMethod: string, err: string | null, data: any) => {
+      const handler = (resultIoName: string, resultMethod: string, error: string | undefined, data: any) => {
         if (ioName !== resultIoName || resultMethod !== method) return;
 
         wasFulfilled = true;
         this.resultMessages.removeListener(handlerIndex);
 
-        if (err) {
-          return reject(new Error(err));
+        if (error) {
+          return reject(new Error(error));
         }
 
         resolve(data);

@@ -1,13 +1,11 @@
 import * as WebSocket from 'ws';
+import _isPlainObject = require('lodash/isPlainObject');
 
 import RemoteIoBase from './RemoteIoBase';
 import {IoSetMessage} from '../system/interfaces/IoSet';
 import {ClientRequest, IncomingMessage} from 'http';
 import System from '../system/System';
 import {Primitives} from '../system/interfaces/Types';
-import IndexedEvents from '../system/helpers/IndexedEvents';
-
-
 
 
 export default class WsIoSet extends RemoteIoBase {
@@ -32,6 +30,7 @@ export default class WsIoSet extends RemoteIoBase {
       type: 'call',
       payload: {
         hostId: this.system.host.id,
+        ioName,
         method,
         args,
       },
@@ -64,9 +63,7 @@ export default class WsIoSet extends RemoteIoBase {
       this.system.log.error(`Websocket io set has received an error: ${err}`);
     });
 
-    this.client.on('message', (data: string | Buffer | Buffer[] | ArrayBuffer) => {
-      // TODO: понять какой тип сообщения
-    });
+    this.client.on('message', this.parseIncomeMessage);
 
     this.client.on('open', () => {
       // TODO: resolve promise
@@ -75,6 +72,27 @@ export default class WsIoSet extends RemoteIoBase {
     this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
       this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
     });
+  }
+
+  private parseIncomeMessage = (data: string | Buffer | Buffer[] | ArrayBuffer) => {
+    let message: IoSetMessage;
+
+    if (typeof data !== 'string') {
+      return this.system.log.error(`Websocket io set: invalid type of received data "${typeof data}"`);
+    }
+
+    try {
+      message = JSON.parse(data);
+    }
+    catch (err) {
+      return this.system.log.error(`Websocket io set: can't parse received json`);
+    }
+
+    if (!_isPlainObject(message)) {
+      return this.system.log.error(`Websocket io set: received message is not an object`);
+    }
+
+    this.resolveIncomeMessage(message);
   }
 
 }
