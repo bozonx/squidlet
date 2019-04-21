@@ -1,14 +1,23 @@
 import IoSet, {IoDefinition} from '../system/interfaces/IoSet';
+import System from '../system/System';
+import {Primitives} from '../system/interfaces/Types';
 
 
 export default abstract class RemoteIoBase implements IoSet {
+  protected readonly system: System;
   private readonly instances: {[index: string]: any} = {};
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
-  abstract callMethod(ioName: string, methodName: string): Promise<any>;
+  abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
   abstract addCbListener(ioName: string): Promise<void>;
   abstract removeCbListener(ioName: string): Promise<void>;
+  abstract destroy(): void;
+
+
+  constructor(system: System) {
+    this.system = system;
+  }
 
 
   async init(ioDefinitions: IoDefinition): Promise<void> {
