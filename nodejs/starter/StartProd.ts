@@ -53,6 +53,7 @@ export default class StartProd {
   private async installModules() {
 
     // TODO: review
+    // TODO: может не запускать если уже были установенны модули???
 
     // copy package.json
     const platformDir: string = resolvePlatformDir(this.props.platform);
@@ -69,10 +70,16 @@ export default class StartProd {
     //const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
 
     await installNpmModules(this.io, cwd);
-    await this.io.symlink(
-      this.getPathToProdSystemDir(),
-      path.join(this.props.workDir, 'node_modules', 'system')
-    );
+
+    try {
+      await this.io.symlink(
+        this.getPathToProdSystemDir(),
+        path.join(this.props.workDir, 'node_modules', 'system')
+      );
+    }
+    catch (e) {
+      // do nothing
+    }
   }
 
   private async buildInitialSystem() {
@@ -136,7 +143,7 @@ export default class StartProd {
   }
 
   private async buildDevs(hostConfig: PreHostConfig) {
-    const buildDir = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
+    const buildDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_DEVS_DIR);
     const buildDevs: BuildDevs = new BuildDevs(
       this.io,
