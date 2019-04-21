@@ -8,11 +8,10 @@ import {Primitives} from '../system/interfaces/Types';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
-type ResultHandler = (resultIoName: string, resultMethod: string, err: string | null, data: any) => void;
 
 
 export default class WsIoSet extends RemoteIoBase {
-  private readonly resultMessages = new IndexedEvents<ResultHandler>();
+
   private readonly client: WebSocket;
 
 
@@ -40,25 +39,7 @@ export default class WsIoSet extends RemoteIoBase {
 
     this.client.send(data);
 
-    return new Promise((resolve, reject) => {
-      let handlerIndex: number;
-      const handler = (resultIoName: string, resultMethod: string, err: string | null, data: any) => {
-        if (ioName !== resultIoName || resultMethod !== method) return;
-
-        this.resultMessages.removeListener(handlerIndex);
-
-        if (err) {
-          return reject(new Error(err));
-        }
-
-        resolve(data);
-      };
-
-      handlerIndex = this.resultMessages.addListener(handler);
-    });
-
-    // TODO: wait for responce that data is received and return data
-
+    return this.waitForCallResponse(ioName, method);
   }
 
   addCbListener(ioName: string): Promise<void> {
