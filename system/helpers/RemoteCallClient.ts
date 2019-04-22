@@ -107,67 +107,40 @@ export default class RemoteCallClient {
    * Wait while response of method is received
    */
   private waitForMethodResponse(objectName: string, method: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      let wasFulfilled: boolean = false;
-      let handlerIndex: number;
-      const handler = (payload: ResultMethodPayload) => {
-        // if not expected method - skip
-        if (objectName !== payload.objectName || method !== payload.method) return;
+    return this.waitForResponse(
+      this.cbsResultEvents,
+      (payload: ResultMethodPayload) => {
+        return objectName !== payload.objectName || method !== payload.method;
+      }
+    );
 
-        wasFulfilled = true;
-        this.methodsResultEvents.removeListener(handlerIndex);
-
-        if (payload.error) {
-          return reject(new Error(payload.error));
-        }
-
-        resolve(payload.result);
-      };
-
-      handlerIndex = this.methodsResultEvents.addListener(handler);
-
-      setTimeout(() => {
-        if (wasFulfilled) return;
-
-        wasFulfilled = true;
-        this.methodsResultEvents.removeListener(handlerIndex);
-        reject(`Remote dev set request timeout has been exceeded.`);
-      }, this.responseTimout);
-    });
-  }
-
-  private waitForResponse(
-    events: IndexedEvents<(payload: {error?: string, result: any}) => void>,
-    resolveSelfEventCb: (payload: any) => boolean
-  ): Promise<any> {
-    return new Promise((resolve, reject) => {
-      let wasFulfilled: boolean = false;
-      let handlerIndex: number;
-      const handler = (payload: {error?: string, result: any}) => {
-        const isMyEvent: boolean = !resolveSelfEventCb(payload);
-
-        if (!isMyEvent) return;
-
-        wasFulfilled = true;
-        events.removeListener(handlerIndex);
-
-        if (payload.error) {
-          return reject(new Error(payload.error));
-        }
-
-        resolve(payload.result);
-      };
-
-      handlerIndex = events.addListener(handler);
-
-      setTimeout(() => {
-        if (wasFulfilled) return;
-
-        wasFulfilled = true;
-        events.removeListener(handlerIndex);
-        reject(`Remote dev set request timeout has been exceeded.`);
-      }, this.responseTimout);
-    });
+    // return new Promise((resolve, reject) => {
+    //   let wasFulfilled: boolean = false;
+    //   let handlerIndex: number;
+    //   const handler = (payload: ResultMethodPayload) => {
+    //     // if not expected method - skip
+    //     if (objectName !== payload.objectName || method !== payload.method) return;
+    //
+    //     wasFulfilled = true;
+    //     this.methodsResultEvents.removeListener(handlerIndex);
+    //
+    //     if (payload.error) {
+    //       return reject(new Error(payload.error));
+    //     }
+    //
+    //     resolve(payload.result);
+    //   };
+    //
+    //   handlerIndex = this.methodsResultEvents.addListener(handler);
+    //
+    //   setTimeout(() => {
+    //     if (wasFulfilled) return;
+    //
+    //     wasFulfilled = true;
+    //     this.methodsResultEvents.removeListener(handlerIndex);
+    //     reject(`Remote dev set request timeout has been exceeded.`);
+    //   }, this.responseTimout);
+    // });
   }
 
   private waitForCbResponse(cbId: string): Promise<any> {
@@ -309,6 +282,40 @@ export default class RemoteCallClient {
 
       return this.waitForCbResponse(cbId);
     };
+  }
+
+  private waitForResponse(
+    events: IndexedEvents<any>,
+    resolveSelfEventCb: (payload: any) => boolean
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let wasFulfilled: boolean = false;
+      let handlerIndex: number;
+      const handler = (payload: {error?: string, result: any}) => {
+        const isMyEvent: boolean = !resolveSelfEventCb(payload);
+
+        if (!isMyEvent) return;
+
+        wasFulfilled = true;
+        events.removeListener(handlerIndex);
+
+        if (payload.error) {
+          return reject(new Error(payload.error));
+        }
+
+        resolve(payload.result);
+      };
+
+      handlerIndex = events.addListener(handler);
+
+      setTimeout(() => {
+        if (wasFulfilled) return;
+
+        wasFulfilled = true;
+        events.removeListener(handlerIndex);
+        reject(`Remote dev set request timeout has been exceeded.`);
+      }, this.responseTimout);
+    });
   }
 
 }
