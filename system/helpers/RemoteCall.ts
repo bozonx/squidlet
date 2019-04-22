@@ -28,15 +28,15 @@ const METHOD_MARK = '!!METHOD!!';
  * This class doesn't support functions in method or callback result,
  * and doesn't support functions in callback arguments.
  */
-export default class RemoteCallClient {
+export default class RemoteCall {
   readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
   readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
 
-  // TODO: make promise
-  private readonly send: (message: RemoteCallMessage) => void;
+  private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly localMethods: {[index: string]: ObjectToCall};
   private readonly senderId: string;
   private readonly responseTimout: number;
+  private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
   // real callback of method which will be called
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
@@ -49,12 +49,14 @@ export default class RemoteCallClient {
     localMethods: {[index: string]: ObjectToCall} = {},
     senderId: string,
     responseTimout: number,
+    logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.send = send;
     this.localMethods = localMethods;
     this.senderId = senderId;
     this.responseTimout = responseTimout;
+    this.logError = logError;
     this.generateUniqId = generateUniqId;
   }
 
@@ -62,7 +64,7 @@ export default class RemoteCallClient {
   /**
    * Call method on remote machine
    */
-  callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
+  async callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
     const payload: CallMethodPayload = {
       senderId: this.senderId,
       objectName,
@@ -74,7 +76,7 @@ export default class RemoteCallClient {
       payload,
     };
 
-    this.send(message);
+    await this.send(message);
 
     return this.waitForMethodResponse(objectName, method);
   }
@@ -182,7 +184,12 @@ export default class RemoteCallClient {
       payload: resultPayload,
     };
 
-    return this.send(message);
+    try {
+      await this.send(message);
+    }
+    catch (err) {
+      this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
+    }
   }
 
   private async callLocalMethod(payload: CallMethodPayload) {
@@ -217,7 +224,12 @@ export default class RemoteCallClient {
       payload: resultPayload,
     };
 
-    return this.send(message);
+    try {
+      await this.send(message);
+    }
+    catch (err) {
+      this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
+    }
   }
 
   private prepareArgsToSend(rawArgs: any[]): any[] {
@@ -266,7 +278,7 @@ export default class RemoteCallClient {
    * It doesn't support functions in arguments!
    */
   private makeFakeCb(cbId: string): (...args: any[]) => Promise<any> {
-    return (...args: any[]): Promise<any> => {
+    return async (...args: any[]): Promise<any> => {
       const resultPayload: CallCbPayload = {
         senderId: this.senderId,
         cbId,
@@ -277,8 +289,13 @@ export default class RemoteCallClient {
         type: 'cbCall',
         payload: resultPayload,
       };
-      
-      this.send(message);
+
+      try {
+        await this.send(message);
+      }
+      catch (err) {
+        this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
+      }
 
       return this.waitForCbResponse(cbId);
     };

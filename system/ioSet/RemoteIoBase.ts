@@ -1,6 +1,6 @@
 import {IoDefinition, IoSetInstance, IoSetInstances} from '../interfaces/IoSet';
 import System from '../System';
-import RemoteCallClient from '../helpers/RemoteCallClient';
+import RemoteCall from '../helpers/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
 import {isPlainObject} from '../helpers/lodashLike';
 
@@ -8,7 +8,7 @@ import {isPlainObject} from '../helpers/lodashLike';
 export default abstract class RemoteIoBase {
   protected readonly system: System;
   private readonly instances: IoSetInstances = {};
-  private readonly remoteCallClient: RemoteCallClient;
+  private readonly remoteCall: RemoteCall;
 
   // send a message to server
   protected abstract send(message: RemoteCallMessage): any;
@@ -17,10 +17,13 @@ export default abstract class RemoteIoBase {
   constructor(system: System) {
     this.system = system;
 
-    this.remoteCallClient = new RemoteCallClient(
+    this.remoteCall = new RemoteCall(
       this.send,
+      // TODO: add local methods ????
+      {},
       this.system.host.id,
       this.system.host.config.config.devSetResponseTimout,
+      this.system.log.error,
       this.system.host.generateUniqId
     );
   }
@@ -51,7 +54,7 @@ export default abstract class RemoteIoBase {
       return this.system.log.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
     }
 
-    await this.remoteCallClient.incomeMessage(message);
+    await this.remoteCall.incomeMessage(message);
   }
 
 
@@ -67,7 +70,7 @@ export default abstract class RemoteIoBase {
 
   private makeMethod(ioName: string, methodName: string): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => {
-      return this.remoteCallClient.callMethod(ioName, methodName, ...args);
+      return this.remoteCall.callMethod(ioName, methodName, ...args);
     };
   }
 
