@@ -8,6 +8,10 @@ import RemoteCall, {ObjectToCall} from '../system/helpers/RemoteCall';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
+// TODO: remove
+let uniqIndex = 10000;
+
+
 const REMOTECALL_POSITION = 0;
 const WS_POSITION = 1;
 const WS_SERVER_HOST_ID = 'wsServer';
@@ -119,8 +123,12 @@ export default class WsIoServer {
     await remoteCall.incomeMessage(message);
   }
 
-  private generateUniqId() {
-    // TODO: !!!!
+  private generateUniqId(): string {
+    uniqIndex++;
+
+    // TODO: make real id generation
+
+    return String(uniqIndex);
   }
 
 }
