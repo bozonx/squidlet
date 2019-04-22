@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws';
 import _isPlainObject = require('lodash/isPlainObject');
 
-import RemoteIoBase from './RemoteIoBase';
+import RemoteIoBase from '../system/ioSet/RemoteIoBase';
 import {IoSetMessage} from '../system/interfaces/IoSet';
 import {ClientRequest, IncomingMessage} from 'http';
 import System from '../system/System';

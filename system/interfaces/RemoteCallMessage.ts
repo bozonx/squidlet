@@ -1,4 +1,4 @@
-import {Primitives} from '../../system/interfaces/Types';
+import {Primitives} from './Types';
 
 
 export type RemoteCallMessageType =

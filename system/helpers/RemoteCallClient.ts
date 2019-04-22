@@ -3,9 +3,9 @@ import RemoteCallMessage, {
   CbCallPayload,
   CbResultPayload,
   ResultPayload
-} from './interfaces/RemoteCallMessage';
-import IndexedEvents from '../system/helpers/IndexedEvents';
-import {isPlainObject} from '../system/helpers/lodashLike';
+} from '../interfaces/RemoteCallMessage';
+import IndexedEvents from './IndexedEvents';
+import {isPlainObject} from './lodashLike';
 
 
 type ResultHandler = (payload: ResultPayload) => void;

@@ -1,19 +1,13 @@
-import IoSet, {IoDefinition, IoSetMessage, ResultPayload} from '../system/interfaces/IoSet';
-import System from '../system/System';
-import {Primitives} from '../system/interfaces/Types';
-import IndexedEvents from '../system/helpers/IndexedEvents';
-import RemoteCallClient from './RemoteCallClient';
-
-
+import IoSet, {IoDefinition, IoSetMessage, ResultPayload} from '../interfaces/IoSet';
+import System from '../System';
+import {Primitives} from '../interfaces/Types';
+import RemoteCallClient from '../helpers/RemoteCallClient';
 
 
 export default abstract class RemoteIoBase implements IoSet {
-
   protected readonly system: System;
   private readonly instances: {[index: string]: any} = {};
   private readonly remoteCallClient: RemoteCallClient;
-
-
 
   abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
   abstract addCbListener(ioName: string): Promise<void>;
