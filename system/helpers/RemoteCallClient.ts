@@ -8,7 +8,8 @@ import IndexedEvents from './IndexedEvents';
 import {isPlainObject} from './lodashLike';
 
 
-type ResultHandler = (payload: ResultPayload) => void;
+type MethodResultHandler = (payload: ResultPayload) => void;
+type CbResultHandler = (payload: CbResultPayload) => void;
 
 export interface ObjectToCall {
   // method name: method()
@@ -28,9 +29,11 @@ const METHOD_MARK = '!!METHOD!!';
  * and doesn't support functions in callback arguments.
  */
 export default class RemoteCallClient {
-  readonly resultMessages = new IndexedEvents<ResultHandler>();
+  readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
+  readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
 
-  private readonly send: (message: RemoteCallMessage) => any;
+  // TODO: make promise
+  private readonly send: (message: RemoteCallMessage) => void;
   private readonly localMethods: {[index: string]: ObjectToCall};
   private readonly senderId: string;
   private readonly responseTimout: number;
@@ -89,13 +92,13 @@ export default class RemoteCallClient {
       await this.callLocalMethod(data.payload);
     }
     else if (message.type === 'methodResult') {
-      this.resultMessages.emit(data.payload);
+      this.methodsResultEvents.emit(data.payload);
     }
     else if (message.type === 'cbCall') {
       await this.handleRemoteCbCall(data.payload);
     }
     else if (message.type === 'cbResult') {
-      this.handleRemoteCbResult(data.payload);
+      this.cbsResultEvents.emit(data.payload);
     }
   }
 
@@ -112,7 +115,7 @@ export default class RemoteCallClient {
         if (objectName !== payload.objectName || method !== payload.method) return;
 
         wasFulfilled = true;
-        this.resultMessages.removeListener(handlerIndex);
+        this.methodsResultEvents.removeListener(handlerIndex);
 
         if (payload.error) {
           return reject(new Error(payload.error));
@@ -121,22 +124,26 @@ export default class RemoteCallClient {
         resolve(payload.result);
       };
 
-      handlerIndex = this.resultMessages.addListener(handler);
+      handlerIndex = this.methodsResultEvents.addListener(handler);
 
       setTimeout(() => {
         if (wasFulfilled) return;
 
         wasFulfilled = true;
-        this.resultMessages.removeListener(handlerIndex);
+        this.methodsResultEvents.removeListener(handlerIndex);
         reject(`Remote dev set request timeout has been exceeded.`);
       }, this.responseTimout);
     });
   }
 
+  private waitForCbResponse(cbId: string): Promise<any> {
+
+  }
+
+  /**
+   * Call a real callback after a fake callback was called on the other side
+   */
   private async handleRemoteCbCall(payload: CbCallPayload) {
-
-    // TODO: review
-
     let result: any;
     let error;
 
@@ -203,11 +210,6 @@ export default class RemoteCallClient {
     return this.send(message);
   }
 
-  private handleRemoteCbResult(payload: CbResultPayload) {
-    // TODO: 1111 нужно вызвать колбэк заглушку в методе
-  }
-
-
   private prepareArgsToSend(rawArgs: any[]): any[] {
     const prapared: any[] = [];
 
@@ -265,8 +267,10 @@ export default class RemoteCallClient {
         type: 'cbCall',
         payload: resultPayload,
       };
+      
+      this.send(message);
 
-      return this.send(message);
+      return this.waitForCbResponse(cbId);
     };
   }
 
