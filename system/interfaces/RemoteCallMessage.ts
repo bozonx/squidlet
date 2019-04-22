@@ -18,6 +18,11 @@ export type RemoteCallMessageType =
   // return cb result
   'cbResult';
 
+export interface ResultLikePayload {
+  error: string | undefined;
+  result: Primitives;
+}
+
 export interface CallMethodPayload {
   senderId: string;
   objectName: string;
@@ -25,12 +30,10 @@ export interface CallMethodPayload {
   args: Primitives[];
 }
 
-export interface ResultPayload {
+export interface ResultMethodPayload extends ResultLikePayload {
   senderId: string;
   objectName: string;
   method: string;
-  error: string | undefined;
-  result: Primitives;
 }
 
 export interface CbCallPayload {
@@ -39,14 +42,12 @@ export interface CbCallPayload {
   args: Primitives[];
 }
 
-export interface CbResultPayload {
+export interface CbResultPayload extends ResultLikePayload {
   senderId: string;
   cbId: string;
-  error: string | undefined;
-  result: Primitives;
 }
 
 export default interface RemoteCallMessage {
   type: RemoteCallMessageType;
-  payload: CallMethodPayload | ResultPayload | CbCallPayload | CbResultPayload;
+  payload: CallMethodPayload | ResultMethodPayload | CbCallPayload | CbResultPayload;
 }

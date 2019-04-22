@@ -2,13 +2,13 @@ import RemoteCallMessage, {
   CallMethodPayload,
   CbCallPayload,
   CbResultPayload,
-  ResultPayload
+  ResultMethodPayload
 } from '../interfaces/RemoteCallMessage';
 import IndexedEvents from './IndexedEvents';
 import {isPlainObject} from './lodashLike';
 
 
-type MethodResultHandler = (payload: ResultPayload) => void;
+type MethodResultHandler = (payload: ResultMethodPayload) => void;
 type CbResultHandler = (payload: CbResultPayload) => void;
 
 export interface ObjectToCall {
@@ -110,7 +110,7 @@ export default class RemoteCallClient {
     return new Promise((resolve, reject) => {
       let wasFulfilled: boolean = false;
       let handlerIndex: number;
-      const handler = (payload: ResultPayload) => {
+      const handler = (payload: ResultMethodPayload) => {
         // if not expected method - skip
         if (objectName !== payload.objectName || method !== payload.method) return;
 
@@ -136,8 +136,45 @@ export default class RemoteCallClient {
     });
   }
 
-  private waitForCbResponse(cbId: string): Promise<any> {
+  private waitForResponse(
+    events: IndexedEvents<(payload: {error?: string, result: any}) => void>,
+    resolveSelfEventCb: (payload: any) => boolean
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      let wasFulfilled: boolean = false;
+      let handlerIndex: number;
+      const handler = (payload: {error?: string, result: any}) => {
+        const isMyEvent: boolean = !resolveSelfEventCb(payload);
 
+        if (!isMyEvent) return;
+
+        wasFulfilled = true;
+        events.removeListener(handlerIndex);
+
+        if (payload.error) {
+          return reject(new Error(payload.error));
+        }
+
+        resolve(payload.result);
+      };
+
+      handlerIndex = events.addListener(handler);
+
+      setTimeout(() => {
+        if (wasFulfilled) return;
+
+        wasFulfilled = true;
+        events.removeListener(handlerIndex);
+        reject(`Remote dev set request timeout has been exceeded.`);
+      }, this.responseTimout);
+    });
+  }
+
+  private waitForCbResponse(cbId: string): Promise<any> {
+    return this.waitForResponse(
+      this.cbsResultEvents,
+      (payload: CbResultPayload) => cbId !== payload.cbId
+    );
   }
 
   /**
@@ -195,7 +232,7 @@ export default class RemoteCallClient {
 
     // next send response
 
-    const resultPayload: ResultPayload = {
+    const resultPayload: ResultMethodPayload = {
       senderId: this.senderId,
       objectName: payload.objectName,
       method: payload.method,
