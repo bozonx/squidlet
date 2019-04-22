@@ -43,7 +43,7 @@ export default class RemoteCall {
 
 
   constructor(
-    send: (message: RemoteCallMessage) => any,
+    send: (message: RemoteCallMessage) => Promise<void>,
     // objects with methods which will be called from other host
     localMethods: {[index: string]: ObjectToCall} = {},
     senderId: string,

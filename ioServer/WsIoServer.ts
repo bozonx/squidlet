@@ -5,10 +5,8 @@ import * as querystring from 'querystring';
 import System from '../system/System';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../system/interfaces/RemoteCallMessage';
 import {isPlainObject} from '../system/helpers/lodashLike';
-import RemoteCall from '../system/helpers/RemoteCall';
+import RemoteCall, {ObjectToCall} from '../system/helpers/RemoteCall';
 
-
-//const SERVER_SENDERID = 'server';
 
 const REMOTECALL_POSITION = 0;
 const WS_POSITION = 1;
@@ -20,10 +18,13 @@ export default class WsIoServer {
   protected readonly system: System;
   private readonly server: WebSocket.Server;
   private connections: {[index: string]: ConnectionItem} = {};
+  private ioSet: {[index: string]: ObjectToCall};
 
 
-  constructor(system: System) {
+  constructor(system: System, ioSet: {[index: string]: ObjectToCall}) {
     this.system = system;
+    this.ioSet = ioSet;
+
     // TODO: set connection params from config
 
     this.server = new WebSocket.Server({
@@ -33,16 +34,6 @@ export default class WsIoServer {
 
     this.listen();
   }
-
-
-  // protected send(message: RemoteCallMessage): any {
-  //   //this.client.send(message);
-  // }
-  //
-  //
-  // destroy() {
-  //   //this.client.close(0, 'Closing on destroy');
-  // }
 
 
   private listen() {
@@ -64,11 +55,13 @@ export default class WsIoServer {
     const splitUrl: string[] = (request.url as any).split('?');
     const getParams: {hostid: string} = querystring.parse(splitUrl[1]) as any;
     const remoteHostId: string = getParams.hostid;
+    const sendToClient = async (message: RemoteCallMessage): Promise<void> => {
+      return socket.send(message);
+    };
 
     const remoteCall = new RemoteCall(
-      this.send,
-      // TODO: add local methods ????
-      {},
+      sendToClient,
+      this.ioSet,
       this.system.host.id,
       this.system.host.config.config.devSetResponseTimout,
       this.system.log.error,
@@ -123,8 +116,9 @@ export default class WsIoServer {
       return this.system.log.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
     }
 
-    // TODO: имеет значение hostId - нужно распределять ответы по каждому соединению
-    await this.remoteCall.incomeMessage(message);
+    const remoteCall: RemoteCall = this.connections[remoteHostId][REMOTECALL_POSITION];
+
+    await remoteCall.incomeMessage(message);
   }
 
 }

@@ -26,8 +26,8 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   }
 
 
-  protected send(message: RemoteCallMessage): any {
-    this.client.send(message);
+  protected async send(message: RemoteCallMessage): Promise<void> {
+    return this.client.send(message);
   }
 
 
