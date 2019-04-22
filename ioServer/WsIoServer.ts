@@ -2,35 +2,33 @@ import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import * as querystring from 'querystring';
 
-import System from '../system/System';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../system/interfaces/RemoteCallMessage';
 import {isPlainObject} from '../system/helpers/lodashLike';
 import RemoteCall, {ObjectToCall} from '../system/helpers/RemoteCall';
+import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 const REMOTECALL_POSITION = 0;
 const WS_POSITION = 1;
+const WS_SERVER_HOST_ID = 'wsServer';
 
 type ConnectionItem = [RemoteCall, WebSocket];
 
+export interface WsServerProps {
+  host: string;
+  port: number;
+}
+
 
 export default class WsIoServer {
-  protected readonly system: System;
   private readonly server: WebSocket.Server;
+  private readonly ioSet: {[index: string]: ObjectToCall};
   private connections: {[index: string]: ConnectionItem} = {};
-  private ioSet: {[index: string]: ObjectToCall};
 
 
-  constructor(system: System, ioSet: {[index: string]: ObjectToCall}) {
-    this.system = system;
+  constructor(serverProps: WsServerProps, ioSet: {[index: string]: ObjectToCall}) {
     this.ioSet = ioSet;
-
-    // TODO: set connection params from config
-
-    this.server = new WebSocket.Server({
-      host: 'localhost',
-      port: 8999,
-    });
+    this.server = new WebSocket.Server(serverProps);
 
     this.listen();
   }
@@ -42,7 +40,7 @@ export default class WsIoServer {
     });
 
     this.server.on('error', (err: Error) => {
-      this.system.log.error(`Websocket io set has received an error: ${err}`);
+      console.error(`Websocket io set has received an error: ${err}`);
     });
 
     // this.server.on('listening', () => {
@@ -62,10 +60,10 @@ export default class WsIoServer {
     const remoteCall = new RemoteCall(
       sendToClient,
       this.ioSet,
-      this.system.host.id,
-      this.system.host.config.config.devSetResponseTimout,
-      this.system.log.error,
-      this.system.host.generateUniqId
+      WS_SERVER_HOST_ID,
+      hostDefaultConfig.config.devSetResponseTimout,
+      console.error,
+      this.generateUniqId
     );
 
     this.connections[remoteHostId] = [remoteCall, socket];
@@ -81,7 +79,7 @@ export default class WsIoServer {
     });
 
     connection.on('error', (err: Error) => {
-      this.system.log.error(`Websocket io set has received an error: ${err}`);
+      console.error(`Websocket io set has received an error: ${err}`);
     });
 
     connection.on('message', (...params: any[]) => this.parseIncomeMessage(remoteHostId, ...params));
@@ -91,7 +89,7 @@ export default class WsIoServer {
     });
 
     connection.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
+      console.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`);
     });
   }
 
@@ -99,26 +97,30 @@ export default class WsIoServer {
     let message: RemoteCallMessage;
 
     if (typeof data !== 'string') {
-      return this.system.log.error(`Websocket io set: invalid type of received data "${typeof data}"`);
+      return console.error(`Websocket io set: invalid type of received data "${typeof data}"`);
     }
 
     try {
       message = JSON.parse(data);
     }
     catch (err) {
-      return this.system.log.error(`Websocket io set: can't parse received json`);
+      return console.error(`Websocket io set: can't parse received json`);
     }
 
     if (!isPlainObject(message)) {
-      return this.system.log.error(`Io set: received message is not an object`);
+      return console.error(`Io set: received message is not an object`);
     }
     else if (!message.type || !REMOTE_CALL_MESSAGE_TYPES.includes(message.type)) {
-      return this.system.log.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
+      return console.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
     }
 
     const remoteCall: RemoteCall = this.connections[remoteHostId][REMOTECALL_POSITION];
 
     await remoteCall.incomeMessage(message);
+  }
+
+  private generateUniqId() {
+    // TODO: !!!!
   }
 
 }
