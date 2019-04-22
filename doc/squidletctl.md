@@ -32,6 +32,7 @@ Also you can specify the next params:
       config:
         someParam: 1
 
+
 ## Start x86 or raspberry pi host
  
 ### Start production host
@@ -52,3 +53,19 @@ Also you can specify the next params:
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
   
+  
+## Run IO server
+
+Io server starts independently from host.
+System can connect to It via websocket and manipulate IO devices which IO server serves.
+It especially suitable for development to run IO server e.g on raspberry pi and connect to it
+from your laptop where development version of System is being running.
+
+    squidlet io-server [--machine=x86 | rpi] [--host=localhost] [--port=8889]
+
+### Parameters
+
+* --machine can be x86 or rpi. It means which machine is used.
+  It tries recognize it if this argument isn't set
+* --host - host where websocket server will be run. Default is localhost
+* --port - port of websocket server. Default if 8889

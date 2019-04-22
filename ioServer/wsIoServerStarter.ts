@@ -1,12 +1,15 @@
+import * as yargs from 'yargs';
+
 import WsIoServer, {WsServerProps} from './WsIoServer';
 import {ObjectToCall} from '../system/helpers/RemoteCall';
 
 
 async function start() {
-  // TODO: get from yargs
+  const argHost: string | undefined = yargs.argv.host as any;
+  const argPort: number | undefined = yargs.argv.port && parseInt(yargs.argv.port as any);
   const serverProps: WsServerProps = {
-    host: 'localhost',
-    port: 8999,
+    host: argHost || 'localhost',
+    port: argPort || 8999,
   };
 
   // TODO: collect ioset
