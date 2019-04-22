@@ -1,6 +1,13 @@
 import {Primitives} from './Types';
 
 
+export const REMOTE_CALL_MESSAGE_TYPES = [
+  'callMethod',
+  'methodResult',
+  'cbCall',
+  'cbResult',
+];
+
 export type RemoteCallMessageType =
   // call method on remote host
   'callMethod' |

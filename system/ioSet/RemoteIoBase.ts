@@ -1,7 +1,8 @@
 import {IoDefinition} from '../interfaces/IoSet';
 import System from '../System';
 import RemoteCallClient from '../helpers/RemoteCallClient';
-import RemoteCallMessage from '../interfaces/RemoteCallMessage';
+import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
+import {isPlainObject} from '../helpers/lodashLike';
 
 
 interface Instance {
@@ -29,7 +30,6 @@ export default abstract class RemoteIoBase {
   protected abstract addListener(cb: (data: any) => void): number;
   // remove listening of income data from server
   protected abstract removeListener(handleIndex: number): void;
-  abstract destroy(): void;
 
 
   constructor(system: System) {
@@ -63,6 +63,21 @@ export default abstract class RemoteIoBase {
     return this.instances[ioName] as T;
   }
 
+  destroy() {
+    //this.remoteCallClient.destroy();
+  }
+
+  protected async resolveIncomeMessage(message: RemoteCallMessage) {
+    if (!isPlainObject(message)) {
+      return this.system.log.error(`Io set: received message is not an object`);
+    }
+    else if (!message.type || !REMOTE_CALL_MESSAGE_TYPES.includes(message.type)) {
+      return this.system.log.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
+    }
+
+    await this.remoteCallClient.incomeMessage(message);
+  }
+
 
   private makeInstances(ioDefinitions: IoDefinition) {
     for (let ioName of Object.keys(ioDefinitions)) {
@@ -74,20 +89,11 @@ export default abstract class RemoteIoBase {
     }
   }
 
-
-  protected makeMethod(ioName: string, methodName: string): (...args: any[]) => Promise<any> {
+  private makeMethod(ioName: string, methodName: string): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => {
       return this.remoteCallClient.callMethod(ioName, methodName, ...args);
     };
   }
 
-
-  // protected resolveIncomeMessage(message: IoSetMessage) {
-  //   if (message.type === 'result') {
-  //     const payload = message.payload as ResultPayload;
-  //
-  //     this.resultMessages.emit(payload.ioName, payload.method, payload.error, payload.result);
-  //   }
-  // }
 
 }

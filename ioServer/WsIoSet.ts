@@ -5,7 +5,7 @@ import RemoteIoBase from '../system/ioSet/RemoteIoBase';
 import IoSet from '../system/interfaces/IoSet';
 import {ClientRequest, IncomingMessage} from 'http';
 import System from '../system/System';
-import {Primitives} from '../system/interfaces/Types';
+import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 
 
 export default class WsIoSet extends RemoteIoBase implements IoSet {
@@ -16,7 +16,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   constructor(system: System) {
     super(system);
 
-    // TODO: get params
+    // TODO: set connection params
 
     this.client = new WebSocket('ws://localhost:8999', {
     });
@@ -25,7 +25,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   }
 
 
-  callMethod(ioName: string, method: string, ...args: Primitives[]): Promise<any> {
+  protected send(message: RemoteCallMessage): any {
     // const data: IoSetMessage = {
     //   type: 'call',
     //   payload: {
@@ -41,15 +41,16 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     // return this.waitForCallResponse(ioName, method);
   }
 
-  addCbListener(ioName: string): Promise<void> {
-
-  }
-
-  removeCbListener(ioName: string): Promise<void> {
-
-  }
+  // protected addListener(cb: (data: any) => void): number {
+  //
+  // }
+  //
+  // protected removeListener(handleIndex: number): void {
+  //
+  // }
 
   destroy() {
+    super.destroy();
     this.client.close(0, 'Closing on destroy');
   }
 
@@ -75,7 +76,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   }
 
   private parseIncomeMessage = (data: string | Buffer | Buffer[] | ArrayBuffer) => {
-    let message: IoSetMessage;
+    let message: RemoteCallMessage;
 
     if (typeof data !== 'string') {
       return this.system.log.error(`Websocket io set: invalid type of received data "${typeof data}"`);
@@ -86,10 +87,6 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     }
     catch (err) {
       return this.system.log.error(`Websocket io set: can't parse received json`);
-    }
-
-    if (!_isPlainObject(message)) {
-      return this.system.log.error(`Websocket io set: received message is not an object`);
     }
 
     this.resolveIncomeMessage(message);

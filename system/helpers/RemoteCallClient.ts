@@ -15,9 +15,9 @@ export interface Client {
   // send a message to server
   send(message: RemoteCallMessage): any;
   // listen whole income data from server
-  addListener(cb: (data: any) => void): number;
-  // remove listening of income data from server
-  removeListener(handleIndex: number): void;
+  // addListener(cb: (data: any) => void): number;
+  // // remove listening of income data from server
+  // removeListener(handleIndex: number): void;
 }
 
 
@@ -34,7 +34,7 @@ export default class RemoteCallClient {
   private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly generateUniqId: () => string;
-  private readonly incomeHandlerIndex: number;
+  //private readonly incomeHandlerIndex: number;
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
@@ -44,7 +44,7 @@ export default class RemoteCallClient {
     this.responseTimout = responseTimout;
     this.generateUniqId = generateUniqId;
 
-    this.incomeHandlerIndex = this.client.addListener(this.onIncomeMessages);
+    //this.incomeHandlerIndex = this.client.addListener(this.onIncomeMessages);
   }
 
 
@@ -65,15 +65,28 @@ export default class RemoteCallClient {
     return this.waitForMethodResponse(objectName, method);
   }
 
+  async incomeMessage(data: any) {
+    if (!isPlainObject(data) || !data.type) return;
+
+    const message: RemoteCallMessage = data;
+
+    if (message.type === 'methodResult') {
+      this.resultMessages.emit(data.payload);
+    }
+    else if (message.type === 'cbCall') {
+      await this.handleRemoteCbCall(data.payload);
+    }
+  }
+
   destroy() {
-    this.client.removeListener(this.incomeHandlerIndex);
+    //this.client.removeListener(this.incomeHandlerIndex);
   }
 
 
   /**
    * Wait while response of method is received
    */
-  protected waitForMethodResponse(objectName: string, method: string): Promise<any> {
+  private waitForMethodResponse(objectName: string, method: string): Promise<any> {
     return new Promise((resolve, reject) => {
       let wasFulfilled: boolean = false;
       let handlerIndex: number;
@@ -103,7 +116,6 @@ export default class RemoteCallClient {
     });
   }
 
-
   private prepareArgs(rawArgs: any[]): any[] {
     const prapared: any[] = [];
 
@@ -121,19 +133,6 @@ export default class RemoteCallClient {
     }
 
     return prapared;
-  }
-
-  private async onIncomeMessages(data: any) {
-    if (!isPlainObject(data) || !data.type) return;
-
-    const message: RemoteCallMessage = data;
-
-    if (message.type === 'methodResult') {
-      this.resultMessages.emit(data.payload);
-    }
-    else if (message.type === 'cbCall') {
-      await this.handleRemoteCbCall(data.payload);
-    }
   }
 
   private async handleRemoteCbCall(payload: CbCallPayload) {
