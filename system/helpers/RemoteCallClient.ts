@@ -10,9 +10,15 @@ import {isPlainObject} from './lodashLike';
 
 type ResultHandler = (payload: ResultPayload) => void;
 
+export interface ObjectToCall {
+  // method name: method()
+  [index: string]: (...args: any[]) => Promise<any>;
+}
+
 
 /**
- * Call remote methods on server.
+ * Call remote methods on other side.
+ * This class the same for server and client, both of them have ability to call methods.
  * If there is a callback in arguments of method then it will be called when server call it.
  * This class doesn't support functions in method or callback result,
  * and doesn't support functions in callback arguments.
@@ -21,6 +27,7 @@ export default class RemoteCallClient {
   readonly resultMessages = new IndexedEvents<ResultHandler>();
 
   private readonly send: (message: RemoteCallMessage) => any;
+  private readonly localMethods: {[index: string]: ObjectToCall};
   private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly generateUniqId: () => string;
@@ -29,17 +36,23 @@ export default class RemoteCallClient {
 
   constructor(
     send: (message: RemoteCallMessage) => any,
+    // objects with methods which will be called from other host
+    localMethods: {[index: string]: ObjectToCall} = {},
     senderId: string,
     responseTimout: number,
     generateUniqId: () => string
   ) {
     this.send = send;
+    this.localMethods = localMethods;
     this.senderId = senderId;
     this.responseTimout = responseTimout;
     this.generateUniqId = generateUniqId;
   }
 
 
+  /**
+   * Call method on remote machine
+   */
   callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
     const payload: CallMethodPayload = {
       senderId: this.senderId,
@@ -58,18 +71,25 @@ export default class RemoteCallClient {
   }
 
   /**
-   * Call this method when income message has come
+   * Call this method when income message has come.
+   * It calls local callbacks or methods
    */
   async incomeMessage(data: any) {
     if (!isPlainObject(data) || !data.type) return;
 
     const message: RemoteCallMessage = data;
 
-    if (message.type === 'methodResult') {
+    if (message.type === 'callMethod') {
+      await this.callLocalMethod(data.payload);
+    }
+    else if (message.type === 'methodResult') {
       this.resultMessages.emit(data.payload);
     }
     else if (message.type === 'cbCall') {
       await this.handleRemoteCbCall(data.payload);
+    }
+    else if (message.type === 'cbResult') {
+      // TODO: !!!! rise event with cb result
     }
   }
 
@@ -134,17 +154,52 @@ export default class RemoteCallClient {
       try {
         result = await this.callBacks[payload.cbId](...payload.args);
       }
-      catch (e) {
-        error = e;
+      catch (err) {
+        error = err;
       }
     }
     else {
-      error = `Method id "${payload.cbId}" hasn't been found`;
+      error = `Callback id "${payload.cbId}" hasn't been found`;
     }
+
+    // next send response
 
     const resultPayload: CbResultPayload = {
       senderId: this.senderId,
       cbId: payload.cbId,
+      error,
+      result,
+    };
+    const message: RemoteCallMessage = {
+      type: 'cbResult',
+      payload: resultPayload,
+    };
+
+    return this.send(message);
+  }
+
+  private async callLocalMethod(payload: CallMethodPayload) {
+    let result: any;
+    let error;
+
+    if (this.localMethods[payload.objectName] && this.localMethods[payload.objectName][payload.method]) {
+      try {
+        result = await this.localMethods[payload.objectName][payload.method](...payload.args);
+      }
+      catch (err) {
+        error = err;
+      }
+    }
+    else {
+      error = `Method "${payload.objectName}.${payload.method}" hasn't been found`;
+    }
+
+    // next send response
+
+    const resultPayload: ResultPayload = {
+      senderId: this.senderId,
+      objectName: payload.objectName,
+      method: payload.method,
       error,
       result,
     };

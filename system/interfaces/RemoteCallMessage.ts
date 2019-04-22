@@ -26,6 +26,7 @@ export interface CallMethodPayload {
 }
 
 export interface ResultPayload {
+  senderId: string;
   objectName: string;
   method: string;
   error: string | undefined;
@@ -33,6 +34,7 @@ export interface ResultPayload {
 }
 
 export interface CbCallPayload {
+  senderId: string;
   cbId: string;
   error: string | undefined;
   args: Primitives[];
