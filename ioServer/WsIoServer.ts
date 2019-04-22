@@ -1,5 +1,5 @@
 import * as WebSocket from 'ws';
-import {IncomingMessage} from 'http';
+import {ClientRequest, IncomingMessage} from 'http';
 import * as querystring from 'querystring';
 
 import RemoteIoBase from '../system/ioSet/RemoteIoBase';
@@ -46,9 +46,8 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
       this.system.log.error(`Websocket io set has received an error: ${err}`);
     });
 
-    this.server.on('listening', () => {
-      // TODO: what to do???
-    });
+    // this.server.on('listening', () => {
+    // });
 
     this.server.on('connection', this.onConnection);
   }
@@ -59,6 +58,29 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     const remoteHostId: string = getParams.hostid;
 
     this.connections[remoteHostId] = socket;
+    this.listenConnection(remoteHostId);
+  }
+
+  private listenConnection(remoteHostId: string) {
+    const connection: WebSocket = this.connections[remoteHostId];
+
+    connection.on('close', (code: number, reason: string) => {
+      // TODO: what to do???
+    });
+
+    connection.on('error', (err: Error) => {
+      this.system.log.error(`Websocket io set has received an error: ${err}`);
+    });
+
+    connection.on('message', this.parseIncomeMessage);
+
+    connection.on('open', () => {
+      // TODO: what to do
+    });
+
+    connection.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
+      this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
+    });
   }
 
   private parseIncomeMessage = async (data: string | Buffer | Buffer[] | ArrayBuffer) => {
