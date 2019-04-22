@@ -4,14 +4,13 @@ import {Primitives} from '../system/interfaces/Types';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
-type ResultHandler = (resultIoName: string, resultMethod: string, error: string | undefined, result: any) => void;
 
 
 export default abstract class RemoteIoBase implements IoSet {
-  protected readonly resultMessages = new IndexedEvents<ResultHandler>();
+
   protected readonly system: System;
   private readonly instances: {[index: string]: any} = {};
-  private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
+
 
 
   abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
@@ -22,6 +21,8 @@ export default abstract class RemoteIoBase implements IoSet {
 
   constructor(system: System) {
     this.system = system;
+
+    // this.system.host.config.config.devSetResponseTimout
   }
 
 
@@ -78,37 +79,6 @@ export default abstract class RemoteIoBase implements IoSet {
 
       this.resultMessages.emit(payload.ioName, payload.method, payload.error, payload.result);
     }
-  }
-
-  /**
-   * Wait while response of method is received
-   */
-  protected waitForCallResponse(ioName: string, method: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      let wasFulfilled: boolean = false;
-      let handlerIndex: number;
-      const handler = (resultIoName: string, resultMethod: string, error: string | undefined, data: any) => {
-        if (ioName !== resultIoName || resultMethod !== method) return;
-
-        wasFulfilled = true;
-        this.resultMessages.removeListener(handlerIndex);
-
-        if (error) {
-          return reject(new Error(error));
-        }
-
-        resolve(data);
-      };
-
-      handlerIndex = this.resultMessages.addListener(handler);
-
-      setTimeout(() => {
-        if (wasFulfilled) return;
-
-        this.resultMessages.removeListener(handlerIndex);
-        reject(`Remote dev set request timeout has been exceeded.`);
-      }, this.system.host.config.config.devSetResponseTimout);
-    });
   }
 
 }

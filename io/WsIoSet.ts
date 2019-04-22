@@ -26,19 +26,19 @@ export default class WsIoSet extends RemoteIoBase {
 
 
   callMethod(ioName: string, method: string, ...args: Primitives[]): Promise<any> {
-    const data: IoSetMessage = {
-      type: 'call',
-      payload: {
-        hostId: this.system.host.id,
-        ioName,
-        method,
-        args,
-      },
-    };
-
-    this.client.send(data);
-
-    return this.waitForCallResponse(ioName, method);
+    // const data: IoSetMessage = {
+    //   type: 'call',
+    //   payload: {
+    //     hostId: this.system.host.id,
+    //     ioName,
+    //     method,
+    //     args,
+    //   },
+    // };
+    //
+    // this.client.send(data);
+    //
+    // return this.waitForCallResponse(ioName, method);
   }
 
   addCbListener(ioName: string): Promise<void> {
