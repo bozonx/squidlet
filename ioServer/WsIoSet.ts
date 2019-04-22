@@ -2,13 +2,13 @@ import * as WebSocket from 'ws';
 import _isPlainObject = require('lodash/isPlainObject');
 
 import RemoteIoBase from '../system/ioSet/RemoteIoBase';
-import {IoSetMessage} from '../system/interfaces/IoSet';
+import IoSet from '../system/interfaces/IoSet';
 import {ClientRequest, IncomingMessage} from 'http';
 import System from '../system/System';
 import {Primitives} from '../system/interfaces/Types';
 
 
-export default class WsIoSet extends RemoteIoBase {
+export default class WsIoSet extends RemoteIoBase implements IoSet {
 
   private readonly client: WebSocket;
 

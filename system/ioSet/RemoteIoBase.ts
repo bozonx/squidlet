@@ -1,24 +1,52 @@
-import IoSet, {IoDefinition, IoSetMessage, ResultPayload} from '../interfaces/IoSet';
+import {IoDefinition} from '../interfaces/IoSet';
 import System from '../System';
-import {Primitives} from '../interfaces/Types';
 import RemoteCallClient from '../helpers/RemoteCallClient';
+import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 
 
-export default abstract class RemoteIoBase implements IoSet {
+interface Instance {
+  // method name: method()
+  [index: string]: (...args: any[]) => Promise<any>;
+}
+
+interface Instances {
+  // io name
+  [index: string]: Instance;
+}
+
+
+export default abstract class RemoteIoBase {
   protected readonly system: System;
-  private readonly instances: {[index: string]: any} = {};
+  private readonly instances: Instances = {};
   private readonly remoteCallClient: RemoteCallClient;
 
-  abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
-  abstract addCbListener(ioName: string): Promise<void>;
-  abstract removeCbListener(ioName: string): Promise<void>;
+  // abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
+  // abstract addCbListener(ioName: string): Promise<void>;
+  // abstract removeCbListener(ioName: string): Promise<void>;
+  // send a message to server
+  protected abstract send(message: RemoteCallMessage): any;
+  // listen whole income data from server
+  protected abstract addListener(cb: (data: any) => void): number;
+  // remove listening of income data from server
+  protected abstract removeListener(handleIndex: number): void;
   abstract destroy(): void;
 
 
   constructor(system: System) {
     this.system = system;
 
-    // this.system.host.config.config.devSetResponseTimout
+    const client = {
+      send: this.send,
+      addListener: this.addListener,
+      removeListener: this.removeListener,
+    };
+
+    this.remoteCallClient = new RemoteCallClient(
+      client,
+      this.system.host.id,
+      this.system.host.config.config.devSetResponseTimout,
+      this.system.host.generateUniqId
+    );
   }
 
 
@@ -27,7 +55,7 @@ export default abstract class RemoteIoBase implements IoSet {
   }
 
 
-  getInstance<T>(ioName: string): T {
+  getInstance<T extends Instance>(ioName: string): T {
     if (this.instances[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
     }
@@ -36,45 +64,30 @@ export default abstract class RemoteIoBase implements IoSet {
   }
 
 
-  protected makeInstances(ioDefinitions: IoDefinition) {
+  private makeInstances(ioDefinitions: IoDefinition) {
     for (let ioName of Object.keys(ioDefinitions)) {
       this.instances[ioName] = {};
 
       for (let methodName of ioDefinitions[ioName]) {
-        this.instances[ioName][methodName] = this.makeMethod();
+        this.instances[ioName][methodName] = this.makeMethod(ioName, methodName);
       }
     }
   }
 
-  protected makeMethod() {
-    return async (...args: any[]): Promise<any> => {
-      const praparedProps: any[] = [];
 
-      for (let arg of args) {
-        if (typeof arg === 'function') {
-          // TODO: make callback id
-          praparedProps.push(this.makeCallBackId(args));
-        }
-        else {
-          praparedProps.push(arg);
-        }
-
-      }
-
-
+  protected makeMethod(ioName: string, methodName: string): (...args: any[]) => Promise<any> {
+    return (...args: any[]): Promise<any> => {
+      return this.remoteCallClient.callMethod(ioName, methodName, ...args);
     };
   }
 
-  protected makeCallBackId(cb: any): string {
-    // TODO: do it
-  }
 
-  protected resolveIncomeMessage(message: IoSetMessage) {
-    if (message.type === 'result') {
-      const payload = message.payload as ResultPayload;
-
-      this.resultMessages.emit(payload.ioName, payload.method, payload.error, payload.result);
-    }
-  }
+  // protected resolveIncomeMessage(message: IoSetMessage) {
+  //   if (message.type === 'result') {
+  //     const payload = message.payload as ResultPayload;
+  //
+  //     this.resultMessages.emit(payload.ioName, payload.method, payload.error, payload.result);
+  //   }
+  // }
 
 }
