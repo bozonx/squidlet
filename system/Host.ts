@@ -3,6 +3,10 @@ import HostConfig from './interfaces/HostConfig';
 import {isEmpty} from './helpers/lodashLike';
 
 
+// TODO: remove
+let lastId: number = 0;
+
+
 export default class Host {
   private readonly system: System;
   private hostConfig?: HostConfig;
@@ -41,8 +45,9 @@ export default class Host {
   generateUniqId(): string {
     // TODO: make - system id + timestamp + index
 
-    return '1234567';
-    //return generateUniqId();
+    lastId++;
+
+    return String(lastId);
   }
 
   /**

@@ -1,6 +1,12 @@
-import RemoteCallMessage, {CallMethodPayload, ResultPayload} from './interfaces/RemoteCallMessage';
+import RemoteCallMessage, {
+  CallMethodPayload,
+  CbCallPayload,
+  CbResultPayload,
+  ResultPayload
+} from './interfaces/RemoteCallMessage';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 import {isPlainObject} from '../system/helpers/lodashLike';
+import prepareToFlash from '../espruino/build-espruino/src/prepareToFlash';
 
 
 type ResultHandler = (payload: ResultPayload) => void;
@@ -20,33 +26,37 @@ export default class RemoteCallClient {
   readonly resultMessages = new IndexedEvents<ResultHandler>();
 
   private readonly client: Client;
+  private readonly senderId: string;
   private readonly responseTimout: number;
+  private readonly generateUniqId: () => string;
   private readonly incomeHandlerIndex: number;
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
-  constructor(client: Client, responseTimout: number) {
+  constructor(client: Client, senderId: string, responseTimout: number, generateUniqId: () => string) {
     this.client = client;
+    this.senderId = senderId;
     this.responseTimout = responseTimout;
+    this.generateUniqId = generateUniqId;
 
     this.incomeHandlerIndex = this.client.addListener(this.onIncomeMessages);
   }
 
 
-  callMethod(senderId: string, objectName: string, method: string, ...args: any[]): Promise<any> {
+  callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
     const payload: CallMethodPayload = {
-      senderId: senderId,
+      senderId: this.senderId,
       objectName,
       method,
-      args,
+      args: this.prepareArgs(args),
     };
 
-    const data: RemoteCallMessage = {
-      type: 'call',
+    const message: RemoteCallMessage = {
+      type: 'callMethod',
       payload,
     };
 
-    this.client.send(data);
+    this.client.send(message);
 
     return this.waitForMethodResponse(objectName, method);
   }
@@ -89,15 +99,60 @@ export default class RemoteCallClient {
   }
 
 
-  private onIncomeMessages(data: any) {
+  private prepareArgs(rawArgs: any[]): any[] {
+    const prapared: any[] = [];
+
+    for (let arg of rawArgs) {
+      if (typeof arg === 'function') {
+        const methodId: string = this.generateUniqId();
+        const methodMark = `!!METHOD!!${methodId}`;
+
+        this.callBacks[methodId] = arg;
+        prapared.push(methodMark);
+      }
+      else {
+        prapared.push(arg);
+      }
+    }
+
+    return prapared;
+  }
+
+  private async onIncomeMessages(data: any) {
     if (!isPlainObject(data) || !data.type) return;
 
     const message: RemoteCallMessage = data;
 
-    if (message.type === 'result') {
+    if (message.type === 'methodResult') {
       this.resultMessages.emit(data.payload);
     }
-    // TODO: add cb listener
+    else if (message.type === 'cbCall') {
+      const payload: CbCallPayload = data.payload;
+      let result: any;
+      let error;
+
+      try {
+        result = await this.callBacks[payload.cbId](...payload.args);
+      }
+      catch (e) {
+        error = e;
+      }
+
+      const resultPayload: CbResultPayload = {
+        senderId: this.senderId,
+        cbId: payload.cbId,
+        error,
+        result,
+      };
+
+      const message: RemoteCallMessage = {
+        type: 'cbResult',
+        payload: resultPayload,
+      };
+
+      return this.client.send(message);
+    }
+
   }
 
 }
