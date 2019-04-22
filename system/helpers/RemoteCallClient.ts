@@ -11,14 +11,14 @@ import {isPlainObject} from './lodashLike';
 type ResultHandler = (payload: ResultPayload) => void;
 
 
-export interface Client {
-  // send a message to server
-  send(message: RemoteCallMessage): any;
-  // listen whole income data from server
-  // addListener(cb: (data: any) => void): number;
-  // // remove listening of income data from server
-  // removeListener(handleIndex: number): void;
-}
+// export interface Client {
+//   // send a message to server
+//   send(message: RemoteCallMessage): any;
+//   // listen whole income data from server
+//   // addListener(cb: (data: any) => void): number;
+//   // // remove listening of income data from server
+//   // removeListener(handleIndex: number): void;
+// }
 
 
 /**
@@ -30,7 +30,7 @@ export interface Client {
 export default class RemoteCallClient {
   readonly resultMessages = new IndexedEvents<ResultHandler>();
 
-  private readonly client: Client;
+  private readonly send: (message: RemoteCallMessage) => any;
   private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly generateUniqId: () => string;
@@ -38,8 +38,13 @@ export default class RemoteCallClient {
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
-  constructor(client: Client, senderId: string, responseTimout: number, generateUniqId: () => string) {
-    this.client = client;
+  constructor(
+    send: (message: RemoteCallMessage) => any,
+    senderId: string,
+    responseTimout: number,
+    generateUniqId: () => string
+  ) {
+    this.send = send;
     this.senderId = senderId;
     this.responseTimout = responseTimout;
     this.generateUniqId = generateUniqId;
@@ -60,11 +65,14 @@ export default class RemoteCallClient {
       payload,
     };
 
-    this.client.send(message);
+    this.send(message);
 
     return this.waitForMethodResponse(objectName, method);
   }
 
+  /**
+   * Call this method when income message has come
+   */
   async incomeMessage(data: any) {
     if (!isPlainObject(data) || !data.type) return;
 
@@ -78,9 +86,9 @@ export default class RemoteCallClient {
     }
   }
 
-  destroy() {
-    //this.client.removeListener(this.incomeHandlerIndex);
-  }
+  // destroy() {
+  //   //this.client.removeListener(this.incomeHandlerIndex);
+  // }
 
 
   /**
@@ -162,7 +170,7 @@ export default class RemoteCallClient {
       payload: resultPayload,
     };
 
-    return this.client.send(message);
+    return this.send(message);
   }
 
 }

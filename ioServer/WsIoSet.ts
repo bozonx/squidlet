@@ -1,5 +1,4 @@
 import * as WebSocket from 'ws';
-import _isPlainObject = require('lodash/isPlainObject');
 
 import RemoteIoBase from '../system/ioSet/RemoteIoBase';
 import IoSet from '../system/interfaces/IoSet';
@@ -50,7 +49,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   // }
 
   destroy() {
-    super.destroy();
+    //super.destroy();
     this.client.close(0, 'Closing on destroy');
   }
 
@@ -75,7 +74,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     });
   }
 
-  private parseIncomeMessage = (data: string | Buffer | Buffer[] | ArrayBuffer) => {
+  private parseIncomeMessage = async (data: string | Buffer | Buffer[] | ArrayBuffer) => {
     let message: RemoteCallMessage;
 
     if (typeof data !== 'string') {
@@ -89,7 +88,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
       return this.system.log.error(`Websocket io set: can't parse received json`);
     }
 
-    this.resolveIncomeMessage(message);
+    await this.resolveIncomeMessage(message);
   }
 
 }

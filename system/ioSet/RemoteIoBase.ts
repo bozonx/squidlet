@@ -1,24 +1,13 @@
-import {IoDefinition} from '../interfaces/IoSet';
+import {IoDefinition, IoSetInstance, IoSetInstances} from '../interfaces/IoSet';
 import System from '../System';
 import RemoteCallClient from '../helpers/RemoteCallClient';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
 import {isPlainObject} from '../helpers/lodashLike';
 
 
-interface Instance {
-  // method name: method()
-  [index: string]: (...args: any[]) => Promise<any>;
-}
-
-interface Instances {
-  // io name
-  [index: string]: Instance;
-}
-
-
 export default abstract class RemoteIoBase {
   protected readonly system: System;
-  private readonly instances: Instances = {};
+  private readonly instances: IoSetInstances = {};
   private readonly remoteCallClient: RemoteCallClient;
 
   // abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
@@ -27,22 +16,22 @@ export default abstract class RemoteIoBase {
   // send a message to server
   protected abstract send(message: RemoteCallMessage): any;
   // listen whole income data from server
-  protected abstract addListener(cb: (data: any) => void): number;
-  // remove listening of income data from server
-  protected abstract removeListener(handleIndex: number): void;
+  // protected abstract addListener(cb: (data: any) => void): number;
+  // // remove listening of income data from server
+  // protected abstract removeListener(handleIndex: number): void;
 
 
   constructor(system: System) {
     this.system = system;
 
-    const client = {
-      send: this.send,
-      addListener: this.addListener,
-      removeListener: this.removeListener,
-    };
+    // const client = {
+    //   send: this.send,
+    //   addListener: this.addListener,
+    //   removeListener: this.removeListener,
+    // };
 
     this.remoteCallClient = new RemoteCallClient(
-      client,
+      this.send,
       this.system.host.id,
       this.system.host.config.config.devSetResponseTimout,
       this.system.host.generateUniqId
@@ -55,7 +44,7 @@ export default abstract class RemoteIoBase {
   }
 
 
-  getInstance<T extends Instance>(ioName: string): T {
+  getInstance<T extends IoSetInstance>(ioName: string): T {
     if (this.instances[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
     }
@@ -63,9 +52,9 @@ export default abstract class RemoteIoBase {
     return this.instances[ioName] as T;
   }
 
-  destroy() {
-    //this.remoteCallClient.destroy();
-  }
+  // destroy() {
+  //   //this.remoteCallClient.destroy();
+  // }
 
   protected async resolveIncomeMessage(message: RemoteCallMessage) {
     if (!isPlainObject(message)) {
