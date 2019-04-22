@@ -36,7 +36,6 @@ export interface ResultPayload {
 export interface CbCallPayload {
   senderId: string;
   cbId: string;
-  error: string | undefined;
   args: Primitives[];
 }
 

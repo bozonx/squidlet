@@ -15,6 +15,10 @@ export interface ObjectToCall {
   [index: string]: (...args: any[]) => Promise<any>;
 }
 
+const METHOD_MARK = '!!METHOD!!';
+
+// TODO: решить как удалить хэндлеры колбюков когда они уже не нужны
+
 
 /**
  * Call remote methods on other side.
@@ -31,7 +35,9 @@ export default class RemoteCallClient {
   private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly generateUniqId: () => string;
+  // real callback of method which will be called
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
+  private readonly fakeCallBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
   constructor(
@@ -58,7 +64,7 @@ export default class RemoteCallClient {
       senderId: this.senderId,
       objectName,
       method,
-      args: this.prepareArgs(args),
+      args: this.prepareArgsToSend(args),
     };
     const message: RemoteCallMessage = {
       type: 'callMethod',
@@ -89,7 +95,7 @@ export default class RemoteCallClient {
       await this.handleRemoteCbCall(data.payload);
     }
     else if (message.type === 'cbResult') {
-      // TODO: !!!! rise event with cb result
+      this.handleRemoteCbResult(data.payload);
     }
   }
 
@@ -127,26 +133,10 @@ export default class RemoteCallClient {
     });
   }
 
-  private prepareArgs(rawArgs: any[]): any[] {
-    const prapared: any[] = [];
-
-    for (let arg of rawArgs) {
-      if (typeof arg === 'function') {
-        const methodId: string = this.generateUniqId();
-        const methodMark = `!!METHOD!!${methodId}`;
-
-        this.callBacks[methodId] = arg;
-        prapared.push(methodMark);
-      }
-      else {
-        prapared.push(arg);
-      }
-    }
-
-    return prapared;
-  }
-
   private async handleRemoteCbCall(payload: CbCallPayload) {
+
+    // TODO: review
+
     let result: any;
     let error;
 
@@ -183,8 +173,10 @@ export default class RemoteCallClient {
     let error;
 
     if (this.localMethods[payload.objectName] && this.localMethods[payload.objectName][payload.method]) {
+      const args: any[] = this.prepareArgsToCall(payload.args);
+
       try {
-        result = await this.localMethods[payload.objectName][payload.method](...payload.args);
+        result = await this.localMethods[payload.objectName][payload.method](...args);
       }
       catch (err) {
         error = err;
@@ -209,6 +201,73 @@ export default class RemoteCallClient {
     };
 
     return this.send(message);
+  }
+
+  private handleRemoteCbResult(payload: CbResultPayload) {
+    // TODO: 1111 нужно вызвать колбэк заглушку в методе
+  }
+
+
+  private prepareArgsToSend(rawArgs: any[]): any[] {
+    const prapared: any[] = [];
+
+    for (let arg of rawArgs) {
+      if (typeof arg === 'function') {
+        const methodId: string = this.generateUniqId();
+        const methodMark = `${METHOD_MARK}${methodId}`;
+
+        this.callBacks[methodId] = arg;
+        prapared.push(methodMark);
+      }
+      else {
+        prapared.push(arg);
+      }
+    }
+
+    return prapared;
+  }
+
+  /**
+   * Prepare args to call the method
+   */
+  private prepareArgsToCall(rawArgs: any[]): any[] {
+    const prepared: any[] = [];
+
+    for (let arg of rawArgs) {
+      if (typeof arg === 'string' && arg.indexOf(METHOD_MARK) === 0) {
+        const cbId: string = arg.slice(METHOD_MARK.length);
+        const fakeCallback = this.makeFakeCb(cbId);
+
+        this.fakeCallBacks[cbId] = fakeCallback;
+        prepared.push(fakeCallback);
+      }
+      else {
+        prepared.push(arg);
+      }
+    }
+
+    return prepared;
+  }
+
+  /**
+   * When fake cb is called it sends a message to other side to call a real message.
+   * It doesn't support functions in arguments!
+   */
+  private makeFakeCb(cbId: string): (...args: any[]) => Promise<any> {
+    return (...args: any[]): Promise<any> => {
+      const resultPayload: CbCallPayload = {
+        senderId: this.senderId,
+        cbId,
+        // there is functions are not allowed!
+        args,
+      };
+      const message: RemoteCallMessage = {
+        type: 'cbCall',
+        payload: resultPayload,
+      };
+
+      return this.send(message);
+    };
   }
 
 }
