@@ -1,15 +1,14 @@
 import * as WebSocket from 'ws';
-import {ClientRequest, IncomingMessage} from 'http';
 
 import RemoteIoBase from '../system/ioSet/RemoteIoBase';
 import IoSet from '../system/interfaces/IoSet';
+import {ClientRequest, IncomingMessage} from 'http';
 import System from '../system/System';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 
 
 export default class WsIoSet extends RemoteIoBase implements IoSet {
-
-  private readonly client: WebSocket;
+  private readonly server: WebSocket.Server;
 
 
   constructor(system: System) {
@@ -17,7 +16,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
 
     // TODO: set connection params
 
-    this.client = new WebSocket('ws://localhost:8999', {
+    this.server = new WebSocket.Server({
     });
 
     this.listen();
@@ -25,33 +24,33 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
 
 
   protected send(message: RemoteCallMessage): any {
-    this.client.send(message);
+    //this.client.send(message);
   }
 
 
   destroy() {
-    this.client.close(0, 'Closing on destroy');
+    //this.client.close(0, 'Closing on destroy');
   }
 
 
   protected listen() {
-    this.client.on('close', (code: number, reason: string) => {
-      // TODO: reconnect
-    });
-
-    this.client.on('error', (err: Error) => {
-      this.system.log.error(`Websocket io set has received an error: ${err}`);
-    });
-
-    this.client.on('message', this.parseIncomeMessage);
-
-    this.client.on('open', () => {
-      // TODO: resolve promise
-    });
-
-    this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
-    });
+    // this.client.on('close', (code: number, reason: string) => {
+    //   // TODO: reconnect
+    // });
+    //
+    // this.client.on('error', (err: Error) => {
+    //   this.system.log.error(`Websocket io set has received an error: ${err}`);
+    // });
+    //
+    // this.client.on('message', this.parseIncomeMessage);
+    //
+    // this.client.on('open', () => {
+    //   // TODO: resolve promise
+    // });
+    //
+    // this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
+    //   this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
+    // });
   }
 
   private parseIncomeMessage = async (data: string | Buffer | Buffer[] | ArrayBuffer) => {

@@ -18,8 +18,6 @@ export interface ObjectToCall {
 
 const METHOD_MARK = '!!METHOD!!';
 
-// TODO: решить как удалить хэндлеры колбюков когда они уже не нужны
-
 
 /**
  * Call remote methods on other side.
@@ -104,6 +102,10 @@ export default class RemoteCall {
     }
   }
 
+  async removeCallBack(cb: (...args: any[]) => Promise<any>) {
+    // TODO: решить как удалить хэндлеры колбюков когда они уже не нужны
+    // TODO: удалить свой колбэк и отправить сообщение на удаление фэйкового колбэка
+  }
 
   /**
    * Wait while response of method is received
