@@ -15,9 +15,11 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   constructor(system: System) {
     super(system);
 
-    // TODO: set connection params
+    // TODO: set connection params from config
 
-    this.client = new WebSocket('ws://localhost:8999', {
+    const url: string = `ws://localhost:8999?hostid=${this.system.host.id}`;
+
+    this.client = new WebSocket(url, {
     });
 
     this.listen();

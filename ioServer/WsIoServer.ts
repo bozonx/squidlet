@@ -1,22 +1,26 @@
 import * as WebSocket from 'ws';
+import {IncomingMessage} from 'http';
+import * as querystring from 'querystring';
 
 import RemoteIoBase from '../system/ioSet/RemoteIoBase';
 import IoSet from '../system/interfaces/IoSet';
-import {ClientRequest, IncomingMessage} from 'http';
 import System from '../system/System';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 
 
 export default class WsIoSet extends RemoteIoBase implements IoSet {
   private readonly server: WebSocket.Server;
+  private connections: {[index: string]: WebSocket} = {};
 
 
   constructor(system: System) {
     super(system);
 
-    // TODO: set connection params
+    // TODO: set connection params from config
 
     this.server = new WebSocket.Server({
+      host: 'localhost',
+      port: 8999,
     });
 
     this.listen();
@@ -34,23 +38,27 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
 
 
   protected listen() {
-    // this.client.on('close', (code: number, reason: string) => {
-    //   // TODO: reconnect
-    // });
-    //
-    // this.client.on('error', (err: Error) => {
-    //   this.system.log.error(`Websocket io set has received an error: ${err}`);
-    // });
-    //
-    // this.client.on('message', this.parseIncomeMessage);
-    //
-    // this.client.on('open', () => {
-    //   // TODO: resolve promise
-    // });
-    //
-    // this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-    //   this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
-    // });
+    this.server.on('close', (code: number, reason: string) => {
+      // TODO: what to do???
+    });
+
+    this.server.on('error', (err: Error) => {
+      this.system.log.error(`Websocket io set has received an error: ${err}`);
+    });
+
+    this.server.on('listening', () => {
+      // TODO: what to do???
+    });
+
+    this.server.on('connection', this.onConnection);
+  }
+
+  private onConnection = (socket: WebSocket, request: IncomingMessage) => {
+    const splitUrl: string[] = (request.url as any).split('?');
+    const getParams: {hostid: string} = querystring.parse(splitUrl[1]) as any;
+    const remoteHostId: string = getParams.hostid;
+
+    this.connections[remoteHostId] = socket;
   }
 
   private parseIncomeMessage = async (data: string | Buffer | Buffer[] | ArrayBuffer) => {
