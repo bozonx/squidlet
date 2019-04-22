@@ -2,26 +2,42 @@ import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import * as querystring from 'querystring';
 
-import RemoteIoBase from '../system/ioSet/RemoteIoBase';
-import IoSet from '../system/interfaces/IoSet';
 import System from '../system/System';
-import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
+import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../system/interfaces/RemoteCallMessage';
+import {isPlainObject} from '../system/helpers/lodashLike';
+import RemoteCall from '../system/helpers/RemoteCall';
 
 
-export default class WsIoSet extends RemoteIoBase implements IoSet {
+//const SERVER_SENDERID = 'server';
+
+
+export default class WsIoServer {
+  protected readonly system: System;
   private readonly server: WebSocket.Server;
   private connections: {[index: string]: WebSocket} = {};
+  private readonly remoteCall: RemoteCall;
 
 
   constructor(system: System) {
-    super(system);
-
+    this.system = system;
     // TODO: set connection params from config
 
     this.server = new WebSocket.Server({
       host: 'localhost',
       port: 8999,
     });
+
+    // TODO: может создават на каждое соединение????
+
+    this.remoteCall = new RemoteCall(
+      this.send,
+      // TODO: add local methods ????
+      {},
+      this.system.host.id,
+      this.system.host.config.config.devSetResponseTimout,
+      this.system.log.error,
+      this.system.host.generateUniqId
+    );
 
     this.listen();
   }
@@ -97,7 +113,15 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
       return this.system.log.error(`Websocket io set: can't parse received json`);
     }
 
-    await this.resolveIncomeMessage(message);
+    if (!isPlainObject(message)) {
+      return this.system.log.error(`Io set: received message is not an object`);
+    }
+    else if (!message.type || !REMOTE_CALL_MESSAGE_TYPES.includes(message.type)) {
+      return this.system.log.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
+    }
+
+    // TODO: имеет значение hostId - нужно распределять ответы по каждому соединению
+    await this.remoteCall.incomeMessage(message);
   }
 
 }

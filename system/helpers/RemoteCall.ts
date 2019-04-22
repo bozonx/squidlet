@@ -32,6 +32,7 @@ export default class RemoteCall {
 
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly localMethods: {[index: string]: ObjectToCall};
+  // my host id
   private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly logError: (message: string) => void;
