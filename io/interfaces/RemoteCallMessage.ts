@@ -1,7 +1,15 @@
 import {Primitives} from '../../system/interfaces/Types';
 
 
-export type RemoteCallMessageType = 'callMethod' | 'methodResult' | 'cbCall' | 'cbResult';
+export type RemoteCallMessageType =
+  // call method on remote host
+  'callMethod' |
+  // listen for method result
+  'methodResult' |
+  // listen for callback call
+  'cbCall' |
+  // return cb result
+  'cbResult';
 
 export interface CallMethodPayload {
   senderId: string;

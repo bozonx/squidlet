@@ -2,6 +2,7 @@ import IoSet, {IoDefinition, IoSetMessage, ResultPayload} from '../system/interf
 import System from '../system/System';
 import {Primitives} from '../system/interfaces/Types';
 import IndexedEvents from '../system/helpers/IndexedEvents';
+import RemoteCallClient from './RemoteCallClient';
 
 
 
@@ -10,6 +11,7 @@ export default abstract class RemoteIoBase implements IoSet {
 
   protected readonly system: System;
   private readonly instances: {[index: string]: any} = {};
+  private readonly remoteCallClient: RemoteCallClient;
 
 
 

@@ -6,7 +6,6 @@ import RemoteCallMessage, {
 } from './interfaces/RemoteCallMessage';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 import {isPlainObject} from '../system/helpers/lodashLike';
-import prepareToFlash from '../espruino/build-espruino/src/prepareToFlash';
 
 
 type ResultHandler = (payload: ResultPayload) => void;
@@ -22,6 +21,12 @@ export interface Client {
 }
 
 
+/**
+ * Call remote methods on server.
+ * If there is a callback in arguments of method then it will be called when server call it.
+ * This class doesn't support functions in method or callback result,
+ * and doesn't support functions in callback arguments.
+ */
 export default class RemoteCallClient {
   readonly resultMessages = new IndexedEvents<ResultHandler>();
 
@@ -50,7 +55,6 @@ export default class RemoteCallClient {
       method,
       args: this.prepareArgs(args),
     };
-
     const message: RemoteCallMessage = {
       type: 'callMethod',
       payload,
@@ -92,6 +96,7 @@ export default class RemoteCallClient {
       setTimeout(() => {
         if (wasFulfilled) return;
 
+        wasFulfilled = true;
         this.resultMessages.removeListener(handlerIndex);
         reject(`Remote dev set request timeout has been exceeded.`);
       }, this.responseTimout);
@@ -127,32 +132,38 @@ export default class RemoteCallClient {
       this.resultMessages.emit(data.payload);
     }
     else if (message.type === 'cbCall') {
-      const payload: CbCallPayload = data.payload;
-      let result: any;
-      let error;
+      await this.handleRemoteCbCall(data.payload);
+    }
+  }
 
+  private async handleRemoteCbCall(payload: CbCallPayload) {
+    let result: any;
+    let error;
+
+    if (this.callBacks[payload.cbId]) {
       try {
         result = await this.callBacks[payload.cbId](...payload.args);
       }
       catch (e) {
         error = e;
       }
-
-      const resultPayload: CbResultPayload = {
-        senderId: this.senderId,
-        cbId: payload.cbId,
-        error,
-        result,
-      };
-
-      const message: RemoteCallMessage = {
-        type: 'cbResult',
-        payload: resultPayload,
-      };
-
-      return this.client.send(message);
+    }
+    else {
+      error = `Method id "${payload.cbId}" hasn't been found`;
     }
 
+    const resultPayload: CbResultPayload = {
+      senderId: this.senderId,
+      cbId: payload.cbId,
+      error,
+      result,
+    };
+    const message: RemoteCallMessage = {
+      type: 'cbResult',
+      payload: resultPayload,
+    };
+
+    return this.client.send(message);
   }
 
 }
