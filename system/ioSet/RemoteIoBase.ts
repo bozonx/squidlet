@@ -10,25 +10,12 @@ export default abstract class RemoteIoBase {
   private readonly instances: IoSetInstances = {};
   private readonly remoteCallClient: RemoteCallClient;
 
-  // abstract callMethod(ioName: string, methodName: string, ...args: Primitives[]): Promise<any>;
-  // abstract addCbListener(ioName: string): Promise<void>;
-  // abstract removeCbListener(ioName: string): Promise<void>;
   // send a message to server
   protected abstract send(message: RemoteCallMessage): any;
-  // listen whole income data from server
-  // protected abstract addListener(cb: (data: any) => void): number;
-  // // remove listening of income data from server
-  // protected abstract removeListener(handleIndex: number): void;
 
 
   constructor(system: System) {
     this.system = system;
-
-    // const client = {
-    //   send: this.send,
-    //   addListener: this.addListener,
-    //   removeListener: this.removeListener,
-    // };
 
     this.remoteCallClient = new RemoteCallClient(
       this.send,
@@ -52,10 +39,10 @@ export default abstract class RemoteIoBase {
     return this.instances[ioName] as T;
   }
 
-  // destroy() {
-  //   //this.remoteCallClient.destroy();
-  // }
 
+  /**
+   * Call this method when you has received a message
+   */
   protected async resolveIncomeMessage(message: RemoteCallMessage) {
     if (!isPlainObject(message)) {
       return this.system.log.error(`Io set: received message is not an object`);

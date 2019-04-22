@@ -25,31 +25,11 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
 
 
   protected send(message: RemoteCallMessage): any {
-    // const data: IoSetMessage = {
-    //   type: 'call',
-    //   payload: {
-    //     hostId: this.system.host.id,
-    //     ioName,
-    //     method,
-    //     args,
-    //   },
-    // };
-    //
-    // this.client.send(data);
-    //
-    // return this.waitForCallResponse(ioName, method);
+    this.client.send(message);
   }
 
-  // protected addListener(cb: (data: any) => void): number {
-  //
-  // }
-  //
-  // protected removeListener(handleIndex: number): void {
-  //
-  // }
 
   destroy() {
-    //super.destroy();
     this.client.close(0, 'Closing on destroy');
   }
 

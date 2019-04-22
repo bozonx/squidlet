@@ -11,16 +11,6 @@ import {isPlainObject} from './lodashLike';
 type ResultHandler = (payload: ResultPayload) => void;
 
 
-// export interface Client {
-//   // send a message to server
-//   send(message: RemoteCallMessage): any;
-//   // listen whole income data from server
-//   // addListener(cb: (data: any) => void): number;
-//   // // remove listening of income data from server
-//   // removeListener(handleIndex: number): void;
-// }
-
-
 /**
  * Call remote methods on server.
  * If there is a callback in arguments of method then it will be called when server call it.
@@ -34,7 +24,6 @@ export default class RemoteCallClient {
   private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly generateUniqId: () => string;
-  //private readonly incomeHandlerIndex: number;
   private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
@@ -48,8 +37,6 @@ export default class RemoteCallClient {
     this.senderId = senderId;
     this.responseTimout = responseTimout;
     this.generateUniqId = generateUniqId;
-
-    //this.incomeHandlerIndex = this.client.addListener(this.onIncomeMessages);
   }
 
 
@@ -85,10 +72,6 @@ export default class RemoteCallClient {
       await this.handleRemoteCbCall(data.payload);
     }
   }
-
-  // destroy() {
-  //   //this.client.removeListener(this.incomeHandlerIndex);
-  // }
 
 
   /**
