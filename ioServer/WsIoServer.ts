@@ -10,12 +10,16 @@ import RemoteCall from '../system/helpers/RemoteCall';
 
 //const SERVER_SENDERID = 'server';
 
+const REMOTECALL_POSITION = 0;
+const WS_POSITION = 1;
+
+type ConnectionItem = [RemoteCall, WebSocket];
+
 
 export default class WsIoServer {
   protected readonly system: System;
   private readonly server: WebSocket.Server;
-  private connections: {[index: string]: WebSocket} = {};
-  private readonly remoteCall: RemoteCall;
+  private connections: {[index: string]: ConnectionItem} = {};
 
 
   constructor(system: System) {
@@ -27,33 +31,21 @@ export default class WsIoServer {
       port: 8999,
     });
 
-    // TODO: может создават на каждое соединение????
-
-    this.remoteCall = new RemoteCall(
-      this.send,
-      // TODO: add local methods ????
-      {},
-      this.system.host.id,
-      this.system.host.config.config.devSetResponseTimout,
-      this.system.log.error,
-      this.system.host.generateUniqId
-    );
-
     this.listen();
   }
 
 
-  protected send(message: RemoteCallMessage): any {
-    //this.client.send(message);
-  }
+  // protected send(message: RemoteCallMessage): any {
+  //   //this.client.send(message);
+  // }
+  //
+  //
+  // destroy() {
+  //   //this.client.close(0, 'Closing on destroy');
+  // }
 
 
-  destroy() {
-    //this.client.close(0, 'Closing on destroy');
-  }
-
-
-  protected listen() {
+  private listen() {
     this.server.on('close', (code: number, reason: string) => {
       // TODO: what to do???
     });
@@ -73,12 +65,23 @@ export default class WsIoServer {
     const getParams: {hostid: string} = querystring.parse(splitUrl[1]) as any;
     const remoteHostId: string = getParams.hostid;
 
-    this.connections[remoteHostId] = socket;
+    const remoteCall = new RemoteCall(
+      this.send,
+      // TODO: add local methods ????
+      {},
+      this.system.host.id,
+      this.system.host.config.config.devSetResponseTimout,
+      this.system.log.error,
+      this.system.host.generateUniqId
+    );
+
+    this.connections[remoteHostId] = [remoteCall, socket];
+
     this.listenConnection(remoteHostId);
   }
 
   private listenConnection(remoteHostId: string) {
-    const connection: WebSocket = this.connections[remoteHostId];
+    const connection: WebSocket = this.connections[remoteHostId][WS_POSITION];
 
     connection.on('close', (code: number, reason: string) => {
       // TODO: what to do???
@@ -88,7 +91,7 @@ export default class WsIoServer {
       this.system.log.error(`Websocket io set has received an error: ${err}`);
     });
 
-    connection.on('message', this.parseIncomeMessage);
+    connection.on('message', (...params: any[]) => this.parseIncomeMessage(remoteHostId, ...params));
 
     connection.on('open', () => {
       // TODO: what to do
@@ -99,7 +102,7 @@ export default class WsIoServer {
     });
   }
 
-  private parseIncomeMessage = async (data: string | Buffer | Buffer[] | ArrayBuffer) => {
+  private parseIncomeMessage = async (remoteHostId: string, data: string | Buffer | Buffer[] | ArrayBuffer) => {
     let message: RemoteCallMessage;
 
     if (typeof data !== 'string') {
