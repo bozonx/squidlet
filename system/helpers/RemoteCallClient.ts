@@ -1,7 +1,7 @@
 import RemoteCallMessage, {
   CallMethodPayload,
-  CbCallPayload,
-  CbResultPayload,
+  CallCbPayload,
+  ResultCbPayload,
   ResultMethodPayload
 } from '../interfaces/RemoteCallMessage';
 import IndexedEvents from './IndexedEvents';
@@ -9,7 +9,7 @@ import {isPlainObject} from './lodashLike';
 
 
 type MethodResultHandler = (payload: ResultMethodPayload) => void;
-type CbResultHandler = (payload: CbResultPayload) => void;
+type CbResultHandler = (payload: ResultCbPayload) => void;
 
 export interface ObjectToCall {
   // method name: method()
@@ -173,14 +173,14 @@ export default class RemoteCallClient {
   private waitForCbResponse(cbId: string): Promise<any> {
     return this.waitForResponse(
       this.cbsResultEvents,
-      (payload: CbResultPayload) => cbId !== payload.cbId
+      (payload: ResultCbPayload) => cbId !== payload.cbId
     );
   }
 
   /**
    * Call a real callback after a fake callback was called on the other side
    */
-  private async handleRemoteCbCall(payload: CbCallPayload) {
+  private async handleRemoteCbCall(payload: CallCbPayload) {
     let result: any;
     let error;
 
@@ -198,7 +198,7 @@ export default class RemoteCallClient {
 
     // next send response
 
-    const resultPayload: CbResultPayload = {
+    const resultPayload: ResultCbPayload = {
       senderId: this.senderId,
       cbId: payload.cbId,
       error,
@@ -294,7 +294,7 @@ export default class RemoteCallClient {
    */
   private makeFakeCb(cbId: string): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => {
-      const resultPayload: CbCallPayload = {
+      const resultPayload: CallCbPayload = {
         senderId: this.senderId,
         cbId,
         // there is functions are not allowed!

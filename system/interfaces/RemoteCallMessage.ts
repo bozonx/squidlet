@@ -36,18 +36,18 @@ export interface ResultMethodPayload extends ResultLikePayload {
   method: string;
 }
 
-export interface CbCallPayload {
+export interface CallCbPayload {
   senderId: string;
   cbId: string;
   args: Primitives[];
 }
 
-export interface CbResultPayload extends ResultLikePayload {
+export interface ResultCbPayload extends ResultLikePayload {
   senderId: string;
   cbId: string;
 }
 
 export default interface RemoteCallMessage {
   type: RemoteCallMessageType;
-  payload: CallMethodPayload | ResultMethodPayload | CbCallPayload | CbResultPayload;
+  payload: CallMethodPayload | ResultMethodPayload | CallCbPayload | ResultCbPayload;
 }
