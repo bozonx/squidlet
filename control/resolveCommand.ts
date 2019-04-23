@@ -26,6 +26,11 @@ export default async function resolveCommand() {
 
     return commandUpdate.start();
   }
+  else if (command === 'io-server') {
+    const commandUpdate: CommandStart = new CommandStart(positionArgsRest, args);
+
+    return commandUpdate.start();
+  }
 
   console.error(`Unknown command "${command}"`);
   process.exit(2);

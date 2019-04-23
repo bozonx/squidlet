@@ -18,3 +18,8 @@ hosts:
       bedroom:
         people-count-sensor:
           device: FakePeopleCount
+
+    ioSet:
+      type: ws
+#      host: localhost
+#      port: 8889
