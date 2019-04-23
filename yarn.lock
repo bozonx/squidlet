@@ -4102,9 +4102,14 @@ typescript@3.3.3333:
   version "3.3.3333"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3333.tgz#171b2c5af66c59e9431199117a3bcadc66fdcfd6"
 
-typescript@^3.0.3, typescript@^3.4.1:
+typescript@^3.0.3:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.4.1.tgz#b6691be11a881ffa9a05765a205cb7383f3b63c6"
+
+typescript@^3.5.0-dev.20190420:
+  version "3.5.0-dev.20190420"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.5.0-dev.20190420.tgz#75e50639c684a528da45244ca4958dd8490b25f2"
+  integrity sha512-dHBM1X1YiEwSkk2BA6Ey6b4FR/yYD3zA34p7HRLXRFKaWlG0fNpKn4vcKORUhwMaNV3544PHqjxIF3xoY4u9Cg==
 
 ultron@~1.1.0:
   version "1.1.1"

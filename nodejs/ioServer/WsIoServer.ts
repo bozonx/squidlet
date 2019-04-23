@@ -64,7 +64,7 @@ export default class WsIoServer {
 
     const remoteCall = new RemoteCall(
       sendToClient,
-      this.ioSet,
+      this.ioSet as any,
       WS_SERVER_HOST_ID,
       hostDefaultConfig.config.devSetResponseTimout,
       console.error,
@@ -98,7 +98,10 @@ export default class WsIoServer {
     });
   }
 
-  private parseIncomeMessage = async (remoteHostId: string, data: string | Buffer | Buffer[] | ArrayBuffer) => {
+  private parseIncomeMessage = async (remoteHostId: string, data?: string | Buffer | Buffer[] | ArrayBuffer) => {
+
+    // TODO: может пытаться отдавать ответ с ошибкой ????
+
     let message: RemoteCallMessage;
 
     if (typeof data !== 'string') {
