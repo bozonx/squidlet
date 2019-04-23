@@ -13,6 +13,7 @@ async function start() {
   };
 
   // TODO: collect ioset
+
   const ioSet: {[index: string]: ObjectToCall} = {};
 
   const server = new WsIoServer(serverProps, ioSet);

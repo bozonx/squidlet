@@ -20,4 +20,7 @@ export default {
     //   requestTimeout: 60000,
     // },
   },
+  ioSet: {
+    type: 'local',
+  },
 };
