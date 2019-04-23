@@ -23,3 +23,5 @@ export const HOST_VAR_DATA_DIR = 'data';
 export const HOST_TMP_DIR = 'tmp';
 // tmp dir of host under tmp dir (HOST_TMP_DIR)
 export const HOST_TMP_HOST_DIR = 'host';
+
+export const IOSET_STRING_DELIMITER = ':';

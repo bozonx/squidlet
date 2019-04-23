@@ -1,3 +1,4 @@
+import _isPlainObject = require('lodash/isPlainObject');
 import * as path from 'path';
 
 import Io from '../../shared/Io';
@@ -7,10 +8,11 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import {
   HOST_ENVSET_DIR,
   HOST_TMP_DIR,
-  HOSTS_WORK_DIRS
+  HOSTS_WORK_DIRS, IOSET_STRING_DELIMITER
 } from '../../shared/constants';
 import {getOsMachine, resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
+import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 export default class Props {
@@ -62,6 +64,8 @@ export default class Props {
 
     this.validate();
 
+    this._hostConfig = this.modifyHostConfig(this._hostConfig);
+
     this.hostId = this.hostConfig.id as any;
 
     if (this.argWorkDir) {
@@ -105,6 +109,49 @@ export default class Props {
     }
 
     return getOsMachine(this.io);
+  }
+
+  private modifyHostConfig(hostConfig: PreHostConfig): PreHostConfig {
+    const ioSetFromConfig: {[index: string]: any} | undefined = hostConfig.ioSet;
+
+    if (this.argIosetProps) {
+      if (!this.argIoset) {
+        throw new Error(`If you specify a "--ioset-props" you should specify a "--ioset" argument`);
+      }
+
+      const parsedProps = JSON.parse(this.argIosetProps);
+
+      if (!_isPlainObject(parsedProps)) {
+        throw new Error(`Incorrect type of ioset props which is set in "-ioset-props" argument`);
+      }
+
+      const ioSetProps = this.parseIoSetString(this.argIoset);
+
+      hostConfig.ioSet = {
+        ...parsedProps,
+        ...ioSetProps,
+      };
+    }
+    else if (this.argIoset) {
+      const ioSetProps = this.parseIoSetString(this.argIoset);
+
+      hostConfig.ioSet = {
+        ...ioSetFromConfig,
+        ...ioSetProps,
+      };
+    }
+
+    return hostConfig;
+  }
+
+  private parseIoSetString(ioSetString: string): {type: IoSetTypes, host?: string, port?: number} {
+    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
+
+    return {
+      type: splat[0] as IoSetTypes,
+      host: splat[1],
+      port: (splat[2]) ? parseInt(splat[2]) : undefined,
+    };
   }
 
 }

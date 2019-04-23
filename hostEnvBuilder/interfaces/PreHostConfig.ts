@@ -1,6 +1,7 @@
 import Platforms from './Platforms';
 import LogLevel from '../../system/interfaces/LogLevel';
 import DevsDefinitions from '../../system/interfaces/DevsDefinitions';
+import IoSetTypes from './IoSetTypes';
 
 
 // raw host config specified in master config
@@ -47,7 +48,7 @@ export default interface PreHostConfig {
   devs?: DevsDefinitions;
 
   ioSet?: {
-    type: 'local' | 'ws' | 'thread' | 'development';
+    type: IoSetTypes;
     // other io set params
     [index: string]: any;
   };
