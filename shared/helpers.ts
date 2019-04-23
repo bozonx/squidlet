@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as ts from 'typescript';
+import _trim = require('lodash/trim');
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
@@ -66,7 +67,11 @@ export function resolveSquidletRoot(): string {
 /**
  * Read a whole directory 'devs' of platform and load all the it's files
  */
-export async function makeDevelopIoSet(io: Io, platformDir: string, machine: string): Promise<{[index: string]: DevClass}> {
+export async function makeDevelopIoSet(
+  io: Io,
+  platformDir: string,
+  machine: string
+): Promise<{[index: string]: DevClass}> {
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
   const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
   const evalModulePath: string = path.join(platformDir, machine, 'evalModule');

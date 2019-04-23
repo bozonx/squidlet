@@ -1,9 +1,9 @@
 import WsIoServer, {WsServerProps} from '../nodejs/ioServer/WsIoServer';
-import {ObjectToCall} from '../system/helpers/RemoteCall';
 import {getOsMachine, makeDevelopIoSet, resolvePlatformDir} from '../shared/helpers';
 import {NODEJS_PLATFORM} from '../shared/constants';
 import NodejsMachines, {nodejsSupportedMachines} from '../nodejs/interfaces/NodejsMachines';
 import Io from '../shared/Io';
+import {DevClass} from '../system/entities/DevManager';
 
 
 interface CommandIoServerArgs {
@@ -13,7 +13,7 @@ interface CommandIoServerArgs {
 }
 
 
-export default class CommandStart {
+export default class CommandIoServer {
   private readonly io: Io = new Io();
   private readonly args: CommandIoServerArgs;
 
@@ -31,7 +31,7 @@ export default class CommandStart {
 
     const platformDir = resolvePlatformDir(NODEJS_PLATFORM);
     const machine: NodejsMachines = await this.resolveMachine();
-    const ioSet: {[index: string]: ObjectToCall} = makeDevelopIoSet(this.io, platformDir, machine);
+    const ioSet: {[index: string]: DevClass} = await makeDevelopIoSet(this.io, platformDir, machine);
 
     const server = new WsIoServer(serverProps, ioSet);
   }

@@ -4,11 +4,11 @@
 
 Update all the hosts of group config
 
-    squidlet update [--work-dir] ./groupConfig.yaml
+    squidletctl update [--work-dir] ./groupConfig.yaml
 
 Update specified host of group config 
 
-    squidlet update myHost [--work-dir] ./groupConfig.yaml
+    squidletctl update myHost [--work-dir] ./groupConfig.yaml
     
 Also you can specify the next params:
 
@@ -37,7 +37,7 @@ Also you can specify the next params:
  
 ### Start production host
 
-    squidlet start [--machine=x86 | rpi] [--prod=true] [--work-dir] [--name] ./groupOrHostConfig.yaml
+    squidletctl start [--machine=x86 | rpi] [--prod=true] [--work-dir] [--name] ./groupOrHostConfig.yaml
 
 ### Parameters
 
@@ -61,7 +61,7 @@ System can connect to It via websocket and manipulate IO devices which IO server
 It especially suitable for development to run IO server e.g on raspberry pi and connect to it
 from your laptop where development version of System is being running.
 
-    squidlet io-server [--machine=x86 | rpi] [--host=localhost] [--port=8889]
+    squidletctl io-server [--machine=x86 | rpi] [--host=localhost] [--port=8889]
 
 ### Parameters
 

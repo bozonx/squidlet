@@ -3,6 +3,7 @@ import * as yargs from 'yargs';
 
 import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
+import CommandIoServer from './CommandIoServer';
 
 
 export default async function resolveCommand() {
@@ -27,7 +28,7 @@ export default async function resolveCommand() {
     return commandUpdate.start();
   }
   else if (command === 'io-server') {
-    const commandUpdate: CommandStart = new CommandStart(positionArgsRest, args);
+    const commandUpdate: CommandIoServer = new CommandIoServer(positionArgsRest, args);
 
     return commandUpdate.start();
   }

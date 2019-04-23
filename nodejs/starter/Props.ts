@@ -1,7 +1,6 @@
-import _trim = require('lodash/trim');
 import * as path from 'path';
 
-import Io, {SpawnCmdResult} from '../../shared/Io';
+import Io from '../../shared/Io';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -10,7 +9,7 @@ import {
   HOST_TMP_DIR,
   HOSTS_WORK_DIRS
 } from '../../shared/constants';
-import {getOsMachine, resolveMachineByOsAndArch, resolveSquidletRoot} from '../../shared/helpers';
+import {getOsMachine, resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 
 

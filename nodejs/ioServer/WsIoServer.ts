@@ -4,8 +4,9 @@ import * as querystring from 'querystring';
 
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
 import {isPlainObject} from '../../system/helpers/lodashLike';
-import RemoteCall, {ObjectToCall} from '../../system/helpers/RemoteCall';
+import RemoteCall from '../../system/helpers/RemoteCall';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
+import {DevClass} from '../../system/entities/DevManager';
 
 
 // TODO: remove
@@ -26,11 +27,11 @@ export interface WsServerProps {
 
 export default class WsIoServer {
   private readonly server: WebSocket.Server;
-  private readonly ioSet: {[index: string]: ObjectToCall};
+  private readonly ioSet: {[index: string]: DevClass};
   private connections: {[index: string]: ConnectionItem} = {};
 
 
-  constructor(serverProps: WsServerProps, ioSet: {[index: string]: ObjectToCall}) {
+  constructor(serverProps: WsServerProps, ioSet: {[index: string]: DevClass}) {
     this.ioSet = ioSet;
     this.server = new WebSocket.Server(serverProps);
 
