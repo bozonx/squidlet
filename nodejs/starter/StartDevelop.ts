@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as ts from 'typescript';
 
 import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -11,8 +10,7 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import {HOST_ENVSET_DIR} from '../../shared/constants';
-import {loadMachineConfig, parseDevName, resolvePlatformDir} from '../../shared/helpers';
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import {makeDevelopIoSet, resolvePlatformDir} from '../../shared/helpers';
 
 
 export default class StartDevelop {
@@ -56,7 +54,12 @@ export default class StartDevelop {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const completedDevSet: {[index: string]: DevClass} = await this.makeDevSet();
+    const platformDir = resolvePlatformDir(this.props.platform);
+    const completedDevSet: {[index: string]: DevClass} = await makeDevelopIoSet(
+      this.io,
+      platformDir,
+      this.props.machine
+    );
     const System = require(`../../system`).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
 
@@ -82,28 +85,6 @@ export default class StartDevelop {
     console.info(`===> initializing system`);
 
     EnvSetMemory.$registerConfigSet(hostEnvSet);
-  }
-
-  /**
-   * Read a whole directory 'devs' of platform and load all the it's files
-   */
-  private async makeDevSet(): Promise<{[index: string]: DevClass}> {
-    const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    const platformDir = resolvePlatformDir(this.props.platform);
-    const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
-    const evalModulePath: string = path.join(platformDir, this.props.machine, 'evalModule');
-    const machineEvalModule: any = require(evalModulePath);
-
-    for (let devPath of machineConfig.devs) {
-      const devName: string = parseDevName(devPath);
-      const devAbsPath = path.resolve(platformDir, devPath);
-      const moduleContent: string = await this.io.getFileContent(devAbsPath);
-      const compinedModuleContent: string = ts.transpile(moduleContent);
-
-      devsSet[devName] = machineEvalModule(compinedModuleContent);
-    }
-
-    return devsSet;
   }
 
 }

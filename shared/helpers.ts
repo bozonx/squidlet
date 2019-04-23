@@ -1,10 +1,11 @@
 import * as path from 'path';
+import * as ts from 'typescript';
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 import {DevClass} from '../system/entities/DevManager';
-import * as ts from 'typescript';
+import Io from './Io';
 
 
 /**
@@ -29,9 +30,16 @@ export function resolvePlatformDir(platform: Platforms): string {
   return path.resolve(__dirname, `../${platform}`);
 }
 
+export function loadMachineConfigInPlatformDir(platformDir: string, machine: string): MachineConfig {
+  const machineConfigPath = path.join(platformDir, `machine-${machine}`);
+
+  return require(machineConfigPath).default;
+}
+
+// TODO: remove, may be use loadMachineConfigInPlatformDir instead of it
 export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
   const platformDir: string = resolvePlatformDir(platform);
-  const machineConfigPath = path.join(platformDir, `${platform}-${machine}`);
+  const machineConfigPath = path.join(platformDir, `machine-${machine}`);
 
   return require(machineConfigPath).default;
 }
@@ -57,17 +65,16 @@ export function resolveSquidletRoot(): string {
 /**
  * Read a whole directory 'devs' of platform and load all the it's files
  */
-export async function makeDevelopIoSet(platformDir: string, machine: string): Promise<{[index: string]: DevClass}> {
+export async function makeDevelopIoSet(io: Io, platformDir: string, machine: string): Promise<{[index: string]: DevClass}> {
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-  const platformDir = resolvePlatformDir(platform);
-  const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
+  const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
   const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
   const machineEvalModule: any = require(evalModulePath);
 
   for (let devPath of machineConfig.devs) {
     const devName: string = parseDevName(devPath);
     const devAbsPath = path.resolve(platformDir, devPath);
-    const moduleContent: string = await this.io.getFileContent(devAbsPath);
+    const moduleContent: string = await io.getFileContent(devAbsPath);
     const compinedModuleContent: string = ts.transpile(moduleContent);
 
     devsSet[devName] = machineEvalModule(compinedModuleContent);
