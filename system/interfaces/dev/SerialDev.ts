@@ -9,6 +9,17 @@ export interface Options {
 }
 
 
+export const SerialMethods = [
+  'on',
+  'write',
+  'print',
+  'println',
+  'read',
+  'setup',
+  'removeListener',
+];
+
+
 /**
  * Uart api
  * uartNum - it's number of UART interface on specified platform

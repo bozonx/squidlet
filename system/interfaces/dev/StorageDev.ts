@@ -8,6 +8,24 @@ export interface Stats {
   mtime: number;
 }
 
+
+export const StorageMethods = [
+  'appendFile',
+  'mkdir',
+  'readdir',
+  'readFile',
+  'readlink',
+  'readBinFile',
+  'rmdir',
+  'unlink',
+  'writeFile',
+  'stat',
+  'exists',
+  'copyFile',
+  'rename',
+];
+
+
 export default interface StorageDev {
   appendFile(path: string, data: string | Uint8Array): Promise<void>;
   mkdir(path: string): Promise<void>;

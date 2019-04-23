@@ -1,3 +1,12 @@
+export const MqttMethods = [
+  'isConnected',
+  'publish',
+  'subscribe',
+  'onMessage',
+  'onMessageBin',
+];
+
+
 export default interface MqttDev {
   isConnected(): boolean;
   publish(topic: string, data: string | Uint8Array | undefined): Promise<void>;

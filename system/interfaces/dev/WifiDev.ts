@@ -3,6 +3,12 @@ export interface WifiParams {
   password?: string;
 }
 
+
+export const WifiMethods = [
+  'configure',
+];
+
+
 export default interface WifiDev {
   configure(params: WifiParams): Promise<void>;
 }

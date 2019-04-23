@@ -6,6 +6,18 @@ export type DigitalPinMode = DigitalInputMode | 'output';
 export type Edge = 'rising' | 'falling' | 'both';
 
 
+export const DigitalMethods = [
+  'read',
+  'write',
+  'setWatch',
+  'clearWatch',
+  'clearAllWatches',
+  'setupInput',
+  'setupOutput',
+  'getPinMode',
+];
+
+
 interface DigitalBase {
   read(pin: number): Promise<boolean>;
 

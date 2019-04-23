@@ -2,6 +2,15 @@ export interface WebSocketClientProps {
   url: string;
 }
 
+
+export const WSClientMethods = [
+  'onClose',
+  'onMessage',
+  'onError',
+  'send',
+];
+
+
 export interface WSClientDev {
   onClose(cb: () => void): void;
   //onConnection(cb: () => void): void;

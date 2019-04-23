@@ -1,3 +1,9 @@
+export const I2cMasterMethods = [
+  'writeTo',
+  'readFrom',
+];
+
+
 export default interface I2cMasterDev {
   writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void>;
   // TODO: можно ли чтобы data была undefined?

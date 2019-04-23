@@ -5,6 +5,13 @@ export interface WebSocketServerProps {
   port?: number;
 }
 
+
+export const WSSeverMethods = [
+  'onMessage',
+  'send',
+];
+
+
 export interface WSSeverDev {
   //onOpen(cb: () => void): void;
   onMessage(cb: (data: any) => void): void;
