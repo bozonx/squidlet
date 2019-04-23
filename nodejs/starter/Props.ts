@@ -12,7 +12,7 @@ import {
 } from '../../shared/constants';
 import {getOsMachine, resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
-import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
+import IoSetTypes, {allowedIoSetTypes} from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 export default class Props {
@@ -112,9 +112,8 @@ export default class Props {
   }
 
   private modifyHostConfig(hostConfig: PreHostConfig): PreHostConfig {
-    const ioSetFromConfig: {[index: string]: any} | undefined = hostConfig.ioSet;
-
     if (this.argIosetProps) {
+      // replace current ioSet host's config param
       if (!this.argIoset) {
         throw new Error(`If you specify a "--ioset-props" you should specify a "--ioset" argument`);
       }
@@ -133,10 +132,11 @@ export default class Props {
       };
     }
     else if (this.argIoset) {
+      // merge with current ioSet host's config param
       const ioSetProps = this.parseIoSetString(this.argIoset);
 
       hostConfig.ioSet = {
-        ...ioSetFromConfig,
+        ...hostConfig.ioSet,
         ...ioSetProps,
       };
     }
@@ -146,9 +146,14 @@ export default class Props {
 
   private parseIoSetString(ioSetString: string): {type: IoSetTypes, host?: string, port?: number} {
     const splat = ioSetString.split(IOSET_STRING_DELIMITER);
+    const type = splat[0] as IoSetTypes;
+
+    if (!allowedIoSetTypes.includes(type)) {
+      throw new Error(`Incorrect ioSet type "${type}"`);
+    }
 
     return {
-      type: splat[0] as IoSetTypes,
+      type,
       host: splat[1],
       port: (splat[2]) ? parseInt(splat[2]) : undefined,
     };
