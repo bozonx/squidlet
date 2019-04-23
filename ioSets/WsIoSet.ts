@@ -7,22 +7,38 @@ import System from '../system/System';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 
 
+export interface WsClientProps {
+  host: string;
+  port: number;
+}
+
+
 export default class WsIoSet extends RemoteIoBase implements IoSet {
+  private ioSetConfig: WsClientProps;
+  private _client?: WebSocket;
+  private get client(): WebSocket {
+    return this._client as any;
+  }
 
-  private readonly client: WebSocket;
 
 
-  constructor(system: System) {
-    super(system);
+  constructor(ioSetConfig: WsClientProps) {
+    super();
+    this.ioSetConfig = ioSetConfig;
+  }
 
-    // TODO: set connection params from config
+  async init(system: System): Promise<void> {
+    super.init(system);
 
-    const url: string = `ws://localhost:8999?hostid=${this.system.host.id}`;
+    const url: string = `ws://${this.ioSetConfig.host}:${this.ioSetConfig.port}?hostid=${this.system.host.id}`;
 
-    this.client = new WebSocket(url, {
+    this._client = new WebSocket(url, {
     });
 
     this.listen();
+    // TODO: remake
+    // TODO: system передастся только в init
+
   }
 
 

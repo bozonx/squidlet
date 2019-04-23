@@ -1,16 +1,17 @@
 import * as path from 'path';
+import _omit = require('lodash/omit');
 
 import Io from '../../shared/Io';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
-import {DevClass} from '../../system/entities/DevManager';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import EnvSetMemory from '../../hostEnvBuilder/EnvSetMemory';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
-import {HOST_ENVSET_DIR} from '../../shared/constants';
-import {makeDevelopIoSet, resolvePlatformDir} from '../../shared/helpers';
+import {resolvePlatformDir} from '../../shared/helpers';
+import IoSet from '../../system/interfaces/IoSet';
+import {firstLetterToUpperCase} from '../../system/helpers/helpers';
+
+
+const ioSetsRoot = '../../ioSets';
 
 
 export default class StartDevelop {
@@ -61,41 +62,34 @@ export default class StartDevelop {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const platformDir = resolvePlatformDir(this.props.platform);
-    const completedDevSet: {[index: string]: DevClass} = await makeDevelopIoSet(
-      this.io,
-      platformDir,
-      this.props.machine
-    );
+    const ioSet: IoSet = this.makeIoSet();
     const System = require(`../../system`).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
 
-    await this.configureEnvSet();
+    console.info(`===> Starting system`);
 
-    const system = new System(completedDevSet, systemConfigExtend, EnvSetMemory);
+    const system = new System(ioSet, systemConfigExtend);
 
     return system.start();
   }
 
-  private async configureEnvSet() {
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
-    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+  private makeIoSet(): IoSet {
+    const platformDir = resolvePlatformDir(this.props.platform);
+    const ioSetConfig = this.props.hostConfig.ioSet as {[index: string]: any};
+    const isSetFileName = `${firstLetterToUpperCase(ioSetConfig.type)}IoSet`;
+    const SelectedIoSet: new () => IoSet = require(path.join(ioSetsRoot, isSetFileName)).default;
 
-    console.info(`===> generate hosts env files and configs`);
-
-    await envBuilder.collect();
-
-    console.info(`===> generate master config object`);
-
-    const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
-
-    console.info(`===> initializing system`);
-
-    EnvSetMemory.$registerConfigSet(hostEnvSet);
+    return new SelectedIoSet(_omit(ioSetConfig, 'type'));
   }
 
 }
 
+
+// const completedDevSet: {[index: string]: DevClass} = await makeDevelopIoSet(
+//   this.io,
+//   platformDir,
+//   this.props.machine
+// );
 
 // const platformDirName: string = resolvePlatformDir(this.platform);
 // const devsDir: string = path.join(platformDirName, 'devs');

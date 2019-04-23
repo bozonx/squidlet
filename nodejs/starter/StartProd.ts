@@ -117,7 +117,9 @@ export default class StartProd {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    // make system instance
+
+    console.info(`===> Starting system`);
+
     const system = new System(completedDevSet, systemConfigExtend);
 
     return system.start();

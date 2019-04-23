@@ -6,17 +6,18 @@ import {isPlainObject} from '../helpers/lodashLike';
 
 
 export default abstract class RemoteIoBase {
-  protected readonly system: System;
+  private _system?: System;
   private readonly instances: IoSetInstances = {};
   private readonly remoteCall: RemoteCall;
+  private get system(): System {
+    return this._system as any;
+  }
 
   // send a message to server
   protected abstract send(message: RemoteCallMessage): any;
 
 
-  constructor(system: System) {
-    this.system = system;
-
+  async init(system: System): Promise<void> {
     this.remoteCall = new RemoteCall(
       this.send,
       // TODO: add local methods ????
@@ -26,11 +27,9 @@ export default abstract class RemoteIoBase {
       this.system.log.error,
       this.system.host.generateUniqId
     );
-  }
 
-
-  async init(ioDefinitions: IoDefinition): Promise<void> {
-    this.makeInstances(ioDefinitions);
+    this._system = system;
+    //this.makeInstances(ioDefinitions);
   }
 
 

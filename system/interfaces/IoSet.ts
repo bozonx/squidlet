@@ -1,4 +1,5 @@
 import {Primitives} from './Types';
+import System from '../System';
 
 
 export interface IoDefinition {
@@ -17,7 +18,7 @@ export interface IoSetInstances {
 
 
 export default interface IoSet {
-  init(ioDefinitions: IoDefinition): Promise<void>;
+  init(system: System): Promise<void>;
   getInstance<T extends IoSetInstance>(ioName: string): T;
   destroy(): void;
 
