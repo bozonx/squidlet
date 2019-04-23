@@ -28,12 +28,14 @@ export interface WsServerProps {
 export default class WsIoServer {
   private readonly server: WebSocket.Server;
   private readonly ioSet: {[index: string]: DevClass};
+  private readonly verbose: boolean;
   private connections: {[index: string]: ConnectionItem} = {};
 
 
-  constructor(serverProps: WsServerProps, ioSet: {[index: string]: DevClass}) {
+  constructor(serverProps: WsServerProps, ioSet: {[index: string]: DevClass}, verbose?: boolean) {
     this.ioSet = ioSet;
     this.server = new WebSocket.Server(serverProps);
+    this.verbose = Boolean(verbose);
 
     this.listen();
   }
@@ -41,15 +43,16 @@ export default class WsIoServer {
 
   private listen() {
     this.server.on('close', (code: number, reason: string) => {
-      // TODO: what to do???
+      console.info(`Websocket server closed: ${code}: ${reason}`);
     });
 
     this.server.on('error', (err: Error) => {
       console.error(`Websocket io set has received an error: ${err}`);
     });
 
-    // this.server.on('listening', () => {
-    // });
+    this.server.on('listening', () => {
+      console.info(`Http server started listening`);
+    });
 
     this.server.on('connection', this.onConnection);
   }
@@ -80,26 +83,25 @@ export default class WsIoServer {
     const connection: WebSocket = this.connections[remoteHostId][WS_POSITION];
 
     connection.on('close', (code: number, reason: string) => {
-      // TODO: what to do???
+      console.info(`Websocket client "${remoteHostId}" closed the connection: ${code}: ${reason}`);
     });
 
     connection.on('error', (err: Error) => {
-      console.error(`Websocket io set has received an error: ${err}`);
+      console.error(`ERROR: ${err}`);
     });
 
     connection.on('message', (...params: any[]) => this.parseIncomeMessage(remoteHostId, ...params));
 
     connection.on('open', () => {
-      // TODO: what to do
+      console.info(`Websocket client "${remoteHostId}" opened the connection`);
     });
 
     connection.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      console.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`);
+      console.error(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
     });
   }
 
   private parseIncomeMessage = async (remoteHostId: string, data?: string | Buffer | Buffer[] | ArrayBuffer) => {
-
     // TODO: может пытаться отдавать ответ с ошибкой ????
 
     let message: RemoteCallMessage;
@@ -120,6 +122,10 @@ export default class WsIoServer {
     }
     else if (!message.type || !REMOTE_CALL_MESSAGE_TYPES.includes(message.type)) {
       return console.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
+    }
+
+    if (this.verbose) {
+      console.info(`Received message from ${remoteHostId}: ${message}`);
     }
 
     const remoteCall: RemoteCall = this.connections[remoteHostId][REMOTECALL_POSITION];

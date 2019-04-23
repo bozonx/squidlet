@@ -42,7 +42,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     });
 
     this.client.on('error', (err: Error) => {
-      this.system.log.error(`Websocket io set has received an error: ${err}`);
+      this.system.log.error(`ERROR: ${err}`);
     });
 
     this.client.on('message', this.parseIncomeMessage);
@@ -52,7 +52,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     });
 
     this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.system.log.error(`Websocket io set has received an unexpected response: ${responce.statusCode}: ${responce.statusMessage}`)
+      this.system.log.error(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`)
     });
   }
 

@@ -10,6 +10,7 @@ interface CommandIoServerArgs {
   host?: string;
   port?: number;
   machine?: NodejsMachines;
+  verbose?: boolean;
 }
 
 
@@ -39,7 +40,7 @@ export default class CommandIoServer {
 
     console.info(`===> Starting websocket server on ${serverProps.host}:${serverProps.port}`);
 
-    const server = new WsIoServer(serverProps, ioSet);
+    const server = new WsIoServer(serverProps, ioSet, this.args.verbose);
   }
 
   private async resolveMachine(): Promise<NodejsMachines> {

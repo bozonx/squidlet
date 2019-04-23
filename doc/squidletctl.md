@@ -61,7 +61,7 @@ System can connect to It via websocket and manipulate IO devices which IO server
 It especially suitable for development to run IO server e.g on raspberry pi and connect to it
 from your laptop where development version of System is being running.
 
-    squidletctl io-server [--machine=x86 | rpi] [--host=localhost] [--port=8889]
+    squidletctl io-server [--machine=x86 | rpi] [--host=localhost] [--port=8889] [--verbose=true]
 
 ### Parameters
 
@@ -69,3 +69,4 @@ from your laptop where development version of System is being running.
   It tries recognize it if this argument isn't set
 * --host - host where websocket server will be run. Default is localhost
 * --port - port of websocket server. Default if 8889
+* --verbose - print incoming messages if true
