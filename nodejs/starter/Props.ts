@@ -10,7 +10,7 @@ import {
   HOST_TMP_DIR,
   HOSTS_WORK_DIRS
 } from '../../shared/constants';
-import {resolveSquidletRoot} from '../../shared/helpers';
+import {getOsMachine, resolveMachineByOsAndArch, resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 
 
@@ -93,50 +93,7 @@ export default class Props {
       return this.argMachine;
     }
 
-    const spawnResult: SpawnCmdResult = await this.io.spawnCmd('hostnamectl');
-
-    if (spawnResult.status !== 0) {
-      throw new Error(`Can't execute a "hostnamectl" command: ${spawnResult.stderr.join('\n')}`);
-    }
-
-    const {os, arch} = this.parseHostNameCtlResult(spawnResult.stdout.join('\n'));
-
-    return this.resolveMachineByOsAndArch(os, arch);
-  }
-
-  private parseHostNameCtlResult(stdout: string): {os: string, arch: string} {
-    const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
-    const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
-
-    if (!osMatch) {
-      throw new Error(`Can't resolve an operating system of the machine`);
-    }
-    else if (!architectureMatch) {
-      throw new Error(`Can't resolve an architecture of the machine`);
-    }
-
-    return {
-      os: _trim(osMatch[1]),
-      arch: architectureMatch[1],
-    };
-  }
-
-  private resolveMachineByOsAndArch(os: string, arch: string): NodejsMachines {
-    if (arch.match(/x86/)) {
-      // no matter which OS and 32 or 64 bits
-      return 'x86';
-    }
-    else if (arch === 'arm') {
-      // TODO: use cpuinfo to resolve Revision or other method
-      if (os.match(/Raspbian/)) {
-        return 'rpi';
-      }
-      else {
-        return 'arm';
-      }
-    }
-
-    throw new Error(`Unsupported architecture "${arch}"`);
+    return getOsMachine(this.io);
   }
 
 }
