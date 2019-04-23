@@ -1,4 +1,4 @@
-import WsIoServer, {WsServerProps} from '../ioServer/WsIoServer';
+import WsIoServer, {WsServerProps} from '../nodejs/ioServer/WsIoServer';
 import {ObjectToCall} from '../system/helpers/RemoteCall';
 
 

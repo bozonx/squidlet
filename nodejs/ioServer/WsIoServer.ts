@@ -2,10 +2,10 @@ import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import * as querystring from 'querystring';
 
-import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../system/interfaces/RemoteCallMessage';
-import {isPlainObject} from '../system/helpers/lodashLike';
-import RemoteCall, {ObjectToCall} from '../system/helpers/RemoteCall';
-import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
+import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
+import {isPlainObject} from '../../system/helpers/lodashLike';
+import RemoteCall, {ObjectToCall} from '../../system/helpers/RemoteCall';
+import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 // TODO: remove
