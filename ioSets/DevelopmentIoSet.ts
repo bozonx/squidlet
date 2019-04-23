@@ -1,4 +1,4 @@
-import IoSet from '../../system/interfaces/IoSet';
+import IoSet from '../system/interfaces/IoSet';
 
 
 export default class DevelopmentIoSet implements IoSet {
