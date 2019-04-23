@@ -30,17 +30,29 @@ export default class Props {
   private readonly argMachine?: NodejsMachines;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
+  private readonly argIoset?: string;
+  private readonly argIosetProps?: string;
   private readonly groupConfig: GroupConfigParser;
   private _hostConfig?: PreHostConfig;
   private _machine?: NodejsMachines;
 
 
-  constructor(io: Io, groupConfig: GroupConfigParser, argMachine?: NodejsMachines, argHostName?: string, argWorkDir?: string) {
+  constructor(
+    io: Io,
+    groupConfig: GroupConfigParser,
+    argMachine?: NodejsMachines,
+    argHostName?: string,
+    argWorkDir?: string,
+    argIoset?: string,
+    argIosetProps?: string
+  ) {
     this.io = io;
     this.groupConfig = groupConfig;
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
+    this.argIoset = argIoset;
+    this.argIosetProps = argIosetProps;
   }
 
 

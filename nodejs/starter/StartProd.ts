@@ -29,9 +29,16 @@ export default class StartProd {
   private readonly props: Props;
 
 
-  constructor(configPath: string, machine?: NodejsMachines, hostName?: string, workDir?: string) {
+  constructor(
+    configPath: string,
+    machine?: NodejsMachines,
+    hostName?: string,
+    workDir?: string,
+    ioset?: string,
+    iosetProps?: string
+  ) {
     this.groupConfig = new GroupConfigParser(this.io, configPath);
-    this.props = new Props(this.io, this.groupConfig, machine, hostName, workDir);
+    this.props = new Props(this.io, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
   }
 
   async init() {

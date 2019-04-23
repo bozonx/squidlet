@@ -37,7 +37,14 @@ Also you can specify the next params:
  
 ### Start production host
 
-    squidletctl start [--machine=x86 | rpi] [--prod=true] [--work-dir] [--name] ./groupOrHostConfig.yaml
+    squidletctl start
+      [--machine=x86 | rpi]
+      [--prod=true]
+      [--work-dir]
+      [--name]
+      [--ioset=ws:[host]:[port]]
+      [--ioset-props={..jsonProps}]
+      ./groupOrHostConfig.yaml
 
 ### Parameters
 
@@ -49,6 +56,9 @@ Also you can specify the next params:
 * SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
 * --name uses only if group config is specified
   and selects a host config from group config
+* --ioset - specify ioSet which will be used. Also you can specify host and port optionally
+* --ioset-props - other ioSet props which will be passed to specified ioSet.
+  These props will replace props in host config
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
