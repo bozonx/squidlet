@@ -3,6 +3,8 @@ import * as path from 'path';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
+import {DevClass} from '../system/entities/DevManager';
+import * as ts from 'typescript';
 
 
 /**
@@ -50,4 +52,26 @@ export function resolveSquidletRoot(): string {
   }
 
   return path.join(process.env['HOME'] as string, HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME);
+}
+
+/**
+ * Read a whole directory 'devs' of platform and load all the it's files
+ */
+export async function makeDevelopIoSet(platformDir: string, machine: string): Promise<{[index: string]: DevClass}> {
+  const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+  const platformDir = resolvePlatformDir(platform);
+  const machineConfig: MachineConfig = loadMachineConfig(platform, machine);
+  const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
+  const machineEvalModule: any = require(evalModulePath);
+
+  for (let devPath of machineConfig.devs) {
+    const devName: string = parseDevName(devPath);
+    const devAbsPath = path.resolve(platformDir, devPath);
+    const moduleContent: string = await this.io.getFileContent(devAbsPath);
+    const compinedModuleContent: string = ts.transpile(moduleContent);
+
+    devsSet[devName] = machineEvalModule(compinedModuleContent);
+  }
+
+  return devsSet;
 }

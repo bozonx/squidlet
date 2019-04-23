@@ -158,6 +158,9 @@ export default class StartProd {
   }
 
   private async makeDevSet(): Promise<{[index: string]: DevClass}> {
+
+    // TODO: may be use the same as in develop
+
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
     const envSetDevsDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
     const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
