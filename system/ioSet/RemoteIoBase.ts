@@ -9,7 +9,7 @@ export default abstract class RemoteIoBase {
   private _system?: System;
   private readonly instances: IoSetInstances = {};
   private readonly remoteCall: RemoteCall;
-  private get system(): System {
+  readonly get system(): System {
     return this._system as any;
   }
 

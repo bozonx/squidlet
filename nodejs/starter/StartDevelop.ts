@@ -74,10 +74,12 @@ export default class StartDevelop {
   }
 
   private makeIoSet(): IoSet {
-    const platformDir = resolvePlatformDir(this.props.platform);
+    //const platformDir = resolvePlatformDir(this.props.platform);
     const ioSetConfig = this.props.hostConfig.ioSet as {[index: string]: any};
     const isSetFileName = `${firstLetterToUpperCase(ioSetConfig.type)}IoSet`;
-    const SelectedIoSet: new () => IoSet = require(path.join(ioSetsRoot, isSetFileName)).default;
+    const SelectedIoSet: new (ioSetConfig: {[index: string]: any}) => IoSet = require(
+      path.join(ioSetsRoot, isSetFileName)
+    ).default;
 
     return new SelectedIoSet(_omit(ioSetConfig, 'type'));
   }

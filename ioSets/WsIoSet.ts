@@ -1,5 +1,6 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
+import _omit = require('lodash/omit');
 
 import RemoteIoBase from '../system/ioSet/RemoteIoBase';
 import IoSet from '../system/interfaces/IoSet';
@@ -21,7 +22,6 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   }
 
 
-
   constructor(ioSetConfig: WsClientProps) {
     super();
     this.ioSetConfig = ioSetConfig;
@@ -30,15 +30,11 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
   async init(system: System): Promise<void> {
     super.init(system);
 
-    const url: string = `ws://${this.ioSetConfig.host}:${this.ioSetConfig.port}?hostid=${this.system.host.id}`;
+    const url = `ws://${this.ioSetConfig.host}:${this.ioSetConfig.port}?hostid=${this.system.host.id}`;
 
-    this._client = new WebSocket(url, {
-    });
+    this._client = new WebSocket(url, _omit(this.ioSetConfig, 'host', 'port'));
 
     this.listen();
-    // TODO: remake
-    // TODO: system передастся только в init
-
   }
 
 
@@ -68,7 +64,7 @@ export default class WsIoSet extends RemoteIoBase implements IoSet {
     });
 
     this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.system.log.error(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`)
+      this.system.log.error(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
     });
   }
 
