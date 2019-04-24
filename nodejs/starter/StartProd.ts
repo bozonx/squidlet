@@ -133,7 +133,7 @@ export default class StartProd {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    const ioSet: IoSet | undefined = this.resolveIoSet();
+    const ioSet: IoSet | undefined = this.makeIoSet();
 
     console.info(`===> Starting system`);
 
@@ -142,25 +142,28 @@ export default class StartProd {
     return system.start();
   }
 
-  private resolveIoSet(): IoSet | undefined {
+  /**
+   * Make ioSet instance or return undefined if local is used.
+   * Only nodejs-ws or local ioSet types are allowed
+   * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
+   */
+  private makeIoSet(): IoSet | undefined {
     const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-    // use specified type or 'local' by default
-    const ioType: IoSetTypes = (ioSetConfig) ? ioSetConfig.type : 'local';
 
-    console.info(`===> using io set "${ioType}"`);
+    if (!ioSetConfig || ioSetConfig.type === 'local') {
+      return;
+    }
+    else if (ioSetConfig.type !== 'nodejs-ws') {
+      throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
+    }
+
+    console.info(`===> using io set "${ioSetConfig.type}"`);
 
     // only nodejs-ws or local ioSet types are allowed
     // ioType local means ioSet = undefined
-    if (ioType === 'nodejs-ws') {
-      const ResolvedIoSet = resolveIoSetClass(ioType);
+    const ResolvedIoSet = resolveIoSetClass(ioSetConfig.type);
 
-      return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
-    }
-    else if (ioType !== 'local') {
-      throw new Error(`Unsupported ioSet type: "${ioType}"`);
-    }
-
-    return;
+    return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
   }
 
   /**
