@@ -13,7 +13,7 @@ import {
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
-import IoBuilder from '../../shared/IoBuilder';
+import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
@@ -113,7 +113,7 @@ export default class StartProd {
     // build config and entities
     await this.buildEnvSet(initialHostConfig);
     // build io
-    await this.buildIo(initialHostConfig);
+    await this.buildIos(initialHostConfig);
   }
 
   /**
@@ -165,10 +165,10 @@ export default class StartProd {
   /**
    * Build io files to
    */
-  private async buildIo(hostConfig: PreHostConfig) {
+  private async buildIos(hostConfig: PreHostConfig) {
     const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
-    const buildDevs: IoBuilder = new IoBuilder(
+    const buildIo: BuildIo = new BuildIo(
       this.os,
       hostConfig,
       buildDir,
@@ -177,7 +177,7 @@ export default class StartProd {
 
     console.info(`===> Building devs`);
 
-    await buildDevs.build();
+    await buildIo.build();
   }
 
   private async makeDevSet(): Promise<{[index: string]: DevClass}> {

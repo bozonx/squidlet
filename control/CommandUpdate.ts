@@ -7,7 +7,7 @@ import Os from '../shared/Os';
 import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
-import IoBuilder from '../shared/IoBuilder';
+import BuildIo from '../shared/BuildIo';
 import {BUILD_IO_DIR} from '../shared/constants';
 
 
@@ -83,19 +83,19 @@ export default class CommandUpdate {
   }
 
   private async updateHost(hostConfig: PreHostConfig) {
-    await this.buildDevs(hostConfig);
+    await this.buildIos(hostConfig);
     await this.buildEnvSet(hostConfig);
     await this.uploadToHost(hostConfig);
   }
 
-  private async buildDevs(hostConfig: PreHostConfig) {
+  private async buildIos(hostConfig: PreHostConfig) {
     if (!hostConfig.id) {
       throw new Error(`Host has to have an id param`);
     }
 
     const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_IO_DIR);
     const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_IO_DIR);
-    const buildDevs: IoBuilder = new IoBuilder(
+    const buildIo: BuildIo = new BuildIo(
       this.os,
       hostConfig,
       buildDir,
@@ -104,7 +104,7 @@ export default class CommandUpdate {
 
     console.info(`===> Building devs`);
 
-    await buildDevs.build();
+    await buildIo.build();
   }
 
   private async buildEnvSet(hostConfig: PreHostConfig) {

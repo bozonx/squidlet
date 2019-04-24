@@ -17,7 +17,7 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import {Stats} from '../system/interfaces/dev/StorageDev';
 
 
-export default class IoBuilder {
+export default class BuildIo {
   private readonly preHostConfig: PreHostConfig;
   private readonly devsBuildDir: string;
   private readonly devsTmpDir: string;
