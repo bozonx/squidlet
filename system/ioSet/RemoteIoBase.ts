@@ -5,6 +5,7 @@ import {isPlainObject} from '../helpers/lodashLike';
 import IoItem from '../interfaces/IoItem';
 import IoSetLocal from './IoSetLocal';
 import {pathJoin} from '../helpers/nodeLike';
+import {firstLetterToUpperCase} from '../helpers/helpers';
 
 
 export default abstract class RemoteIoBase extends IoSetLocal {
@@ -66,8 +67,14 @@ export default abstract class RemoteIoBase extends IoSetLocal {
   private makeFakeIoIfNeed(ioName: string) {
     if (this.ioCollection[ioName]) return;
 
-    // TODO: make path
-    const ioDefinitionPath = pathJoin();
+    const ioDefinitionPath = pathJoin(
+      // this.system.systemConfig.rootDirs.envSet,
+      // this.system.systemConfig.envSetDirs.system,
+      '../',
+      'interfaces',
+      'io',
+      `${firstLetterToUpperCase(ioName)}Io`
+    );
     const ioMethods: string[] = require(ioDefinitionPath).Methods;
 
     for (let methodName of ioMethods) {
@@ -80,6 +87,5 @@ export default abstract class RemoteIoBase extends IoSetLocal {
       return this.remoteCall.callMethod(ioName, methodName, ...args);
     };
   }
-
 
 }
