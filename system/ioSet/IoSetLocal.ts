@@ -1,5 +1,4 @@
 import IoSet from '../interfaces/IoSet';
-import {DevClass} from '../entities/ioManager';
 import * as path from "path";
 
 
@@ -12,7 +11,7 @@ export default class IoSetLocal implements IoSet {
   /**
    * Collect io set
    */
-  private async collectIoSet(): Promise<{[index: string]: DevClass}> {
+  private async collectIoSet(): Promise<{[index: string]: IoItemClass}> {
     //const pathToIoSetIndex = path.join(this.props.workDir, BUILD_IO_DIR, IO_SET_INDEX_FILE);
 
     return require(pathToIoSetIndex);

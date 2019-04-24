@@ -5,12 +5,12 @@ import _trim = require('lodash/trim');
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
-import {DevClass} from '../system/entities/ioManager';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
 import IoSet from '../system/interfaces/IoSet';
 import {firstLetterToUpperCase} from '../system/helpers/helpers';
 import IoSetTypes from '../hostEnvBuilder/interfaces/IoSetTypes';
+import {IoItemClass} from '../system/interfaces/IoItem';
 
 
 const REPO_ROOT = path.resolve(__dirname, '../');
@@ -71,13 +71,13 @@ export function resolveSquidletRoot(): string {
 }
 
 /**
- * Read a whole directory 'devs' of platform and load all the it's files
+ * Read machine config and load io which are specified there.
  */
-export async function makeDevelopIoSet(
+export async function makeDevelopIoCollection(
   os: Os,
   platformDir: string,
   machine: string
-): Promise<{[index: string]: DevClass}> {
+): Promise<{[index: string]: IoItemClass}> {
   const devsSet: {[index: string]: new (...params: any[]) => any} = {};
   const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
   const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
@@ -86,7 +86,7 @@ export async function makeDevelopIoSet(
   for (let devPath of machineConfig.devs) {
     const devName: string = parseDevName(devPath);
     const devAbsPath = path.resolve(platformDir, devPath);
-    const moduleContent: string = await io.getFileContent(devAbsPath);
+    const moduleContent: string = await os.getFileContent(devAbsPath);
     const compinedModuleContent: string = ts.transpile(moduleContent);
 
     devsSet[devName] = machineEvalModule(compinedModuleContent);
@@ -96,19 +96,19 @@ export async function makeDevelopIoSet(
 }
 
 export async function getOsMachine(os: Os) {
-  const spawnResult: SpawnCmdResult = await io.spawnCmd('hostnamectl');
+  const spawnResult: SpawnCmdResult = await os.spawnCmd('hostnamectl');
 
   if (spawnResult.status !== 0) {
     throw new Error(`Can't execute a "hostnamectl" command: ${spawnResult.stderr.join('\n')}`);
   }
 
-  const {os, arch} = parseHostNameCtlResult(spawnResult.stdout.join('\n'));
+  const {osName, arch} = parseHostNameCtlResult(spawnResult.stdout.join('\n'));
 
-  return resolveMachineByOsAndArch(os, arch);
+  return resolveMachineByOsAndArch(osName, arch);
 }
 
 
-export function parseHostNameCtlResult(stdout: string): {os: string, arch: string} {
+export function parseHostNameCtlResult(stdout: string): {osName: string, arch: string} {
   const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
   const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
 
@@ -120,19 +120,19 @@ export function parseHostNameCtlResult(stdout: string): {os: string, arch: strin
   }
 
   return {
-    os: _trim(osMatch[1]),
+    osName: _trim(osMatch[1]),
     arch: architectureMatch[1],
   };
 }
 
-export function resolveMachineByOsAndArch(os: string, arch: string): NodejsMachines {
+export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsMachines {
   if (arch.match(/x86/)) {
     // no matter which OS and 32 or 64 bits
     return 'x86';
   }
   else if (arch === 'arm') {
     // TODO: use cpuinfo to resolve Revision or other method
-    if (os.match(/Raspbian/)) {
+    if (osName.match(/Raspbian/)) {
       return 'rpi';
     }
     else {

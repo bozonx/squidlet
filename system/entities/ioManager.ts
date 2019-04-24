@@ -1,10 +1,7 @@
-import Dev from '../interfaces/Dev';
+import IoItem from '../interfaces/IoItem';
 import System from '../System';
 import DevsDefinitions from '../interfaces/DevsDefinitions';
 import IoSet from '../interfaces/IoSet';
-
-
-//export type DevClass = new () => Dev;
 
 
 export default class IoManager {
@@ -24,7 +21,7 @@ export default class IoManager {
   async init() {
     // call initializing of instances
     for (let devNme of Object.keys(this.devSet)) {
-      const dev: Dev = this.devSet[devNme];
+      const dev: IoItem = this.devSet[devNme];
 
       if (dev.init) await dev.init();
     }
@@ -32,7 +29,7 @@ export default class IoManager {
     return this.configureDevs();
   }
 
-  getDev<T extends Dev>(devName: string): T {
+  getDev<T extends IoItem>(devName: string): T {
     if (!this.devSet[devName]) {
       throw new Error(`Can't find dev "${devName}"`);
     }
@@ -48,7 +45,7 @@ export default class IoManager {
 
     // configure devs if need
     for (let devNme of Object.keys(devsParams)) {
-      const dev: Dev | undefined = this.devSet[devNme];
+      const dev: IoItem | undefined = this.devSet[devNme];
 
       if (!dev) {
         this.system.log.warn(`devsDefinitions config has definition of dev which doesn't exist in list of devs`);

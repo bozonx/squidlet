@@ -6,7 +6,7 @@ import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfa
 import {isPlainObject} from '../../system/helpers/lodashLike';
 import RemoteCall from '../../system/helpers/RemoteCall';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
-import {DevClass} from '../../system/entities/ioManager';
+import {IoItemClass} from '../../system/interfaces/IoItem';
 
 
 // TODO: remove
@@ -27,13 +27,13 @@ export interface WsServerProps {
 
 export default class WsIoServer {
   private readonly server: WebSocket.Server;
-  private readonly ioSet: {[index: string]: DevClass};
+  private readonly ioCollection: {[index: string]: IoItemClass};
   private readonly verbose: boolean;
   private connections: {[index: string]: ConnectionItem} = {};
 
 
-  constructor(serverProps: WsServerProps, ioSet: {[index: string]: DevClass}, verbose?: boolean) {
-    this.ioSet = ioSet;
+  constructor(serverProps: WsServerProps, ioCollection: {[index: string]: IoItemClass}, verbose?: boolean) {
+    this.ioCollection = ioCollection;
     this.server = new WebSocket.Server(serverProps);
     this.verbose = Boolean(verbose);
 
