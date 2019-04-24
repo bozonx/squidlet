@@ -5,7 +5,6 @@ import {isPlainObject} from '../helpers/lodashLike';
 import IoItem from '../interfaces/IoItem';
 import IoSetLocal from './IoSetLocal';
 import {pathJoin} from '../helpers/nodeLike';
-import {firstLetterToUpperCase} from '../helpers/helpers';
 
 
 export default abstract class RemoteIoBase extends IoSetLocal {
@@ -32,7 +31,6 @@ export default abstract class RemoteIoBase extends IoSetLocal {
       this.system.log.error,
       this.system.host.generateUniqId
     );
-    //this.ioCollection = this.makeIoCollection();
 
     await this.initAllIo();
   }
@@ -73,9 +71,16 @@ export default abstract class RemoteIoBase extends IoSetLocal {
       '../',
       'interfaces',
       'io',
-      `${firstLetterToUpperCase(ioName)}Io`
+      `${ioName}Io`
     );
-    const ioMethods: string[] = require(ioDefinitionPath).Methods;
+    let ioMethods: string[];
+
+    try {
+      ioMethods = require(ioDefinitionPath).Methods;
+    }
+    catch (err) {
+      throw new Error(`Can't find methods of io "${ioName}"`);
+    }
 
     for (let methodName of ioMethods) {
       this.ioCollection[ioName][methodName] = this.makeMethod(ioName, methodName);
