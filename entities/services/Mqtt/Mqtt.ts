@@ -1,7 +1,7 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import DeviceData from 'system/interfaces/DeviceData';
 import {combineTopic, parseValue, splitTopicId} from 'system/helpers/helpers';
-import MqttDev from 'system/interfaces/dev/MqttDev';
+import MqttDev from 'system/interfaces/io/MqttDev';
 import categories from 'system/dict/categories';
 
 

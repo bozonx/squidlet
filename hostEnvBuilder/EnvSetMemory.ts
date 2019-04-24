@@ -9,7 +9,7 @@ import HostEnvSet from './interfaces/HostEnvSet';
 import {trimEnd} from '../system/helpers/lodashLike';
 import {pathJoin} from '../system/helpers/nodeLike';
 import EnvSet from '../system/interfaces/EnvSet';
-import StorageDev from '../system/interfaces/dev/StorageDev';
+import StorageDev from '../system/interfaces/io/StorageDev';
 
 
 let configSet: HostEnvSet;

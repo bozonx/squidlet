@@ -1,4 +1,4 @@
-import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/dev/DigitalDev';
+import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalDev';
 import {bitsToBytes} from 'system/helpers/binaryHelpers';
 import {getKeyOfObject, setArrayDimension} from 'system/helpers/collections';
 

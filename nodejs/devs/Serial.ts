@@ -1,7 +1,7 @@
 import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/helpers/binaryHelpers';
-import SerialDev, {BaudRate, EventName, Options} from 'system/interfaces/dev/SerialDev';
+import SerialDev, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialDev';
 
 const {convertBufferToUint8Array} = require('./helpers');
 

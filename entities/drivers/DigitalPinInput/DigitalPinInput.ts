@@ -1,4 +1,4 @@
-import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'system/interfaces/dev/DigitalDev';
+import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'system/interfaces/io/DigitalDev';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';

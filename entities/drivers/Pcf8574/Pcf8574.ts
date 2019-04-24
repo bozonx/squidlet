@@ -7,7 +7,7 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/helpers/binaryHelpers';
-import {Edge} from 'system/interfaces/dev/DigitalDev';
+import {Edge} from 'system/interfaces/io/DigitalDev';
 import DebounceCall from 'system/helpers/DebounceCall';
 import IndexedEvents from 'system/helpers/IndexedEvents';
 

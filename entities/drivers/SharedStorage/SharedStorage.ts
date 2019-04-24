@@ -1,4 +1,4 @@
-import StorageDev, {Stats} from 'system/interfaces/dev/StorageDev';
+import StorageDev, {Stats} from 'system/interfaces/io/StorageDev';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {pathDirname, pathJoin} from 'system/helpers/nodeLike';
 

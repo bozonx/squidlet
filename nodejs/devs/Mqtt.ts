@@ -4,7 +4,7 @@
 
 import * as mqtt from 'mqtt';
 
-import MqttDev from 'system/interfaces/dev/MqttDev';
+import MqttDev from 'system/interfaces/io/MqttDev';
 
 
 interface Props {

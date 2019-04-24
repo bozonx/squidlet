@@ -5,7 +5,7 @@ import DigitalDev, {
   DigitalPinMode,
   WatchHandler,
   DigitalInputMode
-} from 'system/interfaces/dev/DigitalDev';
+} from 'system/interfaces/io/DigitalDev';
 import DebounceCall from 'system/helpers/DebounceCall';
 
 

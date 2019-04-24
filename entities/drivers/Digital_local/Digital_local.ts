@@ -3,7 +3,7 @@ import DigitalDev, {
   Edge,
   WatchHandler,
   DigitalInputMode
-} from 'system/interfaces/dev/DigitalDev';
+} from 'system/interfaces/io/DigitalDev';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 

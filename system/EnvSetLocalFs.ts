@@ -4,7 +4,7 @@ import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
 import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';
-import StorageDev from './interfaces/dev/StorageDev';
+import StorageDev from './interfaces/io/StorageDev';
 
 
 /**

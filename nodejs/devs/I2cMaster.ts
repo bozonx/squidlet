@@ -1,6 +1,6 @@
 import {I2cBus, openSync} from 'i2c-bus';
 
-import I2cMasterDev from 'system/interfaces/dev/I2cMasterDev';
+import I2cMasterDev from 'system/interfaces/io/I2cMasterDev';
 
 const {convertBufferToUint8Array} = require('./helpers');
 

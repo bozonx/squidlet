@@ -1,4 +1,4 @@
-import I2cSlaveDev from 'system/interfaces/dev/I2cSlaveDev';
+import I2cSlaveDev from 'system/interfaces/io/I2cSlaveDev';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'system/helpers/collections';
 import DriverBase from 'system/baseDrivers/DriverBase';

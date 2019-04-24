@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 
-import StorageDev, {Stats} from 'system/interfaces/dev/StorageDev';
+import StorageDev, {Stats} from 'system/interfaces/io/StorageDev';
 import {callPromised} from 'system/helpers/helpers';
 
 const {convertBufferToUint8Array} = require('./helpers');

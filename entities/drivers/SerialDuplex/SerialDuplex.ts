@@ -1,6 +1,6 @@
 import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import SerialDev from 'system/interfaces/dev/SerialDev';
+import SerialDev from 'system/interfaces/io/SerialDev';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/helpers/collections';
 import {DATA_ADDRESS_LENGTH} from 'system/dict/constants';

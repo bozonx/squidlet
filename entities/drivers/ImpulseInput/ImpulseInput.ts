@@ -1,5 +1,5 @@
 import IndexedEvents from 'system/helpers/IndexedEvents';
-import {WatchHandler} from 'system/interfaces/dev/DigitalDev';
+import {WatchHandler} from 'system/interfaces/io/DigitalDev';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
