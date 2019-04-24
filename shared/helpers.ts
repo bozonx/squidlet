@@ -8,6 +8,12 @@ import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 import {DevClass} from '../system/entities/DevManager';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
+import IoSet from '../system/interfaces/IoSet';
+import {firstLetterToUpperCase} from '../system/helpers/helpers';
+import IoSetTypes from '../hostEnvBuilder/interfaces/IoSetTypes';
+
+
+const REPO_ROOT = path.resolve(__dirname, '../');
 
 
 /**
@@ -137,6 +143,31 @@ export function resolveMachineByOsAndArch(os: string, arch: string): NodejsMachi
   throw new Error(`Unsupported architecture "${arch}"`);
 }
 
-export resolveIoSetClass() {
+/**
+ * Resolve ioSet file and load it.
+ */
+export function resolveIoSetClass(iosetType: IoSetTypes): new (ioSetConfig: {[index: string]: any}) => IoSet {
+  let relativeFilePath: string;
 
+  // prod local
+  if (iosetType === 'local') {
+    relativeFilePath = 'system/ioSet/IoSetLocal';
+  }
+  // prod nodejs ws
+  else if (iosetType === 'nodejs-ws') {
+    relativeFilePath = 'nodejs/ioSet/IoSetWs';
+  }
+  else if (iosetType === 'nodejs-developLocal') {
+    relativeFilePath = 'nodejs/ioSet/IoSetDevelopLocal';
+  }
+  else if (iosetType === 'nodejs-developWs') {
+    relativeFilePath = 'nodejs/ioSet/IoSetDevelopWs';
+  }
+  else {
+    throw new Error(`Unsupported type of ioSet "${iosetType}" for nodejs platform`);
+  }
+
+  const ioSetPath = path.join(REPO_ROOT, relativeFilePath);
+
+  return require(ioSetPath).default;
 }

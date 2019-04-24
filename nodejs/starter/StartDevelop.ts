@@ -6,9 +6,10 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
-import {resolvePlatformDir} from '../../shared/helpers';
+import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {firstLetterToUpperCase} from '../../system/helpers/helpers';
+import {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 const ioSetsRoot = '../../ioSets';
@@ -89,15 +90,10 @@ export default class StartDevelop {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   private makeIoSet(): IoSet {
-    const ioSetConfig = this.props.hostConfig.ioSet as {[index: string]: any};
+    const ioSetConfig = this.props.hostConfig.ioSet as IoSetConfig;
+    const ResolvedIoSet = resolveIoSetClass(ioSetConfig.type);
 
-    // TODO: resolve
-
-    const isSetFileName = `${firstLetterToUpperCase(ioSetConfig.type)}IoSet`;
-    const ioSetPath = path.join(ioSetsRoot, isSetFileName);
-    const SelectedIoSet: new (ioSetConfig: {[index: string]: any}) => IoSet = require(ioSetPath).default;
-
-    return new SelectedIoSet(_omit(ioSetConfig, 'type'));
+    return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
   }
 
 }

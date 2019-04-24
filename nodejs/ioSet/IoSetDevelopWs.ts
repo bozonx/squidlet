@@ -1,11 +1,12 @@
-import IoSet from '../system/interfaces/IoSet';
-import * as path from "path";
-import {HOST_ENVSET_DIR} from '../shared/constants';
-import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
+import * as path from 'path';
+
+import IoSet from '../../system/interfaces/IoSet';
+import {HOST_ENVSET_DIR} from '../../shared/constants';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 
 
-export default class IoSetDevelopLocal implements IoSet {
+export default class IoSetNodejsDevelopLocal implements IoSet {
   constructor() {
 
   }
