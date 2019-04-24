@@ -86,14 +86,13 @@ export default class StartDevelop {
   }
 
   /**
-   * Collect io set from this repository reading machine config and load io which are specified there.
+   * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   private makeIoSet(): IoSet {
     const ioSetConfig = this.props.hostConfig.ioSet as {[index: string]: any};
     const isSetFileName = `${firstLetterToUpperCase(ioSetConfig.type)}IoSet`;
-    const SelectedIoSet: new (ioSetConfig: {[index: string]: any}) => IoSet = require(
-      path.join(ioSetsRoot, isSetFileName)
-    ).default;
+    const ioSetPath = path.join(ioSetsRoot, isSetFileName);
+    const SelectedIoSet: new (ioSetConfig: {[index: string]: any}) => IoSet = require(ioSetPath).default;
 
     return new SelectedIoSet(_omit(ioSetConfig, 'type'));
   }
