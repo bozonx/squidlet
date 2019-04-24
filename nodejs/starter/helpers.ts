@@ -16,7 +16,7 @@ export function makeSystemConfigExtend(props: Props): {[index: string]: any} {
 }
 
 export async function installNpmModules(os: Os, cwd: string) {
-  const result: SpawnCmdResult = await io.spawnCmd('npm install', cwd);
+  const result: SpawnCmdResult = await os.spawnCmd('npm install', cwd);
 
   if (result.status) {
     throw new Error(`Can't install npm modules:\n${result.stderr}`);

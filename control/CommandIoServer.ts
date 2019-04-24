@@ -2,7 +2,7 @@ import WsIoServer, {WsServerProps} from '../nodejs/ioServer/WsIoServer';
 import {getOsMachine, makeDevelopIoSet, resolvePlatformDir} from '../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../nodejs/interfaces/NodejsMachines';
 import Os from '../shared/Os';
-import {DevClass} from '../system/entities/DevManager';
+import {DevClass} from '../system/entities/ioManager';
 import Platforms, {NODEJS_PLATFORM} from '../hostEnvBuilder/interfaces/Platforms';
 
 

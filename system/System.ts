@@ -10,17 +10,18 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import topics from './dict/topics';
 import categories from './dict/categories';
 import EnvSetLocalFs from './EnvSetLocalFs';
-import DevManager, {DevClass} from './entities/DevManager';
+import IoManager from './entities/ioManager';
 import EnvSet from './interfaces/EnvSet';
 import SystemConfig from './interfaces/SystemConfig';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
+import IoSet from './interfaces/IoSet';
 
 
 export default class System {
   readonly events: Events;
   readonly log: Logger;
-  readonly devManager: DevManager;
+  readonly ioManager: IoManager;
   readonly envSet: EnvSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
@@ -43,7 +44,7 @@ export default class System {
 
 
   constructor(
-    devSet: {[index: string]: DevClass},
+    ioSet: IoSet,
     systemConfigExtend?: {[index: string]: any},
     envSetReplacement?: new (system: System) => EnvSet
   ) {
@@ -58,7 +59,7 @@ export default class System {
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.devManager = new DevManager(this, devSet);
+    this.ioManager = new IoManager(this, ioSet);
     this.events = new Events(this.systemConfig.eventNameSeparator);
     this.log = new LogPublisher(this);
     this.host = new Host(this);
@@ -69,8 +70,8 @@ export default class System {
 
 
   async start() {
-    console.info(`---> Initializing devs`);
-    await this.devManager.init();
+    console.info(`---> Initializing io`);
+    await this.ioManager.init();
 
     console.info(`---> Initializing configs`);
     await this.host.init();
@@ -117,7 +118,7 @@ export default class System {
   }
 
   // async $registerDevSet(devs: {[index: string]: DevClass}) {
-  //   await this.devManager.registerDevSet(devs);
+  //   await this.ioManager.registerDevSet(devs);
   // }
 
 

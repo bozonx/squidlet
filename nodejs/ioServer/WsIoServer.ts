@@ -6,7 +6,7 @@ import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfa
 import {isPlainObject} from '../../system/helpers/lodashLike';
 import RemoteCall from '../../system/helpers/RemoteCall';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
-import {DevClass} from '../../system/entities/DevManager';
+import {DevClass} from '../../system/entities/ioManager';
 
 
 // TODO: remove

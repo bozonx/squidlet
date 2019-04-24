@@ -22,7 +22,7 @@ export default class EnvSetMemory implements EnvSet {
 
   private readonly system: System;
   private get devStorage(): StorageDev {
-    return this.system.devManager.getDev('Storage');
+    return this.system.ioManager.getDev('Storage');
   }
 
 

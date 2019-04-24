@@ -1,5 +1,5 @@
 import IoSet from '../interfaces/IoSet';
-import {DevClass} from '../entities/DevManager';
+import {DevClass} from '../entities/ioManager';
 import * as path from "path";
 
 

@@ -1,17 +1,18 @@
 import Dev from '../interfaces/Dev';
 import System from '../System';
 import DevsDefinitions from '../interfaces/DevsDefinitions';
+import IoSet from '../interfaces/IoSet';
 
 
-export type DevClass = new () => Dev;
+//export type DevClass = new () => Dev;
 
 
-export default class DevManager {
+export default class IoManager {
   private readonly system: System;
-  private devSet: {[index: string]: Dev} = {};
+  private devSet: IoSet = {};
 
 
-  constructor(system: System, devSet: {[index: string]: DevClass}) {
+  constructor(system: System, devSet: IoSet) {
     this.system = system;
 
     // make dev instances

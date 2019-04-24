@@ -13,7 +13,7 @@ import StorageDev from './interfaces/dev/StorageDev';
 export default class EnvSetLocalFs implements EnvSet {
   private readonly system: System;
   private get devStorage(): StorageDev {
-    return this.system.devManager.getDev('Storage');
+    return this.system.ioManager.getDev('Storage');
   }
 
 
