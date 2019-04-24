@@ -6,8 +6,8 @@ import {pathJoin} from '../helpers/nodeLike';
 
 
 export default class IoSetLocal implements IoSet {
-  private _system?: System;
-  private ioCollection: {[index: string]: IoItem} = {};
+  protected _system?: System;
+  protected ioCollection: {[index: string]: IoItem} = {};
   protected get system(): System {
     return this._system as any;
   }
@@ -23,12 +23,7 @@ export default class IoSetLocal implements IoSet {
       this.ioCollection[ioName] = new ioClasses[ioName]();
     }
 
-    // call init method of instances
-    for (let ioName of Object.keys(this.ioCollection)) {
-      const ioItem: IoItem = this.ioCollection[ioName];
-
-      if (ioItem.init) await ioItem.init();
-    }
+    await this.initAllIo();
   }
 
   async configureAllIo(): Promise<void> {
@@ -65,6 +60,16 @@ export default class IoSetLocal implements IoSet {
     delete this.ioCollection;
   }
 
+  /**
+   * call init method of instances
+   */
+  protected async initAllIo() {
+    for (let ioName of Object.keys(this.ioCollection)) {
+      const ioItem: IoItem = this.ioCollection[ioName];
+
+      if (ioItem.init) await ioItem.init();
+    }
+  }
 
   /**
    * Load io collection workDir/io/index.js

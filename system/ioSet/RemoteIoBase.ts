@@ -3,55 +3,37 @@ import RemoteCall from '../helpers/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
 import {isPlainObject} from '../helpers/lodashLike';
 import IoItem from '../interfaces/IoItem';
-import IoItemDefinition from '../interfaces/IoItemDefinition';
+import IoSetLocal from './IoSetLocal';
 
 
-export default abstract class RemoteIoBase {
-  private _system?: System;
+export default abstract class RemoteIoBase extends IoSetLocal {
   private _remoteCall?: RemoteCall;
-  private readonly ioCollection: {[index: string]: IoItem} = {};
   private get remoteCall(): RemoteCall {
     return this.remoteCall as any;
-  }
-  protected get system(): System {
-    return this._system as any;
   }
 
   // send a message to server
   protected abstract send(message: RemoteCallMessage): any;
 
 
+  /**
+   * Replace init method to generate local proxy methods and instantiate RemoteCall
+   */
   async init(system: System): Promise<void> {
     this._system = system;
-
     this._remoteCall = new RemoteCall(
       this.send,
-      // TODO: add local methods ????
+      // client don't have any local methods
       {},
       this.system.host.id,
       this.system.host.config.config.devSetResponseTimout,
       this.system.log.error,
       this.system.host.generateUniqId
     );
+    this.ioCollection = this.makeIoCollection();
 
-
-    //this.makeInstances(ioDefinitions);
+    await this.initAllIo();
   }
-
-
-  async configureAllIo(): Promise<void> {
-    // TODO: call init functions of all the io.
-  }
-
-
-  getInstance<T extends IoItem>(ioName: string): T {
-    if (this.ioCollection[ioName]) {
-      throw new Error(`Can't find io instance "${ioName}"`);
-    }
-
-    return this.ioCollection[ioName] as T;
-  }
-
 
   /**
    * Call this method when you has received a message
@@ -68,7 +50,7 @@ export default abstract class RemoteIoBase {
   }
 
 
-  private makeInstances(ioItemDefinition: IoItemDefinition) {
+  private makeIoCollection(): {[index: string]: IoItem} {
     for (let ioName of Object.keys(ioItemDefinition)) {
       this.ioCollection[ioName] = {};
 
