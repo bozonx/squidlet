@@ -19,39 +19,37 @@ export default class IoSetLocal implements IoSet {
     const ioClasses: {[index: string]: IoItemClass} = await this.loadIoCollection();
 
     // make dev instances
-    for (let ioNme of Object.keys(ioClasses)) {
-      this.ioCollection[ioNme] = new ioClasses[ioNme]();
+    for (let ioName of Object.keys(ioClasses)) {
+      this.ioCollection[ioName] = new ioClasses[ioName]();
     }
 
-    // call init methods of instances
-    for (let ioNme of Object.keys(this.ioCollection)) {
-      const ioItem: IoItem = this.ioCollection[ioNme];
+    // call init method of instances
+    for (let ioName of Object.keys(this.ioCollection)) {
+      const ioItem: IoItem = this.ioCollection[ioName];
 
       if (ioItem.init) await ioItem.init();
     }
   }
 
   async configureAllIo(): Promise<void> {
-    // TODO: do it
-
-    const devsParams = await this.system.envSet.loadConfig<IoItemDefinition>(
+    const ioParams = await this.system.envSet.loadConfig<IoItemDefinition>(
       this.system.initCfg.fileNames.devsDefinitions
     );
 
     // configure devs if need
-    for (let devNme of Object.keys(devsParams)) {
-      const dev: IoItem | undefined = this.devSet[devNme];
+    for (let ioName of Object.keys(ioParams)) {
+      const ioItem: IoItem | undefined = this.ioCollection[ioName];
 
-      if (!dev) {
-        this.system.log.warn(`devsDefinitions config has definition of dev which doesn't exist in list of devs`);
+      if (!ioItem) {
+        this.system.log.warn(`ioDefinitions config has definition of io item which doesn't exist in collection of io`);
 
         continue;
       }
-      else if (!dev || !dev.configure) {
+      else if (!ioItem || !ioItem.configure) {
         continue;
       }
 
-      await dev.configure(devsParams[devNme]);
+      await ioItem.configure(ioParams[ioName]);
     }
   }
 
@@ -78,20 +76,6 @@ export default class IoSetLocal implements IoSet {
     );
 
     return require(pathToIoSetIndex);
-
-    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    // const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
-    // const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
-    //
-    // for (let devPath of machineConfig.devs) {
-    //   const devName: string = parseDevName(devPath);
-    //   const devFileName: string = `${devName}.js`;
-    //   const devAbsPath: string = path.join(envSetDevsDir, devFileName);
-    //
-    //   devsSet[devName] = require(devAbsPath).default;
-    // }
-    //
-    // return devsSet;
   }
 
 }

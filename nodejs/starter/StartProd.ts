@@ -195,3 +195,18 @@ export default class StartProd {
   }
 
 }
+
+
+// const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+// const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
+// const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
+//
+// for (let devPath of machineConfig.devs) {
+//   const devName: string = parseDevName(devPath);
+//   const devFileName: string = `${devName}.js`;
+//   const devAbsPath: string = path.join(envSetDevsDir, devFileName);
+//
+//   devsSet[devName] = require(devAbsPath).default;
+// }
+//
+// return devsSet;
