@@ -8,9 +8,12 @@ import IoItemDefinition from '../interfaces/IoItemDefinition';
 
 export default abstract class RemoteIoBase {
   private _system?: System;
-  private readonly instances: {[index: string]: IoItem} = {};
-  private readonly remoteCall: RemoteCall;
-  readonly get system(): System {
+  private _remoteCall?: RemoteCall;
+  private readonly ioCollection: {[index: string]: IoItem} = {};
+  private get remoteCall(): RemoteCall {
+    return this.remoteCall as any;
+  }
+  protected get system(): System {
     return this._system as any;
   }
 
@@ -19,7 +22,7 @@ export default abstract class RemoteIoBase {
 
 
   async init(system: System): Promise<void> {
-    this.remoteCall = new RemoteCall(
+    this._remoteCall = new RemoteCall(
       this.send,
       // TODO: add local methods ????
       {},
@@ -34,12 +37,17 @@ export default abstract class RemoteIoBase {
   }
 
 
+  async configureAllIo(): Promise<void> {
+    // TODO: call init functions of all the io.
+  }
+
+
   getInstance<T extends IoItem>(ioName: string): T {
-    if (this.instances[ioName]) {
+    if (this.ioCollection[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
     }
 
-    return this.instances[ioName] as T;
+    return this.ioCollection[ioName] as T;
   }
 
 
@@ -60,10 +68,10 @@ export default abstract class RemoteIoBase {
 
   private makeInstances(ioItemDefinition: IoItemDefinition) {
     for (let ioName of Object.keys(ioItemDefinition)) {
-      this.instances[ioName] = {};
+      this.ioCollection[ioName] = {};
 
       for (let methodName of ioItemDefinition[ioName]) {
-        this.instances[ioName][methodName] = this.makeMethod(ioName, methodName);
+        this.ioCollection[ioName][methodName] = this.makeMethod(ioName, methodName);
       }
     }
   }

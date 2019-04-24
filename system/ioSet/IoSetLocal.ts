@@ -1,26 +1,74 @@
 import IoSet from '../interfaces/IoSet';
-import * as path from "path";
 import IoItemDefinition from '../interfaces/IoItemDefinition';
-import IoItem from '../interfaces/IoItem';
+import IoItem, {IoItemClass} from '../interfaces/IoItem';
+import System from '../System';
 
 
 export default class IoSetLocal implements IoSet {
-  constructor() {
+  private ioClasses: {[index: string]: IoItemClass} = {};
+  private ioCollection: {[index: string]: IoItem} = {};
 
-    // // make dev instances
-    // for (let devNme of Object.keys(devSet)) {
-    //   this.devSet[devNme] = new devSet[devNme]();
-    // }
 
-    // // call initializing of instances
-    // for (let devNme of Object.keys(this.devSet)) {
-    //   const dev: IoItem = this.devSet[devNme];
-    //
-    //   if (dev.init) await dev.init();
-    // }
-    //
-    // return this.configureDevs();
+  constructor(ioClasses: {[index: string]: IoItemClass}) {
+    this.ioClasses = ioClasses;
   }
+
+
+  async init(system: System): Promise<void> {
+    // TODO: for local ioSet загружаем главный файл workDir/io/index.js
+
+
+    // make dev instances
+    for (let ioNme of Object.keys(this.ioClasses)) {
+      this.ioCollection[ioNme] = new this.ioClasses[ioNme]();
+    }
+
+    delete this.ioClasses;
+
+    // call init methods of instances
+    for (let ioNme of Object.keys(this.ioCollection)) {
+      const ioItem: IoItem = this.ioCollection[ioNme];
+
+      if (ioItem.init) await ioItem.init();
+    }
+  }
+
+  async configureAllIo(): Promise<void> {
+    // TODO: do it
+
+    const devsParams = await this.system.envSet.loadConfig<IoItemDefinition>(
+      this.system.initCfg.fileNames.devsDefinitions
+    );
+
+    // configure devs if need
+    for (let devNme of Object.keys(devsParams)) {
+      const dev: IoItem | undefined = this.devSet[devNme];
+
+      if (!dev) {
+        this.system.log.warn(`devsDefinitions config has definition of dev which doesn't exist in list of devs`);
+
+        continue;
+      }
+      else if (!dev || !dev.configure) {
+        continue;
+      }
+
+      await dev.configure(devsParams[devNme]);
+    }
+  }
+
+  getInstance<T extends IoItem>(ioName: string): T {
+    if (!this.ioCollection[ioName]) {
+      throw new Error(`Can't find io instance "${ioName}"`);
+    }
+
+    return this.ioCollection[ioName] as T;
+  }
+
+  destroy(): void {
+    delete this.ioCollection;
+  }
+
 
 
   /**
@@ -44,29 +92,6 @@ export default class IoSetLocal implements IoSet {
     // }
     //
     // return devsSet;
-  }
-
-
-  private async configureDevs() {
-    const devsParams = await this.system.envSet.loadConfig<IoItemDefinition>(
-      this.system.initCfg.fileNames.devsDefinitions
-    );
-
-    // configure devs if need
-    for (let devNme of Object.keys(devsParams)) {
-      const dev: IoItem | undefined = this.devSet[devNme];
-
-      if (!dev) {
-        this.system.log.warn(`devsDefinitions config has definition of dev which doesn't exist in list of devs`);
-
-        continue;
-      }
-      else if (!dev || !dev.configure) {
-        continue;
-      }
-
-      await dev.configure(devsParams[devNme]);
-    }
   }
 
 }

@@ -16,6 +16,7 @@ import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
+import {IoItemClass} from '../../system/interfaces/IoItem';
 
 
 const systemClassFileName = 'System';
