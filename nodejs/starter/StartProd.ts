@@ -18,7 +18,6 @@ import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
-import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 const systemClassFileName = 'System';
@@ -135,6 +134,7 @@ export default class StartProd {
     const systemConfigExtend = makeSystemConfigExtend(this.props);
     const ioSet: IoSet | undefined = this.makeIoSet();
 
+    console.info(`===> using io set "${(this.props.hostConfig.ioSet as IoSetConfig).type}"`);
     console.info(`===> Starting system`);
 
     const system = new System(ioSet, systemConfigExtend);
@@ -157,10 +157,6 @@ export default class StartProd {
       throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
     }
 
-    console.info(`===> using io set "${ioSetConfig.type}"`);
-
-    // only nodejs-ws or local ioSet types are allowed
-    // ioType local means ioSet = undefined
     const ResolvedIoSet = resolveIoSetClass(ioSetConfig.type);
 
     return new ResolvedIoSet(_omit(ioSetConfig, 'type'));

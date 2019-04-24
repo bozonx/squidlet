@@ -87,8 +87,10 @@ export default class StartDevelop {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   private makeIoSet(): IoSet {
-    const ioSetConfig = this.props.hostConfig.ioSet as IoSetConfig;
-    const ioType: IoSetTypes = ioSetConfig.type;
+    // TODO: review
+    const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
+    // use specified type or 'nodejs-developLocal' by default
+    const ioType: IoSetTypes = (ioSetConfig) ? ioSetConfig.type : 'nodejs-developLocal';
 
     console.info(`===> using io set "${ioType}"`);
 
