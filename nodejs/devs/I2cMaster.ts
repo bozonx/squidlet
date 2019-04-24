@@ -1,6 +1,6 @@
 import {I2cBus, openSync} from 'i2c-bus';
 
-import I2cMasterDev from 'system/interfaces/io/I2cMasterDev';
+import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 
 const {convertBufferToUint8Array} = require('./helpers');
 
@@ -8,7 +8,7 @@ const {convertBufferToUint8Array} = require('./helpers');
 /**
  * It's raspberry pi implementation of I2C master.
  */
-export default class I2cMaster implements I2cMasterDev {
+export default class I2cMaster implements I2cMasterIo {
   private readonly instances: {[index: string]: I2cBus} = {};
 
 

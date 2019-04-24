@@ -1,5 +1,5 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
-import I2cMasterDev from 'system/interfaces/io/I2cMasterDev';
+import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import { addFirstItemUint8Arr } from 'system/helpers/collections';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {DATA_ADDRESS_LENGTH} from 'system/dict/constants';
@@ -18,7 +18,7 @@ export interface I2cMasterInstanceProps {
 
 
 export class I2cMaster extends DriverBase<I2cMasterInstanceProps> {
-  private get i2cMasterDev(): I2cMasterDev {
+  private get i2cMasterDev(): I2cMasterIo {
     return this.depsInstances.i2cMaster as any;
   }
 

@@ -4,7 +4,7 @@ export const Methods = [
 ];
 
 
-export default interface I2cMasterDev {
+export default interface I2cMasterIo {
   writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void>;
   // TODO: можно ли чтобы data была undefined?
   //writeTo(bus: string, addrHex: number, data?: Uint8Array): Promise<void>;

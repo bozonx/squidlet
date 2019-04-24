@@ -1,10 +1,10 @@
-import I2cMasterDev from 'system/interfaces/io/I2cMasterDev';
+import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 
 
 /**
  * It's raspberry pi implementation of I2C master.
  */
-export default class I2cMaster implements I2cMasterDev {
+export default class I2cMaster implements I2cMasterIo {
 
 
   // writeTo(bus: string, addrHex: number, data: Uint8Array | undefined): Promise<void> {
