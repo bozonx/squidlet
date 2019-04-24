@@ -113,7 +113,7 @@ export default class StartProd {
     // build config and entities
     await this.buildEnvSet(initialHostConfig);
     // build io
-    await this.buildIos(initialHostConfig);
+    await this.buildIos();
   }
 
   /**
@@ -122,7 +122,7 @@ export default class StartProd {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const completedDevSet: {[index: string]: DevClass} = await this.makeDevSet();
+    const completedDevSet: {[index: string]: DevClass} = await this.buildIoSetIndex();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
@@ -165,12 +165,13 @@ export default class StartProd {
   /**
    * Build io files to workDir/io
    */
-  private async buildIos(hostConfig: PreHostConfig) {
+  private async buildIos() {
     const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
     const buildIo: BuildIo = new BuildIo(
       this.os,
-      hostConfig,
+      this.props.platform,
+      this.props.machine,
       buildDir,
       tmpDir
     );
@@ -180,7 +181,10 @@ export default class StartProd {
     await buildIo.build();
   }
 
-  private async makeDevSet(): Promise<{[index: string]: DevClass}> {
+  /**
+   * Make workDir/io/index.js which
+   */
+  private async buildIoSetIndex(): Promise<{[index: string]: DevClass}> {
 
     // TODO: may be use the same as in develop
 

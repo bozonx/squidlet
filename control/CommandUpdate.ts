@@ -88,16 +88,23 @@ export default class CommandUpdate {
     await this.uploadToHost(hostConfig);
   }
 
-  private async buildIos(hostConfig: PreHostConfig) {
-    if (!hostConfig.id) {
+  private async buildIos(preHostConfig: PreHostConfig) {
+    if (!preHostConfig.id) {
       throw new Error(`Host has to have an id param`);
     }
+    else if (!preHostConfig.platform) {
+      throw new Error(`Host config doesn't have a platform param`);
+    }
+    else if (!preHostConfig.machine) {
+      throw new Error(`Host config doesn't have a machine param`);
+    }
 
-    const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_IO_DIR);
-    const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_IO_DIR);
+    const buildDir = path.join(this.dirs.hostsBuildDir, preHostConfig.id, BUILD_IO_DIR);
+    const tmpDir = path.join(this.dirs.hostsTmpDir, preHostConfig.id, BUILD_IO_DIR);
     const buildIo: BuildIo = new BuildIo(
       this.os,
-      hostConfig,
+      preHostConfig.platform,
+      preHostConfig.machine,
       buildDir,
       tmpDir
     );
