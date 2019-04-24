@@ -113,7 +113,7 @@ export default class StartProd {
     await this.buildSystem();
 
     const initialHostConfig: PreHostConfig = {
-      // TODO: generae id or special guid
+      // TODO: generate id or special guid
       id: 'initialHost',
       platform: this.props.platform,
       machine: this.props.machine,
@@ -126,31 +126,41 @@ export default class StartProd {
   }
 
   /**
-   *
+   * Resolve production io set (nodejs-ws or local)
+   * and start production version of System.
    */
   private async startSystem() {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-    // use specified type or 'local' by default
-    const ioType: IoSetTypes = (ioSetConfig) ? ioSetConfig.type : 'local';
-
-    // only nodejs-ws or local ioSet types are allowed
-    if (ioType !== 'nodejs-ws' && ioType !== 'local') {
-      throw new Error(`Unsupported ioSet type: "${ioType}"`);
-    }
-
-    console.info(`===> using io set "${ioType}"`);
-
-    const ResolvedIoSet = resolveIoSetClass(ioType);
-    const ioSet: IoSet = new ResolvedIoSet(_omit(ioSetConfig, 'type'));
+    const ioSet: IoSet | undefined = this.resolveIoSet();
 
     console.info(`===> Starting system`);
 
     const system = new System(ioSet, systemConfigExtend);
 
     return system.start();
+  }
+
+  private resolveIoSet(): IoSet | undefined {
+    const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
+    // use specified type or 'local' by default
+    const ioType: IoSetTypes = (ioSetConfig) ? ioSetConfig.type : 'local';
+
+    console.info(`===> using io set "${ioType}"`);
+
+    // only nodejs-ws or local ioSet types are allowed
+    // ioType local means ioSet = undefined
+    if (ioType === 'nodejs-ws') {
+      const ResolvedIoSet = resolveIoSetClass(ioType);
+
+      return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
+    }
+    else if (ioType !== 'local') {
+      throw new Error(`Unsupported ioSet type: "${ioType}"`);
+    }
+
+    return;
   }
 
   /**
