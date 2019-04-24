@@ -2,6 +2,7 @@ import IoSet from '../interfaces/IoSet';
 import IoItemDefinition from '../interfaces/IoItemDefinition';
 import IoItem, {IoItemClass} from '../interfaces/IoItem';
 import System from '../System';
+import {pathJoin} from '../helpers/nodeLike';
 
 
 export default class IoSetLocal implements IoSet {
@@ -70,12 +71,11 @@ export default class IoSetLocal implements IoSet {
   }
 
 
-
   /**
-   * Collect io set
+   * Load io collection workDir/io/index.js
    */
-  private async collectIoSet(): Promise<{[index: string]: IoItemClass}> {
-    //const pathToIoSetIndex = path.join(this.props.workDir, BUILD_IO_DIR, IO_SET_INDEX_FILE);
+  private async loadIoCollection(): Promise<{[index: string]: IoItemClass}> {
+    const pathToIoSetIndex = pathJoin(this.props.workDir, BUILD_IO_DIR, IO_SET_INDEX_FILE);
 
     return require(pathToIoSetIndex);
 
