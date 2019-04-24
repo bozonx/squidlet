@@ -7,7 +7,7 @@ import Io from '../shared/Io';
 import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
-import BuildDevs from '../shared/BuildDevs';
+import IoBuilder from '../shared/IoBuilder';
 import {BUILD_IO_DIR} from '../shared/constants';
 
 
@@ -95,7 +95,7 @@ export default class CommandUpdate {
 
     const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_IO_DIR);
     const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_IO_DIR);
-    const buildDevs: BuildDevs = new BuildDevs(
+    const buildDevs: IoBuilder = new IoBuilder(
       this.io,
       hostConfig,
       buildDir,
