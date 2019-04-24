@@ -1,13 +1,13 @@
 import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/helpers/binaryHelpers';
-import SerialDev, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialDev';
+import SerialIo, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialIo';
 
 const {convertBufferToUint8Array} = require('./helpers');
 
 
 
-export default class Serial implements SerialDev {
+export default class Serial implements SerialIo {
   private readonly instances: SerialPort[] = [];
 
   // TODO: rise dataString - data as string

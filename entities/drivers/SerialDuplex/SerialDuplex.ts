@@ -1,6 +1,6 @@
 import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import SerialDev from 'system/interfaces/io/SerialDev';
+import SerialIo from 'system/interfaces/io/SerialIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/helpers/collections';
 import {DATA_ADDRESS_LENGTH} from 'system/dict/constants';
@@ -16,7 +16,7 @@ export interface SerialNodeProps {
 
 export class SerialDuplex extends DriverBase<SerialNodeProps> implements DuplexDriver {
   // TODO: упростить
-  private get serialDev(): SerialDev {
+  private get serialDev(): SerialIo {
     return this.depsInstances.serialDev as any;
   }
 

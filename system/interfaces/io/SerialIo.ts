@@ -24,7 +24,7 @@ export const Methods = [
  * Uart api
  * uartNum - it's number of UART interface on specified platform
  */
-export default interface SerialDev {
+export default interface SerialIo {
   on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): number;
   on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): number;
   on(uartNum: number, eventsName: 'error', handler: (err: string) => void): number;
