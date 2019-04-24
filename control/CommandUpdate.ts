@@ -8,7 +8,7 @@ import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
 import BuildDevs from '../shared/BuildDevs';
-import {BUILD_DEVS_DIR} from '../shared/constants';
+import {BUILD_IO_DIR} from '../shared/constants';
 
 
 interface UpdateCommandParams {
@@ -93,8 +93,8 @@ export default class CommandUpdate {
       throw new Error(`Host has to have an id param`);
     }
 
-    const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_DEVS_DIR);
-    const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_DEVS_DIR);
+    const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_IO_DIR);
+    const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_IO_DIR);
     const buildDevs: BuildDevs = new BuildDevs(
       this.io,
       hostConfig,

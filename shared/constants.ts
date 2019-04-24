@@ -10,7 +10,7 @@ export const DEV_SET_FILE = 'index.js';
 export const BUILD_ROOT_DIR = 'build';
 export const BUILD_HOSTS_DIR = 'hosts';
 export const BUILD_SYSTEM_DIR = 'system';
-export const BUILD_DEVS_DIR = 'devs';
+export const BUILD_IO_DIR = 'io';
 
 // $HOME/.local/share
 export const HOME_SHARE_DIR = '.local/share';

@@ -6,7 +6,7 @@ import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
 import BuildSystem from '../../shared/BuildSystem';
 import {
-  BUILD_DEVS_DIR,
+  BUILD_IO_DIR,
   BUILD_SYSTEM_DIR,
   HOST_ENVSET_DIR,
 } from '../../shared/constants';
@@ -112,10 +112,13 @@ export default class StartProd {
 
     // build config and entities
     await this.buildEnvSet(initialHostConfig);
-    // build devs
-    await this.buildDevs(initialHostConfig);
+    // build io
+    await this.buildIo(initialHostConfig);
   }
 
+  /**
+   *
+   */
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
@@ -131,10 +134,9 @@ export default class StartProd {
     return system.start();
   }
 
-  private getPathToProdSystemDir(): string {
-    return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
-  }
-
+  /**
+   * Build system to workDir/system
+   */
   private async buildSystem() {
     const systemBuildDir = this.getPathToProdSystemDir();
     const systemTmpDir = path.join(this.props.tmpDir, BUILD_SYSTEM_DIR);
@@ -144,12 +146,15 @@ export default class StartProd {
     await buildSystem.build(systemBuildDir, systemTmpDir);
   }
 
+  /**
+   * Build workDir/configs and workDir/entities
+   */
   private async buildEnvSet(hostConfig: PreHostConfig) {
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.io,
       hostConfig,
-      this.props.envSetDir,
+      this.props.workDir,
       tmpDir
     );
 
@@ -157,9 +162,12 @@ export default class StartProd {
     await buildHostEnv.build();
   }
 
-  private async buildDevs(hostConfig: PreHostConfig) {
-    const buildDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
-    const tmpDir = path.join(this.props.tmpDir, BUILD_DEVS_DIR);
+  /**
+   * Build io files to
+   */
+  private async buildIo(hostConfig: PreHostConfig) {
+    const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
+    const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
     const buildDevs: BuildDevs = new BuildDevs(
       this.io,
       hostConfig,
@@ -177,7 +185,7 @@ export default class StartProd {
     // TODO: may be use the same as in develop
 
     const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    const envSetDevsDir = path.join(this.props.workDir, BUILD_DEVS_DIR);
+    const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
     const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
 
     for (let devPath of machineConfig.devs) {
@@ -189,6 +197,10 @@ export default class StartProd {
     }
 
     return devsSet;
+  }
+
+  private getPathToProdSystemDir(): string {
+    return path.join(this.props.workDir, systemConfig.envSetDirs.system);
   }
 
 }
