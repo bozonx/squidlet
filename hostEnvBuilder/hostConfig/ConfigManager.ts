@@ -10,7 +10,7 @@ import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig, makeDevNames} from '../../shared/helpers';
-import DevsDefinitions from '../../system/interfaces/DevsDefinitions';
+import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
 
 
 export default class ConfigManager {
@@ -23,7 +23,7 @@ export default class ConfigManager {
     drivers: {},
     services: {},
   };
-  devsDefinitions: DevsDefinitions = {};
+  devsDefinitions: IoItemDefinition = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   // env build dir

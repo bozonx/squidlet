@@ -1,3 +1,3 @@
-export default interface DevsDefinitions {
+export default interface IoItemDefinition {
   [index: string]: {[index: string]: any};
 }

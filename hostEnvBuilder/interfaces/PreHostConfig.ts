@@ -1,6 +1,6 @@
 import Platforms from './Platforms';
 import LogLevel from '../../system/interfaces/LogLevel';
-import DevsDefinitions from '../../system/interfaces/DevsDefinitions';
+import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
 import IoSetTypes from './IoSetTypes';
 
 
@@ -52,7 +52,7 @@ export default interface PreHostConfig {
   // services definitions by service id
   services?: {[index: string]: any};
   // params which will be passed to dev's configure method. By dev name
-  devs?: DevsDefinitions;
+  devs?: IoItemDefinition;
 
   ioSet?: IoSetConfig;
 

@@ -1,6 +1,6 @@
 import IoSet from '../interfaces/IoSet';
 import * as path from "path";
-import DevsDefinitions from '../interfaces/DevsDefinitions';
+import IoItemDefinition from '../interfaces/IoItemDefinition';
 import IoItem from '../interfaces/IoItem';
 
 
@@ -48,7 +48,7 @@ export default class IoSetLocal implements IoSet {
 
 
   private async configureDevs() {
-    const devsParams = await this.system.envSet.loadConfig<DevsDefinitions>(
+    const devsParams = await this.system.envSet.loadConfig<IoItemDefinition>(
       this.system.initCfg.fileNames.devsDefinitions
     );
 

@@ -1,9 +1,9 @@
-import {IoDefinition} from '../interfaces/IoSet';
 import System from '../System';
 import RemoteCall from '../helpers/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
 import {isPlainObject} from '../helpers/lodashLike';
 import IoItem from '../interfaces/IoItem';
+import IoItemDefinition from '../interfaces/IoItemDefinition';
 
 
 export default abstract class RemoteIoBase {
@@ -58,11 +58,11 @@ export default abstract class RemoteIoBase {
   }
 
 
-  private makeInstances(ioDefinitions: IoDefinition) {
-    for (let ioName of Object.keys(ioDefinitions)) {
+  private makeInstances(ioItemDefinition: IoItemDefinition) {
+    for (let ioName of Object.keys(ioItemDefinition)) {
       this.instances[ioName] = {};
 
-      for (let methodName of ioDefinitions[ioName]) {
+      for (let methodName of ioItemDefinition[ioName]) {
         this.instances[ioName][methodName] = this.makeMethod(ioName, methodName);
       }
     }

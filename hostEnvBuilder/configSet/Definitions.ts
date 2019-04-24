@@ -7,7 +7,7 @@ import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 import {validateProps} from '../../system/helpers/validate';
-import DevsDefinitions from '../../system/interfaces/DevsDefinitions';
+import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
 
 
 /**
@@ -40,7 +40,7 @@ export default class Definitions {
     return this.servicesDefinitions;
   }
 
-  getDevsDefinitions(): DevsDefinitions {
+  getDevsDefinitions(): IoItemDefinition {
     return this.configManager.devsDefinitions;
   }
 

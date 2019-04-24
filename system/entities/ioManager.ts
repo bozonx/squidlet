@@ -1,6 +1,6 @@
 import IoItem from '../interfaces/IoItem';
 import System from '../System';
-import DevsDefinitions from '../interfaces/DevsDefinitions';
+import IoItemDefinition from '../interfaces/IoItemDefinition';
 import IoSet from '../interfaces/IoSet';
 
 
