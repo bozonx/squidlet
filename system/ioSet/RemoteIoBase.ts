@@ -22,6 +22,8 @@ export default abstract class RemoteIoBase {
 
 
   async init(system: System): Promise<void> {
+    this._system = system;
+
     this._remoteCall = new RemoteCall(
       this.send,
       // TODO: add local methods ????
@@ -32,7 +34,7 @@ export default abstract class RemoteIoBase {
       this.system.host.generateUniqId
     );
 
-    this._system = system;
+
     //this.makeInstances(ioDefinitions);
   }
 

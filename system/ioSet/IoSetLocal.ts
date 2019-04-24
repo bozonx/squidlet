@@ -6,25 +6,22 @@ import {pathJoin} from '../helpers/nodeLike';
 
 
 export default class IoSetLocal implements IoSet {
-  private ioClasses: {[index: string]: IoItemClass} = {};
+  private _system?: System;
   private ioCollection: {[index: string]: IoItem} = {};
-
-
-  constructor(ioClasses: {[index: string]: IoItemClass}) {
-    this.ioClasses = ioClasses;
+  protected get system(): System {
+    return this._system as any;
   }
 
 
   async init(system: System): Promise<void> {
-    // TODO: for local ioSet загружаем главный файл workDir/io/index.js
+    this._system = system;
 
+    const ioClasses: {[index: string]: IoItemClass} = await this.loadIoCollection();
 
     // make dev instances
-    for (let ioNme of Object.keys(this.ioClasses)) {
-      this.ioCollection[ioNme] = new this.ioClasses[ioNme]();
+    for (let ioNme of Object.keys(ioClasses)) {
+      this.ioCollection[ioNme] = new ioClasses[ioNme]();
     }
-
-    delete this.ioClasses;
 
     // call init methods of instances
     for (let ioNme of Object.keys(this.ioCollection)) {
@@ -75,7 +72,10 @@ export default class IoSetLocal implements IoSet {
    * Load io collection workDir/io/index.js
    */
   private async loadIoCollection(): Promise<{[index: string]: IoItemClass}> {
-    const pathToIoSetIndex = pathJoin(this.props.workDir, BUILD_IO_DIR, IO_SET_INDEX_FILE);
+    const pathToIoSetIndex = pathJoin(
+      this.system.systemConfig.rootDirs.envSet,
+      this.system.systemConfig.envSetDirs.devs,
+    );
 
     return require(pathToIoSetIndex);
 
