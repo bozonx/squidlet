@@ -82,7 +82,7 @@ describe 'integration network', ->
       listenIncome: (handler) => @destListenHandler = handler
       removeListener: =>
     }
-    @I2cSlaveDev = {
+    @I2cSlaveIo = {
       getInstance: => @I2cSlaveDevInstance
     }
 
@@ -91,7 +91,7 @@ describe 'integration network', ->
       if (driverName == 'I2cMaster.dev')
         return @I2cMaster
       if (driverName == 'I2cSlave.dev')
-        return @I2cSlaveDev
+        return @I2cSlaveIo
 
       return oldGetDriver(driverName)
 

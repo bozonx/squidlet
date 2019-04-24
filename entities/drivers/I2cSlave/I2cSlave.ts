@@ -1,4 +1,4 @@
-import I2cSlaveDev from 'system/interfaces/io/I2cSlaveDev';
+import I2cSlaveIo from 'system/interfaces/io/I2cSlaveIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'system/helpers/collections';
 import DriverBase from 'system/baseDrivers/DriverBase';
@@ -18,7 +18,7 @@ interface I2cSlaveProps {
 export class I2cSlave extends DriverBase<I2cSlaveProps> {
   private readonly events = new IndexedEventEmitter<SlaveHandler>();
 
-  private get i2cSlaveDev(): I2cSlaveDev {
+  private get i2cSlaveDev(): I2cSlaveIo {
     return this.depsInstances.i2cSlave as any;
   }
 

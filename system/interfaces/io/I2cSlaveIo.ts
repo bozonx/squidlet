@@ -5,7 +5,7 @@ export const Methods = [
 ];
 
 
-export default interface I2cSlaveDev {
+export default interface I2cSlaveIo {
   send(bus: number, data: Uint8Array): Promise<void>;
   listenIncome(bus: number, handler: (data: Uint8Array) => void): void;
   removeListener(bus: number, handler: (data: Uint8Array) => void): void;
