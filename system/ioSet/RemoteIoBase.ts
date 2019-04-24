@@ -1,13 +1,14 @@
-import {IoDefinition, IoSetInstance} from '../interfaces/IoSet';
+import {IoDefinition} from '../interfaces/IoSet';
 import System from '../System';
 import RemoteCall from '../helpers/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
 import {isPlainObject} from '../helpers/lodashLike';
+import IoItem from '../interfaces/IoItem';
 
 
 export default abstract class RemoteIoBase {
   private _system?: System;
-  private readonly instances: {[index: string]: IoSetInstance} = {};
+  private readonly instances: {[index: string]: IoItem} = {};
   private readonly remoteCall: RemoteCall;
   readonly get system(): System {
     return this._system as any;
@@ -33,7 +34,7 @@ export default abstract class RemoteIoBase {
   }
 
 
-  getInstance<T extends IoSetInstance>(ioName: string): T {
+  getInstance<T extends IoItem>(ioName: string): T {
     if (this.instances[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
     }
