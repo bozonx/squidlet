@@ -1,16 +1,16 @@
-import DigitalDev, {
+import DigitalIo, {
   DigitalSubDriver,
   Edge,
   WatchHandler,
   DigitalInputMode
-} from 'system/interfaces/io/DigitalDev';
+} from 'system/interfaces/io/DigitalIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 
 
 export class DigitalLocal extends DriverBase implements DigitalSubDriver {
-  private get digitalDev(): DigitalDev {
-    return this.depsInstances.digitalDev as DigitalDev;
+  private get digitalDev(): DigitalIo {
+    return this.depsInstances.digitalDev as DigitalIo;
   }
 
 

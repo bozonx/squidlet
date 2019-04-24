@@ -1,6 +1,6 @@
 import IndexedEvents from 'system/helpers/IndexedEvents';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
-import {WatchHandler} from 'system/interfaces/io/DigitalDev';
+import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/helpers/helpers';

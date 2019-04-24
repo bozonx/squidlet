@@ -1,6 +1,6 @@
 import {ALL_TOPICS} from '../dict/constants';
 import {isEmpty} from './lodashLike';
-import {Edge} from '../interfaces/io/DigitalDev';
+import {Edge} from '../interfaces/io/DigitalIo';
 
 
 export const PATH_SEPARATOR = '/';

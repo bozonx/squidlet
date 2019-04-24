@@ -14,7 +14,7 @@ import {firstLetterToUpperCase} from 'system/helpers/helpers';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';
-import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalDev';
+import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import Logger from 'system/interfaces/Logger';
 import {omit} from 'system/helpers/lodashLike';
 import {PollProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';

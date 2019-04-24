@@ -2,7 +2,7 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {omit} from 'system/helpers/lodashLike';
-import {DigitalSubDriver} from 'system/interfaces/io/DigitalDev';
+import {DigitalSubDriver} from 'system/interfaces/io/DigitalIo';
 
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 

@@ -19,12 +19,12 @@ const pigpio = require('pigpio-client').pigpio({
   //timeout: 1,
 });
 
-import DigitalDev, {
+import DigitalIo, {
   Edge,
   DigitalPinMode,
   WatchHandler,
   DigitalInputMode
-} from 'system/interfaces/io/DigitalDev';
+} from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/helpers/DebounceCall';
 import {callPromised} from 'system/helpers/helpers';
 
@@ -72,7 +72,7 @@ const connectionPromise = new Promise((resolve, reject) => {
 // TODO: все выводы в log выводить в системный логгер (возможно через события)
 
 
-export default class Digital implements DigitalDev {
+export default class Digital implements DigitalIo {
   private readonly pinInstances: {[index: string]: any} = {};
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();

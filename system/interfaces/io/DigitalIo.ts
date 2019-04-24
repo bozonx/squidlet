@@ -38,7 +38,7 @@ export interface DigitalSubDriver extends DigitalBase {
 }
 
 // Digital.dev
-export default interface DigitalDev extends DigitalBase {
+export default interface DigitalIo extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
   setupOutput(pin: number, initialValue?: boolean): Promise<void>;
   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
