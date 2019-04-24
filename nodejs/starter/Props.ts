@@ -112,10 +112,13 @@ export default class Props {
   }
 
   private modifyHostConfig(hostConfig: PreHostConfig): PreHostConfig {
+
+    // TODO: можно вообще ничего не указывать - тогда будут использованны локальные ioSet
+
     if (this.argIosetProps) {
       // replace current ioSet host's config param
       if (!this.argIoset) {
-        throw new Error(`If you specify a "--ioset-props" you should specify a "--ioset" argument`);
+        throw new Error(`If you specified a "--ioset-props" you should specify a "--ioset" argument`);
       }
 
       const parsedProps = JSON.parse(this.argIosetProps);

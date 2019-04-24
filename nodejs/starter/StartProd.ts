@@ -1,4 +1,5 @@
 import * as path from 'path';
+import _omit = require('lodash/omit');
 
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -10,12 +11,14 @@ import {
   BUILD_SYSTEM_DIR,
   HOST_ENVSET_DIR,
 } from '../../shared/constants';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import PreHostConfig, {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {resolvePlatformDir} from '../../shared/helpers';
+import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
+import IoSet from '../../system/interfaces/IoSet';
+import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 const systemClassFileName = 'System';
@@ -126,18 +129,27 @@ export default class StartProd {
    *
    */
   private async startSystem() {
-    console.info(`===> making platform's dev set`);
-
-    //const completedDevSet: {[index: string]: DevClass} = await this.collectIoSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
+    const ioSetConfig = this.props.hostConfig.ioSet as IoSetConfig;
+    const ioType: IoSetTypes = ioSetConfig.type;
+    let ioSet: IoSet | undefined;
+
+    console.info(`===> using io set "${ioType}"`);
+
+    if (ioType === 'nodejs-ws') {
+      const ResolvedIoSet = resolveIoSetClass(ioType);
+
+      ioSet = new ResolvedIoSet(_omit(ioSetConfig, 'type'));
+    }
+    else if (ioType !== 'local') {
+      throw new Error(`Unsupported ioSet type: "${ioType}"`);
+    }
 
     console.info(`===> Starting system`);
 
-    // TODO: make ioSet
-
-    const system = new System(completedDevSet, systemConfigExtend);
+    const system = new System(ioSet, systemConfigExtend);
 
     return system.start();
   }

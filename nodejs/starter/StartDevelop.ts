@@ -88,10 +88,12 @@ export default class StartDevelop {
    */
   private makeIoSet(): IoSet {
     const ioSetConfig = this.props.hostConfig.ioSet as IoSetConfig;
-    let ioType: IoSetTypes = ioSetConfig.type;
+    const ioType: IoSetTypes = ioSetConfig.type;
+
+    console.info(`===> using io set "${ioType}"`);
 
     // if (!ioType) {
-    //   // TODO: подставить по умолчанию если не было подставленно
+    //   // TODO: подставить по умолчанию nodejs-developLocal если не было подставленно
     // }
     // else
 
