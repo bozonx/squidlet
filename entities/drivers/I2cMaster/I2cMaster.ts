@@ -24,7 +24,7 @@ export class I2cMaster extends DriverBase<I2cMasterInstanceProps> {
 
 
   protected willInit = async () => {
-    this.depsInstances.i2cMaster = this.env.getDev('I2cMaster');
+    this.depsInstances.i2cMaster = this.env.getIo('I2cMaster');
   }
 
 

@@ -3,6 +3,7 @@ import ManifestBase from './ManifestBase';
 import System from '../System';
 import Logger from './Logger';
 import HostConfig from './HostConfig';
+import IoItem from './IoItem';
 
 
 export default interface Env {
@@ -10,7 +11,7 @@ export default interface Env {
   readonly log: Logger;
   readonly config: HostConfig;
 
-  getDev<T extends DriverInstance>(shortDevName: string): T;
+  getIo<T extends IoItem>(shortDevName: string): T;
 
   // TODO generic не обязателен наверное
 

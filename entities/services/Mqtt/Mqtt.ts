@@ -18,7 +18,7 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
   protected willInit = async () => {
-    const mqttDev: any = this.env.getDev('Mqtt');
+    const mqttDev: any = this.env.getIo('Mqtt');
 
     this.depsInstances.mqttDev = await mqttDev.connect(this.props);
   }

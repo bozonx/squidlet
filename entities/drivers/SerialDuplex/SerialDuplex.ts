@@ -21,7 +21,7 @@ export class SerialDuplex extends DriverBase<SerialNodeProps> implements DuplexD
   }
 
   protected willInit = async () => {
-    this.depsInstances.serialDev = this.env.getDev('Serial');
+    this.depsInstances.serialDev = this.env.getIo('Serial');
   }
 
 

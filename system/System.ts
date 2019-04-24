@@ -10,7 +10,6 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import topics from './dict/topics';
 import categories from './dict/categories';
 import EnvSetLocalFs from './EnvSetLocalFs';
-import IoManager from './entities/ioManager';
 import EnvSet from './interfaces/EnvSet';
 import SystemConfig from './interfaces/SystemConfig';
 import {mergeDeep} from './helpers/collections';
@@ -21,7 +20,7 @@ import IoSet from './interfaces/IoSet';
 export default class System {
   readonly events: Events;
   readonly log: Logger;
-  readonly ioManager: IoManager;
+  readonly ioSet: IoSet;
   readonly envSet: EnvSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
@@ -55,11 +54,11 @@ export default class System {
       this.envSet = new EnvSetLocalFs(this);
     }
 
+    this.ioSet = ioSet;
     this.systemConfig = mergeDeep(systemConfigExtend, systemConfig) as any;
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.ioManager = new IoManager(this, ioSet);
     this.events = new Events(this.systemConfig.eventNameSeparator);
     this.log = new LogPublisher(this);
     this.host = new Host(this);
@@ -71,7 +70,7 @@ export default class System {
 
   async start() {
     console.info(`---> Initializing io`);
-    await this.ioManager.init();
+    await this.ioSet.init(this);
 
     console.info(`---> Initializing configs`);
     await this.host.init();

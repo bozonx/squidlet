@@ -62,7 +62,7 @@ describe 'app.DriversManager', ->
     sinon.assert.calledOnce(@driversManager.getDriver('Regular.driver').init)
 
 
-  it '$setDevs and getDev()', ->
+  it '$setDevs and getIo()', ->
     devs = {
       'Dev.dev': @driver
     }
@@ -70,5 +70,5 @@ describe 'app.DriversManager', ->
     await @driversManager.$registerDevs(devs)
 
     assert.equal(@driversManager.getDriver('Dev.dev').defintion, @definitions['Dev.dev'])
-    assert.equal(@driversManager.getDev('Dev').defintion, @definitions['Dev.dev'])
+    assert.equal(@driversManager.getIo('Dev').defintion, @definitions['Dev.dev'])
     sinon.assert.calledOnce(@driversManager.getDriver('Dev.dev').init)

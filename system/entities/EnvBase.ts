@@ -21,9 +21,9 @@ export default abstract class EnvBase implements Env {
     this.config = system.host.config;
   }
 
-  getDev<T extends IoItem>(shortDevName: string): T {
+  getIo<T extends IoItem>(shortDevName: string): T {
     //return this.system.driversManager.getDev<T>(shortDevName);
-    return this.system.ioManager.getDev<T>(shortDevName);
+    return this.system.ioSet.getInstance<T>(shortDevName);
   }
 
   getDriver<T extends DriverInstance>(driverName: string): T {
