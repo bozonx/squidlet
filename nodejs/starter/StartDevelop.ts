@@ -22,14 +22,22 @@ export default class StartDevelop {
 
   constructor(
     configPath: string,
-    machine?: NodejsMachines,
-    hostName?: string,
-    workDir?: string,
-    ioset?: string,
-    iosetProps?: string
+    argMachine?: NodejsMachines,
+    argHostName?: string,
+    argWorkDir?: string,
+    argIoset?: string,
+    argIosetProps?: string
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
-    this.props = new Props(this.os, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
+    this.props = new Props(
+      this.os,
+      this.groupConfig,
+      argMachine,
+      argHostName,
+      argWorkDir,
+      argIoset,
+      argIosetProps
+    );
   }
 
   async init() {
@@ -77,8 +85,10 @@ export default class StartDevelop {
     return system.start();
   }
 
+  /**
+   * Collect io set from this repository reading machine config and load io which are specified there.
+   */
   private makeIoSet(): IoSet {
-    //const platformDir = resolvePlatformDir(this.props.platform);
     const ioSetConfig = this.props.hostConfig.ioSet as {[index: string]: any};
     const isSetFileName = `${firstLetterToUpperCase(ioSetConfig.type)}IoSet`;
     const SelectedIoSet: new (ioSetConfig: {[index: string]: any}) => IoSet = require(
@@ -91,6 +101,7 @@ export default class StartDevelop {
 }
 
 
+//const platformDir = resolvePlatformDir(this.props.platform);
 // const completedDevSet: {[index: string]: DevClass} = await makeDevelopIoSet(
 //   this.os,
 //   platformDir,

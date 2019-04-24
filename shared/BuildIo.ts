@@ -104,7 +104,7 @@ export default class BuildIo {
   }
 
   /**
-   * Make index.js which requires all the devs.
+   * Make index.js which requires all the io files.
    */
   private async makeDevSetIndex(machineConfig: MachineConfig) {
     const indexFilePath: string = path.join(this.devsBuildDir, IO_SET_INDEX_FILE);

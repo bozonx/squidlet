@@ -8,16 +8,15 @@ import BuildSystem from '../../shared/BuildSystem';
 import {
   BUILD_IO_DIR,
   BUILD_SYSTEM_DIR,
-  HOST_ENVSET_DIR,
+  HOST_ENVSET_DIR, IO_SET_INDEX_FILE,
 } from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import {DevClass} from '../../system/entities/DevManager';
 import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
+import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import {loadMachineConfig, parseDevName, resolvePlatformDir} from '../../shared/helpers';
 
 
 const systemClassFileName = 'System';
@@ -31,14 +30,22 @@ export default class StartProd {
 
   constructor(
     configPath: string,
-    machine?: NodejsMachines,
-    hostName?: string,
-    workDir?: string,
-    ioset?: string,
-    iosetProps?: string
+    argMachine?: NodejsMachines,
+    argHostName?: string,
+    argWorkDir?: string,
+    argIoset?: string,
+    argIosetProps?: string
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
-    this.props = new Props(this.os, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
+    this.props = new Props(
+      this.os,
+      this.groupConfig,
+      argMachine,
+      argHostName,
+      argWorkDir,
+      argIoset,
+      argIosetProps
+    );
   }
 
   async init() {
@@ -122,7 +129,7 @@ export default class StartProd {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const completedDevSet: {[index: string]: DevClass} = await this.buildIoSetIndex();
+    const completedDevSet: {[index: string]: DevClass} = await this.collectIoSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
@@ -166,6 +173,8 @@ export default class StartProd {
    * Build io files to workDir/io
    */
   private async buildIos() {
+    console.info(`===> Building io`);
+
     const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
     const buildIo: BuildIo = new BuildIo(
@@ -176,31 +185,30 @@ export default class StartProd {
       tmpDir
     );
 
-    console.info(`===> Building devs`);
-
     await buildIo.build();
   }
 
   /**
-   * Make workDir/io/index.js which
+   * Collect io set
    */
-  private async buildIoSetIndex(): Promise<{[index: string]: DevClass}> {
+  private async collectIoSet(): Promise<{[index: string]: DevClass}> {
+    const pathToIoSetIndex = path.join(this.props.workDir, BUILD_IO_DIR, IO_SET_INDEX_FILE);
 
-    // TODO: may be use the same as in develop
+    return require(pathToIoSetIndex);
 
-    const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
-    const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
-
-    for (let devPath of machineConfig.devs) {
-      const devName: string = parseDevName(devPath);
-      const devFileName: string = `${devName}.js`;
-      const devAbsPath: string = path.join(envSetDevsDir, devFileName);
-
-      devsSet[devName] = require(devAbsPath).default;
-    }
-
-    return devsSet;
+    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+    // const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
+    // const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
+    //
+    // for (let devPath of machineConfig.devs) {
+    //   const devName: string = parseDevName(devPath);
+    //   const devFileName: string = `${devName}.js`;
+    //   const devAbsPath: string = path.join(envSetDevsDir, devFileName);
+    //
+    //   devsSet[devName] = require(devAbsPath).default;
+    // }
+    //
+    // return devsSet;
   }
 
   private getPathToProdSystemDir(): string {
