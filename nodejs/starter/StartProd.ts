@@ -57,14 +57,18 @@ export default class StartProd {
   }
 
 
+  /**
+   * It copies package.json and installs node modules into root of working directory.
+   * And it makes link to system in node_modules/system.
+   * It installs only if node_modules directory doesn't exist.
+   */
   private async installModules() {
-
-    // TODO: review
-    // TODO: может не запускать если уже были установенны модули???
-
     // copy package.json
     const platformDir: string = resolvePlatformDir(this.props.platform);
     const machineDir: string = path.join(platformDir, this.props.machine);
+
+    // do not install node modules if they have been installed previously
+    if (await this.io.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
     await this.io.mkdirP(this.props.workDir);
     await this.io.copyFile(
@@ -73,11 +77,10 @@ export default class StartProd {
     );
 
     console.info(`===> Install npm modules`);
-    const cwd: string = path.join(this.props.workDir);
-    //const cwd: string = path.join(this.props.envSetDir, BUILD_DEVS_DIR);
 
-    await installNpmModules(this.io, cwd);
+    await installNpmModules(this.io, this.props.workDir);
 
+    // make sym link to system
     try {
       await this.io.symlink(
         this.getPathToProdSystemDir(),
@@ -89,6 +92,9 @@ export default class StartProd {
     }
   }
 
+  /**
+   * Build system first time.
+   */
   private async buildInitialSystem() {
     const pathToSystemDir = this.getPathToProdSystemDir();
 

@@ -47,6 +47,10 @@ export default class StartDevelop {
   }
 
 
+  /**
+   * Install node modules into squidlet repository in ./nodejs/<x86|rpi|arm>/ .
+   * It installs only if node_modules directory doesn't exist.
+   */
   private async installModules() {
     const platformDir = resolvePlatformDir(this.props.platform);
     const machineCwd: string = path.join(platformDir, this.props.machine);
