@@ -18,7 +18,7 @@ export interface SpawnCmdResult {
 }
 
 
-export default class Io {
+export default class Os {
   async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
     const yamlContent: string = await this.getFileContent(fullPath);
 

@@ -1,7 +1,7 @@
 import WsIoServer, {WsServerProps} from '../nodejs/ioServer/WsIoServer';
 import {getOsMachine, makeDevelopIoSet, resolvePlatformDir} from '../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../nodejs/interfaces/NodejsMachines';
-import Io from '../shared/Io';
+import Os from '../shared/Os';
 import {DevClass} from '../system/entities/DevManager';
 import Platforms, {NODEJS_PLATFORM} from '../hostEnvBuilder/interfaces/Platforms';
 
@@ -15,7 +15,7 @@ interface CommandIoServerArgs {
 
 
 export default class CommandIoServer {
-  private readonly io: Io = new Io();
+  private readonly os: Os = new Os();
   private readonly args: CommandIoServerArgs;
 
 
@@ -36,7 +36,7 @@ export default class CommandIoServer {
 
     console.info(`===> Collecting IO set of platform "${platform}", machine "${machine}"`);
 
-    const ioSet: {[index: string]: DevClass} = await makeDevelopIoSet(this.io, platformDir, machine);
+    const ioSet: {[index: string]: DevClass} = await makeDevelopIoSet(this.os, platformDir, machine);
 
     console.info(`===> Starting websocket server on ${serverProps.host}:${serverProps.port}`);
 
@@ -52,7 +52,7 @@ export default class CommandIoServer {
       return this.args.machine;
     }
 
-    return getOsMachine(this.io);
+    return getOsMachine(this.os);
   }
 
 }

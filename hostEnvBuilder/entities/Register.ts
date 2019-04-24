@@ -7,7 +7,7 @@ import PreServiceManifest from '../interfaces/PreServiceManifest';
 import Plugin from '../interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import Io from '../../shared/Io';
+import Os from '../../shared/Os';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypeName, ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import validateManifest from '../hostConfig/validateManifests';
@@ -18,7 +18,7 @@ import {clearRelativePath} from '../helpers';
  * Register a new type of device, driver or service
  */
 export default class Register {
-  private readonly io: Io;
+  private readonly os: Os;
   private readonly plugins: Plugin[] = [];
   // devices manifest by manifest name
   private devices = Map<string, PreManifestBase>();
@@ -29,8 +29,8 @@ export default class Register {
   private readonly registeringPromises: Promise<any>[] = [];
 
 
-  constructor(io: Io) {
-    this.io = io;
+  constructor(os: Os) {
+    this.os = os;
   }
 
 
@@ -152,7 +152,7 @@ export default class Register {
     if (typeof preManifest.props === 'string') {
       const propPath = path.resolve(preManifest.baseDir, preManifest.props);
 
-      preManifest.props = await this.io.loadYamlFile(propPath);
+      preManifest.props = await this.os.loadYamlFile(propPath);
     }
 
     // clear path to main file
@@ -177,7 +177,7 @@ export default class Register {
       pathToDirOrFile,
       systemConfig.indexManifestFileNames
     );
-    const parsedManifest = (await this.io.loadYamlFile(resolvedPathToManifest)) as T;
+    const parsedManifest = (await this.os.loadYamlFile(resolvedPathToManifest)) as T;
 
     parsedManifest.baseDir = path.dirname(resolvedPathToManifest);
 
@@ -193,7 +193,7 @@ export default class Register {
     pathToDirOrFile: string,
     indexFileNames: string[]
   ): Promise<string> {
-    if (!(await this.io.stat(pathToDirOrFile)).dir) {
+    if (!(await this.os.stat(pathToDirOrFile)).dir) {
       // if it's file - return it
       return pathToDirOrFile;
     }
@@ -202,7 +202,7 @@ export default class Register {
     for (let indexFile of indexFileNames) {
       const fullPath = path.join(pathToDirOrFile, indexFile);
 
-      if (await this.io.exists(fullPath)) {
+      if (await this.os.exists(fullPath)) {
         return fullPath;
       }
     }

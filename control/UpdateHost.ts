@@ -1,5 +1,5 @@
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import Io from '../shared/Io';
+import Os from '../shared/Os';
 
 
 export default class UpdateHost {
@@ -7,10 +7,10 @@ export default class UpdateHost {
   private readonly buildDir: string;
   private readonly tmpDir: string;
   private readonly hostId: string;
-  private readonly io: Io;
+  private readonly os: Os;
 
 
-  constructor(io: Io, preHostConfig: PreHostConfig, buildDir: string, tmpDir: string) {
+  constructor(os: Os, preHostConfig: PreHostConfig, buildDir: string, tmpDir: string) {
     if (!preHostConfig.id) {
       throw new Error(`Host has to have an id param`);
     }
@@ -19,7 +19,7 @@ export default class UpdateHost {
     this.buildDir = buildDir;
     this.tmpDir = tmpDir;
     this.hostId = preHostConfig.id;
-    this.io = io;
+    this.os = os;
   }
 
   async update() {

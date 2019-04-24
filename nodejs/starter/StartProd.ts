@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io from '../../shared/Io';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
@@ -24,7 +24,7 @@ const systemClassFileName = 'System';
 
 
 export default class StartProd {
-  private readonly io: Io = new Io();
+  private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
 
@@ -37,8 +37,8 @@ export default class StartProd {
     ioset?: string,
     iosetProps?: string
   ) {
-    this.groupConfig = new GroupConfigParser(this.io, configPath);
-    this.props = new Props(this.io, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
+    this.groupConfig = new GroupConfigParser(this.os, configPath);
+    this.props = new Props(this.os, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
   }
 
   async init() {
@@ -68,21 +68,21 @@ export default class StartProd {
     const machineDir: string = path.join(platformDir, this.props.machine);
 
     // do not install node modules if they have been installed previously
-    if (await this.io.exists(path.join(this.props.workDir, 'node_modules'))) return;
+    if (await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
-    await this.io.mkdirP(this.props.workDir);
-    await this.io.copyFile(
+    await this.os.mkdirP(this.props.workDir);
+    await this.os.copyFile(
       path.join(machineDir, 'package.json'),
       path.join(this.props.workDir, 'package.json')
     );
 
     console.info(`===> Install npm modules`);
 
-    await installNpmModules(this.io, this.props.workDir);
+    await installNpmModules(this.os, this.props.workDir);
 
     // make sym link to system
     try {
-      await this.io.symlink(
+      await this.os.symlink(
         this.getPathToProdSystemDir(),
         path.join(this.props.workDir, 'node_modules', 'system')
       );
@@ -99,7 +99,7 @@ export default class StartProd {
     const pathToSystemDir = this.getPathToProdSystemDir();
 
     // else if it exists - do nothing
-    if (await this.io.exists(pathToSystemDir)) return;
+    if (await this.os.exists(pathToSystemDir)) return;
 
     await this.buildSystem();
 
@@ -140,7 +140,7 @@ export default class StartProd {
   private async buildSystem() {
     const systemBuildDir = this.getPathToProdSystemDir();
     const systemTmpDir = path.join(this.props.tmpDir, BUILD_SYSTEM_DIR);
-    const buildSystem: BuildSystem = new BuildSystem(this.io);
+    const buildSystem: BuildSystem = new BuildSystem(this.os);
 
     console.info(`===> Building system`);
     await buildSystem.build(systemBuildDir, systemTmpDir);
@@ -152,7 +152,7 @@ export default class StartProd {
   private async buildEnvSet(hostConfig: PreHostConfig) {
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
-      this.io,
+      this.os,
       hostConfig,
       this.props.workDir,
       tmpDir
@@ -169,7 +169,7 @@ export default class StartProd {
     const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
     const buildDevs: IoBuilder = new IoBuilder(
-      this.io,
+      this.os,
       hostConfig,
       buildDir,
       tmpDir

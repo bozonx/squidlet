@@ -6,7 +6,7 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 import {DevClass} from '../system/entities/DevManager';
-import Io, {SpawnCmdResult} from './Io';
+import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
 
 
@@ -68,7 +68,7 @@ export function resolveSquidletRoot(): string {
  * Read a whole directory 'devs' of platform and load all the it's files
  */
 export async function makeDevelopIoSet(
-  io: Io,
+  os: Os,
   platformDir: string,
   machine: string
 ): Promise<{[index: string]: DevClass}> {
@@ -89,7 +89,7 @@ export async function makeDevelopIoSet(
   return devsSet;
 }
 
-export async function getOsMachine(io: Io) {
+export async function getOsMachine(os: Os) {
   const spawnResult: SpawnCmdResult = await io.spawnCmd('hostnamectl');
 
   if (spawnResult.status !== 0) {

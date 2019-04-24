@@ -3,7 +3,7 @@ import * as path from 'path';
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import ConfigManager from '../hostConfig/ConfigManager';
-import Io from '../../shared/Io';
+import Os from '../../shared/Os';
 import Logger from '../interfaces/Logger';
 import buildEntity from './buildEntity';
 import UsedEntities, {EntitiesNames} from './UsedEntities';
@@ -16,7 +16,7 @@ import HostEntitySet from '../interfaces/HostEntitySet';
 export default class EntitiesWriter {
   private readonly configManager: ConfigManager;
   private readonly usedEntities: UsedEntities;
-  private readonly io: Io;
+  private readonly os: Os;
   private readonly log: Logger;
   // entities dir in storage
   private get entitiesDstDir(): string {
@@ -24,8 +24,8 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(io: Io, log: Logger, configManager: ConfigManager, usedEntities: UsedEntities) {
-    this.io = io;
+  constructor(os: Os, log: Logger, configManager: ConfigManager, usedEntities: UsedEntities) {
+    this.os = os;
     this.log = log;
     this.configManager = configManager;
     this.usedEntities = usedEntities;
@@ -43,7 +43,7 @@ export default class EntitiesWriter {
     const usedEntities: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     // clear tmp dir
-    await this.io.rimraf(`${this.configManager.tmpBuildDir}/**/*`);
+    await this.os.rimraf(`${this.configManager.tmpBuildDir}/**/*`);
 
     for (let typeName of Object.keys(usedEntities)) {
       const pluralType = typeName as ManifestsTypePluralName;
@@ -59,7 +59,7 @@ export default class EntitiesWriter {
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
 
     // write manifest
-    await this.io.writeJson(
+    await this.os.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
       entitySet.manifest
     );
@@ -73,9 +73,9 @@ export default class EntitiesWriter {
       const toFileName = path.resolve(entityDstDir, relativeFileName);
 
       // make inner dirs
-      await this.io.mkdirP(path.dirname(toFileName));
+      await this.os.mkdirP(path.dirname(toFileName));
       // copy
-      await this.io.copyFile(fromFile, toFileName);
+      await this.os.copyFile(fromFile, toFileName);
     }
   }
 
@@ -89,7 +89,7 @@ export default class EntitiesWriter {
     this.log.info(`- building main file of entity "${entityName}"`);
     await this.buildEntity(pluralType, entityName, entitySet.srcDir, entityDstDir);
     // rename main file
-    //await this.io.renameFile(`${mainDstFile}.js`, renamedMainDstFile);
+    //await this.os.renameFile(`${mainDstFile}.js`, renamedMainDstFile);
   }
 
   private async buildEntity(

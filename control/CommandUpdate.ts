@@ -3,7 +3,7 @@ import * as path from 'path';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
 import GroupConfigParser from '../shared/GroupConfigParser';
-import Io from '../shared/Io';
+import Os from '../shared/Os';
 import BuildHostEnv from '../shared/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/BuildSystem';
@@ -19,14 +19,14 @@ interface UpdateCommandParams {
 
 export default class CommandUpdate {
   private readonly positionArgs: string[];
-  private readonly io: Io = new Io();
+  private readonly os: Os = new Os();
   private readonly params: UpdateCommandParams = this.resolveParams();
   private readonly groupConfig: GroupConfigParser = new GroupConfigParser(
-    this.io,
+    this.os,
     this.params.groupConfigPath
   );
   private readonly dirs: ResolveDirs;
-  private readonly buildSystem: BuildSystem = new BuildSystem(this.io);
+  private readonly buildSystem: BuildSystem = new BuildSystem(this.os);
 
 
   constructor(positionArgs: string[], args: {[index: string]: any}) {
@@ -42,7 +42,7 @@ export default class CommandUpdate {
     console.info(`Using working dir ${this.dirs.workDir}`);
 
     // clear whole tmp dir
-    await this.io.rimraf(`${this.dirs.tmpDir}/**/*`);
+    await this.os.rimraf(`${this.dirs.tmpDir}/**/*`);
 
     console.info(`===> Building system`);
     await this.buildSystem.build(this.dirs.systemBuildDir, this.dirs.systemTmpDir);
@@ -96,7 +96,7 @@ export default class CommandUpdate {
     const buildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id, BUILD_IO_DIR);
     const tmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id, BUILD_IO_DIR);
     const buildDevs: IoBuilder = new IoBuilder(
-      this.io,
+      this.os,
       hostConfig,
       buildDir,
       tmpDir
@@ -115,7 +115,7 @@ export default class CommandUpdate {
     const hostBuildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id);
     const hostTmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id);
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
-      this.io,
+      this.os,
       hostConfig,
       hostBuildDir,
       hostTmpDir
@@ -127,7 +127,7 @@ export default class CommandUpdate {
 
   private async uploadToHost(hostConfig: PreHostConfig) {
     const updateHost: UpdateHost = new UpdateHost(
-      this.io,
+      this.os,
       hostConfig,
       this.dirs.workDir,
       this.dirs.tmpDir

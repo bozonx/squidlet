@@ -3,13 +3,13 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import Io from './Io';
+import Os from './Os';
 import GroupConfig from './interfaces/GroupConfig';
 
 
 export default class GroupConfigParser {
   readonly groupConfigPath: string;
-  private readonly io: Io;
+  private readonly os: Os;
   private readonly preHostsConfigs: {[index: string]: PreHostConfig} = {};
   private plugins?: string[];
   private hostDefaults?: {[index: string]: any};
@@ -18,13 +18,13 @@ export default class GroupConfigParser {
   }
 
 
-  constructor(io: Io, groupConfigPath: string) {
+  constructor(os: Os, groupConfigPath: string) {
     this.groupConfigPath = groupConfigPath;
-    this.io = io;
+    this.os = os;
   }
 
   async init() {
-    const preConfig = await this.io.loadYamlFile(this.groupConfigPath) as any;
+    const preConfig = await this.os.loadYamlFile(this.groupConfigPath) as any;
 
     if (!_isPlainObject(preConfig)) {
       throw new Error(`Config has to be an object`);
@@ -74,7 +74,7 @@ export default class GroupConfigParser {
       let hostConfig: PreHostConfig;
 
       if (typeof hostConfigPathOrObj === 'string') {
-        hostConfig = await this.io.loadYamlFile(hostConfigPathOrObj);
+        hostConfig = await this.os.loadYamlFile(hostConfigPathOrObj);
       }
       else if (_isPlainObject(hostConfigPathOrObj)) {
         hostConfig = hostConfigPathOrObj;

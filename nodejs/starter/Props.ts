@@ -1,7 +1,7 @@
 import _isPlainObject = require('lodash/isPlainObject');
 import * as path from 'path';
 
-import Io from '../../shared/Io';
+import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -28,7 +28,7 @@ export default class Props {
     return this._machine as any;
   }
 
-  private readonly io: Io;
+  private readonly os: Os;
   private readonly argMachine?: NodejsMachines;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
@@ -40,7 +40,7 @@ export default class Props {
 
 
   constructor(
-    io: Io,
+    os: Os,
     groupConfig: GroupConfigParser,
     argMachine?: NodejsMachines,
     argHostName?: string,
@@ -48,7 +48,7 @@ export default class Props {
     argIoset?: string,
     argIosetProps?: string
   ) {
-    this.io = io;
+    this.os = os;
     this.groupConfig = groupConfig;
     this.argMachine = argMachine;
     this.argHostName = argHostName;
@@ -108,7 +108,7 @@ export default class Props {
       return this.argMachine;
     }
 
-    return getOsMachine(this.io);
+    return getOsMachine(this.os);
   }
 
   private modifyHostConfig(hostConfig: PreHostConfig): PreHostConfig {

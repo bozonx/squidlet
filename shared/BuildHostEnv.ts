@@ -1,5 +1,5 @@
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import Io from './Io';
+import Os from './Os';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
@@ -7,20 +7,20 @@ export default class BuildHostEnv {
   private readonly preHostConfig: PreHostConfig;
   private readonly hostBuildDir: string;
   private readonly hostTmpDir: string;
-  private readonly io: Io;
+  private readonly os: Os;
 
 
-  constructor(io: Io, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
+  constructor(os: Os, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
     this.preHostConfig = preHostConfig;
     this.hostBuildDir = hostsBuildDir;
     this.hostTmpDir = hostsTmpDir;
-    this.io = io;
+    this.os = os;
   }
 
   async build() {
-    await this.io.mkdirP(this.hostBuildDir);
-    //await this.io.rimraf(`${this.hostBuildDir}/**/*`);
-    await this.io.mkdirP(this.hostTmpDir);
+    await this.os.mkdirP(this.hostBuildDir);
+    //await this.os.rimraf(`${this.hostBuildDir}/**/*`);
+    await this.os.mkdirP(this.hostTmpDir);
 
     const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, this.hostBuildDir, this.hostTmpDir);
 

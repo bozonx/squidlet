@@ -4,7 +4,7 @@ import compileTs from './buildToJs/compileTs';
 import compileJs from './buildToJs/compileJs';
 import modulesTree from './buildToJs/modulesTree';
 import minimize from './buildToJs/minimize';
-import Io from './Io';
+import Os from './Os';
 import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from './constants';
 
 
@@ -12,11 +12,11 @@ const systemSrc = path.resolve(__dirname, '../system');
 
 
 export default class BuildSystem {
-  private readonly io: Io;
+  private readonly os: Os;
 
 
-  constructor(io: Io) {
-    this.io = io;
+  constructor(os: Os) {
+    this.os = os;
   }
 
   async build(buildDir: string, tmpDir: string) {
@@ -27,16 +27,16 @@ export default class BuildSystem {
     // TODO: check version and update only if version is different
 
     // ts to modern js
-    await this.io.rimraf(`${modernDst}/**/*`);
+    await this.os.rimraf(`${modernDst}/**/*`);
     await compileTs(systemSrc, modernDst);
     // modern js to ES5
-    await this.io.rimraf(`${legacyDst}/**/*`);
+    await this.os.rimraf(`${legacyDst}/**/*`);
     await compileJs(modernDst, legacyDst, false);
     // Get only used files
-    await this.io.rimraf(`${treeDst}/**/*`);
+    await this.os.rimraf(`${treeDst}/**/*`);
     await modulesTree(legacyDst, treeDst);
     // minimize
-    await this.io.rimraf(`${buildDir}/**/*`);
+    await this.os.rimraf(`${buildDir}/**/*`);
     await minimize(treeDst, buildDir);
   }
 

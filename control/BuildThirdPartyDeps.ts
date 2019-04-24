@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as shelljs from 'shelljs';
-import Io from '../shared/Io';
+import Os from '../shared/Os';
 
 
 const MODULES_DIR = 'node_modules';
@@ -8,11 +8,11 @@ const mainNodeModulesDir = path.resolve(__dirname, '../node_modules');
 
 
 export default class BuildThirdPartyDeps {
-  private readonly io: Io;
+  private readonly os: Os;
 
 
-  constructor(io: Io) {
-    this.io = io;
+  constructor(os: Os) {
+    this.os = os;
   }
 
 
@@ -33,7 +33,7 @@ export default class BuildThirdPartyDeps {
       'inherits',
     ];
 
-    await this.io.rimraf(`${babelDir}/**/*`);
+    await this.os.rimraf(`${babelDir}/**/*`);
     shelljs.mkdir('-p', babelRuntimeHelpersDir);
 
     for (let fileName of babelHelpers) {

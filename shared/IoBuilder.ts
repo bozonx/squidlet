@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Io from './Io';
+import Os from './Os';
 import compileTs from './buildToJs/compileTs';
 import compileJs from './buildToJs/compileJs';
 import minimize from './buildToJs/minimize';
@@ -23,10 +23,10 @@ export default class IoBuilder {
   private readonly devsTmpDir: string;
   private readonly platform: Platforms;
   private readonly machine: string;
-  private readonly io: Io;
+  private readonly os: Os;
 
 
-  constructor(io: Io, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
+  constructor(os: Os, preHostConfig: PreHostConfig, hostsBuildDir: string, hostsTmpDir: string) {
     if (!preHostConfig.platform) {
       throw new Error(`Host config doesn't have a platform param`);
     }
@@ -39,7 +39,7 @@ export default class IoBuilder {
     this.preHostConfig = preHostConfig;
     this.devsBuildDir = hostsBuildDir;
     this.devsTmpDir = hostsTmpDir;
-    this.io = io;
+    this.os = os;
   }
 
 
@@ -48,8 +48,8 @@ export default class IoBuilder {
 
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
-    await this.io.rimraf(`${this.devsBuildDir}/**/*`);
-    await this.io.mkdirP(this.devsBuildDir);
+    await this.os.rimraf(`${this.devsBuildDir}/**/*`);
+    await this.os.mkdirP(this.devsBuildDir);
 
     await this.copyDevs(machineConfig);
     await this.buildDevs();
@@ -65,8 +65,8 @@ export default class IoBuilder {
     const usedDevsDir = path.join(this.devsTmpDir, ORIGINAL_DIR);
     const platformDir = resolvePlatformDir(this.platform);
 
-    await this.io.rimraf(`${usedDevsDir}/**/*`);
-    await this.io.mkdirP(usedDevsDir);
+    await this.os.rimraf(`${usedDevsDir}/**/*`);
+    await this.os.mkdirP(usedDevsDir);
 
     // copy specified devs
     for (let devPath of machineConfig.devs) {
@@ -74,7 +74,7 @@ export default class IoBuilder {
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
       const dstFile: string = path.join(usedDevsDir, path.basename(devPath));
 
-      await this.io.copyFile(srcFile, dstFile);
+      await this.os.copyFile(srcFile, dstFile);
     }
   }
 
@@ -87,10 +87,10 @@ export default class IoBuilder {
     const legacyDst = path.join(this.devsTmpDir, LEGACY_DIR);
 
     // ts to modern js
-    await this.io.rimraf(`${modernDst}/**/*`);
+    await this.os.rimraf(`${modernDst}/**/*`);
     await compileTs(original, modernDst);
     // modern js to ES5
-    await this.io.rimraf(`${legacyDst}/**/*`);
+    await this.os.rimraf(`${legacyDst}/**/*`);
     await compileJs(modernDst, legacyDst, false);
     // minimize
     await minimize(legacyDst, this.devsBuildDir);
@@ -109,7 +109,7 @@ export default class IoBuilder {
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
       const dstFile: string = path.join(this.devsBuildDir, path.basename(supportFilePath));
 
-      await this.io.copyFile(srcFile, dstFile);
+      await this.os.copyFile(srcFile, dstFile);
     }
   }
 
@@ -129,7 +129,7 @@ export default class IoBuilder {
 
     const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};\n`;
 
-    await this.io.writeFile(indexFilePath, devSet);
+    await this.os.writeFile(indexFilePath, devSet);
   }
 
   /**
@@ -137,11 +137,11 @@ export default class IoBuilder {
    * If it a regular file - it returns filePath as is.
    */
   private async resolveFileTargetPath(filePath: string): Promise<string> {
-    const stat: Stats = await this.io.stat(filePath);
+    const stat: Stats = await this.os.stat(filePath);
 
     if (!stat.symbolicLink) return filePath;
 
-    const linkTo: string = await this.io.readlink(filePath);
+    const linkTo: string = await this.os.readlink(filePath);
 
     return path.resolve(path.dirname(filePath), linkTo);
   }

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import _omit = require('lodash/omit');
 
-import Io from '../../shared/Io';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
@@ -15,7 +15,7 @@ const ioSetsRoot = '../../ioSets';
 
 
 export default class StartDevelop {
-  private readonly io: Io = new Io();
+  private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
 
@@ -28,8 +28,8 @@ export default class StartDevelop {
     ioset?: string,
     iosetProps?: string
   ) {
-    this.groupConfig = new GroupConfigParser(this.io, configPath);
-    this.props = new Props(this.io, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
+    this.groupConfig = new GroupConfigParser(this.os, configPath);
+    this.props = new Props(this.os, this.groupConfig, machine, hostName, workDir, ioset, iosetProps);
   }
 
   async init() {
@@ -56,11 +56,11 @@ export default class StartDevelop {
     const machineCwd: string = path.join(platformDir, this.props.machine);
 
     // do not install node modules if they have been installed previously
-    if (await this.io.exists(path.join(machineCwd, 'node_modules'))) return;
+    if (await this.os.exists(path.join(machineCwd, 'node_modules'))) return;
 
     console.info(`===> Install npm modules`);
 
-    await installNpmModules(this.io, machineCwd);
+    await installNpmModules(this.os, machineCwd);
   }
 
   private async startSystem() {
@@ -92,14 +92,14 @@ export default class StartDevelop {
 
 
 // const completedDevSet: {[index: string]: DevClass} = await makeDevelopIoSet(
-//   this.io,
+//   this.os,
 //   platformDir,
 //   this.props.machine
 // );
 
 // const platformDirName: string = resolvePlatformDir(this.platform);
 // const devsDir: string = path.join(platformDirName, 'devs');
-// const devsFileNames: string[] = await this.io.readdir(devsDir);
+// const devsFileNames: string[] = await this.os.readdir(devsDir);
 // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 //
 // for (let fullDevName of devsFileNames) {

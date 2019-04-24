@@ -5,7 +5,7 @@ import validateHostConfig from './validateHostConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
-import Io from '../../shared/Io';
+import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
@@ -35,7 +35,7 @@ export default class ConfigManager {
     return this._hostConfig as any;
   }
 
-  private readonly io: Io;
+  private readonly os: Os;
   private _hostConfig?: HostConfig;
   private _machineConfig?: MachineConfig;
   // absolute path to master config yaml
@@ -43,12 +43,12 @@ export default class ConfigManager {
 
 
   constructor(
-    io: Io,
+    os: Os,
     hostConfigOrConfigPath: string | PreHostConfig,
     absEnvBuildDir: string,
     tmpBuildDir: string
   ) {
-    this.io = io;
+    this.os = os;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
     this.buildDir = absEnvBuildDir;
     this.tmpBuildDir = tmpBuildDir;
@@ -86,7 +86,7 @@ export default class ConfigManager {
 
   private async resolveHostConfig(): Promise<PreHostConfig> {
     if (typeof this.hostConfigOrConfigPath === 'string') {
-      return await this.io.loadYamlFile(this.hostConfigOrConfigPath) as PreHostConfig;
+      return await this.os.loadYamlFile(this.hostConfigOrConfigPath) as PreHostConfig;
     }
     else if (typeof this.hostConfigOrConfigPath === 'object') {
       return this.hostConfigOrConfigPath;

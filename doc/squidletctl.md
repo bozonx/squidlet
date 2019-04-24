@@ -66,7 +66,7 @@ Also you can specify the next params:
   
 ## Run IO server
 
-Io server starts independently from host.
+Os server starts independently from host.
 System can connect to It via websocket and manipulate IO devices which IO server serves.
 It especially suitable for development to run IO server e.g on raspberry pi and connect to it
 from your laptop where development version of System is being running.
