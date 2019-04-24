@@ -1,4 +1,4 @@
-import {IoDefinition, IoSetInstance, IoSetInstances} from '../interfaces/IoSet';
+import {IoDefinition, IoSetInstance} from '../interfaces/IoSet';
 import System from '../System';
 import RemoteCall from '../helpers/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
@@ -7,7 +7,7 @@ import {isPlainObject} from '../helpers/lodashLike';
 
 export default abstract class RemoteIoBase {
   private _system?: System;
-  private readonly instances: IoSetInstances = {};
+  private readonly instances: {[index: string]: IoSetInstance} = {};
   private readonly remoteCall: RemoteCall;
   readonly get system(): System {
     return this._system as any;

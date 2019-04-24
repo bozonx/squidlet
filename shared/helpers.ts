@@ -136,3 +136,7 @@ export function resolveMachineByOsAndArch(os: string, arch: string): NodejsMachi
 
   throw new Error(`Unsupported architecture "${arch}"`);
 }
+
+export resolveIoSetClass() {
+
+}

@@ -1,11 +1,16 @@
 export const allowedIoSetTypes = [
   'local',
-  'ws',
-  'thread',
-  'development',
+  'nodejs-ws',
+  'nodejs-developLocal',
+  'nodejs-developWs',
+  //'thread',
 ];
 
-type IoSetTypes = 'local' | 'ws' | 'thread' | 'development';
-
+type IoSetTypes =
+  'local' |
+  'nodejs-ws' |
+  'nodejs-developLocal' |
+  'nodejs-developWs';
+  //'thread' |
 
 export default IoSetTypes;

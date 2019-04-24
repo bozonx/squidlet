@@ -1,7 +1,7 @@
 import IoSet from '../system/interfaces/IoSet';
 
 
-export default class ThreadIoSet implements IoSet {
+export default class IoSetThread implements IoSet {
   constructor() {
 
   }

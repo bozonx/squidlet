@@ -5,7 +5,7 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 
 
-export default class IoSetNodejsDevelopLocal implements IoSet {
+export default class IoSetDevelopLocal implements IoSet {
   constructor() {
 
   }
