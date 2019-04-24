@@ -14,7 +14,7 @@ export interface WsClientProps {
 }
 
 
-export default class WsIoSet extends RemoteIoBase implements IoSet {
+export default class IoSetNodejsWs extends RemoteIoBase implements IoSet {
   private ioSetConfig: WsClientProps;
   private _client?: WebSocket;
   private get client(): WebSocket {

@@ -90,6 +90,9 @@ export default class StartDevelop {
    */
   private makeIoSet(): IoSet {
     const ioSetConfig = this.props.hostConfig.ioSet as {[index: string]: any};
+
+    // TODO: resolve
+
     const isSetFileName = `${firstLetterToUpperCase(ioSetConfig.type)}IoSet`;
     const ioSetPath = path.join(ioSetsRoot, isSetFileName);
     const SelectedIoSet: new (ioSetConfig: {[index: string]: any}) => IoSet = require(ioSetPath).default;

@@ -129,12 +129,14 @@ export default class StartProd {
   private async startSystem() {
     console.info(`===> making platform's dev set`);
 
-    const completedDevSet: {[index: string]: DevClass} = await this.collectIoSet();
+    //const completedDevSet: {[index: string]: DevClass} = await this.collectIoSet();
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
 
     console.info(`===> Starting system`);
+
+    // TODO: make ioSet
 
     const system = new System(completedDevSet, systemConfigExtend);
 
