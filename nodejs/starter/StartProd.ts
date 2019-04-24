@@ -8,11 +8,10 @@ import BuildSystem from '../../shared/BuildSystem';
 import {
   BUILD_IO_DIR,
   BUILD_SYSTEM_DIR,
-  HOST_ENVSET_DIR, IO_SET_INDEX_FILE,
+  HOST_ENVSET_DIR,
 } from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
-import {DevClass} from '../../system/entities/DevManager';
 import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
@@ -188,29 +187,6 @@ export default class StartProd {
     );
 
     await buildIo.build();
-  }
-
-  /**
-   * Collect io set
-   */
-  private async collectIoSet(): Promise<{[index: string]: DevClass}> {
-    const pathToIoSetIndex = path.join(this.props.workDir, BUILD_IO_DIR, IO_SET_INDEX_FILE);
-
-    return require(pathToIoSetIndex);
-
-    // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-    // const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
-    // const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
-    //
-    // for (let devPath of machineConfig.devs) {
-    //   const devName: string = parseDevName(devPath);
-    //   const devFileName: string = `${devName}.js`;
-    //   const devAbsPath: string = path.join(envSetDevsDir, devFileName);
-    //
-    //   devsSet[devName] = require(devAbsPath).default;
-    // }
-    //
-    // return devsSet;
   }
 
   private getPathToProdSystemDir(): string {
