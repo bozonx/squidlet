@@ -4,7 +4,7 @@
 
 import * as mqtt from 'mqtt';
 
-import MqttDev from 'system/interfaces/io/MqttDev';
+import MqttIo from 'system/interfaces/io/MqttIo';
 
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
   port: string;
 }
 
-export class MqttDevConnection implements MqttDev {
+export class MqttDevConnection implements MqttIo {
   connectPromise: Promise<void>;
 
   private _connected: boolean = false;

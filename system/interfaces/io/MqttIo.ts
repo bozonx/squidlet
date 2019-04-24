@@ -7,7 +7,7 @@ export const Methods = [
 ];
 
 
-export default interface MqttDev {
+export default interface MqttIo {
   isConnected(): boolean;
   publish(topic: string, data: string | Uint8Array | undefined): Promise<void>;
   subscribe(topic: string): Promise<void>;

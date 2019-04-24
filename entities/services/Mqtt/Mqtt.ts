@@ -1,7 +1,7 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import DeviceData from 'system/interfaces/DeviceData';
 import {combineTopic, parseValue, splitTopicId} from 'system/helpers/helpers';
-import MqttDev from 'system/interfaces/io/MqttDev';
+import MqttIo from 'system/interfaces/io/MqttIo';
 import categories from 'system/dict/categories';
 
 
@@ -13,8 +13,8 @@ interface Props {
 }
 
 export default class MqttSevice extends ServiceBase<Props> {
-  private get mqttDev(): MqttDev {
-    return this.depsInstances.mqttDev as MqttDev;
+  private get mqttDev(): MqttIo {
+    return this.depsInstances.mqttDev as any;
   }
 
   protected willInit = async () => {
