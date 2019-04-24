@@ -132,20 +132,19 @@ export default class StartProd {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    const ioSetConfig = this.props.hostConfig.ioSet as IoSetConfig;
-    const ioType: IoSetTypes = ioSetConfig.type;
-    let ioSet: IoSet | undefined;
+    const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
+    // use specified type or 'local' by default
+    const ioType: IoSetTypes = (ioSetConfig) ? ioSetConfig.type : 'local';
+
+    // only nodejs-ws or local ioSet types are allowed
+    if (ioType !== 'nodejs-ws' && ioType !== 'local') {
+      throw new Error(`Unsupported ioSet type: "${ioType}"`);
+    }
 
     console.info(`===> using io set "${ioType}"`);
 
-    if (ioType === 'nodejs-ws') {
-      const ResolvedIoSet = resolveIoSetClass(ioType);
-
-      ioSet = new ResolvedIoSet(_omit(ioSetConfig, 'type'));
-    }
-    else if (ioType !== 'local') {
-      throw new Error(`Unsupported ioSet type: "${ioType}"`);
-    }
+    const ResolvedIoSet = resolveIoSetClass(ioType);
+    const ioSet: IoSet = new ResolvedIoSet(_omit(ioSetConfig, 'type'));
 
     console.info(`===> Starting system`);
 
