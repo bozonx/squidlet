@@ -15,26 +15,28 @@ export interface WsClientProps {
 
 
 export default class IoSetWs extends RemoteIoBase implements IoSet {
-  private ioSetConfig: WsClientProps;
+  private wsClientProps: WsClientProps;
   private _client?: WebSocket;
   private get client(): WebSocket {
     return this._client as any;
   }
 
 
-  constructor(ioSetConfig: WsClientProps) {
+  constructor(wsClientProps: WsClientProps) {
     super();
-    this.ioSetConfig = ioSetConfig;
+    this.wsClientProps = wsClientProps;
   }
 
   async init(system: System): Promise<void> {
     super.init(system);
 
-    const url = `ws://${this.ioSetConfig.host}:${this.ioSetConfig.port}?hostid=${this.system.host.id}`;
+    const url = `ws://${this.wsClientProps.host}:${this.wsClientProps.port}?hostid=${this.system.host.id}`;
 
-    this._client = new WebSocket(url, _omit(this.ioSetConfig, 'host', 'port'));
+    this._client = new WebSocket(url, _omit(this.wsClientProps, 'host', 'port'));
 
     this.listen();
+
+    delete this.wsClientProps;
   }
 
 

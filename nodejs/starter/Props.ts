@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import PreHostConfig, {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {
   HOST_ENVSET_DIR,
@@ -64,7 +64,7 @@ export default class Props {
 
     this.validate();
 
-    this._hostConfig = this.modifyHostConfig(this._hostConfig);
+    this._hostConfig.ioSet = this.resolveIoSetConfig(this._hostConfig.ioSet);
 
     this.hostId = this.hostConfig.id as any;
 
@@ -111,12 +111,15 @@ export default class Props {
     return getOsMachine(this.os);
   }
 
-  private modifyHostConfig(hostConfig: PreHostConfig): PreHostConfig {
-
-    // TODO: можно вообще ничего не указывать - тогда будут использованны локальные ioSet
-
+  /**
+   * Replace ioSet config if specified --ioset and --ioset-props arguments.
+   * Merge if specified only --ioset
+   * Else just return as was specified in host config or undefined
+   */
+  private resolveIoSetConfig(specifiedIoSetConfig?: IoSetConfig): IoSetConfig | undefined {
+    // replace current ioSet host's config param
     if (this.argIosetProps) {
-      // replace current ioSet host's config param
+
       if (!this.argIoset) {
         throw new Error(`If you specified a "--ioset-props" you should specify a "--ioset" argument`);
       }
@@ -129,22 +132,23 @@ export default class Props {
 
       const ioSetProps = this.parseIoSetString(this.argIoset);
 
-      hostConfig.ioSet = {
+      return {
         ...parsedProps,
         ...ioSetProps,
       };
     }
+    // merge with current ioSet host's config param
     else if (this.argIoset) {
-      // merge with current ioSet host's config param
       const ioSetProps = this.parseIoSetString(this.argIoset);
 
-      hostConfig.ioSet = {
-        ...hostConfig.ioSet,
+      return {
+        ...specifiedIoSetConfig,
         ...ioSetProps,
       };
     }
 
-    return hostConfig;
+    // else return as is
+    return specifiedIoSetConfig;
   }
 
   private parseIoSetString(ioSetString: string): {type: IoSetTypes, host?: string, port?: number} {
