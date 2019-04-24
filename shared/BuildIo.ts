@@ -8,7 +8,7 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {loadMachineConfig, parseDevName, resolvePlatformDir} from './helpers';
 import {
-  DEV_SET_FILE,
+  IO_SET_INDEX_FILE,
   LEGACY_DIR,
   MODERN_DIR,
   ORIGINAL_DIR,
@@ -117,7 +117,7 @@ export default class BuildIo {
    * Make index.js which requires all the devs.
    */
   private async makeDevSetIndex(machineConfig: MachineConfig) {
-    const indexFilePath: string = path.join(this.devsBuildDir, DEV_SET_FILE);
+    const indexFilePath: string = path.join(this.devsBuildDir, IO_SET_INDEX_FILE);
     const devs: string[] = [];
 
     for (let devPath of machineConfig.devs) {

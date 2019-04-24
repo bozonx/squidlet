@@ -3,8 +3,8 @@ export const ORIGINAL_DIR = 'original';
 export const MODERN_DIR = 'modern';
 export const LEGACY_DIR = 'legacy';
 export const TREE_DIR = 'tree';
-// main file name of devs set
-export const DEV_SET_FILE = 'index.js';
+// main file name of io set
+export const IO_SET_INDEX_FILE = 'index.js';
 
 // dirs inside build dir squidlet update command
 export const BUILD_ROOT_DIR = 'build';

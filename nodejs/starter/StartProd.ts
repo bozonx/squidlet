@@ -163,7 +163,7 @@ export default class StartProd {
   }
 
   /**
-   * Build io files to
+   * Build io files to workDir/io
    */
   private async buildIos(hostConfig: PreHostConfig) {
     const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
