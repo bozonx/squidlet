@@ -69,12 +69,18 @@ export default class StartDevelop {
     await installNpmModules(this.os, machineCwd);
   }
 
+  /**
+   * Resolve development io set (nodejs-developLocal or nodejs-developWs)
+   * and start development version of System.
+   */
   private async startSystem() {
-    console.info(`===> making platform's dev set`);
-
-    const ioSet: IoSet = this.makeIoSet();
     const System = require(`../../system`).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
+    const ioSetType: IoSetTypes = this.resolveIoSetType();
+
+    console.info(`===> using io set "${ioSetType}"`);
+
+    const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
 
     console.info(`===> Starting system`);
 
@@ -86,26 +92,27 @@ export default class StartDevelop {
   /**
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
-  private makeIoSet(): IoSet {
-    // TODO: review
+  private makeIoSet(ioSetType: IoSetTypes): IoSet {
+    const ResolvedIoSet = resolveIoSetClass(ioSetType);
+
+    return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
+  }
+
+  /**
+   * Only nodejs-developLocal or nodejs-developWs ioSet types are allowed
+   * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
+   */
+  private resolveIoSetType(): IoSetTypes {
     const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-    // use specified type or 'nodejs-developLocal' by default
-    const ioType: IoSetTypes = (ioSetConfig) ? ioSetConfig.type : 'nodejs-developLocal';
 
-    console.info(`===> using io set "${ioType}"`);
-
-    // if (!ioType) {
-    //   // TODO: подставить по умолчанию nodejs-developLocal если не было подставленно
-    // }
-    // else
-
-    if (ioType !== 'nodejs-developLocal' && ioType !== 'nodejs-developWs') {
-      throw new Error(`Unsupported ioSet type: "${ioType}"`);
+    if (!ioSetConfig || ioSetConfig.type === 'nodejs-developLocal') {
+      return 'nodejs-developLocal';
+    }
+    else if (ioSetConfig.type !== 'nodejs-developWs') {
+      throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
     }
 
-    const ResolvedIoSet = resolveIoSetClass(ioType);
-
-    return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
+    return ioSetConfig.type;
   }
 
 }

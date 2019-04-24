@@ -18,6 +18,7 @@ import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
+import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 const systemClassFileName = 'System';
@@ -132,9 +133,12 @@ export default class StartProd {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    const ioSet: IoSet | undefined = this.makeIoSet();
+    const ioSetType: IoSetTypes = this.resolveIoSetType();
 
-    console.info(`===> using io set "${(this.props.hostConfig.ioSet as IoSetConfig).type}"`);
+    console.info(`===> using io set "${ioSetType}"`);
+
+    const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
+
     console.info(`===> Starting system`);
 
     const system = new System(ioSet, systemConfigExtend);
@@ -144,22 +148,30 @@ export default class StartProd {
 
   /**
    * Make ioSet instance or return undefined if local is used.
+   */
+  private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
+    if (ioSetType === 'local') return;
+
+    const ResolvedIoSet = resolveIoSetClass(ioSetType);
+
+    return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
+  }
+
+  /**
    * Only nodejs-ws or local ioSet types are allowed
    * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
    */
-  private makeIoSet(): IoSet | undefined {
+  private resolveIoSetType(): IoSetTypes {
     const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
 
     if (!ioSetConfig || ioSetConfig.type === 'local') {
-      return;
+      return 'local';
     }
     else if (ioSetConfig.type !== 'nodejs-ws') {
       throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
     }
 
-    const ResolvedIoSet = resolveIoSetClass(ioSetConfig.type);
-
-    return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
+    return ioSetConfig.type;
   }
 
   /**

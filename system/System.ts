@@ -48,6 +48,7 @@ export default class System {
     systemConfigExtend?: {[index: string]: any},
     envSetReplacement?: new (system: System) => EnvSet
   ) {
+    // TODO: remove
     if (envSetReplacement) {
       this.envSet = new envSetReplacement(this);
     }
