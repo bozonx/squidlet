@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 
-import StorageDev, {Stats} from 'system/interfaces/io/StorageDev';
+import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/helpers/helpers';
 
 const {convertBufferToUint8Array} = require('./helpers');
@@ -13,7 +13,7 @@ const {convertBufferToUint8Array} = require('./helpers');
 const DEFAULT_ENCODE = 'utf8';
 
 
-export default class Storage implements StorageDev {
+export default class Storage implements StorageIo {
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
       return callPromised(fs.appendFile, pathTo, data, DEFAULT_ENCODE);

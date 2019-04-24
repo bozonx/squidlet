@@ -26,7 +26,7 @@ export const Methods = [
 ];
 
 
-export default interface StorageDev {
+export default interface StorageIo {
   appendFile(path: string, data: string | Uint8Array): Promise<void>;
   mkdir(path: string): Promise<void>;
   readdir(path: string): Promise<string[]>;

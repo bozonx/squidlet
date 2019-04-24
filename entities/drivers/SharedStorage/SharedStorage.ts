@@ -1,4 +1,4 @@
-import StorageDev, {Stats} from 'system/interfaces/io/StorageDev';
+import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {pathDirname, pathJoin} from 'system/helpers/nodeLike';
 
@@ -8,8 +8,8 @@ import {pathDirname, pathJoin} from 'system/helpers/nodeLike';
  */
 export class SharedStorage extends DriverBase {
   private rootDir: string = '';
-  private get storageDev(): StorageDev {
-    return this.depsInstances.storageDev as StorageDev;
+  private get storageDev(): StorageIo {
+    return this.depsInstances.storageDev as any;
   }
 
 

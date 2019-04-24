@@ -13,7 +13,7 @@ import {
   MODERN_DIR,
   ORIGINAL_DIR,
 } from './constants';
-import {Stats} from '../system/interfaces/io/StorageDev';
+import {Stats} from '../system/interfaces/io/StorageIo';
 
 
 export default class BuildIo {

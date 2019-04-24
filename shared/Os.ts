@@ -6,7 +6,7 @@ import * as yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 
 import systemConfig from '../hostEnvBuilder/configs/systemConfig';
-import {Stats} from '../system/interfaces/io/StorageDev';
+import {Stats} from '../system/interfaces/io/StorageIo';
 import {callPromised} from '../system/helpers/helpers';
 import {ChildProcess} from 'child_process';
 

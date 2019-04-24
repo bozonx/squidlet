@@ -9,7 +9,7 @@ import HostEnvSet from './interfaces/HostEnvSet';
 import {trimEnd} from '../system/helpers/lodashLike';
 import {pathJoin} from '../system/helpers/nodeLike';
 import EnvSet from '../system/interfaces/EnvSet';
-import StorageDev from '../system/interfaces/io/StorageDev';
+import StorageIo from '../system/interfaces/io/StorageIo';
 
 
 let configSet: HostEnvSet;
@@ -21,7 +21,7 @@ export default class EnvSetMemory implements EnvSet {
   }
 
   private readonly system: System;
-  private get devStorage(): StorageDev {
+  private get devStorage(): StorageIo {
     return this.system.ioSet.getInstance('Storage') as any;
   }
 

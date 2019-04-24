@@ -4,7 +4,7 @@ import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
 import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';
-import StorageDev from './interfaces/io/StorageDev';
+import StorageIo from './interfaces/io/StorageIo';
 
 
 /**
@@ -12,7 +12,7 @@ import StorageDev from './interfaces/io/StorageDev';
  */
 export default class EnvSetLocalFs implements EnvSet {
   private readonly system: System;
-  private get devStorage(): StorageDev {
+  private get devStorage(): StorageIo {
     return this.system.ioSet.getInstance('Storage') as any;
   }
 
