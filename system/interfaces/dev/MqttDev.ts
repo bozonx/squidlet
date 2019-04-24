@@ -1,4 +1,4 @@
-export const MqttMethods = [
+export const Methods = [
   'isConnected',
   'publish',
   'subscribe',

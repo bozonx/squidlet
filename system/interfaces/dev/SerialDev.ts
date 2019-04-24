@@ -9,7 +9,7 @@ export interface Options {
 }
 
 
-export const SerialMethods = [
+export const Methods = [
   'on',
   'write',
   'print',

@@ -3,7 +3,7 @@ export interface WebSocketClientProps {
 }
 
 
-export const WSClientMethods = [
+export const Methods = [
   'onClose',
   'onMessage',
   'onError',

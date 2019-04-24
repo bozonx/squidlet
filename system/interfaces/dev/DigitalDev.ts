@@ -6,7 +6,7 @@ export type DigitalPinMode = DigitalInputMode | 'output';
 export type Edge = 'rising' | 'falling' | 'both';
 
 
-export const DigitalMethods = [
+export const Methods = [
   'read',
   'write',
   'setWatch',

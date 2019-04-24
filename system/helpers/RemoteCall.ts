@@ -108,6 +108,10 @@ export default class RemoteCall {
     // TODO: удалить свой колбэк и отправить сообщение на удаление фэйкового колбэка
   }
 
+  async destroy() {
+    // TODO: отписаться от всех коллбэков на сервере
+  }
+
   /**
    * Wait while response of method is received
    */

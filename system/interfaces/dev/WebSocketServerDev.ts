@@ -6,7 +6,7 @@ export interface WebSocketServerProps {
 }
 
 
-export const WSSeverMethods = [
+export const Methods = [
   'onMessage',
   'send',
 ];

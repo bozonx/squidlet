@@ -56,7 +56,7 @@ export default class IoSetLocal implements IoSet {
     return this.ioCollection[ioName] as T;
   }
 
-  destroy(): void {
+  async destroy() {
     delete this.ioCollection;
   }
 

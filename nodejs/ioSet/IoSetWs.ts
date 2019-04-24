@@ -45,7 +45,8 @@ export default class IoSetWs extends RemoteIoBase implements IoSet {
   }
 
 
-  destroy() {
+  async destroy() {
+    await super.destroy();
     this.client.close(0, 'Closing on destroy');
   }
 

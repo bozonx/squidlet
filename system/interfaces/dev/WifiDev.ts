@@ -4,7 +4,7 @@ export interface WifiParams {
 }
 
 
-export const WifiMethods = [
+export const Methods = [
   'configure',
 ];
 

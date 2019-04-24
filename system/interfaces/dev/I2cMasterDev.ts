@@ -1,4 +1,4 @@
-export const I2cMasterMethods = [
+export const Methods = [
   'writeTo',
   'readFrom',
 ];

@@ -1,4 +1,4 @@
-export const I2cSlaveMethods = [
+export const Methods = [
   'send',
   'listenIncome',
   'removeListener',

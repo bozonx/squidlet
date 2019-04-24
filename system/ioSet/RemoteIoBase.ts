@@ -4,6 +4,7 @@ import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/Remote
 import {isPlainObject} from '../helpers/lodashLike';
 import IoItem from '../interfaces/IoItem';
 import IoSetLocal from './IoSetLocal';
+import {pathJoin} from '../helpers/nodeLike';
 
 
 export default abstract class RemoteIoBase extends IoSetLocal {
@@ -30,10 +31,22 @@ export default abstract class RemoteIoBase extends IoSetLocal {
       this.system.log.error,
       this.system.host.generateUniqId
     );
-    this.ioCollection = this.makeIoCollection();
+    //this.ioCollection = this.makeIoCollection();
 
     await this.initAllIo();
   }
+
+  getInstance<T extends IoItem>(ioName: string): T {
+    this.makeFakeIoIfNeed(ioName);
+
+    return this.ioCollection[ioName] as T;
+  }
+
+  async destroy() {
+    await super.destroy();
+    await this.remoteCall.destroy();
+  }
+
 
   /**
    * Call this method when you has received a message
@@ -50,13 +63,15 @@ export default abstract class RemoteIoBase extends IoSetLocal {
   }
 
 
-  private makeIoCollection(): {[index: string]: IoItem} {
-    for (let ioName of Object.keys(ioItemDefinition)) {
-      this.ioCollection[ioName] = {};
+  private makeFakeIoIfNeed(ioName: string) {
+    if (this.ioCollection[ioName]) return;
 
-      for (let methodName of ioItemDefinition[ioName]) {
-        this.ioCollection[ioName][methodName] = this.makeMethod(ioName, methodName);
-      }
+    // TODO: make path
+    const ioDefinitionPath = pathJoin();
+    const ioMethods: string[] = require(ioDefinitionPath).Methods;
+
+    for (let methodName of ioMethods) {
+      this.ioCollection[ioName][methodName] = this.makeMethod(ioName, methodName);
     }
   }
 

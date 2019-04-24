@@ -9,7 +9,7 @@ export interface Stats {
 }
 
 
-export const StorageMethods = [
+export const Methods = [
   'appendFile',
   'mkdir',
   'readdir',
