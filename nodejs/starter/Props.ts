@@ -17,7 +17,6 @@ import IoSetTypes, {allowedIoSetTypes} from '../../hostEnvBuilder/interfaces/IoS
 
 export default class Props {
   workDir: string = '';
-  // TODO: doesn't need
   envSetDir: string = '';
   tmpDir: string = '';
   platform: Platforms = 'nodejs';

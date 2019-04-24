@@ -9,6 +9,7 @@ import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 export default class StartDevelop {
@@ -87,7 +88,18 @@ export default class StartDevelop {
    */
   private makeIoSet(): IoSet {
     const ioSetConfig = this.props.hostConfig.ioSet as IoSetConfig;
-    const ResolvedIoSet = resolveIoSetClass(ioSetConfig.type);
+    let ioType: IoSetTypes = ioSetConfig.type;
+
+    // if (!ioType) {
+    //   // TODO: подставить по умолчанию если не было подставленно
+    // }
+    // else
+
+    if (ioType !== 'nodejs-developLocal' && ioType !== 'nodejs-developWs') {
+      throw new Error(`Unsupported ioSet type: "${ioType}"`);
+    }
+
+    const ResolvedIoSet = resolveIoSetClass(ioType);
 
     return new ResolvedIoSet(_omit(ioSetConfig, 'type'));
   }

@@ -16,7 +16,6 @@ import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
-import {IoItemClass} from '../../system/interfaces/IoItem';
 
 
 const systemClassFileName = 'System';
@@ -163,7 +162,7 @@ export default class StartProd {
     const buildHostEnv: BuildHostEnv = new BuildHostEnv(
       this.os,
       hostConfig,
-      this.props.workDir,
+      this.props.envSetDir,
       tmpDir
     );
 
@@ -177,7 +176,7 @@ export default class StartProd {
   private async buildIos() {
     console.info(`===> Building io`);
 
-    const buildDir = path.join(this.props.workDir, BUILD_IO_DIR);
+    const buildDir = path.join(this.props.envSetDir, BUILD_IO_DIR);
     const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
     const buildIo: BuildIo = new BuildIo(
       this.os,
@@ -191,7 +190,7 @@ export default class StartProd {
   }
 
   private getPathToProdSystemDir(): string {
-    return path.join(this.props.workDir, systemConfig.envSetDirs.system);
+    return path.join(this.props.workDir, this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
 }

@@ -15,6 +15,7 @@ import SystemConfig from './interfaces/SystemConfig';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
+import IoSetLocal from './ioSet/IoSetLocal';
 
 
 export default class System {
@@ -43,7 +44,7 @@ export default class System {
 
 
   constructor(
-    ioSet: IoSet,
+    ioSet?: IoSet,
     systemConfigExtend?: {[index: string]: any},
     envSetReplacement?: new (system: System) => EnvSet
   ) {
@@ -54,7 +55,15 @@ export default class System {
       this.envSet = new EnvSetLocalFs(this);
     }
 
-    this.ioSet = ioSet;
+    if (ioSet) {
+      // use specified IO set
+      this.ioSet = ioSet;
+    }
+    else {
+      // use local IO set by default
+      this.ioSet = new IoSetLocal();
+    }
+
     this.systemConfig = mergeDeep(systemConfigExtend, systemConfig) as any;
 
     // config which is used only on initialization time
