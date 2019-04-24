@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 
-import WebSocketServerDev, {WebSocketServerProps, WSSeverDev} from 'system/interfaces/io/WebSocketServerDev';
+import WebSocketServerIo, {WebSocketServerProps, WSSeverDev} from 'system/interfaces/io/WebSocketServerIo';
 
 
 export class WSServer implements WSSeverDev {
@@ -42,7 +42,7 @@ export class WSServer implements WSSeverDev {
 }
 
 
-export default class WebSocketServer implements WebSocketServerDev {
+export default class WebSocketServer implements WebSocketServerIo {
 
   // TODO: сохранять инстансы серверов чтобы не создавать дважды на один host и port
 

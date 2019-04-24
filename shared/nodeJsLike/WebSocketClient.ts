@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 
-import WebSocketClientDev, {WebSocketClientProps, WSClientDev} from 'system/interfaces/io/WebSocketClientDev';
+import WebSocketClientIo, {WebSocketClientProps, WSClientDev} from 'system/interfaces/io/WebSocketClientIo';
 
 
 export class WSClient implements WSClientDev {
@@ -33,7 +33,7 @@ export class WSClient implements WSClientDev {
 
 }
 
-export default class WebSocketClient implements WebSocketClientDev {
+export default class WebSocketClient implements WebSocketClientIo {
   newClient(props: WebSocketClientProps): WSClient {
     return new WSClient(props);
   }

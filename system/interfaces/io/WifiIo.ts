@@ -9,6 +9,6 @@ export const Methods = [
 ];
 
 
-export default interface WifiDev {
+export default interface WifiIo {
   configure(params: WifiParams): Promise<void>;
 }

@@ -20,6 +20,6 @@ export interface WSClientDev {
   send(data: any): void;
 }
 
-export default interface WebSocketClientDev {
+export default interface WebSocketClientIo {
 
 }

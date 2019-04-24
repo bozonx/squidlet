@@ -18,6 +18,6 @@ export interface WSSeverDev {
   send(data: any): void;
 }
 
-export default interface WebSocketServerDev {
+export default interface WebSocketServerIo {
 
 }
