@@ -13,7 +13,7 @@ export interface WsClientProps {
 }
 
 
-export default class WsClientWrapper {
+export default class WsClient {
   private readonly incomeDataEvents = new IndexedEvents<IncomeDataHandler>();
   private readonly errorEvents = new IndexedEvents<ErrorHandler>();
   private _client?: WebSocket;

@@ -84,22 +84,23 @@ export default class RemoteCall {
    * Call this method when income message has come.
    * It calls local callbacks or methods
    */
-  async incomeMessage(data: any) {
-    if (!isPlainObject(data) || !data.type) return;
+  async incomeMessage(rawMessage: {[index: string]: any}) {
+    if (!isPlainObject(rawMessage) || !rawMessage.type) return;
 
-    const message: RemoteCallMessage = data;
+    const message: RemoteCallMessage = rawMessage as any;
+    const payload: any = message.payload;
 
     if (message.type === 'callMethod') {
-      await this.callLocalMethod(data.payload);
+      await this.callLocalMethod(payload);
     }
     else if (message.type === 'methodResult') {
-      this.methodsResultEvents.emit(data.payload);
+      this.methodsResultEvents.emit(payload);
     }
     else if (message.type === 'cbCall') {
-      await this.handleRemoteCbCall(data.payload);
+      await this.handleRemoteCbCall(payload);
     }
     else if (message.type === 'cbResult') {
-      this.cbsResultEvents.emit(data.payload);
+      this.cbsResultEvents.emit(payload);
     }
   }
 

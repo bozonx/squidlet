@@ -50,7 +50,7 @@ export default abstract class RemoteIoBase extends IoSetLocal {
   /**
    * Call this method when you has received a message
    */
-  protected async resolveIncomeMessage(message: RemoteCallMessage) {
+  protected resolveIncomeMessage = async (message: {[index: string]: any}) => {
     if (!isPlainObject(message)) {
       return this.system.log.error(`Io set: received message is not an object`);
     }

@@ -67,7 +67,7 @@ export default class WsIoServer {
 
     const remoteCall = new RemoteCall(
       sendToClient,
-      this.ioSet as any,
+      this.ioCollection as any,
       WS_SERVER_HOST_ID,
       hostDefaultConfig.config.devSetResponseTimout,
       console.error,
