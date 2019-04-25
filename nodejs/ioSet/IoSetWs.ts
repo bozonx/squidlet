@@ -1,4 +1,3 @@
-import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import _omit = require('lodash/omit');
 
@@ -6,18 +5,13 @@ import RemoteIoBase from '../../system/ioSet/RemoteIoBase';
 import IoSet from '../../system/interfaces/IoSet';
 import System from '../../system/System';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-
-
-export interface WsClientProps {
-  host: string;
-  port: number;
-}
+import WsClientWrapper, {WsClientProps} from '../../shared/WsClientWrapper';
 
 
 export default class IoSetWs extends RemoteIoBase implements IoSet {
   private wsClientProps: WsClientProps;
-  private _client?: WebSocket;
-  private get client(): WebSocket {
+  private _client?: WsClientWrapper;
+  private get client(): WsClientWrapper {
     return this._client as any;
   }
 
@@ -28,11 +22,9 @@ export default class IoSetWs extends RemoteIoBase implements IoSet {
   }
 
   async init(system: System): Promise<void> {
-    super.init(system);
+    await super.init(system);
 
-    const url = `ws://${this.wsClientProps.host}:${this.wsClientProps.port}?hostid=${this.system.host.id}`;
-
-    this._client = new WebSocket(url, _omit(this.wsClientProps, 'host', 'port'));
+    this._client = new WsClientWrapper(this.system.host.id, this.wsClientProps);
 
     this.listen();
 
@@ -52,23 +44,25 @@ export default class IoSetWs extends RemoteIoBase implements IoSet {
 
 
   protected listen() {
-    this.client.on('close', (code: number, reason: string) => {
-      // TODO: reconnect
-    });
+    this.client.onError((err: string) => this.system.log.error(err));
 
-    this.client.on('error', (err: Error) => {
-      this.system.log.error(`ERROR: ${err}`);
-    });
-
-    this.client.on('message', this.parseIncomeMessage);
-
-    this.client.on('open', () => {
-      // TODO: resolve promise
-    });
-
-    this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.system.log.error(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
-    });
+    // this.client.on('close', (code: number, reason: string) => {
+    //   // TODO: reconnect
+    // });
+    //
+    // this.client.on('error', (err: Error) => {
+    //   this.system.log.error(`ERROR: ${err}`);
+    // });
+    //
+    // this.client.on('message', this.parseIncomeMessage);
+    //
+    // this.client.on('open', () => {
+    //   // TODO: resolve promise
+    // });
+    //
+    // this.client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
+    //   this.system.log.error(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
+    // });
   }
 
   private parseIncomeMessage = async (data: string | Buffer | Buffer[] | ArrayBuffer) => {
