@@ -40,7 +40,7 @@ export default class IoSetWs extends RemoteIoBase implements IoSet {
   }
 
 
-  protected listen() {
+  private listen() {
     this.client.onError((err: string) => this.system.log.error(err));
     this.client.onIncomeMessage(this.resolveIncomeMessage);
   }

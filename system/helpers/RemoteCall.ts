@@ -2,7 +2,7 @@ import RemoteCallMessage, {
   CallMethodPayload,
   CallCbPayload,
   ResultCbPayload,
-  ResultMethodPayload
+  ResultMethodPayload, REMOTE_CALL_MESSAGE_TYPES
 } from '../interfaces/RemoteCallMessage';
 import IndexedEvents from './IndexedEvents';
 import {isPlainObject} from './lodashLike';
@@ -85,7 +85,15 @@ export default class RemoteCall {
    * It calls local callbacks or methods
    */
   async incomeMessage(rawMessage: {[index: string]: any}) {
-    if (!isPlainObject(rawMessage) || !rawMessage.type) return;
+    if (!isPlainObject(rawMessage) || !rawMessage.type) {
+      return;
+    }
+    else if (!rawMessage.type || !REMOTE_CALL_MESSAGE_TYPES.includes(rawMessage.type)) {
+
+      // TODO: может пытаться отдавать ответ с ошибкой ????
+
+      return this.logError(`Io set: incorrect type of message ${JSON.stringify(rawMessage)}`);
+    }
 
     const message: RemoteCallMessage = rawMessage as any;
     const payload: any = message.payload;

@@ -6,6 +6,7 @@ import {isPlainObject} from '../system/helpers/lodashLike';
 
 
 type IncomeDataHandler = (remoteHostId: string, message: {[index: string]: any}) => void;
+type NewConnectionHandler = (remoteHostId: string, socket: WebSocket, request: IncomingMessage) => void;
 type ErrorHandler = (err: string) => void;
 
 export interface WsServerProps {
@@ -14,8 +15,9 @@ export interface WsServerProps {
 }
 
 
-export default class WsIoServer {
+export default class WsServer {
   private readonly incomeDataEvents = new IndexedEvents<IncomeDataHandler>();
+  private readonly newConnectionEvents = new IndexedEvents<NewConnectionHandler>();
   private readonly errorEvents = new IndexedEvents<ErrorHandler>();
   private readonly server: WebSocket.Server;
   private readonly verbose: boolean;
@@ -45,6 +47,10 @@ export default class WsIoServer {
     this.incomeDataEvents.addListener(cb);
   }
 
+  onConnection(cb: NewConnectionHandler) {
+    this.newConnectionEvents.addListener(cb);
+  }
+
   onError(cb: ErrorHandler) {
     this.errorEvents.addListener(cb);
   }
@@ -63,10 +69,10 @@ export default class WsIoServer {
       console.info(`Http server started listening`);
     });
 
-    this.server.on('connection', this.onConnection);
+    this.server.on('connection', this.handleIncomeConnection);
   }
 
-  private onConnection = (socket: WebSocket, request: IncomingMessage) => {
+  private handleIncomeConnection = (socket: WebSocket, request: IncomingMessage) => {
     const splitUrl: string[] = (request.url as any).split('?');
     const getParams: {hostid: string} = querystring.parse(splitUrl[1]) as any;
     const remoteHostId: string = getParams.hostid;
@@ -74,6 +80,7 @@ export default class WsIoServer {
     this.connections[remoteHostId] = socket;
 
     this.listenConnection(remoteHostId);
+    this.newConnectionEvents.emit(remoteHostId, socket, request);
   }
 
   private listenConnection(remoteHostId: string) {
