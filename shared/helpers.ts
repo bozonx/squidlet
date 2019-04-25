@@ -78,21 +78,21 @@ export async function makeDevelopIoCollection(
   platformDir: string,
   machine: string
 ): Promise<{[index: string]: IoItemClass}> {
-  const devsSet: {[index: string]: new (...params: any[]) => any} = {};
+  const ioSet: {[index: string]: new (...params: any[]) => any} = {};
   const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
   const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
   const machineEvalModule: any = require(evalModulePath);
 
-  for (let devPath of machineConfig.devs) {
-    const devName: string = parseDevName(devPath);
-    const devAbsPath = path.resolve(platformDir, devPath);
-    const moduleContent: string = await os.getFileContent(devAbsPath);
-    const compinedModuleContent: string = ts.transpile(moduleContent);
+  for (let ioPath of machineConfig.devs) {
+    const ioName: string = parseDevName(ioPath);
+    const ioAbsPath = path.resolve(platformDir, ioPath);
+    const moduleContent: string = await os.getFileContent(ioAbsPath);
+    const compiledModuleContent: string = ts.transpile(moduleContent);
 
-    devsSet[devName] = machineEvalModule(compinedModuleContent);
+    ioSet[ioName] = machineEvalModule(compiledModuleContent);
   }
 
-  return devsSet;
+  return ioSet;
 }
 
 export async function getOsMachine(os: Os) {

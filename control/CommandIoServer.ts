@@ -36,7 +36,7 @@ export default class CommandIoServer {
 
     console.info(`===> Collecting IO set of platform "${platform}", machine "${machine}"`);
 
-    const ioCollection: {[index: string]: IoItemClass} = await makeDevelopIoCollection(
+    const ioClasses: {[index: string]: IoItemClass} = await makeDevelopIoCollection(
       this.os,
       platformDir,
       machine
@@ -44,7 +44,9 @@ export default class CommandIoServer {
 
     console.info(`===> Starting websocket server on ${serverProps.host}:${serverProps.port}`);
 
-    const server = new WsIoServer(serverProps, ioCollection, this.args.verbose);
+    const server = new WsIoServer(serverProps, ioClasses, this.args.verbose);
+
+    await server.init();
   }
 
   private async resolveMachine(): Promise<NodejsMachines> {

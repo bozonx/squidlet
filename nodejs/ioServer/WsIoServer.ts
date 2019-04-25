@@ -1,7 +1,7 @@
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import RemoteCall from '../../system/helpers/RemoteCall';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
-import {IoItemClass} from '../../system/interfaces/IoItem';
+import IoItem, {IoItemClass} from '../../system/interfaces/IoItem';
 import WsServer from '../../shared/WsServer';
 
 
@@ -18,15 +18,28 @@ export interface WsServerProps {
 
 export default class WsIoServer {
   private readonly server: WsServer;
-  private readonly ioCollection: {[index: string]: IoItemClass};
+  private readonly ioCollection: {[index: string]: IoItem} = {};
   private readonly remoteCalls: {[index: string]: RemoteCall} = {};
 
 
-  constructor(serverProps: WsServerProps, ioCollection: {[index: string]: IoItemClass}, verbose?: boolean) {
-    this.ioCollection = ioCollection;
+  constructor(serverProps: WsServerProps, ioClasses: {[index: string]: IoItemClass}, verbose?: boolean) {
     this.server = new WsServer(serverProps, verbose);
 
+    // make dev instances
+    for (let ioName of Object.keys(ioClasses)) {
+      this.ioCollection[ioName] = new ioClasses[ioName]();
+    }
+
     this.listen();
+  }
+
+  async init() {
+    // call init() method of all the io
+    for (let ioName of Object.keys(this.ioCollection)) {
+      const ioItem: IoItem = this.ioCollection[ioName];
+
+      if (ioItem.init) await ioItem.init();
+    }
   }
 
 
