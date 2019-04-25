@@ -19,6 +19,8 @@ export class MqttDevConnection implements MqttIo {
   private _connected: boolean = false;
   private readonly client: any;
 
+  // TODO: поддержка нескольких соединений как в ws
+
   constructor(params: Props) {
     const url = `${params.protocol}://${params.host}:${params.port}`;
     this.client = mqtt.connect(url);
