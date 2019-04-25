@@ -3,6 +3,10 @@ import * as WebSocket from 'ws';
 import WebSocketClientIo, {WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
 import {ClientRequest, IncomingMessage} from 'http';
 import IndexedEvents from '../../system/helpers/IndexedEvents';
+import {isUint8Array} from '../../system/helpers/collections';
+
+
+type WsClientEvents = 'open' | 'close' | 'message' | 'error';
 
 
 export default class WebSocketClient implements WebSocketClientIo {
@@ -39,7 +43,6 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
   onMessage(connectionId: number, cb: (data: string | Uint8Array) => void) {
-
     // TODO: check data
 
     this.connections[connectionId].on('message', cb);
@@ -49,8 +52,33 @@ export default class WebSocketClient implements WebSocketClientIo {
     this.errorEvents.addListener(cb);
   }
 
+  // on(event: WsClientEvents, cb: Function) {
+  //
+  // }
+
+  removeEventListener(connectionId: number, event: WsClientEvents, listener: (...args: any[]) => void) {
+    if (event === 'error') {
+      this.errorEvents.removeListener(listener);
+    }
+    else {
+      this.connections[connectionId].removeEventListener(event, listener);
+    }
+  }
+
+
   send(connectionId: number, data: string | Uint8Array) {
+
+    // TODO: support of null or undefined, number, boolean ???
+
+    if (typeof data !== 'string' && !isUint8Array(data)) {
+      throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
+    }
+
     this.connections[connectionId].send(data);
+  }
+
+  close(connectionId: number, code: number, reason: string) {
+    this.connections[connectionId].close();
   }
 
   /**
@@ -63,4 +91,7 @@ export default class WebSocketClient implements WebSocketClientIo {
     //this.connections[connectionId].connect();
   }
 
+  destroy() {
+    // TODO: удалить все события и вызвать close на всех клиентах
+  }
 }
