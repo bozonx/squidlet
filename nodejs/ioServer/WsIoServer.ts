@@ -1,5 +1,5 @@
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-import RemoteCall from '../../system/helpers/RemoteCall';
+import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import IoItem, {IoItemClass} from '../../system/interfaces/IoItem';
 import WsServer from '../../shared/WsServer';

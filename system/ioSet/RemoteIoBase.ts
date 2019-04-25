@@ -1,5 +1,5 @@
 import System from '../System';
-import RemoteCall from '../helpers/RemoteCall';
+import RemoteCall from '../helpers/remoteCall/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
 import {isPlainObject} from '../helpers/lodashLike';
 import IoItem from '../interfaces/IoItem';

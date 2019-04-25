@@ -12,7 +12,7 @@ import StorageIo from './interfaces/io/StorageIo';
  */
 export default class EnvSetLocalFs implements EnvSet {
   private readonly system: System;
-  private get devStorage(): StorageIo {
+  private get storageIo(): StorageIo {
     return this.system.ioSet.getInstance('Storage') as any;
   }
 
@@ -100,7 +100,7 @@ export default class EnvSetLocalFs implements EnvSet {
       fileName
     );
 
-    return this.devStorage.readBinFile(pathToFile);
+    return this.storageIo.readBinFile(pathToFile);
   }
 
 
@@ -119,74 +119,7 @@ export default class EnvSetLocalFs implements EnvSet {
   private async readStringFile(fileName: string): Promise<string> {
     const filePath = pathJoin(this.system.systemConfig.rootDirs.envSet, fileName);
 
-    return this.devStorage.readFile(filePath);
+    return this.storageIo.readFile(filePath);
   }
 
 }
-
-
-//
-// getHostHashes(): Promise<{[index: string]: any}> {
-//   return this.readJsonObjectFile(systemConfig.hashFiles.host);
-// }
-//
-// getConfigsHashes(): Promise<{[index: string]: any}> {
-//   return this.readJsonObjectFile(systemConfig.hashFiles.configs);
-// }
-//
-// getEntitiesHashes(): Promise<{[index: string]: any}> {
-//   return this.readJsonObjectFile(systemConfig.hashFiles.entities);
-// }
-//
-// async writeHostFile(fileName: string, content: string): Promise<void> {
-//   // T-O-D-O: create dir, create or overwrite existing
-//   // T-O-D-O: запретить выход наверх
-// }
-//
-// async writeConfigFile(fileName: string, content: string): Promise<void> {
-//   // T-O-D-O: create dir, create or overwrite existing
-//   // T-O-D-O: запретить выход наверх
-// }
-//
-// async writeEntityFile(fileName: string, content: string): Promise<void> {
-//   // T-O-D-O: create dir, create or overwrite existing
-//   // T-O-D-O: запретить выход наверх
-// }
-//
-// writeHostHashesFile(content: string): Promise<void> {
-//   const pathToFile: string = pathJoin(
-//     this.system.host.config.config.envSetDir,
-//     systemConfig.hashFiles.host
-//   );
-//
-//   return this.devStorage.writeFile(pathToFile, content);
-// }
-//
-// writeConfigHashesFile(content: string): Promise<void> {
-//   const pathToFile: string = pathJoin(
-//     this.system.host.config.config.envSetDir,
-//     systemConfig.hashFiles.configs
-//   );
-//
-//   return this.devStorage.writeFile(systemConfig.hashFiles.configs, content);
-// }
-//
-// writeEntitiesHashesFile(content: string): Promise<void> {
-//   const pathToFile: string = pathJoin(
-//     this.system.host.config.config.envSetDir,
-//     systemConfig.hashFiles.entities
-//   );
-//
-//   return this.devStorage.writeFile(systemConfig.hashFiles.entities, content);
-// }
-
-//
-// private async checkEntity(
-//   pluralType: ManifestsTypePluralName,
-//   entityName: string,
-//   fileName?: string
-// ) {
-//
-//   // T-O-D-O: запротить выход наверх, проверить существование entityName
-//
-// }
