@@ -1,9 +1,9 @@
 import * as WebSocket from 'ws';
 
-import WebSocketServerIo, {WebSocketServerProps, WSSeverDev} from 'system/interfaces/io/WebSocketServerIo';
+import WebSocketServerIo, {WebSocketServerProps, WSSeverIo} from 'system/interfaces/io/WebSocketServerIo';
 
 
-export class WSServer implements WSSeverDev {
+export class WSServer implements WSSeverIo {
   private readonly server: WebSocket.Server;
 
   constructor(props: WebSocketServerProps) {

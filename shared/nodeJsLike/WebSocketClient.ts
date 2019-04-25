@@ -1,19 +1,28 @@
 import * as WebSocket from 'ws';
 
-import WebSocketClientIo, {WebSocketClientProps, WSClientDev} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {WebSocketClientProps, WSClientIo} from 'system/interfaces/io/WebSocketClientIo';
 
 
-export class WSClient implements WSClientDev {
-  private readonly client: WebSocket;
+export class WSClient implements WSClientIo {
+  private _client?: WebSocket;
+  private get client(): WebSocket {
+    return this._client as any;
+  }
 
   constructor(props: WebSocketClientProps) {
-    this.client = new WebSocket('ws://www.host.com/path', {
+
+  }
+
+  configure(props: WebSocketClientProps) {
+    // 'ws://www.host.com/path'
+
+    this._client = new WebSocket(props.url, {
     });
   }
 
-  // onOpen(cb: () => void) {
-  //   this.client.on('open', cb);
-  // }
+  onOpen(cb: () => void) {
+    this.client.on('open', cb);
+  }
 
   onClose(cb: () => void) {
     //this.client.on('open', cb);
@@ -30,7 +39,6 @@ export class WSClient implements WSClientDev {
   send(data: any) {
     this.client.send(data);
   }
-
 }
 
 export default class WebSocketClient implements WebSocketClientIo {

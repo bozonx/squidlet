@@ -12,7 +12,7 @@ export const Methods = [
 ];
 
 
-export interface WSSeverDev {
+export interface WSSeverIo {
   //onOpen(cb: () => void): void;
   onMessage(cb: (data: any) => void): void;
   send(data: any): void;

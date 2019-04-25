@@ -11,7 +11,7 @@ export const Methods = [
 ];
 
 
-export interface WSClientDev {
+export interface WSClientIo {
   onClose(cb: () => void): void;
   //onConnection(cb: () => void): void;
   //onListening(cb: () => void): void;
