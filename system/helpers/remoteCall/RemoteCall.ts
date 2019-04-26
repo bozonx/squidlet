@@ -1,22 +1,18 @@
 import RemoteCallMessage, {
   CallMethodPayload,
-  CallCbPayload,
-  ResultCbPayload,
   ResultMethodPayload, REMOTE_CALL_MESSAGE_TYPES
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
 import {isPlainObject} from '../lodashLike';
+import RemoteCallbacks from './RemoteCallbacks';
 
 
 type MethodResultHandler = (payload: ResultMethodPayload) => void;
-type CbResultHandler = (payload: ResultCbPayload) => void;
 
 export interface ObjectToCall {
   // method name: method()
   [index: string]: (...args: any[]) => Promise<any>;
 }
-
-const METHOD_MARK = '!!METHOD!!';
 
 
 /**
@@ -28,8 +24,8 @@ const METHOD_MARK = '!!METHOD!!';
  */
 export default class RemoteCall {
   readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
-  readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
 
+  private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly localMethods: {[index: string]: ObjectToCall};
   // my host id
@@ -37,9 +33,6 @@ export default class RemoteCall {
   private readonly responseTimout: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
-  // real callback of method which will be called
-  private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
-  private readonly fakeCallBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
   constructor(
@@ -57,6 +50,13 @@ export default class RemoteCall {
     this.responseTimout = responseTimout;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
+    this.remoteCallbacks = new RemoteCallbacks(
+      send,
+      senderId,
+      responseTimout,
+      logError,
+      generateUniqId
+    );
   }
 
 
@@ -77,7 +77,12 @@ export default class RemoteCall {
 
     await this.send(message);
 
-    return this.waitForMethodResponse(objectName, method);
+    return this.waitForResponse(
+      this.cbsResultEvents,
+      (payload: ResultMethodPayload) => {
+        return objectName !== payload.objectName || method !== payload.method;
+      }
+    );
   }
 
   /**
@@ -104,129 +109,42 @@ export default class RemoteCall {
     else if (message.type === 'methodResult') {
       this.methodsResultEvents.emit(payload);
     }
-    else if (message.type === 'cbCall') {
-      await this.handleRemoteCbCall(payload);
-    }
-    else if (message.type === 'cbResult') {
-      this.cbsResultEvents.emit(payload);
+    else {
+      // try to recognize in remote callback class
+      await this.remoteCallbacks.incomeMessage(message);
     }
   }
 
   async removeCallBack(cb: (...args: any[]) => Promise<any>) {
-    // TODO: решить как удалить хэндлеры колбюков когда они уже не нужны
-    // TODO: удалить свой колбэк и отправить сообщение на удаление фэйкового колбэка
+    this.remoteCallbacks.registerCallBack(cb);
   }
 
   async destroy() {
-    // TODO: отписаться от всех коллбэков на сервере
+    this.remoteCallbacks.destroy();
+
+    // TODO: отписаться от всех методов на сервере
   }
+
+  
+  // /**
+  //  * Wait while response of method is received
+  //  */
+  // private waitForMethodResponse(objectName: string, method: string): Promise<any> {
+  //   return this.waitForResponse(
+  //     this.cbsResultEvents,
+  //     (payload: ResultMethodPayload) => {
+  //       return objectName !== payload.objectName || method !== payload.method;
+  //     }
+  //   );
+  // }
 
   /**
-   * Wait while response of method is received
+   * Call real local method when message to do it has been received.
    */
-  private waitForMethodResponse(objectName: string, method: string): Promise<any> {
-    return this.waitForResponse(
-      this.cbsResultEvents,
-      (payload: ResultMethodPayload) => {
-        return objectName !== payload.objectName || method !== payload.method;
-      }
-    );
-
-    // return new Promise((resolve, reject) => {
-    //   let wasFulfilled: boolean = false;
-    //   let handlerIndex: number;
-    //   const handler = (payload: ResultMethodPayload) => {
-    //     // if not expected method - skip
-    //     if (objectName !== payload.objectName || method !== payload.method) return;
-    //
-    //     wasFulfilled = true;
-    //     this.methodsResultEvents.removeListener(handlerIndex);
-    //
-    //     if (payload.error) {
-    //       return reject(new Error(payload.error));
-    //     }
-    //
-    //     resolve(payload.result);
-    //   };
-    //
-    //   handlerIndex = this.methodsResultEvents.addListener(handler);
-    //
-    //   setTimeout(() => {
-    //     if (wasFulfilled) return;
-    //
-    //     wasFulfilled = true;
-    //     this.methodsResultEvents.removeListener(handlerIndex);
-    //     reject(`Remote dev set request timeout has been exceeded.`);
-    //   }, this.responseTimout);
-    // });
-  }
-
-  private waitForCbResponse(cbId: string): Promise<any> {
-    return this.waitForResponse(
-      this.cbsResultEvents,
-      (payload: ResultCbPayload) => cbId !== payload.cbId
-    );
-  }
-
-  /**
-   * Call a real callback after a fake callback was called on the other side
-   */
-  private async handleRemoteCbCall(payload: CallCbPayload) {
-    let result: any;
-    let error;
-
-    if (this.callBacks[payload.cbId]) {
-      try {
-        result = await this.callBacks[payload.cbId](...payload.args);
-      }
-      catch (err) {
-        error = err;
-      }
-    }
-    else {
-      error = `Callback id "${payload.cbId}" hasn't been found`;
-    }
-
-    // next send response
-
-    const resultPayload: ResultCbPayload = {
-      senderId: this.senderId,
-      cbId: payload.cbId,
-      error,
-      result,
-    };
-    const message: RemoteCallMessage = {
-      type: 'cbResult',
-      payload: resultPayload,
-    };
-
-    try {
-      await this.send(message);
-    }
-    catch (err) {
-      this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
-    }
-  }
-
   private async callLocalMethod(payload: CallMethodPayload) {
-    let result: any;
-    let error;
+    const { result, error } = await this.safeCallMethod(payload.objectName, payload.method, payload.args);
 
-    if (this.localMethods[payload.objectName] && this.localMethods[payload.objectName][payload.method]) {
-      const args: any[] = this.prepareArgsToCall(payload.args);
-
-      try {
-        result = await this.localMethods[payload.objectName][payload.method](...args);
-      }
-      catch (err) {
-        error = err;
-      }
-    }
-    else {
-      error = `Method "${payload.objectName}.${payload.method}" hasn't been found`;
-    }
-
-    // next send response
+    // next is sending response
 
     const resultPayload: ResultMethodPayload = {
       senderId: this.senderId,
@@ -236,7 +154,7 @@ export default class RemoteCall {
       result,
     };
     const message: RemoteCallMessage = {
-      type: 'cbResult',
+      type: 'methodResult',
       payload: resultPayload,
     };
 
@@ -247,39 +165,45 @@ export default class RemoteCall {
       this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
     }
   }
+  
+  private async safeCallMethod(
+    objectName: string,
+    method: string,
+    args: any[]
+  ): Promise<{result: any, error: string}> {
+    let result: any;
+    let error;
+    
+    if (this.localMethods[objectName] && this.localMethods[objectName][method]) {
+      const preparedArgs: any[] = this.prepareArgsToCall(args);
 
-  private prepareArgsToSend(rawArgs: any[]): any[] {
-    const prapared: any[] = [];
-
-    for (let arg of rawArgs) {
-      if (typeof arg === 'function') {
-        const methodId: string = this.generateUniqId();
-        const methodMark = `${METHOD_MARK}${methodId}`;
-
-        this.callBacks[methodId] = arg;
-        prapared.push(methodMark);
+      try {
+        result = await this.localMethods[objectName][method](...preparedArgs);
       }
-      else {
-        prapared.push(arg);
+      catch (err) {
+        error = err;
       }
     }
-
-    return prapared;
+    else {
+      error = `Method "${objectName}.${method}" hasn't been found`;
+    }
+    
+    return { result, error };
   }
 
   /**
-   * Prepare args to call the method
+   * Register callbacks and set special mark instead of it.
+   * These callbacks will be wait of calling
    */
-  private prepareArgsToCall(rawArgs: any[]): any[] {
+  private prepareArgsToSend(rawArgs: any[]): any[] {
     const prepared: any[] = [];
 
     for (let arg of rawArgs) {
-      if (typeof arg === 'string' && arg.indexOf(METHOD_MARK) === 0) {
-        const cbId: string = arg.slice(METHOD_MARK.length);
-        const fakeCallback = this.makeFakeCb(cbId);
+      if (typeof arg === 'function') {
+        // register callback and set special method mark instead of it
+        const methodMark: string = this.remoteCallbacks.registerCallBack(arg);
 
-        this.fakeCallBacks[cbId] = fakeCallback;
-        prepared.push(fakeCallback);
+        prepared.push(methodMark);
       }
       else {
         prepared.push(arg);
@@ -290,65 +214,22 @@ export default class RemoteCall {
   }
 
   /**
-   * When fake cb is called it sends a message to other side to call a real message.
-   * It doesn't support functions in arguments!
+   * Prepare args to call the local method.
+   * It replaces callback mark with fake callback which will send request back to call a real callback.
    */
-  private makeFakeCb(cbId: string): (...args: any[]) => Promise<any> {
-    return async (...args: any[]): Promise<any> => {
-      const resultPayload: CallCbPayload = {
-        senderId: this.senderId,
-        cbId,
-        // there is functions are not allowed!
-        args,
-      };
-      const message: RemoteCallMessage = {
-        type: 'cbCall',
-        payload: resultPayload,
-      };
+  private prepareArgsToCall(rawArgs: any[]): any[] {
+    const prepared: any[] = [];
 
-      try {
-        await this.send(message);
+    for (let arg of rawArgs) {
+      if (typeof arg === 'string' && this.remoteCallbacks.isCallBackMark(arg)) {
+        prepared.push(this.remoteCallbacks.makeFakeCallBack(arg));
       }
-      catch (err) {
-        this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
+      else {
+        prepared.push(arg);
       }
+    }
 
-      return this.waitForCbResponse(cbId);
-    };
+    return prepared;
   }
-
-  private waitForResponse(
-    events: IndexedEvents<any>,
-    resolveSelfEventCb: (payload: any) => boolean
-  ): Promise<any> {
-    return new Promise((resolve, reject) => {
-      let wasFulfilled: boolean = false;
-      let handlerIndex: number;
-      const handler = (payload: {error?: string, result: any}) => {
-        const isMyEvent: boolean = !resolveSelfEventCb(payload);
-
-        if (!isMyEvent) return;
-
-        wasFulfilled = true;
-        events.removeListener(handlerIndex);
-
-        if (payload.error) {
-          return reject(new Error(payload.error));
-        }
-
-        resolve(payload.result);
-      };
-
-      handlerIndex = events.addListener(handler);
-
-      setTimeout(() => {
-        if (wasFulfilled) return;
-
-        wasFulfilled = true;
-        events.removeListener(handlerIndex);
-        reject(`Remote dev set request timeout has been exceeded.`);
-      }, this.responseTimout);
-    });
-  }
-
+  
 }
