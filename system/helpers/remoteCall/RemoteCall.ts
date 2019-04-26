@@ -78,7 +78,7 @@ export default class RemoteCall {
     await this.send(message);
 
     return this.waitForResponse(
-      this.cbsResultEvents,
+      this.methodsResultEvents,
       (payload: ResultMethodPayload) => {
         return objectName !== payload.objectName || method !== payload.method;
       }
@@ -162,7 +162,7 @@ export default class RemoteCall {
       await this.send(message);
     }
     catch (err) {
-      this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
+      this.logError(`RemoteCall: Can't send a "methodResult" message: ${err}`);
     }
   }
   
