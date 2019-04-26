@@ -5,6 +5,7 @@ import RemoteCallMessage, {
 import IndexedEvents from '../IndexedEvents';
 import {isPlainObject} from '../lodashLike';
 import RemoteCallbacks from './RemoteCallbacks';
+import {waitForResponse} from './helpers';
 
 
 type MethodResultHandler = (payload: ResultMethodPayload) => void;
@@ -77,11 +78,12 @@ export default class RemoteCall {
 
     await this.send(message);
 
-    return this.waitForResponse(
+    return waitForResponse(
       this.methodsResultEvents,
       (payload: ResultMethodPayload) => {
         return objectName !== payload.objectName || method !== payload.method;
-      }
+      },
+      this.responseTimout
     );
   }
 

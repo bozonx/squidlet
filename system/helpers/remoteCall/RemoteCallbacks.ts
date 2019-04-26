@@ -3,6 +3,7 @@ import RemoteCallMessage, {
   ResultCbPayload,
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
+import {waitForResponse} from './helpers';
 
 
 type CbResultHandler = (payload: ResultCbPayload) => void;
@@ -99,13 +100,6 @@ export default class RemoteCallbacks {
     // TODO: отписаться от всех коллбэков на сервере
   }
 
-  // private waitForCbResponse(cbId: string): Promise<any> {
-  //   return this.waitForResponse(
-  //     this.cbsResultEvents,
-  //     (payload: ResultCbPayload) => cbId !== payload.cbId
-  //   );
-  // }
-
   /**
    * When fake cb is called it sends a message to other side to call a real message.
    * It doesn't support functions in arguments!
@@ -130,9 +124,10 @@ export default class RemoteCallbacks {
         this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
       }
 
-      return this.waitForResponse(
+      return waitForResponse(
         this.cbsResultEvents,
-        (payload: ResultCbPayload) => cbId !== payload.cbId
+        (payload: ResultCbPayload) => cbId !== payload.cbId,
+        this.responseTimout
       );
     };
   }
