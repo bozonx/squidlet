@@ -3,17 +3,27 @@ import IndexedEvents from '../IndexedEvents';
 
 export function waitForResponse(
   events: IndexedEvents<any>,
-  resolveSelfEventCb: (payload: any) => boolean,
+  isMyEventCb: (payload: any) => boolean,
   responseTimout: number
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     let wasFulfilled: boolean = false;
     let handlerIndex: number;
+
+    const timeout = setTimeout(() => {
+      if (wasFulfilled) return;
+
+      wasFulfilled = true;
+      events.removeListener(handlerIndex);
+      reject(`Remote dev set request timeout has been exceeded.`);
+    }, responseTimout * 1000);
+
     const handler = (payload: {error?: string, result: any}) => {
-      const isMyEvent: boolean = !resolveSelfEventCb(payload);
+      const isMyEvent: boolean = isMyEventCb(payload);
 
       if (!isMyEvent) return;
 
+      clearTimeout(timeout);
       wasFulfilled = true;
       events.removeListener(handlerIndex);
 
@@ -25,14 +35,6 @@ export function waitForResponse(
     };
 
     handlerIndex = events.addListener(handler);
-
-    setTimeout(() => {
-      if (wasFulfilled) return;
-
-      wasFulfilled = true;
-      events.removeListener(handlerIndex);
-      reject(`Remote dev set request timeout has been exceeded.`);
-    }, responseTimout);
   });
 
 }

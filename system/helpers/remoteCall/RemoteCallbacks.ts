@@ -126,7 +126,7 @@ export default class RemoteCallbacks {
 
       return waitForResponse(
         this.cbsResultEvents,
-        (payload: ResultCbPayload) => cbId !== payload.cbId,
+        (payload: ResultCbPayload) => cbId === payload.cbId,
         this.responseTimout
       );
     };

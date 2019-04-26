@@ -76,15 +76,18 @@ export default class RemoteCall {
       payload,
     };
 
-    await this.send(message);
-
-    return waitForResponse(
+    const sendPromise = this.send(message);
+    const resultPromise = waitForResponse(
       this.methodsResultEvents,
       (payload: ResultMethodPayload) => {
-        return objectName !== payload.objectName || method !== payload.method;
+        return objectName === payload.objectName && method === payload.method;
       },
       this.responseTimout
     );
+
+    await sendPromise;
+
+    return resultPromise;
   }
 
   /**
