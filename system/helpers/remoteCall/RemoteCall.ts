@@ -76,6 +76,8 @@ export default class RemoteCall {
       payload,
     };
 
+    // TODO: refactor
+
     const sendPromise = this.send(message);
     const resultPromise = waitForResponse(
       this.methodsResultEvents,
@@ -130,18 +132,6 @@ export default class RemoteCall {
     // TODO: отписаться от всех методов на сервере
   }
 
-  
-  // /**
-  //  * Wait while response of method is received
-  //  */
-  // private waitForMethodResponse(objectName: string, method: string): Promise<any> {
-  //   return this.waitForResponse(
-  //     this.cbsResultEvents,
-  //     (payload: ResultMethodPayload) => {
-  //       return objectName !== payload.objectName || method !== payload.method;
-  //     }
-  //   );
-  // }
 
   /**
    * Call real local method when message to do it has been received.

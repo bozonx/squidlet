@@ -6,7 +6,7 @@ uniqId = 0
 
 describe.only 'helpers.Republish', ->
   beforeEach ->
-    @remoteCb = undefined
+    @fakeCb = undefined
     @clientSend = (message) =>
       await @server.incomeMessage(message)
     @serverSend = (message) =>
@@ -14,7 +14,9 @@ describe.only 'helpers.Republish', ->
     @serverLocalMethods = {
       obj: {
         method1: sinon.stub().returns('result')
-        methodWithCb: (param, cb) => @cb = @remoteCb
+        methodWithCb: (param, fakeCb) =>
+          @fakeCb = fakeCb
+          return 'result'
       }
     }
     @clientSenderId = 'client';
@@ -35,10 +37,11 @@ describe.only 'helpers.Republish', ->
     sinon.assert.calledWith(@serverLocalMethods.obj.method1, 'param1', 5)
 
   it "call method on server and server call cb", ->
-    cb = sinon.spy()
-    await @client.callMethod('obj', 'methodWithCb', 'param1', cb);
+    realCb = sinon.stub().returns('cbResult')
+    await @client.callMethod('obj', 'methodWithCb', 'param1', realCb);
 
-    await @cb('cbParam', 5)
+    result = await @fakeCb('cbParam', 5)
 
-    sinon.assert.calledOnce(cb)
-    sinon.assert.calledWith(cb, 'cbParam', 5)
+    assert.equal(result, 'cbResult')
+    sinon.assert.calledOnce(realCb)
+    sinon.assert.calledWith(realCb, 'cbParam', 5)

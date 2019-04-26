@@ -117,18 +117,25 @@ export default class RemoteCallbacks {
         payload: resultPayload,
       };
 
-      try {
-        await this.send(message);
-      }
-      catch (err) {
-        this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
-      }
+      // TODO: refactor
 
-      return waitForResponse(
+      const sendPromise = this.send(message);
+
+      // wait for result of real cb
+      const resultPromise = waitForResponse(
         this.cbsResultEvents,
         (payload: ResultCbPayload) => cbId === payload.cbId,
         this.responseTimout
       );
+
+      try {
+        await sendPromise;
+      }
+      catch (err) {
+        return this.logError(`RemoteCall: Can't send a "cbResult" message: ${err}`);
+      }
+
+      return resultPromise;
     };
   }
 
@@ -137,7 +144,8 @@ export default class RemoteCallbacks {
    */
   private async handleRemoteCbCall(payload: CallCbPayload) {
     let result: any;
-    let error;
+    let error: string | undefined;
+
 
     if (this.callBacks[payload.cbId]) {
       try {
