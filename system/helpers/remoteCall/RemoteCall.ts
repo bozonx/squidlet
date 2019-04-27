@@ -62,6 +62,13 @@ export default class RemoteCall {
 
 
   /**
+   * Send signal that connection is inited which removes previously set callback on other side
+   */
+  initConnection() {
+    // TODO: send signal on init connection
+  }
+
+  /**
    * Call method on remote machine
    */
   async callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
@@ -127,7 +134,7 @@ export default class RemoteCall {
   }
 
   async destroy() {
-    this.remoteCallbacks.destroy();
+    await this.remoteCallbacks.destroy();
 
     // TODO: отписаться от всех методов на сервере
   }
