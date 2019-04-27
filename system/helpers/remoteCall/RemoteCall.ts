@@ -29,7 +29,7 @@ export default class RemoteCall {
   private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly localMethods: {[index: string]: ObjectToCall};
-  private readonly responseTimout: number;
+  private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
 
@@ -38,18 +38,18 @@ export default class RemoteCall {
     send: (message: RemoteCallMessage) => Promise<void>,
     // objects with methods which will be called from other host
     localMethods: {[index: string]: ObjectToCall} = {},
-    responseTimout: number,
+    responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.send = send;
     this.localMethods = localMethods;
-    this.responseTimout = responseTimout;
+    this.responseTimoutSec = responseTimoutSec;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
     this.remoteCallbacks = new RemoteCallbacks(
       send,
-      responseTimout,
+      responseTimoutSec,
       logError,
       generateUniqId
     );
@@ -85,7 +85,7 @@ export default class RemoteCall {
       (payload: ResultMethodPayload) => {
         return objectName === payload.objectName && method === payload.method;
       },
-      this.responseTimout
+      this.responseTimoutSec
     );
 
     await sendPromise;

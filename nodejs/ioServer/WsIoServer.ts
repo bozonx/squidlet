@@ -58,7 +58,7 @@ export default class WsIoServer {
       sendToClient,
       this.ioCollection as any,
       WS_SERVER_HOST_ID,
-      hostDefaultConfig.config.devSetResponseTimout,
+      hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.error,
       this.generateUniqId
     );

@@ -4,7 +4,7 @@ import IndexedEvents from '../IndexedEvents';
 export function waitForResponse(
   events: IndexedEvents<any>,
   isMyEventCb: (payload: any) => boolean,
-  responseTimout: number
+  responseTimoutSec: number
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     let wasFulfilled: boolean = false;
@@ -16,7 +16,7 @@ export function waitForResponse(
       wasFulfilled = true;
       events.removeListener(handlerIndex);
       reject(`Remote dev set request timeout has been exceeded.`);
-    }, responseTimout * 1000);
+    }, responseTimoutSec * 1000);
 
     const handler = (payload: {error?: string, result: any}) => {
       const isMyEvent: boolean = isMyEventCb(payload);

@@ -27,7 +27,7 @@ export default abstract class RemoteIoBase extends IoSetLocal {
       // client don't have any local methods
       {},
       this.system.host.id,
-      this.system.host.config.config.devSetResponseTimout,
+      this.system.host.config.config.ioSetResponseTimoutSec,
       this.system.log.error,
       this.system.host.generateUniqId
     );

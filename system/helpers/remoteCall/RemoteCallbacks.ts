@@ -22,7 +22,7 @@ export default class RemoteCallbacks {
   readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
 
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
-  private readonly responseTimout: number;
+  private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
   // real callback of method which will be called
@@ -32,12 +32,12 @@ export default class RemoteCallbacks {
 
   constructor(
     send: (message: RemoteCallMessage) => Promise<void>,
-    responseTimout: number,
+    responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.send = send;
-    this.responseTimout = responseTimout;
+    this.responseTimoutSec = responseTimoutSec;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
   }
@@ -120,7 +120,7 @@ export default class RemoteCallbacks {
       const resultPromise = waitForResponse(
         this.cbsResultEvents,
         (payload: ResultCbPayload) => cbId === payload.cbId,
-        this.responseTimout
+        this.responseTimoutSec
       );
 
       try {

@@ -34,7 +34,7 @@ export default interface PreHostConfig {
     // resend timeout in seconds
     senderResendTimeout?: number;
     // response of remote devSet
-    devSetResponseTimout?: number;
+    ioSetResponseTimoutSec?: number;
 
     // custom params
     //params?: {[index: string]: any};
