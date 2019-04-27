@@ -108,6 +108,16 @@ export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: 
 }
 
 /**
+ * Clear all the props in object
+ */
+export function clearObject(obj: {[index: string]: any}) {
+
+  // TODO: test
+
+  for (let name of Object.keys(obj)) delete obj[name];
+}
+
+/**
  * Merges two objects deeply.
  * It doesn't mutate any object.
  */

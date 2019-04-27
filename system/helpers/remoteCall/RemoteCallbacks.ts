@@ -4,6 +4,7 @@ import RemoteCallMessage, {
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
 import {waitForResponse} from './helpers';
+import {clearObject} from '../collections';
 
 
 type CbResultHandler = (payload: ResultCbPayload) => void;
@@ -19,15 +20,14 @@ const METHOD_MARK = '!!METHOD!!';
  * and doesn't support functions in callback arguments.
  */
 export default class RemoteCallbacks {
-  readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
-
+  private readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
+  // real callback of method which will be called
+  private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
+  private readonly fakeCallBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
-  // real callback of method which will be called
-  private readonly callBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
-  private readonly fakeCallBacks: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
   constructor(
@@ -101,13 +101,17 @@ export default class RemoteCallbacks {
     }
   }
 
-  async removeCallBack(cb: (...args: any[]) => Promise<any>) {
-    // TODO: решить как удалить хэндлеры колбюков когда они уже не нужны
-    // TODO: удалить свой колбэк и отправить сообщение на удаление фэйкового колбэка
-  }
-
   async destroy() {
-    // TODO: отписаться от всех коллбэков на сервере
+    // TODO: прекратить ожидать ответы
+    // const destroyMessage: RemoteCallMessage = {
+    //   type: 'destroy',
+    // };
+    //
+    // await this.send();
+
+    this.cbsResultEvents.removeAll();
+    clearObject(this.callBacks);
+    clearObject(this.fakeCallBacks);
   }
 
   /**

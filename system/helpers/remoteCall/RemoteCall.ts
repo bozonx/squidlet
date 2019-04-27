@@ -1,8 +1,7 @@
 import RemoteCallMessage, {
   CallMethodPayload,
   ResultMethodPayload,
-  REMOTE_CALL_MESSAGE_TYPES,
-  InitConnectionMessage
+  REMOTE_CALL_MESSAGE_TYPES
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
 import {isPlainObject} from '../lodashLike';
@@ -52,14 +51,14 @@ export default class RemoteCall {
   }
 
 
-  /**
-   * Send signal that connection is inited which removes previously set callback on other side
-   */
-  async init() {
-    const message: InitConnectionMessage = { type: 'init' };
-
-    await this.send(message);
-  }
+  // /**
+  //  * Send signal that connection is inited which removes previously set callback on other side
+  //  */
+  // async init() {
+  //   const message: RemoteCallMessage = { type: 'init' };
+  //
+  //   await this.send(message);
+  // }
 
   /**
    * Call method on remote machine
@@ -129,21 +128,34 @@ export default class RemoteCall {
 
       this.methodsResultEvents.emit(payload);
     }
+    // else if (message.type === 'init') {
+    //   this.handleInitMessage();
+    // }
+    // else if (message.type === 'destroy') {
+    //   this.handleDestroyMessage();
+    // }
     else {
       // try to recognize in remote callback class
       await this.remoteCallbacks.incomeMessage(message);
     }
   }
 
-  async removeCallBack(cb: (...args: any[]) => Promise<any>) {
-    this.remoteCallbacks.registerCallBack(cb);
-  }
-
   async destroy() {
+
+    // TODO: прекратить ожидать ответы
+
     await this.remoteCallbacks.destroy();
     this.methodsResultEvents.removeAll();
   }
 
+
+  // private handleInitMessage() {
+  //   // TODO: !!!
+  // }
+  //
+  // private handleDestroyMessage() {
+  //   // TODO: !!!
+  // }
 
   /**
    * Call real local method when message to do it has been received.
