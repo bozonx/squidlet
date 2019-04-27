@@ -8,8 +8,6 @@ import WsServer from '../../shared/WsServer';
 // TODO: remove
 let uniqIndex = 10000;
 
-const WS_SERVER_HOST_ID = 'wsServer';
-
 export interface WsServerProps {
   host: string;
   port: number;
@@ -57,7 +55,6 @@ export default class WsIoServer {
     this.remoteCalls[remoteHostId] = new RemoteCall(
       sendToClient,
       this.ioCollection as any,
-      WS_SERVER_HOST_ID,
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.error,
       this.generateUniqId
