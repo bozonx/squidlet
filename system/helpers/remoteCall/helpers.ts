@@ -18,7 +18,9 @@ export function waitForResponse(
       reject(`Remote dev set request timeout has been exceeded.`);
     }, responseTimoutSec * 1000);
 
-    const handler = (payload: {error?: string, result: any}) => {
+    const handler = (payload: {error?: string, result: any} | undefined) => {
+      if (!payload) return ;
+
       const isMyEvent: boolean = isMyEventCb(payload);
 
       if (!isMyEvent) return;

@@ -6,6 +6,8 @@ export const REMOTE_CALL_MESSAGE_TYPES = [
   'methodResult',
   'cbCall',
   'cbResult',
+  'init',
+  'destroy',
 ];
 
 export type RemoteCallMessageType =
@@ -16,7 +18,9 @@ export type RemoteCallMessageType =
   // listen for callback call
   'cbCall' |
   // return cb result
-  'cbResult';
+  'cbResult' |
+  'init' |
+  'destroy';
 
 export interface ResultLikePayload {
   error: string | undefined;
@@ -43,7 +47,11 @@ export interface ResultCbPayload extends ResultLikePayload {
   cbId: string;
 }
 
+export interface InitConnectionMessage {
+  type: RemoteCallMessageType;
+}
+
 export default interface RemoteCallMessage {
   type: RemoteCallMessageType;
-  payload: CallMethodPayload | ResultMethodPayload | CallCbPayload | ResultCbPayload;
+  payload?: CallMethodPayload | ResultMethodPayload | CallCbPayload | ResultCbPayload;
 }

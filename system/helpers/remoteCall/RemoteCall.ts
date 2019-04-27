@@ -1,6 +1,8 @@
 import RemoteCallMessage, {
   CallMethodPayload,
-  ResultMethodPayload, REMOTE_CALL_MESSAGE_TYPES
+  ResultMethodPayload,
+  REMOTE_CALL_MESSAGE_TYPES,
+  InitConnectionMessage
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
 import {isPlainObject} from '../lodashLike';
@@ -24,8 +26,7 @@ export interface ObjectToCall {
  * and doesn't support functions in callback arguments.
  */
 export default class RemoteCall {
-  readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
-
+  private readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
   private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly localMethods: {[index: string]: ObjectToCall};
@@ -47,20 +48,17 @@ export default class RemoteCall {
     this.responseTimoutSec = responseTimoutSec;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
-    this.remoteCallbacks = new RemoteCallbacks(
-      send,
-      responseTimoutSec,
-      logError,
-      generateUniqId
-    );
+    this.remoteCallbacks = new RemoteCallbacks(send, responseTimoutSec, logError, generateUniqId);
   }
 
 
   /**
    * Send signal that connection is inited which removes previously set callback on other side
    */
-  initConnection() {
-    // TODO: send signal on init connection
+  async init() {
+    const message: InitConnectionMessage = { type: 'init' };
+
+    await this.send(message);
   }
 
   /**
@@ -112,9 +110,23 @@ export default class RemoteCall {
     const payload: any = message.payload;
 
     if (message.type === 'callMethod') {
+      if (!payload) {
+
+        // TODO: отдать ошибку клиенту
+
+        throw new Error(`Payload has to be specified for message type "callMethod"`);
+      }
+
       await this.callLocalMethod(payload);
     }
     else if (message.type === 'methodResult') {
+      if (!payload) {
+
+        // TODO: отдать ошибку клиенту
+
+        throw new Error(`Payload has to be specified for message type "methodResult"`);
+      }
+
       this.methodsResultEvents.emit(payload);
     }
     else {
@@ -129,8 +141,7 @@ export default class RemoteCall {
 
   async destroy() {
     await this.remoteCallbacks.destroy();
-
-    // TODO: отписаться от всех методов на сервере
+    this.methodsResultEvents.removeAll();
   }
 
 

@@ -80,9 +80,23 @@ export default class RemoteCallbacks {
     const payload: any = message.payload;
 
     if (message.type === 'cbCall') {
+      if (!payload) {
+
+        // TODO: отдать ошибку клиенту
+
+        throw new Error(`Payload has to be specified for message type "cbCall"`);
+      }
+
       await this.handleRemoteCbCall(payload);
     }
     else if (message.type === 'cbResult') {
+      if (!payload) {
+
+        // TODO: отдать ошибку клиенту
+
+        throw new Error(`Payload has to be specified for message type "cbResult"`);
+      }
+
       this.cbsResultEvents.emit(payload);
     }
   }
