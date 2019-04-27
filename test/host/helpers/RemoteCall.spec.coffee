@@ -19,15 +19,13 @@ describe.only 'helpers.Republish', ->
           return 'result'
       }
     }
-    @clientSenderId = 'client';
-    @serverSenderId = 'master';
     @logError = sinon.spy()
     @generateUniqId = () =>
       uniqId++
       return String(uniqId)
 
-    @client = new RemoteCall(@clientSend, {}, @clientSenderId, 1, @logError, @generateUniqId)
-    @server = new RemoteCall(@serverSend, @serverLocalMethods, @serverSenderId, 1, @logError, @generateUniqId)
+    @client = new RemoteCall(@clientSend, {}, 1, @logError, @generateUniqId)
+    @server = new RemoteCall(@serverSend, @serverLocalMethods, 1, @logError, @generateUniqId)
 
   it "call method on server", ->
     result = await @client.callMethod('obj', 'method1', 'param1', 5);

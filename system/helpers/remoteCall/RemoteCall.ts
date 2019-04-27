@@ -29,8 +29,6 @@ export default class RemoteCall {
   private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
   private readonly localMethods: {[index: string]: ObjectToCall};
-  // my host id
-  private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
@@ -40,20 +38,17 @@ export default class RemoteCall {
     send: (message: RemoteCallMessage) => Promise<void>,
     // objects with methods which will be called from other host
     localMethods: {[index: string]: ObjectToCall} = {},
-    senderId: string,
     responseTimout: number,
     logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.send = send;
     this.localMethods = localMethods;
-    this.senderId = senderId;
     this.responseTimout = responseTimout;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
     this.remoteCallbacks = new RemoteCallbacks(
       send,
-      senderId,
       responseTimout,
       logError,
       generateUniqId
@@ -73,7 +68,6 @@ export default class RemoteCall {
    */
   async callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
     const payload: CallMethodPayload = {
-      senderId: this.senderId,
       objectName,
       method,
       args: this.prepareArgsToSend(args),
@@ -149,7 +143,6 @@ export default class RemoteCall {
     // next is sending response
 
     const resultPayload: ResultMethodPayload = {
-      senderId: this.senderId,
       objectName: payload.objectName,
       method: payload.method,
       error,

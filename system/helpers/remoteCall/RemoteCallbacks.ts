@@ -22,8 +22,6 @@ export default class RemoteCallbacks {
   readonly cbsResultEvents = new IndexedEvents<CbResultHandler>();
 
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
-  // my host id
-  private readonly senderId: string;
   private readonly responseTimout: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
@@ -34,13 +32,11 @@ export default class RemoteCallbacks {
 
   constructor(
     send: (message: RemoteCallMessage) => Promise<void>,
-    senderId: string,
     responseTimout: number,
     logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.send = send;
-    this.senderId = senderId;
     this.responseTimout = responseTimout;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
@@ -107,7 +103,6 @@ export default class RemoteCallbacks {
   private makeFakeCb(cbId: string): (...args: any[]) => Promise<any> {
     return async (...args: any[]): Promise<any> => {
       const resultPayload: CallCbPayload = {
-        senderId: this.senderId,
         cbId,
         // there is functions are not allowed!
         args,
@@ -162,7 +157,6 @@ export default class RemoteCallbacks {
     // next send response
 
     const resultPayload: ResultCbPayload = {
-      senderId: this.senderId,
       cbId: payload.cbId,
       error,
       result,

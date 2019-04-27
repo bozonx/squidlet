@@ -24,26 +24,22 @@ export interface ResultLikePayload {
 }
 
 export interface CallMethodPayload {
-  senderId: string;
   objectName: string;
   method: string;
   args: Primitives[];
 }
 
 export interface ResultMethodPayload extends ResultLikePayload {
-  senderId: string;
   objectName: string;
   method: string;
 }
 
 export interface CallCbPayload {
-  senderId: string;
   cbId: string;
   args: Primitives[];
 }
 
 export interface ResultCbPayload extends ResultLikePayload {
-  senderId: string;
   cbId: string;
 }
 
