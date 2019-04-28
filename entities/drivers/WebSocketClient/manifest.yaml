@@ -1,0 +1,8 @@
+name: WebSocketClient
+main: WebSocketClient.ts
+system: true
+
+devs:
+  - WebSocketClient
+
+#props: {}

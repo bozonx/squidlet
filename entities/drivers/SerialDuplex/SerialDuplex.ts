@@ -7,14 +7,14 @@ import {DATA_ADDRESS_LENGTH} from 'system/dict/constants';
 import {hexStringToHexNum} from 'system/helpers/binaryHelpers';
 
 
-export interface SerialNodeProps {
+export interface SerialDuplexProps {
   uartNum: number;
   // wait for data transfer ends on send and request methods
   requestTimeout: number;
 }
 
 
-export class SerialDuplex extends DriverBase<SerialNodeProps> implements DuplexDriver {
+export class SerialDuplex extends DriverBase<SerialDuplexProps> implements DuplexDriver {
   // TODO: упростить
   private get serialDev(): SerialIo {
     return this.depsInstances.serialDev as any;
