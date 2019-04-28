@@ -12,6 +12,8 @@ export interface WsClientProps {
   port: number;
 }
 
+// TODO: review maybe use driver WebSocketClient
+
 
 export default class WsClient {
   private readonly incomeDataEvents = new IndexedEvents<IncomeDataHandler>();
