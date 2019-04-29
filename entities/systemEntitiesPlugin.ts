@@ -54,6 +54,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addService(path.join(servicesRoot, 'ConsoleLogger/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'IoSetServer/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Updater/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'Backdoor/manifest.yaml'));
 
   // add used on host drivers related on devs
   env.afterRegistering(async () => {

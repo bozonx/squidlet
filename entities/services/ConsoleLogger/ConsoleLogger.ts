@@ -3,8 +3,28 @@ import LogLevel from 'system/interfaces/LogLevel';
 import {LOG_LEVELS} from 'system/dict/constants';
 import categories from 'system/dict/categories';
 
-import * as defaultLogger from './defaultLogger';
 
+const consoleLog = {
+  debug(message: string) {
+    console.info(message);
+  },
+
+  verbose(message: string) {
+    console.log(message);
+  },
+
+  info(message: string) {
+    console.info(message);
+  },
+
+  warn(message: string) {
+    console.warn(message);
+  },
+
+  error(message: string) {
+    console.error(message);
+  },
+};
 
 interface Props {
 }
@@ -21,7 +41,7 @@ export default class ConsoleLogger extends ServiceBase<Props> {
     // listen to allowed levels
     for (let level of allowedLogLevels) {
       this.env.events.addListener(categories.logger, level, (message: string) => {
-        (defaultLogger as any)[level](message);
+        (consoleLog as any)[level](message);
       });
     }
   }
