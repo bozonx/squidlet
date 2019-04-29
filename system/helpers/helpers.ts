@@ -1,4 +1,3 @@
-import {ALL_TOPICS} from '../dict/constants';
 import {isEmpty} from './lodashLike';
 import {Edge} from '../interfaces/io/DigitalIo';
 

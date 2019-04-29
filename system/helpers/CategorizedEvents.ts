@@ -1,9 +1,6 @@
 import IndexedEventEmitter from './IndexedEventEmitter';
 
 
-export const ALL_TOPICS = '*';
-
-
 export default class CategorizedEvents {
   private readonly eventEmitter = new IndexedEventEmitter<(data: any, topic?: string) => void>();
   private readonly separator: string;
@@ -16,7 +13,7 @@ export default class CategorizedEvents {
 
   emit(category: string, topic?: string, data?: any): void {
     if (topic) {
-      const eventName = this.makeEventName(this.separator, category, topic);
+      const eventName = this.makeEventName(category, topic);
       this.eventEmitter.emit(eventName, data);
     }
 
@@ -28,14 +25,14 @@ export default class CategorizedEvents {
    * Listen for local messages of certain category.
    */
   addListener(category: string, topic: string, handler: (data: any) => void): number {
-    const eventName = this.makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(category, topic);
 
     // listen to local events
     return this.eventEmitter.addListener(eventName, handler);
   }
 
   once(category: string, topic: string, handler: (data: any) => void): number {
-    const eventName = this.makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(category, topic);
 
     // listen to local event once
     return this.eventEmitter.once(eventName, handler);
@@ -50,7 +47,7 @@ export default class CategorizedEvents {
   }
 
   removeListener(category: string, topic: string, handlerIndex: number): void {
-    const eventName = this.makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(category, topic);
 
     this.eventEmitter.removeListener(eventName, handlerIndex);
   }
@@ -60,7 +57,7 @@ export default class CategorizedEvents {
   }
 
   removeAllListeners(category: string, topic: string): void {
-    const eventName = this.makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(category, topic);
 
     this.eventEmitter.removeAllListeners(eventName);
   }
@@ -71,11 +68,11 @@ export default class CategorizedEvents {
 
 
   /**
-   * Make combined event name which is used in host's event system.
-   * makeEventName('cat', 'topic', 'name', 'otherName') => 'cat|topic|name|otherName'
+   * Make combined event name.
+   * makeEventName('cat', 'topic') => 'cat|topic'
    */
-  private makeEventName(eventNameSeparator: string, category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
-    return [ category, topic, ...others ].join(eventNameSeparator);
+  private makeEventName(category: string, topic: string): string {
+    return [ category, topic ].join(this.separator);
   }
 
 }
