@@ -3,17 +3,18 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 
 
-type IncomeDataHandler = (message: {[index: string]: any}) => void;
+type IncomeDataHandler = (message: Uint8Array | {[index: string]: any}) => void;
 
 
 export interface WebSocketServerDriverProps {
   host: string;
   port: number;
+  binary?: boolean;
 }
 
 
 export class WebSocketServerConnection {
-  private readonly clientId: string;
+  readonly clientId: string;
 
   constructor(clientId: string) {
     this.clientId = clientId;
@@ -51,7 +52,7 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   }
 
 
-  onConnection(cb: () => WebSocketServerConnection) {
+  onConnection(cb: (connection: WebSocketServerConnection) => void) {
 
   }
 
