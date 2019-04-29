@@ -36,7 +36,7 @@ interface BackDoorProps {
 // TODO: set default host port in manifest
 // TODO: listen subscribes which was set by squildetctl - use externalDataOutcome, externalDataIncome
 
-export default class BackDoor extends ServiceBase<BackDoorProps> {
+export default class Backdoor extends ServiceBase<BackDoorProps> {
   private get wsServerDriver(): WebSocketServer {
     return this.depsInstances.wsServerDriver as any;
   }
