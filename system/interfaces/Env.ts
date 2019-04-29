@@ -1,14 +1,14 @@
 import DriverInstance from './DriverInstance';
 import ManifestBase from './ManifestBase';
 import System from '../System';
-import Logger from './Logger';
 import HostConfig from './HostConfig';
 import IoItem from './IoItem';
+import LogPublisher from '../LogPublisher';
 
 
 export default interface Env {
   readonly system: System;
-  readonly log: Logger;
+  readonly log: LogPublisher;
   readonly config: HostConfig;
 
   getIo<T extends IoItem>(shortDevName: string): T;

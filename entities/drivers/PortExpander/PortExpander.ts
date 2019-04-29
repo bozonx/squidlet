@@ -15,7 +15,6 @@ import DriverBase from 'system/baseDrivers/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
-import Logger from 'system/interfaces/Logger';
 import {omit} from 'system/helpers/lodashLike';
 import {PollProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';
 import {uint8WordToNum} from 'system/helpers/binaryHelpers';
@@ -23,6 +22,7 @@ import {uint8WordToNum} from 'system/helpers/binaryHelpers';
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';
 import AnalogPins, {AnalogPinHandler, FilterTypes} from './AnalogPins';
+import LogPublisher from '../../../system/LogPublisher';
 
 
 export type PortExpanderConnection = 'i2c' | 'serial';
@@ -101,7 +101,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   wasIcInited: boolean = false;
   readonly state: State = new State(this);
   // TODO: does it really need?
-  readonly log: Logger = this.env.log;
+  readonly log: LogPublisher = this.env.log;
   get node(): DuplexDriver {
     return this.depsInstances.node as any;
   }

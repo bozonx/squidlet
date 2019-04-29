@@ -2,9 +2,9 @@ import System from '../System';
 import DriverInstance from '../interfaces/DriverInstance';
 import Env from '../interfaces/Env';
 import ManifestBase from '../interfaces/ManifestBase';
-import Logger from '../interfaces/Logger';
 import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
+import LogPublisher from '../LogPublisher';
 
 
 /**
@@ -12,7 +12,7 @@ import IoItem from '../interfaces/IoItem';
  */
 export default abstract class EnvBase implements Env {
   readonly system: System;
-  readonly log: Logger;
+  readonly log: LogPublisher;
   readonly config: HostConfig;
 
   constructor(system: System) {
