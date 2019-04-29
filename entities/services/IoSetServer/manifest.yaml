@@ -1,0 +1,3 @@
+name: IoSetServer
+main: IoSetServer.ts
+system: true

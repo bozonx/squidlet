@@ -9,7 +9,7 @@ import * as defaultLogger from './defaultLogger';
 interface Props {
 }
 
-export default class Logger extends ServiceBase<Props> {
+export default class ConsoleLogger extends ServiceBase<Props> {
   protected didInit = async () => {
     this.listenLevels();
   }

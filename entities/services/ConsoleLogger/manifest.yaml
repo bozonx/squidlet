@@ -1,0 +1,3 @@
+name: ConsoleLogger
+main: ConsoleLogger.ts
+system: true
