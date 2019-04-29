@@ -79,40 +79,34 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
     const channel: number = message[CHANNEL_POSITION];
     const payload: Uint8Array = withoutFirstItemUint8Arr(message);
 
-    if (channel === BACKDOOR_CHANNELS.pub) {
-      this.onPub(payload);
+    switch (channel) {
+      case BACKDOOR_CHANNELS.pub:
+        return this.onPub(payload);
+      case BACKDOOR_CHANNELS.sub:
+        return this.onSub(clientId, payload);
+      case BACKDOOR_CHANNELS.ioPub:
+        return this.onIoPub(payload);
+      case BACKDOOR_CHANNELS.ioSub:
+        return this.onIoSub(clientId, payload);
+      case BACKDOOR_CHANNELS.updatePub:
+        return this.onUpdatePub(payload);
+      case BACKDOOR_CHANNELS.updateSub:
+        return this.onUpdateSub(clientId, payload);
+      case BACKDOOR_CHANNELS.logSub:
+        return this.onLogSub(clientId, payload);
+      case BACKDOOR_CHANNELS.swhitchIoAccess:
+        return this.onSwitchIoAccess(payload);
+      default:
+        this.env.system.log.error(`Backdoor: Can't recognize channel "${channel}"`);
     }
-    else if (channel === BACKDOOR_CHANNELS.sub) {
-      this.onSub(payload);
-    }
-    else if (channel === BACKDOOR_CHANNELS.ioPub) {
-      this.onIoPub(payload);
-    }
-    else if (channel === BACKDOOR_CHANNELS.ioSub) {
-      this.onIoSub(payload);
-    }
-    else if (channel === BACKDOOR_CHANNELS.updatePub) {
-      this.onUpdatePub(payload);
-    }
-    else if (channel === BACKDOOR_CHANNELS.updateSub) {
-      this.onUpdateSub(payload);
-    }
-    else if (channel === BACKDOOR_CHANNELS.logSub) {
-      this.onLogSub(payload);
-    }
-    else if (channel === BACKDOOR_CHANNELS.swhitchIoAccess) {
-      this.onSwitchIoAccess(payload);
-    }
-    else {
-      this.env.system.log.error(`Backdoor: Can't recognize channel "${channel}"`);
-    }
+
   }
 
   private onUpdatePub(payload: Uint8Array) {
 
   }
 
-  private onUpdateSub(payload: Uint8Array) {
+  private onUpdateSub(clientId: string, payload: Uint8Array) {
 
   }
 
@@ -121,7 +115,7 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
     // TODO: call events.emit
   }
 
-  private onSub(payload: Uint8Array) {
+  private onSub(clientId: string, payload: Uint8Array) {
 
   }
 
@@ -129,11 +123,11 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
     // TODO: convert to json
   }
 
-  private onIoSub(payload: Uint8Array) {
+  private onIoSub(clientId: string, payload: Uint8Array) {
     // TODO: subscribe to io
   }
 
-  private onLogSub(payload: Uint8Array) {
+  private onLogSub(clientId: string, payload: Uint8Array) {
     // TODO: subscribe to log
   }
 
