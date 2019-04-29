@@ -3,7 +3,7 @@ import IndexedEventEmitter from './IndexedEventEmitter';
 
 
 export default class CategorizedEvents {
-  private readonly events = new IndexedEventEmitter<(data: any, topic?: string) => void>();
+  private readonly eventEmitter = new IndexedEventEmitter<(data: any, topic?: string) => void>();
   private readonly separator: string;
 
 
@@ -15,11 +15,11 @@ export default class CategorizedEvents {
   emit(category: string, topic?: string, data?: any): void {
     if (topic) {
       const eventName = makeEventName(this.separator, category, topic);
-      this.events.emit(eventName, data);
+      this.eventEmitter.emit(eventName, data);
     }
 
     // emit category listeners
-    this.events.emit(category, data, topic);
+    this.eventEmitter.emit(category, data, topic);
   }
 
   /**
@@ -29,14 +29,14 @@ export default class CategorizedEvents {
     const eventName = makeEventName(this.separator, category, topic);
 
     // listen to local events
-    return this.events.addListener(eventName, handler);
+    return this.eventEmitter.addListener(eventName, handler);
   }
 
   once(category: string, topic: string, handler: (data: any) => void): number {
     const eventName = makeEventName(this.separator, category, topic);
 
     // listen to local event once
-    return this.events.once(eventName, handler);
+    return this.eventEmitter.once(eventName, handler);
   }
 
   /**
@@ -44,27 +44,27 @@ export default class CategorizedEvents {
    */
   addCategoryListener(category: string, handler: (data: any, topic: string) => void): number {
     // listen to local events
-    return this.events.addListener(category, handler as any);
+    return this.eventEmitter.addListener(category, handler as any);
   }
 
   removeListener(category: string, topic: string, handlerIndex: number): void {
     const eventName = makeEventName(this.separator, category, topic);
 
-    this.events.removeListener(eventName, handlerIndex);
+    this.eventEmitter.removeListener(eventName, handlerIndex);
   }
 
   removeCategoryListener(category: string, handlerIndex: number): void {
-    this.events.removeListener(category, handlerIndex);
+    this.eventEmitter.removeListener(category, handlerIndex);
   }
 
   removeAllListeners(category: string, topic: string): void {
     const eventName = makeEventName(this.separator, category, topic);
 
-    this.events.removeAllListeners(eventName);
+    this.eventEmitter.removeAllListeners(eventName);
   }
 
   destroy() {
-    this.events.destroy();
+    this.eventEmitter.destroy();
   }
 
 }
