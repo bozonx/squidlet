@@ -17,8 +17,3 @@ export function warn(message: string) {
 export function error(message: string) {
   console.error(`ERROR: ${message}`);
 }
-
-export function fatal(message: string) {
-  console.error(`ERROR: ${message}`);
-  process.exit(2);
-}
