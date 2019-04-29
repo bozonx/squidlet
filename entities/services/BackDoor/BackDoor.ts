@@ -47,29 +47,8 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
         this.onIncomeMessage(connection.clientId, message as Uint8Array);
       });
     });
-
-    this.listenSystemEvents();
   }
 
-
-  private listenSystemEvents() {
-    // TODO: слушать только если пришел запрос
-
-    this.env.events.addCategoryListener(categories.logger, (data: any, level: string) => {
-      // TODO: !!!
-    });
-
-    this.env.events.addCategoryListener(categories.updater, (data: any, topic: string) => {
-      // TODO: !!!
-    });
-
-    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
-      //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
-
-      // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
-
-    });
-  }
 
   private onIncomeMessage(clientId: string, message: Uint8Array) {
     if (message.length <= 1) {
@@ -102,13 +81,6 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
 
   }
 
-  private onUpdatePub(payload: Uint8Array) {
-
-  }
-
-  private onUpdateSub(clientId: string, payload: Uint8Array) {
-
-  }
 
   private onPub(payload: Uint8Array) {
     // TODO: convert to json
@@ -116,7 +88,12 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
   }
 
   private onSub(clientId: string, payload: Uint8Array) {
+    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
+      //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
 
+      // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
+
+    });
   }
 
   private onIoPub(payload: Uint8Array) {
@@ -127,8 +104,22 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
     // TODO: subscribe to io
   }
 
+  private onUpdatePub(payload: Uint8Array) {
+
+  }
+
+  private onUpdateSub(clientId: string, payload: Uint8Array) {
+    this.env.events.addCategoryListener(categories.updater, (data: any, topic: string) => {
+      // TODO: !!!
+    });
+  }
+
   private onLogSub(clientId: string, payload: Uint8Array) {
     // TODO: subscribe to log
+    this.env.events.addCategoryListener(categories.logger, (data: any, level: string) => {
+      // TODO: !!!
+    });
+
   }
 
   private onSwitchIoAccess(payload: Uint8Array) {
