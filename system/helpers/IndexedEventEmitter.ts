@@ -2,25 +2,26 @@ import IndexedEvents, {AnyHandler} from './IndexedEvents';
 
 
 export default class IndexedEventEmitter<T extends AnyHandler> {
-  private handlersById: {[index: string]: IndexedEvents<T>} = {};
+  // IndexedEvents instances by event name
+  private indexedEvents: {[index: string]: IndexedEvents<T>} = {};
 
 
   // TODO: как сделать типизированный ?? или хотябы error first
   emit(eventName: string, ...args: any[]) {
-    if (!this.handlersById[eventName]) return;
+    if (!this.indexedEvents[eventName]) return;
 
-    this.handlersById[eventName].emit(...args);
+    this.indexedEvents[eventName].emit(...args);
   }
 
   /**
    * Register listener and return its index
    */
   addListener(eventName: string, handler: T): number {
-    if (!this.handlersById[eventName]) {
-      this.handlersById[eventName] = new IndexedEvents();
+    if (!this.indexedEvents[eventName]) {
+      this.indexedEvents[eventName] = new IndexedEvents();
     }
 
-    return this.handlersById[eventName].addListener(handler);
+    return this.indexedEvents[eventName].addListener(handler);
   }
 
   once(eventName: string, handler: T): number {
@@ -36,21 +37,29 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
   }
 
   removeListener(eventName: string, handlerIndex: number): void {
-    if (!this.handlersById[eventName]) return;
+    if (!this.indexedEvents[eventName]) return;
 
-    this.handlersById[eventName].removeListener(handlerIndex);
+    this.indexedEvents[eventName].removeListener(handlerIndex);
 
     // remove instance if it doesn't have any instances
-    if (!this.handlersById[eventName].hasListeners()) {
+    if (!this.indexedEvents[eventName].hasListeners()) {
       this.removeAllListeners(eventName);
     }
   }
 
   removeAllListeners(eventName: string): void {
-    if (!this.handlersById[eventName]) return;
+    if (!this.indexedEvents[eventName]) return;
 
-    this.handlersById[eventName].removeAll();
-    delete this.handlersById[eventName];
+    this.indexedEvents[eventName].removeAll();
+    delete this.indexedEvents[eventName];
+  }
+
+  destroy() {
+    // TODO: test
+
+    for (let eventName of Object.keys(this.indexedEvents)) {
+      this.removeAllListeners(eventName);
+    }
   }
 
 }

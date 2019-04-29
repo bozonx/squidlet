@@ -13,9 +13,11 @@ export default class Events {
 
 
   emit(category: string, topic?: string, data?: any): void {
-    const eventName = makeEventName(this.separator, category, topic);
+    if (topic) {
+      const eventName = makeEventName(this.separator, category, topic);
+      this.events.emit(eventName, data);
+    }
 
-    this.events.emit(eventName, data);
     // emit category listeners
     this.events.emit(category, data, topic);
   }
@@ -51,14 +53,18 @@ export default class Events {
     this.events.removeListener(eventName, handlerIndex);
   }
 
+  removeCategoryListener(category: string, handlerIndex: number): void {
+    this.events.removeListener(category, handlerIndex);
+  }
+
   removeAllListeners(category: string, topic: string): void {
     const eventName = makeEventName(this.separator, category, topic);
 
     this.events.removeAllListeners(eventName);
   }
 
-  removeCategoryListener(category: string, handlerIndex: number): void {
-    this.events.removeListener(category, handlerIndex);
+  destroy() {
+    this.events.destroy();
   }
 
 }
