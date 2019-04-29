@@ -6,6 +6,7 @@ import {
   WebSocketServerConnection
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {withoutFirstItemUint8Arr} from '../../../system/helpers/collections';
+import {uint8ArrayToJsData} from '../../../system/helpers/binaryHelpers';
 
 
 enum BACKDOOR_CHANNELS {
@@ -20,6 +21,12 @@ enum BACKDOOR_CHANNELS {
 }
 
 const CHANNEL_POSITION = 0;
+
+interface EventMessage {
+  category: string;
+  topic?: string;
+  data?: any;
+}
 
 interface BackDoorProps {
   host: string;
@@ -83,17 +90,28 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
 
 
   private onPub(payload: Uint8Array) {
-    // TODO: convert to json
-    // TODO: call events.emit
+    const message: EventMessage = uint8ArrayToJsData(payload);
+
+    if (!message.topic) {
+      return this.env.system.log.error(`Backdoor: message doesn't have a topic "${JSON.stringify(message)}"`);
+    }
+
+    this.env.events.emit(message.category, message.topic, message.data);
   }
 
   private onSub(clientId: string, payload: Uint8Array) {
-    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
-      //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
+    const message: EventMessage = uint8ArrayToJsData(payload);
 
-      // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
-
-    });
+    if (message.topic) {
+      this.env.events.addListener(message.category, message.topic, (data: any) => {
+        // TODO: make send
+      });
+    }
+    else {
+      this.env.events.addCategoryListener(message.category, (data: any) => {
+        // TODO: make send
+      });
+    }
   }
 
   private onIoPub(payload: Uint8Array) {
@@ -102,6 +120,12 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
 
   private onIoSub(clientId: string, payload: Uint8Array) {
     // TODO: subscribe to io
+    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
+      //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
+
+      // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
+
+    });
   }
 
   private onUpdatePub(payload: Uint8Array) {

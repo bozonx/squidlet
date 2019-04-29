@@ -204,3 +204,15 @@ export function textToUint8Array(str: string): Uint8Array {
   return new Uint8Array(0);
   //return new TextEncoder('utf-8').encode(str);
 }
+
+export function uint8ArrayToJsData(arr: Uint8Array): any {
+  const text: string = uint8ArrayToText(arr);
+
+  return JSON.parse(text);
+}
+
+export function jsDataToUint8Array(jsData: any): any {
+  const json: string = JSON.stringify(jsData);
+
+  return textToUint8Array(jsData);
+}
