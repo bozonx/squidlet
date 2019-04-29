@@ -50,6 +50,9 @@ export default async function resolveCommand() {
   else if (command === 'sub') {
     await backdoorEvent('pub', args);
   }
+  else if (command === 'block-io') {
+    await backdoorEvent('pub', { ...args, category: 'system', topic: 'block-io' });
+  }
   // else if (command === 'io-server') {
   //   const commandUpdate: CommandIoServer = new CommandIoServer(positionArgsRest, args);
   //

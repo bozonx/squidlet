@@ -72,18 +72,22 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
         return this.onPub(payload);
       case BACKDOOR_CHANNELS.sub:
         return this.onSub(clientId, payload);
+
+        // TODO: может не выделять - а просто обращаться к событиям напрямую ???
       case BACKDOOR_CHANNELS.ioPub:
         return this.onIoPub(payload);
       case BACKDOOR_CHANNELS.ioSub:
         return this.onIoSub(clientId, payload);
-      case BACKDOOR_CHANNELS.updatePub:
-        return this.onUpdatePub(payload);
-      case BACKDOOR_CHANNELS.updateSub:
-        return this.onUpdateSub(clientId, payload);
       case BACKDOOR_CHANNELS.logSub:
         return this.onLogSub(clientId, payload);
       case BACKDOOR_CHANNELS.switchIoAccess:
         return this.onSwitchIoAccess(payload);
+
+      case BACKDOOR_CHANNELS.updatePub:
+        return this.onUpdatePub(payload);
+      case BACKDOOR_CHANNELS.updateSub:
+        return this.onUpdateSub(clientId, payload);
+
       default:
         this.env.log.error(`Backdoor: Can't recognize channel "${channel}"`);
     }
