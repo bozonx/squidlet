@@ -12,3 +12,6 @@ props:
   port:
     type: number
     default: 8889
+  autoReconnect:
+    type: boolean
+    default: false
