@@ -1,5 +1,7 @@
-import { makeEventName } from './helpers';
 import IndexedEventEmitter from './IndexedEventEmitter';
+
+
+export const ALL_TOPICS = '*';
 
 
 export default class CategorizedEvents {
@@ -14,7 +16,7 @@ export default class CategorizedEvents {
 
   emit(category: string, topic?: string, data?: any): void {
     if (topic) {
-      const eventName = makeEventName(this.separator, category, topic);
+      const eventName = this.makeEventName(this.separator, category, topic);
       this.eventEmitter.emit(eventName, data);
     }
 
@@ -26,14 +28,14 @@ export default class CategorizedEvents {
    * Listen for local messages of certain category.
    */
   addListener(category: string, topic: string, handler: (data: any) => void): number {
-    const eventName = makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(this.separator, category, topic);
 
     // listen to local events
     return this.eventEmitter.addListener(eventName, handler);
   }
 
   once(category: string, topic: string, handler: (data: any) => void): number {
-    const eventName = makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(this.separator, category, topic);
 
     // listen to local event once
     return this.eventEmitter.once(eventName, handler);
@@ -48,7 +50,7 @@ export default class CategorizedEvents {
   }
 
   removeListener(category: string, topic: string, handlerIndex: number): void {
-    const eventName = makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(this.separator, category, topic);
 
     this.eventEmitter.removeListener(eventName, handlerIndex);
   }
@@ -58,13 +60,22 @@ export default class CategorizedEvents {
   }
 
   removeAllListeners(category: string, topic: string): void {
-    const eventName = makeEventName(this.separator, category, topic);
+    const eventName = this.makeEventName(this.separator, category, topic);
 
     this.eventEmitter.removeAllListeners(eventName);
   }
 
   destroy() {
     this.eventEmitter.destroy();
+  }
+
+
+  /**
+   * Make combined event name which is used in host's event system.
+   * makeEventName('cat', 'topic', 'name', 'otherName') => 'cat|topic|name|otherName'
+   */
+  private makeEventName(eventNameSeparator: string, category: string, topic: string = ALL_TOPICS, ...others: Array<string>): string {
+    return [ category, topic, ...others ].join(eventNameSeparator);
   }
 
 }
