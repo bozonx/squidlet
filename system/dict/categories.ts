@@ -9,9 +9,10 @@ export default {
   externalDataOutcome: 'externalDataOutcome',
   // data from mqtt or backend moves to this category
   externalDataIncome: 'externalDataIncome',
+  // all the logs. Topic is level
   logger: 'logger',
   // updater service
   updater: 'updater',
-  // io set access
+  // io set access. topic is ioName
   ioSet: 'ioSet',
 };

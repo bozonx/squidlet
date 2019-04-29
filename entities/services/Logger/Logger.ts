@@ -29,6 +29,9 @@ export default class Logger extends ServiceBase<Props> {
     const hosts: string[] = ['master'];
 
     for (let hostId of hosts) {
+
+      // TODO: better to use categoryListener
+
       const allowedLogLevels: string[] = this.calcLogLevel(this.env.host.config.config.logLevel);
 
       // listen to allowed levels

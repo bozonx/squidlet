@@ -1,10 +1,10 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
+import categories from 'system/dict/categories';
 import {
   WebSocketServer,
   WebSocketServerConnection
 } from '../../drivers/WebSocketServer/WebSocketServer';
-import categories from '../../../system/dict/categories';
 
 
 interface BackDoorProps {
@@ -39,15 +39,15 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
 
 
   private listenSystemEvents() {
-    this.env.events.addCategoryListener(categories.logger, (data: any) => {
+    this.env.events.addCategoryListener(categories.logger, (data: any, level: string) => {
       // TODO: !!!
     });
 
-    this.env.events.addCategoryListener(categories.updater, (data: any) => {
+    this.env.events.addCategoryListener(categories.updater, (data: any, topic: string) => {
       // TODO: !!!
     });
 
-    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
+    this.env.events.addCategoryListener(categories.ioSet, (data: any, topic: string) => {
       // TODO: !!!
     });
   }
