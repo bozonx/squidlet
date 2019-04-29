@@ -18,11 +18,11 @@ const consoleLog = {
   },
 
   warn(message: string) {
-    console.warn(`WARNING: ${message}`);
+    console.warn(message);
   },
 
   error(message: string) {
-    console.error(`ERROR: ${message}`);
+    console.error(message);
   },
 };
 

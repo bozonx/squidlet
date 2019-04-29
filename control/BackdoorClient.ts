@@ -3,7 +3,7 @@
 export default class BackdoorClient {
   constructor(host?: string, port?: number) {
     // TODO: use defaults
-    // TODO: make connection
+    // TODO: make connection to server
   }
 
   async pub(category: string, topic?: string, data?: string) {
@@ -13,6 +13,5 @@ export default class BackdoorClient {
   async sub(category: string, topic?: string) {
     // TODO: subscribe to event and print events to console
   }
-
 
 }

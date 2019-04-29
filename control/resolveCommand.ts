@@ -51,6 +51,7 @@ export default async function resolveCommand() {
     await backdoorEvent('pub', args);
   }
   else if (command === 'block-io') {
+    // TODO: review
     await backdoorEvent('pub', { ...args, category: 'system', topic: 'block-io' });
   }
   // else if (command === 'io-server') {

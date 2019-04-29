@@ -10,28 +10,28 @@ export default class LogPublisher {
     this.system = system;
   }
 
-  async debug(message: string) {
-    await this.send('debug', message);
+  debug(message: string) {
+    this.send('debug', `DEBUG: ${message}`);
   }
 
   // async verbose(message: string) {
   //   await this.send('verbose', message);
   // }
 
-  async info(message: string) {
-    await this.send('info', message);
+  info(message: string) {
+    this.send('info', message);
   }
 
-  async warn(message: string) {
-    await this.send('warn', `WARNING: ${message}`);
+  warn(message: string) {
+    this.send('warn', `WARNING: ${message}`);
   }
 
-  async error(message: string) {
-    await this.send('error', `ERROR: ${message}`);
+  error(message: string) {
+    this.send('error', `ERROR: ${message}`);
   }
 
 
-  private async send(level: string, message: string) {
+  private send(level: string, message: string) {
     this.system.events.emit(categories.logger, level, message);
   }
 

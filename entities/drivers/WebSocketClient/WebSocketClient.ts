@@ -1,9 +1,10 @@
 import WebSocketClientIo from 'system/interfaces/io/WebSocketClientIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
+import {omit} from '../../../system/helpers/lodashLike';
 
 
-type IncomeDataHandler = (message: {[index: string]: any}) => void;
+type IncomeDataHandler = (data: string | Uint8Array) => void;
 
 
 export interface WebSocketClientDriverProps {
@@ -21,27 +22,46 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   protected willInit = async () => {
     const url = `ws://${this.props.host}:${this.props.port}?hostid=${this.env.system.host.id}`;
 
-    this.connectionId = this.wsClientIo.newConnection({ url });
+    this.connectionId = this.wsClientIo.newConnection({
+      url,
+      // additional io client params
+      ...omit(this.props, 'host', 'port')
+    });
 
     this.listen();
   }
 
   destroy = async () => {
-    // TODO: close connection and remove listeners
+    this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+
+    // TODO: remove listeners
   }
 
 
-  async send(message: {[index: string]: any}): Promise<void> {
-
+  async send(data: string | Uint8Array): Promise<void> {
+    return this.wsClientIo.send(this.connectionId, data);
   }
 
-  onIncomeMessage(cb: IncomeDataHandler) {
-
+  onMessage(cb: IncomeDataHandler) {
+    return this.wsClientIo.onMessage(this.connectionId, cb);
   }
 
 
   private listen() {
-    // TODO: make reconnection if connection lost
+    this.wsClientIo.onOpen(this.connectionId, () => {
+      return this.env.log.info(`WebSocketClient: connection opened. Id: ${this.connectionId}`);
+    });
+
+    this.wsClientIo.onClose(this.connectionId, () => {
+      this.env.log.info(`WebSocketClient: connection closed. Id: ${this.connectionId}. Reconnecting...`);
+
+
+      // TODO: make reconnection if connection lost
+    });
+
+    this.wsClientIo.onError(this.connectionId, (err: string) => {
+      return this.env.log.error(err);
+    });
   }
 
 }

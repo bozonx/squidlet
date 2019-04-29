@@ -12,12 +12,12 @@ import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 enum BACKDOOR_CHANNELS {
   pub,
   sub,
-  ioPub,
-  ioSub,
-  updatePub,
-  updateSub,
-  logSub,
-  switchIoAccess,
+  // updatePub,
+  // updateSub,
+  // ioPub,
+  // ioSub,
+  // logSub,
+  // switchIoAccess,
 }
 
 const CHANNEL_POSITION = 0;
@@ -74,19 +74,18 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
         return this.onSub(clientId, payload);
 
         // TODO: может не выделять - а просто обращаться к событиям напрямую ???
-      case BACKDOOR_CHANNELS.ioPub:
-        return this.onIoPub(payload);
-      case BACKDOOR_CHANNELS.ioSub:
-        return this.onIoSub(clientId, payload);
-      case BACKDOOR_CHANNELS.logSub:
-        return this.onLogSub(clientId, payload);
-      case BACKDOOR_CHANNELS.switchIoAccess:
-        return this.onSwitchIoAccess(payload);
-
-      case BACKDOOR_CHANNELS.updatePub:
-        return this.onUpdatePub(payload);
-      case BACKDOOR_CHANNELS.updateSub:
-        return this.onUpdateSub(clientId, payload);
+      // case BACKDOOR_CHANNELS.ioPub:
+      //   return this.onIoPub(payload);
+      // case BACKDOOR_CHANNELS.ioSub:
+      //   return this.onIoSub(clientId, payload);
+      // case BACKDOOR_CHANNELS.logSub:
+      //   return this.onLogSub(clientId, payload);
+      // case BACKDOOR_CHANNELS.switchIoAccess:
+      //   return this.onSwitchIoAccess(payload);
+      // case BACKDOOR_CHANNELS.updatePub:
+      //   return this.onUpdatePub(payload);
+      // case BACKDOOR_CHANNELS.updateSub:
+      //   return this.onUpdateSub(clientId, payload);
 
       default:
         this.env.log.error(`Backdoor: Can't recognize channel "${channel}"`);
@@ -123,46 +122,46 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
       });
     }
   }
-
-  private onIoPub(payload: Uint8Array) {
-    const message: RemoteCallMessage = uint8ArrayToJsData(payload);
-
-    this.env.events.emit(categories.ioSet, undefined, message.data);
-  }
-
-  private onIoSub(clientId: string, payload: Uint8Array) {
-    const message: RemoteCallMessage = uint8ArrayToJsData(payload);
-
-    // TODO: subscribe to io
-    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
-      //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
-
-      // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
-
-    });
-  }
-
-  private onUpdatePub(payload: Uint8Array) {
-
-  }
-
-  private onUpdateSub(clientId: string, payload: Uint8Array) {
-    this.env.events.addCategoryListener(categories.updater, (data: any, topic: string) => {
-      // TODO: !!!
-    });
-  }
-
-  private onLogSub(clientId: string, payload: Uint8Array) {
-    // TODO: subscribe to log
-    this.env.events.addCategoryListener(categories.logger, (data: any, level: string) => {
-      // TODO: !!!
-    });
-
-  }
-
-  private onSwitchIoAccess(payload: Uint8Array) {
-    // TODO: convert to boolean
-  }
+  //
+  // private onIoPub(payload: Uint8Array) {
+  //   const message: RemoteCallMessage = uint8ArrayToJsData(payload);
+  //
+  //   this.env.events.emit(categories.ioSet, undefined, message.data);
+  // }
+  //
+  // private onIoSub(clientId: string, payload: Uint8Array) {
+  //   const message: RemoteCallMessage = uint8ArrayToJsData(payload);
+  //
+  //   // TODO: subscribe to io
+  //   this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
+  //     //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
+  //
+  //     // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
+  //
+  //   });
+  // }
+  //
+  // private onUpdatePub(payload: Uint8Array) {
+  //
+  // }
+  //
+  // private onUpdateSub(clientId: string, payload: Uint8Array) {
+  //   this.env.events.addCategoryListener(categories.updater, (data: any, topic: string) => {
+  //     // TODO: !!!
+  //   });
+  // }
+  //
+  // private onLogSub(clientId: string, payload: Uint8Array) {
+  //   // TODO: subscribe to log
+  //   this.env.events.addCategoryListener(categories.logger, (data: any, level: string) => {
+  //     // TODO: !!!
+  //   });
+  //
+  // }
+  //
+  // private onSwitchIoAccess(payload: Uint8Array) {
+  //   // TODO: convert to boolean
+  // }
 
 
   private async send(clientId: string, data: any) {
