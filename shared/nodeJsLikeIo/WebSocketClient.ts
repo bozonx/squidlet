@@ -1,63 +1,82 @@
 import * as WebSocket from 'ws';
-
-import WebSocketClientIo, {WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
 import {ClientRequest, IncomingMessage} from 'http';
-import IndexedEvents from '../../system/helpers/IndexedEvents';
-import {isUint8Array} from '../../system/helpers/collections';
+
+import WebSocketClientIo, {WebSocketClientProps, WsClientEvents} from 'system/interfaces/io/WebSocketClientIo';
+import {isUint8Array} from 'system/helpers/collections';
+import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
+import {AnyHandler} from 'system/helpers/IndexedEvents';
 
 
-type WsClientEvents = 'open' | 'close' | 'message' | 'error';
+type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler>, WebSocketClientProps ];
+
+enum CONNECTION_POSITIONS {
+  webSocket,
+  events,
+  props
+}
+
+const eventNames = {
+  open: 'open',
+  close: 'close',
+  message: 'message',
+  error: 'error',
+};
 
 
 export default class WebSocketClient implements WebSocketClientIo {
-  private readonly errorEvents = new IndexedEvents<(err: string) => void>();
-  private readonly connections: WebSocket[] = [];
+  // TODO: тоже должны идти по connection id
+  //private readonly errorEvents = new IndexedEvents<(err: string) => void>();
+  private readonly connections: ConnectionItem[] = [];
   // TODO: сохранять их по connection id
-  private lastProps?: WebSocketClientProps;
+  //private lastProps?: WebSocketClientProps;
 
   /**
    * Make new connection to server.
    * It returns a connection id to use with other methods
    */
   newConnection(props: WebSocketClientProps): number {
-    this.lastProps = props;
-
     const client = this.connectToServer();
+    const events = new IndexedEventEmitter();
 
-    this.connections.push(client);
+    this.connections.push([
+      client,
+      events,
+      props,
+    ]);
+
+    client.on(eventNames.open, () => events.emit(eventNames.open));
+    client.on(eventNames.close, () => events.emit(eventNames.close));
+    client.on(eventNames.message, (data: string | Uint8Array) => {
+      events.emit(eventNames.message, data);
+    });
+    client.on(eventNames.error, (err: Error) => {
+      events.emit(eventNames.error, err);
+    });
+    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
+      events.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
+    });
 
     return this.connections.length - 1;
   }
 
-  onOpen(connectionId: number, cb: () => void) {
-    this.connections[connectionId].on('open', cb);
+  onOpen(connectionId: number, cb: () => void): number {
+    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.open, cb);
   }
 
-  onClose(connectionId: number, cb: () => void) {
-    this.connections[connectionId].on('close', cb);
+  onClose(connectionId: number, cb: () => void): number {
+    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.close, cb);
   }
 
-  onMessage(connectionId: number, cb: (data: string | Uint8Array) => void) {
-    // TODO: check data
-
-    this.connections[connectionId].on('message', cb);
+  onMessage(connectionId: number, cb: (data: string | Uint8Array) => void): number {
+    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.message, cb);
   }
 
-  onError(connectionId: number, cb: (err: string) => void) {
-    this.errorEvents.addListener(cb);
+  onError(connectionId: number, cb: (err: string) => void): number {
+    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.error, cb);
   }
 
-  // on(event: WsClientEvents, cb: Function) {
-  //
-  // }
-
-  removeEventListener(connectionId: number, event: WsClientEvents, listener: (...args: any[]) => void) {
-    if (event === 'error') {
-      this.errorEvents.removeListener(listener);
-    }
-    else {
-      this.connections[connectionId].removeEventListener(event, listener);
-    }
+  removeEventListener(connectionId: number, eventName: WsClientEvents, handlerIndex: number) {
+    return this.connections[connectionId][CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
 
@@ -80,6 +99,7 @@ export default class WebSocketClient implements WebSocketClientIo {
 
     // TODO: проверить не будет ли ошибки если соединение уже закрыто
     // TODO: нужно ли отписываться от навешанных колбэков ???
+    // TODO: remove all the listeners
   }
 
   /**
@@ -88,6 +108,8 @@ export default class WebSocketClient implements WebSocketClientIo {
   reConnect(connectionId: number) {
     if (this.connections[connectionId]) {
       this.close(connectionId, 0);
+      // TODO: remove all the listeners
+
     }
 
     this.connections[connectionId] = this.connectToServer();
@@ -106,13 +128,6 @@ export default class WebSocketClient implements WebSocketClientIo {
     const client = new WebSocket(this.lastProps.url, {
     });
 
-    client.on('error', (err: Error) => {
-      this.errorEvents.emit(`ERROR: ${err}`);
-    });
-
-    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.errorEvents.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
-    });
 
     return client;
   }

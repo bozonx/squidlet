@@ -1,8 +1,3 @@
-export interface WebSocketClientProps {
-  url: string;
-}
-
-
 export const Methods = [
   'newConnection',
   'onOpen',
@@ -14,13 +9,20 @@ export const Methods = [
 ];
 
 
+export type WsClientEvents = 'open' | 'close' | 'message' | 'error';
+
+export interface WebSocketClientProps {
+  url: string;
+}
+
+
 export default interface WebSocketClientIo {
   newConnection       (props: WebSocketClientProps): number;
-  onOpen              (connectionId: number, cb: () => void): void;
-  onClose             (connectionId: number, cb: () => void): void;
-  onMessage           (connectionId: number, cb: (data: string | Uint8Array) => void): void;
-  onError             (connectionId: number, cb: (err: string) => void): void;
-  removeEventListener (connectionId: number, WsClientEvents: string, listener: Function): void;
+  onOpen              (connectionId: number, cb: () => void): number;
+  onClose             (connectionId: number, cb: () => void): number;
+  onMessage           (connectionId: number, cb: (data: string | Uint8Array) => void): number;
+  onError             (connectionId: number, cb: (err: string) => void): number;
+  removeEventListener (connectionId: number, eventName: WsClientEvents, handlerIndex: number): void;
   send                (connectionId: number, data: string | Uint8Array): void;
   close               (connectionId: number, code: number, reason: string): void;
   reConnect           (connectionId: number): void;

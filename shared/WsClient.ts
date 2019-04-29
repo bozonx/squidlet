@@ -13,6 +13,7 @@ export interface WsClientProps {
 }
 
 // TODO: review maybe use driver WebSocketClient
+// TODO: remake to ws client logic (in driver)
 
 
 export default class WsClient {
