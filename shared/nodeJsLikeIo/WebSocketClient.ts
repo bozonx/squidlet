@@ -12,24 +12,19 @@ type WsClientEvents = 'open' | 'close' | 'message' | 'error';
 export default class WebSocketClient implements WebSocketClientIo {
   private readonly errorEvents = new IndexedEvents<(err: string) => void>();
   private readonly connections: WebSocket[] = [];
+  // TODO: сохранять их по connection id
+  private lastProps?: WebSocketClientProps;
 
   /**
    * Make new connection to server.
    * It returns a connection id to use with other methods
    */
   newConnection(props: WebSocketClientProps): number {
-    const client = new WebSocket(props.url, {
-    });
+    this.lastProps = props;
+
+    const client = this.connectToServer();
 
     this.connections.push(client);
-
-    client.on('error', (err: Error) => {
-      this.errorEvents.emit(`ERROR: ${err}`);
-    });
-
-    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      this.errorEvents.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
-    });
 
     return this.connections.length - 1;
   }
@@ -77,21 +72,49 @@ export default class WebSocketClient implements WebSocketClientIo {
     this.connections[connectionId].send(data);
   }
 
-  close(connectionId: number, code: number, reason: string) {
-    this.connections[connectionId].close();
+  close(connectionId: number, code: number, reason?: string) {
+    if (!this.connections[connectionId]) return;
+
+    this.connections[connectionId].close(code, reason);
+    delete this.connections[connectionId];
+
+    // TODO: проверить не будет ли ошибки если соединение уже закрыто
+    // TODO: нужно ли отписываться от навешанных колбэков ???
   }
 
   /**
    * It uses to reconnect
    */
   reConnect(connectionId: number) {
+    if (this.connections[connectionId]) {
+      this.close(connectionId, 0);
+    }
 
-    // TODO: !!!
-
-    //this.connections[connectionId].connect();
+    this.connections[connectionId] = this.connectToServer();
   }
 
   destroy() {
     // TODO: удалить все события и вызвать close на всех клиентах
   }
+
+
+  private connectToServer(): WebSocket {
+    if (!this.lastProps) {
+      throw new Error(`WebSocketClient: There isn't props`);
+    }
+
+    const client = new WebSocket(this.lastProps.url, {
+    });
+
+    client.on('error', (err: Error) => {
+      this.errorEvents.emit(`ERROR: ${err}`);
+    });
+
+    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
+      this.errorEvents.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
+    });
+
+    return client;
+  }
+
 }

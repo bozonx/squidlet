@@ -32,7 +32,7 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   }
 
   destroy = async () => {
-    this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+    //this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
 
     // TODO: remove listeners
   }
@@ -55,8 +55,7 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
     this.wsClientIo.onClose(this.connectionId, () => {
       this.env.log.info(`WebSocketClient: connection closed. Id: ${this.connectionId}. Reconnecting...`);
 
-
-      // TODO: make reconnection if connection lost
+      this.wsClientIo.reConnect(this.connectionId);
     });
 
     this.wsClientIo.onError(this.connectionId, (err: string) => {
@@ -72,4 +71,6 @@ export default class Factory extends DriverFactoryBase<WebSocketClient> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return String(props.url);
   }
+
+  // TODO: use io's destroy
 }
