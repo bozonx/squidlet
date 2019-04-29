@@ -26,7 +26,9 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
       this.props.host,
       this.props.port,
       this.env.system.host.id,
-      this.props.autoReconnect
+      this.props.autoReconnect,
+      this.env.log.info,
+      this.env.log.error
     );
   }
 
