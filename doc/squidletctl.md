@@ -42,8 +42,9 @@ Also you can specify the next params:
       [--prod=true]
       [--work-dir]
       [--name]
-      [--ioset=ws:[host]:[port]]
-      [--ioset-props={..jsonProps}]
+      [--io-server=localhost:8889]
+      ???[--ioset=ws:[host]:[port]]
+      ???[--ioset-props={..jsonProps}]
       ./groupOrHostConfig.yaml
 
 ### Parameters
@@ -56,15 +57,41 @@ Also you can specify the next params:
 * SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
 * --name uses only if group config is specified
   and selects a host config from group config
-* --ioset - specify ioSet which will be used. Also you can specify host and port optionally
-* --ioset-props - other ioSet props which will be passed to specified ioSet.
+* --io-server=localhost:8889 - if set io server mode will be used. Local access to io will be blocked.
+  only remote access is allowed. Host is required. Port is optional - default will be used.
+* ???--ioset - specify ioSet which will be used. Also you can specify host and port optionally
+* ???--ioset-props - other ioSet props which will be passed to specified ioSet.
   These props will replace props in host config
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
+
   
-  
-## Run IO server
+## Listen logs of remote host
+
+    squidletctl log --host [--port=8889]
+    
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+
+
+## Publish and subscript to remote events
+Publish
+
+    squidletctl pub --host --category="myCategory" [--topic] [--data] [--port=8889]
+    
+Subscribe
+    
+    squidletctl sub --host --category="myCategory" [--topic] [--port=8889]
+
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+* --category - category of event
+* --topic - topic of event
+* --data - data to send in json format
+
+
+## ????? Run IO server
 
 Os server starts independently from host.
 System can connect to It via websocket and manipulate IO devices which IO server serves.
