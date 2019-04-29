@@ -12,7 +12,7 @@ export default class Events {
   }
 
 
-  emit(category: string, topic: string, data?: any): void {
+  emit(category: string, topic?: string, data?: any): void {
     const eventName = makeEventName(this.separator, category, topic);
 
     this.events.emit(eventName, data);

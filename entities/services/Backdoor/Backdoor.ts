@@ -6,6 +6,7 @@ import {
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {withoutFirstItemUint8Arr} from '../../../system/helpers/collections';
 import {uint8ArrayToJsData} from '../../../system/helpers/binaryHelpers';
+import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 
 
 enum BACKDOOR_CHANNELS {
@@ -60,7 +61,7 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
 
   private parseIncomeMessage(clientId: string, message: Uint8Array) {
     if (message.length <= 1) {
-      return this.env.system.log.error(`Backdoor: message is too small`);
+      return this.env.log.error(`Backdoor: message is too small`);
     }
 
     const channel: number = message[CHANNEL_POSITION];
@@ -84,7 +85,7 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
       case BACKDOOR_CHANNELS.switchIoAccess:
         return this.onSwitchIoAccess(payload);
       default:
-        this.env.system.log.error(`Backdoor: Can't recognize channel "${channel}"`);
+        this.env.log.error(`Backdoor: Can't recognize channel "${channel}"`);
     }
 
   }
@@ -94,7 +95,7 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
     const message: EventMessage = uint8ArrayToJsData(payload);
 
     if (!message.topic) {
-      return this.env.system.log.error(`Backdoor: message doesn't have a topic "${JSON.stringify(message)}"`);
+      return this.env.log.error(`Backdoor: message doesn't have a topic "${JSON.stringify(message)}"`);
     }
 
     this.env.events.emit(message.category, message.topic, message.data);
@@ -107,23 +108,27 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
       this.env.events.addListener(message.category, message.topic, (data: any) => {
         const returnMessage: EventMessage = { ...message, data };
 
-        this.wsServerDriver.send(clientId, returnMessage);
+        return this.send(clientId, returnMessage);
       });
     }
     else {
       this.env.events.addCategoryListener(message.category, (data: any) => {
         const returnMessage: EventMessage = { ...message, data };
 
-        this.wsServerDriver.send(clientId, returnMessage);
+        return this.send(clientId, returnMessage);
       });
     }
   }
 
   private onIoPub(payload: Uint8Array) {
-    // TODO: convert to json
+    const message: RemoteCallMessage = uint8ArrayToJsData(payload);
+
+    this.env.events.emit(categories.ioSet, undefined, message.data);
   }
 
   private onIoSub(clientId: string, payload: Uint8Array) {
+    const message: RemoteCallMessage = uint8ArrayToJsData(payload);
+
     // TODO: subscribe to io
     this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
       //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
@@ -153,6 +158,16 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
 
   private onSwitchIoAccess(payload: Uint8Array) {
     // TODO: convert to boolean
+  }
+
+
+  private async send(clientId: string, data: any) {
+    try {
+      await this.wsServerDriver.send(clientId, data);
+    }
+    catch (err) {
+      this.env.log.error(`Backdoor: send error: ${err}`);
+    }
   }
 
 }
