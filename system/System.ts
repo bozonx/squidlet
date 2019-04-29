@@ -1,5 +1,5 @@
 import Host from './Host';
-import Events from './Events';
+import CategorizedEvents from './helpers/CategorizedEvents';
 import LogPublisher from './LogPublisher';
 import DevicesManager from './entities/DevicesManager';
 import DriversManager from './entities/DriversManager';
@@ -19,7 +19,7 @@ import IoSetLocal from './ioSet/IoSetLocal';
 
 
 export default class System {
-  readonly events: Events;
+  readonly events: CategorizedEvents;
   readonly log: Logger;
   readonly ioSet: IoSet;
   readonly envSet: EnvSet;
@@ -69,7 +69,7 @@ export default class System {
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.events = new Events(this.systemConfig.eventNameSeparator);
+    this.events = new CategorizedEvents(this.systemConfig.eventNameSeparator);
     this.log = new LogPublisher(this);
     this.host = new Host(this);
     this.driversManager = new DriversManager(this);

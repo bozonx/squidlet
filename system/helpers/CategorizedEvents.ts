@@ -1,8 +1,8 @@
-import { makeEventName } from './helpers/helpers';
-import IndexedEventEmitter from './helpers/IndexedEventEmitter';
+import { makeEventName } from './helpers';
+import IndexedEventEmitter from './IndexedEventEmitter';
 
 
-export default class Events {
+export default class CategorizedEvents {
   private readonly events = new IndexedEventEmitter<(data: any, topic?: string) => void>();
   private readonly separator: string;
 

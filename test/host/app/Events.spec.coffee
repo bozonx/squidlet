@@ -1,4 +1,4 @@
-Events = require('../../../system/Events').default
+Events = require('../../../system/helpers/CategorizedEvents').default
 
 
 describe 'app.Events', ->

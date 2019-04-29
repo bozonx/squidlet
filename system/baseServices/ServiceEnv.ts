@@ -1,6 +1,6 @@
 import ServiceManifest from '../interfaces/ServiceManifest';
 import EnvBase from '../entities/EnvBase';
-import Events from '../Events';
+import CategorizedEvents from '../helpers/CategorizedEvents';
 import Host from '../Host';
 import System from '../System';
 
@@ -9,7 +9,7 @@ import System from '../System';
  * It is environment for devices and services
  */
 export default class ServiceEnv extends EnvBase {
-  readonly events: Events;
+  readonly events: CategorizedEvents;
   readonly host: Host;
 
   constructor(system: System) {
