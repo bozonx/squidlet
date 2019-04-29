@@ -30,12 +30,9 @@ export default class LogPublisher {
     await this.send('error', `ERROR: ${message}`);
   }
 
+
   private async send(level: string, message: string) {
-    this.system.events.emit(categories.logger, level, {
-      message,
-      // TODO: level isn't needed
-      level,
-    });
+    this.system.events.emit(categories.logger, level, message);
   }
 
 }

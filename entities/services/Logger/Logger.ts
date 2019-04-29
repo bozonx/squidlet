@@ -7,48 +7,30 @@ import * as defaultLogger from './defaultLogger';
 
 
 interface Props {
-  //listenHosts: string[];
 }
 
 export default class Logger extends ServiceBase<Props> {
   protected didInit = async () => {
-    this.listenHosts();
-  }
-
-  protected destroy = () => {
-    // TODO: remove listener
+    this.listenLevels();
   }
 
 
-  private listenHosts() {
-    // get hosts list from props or use all the hosts
-    // const hosts: string[] = (this.props.listenHosts.length)
-    //   ? this.props.listenHosts
-    //   : this.env.host.getAllTheHostsIds();
+  private listenLevels() {
+    const allowedLogLevels: LogLevel[] = this.calcAllowedLogLevels(this.env.host.config.config.logLevel);
 
-    const hosts: string[] = ['master'];
-
-    for (let hostId of hosts) {
-
-      // TODO: better to use categoryListener
-
-      const allowedLogLevels: string[] = this.calcLogLevel(this.env.host.config.config.logLevel);
-
-      // listen to allowed levels
-      for (let level of allowedLogLevels) {
-        this.env.events.addListener(categories.logger, level, this.logEventsHandler);
-      }
+    // listen to allowed levels
+    for (let level of allowedLogLevels) {
+      this.env.events.addListener(categories.logger, level, (message: string) => {
+        (defaultLogger as any)[level](message);
+      });
     }
   }
 
-  private logEventsHandler = (data: {level: LogLevel, message: string}) => {
-    defaultLogger[data.level](data.message);
-  }
 
-  private calcLogLevel(logLevel: LogLevel): string[] {
+  private calcAllowedLogLevels(logLevel: LogLevel): LogLevel[] {
     const currentLevelIndex: number = LOG_LEVELS.indexOf(logLevel);
 
-    return LOG_LEVELS.slice(currentLevelIndex);
+    return LOG_LEVELS.slice(currentLevelIndex) as LogLevel[];
   }
 
 }
