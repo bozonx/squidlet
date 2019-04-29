@@ -4,7 +4,6 @@ import LogPublisher from './LogPublisher';
 import DevicesManager from './entities/DevicesManager';
 import DriversManager from './entities/DriversManager';
 import ServicesManager from './entities/ServicesManager';
-import Logger from './interfaces/Logger';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import topics from './dict/topics';
@@ -20,7 +19,7 @@ import IoSetLocal from './ioSet/IoSetLocal';
 
 export default class System {
   readonly events: CategorizedEvents;
-  readonly log: Logger;
+  readonly log: LogPublisher;
   readonly ioSet: IoSet;
   readonly envSet: EnvSet;
   readonly host: Host;

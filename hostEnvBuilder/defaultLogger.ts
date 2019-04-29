@@ -2,9 +2,9 @@ export function debug(message: string) {
   console.info(message);
 }
 
-export function verbose(message: string) {
-  console.log(message);
-}
+// export function verbose(message: string) {
+//   console.log(message);
+// }
 
 export function info(message: string) {
   console.info(message);

@@ -1,3 +1,4 @@
-type LogLevel = 'debug' | 'verbose' | 'info' | 'warn' | 'error';
+// 'verbose' |
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export default LogLevel;

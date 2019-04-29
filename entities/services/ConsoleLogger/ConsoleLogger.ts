@@ -9,20 +9,20 @@ const consoleLog = {
     console.info(message);
   },
 
-  verbose(message: string) {
-    console.log(message);
-  },
+  // verbose(message: string) {
+  //   console.log(message);
+  // },
 
   info(message: string) {
     console.info(message);
   },
 
   warn(message: string) {
-    console.warn(message);
+    console.warn(`WARNING: ${message}`);
   },
 
   error(message: string) {
-    console.error(message);
+    console.error(`ERROR: ${message}`);
   },
 };
 
@@ -41,6 +41,8 @@ export default class ConsoleLogger extends ServiceBase<Props> {
     // listen to allowed levels
     for (let level of allowedLogLevels) {
       this.env.events.addListener(categories.logger, level, (message: string) => {
+        if (!LOG_LEVELS.includes(level)) return consoleLog.error(`Unsupported level: ${level}`);
+
         (consoleLog as any)[level](message);
       });
     }

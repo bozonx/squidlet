@@ -14,9 +14,9 @@ export default class LogPublisher {
     await this.send('debug', message);
   }
 
-  async verbose(message: string) {
-    await this.send('verbose', message);
-  }
+  // async verbose(message: string) {
+  //   await this.send('verbose', message);
+  // }
 
   async info(message: string) {
     await this.send('info', message);
