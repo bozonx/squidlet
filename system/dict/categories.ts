@@ -13,6 +13,6 @@ export default {
   logger: 'logger',
   // updater service
   updater: 'updater',
-  // io set access. topic is ioName
+  // io set access. Topic is ioName
   ioSet: 'ioSet',
 };

@@ -5,6 +5,7 @@ import {
   WebSocketServer,
   WebSocketServerConnection
 } from '../../drivers/WebSocketServer/WebSocketServer';
+import IoItem from '../../../system/interfaces/IoItem';
 
 
 interface BackDoorProps {
@@ -47,8 +48,11 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
       // TODO: !!!
     });
 
-    this.env.events.addCategoryListener(categories.ioSet, (data: any, topic: string) => {
-      // TODO: !!!
+    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
+      //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
+
+      // TODO: call IoSet service
+
     });
   }
 
