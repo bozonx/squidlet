@@ -2,7 +2,6 @@ import System from './System';
 import ManifestBase from './interfaces/ManifestBase';
 import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
 import {EntityClassType} from './entities/EntityManagerBase';
-import EnvSet from './interfaces/EnvSet';
 import {pathJoin} from './helpers/nodeLike';
 import StorageIo from './interfaces/io/StorageIo';
 
@@ -10,7 +9,7 @@ import StorageIo from './interfaces/io/StorageIo';
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-export default class EnvSetLocalFs implements EnvSet {
+export default class EnvSet {
   private readonly system: System;
   private get storageIo(): StorageIo {
     return this.system.ioSet.getInstance('Storage') as any;

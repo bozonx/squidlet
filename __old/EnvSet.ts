@@ -1,6 +1,6 @@
-import ManifestBase from './ManifestBase';
-import {ManifestsTypePluralName} from './ManifestTypes';
-import {EntityClassType} from '../entities/EntityManagerBase';
+import ManifestBase from '../system/interfaces/ManifestBase';
+import {ManifestsTypePluralName} from '../system/interfaces/ManifestTypes';
+import {EntityClassType} from '../system/entities/EntityManagerBase';
 
 export default interface EnvSet {
   loadConfig<T>(configName: string): Promise<T>;
