@@ -4,9 +4,9 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 const machineConfig: MachineConfig = {
   devs: [
     './devs/Mqtt.ts',
-    '../shared/nodeJsLike/Storage.ts',
-    '../shared/nodeJsLike/WebSocketClient.ts',
-    '../shared/nodeJsLike/WebSocketServer.ts',
+    '../shared/nodeJsLikeIo/Storage.ts',
+    '../shared/nodeJsLikeIo/WebSocketClient.ts',
+    '../shared/nodeJsLikeIo/WebSocketServer.ts',
     //'Sha1',
     //'Serial',
     //'Wifi',
@@ -14,7 +14,7 @@ const machineConfig: MachineConfig = {
   ],
   devsSupportFiles: [
     './x86/package.json',
-    '../shared/nodeJsLike/helpers.js',
+    '../shared/nodeJsLikeIo/helpers.js',
   ],
 
   hostConfig: {
