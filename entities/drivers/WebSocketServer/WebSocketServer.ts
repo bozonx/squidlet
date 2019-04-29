@@ -13,27 +13,30 @@ export interface WebSocketServerDriverProps {
 }
 
 
-export class WebSocketServerConnection {
-  readonly clientId: string;
+// TODO: не нужно
+// export class WebSocketServerConnection {
+//   readonly clientId: string;
+//
+//   constructor(clientId: string) {
+//     this.clientId = clientId;
+//   }
+//
+//   send(message: {[index: string]: any}) {
+//
+//   }
+//
+//   onIncomeMessage(cb: IncomeDataHandler) {
+//
+//   }
+//
+//   destroy = async () => {
+//     // TODO: close connections and remove listeners
+//   }
+//
+// }
 
-  constructor(clientId: string) {
-    this.clientId = clientId;
-  }
 
-  send(message: {[index: string]: any}) {
-
-  }
-
-  onIncomeMessage(cb: IncomeDataHandler) {
-
-  }
-
-  destroy = async () => {
-    // TODO: close connections and remove listeners
-  }
-
-}
-
+// TODO: удостовериться что при переподключении клиента будет тот же clientId
 
 export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   private get wsServerIo(): WebSocketClientIo {
@@ -52,8 +55,16 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   }
 
 
-  onConnection(cb: (connection: WebSocketServerConnection) => void) {
+  onConnection(cb: (clientId: string) => void) {
+    // TODO: !!!
+  }
 
+  send(clientId: string, message: {[index: string]: any}) {
+    // TODO: !!!
+  }
+
+  onIncomeMessage(clientId: string, cb: IncomeDataHandler) {
+    // TODO: !!!
   }
 
 

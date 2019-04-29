@@ -2,8 +2,7 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import categories from 'system/dict/categories';
 import {
-  WebSocketServer,
-  WebSocketServerConnection
+  WebSocketServer
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {withoutFirstItemUint8Arr} from '../../../system/helpers/collections';
 import {uint8ArrayToJsData} from '../../../system/helpers/binaryHelpers';
@@ -17,7 +16,7 @@ enum BACKDOOR_CHANNELS {
   updatePub,
   updateSub,
   logSub,
-  swhitchIoAccess,
+  switchIoAccess,
 }
 
 const CHANNEL_POSITION = 0;
@@ -49,15 +48,17 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
         binary: true,
       });
 
-    this.wsServerDriver.onConnection((connection: WebSocketServerConnection) => {
-      connection.onIncomeMessage((message: {[index: string]: any}) => {
-        this.onIncomeMessage(connection.clientId, message as Uint8Array);
+    this.wsServerDriver.onConnection((clientId: string) => {
+      // start listening income message of this connection
+      this.wsServerDriver.onIncomeMessage(clientId, (message: Uint8Array | {[index: string]: any} ) => {
+        // parse message
+        this.parseIncomeMessage(clientId, message as Uint8Array);
       });
     });
   }
 
 
-  private onIncomeMessage(clientId: string, message: Uint8Array) {
+  private parseIncomeMessage(clientId: string, message: Uint8Array) {
     if (message.length <= 1) {
       return this.env.system.log.error(`Backdoor: message is too small`);
     }
@@ -80,7 +81,7 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
         return this.onUpdateSub(clientId, payload);
       case BACKDOOR_CHANNELS.logSub:
         return this.onLogSub(clientId, payload);
-      case BACKDOOR_CHANNELS.swhitchIoAccess:
+      case BACKDOOR_CHANNELS.switchIoAccess:
         return this.onSwitchIoAccess(payload);
       default:
         this.env.system.log.error(`Backdoor: Can't recognize channel "${channel}"`);
@@ -104,12 +105,16 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
 
     if (message.topic) {
       this.env.events.addListener(message.category, message.topic, (data: any) => {
-        // TODO: make send
+        const returnMessage: EventMessage = { ...message, data };
+
+        this.wsServerDriver.send(clientId, returnMessage);
       });
     }
     else {
       this.env.events.addCategoryListener(message.category, (data: any) => {
-        // TODO: make send
+        const returnMessage: EventMessage = { ...message, data };
+
+        this.wsServerDriver.send(clientId, returnMessage);
       });
     }
   }
