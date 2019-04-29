@@ -1,3 +1,8 @@
 name: ConsoleLogger
 main: ConsoleLogger.ts
 system: true
+
+props:
+  logLevel:
+    type: "'debug' | 'info' | 'warn' | 'error'"
+    default: info

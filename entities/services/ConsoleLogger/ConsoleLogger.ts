@@ -27,6 +27,7 @@ const consoleLog = {
 };
 
 interface Props {
+  logLevel: LogLevel;
 }
 
 export default class ConsoleLogger extends ServiceBase<Props> {
@@ -36,7 +37,7 @@ export default class ConsoleLogger extends ServiceBase<Props> {
 
 
   private listenLevels() {
-    const allowedLogLevels: LogLevel[] = this.calcAllowedLogLevels(this.env.host.config.config.logLevel);
+    const allowedLogLevels: LogLevel[] = this.calcAllowedLogLevels(this.props.logLevel);
 
     // listen to allowed levels
     for (let level of allowedLogLevels) {

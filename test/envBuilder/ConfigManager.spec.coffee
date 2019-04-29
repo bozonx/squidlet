@@ -72,7 +72,7 @@ describe 'envBuilder.ConfigManager', ->
       config: {
         defaultConfigRepublishIntervalMs: 600000
         defaultStatusRepublishIntervalMs: 60000
-        logLevel: 'info'
+        #logLevel: 'info'
         senderResendTimeout: 1
         senderTimeout: 60
 

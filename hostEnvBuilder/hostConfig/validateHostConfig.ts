@@ -22,7 +22,7 @@ function checkConfig(rawConfig: {[index: string]: any}): string | undefined {
     // () => isString(rawConfig.config.varDataDir, 'config.varDataDir'),
     // () => isString(rawConfig.config.envSetDir, 'config.envSetDir'),
     // 'verbose',
-    () => oneOf(rawConfig.config.logLevel, ['debug', 'info', 'warn', 'error'], 'config.logLevel'),
+    //() => oneOf(rawConfig.config.logLevel, ['debug', 'info', 'warn', 'error'], 'config.logLevel'),
     () => isNumber(rawConfig.config.defaultStatusRepublishIntervalMs, 'config.defaultStatusRepublishIntervalMs'),
     () => isNumber(rawConfig.config.defaultConfigRepublishIntervalMs, 'config.defaultConfigRepublishIntervalMs'),
     () => isNumber(rawConfig.config.senderTimeout, 'config.senderTimeout'),

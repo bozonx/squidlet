@@ -82,7 +82,7 @@ describe 'envBuilder.validateHostConfig', ->
     assert.isUndefined(validateHostConfig({ @hostConfig..., config: {
 #      varDataDir: 'str'
 #      envSetDir: 'str'
-      logLevel: 'debug'
+      #logLevel: 'debug'
       defaultStatusRepublishIntervalMs: 5
       defaultConfigRepublishIntervalMs: 5
       senderTimeout: 5
@@ -91,7 +91,7 @@ describe 'envBuilder.validateHostConfig', ->
     # incorrect types
     #assert.isString(validateHostConfig({ @hostConfig..., config: {varDataDir: 5} }))
     #assert.isString(validateHostConfig({ @hostConfig..., config: {envSetDir: 5} }))
-    assert.isString(validateHostConfig({ @hostConfig..., config: {logLevel: 'other'} }))
+    #assert.isString(validateHostConfig({ @hostConfig..., config: {logLevel: 'other'} }))
     assert.isString(validateHostConfig({ @hostConfig..., config: {defaultStatusRepublishIntervalMs: 'str'} }))
     assert.isString(validateHostConfig({ @hostConfig..., config: {defaultConfigRepublishIntervalMs: 'str'} }))
     assert.isString(validateHostConfig({ @hostConfig..., config: {senderTimeout: 'str'} }))

@@ -1,5 +1,4 @@
 import Platforms from './Platforms';
-import LogLevel from '../../system/interfaces/LogLevel';
 import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
 import IoSetTypes from './IoSetTypes';
 
@@ -24,7 +23,7 @@ export default interface PreHostConfig {
 
   // specific config for each host
   config?: {
-    logLevel?: LogLevel;
+    //logLevel?: LogLevel;
     // republish status silently every minute if it hasn't been changed
     defaultStatusRepublishIntervalMs?: number;
     // republish config silently every 10 minutes if it hasn't been changed

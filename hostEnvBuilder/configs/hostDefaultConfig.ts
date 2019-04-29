@@ -1,6 +1,6 @@
 export default {
   config: {
-    logLevel: 'info',
+    //logLevel: 'info',
     defaultStatusRepublishIntervalMs: 60000,
     defaultConfigRepublishIntervalMs: 600000,
     // timeout in seconds to send a request. It resend on failure or brake connection if timout is finished.
