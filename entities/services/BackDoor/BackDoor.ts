@@ -5,8 +5,21 @@ import {
   WebSocketServer,
   WebSocketServerConnection
 } from '../../drivers/WebSocketServer/WebSocketServer';
-import IoItem from '../../../system/interfaces/IoItem';
+import {withoutFirstItemUint8Arr} from '../../../system/helpers/collections';
 
+
+enum BACKDOOR_CHANNELS {
+  pub,
+  sub,
+  ioPub,
+  ioSub,
+  updatePub,
+  updateSub,
+  logSub,
+  swhitchIoAccess,
+}
+
+const CHANNEL_POSITION = 0;
 
 interface BackDoorProps {
   host: string;
@@ -40,6 +53,8 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
 
 
   private listenSystemEvents() {
+    // TODO: слушать только если пришел запрос
+
     this.env.events.addCategoryListener(categories.logger, (data: any, level: string) => {
       // TODO: !!!
     });
@@ -51,37 +66,79 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
     this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
       //const instance: IoItem = this.env.system.ioSet.getInstance(ioName);
 
-      // TODO: call IoSet service
+      // TODO: это выход из ioSet - его перенаправляем на удаленный хост если он подписан
 
     });
   }
 
   private onIncomeMessage(clientId: string, message: Uint8Array) {
-    // TODO: parse message
+    if (message.length <= 1) {
+      return this.env.system.log.error(`Backdoor: message is too small`);
+    }
+
+    const channel: number = message[CHANNEL_POSITION];
+    const payload: Uint8Array = withoutFirstItemUint8Arr(message);
+
+    if (channel === BACKDOOR_CHANNELS.pub) {
+      this.onPub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.sub) {
+      this.onSub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.ioPub) {
+      this.onIoPub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.ioSub) {
+      this.onIoSub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.updatePub) {
+      this.onUpdatePub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.updateSub) {
+      this.onUpdateSub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.logSub) {
+      this.onLogSub(payload);
+    }
+    else if (channel === BACKDOOR_CHANNELS.swhitchIoAccess) {
+      this.onSwitchIoAccess(payload);
+    }
+    else {
+      this.env.system.log.error(`Backdoor: Can't recognize channel "${channel}"`);
+    }
   }
 
-  private onIncomeEntityUpdate() {
+  private onUpdatePub(payload: Uint8Array) {
 
   }
 
-  private onIncomeConfigsUpdate() {
+  private onUpdateSub(payload: Uint8Array) {
 
   }
 
-  private onIncomeSystemUpdate() {
+  private onPub(payload: Uint8Array) {
+    // TODO: convert to json
+    // TODO: call events.emit
+  }
+
+  private onSub(payload: Uint8Array) {
 
   }
 
-  private onIncomePub() {
-
+  private onIoPub(payload: Uint8Array) {
+    // TODO: convert to json
   }
 
-  private onIncomeAddSub() {
-
+  private onIoSub(payload: Uint8Array) {
+    // TODO: subscribe to io
   }
 
-  private onIncomeIoCall() {
+  private onLogSub(payload: Uint8Array) {
+    // TODO: subscribe to log
+  }
 
+  private onSwitchIoAccess(payload: Uint8Array) {
+    // TODO: convert to boolean
   }
 
 }
