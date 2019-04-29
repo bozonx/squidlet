@@ -3,7 +3,7 @@ import IndexedEventEmitter from './helpers/IndexedEventEmitter';
 
 
 export default class Events {
-  private readonly events = new IndexedEventEmitter<(data: any) => void>();
+  private readonly events = new IndexedEventEmitter<(data: any, topic?: string) => void>();
   private readonly separator: string;
 
 
@@ -11,15 +11,13 @@ export default class Events {
     this.separator = separator;
   }
 
-  // TODO: add separator
-
 
   emit(category: string, topic: string, data?: any): void {
     const eventName = makeEventName(this.separator, category, topic);
 
     this.events.emit(eventName, data);
     // emit category listeners
-    this.events.emit(category, data);
+    this.events.emit(category, data, topic);
   }
 
   /**
@@ -42,9 +40,9 @@ export default class Events {
   /**
    * Listen all the topics of category
    */
-  addCategoryListener(category: string, handler: (data: any) => void): number {
+  addCategoryListener(category: string, handler: (data: any, topic: string) => void): number {
     // listen to local events
-    return this.events.addListener(category, handler);
+    return this.events.addListener(category, handler as any);
   }
 
   removeListener(category: string, topic: string, handlerIndex: number): void {

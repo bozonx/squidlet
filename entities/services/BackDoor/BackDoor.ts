@@ -2,9 +2,9 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {
   WebSocketServer,
-  WebSocketServerConnection,
-  WebSocketServerDriverProps
+  WebSocketServerConnection
 } from '../../drivers/WebSocketServer/WebSocketServer';
+import categories from '../../../system/dict/categories';
 
 
 interface BackDoorProps {
@@ -12,7 +12,8 @@ interface BackDoorProps {
   port: number;
 }
 
-// TODO: set default host port
+// TODO: set default host port in manifest
+// TODO: listen subscribes which was set by squildetctl - use externalDataOutcome, externalDataIncome
 
 export default class BackDoor extends ServiceBase<BackDoorProps> {
   private get wsServerDriver(): WebSocketServer {
@@ -38,11 +39,17 @@ export default class BackDoor extends ServiceBase<BackDoorProps> {
 
 
   private listenSystemEvents() {
-    // TODO: listen logger
-    // TODO: listen ioSet
-    // TODO: listen subscribes which was set by squildetctl
+    this.env.events.addCategoryListener(categories.logger, (data: any) => {
+      // TODO: !!!
+    });
 
-    //this.env.events.addCategoryListener();
+    this.env.events.addCategoryListener(categories.updater, (data: any) => {
+      // TODO: !!!
+    });
+
+    this.env.events.addCategoryListener(categories.ioSet, (data: any) => {
+      // TODO: !!!
+    });
   }
 
   private onIncomeMessage(clientId: string, message: Uint8Array) {
