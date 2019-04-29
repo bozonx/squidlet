@@ -1,5 +1,5 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import WebSocketClientIo from '../../../system/interfaces/io/WebSocketClientIo';
+import {GetDriverDep} from '../../../system/entities/EntityBase';
 
 
 interface Props {
@@ -7,14 +7,14 @@ interface Props {
 
 
 export default class BackDoor extends ServiceBase<Props> {
-  // TODO: use driver
-  private get storageIo(): WebSocketClientIo {
-    return this.env.getIo('WebSocketClient') as any;
+  private get wsServerDriver(): WebSocketServer {
+    return this.depsInstances.wsServerDriver as any;
   }
 
 
-  protected didInit = async () => {
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.wsServerDriver = await getDriverDep('WebSocketServer')
+      .getInstance(this.props);
   }
-
 
 }
