@@ -24,37 +24,14 @@ const eventNames = {
 
 
 export default class WebSocketClient implements WebSocketClientIo {
-  // TODO: тоже должны идти по connection id
-  //private readonly errorEvents = new IndexedEvents<(err: string) => void>();
   private readonly connections: ConnectionItem[] = [];
-  // TODO: сохранять их по connection id
-  //private lastProps?: WebSocketClientProps;
 
   /**
    * Make new connection to server.
    * It returns a connection id to use with other methods
    */
   newConnection(props: WebSocketClientProps): number {
-    const client = this.connectToServer();
-    const events = new IndexedEventEmitter();
-
-    this.connections.push([
-      client,
-      events,
-      props,
-    ]);
-
-    client.on(eventNames.open, () => events.emit(eventNames.open));
-    client.on(eventNames.close, () => events.emit(eventNames.close));
-    client.on(eventNames.message, (data: string | Uint8Array) => {
-      events.emit(eventNames.message, data);
-    });
-    client.on(eventNames.error, (err: Error) => {
-      events.emit(eventNames.error, err);
-    });
-    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      events.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
-    });
+    this.connections.push( this.connectToServer(props) );
 
     return this.connections.length - 1;
   }
@@ -79,40 +56,42 @@ export default class WebSocketClient implements WebSocketClientIo {
     return this.connections[connectionId][CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
-
   send(connectionId: number, data: string | Uint8Array) {
 
-    // TODO: support of null or undefined, number, boolean ???
+    // TODO: is it need support of null or undefined, number, boolean ???
 
     if (typeof data !== 'string' && !isUint8Array(data)) {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    this.connections[connectionId].send(data);
+    this.connections[connectionId][CONNECTION_POSITIONS.webSocket].send(data);
   }
 
   close(connectionId: number, code: number, reason?: string) {
     if (!this.connections[connectionId]) return;
 
-    this.connections[connectionId].close(code, reason);
+    this.connections[connectionId][CONNECTION_POSITIONS.webSocket].close(code, reason);
+    this.connections[connectionId][CONNECTION_POSITIONS.events].destroy();
+
     delete this.connections[connectionId];
 
     // TODO: проверить не будет ли ошибки если соединение уже закрыто
-    // TODO: нужно ли отписываться от навешанных колбэков ???
-    // TODO: remove all the listeners
+    // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
   }
 
   /**
-   * It uses to reconnect
+   * It is used to reconnect on connections lost.
    */
   reConnect(connectionId: number) {
-    if (this.connections[connectionId]) {
-      this.close(connectionId, 0);
-      // TODO: remove all the listeners
-
+    if (!this.connections[connectionId]) {
+      throw new Error(`WebSocketClient: can't reconnect, there isn't previous connection with id "${connectionId}"`);
     }
 
-    this.connections[connectionId] = this.connectToServer();
+    const props: WebSocketClientProps = this.connections[connectionId][CONNECTION_POSITIONS.props];
+
+    this.close(connectionId, 0);
+
+    this.connections[connectionId] = this.connectToServer(props);
   }
 
   destroy() {
@@ -120,16 +99,28 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
 
-  private connectToServer(): WebSocket {
-    if (!this.lastProps) {
-      throw new Error(`WebSocketClient: There isn't props`);
-    }
-
-    const client = new WebSocket(this.lastProps.url, {
+  private connectToServer(props: WebSocketClientProps): ConnectionItem {
+    const events = new IndexedEventEmitter();
+    const client = new WebSocket(props.url, {
     });
 
+    client.on(eventNames.open, () => events.emit(eventNames.open));
+    client.on(eventNames.close, () => events.emit(eventNames.close));
+    client.on(eventNames.message, (data: string | Uint8Array) => {
+      events.emit(eventNames.message, data);
+    });
+    client.on(eventNames.error, (err: Error) => {
+      events.emit(eventNames.error, err);
+    });
+    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
+      events.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
+    });
 
-    return client;
+    return [
+      client,
+      events,
+      props,
+    ];
   }
 
 }
