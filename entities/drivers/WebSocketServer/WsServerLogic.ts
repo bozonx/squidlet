@@ -1,5 +1,5 @@
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
+import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 
 
 // TODO: extend of driver's props
@@ -77,8 +77,11 @@ export default class WsServerLogic {
   }
 
   removeMessageListener(connectionId: string, handlerId: number) {
-    // TODO: review
     this.wsServerIo.removeEventListener(this.serverId, connectionId,'message', handlerId);
+  }
+
+  removeConnectionListener(handlerId: number) {
+    this.wsServerIo.removeServerEventListener(this.serverId, 'connection', handlerId);
   }
 
 

@@ -2,9 +2,7 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import WsServerLogic, {WsServerLogicProps} from './WsServerLogic';
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-
-
-type OnMessageHandler = (message: Uint8Array | {[index: string]: any}) => void;
+import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 
 
 export interface WebSocketServerDriverProps {
@@ -72,7 +70,7 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
 
   onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
     if (!this._server) {
-      throw new Error(`WebSocketServer.onNewConnection: Server has already been closed`);
+      throw new Error(`WebSocketServer.onConnection: Server has already been closed`);
     }
 
     return this._server.onConnection(cb);
@@ -80,14 +78,19 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
 
   removeMessageListener(connectionId: string, handlerId: number) {
     if (!this._server) {
-      throw new Error(`WebSocketServer.onNewConnection: Server has been already closed`);
+      throw new Error(`WebSocketServer.removeMessageListener: Server has been already closed`);
     }
 
-    // TODO: review
-    //this._server.removeEventListener(connectionId,'message', handlerId);
+    this._server.removeMessageListener(connectionId, handlerId);
   }
 
-  // TODO: remove on connection listener
+  removeConnectionListener(handlerId: number) {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.removeConnectionListener: Server has been already closed`);
+    }
+
+    this._server.removeConnectionListener(handlerId);
+  }
 
   private onServerClosed = () => {
     this.env.log.error(`WebSocketServer: Server "${this.props.host}:${this.props.port}" has been closed, you can't manipulate it any more!`);
