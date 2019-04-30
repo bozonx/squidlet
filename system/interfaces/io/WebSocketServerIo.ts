@@ -1,8 +1,8 @@
 export interface WebSocketServerProps {
   // The hostname where to bind the server
-  host?: string;
+  host: string;
   // The port where to bind the server
-  port?: number;
+  port: number;
 }
 
 export interface ConnectionParams {

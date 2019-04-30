@@ -1,7 +1,7 @@
-import WebSocketClientIo from 'system/interfaces/io/WebSocketClientIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import WsServerLogic, {WsServerLogicProps} from './WsServerLogic';
+import WebSocketServerIo from 'system/interfaces/io/WebSocketServerIo';
 
 
 type IncomeDataHandler = (message: Uint8Array | {[index: string]: any}) => void;
@@ -10,37 +10,14 @@ type IncomeDataHandler = (message: Uint8Array | {[index: string]: any}) => void;
 export interface WebSocketServerDriverProps {
   host: string;
   port: number;
-  binary?: boolean;
+  //binary?: boolean;
 }
-
-
-// TODO: не нужно
-// export class WebSocketServerConnection {
-//   readonly clientId: string;
-//
-//   constructor(clientId: string) {
-//     this.clientId = clientId;
-//   }
-//
-//   send(message: {[index: string]: any}) {
-//
-//   }
-//
-//   onIncomeMessage(cb: IncomeDataHandler) {
-//
-//   }
-//
-//   destroy = async () => {
-//     // TODO: close connections and remove listeners
-//   }
-//
-// }
 
 
 // TODO: удостовериться что при переподключении клиента будет тот же clientId
 
 export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
-  private get wsServerIo(): WebSocketClientIo {
+  private get wsServerIo(): WebSocketServerIo {
     return this.env.getIo('WebSocketServer') as any;
   }
   private _server?: WsServerLogic;
@@ -48,7 +25,7 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
 
   protected willInit = async () => {
     const wsServerLogicProps: WsServerLogicProps = {
-
+      ...this.props,
     };
 
     this._server = new WsServerLogic(
