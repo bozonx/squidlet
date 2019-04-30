@@ -8,56 +8,65 @@ export interface WebSocketClientDriverProps {
   host: string;
   port: number;
   autoReconnect: boolean;
-  maxTries: number;
   reconnectTimeoutSec: number;
 }
 
 
+/**
+ * Simplified websocket driver.
+ * It holds connection for ever and reconnects if it lost.
+ */
 export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   private get wsClientIo(): WebSocketClientIo {
     return this.env.getIo('WebSocketClient') as any;
   }
   private _client?: WsClientLogic;
-  private get client(): WsClientLogic {
-    return this._client as any;
-  }
 
 
   protected willInit = async () => {
     const wsClientLogicProps: WsClientLogicProps = {
       ...this.props,
+      maxTries: 0,
       clientId: this.env.system.host.id,
     };
 
     this._client = new WsClientLogic(
       this.wsClientIo,
       wsClientLogicProps,
-      this.onConnectionClose,
+      this.onConnectionClosed,
       this.env.log.info,
       this.env.log.error
     );
   }
 
   destroy = async () => {
-    this.client.destroy();
+    if (!this._client) return;
+
+    this._client.destroy();
   }
 
 
   async send(data: string | Uint8Array): Promise<void> {
-    return this.client.send(data);
+    if (!this._client) throw new Error(`WebSocketClient.send: You can't send message because connection was closed for ever`);
+
+    return this._client.send(data);
   }
 
   onMessage(cb: IncomeDataHandler): number {
-    return this.client.onMessage(cb);
+    if (!this._client) throw new Error(`WebSocketClient.onMessage: You can't listen connection because it was closed for ever`);
+
+    return this._client.onMessage(cb);
   }
 
   removeMessageListener(handlerId: number) {
-    this.client.removeMessageListener(handlerId);
+    if (!this._client) return;
+
+    this._client.removeMessageListener(handlerId);
   }
 
 
-  private onConnectionClose = () => {
-    // TODO: remake instance of connection ????
+  private onConnectionClosed = () => {
+    this.env.log.error(`WebSocketClient: connection "${this.props.host}:${this.props.port}" is closed, you can't manipulate it any more!`);
   }
 
 }

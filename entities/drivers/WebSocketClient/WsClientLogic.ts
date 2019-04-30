@@ -6,6 +6,8 @@ export type IncomeDataHandler = (data: string | Uint8Array) => void;
 
 export interface WsClientLogicProps extends WebSocketClientDriverProps {
   clientId: string;
+  // tries of reconnection. 0 is infinity
+  maxTries: number;
 }
 
 
@@ -100,10 +102,13 @@ export default class WsClientLogic {
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
 
-    // TODO: add infinity tries
+    // if tries more than 0(infinity) - increment it and close connection if can't connect
+    if (this.props.maxTries) {
+      if (this.connectionTries >= this.props.maxTries) {
+        return this.finallyCloseConnection();
+      }
 
-    if (this.connectionTries >= this.props.maxTries) {
-      return this.finallyCloseConnection();
+      this.connectionTries++;
     }
 
     // make new promise if previous was fulfilled

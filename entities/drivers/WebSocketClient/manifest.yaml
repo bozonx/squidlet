@@ -15,10 +15,6 @@ props:
   autoReconnect:
     type: boolean
     default: false
-  maxTries:
-    type: number
-    # 0 is infinity
-    default: 0
   reconnectTimeoutSec:
     type: number
     # in seconds
