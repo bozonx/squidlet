@@ -43,9 +43,7 @@ export default class WsServerLogic {
   }
 
   destroy() {
-    // clearTimeout(this.reconnectTimeout);
-    // this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
-    // TODO: !!!!
+    this.wsServerIo.closeServer(this.serverId);
   }
 
   /**

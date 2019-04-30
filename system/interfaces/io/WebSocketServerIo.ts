@@ -24,6 +24,7 @@ export interface ConnectionParams {
 export default interface WebSocketServerIo {
   // make new server and return serverId
   newServer(props: WebSocketServerProps): string;
+  closeServer(serverId: string): Promise<void>;
   // when new client is connected
   onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number;
   // when server starts listening
