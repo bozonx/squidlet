@@ -1,4 +1,4 @@
-import {WsClientEvents} from './WebSocketClientIo';
+import {WsEvents} from './WebSocketClientIo';
 
 
 export const Methods = [
@@ -37,7 +37,7 @@ export default interface WebSocketServerIo {
   onError             (serverId: string, connectionId: string, cb: (err: Error) => void): number;
   // TODO: remove server listener
   // TODO: какие события ???
-  removeEventListener (serverId: string, connectionId: string, eventName: WsClientEvents, handlerIndex: number): void;
+  removeEventListener (serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void;
   send                (serverId: string, connectionId: string, data: string | Uint8Array): void;
   close               (serverId: string, connectionId: string, code: number, reason: string): void;
 }

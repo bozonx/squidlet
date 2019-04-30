@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws';
 
 import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {WsClientEvents} from '../../system/interfaces/io/WebSocketClientIo';
+import {WsEvents} from '../../system/interfaces/io/WebSocketClientIo';
 
 
 // export class WSServer implements WSSeverIo {
@@ -90,7 +90,7 @@ export default class WebSocketServer implements WebSocketServerIo {
   }
   // TODO: remove server listener
   // TODO: какие события ???
-  removeEventListener(serverId: string, connectionId: string, eventName: WsClientEvents, handlerIndex: number): void {
+  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
 
   }
 

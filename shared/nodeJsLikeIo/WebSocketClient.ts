@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
-import WebSocketClientIo, {WebSocketClientProps, WsClientEvents} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {WebSocketClientProps, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
 import {isUint8Array} from 'system/helpers/collections';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
@@ -55,7 +55,7 @@ export default class WebSocketClient implements WebSocketClientIo {
       .addListener(eventNames.error, cb);
   }
 
-  removeEventListener(connectionId: string, eventName: WsClientEvents, handlerIndex: number) {
+  removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .removeListener(eventName, handlerIndex);
   }
