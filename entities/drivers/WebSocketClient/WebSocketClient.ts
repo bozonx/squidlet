@@ -1,14 +1,17 @@
 import WebSocketClientIo from 'system/interfaces/io/WebSocketClientIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import WsClientLogic, {IncomeDataHandler} from './WsClientLogic';
+import WsClientLogic, {IncomeDataHandler, WsClientLogicProps} from './WsClientLogic';
 
 
 export interface WebSocketClientDriverProps {
   host: string;
   port: number;
   autoReconnect: boolean;
+  maxTries: number;
+  reconnectTimeoutSec: number;
 }
+
 
 export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   private get wsClientIo(): WebSocketClientIo {
@@ -21,12 +24,15 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 
 
   protected willInit = async () => {
+    const wsClientLogicProps: WsClientLogicProps = {
+      ...this.props,
+      clientId: this.env.system.host.id,
+    };
+
     this._client = new WsClientLogic(
       this.wsClientIo,
-      this.props.host,
-      this.props.port,
-      this.env.system.host.id,
-      this.props.autoReconnect,
+      wsClientLogicProps,
+      this.onConnectionClose,
       this.env.log.info,
       this.env.log.error
     );
@@ -47,6 +53,11 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 
   removeMessageListener(handlerId: number) {
     this.client.removeMessageListener(handlerId);
+  }
+
+
+  private onConnectionClose = () => {
+    // TODO: remake instance of connection ????
   }
 
 }

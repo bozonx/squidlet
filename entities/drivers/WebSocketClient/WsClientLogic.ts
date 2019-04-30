@@ -1,16 +1,12 @@
 import WebSocketClientIo, {WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
+import {WebSocketClientDriverProps} from './WebSocketClient';
 
 
 export type IncomeDataHandler = (data: string | Uint8Array) => void;
 
-export interface WsClientLogicProps {
-  host: string;
-  port: number;
+export interface WsClientLogicProps extends WebSocketClientDriverProps {
   clientId: string;
-  autoReconnect: boolean;
-  maxTries: number;
-  reconnectTimeoutSec: number;
-} 
+}
 
 
 /**
@@ -103,6 +99,8 @@ export default class WsClientLogic {
 
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
+
+    // TODO: add infinity tries
 
     if (this.connectionTries >= this.props.maxTries) {
       return this.finallyCloseConnection();
