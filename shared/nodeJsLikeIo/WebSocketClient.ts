@@ -80,15 +80,9 @@ export default class WebSocketClient implements WebSocketClientIo {
 
   /**
    * It is used to reconnect on connections lost.
-   * If connection has been closed by calling "close" method it will rise an exception.
+   * It closes previous connection and makes new one with the same id.
    */
   reConnect(connectionId: number, props: WebSocketClientProps) {
-    // if (!this.connections[connectionId]) {
-    //   throw new Error(`WebSocketClient: can't reconnect, there isn't previous connection with id "${connectionId}"`);
-    // }
-    //
-    // const props: WebSocketClientProps = this.connections[connectionId][CONNECTION_POSITIONS.props];
-
     this.close(connectionId, 0);
 
     this.connections[connectionId] = this.connectToServer(props);
@@ -96,6 +90,9 @@ export default class WebSocketClient implements WebSocketClientIo {
 
   destroy() {
     // TODO: удалить все события и вызвать close на всех клиентах
+    for (let connectionId in this.connections) {
+      this.close(parseInt(connectionId), 0, 'Destroy');
+    }
   }
 
 
