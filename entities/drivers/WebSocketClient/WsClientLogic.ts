@@ -10,6 +10,8 @@ export type IncomeDataHandler = (data: string | Uint8Array) => void;
  * It can automatically reconnect if "autoReconnect" param is true.
  */
 export default class WsClientLogic {
+  // on first time connect or reconnect
+  openPromise: Promise<void>;
   private readonly props: WebSocketClientProps;
   private readonly connectionId: string;
   private readonly wsClientIo: WebSocketClientIo;
@@ -17,6 +19,10 @@ export default class WsClientLogic {
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
+  private openPromiseResolve: () => void = () => {};
+  private openPromiseReject: () => void = () => {};
+  // was previous open promise fulfilled
+  private wasPrevOpenFulfilled: boolean = false;
 
 
   constructor(
@@ -41,9 +47,7 @@ export default class WsClientLogic {
       // additional io client params
       //...omit(this.props, 'host', 'port')
     };
-
-    // TODO: make open connection promise
-
+    this.openPromise = this.makeOpenPromise();
     this.connectionId = this.wsClientIo.newConnection(this.props);
 
     this.listen();
@@ -69,7 +73,10 @@ export default class WsClientLogic {
 
   private listen() {
     this.wsClientIo.onOpen(this.connectionId, () => {
-      return this.logInfo(`WebSocketClient: connection opened. ${this.url} Id: ${this.connectionId}`);
+      this.wasPrevOpenFulfilled = true;
+      this.openPromiseResolve();
+      
+      return this.logInfo(`WebSocketClient: connection opened. ${this.props.url} Id: ${this.connectionId}`);
     });
 
     this.wsClientIo.onError(this.connectionId, (err: string) => {
@@ -77,20 +84,39 @@ export default class WsClientLogic {
     });
 
     this.wsClientIo.onClose(this.connectionId, () => {
-      this.logInfo(`WebSocketClient: connection closed. ${this.url} Id: ${this.connectionId}`);
+      this.logInfo(`WebSocketClient: connection closed. ${this.props.url} Id: ${this.connectionId}`);
 
       if (!this.autoReconnect) {
         this.wsClientIo.destroyConnection(this.connectionId);
 
+        if (!this.wasPrevOpenFulfilled) {
+          this.wasPrevOpenFulfilled = true;
+          this.openPromiseReject();
+        }
+        
         return this.onClose();
       }
 
-      // TODO: renew open connection promise
       // TODO: переконекчиваться регулярно каждые 10 секунд
 
+      // make new promise if previous was fulfilled
+      if (this.wasPrevOpenFulfilled) {
+        this.openPromise = this.makeOpenPromise();
+      }
+      
       this.logInfo(`WebSocketClient: Reconnecting...`);
+      
       this.wsClientIo.reConnect(this.connectionId);
     });
   }
 
+  private makeOpenPromise(): Promise<void> {
+    this.wasPrevOpenFulfilled = false;
+    
+    return new Promise<void>((resolve, reject) => {
+      this.openPromiseResolve = resolve;
+      this.openPromiseReject = reject;
+    });
+  }
+  
 }
