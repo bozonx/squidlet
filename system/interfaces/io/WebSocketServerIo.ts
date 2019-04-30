@@ -21,6 +21,11 @@ export default interface WebSocketServerIo {
   newServer(props: WebSocketServerProps): string;
   // when new client is connected
   onConnection(serverId: string, cb: (clientId: string, connectionParams: ConnectionParams) => void): void;
+  // when server starts listening
+  onListening(serverId: string, cb: () => void): void;
+  // on server close. Depend on http server close
+  onClose(serverId: string, cb: () => void): void;
+  onServerError(serverId: string, cb: (err: Error) => void): void;
 
   //onOpen(cb: () => void): void;
   //onMessage(cb: (data: any) => void): void;

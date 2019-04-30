@@ -1,4 +1,4 @@
-import WebSocketServerIo from 'system/interfaces/io/WebSocketServerIo';
+import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 
 
 // TODO: extend of driver's props
@@ -14,6 +14,8 @@ export default class WsServerLogic {
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private readonly serverId: string;
+
+  // TODO: add startListenning promise
 
   constructor(
     wsServerIo: WebSocketServerIo,
@@ -31,8 +33,23 @@ export default class WsServerLogic {
       port: this.props.port,
     });
 
+    this.wsServerIo.onConnection(this.serverId, this.handleIncomeConnection);
+    this.wsServerIo.onListening(this.serverId, this.handleListenning);
+    this.wsServerIo.onClose(this.serverId, this.onClose);
+    this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(err));
+  }
+
+
+  private handleIncomeConnection = (clientId: string, connectionParams: ConnectionParams) => {
 
   }
 
+  private handleListenning = () => {
+
+  }
+
+  private onClose = () => {
+
+  }
 
 }
