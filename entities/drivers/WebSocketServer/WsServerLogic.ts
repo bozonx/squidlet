@@ -60,7 +60,7 @@ export default class WsServerLogic {
 
   private onIncomeConnection = (clientId: string, connectionParams: ConnectionParams) => {
     this.wsServerIo.onClose(this.serverId, clientId, this.onClose);
-    this.wsServerIo.onMessage(this.serverId, clientId, this.onMessage);
+    this.wsServerIo.onMessage(this.serverId, clientId, this.onIncomeMessage);
     this.wsServerIo.onError(this.serverId, clientId, (err: Error) => this.logError(String(err)));
   }
 
@@ -72,11 +72,11 @@ export default class WsServerLogic {
     // TODO: what to do???
   }
 
-  private onClose = () => {
+  private onClose = (): number => {
     // TODO: what to do???
   }
 
-  private onMessage = (data: string | Uint8Array) => {
+  private onIncomeMessage = (data: string | Uint8Array): number => {
     // TODO: what to do???
   }
 

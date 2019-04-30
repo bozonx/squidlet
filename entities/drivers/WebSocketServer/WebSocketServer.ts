@@ -41,7 +41,9 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   }
 
   destroy = async () => {
-    // TODO: close connections and remove listeners
+    if (!this._server) return ;
+
+    this._server.destroy();
   }
 
 

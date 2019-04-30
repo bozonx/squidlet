@@ -4,6 +4,9 @@ import topics from 'system/dict/topics';
 import {ManifestsTypeName} from 'system/interfaces/ManifestTypes';
 
 
+// TODO: прописать зависимость от драйверов
+
+
 enum UPDATER_STATUS {
   ok,
   notWritten,
