@@ -17,6 +17,14 @@ export interface WebSocketClientDriverProps {
  * It holds connection for ever and reconnects if it lost.
  */
 export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
+  get openPromise(): Promise<void> {
+    if (!this._client) {
+      throw new Error(`WebSocketClient.openPromise: Client hasn't been connected`);
+    }
+
+    return this._client.openPromise;
+  }
+
   private get wsClientIo(): WebSocketClientIo {
     return this.env.getIo('WebSocketClient') as any;
   }
@@ -45,8 +53,6 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
     this._client.destroy();
   }
 
-
-  // TODO: use open promise
 
   async send(data: string | Uint8Array): Promise<void> {
     if (!this._client) throw new Error(`WebSocketClient.send: You can't send message because connection was closed for ever`);

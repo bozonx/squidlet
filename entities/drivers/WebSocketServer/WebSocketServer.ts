@@ -13,6 +13,14 @@ export interface WebSocketServerDriverProps {
 
 
 export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
+  get listeningPromise(): Promise<void> {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.listeningPromise: Server has been already closed`);
+    }
+
+    return this._server.listeningPromise;
+  }
+
   private get wsServerIo(): WebSocketServerIo {
     return this.env.getIo('WebSocketServer') as any;
   }
@@ -34,12 +42,11 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   }
 
   destroy = async () => {
-    if (!this._server) return ;
+    if (!this._server) return;
 
-    this._server.destroy();
+    await this._server.destroy();
   }
 
-  // TODO: use server listen promise
 
   /**
    * Force closing a connection

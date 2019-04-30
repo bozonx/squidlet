@@ -10,14 +10,17 @@ export interface WsServerLogicProps {
 
 
 export default class WsServerLogic {
+  // it fulfils when server is start listening
+  listeningPromise: Promise<void>;
+
   private readonly wsServerIo: WebSocketServerIo;
   private readonly props: WsServerLogicProps;
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private readonly serverId: string;
+  private listeningPromiseResolve: () => void = () => {};
 
-  // TODO: add startListening promise
 
   constructor(
     wsServerIo: WebSocketServerIo,
@@ -33,6 +36,9 @@ export default class WsServerLogic {
     this.onClose = onClose;
     this.logInfo = logInfo;
     this.logError = logError;
+    this.listeningPromise = new Promise<void>((resolve) => {
+      this.listeningPromiseResolve = resolve;
+    });
 
     this.serverId = this.wsServerIo.newServer({
       host: this.props.host,
@@ -42,8 +48,8 @@ export default class WsServerLogic {
     this.listenServer();
   }
 
-  destroy() {
-    this.wsServerIo.closeServer(this.serverId);
+  async destroy() {
+    await this.wsServerIo.closeServer(this.serverId);
   }
 
   /**
@@ -96,7 +102,7 @@ export default class WsServerLogic {
   }
 
   private onServerListening = () => {
-    // TODO: fulfill listening promise
+    this.listeningPromiseResolve();
   }
 
   private onServerClose = () => {
