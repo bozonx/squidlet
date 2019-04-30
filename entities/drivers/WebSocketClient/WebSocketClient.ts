@@ -57,6 +57,4 @@ export default class Factory extends DriverFactoryBase<WebSocketClient> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;
   }
-
-  // TODO: ???? use io's destroy
 }

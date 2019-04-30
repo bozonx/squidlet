@@ -98,10 +98,6 @@ export default class WebSocketClient implements WebSocketClientIo {
     this.connections[Number(connectionId)][CONNECTION_POSITIONS.events].destroy();
 
     delete this.connections[Number(connectionId)];
-
-    // for (let connectionId in this.connections) {
-    //   this.close(connectionId, 0, 'Destroy');
-    // }
   }
 
 
