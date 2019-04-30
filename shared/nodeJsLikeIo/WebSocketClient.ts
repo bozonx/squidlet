@@ -7,12 +7,11 @@ import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 
 
-type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler>, WebSocketClientProps ];
+type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
 
 enum CONNECTION_POSITIONS {
   webSocket,
-  events,
-  props
+  events
 }
 
 const eventNames = {
@@ -81,13 +80,14 @@ export default class WebSocketClient implements WebSocketClientIo {
 
   /**
    * It is used to reconnect on connections lost.
+   * If connection has been closed by calling "close" method it will rise an exception.
    */
-  reConnect(connectionId: number) {
-    if (!this.connections[connectionId]) {
-      throw new Error(`WebSocketClient: can't reconnect, there isn't previous connection with id "${connectionId}"`);
-    }
-
-    const props: WebSocketClientProps = this.connections[connectionId][CONNECTION_POSITIONS.props];
+  reConnect(connectionId: number, props: WebSocketClientProps) {
+    // if (!this.connections[connectionId]) {
+    //   throw new Error(`WebSocketClient: can't reconnect, there isn't previous connection with id "${connectionId}"`);
+    // }
+    //
+    // const props: WebSocketClientProps = this.connections[connectionId][CONNECTION_POSITIONS.props];
 
     this.close(connectionId, 0);
 
@@ -119,7 +119,6 @@ export default class WebSocketClient implements WebSocketClientIo {
     return [
       client,
       events,
-      props,
     ];
   }
 

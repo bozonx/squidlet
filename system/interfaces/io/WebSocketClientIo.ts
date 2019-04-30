@@ -25,5 +25,5 @@ export default interface WebSocketClientIo {
   removeEventListener (connectionId: number, eventName: WsClientEvents, handlerIndex: number): void;
   send                (connectionId: number, data: string | Uint8Array): void;
   close               (connectionId: number, code: number, reason: string): void;
-  reConnect           (connectionId: number): void;
+  reConnect           (connectionId: number, props: WebSocketClientProps): void;
 }
