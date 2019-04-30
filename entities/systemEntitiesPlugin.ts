@@ -45,16 +45,18 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SharedStorage/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'WebSocketClient/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'WebSocketServer/manifest.yaml'));
 
   // network connections drivers
   //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection'));
 
   // services
-  await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'Backdoor/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'ConsoleLogger/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'IoSetServer/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Updater/manifest.yaml'));
-  await env.addService(path.join(servicesRoot, 'Backdoor/manifest.yaml'));
 
   // add used on host drivers related on devs
   env.afterRegistering(async () => {
