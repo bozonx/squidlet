@@ -5,6 +5,10 @@ export interface WebSocketServerProps {
   port?: number;
 }
 
+export interface ConnectionParams {
+  url: string;
+}
+
 
 export const Methods = [
   'onMessage',
@@ -12,12 +16,13 @@ export const Methods = [
 ];
 
 
-export interface WSSeverIo {
-  //onOpen(cb: () => void): void;
-  onMessage(cb: (data: any) => void): void;
-  send(data: any): void;
-}
-
 export default interface WebSocketServerIo {
+  // make new server and return serverId
+  newServer(props: WebSocketServerProps): string;
+  // when new client is connected
+  onConnection(serverId: string, cb: (clientId: string, connectionParams: ConnectionParams) => void): void;
 
+  //onOpen(cb: () => void): void;
+  //onMessage(cb: (data: any) => void): void;
+  //send(data: any): void;
 }

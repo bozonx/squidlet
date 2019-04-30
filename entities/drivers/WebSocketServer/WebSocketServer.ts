@@ -1,6 +1,7 @@
 import WebSocketClientIo from 'system/interfaces/io/WebSocketClientIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
+import WsServerLogic, {WsServerLogicProps} from './WsServerLogic';
 
 
 type IncomeDataHandler = (message: Uint8Array | {[index: string]: any}) => void;
@@ -42,12 +43,24 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   private get wsServerIo(): WebSocketClientIo {
     return this.env.getIo('WebSocketServer') as any;
   }
+  private _server?: WsServerLogic;
 
 
   protected willInit = async () => {
+    const wsServerLogicProps: WsServerLogicProps = {
+
+    };
+
+    this._server = new WsServerLogic(
+      this.wsServerIo,
+      wsServerLogicProps,
+      this.env.log.info,
+      this.env.log.error
+    );
+
     //this.connectionId = this.wsClientIo.newConnection({ url });
 
-    this.listen();
+    //this.listen();
   }
 
   destroy = async () => {
