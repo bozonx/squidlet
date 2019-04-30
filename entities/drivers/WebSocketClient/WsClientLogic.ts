@@ -1,4 +1,4 @@
-import WebSocketClientIo from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
 
 
 export type IncomeDataHandler = (data: string | Uint8Array) => void;
@@ -10,10 +10,11 @@ export type IncomeDataHandler = (data: string | Uint8Array) => void;
  * It can automatically reconnect if "autoReconnect" param is true.
  */
 export default class WsClientLogic {
-  private readonly url: string;
+  private readonly props: WebSocketClientProps;
   private readonly connectionId: string;
   private readonly wsClientIo: WebSocketClientIo;
   private readonly autoReconnect: boolean;
+  private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
 
@@ -24,23 +25,26 @@ export default class WsClientLogic {
     port: number,
     clientId: string,
     autoReconnect: boolean,
+    // It rises a handler only if connection is really closed. It doesn't rise it on reconnect.
+    // It's better to destroy this instance and make new one if need.
+    onClose: () => void,
     logInfo: (message: string) => void,
     logError: (message: string) => void,
   ) {
     this.wsClientIo = wsClientIo;
     this.autoReconnect = autoReconnect;
+    this.onClose = onClose;
     this.logInfo = logInfo;
     this.logError = logError;
-    this.url = `ws://${host}:${port}?clientId=${clientId}`;
-
-    // TODO: save props
-    // TODO: make open connection promise
-
-    this.connectionId = this.wsClientIo.newConnection({
-      url: this.url,
+    this.props = {
+      url: `ws://${host}:${port}?clientId=${clientId}`,
       // additional io client params
       //...omit(this.props, 'host', 'port')
-    });
+    };
+
+    // TODO: make open connection promise
+
+    this.connectionId = this.wsClientIo.newConnection(this.props);
 
     this.listen();
   }
@@ -58,20 +62,8 @@ export default class WsClientLogic {
     return this.wsClientIo.onMessage(this.connectionId, cb);
   }
 
-  /**
-   * It rises a handler only if connection is really closed.
-   * It doesn't rise it on reconnect.
-   */
-  onClose(cb: () => void): number {
-    // TODO: make it !!!!
-  }
-
   removeMessageListener(handlerId: number) {
     this.wsClientIo.removeEventListener(this.connectionId, 'message', handlerId);
-  }
-
-  removeCloseListener(handlerId: number) {
-    // TODO: make it !!!!
   }
 
 
@@ -88,10 +80,9 @@ export default class WsClientLogic {
       this.logInfo(`WebSocketClient: connection closed. ${this.url} Id: ${this.connectionId}`);
 
       if (!this.autoReconnect) {
+        this.wsClientIo.destroyConnection(this.connectionId);
 
-        // TODO: rise close event
-
-        return;
+        return this.onClose();
       }
 
       // TODO: renew open connection promise

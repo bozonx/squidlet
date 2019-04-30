@@ -26,4 +26,5 @@ export default interface WebSocketClientIo {
   send                (connectionId: string, data: string | Uint8Array): void;
   close               (connectionId: string, code: number, reason: string): void;
   reConnect           (connectionId: string, props: WebSocketClientProps): void;
+  destroyConnection   (connectionId: string): void;
 }
