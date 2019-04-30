@@ -11,7 +11,7 @@ export type IncomeDataHandler = (data: string | Uint8Array) => void;
  */
 export default class WsClientLogic {
   private readonly url: string;
-  private readonly connectionId: number;
+  private readonly connectionId: string;
   private readonly wsClientIo: WebSocketClientIo;
   private readonly autoReconnect: boolean;
   private readonly logInfo: (message: string) => void;
@@ -33,6 +33,9 @@ export default class WsClientLogic {
     this.logError = logError;
     this.url = `ws://${host}:${port}?clientId=${clientId}`;
 
+    // TODO: save props
+    // TODO: make open connection promise
+
     this.connectionId = this.wsClientIo.newConnection({
       url: this.url,
       // additional io client params
@@ -43,9 +46,7 @@ export default class WsClientLogic {
   }
 
   destroy() {
-    //this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
-
-    // TODO: remove listeners
+    this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
   }
 
 
@@ -54,11 +55,22 @@ export default class WsClientLogic {
   }
 
   onMessage(cb: IncomeDataHandler): number {
-    // TODO: return number
     return this.wsClientIo.onMessage(this.connectionId, cb);
   }
 
+  /**
+   * It rises a handler only if connection is really closed.
+   * It doesn't rise it on reconnect.
+   */
+  onClose(cb: () => void): number {
+    // TODO: make it !!!!
+  }
+
   removeMessageListener(handlerId: number) {
+    this.wsClientIo.removeEventListener(this.connectionId, 'message', handlerId);
+  }
+
+  removeCloseListener(handlerId: number) {
     // TODO: make it !!!!
   }
 
@@ -68,17 +80,25 @@ export default class WsClientLogic {
       return this.logInfo(`WebSocketClient: connection opened. ${this.url} Id: ${this.connectionId}`);
     });
 
+    this.wsClientIo.onError(this.connectionId, (err: string) => {
+      return this.logError(err);
+    });
+
     this.wsClientIo.onClose(this.connectionId, () => {
       this.logInfo(`WebSocketClient: connection closed. ${this.url} Id: ${this.connectionId}`);
 
-      if (!this.autoReconnect)  return;
+      if (!this.autoReconnect) {
+
+        // TODO: rise close event
+
+        return;
+      }
+
+      // TODO: renew open connection promise
+      // TODO: переконекчиваться регулярно каждые 10 секунд
 
       this.logInfo(`WebSocketClient: Reconnecting...`);
       this.wsClientIo.reConnect(this.connectionId);
-    });
-
-    this.wsClientIo.onError(this.connectionId, (err: string) => {
-      return this.logError(err);
     });
   }
 

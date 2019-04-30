@@ -93,11 +93,11 @@ export default class WebSocketClient implements WebSocketClientIo {
     this.connections[Number(connectionId)] = this.connectToServer(props);
   }
 
-  destroy() {
-    for (let connectionId in this.connections) {
-      this.close(connectionId, 0, 'Destroy');
-    }
-  }
+  // destroy() {
+  //   for (let connectionId in this.connections) {
+  //     this.close(connectionId, 0, 'Destroy');
+  //   }
+  // }
 
 
   private connectToServer(props: WebSocketClientProps): ConnectionItem {
