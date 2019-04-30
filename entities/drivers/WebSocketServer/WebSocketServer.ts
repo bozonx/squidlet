@@ -4,7 +4,7 @@ import WsServerLogic, {WsServerLogicProps} from './WsServerLogic';
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 
 
-type IncomeDataHandler = (message: Uint8Array | {[index: string]: any}) => void;
+type OnMessageHandler = (message: Uint8Array | {[index: string]: any}) => void;
 
 
 export interface WebSocketServerDriverProps {
@@ -47,30 +47,53 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
     this._server.destroy();
   }
 
+  // TODO: use server listen promise
 
   /**
    * Force closing a connection
    */
   close(connectionId: string, code: number, reason: string) {
-    this._server.close(this.serverId, connectionId, code, reason);
+    if (!this._server) {
+      throw new Error(`WebSocketServer.close: Server has been already closed`);
+    }
+
+    this._server.close(connectionId, code, reason);
   }
 
-  onMessage(connectionId: string, cb: IncomeDataHandler): number {
-    return this._server.onMessage(this.serverId, connectionId, cb);
+  send(connectionId: string, data: string | Uint8Array) {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.send: Server has been already closed`);
+    }
+
+    this._server.send(connectionId, data);
   }
 
-  onNewConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
-    return this._server.onConnection(this.serverId, cb);
+  onMessage(connectionId: string, cb: OnMessageHandler): number {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.onMessage: Server has been already closed`);
+    }
+
+    return this._server.onMessage(connectionId, cb);
+  }
+
+  onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.onNewConnection: Server has already been closed`);
+    }
+
+    return this._server.onConnection(cb);
   }
 
   removeMessageListener(connectionId: string, handlerId: number) {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.onNewConnection: Server has been already closed`);
+    }
+
     // TODO: review
-    this._server.removeEventListener(this.serverId, connectionId,'message', handlerId);
+    //this._server.removeEventListener(connectionId,'message', handlerId);
   }
 
-
-  // private listen() {
-  // }
+  // TODO: remove on connection listener
 
   private onServerClosed = () => {
     this.env.log.error(`WebSocketServer: Server "${this.props.host}:${this.props.port}" has been closed, you can't manipulate it any more!`);

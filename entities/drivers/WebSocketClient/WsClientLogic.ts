@@ -1,8 +1,6 @@
-import WebSocketClientIo, {WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {OnMessageHandler, WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketClientDriverProps} from './WebSocketClient';
 
-
-export type IncomeDataHandler = (data: string | Uint8Array) => void;
 
 export interface WsClientLogicProps extends WebSocketClientDriverProps {
   clientId: string;
@@ -66,7 +64,7 @@ export default class WsClientLogic {
     return this.wsClientIo.send(this.connectionId, data);
   }
 
-  onMessage(cb: IncomeDataHandler): number {
+  onMessage(cb: OnMessageHandler): number {
     return this.wsClientIo.onMessage(this.connectionId, cb);
   }
 

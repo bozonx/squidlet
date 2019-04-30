@@ -1,5 +1,5 @@
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import {IncomeDataHandler} from '../WebSocketClient/WsClientLogic';
+import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
 // TODO: extend of driver's props
@@ -48,6 +48,9 @@ export default class WsServerLogic {
     // TODO: !!!!
   }
 
+  /**
+   * Send message to client
+   */
   send(connectionId: string, data: string | Uint8Array) {
     this.wsServerIo.send(this.serverId, connectionId, data);
   }
@@ -59,11 +62,17 @@ export default class WsServerLogic {
     this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
-  onMessage(connectionId: string, cb: IncomeDataHandler): number {
+  /**
+   * Listen income messages
+   */
+  onMessage(connectionId: string, cb: OnMessageHandler): number {
     return this.wsServerIo.onMessage(this.serverId, connectionId, cb);
   }
 
-  onNewConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+  /**
+   * It rises when new connection is come.
+   */
+  onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
     return this.wsServerIo.onConnection(this.serverId, cb);
   }
 

@@ -10,6 +10,7 @@ export const Methods = [
 
 
 export type WsClientEvents = 'open' | 'close' | 'message' | 'error';
+export type OnMessageHandler = (data: string | Uint8Array) => void;
 
 export interface WebSocketClientProps {
   url: string;

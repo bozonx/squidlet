@@ -1,7 +1,7 @@
-import WebSocketClientIo from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import WsClientLogic, {IncomeDataHandler, WsClientLogicProps} from './WsClientLogic';
+import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 
 
 export interface WebSocketClientDriverProps {
@@ -46,13 +46,15 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   }
 
 
+  // TODO: use open promise
+
   async send(data: string | Uint8Array): Promise<void> {
     if (!this._client) throw new Error(`WebSocketClient.send: You can't send message because connection was closed for ever`);
 
     return this._client.send(data);
   }
 
-  onMessage(cb: IncomeDataHandler): number {
+  onMessage(cb: OnMessageHandler): number {
     if (!this._client) throw new Error(`WebSocketClient.onMessage: You can't listen connection because it was closed for ever`);
 
     return this._client.onMessage(cb);
