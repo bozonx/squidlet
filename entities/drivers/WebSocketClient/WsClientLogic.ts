@@ -12,6 +12,7 @@ export type IncomeDataHandler = (data: string | Uint8Array) => void;
 export default class WsClientLogic {
   // on first time connect or reconnect
   openPromise: Promise<void>;
+
   private readonly props: WebSocketClientProps;
   private readonly connectionId: string;
   private readonly wsClientIo: WebSocketClientIo;
@@ -72,42 +73,46 @@ export default class WsClientLogic {
 
 
   private listen() {
+    this.wsClientIo.onError(this.connectionId, (err: string) => this.logError(err));
+    this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
     this.wsClientIo.onOpen(this.connectionId, () => {
       this.wasPrevOpenFulfilled = true;
       this.openPromiseResolve();
       
       return this.logInfo(`WebSocketClient: connection opened. ${this.props.url} Id: ${this.connectionId}`);
     });
+  }
 
-    this.wsClientIo.onError(this.connectionId, (err: string) => {
-      return this.logError(err);
-    });
+  private handleConnectionClose = () => {
+    this.logInfo(`WebSocketClient: connection closed. ${this.props.url} Id: ${this.connectionId}`);
 
-    this.wsClientIo.onClose(this.connectionId, () => {
-      this.logInfo(`WebSocketClient: connection closed. ${this.props.url} Id: ${this.connectionId}`);
+    if (!this.autoReconnect) return this.finallyCloseConnection();
 
-      if (!this.autoReconnect) {
-        this.wsClientIo.destroyConnection(this.connectionId);
+    this.reconnect();
+  }
 
-        if (!this.wasPrevOpenFulfilled) {
-          this.wasPrevOpenFulfilled = true;
-          this.openPromiseReject();
-        }
-        
-        return this.onClose();
-      }
+  private reconnect() {
+    // TODO: переконекчиваться регулярно каждые 10 секунд
 
-      // TODO: переконекчиваться регулярно каждые 10 секунд
+    // make new promise if previous was fulfilled
+    if (this.wasPrevOpenFulfilled) {
+      this.openPromise = this.makeOpenPromise();
+    }
 
-      // make new promise if previous was fulfilled
-      if (this.wasPrevOpenFulfilled) {
-        this.openPromise = this.makeOpenPromise();
-      }
-      
-      this.logInfo(`WebSocketClient: Reconnecting...`);
-      
-      this.wsClientIo.reConnect(this.connectionId);
-    });
+    this.logInfo(`WebSocketClient: Reconnecting...`);
+
+    this.wsClientIo.reConnect(this.connectionId, this.props);
+  }
+
+  private finallyCloseConnection() {
+    this.wsClientIo.destroyConnection(this.connectionId);
+
+    if (!this.wasPrevOpenFulfilled) {
+      this.wasPrevOpenFulfilled = true;
+      this.openPromiseReject();
+    }
+
+    return this.onClose();
   }
 
   private makeOpenPromise(): Promise<void> {
