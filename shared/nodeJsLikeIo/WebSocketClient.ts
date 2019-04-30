@@ -29,33 +29,38 @@ export default class WebSocketClient implements WebSocketClientIo {
    * Make new connection to server.
    * It returns a connection id to use with other methods
    */
-  newConnection(props: WebSocketClientProps): number {
+  newConnection(props: WebSocketClientProps): string {
     this.connections.push( this.connectToServer(props) );
 
-    return this.connections.length - 1;
+    return String(this.connections.length - 1);
   }
 
-  onOpen(connectionId: number, cb: () => void): number {
-    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.open, cb);
+  onOpen(connectionId: string, cb: () => void): number {
+    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
+      .addListener(eventNames.open, cb);
   }
 
-  onClose(connectionId: number, cb: () => void): number {
-    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.close, cb);
+  onClose(connectionId: string, cb: () => void): number {
+    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
+      .addListener(eventNames.close, cb);
   }
 
-  onMessage(connectionId: number, cb: (data: string | Uint8Array) => void): number {
-    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.message, cb);
+  onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): number {
+    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
+      .addListener(eventNames.message, cb);
   }
 
-  onError(connectionId: number, cb: (err: string) => void): number {
-    return this.connections[connectionId][CONNECTION_POSITIONS.events].addListener(eventNames.error, cb);
+  onError(connectionId: string, cb: (err: string) => void): number {
+    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
+      .addListener(eventNames.error, cb);
   }
 
-  removeEventListener(connectionId: number, eventName: WsClientEvents, handlerIndex: number) {
-    return this.connections[connectionId][CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
+  removeEventListener(connectionId: string, eventName: WsClientEvents, handlerIndex: number) {
+    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
+      .removeListener(eventName, handlerIndex);
   }
 
-  send(connectionId: number, data: string | Uint8Array) {
+  send(connectionId: string, data: string | Uint8Array) {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -63,16 +68,16 @@ export default class WebSocketClient implements WebSocketClientIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    this.connections[connectionId][CONNECTION_POSITIONS.webSocket].send(data);
+    this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].send(data);
   }
 
-  close(connectionId: number, code: number, reason?: string) {
-    if (!this.connections[connectionId]) return;
+  close(connectionId: string, code: number, reason?: string) {
+    if (!this.connections[Number(connectionId)]) return;
 
-    this.connections[connectionId][CONNECTION_POSITIONS.webSocket].close(code, reason);
-    this.connections[connectionId][CONNECTION_POSITIONS.events].destroy();
+    this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].close(code, reason);
+    this.connections[Number(connectionId)][CONNECTION_POSITIONS.events].destroy();
 
-    delete this.connections[connectionId];
+    delete this.connections[Number(connectionId)];
 
     // TODO: проверить не будет ли ошибки если соединение уже закрыто
     // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
@@ -82,16 +87,15 @@ export default class WebSocketClient implements WebSocketClientIo {
    * It is used to reconnect on connections lost.
    * It closes previous connection and makes new one with the same id.
    */
-  reConnect(connectionId: number, props: WebSocketClientProps) {
+  reConnect(connectionId: string, props: WebSocketClientProps) {
     this.close(connectionId, 0);
 
-    this.connections[connectionId] = this.connectToServer(props);
+    this.connections[Number(connectionId)] = this.connectToServer(props);
   }
 
   destroy() {
-    // TODO: удалить все события и вызвать close на всех клиентах
     for (let connectionId in this.connections) {
-      this.close(parseInt(connectionId), 0, 'Destroy');
+      this.close(connectionId, 0, 'Destroy');
     }
   }
 

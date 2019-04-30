@@ -17,13 +17,13 @@ export interface WebSocketClientProps {
 
 
 export default interface WebSocketClientIo {
-  newConnection       (props: WebSocketClientProps): number;
-  onOpen              (connectionId: number, cb: () => void): number;
-  onClose             (connectionId: number, cb: () => void): number;
-  onMessage           (connectionId: number, cb: (data: string | Uint8Array) => void): number;
-  onError             (connectionId: number, cb: (err: string) => void): number;
-  removeEventListener (connectionId: number, eventName: WsClientEvents, handlerIndex: number): void;
-  send                (connectionId: number, data: string | Uint8Array): void;
-  close               (connectionId: number, code: number, reason: string): void;
-  reConnect           (connectionId: number, props: WebSocketClientProps): void;
+  newConnection       (props: WebSocketClientProps): string;
+  onOpen              (connectionId: string, cb: () => void): number;
+  onClose             (connectionId: string, cb: () => void): number;
+  onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): number;
+  onError             (connectionId: string, cb: (err: string) => void): number;
+  removeEventListener (connectionId: string, eventName: WsClientEvents, handlerIndex: number): void;
+  send                (connectionId: string, data: string | Uint8Array): void;
+  close               (connectionId: string, code: number, reason: string): void;
+  reConnect           (connectionId: string, props: WebSocketClientProps): void;
 }
