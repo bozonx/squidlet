@@ -14,8 +14,6 @@ export interface WebSocketServerDriverProps {
 }
 
 
-// TODO: удостовериться что при переподключении клиента будет тот же clientId
-
 export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   private get wsServerIo(): WebSocketServerIo {
     return this.env.getIo('WebSocketServer') as any;
@@ -35,10 +33,6 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
       this.env.log.info,
       this.env.log.error
     );
-
-    //this.connectionId = this.wsClientIo.newConnection({ url });
-
-    //this.listen();
   }
 
   destroy = async () => {
@@ -60,12 +54,12 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
     this._server.close(connectionId, code, reason);
   }
 
-  send(connectionId: string, data: string | Uint8Array) {
+  send(connectionId: string, data: string | Uint8Array): Promise<void> {
     if (!this._server) {
       throw new Error(`WebSocketServer.send: Server has been already closed`);
     }
 
-    this._server.send(connectionId, data);
+    return this._server.send(connectionId, data);
   }
 
   onMessage(connectionId: string, cb: OnMessageHandler): number {
@@ -104,9 +98,7 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
 export default class Factory extends DriverFactoryBase<WebSocketServer> {
   protected DriverClass = WebSocketServer;
 
-  // TODO: review
-
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
-    return String(props.url);
+    return `${props.host}:${props.port}`;
   }
 }

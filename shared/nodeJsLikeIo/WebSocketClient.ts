@@ -5,6 +5,7 @@ import WebSocketClientIo, {WebSocketClientProps, WsEvents} from 'system/interfac
 import {isUint8Array} from 'system/helpers/collections';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
+import {callPromised} from '../../system/helpers/helpers';
 
 
 type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
@@ -50,7 +51,7 @@ export default class WebSocketClient implements WebSocketClientIo {
       .addListener(eventNames.message, cb);
   }
 
-  onError(connectionId: string, cb: (err: string) => void): number {
+  onError(connectionId: string, cb: (err: Error) => void): number {
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .addListener(eventNames.error, cb);
   }
@@ -60,7 +61,7 @@ export default class WebSocketClient implements WebSocketClientIo {
       .removeListener(eventName, handlerIndex);
   }
 
-  send(connectionId: string, data: string | Uint8Array) {
+  send(connectionId: string, data: string | Uint8Array): Promise<void> {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -68,7 +69,7 @@ export default class WebSocketClient implements WebSocketClientIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].send(data);
+    return callPromised(this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].send, data);
   }
 
   close(connectionId: string, code: number, reason?: string) {

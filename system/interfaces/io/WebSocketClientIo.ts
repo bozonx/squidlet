@@ -26,6 +26,6 @@ export default interface WebSocketClientIo {
   onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): number;
   onError             (connectionId: string, cb: (err: Error) => void): number;
   removeEventListener (connectionId: string, eventName: WsEvents, handlerIndex: number): void;
-  send                (connectionId: string, data: string | Uint8Array): void;
-  close               (connectionId: string, code: number, reason: string): void;
+  send                (connectionId: string, data: string | Uint8Array): Promise<void>;
+  close               (connectionId: string, code: number, reason?: string): void;
 }

@@ -38,6 +38,6 @@ export default interface WebSocketServerIo {
   // TODO: remove server listener
   // TODO: какие события ???
   removeEventListener (serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void;
-  send                (serverId: string, connectionId: string, data: string | Uint8Array): void;
+  send                (serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
   close               (serverId: string, connectionId: string, code: number, reason: string): void;
 }
