@@ -1,3 +1,5 @@
+import {extends} from 'tslint/lib/configs/latest';
+
 export const Methods = [
   'newConnection',
   'onOpen',
@@ -15,9 +17,11 @@ export interface WebSocketClientProps {
   url: string;
 }
 
-
 export default interface WebSocketClientIo {
   newConnection       (props: WebSocketClientProps): string;
+  reConnect           (connectionId: string, props: WebSocketClientProps): void;
+  destroyConnection   (connectionId: string): void;
+
   onOpen              (connectionId: string, cb: () => void): number;
   onClose             (connectionId: string, cb: () => void): number;
   onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): number;
@@ -25,6 +29,4 @@ export default interface WebSocketClientIo {
   removeEventListener (connectionId: string, eventName: WsClientEvents, handlerIndex: number): void;
   send                (connectionId: string, data: string | Uint8Array): void;
   close               (connectionId: string, code: number, reason: string): void;
-  reConnect           (connectionId: string, props: WebSocketClientProps): void;
-  destroyConnection   (connectionId: string): void;
 }
