@@ -1,5 +1,3 @@
-import {extends} from 'tslint/lib/configs/latest';
-
 export const Methods = [
   'newConnection',
   'onOpen',

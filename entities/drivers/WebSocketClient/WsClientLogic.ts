@@ -84,11 +84,11 @@ export default class WsClientLogic {
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
     this.openPromiseResolve();
-    this.logInfo(`WebSocketClient: connection opened. ${this.makeIoProps().url} Id: ${this.connectionId}`);
+    this.logInfo(`WsClientLogic: connection opened. ${this.makeIoProps().url} Id: ${this.connectionId}`);
   }
 
   private handleConnectionClose = () => {
-    this.logInfo(`WebSocketClient: connection closed. ${this.makeIoProps().url} Id: ${this.connectionId}`);
+    this.logInfo(`WsClientLogic: connection closed. ${this.makeIoProps().url} Id: ${this.connectionId}`);
 
     if (!this.props.autoReconnect) return this.finallyCloseConnection();
 
@@ -116,11 +116,11 @@ export default class WsClientLogic {
       this.openPromise = this.makeOpenPromise();
     }
 
-    this.logInfo(`WebSocketClient: Wait to reconnect ${this.props.reconnectTimeoutSec}`);
+    this.logInfo(`WsClientLogic: Wait to reconnect ${this.props.reconnectTimeoutSec}`);
 
     this.reconnectTimeout = setTimeout(() => {
       this.reconnectTimeout = undefined;
-      this.logInfo(`WebSocketClient: Reconnecting...`);
+      this.logInfo(`WsClientLogic: Reconnecting...`);
 
       this.wsClientIo.reConnect(this.connectionId, this.makeIoProps());
     }, this.props.reconnectTimeoutSec);

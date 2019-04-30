@@ -35,6 +35,7 @@ export default interface WebSocketServerIo {
   onClose             (serverId: string, connectionId: string, cb: () => void): number;
   onMessage           (serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number;
   onError             (serverId: string, connectionId: string, cb: (err: Error) => void): number;
+  // TODO: remove server listener
   // TODO: какие события ???
   removeEventListener (serverId: string, connectionId: string, eventName: WsClientEvents, handlerIndex: number): void;
   send                (serverId: string, connectionId: string, data: string | Uint8Array): void;

@@ -12,6 +12,7 @@ export interface WsServerLogicProps {
 export default class WsServerLogic {
   private readonly wsServerIo: WebSocketServerIo;
   private readonly props: WsServerLogicProps;
+  private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private readonly serverId: string;
@@ -21,11 +22,15 @@ export default class WsServerLogic {
   constructor(
     wsServerIo: WebSocketServerIo,
     props: WsServerLogicProps,
+    // It rises a handler only if server is closed.
+    // It's better to destroy this instance and make new one if need.
+    onClose: () => void,
     logInfo: (message: string) => void,
     logError: (message: string) => void,
   ) {
     this.wsServerIo = wsServerIo;
     this.props = props;
+    this.onClose = onClose;
     this.logInfo = logInfo;
     this.logError = logError;
 
@@ -34,34 +39,47 @@ export default class WsServerLogic {
       port: this.props.port,
     });
 
+    this.listenServer();
+  }
+
+  destroy() {
+    // clearTimeout(this.reconnectTimeout);
+    // this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+    // TODO: !!!!
+  }
+
+  send(connectionId: string, data: string | Uint8Array) {
+    this.wsServerIo.send(this.serverId, connectionId, data);
+  }
+
+  /**
+   * Force closing a connection
+   */
+  close(connectionId: string, code: number, reason: string) {
+    this.wsServerIo.close(this.serverId, connectionId, code, reason);
+  }
+
+  onMessage(connectionId: string, cb: IncomeDataHandler): number {
+    return this.wsServerIo.onMessage(this.serverId, connectionId, cb);
+  }
+
+  removeMessageListener(connectionId: string, handlerId: number) {
+    // TODO: review
+    this.wsServerIo.removeEventListener(this.serverId, connectionId,'message', handlerId);
+  }
+
+
+  private listenServer() {
     this.wsServerIo.onConnection(this.serverId, this.onIncomeConnection);
     this.wsServerIo.onServerListening(this.serverId, this.onServerListening);
     this.wsServerIo.onServerClose(this.serverId, this.onServerClose);
     this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
   }
 
-  destroy() {
-    // clearTimeout(this.reconnectTimeout);
-    // this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
-  }
-
-  send(clientId: string, data: string | Uint8Array) {
-    this.wsServerIo.send(this.serverId, clientId, data);
-  }
-
-  onMessage(clientId: string, cb: IncomeDataHandler): number {
-    return this.wsServerIo.onMessage(this.serverId, clientId, cb);
-  }
-
-  removeMessageListener(clientId: string, handlerId: number) {
-    this.wsServerIo.removeEventListener(this.serverId, clientId,'message', handlerId);
-  }
-
-
-  private onIncomeConnection = (clientId: string, connectionParams: ConnectionParams) => {
-    this.wsServerIo.onClose(this.serverId, clientId, this.onClose);
-    this.wsServerIo.onMessage(this.serverId, clientId, this.onIncomeMessage);
-    this.wsServerIo.onError(this.serverId, clientId, (err: Error) => this.logError(String(err)));
+  private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
+    this.wsServerIo.onClose(this.serverId, connectionId, () => this.onConnectionClose(connectionId));
+    this.wsServerIo.onMessage(this.serverId, connectionId, this.onIncomeMessage);
+    this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
   }
 
   private onServerListening = () => {
@@ -69,11 +87,11 @@ export default class WsServerLogic {
   }
 
   private onServerClose = () => {
-    // TODO: what to do???
+    this.onClose();
   }
 
-  private onClose = (): number => {
-    // TODO: what to do???
+  private onConnectionClose = (connectionId: string) => {
+    this.logInfo(`WsServerLogic: connection closed. Client id: ${connectionId}. Server id: ${this.serverId}`);
   }
 
   private onIncomeMessage = (data: string | Uint8Array): number => {
