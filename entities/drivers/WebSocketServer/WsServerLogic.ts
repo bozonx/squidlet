@@ -63,6 +63,10 @@ export default class WsServerLogic {
     return this.wsServerIo.onMessage(this.serverId, connectionId, cb);
   }
 
+  onNewConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+    return this.wsServerIo.onConnection(this.serverId, cb);
+  }
+
   removeMessageListener(connectionId: string, handlerId: number) {
     // TODO: review
     this.wsServerIo.removeEventListener(this.serverId, connectionId,'message', handlerId);
@@ -78,7 +82,6 @@ export default class WsServerLogic {
 
   private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
     this.wsServerIo.onClose(this.serverId, connectionId, () => this.onConnectionClose(connectionId));
-    this.wsServerIo.onMessage(this.serverId, connectionId, this.onIncomeMessage);
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
   }
 
@@ -94,8 +97,8 @@ export default class WsServerLogic {
     this.logInfo(`WsServerLogic: connection closed. Client id: ${connectionId}. Server id: ${this.serverId}`);
   }
 
-  private onIncomeMessage = (data: string | Uint8Array): number => {
-    // TODO: what to do???
-  }
+  // private onIncomeMessage = (data: string | Uint8Array) => {
+  //   // TODO: what to do???
+  // }
 
 }

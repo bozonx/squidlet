@@ -23,12 +23,12 @@ export default interface WebSocketServerIo {
   // make new server and return serverId
   newServer(props: WebSocketServerProps): string;
   // when new client is connected
-  onConnection(serverId: string, cb: (clientId: string, connectionParams: ConnectionParams) => void): void;
+  onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number;
   // when server starts listening
-  onServerListening(serverId: string, cb: () => void): void;
+  onServerListening(serverId: string, cb: () => void): number;
   // on server close. Depend on http server close
-  onServerClose(serverId: string, cb: () => void): void;
-  onServerError(serverId: string, cb: (err: Error) => void): void;
+  onServerClose(serverId: string, cb: () => void): number;
+  onServerError(serverId: string, cb: (err: Error) => void): number;
 
   // connection's methods like in client
   //onOpen              (serverId: string, connectionId: string, cb: () => void): number;

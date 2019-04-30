@@ -77,7 +77,7 @@ export default class WsClientLogic {
   private listen() {
     this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
     this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
-    this.wsClientIo.onError(this.connectionId, (err: string) => this.logError(err));
+    this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
   }
 
   private handleConnectionOpen = () => {
