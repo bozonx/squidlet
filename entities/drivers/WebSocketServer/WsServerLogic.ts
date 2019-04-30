@@ -97,8 +97,4 @@ export default class WsServerLogic {
     this.logInfo(`WsServerLogic: connection closed. Client id: ${connectionId}. Server id: ${this.serverId}`);
   }
 
-  // private onIncomeMessage = (data: string | Uint8Array) => {
-  //   // TODO: what to do???
-  // }
-
 }

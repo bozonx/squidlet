@@ -60,6 +60,7 @@ export default class WsClientLogic {
     this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
   }
 
+  // TODO: add close method
 
   async send(data: string | Uint8Array): Promise<void> {
     return this.wsClientIo.send(this.connectionId, data);

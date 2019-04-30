@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import WsServerLogic, {WsServerLogicProps} from './WsServerLogic';
-import WebSocketServerIo from 'system/interfaces/io/WebSocketServerIo';
+import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 
 
 type IncomeDataHandler = (message: Uint8Array | {[index: string]: any}) => void;
@@ -31,6 +31,7 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
     this._server = new WsServerLogic(
       this.wsServerIo,
       wsServerLogicProps,
+      this.onServerClosed,
       this.env.log.info,
       this.env.log.error
     );
@@ -47,21 +48,32 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
   }
 
 
-  onConnection(cb: (clientId: string) => void) {
-    // TODO: !!!
+  /**
+   * Force closing a connection
+   */
+  close(connectionId: string, code: number, reason: string) {
+    this._server.close(this.serverId, connectionId, code, reason);
   }
 
-  send(clientId: string, message: {[index: string]: any}) {
-    // TODO: !!!
+  onMessage(connectionId: string, cb: IncomeDataHandler): number {
+    return this._server.onMessage(this.serverId, connectionId, cb);
   }
 
-  onIncomeMessage(clientId: string, cb: IncomeDataHandler) {
-    // TODO: !!!
+  onNewConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+    return this._server.onConnection(this.serverId, cb);
+  }
+
+  removeMessageListener(connectionId: string, handlerId: number) {
+    // TODO: review
+    this._server.removeEventListener(this.serverId, connectionId,'message', handlerId);
   }
 
 
-  private listen() {
-    // TODO: make reconnection if connection lost
+  // private listen() {
+  // }
+
+  private onServerClosed = () => {
+    this.env.log.error(`WebSocketServer: Server "${this.props.host}:${this.props.port}" has been closed, you can't manipulate it any more!`);
   }
 
 }

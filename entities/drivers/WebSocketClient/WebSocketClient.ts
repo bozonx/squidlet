@@ -66,7 +66,7 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 
 
   private onConnectionClosed = () => {
-    this.env.log.error(`WebSocketClient: connection "${this.props.host}:${this.props.port}" is closed, you can't manipulate it any more!`);
+    this.env.log.error(`WebSocketClient: connection "${this.props.host}:${this.props.port}" has been closed, you can't manipulate it any more!`);
   }
 
 }
