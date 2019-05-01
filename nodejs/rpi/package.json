@@ -8,10 +8,10 @@
     "node": ">=10.9.0"
   },
   "dependencies": {
-    "i2c-bus": "^4.0.1",
-    "pigpio": "^1.1.4",
-    "pigpio-client": "^1.1.0",
+    "i2c-bus": "^4.0.9",
+    "pigpio": "^1.2.2",
     "mqtt": "^2.18.8",
-    "serialport": "^7.0.2"
+    "serialport": "^7.1.4",
+    "ws": "^7.0.0"
   }
 }
