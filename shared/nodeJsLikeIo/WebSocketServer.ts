@@ -1,5 +1,5 @@
 import * as WebSocket from 'ws';
-import {IncomingMessage} from 'http';
+import {ClientRequest, IncomingMessage} from 'http';
 
 
 import WebSocketServerIo, {
@@ -13,6 +13,7 @@ import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 import {CONNECTION_POSITIONS, ConnectionItem} from './WebSocketClient';
+import {isUint8Array} from 'system/helpers/collections';
 
 
 // Server instance, server's events, [connection, connection's events]
@@ -44,7 +45,7 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     this.servers[Number(serverId)][SERVER_POSITIONS.events].destroy();
 
-    // TODO: does it need to close connections ???
+    // TODO: does it need closing connections ???
 
     await callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].close);
 
@@ -93,8 +94,7 @@ export default class WebSocketServer implements WebSocketServerIo {
   removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void {
     if (!this.servers[Number(serverId)]) return;
 
-    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .removeListener(eventName, handlerIndex);
+    return this.servers[Number(serverId)][SERVER_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
   /////// Connection's methods
@@ -117,18 +117,6 @@ export default class WebSocketServer implements WebSocketServerIo {
     return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
-  send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
-    const connection = this.getConnectionItem(serverId, connectionId);
-
-    return callPromised(connection[CONNECTION_POSITIONS.webSocket].send, data);
-  }
-
-  close(serverId: string, connectionId: string, code: number, reason: string): void {
-    const connection = this.getConnectionItem(serverId, connectionId);
-
-    return connection[CONNECTION_POSITIONS.webSocket].close(code, reason);
-  }
-
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
     if (
       !this.servers[Number(serverId)]
@@ -140,6 +128,38 @@ export default class WebSocketServer implements WebSocketServerIo {
     const connection = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
 
     return connection[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
+  }
+
+  send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
+
+    // TODO: is it need support of null or undefined, number, boolean ???
+
+    if (typeof data !== 'string' && !isUint8Array(data)) {
+      throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
+    }
+
+    const connection = this.getConnectionItem(serverId, connectionId);
+
+    return callPromised(connection[CONNECTION_POSITIONS.webSocket].send, data);
+  }
+
+  close(serverId: string, connectionId: string, code: number, reason: string): void {
+    if (
+      !this.servers[Number(serverId)]
+      || !this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]
+    ) {
+      return;
+    }
+
+    const connection = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
+
+    connection[CONNECTION_POSITIONS.webSocket].close(code, reason);
+    connection[CONNECTION_POSITIONS.events].destroy();
+
+    delete this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
+
+    // TODO: проверить не будет ли ошибки если соединение уже закрыто
+    // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
   }
 
 
@@ -175,8 +195,23 @@ export default class WebSocketServer implements WebSocketServerIo {
       events
     ]);
 
-    // TODO: listen connection events
+    socket.on('error', (err: Error) => events.emit(wsEventNames.error, err));
+    socket.on('open', () => events.emit(wsEventNames.open));
+    socket.on('close', (code: number, reason: string) => {
+      events.emit(wsEventNames.close, code, reason);
+    });
+    socket.on('message', (data: string | Uint8Array) => {
+      events.emit(wsEventNames.message, data);
+    });
+    socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
+      events.emit(
+        wsEventNames.error,
+        `Unexpected response has been received on server "${serverId}", ` +
+        `connection "${connectionId}": ${response.statusCode}: ${response.statusMessage}`
+      );
+    });
 
+    // emit new connection
     this.servers[Number(serverId)][SERVER_POSITIONS.events]
       .emit(wsServerEventNames.connection, connectionId, connectionParams);
   }

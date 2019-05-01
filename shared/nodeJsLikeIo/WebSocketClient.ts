@@ -24,60 +24,47 @@ export default class WebSocketClient implements WebSocketClientIo {
    * It returns a connection id to use with other methods
    */
   newConnection(props: WebSocketClientProps): string {
-    this.connections.push( this.connectToServer(props) );
+    const connectionId = String(this.connections.length);
 
-    return String(this.connections.length - 1);
+    this.connections.push( this.connectToServer(connectionId, props) );
+
+    return connectionId;
   }
 
   onOpen(connectionId: string, cb: () => void): number {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(connectionId);
 
-    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
+    return connection[CONNECTION_POSITIONS.events]
       .addListener(wsEventNames.open, cb);
   }
 
   onClose(connectionId: string, cb: () => void): number {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(connectionId);
 
-    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(wsEventNames.close, cb);
+    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
   }
 
   onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): number {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(connectionId);
 
-    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(wsEventNames.message, cb);
+    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
   }
 
   onError(connectionId: string, cb: (err: Error) => void): number {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(connectionId);
 
-    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(wsEventNames.error, cb);
+    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
   removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
+    const connection = this.connections[Number(connectionId)];
 
-    return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .removeListener(eventName, handlerIndex);
+    if (!connection) return;
+
+    return connection[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
   send(connectionId: string, data: string | Uint8Array): Promise<void> {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -85,14 +72,18 @@ export default class WebSocketClient implements WebSocketClientIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    return callPromised(this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].send, data);
+    const connection = this.getConnectionItem(connectionId);
+
+    return callPromised(connection[CONNECTION_POSITIONS.webSocket].send, data);
   }
 
   close(connectionId: string, code: number, reason?: string) {
-    if (!this.connections[Number(connectionId)]) return;
+    const connection = this.connections[Number(connectionId)];
 
-    this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].close(code, reason);
-    this.connections[Number(connectionId)][CONNECTION_POSITIONS.events].destroy();
+    if (!connection) return;
+
+    connection[CONNECTION_POSITIONS.webSocket].close(code, reason);
+    connection[CONNECTION_POSITIONS.events].destroy();
 
     delete this.connections[Number(connectionId)];
 
@@ -107,7 +98,7 @@ export default class WebSocketClient implements WebSocketClientIo {
   reConnect(connectionId: string, props: WebSocketClientProps) {
     this.close(connectionId, 0);
 
-    this.connections[Number(connectionId)] = this.connectToServer(props);
+    this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
 
   destroyConnection(connectionId: string) {
@@ -120,7 +111,7 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
 
-  private connectToServer(props: WebSocketClientProps): ConnectionItem {
+  private connectToServer(connectionId: string, props: WebSocketClientProps): ConnectionItem {
     const events = new IndexedEventEmitter();
     const client = new WebSocket(props.url, {
     });
@@ -133,14 +124,26 @@ export default class WebSocketClient implements WebSocketClientIo {
     client.on(wsEventNames.error, (err: Error) => {
       events.emit(wsEventNames.error, err);
     });
-    client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
-      events.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);
+    client.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
+      events.emit(
+        wsEventNames.error,
+        `Unexpected response has been received on connection "${connectionId}": ` +
+        `${response.statusCode}: ${response.statusMessage}`
+      );
     });
 
     return [
       client,
       events,
     ];
+  }
+
+  private getConnectionItem(connectionId: string): ConnectionItem {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
+
+    return this.connections[Number(connectionId)];
   }
 
 }
