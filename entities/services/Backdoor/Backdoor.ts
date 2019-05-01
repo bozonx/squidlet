@@ -2,7 +2,7 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import categories from 'system/dict/categories';
 import {
-  WebSocketServer
+  WebSocketServer, WebSocketServerDriverProps
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {isUint8Array} from 'system/helpers/collections';
 import {decodeJsonMessage} from './helpers';
@@ -28,13 +28,15 @@ export interface BackdoorMessage {
   };
 }
 
-interface BackDoorProps {
-  host: string;
-  port: number;
+interface BackDoorProps extends WebSocketServerDriverProps {
 }
+
+// contents [category, topic, handlerIndex]
+type HandlerItem = [string, (string | undefined), number];
 
 
 export default class Backdoor extends ServiceBase<BackDoorProps> {
+  private readonly handlers: {[index: string]: HandlerItem[]} = {};
   private get wsServerDriver(): WebSocketServer {
     return this.depsInstances.wsServerDriver as any;
   }
@@ -93,20 +95,24 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
   }
 
   private addEventListener(connectionId: string, category: string, topic?: string) {
-    if (topic) {
-      this.env.events.addListener(category, topic, (data: any) => {
-        const returnMessage: EventMessage = { ...message, data };
+    let handlerIndex: number;
 
-        return this.send(clientId, returnMessage);
+    if (topic) {
+      handlerIndex = this.env.events.addListener(category, topic, (data: any) => {
+        return this.sendEventResponseMessage(connectionId, category, topic, data);
       });
     }
     else {
-      this.env.events.addCategoryListener(category, (data: any) => {
-        const returnMessage: EventMessage = { ...message, data };
-
-        return this.send(clientId, returnMessage);
+      handlerIndex = this.env.events.addCategoryListener(category, (data: any) => {
+        return this.sendEventResponseMessage(connectionId, category, topic, data);
       });
     }
+
+    const handlerItem: HandlerItem = [category, topic, handlerIndex];
+
+    if (!this.handlers[connectionId]) this.handlers[connectionId] = [];
+
+    this.handlers[connectionId].push(handlerItem);
   }
 
   private removeEventListener(connectionId: string, category: string, topic?: string) {
@@ -155,9 +161,20 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
   // }
 
 
-  private async send(clientId: string, data: any) {
+  private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data: any) {
+    const returnMessage: BackdoorMessage = {
+      type: BACKDOOR_MESSAGE_TYPE.listenerResponse,
+      payload: {
+        category,
+        topic,
+        data,
+      }
+    };
+
+    // TODO: conver to binary
+
     try {
-      await this.wsServerDriver.send(clientId, data);
+      await this.wsServerDriver.send(connectionId, data);
     }
     catch (err) {
       this.env.log.error(`Backdoor: send error: ${err}`);
