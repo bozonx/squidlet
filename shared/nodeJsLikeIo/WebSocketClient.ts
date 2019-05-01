@@ -16,6 +16,9 @@ export enum CONNECTION_POSITIONS {
 }
 
 
+/**
+ * The same for lowjs and nodejs
+ */
 export default class WebSocketClient implements WebSocketClientIo {
   private readonly connections: ConnectionItem[] = [];
 

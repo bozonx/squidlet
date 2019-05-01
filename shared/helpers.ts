@@ -8,7 +8,6 @@ import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
 import IoSet from '../system/interfaces/IoSet';
-import {firstLetterToUpperCase} from '../system/helpers/helpers';
 import IoSetTypes from '../hostEnvBuilder/interfaces/IoSetTypes';
 import {IoItemClass} from '../system/interfaces/IoItem';
 

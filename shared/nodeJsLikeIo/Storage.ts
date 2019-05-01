@@ -1,7 +1,3 @@
-/**
- * The same file for lowjs and nodejs
- */
-
 import * as fs from 'fs';
 
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
@@ -13,6 +9,9 @@ const {convertBufferToUint8Array} = require('./helpers');
 const DEFAULT_ENCODE = 'utf8';
 
 
+/**
+ * The same for lowjs and nodejs
+ */
 export default class Storage implements StorageIo {
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {

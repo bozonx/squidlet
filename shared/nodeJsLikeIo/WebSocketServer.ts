@@ -26,6 +26,9 @@ enum SERVER_POSITIONS {
 }
 
 
+/**
+ * The same for lowjs and nodejs
+ */
 export default class WebSocketServer implements WebSocketServerIo {
   private readonly servers: ServerItem[] = [];
 
