@@ -51,7 +51,6 @@ export default abstract class DriverFactoryBase<Instance extends DriverInstance>
 
   private getInstanceId(props: {[index: string]: any}): string | undefined {
     if (this.instanceAlwaysNew) {
-      // undefined means always new instance
       return;
     }
     if (this.instanceAlwaysSame) {
