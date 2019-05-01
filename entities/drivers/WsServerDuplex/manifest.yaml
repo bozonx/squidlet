@@ -1,5 +1,5 @@
-name: WebSocketServerRouter
-main: WebSocketServerRouter.ts
+name: WsServerDuplex
+main: WsServerDuplex.ts
 system: true
 
 drivers:
