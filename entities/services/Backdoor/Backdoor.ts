@@ -4,32 +4,23 @@ import categories from 'system/dict/categories';
 import {
   WebSocketServer
 } from '../../drivers/WebSocketServer/WebSocketServer';
-import {withoutFirstItemUint8Arr} from '../../../system/helpers/collections';
-import {uint8ArrayToJsData} from '../../../system/helpers/binaryHelpers';
-import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
+import {isUint8Array} from 'system/helpers/collections';
+import {decodeJsonMessage} from './helpers';
 
-
-enum BACKDOOR_CHANNELS {
-  pub,
-  sub,
-  // updatePub,
-  // updateSub,
-  // ioPub,
-  // ioSub,
-  // logSub,
-  // switchIoAccess,
-}
 
 export enum BACKDOOR_DATA_TYPES {
   json,
 }
 
-const CHANNEL_POSITION = 0;
-
-export type BackdoorMessageTypes = 'emit' | 'addListener' | 'removeListener' | 'subscribe';
+export enum BACKDOOR_MESSAGE_TYPE {
+  emit,
+  addListener,
+  removeListener,
+  listenerResponse
+}
 
 export interface BackdoorMessage {
-  type: BackdoorMessageTypes;
+  type: number;
   payload: {
     category: string;
     topic?: string;
@@ -37,19 +28,11 @@ export interface BackdoorMessage {
   };
 }
 
-interface EventMessage {
-  category: string;
-  topic?: string;
-  data?: any;
-}
-
 interface BackDoorProps {
   host: string;
   port: number;
 }
 
-// TODO: set default host port in manifest
-// TODO: listen subscribes which was set by squildetctl - use externalDataOutcome, externalDataIncome
 
 export default class Backdoor extends ServiceBase<BackDoorProps> {
   private get wsServerDriver(): WebSocketServer {
@@ -59,85 +42,77 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.wsServerDriver = await getDriverDep('WebSocketServer')
-      .getInstance({
-        // TODO: collect defaults !!!
-        ...this.props,
-        binary: true,
+      .getInstance(this.props);
+
+    this.wsServerDriver.onConnection((connectionId: string) => {
+      // start listening income message of this connection
+      this.wsServerDriver.onMessage(connectionId, (data: string | Uint8Array) => {
+        // parse message
+        this.parseIncomeMessage(connectionId, data);
       });
 
-    this.wsServerDriver.onConnection((clientId: string) => {
-      // start listening income message of this connection
-      this.wsServerDriver.onIncomeMessage(clientId, (message: Uint8Array | {[index: string]: any} ) => {
-        // parse message
-        this.parseIncomeMessage(clientId, message as Uint8Array);
-      });
+      // TODO: on close connection - remove all the listeners
     });
   }
 
+  destroy = async () => {
+    await this.wsServerDriver.destroy();
+  }
 
-  private parseIncomeMessage(clientId: string, message: Uint8Array) {
-    if (message.length <= 1) {
-      return this.env.log.error(`Backdoor: message is too small`);
+
+  private parseIncomeMessage(connectionId: string, data: string | Uint8Array) {
+    if (!isUint8Array(data)) {
+      throw new Error(`Backdoor: data has be a Uint8Array`);
+    }
+    else if (data.length <= 1) {
+      return this.env.log.error(`Backdoor: income data is too small`);
     }
 
-    const channel: number = message[CHANNEL_POSITION];
-    const payload: Uint8Array = withoutFirstItemUint8Arr(message);
+    if (data[0] === BACKDOOR_DATA_TYPES.json) {
+      const message: BackdoorMessage = decodeJsonMessage(data as Uint8Array) as any;
 
-    switch (channel) {
-      case BACKDOOR_CHANNELS.pub:
-        return this.onPub(payload);
-      case BACKDOOR_CHANNELS.sub:
-        return this.onSub(clientId, payload);
+      this.resolveJsonMessage(connectionId, message);
+    }
 
-        // TODO: может не выделять - а просто обращаться к событиям напрямую ???
-      // case BACKDOOR_CHANNELS.ioPub:
-      //   return this.onIoPub(payload);
-      // case BACKDOOR_CHANNELS.ioSub:
-      //   return this.onIoSub(clientId, payload);
-      // case BACKDOOR_CHANNELS.logSub:
-      //   return this.onLogSub(clientId, payload);
-      // case BACKDOOR_CHANNELS.switchIoAccess:
-      //   return this.onSwitchIoAccess(payload);
-      // case BACKDOOR_CHANNELS.updatePub:
-      //   return this.onUpdatePub(payload);
-      // case BACKDOOR_CHANNELS.updateSub:
-      //   return this.onUpdateSub(clientId, payload);
+    // TODO: update message etc...
 
+    throw new Error(`Backdoor: unsapported type of message "${data[0]}"`);
+  }
+
+  private resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
+    switch (message.type) {
+      case BACKDOOR_MESSAGE_TYPE.emit:
+        return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
+      case BACKDOOR_MESSAGE_TYPE.addListener:
+        return this.addEventListener(connectionId, message.payload.category, message.payload.topic);
+      case BACKDOOR_MESSAGE_TYPE.removeListener:
+        return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
       default:
-        this.env.log.error(`Backdoor: Can't recognize channel "${channel}"`);
+        this.env.log.error(`Backdoor: Can't recognize message type "${message.type}"`);
     }
-
   }
 
-
-  private onPub(payload: Uint8Array) {
-    const message: EventMessage = uint8ArrayToJsData(payload);
-
-    if (!message.topic) {
-      return this.env.log.error(`Backdoor: message doesn't have a topic "${JSON.stringify(message)}"`);
-    }
-
-    this.env.events.emit(message.category, message.topic, message.data);
-  }
-
-  private onSub(clientId: string, payload: Uint8Array) {
-    const message: EventMessage = uint8ArrayToJsData(payload);
-
-    if (message.topic) {
-      this.env.events.addListener(message.category, message.topic, (data: any) => {
+  private addEventListener(connectionId: string, category: string, topic?: string) {
+    if (topic) {
+      this.env.events.addListener(category, topic, (data: any) => {
         const returnMessage: EventMessage = { ...message, data };
 
         return this.send(clientId, returnMessage);
       });
     }
     else {
-      this.env.events.addCategoryListener(message.category, (data: any) => {
+      this.env.events.addCategoryListener(category, (data: any) => {
         const returnMessage: EventMessage = { ...message, data };
 
         return this.send(clientId, returnMessage);
       });
     }
   }
+
+  private removeEventListener(connectionId: string, category: string, topic?: string) {
+    // TODO: remove listeners
+  }
+
   //
   // private onIoPub(payload: Uint8Array) {
   //   const message: RemoteCallMessage = uint8ArrayToJsData(payload);

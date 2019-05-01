@@ -6,7 +6,7 @@ import {callPromised} from 'system/helpers/helpers';
 export interface WsClientLogicProps extends WebSocketClientDriverProps {
   clientId: string;
   // tries of reconnection. 0 is infinity
-  maxTries: number;
+  maxTries?: number;
 }
 
 

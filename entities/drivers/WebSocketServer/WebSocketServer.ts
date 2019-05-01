@@ -5,10 +5,7 @@ import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocke
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 
 
-export interface WebSocketServerDriverProps {
-  host: string;
-  port: number;
-  //binary?: boolean;
+export interface WebSocketServerDriverProps extends WsServerLogicProps {
 }
 
 
