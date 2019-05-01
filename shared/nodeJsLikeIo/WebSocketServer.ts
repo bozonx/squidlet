@@ -13,11 +13,13 @@ import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 
 
-type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler> ];
+// Server instance, server's events, connections by clientId
+type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, {[index: string]: WebSocket} ];
 
 enum SERVER_POSITIONS {
   wsServer,
-  events
+  events,
+  connections
 }
 
 
@@ -36,7 +38,13 @@ export default class WebSocketServer implements WebSocketServerIo {
   async closeServer(serverId: string): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
-    return callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].close);
+    this.servers[Number(serverId)][SERVER_POSITIONS.events].destroy();
+
+    // TODO: does it need to close connections ???
+
+    await callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].close);
+
+    delete this.servers[Number(serverId)];
   }
 
   // when new client is connected
@@ -93,40 +101,51 @@ export default class WebSocketServer implements WebSocketServerIo {
     if (!this.servers[Number(serverId)]) {
       throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
     }
+
+    // TODO: add
   }
 
   onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number {
     if (!this.servers[Number(serverId)]) {
       throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
     }
+
+    // TODO: add
   }
 
   onError(serverId: string, connectionId: string, cb: (err: Error) => void): number {
     if (!this.servers[Number(serverId)]) {
       throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
     }
-  }
-  // TODO: remove server listener
-  // TODO: какие события ???
-  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
-  }
 
-
+    // TODO: add
+  }
 
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
     if (!this.servers[Number(serverId)]) {
       throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
     }
 
+    // TODO: add
+    //return callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].send)
   }
 
   close(serverId: string, connectionId: string, code: number, reason: string): void {
     if (!this.servers[Number(serverId)]) {
       throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
     }
+
+    // TODO: add
+  }
+
+  // TODO: remove server listener
+  // TODO: какие события ???
+  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
+
+    // TODO: add
   }
 
 
@@ -142,11 +161,14 @@ export default class WebSocketServer implements WebSocketServerIo {
     return [
       server,
       events,
+      // an empty connections
+      {},
     ];
   }
 
   private handleIncomeConnection(socket: WebSocket, request: IncomingMessage) {
     // TODO: make and rise an event
+
   }
 
 }
