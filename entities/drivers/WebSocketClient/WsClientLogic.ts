@@ -1,6 +1,6 @@
 import WebSocketClientIo, {OnMessageHandler, WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketClientDriverProps} from './WebSocketClient';
-import {callPromised} from '../../../system/helpers/helpers';
+import {callPromised} from 'system/helpers/helpers';
 
 
 export interface WsClientLogicProps extends WebSocketClientDriverProps {
