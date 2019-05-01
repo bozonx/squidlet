@@ -17,6 +17,11 @@ async function backdoorEvent(method: string, args: {[index: string]: any}) {
   }
 
   await (backdoorClient as any)[method](args.category, args.topic, args.data);
+
+  if (method === 'emit') {
+    // exit
+    backdoorClient.close();
+  }
 }
 
 
@@ -42,17 +47,17 @@ export default async function resolveCommand() {
     return commandUpdate.start();
   }
   else if (command === 'log') {
-    await backdoorEvent('sub', { ...args, category: 'logger', topic: undefined });
+    await backdoorEvent('addListener', { ...args, category: 'logger', topic: undefined });
   }
   else if (command === 'pub') {
-    await backdoorEvent('pub', args);
+    await backdoorEvent('emit', args);
   }
   else if (command === 'sub') {
-    await backdoorEvent('pub', args);
+    await backdoorEvent('addListener', args);
   }
   else if (command === 'block-io') {
     // TODO: review
-    await backdoorEvent('pub', { ...args, category: 'system', topic: 'block-io' });
+    await backdoorEvent('emit', { ...args, category: 'system', topic: 'block-io' });
   }
   // else if (command === 'io-server') {
   //   const commandUpdate: CommandIoServer = new CommandIoServer(positionArgsRest, args);

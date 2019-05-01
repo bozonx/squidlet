@@ -22,6 +22,8 @@ enum BACKDOOR_CHANNELS {
 
 const CHANNEL_POSITION = 0;
 
+export type BackdoorMessageTypes = 'emit' | 'addListener' | 'removeListener';
+
 interface EventMessage {
   category: string;
   topic?: string;
