@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 import {IncomingMessage} from 'http';
-import * as querystring from 'querystring';
+
 
 import WebSocketServerIo, {
   ConnectionParams,
@@ -14,8 +14,8 @@ import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 
 
-// Server instance, server's events, connections by clientId
-type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, {[index: string]: WebSocket} ];
+// Server instance, server's events, connections
+type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
 
 enum SERVER_POSITIONS {
   wsServer,
@@ -167,21 +167,21 @@ export default class WebSocketServer implements WebSocketServerIo {
       server,
       events,
       // an empty connections
-      {},
+      [],
     ];
   }
 
-  private handleIncomeConnection(serverIn: string, socket: WebSocket, request: IncomingMessage) {
-    // TODO: make and rise an event
-    const splitUrl: string[] = (request.url as any).split('?');
-    const getParams: {clientId: string} = querystring.parse(splitUrl[1]) as any;
-    const clientId: string = getParams.clientId;
+  private handleIncomeConnection(serverId: string, socket: WebSocket, request: IncomingMessage) {
+    const connections: WebSocket[] = this.servers[Number(serverId)][SERVER_POSITIONS.connections];
+    const connectionId: string = String(connections.length);
+    const connectionParams: ConnectionParams = {
+      url: request.url as string,
+    };
 
-    if (!clientId) {
-      // TODO: what to do ????
-    }
+    connections.push(socket);
 
-
+    this.servers[Number(serverId)][SERVER_POSITIONS.events]
+      .emit(wsServerEventNames.connection, connectionId, connectionParams);
   }
 
 }

@@ -39,6 +39,17 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
       this.env.log.info,
       this.env.log.error
     );
+
+    // TODO: use clientId instead of connectionId
+
+    /*
+    import * as querystring from 'querystring';
+
+    const splitUrl: string[] = (request.url as any).split('?');
+    const getParams: {clientId: string} = querystring.parse(splitUrl[1]) as any;
+    const clientId: string = getParams.clientId;
+
+     */
   }
 
   destroy = async () => {
