@@ -20,9 +20,22 @@ enum BACKDOOR_CHANNELS {
   // switchIoAccess,
 }
 
+export enum BACKDOOR_DATA_TYPES {
+  json,
+}
+
 const CHANNEL_POSITION = 0;
 
-export type BackdoorMessageTypes = 'emit' | 'addListener' | 'removeListener';
+export type BackdoorMessageTypes = 'emit' | 'addListener' | 'removeListener' | 'subscribe';
+
+export interface BackdoorMessage {
+  type: BackdoorMessageTypes;
+  payload: {
+    category: string;
+    topic?: string;
+    data?: string;
+  };
+}
 
 interface EventMessage {
   category: string;

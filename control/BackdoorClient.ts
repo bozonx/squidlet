@@ -1,6 +1,7 @@
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WebSocketClient/WsClientLogic';
 import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
-import {BackdoorMessageTypes} from '../entities/services/Backdoor/Backdoor';
+import {BackdoorMessage, BackdoorMessageTypes} from '../entities/services/Backdoor/Backdoor';
+import {decodeJsonMessage, encodeJsonMessage} from '../entities/services/Backdoor/helpers';
 
 
 export default class BackdoorClient {
@@ -23,8 +24,11 @@ export default class BackdoorClient {
     );
 
     this.client.onMessage((data: string | Uint8Array) => {
-      // TODO: convert to message
-      // TODO: print
+      const message: BackdoorMessage = decodeJsonMessage(data as Uint8Array) as any;
+
+      if (message.type !== 'subscribe') return;
+
+      console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
     });
 
   }
@@ -34,61 +38,36 @@ export default class BackdoorClient {
     this.client.close(0);
   }
 
-  async emit(category: string, topic?: string, data?: string) {
-    // TODO: type of message
-    const message = {
-      type: 'emit',
-      payload: {
-        category,
-        topic,
-        data,
-      }
-    };
+  async emit(category: string, topic?: string, data?: string): Promise<void> {
+    const binMsg: Uint8Array = this.makeMessage('emit', category, topic, data);
 
-    // TODO: convert message to binary
-
-    await this.client.send();
+    await this.client.send(binMsg);
   }
 
-  async addListener(category: string, topic?: string): Promise<number> {
+  async addListener(category: string, topic?: string): Promise<void> {
+    const binMsg: Uint8Array = this.makeMessage('addListener', category, topic);
 
-    //, cb: (...args: any[]) => void
-
-    const message = {
-      type: 'addListener',
-      payload: {
-        category,
-        topic,
-      }
-    };
-
-    await this.client.send();
-
-
+    await this.client.send(binMsg);
   }
 
-  async removeListener(category: string, topic: string | undefined): Promise<void> {
-    const message = {
-      type: 'removeListener',
-      payload: {
-        category,
-        topic,
-      }
-    };
+  async removeListener(category: string, topic?: string): Promise<void> {
+    const binMsg: Uint8Array = this.makeMessage('removeListener', category, topic);
 
-    await this.client.send();
+    await this.client.send(binMsg);
   }
 
 
   private makeMessage(type: BackdoorMessageTypes, category: string, topic?: string, data?: string): Uint8Array {
-    const message = {
-      type: 'removeListener',
+    const message: BackdoorMessage = {
+      type,
       payload: {
         category,
         topic,
         data,
       }
     };
+
+    return encodeJsonMessage(message);
   }
 
   private onClientClose() {
