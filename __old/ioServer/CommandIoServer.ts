@@ -2,12 +2,12 @@
 // TODO: remove
 
 
-import WsIoServer, {WsServerProps} from '../nodejs/ioServer/WsIoServer';
-import {getOsMachine, makeDevelopIoCollection, resolvePlatformDir} from '../shared/helpers';
-import NodejsMachines, {nodejsSupportedMachines} from '../nodejs/interfaces/NodejsMachines';
-import Os from '../shared/Os';
-import Platforms, {NODEJS_PLATFORM} from '../hostEnvBuilder/interfaces/Platforms';
-import {IoItemClass} from '../system/interfaces/IoItem';
+import WsIoServer, {WsServerProps} from './WsIoServer';
+import {getOsMachine, makeDevelopIoCollection, resolvePlatformDir} from '../../shared/helpers';
+import NodejsMachines, {nodejsSupportedMachines} from '../../nodejs/interfaces/NodejsMachines';
+import Os from '../../shared/Os';
+import Platforms, {NODEJS_PLATFORM} from '../../hostEnvBuilder/interfaces/Platforms';
+import {IoItemClass} from '../../system/interfaces/IoItem';
 
 
 interface CommandIoServerArgs {

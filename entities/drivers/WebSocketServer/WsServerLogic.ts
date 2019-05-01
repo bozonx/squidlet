@@ -1,11 +1,8 @@
-import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
+import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 
 
-// TODO: extend of driver's props
-export interface WsServerLogicProps {
-  host: string;
-  port: number;
+export interface WsServerLogicProps extends WebSocketServerProps {
 }
 
 

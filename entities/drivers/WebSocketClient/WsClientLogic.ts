@@ -150,7 +150,7 @@ export default class WsClientLogic {
 
   private makeIoProps(): WebSocketClientProps {
     return {
-      url: `ws://${this.props.host}:${this.props.port}?clientId=${this.props.clientId}`,
+      url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
       // additional io client params
       //...omit(this.props, 'host', 'port')
     };
