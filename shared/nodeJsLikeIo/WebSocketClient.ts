@@ -30,31 +30,54 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
   onOpen(connectionId: string, cb: () => void): number {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
+
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .addListener(wsEventNames.open, cb);
   }
 
   onClose(connectionId: string, cb: () => void): number {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
+
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .addListener(wsEventNames.close, cb);
   }
 
   onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): number {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
+
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .addListener(wsEventNames.message, cb);
   }
 
   onError(connectionId: string, cb: (err: Error) => void): number {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
+
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .addListener(wsEventNames.error, cb);
   }
 
   removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
+
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
       .removeListener(eventName, handlerIndex);
   }
 
   send(connectionId: string, data: string | Uint8Array): Promise<void> {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
+    }
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -88,6 +111,8 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
   destroyConnection(connectionId: string) {
+    if (!this.connections[Number(connectionId)]) return;
+
     this.connections[Number(connectionId)][CONNECTION_POSITIONS.webSocket].close(0);
     this.connections[Number(connectionId)][CONNECTION_POSITIONS.events].destroy();
 

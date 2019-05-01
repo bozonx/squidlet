@@ -1,4 +1,5 @@
 import * as WebSocket from 'ws';
+import {IncomingMessage} from 'http';
 
 import WebSocketServerIo, {
   ConnectionParams,
@@ -23,6 +24,8 @@ enum SERVER_POSITIONS {
 export default class WebSocketServer implements WebSocketServerIo {
   private readonly servers: ServerItem[] = [];
 
+  /////// Server's methods
+
   // make new server and return serverId
   newServer(props: WebSocketServerProps): string {
     this.servers.push( this.makeServer(props) );
@@ -30,60 +33,100 @@ export default class WebSocketServer implements WebSocketServerIo {
     return String(this.servers.length - 1);
   }
 
-  closeServer(serverId: string): Promise<void> {
+  async closeServer(serverId: string): Promise<void> {
+    if (!this.servers[Number(serverId)]) return;
+
     return callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].close);
   }
 
   // when new client is connected
   onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
+
     return this.servers[Number(serverId)][SERVER_POSITIONS.events]
       .addListener(wsServerEventNames.connection, cb);
   }
 
   // when server starts listening
   onServerListening(serverId: string, cb: () => void): number {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
 
+    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
+      .addListener(wsServerEventNames.listening, cb);
   }
 
   // on server close. Depend on http server close
   onServerClose(serverId: string, cb: () => void): number {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
 
+    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
+      .addListener(wsServerEventNames.close, cb);
   }
 
   onServerError(serverId: string, cb: (err: Error) => void): number {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
 
+    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
+      .addListener(wsServerEventNames.error, cb);
   }
+
+  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void {
+    if (!this.servers[Number(serverId)]) return;
+
+    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
+      .removeListener(eventName, handlerIndex);
+  }
+
+  /////// Connection's methods
 
   // connection's methods like in client
   //onOpen              (serverId: string, connectionId: string, cb: () => void): number;
   onClose(serverId: string, connectionId: string, cb: () => void): number {
-
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
   }
 
   onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number {
-
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
   }
 
   onError(serverId: string, connectionId: string, cb: (err: Error) => void): number {
-
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
   }
   // TODO: remove server listener
   // TODO: какие события ???
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
-
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
   }
 
-  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void {
 
-  }
 
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
-
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
 
   }
 
   close(serverId: string, connectionId: string, code: number, reason: string): void {
-
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
   }
 
 
@@ -91,24 +134,19 @@ export default class WebSocketServer implements WebSocketServerIo {
     const events = new IndexedEventEmitter();
     const server = new WebSocket.Server(props);
 
-    server.on('close', (code: number, reason: string) => {
-      console.info(`Websocket server closed: ${code}: ${reason}`);
-    });
-
-    server.on('error', (err: Error) => {
-      this.errorEvents.emit(`Websocket io set has received an error: ${err}`);
-    });
-
-    server.on('listening', () => {
-      console.info(`Http server started listening`);
-    });
-
+    server.on('close', () => events.emit(wsServerEventNames.close));
+    server.on('listening', () => events.emit(wsServerEventNames.listening));
+    server.on('error', () => events.emit(wsServerEventNames.error));
     server.on('connection', this.handleIncomeConnection);
 
     return [
       server,
       events,
     ];
+  }
+
+  private handleIncomeConnection(socket: WebSocket, request: IncomingMessage) {
+    // TODO: make and rise an event
   }
 
 }

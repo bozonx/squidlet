@@ -7,7 +7,7 @@ export const Methods = [
 ];
 
 export const wsServerEventNames = {
-  listen: 'listen',
+  listening: 'listening',
   close: 'close',
   connection: 'connection',
   error: 'error',
