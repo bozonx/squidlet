@@ -8,14 +8,15 @@ import WebSocketServerIo, {
   wsServerEventNames,
   WsServerEvents
 } from 'system/interfaces/io/WebSocketServerIo';
-import {WsEvents} from 'system/interfaces/io/WebSocketClientIo';
+import {wsEventNames, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
+import {CONNECTION_POSITIONS, ConnectionItem} from './WebSocketClient';
 
 
-// Server instance, server's events, connections
-type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
+// Server instance, server's events, [connection, connection's events]
+type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, ConnectionItem[] ];
 
 enum SERVER_POSITIONS {
   wsServer,
@@ -98,57 +99,47 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   /////// Connection's methods
 
-  // connection's methods like in client
-  //onOpen              (serverId: string, connectionId: string, cb: () => void): number;
   onClose(serverId: string, connectionId: string, cb: () => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(serverId, connectionId);
 
-    // TODO: add
+    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
   }
 
   onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(serverId, connectionId);
 
-    // TODO: add
+    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
   }
 
   onError(serverId: string, connectionId: string, cb: (err: Error) => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(serverId, connectionId);
 
-    // TODO: add
+    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(serverId, connectionId);
 
-    // TODO: add
-    //return callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].send)
+    return callPromised(connection[CONNECTION_POSITIONS.webSocket].send, data);
   }
 
   close(serverId: string, connectionId: string, code: number, reason: string): void {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const connection = this.getConnectionItem(serverId, connectionId);
 
-    // TODO: add
+    return connection[CONNECTION_POSITIONS.webSocket].close(code, reason);
   }
 
-  // TODO: remove server listener
-  // TODO: какие события ???
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    if (
+      !this.servers[Number(serverId)]
+      || !this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]
+    ) {
+      return;
     }
 
-    // TODO: add
+    const connection = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
+
+    return connection[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
 
@@ -172,16 +163,33 @@ export default class WebSocketServer implements WebSocketServerIo {
   }
 
   private handleIncomeConnection(serverId: string, socket: WebSocket, request: IncomingMessage) {
-    const connections: WebSocket[] = this.servers[Number(serverId)][SERVER_POSITIONS.connections];
+    const connections = this.servers[Number(serverId)][SERVER_POSITIONS.connections];
+    const events = new IndexedEventEmitter();
     const connectionId: string = String(connections.length);
     const connectionParams: ConnectionParams = {
       url: request.url as string,
     };
 
-    connections.push(socket);
+    connections.push([
+      socket,
+      events
+    ]);
+
+    // TODO: listen connection events
 
     this.servers[Number(serverId)][SERVER_POSITIONS.events]
       .emit(wsServerEventNames.connection, connectionId, connectionParams);
+  }
+
+  private getConnectionItem(serverId: string, connectionId: string): ConnectionItem {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
+    else if (!this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]) {
+      throw new Error(`WebSocketServer: Connection "${connectionId}" hasn't been found on server "${serverId}"`);
+    }
+
+    return this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
   }
 
 }

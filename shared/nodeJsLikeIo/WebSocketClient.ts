@@ -8,9 +8,9 @@ import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 
 
-type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
+export type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
 
-enum CONNECTION_POSITIONS {
+export enum CONNECTION_POSITIONS {
   webSocket,
   events
 }
