@@ -1,7 +1,14 @@
+import * as yaml from 'js-yaml';
+import * as fs from 'fs';
+
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WebSocketClient/WsClientLogic';
 import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BackdoorMessage, BackdoorMessageTypes} from '../entities/services/Backdoor/Backdoor';
 import {decodeJsonMessage, encodeJsonMessage} from '../entities/services/Backdoor/helpers';
+import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
+
+
+const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
 
 
 export default class BackdoorClient {
@@ -9,9 +16,17 @@ export default class BackdoorClient {
 
 
   constructor(host?: string, port?: number) {
+    const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
+    const backdoorManifest = yaml.safeLoad(yamlContent);
+    const backdoorProps = collectPropsDefaults(backdoorManifest.props);
     const props: WsClientLogicProps = {
-      // TODO: !!!!
-      // TODO: use defaults from backdoor service props
+      host: host || backdoorProps.host,
+      port: port || backdoorProps.port,
+      autoReconnect: false,
+      reconnectTimeoutSec: 10,
+      // TODO: remove
+      clientId: 'client',
+      maxTries: 0,
     };
     const wsClientIo = new WebSocketClient();
 

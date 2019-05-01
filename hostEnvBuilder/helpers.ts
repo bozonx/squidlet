@@ -41,6 +41,24 @@ export function clearRelativePath(rawPath: string): string {
   return rawPath.replace(/\.{1,2}\//g, '');
 }
 
+export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
+
+  // TODO: test
+
+  const result: {[index: string]: any} = {};
+
+  if (!manifestProps) return result;
+
+  for (let propName of Object.keys(manifestProps)) {
+    if (!manifestProps[propName] || typeof manifestProps[propName].default === 'undefined') continue;
+
+    result[propName] = manifestProps[propName].default;
+  }
+
+  return result;
+}
+
+
 // export function yamlToJs(yamlString: string): any {
 //
 //   return yaml.safeLoad(yamlString);

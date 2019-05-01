@@ -8,6 +8,7 @@ import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 import {validateProps} from '../../system/helpers/validate';
 import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
+import {collectPropsDefaults} from '../helpers';
 
 
 /**
@@ -92,7 +93,7 @@ export default class Definitions {
         hostDeviceDefaultProps && hostDeviceDefaultProps[className],
 
         // manifest's defaults
-        this.collectManifestPropsDefaults(entitySet.manifest.props),
+        collectPropsDefaults(entitySet.manifest.props),
       ),
     };
   }
@@ -116,7 +117,7 @@ export default class Definitions {
       className: className,
       props: _defaultsDeep(
         definitionProps,
-        this.collectManifestPropsDefaults(entitySet.manifest.props),
+        collectPropsDefaults(entitySet.manifest.props),
       ),
     };
   }
@@ -136,23 +137,9 @@ export default class Definitions {
       className: serviceDef.className,
       props: _defaultsDeep(
         definitionProps,
-        this.collectManifestPropsDefaults(entitySet.manifest.props),
+        collectPropsDefaults(entitySet.manifest.props),
       ),
     };
-  }
-
-  private collectManifestPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
-    const result: {[index: string]: any} = {};
-
-    if (!manifestProps) return result;
-
-    for (let propName of Object.keys(manifestProps)) {
-      if (!manifestProps[propName] || typeof manifestProps[propName].default === 'undefined') continue;
-
-      result[propName] = manifestProps[propName].default;
-    }
-
-    return result;
   }
 
   private validateDevicesDefault() {

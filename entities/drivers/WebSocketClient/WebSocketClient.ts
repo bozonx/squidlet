@@ -33,7 +33,6 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 
   protected willInit = async () => {
     const wsClientLogicProps: WsClientLogicProps = {
-      // TODO: collect defaults !!!
       ...this.props,
       maxTries: 0,
       clientId: this.env.system.host.id,
