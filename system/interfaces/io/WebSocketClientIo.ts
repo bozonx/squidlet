@@ -8,6 +8,12 @@ export const Methods = [
   'reConnect',
 ];
 
+export const wsEventNames = {
+  open: 'open',
+  close: 'close',
+  message: 'message',
+  error: 'error',
+};
 
 export type WsEvents = 'open' | 'close' | 'message' | 'error';
 export type OnMessageHandler = (data: string | Uint8Array) => void;

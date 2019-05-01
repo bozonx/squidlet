@@ -6,6 +6,13 @@ export const Methods = [
   'send',
 ];
 
+export const wsServerEventNames = {
+  listen: 'listen',
+  close: 'close',
+  connection: 'connection',
+  error: 'error',
+};
+
 
 export type WsServerEvents = 'listen' | 'close' | 'connection' | 'error';
 
@@ -35,11 +42,11 @@ export default interface WebSocketServerIo {
 
   // connection's methods like in client
   //onOpen              (serverId: string, connectionId: string, cb: () => void): number;
-  onClose             (serverId: string, connectionId: string, cb: () => void): number;
-  onMessage           (serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number;
-  onError             (serverId: string, connectionId: string, cb: (err: Error) => void): number;
+  onClose(serverId: string, connectionId: string, cb: () => void): number;
+  onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number;
+  onError(serverId: string, connectionId: string, cb: (err: Error) => void): number;
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void;
   removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void;
-  send                (serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
-  close               (serverId: string, connectionId: string, code: number, reason: string): void;
+  send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
+  close(serverId: string, connectionId: string, code: number, reason: string): void;
 }

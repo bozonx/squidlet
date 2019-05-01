@@ -1,11 +1,11 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
-import WebSocketClientIo, {WebSocketClientProps, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {WebSocketClientProps, wsEventNames, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
 import {isUint8Array} from 'system/helpers/collections';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
-import {callPromised} from '../../system/helpers/helpers';
+import {callPromised} from 'system/helpers/helpers';
 
 
 type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
@@ -14,13 +14,6 @@ enum CONNECTION_POSITIONS {
   webSocket,
   events
 }
-
-const eventNames = {
-  open: 'open',
-  close: 'close',
-  message: 'message',
-  error: 'error',
-};
 
 
 export default class WebSocketClient implements WebSocketClientIo {
@@ -38,22 +31,22 @@ export default class WebSocketClient implements WebSocketClientIo {
 
   onOpen(connectionId: string, cb: () => void): number {
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(eventNames.open, cb);
+      .addListener(wsEventNames.open, cb);
   }
 
   onClose(connectionId: string, cb: () => void): number {
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(eventNames.close, cb);
+      .addListener(wsEventNames.close, cb);
   }
 
   onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): number {
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(eventNames.message, cb);
+      .addListener(wsEventNames.message, cb);
   }
 
   onError(connectionId: string, cb: (err: Error) => void): number {
     return this.connections[Number(connectionId)][CONNECTION_POSITIONS.events]
-      .addListener(eventNames.error, cb);
+      .addListener(wsEventNames.error, cb);
   }
 
   removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
@@ -107,13 +100,13 @@ export default class WebSocketClient implements WebSocketClientIo {
     const client = new WebSocket(props.url, {
     });
 
-    client.on(eventNames.open, () => events.emit(eventNames.open));
-    client.on(eventNames.close, () => events.emit(eventNames.close));
-    client.on(eventNames.message, (data: string | Uint8Array) => {
-      events.emit(eventNames.message, data);
+    client.on(wsEventNames.open, () => events.emit(wsEventNames.open));
+    client.on(wsEventNames.close, () => events.emit(wsEventNames.close));
+    client.on(wsEventNames.message, (data: string | Uint8Array) => {
+      events.emit(wsEventNames.message, data);
     });
-    client.on(eventNames.error, (err: Error) => {
-      events.emit(eventNames.error, err);
+    client.on(wsEventNames.error, (err: Error) => {
+      events.emit(wsEventNames.error, err);
     });
     client.on('unexpected-response', (request: ClientRequest, responce: IncomingMessage) => {
       events.emit(`Unexpected response has been received: ${responce.statusCode}: ${responce.statusMessage}`);

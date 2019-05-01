@@ -1,64 +1,43 @@
 import * as WebSocket from 'ws';
 
-import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {WsEvents} from '../../system/interfaces/io/WebSocketClientIo';
+import WebSocketServerIo, {
+  ConnectionParams,
+  WebSocketServerProps,
+  wsServerEventNames,
+  WsServerEvents
+} from 'system/interfaces/io/WebSocketServerIo';
+import {WsEvents} from 'system/interfaces/io/WebSocketClientIo';
+import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
+import {AnyHandler} from 'system/helpers/IndexedEvents';
+import {callPromised} from 'system/helpers/helpers';
 
 
-// export class WSServer implements WSSeverIo {
-//   private readonly server: WebSocket.Server;
-//
-//   constructor(props: WebSocketServerProps) {
-//
-//     // TODO: инстанс выдается на connection
-//
-//     this.server = new WebSocket.Server(props);
-//   }
-//
-//
-//   // onClose(cb: () => void) {
-//   //   this.server.on('close', cb);
-//   // }
-//   //
-//   // onConnection(cb: () => void) {
-//   //   this.server.on('connection', cb);
-//   // }
-//   //
-//   // onListening(cb: () => void) {
-//   //   this.server.on('listening', cb);
-//   // }
-//
-//   onMessage(cb: (data: any) => void) {
-//     // TODO: может навешивать только после on connection ????
-//     this.server.on('message', cb);
-//   }
-//
-//   // onError(cb: (err: Error) => void) {
-//   //   this.server.on('error', cb);
-//   // }
-//
-//   send(data: any) {
-//     //this.server.send(data);
-//   }
-//
-// }
+type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler> ];
+
+enum SERVER_POSITIONS {
+  wsServer,
+  events
+}
 
 
 export default class WebSocketServer implements WebSocketServerIo {
-
-  // TODO: сохранять инстансы серверов чтобы не создавать дважды на один host и port
-
-  // newServer(props: WebSocketServerProps): WSServer {
-  //   return new WSServer(props);
-  // }
+  private readonly servers: ServerItem[] = [];
 
   // make new server and return serverId
   newServer(props: WebSocketServerProps): string {
+    this.servers.push( this.makeServer(props) );
 
+    return String(this.servers.length - 1);
+  }
+
+  closeServer(serverId: string): Promise<void> {
+    return callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].close);
   }
 
   // when new client is connected
   onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
-
+    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
+      .addListener(wsServerEventNames.connection, cb);
   }
 
   // when server starts listening
@@ -94,7 +73,11 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   }
 
-  send(serverId: string, connectionId: string, data: string | Uint8Array): void {
+  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void {
+
+  }
+
+  send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
 
 
   }
@@ -102,4 +85,30 @@ export default class WebSocketServer implements WebSocketServerIo {
   close(serverId: string, connectionId: string, code: number, reason: string): void {
 
   }
+
+
+  private makeServer(props: WebSocketServerProps): ServerItem {
+    const events = new IndexedEventEmitter();
+    const server = new WebSocket.Server(props);
+
+    server.on('close', (code: number, reason: string) => {
+      console.info(`Websocket server closed: ${code}: ${reason}`);
+    });
+
+    server.on('error', (err: Error) => {
+      this.errorEvents.emit(`Websocket io set has received an error: ${err}`);
+    });
+
+    server.on('listening', () => {
+      console.info(`Http server started listening`);
+    });
+
+    server.on('connection', this.handleIncomeConnection);
+
+    return [
+      server,
+      events,
+    ];
+  }
+
 }
