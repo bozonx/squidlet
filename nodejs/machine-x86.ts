@@ -13,7 +13,7 @@ const machineConfig: MachineConfig = {
     //'Bluetooth',
   ],
   devsSupportFiles: [
-    './x86/package.json',
+    //'./x86/package.json',
     '../shared/nodeJsLikeIo/helpers.js',
   ],
 

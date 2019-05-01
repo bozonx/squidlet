@@ -22,7 +22,7 @@ const machineConfig: MachineConfig = {
     //'I2cSlave',
   ],
   devsSupportFiles: [
-    './rpi/package.json',
+    //'./rpi/package.json',
     '../shared/nodeJsLikeIo/helpers.js',
   ],
 
