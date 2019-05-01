@@ -129,7 +129,7 @@ export default class WsClientLogic {
   }
 
   private finallyCloseConnection() {
-    this.wsClientIo.destroyConnection(this.connectionId);
+    this.wsClientIo.close(this.connectionId, 0);
 
     if (!this.wasPrevOpenFulfilled) {
       this.wasPrevOpenFulfilled = true;

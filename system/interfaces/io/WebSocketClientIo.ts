@@ -25,7 +25,6 @@ export interface WebSocketClientProps {
 export default interface WebSocketClientIo {
   newConnection       (props: WebSocketClientProps): string;
   reConnect           (connectionId: string, props: WebSocketClientProps): void;
-  destroyConnection   (connectionId: string): void;
 
   onOpen              (connectionId: string, cb: () => void): number;
   onClose             (connectionId: string, cb: () => void): number;
