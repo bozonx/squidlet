@@ -32,36 +32,36 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
   onOpen(connectionId: string, cb: () => void): number {
-    const connection = this.getConnectionItem(connectionId);
+    const connectionItem = this.getConnectionItem(connectionId);
 
-    return connection[CONNECTION_POSITIONS.events]
+    return connectionItem[CONNECTION_POSITIONS.events]
       .addListener(wsEventNames.open, cb);
   }
 
   onClose(connectionId: string, cb: () => void): number {
-    const connection = this.getConnectionItem(connectionId);
+    const connectionItem = this.getConnectionItem(connectionId);
 
-    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
   }
 
   onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): number {
-    const connection = this.getConnectionItem(connectionId);
+    const connectionItem = this.getConnectionItem(connectionId);
 
-    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
   }
 
   onError(connectionId: string, cb: (err: Error) => void): number {
-    const connection = this.getConnectionItem(connectionId);
+    const connectionItem = this.getConnectionItem(connectionId);
 
-    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
   removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
-    const connection = this.connections[Number(connectionId)];
+    const connectionItem = this.connections[Number(connectionId)];
 
-    if (!connection) return;
+    if (!connectionItem) return;
 
-    return connection[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
+    return connectionItem[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
   send(connectionId: string, data: string | Uint8Array): Promise<void> {
@@ -72,18 +72,18 @@ export default class WebSocketClient implements WebSocketClientIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    const connection = this.getConnectionItem(connectionId);
+    const connectionItem = this.getConnectionItem(connectionId);
 
-    return callPromised(connection[CONNECTION_POSITIONS.webSocket].send, data);
+    return callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
   }
 
   close(connectionId: string, code: number, reason?: string) {
-    const connection = this.connections[Number(connectionId)];
+    const connectionItem = this.connections[Number(connectionId)];
 
-    if (!connection) return;
+    if (!connectionItem) return;
 
-    connection[CONNECTION_POSITIONS.webSocket].close(code, reason);
-    connection[CONNECTION_POSITIONS.events].destroy();
+    connectionItem[CONNECTION_POSITIONS.webSocket].close(code, reason);
+    connectionItem[CONNECTION_POSITIONS.events].destroy();
 
     delete this.connections[Number(connectionId)];
 

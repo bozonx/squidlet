@@ -54,41 +54,29 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   // when new client is connected
   onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const serverItem = this.getServerItem(serverId);
 
-    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .addListener(wsServerEventNames.connection, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.connection, cb);
   }
 
   // when server starts listening
   onServerListening(serverId: string, cb: () => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const serverItem = this.getServerItem(serverId);
 
-    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .addListener(wsServerEventNames.listening, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.listening, cb);
   }
 
   // on server close. Depend on http server close
   onServerClose(serverId: string, cb: () => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const serverItem = this.getServerItem(serverId);
 
-    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .addListener(wsServerEventNames.close, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.close, cb);
   }
 
   onServerError(serverId: string, cb: (err: Error) => void): number {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
+    const serverItem = this.getServerItem(serverId);
 
-    return this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .addListener(wsServerEventNames.error, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.error, cb);
   }
 
   removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void {
@@ -100,21 +88,21 @@ export default class WebSocketServer implements WebSocketServerIo {
   /////// Connection's methods
 
   onClose(serverId: string, connectionId: string, cb: () => void): number {
-    const connection = this.getConnectionItem(serverId, connectionId);
+    const connectionItem = this.getConnectionItem(serverId, connectionId);
 
-    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
   }
 
   onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number {
-    const connection = this.getConnectionItem(serverId, connectionId);
+    const connectionItem = this.getConnectionItem(serverId, connectionId);
 
-    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
   }
 
   onError(serverId: string, connectionId: string, cb: (err: Error) => void): number {
-    const connection = this.getConnectionItem(serverId, connectionId);
+    const connectionItem = this.getConnectionItem(serverId, connectionId);
 
-    return connection[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
@@ -125,9 +113,9 @@ export default class WebSocketServer implements WebSocketServerIo {
       return;
     }
 
-    const connection = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
+    const connectionItem = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
 
-    return connection[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
+    return connectionItem[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
@@ -138,9 +126,9 @@ export default class WebSocketServer implements WebSocketServerIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    const connection = this.getConnectionItem(serverId, connectionId);
+    const connectionItem = this.getConnectionItem(serverId, connectionId);
 
-    return callPromised(connection[CONNECTION_POSITIONS.webSocket].send, data);
+    return callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
   }
 
   close(serverId: string, connectionId: string, code: number, reason: string): void {
@@ -151,10 +139,10 @@ export default class WebSocketServer implements WebSocketServerIo {
       return;
     }
 
-    const connection = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
+    const connectionItem = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
 
-    connection[CONNECTION_POSITIONS.webSocket].close(code, reason);
-    connection[CONNECTION_POSITIONS.events].destroy();
+    connectionItem[CONNECTION_POSITIONS.webSocket].close(code, reason);
+    connectionItem[CONNECTION_POSITIONS.events].destroy();
 
     delete this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
 
@@ -214,6 +202,14 @@ export default class WebSocketServer implements WebSocketServerIo {
     // emit new connection
     this.servers[Number(serverId)][SERVER_POSITIONS.events]
       .emit(wsServerEventNames.connection, connectionId, connectionParams);
+  }
+
+  private getServerItem(serverId: string): ServerItem {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+    }
+
+    return this.servers[Number(serverId)];
   }
 
   private getConnectionItem(serverId: string, connectionId: string): ConnectionItem {
