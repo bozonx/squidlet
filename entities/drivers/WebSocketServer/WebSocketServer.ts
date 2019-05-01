@@ -29,6 +29,7 @@ export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
 
   protected willInit = async () => {
     const wsServerLogicProps: WsServerLogicProps = {
+      // TODO: collect defaults !!!
       ...this.props,
     };
 

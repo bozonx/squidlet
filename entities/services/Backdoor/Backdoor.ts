@@ -60,6 +60,7 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.wsServerDriver = await getDriverDep('WebSocketServer')
       .getInstance({
+        // TODO: collect defaults !!!
         ...this.props,
         binary: true,
       });
