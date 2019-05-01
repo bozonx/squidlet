@@ -5,7 +5,7 @@ import {
   WebSocketServer, WebSocketServerDriverProps
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {isUint8Array} from 'system/helpers/collections';
-import {decodeJsonMessage} from './helpers';
+import {decodeJsonMessage, encodeJsonMessage} from './helpers';
 
 
 export enum BACKDOOR_DATA_TYPES {
@@ -58,6 +58,9 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
   }
 
   destroy = async () => {
+
+    // TODO: remove all the handlers
+
     await this.wsServerDriver.destroy();
   }
 
@@ -161,7 +164,7 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
   // }
 
 
-  private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data: any) {
+  private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data?: any) {
     const returnMessage: BackdoorMessage = {
       type: BACKDOOR_MESSAGE_TYPE.listenerResponse,
       payload: {
@@ -171,10 +174,10 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
       }
     };
 
-    // TODO: conver to binary
+    const binData: Uint8Array = encodeJsonMessage(returnMessage);
 
     try {
-      await this.wsServerDriver.send(connectionId, data);
+      await this.wsServerDriver.send(connectionId, binData);
     }
     catch (err) {
       this.env.log.error(`Backdoor: send error: ${err}`);

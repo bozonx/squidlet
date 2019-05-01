@@ -77,6 +77,8 @@ export default class WsServerLogic {
     return this.wsServerIo.onConnection(this.serverId, cb);
   }
 
+  // TODO: add on close connection
+
   removeMessageListener(connectionId: string, handlerId: number) {
     this.wsServerIo.removeEventListener(this.serverId, connectionId,'message', handlerId);
   }
