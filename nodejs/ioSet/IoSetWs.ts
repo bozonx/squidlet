@@ -2,7 +2,9 @@ import RemoteIoBase from '../../system/ioSet/RemoteIoBase';
 import IoSet from '../../system/interfaces/IoSet';
 import System from '../../system/System';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-import WsClient, {WsClientProps} from '../../shared/WsClient';
+//import WsClient, {WsClientProps} from '../../__old/WsClient';
+
+// TODO: use Ws client logic from driver
 
 
 export default class IoSetWs extends RemoteIoBase implements IoSet {
