@@ -104,8 +104,8 @@ export default class WsClientLogic {
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
 
-    // if tries more than 0(infinity) - increment it and close connection if can't connect
-    if (this.props.maxTries) {
+    // if tries more than -1(infinity) - increment it and close connection if can't connect
+    if (this.props.maxTries >= 0) {
       if (this.connectionTries >= this.props.maxTries) {
         return this.finallyCloseConnection();
       }

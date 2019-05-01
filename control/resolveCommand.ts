@@ -22,6 +22,9 @@ async function backdoorEvent(method: string, args: {[index: string]: any}) {
     // exit
     backdoorClient.close();
   }
+
+  // TODO: on control+C send removeListener
+
 }
 
 
