@@ -1,5 +1,6 @@
 import * as WebSocket from 'ws';
 import {IncomingMessage} from 'http';
+import * as querystring from 'querystring';
 
 import WebSocketServerIo, {
   ConnectionParams,
@@ -30,9 +31,11 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   // make new server and return serverId
   newServer(props: WebSocketServerProps): string {
-    this.servers.push( this.makeServer(props) );
+    const serverId: string = String(this.servers.length);
 
-    return String(this.servers.length - 1);
+    this.servers.push( this.makeServer(serverId, props) );
+
+    return serverId;
   }
 
   async closeServer(serverId: string): Promise<void> {
@@ -149,14 +152,16 @@ export default class WebSocketServer implements WebSocketServerIo {
   }
 
 
-  private makeServer(props: WebSocketServerProps): ServerItem {
+  private makeServer(serverId: string, props: WebSocketServerProps): ServerItem {
     const events = new IndexedEventEmitter();
     const server = new WebSocket.Server(props);
 
     server.on('close', () => events.emit(wsServerEventNames.close));
     server.on('listening', () => events.emit(wsServerEventNames.listening));
     server.on('error', () => events.emit(wsServerEventNames.error));
-    server.on('connection', this.handleIncomeConnection);
+    server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
+      this.handleIncomeConnection(serverId, socket, request);
+    });
 
     return [
       server,
@@ -166,8 +171,16 @@ export default class WebSocketServer implements WebSocketServerIo {
     ];
   }
 
-  private handleIncomeConnection(socket: WebSocket, request: IncomingMessage) {
+  private handleIncomeConnection(serverIn: string, socket: WebSocket, request: IncomingMessage) {
     // TODO: make and rise an event
+    const splitUrl: string[] = (request.url as any).split('?');
+    const getParams: {clientId: string} = querystring.parse(splitUrl[1]) as any;
+    const clientId: string = getParams.clientId;
+
+    if (!clientId) {
+      // TODO: what to do ????
+    }
+
 
   }
 
