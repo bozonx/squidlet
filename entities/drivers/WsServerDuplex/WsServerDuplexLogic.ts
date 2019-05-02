@@ -3,7 +3,9 @@ import {addFirstItemUint8Arr, isUint8Array, withoutFirstItemUint8Arr} from '../.
 import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
-// TODO: make interface of server driver to use just logic
+// TODO: use the same duplex class for client and server
+
+
 interface WsServerLogic {
   send(connectionId: string, data: string | Uint8Array): Promise<void>;
   onMessage(connectionId: string, cb: OnMessageHandler): number;
@@ -61,21 +63,5 @@ export default class WsServerDuplexLogic implements DuplexDriver {
   removeListener(handlerIndex: number): void {
     this.server.removeMessageListener(this.connectionId, handlerIndex);
   }
-
-
-  // onConnection(cb: (routeParams: RouteParams) => void): number {
-  //
-  // }
-  //
-  // removeConnectionListener(handlerId: number) {
-  //
-  // }
-  //
-  // /**
-  //  * Force closing a connection to all the routes
-  //  */
-  // closeConnection(connectionId: string, code: number, reason: string) {
-  //
-  // }
 
 }
