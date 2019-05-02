@@ -1,6 +1,7 @@
 import {cloneDeep, find, isEqual, isObject, isPlainObject, trim, values} from './lodashLike';
 
 
+// TODO: move to binary helpers
 /**
  * Make a new Uint8Array without the first item
  */
@@ -19,6 +20,7 @@ export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
   return result;
 }
 
+// TODO: move to binary helpers
 /**
  * Make a new Uint8Array with the new item on the first position and other items is moved right
  */
@@ -36,6 +38,7 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
 }
 
 
+// TODO: move to binary helpers
 export function isUint8Array(value: any): boolean {
   if (typeof value !== 'object') return false;
 
