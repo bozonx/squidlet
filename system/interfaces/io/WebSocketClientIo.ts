@@ -1,11 +1,13 @@
 export const Methods = [
   'newConnection',
+  'reConnect',
   'onOpen',
   'onClose',
   'onMessage',
   'onError',
+  'removeEventListener',
   'send',
-  'reConnect',
+  'close',
 ];
 
 export const wsEventNames = {

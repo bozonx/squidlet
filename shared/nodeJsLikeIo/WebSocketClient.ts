@@ -49,8 +49,7 @@ export default class WebSocketClient implements WebSocketClientIo {
   onOpen(connectionId: string, cb: () => void): number {
     const connectionItem = this.getConnectionItem(connectionId);
 
-    return connectionItem[CONNECTION_POSITIONS.events]
-      .addListener(wsEventNames.open, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.open, cb);
   }
 
   onClose(connectionId: string, cb: () => void): number {

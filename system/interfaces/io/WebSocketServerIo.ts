@@ -2,8 +2,19 @@ import {WsEvents} from './WebSocketClientIo';
 
 
 export const Methods = [
+  'newServer',
+  'closeServer',
+  'onConnection',
+  'onServerListening',
+  'onServerClose',
+  'onServerError',
+  'onClose',
   'onMessage',
+  'onError',
+  'removeEventListener',
+  'removeServerEventListener',
   'send',
+  'close',
 ];
 
 export const wsServerEventNames = {
