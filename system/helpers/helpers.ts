@@ -1,5 +1,6 @@
 import {isEmpty} from './lodashLike';
 import {Edge} from '../interfaces/io/DigitalIo';
+import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 
 
 export const PATH_SEPARATOR = '/';
@@ -222,6 +223,19 @@ export function callOnDifferentValues(
     }
   }
 }
+
+
+/**
+ * Makes ['info', 'warn', 'error'] if log level is 'info'
+ */
+export function calcAllowedLogLevels(logLevel: LogLevel): LogLevel[] {
+  // TODO: test
+
+  const currentLevelIndex: number = LOG_LEVELS.indexOf(logLevel);
+
+  return LOG_LEVELS.slice(currentLevelIndex) as LogLevel[];
+}
+
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;

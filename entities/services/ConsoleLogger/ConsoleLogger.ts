@@ -1,7 +1,7 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import LogLevel from 'system/interfaces/LogLevel';
-import {LOG_LEVELS} from 'system/dict/constants';
+import LogLevel, {LOG_LEVELS} from 'system/interfaces/LogLevel';
 import categories from 'system/dict/categories';
+import {calcAllowedLogLevels} from '../../../system/helpers/helpers';
 
 
 const consoleLog = {
@@ -37,7 +37,7 @@ export default class ConsoleLogger extends ServiceBase<Props> {
 
 
   private listenLevels() {
-    const allowedLogLevels: LogLevel[] = this.calcAllowedLogLevels(this.props.logLevel);
+    const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(this.props.logLevel);
 
     // listen to allowed levels
     for (let level of allowedLogLevels) {
@@ -47,13 +47,6 @@ export default class ConsoleLogger extends ServiceBase<Props> {
         (consoleLog as any)[level](message);
       });
     }
-  }
-
-
-  private calcAllowedLogLevels(logLevel: LogLevel): LogLevel[] {
-    const currentLevelIndex: number = LOG_LEVELS.indexOf(logLevel);
-
-    return LOG_LEVELS.slice(currentLevelIndex) as LogLevel[];
   }
 
 }

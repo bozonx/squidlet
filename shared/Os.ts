@@ -4,11 +4,11 @@ import * as shelljs from 'shelljs';
 import * as rimraf from 'rimraf';
 import * as yaml from 'js-yaml';
 import * as childProcess from 'child_process';
+import {ChildProcess} from 'child_process';
 
 import systemConfig from '../hostEnvBuilder/configs/systemConfig';
 import {Stats} from '../system/interfaces/io/StorageIo';
 import {callPromised} from '../system/helpers/helpers';
-import {ChildProcess} from 'child_process';
 
 
 export interface SpawnCmdResult {
@@ -19,14 +19,14 @@ export interface SpawnCmdResult {
 
 
 export default class Os {
+  getFileContent(pathTo: string): Promise<string> {
+    return callPromised(fs.readFile, pathTo, systemConfig.filesEncode) as Promise<string>;
+  }
+
   async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
     const yamlContent: string = await this.getFileContent(fullPath);
 
     return yaml.safeLoad(yamlContent);
-  }
-
-  getFileContent(pathTo: string): Promise<string> {
-    return callPromised(fs.readFile, pathTo, systemConfig.filesEncode) as Promise<string>;
   }
 
   async writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
