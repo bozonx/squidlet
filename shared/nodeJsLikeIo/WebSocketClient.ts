@@ -119,6 +119,7 @@ export default class WebSocketClient implements WebSocketClientIo {
     client.on(wsEventNames.error, (err: Error) => {
       events.emit(wsEventNames.error, err);
     });
+    // TODO: не делать абстракцию
     client.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
       events.emit(
         wsEventNames.error,

@@ -34,7 +34,6 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   /////// Server's methods
 
-  // make new server and return serverId
   newServer(props: WebSocketServerProps): string {
     const serverId: string = String(this.servers.length);
 
@@ -55,21 +54,18 @@ export default class WebSocketServer implements WebSocketServerIo {
     delete this.servers[Number(serverId)];
   }
 
-  // when new client is connected
   onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.connection, cb);
   }
 
-  // when server starts listening
   onServerListening(serverId: string, cb: () => void): number {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.listening, cb);
   }
 
-  // on server close. Depend on http server close
   onServerClose(serverId: string, cb: () => void): number {
     const serverItem = this.getServerItem(serverId);
 
@@ -88,7 +84,8 @@ export default class WebSocketServer implements WebSocketServerIo {
     return this.servers[Number(serverId)][SERVER_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
-  /////// Connection's methods
+
+  ////////// Connection's methods like in client, but without onOpen
 
   onClose(serverId: string, connectionId: string, cb: () => void): number {
     const connectionItem = this.getConnectionItem(serverId, connectionId);
@@ -179,6 +176,14 @@ export default class WebSocketServer implements WebSocketServerIo {
     const connectionId: string = String(connections.length);
     const connectionParams: ConnectionParams = {
       url: request.url as string,
+      method: request.method as string,
+      statusCode: request.statusCode as number,
+      statusMessage: request.statusMessage as string,
+      headers: {
+        authorization: request.headers.authorization,
+        cookie: request.headers.cookie,
+        'user-agent': request.headers['user-agent'],
+      },
     };
 
     connections.push([
@@ -194,6 +199,7 @@ export default class WebSocketServer implements WebSocketServerIo {
     socket.on('message', (data: string | Uint8Array) => {
       events.emit(wsEventNames.message, data);
     });
+    // TODO: не делать абстракцию
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
       events.emit(
         wsEventNames.error,
