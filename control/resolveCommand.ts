@@ -6,18 +6,10 @@ import CommandStart from './CommandStart';
 import RemoteEvents from './RemoteEvents';
 
 
-export default async function resolveCommand() {
-  const remoteEvents = new RemoteEvents();
-  const positionArgs: string[] = [ ...yargs.argv._ ];
-  const args: {[index: string]: any} = _omit(yargs.argv, '_');
+const remoteEvents = new RemoteEvents();
 
-  if (!positionArgs || !positionArgs.length) {
-    throw new Error(`You should specify a command`);
-  }
 
-  const command: string = positionArgs[0];
-  const positionArgsRest: string[] = positionArgs.slice(1, positionArgs.length);
-
+async function startCommand(command: string, positionArgsRest: string[], args: {[index: string]: any}) {
   if (command === 'start') {
     const commandUpdate: CommandStart = new CommandStart(positionArgsRest, args as any);
 
@@ -49,4 +41,19 @@ export default async function resolveCommand() {
 
   console.error(`Unknown command "${command}"`);
   process.exit(2);
+}
+
+
+export default async function resolveCommand() {
+  const positionArgs: string[] = [ ...yargs.argv._ ];
+  const args: {[index: string]: any} = _omit(yargs.argv, '_');
+
+  if (!positionArgs || !positionArgs.length) {
+    throw new Error(`You should specify a command`);
+  }
+
+  const command: string = positionArgs[0];
+  const positionArgsRest: string[] = positionArgs.slice(1, positionArgs.length);
+
+  await startCommand(command, positionArgsRest, args);
 }
