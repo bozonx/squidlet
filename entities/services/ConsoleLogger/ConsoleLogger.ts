@@ -6,7 +6,7 @@ import {calcAllowedLogLevels} from '../../../system/helpers/helpers';
 
 const consoleLog = {
   debug(message: string) {
-    console.info(message);
+    console.info(`DEBUG: ${message}`);
   },
 
   // verbose(message: string) {
@@ -18,11 +18,11 @@ const consoleLog = {
   },
 
   warn(message: string) {
-    console.warn(message);
+    console.warn(`WARNING: ${message}`);
   },
 
   error(message: string) {
-    console.error(message);
+    console.error(`ERROR: ${message}`);
   },
 };
 

@@ -44,8 +44,6 @@ export default class WebSocketClient implements WebSocketClientIo {
     this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
 
-  /////// Connection's methods
-
   onOpen(connectionId: string, cb: () => void): number {
     const connectionItem = this.getConnectionItem(connectionId);
 

@@ -11,7 +11,7 @@ export default class LogPublisher {
   }
 
   debug(message: string) {
-    this.send('debug', `DEBUG: ${message}`);
+    this.send('debug', message);
   }
 
   // async verbose(message: string) {
@@ -23,11 +23,11 @@ export default class LogPublisher {
   }
 
   warn(message: string) {
-    this.send('warn', `WARNING: ${message}`);
+    this.send('warn', message);
   }
 
   error(message: string) {
-    this.send('error', `ERROR: ${message}`);
+    this.send('error', message);
   }
 
 
