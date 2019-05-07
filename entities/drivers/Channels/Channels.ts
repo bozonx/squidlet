@@ -17,7 +17,7 @@ export interface PortsProps {
 }
 
 
-export class Ports extends DriverBase<PortsProps> {
+export class Channels extends DriverBase<PortsProps> {
   private get driver(): DuplexDriver {
     return this.depsInstances.driver as any;
   }
@@ -57,13 +57,14 @@ export class Ports extends DriverBase<PortsProps> {
   removeListener(port: number, handlerIndex: number): void {
 
   }
+
 }
 
-export default class Factory extends DriverFactoryBase<Ports> {
+export default class Factory extends DriverFactoryBase<Channels> {
   // protected instanceIdCalc = (props: {[index: string]: any}): string => {
   //   return `${props.bus || 'default'}-${props.address}`;
   // }
-  protected DriverClass = Ports;
+  protected DriverClass = Channels;
 
   // TODO: инстансы по типу соединения (имени драйвера)
 }

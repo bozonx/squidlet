@@ -16,27 +16,6 @@ export default class BackdoorClient {
 
 
   constructor(host?: string, port?: number) {
-    const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
-    const backdoorManifest = yaml.safeLoad(yamlContent);
-    const backdoorProps = collectPropsDefaults(backdoorManifest.props);
-    const props: WsClientLogicProps = {
-      host: host || backdoorProps.host,
-      port: port || backdoorProps.port,
-      autoReconnect: false,
-      //reconnectTimeoutMs: 10,
-      // TODO: remove
-      clientId: 'client',
-      //maxTries: 0,
-    };
-    const wsClientIo = new WebSocketClient();
-
-    this.client = new WsClientLogic(
-      wsClientIo,
-      props,
-      this.onClientClose,
-      console.info,
-      console.error
-    );
 
     this.client.onMessage((data: string | Uint8Array) => {
 
@@ -90,6 +69,29 @@ export default class BackdoorClient {
 
   private onClientClose() {
     console.info(`Websocket connection has been closed`);
+  }
+
+  private makeClientInstance() {
+    const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
+    const backdoorManifest = yaml.safeLoad(yamlContent);
+    const backdoorProps = collectPropsDefaults(backdoorManifest.props);
+    const props: WsClientLogicProps = {
+      host: host || backdoorProps.host,
+      port: port || backdoorProps.port,
+      autoReconnect: false,
+      //reconnectTimeoutMs: 1000,
+      //maxTries: 0,
+    };
+    const wsClientIo = new WebSocketClient();
+
+    this.client = new WsClientLogic(
+      wsClientIo,
+      props,
+      this.onClientClose,
+      console.info,
+      console.error
+    );
+
   }
 
 }
