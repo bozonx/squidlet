@@ -110,25 +110,31 @@ export default class WsClientLogic {
    * Trying to reconnect on connection closed.
    */
   private handleConnectionClose = () => {
+
+    // TODO: проверить действительно ли сработает close если даже соединение не открывалось
+
     this.logInfo(`WsClientLogic: connection closed. ${this.makeIoProps().url} Id: ${this.connectionId}`);
 
-    if (!this.props.autoReconnect) return this.finallyCloseConnection();
+    if (!this.props.autoReconnect || this.props.maxTries === 0) {
+      return this.finallyCloseConnection();
+    }
 
     this.reconnect();
   }
 
   private reconnect() {
 
-    // TODO: review
-    // TODO: maxTries 0 means none
-    // TODO: reconnectTimeoutMs что если 0 и меньше
-    // TODO: проверить действительно ли сработает close если даже соединение не открывалось
+    // TODO: что если не получилось переконнектиться
+    // TODO: поидее после реконнекта мы можем ожидать соединения 60 сек - не нужно создавать новое
 
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
 
     // if tries more than -1(infinity) - increment it and close connection if can't connect
     // 0 means none
+
+    // TODO: review
+    // TODO: maxTries 0 means none
     if (this.props.maxTries >= 0) {
       if (this.connectionTries >= this.props.maxTries) {
         return this.finallyCloseConnection();
@@ -137,19 +143,22 @@ export default class WsClientLogic {
       this.connectionTries++;
     }
 
+    // reconnecting...
+
     // make new promise if previous was fulfilled
-    if (this.wasPrevOpenFulfilled) {
-      this.openPromise = this.makeOpenPromise();
-    }
+    if (this.wasPrevOpenFulfilled) this.openPromise = this.makeOpenPromise();
+    // reconnect immediately if reconnectTimeoutMs = 0 or less
+    if (this.props.reconnectTimeoutMs <= 0) return this.doReconnect();
 
     this.logInfo(`WsClientLogic: Wait ${this.props.reconnectTimeoutMs} ms to reconnect`);
+    this.reconnectTimeout = setTimeout(this.doReconnect, this.props.reconnectTimeoutMs);
+  }
 
-    this.reconnectTimeout = setTimeout(() => {
-      this.reconnectTimeout = undefined;
-      this.logInfo(`WsClientLogic: Reconnecting...`);
-
-      this.wsClientIo.reConnect(this.connectionId, this.makeIoProps());
-    }, this.props.reconnectTimeoutMs);
+  private doReconnect = () => {
+    delete this.reconnectTimeout;
+    this.logInfo(`WsClientLogic: Reconnecting...`);
+    // try to reconnect and save current connectionId
+    this.wsClientIo.reConnect(this.connectionId, this.makeIoProps());
   }
 
   private finallyCloseConnection() {
