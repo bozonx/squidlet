@@ -5,11 +5,7 @@ import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocke
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 
 
-export interface WebSocketServerDriverProps extends WsServerLogicProps {
-}
-
-
-export class WebSocketServer extends DriverBase<WebSocketServerDriverProps> {
+export class WebSocketServer extends DriverBase<WsServerLogicProps> {
   get listeningPromise(): Promise<void> {
     if (!this._server) {
       throw new Error(`WebSocketServer.listeningPromise: Server has been already closed`);

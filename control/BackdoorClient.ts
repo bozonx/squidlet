@@ -10,6 +10,7 @@ import {isUint8Array} from '../system/helpers/collections';
 
 
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
+const wsClientIo = new WebSocketClient();
 
 
 export default class BackdoorClient {
@@ -45,12 +46,12 @@ export default class BackdoorClient {
     await this.client.send(binMsg);
   }
 
-  // TODO: does really it need?
-  async removeListener(category: string, topic?: string): Promise<void> {
-    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.removeListener, category, topic);
-
-    await this.client.send(binMsg);
-  }
+  // TODO: does it really need?
+  // async removeListener(category: string, topic?: string): Promise<void> {
+  //   const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.removeListener, category, topic);
+  //
+  //   await this.client.send(binMsg);
+  // }
 
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
@@ -96,23 +97,21 @@ export default class BackdoorClient {
     const backdoorProps = collectPropsDefaults(backdoorManifest.props);
     const host: string = specifiedHost || backdoorProps.host;
     const port: number= specifiedPort || backdoorProps.port;
+    const url = `ws://${host}:${port}`;
     const props: WsClientLogicProps = {
-      host: host || backdoorProps.host,
-      port: port || backdoorProps.port,
+      url,
       autoReconnect: false,
-      //reconnectTimeoutMs: 1000,
-      //maxTries: 0,
+      reconnectTimeoutMs: 1000,
+      maxTries: 0,
     };
-    const wsClientIo = new WebSocketClient();
 
-    this.client = new WsClientLogic(
+    return new WsClientLogic(
       wsClientIo,
       props,
       this.onClientClose,
       console.info,
       console.error
     );
-
   }
 
 }

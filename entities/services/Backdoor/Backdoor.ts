@@ -15,8 +15,8 @@ export enum BACKDOOR_DATA_TYPES {
 export enum BACKDOOR_MESSAGE_TYPE {
   emit,
   addListener,
-  removeListener,
-  listenerResponse
+  listenerResponse,
+  //removeListener,
 }
 
 export interface BackdoorMessage {
