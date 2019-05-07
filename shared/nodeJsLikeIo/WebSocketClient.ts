@@ -6,6 +6,7 @@ import {isUint8Array} from 'system/helpers/collections';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
+import {omit} from 'system/helpers/lodashLike';
 
 
 export type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
@@ -106,8 +107,7 @@ export default class WebSocketClient implements WebSocketClientIo {
 
   private connectToServer(connectionId: string, props: WebSocketClientProps): ConnectionItem {
     const events = new IndexedEventEmitter();
-    const client = new WebSocket(props.url, {
-    });
+    const client = new WebSocket(props.url, omit(props, 'url'));
 
     client.on(wsEventNames.open, () => events.emit(wsEventNames.open));
     client.on(wsEventNames.close, () => events.emit(wsEventNames.close));

@@ -47,6 +47,7 @@ export default class WsClientLogic {
     this.logError = logError;
 
     this.openPromise = this.makeOpenPromise();
+    // make new connection and save connectionId of it
     this.connectionId = this.wsClientIo.newConnection(this.makeIoProps());
 
     this.listen();
@@ -55,7 +56,12 @@ export default class WsClientLogic {
   destroy() {
     clearTimeout(this.reconnectTimeout);
     this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+    delete this.openPromiseResolve;
+    delete this.openPromiseReject;
+    delete this.openPromise;
+    delete this.reconnectTimeout;
   }
+
 
   async send(data: string | Uint8Array): Promise<void> {
     return callPromised(this.wsClientIo.send, this.connectionId, data);

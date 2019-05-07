@@ -76,6 +76,9 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   }
 
 
+  /**
+   * It calls on unexpected closing of connection or on max reconnect tries is exceeded.
+   */
   private onConnectionClosed = () => {
     this.env.log.error(`WebSocketClient: connection "${this.props.url}" has been closed, you can't manipulate it any more!`);
   }
