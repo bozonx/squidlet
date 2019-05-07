@@ -3,20 +3,21 @@ import DuplexDriver from '../../../system/interfaces/DuplexDriver';
 import DriverFactoryBase from '../../../system/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from '../../../system/entities/EntityBase';
 import {omit} from '../../../system/helpers/lodashLike';
+import {addFirstItemUint8Arr} from '../../../system/helpers/collections';
 
 
 export type ReceiveHandler = (port: number, data: Uint8Array) => void;
 
 
-export interface ChannelsProps {
+export interface PortsProps {
   // duplex driver name
-  driver: string;
-  // driver props
+  duplex: string;
+  // duplex driver's props
   [index: string]: any;
 }
 
 
-export class Channels extends DriverBase<ChannelsProps> {
+export class Ports extends DriverBase<PortsProps> {
   private get driver(): DuplexDriver {
     return this.depsInstances.driver as any;
   }
@@ -30,11 +31,12 @@ export class Channels extends DriverBase<ChannelsProps> {
 
   /**
    * Send data to the other side
-   * @param channel - one byte e.g 0x4f up to 0xff
+   * @param port - number from 0 to 255
    * @param data - data to send. It can be an empty Uint8Array
    */
   send(port: number, data: Uint8Array): Promise<void> {
     // TODO: convert number 0-256 to hex byte
+    const message: Uint8Array = addFirstItemUint8Arr(data, action);
   }
 
   /**
@@ -57,11 +59,11 @@ export class Channels extends DriverBase<ChannelsProps> {
   }
 }
 
-export default class Factory extends DriverFactoryBase<Channels> {
+export default class Factory extends DriverFactoryBase<Ports> {
   // protected instanceIdCalc = (props: {[index: string]: any}): string => {
   //   return `${props.bus || 'default'}-${props.address}`;
   // }
-  protected DriverClass = Channels;
+  protected DriverClass = Ports;
 
   // TODO: инстансы по типу соединения (имени драйвера)
 }
