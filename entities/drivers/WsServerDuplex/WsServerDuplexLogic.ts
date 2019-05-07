@@ -3,7 +3,7 @@ import {addFirstItemUint8Arr, isUint8Array, withoutFirstItemUint8Arr} from '../.
 import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
-// TODO: use the same duplex class for client and server
+// TODO: make specified class for client and server
 
 
 interface WsServerLogic {
@@ -24,13 +24,15 @@ export default class WsServerDuplexLogic implements DuplexDriver {
     this.logError = logError;
   }
 
-  send(action: number, data: Uint8Array): Promise<void> {
+  // TODO: use cookie to set/get sessionId
+
+  send(data: Uint8Array): Promise<void> {
     const message: Uint8Array = addFirstItemUint8Arr(data, action);
 
     return this.server.send(this.connectionId, message);
   }
 
-  async request(action: number, data: Uint8Array): Promise<Uint8Array> {
+  async request(data: Uint8Array): Promise<Uint8Array> {
     // TODO: send and listen to receive
     // TODO: add timeout
 
@@ -40,7 +42,7 @@ export default class WsServerDuplexLogic implements DuplexDriver {
   /**
    * Listen to all the received data of all the dataAddresses
    */
-  onReceive(action: number, handler: ReceiveHandler): number {
+  onReceive(handler: ReceiveHandler): number {
     return this.server.onMessage(this.connectionId, (message: string | Uint8Array) => {
       if (!isUint8Array(message)) {
         return this.logError(`WsServerDuplexLogic: Can only receive an Uint8Array`);
