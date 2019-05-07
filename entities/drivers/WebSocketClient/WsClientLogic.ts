@@ -3,12 +3,15 @@ import WebSocketClientIo, {
   WebSocketClientProps,
   wsEventNames
 } from 'system/interfaces/io/WebSocketClientIo';
-import {WebSocketClientDriverProps} from './WebSocketClient';
 
 
-export interface WsClientLogicProps extends WebSocketClientDriverProps {
-  // tries of reconnection. 0 is infinity
-  maxTries?: number;
+export interface WsClientLogicProps {
+  // host: string;
+  // port: number;
+  url: string;
+  autoReconnect: boolean;
+  reconnectTimeoutMs: number;
+  maxTries: number;
 }
 
 
@@ -116,12 +119,16 @@ export default class WsClientLogic {
 
   private reconnect() {
 
+    // TODO: review
+    // TODO: maxTries 0 means none
+    // TODO: reconnectTimeoutMs что если 0 и меньше
     // TODO: проверить действительно ли сработает close если даже соединение не открывалось
 
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
 
     // if tries more than -1(infinity) - increment it and close connection if can't connect
+    // 0 means none
     if (this.props.maxTries >= 0) {
       if (this.connectionTries >= this.props.maxTries) {
         return this.finallyCloseConnection();

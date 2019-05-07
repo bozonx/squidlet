@@ -4,21 +4,12 @@ import DriverBase from 'system/baseDrivers/DriverBase';
 import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 
 
-export interface WebSocketClientDriverProps {
-  // host: string;
-  // port: number;
-  url: string;
-  autoReconnect: boolean;
-  reconnectTimeoutMs: number;
-}
-
-
 /**
  * Simplified websocket driver.
  * If autoReconnect if set it holds connection for ever and reconnects if it lost.
  * By calling getInstance() you will get always a new one. There isn't any sessions.
  */
-export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
+export class WebSocketClient extends DriverBase<WsClientLogicProps> {
   get openPromise(): Promise<void> {
     if (!this._client) {
       throw new Error(`WebSocketClient.openPromise: Connection hasn't been initialized or closed for ever`);
@@ -34,16 +25,9 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 
 
   protected willInit = async () => {
-    const wsClientLogicProps: WsClientLogicProps = {
-      ...this.props,
-      // TODO: move to props and set -1 by default
-      // infinity tries of reconnection
-      maxTries: -1,
-    };
-
     this._client = new WsClientLogic(
       this.wsClientIo,
-      wsClientLogicProps,
+      this.props,
       this.onConnectionClosed,
       this.env.log.info,
       this.env.log.error
