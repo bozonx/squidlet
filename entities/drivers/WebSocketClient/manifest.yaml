@@ -24,5 +24,4 @@ props:
     default: 1000
   maxTries:
     type: number
-    # reconnect times. -1 is infinity. 0 means none.
     default: -1

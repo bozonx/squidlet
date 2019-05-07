@@ -6,11 +6,12 @@ import WebSocketClientIo, {
 
 
 export interface WsClientLogicProps {
-  // host: string;
-  // port: number;
   url: string;
+  // allow reconnect
   autoReconnect: boolean;
+  // waiting before new reconnection trying. 0 or less means don't wait. In ms.
   reconnectTimeoutMs: number;
+  // reconnect times. -1 = infinity. 0 means none.
   maxTries: number;
 }
 
@@ -156,7 +157,7 @@ export default class WsClientLogic {
 
   private doReconnect = () => {
     delete this.reconnectTimeout;
-    this.logInfo(`WsClientLogic: Reconnecting...`);
+    this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
     // try to reconnect and save current connectionId
     this.wsClientIo.reConnect(this.connectionId, this.makeIoProps());
   }
