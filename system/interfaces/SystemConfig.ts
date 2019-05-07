@@ -31,4 +31,8 @@ export default interface SystemConfig {
   deviceIdSeparator: string;
   topicSeparator: string;
   eventNameSeparator: string;
+
+  channels: {
+    network: number;
+  };
 }

@@ -16,7 +16,8 @@ export default class BackdoorClient {
 
 
   constructor(host?: string, port?: number) {
-
+    this.client = this.makeChannelsInstance(host, port);
+    // listen income data
     this.client.onMessage((data: string | Uint8Array) => {
 
       // TODO: ожидать только json type
@@ -32,7 +33,7 @@ export default class BackdoorClient {
 
 
   close() {
-    this.client.close(0);
+    this.client.close();
   }
 
   async emit(category: string, topic?: string, data?: string): Promise<void> {
@@ -71,7 +72,7 @@ export default class BackdoorClient {
     console.info(`Websocket connection has been closed`);
   }
 
-  private makeClientInstance() {
+  private makeChannelsInstance(host?: string, port?: number): WsClientLogic {
     const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
     const backdoorManifest = yaml.safeLoad(yamlContent);
     const backdoorProps = collectPropsDefaults(backdoorManifest.props);

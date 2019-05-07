@@ -40,6 +40,10 @@ const systemConfig: SystemConfig = {
   deviceIdSeparator: '.',
   topicSeparator: '/',
   eventNameSeparator: '|',
+
+  channels: {
+    network: 255,
+  },
 };
 
 export default systemConfig;

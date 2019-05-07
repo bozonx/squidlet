@@ -6,10 +6,10 @@ import {omit} from '../../../system/helpers/lodashLike';
 import {addFirstItemUint8Arr} from '../../../system/helpers/collections';
 
 
-export type ReceiveHandler = (port: number, data: Uint8Array) => void;
 
 
-export interface PortsProps {
+
+export interface ChannelsProps {
   // duplex driver name
   duplex: string;
   // duplex driver's props
@@ -17,7 +17,7 @@ export interface PortsProps {
 }
 
 
-export class Channels extends DriverBase<PortsProps> {
+export class Channels extends DriverBase<ChannelsProps> {
   private get driver(): DuplexDriver {
     return this.depsInstances.driver as any;
   }
@@ -34,7 +34,7 @@ export class Channels extends DriverBase<PortsProps> {
    * @param port - number from 0 to 255
    * @param data - data to send. It can be an empty Uint8Array
    */
-  send(port: number, data: Uint8Array): Promise<void> {
+  send(channel: number, data: Uint8Array): Promise<void> {
     // TODO: convert number 0-256 to hex byte
     const message: Uint8Array = addFirstItemUint8Arr(data, action);
   }
@@ -43,18 +43,18 @@ export class Channels extends DriverBase<PortsProps> {
    * Send data and waiting of response.
    * On the other side you should listen to this address and send data to the same address on this side
    */
-  request(port: number, data: Uint8Array): Promise<Uint8Array> {
+  request(channel: number, data: Uint8Array): Promise<Uint8Array> {
 
   }
 
   /**
    * Listen to all the received data of all the dataAddresses
    */
-  onReceive(port: number, handler: ReceiveHandler): number {
+  onReceive(channel: number, handler: ReceiveHandler): number {
 
   }
 
-  removeListener(port: number, handlerIndex: number): void {
+  removeListener(channel: number, handlerIndex: number): void {
 
   }
 
