@@ -72,10 +72,12 @@ export default class BackdoorClient {
     console.info(`Websocket connection has been closed`);
   }
 
-  private makeChannelsInstance(host?: string, port?: number): WsClientLogic {
+  private makeChannelsInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {
     const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
     const backdoorManifest = yaml.safeLoad(yamlContent);
     const backdoorProps = collectPropsDefaults(backdoorManifest.props);
+    const host: string = specifiedHost || backdoorProps.host;
+    const port: number= specifiedPort || backdoorProps.port;
     const props: WsClientLogicProps = {
       host: host || backdoorProps.host,
       port: port || backdoorProps.port,

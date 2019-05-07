@@ -11,4 +11,4 @@ props:
     default: localhost
   port:
     type: number
-    required: true
+    default: 8080
