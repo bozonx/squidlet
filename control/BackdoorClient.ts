@@ -18,42 +18,51 @@ export default class BackdoorClient {
   constructor(host?: string, port?: number) {
     this.client = this.makeChannelsInstance(host, port);
     // listen income data
-    this.client.onMessage((data: string | Uint8Array) => {
-
-      // TODO: ожидать только json type
-
-      const message: BackdoorMessage = decodeJsonMessage(data as Uint8Array) as any;
-
-      if (message.type !== BACKDOOR_MESSAGE_TYPE.listenerResponse) return;
-
-      console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
-    });
-
+    this.client.onMessage(this.handleIncomeMessage);
   }
 
 
   close() {
-    this.client.close();
+    this.client.close(0, 'finish');
   }
 
+  /**
+   * Emit remote event
+   */
   async emit(category: string, topic?: string, data?: string): Promise<void> {
     const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.emit, category, topic, data);
 
     await this.client.send(binMsg);
   }
 
+  /**
+   * Ask backdoor to send back data which emits on specified event
+   */
   async addListener(category: string, topic?: string): Promise<void> {
     const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.addListener, category, topic);
 
     await this.client.send(binMsg);
   }
 
+  // TODO: does really it need?
   async removeListener(category: string, topic?: string): Promise<void> {
     const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.removeListener, category, topic);
 
     await this.client.send(binMsg);
   }
 
+
+  private handleIncomeMessage = (data: string | Uint8Array) => {
+
+    // TODO: ожидать только json type
+
+    const message: BackdoorMessage = decodeJsonMessage(data as Uint8Array) as any;
+
+    // print only data which is send on previously added listener
+    if (message.type !== BACKDOOR_MESSAGE_TYPE.listenerResponse) return;
+
+    console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
+  }
 
   private makeMessage(type: number, category: string, topic?: string, data?: string): Uint8Array {
     const message: BackdoorMessage = {

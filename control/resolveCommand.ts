@@ -16,14 +16,14 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      return remoteEvents.listenEvent({ ...args, category: 'logger', topic: undefined });
+      return remoteEvents.startListen({ ...args, category: 'logger', topic: undefined });
     case 'pub':
-      return remoteEvents.emitEvent(args);
+      return remoteEvents.emitAndExit(args);
     case 'sub':
-      return remoteEvents.listenEvent(args);
+      return remoteEvents.startListen(args);
     case 'block-io':
       // TODO: review
-      return remoteEvents.emitEvent({ ...args, category: 'system', topic: 'block-io' });
+      return remoteEvents.emitAndExit({ ...args, category: 'system', topic: 'block-io' });
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);
