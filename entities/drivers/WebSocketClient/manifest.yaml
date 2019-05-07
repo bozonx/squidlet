@@ -15,7 +15,7 @@ props:
   autoReconnect:
     type: boolean
     default: false
-  reconnectTimeoutSec:
+  reconnectTimeoutMs:
     type: number
-    # in seconds
-    default: 10
+    # in ms
+    default: 1000

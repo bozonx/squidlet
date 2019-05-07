@@ -7,8 +7,8 @@ import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 export interface WebSocketClientDriverProps {
   host: string;
   port: number;
-  autoReconnect?: boolean;
-  reconnectTimeoutSec?: number;
+  autoReconnect: boolean;
+  reconnectTimeoutMs: number;
 }
 
 

@@ -23,7 +23,7 @@ export default class BackdoorClient {
       host: host || backdoorProps.host,
       port: port || backdoorProps.port,
       autoReconnect: false,
-      //reconnectTimeoutSec: 10,
+      //reconnectTimeoutMs: 10,
       // TODO: remove
       clientId: 'client',
       //maxTries: 0,

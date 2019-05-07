@@ -118,14 +118,14 @@ export default class WsClientLogic {
       this.openPromise = this.makeOpenPromise();
     }
 
-    this.logInfo(`WsClientLogic: Wait to reconnect ${this.props.reconnectTimeoutSec}`);
+    this.logInfo(`WsClientLogic: Wait ${this.props.reconnectTimeoutMs} ms to reconnect`);
 
     this.reconnectTimeout = setTimeout(() => {
       this.reconnectTimeout = undefined;
       this.logInfo(`WsClientLogic: Reconnecting...`);
 
       this.wsClientIo.reConnect(this.connectionId, this.makeIoProps());
-    }, this.props.reconnectTimeoutSec);
+    }, this.props.reconnectTimeoutMs);
   }
 
   private finallyCloseConnection() {
