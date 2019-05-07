@@ -69,6 +69,8 @@ export default class WsClientLogic {
   }
 
 
+  // TODO: что если нет текущего открытого соединения??? - повешать в очередь или вернуть ошибку ?
+
   async send(data: string | Uint8Array): Promise<void> {
     return this.wsClientIo.send(this.connectionId, data);
   }
@@ -79,6 +81,8 @@ export default class WsClientLogic {
     // TODO: вызвать onClose()
 
   }
+
+  // TODO: наверное нужна отдельная прослойка так как инстанс соединения убивается при закрытии
 
   onMessage(cb: OnMessageHandler): number {
     return this.wsClientIo.onMessage(this.connectionId, cb);
@@ -115,7 +119,14 @@ export default class WsClientLogic {
 
     this.logInfo(`WsClientLogic: connection closed. ${this.makeIoProps().url} Id: ${this.connectionId}`);
 
-    if (!this.props.autoReconnect || this.props.maxTries === 0) {
+    // close connection and don't do reconnect if autoReconnect=false or no max tries or tries are exceeded
+    // if tries more than -1(infinity) - increment it and close connection if can't connect
+    // 0 means none
+    if (
+      !this.props.autoReconnect
+      || this.props.maxTries === 0
+      || (this.props.maxTries > 0 && this.connectionTries >= this.props.maxTries)
+    ) {
       return this.finallyCloseConnection();
     }
 
@@ -123,25 +134,14 @@ export default class WsClientLogic {
   }
 
   private reconnect() {
-
     // TODO: что если не получилось переконнектиться
     // TODO: поидее после реконнекта мы можем ожидать соединения 60 сек - не нужно создавать новое
 
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
 
-    // if tries more than -1(infinity) - increment it and close connection if can't connect
-    // 0 means none
-
-    // TODO: review
-    // TODO: maxTries 0 means none
-    if (this.props.maxTries >= 0) {
-      if (this.connectionTries >= this.props.maxTries) {
-        return this.finallyCloseConnection();
-      }
-
-      this.connectionTries++;
-    }
+    // increment connection tries if maxTries is set
+    if (this.props.maxTries >= 0) this.connectionTries++;
 
     // reconnecting...
 
