@@ -6,6 +6,7 @@ import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_MESSAGE_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import {decodeJsonMessage, encodeJsonMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
+import {isUint8Array} from '../system/helpers/collections';
 
 
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
@@ -53,10 +54,18 @@ export default class BackdoorClient {
 
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
+    let message: BackdoorMessage;
 
-    // TODO: ожидать только json type
+    if (!isUint8Array(data) || data.length <= 1) {
+      return console.error(`Incorrect received data`);
+    }
 
-    const message: BackdoorMessage = decodeJsonMessage(data as Uint8Array) as any;
+    try {
+      message = decodeJsonMessage(data as Uint8Array) as any;
+    }
+    catch (err) {
+      return console.error(`Can't decode message: ${err}`);
+    }
 
     // print only data which is send on previously added listener
     if (message.type !== BACKDOOR_MESSAGE_TYPE.listenerResponse) return;
