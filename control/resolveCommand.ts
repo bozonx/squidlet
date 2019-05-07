@@ -3,32 +3,11 @@ import * as yargs from 'yargs';
 
 import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
-import BackdoorClient from './BackdoorClient';
-
-
-/**
- * Call pub/sub method on backdoor client
- */
-async function backdoorEvent(method: string, args: {[index: string]: any}) {
-  const backdoorClient = new BackdoorClient(args.host, args.port);
-
-  if (!args.category) {
-    throw new Error(`You have to specify a category`);
-  }
-
-  await (backdoorClient as any)[method](args.category, args.topic, args.data);
-
-  if (method === 'emit') {
-    // exit
-    backdoorClient.close();
-  }
-
-  // TODO: on control+C send removeListener
-
-}
+import RemoteEvents from './RemoteEvents';
 
 
 export default async function resolveCommand() {
+  const remoteEvents = new RemoteEvents();
   const positionArgs: string[] = [ ...yargs.argv._ ];
   const args: {[index: string]: any} = _omit(yargs.argv, '_');
 
@@ -50,17 +29,17 @@ export default async function resolveCommand() {
     return commandUpdate.start();
   }
   else if (command === 'log') {
-    await backdoorEvent('addListener', { ...args, category: 'logger', topic: undefined });
+    await remoteEvents.listenEvent({ ...args, category: 'logger', topic: undefined });
   }
   else if (command === 'pub') {
-    await backdoorEvent('emit', args);
+    await remoteEvents.emitEvent(args);
   }
   else if (command === 'sub') {
-    await backdoorEvent('addListener', args);
+    await remoteEvents.listenEvent(args);
   }
   else if (command === 'block-io') {
     // TODO: review
-    await backdoorEvent('emit', { ...args, category: 'system', topic: 'block-io' });
+    await remoteEvents.emitEvent({ ...args, category: 'system', topic: 'block-io' });
   }
   // else if (command === 'io-server') {
   //   const commandUpdate: CommandIoServer = new CommandIoServer(positionArgsRest, args);
