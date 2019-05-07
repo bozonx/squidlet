@@ -1,6 +1,9 @@
-import WebSocketClientIo, {OnMessageHandler, WebSocketClientProps} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {
+  OnMessageHandler,
+  WebSocketClientProps,
+  wsEventNames
+} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketClientDriverProps} from './WebSocketClient';
-import {callPromised} from 'system/helpers/helpers';
 
 
 export interface WsClientLogicProps extends WebSocketClientDriverProps {
@@ -64,11 +67,14 @@ export default class WsClientLogic {
 
 
   async send(data: string | Uint8Array): Promise<void> {
-    return callPromised(this.wsClientIo.send, this.connectionId, data);
+    return this.wsClientIo.send(this.connectionId, data);
   }
 
   close(code: number, reason?: string) {
     this.wsClientIo.close(this.connectionId, code, reason);
+
+    // TODO: вызвать onClose()
+
   }
 
   onMessage(cb: OnMessageHandler): number {
@@ -76,7 +82,7 @@ export default class WsClientLogic {
   }
 
   removeMessageListener(handlerId: number) {
-    this.wsClientIo.removeEventListener(this.connectionId, 'message', handlerId);
+    this.wsClientIo.removeEventListener(this.connectionId, wsEventNames.message, handlerId);
   }
 
 

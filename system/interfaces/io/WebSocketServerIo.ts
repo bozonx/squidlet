@@ -17,7 +17,7 @@ export const Methods = [
   'close',
 ];
 
-export const wsServerEventNames = {
+export const wsServerEventNames: {[index: string]: WsServerEvents} = {
   listening: 'listening',
   close: 'close',
   connection: 'connection',
@@ -25,7 +25,7 @@ export const wsServerEventNames = {
 };
 
 
-export type WsServerEvents = 'listen' | 'close' | 'connection' | 'error';
+export type WsServerEvents = 'listening' | 'close' | 'connection' | 'error';
 
 export interface WebSocketServerProps {
   // The hostname where to bind the server

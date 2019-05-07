@@ -10,7 +10,7 @@ export const Methods = [
   'close',
 ];
 
-export const wsEventNames = {
+export const wsEventNames: {[index: string]: WsEvents} = {
   open: 'open',
   close: 'close',
   message: 'message',
