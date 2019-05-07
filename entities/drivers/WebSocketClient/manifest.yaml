@@ -6,11 +6,14 @@ devs:
   - WebSocketClient
 
 props:
-  host:
+#  host:
+#    type: string
+#    default: localhost
+#  port:
+#    type: number
+#    required: true
+  url:
     type: string
-    default: localhost
-  port:
-    type: number
     required: true
   autoReconnect:
     type: boolean

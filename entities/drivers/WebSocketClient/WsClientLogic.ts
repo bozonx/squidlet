@@ -4,7 +4,6 @@ import {callPromised} from 'system/helpers/helpers';
 
 
 export interface WsClientLogicProps extends WebSocketClientDriverProps {
-  clientId: string;
   // tries of reconnection. 0 is infinity
   maxTries?: number;
 }
@@ -12,7 +11,6 @@ export interface WsClientLogicProps extends WebSocketClientDriverProps {
 
 /**
  * Websocket client simplified interface.
- * It makes only one connection to one host.
  * It can automatically reconnect if "autoReconnect" param is true.
  */
 export default class WsClientLogic {
@@ -150,7 +148,8 @@ export default class WsClientLogic {
 
   private makeIoProps(): WebSocketClientProps {
     return {
-      url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
+      url: this.props.url,
+      //url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
       // additional io client params
       //...omit(this.props, 'host', 'port')
     };

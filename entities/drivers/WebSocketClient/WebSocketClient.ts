@@ -5,8 +5,9 @@ import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 
 
 export interface WebSocketClientDriverProps {
-  host: string;
-  port: number;
+  // host: string;
+  // port: number;
+  url: string;
   autoReconnect: boolean;
   reconnectTimeoutMs: number;
 }
@@ -15,11 +16,12 @@ export interface WebSocketClientDriverProps {
 /**
  * Simplified websocket driver.
  * It holds connection for ever and reconnects if it lost.
+ * By calling getInstance() you will get always a new one. There isn't any sessions.
  */
 export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   get openPromise(): Promise<void> {
     if (!this._client) {
-      throw new Error(`WebSocketClient.openPromise: Client hasn't been connected`);
+      throw new Error(`WebSocketClient.openPromise: Connection hasn't been initialized or closed for ever`);
     }
 
     return this._client.openPromise;
@@ -34,8 +36,8 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   protected willInit = async () => {
     const wsClientLogicProps: WsClientLogicProps = {
       ...this.props,
+      // infinity tries of reconnect
       maxTries: -1,
-      clientId: this.env.system.host.id,
     };
 
     this._client = new WsClientLogic(
@@ -51,10 +53,11 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
     if (!this._client) return;
 
     this._client.destroy();
+    delete this._client;
   }
 
 
-  async send(data: string | Uint8Array): Promise<void> {
+  send(data: string | Uint8Array): Promise<void> {
     if (!this._client) throw new Error(`WebSocketClient.send: You can't send message because connection was closed for ever`);
 
     return this._client.send(data);
@@ -74,7 +77,7 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 
 
   private onConnectionClosed = () => {
-    this.env.log.error(`WebSocketClient: connection "${this.props.host}:${this.props.port}" has been closed, you can't manipulate it any more!`);
+    this.env.log.error(`WebSocketClient: connection "${this.props.url}" has been closed, you can't manipulate it any more!`);
   }
 
 }
@@ -82,7 +85,9 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
 export default class Factory extends DriverFactoryBase<WebSocketClient> {
   protected DriverClass = WebSocketClient;
 
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
-    return `${props.host}:${props.port}`;
-  }
+  protected instanceAlwaysNew: boolean = false;
+
+  // protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  //   return `${props.url}`;
+  // }
 }
