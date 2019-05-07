@@ -90,6 +90,10 @@ export default class WsClientLogic {
     this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
     this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
     this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
+    this.wsClientIo.onUnexpectedResponse(this.connectionId, (request, response) => {
+      this.logError(`The unexpected response has been received on connection "${this.connectionId}": ` +
+        `${response.statusCode}: ${response.statusMessage}`);
+    });
   }
 
   private handleConnectionOpen = () => {
@@ -99,6 +103,9 @@ export default class WsClientLogic {
     this.logInfo(`WsClientLogic: connection opened. ${this.makeIoProps().url} Id: ${this.connectionId}`);
   }
 
+  /**
+   * Trying to reconnect on connection closed.
+   */
   private handleConnectionClose = () => {
     this.logInfo(`WsClientLogic: connection closed. ${this.makeIoProps().url} Id: ${this.connectionId}`);
 
@@ -141,6 +148,7 @@ export default class WsClientLogic {
   private finallyCloseConnection() {
     this.wsClientIo.close(this.connectionId, 0);
 
+    // reject open promise if connection hasn't been established
     if (!this.wasPrevOpenFulfilled) {
       this.wasPrevOpenFulfilled = true;
       this.openPromiseReject();

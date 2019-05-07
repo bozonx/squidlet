@@ -69,6 +69,11 @@ export default class WebSocketClient implements WebSocketClientIo {
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
+  onUnexpectedResponse() {
+    // TODO: make
+    // TODO: add interface
+  }
+
   removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
     const connectionItem = this.connections[Number(connectionId)];
 

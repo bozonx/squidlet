@@ -15,7 +15,7 @@ export interface WebSocketClientDriverProps {
 
 /**
  * Simplified websocket driver.
- * It holds connection for ever and reconnects if it lost.
+ * If autoReconnect if set it holds connection for ever and reconnects if it lost.
  * By calling getInstance() you will get always a new one. There isn't any sessions.
  */
 export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
@@ -36,7 +36,8 @@ export class WebSocketClient extends DriverBase<WebSocketClientDriverProps> {
   protected willInit = async () => {
     const wsClientLogicProps: WsClientLogicProps = {
       ...this.props,
-      // infinity tries of reconnect
+      // TODO: move to props and set -1 by default
+      // infinity tries of reconnection
       maxTries: -1,
     };
 
