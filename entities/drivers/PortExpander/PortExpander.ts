@@ -10,7 +10,7 @@
 
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {firstLetterToUpperCase} from 'system/helpers/helpers';
+import {firstLetterToUpperCase} from 'system/helpers/strings';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';

@@ -2,6 +2,12 @@ strings = require('../../../system/helpers/strings')
 
 
 describe.only 'helpers.strings', ->
+  it 'base64ToString', ->
+    assert.equal(strings.base64ToString('str строка'), 'c3RyINGB0YLRgNC+0LrQsA==')
+
+  it 'stringTobase64', ->
+    assert.equal(strings.stringTobase64('c3RyINGB0YLRgNC+0LrQsA=='), 'str строка')
+
   it 'firstLetterToUpperCase', ->
     assert.equal(strings.firstLetterToUpperCase('str str'), 'Str str')
     assert.equal(strings.firstLetterToUpperCase('strStr'), 'StrStr')

@@ -2,6 +2,7 @@ import {TextEncoder} from 'util';
 import {padStart} from './lodashLike';
 //import {TextDecoder, TextEncoder} from 'text-encoding';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
+import {base64ToString, stringTobase64} from './strings';
 
 
 const BIN_MARK = '!BIN!';
@@ -285,7 +286,7 @@ export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
 export function uint8ArrayToText(uintArray: Uint8Array): string {
   const encodedString = String.fromCharCode.apply(null, uintArray as any);
 
-  return decodeURIComponent(escape(atob(encodedString)));
+  return decodeURIComponent(escape(stringTobase64(encodedString)));
 
   // var uint8array = new TextEncoder("utf-8").encode("Plain Text");
   // var string = new TextDecoder().decode(uint8array);
@@ -293,7 +294,7 @@ export function uint8ArrayToText(uintArray: Uint8Array): string {
 }
 
 export function textToUint8Array(str: string): Uint8Array {
-  const string = btoa(unescape(encodeURIComponent(str)));
+  const string = base64ToString(unescape(encodeURIComponent(str)));
   const charList = string.split('');
   const uintArray = [];
 
@@ -332,7 +333,7 @@ export function serializeJson(data: any): Uint8Array {
 
   console.log(1, stringMsg)
   console.log(2, jsonBin)
-  console.log(3, jsonLengthBin)
+  console.log(3, jsonBin.length, jsonLengthBin)
   console.log(4, binDataTail)
 
   return concatUint8Arr(
@@ -344,21 +345,20 @@ export function serializeJson(data: any): Uint8Array {
 
 export function deserializeJson(serialized: Uint8Array) {
   // TODO: test
-  // TODO: end rename to length
 
   const binJsonLength: Uint8Array = serialized.slice(0, 3);
-  const jsonLenght: number = uint8ToNum(binJsonLength);
+  const jsonLength: number = uint8ToNum(binJsonLength);
   // 4 is 4 bytes of length 32 bit number
-  const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLenght);
-  const binaryTail: Uint8Array = serialized.slice(4 + jsonLenght);
+  const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLength);
+  const binaryTail: Uint8Array = serialized.slice(4 + jsonLength);
   const jsonString: string = uint8ArrayToText(jsonBin);
 
   return JSON.parse(jsonString, (key: string, value: any) => {
     if (typeof value === 'string' && value.indexOf(BIN_MARK) === 0) {
       const startEnd: string = value.split(BIN_MARK)[1];
-      const [startStr, endStr] = startEnd.split(BIN_LENGTH_SEP);
+      const [startStr, lengthStr] = startEnd.split(BIN_LENGTH_SEP);
 
-      return binaryTail.slice(Number(startStr), Number(endStr));
+      return binaryTail.slice(Number(startStr), Number(lengthStr));
     }
 
     return value;

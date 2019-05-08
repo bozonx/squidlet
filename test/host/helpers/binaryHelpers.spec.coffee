@@ -89,33 +89,41 @@ describe.only 'helpers.binaryHelpers', ->
   it 'getAsciiNumber', ->
     assert.equal(helpers.getAsciiNumber(1), 49)
 
-
-  it 'uint8ArrayToText and textToUint8Array', ->
-    str = 'my строка'
-    encoded = helpers.textToUint8Array(str)
-
-    assert.deepEqual(encoded, new Uint8Array([ 109, 121, 32, 209, 129, 209, 130, 209, 128, 208, 190, 208, 186, 208, 176 ]))
-    assert.equal(helpers.uint8ArrayToText(encoded), str)
-
-  it 'isUint8Array', ->
-    uint = new Uint8Array(1)
-    assert.isTrue(collections.isUint8Array(uint))
-    assert.isFalse(collections.isUint8Array([]))
-
   it 'concatUint8Arr', ->
     assert.deepEqual(
       helpers.concatUint8Arr(new Uint8Array([1]), new Uint8Array([2, 3]), new Uint8Array([4, 5 ,6])),
       new Uint8Array([1, 2, 3, 4, 5, 6])
     )
 
-  it 'serializeJson', ->
+  it 'uint8ArrayToText and textToUint8Array', ->
+    str = 'my строка'
+    encoded = helpers.textToUint8Array(str)
+
+    assert.equal(helpers.uint8ArrayToText(encoded), str)
+
+  it 'serializeJson and deserializeJson', ->
+    jsonLength = 88
     json = {
       param1: 1
       param2: {
         binData: new Uint8Array([1,2,3])
       }
-      orherBin: new Uint8Array([3, 4])
+      otherBin: new Uint8Array([4, 5])
     }
-    result = new Uint8Array();
+    serialized = helpers.serializeJson(json);
+    #deserialized = helpers.deserializeJson(serialized);
 
-    assert.deepEqual(helpers.serializeJson(json),result)
+    # length of json
+    assert.deepEqual(serialized.slice(0, 4), new Uint8Array([0, 0, 0, jsonLength]));
+    # data part at the tail
+    assert.deepEqual(serialized.slice(jsonLength + 4), new Uint8Array([1, 2, 3, 4, 5]));
+    #assert.deepEqual(deserialized, json)
+    #assert.isTrue(deserialized.param2.binData instanceof Uint8Array)
+
+
+
+#  it 'isUint8Array', ->
+#    uint = new Uint8Array(1)
+#    assert.isTrue(helpers.isUint8Array(uint))
+#    assert.isFalse(helpers.isUint8Array([]))
+

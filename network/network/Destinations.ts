@@ -4,7 +4,7 @@ import Connection from './interfaces/Connection';
 import MyAddress from '../../system/interfaces/MyAddress';
 import Destination from './interfaces/Destination';
 import {find} from '../../system/helpers/lodashLike';
-import {firstLetterToUpperCase} from '../../system/helpers/helpers';
+import {firstLetterToUpperCase} from '../../system/helpers/strings';
 
 
 type DestHandler = (error: Error | null, payload: any | undefined, fromDest: Destination) => void;
