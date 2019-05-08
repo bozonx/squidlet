@@ -50,6 +50,17 @@ describe.only 'helpers.binaryHelpers', ->
   it 'uint8ToNum', ->
     assert.deepEqual(helpers.uint8ToNum(new Uint8Array([ 255, 255 ])), 65535)
     assert.deepEqual(helpers.uint8ToNum(new Uint8Array([ 0, 1 ])), 1)
+    assert.deepEqual(helpers.uint8ToNum(new Uint8Array([ 255, 255, 255, 255 ])), 4294967295)
+
+  it 'int32ToHexString', ->
+    assert.throws(() => helpers.int32ToHexString(99999999999))
+    assert.throws(() => helpers.int32ToHexString(-1))
+    assert.deepEqual(helpers.int32ToHexString(4294967295), 'ffffffff')
+    assert.deepEqual(helpers.int32ToHexString(65535), '0000ffff')
+    assert.deepEqual(helpers.int32ToHexString(0), '00000000')
+
+  it 'int32ToUint8Arr', ->
+    assert.deepEqual(helpers.int32ToUint8Arr(4294967295), new Uint8Array([255,255,255,255]))
 
   it 'bitsToBytes', ->
     assert.deepEqual(
@@ -90,3 +101,9 @@ describe.only 'helpers.binaryHelpers', ->
 #    uint = new Uint8Array(1)
 #    assert.isTrue(collections.isUint8Array(uint))
 #    assert.isFalse(collections.isUint8Array([]))
+
+  it 'concatUint8Arr', ->
+    assert.deepEqual(
+      helpers.concatUint8Arr(new Uint8Array([1]), new Uint8Array([2, 3]), new Uint8Array([4, 5 ,6])),
+      new Uint8Array([1 , 2, 3, 4, 5, 6])
+    )

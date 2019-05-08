@@ -151,9 +151,6 @@ export function numToUint8Word(num: number): Uint8Array {
  * [ 255, 255, 255, 255 ] >  4294967295
  */
 export function uint8ToNum(uint8Arr: Uint8Array): number {
-
-  // TODO: test 32 bit number
-
   const hexStr: string = uint8ArrToHexString(uint8Arr);
 
   return hexStringToHexNum(hexStr);
@@ -163,17 +160,16 @@ export function uint8ToNum(uint8Arr: Uint8Array): number {
  * Make hex string from 32 bit number (0 - 4294967295).
  * It always returns 8 characters.
  * 4294967295 > "ffffffff"
+ * 65535 > "0000ffff"
  * 0 > "00000000"
  */
 export function int32ToHexString(int32: number): string {
-  // TODO: test
-
   if (int32 < 0 || int32 > 4294967295) {
     throw new Error(`int32ToUint8Arr: Incorrect int32: ${4294967295}`);
   }
 
   // from "0" up to "ffffffff"
-  const hexString = int32.toString(32);
+  const hexString = int32.toString(16);
 
   return padStart(hexString, 8, '0');
 }
@@ -183,9 +179,6 @@ export function int32ToHexString(int32: number): string {
  * 4294967295 > [255, 255, 255, 255]
  */
 export function int32ToUint8Arr(int32: number): Uint8Array {
-
-  // TODO: test
-
   const hexString = int32ToHexString(int32);
 
   return hexStringToUint8Arr(hexString);
@@ -274,16 +267,17 @@ export function getAsciiNumber(num: number): number {
 }
 
 export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
-  // TODO: test
+  let offset: number = 0;
+  const lengths: number = arrs.map((item) => item.length)
+    .reduce((prev: number, cur: number) => prev + cur);
+  const result = new Uint8Array(lengths);
 
-  // var a = new Int8Array( [ 1, 2, 3 ] );
-  // var b = new Int8Array( [ 4, 5, 6 ] );
-  //
-  // var c = new Int8Array(a.length + b.length);
-  // c.set(a);
-  // c.set(b, a.length);
+  for (let uint8Arr of arrs) {
+    result.set(uint8Arr, offset);
+    offset += uint8Arr.length;
+  }
 
-  return new Uint8Array();
+  return result;
 }
 
 // TODO: remake
