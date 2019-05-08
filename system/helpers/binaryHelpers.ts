@@ -301,25 +301,27 @@ export function textToUint8Array(str: string): Uint8Array {
  * ]
  */
 export function serializeJson(data: any): Uint8Array {
-  // TODO: test
-
   let binDataTail = new Uint8Array();
 
   const stringMsg: string = JSON.stringify(data, (key: string, value: any) => {
     if (value instanceof Uint8Array) {
-      const start = binDataTail.length - 1;
-      const end = value.length;
+      const start = binDataTail.length;
+      const length = value.length;
       binDataTail = concatUint8Arr(binDataTail, value);
 
-      return BIN_MARK + start + BIN_LENGTH_SEP + end;
+      return BIN_MARK + start + BIN_LENGTH_SEP + length;
     }
 
     return value;
   });
-
   const jsonBin: Uint8Array = textToUint8Array(stringMsg);
   // 4 bytes of json binary length
   const jsonLengthBin = int32ToUint8Arr(jsonBin.length);
+
+  console.log(1, stringMsg)
+  console.log(2, jsonBin)
+  console.log(3, jsonLengthBin)
+  console.log(4, binDataTail)
 
   return concatUint8Arr(
     jsonLengthBin,
@@ -330,6 +332,7 @@ export function serializeJson(data: any): Uint8Array {
 
 export function deserializeJson(serialized: Uint8Array) {
   // TODO: test
+  // TODO: end rename to length
 
   const binJsonLength: Uint8Array = serialized.slice(0, 3);
   const jsonLenght: number = uint8ToNum(binJsonLength);

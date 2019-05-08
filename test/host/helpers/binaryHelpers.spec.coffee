@@ -105,5 +105,17 @@ describe.only 'helpers.binaryHelpers', ->
   it 'concatUint8Arr', ->
     assert.deepEqual(
       helpers.concatUint8Arr(new Uint8Array([1]), new Uint8Array([2, 3]), new Uint8Array([4, 5 ,6])),
-      new Uint8Array([1 , 2, 3, 4, 5, 6])
+      new Uint8Array([1, 2, 3, 4, 5, 6])
     )
+
+  it 'serializeJson', ->
+    json = {
+      param1: 1
+      param2: {
+        binData: new Uint8Array([1,2,3])
+      }
+      orherBin: new Uint8Array([3, 4])
+    }
+    result = new Uint8Array();
+
+    assert.deepEqual(helpers.serializeJson(json),result)
