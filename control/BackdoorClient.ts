@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WebSocketClient/WsClientLogic';
 import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
-import {decodeJsonMessage, encodeJsonMessage} from '../entities/services/Backdoor/helpers';
+import {decodeJsonMessage, makeMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 
 
@@ -17,7 +17,7 @@ export default class BackdoorClient {
 
 
   constructor(host?: string, port?: number) {
-    this.client = this.makeChannelsInstance(host, port);
+    this.client = this.makeClientInstance(host, port);
     // listen income data
     this.client.onMessage(this.handleIncomeMessage);
   }
@@ -31,7 +31,7 @@ export default class BackdoorClient {
    * Emit remote event
    */
   async emit(category: string, topic?: string, data?: string): Promise<void> {
-    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_ACTION.emit, category, topic, data);
+    const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.emit, category, topic, data);
 
     await this.client.send(binMsg);
   }
@@ -40,17 +40,16 @@ export default class BackdoorClient {
    * Ask backdoor to send back data which emits on specified event
    */
   async addListener(category: string, topic?: string): Promise<void> {
-    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_ACTION.addListener, category, topic);
+    const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.addListener, category, topic);
 
     await this.client.send(binMsg);
   }
 
-  // TODO: does it really need?
-  // async removeListener(category: string, topic?: string): Promise<void> {
-  //   const binMsg: Uint8Array = this.makeMessage(BACKDOOR_ACTION.removeListener, category, topic);
-  //
-  //   await this.client.send(binMsg);
-  // }
+  async removeListener(category: string, topic?: string): Promise<void> {
+    const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.removeListener, category, topic);
+
+    await this.client.send(binMsg);
+  }
 
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
@@ -71,24 +70,11 @@ export default class BackdoorClient {
     console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
   }
 
-  private makeMessage(action: number, category: string, topic?: string, data?: string): Uint8Array {
-    const message: BackdoorMessage = {
-      action,
-      payload: {
-        category,
-        topic,
-        data,
-      }
-    };
-
-    return encodeJsonMessage(message);
-  }
-
   private onClientClose() {
     console.info(`Websocket connection has been closed`);
   }
 
-  private makeChannelsInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {
+  private makeClientInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {
     const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
     const backdoorManifest = yaml.safeLoad(yamlContent);
     const backdoorProps = collectPropsDefaults(backdoorManifest.props);

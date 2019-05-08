@@ -1,5 +1,6 @@
 import {textToUint8Array, uint8ArrayToText} from 'system/helpers/binaryHelpers';
 import {isUint8Array, withoutFirstItemUint8Arr} from 'system/helpers/collections';
+import {BackdoorMessage} from './Backdoor';
 
 
 export function encodeJsonMessage(message: {[index: string]: any}): Uint8Array {
@@ -31,4 +32,17 @@ export function decodeJsonMessage(binMsg: Uint8Array): {[index: string]: any} {
   const stringMsg: string = uint8ArrayToText(uint8Msg);
 
   return JSON.parse(stringMsg);
+}
+
+export function makeMessage(action: number, category: string, topic?: string, data?: string): Uint8Array {
+  const message: BackdoorMessage = {
+    action,
+    payload: {
+      category,
+      topic,
+      data,
+    }
+  };
+
+  return encodeJsonMessage(message);
 }
