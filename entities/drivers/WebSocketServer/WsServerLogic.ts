@@ -77,7 +77,9 @@ export default class WsServerLogic {
     return this.wsServerIo.onConnection(this.serverId, cb);
   }
 
-  // TODO: add on close connection
+  onConnectionClose(cb: (connectionId: string) => void) {
+    // TODO: add on close connection
+  }
 
   removeMessageListener(connectionId: string, handlerId: number) {
     this.wsServerIo.removeEventListener(this.serverId, connectionId,'message', handlerId);
@@ -96,6 +98,7 @@ export default class WsServerLogic {
   }
 
   private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
+    // TODO: does it really need ???
     this.wsServerIo.onClose(this.serverId, connectionId, () => this.onConnectionClose(connectionId));
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
   }

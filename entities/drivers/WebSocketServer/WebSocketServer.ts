@@ -87,6 +87,14 @@ export class WebSocketServer extends DriverBase<WsServerLogicProps> {
     return this._server.onConnection(cb);
   }
 
+  onConnectionClose(cb: (connectionId: string) => void) {
+    if (!this._server) {
+      throw new Error(`WebSocketServer.onConnection: Server has already been closed`);
+    }
+
+    return this._server.onConnectionClose(cb);
+  }
+
   removeMessageListener(connectionId: string, handlerId: number) {
     if (!this._server) {
       throw new Error(`WebSocketServer.removeMessageListener: Server has been already closed`);

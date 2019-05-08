@@ -2,10 +2,11 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import categories from 'system/dict/categories';
 import {
-  WebSocketServer, WebSocketServerDriverProps
+  WebSocketServer
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {isUint8Array} from 'system/helpers/collections';
 import {decodeJsonMessage, encodeJsonMessage} from './helpers';
+import {WsServerLogicProps} from '../../drivers/WebSocketServer/WsServerLogic';
 
 
 export enum BACKDOOR_DATA_TYPES {
@@ -28,16 +29,13 @@ export interface BackdoorMessage {
   };
 }
 
-interface BackDoorProps extends WebSocketServerDriverProps {
-}
-
 // contents [category, topic, handlerIndex]
 type HandlerItem = [string, (string | undefined), number];
 
 
-export default class Backdoor extends ServiceBase<BackDoorProps> {
+export default class Backdoor extends ServiceBase<WsServerLogicProps> {
   private readonly handlers: {[index: string]: HandlerItem[]} = {};
-  private get wsServerDriver(): WebSocketServer {
+  private get wsServer(): WebSocketServer {
     return this.depsInstances.wsServerDriver as any;
   }
 
@@ -46,13 +44,16 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
     this.depsInstances.wsServerDriver = await getDriverDep('WebSocketServer')
       .getInstance(this.props);
 
-    this.wsServerDriver.onConnection((connectionId: string) => {
+    this.wsServer.onConnection((connectionId: string) => {
       // start listening income message of this connection
-      this.wsServerDriver.onMessage(connectionId, (data: string | Uint8Array) => {
+      this.wsServer.onMessage(connectionId, (data: string | Uint8Array) => {
         // parse message
-        this.parseIncomeMessage(connectionId, data);
+        this.handleIncomeMessage(connectionId, data);
       });
+    });
 
+    this.wsServer.onConnectionClose((connectionId: string) => {
+      // TODO: убить все хэндлеры привязанные к connection
       // TODO: on close connection - remove all the listeners
     });
   }
@@ -61,25 +62,32 @@ export default class Backdoor extends ServiceBase<BackDoorProps> {
 
     // TODO: remove all the handlers
 
-    await this.wsServerDriver.destroy();
+    await this.wsServer.destroy();
   }
 
 
-  private parseIncomeMessage(connectionId: string, data: string | Uint8Array) {
+  private handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
     if (!isUint8Array(data)) {
-      throw new Error(`Backdoor: data has be a Uint8Array`);
+      return this.env.log.error(`Backdoor: data has be a Uint8Array`);
     }
     else if (data.length <= 1) {
       return this.env.log.error(`Backdoor: income data is too small`);
     }
 
     if (data[0] === BACKDOOR_DATA_TYPES.json) {
-      const message: BackdoorMessage = decodeJsonMessage(data as Uint8Array) as any;
+      let message: BackdoorMessage;
 
-      this.resolveJsonMessage(connectionId, message);
+      try {
+        message = decodeJsonMessage(data as Uint8Array) as any;
+      }
+      catch (err) {
+        return this.env.log.error(`Can't decode message: ${err}`);
+      }
+
+      return this.resolveJsonMessage(connectionId, message);
     }
 
-    // TODO: update message etc...
+    // TODO: bin message for updating etc...
 
     throw new Error(`Backdoor: unsapported type of message "${data[0]}"`);
   }

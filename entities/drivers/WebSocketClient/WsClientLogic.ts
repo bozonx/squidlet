@@ -73,6 +73,9 @@ export default class WsClientLogic {
   // TODO: что если нет текущего открытого соединения??? - повешать в очередь или вернуть ошибку ?
 
   async send(data: string | Uint8Array): Promise<void> {
+
+    // TODO: почему не добавляется тип ???
+
     return this.wsClientIo.send(this.connectionId, data);
   }
 

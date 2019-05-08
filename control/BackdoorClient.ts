@@ -55,11 +55,14 @@ export default class BackdoorClient {
 
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
-    let message: BackdoorMessage;
-
-    if (!isUint8Array(data) || data.length <= 1) {
-      return console.error(`Incorrect received data`);
+    if (!isUint8Array(data)) {
+      return console.error(`Backdoor: data has be a Uint8Array`);
     }
+    else if (data.length <= 1) {
+      return console.error(`Backdoor: income data is too small`);
+    }
+
+    let message: BackdoorMessage;
 
     try {
       message = decodeJsonMessage(data as Uint8Array) as any;
