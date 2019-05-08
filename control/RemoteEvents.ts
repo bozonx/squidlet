@@ -1,7 +1,5 @@
 import BackdoorClient from './BackdoorClient';
-
-
-// TODO: on control+C send removeListener ????
+import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 
 
 export default class RemoteEvents {
@@ -11,6 +9,13 @@ export default class RemoteEvents {
     }
 
     const backdoorClient = new BackdoorClient(args.host, args.port);
+
+    backdoorClient.onIncomeMessage((message: BackdoorMessage) => {
+      // print only data which is send on previously added listener
+      if (message.action !== BACKDOOR_ACTION.listenerResponse) return;
+
+      console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
+    });
 
     await backdoorClient.addListener(args.category, args.topic);
   }

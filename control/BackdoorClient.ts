@@ -6,6 +6,7 @@ import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import {decodeJsonMessage, makeMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
+import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
@@ -13,6 +14,7 @@ const wsClientIo = new WebSocketClient();
 
 
 export default class BackdoorClient {
+  private readonly incomeMessageEvents = new IndexedEvents<(message: BackdoorMessage) => void>();
   private readonly client: WsClientLogic;
 
 
@@ -51,6 +53,10 @@ export default class BackdoorClient {
     await this.client.send(binMsg);
   }
 
+  onIncomeMessage(cb: (message: BackdoorMessage) => void) {
+    this.incomeMessageEvents.addListener(cb);
+  }
+
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
     let message: BackdoorMessage;
@@ -62,12 +68,7 @@ export default class BackdoorClient {
       return console.error(`Can't decode message: ${err}`);
     }
 
-    // TODO: сделать через события
-
-    // print only data which is send on previously added listener
-    if (message.action !== BACKDOOR_ACTION.listenerResponse) return;
-
-    console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
+    this.incomeMessageEvents.emit(message);
   }
 
   private onClientClose() {
