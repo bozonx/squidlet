@@ -4,8 +4,8 @@ import categories from 'system/dict/categories';
 import {
   WebSocketServer
 } from '../../drivers/WebSocketServer/WebSocketServer';
-import {decodeJsonMessage, encodeJsonMessage} from './helpers';
 import {WsServerLogicProps} from '../../drivers/WebSocketServer/WsServerLogic';
+import {decodeJsonMessage, encodeJsonMessage} from './helpers';
 
 
 // export enum BACKDOOR_DATA_TYPES {
@@ -28,7 +28,14 @@ export interface BackdoorMessage {
   };
 }
 
-// contents [category, topic, handlerIndex]
+
+enum HANDLER_ITEM_POS {
+  category,
+  topic,
+  handlerIndex
+}
+
+// see HANDLER_ITEM_POS
 type HandlerItem = [string, (string | undefined), number];
 
 
@@ -52,14 +59,16 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
     });
 
     this.wsServer.onConnectionClose((connectionId: string) => {
-      // TODO: убить все хэндлеры привязанные к connection
-      // TODO: on close connection - remove all the listeners
+      // remove all the listeners of this connection
+      this.removeConnectionHandlers(connectionId);
     });
   }
 
   destroy = async () => {
-
-    // TODO: remove all the handlers
+    // remove all the handlers
+    for (let connectionId of Object.keys(this.handlers)) {
+      this.removeConnectionHandlers(connectionId);
+    }
 
     await this.wsServer.destroy();
   }
@@ -81,27 +90,28 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
   private resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
     switch (message.action) {
       case BACKDOOR_ACTION.emit:
+        // rise event on common event system
         return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
       case BACKDOOR_ACTION.addListener:
-        return this.addEventListener(connectionId, message.payload.category, message.payload.topic);
-      case BACKDOOR_ACTION.removeListener:
-        return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
+        return this.startListenEvents(connectionId, message.payload.category, message.payload.topic);
+      // case BACKDOOR_ACTION.removeListener:
+      //   return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
       default:
-        this.env.log.error(`Backdoor: Can't recognize message type "${message.type}"`);
+        this.env.log.error(`Backdoor: Can't recognize message type "${message.action}"`);
     }
   }
 
-  private addEventListener(connectionId: string, category: string, topic?: string) {
+  private startListenEvents(connectionId: string, category: string, topic?: string) {
     let handlerIndex: number;
 
     if (topic) {
       handlerIndex = this.env.events.addListener(category, topic, (data: any) => {
-        return this.sendEventResponseMessage(connectionId, category, topic, data);
+        this.sendEventResponseMessage(connectionId, category, topic, data);
       });
     }
     else {
       handlerIndex = this.env.events.addCategoryListener(category, (data: any) => {
-        return this.sendEventResponseMessage(connectionId, category, topic, data);
+        this.sendEventResponseMessage(connectionId, category, topic, data);
       });
     }
 
@@ -112,10 +122,51 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
     this.handlers[connectionId].push(handlerItem);
   }
 
-  private removeEventListener(connectionId: string, category: string, topic?: string) {
-    // TODO: remove listeners
+  private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data?: any) {
+    const returnMessage: BackdoorMessage = {
+      type: BACKDOOR_ACTION.listenerResponse,
+      payload: {
+        category,
+        topic,
+        data,
+      }
+    };
+
+    const binData: Uint8Array = encodeJsonMessage(returnMessage);
+
+    try {
+      await this.wsServerDriver.send(connectionId, binData);
+    }
+    catch (err) {
+      this.env.log.error(`Backdoor: send error: ${err}`);
+    }
+  }
+  
+  private removeConnectionHandlers(connectionId: string) {
+    if (!this.handlers[connectionId]) return;
+    
+    for (let handlerItem of this.handlers[connectionId]) {
+      const category: string = handlerItem[HANDLER_ITEM_POS.category];
+      const topic: string | undefined = handlerItem[HANDLER_ITEM_POS.topic];
+      const handlerIndex: number = handlerItem[HANDLER_ITEM_POS.handlerIndex];
+      
+      if (topic) {
+        this.env.events.removeListener(category, topic, handlerIndex);
+      }
+      else {
+        this.env.events.removeCategoryListener(category, handlerIndex);
+      }
+    }
+
+    delete this.handlers[connectionId];
   }
 
+
+  // private removeEventListener(connectionId: string, category: string, topic?: string) {
+  //   // TODO: remove listeners
+  // }
+
+  
   //
   // private onIoPub(payload: Uint8Array) {
   //   const message: RemoteCallMessage = uint8ArrayToJsData(payload);
@@ -156,26 +207,5 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
   // private onSwitchIoAccess(payload: Uint8Array) {
   //   // TODO: convert to boolean
   // }
-
-
-  private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data?: any) {
-    const returnMessage: BackdoorMessage = {
-      type: BACKDOOR_ACTION.listenerResponse,
-      payload: {
-        category,
-        topic,
-        data,
-      }
-    };
-
-    const binData: Uint8Array = encodeJsonMessage(returnMessage);
-
-    try {
-      await this.wsServerDriver.send(connectionId, binData);
-    }
-    catch (err) {
-      this.env.log.error(`Backdoor: send error: ${err}`);
-    }
-  }
-
+  
 }
