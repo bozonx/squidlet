@@ -1,6 +1,7 @@
 import {padStart} from './lodashLike';
 //import {TextDecoder, TextEncoder} from 'text-encoding';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
+import {isUint8Array, withoutFirstItemUint8Arr} from './collections';
 
 
 /**
@@ -205,14 +206,42 @@ export function textToUint8Array(str: string): Uint8Array {
   //return new TextEncoder('utf-8').encode(str);
 }
 
-export function uint8ArrayToJsData(arr: Uint8Array): any {
-  const text: string = uint8ArrayToText(arr);
+// export function uint8ArrayToJsData(arr: Uint8Array): any {
+//   const text: string = uint8ArrayToText(arr);
+//
+//   return JSON.parse(text);
+// }
+//
+// export function jsDataToUint8Array(jsData: any): any {
+//   const json: string = JSON.stringify(jsData);
+//
+//   return textToUint8Array(jsData);
+// }
 
-  return JSON.parse(text);
+export function serializeJson(data: any): Uint8Array {
+  // TODO: do it
+
+  const stringMsg: string = JSON.stringify(message);
+  const uint8Msg: Uint8Array = textToUint8Array(stringMsg);
+  const result = new Uint8Array(uint8Msg.length + 1);
 }
 
-export function jsDataToUint8Array(jsData: any): any {
-  const json: string = JSON.stringify(jsData);
+export function deserializeJson(serialized: Uint8Array) {
+  // TODO: do it
 
-  return textToUint8Array(jsData);
+  if (!isUint8Array(data)) {
+    return this.env.log.error(`Backdoor: data has be a Uint8Array`);
+  }
+  else if (data.length <= 1) {
+    return this.env.log.error(`Backdoor: income data is too small`);
+  }
+
+  if (!isUint8Array(binMsg) || !binMsg.length || binMsg[0] !== BACKDOOR_DATA_TYPES.json) {
+    throw new Error(`Incorrect backdoor binary json message: "${JSON.stringify(binMsg)}"`);
+  }
+
+  const uint8Msg: Uint8Array = withoutFirstItemUint8Arr(binMsg);
+  const stringMsg: string = uint8ArrayToText(uint8Msg);
+
+  return JSON.parse(stringMsg);
 }

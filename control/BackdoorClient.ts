@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WebSocketClient/WsClientLogic';
 import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
-import {decodeJsonMessage, makeMessage} from '../entities/services/Backdoor/helpers';
+import {decodeBackdoorMessage, makeMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
@@ -62,7 +62,7 @@ export default class BackdoorClient {
     let message: BackdoorMessage;
 
     try {
-      message = decodeJsonMessage(data as Uint8Array) as any;
+      message = decodeBackdoorMessage(data as Uint8Array);
     }
     catch (err) {
       return console.error(`Can't decode message: ${err}`);

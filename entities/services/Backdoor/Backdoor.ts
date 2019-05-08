@@ -4,7 +4,7 @@ import {
   WebSocketServer
 } from '../../drivers/WebSocketServer/WebSocketServer';
 import {WsServerLogicProps} from '../../drivers/WebSocketServer/WsServerLogic';
-import {decodeJsonMessage, makeMessage} from './helpers';
+import {decodeBackdoorMessage, makeMessage} from './helpers';
 
 
 export enum BACKDOOR_ACTION {
@@ -72,7 +72,7 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
     let message: BackdoorMessage;
 
     try {
-      message = decodeJsonMessage(data as Uint8Array) as any;
+      message = decodeBackdoorMessage(data as Uint8Array);
     }
     catch (err) {
       return this.env.log.error(`Backdoor: Can't decode message: ${err}`);
