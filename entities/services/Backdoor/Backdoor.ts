@@ -16,7 +16,7 @@ export enum BACKDOOR_ACTION {
   emit,
   addListener,
   listenerResponse,
-  //removeListener,
+  removeListener,
 }
 
 export interface BackdoorMessage {
@@ -51,10 +51,9 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
       .getInstance(this.props);
 
     this.wsServer.onConnection((connectionId: string) => {
-      // start listening income message of this connection
+      // start listening income messages of this connection
       this.wsServer.onMessage(connectionId, (data: string | Uint8Array) => {
-        // parse message
-        this.handleIncomeMessage(connectionId, data);
+        return this.handleIncomeMessage(connectionId, data);
       });
     });
 
@@ -74,43 +73,54 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
   }
 
 
-  private handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
+  private async handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
     let message: BackdoorMessage;
 
     try {
       message = decodeJsonMessage(data as Uint8Array) as any;
     }
     catch (err) {
-      return this.env.log.error(`Can't decode message: ${err}`);
+      return this.env.log.error(`Backdoor: Can't decode message: ${err}`);
     }
 
-    this.resolveJsonMessage(connectionId, message);
+    try {
+      await this.resolveJsonMessage(connectionId, message);
+    }
+    catch (err) {
+      return this.env.log.error(`Backdoor: ${err}`);
+    }
   }
 
-  private resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
+  private async resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
     switch (message.action) {
       case BACKDOOR_ACTION.emit:
         // rise event on common event system
         return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
       case BACKDOOR_ACTION.addListener:
         return this.startListenEvents(connectionId, message.payload.category, message.payload.topic);
-      // case BACKDOOR_ACTION.removeListener:
-      //   return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
+      case BACKDOOR_ACTION.removeListener:
+        return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
       default:
-        this.env.log.error(`Backdoor: Can't recognize message type "${message.action}"`);
+        throw new Error(`Backdoor: Can't recognize message's action "${message.action}"`);
     }
   }
 
+  /**
+   * Listen to event of common event system
+   * and send it to backdoor client which has been subscribed to this event.
+   */
   private startListenEvents(connectionId: string, category: string, topic?: string) {
     let handlerIndex: number;
 
     if (topic) {
       handlerIndex = this.env.events.addListener(category, topic, (data: any) => {
+        // TODO: handle error
         this.sendEventResponseMessage(connectionId, category, topic, data);
       });
     }
     else {
       handlerIndex = this.env.events.addCategoryListener(category, (data: any) => {
+        // TODO: handle error
         this.sendEventResponseMessage(connectionId, category, topic, data);
       });
     }
@@ -161,10 +171,9 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
     delete this.handlers[connectionId];
   }
 
-
-  // private removeEventListener(connectionId: string, category: string, topic?: string) {
-  //   // TODO: remove listeners
-  // }
+  private removeEventListener(connectionId: string, category: string, topic?: string) {
+    // TODO: remove listeners
+  }
 
   
   //
