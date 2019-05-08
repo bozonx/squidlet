@@ -4,10 +4,13 @@ import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
 import {isUint8Array, withoutFirstItemUint8Arr} from './collections';
 
 
+const BIN_MARK = '!BIN!';
+
+
 /**
  * Converts hex like "ffff" to array of bytes [ 255, 255 ]
  */
-export function hexToBytes(hex: string): Uint8Array {
+export function hexStringToUint8Arr(hex: string): Uint8Array {
   if (hex.length < 2) throw new Error(`Incorrect length of hex data`);
   else if (hex.length / 2 !== Math.ceil(hex.length / 2)) {
     throw new Error(`Incorrect length of hex data. It has to be even`);
@@ -30,7 +33,7 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
   let result = '';
 
   bytesArr.forEach((byte: number) => {
-    result += hexNumToHexString(Number(byte));
+    result += int16ToHexString(Number(byte));
   });
 
   return result;
@@ -39,7 +42,11 @@ export function bytesToHexString(bytesArr: Uint8Array): string {
 /**
  * e.g 65535 => "ffff". To decode use - hexStringToHexNum() or parseInt("ffff", 16)
  */
-export function hexNumToHexString(hexNum: number): string {
+export function int16ToHexString(hexNum: number): string {
+  if (hexNum < 0 || hexNum > 65535) {
+    throw new Error(`int16ToHexString: Incorrect hexNum: ${hexNum}`);
+  }
+
   let hexString: string = hexNum.toString(16);
   if (hexString.length === 1) hexString = '0' + hexString;
 
@@ -57,7 +64,7 @@ export function hexStringToHexNum(hexString: string | number | undefined): numbe
 }
 
 /**
- * Converts byte as number (255) to binary string "11111111", (4 > "00000100").
+ * Converts byte as a number (255) to binary string "11111111", (4 > "00000100").
  * Number are always 8.
  */
 export function byteToString(hexValue: number): string {
@@ -67,7 +74,7 @@ export function byteToString(hexValue: number): string {
 /**
  * Converts byte as number (255) to binary array
  * [true, true, true, true, true, true, true, true], (4 > [false, false, false, false, false, true, false, false]).
- * Number are always 8.
+ * Numbers are always 8.
  */
 export function byteToBinArr(hexValue: number): boolean[] {
   // convert 4 to ""00000100""
@@ -88,7 +95,7 @@ export function byteToBinArr(hexValue: number): boolean[] {
  * Result is always 4 chars
  */
 export function numToWord(num: number): string {
-  let result: string = hexNumToHexString(num);
+  let result: string = int16ToHexString(num);
   if (result.length === 2) result = '00' + result;
 
   return result;
@@ -100,7 +107,7 @@ export function numToWord(num: number): string {
 export function numToUint8Word(num: number): Uint8Array {
   const valueWord: string = numToWord(num);
 
-  return hexToBytes(valueWord);
+  return hexStringToUint8Arr(valueWord);
 }
 
 /**
@@ -110,6 +117,46 @@ export function uint8WordToNum(word: Uint8Array): number {
   const hexStr: string = bytesToHexString(word);
 
   return hexStringToHexNum(hexStr);
+}
+
+/**
+ * Make hex string from 32 bit number (0 - 4294967295).
+ * It always returns 8 characters.
+ * 4294967295 > "ffffffff"
+ * 0 > "00000000"
+ */
+export function int32ToHexString(int32: number): string {
+  // TODO: test
+
+  if (int32 < 0 || int32 > 4294967295) {
+    throw new Error(`int32ToUint8Arr: Incorrect int32: ${4294967295}`);
+  }
+
+  // from "0" up to "ffffffff"
+  const hexString = int32.toString(32);
+
+  return padStart(hexString, 8, '0');
+}
+
+/**
+ * It make uint8 array with 4 items.
+ * 4294967295 > [255, 255, 255, 255]
+ */
+export function int32ToUint8Arr(int32: number): Uint8Array {
+
+  // TODO: test
+
+  const hexString = int32ToHexString(int32);
+
+  return hexStringToUint8Arr(hexString);
+}
+
+/**
+ * It receives only Uint8Arr with 4 items.
+ * [255, 255, 255, 255] > 4294967295
+ */
+export function uint8ArrToInt32(uint8Arr: Uint8Array): number {
+  // TODO: add
 }
 
 /**
@@ -194,6 +241,10 @@ export function getAsciiNumber(num: number): number {
   return num + ASCII_NUMERIC_OFFSET;
 }
 
+export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
+  // TODO: make
+}
+
 // TODO: remake
 export function uint8ArrayToText(arr: Uint8Array): string {
   return '123';
@@ -218,12 +269,38 @@ export function textToUint8Array(str: string): Uint8Array {
 //   return textToUint8Array(jsData);
 // }
 
+/**
+ * Extract binary data from json and put in to a tail.
+ * Result will be [
+ *   4 bytes of json length,
+ *   binary json,
+ *   binary data from json
+ * ]
+ */
 export function serializeJson(data: any): Uint8Array {
-  // TODO: do it
+  let binDataTail = new Uint8Array();
 
-  const stringMsg: string = JSON.stringify(message);
-  const uint8Msg: Uint8Array = textToUint8Array(stringMsg);
-  const result = new Uint8Array(uint8Msg.length + 1);
+  const stringMsg: string = JSON.stringify(data, function(key, value) {
+    if (value instanceof Uint8Array) {
+      const start = binDataTail.length - 1;
+      const end = value.length;
+      binDataTail = concatUint8Arr(binDataTail, value);
+
+      return `${BIN_MARK}${start}-${end}`;
+    }
+
+    return value;
+  });
+
+  const jsonBin: Uint8Array = textToUint8Array(stringMsg);
+  // 4 bytes of json binary length
+  const jsonLengthBin = int32ToUint8Arr(jsonBin.length);
+
+  return concatUint8Arr(
+    jsonLengthBin,
+    jsonBin,
+    binDataTail,
+  );
 }
 
 export function deserializeJson(serialized: Uint8Array) {

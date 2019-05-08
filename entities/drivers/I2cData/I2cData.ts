@@ -1,6 +1,6 @@
 import {withoutFirstItemUint8Arr} from 'system/helpers/collections';
 import {
-  hexToBytes,
+  hexStringToUint8Arr,
   bytesToHexString,
   numToWord,
   hexStringToHexNum
@@ -98,7 +98,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
 
     // e.g 65535 => "ffff". To decode use - parseInt("ffff", 16)
     const lengthHex: string = numToWord(dataLength);
-    const bytes: Uint8Array = hexToBytes(lengthHex);
+    const bytes: Uint8Array = hexStringToUint8Arr(lengthHex);
     const lengthToSend: Uint8Array = new Uint8Array(DATA_LENGTH_REQUEST);
 
     lengthToSend[DATA_MARK_POSITION] = dataMark;

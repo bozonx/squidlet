@@ -1,4 +1,4 @@
-import {cloneDeep, find, isEqual, isObject, isPlainObject, trim, values} from './lodashLike';
+import {cloneDeep, isEqual, isObject, isPlainObject, values} from './lodashLike';
 
 
 // TODO: move to binary helpers
