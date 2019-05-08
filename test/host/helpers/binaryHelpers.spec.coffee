@@ -6,9 +6,9 @@ describe 'helpers.binaryHelpers', ->
     assert.deepEqual(helpers.hexStringToUint8Arr('ffff'), new Uint8Array([ 255, 255 ]))
     assert.deepEqual(helpers.hexStringToUint8Arr('0102'), new Uint8Array([ 1, 2 ]))
 
-  it 'bytesToHexString', ->
-    assert.equal(helpers.bytesToHexString(new Uint8Array([ 255, 255 ])), 'ffff')
-    assert.equal(helpers.bytesToHexString(new Uint8Array([ 1, 2 ])), '0102')
+  it 'uint8ArrToHexString', ->
+    assert.equal(helpers.uint8ArrToHexString(new Uint8Array([ 255, 255 ])), 'ffff')
+    assert.equal(helpers.uint8ArrToHexString(new Uint8Array([ 1, 2 ])), '0102')
 
   it 'int16ToHexString', ->
     assert.equal(helpers.int16ToHexString(1), '01')
@@ -31,9 +31,9 @@ describe 'helpers.binaryHelpers', ->
     assert.deepEqual(helpers.numToUint8Word(65535), new Uint8Array([ 255, 255 ]))
     assert.deepEqual(helpers.numToUint8Word(1), new Uint8Array([ 0, 1 ]))
 
-  it 'uint8WordToNum', ->
-    assert.deepEqual(helpers.uint8WordToNum(new Uint8Array([ 255, 255 ])), 65535)
-    assert.deepEqual(helpers.uint8WordToNum(new Uint8Array([ 0, 1 ])), 1)
+  it 'uint8ToNum', ->
+    assert.deepEqual(helpers.uint8ToNum(new Uint8Array([ 255, 255 ])), 65535)
+    assert.deepEqual(helpers.uint8ToNum(new Uint8Array([ 0, 1 ])), 1)
 
   it 'bitsToBytes', ->
     assert.deepEqual(

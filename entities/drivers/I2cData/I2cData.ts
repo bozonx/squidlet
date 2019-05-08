@@ -1,7 +1,7 @@
 import {withoutFirstItemUint8Arr} from 'system/helpers/collections';
 import {
   hexStringToUint8Arr,
-  bytesToHexString,
+  uint8ArrToHexString,
   numToWord,
   hexStringToHexNum
 } from 'system/helpers/binaryHelpers';
@@ -113,7 +113,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
   }
 
   private lengthBytesToNumber(bytes: Uint8Array): number {
-    const dataLengthHex: string = bytesToHexString(bytes);
+    const dataLengthHex: string = uint8ArrToHexString(bytes);
 
     return hexStringToHexNum(dataLengthHex);
   }

@@ -1,7 +1,6 @@
 import {padStart} from './lodashLike';
 //import {TextDecoder, TextEncoder} from 'text-encoding';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
-import {isUint8Array, withoutFirstItemUint8Arr} from './collections';
 
 
 const BIN_MARK = '!BIN!';
@@ -30,7 +29,7 @@ export function hexStringToUint8Arr(hex: string): Uint8Array {
 /**
  * converts uint [ 255, 255 ] to 'ffff'
  */
-export function bytesToHexString(bytesArr: Uint8Array): string {
+export function uint8ArrToHexString(bytesArr: Uint8Array): string {
   let result = '';
 
   bytesArr.forEach((byte: number) => {
@@ -112,10 +111,16 @@ export function numToUint8Word(num: number): Uint8Array {
 }
 
 /**
- * Converts [ 255, 255 ] > 65535, [ 0, 1 ] > 1
+ * You have to pass a uint8Arr with 2, 4, or 8 length to convert:
+ * [ 255, 255 ] > 65535,
+ * [ 0, 1 ] > 1
+ * [ 255, 255, 255, 255 ] >  4294967295
  */
-export function uint8WordToNum(word: Uint8Array): number {
-  const hexStr: string = bytesToHexString(word);
+export function uint8ToNum(uint8Arr: Uint8Array): number {
+
+  // TODO: test 32 bit number
+
+  const hexStr: string = uint8ArrToHexString(uint8Arr);
 
   return hexStringToHexNum(hexStr);
 }
@@ -150,14 +155,6 @@ export function int32ToUint8Arr(int32: number): Uint8Array {
   const hexString = int32ToHexString(int32);
 
   return hexStringToUint8Arr(hexString);
-}
-
-/**
- * It receives only Uint8Arr with 4 items.
- * [255, 255, 255, 255] > 4294967295
- */
-export function uint8ArrToInt32(uint8Arr: Uint8Array): number {
-  // TODO: add
 }
 
 /**
@@ -243,7 +240,14 @@ export function getAsciiNumber(num: number): number {
 }
 
 export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
-  // TODO: make
+  // TODO: test
+
+  // var a = new Int8Array( [ 1, 2, 3 ] );
+  // var b = new Int8Array( [ 4, 5, 6 ] );
+  //
+  // var c = new Int8Array(a.length + b.length);
+  // c.set(a);
+  // c.set(b, a.length);
 }
 
 // TODO: remake
@@ -298,7 +302,7 @@ export function deserializeJson(serialized: Uint8Array) {
   // TODO: test
 
   const binJsonLength: Uint8Array = serialized.slice(0, 3);
-  const jsonLenght: number = uint8ArrToInt32(binJsonLength);
+  const jsonLenght: number = uint8ToNum(binJsonLength);
   // 4 is 4 bytes of length 32 bit number
   const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLenght);
   const binaryTail: Uint8Array = serialized.slice(4 + jsonLenght);

@@ -23,7 +23,6 @@ export interface BackdoorMessage {
   };
 }
 
-
 enum HANDLER_ITEM_POS {
   category,
   topic,

@@ -17,7 +17,7 @@ import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {omit} from 'system/helpers/lodashLike';
 import {PollProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';
-import {uint8WordToNum} from 'system/helpers/binaryHelpers';
+import {uint8ToNum} from 'system/helpers/binaryHelpers';
 
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';
@@ -143,7 +143,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
         // first byte is pin number with 48 position shift
         const pinNumber: number = this.hexPinToNumber(data[0]);
         // 2nd and 3rd are word which represent a 16bit number
-        const value: number = uint8WordToNum(new Uint8Array([data[1], data[2]]));
+        const value: number = uint8ToNum(new Uint8Array([data[1], data[2]]));
 
         this.state.setAnalogInput(pinNumber, value);
       }
