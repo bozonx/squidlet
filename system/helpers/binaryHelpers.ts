@@ -1,6 +1,4 @@
-import {TextEncoder} from 'util';
 import {padStart} from './lodashLike';
-//import {TextDecoder, TextEncoder} from 'text-encoding';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
 import {base64ToString, stringTobase64} from './strings';
 
@@ -331,11 +329,6 @@ export function serializeJson(data: any): Uint8Array {
   // 4 bytes of json binary length
   const jsonLengthBin = int32ToUint8Arr(jsonBin.length);
 
-  console.log(1, stringMsg)
-  console.log(2, jsonBin)
-  console.log(3, jsonBin.length, jsonLengthBin)
-  console.log(4, binDataTail)
-
   return concatUint8Arr(
     jsonLengthBin,
     jsonBin,
@@ -343,22 +336,26 @@ export function serializeJson(data: any): Uint8Array {
   );
 }
 
+/**
+ * Convert previously serialized json which mights content binary data
+ * to js object as it was before serialization.
+ */
 export function deserializeJson(serialized: Uint8Array) {
-  // TODO: test
-
-  const binJsonLength: Uint8Array = serialized.slice(0, 3);
+  const binJsonLength: Uint8Array = serialized.slice(0, 4);
   const jsonLength: number = uint8ToNum(binJsonLength);
   // 4 is 4 bytes of length 32 bit number
   const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLength);
-  const binaryTail: Uint8Array = serialized.slice(4 + jsonLength);
   const jsonString: string = uint8ArrayToText(jsonBin);
+  const binaryTail: Uint8Array = serialized.slice(4 + jsonLength);
 
   return JSON.parse(jsonString, (key: string, value: any) => {
     if (typeof value === 'string' && value.indexOf(BIN_MARK) === 0) {
-      const startEnd: string = value.split(BIN_MARK)[1];
-      const [startStr, lengthStr] = startEnd.split(BIN_LENGTH_SEP);
+      const payload: string = value.split(BIN_MARK)[1];
+      const splat: string[] = payload.split(BIN_LENGTH_SEP);
+      const start = Number(splat[0]);
+      const length = Number(splat[1]);
 
-      return binaryTail.slice(Number(startStr), Number(lengthStr));
+      return binaryTail.slice(start, start + length);
     }
 
     return value;
