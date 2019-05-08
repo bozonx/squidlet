@@ -5,6 +5,7 @@ import {isUint8Array, withoutFirstItemUint8Arr} from './collections';
 
 
 const BIN_MARK = '!BIN!';
+const BIN_LENGTH_SEP = ':';
 
 
 /**
@@ -257,18 +258,6 @@ export function textToUint8Array(str: string): Uint8Array {
   //return new TextEncoder('utf-8').encode(str);
 }
 
-// export function uint8ArrayToJsData(arr: Uint8Array): any {
-//   const text: string = uint8ArrayToText(arr);
-//
-//   return JSON.parse(text);
-// }
-//
-// export function jsDataToUint8Array(jsData: any): any {
-//   const json: string = JSON.stringify(jsData);
-//
-//   return textToUint8Array(jsData);
-// }
-
 /**
  * Extract binary data from json and put in to a tail.
  * Result will be [
@@ -278,15 +267,17 @@ export function textToUint8Array(str: string): Uint8Array {
  * ]
  */
 export function serializeJson(data: any): Uint8Array {
+  // TODO: test
+
   let binDataTail = new Uint8Array();
 
-  const stringMsg: string = JSON.stringify(data, function(key, value) {
+  const stringMsg: string = JSON.stringify(data, (key: string, value: any) => {
     if (value instanceof Uint8Array) {
       const start = binDataTail.length - 1;
       const end = value.length;
       binDataTail = concatUint8Arr(binDataTail, value);
 
-      return `${BIN_MARK}${start}-${end}`;
+      return BIN_MARK + start + BIN_LENGTH_SEP + end;
     }
 
     return value;
@@ -304,21 +295,23 @@ export function serializeJson(data: any): Uint8Array {
 }
 
 export function deserializeJson(serialized: Uint8Array) {
-  // TODO: do it
+  // TODO: test
 
-  if (!isUint8Array(data)) {
-    return this.env.log.error(`Backdoor: data has be a Uint8Array`);
-  }
-  else if (data.length <= 1) {
-    return this.env.log.error(`Backdoor: income data is too small`);
-  }
+  const binJsonLength: Uint8Array = serialized.slice(0, 3);
+  const jsonLenght: number = uint8ArrToInt32(binJsonLength);
+  // 4 is 4 bytes of length 32 bit number
+  const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLenght);
+  const binaryTail: Uint8Array = serialized.slice(4 + jsonLenght);
+  const jsonString: string = uint8ArrayToText(jsonBin);
 
-  if (!isUint8Array(binMsg) || !binMsg.length || binMsg[0] !== BACKDOOR_DATA_TYPES.json) {
-    throw new Error(`Incorrect backdoor binary json message: "${JSON.stringify(binMsg)}"`);
-  }
+  return JSON.parse(jsonString, (key: string, value: any) => {
+    if (typeof value === 'string' && value.indexOf(BIN_MARK) === 0) {
+      const startEnd: string = value.split(BIN_MARK)[1];
+      const [startStr, endStr] = startEnd.split(BIN_LENGTH_SEP);
 
-  const uint8Msg: Uint8Array = withoutFirstItemUint8Arr(binMsg);
-  const stringMsg: string = uint8ArrayToText(uint8Msg);
+      return binaryTail.slice(Number(startStr), Number(endStr));
+    }
 
-  return JSON.parse(stringMsg);
+    return value;
+  });
 }
