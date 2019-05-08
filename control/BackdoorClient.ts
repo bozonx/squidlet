@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WebSocketClient/WsClientLogic';
 import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
-import {BACKDOOR_MESSAGE_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import {decodeJsonMessage, encodeJsonMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import {isUint8Array} from '../system/helpers/collections';
@@ -32,7 +32,7 @@ export default class BackdoorClient {
    * Emit remote event
    */
   async emit(category: string, topic?: string, data?: string): Promise<void> {
-    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.emit, category, topic, data);
+    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_ACTION.emit, category, topic, data);
 
     await this.client.send(binMsg);
   }
@@ -41,14 +41,14 @@ export default class BackdoorClient {
    * Ask backdoor to send back data which emits on specified event
    */
   async addListener(category: string, topic?: string): Promise<void> {
-    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.addListener, category, topic);
+    const binMsg: Uint8Array = this.makeMessage(BACKDOOR_ACTION.addListener, category, topic);
 
     await this.client.send(binMsg);
   }
 
   // TODO: does it really need?
   // async removeListener(category: string, topic?: string): Promise<void> {
-  //   const binMsg: Uint8Array = this.makeMessage(BACKDOOR_MESSAGE_TYPE.removeListener, category, topic);
+  //   const binMsg: Uint8Array = this.makeMessage(BACKDOOR_ACTION.removeListener, category, topic);
   //
   //   await this.client.send(binMsg);
   // }
@@ -72,14 +72,14 @@ export default class BackdoorClient {
     }
 
     // print only data which is send on previously added listener
-    if (message.type !== BACKDOOR_MESSAGE_TYPE.listenerResponse) return;
+    if (message.action !== BACKDOOR_ACTION.listenerResponse) return;
 
     console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
   }
 
-  private makeMessage(type: number, category: string, topic?: string, data?: string): Uint8Array {
+  private makeMessage(action: number, category: string, topic?: string, data?: string): Uint8Array {
     const message: BackdoorMessage = {
-      type,
+      action,
       payload: {
         category,
         topic,

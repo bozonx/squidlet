@@ -13,7 +13,7 @@ export enum BACKDOOR_DATA_TYPES {
   json,
 }
 
-export enum BACKDOOR_MESSAGE_TYPE {
+export enum BACKDOOR_ACTION {
   emit,
   addListener,
   listenerResponse,
@@ -21,7 +21,7 @@ export enum BACKDOOR_MESSAGE_TYPE {
 }
 
 export interface BackdoorMessage {
-  type: number;
+  action: number;
   payload: {
     category: string;
     topic?: string;
@@ -74,6 +74,8 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
       return this.env.log.error(`Backdoor: income data is too small`);
     }
 
+    // TODO: use serialize !!!! not BACKDOOR_DATA_TYPES
+
     if (data[0] === BACKDOOR_DATA_TYPES.json) {
       let message: BackdoorMessage;
 
@@ -94,11 +96,11 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
 
   private resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
     switch (message.type) {
-      case BACKDOOR_MESSAGE_TYPE.emit:
+      case BACKDOOR_ACTION.emit:
         return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
-      case BACKDOOR_MESSAGE_TYPE.addListener:
+      case BACKDOOR_ACTION.addListener:
         return this.addEventListener(connectionId, message.payload.category, message.payload.topic);
-      case BACKDOOR_MESSAGE_TYPE.removeListener:
+      case BACKDOOR_ACTION.removeListener:
         return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
       default:
         this.env.log.error(`Backdoor: Can't recognize message type "${message.type}"`);
@@ -174,7 +176,7 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
 
   private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data?: any) {
     const returnMessage: BackdoorMessage = {
-      type: BACKDOOR_MESSAGE_TYPE.listenerResponse,
+      type: BACKDOOR_ACTION.listenerResponse,
       payload: {
         category,
         topic,
