@@ -13,7 +13,6 @@ import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 import {CONNECTION_POSITIONS, ConnectionItem} from './WebSocketClient';
-import {isUint8Array} from 'system/helpers/collections';
 
 
 // Server instance, server's events, [connection, connection's events]
@@ -122,7 +121,7 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
-    if (typeof data !== 'string' && !isUint8Array(data)) {
+    if (typeof data !== 'string' && !(data instanceof Uint8Array)) {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 

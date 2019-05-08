@@ -1,5 +1,5 @@
 import DuplexDriver, {ReceiveHandler} from '../../../system/interfaces/DuplexDriver';
-import {addFirstItemUint8Arr, isUint8Array, withoutFirstItemUint8Arr} from '../../../system/helpers/binaryHelpers';
+import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from '../../../system/helpers/binaryHelpers';
 import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
@@ -44,7 +44,7 @@ export default class WsServerDuplexLogic implements DuplexDriver {
    */
   onReceive(handler: ReceiveHandler): number {
     return this.server.onMessage(this.connectionId, (message: string | Uint8Array) => {
-      if (!isUint8Array(message)) {
+      if (!(message instanceof Uint8Array)) {
         return this.logError(`WsServerDuplexLogic: Can only receive an Uint8Array`);
       }
       if (!message.length) {

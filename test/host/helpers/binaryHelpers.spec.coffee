@@ -1,7 +1,7 @@
 helpers = require('../../../system/helpers/binaryHelpers')
 
 
-describe 'helpers.binaryHelpers', ->
+describe.only 'helpers.binaryHelpers', ->
   it 'withoutFirstItemUint8Arr', ->
     uint = new Uint8Array(2)
     uint[0] = 127
@@ -17,11 +17,6 @@ describe 'helpers.binaryHelpers', ->
     resultUint[0] = 127
     resultUint[1] = 255
     assert.deepEqual(collections.addFirstItemUint8Arr(uint, 127), resultUint)
-
-#  it 'isUint8Array', ->
-#    uint = new Uint8Array(1)
-#    assert.isTrue(collections.isUint8Array(uint))
-#    assert.isFalse(collections.isUint8Array([]))
 
   it 'hexStringToUint8Arr', ->
     assert.deepEqual(helpers.hexStringToUint8Arr('ffff'), new Uint8Array([ 255, 255 ]))
@@ -90,3 +85,8 @@ describe 'helpers.binaryHelpers', ->
 #
 #    assert.deepEqual(encoded, new Uint8Array([ 109, 121, 32, 209, 129, 209, 130, 209, 128, 208, 190, 208, 186, 208, 176 ]))
 #    assert.equal(helpers.uint8ArrayToText(encoded), str)
+
+#  it 'isUint8Array', ->
+#    uint = new Uint8Array(1)
+#    assert.isTrue(collections.isUint8Array(uint))
+#    assert.isFalse(collections.isUint8Array([]))

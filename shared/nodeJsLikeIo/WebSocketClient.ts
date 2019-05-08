@@ -2,7 +2,6 @@ import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
 import WebSocketClientIo, {WebSocketClientProps, wsEventNames, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
-import {isUint8Array} from 'system/helpers/collections';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
@@ -86,7 +85,7 @@ export default class WebSocketClient implements WebSocketClientIo {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
-    if (typeof data !== 'string' && !isUint8Array(data)) {
+    if (typeof data !== 'string' && !(data instanceof Uint8Array)) {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 

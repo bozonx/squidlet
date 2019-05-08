@@ -1,10 +1,9 @@
 import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
-import {isUint8Array} from 'system/helpers/collections';
 import {BackdoorMessage} from './Backdoor';
 
 
 export function decodeBackdoorMessage(binMsg: Uint8Array): BackdoorMessage {
-  if (!isUint8Array(binMsg)) {
+  if (!(binMsg instanceof Uint8Array)) {
     throw new Error(`Backdoor: data has be a Uint8Array`);
   }
   else if (!binMsg.length) {

@@ -1,6 +1,3 @@
-import {isUint8Array} from './collections';
-
-
 /**
  * When undefined, null, '', [] or {}.
  * 0 is not empty!
@@ -101,7 +98,7 @@ export function cloneDeep(value: any): any {
   if (typeof value === 'string') {
     return '' + value;
   }
-  else if (isUint8Array(value)) {
+  else if (value instanceof Uint8Array) {
     const oldArr: Uint8Array = value;
     const newArr: Uint8Array = new Uint8Array(oldArr.length);
 
@@ -138,7 +135,7 @@ export function isEqual(first: any, second: any): boolean {
   else if (typeof first === 'undefined' && typeof second !== 'undefined') {
     return false;
   }
-  else if (isUint8Array(first) && isUint8Array(second)) {
+  else if (first instanceof Uint8Array && second instanceof Uint8Array) {
     return first.toString() === second.toString();
   }
 

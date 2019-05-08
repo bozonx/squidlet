@@ -1,5 +1,5 @@
 import DuplexDriver from 'system/interfaces/DuplexDriver';
-import {addFirstItemUint8Arr} from '../../../system/helpers/collections';
+import {addFirstItemUint8Arr} from '../../../system/helpers/binaryHelpers';
 
 
 export type ReceiveHandler = (channel: number, data: Uint8Array) => void;

@@ -7,13 +7,11 @@ const BIN_MARK = '!BIN!';
 const BIN_LENGTH_SEP = ':';
 
 
-
-// TODO: move to binary helpers
 /**
  * Make a new Uint8Array without the first item
  */
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
-  if (!isUint8Array(arr)) {
+  if (!(arr instanceof Uint8Array)) {
     throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
   }
 
@@ -27,12 +25,11 @@ export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
   return result;
 }
 
-// TODO: move to binary helpers
 /**
  * Make a new Uint8Array with the new item on the first position and other items is moved right
  */
 export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
-  if (!isUint8Array(arr)) {
+  if (!(arr instanceof Uint8Array)) {
     throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
   }
 
@@ -42,13 +39,6 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
   arr.forEach((item, index) => result[index + itemsToAdd] = item);
 
   return result;
-}
-
-// TODO: move to binary helpers
-export function isUint8Array(value: any): boolean {
-  if (typeof value !== 'object') return false;
-
-  return value.constructor === Uint8Array;
 }
 
 /**
@@ -292,6 +282,8 @@ export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
   // var c = new Int8Array(a.length + b.length);
   // c.set(a);
   // c.set(b, a.length);
+
+  return new Uint8Array();
 }
 
 // TODO: remake
@@ -363,3 +355,10 @@ export function deserializeJson(serialized: Uint8Array) {
     return value;
   });
 }
+
+
+// export function isUint8Array(value: any): boolean {
+//   if (typeof value !== 'object') return false;
+//
+//   return value.constructor === Uint8Array;
+// }

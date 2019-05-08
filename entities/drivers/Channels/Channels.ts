@@ -3,7 +3,7 @@ import DuplexDriver from '../../../system/interfaces/DuplexDriver';
 import DriverFactoryBase from '../../../system/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from '../../../system/entities/EntityBase';
 import {omit} from '../../../system/helpers/lodashLike';
-import {addFirstItemUint8Arr} from '../../../system/helpers/collections';
+import {addFirstItemUint8Arr} from '../../../system/helpers/binaryHelpers';
 
 
 
