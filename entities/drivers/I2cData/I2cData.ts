@@ -1,5 +1,5 @@
-import {withoutFirstItemUint8Arr} from 'system/helpers/collections';
 import {
+  withoutFirstItemUint8Arr,
   hexStringToUint8Arr,
   uint8ArrToHexString,
   numToWord,

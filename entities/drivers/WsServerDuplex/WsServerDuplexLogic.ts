@@ -1,5 +1,5 @@
 import DuplexDriver, {ReceiveHandler} from '../../../system/interfaces/DuplexDriver';
-import {addFirstItemUint8Arr, isUint8Array, withoutFirstItemUint8Arr} from '../../../system/helpers/collections';
+import {addFirstItemUint8Arr, isUint8Array, withoutFirstItemUint8Arr} from '../../../system/helpers/binaryHelpers';
 import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
