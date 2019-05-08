@@ -24,6 +24,7 @@ describe 'app.DriversManager', ->
           otherParam: 1
         }
       }
+      # TODO: remove
       'Dev.dev': {
         id: 'Dev.dev'
         className: 'Dev.dev'

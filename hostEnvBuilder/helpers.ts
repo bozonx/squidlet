@@ -25,11 +25,11 @@ export function sortByIncludeInList(wholeSet: string[], targetItems: string[]): 
   ];
 }
 
-export function checkDevsExistance(hostDevs: string[], machineDevs: string[]) {
-  const diff: string[] = _difference(hostDevs, machineDevs);
+export function checkIoExistance(hostIos: string[], machineDevs: string[]) {
+  const diff: string[] = _difference(hostIos, machineDevs);
 
   if (diff.length) {
-    throw new Error(`There aren't some devs "${JSON.stringify(diff)}" in the selected platform`);
+    throw new Error(`There aren't some IO "${JSON.stringify(diff)}" in the selected platform`);
   }
 }
 

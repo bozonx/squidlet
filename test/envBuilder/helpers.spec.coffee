@@ -10,9 +10,10 @@ describe 'envBuilder.helpers', ->
       ]
     )
 
-  it 'checkDevsExistance', ->
-    assert.doesNotThrow(() => helpers.checkDevsExistance(['one'], ['one']))
-    assert.throws(() => helpers.checkDevsExistance(['one'], ['two']))
+  # TODO: rename
+  it 'checkIoExistance', ->
+    assert.doesNotThrow(() => helpers.checkIoExistance(['one'], ['one']))
+    assert.throws(() => helpers.checkIoExistance(['one'], ['two']))
 
   it 'clearRelativePath', ->
     assert.equal(helpers.clearRelativePath('/abs'), '/abs')

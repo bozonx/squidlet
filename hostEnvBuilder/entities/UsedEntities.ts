@@ -47,7 +47,7 @@ export default class UsedEntities {
     await this.proceedDefinitions('services', this.configManager.preEntities.services);
   }
 
-  getUsedDevs(): string[] {
+  getUsedIo(): string[] {
     return Object.keys(this.usedDevs);
   }
 

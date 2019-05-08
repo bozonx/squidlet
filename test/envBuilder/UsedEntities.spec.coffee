@@ -140,10 +140,10 @@ describe 'envBuilder.UsedEntities', ->
       services: ['MyService']
     })
 
-  it 'generate and getUsedDevs', ->
+  it 'generate and getUsedIo', ->
     await @usedEntities.generate()
 
-    assert.deepEqual(@usedEntities.getUsedDevs(), ['MyDev'])
+    assert.deepEqual(@usedEntities.getUsedIo(), ['MyDev'])
 
   it 'mergePropsSchema', ->
     @manifests.devices.DeviceClass.props = {

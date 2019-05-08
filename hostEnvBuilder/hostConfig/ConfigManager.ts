@@ -80,7 +80,7 @@ export default class ConfigManager {
   }
 
 
-  getMachineDevs(): string[] {
+  getMachineIos(): string[] {
     return makeDevNames(this.machineConfig.devs);
   }
 

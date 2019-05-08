@@ -71,7 +71,7 @@ export default class PluginEnv {
    * Call it after registering.
    */
   getDevs = (): string[] => {
-    return this.usedEntities.getUsedDevs();
+    return this.usedEntities.getUsedIo();
   }
 
   afterRegistering(handler: () => void) {
