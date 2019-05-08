@@ -4,14 +4,13 @@ import categories from 'system/dict/categories';
 import {
   WebSocketServer
 } from '../../drivers/WebSocketServer/WebSocketServer';
-import {isUint8Array} from 'system/helpers/collections';
 import {decodeJsonMessage, encodeJsonMessage} from './helpers';
 import {WsServerLogicProps} from '../../drivers/WebSocketServer/WsServerLogic';
 
 
-export enum BACKDOOR_DATA_TYPES {
-  json,
-}
+// export enum BACKDOOR_DATA_TYPES {
+//   json,
+// }
 
 export enum BACKDOOR_ACTION {
   emit,
@@ -67,35 +66,20 @@ export default class Backdoor extends ServiceBase<WsServerLogicProps> {
 
 
   private handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
-    if (!isUint8Array(data)) {
-      return this.env.log.error(`Backdoor: data has be a Uint8Array`);
+    let message: BackdoorMessage;
+
+    try {
+      message = decodeJsonMessage(data as Uint8Array) as any;
     }
-    else if (data.length <= 1) {
-      return this.env.log.error(`Backdoor: income data is too small`);
-    }
-
-    // TODO: use serialize !!!! not BACKDOOR_DATA_TYPES
-
-    if (data[0] === BACKDOOR_DATA_TYPES.json) {
-      let message: BackdoorMessage;
-
-      try {
-        message = decodeJsonMessage(data as Uint8Array) as any;
-      }
-      catch (err) {
-        return this.env.log.error(`Can't decode message: ${err}`);
-      }
-
-      return this.resolveJsonMessage(connectionId, message);
+    catch (err) {
+      return this.env.log.error(`Can't decode message: ${err}`);
     }
 
-    // TODO: bin message for updating etc...
-
-    throw new Error(`Backdoor: unsapported type of message "${data[0]}"`);
+    this.resolveJsonMessage(connectionId, message);
   }
 
   private resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
-    switch (message.type) {
+    switch (message.action) {
       case BACKDOOR_ACTION.emit:
         return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
       case BACKDOOR_ACTION.addListener:

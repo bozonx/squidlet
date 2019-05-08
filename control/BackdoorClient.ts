@@ -6,7 +6,6 @@ import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import {decodeJsonMessage, encodeJsonMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
-import {isUint8Array} from '../system/helpers/collections';
 
 
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
@@ -55,13 +54,6 @@ export default class BackdoorClient {
 
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
-    if (!isUint8Array(data)) {
-      return console.error(`Backdoor: data has be a Uint8Array`);
-    }
-    else if (data.length <= 1) {
-      return console.error(`Backdoor: income data is too small`);
-    }
-
     let message: BackdoorMessage;
 
     try {
@@ -70,6 +62,8 @@ export default class BackdoorClient {
     catch (err) {
       return console.error(`Can't decode message: ${err}`);
     }
+
+    // TODO: сделать через события
 
     // print only data which is send on previously added listener
     if (message.action !== BACKDOOR_ACTION.listenerResponse) return;
