@@ -67,11 +67,6 @@ describe 'helpers.helpers', ->
     assert.equal(helpers.resolveEdge('rising', true), 'falling')
     assert.equal(helpers.resolveEdge('falling', true), 'rising')
 
-  it 'firstLetterToUpperCase', ->
-    assert.equal(helpers.firstLetterToUpperCase('str str'), 'Str str')
-    assert.equal(helpers.firstLetterToUpperCase('strStr'), 'StrStr')
-    assert.equal(helpers.firstLetterToUpperCase('5str'), '5str')
-
   it 'callPromised', ->
     data = 'param1'
     method = (param, cb) => cb(null, param)
@@ -90,14 +85,6 @@ describe 'helpers.helpers', ->
 
   it 'splitTopicId', ->
     assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
-
-  it 'splitFirstElement', ->
-    assert.deepEqual(helpers.splitFirstElement('path/to/dest', '/'), [ 'path', 'to/dest' ])
-    assert.deepEqual(helpers.splitFirstElement('path', '/'), [ 'path', undefined ])
-
-  it 'splitLastElement', ->
-    assert.deepEqual(helpers.splitLastElement('path/to/dest', '/'), [ 'dest', 'path/to' ])
-    assert.deepEqual(helpers.splitLastElement('path', '/'), [ 'path', undefined ])
 
   it 'makeEventName', ->
     assert.equal(helpers.makeEventName('|', 'cat', 'topic', 'name', 'otherName'), 'cat|topic|name|otherName')

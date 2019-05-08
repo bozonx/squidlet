@@ -90,17 +90,17 @@ describe.only 'helpers.binaryHelpers', ->
     assert.equal(helpers.getAsciiNumber(1), 49)
 
 
-#  it 'uint8ArrayToText and textToUint8Array', ->
-#    str = 'my строка'
-#    encoded = helpers.textToUint8Array(str)
-#
-#    assert.deepEqual(encoded, new Uint8Array([ 109, 121, 32, 209, 129, 209, 130, 209, 128, 208, 190, 208, 186, 208, 176 ]))
-#    assert.equal(helpers.uint8ArrayToText(encoded), str)
+  it 'uint8ArrayToText and textToUint8Array', ->
+    str = 'my строка'
+    encoded = helpers.textToUint8Array(str)
 
-#  it 'isUint8Array', ->
-#    uint = new Uint8Array(1)
-#    assert.isTrue(collections.isUint8Array(uint))
-#    assert.isFalse(collections.isUint8Array([]))
+    assert.deepEqual(encoded, new Uint8Array([ 109, 121, 32, 209, 129, 209, 130, 209, 128, 208, 190, 208, 186, 208, 176 ]))
+    assert.equal(helpers.uint8ArrayToText(encoded), str)
+
+  it 'isUint8Array', ->
+    uint = new Uint8Array(1)
+    assert.isTrue(collections.isUint8Array(uint))
+    assert.isFalse(collections.isUint8Array([]))
 
   it 'concatUint8Arr', ->
     assert.deepEqual(

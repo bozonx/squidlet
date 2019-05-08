@@ -1,3 +1,4 @@
+import {TextEncoder} from 'util';
 import {padStart} from './lodashLike';
 //import {TextDecoder, TextEncoder} from 'text-encoding';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
@@ -280,16 +281,27 @@ export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
   return result;
 }
 
-// TODO: remake
-export function uint8ArrayToText(arr: Uint8Array): string {
-  return '123';
-  //return new TextDecoder('utf-8').decode(arr);
+// see https://stackoverflow.com/questions/17191945/conversion-between-utf-8-arraybuffer-and-string
+export function uint8ArrayToText(uintArray: Uint8Array): string {
+  const encodedString = String.fromCharCode.apply(null, uintArray as any);
+
+  return decodeURIComponent(escape(atob(encodedString)));
+
+  // var uint8array = new TextEncoder("utf-8").encode("Plain Text");
+  // var string = new TextDecoder().decode(uint8array);
+  // console.log(uint8array ,string )
 }
 
-// TODO: remake
 export function textToUint8Array(str: string): Uint8Array {
-  return new Uint8Array(0);
-  //return new TextEncoder('utf-8').encode(str);
+  const string = btoa(unescape(encodeURIComponent(str)));
+  const charList = string.split('');
+  const uintArray = [];
+
+  for (let i = 0; i < charList.length; i++) {
+    uintArray.push(charList[i].charCodeAt(0));
+  }
+
+  return new Uint8Array(uintArray);
 }
 
 /**
