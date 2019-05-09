@@ -77,7 +77,7 @@ export default class WsServerLogic {
     return this.wsServerIo.onConnection(this.serverId, cb);
   }
 
-  onConnectionClose(cb: (connectionId: string) => void) {
+  onConnectionClose(cb: (connectionId: string) => void): number {
     // TODO: add on close connection
   }
 
