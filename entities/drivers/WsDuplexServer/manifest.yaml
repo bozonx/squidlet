@@ -1,9 +1,9 @@
-name: WsServerDuplex
-main: WsServerDuplex.ts
+name: WsDuplexServer
+main: WsDuplexServer.ts
 system: true
 
 drivers:
-  - WebSocketServer
+  - WsServer
 
 props:
   host:
