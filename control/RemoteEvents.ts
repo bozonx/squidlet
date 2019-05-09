@@ -17,7 +17,7 @@ export default class RemoteEvents {
       console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
     });
 
-    await backdoorClient.addListener(args.category, args.topic);
+    // TODO: on ctl + C - call destroy of backdoorClient
   }
 
   async emitAndExit(args: {[index: string]: any}) {

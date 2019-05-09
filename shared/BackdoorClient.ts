@@ -24,6 +24,12 @@ export default class BackdoorClient {
     this.client.onMessage(this.handleIncomeMessage);
   }
 
+  destroy() {
+    // TODO: remove all the handlers
+
+    this.close();
+  }
+
 
   close() {
     this.client.close(0, 'finish');
