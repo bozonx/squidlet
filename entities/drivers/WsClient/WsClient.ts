@@ -9,7 +9,7 @@ import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
  * If autoReconnect if set it holds connection for ever and reconnects if it lost.
  * By calling getInstance() you will get always a new one. There isn't any sessions.
  */
-export class WebSocketClient extends DriverBase<WsClientLogicProps> {
+export class WsClient extends DriverBase<WsClientLogicProps> {
   get openPromise(): Promise<void> {
     if (!this._client) {
       throw new Error(`WebSocketClient.openPromise: Connection hasn't been initialized or closed for ever`);
@@ -72,8 +72,8 @@ export class WebSocketClient extends DriverBase<WsClientLogicProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<WebSocketClient> {
-  protected DriverClass = WebSocketClient;
+export default class Factory extends DriverFactoryBase<WsClient> {
+  protected DriverClass = WsClient;
 
   protected instanceAlwaysNew: boolean = false;
 

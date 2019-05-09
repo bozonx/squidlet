@@ -1,5 +1,5 @@
-name: WebSocketClient
-main: WebSocketClient.ts
+name: WsClient
+main: WsClient.ts
 system: true
 
 devs:
