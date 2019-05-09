@@ -1,4 +1,4 @@
-import BackdoorClient from './BackdoorClient';
+import BackdoorClient from '../shared/BackdoorClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 
 
