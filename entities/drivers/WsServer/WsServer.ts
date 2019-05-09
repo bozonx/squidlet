@@ -41,7 +41,11 @@ export class WsServer extends DriverBase<WsServerLogicProps> {
   }
 
 
-  // TODO: add server close
+  async closeServer(): Promise<void> {
+    if (!this.server) return;
+
+    return this.server.closeServer();
+  }
 
   /**
    * Force closing a connection

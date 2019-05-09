@@ -49,6 +49,11 @@ export default class WsServerLogic {
     await this.wsServerIo.closeServer(this.serverId);
   }
 
+
+  closeServer(): Promise<void> {
+    return this.wsServerIo.closeServer(this.serverId);
+  }
+
   /**
    * Send message to client
    */
