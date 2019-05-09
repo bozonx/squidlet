@@ -1,5 +1,0 @@
-name: WsClientDuplex
-main: WsClientDuplex.ts
-
-drivers:
-  - WebSocketClient

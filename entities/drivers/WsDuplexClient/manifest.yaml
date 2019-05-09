@@ -1,0 +1,5 @@
+name: WsDuplexClient
+main: WsDuplexClient.ts
+
+drivers:
+  - WsClient

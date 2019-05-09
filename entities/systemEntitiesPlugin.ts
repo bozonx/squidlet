@@ -45,8 +45,8 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'PortExpander/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SharedStorage/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'WebSocketClient/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'WebSocketServer/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'WsClient/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'WsServer/manifest.yaml'));
 
   // network connections drivers
   //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection'));
