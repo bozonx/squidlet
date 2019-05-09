@@ -42,23 +42,38 @@ export default class BackdoorClient {
    * Ask backdoor to send back data which emits on specified event
    */
   async addListener(category: string, topic?: string): Promise<void> {
+
+    // TODO: лучше сюда передать колбэш и его поднимать когда приходит сообщение
+
     const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.addListener, category, topic);
 
     await this.client.send(binMsg);
   }
 
   async removeListener(category: string, topic?: string): Promise<void> {
+
+    // TODO: лучше передавать индекс
+
     const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.removeListener, category, topic);
 
     await this.client.send(binMsg);
   }
 
+  /**
+   * On every income message
+   */
   onIncomeMessage(cb: (message: BackdoorMessage) => void) {
+
+    // TODO: наверное не нужно если будет addListener слушать свои события
+
     this.incomeMessageEvents.addListener(cb);
   }
 
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
+
+    // TODO: review
+
     let message: BackdoorMessage;
 
     try {
@@ -85,7 +100,7 @@ export default class BackdoorClient {
     const props: WsClientLogicProps = {
       url,
       autoReconnect: false,
-      reconnectTimeoutMs: 1000,
+      reconnectTimeoutMs: 0,
       maxTries: 0,
     };
 
