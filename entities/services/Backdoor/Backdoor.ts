@@ -1,9 +1,9 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {
-  WebSocketServer
-} from '../../drivers/WebSocketServer/WebSocketServer';
-import {WsServerLogicProps} from '../../drivers/WebSocketServer/WsServerLogic';
+  WsServer
+} from '../../drivers/WsServer/WsServer';
+import {WsServerLogicProps} from '../../drivers/WsServer/WsServerLogic';
 import {decodeBackdoorMessage, makeMessage} from './helpers';
 
 
@@ -35,7 +35,7 @@ type HandlerItem = [string, (string | undefined), number];
 
 export default class Backdoor extends ServiceBase<WsServerLogicProps> {
   private readonly handlers: {[index: string]: HandlerItem[]} = {};
-  private get wsServer(): WebSocketServer {
+  private get wsServer(): WsServer {
     return this.depsInstances.wsServerDriver as any;
   }
 

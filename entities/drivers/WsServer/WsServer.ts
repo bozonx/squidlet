@@ -5,7 +5,7 @@ import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocke
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 
 
-export class WebSocketServer extends DriverBase<WsServerLogicProps> {
+export class WsServer extends DriverBase<WsServerLogicProps> {
   get listeningPromise(): Promise<void> {
     if (!this._server) {
       throw new Error(`WebSocketServer.listeningPromise: Server has been already closed`);
@@ -117,8 +117,8 @@ export class WebSocketServer extends DriverBase<WsServerLogicProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<WebSocketServer> {
-  protected DriverClass = WebSocketServer;
+export default class Factory extends DriverFactoryBase<WsServer> {
+  protected DriverClass = WsServer;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;

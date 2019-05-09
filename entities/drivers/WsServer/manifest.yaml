@@ -1,5 +1,5 @@
-name: WebSocketServer
-main: WebSocketServer.ts
+name: WsServer
+main: WsServer.ts
 system: true
 
 devs:

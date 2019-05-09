@@ -1,6 +1,6 @@
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {mergeDeep} from '../../../system/helpers/collections';
-import DriverFactoryBase, {WebSocketServer, WebSocketServerDriverProps} from '../WebSocketServer/WebSocketServer';
+import DriverFactoryBase, {WsServer, WebSocketServerDriverProps} from '../WsServer/WsServer';
 import WsServerDuplexLogic from './WsServerDuplexLogic';
 import DriverInstance from 'system/interfaces/DriverInstance';
 
@@ -30,7 +30,7 @@ export class WebSocketServerDuplex extends DriverBase<WebSocketServerRouterProps
 
 
 export default class Factory extends DriverFactoryBase<WebSocketServerDuplex> {
-  protected DriverClass = WebSocketServer;
+  protected DriverClass = WsServer;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;
