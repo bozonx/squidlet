@@ -102,28 +102,17 @@ export default class WsServerLogic {
 
   private listenServer() {
     this.wsServerIo.onConnection(this.serverId, this.onIncomeConnection);
-    this.wsServerIo.onServerListening(this.serverId, this.onServerListening);
-    this.wsServerIo.onServerClose(this.serverId, this.onServerClose);
+    this.wsServerIo.onServerListening(this.serverId, this.listeningPromiseResolve);
+    this.wsServerIo.onServerClose(this.serverId, () => this.onClose());
     this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
   }
 
+  /**
+   * Start listen connection's events
+   */
   private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
-    // TODO: does it really need ???
-    //this.wsServerIo.onClose(this.serverId, connectionId, () => this.onConnectionClose(connectionId));
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
+    // TODO: add unexpected reponce
   }
-
-  private onServerListening = () => {
-    this.listeningPromiseResolve();
-  }
-
-  private onServerClose = () => {
-    // TODO: review
-    this.onClose();
-  }
-
-  // private onConnectionClose = (connectionId: string) => {
-  //   this.logInfo(`WsServerLogic: connection closed. Client id: ${connectionId}. Server id: ${this.serverId}`);
-  // }
 
 }

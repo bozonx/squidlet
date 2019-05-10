@@ -69,10 +69,10 @@ export class WsServer extends DriverBase<WsServerLogicProps> {
     return this.server.onConnection(cb);
   }
 
-  onConnectionClose(cb: (connectionId: string) => void): number {
+  onConnectionClose(connectionId: string, cb: () => void): number {
     if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.serverClosedMsg}`);
 
-    return this.server.onConnectionClose(cb);
+    return this.server.onConnectionClose(connectionId, cb);
   }
 
   removeMessageListener(connectionId: string, handlerId: number) {
