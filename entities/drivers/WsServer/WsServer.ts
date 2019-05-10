@@ -9,7 +9,7 @@ export class WsServer extends DriverBase<WsServerLogicProps> {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     if (!this.server) {
-      throw new Error(`WebSocketServer.listeningPromise: Server has been already closed`);
+      throw new Error(`WebSocketServer.listeningPromise: ${this.serverClosedMsg}`);
     }
 
     return this.server.listeningPromise;
