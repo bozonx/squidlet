@@ -1,11 +1,12 @@
 import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
-import IndexedEventEmitter from '../../../system/helpers/IndexedEventEmitter';
+import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 
 
-enum WS_SERVER_EVENTS {
+export enum WS_SERVER_EVENTS {
+  incomeMessage,
   closeConnection,
-  onMessage,
+  newConnection,
 }
 
 
@@ -58,7 +59,7 @@ export default class WsServerLogic {
   }
 
   async destroy() {
-    if (!this.isInited()) {
+    if (!this.isInitialized()) {
       return this.logError(`WsServerLogic.destroy: Server hasn't been initialized yet.`);
     }
 
@@ -66,7 +67,7 @@ export default class WsServerLogic {
   }
 
 
-  isInited(): boolean {
+  isInitialized(): boolean {
     return !this.serverId;
   }
 
@@ -92,36 +93,26 @@ export default class WsServerLogic {
       if (connectionId === receivedConnectionId) cb(data);
     };
 
-    return this.events.addListener(String(WS_SERVER_EVENTS.onMessage), handler);
+    return this.events.addListener(String(WS_SERVER_EVENTS.incomeMessage), handler);
   }
 
   /**
    * It rises when new connection is come.
    */
   onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
-    return this.wsServerIo.onConnection(this.serverId, cb);
+    return this.events.addListener(String(WS_SERVER_EVENTS.newConnection), cb);
   }
 
   /**
-   * Listen connection close
+   * Listen any connection close
    */
-  onConnectionClose(connectionId: string, cb: () => void): number {
-    return this.wsServerIo.onClose(this.serverId, connectionId, cb);
+  onConnectionClose(cb: (connectionId: string) => void): number {
+    return this.events.addListener(String(WS_SERVER_EVENTS.closeConnection), cb);
   }
 
-  // TODO: remake to just removeListener
-
-  // removeMessageListener(connectionId: string, handlerId: number) {
-  //   this.wsServerIo.removeEventListener(this.serverId, connectionId,'message', handlerId);
-  // }
-  //
-  // removeConnectionListener(handlerId: number) {
-  //   this.wsServerIo.removeServerEventListener(this.serverId, 'connection', handlerId);
-  // }
-  //
-  // removeConnectionCloseListener(connectionId: string, handlerId: number) {
-  //   this.wsServerIo.removeEventListener(this.serverId, connectionId,'close', handlerId);
-  // }
+  removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
+    this.events.removeListener(String(eventName), handlerIndex);
+  }
 
 
   private listenServer() {
@@ -135,9 +126,17 @@ export default class WsServerLogic {
    * Start listen connection's events
    */
   private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
+    // rise a new connection events
+    this.events.emit(String(WS_SERVER_EVENTS.newConnection), connectionId, connectionParams);
+
     this.wsServerIo.onMessage(this.serverId, connectionId, (data: string | Uint8Array) => {
-      this.events.emit(String(WS_SERVER_EVENTS.onMessage), connectionId, data);
+      this.events.emit(String(WS_SERVER_EVENTS.incomeMessage), connectionId, data);
     });
+
+    this.wsServerIo.onClose(this.serverId, connectionId, () => {
+      this.events.emit(String(WS_SERVER_EVENTS.closeConnection), connectionId);
+    });
+
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
     // TODO: add unexpected reponce
   }
