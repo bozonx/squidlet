@@ -12,7 +12,7 @@ import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 export class WsClient extends DriverBase<WsClientLogicProps> {
   get openPromise(): Promise<void> {
     if (!this._client) {
-      throw new Error(`WebSocketClient.openPromise: Connection hasn't been initialized or closed for ever`);
+      throw new Error(`WebSocketClient.openPromise: ${this.closedMsg}`);
     }
 
     return this._client.openPromise;
@@ -22,6 +22,9 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
     return this.env.getIo('WebSocketClient') as any;
   }
   private _client?: WsClientLogic;
+  private get closedMsg() {
+    return `You can't send message because connection "${this.props.url}" has been closed`;
+  }
 
 
   protected willInit = async () => {
@@ -43,13 +46,13 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
 
   send(data: string | Uint8Array): Promise<void> {
-    if (!this._client) throw new Error(`WebSocketClient.send: You can't send message because connection was closed for ever`);
+    if (!this._client) throw new Error(`WebSocketClient.send: ${this.closedMsg}`);
 
     return this._client.send(data);
   }
 
   onMessage(cb: OnMessageHandler): number {
-    if (!this._client) throw new Error(`WebSocketClient.onMessage: You can't listen connection because it was closed for ever`);
+    if (!this._client) throw new Error(`WebSocketClient.onMessage: ${this.closedMsg}`);
 
     return this._client.onMessage(cb);
   }
@@ -65,6 +68,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
    * It calls on unexpected closing of connection or on max reconnect tries is exceeded.
    */
   private onConnectionClosed = () => {
+    // TODO: ??? why print message
     this.env.log.error(`WebSocketClient: connection "${this.props.url}" has been closed, you can't manipulate it any more!`);
 
     // TODO: destroy logic ???
@@ -76,8 +80,4 @@ export default class Factory extends DriverFactoryBase<WsClient> {
   protected DriverClass = WsClient;
 
   protected instanceAlwaysNew: boolean = false;
-
-  // protected instanceIdCalc = (props: {[index: string]: any}): string => {
-  //   return `${props.url}`;
-  // }
 }

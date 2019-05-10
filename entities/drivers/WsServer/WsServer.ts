@@ -10,7 +10,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     if (!this.server) {
-      throw new Error(`WebSocketServer.listeningPromise: ${this.serverClosedMsg}`);
+      throw new Error(`WebSocketServer.listeningPromise: ${this.closedMsg}`);
     }
 
     return this.server.listeningPromise;
@@ -20,7 +20,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
     return this.env.getIo('WebSocketServer') as any;
   }
   private server?: WsServerLogic;
-  get serverClosedMsg() {
+  private get closedMsg() {
     return `Server "${this.props.host}:${this.props.port}" has been closed`;
   }
 
@@ -48,7 +48,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 
 
   send(connectionId: string, data: string | Uint8Array): Promise<void> {
-    if (!this.server) throw new Error(`WebSocketServer.send: ${this.serverClosedMsg}`);
+    if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
 
     return this.server.send(connectionId, data);
   }
@@ -63,19 +63,19 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
   onMessage(connectionId: string, cb: OnMessageHandler): number {
-    if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.serverClosedMsg}`);
+    if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.closedMsg}`);
 
     return this.server.onMessage(connectionId, cb);
   }
 
   onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
-    if (!this.server) throw new Error(`WebSocketServer.onConnection: ${this.serverClosedMsg}`);
+    if (!this.server) throw new Error(`WebSocketServer.onConnection: ${this.closedMsg}`);
 
     return this.server.onConnection(cb);
   }
 
   onConnectionClose(cb: (connectionId: string) => void): number {
-    if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.serverClosedMsg}`);
+    if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.closedMsg}`);
 
     return this.server.onConnectionClose(cb);
   }
@@ -88,7 +88,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 
 
   private onServerClosed = () => {
-    this.env.log.error(`WebSocketServer: ${this.serverClosedMsg}, you can't manipulate it any more!`);
+    this.env.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
   }
 
 }

@@ -3,7 +3,7 @@ import WebSocketClientIo, {
   WebSocketClientProps,
   wsEventNames
 } from 'system/interfaces/io/WebSocketClientIo';
-import {ConnectionParams} from '../../../system/interfaces/io/WebSocketServerIo';
+import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 
 
 export interface WsClientLogicProps {
@@ -56,7 +56,7 @@ export default class WsClientLogic {
 
     this.openPromise = this.makeOpenPromise();
     // make new connection and save connectionId of it
-    this.connectionId = this.wsClientIo.newConnection(this.makeIoProps());
+    this.connectionId = this.wsClientIo.newConnection(this.props);
 
     this.listen();
   }
@@ -65,6 +65,7 @@ export default class WsClientLogic {
     clearTimeout(this.reconnectTimeout);
     this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
     delete this.openPromiseResolve;
+    this.openPromiseReject && this.openPromiseReject();
     delete this.openPromiseReject;
     delete this.openPromise;
     delete this.reconnectTimeout;
@@ -114,7 +115,7 @@ export default class WsClientLogic {
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
     this.openPromiseResolve();
-    this.logInfo(`WsClientLogic: connection opened. ${this.makeIoProps().url} Id: ${this.connectionId}`);
+    this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
 
   /**
@@ -124,7 +125,7 @@ export default class WsClientLogic {
 
     // TODO: проверить действительно ли сработает close если даже соединение не открывалось
 
-    this.logInfo(`WsClientLogic: connection closed. ${this.makeIoProps().url} Id: ${this.connectionId}`);
+    this.logInfo(`WsClientLogic: connection closed. ${this.props.url} Id: ${this.connectionId}`);
 
     // close connection and don't do reconnect if autoReconnect=false or no max tries or tries are exceeded
     // if tries more than -1(infinity) - increment it and close connection if can't connect
@@ -165,7 +166,7 @@ export default class WsClientLogic {
     delete this.reconnectTimeout;
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
     // try to reconnect and save current connectionId
-    this.wsClientIo.reConnect(this.connectionId, this.makeIoProps());
+    this.wsClientIo.reConnect(this.connectionId, this.props);
   }
 
   private finallyCloseConnection() {
@@ -189,13 +190,13 @@ export default class WsClientLogic {
     });
   }
 
-  private makeIoProps(): WebSocketClientProps {
-    return {
-      url: this.props.url,
-      //url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
-      // additional io client params
-      //...omit(this.props, 'host', 'port')
-    };
-  }
+  // private makeIoProps(): WebSocketClientProps {
+  //   return {
+  //     url: this.props.url,
+  //     //url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
+  //     // additional io client params
+  //     //...omit(this.props, 'host', 'port')
+  //   };
+  // }
   
 }
