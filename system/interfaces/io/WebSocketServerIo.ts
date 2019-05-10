@@ -12,6 +12,7 @@ export const Methods = [
   'onClose',
   'onMessage',
   'onError',
+  'onUnexpectedResponse',
   'removeEventListener',
   'send',
   'close',
@@ -91,6 +92,7 @@ export default interface WebSocketServerIo {
   onClose(serverId: string, connectionId: string, cb: () => void): number;
   onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number;
   onError(serverId: string, connectionId: string, cb: (err: Error) => void): number;
+  onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): number
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void;
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
   close(serverId: string, connectionId: string, code: number, reason: string): void;

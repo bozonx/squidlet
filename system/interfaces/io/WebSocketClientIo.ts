@@ -15,9 +15,10 @@ export const wsEventNames: {[index: string]: WsEvents} = {
   close: 'close',
   message: 'message',
   error: 'error',
+  unexpectedResponse: 'unexpectedResponse',
 };
 
-export type WsEvents = 'open' | 'close' | 'message' | 'error';
+export type WsEvents = 'open' | 'close' | 'message' | 'error' | 'unexpectedResponse';
 export type OnMessageHandler = (data: string | Uint8Array) => void;
 
 export interface WebSocketClientProps {

@@ -104,10 +104,10 @@ export default class WebSocketServer implements WebSocketServerIo {
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
-  onUnexpectedResponce(serverId: string, connectionId: string, cb: (err: Error) => void): number {
+  onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): number {
     const connectionItem = this.getConnectionItem(serverId, connectionId);
 
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.unexpectedResponse, cb);
   }
 
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
@@ -194,13 +194,8 @@ export default class WebSocketServer implements WebSocketServerIo {
     socket.on('message', (data: string | Uint8Array) => {
       events.emit(wsEventNames.message, data);
     });
-    // TODO: не делать абстракцию
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      events.emit(
-        wsEventNames.error,
-        `Unexpected response has been received on server "${serverId}", ` +
-        `connection "${connectionId}": ${response.statusCode}: ${response.statusMessage}`
-      );
+      events.emit(wsEventNames.unexpectedResponse, this.makeConnectionParams(response));
     });
 
     // emit new connection

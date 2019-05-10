@@ -3,8 +3,8 @@ import {GetDriverDep} from 'system/entities/EntityBase';
 import {
   WsServer
 } from '../../drivers/WsServer/WsServer';
-import {WsServerLogicProps} from '../../drivers/WsServer/WsServerLogic';
 import {decodeBackdoorMessage, makeMessage} from './helpers';
+import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 
 
 export enum BACKDOOR_ACTION {
@@ -33,7 +33,7 @@ enum HANDLER_ITEM_POS {
 type HandlerItem = [string, (string | undefined), number];
 
 
-export default class Backdoor extends ServiceBase<WsServerLogicProps> {
+export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   private readonly handlers: {[index: string]: HandlerItem[]} = {};
   private get wsServer(): WsServer {
     return this.depsInstances.wsServerDriver as any;

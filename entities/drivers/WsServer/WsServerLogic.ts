@@ -138,7 +138,12 @@ export default class WsServerLogic {
     });
 
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
-    // TODO: add unexpected reponce
+    this.wsServerIo.onUnexpectedResponse(this.serverId, connectionId, (response: ConnectionParams) => {
+      this.logError(
+        `Unexpected response has been received on server "${this.serverId}", ` +
+        `connection "${connectionId}": ${JSON.stringify(response)}`
+      );
+    });
   }
 
 }
