@@ -93,21 +93,21 @@ export default class WsServerLogic {
       if (connectionId === receivedConnectionId) cb(data);
     };
 
-    return this.events.addListener(String(WS_SERVER_EVENTS.incomeMessage), handler);
+    return this.events.addListener(WS_SERVER_EVENTS.incomeMessage, handler);
   }
 
   /**
    * It rises when new connection is come.
    */
   onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
-    return this.events.addListener(String(WS_SERVER_EVENTS.newConnection), cb);
+    return this.events.addListener(WS_SERVER_EVENTS.newConnection, cb);
   }
 
   /**
    * Listen any connection close
    */
   onConnectionClose(cb: (connectionId: string) => void): number {
-    return this.events.addListener(String(WS_SERVER_EVENTS.closeConnection), cb);
+    return this.events.addListener(WS_SERVER_EVENTS.closeConnection, cb);
   }
 
   removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
@@ -127,14 +127,14 @@ export default class WsServerLogic {
    */
   private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
     // rise a new connection events
-    this.events.emit(String(WS_SERVER_EVENTS.newConnection), connectionId, connectionParams);
+    this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, connectionParams);
 
     this.wsServerIo.onMessage(this.serverId, connectionId, (data: string | Uint8Array) => {
-      this.events.emit(String(WS_SERVER_EVENTS.incomeMessage), connectionId, data);
+      this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
     });
 
     this.wsServerIo.onClose(this.serverId, connectionId, () => {
-      this.events.emit(String(WS_SERVER_EVENTS.closeConnection), connectionId);
+      this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
     });
 
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));

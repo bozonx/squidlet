@@ -104,6 +104,12 @@ export default class WebSocketServer implements WebSocketServerIo {
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
+  onUnexpectedResponce(serverId: string, connectionId: string, cb: (err: Error) => void): number {
+    const connectionItem = this.getConnectionItem(serverId, connectionId);
+
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
+  }
+
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
     if (
       !this.servers[Number(serverId)]

@@ -6,8 +6,7 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
   private indexedEvents: {[index: string]: IndexedEvents<T>} = {};
 
 
-  // TODO: как сделать типизированный ?? или хотябы error first
-  emit(eventName: string, ...args: any[]) {
+  emit(eventName: string | number, ...args: any[]) {
     if (!this.indexedEvents[eventName]) return;
 
     this.indexedEvents[eventName].emit(...args);
@@ -16,7 +15,7 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
   /**
    * Register listener and return its index
    */
-  addListener(eventName: string, handler: T): number {
+  addListener(eventName: string | number, handler: T): number {
     if (!this.indexedEvents[eventName]) {
       this.indexedEvents[eventName] = new IndexedEvents();
     }
@@ -24,7 +23,7 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
     return this.indexedEvents[eventName].addListener(handler);
   }
 
-  once(eventName: string, handler: T): number {
+  once(eventName: string | number, handler: T): number {
     let wrapperIndex: number = -1;
     const wrapper = ((...args: any[]) => {
       this.removeListener(eventName, wrapperIndex);
@@ -36,7 +35,7 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
     return wrapperIndex;
   }
 
-  removeListener(eventName: string, handlerIndex: number): void {
+  removeListener(eventName: string | number, handlerIndex: number): void {
     if (!this.indexedEvents[eventName]) return;
 
     this.indexedEvents[eventName].removeListener(handlerIndex);
@@ -47,7 +46,7 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
     }
   }
 
-  removeAllListeners(eventName: string): void {
+  removeAllListeners(eventName: string | number): void {
     if (!this.indexedEvents[eventName]) return;
 
     this.indexedEvents[eventName].removeAll();
@@ -55,8 +54,6 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
   }
 
   destroy() {
-    // TODO: test
-
     for (let eventName of Object.keys(this.indexedEvents)) {
       this.removeAllListeners(eventName);
     }
