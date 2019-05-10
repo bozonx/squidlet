@@ -1,7 +1,6 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
-
 import WebSocketServerIo, {
   ConnectionParams,
   WebSocketServerProps,
@@ -22,6 +21,21 @@ enum SERVER_POSITIONS {
   wsServer,
   events,
   connections
+}
+
+
+export function makeConnectionParams(request: IncomingMessage): ConnectionParams {
+  return {
+    url: request.url as string,
+    method: request.method as string,
+    statusCode: request.statusCode as number,
+    statusMessage: request.statusMessage as string,
+    headers: {
+      authorization: request.headers.authorization,
+      cookie: request.headers.cookie,
+      'user-agent': request.headers['user-agent'],
+    },
+  };
 }
 
 
@@ -179,7 +193,7 @@ export default class WebSocketServer implements WebSocketServerIo {
     const connections = this.servers[Number(serverId)][SERVER_POSITIONS.connections];
     const events = new IndexedEventEmitter();
     const connectionId: string = String(connections.length);
-    const connectionParams: ConnectionParams = this.makeConnectionParams(request);
+    const connectionParams: ConnectionParams = makeConnectionParams(request);
 
     connections.push([
       socket,
@@ -195,26 +209,12 @@ export default class WebSocketServer implements WebSocketServerIo {
       events.emit(wsEventNames.message, data);
     });
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      events.emit(wsEventNames.unexpectedResponse, this.makeConnectionParams(response));
+      events.emit(wsEventNames.unexpectedResponse, makeConnectionParams(response));
     });
 
     // emit new connection
     this.servers[Number(serverId)][SERVER_POSITIONS.events]
       .emit(wsServerEventNames.connection, connectionId, connectionParams);
-  }
-
-  private makeConnectionParams(request: IncomingMessage): ConnectionParams {
-    return {
-      url: request.url as string,
-      method: request.method as string,
-      statusCode: request.statusCode as number,
-      statusMessage: request.statusMessage as string,
-      headers: {
-        authorization: request.headers.authorization,
-        cookie: request.headers.cookie,
-        'user-agent': request.headers['user-agent'],
-      },
-    };
   }
 
   private getServerItem(serverId: string): ServerItem {

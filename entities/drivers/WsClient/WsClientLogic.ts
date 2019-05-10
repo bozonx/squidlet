@@ -3,6 +3,7 @@ import WebSocketClientIo, {
   WebSocketClientProps,
   wsEventNames
 } from 'system/interfaces/io/WebSocketClientIo';
+import {ConnectionParams} from '../../../system/interfaces/io/WebSocketServerIo';
 
 
 export interface WsClientLogicProps {
@@ -101,9 +102,11 @@ export default class WsClientLogic {
     this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
     this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
     this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
-    this.wsClientIo.onUnexpectedResponse(this.connectionId, (request, response) => {
-      this.logError(`The unexpected response has been received on connection "${this.connectionId}": ` +
-        `${response.statusCode}: ${response.statusMessage}`);
+    this.wsClientIo.onUnexpectedResponse(this.connectionId, (response: ConnectionParams) => {
+      this.logError(
+        `The unexpected response has been received on ` +
+        `connection "${this.connectionId}": ${JSON.stringify(response)}`
+      );
     });
   }
 

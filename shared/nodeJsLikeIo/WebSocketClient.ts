@@ -6,6 +6,8 @@ import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 import {omit} from 'system/helpers/lodashLike';
+import {makeConnectionParams} from './WebSocketServer';
+import {ConnectionParams} from '../../system/interfaces/io/WebSocketServerIo';
 
 
 export type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
@@ -68,9 +70,10 @@ export default class WebSocketClient implements WebSocketClientIo {
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
-  onUnexpectedResponse() {
-    // TODO: make
-    // TODO: add interface
+  onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): number {
+    const connectionItem = this.getConnectionItem(connectionId);
+
+    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.unexpectedResponse, cb);
   }
 
   removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
@@ -121,13 +124,8 @@ export default class WebSocketClient implements WebSocketClientIo {
     client.on(wsEventNames.error, (err: Error) => {
       events.emit(wsEventNames.error, err);
     });
-    // TODO: не делать абстракцию
     client.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      events.emit(
-        wsEventNames.error,
-        `Unexpected response has been received on connection "${connectionId}": ` +
-        `${response.statusCode}: ${response.statusMessage}`
-      );
+      events.emit(wsEventNames.unexpectedResponse, makeConnectionParams(response));
     });
 
     return [

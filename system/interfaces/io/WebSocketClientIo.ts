@@ -1,3 +1,5 @@
+import {ConnectionParams} from './WebSocketServerIo';
+
 export const Methods = [
   'newConnection',
   'reConnect',
@@ -5,6 +7,7 @@ export const Methods = [
   'onClose',
   'onMessage',
   'onError',
+  'onUnexpectedResponse',
   'removeEventListener',
   'send',
   'close',
@@ -33,6 +36,7 @@ export default interface WebSocketClientIo {
   onClose             (connectionId: string, cb: () => void): number;
   onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): number;
   onError             (connectionId: string, cb: (err: Error) => void): number;
+  onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): number;
   removeEventListener (connectionId: string, eventName: WsEvents, handlerIndex: number): void;
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;
   close               (connectionId: string, code: number, reason?: string): void;
