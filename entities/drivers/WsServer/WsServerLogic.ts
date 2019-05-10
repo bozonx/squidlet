@@ -43,16 +43,14 @@ export default class WsServerLogic {
     });
 
     this.listenServer();
+
+    // TODO: add timeout if server doesn't start listen and rise a promise reject
   }
 
   async destroy() {
     await this.wsServerIo.closeServer(this.serverId);
   }
 
-
-  closeServer(): Promise<void> {
-    return this.wsServerIo.closeServer(this.serverId);
-  }
 
   /**
    * Send message to client
@@ -64,7 +62,7 @@ export default class WsServerLogic {
   /**
    * Force closing a connection
    */
-  close(connectionId: string, code: number, reason: string) {
+  closeConnection(connectionId: string, code: number, reason: string) {
     this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
@@ -82,8 +80,11 @@ export default class WsServerLogic {
     return this.wsServerIo.onConnection(this.serverId, cb);
   }
 
-  onConnectionClose(cb: (connectionId: string) => void): number {
-    // TODO: add on close connection
+  /**
+   * Listen connection close
+   */
+  onConnectionClose(connectionId: string, cb: () => void): number {
+    return this.wsServerIo.onClose(this.serverId, connectionId, cb);
   }
 
   removeMessageListener(connectionId: string, handlerId: number) {
@@ -92,6 +93,10 @@ export default class WsServerLogic {
 
   removeConnectionListener(handlerId: number) {
     this.wsServerIo.removeServerEventListener(this.serverId, 'connection', handlerId);
+  }
+
+  removeConnectionCloseListener(connectionId: string, handlerId: number) {
+    this.wsServerIo.removeEventListener(this.serverId, connectionId,'close', handlerId);
   }
 
 
@@ -104,7 +109,7 @@ export default class WsServerLogic {
 
   private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
     // TODO: does it really need ???
-    this.wsServerIo.onClose(this.serverId, connectionId, () => this.onConnectionClose(connectionId));
+    //this.wsServerIo.onClose(this.serverId, connectionId, () => this.onConnectionClose(connectionId));
     this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
   }
 
@@ -113,11 +118,12 @@ export default class WsServerLogic {
   }
 
   private onServerClose = () => {
+    // TODO: review
     this.onClose();
   }
 
-  private onConnectionClose = (connectionId: string) => {
-    this.logInfo(`WsServerLogic: connection closed. Client id: ${connectionId}. Server id: ${this.serverId}`);
-  }
+  // private onConnectionClose = (connectionId: string) => {
+  //   this.logInfo(`WsServerLogic: connection closed. Client id: ${connectionId}. Server id: ${this.serverId}`);
+  // }
 
 }

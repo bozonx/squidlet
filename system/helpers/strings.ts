@@ -74,3 +74,12 @@ export function splitLastElement(
   return [ last, split.join(separator) ];
 }
 
+
+
+/*
+import * as querystring from 'querystring';
+
+const splitUrl: string[] = (request.url as any).split('?');
+const getParams: {clientId: string} = querystring.parse(splitUrl[1]) as any;
+const clientId: string = getParams.clientId;
+ */

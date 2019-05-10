@@ -8,11 +8,11 @@ export const Methods = [
   'onServerListening',
   'onServerClose',
   'onServerError',
+  'removeServerEventListener',
   'onClose',
   'onMessage',
   'onError',
   'removeEventListener',
-  'removeServerEventListener',
   'send',
   'close',
 ];
@@ -85,6 +85,9 @@ export default interface WebSocketServerIo {
 
   ////////// Connection's methods like in client, but without onOpen
 
+  /**
+   * On connection close
+   */
   onClose(serverId: string, connectionId: string, cb: () => void): number;
   onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number;
   onError(serverId: string, connectionId: string, cb: (err: Error) => void): number;

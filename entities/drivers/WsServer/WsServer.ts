@@ -38,28 +38,23 @@ export class WsServer extends DriverBase<WsServerLogicProps> {
     if (!this.server) return;
 
     await this.server.destroy();
+    delete this.server;
   }
 
-
-  async closeServer(): Promise<void> {
-    if (!this.server) return;
-
-    return this.server.closeServer();
-  }
-
-  /**
-   * Force closing a connection
-   */
-  close(connectionId: string, code: number, reason: string) {
-    if (!this.server) return;
-
-    this.server.close(connectionId, code, reason);
-  }
 
   send(connectionId: string, data: string | Uint8Array): Promise<void> {
     if (!this.server) throw new Error(`WebSocketServer.send: ${this.serverClosedMsg}`);
 
     return this.server.send(connectionId, data);
+  }
+
+  /**
+   * Force closing a connection
+   */
+  closeConnection(connectionId: string, code: number, reason: string) {
+    if (!this.server) return;
+
+    this.server.closeConnection(connectionId, code, reason);
   }
 
   onMessage(connectionId: string, cb: OnMessageHandler): number {
@@ -92,6 +87,12 @@ export class WsServer extends DriverBase<WsServerLogicProps> {
     this.server.removeConnectionListener(handlerId);
   }
 
+  removeConnectionCloseListener(connectionId: string, handlerId: number) {
+    if (!this.server) throw new Error(`WebSocketServer.removeConnectionCloseListener: ${this.serverClosedMsg}`);
+
+    this.server.removeConnectionCloseListener(connectionId, handlerId);
+  }
+
   private onServerClosed = () => {
     this.env.log.error(`WebSocketServer: ${this.serverClosedMsg}, you can't manipulate it any more!`);
   }
@@ -105,12 +106,3 @@ export default class Factory extends DriverFactoryBase<WsServer> {
     return `${props.host}:${props.port}`;
   }
 }
-
-
-/*
-import * as querystring from 'querystring';
-
-const splitUrl: string[] = (request.url as any).split('?');
-const getParams: {clientId: string} = querystring.parse(splitUrl[1]) as any;
-const clientId: string = getParams.clientId;
- */
