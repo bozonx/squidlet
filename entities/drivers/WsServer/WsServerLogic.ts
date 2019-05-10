@@ -15,7 +15,7 @@ export default class WsServerLogic {
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
-  private readonly serverId: string;
+  private serverId: string = '';
   private listeningPromiseResolve: () => void = () => {};
 
 
@@ -36,7 +36,12 @@ export default class WsServerLogic {
     this.listeningPromise = new Promise<void>((resolve) => {
       this.listeningPromiseResolve = resolve;
     });
+  }
 
+  /**
+   * Start server
+   */
+  init() {
     this.serverId = this.wsServerIo.newServer({
       host: this.props.host,
       port: this.props.port,
@@ -51,6 +56,8 @@ export default class WsServerLogic {
     await this.wsServerIo.closeServer(this.serverId);
   }
 
+
+  // TODO : добавить прослойку событий
 
   /**
    * Send message to client

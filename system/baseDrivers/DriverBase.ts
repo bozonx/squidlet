@@ -12,6 +12,7 @@ export default class DriverBase<Props = {}> extends EntityBase<Props> {
     this.env = env;
   }
 
+  // TODO: review
   protected newSender(): Sender {
     return new Sender(
       // TODO: don't use system.host

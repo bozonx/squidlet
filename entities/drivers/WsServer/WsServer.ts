@@ -34,6 +34,10 @@ export class WsServer extends DriverBase<WsServerLogicProps> {
     );
   }
 
+  protected appDidInit = async () => {
+    this.server && this.server.init();
+  }
+
   destroy = async () => {
     if (!this.server) return;
 
