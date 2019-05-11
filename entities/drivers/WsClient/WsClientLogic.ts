@@ -38,7 +38,7 @@ export default class WsClientLogic {
   private wasPrevOpenFulfilled: boolean = false;
   private connectionTries: number = 0;
   private reconnectTimeout: any;
-  private isConnectionEstablished: boolean = false;
+  private isConnectionOpened: boolean = false;
 
 
   constructor(
@@ -70,7 +70,7 @@ export default class WsClientLogic {
 
 
   isConnected(): boolean {
-    return this.isConnectionEstablished;
+    return this.isConnectionOpened;
   }
 
   // TODO: если вызывается вовремя реконнекта - повешать в очередь и выполнить когда создастся новое соединение
@@ -108,7 +108,7 @@ export default class WsClientLogic {
   private handleConnectionOpen = () => {
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
-    this.isConnectionEstablished = true;
+    this.isConnectionOpened = true;
     this.openPromiseResolve();
     this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
@@ -117,7 +117,7 @@ export default class WsClientLogic {
    * Trying to reconnect on connection closed.
    */
   private handleConnectionClose = () => {
-    this.isConnectionEstablished = false;
+    this.isConnectionOpened = false;
     // TODO: проверить действительно ли сработает close если даже соединение не открывалось
 
     this.logInfo(`WsClientLogic: connection closed. ${this.props.url} Id: ${this.connectionId}`);
@@ -142,14 +142,9 @@ export default class WsClientLogic {
   }
 
   private reconnect() {
-    // TODO: поидее после реконнекта мы можем ожидать соединения 60 сек - не нужно создавать новое
-
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
-
-    // increment connection tries if maxTries is greater than 0
-    if (this.props.maxTries >= 0) this.connectionTries++;
-
+    
     // make new promise if previous was fulfilled
     if (this.wasPrevOpenFulfilled) this.openPromise = this.makeOpenPromise();
 
@@ -164,15 +159,17 @@ export default class WsClientLogic {
     delete this.reconnectTimeout;
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
 
-    // TODO: пои этом не сработает close ??? или сработает???
+    // TODO: при этом не сработает close ??? или сработает???
     // try to reconnect and save current connectionId
     try {
       this.wsClientIo.reConnect(this.connectionId, this.props);
     }
     catch (err) {
       this.logError(`WsClientLogic.doReconnect: ${err}. Reconnecting...`);
-      this.isConnectionEstablished = false;
-      
+
+      // increment connection tries if maxTries is greater than 0
+      if (this.props.maxTries >= 0) this.connectionTries++;
+
       return this.resolveReconnection();
     }
 
@@ -206,6 +203,7 @@ export default class WsClientLogic {
   }
 
   private destroyInstance() {
+    this.isConnectionOpened = false;
     this.openPromiseReject && this.openPromiseReject();
     clearTimeout(this.reconnectTimeout);
     delete this.openPromiseReject;
