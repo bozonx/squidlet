@@ -64,8 +64,7 @@ export default class WsClientLogic {
 
   destroy() {
     this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
-    this.openPromiseReject && this.openPromiseReject();
-    this.clearMemory();
+    this.destroyInstance();
   }
 
 
@@ -76,8 +75,7 @@ export default class WsClientLogic {
 
   close(code: number, reason?: string) {
     this.wsClientIo.close(this.connectionId, code, reason);
-    this.openPromiseReject && this.openPromiseReject();
-    this.clearMemory();
+    this.destroyInstance();
   }
 
   onMessage(cb: OnMessageHandler): number {
@@ -162,20 +160,18 @@ export default class WsClientLogic {
   }
 
   /**
-   * After that you can't reconnect. You should create a new instance if need.
+   * You can't reconnect anymore after this. You should create a new instance if need.
    */
   private finallyCloseConnection() {
-    // TODO: may be use destroy instead?
-
     this.wsClientIo.close(this.connectionId, 0);
 
-    // reject open promise if connection hasn't been established
-    if (!this.wasPrevOpenFulfilled) {
-      this.wasPrevOpenFulfilled = true;
-      this.openPromiseReject();
-    }
+    // // reject open promise if connection hasn't been established
+    // if (!this.wasPrevOpenFulfilled) {
+    //   this.wasPrevOpenFulfilled = true;
+    //   this.openPromiseReject();
+    // }
 
-    this.clearMemory();
+    this.destroyInstance();
 
     return this.onClose();
   }
@@ -189,7 +185,8 @@ export default class WsClientLogic {
     });
   }
 
-  private clearMemory() {
+  private destroyInstance() {
+    this.openPromiseReject && this.openPromiseReject();
     clearTimeout(this.reconnectTimeout);
     delete this.openPromiseReject;
     delete this.openPromise;
