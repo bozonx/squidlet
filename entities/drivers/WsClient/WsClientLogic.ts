@@ -4,6 +4,7 @@ import WebSocketClientIo, {
   wsEventNames
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
+import IndexedEvents from '../../../system/helpers/IndexedEvents';
 
 
 export interface WsClientLogicProps {
@@ -25,6 +26,7 @@ export default class WsClientLogic {
   // on first time connect or reconnect
   openPromise: Promise<void>;
 
+  private readonly messageEvents = new IndexedEvents<OnMessageHandler>();
   private readonly wsClientIo: WebSocketClientIo;
   private readonly props: WsClientLogicProps;
   private readonly onClose: () => void;
@@ -64,6 +66,7 @@ export default class WsClientLogic {
   destroy() {
     clearTimeout(this.reconnectTimeout);
     this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+    this.messageEvents.removeAll();
     delete this.openPromiseResolve;
     this.openPromiseReject && this.openPromiseReject();
     delete this.openPromiseReject;
@@ -88,14 +91,12 @@ export default class WsClientLogic {
 
   }
 
-  // TODO: наверное нужна отдельная прослойка так как инстанс соединения убивается при закрытии
-
   onMessage(cb: OnMessageHandler): number {
-    return this.wsClientIo.onMessage(this.connectionId, cb);
+    return this.messageEvents.addListener(cb);
   }
 
   removeMessageListener(handlerId: number) {
-    this.wsClientIo.removeEventListener(this.connectionId, wsEventNames.message, handlerId);
+    this.messageEvents.removeListener(handlerId);
   }
 
 
@@ -103,6 +104,7 @@ export default class WsClientLogic {
     this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
     this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
     this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
+    this.wsClientIo.onMessage(this.connectionId, this.messageEvents.emit);
     this.wsClientIo.onUnexpectedResponse(this.connectionId, (response: ConnectionParams) => {
       this.logError(
         `The unexpected response has been received on ` +
@@ -144,6 +146,7 @@ export default class WsClientLogic {
   private reconnect() {
     // TODO: что если не получилось переконнектиться
     // TODO: поидее после реконнекта мы можем ожидать соединения 60 сек - не нужно создавать новое
+    // TODO: навешиваться на события - listen()
 
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
