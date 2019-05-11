@@ -76,9 +76,8 @@ export default class WsClientLogic {
 
   close(code: number, reason?: string) {
     this.wsClientIo.close(this.connectionId, code, reason);
-
-    // TODO: вызвать onClose()
-
+    this.openPromiseReject && this.openPromiseReject();
+    this.clearMemory();
   }
 
   onMessage(cb: OnMessageHandler): number {
