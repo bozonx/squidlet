@@ -1,7 +1,5 @@
 import WebSocketClientIo, {
   OnMessageHandler,
-  WebSocketClientProps,
-  wsEventNames
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from '../../../system/helpers/IndexedEvents';
@@ -21,6 +19,7 @@ export interface WsClientLogicProps {
 /**
  * Websocket client simplified interface.
  * It can automatically reconnect if "autoReconnect" param is true.
+ * But if connection is closed you should create a new instance to reconnect.
  */
 export default class WsClientLogic {
   // on first time connect or reconnect
@@ -64,23 +63,14 @@ export default class WsClientLogic {
   }
 
   destroy() {
-    clearTimeout(this.reconnectTimeout);
     this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
-    this.messageEvents.removeAll();
-    delete this.openPromiseResolve;
     this.openPromiseReject && this.openPromiseReject();
-    delete this.openPromiseReject;
-    delete this.openPromise;
-    delete this.reconnectTimeout;
+    this.clearMemory();
   }
 
 
-  // TODO: что если нет текущего открытого соединения??? - повешать в очередь или вернуть ошибку ?
-
+  // TODO: если вызывается вовремя реконнекта - повешать в очередь и выполнить когда создастся новое соединение
   async send(data: string | Uint8Array): Promise<void> {
-
-    // TODO: почему не добавляется тип ???
-
     return this.wsClientIo.send(this.connectionId, data);
   }
 
@@ -172,7 +162,12 @@ export default class WsClientLogic {
     this.wsClientIo.reConnect(this.connectionId, this.props);
   }
 
+  /**
+   * After that you can't reconnect. You should create a new instance if need.
+   */
   private finallyCloseConnection() {
+    // TODO: may be use destroy instead?
+
     this.wsClientIo.close(this.connectionId, 0);
 
     // reject open promise if connection hasn't been established
@@ -180,6 +175,8 @@ export default class WsClientLogic {
       this.wasPrevOpenFulfilled = true;
       this.openPromiseReject();
     }
+
+    this.clearMemory();
 
     return this.onClose();
   }
@@ -193,13 +190,22 @@ export default class WsClientLogic {
     });
   }
 
-  // private makeIoProps(): WebSocketClientProps {
-  //   return {
-  //     url: this.props.url,
-  //     //url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
-  //     // additional io client params
-  //     //...omit(this.props, 'host', 'port')
-  //   };
-  // }
-  
+  private clearMemory() {
+    clearTimeout(this.reconnectTimeout);
+    delete this.openPromiseReject;
+    delete this.openPromise;
+    delete this.reconnectTimeout;
+    this.messageEvents.removeAll();
+    delete this.openPromiseResolve;
+  }
+
 }
+
+// private makeIoProps(): WebSocketClientProps {
+//   return {
+//     url: this.props.url,
+//     //url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
+//     // additional io client params
+//     //...omit(this.props, 'host', 'port')
+//   };
+// }

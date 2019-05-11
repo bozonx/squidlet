@@ -2,6 +2,7 @@ import WebSocketClientIo, {OnMessageHandler} from 'system/interfaces/io/WebSocke
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
+import IndexedEvents from '../../../system/helpers/IndexedEvents';
 
 
 /**
@@ -11,24 +12,25 @@ import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
  */
 export class WsClient extends DriverBase<WsClientLogicProps> {
   get openPromise(): Promise<void> {
-    if (!this._client) {
+    if (!this.client) {
       throw new Error(`WebSocketClient.openPromise: ${this.closedMsg}`);
     }
 
-    return this._client.openPromise;
+    return this.client.openPromise;
   }
 
+  private readonly closeEvents = new IndexedEvents<() => void>();
   private get wsClientIo(): WebSocketClientIo {
     return this.env.getIo('WebSocketClient') as any;
   }
-  private _client?: WsClientLogic;
+  private client?: WsClientLogic;
   private get closedMsg() {
     return `You can't send message because connection "${this.props.url}" has been closed`;
   }
 
 
   protected willInit = async () => {
-    this._client = new WsClientLogic(
+    this.client = new WsClientLogic(
       this.wsClientIo,
       this.props,
       this.onConnectionClosed,
@@ -38,29 +40,37 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
   }
 
   destroy = async () => {
-    if (!this._client) return;
+    if (!this.client) return;
 
-    this._client.destroy();
-    delete this._client;
+    this.client.destroy();
+    delete this.client;
   }
 
 
   send(data: string | Uint8Array): Promise<void> {
-    if (!this._client) throw new Error(`WebSocketClient.send: ${this.closedMsg}`);
+    if (!this.client) throw new Error(`WebSocketClient.send: ${this.closedMsg}`);
 
-    return this._client.send(data);
+    return this.client.send(data);
   }
 
   onMessage(cb: OnMessageHandler): number {
-    if (!this._client) throw new Error(`WebSocketClient.onMessage: ${this.closedMsg}`);
+    if (!this.client) throw new Error(`WebSocketClient.onMessage: ${this.closedMsg}`);
 
-    return this._client.onMessage(cb);
+    return this.client.onMessage(cb);
+  }
+  
+  onClose(cb: () => void): number {
+    return this.closeEvents.addListener(cb);
   }
 
   removeMessageListener(handlerId: number) {
-    if (!this._client) return;
+    if (!this.client) return;
 
-    this._client.removeMessageListener(handlerId);
+    this.client.removeMessageListener(handlerId);
+  }
+  
+  removeCloseListener(handlerIndex: number) {
+    this.closeEvents.removeListener(handlerIndex);
   }
 
 
@@ -68,10 +78,9 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
    * It calls on unexpected closing of connection or on max reconnect tries is exceeded.
    */
   private onConnectionClosed = () => {
-    // TODO: ??? why print message
-    this.env.log.error(`WebSocketClient: connection "${this.props.url}" has been closed, you can't manipulate it any more!`);
-
-    // TODO: destroy logic ???
+    delete this.client;
+    
+    this.closeEvents.emit();
   }
 
 }
