@@ -1,7 +1,7 @@
-import IoSet from '../interfaces/IoSet';
-import IoItem, {IoItemClass} from '../interfaces/IoItem';
-import System from '../System';
-import {pathJoin} from '../helpers/nodeLike';
+import IoSet from './interfaces/IoSet';
+import IoItem, {IoItemClass} from './interfaces/IoItem';
+import System from './System';
+import {pathJoin} from './helpers/nodeLike';
 
 
 export default class IoSetLocal implements IoSet {

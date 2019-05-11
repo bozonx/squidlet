@@ -13,7 +13,7 @@ import SystemConfig from './interfaces/SystemConfig';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
-import IoSetLocal from './ioSet/IoSetLocal';
+import IoSetLocal from './IoSetLocal';
 import IoManager from './entities/IoManager';
 
 

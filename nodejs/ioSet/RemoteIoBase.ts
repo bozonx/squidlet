@@ -1,10 +1,10 @@
-import System from '../System';
-import RemoteCall from '../helpers/remoteCall/RemoteCall';
-import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../interfaces/RemoteCallMessage';
-import {isPlainObject} from '../helpers/lodashLike';
-import IoItem from '../interfaces/IoItem';
-import IoSetLocal from './IoSetLocal';
-import {pathJoin} from '../helpers/nodeLike';
+import System from '../../system/System';
+import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
+import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
+import {isPlainObject} from '../../system/helpers/lodashLike';
+import IoItem from '../../system/interfaces/IoItem';
+import IoSetLocal from '../../system/IoSetLocal';
+import {pathJoin} from '../../system/helpers/nodeLike';
 
 
 export default abstract class RemoteIoBase extends IoSetLocal {

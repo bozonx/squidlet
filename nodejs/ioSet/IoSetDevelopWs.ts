@@ -6,7 +6,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import System from '../../system';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-import RemoteIoBase from '../../system/ioSet/RemoteIoBase';
+import RemoteIoBase from './RemoteIoBase';
 
 
 export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoSet {

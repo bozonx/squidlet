@@ -1,14 +1,14 @@
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-import System from '../system/System';
-import {ManifestsTypePluralName} from '../system/interfaces/ManifestTypes';
-import ManifestBase from '../system/interfaces/ManifestBase';
-import {EntityClassType} from '../system/entities/EntityManagerBase';
-import HostEnvSet from './interfaces/HostEnvSet';
-import {trimEnd} from '../system/helpers/lodashLike';
-import {pathJoin} from '../system/helpers/nodeLike';
-import StorageIo from '../system/interfaces/io/StorageIo';
+import System from '../../system/System';
+import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
+import ManifestBase from '../../system/interfaces/ManifestBase';
+import {EntityClassType} from '../../system/entities/EntityManagerBase';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import {trimEnd} from '../../system/helpers/lodashLike';
+import {pathJoin} from '../../system/helpers/nodeLike';
+import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
 let configSet: HostEnvSet;
