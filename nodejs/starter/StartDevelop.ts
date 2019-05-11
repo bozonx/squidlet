@@ -93,6 +93,9 @@ export default class StartDevelop {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
+
+    // TODO: review
+
     const ResolvedIoSet = resolveIoSetClass(ioSetType);
 
     return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
@@ -103,6 +106,9 @@ export default class StartDevelop {
    * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
    */
   private resolveIoSetType(): IoSetTypes {
+
+    // TODO: review
+
     const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
 
     if (!ioSetConfig || ioSetConfig.type === 'nodejs-developLocal') {

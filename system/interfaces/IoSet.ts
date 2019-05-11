@@ -1,7 +1,11 @@
 import IoItem from './IoItem';
+import System from '../System';
 
 
 export default interface IoSet {
+  init(system: System): Promise<void>;
+  destroy(): Promise<void>;
+
   getIo<T extends IoItem>(ioName: string): T;
 
   /**

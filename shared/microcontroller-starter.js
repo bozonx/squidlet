@@ -1,7 +1,3 @@
-var devSet = require('./devs/index');
 var System = require('./system/index');
-
-// TODO: review
-
-var host = new System(devSet);
+var host = new System();
 host.start().catch((err) => console.error(err));

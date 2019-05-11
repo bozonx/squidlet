@@ -14,6 +14,18 @@ export default class IoManager {
     this.ioSet = ioSet;
   }
 
+  async init(): Promise<void> {
+    await this.ioSet.init(this.system);
+
+    const ioNames: string[] = this.ioSet.getNames();
+
+    for (let ioName of ioNames) {
+      const ioItem: IoItem = this.ioSet.getIo(ioName);
+
+      if (ioItem.init) await ioItem.init();
+    }
+  }
+
   async destroy() {
     const ioNames: string[] = this.ioSet.getNames();
 
@@ -22,21 +34,13 @@ export default class IoManager {
 
       if (ioItem.destroy) await ioItem.destroy();
     }
+
+    await this.ioSet.destroy();
   }
 
 
   getIo<T extends IoItem>(ioName: string): T {
     return this.ioSet.getIo<T>(ioName);
-  }
-
-  async init(): Promise<void> {
-    const ioNames: string[] = this.ioSet.getNames();
-
-    for (let ioName of ioNames) {
-      const ioItem: IoItem = this.ioSet.getIo(ioName);
-
-      if (ioItem.init) await ioItem.init();
-    }
   }
 
   async configureAllIo(): Promise<void> {
