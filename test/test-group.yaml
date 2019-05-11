@@ -12,7 +12,7 @@ hosts:
       someParam: 1
       #storageDir: './masterStorage'
 
-    #logger: {}
+    backdoor: {}
 
     devices:
       bedroom:
