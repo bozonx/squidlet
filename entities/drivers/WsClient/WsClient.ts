@@ -47,6 +47,12 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
   }
 
 
+  isConnected(): boolean {
+    if (!this.client) return false;
+
+    return this.client.isConnected();
+  }
+
   send(data: string | Uint8Array): Promise<void> {
     if (!this.client) throw new Error(`WebSocketClient.send: ${this.closedMsg}`);
 

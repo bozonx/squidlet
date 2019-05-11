@@ -38,6 +38,7 @@ export default class WsClientLogic {
   private wasPrevOpenFulfilled: boolean = false;
   private connectionTries: number = 0;
   private reconnectTimeout: any;
+  private isConnectionEstablished: boolean = false;
 
 
   constructor(
@@ -67,6 +68,10 @@ export default class WsClientLogic {
     this.destroyInstance();
   }
 
+
+  isConnected(): boolean {
+    return this.isConnectionEstablished;
+  }
 
   // TODO: если вызывается вовремя реконнекта - повешать в очередь и выполнить когда создастся новое соединение
   async send(data: string | Uint8Array): Promise<void> {
@@ -103,6 +108,7 @@ export default class WsClientLogic {
   private handleConnectionOpen = () => {
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
+    this.isConnectionEstablished = true;
     this.openPromiseResolve();
     this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
@@ -111,14 +117,19 @@ export default class WsClientLogic {
    * Trying to reconnect on connection closed.
    */
   private handleConnectionClose = () => {
-
+    this.isConnectionEstablished = false;
     // TODO: проверить действительно ли сработает close если даже соединение не открывалось
 
     this.logInfo(`WsClientLogic: connection closed. ${this.props.url} Id: ${this.connectionId}`);
+    this.resolveReconnection();
+  }
 
-    // close connection and don't do reconnect if autoReconnect=false or no max tries or tries are exceeded
-    // if tries more than -1(infinity) - increment it and close connection if can't connect
-    // 0 means none
+  /**
+   * close connection and don't do reconnect if autoReconnect=false or no max tries or tries are exceeded
+   * if tries more than -1(infinity) - increment it and close connection if can't connect
+   * 0 means none
+   */
+  private resolveReconnection() {
     if (
       !this.props.autoReconnect
       || this.props.maxTries === 0
@@ -131,20 +142,17 @@ export default class WsClientLogic {
   }
 
   private reconnect() {
-    // TODO: что если не получилось переконнектиться
     // TODO: поидее после реконнекта мы можем ожидать соединения 60 сек - не нужно создавать новое
-    // TODO: навешиваться на события - listen()
 
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
 
-    // increment connection tries if maxTries is set
+    // increment connection tries if maxTries is greater than 0
     if (this.props.maxTries >= 0) this.connectionTries++;
-
-    // reconnecting...
 
     // make new promise if previous was fulfilled
     if (this.wasPrevOpenFulfilled) this.openPromise = this.makeOpenPromise();
+
     // reconnect immediately if reconnectTimeoutMs = 0 or less
     if (this.props.reconnectTimeoutMs <= 0) return this.doReconnect();
 
@@ -155,8 +163,20 @@ export default class WsClientLogic {
   private doReconnect = () => {
     delete this.reconnectTimeout;
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
+
+    // TODO: пои этом не сработает close ??? или сработает???
     // try to reconnect and save current connectionId
-    this.wsClientIo.reConnect(this.connectionId, this.props);
+    try {
+      this.wsClientIo.reConnect(this.connectionId, this.props);
+    }
+    catch (err) {
+      this.logError(`WsClientLogic.doReconnect: ${err}. Reconnecting...`);
+      this.isConnectionEstablished = false;
+      
+      return this.resolveReconnection();
+    }
+
+    this.listen();
   }
 
   /**
