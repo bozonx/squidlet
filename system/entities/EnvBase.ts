@@ -23,7 +23,7 @@ export default abstract class EnvBase implements Env {
 
   getIo<T extends IoItem>(shortDevName: string): T {
     //return this.system.driversManager.getDev<T>(shortDevName);
-    return this.system.ioSet.getInstance<T>(shortDevName);
+    return this.system.ioManager.getIo<T>(shortDevName);
   }
 
   getDriver<T extends DriverInstance>(driverName: string): T {

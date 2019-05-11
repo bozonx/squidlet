@@ -1,9 +1,9 @@
-import System from './System';
-import ManifestBase from './interfaces/ManifestBase';
-import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
-import {EntityClassType} from './entities/EntityManagerBase';
-import {pathJoin} from './helpers/nodeLike';
-import StorageIo from './interfaces/io/StorageIo';
+import System from '../System';
+import ManifestBase from '../interfaces/ManifestBase';
+import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
+import {EntityClassType} from './EntityManagerBase';
+import {pathJoin} from '../helpers/nodeLike';
+import StorageIo from '../interfaces/io/StorageIo';
 
 
 /**
@@ -12,7 +12,7 @@ import StorageIo from './interfaces/io/StorageIo';
 export default class EnvSet {
   private readonly system: System;
   private get storageIo(): StorageIo {
-    return this.system.ioSet.getInstance('Storage') as any;
+    return this.system.ioManager.getIo('Storage') as any;
   }
 
 

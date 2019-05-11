@@ -21,7 +21,7 @@ export default class EnvSetMemory {
 
   private readonly system: System;
   private get devStorage(): StorageIo {
-    return this.system.ioSet.getInstance('Storage') as any;
+    return this.system.ioManager.getIo('Storage') as any;
   }
 
 

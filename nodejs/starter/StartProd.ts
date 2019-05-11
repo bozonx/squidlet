@@ -15,9 +15,8 @@ import PreHostConfig, {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHos
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
+import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
-import IoSet from '../../system/interfaces/IoSet';
 import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
@@ -137,25 +136,26 @@ export default class StartProd {
 
     console.info(`===> using io set "${ioSetType}"`);
 
-    const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
+    //const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
 
     console.info(`===> Starting system`);
 
-    const system = new System(ioSet, systemConfigExtend);
+    // prod supports only local io set
+    const system = new System(undefined, systemConfigExtend);
 
     return system.start();
   }
 
-  /**
-   * Make ioSet instance or return undefined if local is used.
-   */
-  private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
-    if (ioSetType === 'local') return;
-
-    const ResolvedIoSet = resolveIoSetClass(ioSetType);
-
-    return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
-  }
+  // /**
+  //  * Make ioSet instance or return undefined if local is used.
+  //  */
+  // private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
+  //   if (ioSetType === 'local') return;
+  //
+  //   const ResolvedIoSet = resolveIoSetClass(ioSetType);
+  //
+  //   return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
+  // }
 
   /**
    * Only nodejs-ws or local ioSet types are allowed

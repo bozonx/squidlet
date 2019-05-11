@@ -8,19 +8,20 @@ import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import topics from './dict/topics';
 import categories from './dict/categories';
-import EnvSet from './EnvSet';
+import EnvSet from './entities/EnvSet';
 import SystemConfig from './interfaces/SystemConfig';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
 import IoSetLocal from './ioSet/IoSetLocal';
+import IoManager from './entities/IoManager';
 
 
 export default class System {
   readonly systemConfig: SystemConfig;
   readonly events: CategorizedEvents;
   readonly log: LogPublisher;
-  readonly ioSet: IoSet;
+  readonly ioManager: IoManager;
   readonly envSet: EnvSet;
   readonly host: Host;
   readonly driversManager: DriversManager;
@@ -42,15 +43,7 @@ export default class System {
 
 
   constructor(ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) {
-    if (ioSet) {
-      // use specified IO set
-      this.ioSet = ioSet;
-    }
-    else {
-      // use local IO set by default
-      this.ioSet = new IoSetLocal();
-    }
-
+    this.ioManager = new IoManager(this, this.resolveIoSet(ioSet));
     this.systemConfig = mergeDeep(systemConfigExtend, systemConfig) as any;
     this.envSet = new EnvSet(this);
 
@@ -67,7 +60,8 @@ export default class System {
 
   async start() {
     console.info(`---> Initializing io`);
-    await this.ioSet.init(this);
+    await this.ioManager.init();
+    await this.ioManager.configureAllIo();
 
     console.info(`---> Initializing configs`);
     await this.host.init();
@@ -140,6 +134,14 @@ export default class System {
 
   private riseEvent(eventName: string) {
     this.events.emit(categories.system, eventName);
+  }
+
+  private resolveIoSet(specifiedIoSet?: IoSet): IoSet {
+    // use specified IO set if it is set
+    if (specifiedIoSet) return specifiedIoSet;
+
+    // use local IO set by default
+    return new IoSetLocal();
   }
 
 }
