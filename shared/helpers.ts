@@ -145,17 +145,19 @@ export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsM
 /**
  * Resolve ioSet file and load it.
  */
-export function resolveIoSetClass(iosetType: IoSetTypes): new (ioSetConfig: {[index: string]: any}) => IoSet {
+export function resolveIoSetClass(iosetType: IoSetTypes): IoSet | undefined {
   let relativeFilePath: string;
 
+  // TODO: why????
   // prod local
   if (iosetType === 'local') {
-    relativeFilePath = 'system/ioSet/IoSetLocal';
+    return undefined;
+    //relativeFilePath = 'system/ioSet/IoSetLocal';
   }
-  // prod nodejs ws
-  else if (iosetType === 'nodejs-ws') {
-    relativeFilePath = 'nodejs/ioSet/IoSetWs';
-  }
+  // // prod nodejs ws
+  // else if (iosetType === 'nodejs-ws') {
+  //   relativeFilePath = 'nodejs/ioSet/IoSetWs';
+  // }
   else if (iosetType === 'nodejs-developLocal') {
     relativeFilePath = 'nodejs/ioSet/IoSetDevelopLocal';
   }

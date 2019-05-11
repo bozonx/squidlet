@@ -92,7 +92,7 @@ export default class StartDevelop {
   /**
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
-  private makeIoSet(ioSetType: IoSetTypes): IoSet {
+  private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
     const ResolvedIoSet = resolveIoSetClass(ioSetType);
 
     return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
