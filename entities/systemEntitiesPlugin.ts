@@ -58,25 +58,25 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addService(path.join(servicesRoot, 'Mqtt/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Updater/manifest.yaml'));
 
-  // add used on host drivers related on devs
+  // add used on host drivers related on ios
   env.afterRegistering(async () => {
-    const machineDevs: string[] = makeDevNames(env.getMachineConfig().devs);
+    const machineIos: string[] = makeDevNames(env.getMachineConfig().ios);
 
-    if (machineDevs.includes('Digital')) {
+    if (machineIos.includes('Digital')) {
       await env.addUsedEntity('drivers', 'Digital_local');
     }
 
-    if (machineDevs.includes('Serial')) {
+    if (machineIos.includes('Serial')) {
       await env.addUsedEntity('drivers', 'SerialDuplex');
     }
 
-    if (machineDevs.includes('I2cMaster')) {
+    if (machineIos.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');
       await env.addUsedEntity('drivers', 'I2cToSlave');
       await env.addUsedEntity('drivers', 'I2cDuplex');
     }
 
-    if (machineDevs.includes('I2cSlave')) {
+    if (machineIos.includes('I2cSlave')) {
       //await env.addUsedEntity('drivers', 'I2cSlave');
       await env.addUsedEntity('drivers', 'I2cToMaster');
       await env.addUsedEntity('drivers', 'I2cDuplex');

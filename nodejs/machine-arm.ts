@@ -2,8 +2,8 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
-  devs: [
-    './devs/Mqtt.ts',
+  ios: [
+    './ios/Mqtt.ts',
     '../shared/nodeJsLikeIo/Storage.ts',
     '../shared/nodeJsLikeIo/WebSocketClient.ts',
     '../shared/nodeJsLikeIo/WebSocketServer.ts',
@@ -12,7 +12,7 @@ const machineConfig: MachineConfig = {
     //'Wifi',
     //'Bluetooth',
   ],
-  devsSupportFiles: [
+  iosSupportFiles: [
     //'./x86/package.json',
     '../shared/nodeJsLikeIo/helpers.js',
   ],

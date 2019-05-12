@@ -82,7 +82,7 @@ export async function makeDevelopIoCollection(
   const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
   const machineEvalModule: any = require(evalModulePath);
 
-  for (let ioPath of machineConfig.devs) {
+  for (let ioPath of machineConfig.ios) {
     const ioName: string = parseDevName(ioPath);
     const ioAbsPath = path.resolve(platformDir, ioPath);
     const moduleContent: string = await os.getFileContent(ioAbsPath);

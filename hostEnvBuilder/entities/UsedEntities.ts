@@ -26,8 +26,8 @@ export interface EntitiesNames {
 export default class UsedEntities {
   private readonly configManager: ConfigManager;
   private readonly register: Register;
-  // devs which are used, like {devName: true}
-  private usedDevs: {[index: string]: true} = {};
+  // ios which are used, like {devName: true}
+  private usedIos: {[index: string]: true} = {};
   private entitiesSet: HostEntitiesSet = {
     devices: {},
     drivers: {},
@@ -48,7 +48,7 @@ export default class UsedEntities {
   }
 
   getUsedIo(): string[] {
-    return Object.keys(this.usedDevs);
+    return Object.keys(this.usedIos);
   }
 
   getEntitiesSet(): HostEntitiesSet {
@@ -111,9 +111,9 @@ export default class UsedEntities {
       await this.proceedEntity('services', depClassName);
     }
 
-    // collect devs
-    for (let depClassName of preManifest.devs || []) {
-      this.usedDevs[depClassName] = true;
+    // collect ios
+    for (let depClassName of preManifest.ios || []) {
+      this.usedIos[depClassName] = true;
     }
   }
 
@@ -136,7 +136,7 @@ export default class UsedEntities {
       'baseDir',
       'devices',
       'drivers',
-      'devs',
+      'ios',
       'props'
     );
 

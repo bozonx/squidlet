@@ -46,7 +46,7 @@ describe 'envBuilder.validateManifests', ->
       devices: ['MyDevice']
       drivers: ['MyDriver']
       services: ['MyService']
-      devs: ['MyDev']
+      ios: ['MyIo']
       files: ['./file.ts']
       props: { param: {type: 'number'} }
     }))
@@ -64,7 +64,7 @@ describe 'envBuilder.validateManifests', ->
     assert.isString(validate('service', { @manifest..., devices: 5 }))
     assert.isString(validate('service', { @manifest..., drivers: 5 }))
     assert.isString(validate('service', { @manifest..., services: 5 }))
-    assert.isString(validate('service', { @manifest..., devs: 5 }))
+    assert.isString(validate('service', { @manifest..., ios: 5 }))
     assert.isString(validate('service', { @manifest..., files: 5 }))
     assert.isString(validate('service', { @manifest..., props: 5 }))
 

@@ -14,7 +14,7 @@ describe 'envBuilder.ConfigsWriter', ->
       devicesDefinitions: 'devicesDefinitions'
       driversDefinitions: 'driversDefinitions'
       servicesDefinitions: 'servicesDefinitions'
-      devsDefinitions: 'devsDefinitions'
+      iosDefinitions: 'iosDefinitions'
     }
 
     @io = {
@@ -68,8 +68,8 @@ describe 'envBuilder.ConfigsWriter', ->
       @hostConfigSet.servicesDefinitions
     )
     sinon.assert.calledWith(@io.writeJson.getCall(8),
-      "#{@configManager.buildDir}/configs/devsDefinitions.json",
-      @hostConfigSet.devsDefinitions
+      "#{@configManager.buildDir}/configs/iosDefinitions.json",
+      @hostConfigSet.iosDefinitions
     )
 #    sinon.assert.calledWith(@io.writeJson.getCall(8),
 #      "/buildDir/hosts/configWorks/usedEntities.json",

@@ -64,12 +64,13 @@ describe 'app.DriversManager', ->
 
 
   it '$setDevs and getIo()', ->
-    devs = {
-      'Dev.dev': @driver
+    ios = {
+      'Io.io': @driver
     }
 
-    await @driversManager.$registerDevs(devs)
+    # TODO: !!! WTF
+    await @driversManager.$registerDevs(ios)
 
-    assert.equal(@driversManager.getDriver('Dev.dev').defintion, @definitions['Dev.dev'])
-    assert.equal(@driversManager.getIo('Dev').defintion, @definitions['Dev.dev'])
-    sinon.assert.calledOnce(@driversManager.getDriver('Dev.dev').init)
+    assert.equal(@driversManager.getDriver('Dev.dev').defintion, @definitions['Io.io'])
+    assert.equal(@driversManager.getIo('Dev').defintion, @definitions['Io.io'])
+    sinon.assert.calledOnce(@driversManager.getDriver('Io.io').init)

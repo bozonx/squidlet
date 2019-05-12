@@ -32,7 +32,7 @@ export default interface PreHostConfig {
     senderTimeout?: number;
     // resend timeout in seconds
     senderResendTimeout?: number;
-    // response of remote devSet
+    // response of remote ioSet
     ioSetResponseTimoutSec?: number;
 
     // custom params
@@ -51,7 +51,7 @@ export default interface PreHostConfig {
   // services definitions by service id
   services?: {[index: string]: any};
   // params which will be passed to dev's configure method. By dev name
-  devs?: IoItemDefinition;
+  ios?: IoItemDefinition;
 
   ioSet?: IoSetConfig;
 

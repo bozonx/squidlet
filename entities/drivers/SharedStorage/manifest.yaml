@@ -2,7 +2,7 @@ name: SharedStorage
 main: SharedStorage.ts
 system: true
 
-devs:
+ios:
   - Storage
 
 #props: {}

@@ -2,7 +2,7 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
-  devs: [
+  ios: [
     'Storage',
     'Sys',
     'Sha1',

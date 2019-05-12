@@ -109,7 +109,7 @@ export default class CommandUpdate {
       tmpDir
     );
 
-    console.info(`===> Building devs`);
+    console.info(`===> Building ios`);
 
     await buildIo.build();
   }

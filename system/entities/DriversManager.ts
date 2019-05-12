@@ -57,16 +57,16 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
   }
 
   // /**
-  //  * Set platform specific devs
-  //  * @param devs - like {DeviClassName: DevClass}
+  //  * Set platform specific ios
+  //  * @param ios - like {DeviClassName: DevClass}
   //  */
-  // async $registerDevs(devs: {[index: string]: EntityClassType}) {
+  // async $registerDevs(ios: {[index: string]: EntityClassType}) {
   //   // TODO: ещё нет configSet
   //   // load list of definitions of drivers
   //   //const definitions: {[index: string]: EntityDefinition} = await this.loadDriversDefinitions();
   //
-  //   for (let driverName of Object.keys(devs)) {
-  //     const DriverClass: EntityClassType = devs[driverName];
+  //   for (let driverName of Object.keys(ios)) {
+  //     const DriverClass: EntityClassType = ios[driverName];
   //
   //     // TODO: не надо подставлять ложный definition
   //
@@ -74,7 +74,7 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
   //     this.instances[driverName] = new DriverClass({id: driverName, className: driverName, props: {}}, this.env);
   //   }
   //
-  //   await this.initializeAll(Object.keys(devs));
+  //   await this.initializeAll(Object.keys(ios));
   // }
 
 

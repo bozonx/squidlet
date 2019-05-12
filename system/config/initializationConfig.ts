@@ -26,7 +26,7 @@ export default function initializationConfig(): InitializationConfig {
       // definitions of services like {serviceId: ServiceDefinition}
       servicesDefinitions: 'servicesDefinitions.json',
       // params which will be sent to dev.configure()
-      devsDefinitions: 'devsDefinitions.json',
+      iosDefinitions: 'iosDefinitions.json',
     },
   };
 }

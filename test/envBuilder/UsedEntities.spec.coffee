@@ -26,7 +26,7 @@ describe 'envBuilder.UsedEntities', ->
           name: 'MyDriver'
           main: 'main.ts'
           baseDir: '/myBaseDir'
-          devs: ['MyDev']
+          ios: ['MyIo']
         }
         DepDriver: {
           name: 'DepDriver'
@@ -143,7 +143,7 @@ describe 'envBuilder.UsedEntities', ->
   it 'generate and getUsedIo', ->
     await @usedEntities.generate()
 
-    assert.deepEqual(@usedEntities.getUsedIo(), ['MyDev'])
+    assert.deepEqual(@usedEntities.getUsedIo(), ['MyIo'])
 
   it 'mergePropsSchema', ->
     @manifests.devices.DeviceClass.props = {

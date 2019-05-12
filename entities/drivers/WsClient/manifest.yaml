@@ -2,7 +2,7 @@ name: WsClient
 main: WsClient.ts
 system: true
 
-devs:
+ios:
   - WebSocketClient
 
 props:

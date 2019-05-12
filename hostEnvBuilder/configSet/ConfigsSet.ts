@@ -40,7 +40,7 @@ export default class ConfigsSet {
       devicesDefinitions: _values(this.definitions.getDevicesDefinitions()),
       driversDefinitions: this.definitions.getDriversDefinitions(),
       servicesDefinitions: this.definitions.getServicesDefinitions(),
-      devsDefinitions: this.definitions.getDevsDefinitions(),
+      iosDefinitions: this.definitions.getIosDefinitions(),
     };
   }
 

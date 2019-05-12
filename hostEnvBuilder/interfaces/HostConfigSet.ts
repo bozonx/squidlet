@@ -22,5 +22,5 @@ export default interface HostConfigSet {
   // list of services definitions
   servicesDefinitions: {[index: string]: EntityDefinition};
   // list of services definitions
-  devsDefinitions: IoItemDefinition;
+  iosDefinitions: IoItemDefinition;
 }

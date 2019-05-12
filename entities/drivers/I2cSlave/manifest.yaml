@@ -2,7 +2,7 @@ name: I2cSlave
 main: I2cSlave.ts
 system: true
 
-devs:
+ios:
   - I2cSlave
 
 props:

@@ -18,8 +18,8 @@ export default interface PreManifestBase {
   drivers?: string[];
   // services dependencies which entity use
   services?: string[];
-  // devs dependencies which entity use
-  devs?: string[];
+  // ios dependencies which entity use
+  ios?: string[];
 
   // additional files relative to manifest place.
   files?: string[];

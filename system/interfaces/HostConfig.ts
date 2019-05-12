@@ -12,7 +12,7 @@ export interface HostConfigConfig {
   senderTimeout: number;
   // resend timeout in seconds
   senderResendTimeout: number;
-  // response of remote devSet in seconds
+  // response of remote ioSet in seconds
   ioSetResponseTimoutSec: number;
 
   // custom params

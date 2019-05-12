@@ -15,7 +15,7 @@ const systemConfig: SystemConfig = {
     system: 'system',
     configs: 'configs',
     entities: 'entities',
-    devs: 'devs',
+    ios: 'ios',
   },
   // dirs under varDataDir which is set in host config
   storageDirs: {

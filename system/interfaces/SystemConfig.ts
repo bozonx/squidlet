@@ -11,7 +11,7 @@ export default interface SystemConfig {
     system: string;
     configs: string;
     entities: string;
-    devs: string;
+    ios: string;
   };
   storageDirs: {
     common: string;

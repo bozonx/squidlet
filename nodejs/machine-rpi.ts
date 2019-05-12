@@ -2,26 +2,26 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
-  devs: [
+  ios: [
     '../shared/nodeJsLikeIo/Storage.ts',
     '../shared/nodeJsLikeIo/WebSocketClient.ts',
     '../shared/nodeJsLikeIo/WebSocketServer.ts',
     //'Sha1',
-    './devs/Digital.ts',
+    './ios/Digital.ts',
     //'Pwm',
     //'Serial',
     //'Spi',
     //'Wifi',
     //'Bluetooth',
-    './devs/I2cMaster.ts',
+    './ios/I2cMaster.ts',
 
-    './devs/Mqtt.ts',
+    './ios/Mqtt.ts',
 
     //'Adc',
     //'Dac',
     //'I2cSlave',
   ],
-  devsSupportFiles: [
+  iosSupportFiles: [
     //'./rpi/package.json',
     '../shared/nodeJsLikeIo/helpers.js',
   ],

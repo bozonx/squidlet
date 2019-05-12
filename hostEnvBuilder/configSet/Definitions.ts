@@ -41,8 +41,8 @@ export default class Definitions {
     return this.servicesDefinitions;
   }
 
-  getDevsDefinitions(): IoItemDefinition {
-    return this.configManager.devsDefinitions;
+  getIosDefinitions(): IoItemDefinition {
+    return this.configManager.iosDefinitions;
   }
 
   /**
@@ -58,7 +58,7 @@ export default class Definitions {
       this.devicesDefinitions[id] = this.generateDeviceDef(id);
     }
 
-    // make each all drivers of host include dependencies but exclude devs
+    // make each all drivers of host include dependencies but exclude ios
     for (let entityName of usedEntitiesNames.drivers) {
       this.driversDefinitions[entityName] = this.generateDriverDef(entityName);
     }

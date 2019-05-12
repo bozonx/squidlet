@@ -2,7 +2,7 @@ name: I2cMaster
 main: I2cMaster.ts
 system: true
 
-devs:
+ios:
   - I2cMaster
 
 props:

@@ -23,7 +23,7 @@ export default class ConfigManager {
     drivers: {},
     services: {},
   };
-  devsDefinitions: IoItemDefinition = {};
+  iosDefinitions: IoItemDefinition = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   // env build dir
@@ -66,7 +66,7 @@ export default class ConfigManager {
     const normalizedConfig: PreHostConfig = normalizeHostConfig(mergedConfig);
 
     this.devicesDefaults = normalizedConfig.devicesDefaults;
-    if (normalizedConfig.devs) this.devsDefinitions = normalizedConfig.devs;
+    if (normalizedConfig.ios) this.iosDefinitions = normalizedConfig.ios;
     this.preEntities = {
       devices: normalizedConfig.devices || {},
       drivers: normalizedConfig.drivers || {},
@@ -81,7 +81,7 @@ export default class ConfigManager {
 
 
   getMachineIos(): string[] {
-    return makeDevNames(this.machineConfig.devs);
+    return makeDevNames(this.machineConfig.ios);
   }
 
   private async resolveHostConfig(): Promise<PreHostConfig> {

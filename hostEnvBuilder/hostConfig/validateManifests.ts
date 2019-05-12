@@ -47,7 +47,7 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
     () => isStringArray(rawManifest.devices, 'devices'),
     () => isStringArray(rawManifest.drivers, 'drivers'),
     () => isStringArray(rawManifest.services, 'services'),
-    () => isStringArray(rawManifest.devs, 'devs'),
+    () => isStringArray(rawManifest.ios, 'ios'),
 
     () => isStringArray(rawManifest.files, 'files'),
     () => checkFiles(rawManifest.files),

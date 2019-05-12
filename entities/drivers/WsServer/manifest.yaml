@@ -2,7 +2,7 @@ name: WsServer
 main: WsServer.ts
 system: true
 
-devs:
+ios:
   - WebSocketServer
 
 props:

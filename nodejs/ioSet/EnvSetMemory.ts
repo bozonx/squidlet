@@ -20,7 +20,7 @@ export default class EnvSetMemory {
   }
 
   private readonly system: System;
-  private get devStorage(): StorageIo {
+  private get ioStorage(): StorageIo {
     return this.system.ioManager.getIo('Storage') as any;
   }
 
@@ -82,7 +82,7 @@ export default class EnvSetMemory {
   ): Promise<string> {
     const filePath: string = pathJoin(configSet.entities[pluralType][entityName].srcDir, fileName);
 
-    return this.devStorage.readFile(filePath);
+    return this.ioStorage.readFile(filePath);
   }
 
   loadEntityBinFile(
@@ -92,7 +92,7 @@ export default class EnvSetMemory {
   ): Promise<Uint8Array> {
     const filePath: string = pathJoin(configSet.entities[pluralType][entityName].srcDir, fileName);
 
-    return this.devStorage.readBinFile(filePath);
+    return this.ioStorage.readBinFile(filePath);
   }
 
 }

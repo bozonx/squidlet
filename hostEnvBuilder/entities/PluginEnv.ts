@@ -67,10 +67,10 @@ export default class PluginEnv {
   }
 
   /**
-   * Get devs list.
+   * Get ios list.
    * Call it after registering.
    */
-  getDevs = (): string[] => {
+  getIos = (): string[] => {
     return this.usedEntities.getUsedIo();
   }
 

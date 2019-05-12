@@ -103,7 +103,7 @@ describe 'envBuilder.Definitions', ->
           hostProp: 1
         }
       }
-      devsDefinitions: {
+      iosDefinitions: {
         MyDev: { param: 1 }
       }
     }
@@ -153,6 +153,6 @@ describe 'envBuilder.Definitions', ->
         }
       }
     })
-    assert.deepEqual(@definitions.getDevsDefinitions(), {
+    assert.deepEqual(@definitions.getIosDefinitions(), {
       MyDev: { param: 1 }
     })

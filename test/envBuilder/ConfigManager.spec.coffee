@@ -19,13 +19,13 @@ describe 'envBuilder.ConfigManager', ->
           device: 'Switch'
         }
       }
-      devs: {
+      ios: {
         MyDev: { topParam: 1 }
       }
     }
     @machineConfig = {
-      devs: ['./Storage.ts']
-      devsSupportFiles: [
+      ios: ['./Storage.ts']
+      iosSupportFiles: [
         './package.json'
       ]
       hostConfig: {
@@ -33,7 +33,7 @@ describe 'envBuilder.ConfigManager', ->
           #envSetDir: '/path/to/env'
           platformParam: 1
         },
-        devs: {
+        ios: {
           MyDev: { topParam: 2, bottomParam: 2 }
         }
       }
@@ -63,7 +63,7 @@ describe 'envBuilder.ConfigManager', ->
         }
       }
     })
-    assert.deepEqual(@configManager.devsDefinitions, {
+    assert.deepEqual(@configManager.iosDefinitions, {
       MyDev: { topParam: 1, bottomParam: 2 }
     })
     assert.deepEqual(@configManager.machineConfig, @machineConfig)

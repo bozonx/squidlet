@@ -17,8 +17,8 @@ import {Stats} from '../system/interfaces/io/StorageIo';
 
 
 export default class BuildIo {
-  private readonly devsBuildDir: string;
-  private readonly devsTmpDir: string;
+  private readonly iosBuildDir: string;
+  private readonly iosTmpDir: string;
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly os: Os;
@@ -27,54 +27,54 @@ export default class BuildIo {
   constructor(os: Os, platform: Platforms, machine: string, hostsBuildDir: string, hostsTmpDir: string) {
     this.platform = platform;
     this.machine = machine;
-    this.devsBuildDir = hostsBuildDir;
-    this.devsTmpDir = hostsTmpDir;
+    this.iosBuildDir = hostsBuildDir;
+    this.iosTmpDir = hostsTmpDir;
     this.os = os;
   }
 
 
   async build() {
-    console.info(`--> Build devs of platform: "${this.platform}", machine "${this.machine}"`);
+    console.info(`--> Build ios of platform: "${this.platform}", machine "${this.machine}"`);
 
     const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
 
-    await this.os.rimraf(`${this.devsBuildDir}/**/*`);
-    await this.os.mkdirP(this.devsBuildDir);
+    await this.os.rimraf(`${this.iosBuildDir}/**/*`);
+    await this.os.mkdirP(this.iosBuildDir);
 
-    await this.copyDevs(machineConfig);
-    await this.buildDevs();
+    await this.copyIos(machineConfig);
+    await this.buildIos();
     await this.copySupportFiles(machineConfig);
-    await this.makeDevSetIndex(machineConfig);
+    await this.makeIoSetIndex(machineConfig);
   }
 
 
   /**
-   * Copy only used devs
+   * Copy only used ios
    */
-  private async copyDevs(machineConfig: MachineConfig) {
-    const usedDevsDir = path.join(this.devsTmpDir, ORIGINAL_DIR);
+  private async copyIos(machineConfig: MachineConfig) {
+    const usedIosDir = path.join(this.iosTmpDir, ORIGINAL_DIR);
     const platformDir = resolvePlatformDir(this.platform);
 
-    await this.os.rimraf(`${usedDevsDir}/**/*`);
-    await this.os.mkdirP(usedDevsDir);
+    await this.os.rimraf(`${usedIosDir}/**/*`);
+    await this.os.mkdirP(usedIosDir);
 
-    // copy specified devs
-    for (let devPath of machineConfig.devs) {
+    // copy specified ios
+    for (let devPath of machineConfig.ios) {
       const absFilePath: string = path.resolve(platformDir, devPath);
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
-      const dstFile: string = path.join(usedDevsDir, path.basename(devPath));
+      const dstFile: string = path.join(usedIosDir, path.basename(devPath));
 
       await this.os.copyFile(srcFile, dstFile);
     }
   }
 
   /**
-   * Build devs from whole original dir to envset/devs
+   * Build ios from whole original dir to envset/ios
    */
-  private async buildDevs() {
-    const original = path.join(this.devsTmpDir, ORIGINAL_DIR);
-    const modernDst = path.join(this.devsTmpDir, MODERN_DIR);
-    const legacyDst = path.join(this.devsTmpDir, LEGACY_DIR);
+  private async buildIos() {
+    const original = path.join(this.iosTmpDir, ORIGINAL_DIR);
+    const modernDst = path.join(this.iosTmpDir, MODERN_DIR);
+    const legacyDst = path.join(this.iosTmpDir, LEGACY_DIR);
 
     // ts to modern js
     await this.os.rimraf(`${modernDst}/**/*`);
@@ -83,21 +83,21 @@ export default class BuildIo {
     await this.os.rimraf(`${legacyDst}/**/*`);
     await compileJs(modernDst, legacyDst, false);
     // minimize
-    await minimize(legacyDst, this.devsBuildDir);
+    await minimize(legacyDst, this.iosBuildDir);
   }
 
   /**
    * Copy support files
    */
   private async copySupportFiles(machineConfig: MachineConfig) {
-    if (!machineConfig.devsSupportFiles) return;
+    if (!machineConfig.iosSupportFiles) return;
 
     const platformDir = resolvePlatformDir(this.platform);
 
-    for (let supportFilePath of machineConfig.devsSupportFiles) {
+    for (let supportFilePath of machineConfig.iosSupportFiles) {
       const absFilePath: string = path.resolve(platformDir, supportFilePath);
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
-      const dstFile: string = path.join(this.devsBuildDir, path.basename(supportFilePath));
+      const dstFile: string = path.join(this.iosBuildDir, path.basename(supportFilePath));
 
       await this.os.copyFile(srcFile, dstFile);
     }
@@ -106,20 +106,20 @@ export default class BuildIo {
   /**
    * Make index.js which requires all the io files.
    */
-  private async makeDevSetIndex(machineConfig: MachineConfig) {
-    const indexFilePath: string = path.join(this.devsBuildDir, IO_SET_INDEX_FILE);
-    const devs: string[] = [];
+  private async makeIoSetIndex(machineConfig: MachineConfig) {
+    const indexFilePath: string = path.join(this.iosBuildDir, IO_SET_INDEX_FILE);
+    const ios: string[] = [];
 
-    for (let devPath of machineConfig.devs) {
+    for (let devPath of machineConfig.ios) {
       const devName: string = parseDevName(devPath);
-      const devString = `${devName}: require("./${devName}")`;
+      const ioString = `${devName}: require("./${devName}")`;
 
-      devs.push(devString);
+      ios.push(ioString);
     }
 
-    const devSet: string = `module.exports = {\n${devs.join(',\n')}\n};\n`;
+    const ioSet: string = `module.exports = {\n${ios.join(',\n')}\n};\n`;
 
-    await this.os.writeFile(indexFilePath, devSet);
+    await this.os.writeFile(indexFilePath, ioSet);
   }
 
   /**

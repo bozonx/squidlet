@@ -2,7 +2,7 @@ name: Mqtt
 main: Mqtt.ts
 system: true
 
-devs:
+ios:
   - Mqtt
 
 props: props.yaml

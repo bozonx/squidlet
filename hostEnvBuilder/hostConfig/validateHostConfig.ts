@@ -7,9 +7,9 @@ import {whiteList} from '../../system/helpers/validate';
 //
 //   return sequence([
 //     () => isObject(rawConfig.buildConfig, 'buildConfig'),
-//     () => isString(rawConfig.buildConfig.devsModernDst, 'buildConfig.devsModernDst'),
-//     () => isString(rawConfig.buildConfig.devsLegacyDst, 'buildConfig.devsLegacyDst'),
-//     () => isString(rawConfig.buildConfig.devsMinDst, 'buildConfig.devsMinDst'),
+//     () => isString(rawConfig.buildConfig.iosModernDst, 'buildConfig.iosModernDst'),
+//     () => isString(rawConfig.buildConfig.iosLegacyDst, 'buildConfig.iosLegacyDst'),
+//     () => isString(rawConfig.buildConfig.iosMinDst, 'buildConfig.devsMinDst'),
 //     () => isString(rawConfig.buildConfig.devsSrc, 'buildConfig.devsSrc'),
 //   ]);
 // }
@@ -47,7 +47,7 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     () => isObject(rawConfig.devices, 'devices'),
     () => isObject(rawConfig.drivers, 'drivers'),
     () => isObject(rawConfig.services, 'services'),
-    () => isObject(rawConfig.devs, 'devs'),
+    () => isObject(rawConfig.ios, 'ios'),
     () => isObject(rawConfig.automation, 'automation'),
     () => isObject(rawConfig.mqtt, 'mqtt'),
     () => isObject(rawConfig.logger, 'logger'),
@@ -68,7 +68,7 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
       'devices',
       'drivers',
       'services',
-      'devs',
+      'ios',
       'devicesDefaults',
       'automation',
       'mqtt',
