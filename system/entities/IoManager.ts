@@ -2,7 +2,7 @@ import IoSet from '../interfaces/IoSet';
 import IoItem from '../interfaces/IoItem';
 import System from '../System';
 import IoItemDefinition from '../interfaces/IoItemDefinition';
-import IoSetLocal from '../IoSetLocal';
+import IoSetLocal from './IoSetLocal';
 
 
 export default class IoManager {

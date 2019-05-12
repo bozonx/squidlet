@@ -3,7 +3,7 @@ import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
 import {isPlainObject} from '../../system/helpers/lodashLike';
 import IoItem from '../../system/interfaces/IoItem';
-import IoSetLocal from '../../system/IoSetLocal';
+import IoSetLocal from '../../system/entities/IoSetLocal';
 import {pathJoin} from '../../system/helpers/nodeLike';
 
 

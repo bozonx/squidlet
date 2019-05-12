@@ -1,13 +1,16 @@
-import IoSet from './interfaces/IoSet';
-import IoItem, {IoItemClass} from './interfaces/IoItem';
-import System from './System';
-import {pathJoin} from './helpers/nodeLike';
+import IoSet from '../interfaces/IoSet';
+import IoItem, {IoItemClass} from '../interfaces/IoItem';
+import System from '../System';
+import {pathJoin} from '../helpers/nodeLike';
 
 
 export default class IoSetLocal implements IoSet {
   protected ioCollection: {[index: string]: IoItem} = {};
 
 
+  /**
+   * Load ioSet index.js file where included all the used io on platform
+   */
   async init(system: System): Promise<void> {
     const pathToIoSetIndex = pathJoin(
       system.systemConfig.rootDirs.envSet,
