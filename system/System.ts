@@ -43,7 +43,7 @@ export default class System {
 
 
   constructor(ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) {
-    this.ioManager = new IoManager(this, this.resolveIoSet(ioSet));
+    this.ioManager = new IoManager(this, ioSet);
     this.systemConfig = mergeDeep(systemConfigExtend, systemConfig) as any;
     this.envSet = new EnvSet(this);
 
@@ -61,7 +61,6 @@ export default class System {
   async start() {
     console.info(`---> Initializing io`);
     await this.ioManager.init();
-    await this.ioManager.configureAllIo();
 
     console.info(`---> Initializing configs`);
     await this.host.init();
@@ -134,14 +133,6 @@ export default class System {
 
   private riseEvent(eventName: string) {
     this.events.emit(categories.system, eventName);
-  }
-
-  private resolveIoSet(specifiedIoSet?: IoSet): IoSet {
-    // use specified IO set if it is set
-    if (specifiedIoSet) return specifiedIoSet;
-
-    // use local IO set by default
-    return new IoSetLocal();
   }
 
 }

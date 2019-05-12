@@ -2,6 +2,7 @@ import IoSet from '../interfaces/IoSet';
 import IoItem from '../interfaces/IoItem';
 import System from '../System';
 import IoItemDefinition from '../interfaces/IoItemDefinition';
+import IoSetLocal from '../IoSetLocal';
 
 
 export default class IoManager {
@@ -9,21 +10,15 @@ export default class IoManager {
   private readonly ioSet: IoSet;
 
 
-  constructor(system: System, ioSet: IoSet) {
+  constructor(system: System, ioSet?: IoSet) {
     this.system = system;
-    this.ioSet = ioSet;
+    this.ioSet = this.resolveIoSet(ioSet);
   }
 
   async init(): Promise<void> {
     await this.ioSet.init(this.system);
-
-    const ioNames: string[] = this.ioSet.getNames();
-
-    for (let ioName of ioNames) {
-      const ioItem: IoItem = this.ioSet.getIo(ioName);
-
-      if (ioItem.init) await ioItem.init();
-    }
+    await this.initAllIo();
+    await this.configureAllIo();
   }
 
   async destroy() {
@@ -43,7 +38,18 @@ export default class IoManager {
     return this.ioSet.getIo<T>(ioName);
   }
 
-  async configureAllIo(): Promise<void> {
+
+  private async initAllIo() {
+    const ioNames: string[] = this.ioSet.getNames();
+
+    for (let ioName of ioNames) {
+      const ioItem: IoItem = this.ioSet.getIo(ioName);
+
+      if (ioItem.init) await ioItem.init();
+    }
+  }
+
+  private async configureAllIo() {
     const ioNames: string[] = this.ioSet.getNames();
     const ioParams = await this.system.envSet.loadConfig<IoItemDefinition>(
       this.system.initCfg.fileNames.devsDefinitions
@@ -64,6 +70,14 @@ export default class IoManager {
 
       await ioItem.configure(ioParams[ioName]);
     }
+  }
+
+  private resolveIoSet(specifiedIoSet?: IoSet): IoSet {
+    // use specified IO set if it is set
+    if (specifiedIoSet) return specifiedIoSet;
+
+    // use local IO set by default
+    return new IoSetLocal();
   }
 
 }
