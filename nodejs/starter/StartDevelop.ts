@@ -5,8 +5,7 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules, makeSystemConfigExtend, SYSTEM_DIR, SYSTEM_FILE_NAME} from './helpers';
-import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
+import {makeSystemConfigExtend, SYSTEM_DIR, SYSTEM_FILE_NAME} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
@@ -110,6 +109,31 @@ export default class StartDevelop {
     }
 
     return ioSetConfig.type;
+  }
+
+  /**
+   * Read machine config and load io which are specified there.
+   */
+  private async makeDevelopIoCollection(
+    os: Os,
+    platformDir: string,
+    machine: string
+  ): Promise<{[index: string]: IoItemClass}> {
+    const ioSet: {[index: string]: new (...params: any[]) => any} = {};
+    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
+    const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
+    const machineEvalModule: any = require(evalModulePath);
+
+    for (let ioPath of machineConfig.ios) {
+      const ioName: string = parseIoName(ioPath);
+      const ioAbsPath = path.resolve(platformDir, ioPath);
+      const moduleContent: string = await os.getFileContent(ioAbsPath);
+      const compiledModuleContent: string = ts.transpile(moduleContent);
+
+      ioSet[ioName] = machineEvalModule(compiledModuleContent);
+    }
+
+    return ioSet;
   }
 
 }

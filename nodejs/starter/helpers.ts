@@ -9,6 +9,7 @@ import * as ts from 'typescript';
 import {loadMachineConfigInPlatformDir, parseIoName} from '../../shared/helpers';
 
 
+//const REPO_ROOT = path.resolve(__dirname, '../');
 export const SYSTEM_DIR = path.resolve(__dirname, '../../system');
 export const SYSTEM_FILE_NAME = 'System';
 
@@ -32,30 +33,7 @@ export async function installNpmModules(os: Os, cwd: string) {
 }
 
 
-/**
- * Read machine config and load io which are specified there.
- */
-export async function makeDevelopIoCollection(
-  os: Os,
-  platformDir: string,
-  machine: string
-): Promise<{[index: string]: IoItemClass}> {
-  const ioSet: {[index: string]: new (...params: any[]) => any} = {};
-  const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
-  const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
-  const machineEvalModule: any = require(evalModulePath);
 
-  for (let ioPath of machineConfig.ios) {
-    const ioName: string = parseIoName(ioPath);
-    const ioAbsPath = path.resolve(platformDir, ioPath);
-    const moduleContent: string = await os.getFileContent(ioAbsPath);
-    const compiledModuleContent: string = ts.transpile(moduleContent);
-
-    ioSet[ioName] = machineEvalModule(compiledModuleContent);
-  }
-
-  return ioSet;
-}
 
 // /**
 //  * Resolve ioSet file and load it.

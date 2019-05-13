@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as ts from 'typescript';
 import _trim = require('lodash/trim');
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
@@ -7,12 +6,6 @@ import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
-import IoSet from '../system/interfaces/IoSet';
-import IoSetTypes from '../hostEnvBuilder/interfaces/IoSetTypes';
-import {IoItemClass} from '../system/interfaces/IoItem';
-
-
-const REPO_ROOT = path.resolve(__dirname, '../');
 
 
 /**
