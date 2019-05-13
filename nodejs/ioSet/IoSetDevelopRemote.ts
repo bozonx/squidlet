@@ -6,7 +6,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import System from '../../system';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-import RemoteIoBase from './RemoteIoBase';
+import RemoteIoCollection from './RemoteIoCollection';
 import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
@@ -18,6 +18,7 @@ export default class IoSetDevelopRemote implements IoSet {
   private readonly platform: Platforms;
   private readonly machine: string;
   private storageWrapper: StorageEnvMemoryWrapper;
+  private ioCollection = new RemoteIoCollection();
 
   // private wsClientProps: WsClientProps;
   // private _client?: WsClient;
@@ -47,36 +48,24 @@ export default class IoSetDevelopRemote implements IoSet {
     await this.storageWrapper.init();
   }
 
-  async init(system: System): Promise<void> {
-    // TODO: use backdoor client
+  async init(system: System) {
+    // TODO: make memeory storage wrapper
 
-    //this._client = new WsClient(this.system.host.id, this.wsClientProps);
-
-    this.listen();
+    await this.ioCollection.init(system);
   }
 
-
   async destroy() {
-    //await this.client.destroy();
+    await this.ioCollection.destroy();
   }
 
   getIo<T extends IoItem>(ioName: string): T {
-    if (!this.ioCollection[ioName]) {
-      throw new Error(`Can't find io instance "${ioName}"`);
-    }
-
-    return this.ioCollection[ioName] as T;
+    return this.ioCollection.getIo(ioName) as T;
   }
 
   getNames(): string[] {
-    return Object.keys(this.ioCollection);
+    return this.ioCollection.getNames();
   }
 
-
-  private listen() {
-    // this.client.onError((err: string) => this.system.log.error(err));
-    // this.client.onIncomeMessage(this.resolveIncomeMessage);
-  }
 
   private parseIoSetString(ioSetString?: string): {host: string, port?: number} | undefined {
     if (!ioSetString) return;

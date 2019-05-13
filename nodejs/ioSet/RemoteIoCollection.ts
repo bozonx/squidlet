@@ -3,11 +3,10 @@ import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
 import {isPlainObject} from '../../system/helpers/lodashLike';
 import IoItem from '../../system/interfaces/IoItem';
-import IoSetLocal from '../../system/entities/IoSetLocal';
 import {pathJoin} from '../../system/helpers/nodeLike';
 
 
-export default abstract class RemoteIoBase extends IoSetLocal {
+export default abstract class RemoteIoCollection {
   private _remoteCall?: RemoteCall;
   private get remoteCall(): RemoteCall {
     return this.remoteCall as any;
@@ -21,6 +20,10 @@ export default abstract class RemoteIoBase extends IoSetLocal {
    * Replace init method to generate local proxy methods and instantiate RemoteCall
    */
   async init(system: System): Promise<void> {
+    // TODO: use backdoor client
+
+    //this._client = new WsClient(this.system.host.id, this.wsClientProps);
+
     this._system = system;
     this._remoteCall = new RemoteCall(
       this.send,
@@ -34,16 +37,36 @@ export default abstract class RemoteIoBase extends IoSetLocal {
     await this.initAllIo();
   }
 
-  getInstance<T extends IoItem>(ioName: string): T {
-    this.makeFakeIoIfNeed(ioName);
 
-    return this.ioCollection[ioName] as T;
-  }
+  // private listen() {
+  //   // this.client.onError((err: string) => this.system.log.error(err));
+  //   // this.client.onIncomeMessage(this.resolveIncomeMessage);
+  // }
+
+  //
+  // getInstance<T extends IoItem>(ioName: string): T {
+  //   this.makeFakeIoIfNeed(ioName);
+  //
+  //   return this.ioCollection[ioName] as T;
+  // }
 
   async destroy() {
     await super.destroy();
     await this.remoteCall.destroy();
   }
+
+  getIo<T extends IoItem>(ioName: string): T {
+    if (!this.ioCollection[ioName]) {
+      throw new Error(`Can't find io instance "${ioName}"`);
+    }
+
+    return this.ioCollection[ioName] as T;
+  }
+
+  getNames(): string[] {
+    return Object.keys(this.ioCollection);
+  }
+
 
 
   /**
