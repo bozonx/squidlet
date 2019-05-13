@@ -11,7 +11,6 @@ import {loadMachineConfigInPlatformDir, parseIoName} from '../../shared/helpers'
 
 //const REPO_ROOT = path.resolve(__dirname, '../');
 export const SYSTEM_DIR = path.resolve(__dirname, '../../system');
-export const SYSTEM_FILE_NAME = 'System';
 
 
 export function makeSystemConfigExtend(props: Props): {[index: string]: any} {

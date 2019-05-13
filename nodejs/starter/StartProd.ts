@@ -7,8 +7,9 @@ import systemConfig from '../../system/config/systemConfig';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
-import {installNpmModules, makeSystemConfigExtend, SYSTEM_FILE_NAME} from './helpers';
+import {installNpmModules, makeSystemConfigExtend} from './helpers';
 import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
+import {SYSTEM_FILE_NAME} from '../../shared/constants';
 
 
 export default class StartProd {

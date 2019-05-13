@@ -25,3 +25,5 @@ export const HOST_TMP_DIR = 'tmp';
 export const HOST_TMP_HOST_DIR = 'host';
 
 export const IOSET_STRING_DELIMITER = ':';
+
+export const SYSTEM_FILE_NAME = 'System';

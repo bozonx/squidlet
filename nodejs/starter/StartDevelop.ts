@@ -1,13 +1,14 @@
 import * as path from 'path';
-import _omit = require('lodash/omit');
 
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {makeSystemConfigExtend, SYSTEM_DIR, SYSTEM_FILE_NAME} from './helpers';
+import {makeSystemConfigExtend, SYSTEM_DIR} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
-import {IOSET_STRING_DELIMITER} from '../../shared/constants';
+import {HOST_ENVSET_DIR, IOSET_STRING_DELIMITER, SYSTEM_FILE_NAME} from '../../shared/constants';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 
 
 const IOSET_DIR = path.resolve(__dirname, '../ioSet');
@@ -115,35 +116,7 @@ export default class StartDevelop {
     };
   }
 
-  /**
-   * Read machine config and load io which are specified there.
-   */
-  private async makeDevelopIoCollection(
-    os: Os,
-    platformDir: string,
-    machine: string
-  ): Promise<{[index: string]: IoItemClass}> {
-    const ioSet: {[index: string]: new (...params: any[]) => any} = {};
-    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
-    const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
-    const machineEvalModule: any = require(evalModulePath);
-
-    for (let ioPath of machineConfig.ios) {
-      const ioName: string = parseIoName(ioPath);
-      const ioAbsPath = path.resolve(platformDir, ioPath);
-      const moduleContent: string = await os.getFileContent(ioAbsPath);
-      const compiledModuleContent: string = ts.transpile(moduleContent);
-
-      ioSet[ioName] = machineEvalModule(compiledModuleContent);
-    }
-
-    return ioSet;
-  }
-
-  private async configureEnvSet() {
-
-    // TODO review
-
+  private async makeInMemoryEnvSet(): Promise<HostEnvSet> {
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
@@ -153,11 +126,7 @@ export default class StartDevelop {
 
     console.info(`===> generate master config object`);
 
-    const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
-
-    console.info(`===> initializing system`);
-
-    //EnvSetMemory.$registerConfigSet(hostEnvSet);
+    return envBuilder.generateHostEnvSet();
   }
 
 }
