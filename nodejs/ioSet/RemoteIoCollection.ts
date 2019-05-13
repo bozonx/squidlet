@@ -1,10 +1,14 @@
+import * as path from 'path';
+
 import System from '../../system/System';
 import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
 import {isPlainObject} from '../../system/helpers/lodashLike';
 import IoItem from '../../system/interfaces/IoItem';
-import {pathJoin} from '../../system/helpers/nodeLike';
 import BackdoorClient from '../../shared/BackdoorClient';
+import {SYSTEM_DIR} from '../starter/helpers';
+import categories from '../../system/dict/categories';
+import topics from '../../system/dict/topics';
 
 
 export default class RemoteIoCollection {
@@ -26,12 +30,6 @@ export default class RemoteIoCollection {
    * Replace init method to generate local proxy methods and instantiate RemoteCall
    */
   async init(system: System): Promise<void> {
-    // TODO: ask for io list
-    // TODO: fill this.ioCollection
-    // TODO: не указывать методы init and configure
-
-    //this._client = new WsClient(this.system.host.id, this.wsClientProps);
-
     this._remoteCall = new RemoteCall(
       this.sendMessage,
       undefined,
@@ -40,28 +38,29 @@ export default class RemoteIoCollection {
       system.host.generateUniqId
     );
 
-    //await this.initAllIo();
+    // TODO: listen messages
+    // this.client.onIncomeMessage(this.resolveIncomeMessage);
+
+    const ioNames: string[] = await this.askIoNames();
+
+    // make fake io items
+    for (let ioName of ioNames) {
+      this.ioCollection[ioName] = this.makeFakeIo(ioName);
+    }
   }
-
-
-  // private listen() {
-  //   // this.client.onError((err: string) => this.system.log.error(err));
-  //   // this.client.onIncomeMessage(this.resolveIncomeMessage);
-  // }
-
-  //
-  // getInstance<T extends IoItem>(ioName: string): T {
-  //   this.makeFakeIoIfNeed(ioName);
-  //
-  //   return this.ioCollection[ioName] as T;
-  // }
 
   async destroy() {
-    await super.destroy();
     await this.remoteCall.destroy();
+    await this.client.destroy();
   }
 
 
+  private sendMessage(message: RemoteCallMessage): Promise<void> {
+
+    // TODO: нужно ли указывать топик ???
+
+    return this.client.emit(categories.ioSet, undefined, message);
+  }
 
   /**
    * Call this method when you has received a message
@@ -77,18 +76,13 @@ export default class RemoteIoCollection {
     await this.remoteCall.incomeMessage(message);
   }
 
+  private async askIoNames(): Promise<string[]> {
+    // TODO: ask for io list
+  }
 
-  private makeFakeIoIfNeed(ioName: string) {
-    if (this.ioCollection[ioName]) return;
-
-    const ioDefinitionPath = pathJoin(
-      // this.system.systemConfig.rootDirs.envSet,
-      // this.system.systemConfig.envSetDirs.system,
-      '../',
-      'interfaces',
-      'io',
-      `${ioName}Io`
-    );
+  private makeFakeIo(ioName: string): IoItem {
+    const ioDefinitionPath = path.join(SYSTEM_DIR, 'interfaces', 'io', `${ioName}Io`);
+    const ioItem: {[index: string]: any} = {};
     let ioMethods: string[];
 
     try {
@@ -99,18 +93,19 @@ export default class RemoteIoCollection {
     }
 
     for (let methodName of ioMethods) {
-      this.ioCollection[ioName][methodName] = this.makeMethod(ioName, methodName);
+      // skip init and configure methods because io item has already initialized and configured on a host
+      if (methodName === 'init' || methodName === 'configure') continue;
+
+      ioItem[methodName] = this.makeMethod(ioName, methodName);
     }
+
+    return ioItem as IoItem;
   }
 
   private makeMethod(ioName: string, methodName: string): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => {
       return this.remoteCall.callMethod(ioName, methodName, ...args);
     };
-  }
-
-  private sendMessage(message: RemoteCallMessage): Promise<void> {
-    // TODO: do it
   }
 
 }
