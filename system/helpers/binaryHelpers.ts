@@ -1,6 +1,6 @@
 import {padStart} from './lodashLike';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
-import {base64ToString, stringTobase64} from './strings';
+import {base64ToString, stringToBase64} from './strings';
 
 
 const BIN_MARK = '!BIN!';
@@ -284,7 +284,7 @@ export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
 export function uint8ArrayToText(uintArray: Uint8Array): string {
   const encodedString = String.fromCharCode.apply(null, uintArray as any);
 
-  return decodeURIComponent(escape(stringTobase64(encodedString)));
+  return decodeURIComponent(escape(stringToBase64(encodedString)));
 
   // var uint8array = new TextEncoder("utf-8").encode("Plain Text");
   // var string = new TextDecoder().decode(uint8array);

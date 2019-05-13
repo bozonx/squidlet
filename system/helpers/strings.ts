@@ -10,7 +10,7 @@ export function base64ToString(str: string): string {
   return btoa(str);
 }
 
-export function stringTobase64(base64Str: string): string {
+export function stringToBase64(base64Str: string): string {
   if (typeof atob === 'undefined') {
     return Buffer.from(base64Str, 'base64').toString();
   }

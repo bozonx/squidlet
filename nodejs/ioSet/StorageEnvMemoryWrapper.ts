@@ -1,16 +1,20 @@
-/**
- * Base class for builds which use src files or which use requireJs to load modules.
- */
+import * as path from 'path';
+import _trimEnd = require('lodash/trimEnd');
+import _trimStart = require('lodash/trimStart');
+
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
-import {EntityClassType} from '../../system/entities/EntityManagerBase';
-import {trimEnd} from '../../system/helpers/lodashLike';
-import {pathJoin} from '../../system/helpers/nodeLike';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import {splitFirstElement} from '../../system/helpers/strings';
+import systemConfig from '../../system/config/systemConfig';
 
 
+/**
+ * It wraps a Storage io instance to load configs and manifests from memory.
+ * But other files it loads as an original Storage.
+ */
 export default class StorageEnvMemoryWrapper {
   private readonly envBuilder: EnvBuilder;
   private readonly envSetDir: string;
@@ -41,39 +45,57 @@ export default class StorageEnvMemoryWrapper {
     };
   }
 
+
+  private readFile = async (originalStorage: StorageIo, pathTo: string): Promise<string> => {
+    if (pathTo.indexOf(this.envSetDir) === -1) return originalStorage.readFile(pathTo);
+
+    const splat = pathTo.split(pathTo);
+    const relativePath = _trimStart(splat[1], path.sep);
+
+    if (!relativePath) throw new Error(`StorageEnvMemoryWrapper.readFile: Can't read path "${pathTo}"`);
+
+    const [envsetDir, restPath] = splitFirstElement(relativePath, path.sep);
+
+    if (!restPath) throw new Error(`StorageEnvMemoryWrapper.readFile: empty rest of path`);
+
+    if (envsetDir === systemConfig.envSetDirs.configs) {
+      return JSON.stringify(this.loadConfig(restPath));
+    }
+    else if (envsetDir === systemConfig.envSetDirs.entities) {
+      return JSON.stringify(this.loadManifest(restPath));
+    }
+
+    return originalStorage.readFile(pathTo);
+  }
+
   /**
    * Get builtin config
    * @param configName - config name with ".json" extension
    */
-  async loadConfig<T>(configName: string): Promise<T> {
-    const strippedName: string = trimEnd(configName, '.json');
-    const config: any = (configSet.configs as any)[strippedName];
+  private loadConfig(configName: string): {[index: string]: any} {
+    // TODO: use path parse or helper
+    const strippedName: string = _trimEnd(configName, '.json');
+    const config: any = (this.envSet && this.envSet.configs as any)[strippedName];
 
-    if (!config) throw new Error(`Can't find config "${configName}"`);
+    if (!config) throw new Error(`StorageEnvMemoryWrapper.loadConfig: Can't find config "${configName}"`);
 
     return config;
   }
 
   /**
    * Get builtin manifest
-   * @param pluralType - devices, drivers or services
-   * @param entityName - name of entity
    */
-  async loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
-    if (!configSet.entities[pluralType][entityName]) {
-      throw new Error(`EnvSetMemory.loadManifest("${pluralType}", "${entityName}"): Can't find an entity`);
+  private loadManifest(entityString: string) : Promise<ManifestBase> {
+    const [pluralTypeStr, entityName] = splitFirstElement(entityString, path.sep);
+    const pluralType = pluralTypeStr as ManifestsTypePluralName;
+
+    if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
+      throw new Error(`StorageEnvMemoryWrapper.loadManifest("${pluralType}", "${entityName}"): Can't find an entity`);
     }
 
-    return configSet.entities[pluralType][entityName].manifest as T;
+    return this.envSet.entities[pluralType][entityName].manifest as any;
   }
 
-
-  private readFile = (originalStorage: StorageIo, pathTo: string): Promise<string> => {
-    if (pathTo.indexOf(envSetDir) === -1) return originalStorage.readFile(pathTo);
-
-    // TODO: определить что это configs или enriries
-    // TODO: убрать расширение
-  }
 
 }
 
