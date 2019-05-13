@@ -11,6 +11,7 @@ import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
 import IoItem from '../../system/interfaces/IoItem';
+import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
 export default class IoSetDevelopRemote implements IoSet {
@@ -18,7 +19,8 @@ export default class IoSetDevelopRemote implements IoSet {
   private readonly platform: Platforms;
   private readonly machine: string;
   private storageWrapper: StorageEnvMemoryWrapper;
-  private ioCollection = new RemoteIoCollection();
+  private ioCollection: {[index: string]: IoItem} = {};
+  private remoteIoCollection = new RemoteIoCollection();
 
   // private wsClientProps: WsClientProps;
   // private _client?: WsClient;
@@ -49,21 +51,42 @@ export default class IoSetDevelopRemote implements IoSet {
   }
 
   async init(system: System) {
-    // TODO: make memeory storage wrapper
+    await this.remoteIoCollection.init(system);
 
-    await this.ioCollection.init(system);
+    for (let ioName of Object.keys(this.remoteIoCollection.items)) {
+      if (ioName === 'Storage') {
+        this.ioCollection[ioName] = this.storageWrapper.makeWrapper(
+          this.remoteIoCollection.items[ioName] as StorageIo
+        );
+      }
+      else {
+        this.ioCollection[ioName] = this.remoteIoCollection.items[ioName];
+      }
+    }
   }
 
   async destroy() {
-    await this.ioCollection.destroy();
+    await this.remoteIoCollection.destroy();
   }
 
+  // getIo<T extends IoItem>(ioName: string): T {
+  //   return this.ioCollection.getIo(ioName) as T;
+  // }
+  //
+  // getNames(): string[] {
+  //   return this.ioCollection.getNames();
+  // }
+
   getIo<T extends IoItem>(ioName: string): T {
-    return this.ioCollection.getIo(ioName) as T;
+    if (!this.ioCollection[ioName]) {
+      throw new Error(`Can't find io instance "${ioName}"`);
+    }
+
+    return this.ioCollection[ioName] as T;
   }
 
   getNames(): string[] {
-    return this.ioCollection.getNames();
+    return Object.keys(this.ioCollection);
   }
 
 

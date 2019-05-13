@@ -6,14 +6,13 @@ import IoItem from '../../system/interfaces/IoItem';
 import {pathJoin} from '../../system/helpers/nodeLike';
 
 
-export default abstract class RemoteIoCollection {
+export default class RemoteIoCollection {
+  readonly items: {[index: string]: IoItem} = {};
+
   private _remoteCall?: RemoteCall;
   private get remoteCall(): RemoteCall {
     return this.remoteCall as any;
   }
-
-  // send a message to server
-  protected abstract send(message: RemoteCallMessage): any;
 
 
   /**
