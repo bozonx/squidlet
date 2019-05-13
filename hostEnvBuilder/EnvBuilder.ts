@@ -90,6 +90,10 @@ export default class EnvBuilder {
    * It uses only to start in nodejs environment.
    */
   generateHostEnvSet(): HostEnvSet {
+
+    // TODO: rename to developEnvSet - потомучто в src будут пути к оригинальным файлам
+    // TODO: либо их прописывать в отдельные свойства
+
     return {
       configs: this.configsSet.getConfigSet(),
       entities: this.usedEntities.getEntitiesSet(),

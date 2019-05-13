@@ -15,18 +15,17 @@ import StorageIo from '../../system/interfaces/io/StorageIo';
 
 export default class IoSetDevelopLocal implements IoSet {
   private readonly os: Os;
-  private readonly envBuilder: EnvBuilder;
   private readonly platform: Platforms;
   private readonly machine: string;
-  private storageWrapper = new StorageEnvMemoryWrapper();
+  private storageWrapper: StorageEnvMemoryWrapper;
   protected ioCollection: {[index: string]: IoItem} = {};
 
 
-  constructor(os: Os, envBuilder: EnvBuilder, platform: Platforms, machine: string) {
+  constructor(os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string) {
     this.os = os;
-    this.envBuilder = envBuilder;
     this.platform = platform;
     this.machine = machine;
+    this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
   }
 
 

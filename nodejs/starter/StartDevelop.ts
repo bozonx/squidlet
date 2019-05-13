@@ -6,11 +6,12 @@ import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {makeSystemConfigExtend, SYSTEM_DIR} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR, IOSET_STRING_DELIMITER, SYSTEM_FILE_NAME} from '../../shared/constants';
+import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
-type IoSetClass = new (os: Os, envBuilder: EnvBuilder, paramsString?: string) => IoSet;
+type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
 
 const IOSET_DIR = path.resolve(__dirname, '../ioSet');
 
@@ -92,7 +93,14 @@ export default class StartDevelop {
 
     console.info(`--> using io set "${ioSetFile}"`);
 
-    const ioSet = new IoSetClass(this.io, envBuilder, this.argIoset);
+    const ioSet = new IoSetClass(
+      this.os,
+      envBuilder,
+      this.props.envSetDir,
+      this.props.platform,
+      this.props.machine,
+      this.argIoset
+    );
 
     ioSet.prepare && ioSet.prepare();
 

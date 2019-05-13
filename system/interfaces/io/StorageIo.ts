@@ -29,10 +29,10 @@ export const Methods = [
 
 
 export default interface StorageIo extends IoItem {
-  appendFile(path: string, data: string | Uint8Array): Promise<void>;
-  mkdir(path: string): Promise<void>;
-  readdir(path: string): Promise<string[]>;
-  readFile(path: string): Promise<string>;
+  appendFile(pathTo: string, data: string | Uint8Array): Promise<void>;
+  mkdir(pathTo: string): Promise<void>;
+  readdir(pathTo: string): Promise<string[]>;
+  readFile(pathTo: string): Promise<string>;
 
   /**
    * You should pass only symlink. Resolve it by using stat().
@@ -40,12 +40,12 @@ export default interface StorageIo extends IoItem {
    */
   readlink(pathTo: string): Promise<string>;
 
-  readBinFile(path: string): Promise<Uint8Array>;
-  rmdir(path: string): Promise<void>;
-  unlink(path: string): Promise<void>;
-  writeFile(path: string, data: string | Uint8Array): Promise<void>;
-  stat(path: string): Promise<Stats>;
-  exists(path: string): Promise<boolean>;
+  readBinFile(pathTo: string): Promise<Uint8Array>;
+  rmdir(pathTo: string): Promise<void>;
+  unlink(pathTo: string): Promise<void>;
+  writeFile(pathTo: string, data: string | Uint8Array): Promise<void>;
+  stat(pathTo: string): Promise<Stats>;
+  exists(pathTo: string): Promise<boolean>;
   copyFile(src: string, dest: string): Promise<void>;
   rename(oldPath: string, newPath: string): Promise<void>;
 }

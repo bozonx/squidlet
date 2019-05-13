@@ -8,6 +8,7 @@ import System from '../../system';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import RemoteIoBase from './RemoteIoBase';
 import Os from '../../shared/Os';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoSet {
@@ -22,7 +23,7 @@ export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoS
   private readonly envBuilder: EnvBuilder;
   private readonly paramsString: string;
 
-  constructor(os: Os, envBuilder: EnvBuilder, paramsString?: string) {
+  constructor(os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) {
     this.os = os;
     this.envBuilder = envBuilder;
     this.paramsString = paramsString;
