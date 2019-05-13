@@ -91,8 +91,7 @@ export default class StartDevelop {
 
     const ioSet = new IoSetClass(connectionParams);
 
-    // TODO: configure
-    //ioSet.
+    ioSet.connect && ioSet.connect();
 
     return ioSet;
   }

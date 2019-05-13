@@ -8,6 +8,9 @@ import IoItem from '../../system/interfaces/IoItem';
 
 
 export default class IoSetDevelopLocal extends IoSetLocal implements IoSet {
+  connect() {
+
+  }
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.ioCollection[ioName]) {
