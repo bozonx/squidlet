@@ -6,7 +6,7 @@ import compileJs from './buildToJs/compileJs';
 import minimize from './buildToJs/minimize';
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
-import {loadMachineConfig, parseDevName, resolvePlatformDir} from './helpers';
+import {loadMachineConfig, parseIoName, resolvePlatformDir} from './helpers';
 import {
   IO_SET_INDEX_FILE,
   LEGACY_DIR,
@@ -111,7 +111,7 @@ export default class BuildIo {
     const ios: string[] = [];
 
     for (let devPath of machineConfig.ios) {
-      const devName: string = parseDevName(devPath);
+      const devName: string = parseIoName(devPath);
       const ioString = `${devName}: require("./${devName}")`;
 
       ios.push(ioString);

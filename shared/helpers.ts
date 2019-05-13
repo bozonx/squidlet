@@ -16,21 +16,21 @@ const REPO_ROOT = path.resolve(__dirname, '../');
 
 
 /**
- * Make dev name from dev path
+ * Make io name from io path
  */
-export function parseDevName(pathToDev: string): string {
-  const parsed = path.parse(pathToDev);
+export function parseIoName(pathToIo: string): string {
+  const parsed = path.parse(pathToIo);
 
-  if (!parsed.name) throw new Error(`Can't parse dev name of path "${pathToDev}"`);
+  if (!parsed.name) throw new Error(`Can't parse io name of path "${pathToIo}"`);
 
   return parsed.name;
 }
 
 /**
- * Make list of dev names from list of dev paths.
+ * Make list of io names from list of io paths.
  */
-export function makeDevNames(devPaths: string[]): string[] {
-  return devPaths.map((devPath) => parseDevName(devPath));
+export function makeIoNames(devPaths: string[]): string[] {
+  return devPaths.map((devPath) => parseIoName(devPath));
 }
 
 export function resolvePlatformDir(platform: Platforms): string {
@@ -69,31 +69,6 @@ export function resolveSquidletRoot(): string {
   return path.join(process.env['HOME'] as string, HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME);
 }
 
-/**
- * Read machine config and load io which are specified there.
- */
-export async function makeDevelopIoCollection(
-  os: Os,
-  platformDir: string,
-  machine: string
-): Promise<{[index: string]: IoItemClass}> {
-  const ioSet: {[index: string]: new (...params: any[]) => any} = {};
-  const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
-  const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
-  const machineEvalModule: any = require(evalModulePath);
-
-  for (let ioPath of machineConfig.ios) {
-    const ioName: string = parseDevName(ioPath);
-    const ioAbsPath = path.resolve(platformDir, ioPath);
-    const moduleContent: string = await os.getFileContent(ioAbsPath);
-    const compiledModuleContent: string = ts.transpile(moduleContent);
-
-    ioSet[ioName] = machineEvalModule(compiledModuleContent);
-  }
-
-  return ioSet;
-}
-
 export async function getOsMachine(os: Os) {
   const spawnResult: SpawnCmdResult = await os.spawnCmd('hostnamectl');
 
@@ -105,7 +80,6 @@ export async function getOsMachine(os: Os) {
 
   return resolveMachineByOsAndArch(osName, arch);
 }
-
 
 export function parseHostNameCtlResult(stdout: string): {osName: string, arch: string} {
   const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
@@ -140,35 +114,4 @@ export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsM
   }
 
   throw new Error(`Unsupported architecture "${arch}"`);
-}
-
-/**
- * Resolve ioSet file and load it.
- */
-export function resolveIoSetClass(iosetType: IoSetTypes): IoSet | undefined {
-  let relativeFilePath: string;
-
-  // TODO: why????
-  // prod local
-  if (iosetType === 'local') {
-    return undefined;
-    //relativeFilePath = 'system/ioSet/IoSetLocal';
-  }
-  // // prod nodejs ws
-  // else if (iosetType === 'nodejs-ws') {
-  //   relativeFilePath = 'nodejs/ioSet/IoSetWs';
-  // }
-  else if (iosetType === 'nodejs-developLocal') {
-    relativeFilePath = 'nodejs/ioSet/IoSetDevelopLocal';
-  }
-  else if (iosetType === 'nodejs-developWs') {
-    relativeFilePath = 'nodejs/ioSet/IoSetDevelopWs';
-  }
-  else {
-    throw new Error(`Unsupported type of ioSet "${iosetType}" for nodejs platform`);
-  }
-
-  const ioSetPath = path.join(REPO_ROOT, relativeFilePath);
-
-  return require(ioSetPath).default;
 }

@@ -9,7 +9,7 @@ import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig, makeDevNames} from '../../shared/helpers';
+import {loadMachineConfig, makeIoNames} from '../../shared/helpers';
 import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
 
 
@@ -81,7 +81,7 @@ export default class ConfigManager {
 
 
   getMachineIos(): string[] {
-    return makeDevNames(this.machineConfig.ios);
+    return makeIoNames(this.machineConfig.ios);
   }
 
   private async resolveHostConfig(): Promise<PreHostConfig> {
