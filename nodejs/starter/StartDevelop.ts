@@ -5,7 +5,7 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules, makeSystemConfigExtend} from './helpers';
+import {installNpmModules, makeSystemConfigExtend, SYSTEM_DIR, SYSTEM_FILE_NAME} from './helpers';
 import {resolveIoSetClass, resolvePlatformDir} from '../../shared/helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
@@ -60,11 +60,12 @@ export default class StartDevelop {
 
 
   /**
-   * Resolve development io set (nodejs-developLocal or nodejs-developWs)
+   * Resolve development io set (IoSetDevelopLocal or IoSetDevelopRemote)
    * and start development version of System.
    */
   private async startSystem() {
-    const System = require(`../../system`).default;
+    const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
+    const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
     const ioSetType: IoSetTypes = this.resolveIoSetType();
 

@@ -5,6 +5,10 @@ import Os, {SpawnCmdResult} from '../../shared/Os';
 import Props from './Props';
 
 
+export const SYSTEM_DIR = path.resolve(__dirname, '../../system');
+export const SYSTEM_FILE_NAME = 'System';
+
+
 export function makeSystemConfigExtend(props: Props): {[index: string]: any} {
   return {
     rootDirs: {

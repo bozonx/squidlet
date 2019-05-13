@@ -15,10 +15,7 @@ import BuildHostEnv from '../../shared/BuildHostEnv';
 import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
-import {installNpmModules, makeSystemConfigExtend} from './helpers';
-
-
-const systemClassFileName = 'System';
+import {installNpmModules, makeSystemConfigExtend, SYSTEM_FILE_NAME} from './helpers';
 
 
 export default class StartProd {
@@ -128,7 +125,7 @@ export default class StartProd {
    * and start production version of System.
    */
   private async startSystem() {
-    const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
+    const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
 
