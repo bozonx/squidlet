@@ -72,10 +72,8 @@ export default class IoSetDevelopRemote implements IoSet {
   }
 
 
-  private parseIoSetString(ioSetString?: string): {host: string, port?: number} {
-    if (!ioSetString) {
-      throw new Error(`IoSetDevelopRemote.parseIoSetString: You have to specify at leas a hostname`);
-    }
+  private parseIoSetString(ioSetString?: string): {host?: string, port?: number} {
+    if (!ioSetString) return {};
 
     const splat = ioSetString.split(IOSET_STRING_DELIMITER);
 

@@ -4,6 +4,7 @@ import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfa
 import {isPlainObject} from '../../system/helpers/lodashLike';
 import IoItem from '../../system/interfaces/IoItem';
 import {pathJoin} from '../../system/helpers/nodeLike';
+import BackdoorClient from '../../shared/BackdoorClient';
 
 
 export default class RemoteIoCollection {
@@ -11,18 +12,18 @@ export default class RemoteIoCollection {
 
   private _remoteCall?: RemoteCall;
   private get remoteCall(): RemoteCall {
-    return this.remoteCall as any;
+    return this._remoteCall as any;
   }
 
   // private wsClientProps: WsClientProps;
-  // private _client?: WsClient;
-  // private get client(): WsClient {
-  //   return this._client as any;
-  // }
+  private _client?: BackdoorClient;
+  private get client(): BackdoorClient {
+    return this._client as any;
+  }
 
 
-  constructor(host: string, port?: number) {
-
+  constructor(host?: string, port?: number) {
+    this._client = new BackdoorClient(host, port);
     // TODO: set default port ???
 
   }
@@ -30,6 +31,7 @@ export default class RemoteIoCollection {
 
   async connect() {
     // TODO: do connection
+    // TODO: ask for io list
   }
 
   /**
@@ -38,6 +40,7 @@ export default class RemoteIoCollection {
   async init(system: System): Promise<void> {
     // TODO: use backdoor client
     // TODO: fill this.ioCollection
+    // TODO: не указывать методы init and configure
 
     //this._client = new WsClient(this.system.host.id, this.wsClientProps);
 
