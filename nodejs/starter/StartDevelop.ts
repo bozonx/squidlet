@@ -49,7 +49,8 @@ export default class StartDevelop {
 
   async start() {
 
-    // TODO: review может вообще i2c-bus и pigpio устанавливать глобально??? если они не работают на x86
+    // TODO: review может вообще pigpio устанавливать глобально??? он не билдятся на x86
+    // TODO: или лучше указывать в machine config
 
     // TODO: проверить чтобы были установленны node_modules в корне самого squidlet
 

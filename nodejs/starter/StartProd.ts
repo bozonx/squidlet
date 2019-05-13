@@ -10,13 +10,12 @@ import {
   BUILD_SYSTEM_DIR,
   HOST_ENVSET_DIR,
 } from '../../shared/constants';
-import PreHostConfig, {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from '../../shared/BuildHostEnv';
 import BuildIo from '../../shared/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend} from './helpers';
-import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 const systemClassFileName = 'System';
@@ -100,7 +99,8 @@ export default class StartProd {
   }
 
   /**
-   * Build system first time.
+   * Build system only at first time.
+   * It builds to workDir/envset/system
    */
   private async buildInitialSystem() {
     const pathToSystemDir = this.getPathToProdSystemDir();
@@ -131,11 +131,6 @@ export default class StartProd {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), systemClassFileName);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    const ioSetType: IoSetTypes = this.resolveIoSetType();
-
-    console.info(`===> using io set "${ioSetType}"`);
-
-    //const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
 
     console.info(`===> Starting system`);
 
@@ -146,24 +141,7 @@ export default class StartProd {
   }
 
   /**
-   * Only nodejs-ws or local ioSet types are allowed
-   * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
-   */
-  private resolveIoSetType(): IoSetTypes {
-    const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-
-    if (!ioSetConfig || ioSetConfig.type === 'local') {
-      return 'local';
-    }
-    else if (ioSetConfig.type !== 'nodejs-ws') {
-      throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
-    }
-
-    return ioSetConfig.type;
-  }
-
-  /**
-   * Build system to workDir/system
+   * Build system to workDir/envset/system
    */
   private async buildSystem() {
     const systemBuildDir = this.getPathToProdSystemDir();
@@ -215,6 +193,27 @@ export default class StartProd {
 
 }
 
+
+//const ioSetType: IoSetTypes = this.resolveIoSetType();
+//console.info(`===> using io set "${ioSetType}"`);
+//const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
+
+// /**
+//  * Only nodejs-ws or local ioSet types are allowed
+//  * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
+//  */
+// private resolveIoSetType(): IoSetTypes {
+//   const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
+//
+//   if (!ioSetConfig || ioSetConfig.type === 'local') {
+//     return 'local';
+//   }
+//   else if (ioSetConfig.type !== 'nodejs-ws') {
+//     throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
+//   }
+//
+//   return ioSetConfig.type;
+// }
 
 // /**
 //  * Make ioSet instance or return undefined if local is used.
