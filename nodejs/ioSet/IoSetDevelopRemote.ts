@@ -12,8 +12,6 @@ import StorageIo from '../../system/interfaces/io/StorageIo';
 
 export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
-  private readonly platform: Platforms;
-  private readonly machine: string;
   private readonly storageWrapper: StorageEnvMemoryWrapper;
   private readonly ioCollection: {[index: string]: IoItem} = {};
   private remoteIoCollection: RemoteIoCollection;
@@ -25,8 +23,6 @@ export default class IoSetDevelopRemote implements IoSet {
     }
 
     this.os = os;
-    this.platform = platform;
-    this.machine = machine;
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
 
     const {host, port} = this.parseIoSetString(paramsString);

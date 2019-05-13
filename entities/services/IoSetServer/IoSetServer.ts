@@ -2,11 +2,10 @@
 // TODO: прописать зависимость от драйверов
 
 
-import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
-import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
-import IoItem, {IoItemClass} from '../../system/interfaces/IoItem';
-import WsServer from '../../__old/WsServer';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
+import RemoteCall from 'system/helpers/remoteCall/RemoteCall';
+import IoItem, {IoItemClass} from 'system/interfaces/IoItem';
+import hostDefaultConfig from '../../../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 // TODO: remove

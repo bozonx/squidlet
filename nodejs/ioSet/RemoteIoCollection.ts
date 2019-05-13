@@ -10,22 +10,25 @@ import BackdoorClient from '../../shared/BackdoorClient';
 export default class RemoteIoCollection {
   readonly ioCollection: {[index: string]: IoItem} = {};
 
-  private _remoteCall?: RemoteCall;
-  private get remoteCall(): RemoteCall {
-    return this._remoteCall as any;
-  }
-
-  // private wsClientProps: WsClientProps;
-  private _client?: BackdoorClient;
-  private get client(): BackdoorClient {
-    return this._client as any;
-  }
+  private readonly remoteCall: RemoteCall;
+  private readonly client: BackdoorClient;
 
 
-  constructor(host?: string, port?: number) {
-    this._client = new BackdoorClient(host, port);
-    // TODO: set default port ???
-
+  constructor(
+    responseTimoutSec: number,
+    logError: (message: string) => void,
+    generateUniqId: () => string,
+    host?: string,
+    port?: number
+  ) {
+    this.client = new BackdoorClient(host, port);
+    this.remoteCall = new RemoteCall(
+      this.sendMessage,
+      undefined,
+      responseTimoutSec,
+      logError,
+      generateUniqId
+    );
   }
 
 
@@ -121,6 +124,10 @@ export default class RemoteIoCollection {
     return (...args: any[]): Promise<any> => {
       return this.remoteCall.callMethod(ioName, methodName, ...args);
     };
+  }
+
+  private sendMessage(message: RemoteCallMessage): Promise<void> {
+    // TODO: do it
   }
 
 }
