@@ -5,7 +5,6 @@ import IoSet from '../../system/interfaces/IoSet';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
-import System from '../../system';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import {loadMachineConfigInPlatformDir, getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
@@ -36,7 +35,7 @@ export default class IoSetDevelopLocal implements IoSet {
   /**
    * Collect io items instances
    */
-  async init(system: System): Promise<void> {
+  async init(): Promise<void> {
     const platformDir: string = resolvePlatformDir(this.platform);
     const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, this.machine);
     const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule');
