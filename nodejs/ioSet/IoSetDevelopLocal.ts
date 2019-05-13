@@ -1,29 +1,71 @@
 import * as path from 'path';
+import * as ts from 'typescript';
+
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import IoSetLocal from '../../system/entities/IoSetLocal';
 import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
 import System from '../../system';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import {loadMachineConfigInPlatformDir, parseIoName, resolvePlatformDir} from '../../shared/helpers';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
+import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
 export default class IoSetDevelopLocal implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
+  private readonly platform: Platforms;
+  private readonly machine: string;
+  private storageWrapper = new StorageEnvMemoryWrapper();
   protected ioCollection: {[index: string]: IoItem} = {};
 
 
-  constructor(os: Os, envBuilder: EnvBuilder) {
+  constructor(os: Os, envBuilder: EnvBuilder, platform: Platforms, machine: string) {
     this.os = os;
     this.envBuilder = envBuilder;
+    this.platform = platform;
+    this.machine = machine;
   }
 
+
+  async prepare() {
+    await this.storageWrapper.init();
+  }
+
+  /**
+   * Collect io items instances
+   */
   async init(system: System): Promise<void> {
+    const platformDir: string = resolvePlatformDir(this.platform);
+    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, this.machine);
+    const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule');
+    const machineEvalModule: any = require(evalModulePath);
 
+    for (let ioPath of machineConfig.ios) {
+      const ioName: string = parseIoName(ioPath);
+      const ioAbsPath = path.resolve(platformDir, ioPath);
+
+      // TODO: review
+
+      const moduleContent: string = await this.os.getFileContent(ioAbsPath);
+      const compiledModuleContent: string = ts.transpile(moduleContent);
+      const ioItemClass: new () => IoItem = machineEvalModule(compiledModuleContent);
+
+      if (ioName === 'Storage') {
+        this.ioCollection[ioName] = this.storageWrapper.makeWrapper(new ioItemClass() as StorageIo);
+      }
+      else {
+        this.ioCollection[ioName] = new ioItemClass();
+      }
+    }
   }
 
+
+  async destroy() {
+    delete this.ioCollection;
+  }
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.ioCollection[ioName]) {
@@ -35,31 +77,6 @@ export default class IoSetDevelopLocal implements IoSet {
 
   getNames(): string[] {
     return Object.keys(this.ioCollection);
-  }
-
-  /**
-   * Read machine config and load io which are specified there.
-   */
-  private async makeDevelopIoCollection(
-    os: Os,
-    platformDir: string,
-    machine: string
-  ): Promise<{[index: string]: IoItemClass}> {
-    const ioSet: {[index: string]: new (...params: any[]) => any} = {};
-    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, machine);
-    const evalModulePath: string = path.join(platformDir, machine, 'evalModule');
-    const machineEvalModule: any = require(evalModulePath);
-
-    for (let ioPath of machineConfig.ios) {
-      const ioName: string = parseIoName(ioPath);
-      const ioAbsPath = path.resolve(platformDir, ioPath);
-      const moduleContent: string = await os.getFileContent(ioAbsPath);
-      const compiledModuleContent: string = ts.transpile(moduleContent);
-
-      ioSet[ioName] = machineEvalModule(compiledModuleContent);
-    }
-
-    return ioSet;
   }
 
 }

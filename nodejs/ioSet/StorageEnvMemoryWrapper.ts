@@ -1,7 +1,6 @@
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
  */
-import System from '../../system/System';
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
 import {EntityClassType} from '../../system/entities/EntityManagerBase';
@@ -9,28 +8,28 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {trimEnd} from '../../system/helpers/lodashLike';
 import {pathJoin} from '../../system/helpers/nodeLike';
 import StorageIo from '../../system/interfaces/io/StorageIo';
+import IoItem from '../../system/interfaces/IoItem';
 
 
 let configSet: HostEnvSet;
 
 
-export default class EnvSetMemory {
+export default class StorageEnvMemoryWrapper {
   static $registerConfigSet(hostConfigSet: HostEnvSet) {
     configSet = hostConfigSet;
   }
 
-  private readonly system: System;
   private get ioStorage(): StorageIo {
     return this.system.ioManager.getIo('Storage') as any;
   }
+  //
+  //
+  // constructor(system: System) {
+  //   this.system = system;
+  // }
 
 
-  constructor(system: System) {
-    this.system = system;
-  }
-
-
-  private async makeInMemoryEnvSet(): Promise<HostEnvSet> {
+  async init() {
     // const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     // const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
@@ -41,6 +40,11 @@ export default class EnvSetMemory {
     console.info(`===> generate master config object`);
 
     return envBuilder.generateHostEnvSet();
+  }
+
+
+  makeWrapper(storageIo: StorageIo): IoItem {
+    // TODO: save it and return wrapper
   }
 
   /**

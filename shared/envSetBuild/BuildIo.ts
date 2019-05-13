@@ -1,19 +1,19 @@
 import * as path from 'path';
 
-import Os from './Os';
-import compileTs from './buildToJs/compileTs';
-import compileJs from './buildToJs/compileJs';
-import minimize from './buildToJs/minimize';
-import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
-import Platforms from '../hostEnvBuilder/interfaces/Platforms';
-import {loadMachineConfig, parseIoName, resolvePlatformDir} from './helpers';
+import Os from '../Os';
+import compileTs from '../buildToJs/compileTs';
+import compileJs from '../buildToJs/compileJs';
+import minimize from '../buildToJs/minimize';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+import {loadMachineConfig, parseIoName, resolvePlatformDir} from '../helpers';
 import {
   IO_SET_INDEX_FILE,
   LEGACY_DIR,
   MODERN_DIR,
   ORIGINAL_DIR,
-} from './constants';
-import {Stats} from '../system/interfaces/io/StorageIo';
+} from '../constants';
+import {Stats} from '../../system/interfaces/io/StorageIo';
 
 
 export default class BuildIo {

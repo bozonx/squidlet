@@ -1,11 +1,11 @@
 import * as path from 'path';
 
-import compileTs from './buildToJs/compileTs';
-import compileJs from './buildToJs/compileJs';
-import modulesTree from './buildToJs/modulesTree';
-import minimize from './buildToJs/minimize';
-import Os from './Os';
-import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from './constants';
+import compileTs from '../buildToJs/compileTs';
+import compileJs from '../buildToJs/compileJs';
+import modulesTree from '../buildToJs/modulesTree';
+import minimize from '../buildToJs/minimize';
+import Os from '../Os';
+import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from '../constants';
 
 
 const systemSrc = path.resolve(__dirname, '../system');

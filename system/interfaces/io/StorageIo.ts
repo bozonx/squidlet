@@ -1,3 +1,5 @@
+import IoItem from '../IoItem';
+
 export interface Stats {
   // in bytes
   size: number;
@@ -26,7 +28,7 @@ export const Methods = [
 ];
 
 
-export default interface StorageIo {
+export default interface StorageIo extends IoItem {
   appendFile(path: string, data: string | Uint8Array): Promise<void>;
   mkdir(path: string): Promise<void>;
   readdir(path: string): Promise<string[]>;
