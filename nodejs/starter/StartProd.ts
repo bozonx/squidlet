@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _omit = require('lodash/omit');
 
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -146,17 +145,6 @@ export default class StartProd {
     return system.start();
   }
 
-  // /**
-  //  * Make ioSet instance or return undefined if local is used.
-  //  */
-  // private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
-  //   if (ioSetType === 'local') return;
-  //
-  //   const ResolvedIoSet = resolveIoSetClass(ioSetType);
-  //
-  //   return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
-  // }
-
   /**
    * Only nodejs-ws or local ioSet types are allowed
    * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
@@ -227,6 +215,17 @@ export default class StartProd {
 
 }
 
+
+// /**
+//  * Make ioSet instance or return undefined if local is used.
+//  */
+// private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
+//   if (ioSetType === 'local') return;
+//
+//   const ResolvedIoSet = resolveIoSetClass(ioSetType);
+//
+//   return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
+// }
 
 // const devsSet: {[index: string]: new (...params: any[]) => any} = {};
 // const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);

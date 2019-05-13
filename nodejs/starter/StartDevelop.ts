@@ -48,26 +48,15 @@ export default class StartDevelop {
 
 
   async start() {
-    await this.installModules();
+
+    // TODO: review может вообще i2c-bus и pigpio устанавливать глобально??? если они не работают на x86
+
+    // TODO: проверить чтобы были установленны node_modules в корне самого squidlet
+
+    //await this.installModules();
     await this.startSystem();
   }
 
-
-  /**
-   * Install node modules into squidlet repository in ./nodejs/<x86|rpi|arm>/ .
-   * It installs only if node_modules directory doesn't exist.
-   */
-  private async installModules() {
-    const platformDir = resolvePlatformDir(this.props.platform);
-    const machineCwd: string = path.join(platformDir, this.props.machine);
-
-    // do not install node modules if they have been installed previously
-    if (await this.os.exists(path.join(machineCwd, 'node_modules'))) return;
-
-    console.info(`===> Install npm modules`);
-
-    await installNpmModules(this.os, machineCwd);
-  }
 
   /**
    * Resolve development io set (nodejs-developLocal or nodejs-developWs)
@@ -122,3 +111,22 @@ export default class StartDevelop {
   }
 
 }
+
+
+// /**
+//  * Install node modules into squidlet repository in ./nodejs/<x86|rpi|arm>/ .
+//  * It installs only if node_modules directory doesn't exist.
+//  */
+// private async installModules() {
+//
+//
+//   const platformDir = resolvePlatformDir(this.props.platform);
+//   const machineCwd: string = path.join(platformDir, this.props.machine);
+//
+//   // do not install node modules if they have been installed previously
+//   if (await this.os.exists(path.join(machineCwd, 'node_modules'))) return;
+//
+//   console.info(`===> Install npm modules`);
+//
+//   await installNpmModules(this.os, machineCwd);
+// }
