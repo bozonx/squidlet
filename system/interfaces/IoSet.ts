@@ -3,7 +3,7 @@ import System from '../System';
 
 
 export default interface IoSet {
-  connect?(): Promise<void>;
+  prepare?(): Promise<void>;
   init(system: System): Promise<void>;
   destroy(): Promise<void>;
 

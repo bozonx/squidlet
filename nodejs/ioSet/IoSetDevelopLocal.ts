@@ -8,7 +8,7 @@ import IoItem from '../../system/interfaces/IoItem';
 
 
 export default class IoSetDevelopLocal extends IoSetLocal implements IoSet {
-  connect() {
+  async prepare() {
 
   }
 
@@ -19,26 +19,5 @@ export default class IoSetDevelopLocal extends IoSetLocal implements IoSet {
 
     return this.ioCollection[ioName] as T;
   }
-
-
-  // private async configureEnvSet() {
-  //
-  //   // TODO review
-  //
-  //   const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
-  //   const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
-  //
-  //   console.info(`===> generate hosts env files and configs`);
-  //
-  //   await envBuilder.collect();
-  //
-  //   console.info(`===> generate master config object`);
-  //
-  //   const hostEnvSet: HostEnvSet = envBuilder.generateHostEnvSet();
-  //
-  //   console.info(`===> initializing system`);
-  //
-  //   //EnvSetMemory.$registerConfigSet(hostEnvSet);
-  // }
 
 }
