@@ -11,7 +11,7 @@ import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
 /**
  * Make io name from io path
  */
-export function parseIoName(pathToIo: string): string {
+export function getFileNameOfPath(pathToIo: string): string {
   const parsed = path.parse(pathToIo);
 
   if (!parsed.name) throw new Error(`Can't parse io name of path "${pathToIo}"`);
@@ -23,7 +23,7 @@ export function parseIoName(pathToIo: string): string {
  * Make list of io names from list of io paths.
  */
 export function makeIoNames(devPaths: string[]): string[] {
-  return devPaths.map((devPath) => parseIoName(devPath));
+  return devPaths.map((devPath) => getFileNameOfPath(devPath));
 }
 
 export function resolvePlatformDir(platform: Platforms): string {

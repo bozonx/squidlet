@@ -7,7 +7,7 @@ import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
 import System from '../../system';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import {loadMachineConfigInPlatformDir, parseIoName, resolvePlatformDir} from '../../shared/helpers';
+import {loadMachineConfigInPlatformDir, getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
 import StorageIo from '../../system/interfaces/io/StorageIo';
@@ -43,7 +43,7 @@ export default class IoSetDevelopLocal implements IoSet {
     const machineEvalModule: any = require(evalModulePath);
 
     for (let ioPath of machineConfig.ios) {
-      const ioName: string = parseIoName(ioPath);
+      const ioName: string = getFileNameOfPath(ioPath);
       const ioAbsPath = path.resolve(platformDir, ioPath);
 
       // TODO: review

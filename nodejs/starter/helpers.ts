@@ -6,7 +6,7 @@ import Props from './Props';
 import {IoItemClass} from '../../system/interfaces/IoItem';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import * as ts from 'typescript';
-import {loadMachineConfigInPlatformDir, parseIoName} from '../../shared/helpers';
+import {loadMachineConfigInPlatformDir, getFileNameOfPath} from '../../shared/helpers';
 
 
 //const REPO_ROOT = path.resolve(__dirname, '../');

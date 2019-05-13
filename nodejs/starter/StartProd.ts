@@ -173,7 +173,7 @@ export default class StartProd {
 // const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
 //
 // for (let devPath of machineConfig.devs) {
-//   const devName: string = parseIoName(devPath);
+//   const devName: string = getFileNameOfPath(devPath);
 //   const devFileName: string = `${devName}.js`;
 //   const devAbsPath: string = path.join(envSetDevsDir, devFileName);
 //

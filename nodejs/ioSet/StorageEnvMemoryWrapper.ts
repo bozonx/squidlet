@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _trimEnd = require('lodash/trimEnd');
 import _trimStart = require('lodash/trimStart');
 
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
@@ -9,6 +8,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement} from '../../system/helpers/strings';
 import systemConfig from '../../system/config/systemConfig';
+import {getFileNameOfPath} from '../../shared/helpers';
 
 
 /**
@@ -73,8 +73,8 @@ export default class StorageEnvMemoryWrapper {
    * @param configName - config name with ".json" extension
    */
   private loadConfig(configName: string): {[index: string]: any} {
-    // TODO: use path parse or helper
-    const strippedName: string = _trimEnd(configName, '.json');
+    // cut extension
+    const strippedName: string = getFileNameOfPath(configName);
     const config: any = (this.envSet && this.envSet.configs as any)[strippedName];
 
     if (!config) throw new Error(`StorageEnvMemoryWrapper.loadConfig: Can't find config "${configName}"`);
