@@ -5,7 +5,7 @@ import {pathJoin} from '../helpers/nodeLike';
 
 
 export default class IoSetLocal implements IoSet {
-  protected ioCollection: {[index: string]: IoItem} = {};
+  private ioCollection: {[index: string]: IoItem} = {};
 
 
   /**

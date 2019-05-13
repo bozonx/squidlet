@@ -7,7 +7,7 @@ import {pathJoin} from '../../system/helpers/nodeLike';
 
 
 export default class RemoteIoCollection {
-  readonly items: {[index: string]: IoItem} = {};
+  readonly ioCollection: {[index: string]: IoItem} = {};
 
   private _remoteCall?: RemoteCall;
   private get remoteCall(): RemoteCall {
@@ -37,6 +37,7 @@ export default class RemoteIoCollection {
    */
   async init(system: System): Promise<void> {
     // TODO: use backdoor client
+    // TODO: fill this.ioCollection
 
     //this._client = new WsClient(this.system.host.id, this.wsClientProps);
 
@@ -69,18 +70,6 @@ export default class RemoteIoCollection {
   async destroy() {
     await super.destroy();
     await this.remoteCall.destroy();
-  }
-
-  getIo<T extends IoItem>(ioName: string): T {
-    if (!this.ioCollection[ioName]) {
-      throw new Error(`Can't find io instance "${ioName}"`);
-    }
-
-    return this.ioCollection[ioName] as T;
-  }
-
-  getNames(): string[] {
-    return Object.keys(this.ioCollection);
   }
 
 

@@ -1,11 +1,7 @@
-import * as path from 'path';
-
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR, IOSET_STRING_DELIMITER} from '../../shared/constants';
+import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import System from '../../system';
-import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import RemoteIoCollection from './RemoteIoCollection';
 import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
@@ -18,9 +14,9 @@ export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
   private readonly platform: Platforms;
   private readonly machine: string;
-  private storageWrapper: StorageEnvMemoryWrapper;
-  private ioCollection: {[index: string]: IoItem} = {};
-  private remoteIoCollection = new RemoteIoCollection();
+  private readonly storageWrapper: StorageEnvMemoryWrapper;
+  private readonly ioCollection: {[index: string]: IoItem} = {};
+  private remoteIoCollection: RemoteIoCollection;
 
 
   constructor(os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) {
@@ -47,14 +43,14 @@ export default class IoSetDevelopRemote implements IoSet {
   async init(system: System) {
     await this.remoteIoCollection.init(system);
 
-    for (let ioName of Object.keys(this.remoteIoCollection.items)) {
+    for (let ioName of Object.keys(this.remoteIoCollection.ioCollection)) {
       if (ioName === 'Storage') {
         this.ioCollection[ioName] = this.storageWrapper.makeWrapper(
-          this.remoteIoCollection.items[ioName] as StorageIo
+          this.remoteIoCollection.ioCollection[ioName] as StorageIo
         );
       }
       else {
-        this.ioCollection[ioName] = this.remoteIoCollection.items[ioName];
+        this.ioCollection[ioName] = this.remoteIoCollection.ioCollection[ioName];
       }
     }
   }

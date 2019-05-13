@@ -16,7 +16,7 @@ export default class IoSetDevelopLocal implements IoSet {
   private readonly os: Os;
   private readonly platform: Platforms;
   private readonly machine: string;
-  private storageWrapper: StorageEnvMemoryWrapper;
+  private readonly storageWrapper: StorageEnvMemoryWrapper;
   private ioCollection: {[index: string]: IoItem} = {};
 
 
