@@ -1,17 +1,27 @@
+import * as path from 'path';
 import IoSet from '../../system/interfaces/IoSet';
-import * as path from "path";
 import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import IoSetLocal from '../../system/entities/IoSetLocal';
 import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
+import System from '../../system';
 
 
-export default class IoSetDevelopLocal extends IoSetLocal implements IoSet {
-  async prepare() {
+export default class IoSetDevelopLocal implements IoSet {
+  private readonly envBuilder: EnvBuilder;
+  protected ioCollection: {[index: string]: IoItem} = {};
+
+
+  constructor(envBuilder: EnvBuilder) {
+    this.envBuilder = envBuilder;
+  }
+
+  async init(system: System): Promise<void> {
 
   }
+
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.ioCollection[ioName]) {
@@ -19,6 +29,10 @@ export default class IoSetDevelopLocal extends IoSetLocal implements IoSet {
     }
 
     return this.ioCollection[ioName] as T;
+  }
+
+  getNames(): string[] {
+    return Object.keys(this.ioCollection);
   }
 
   /**

@@ -30,6 +30,19 @@ export default class EnvSetMemory {
   }
 
 
+  private async makeInMemoryEnvSet(): Promise<HostEnvSet> {
+    // const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    // const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+
+    console.info(`===> generate hosts env files and configs`);
+
+    await envBuilder.collect();
+
+    console.info(`===> generate master config object`);
+
+    return envBuilder.generateHostEnvSet();
+  }
+
   /**
    * Get builtin config
    * @param configName - config name with ".json" extension

@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR} from '../../shared/constants';
+import {HOST_ENVSET_DIR, IOSET_STRING_DELIMITER} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import System from '../../system';
@@ -17,10 +17,18 @@ export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoS
   }
 
 
-  constructor(wsClientProps: WsClientProps) {
-    super();
-    this.wsClientProps = wsClientProps;
+  private readonly envBuilder: EnvBuilder;
+  private readonly paramsString: string;
+
+  constructor(envBuilder: EnvBuilder, paramsString?: string) {
+    this.envBuilder = envBuilder;
+    this.paramsString = paramsString;
   }
+
+  // constructor(wsClientProps: WsClientProps) {
+  //   super();
+  //   this.wsClientProps = wsClientProps;
+  // }
 
   async init(system: System): Promise<void> {
     await super.init(system);
@@ -68,6 +76,17 @@ export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoS
     console.info(`===> initializing system`);
 
     //EnvSetMemory.$registerConfigSet(hostEnvSet);
+  }
+
+  private parseIoSetString(ioSetString?: string): {host: string, port?: number} | undefined {
+    if (!ioSetString) return;
+
+    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
+
+    return {
+      host: splat[0],
+      port: splat[1] && parseInt(splat[1]) || undefined,
+    };
   }
 
 }

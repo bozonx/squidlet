@@ -7,7 +7,6 @@ import NodejsMachines from '../interfaces/NodejsMachines';
 import {makeSystemConfigExtend, SYSTEM_DIR} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, IOSET_STRING_DELIMITER, SYSTEM_FILE_NAME} from '../../shared/constants';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 
 
@@ -85,12 +84,13 @@ export default class StartDevelop {
   private makeIoSet(): IoSet {
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = path.join(IOSET_DIR, ioSetFile);
-    const IoSetClass: new (connectionParams?: {host: string, port?: number}) => IoSet = require(ioSetPath).default;
-    const connectionParams = this.parseIoSetString();
+    const IoSetClass: new (envBuilder: EnvBuilder, paramsString?: string) => IoSet = require(ioSetPath).default;
+    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
     console.info(`--> using io set "${ioSetFile}"`);
 
-    const ioSet = new IoSetClass(connectionParams);
+    const ioSet = new IoSetClass(envBuilder, this.argIoset);
 
     ioSet.prepare && ioSet.prepare();
 
@@ -103,30 +103,6 @@ export default class StartDevelop {
     }
 
     return 'IoSetDevelopLocal';
-  }
-
-  private parseIoSetString(ioSetString?: string): {host: string, port?: number} | undefined {
-    if (!ioSetString) return;
-
-    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
-
-    return {
-      host: splat[0],
-      port: splat[1] && parseInt(splat[1]) || undefined,
-    };
-  }
-
-  private async makeInMemoryEnvSet(): Promise<HostEnvSet> {
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
-    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
-
-    console.info(`===> generate hosts env files and configs`);
-
-    await envBuilder.collect();
-
-    console.info(`===> generate master config object`);
-
-    return envBuilder.generateHostEnvSet();
   }
 
 }
