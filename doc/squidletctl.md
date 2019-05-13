@@ -33,38 +33,42 @@ Also you can specify the next params:
         someParam: 1
 
 
-## Start x86 or raspberry pi host
+## Start x86/arm/raspberry pi host on nodejs
  
 ### Start production host
 
     squidletctl start
-      [--machine=x86 | rpi]
-      [--prod=true]
+      --prod=true
+      [--machine=x86 | arm | rpi]
       [--work-dir]
       [--name]
-      [--io-server=localhost:8889]
-      ???[--ioset=ws:[host]:[port]]
-      ???[--ioset-props={..jsonProps}]
+      ./groupOrHostConfig.yaml
+
+### Start development host
+
+    squidletctl start
+      [--machine=x86 | arm | rpi]
+      [--work-dir]
+      [--name]
+      [--ioset=localhost:8889]
       ./groupOrHostConfig.yaml
 
 ### Parameters
 
-* --machine can be x86 or rpi. It means which machine is used.
-  It tries recognize it if this argument isn't set
-* --prod=true - if set then production version will be used instead development if isn't set
+* --machine can be x86, arm or rpi. It tries recognize it automatically if this argument isn't set
+* --prod=true - if set production version will be used instead. Development if isn't set.
 * --work-dir - set working dir for host where envset, data and tmp dirs will be placed.
-  By default it is upder $SQUIDLET_ROOT dir
-* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
+  By default it is under $SQUIDLET_ROOT dir
 * --name uses only if group config is specified
   and selects a host config from group config
-* --io-server=localhost:8889 - if set io server mode will be used. Local access to io will be blocked.
-  only remote access is allowed. Host is required. Port is optional - default will be used.
-* ???--ioset - specify ioSet which will be used. Also you can specify host and port optionally
-* ???--ioset-props - other ioSet props which will be passed to specified ioSet.
-  These props will replace props in host config
+* --ioset=localhost:8889 - connect to ioSet of remote host. You should allow it in this host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
+
+### Environment variables
+
+* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
 
   
 ## Listen logs of remote host

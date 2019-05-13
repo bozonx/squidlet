@@ -7,8 +7,6 @@ import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {makeSystemConfigExtend, SYSTEM_DIR, SYSTEM_FILE_NAME} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
-import {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import IoSetTypes from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 export default class StartDevelop {
@@ -80,18 +78,6 @@ export default class StartDevelop {
   }
 
   /**
-   * Resolve which io set will be used and make instance of it and pass ioSet config.
-   */
-  private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
-
-    // TODO: review
-
-    const ResolvedIoSet = resolveIoSetClass(ioSetType);
-
-    return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
-  }
-
-  /**
    * Only nodejs-developLocal or nodejs-developWs ioSet types are allowed
    * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
    */
@@ -109,6 +95,18 @@ export default class StartDevelop {
     }
 
     return ioSetConfig.type;
+  }
+
+  /**
+   * Resolve which io set will be used and make instance of it and pass ioSet config.
+   */
+  private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
+
+    // TODO: review
+
+    const ResolvedIoSet = resolveIoSetClass(ioSetType);
+
+    return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
   }
 
   /**

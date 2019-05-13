@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as shelljs from 'shelljs';
-import Os from '../shared/Os';
+import Os from './Os';
 
 
 const MODULES_DIR = 'node_modules';

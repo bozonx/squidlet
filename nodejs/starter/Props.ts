@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import PreHostConfig, {IoSetConfig} from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {
   HOST_ENVSET_DIR,
@@ -12,7 +12,6 @@ import {
 } from '../../shared/constants';
 import {getOsMachine, resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
-import IoSetTypes, {allowedIoSetTypes} from '../../hostEnvBuilder/interfaces/IoSetTypes';
 
 
 export default class Props {
@@ -63,6 +62,8 @@ export default class Props {
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
 
     this.validate();
+
+    // TODO: review
 
     this._hostConfig.ioSet = this.resolveIoSetConfig(this._hostConfig.ioSet);
 
