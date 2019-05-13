@@ -4,15 +4,15 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
-import BuildSystem from '../../shared/BuildSystem';
+import BuildSystem from '../../shared/envSetBuild/BuildSystem';
 import {
   BUILD_IO_DIR,
   BUILD_SYSTEM_DIR,
   HOST_ENVSET_DIR,
 } from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import BuildHostEnv from '../../shared/BuildHostEnv';
-import BuildIo from '../../shared/BuildIo';
+import BuildHostEnv from '../../shared/envSetBuild/BuildHostEnv';
+import BuildIo from '../../shared/envSetBuild/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend, SYSTEM_FILE_NAME} from './helpers';

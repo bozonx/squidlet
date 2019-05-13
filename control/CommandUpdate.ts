@@ -4,10 +4,10 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
 import GroupConfigParser from '../shared/GroupConfigParser';
 import Os from '../shared/Os';
-import BuildHostEnv from '../shared/BuildHostEnv';
+import BuildHostEnv from '../shared/envSetBuild/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
-import BuildSystem from '../shared/BuildSystem';
-import BuildIo from '../shared/BuildIo';
+import BuildSystem from '../shared/envSetBuild/BuildSystem';
+import BuildIo from '../shared/envSetBuild/BuildIo';
 import {BUILD_IO_DIR} from '../shared/constants';
 
 
