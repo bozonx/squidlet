@@ -16,7 +16,7 @@ export default class StartProd {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
-  private readonly buildEnvSet: BuildEnvSet = new BuildEnvSet();
+  private readonly buildEnvSet: BuildEnvSet;
 
 
   constructor(
@@ -26,6 +26,7 @@ export default class StartProd {
     argWorkDir?: string
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
+    this.buildEnvSet = new BuildEnvSet(this.os);
     this.props = new Props(
       this.os,
       this.groupConfig,

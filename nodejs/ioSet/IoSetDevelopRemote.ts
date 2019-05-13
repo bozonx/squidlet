@@ -7,9 +7,11 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import System from '../../system';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import RemoteIoBase from './RemoteIoBase';
+import Os from '../../shared/Os';
 
 
 export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoSet {
+  private readonly os: Os;
   private wsClientProps: WsClientProps;
   private _client?: WsClient;
   private get client(): WsClient {
@@ -20,7 +22,8 @@ export default class IoSetNodejsDevelopLocal extends RemoteIoBase implements IoS
   private readonly envBuilder: EnvBuilder;
   private readonly paramsString: string;
 
-  constructor(envBuilder: EnvBuilder, paramsString?: string) {
+  constructor(os: Os, envBuilder: EnvBuilder, paramsString?: string) {
+    this.os = os;
     this.envBuilder = envBuilder;
     this.paramsString = paramsString;
   }

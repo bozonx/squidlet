@@ -10,6 +10,8 @@ import {HOST_ENVSET_DIR, IOSET_STRING_DELIMITER, SYSTEM_FILE_NAME} from '../../s
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 
 
+type IoSetClass = new (os: Os, envBuilder: EnvBuilder, paramsString?: string) => IoSet;
+
 const IOSET_DIR = path.resolve(__dirname, '../ioSet');
 
 
@@ -84,13 +86,13 @@ export default class StartDevelop {
   private makeIoSet(): IoSet {
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = path.join(IOSET_DIR, ioSetFile);
-    const IoSetClass: new (envBuilder: EnvBuilder, paramsString?: string) => IoSet = require(ioSetPath).default;
+    const IoSetClass: IoSetClass = require(ioSetPath).default;
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
     console.info(`--> using io set "${ioSetFile}"`);
 
-    const ioSet = new IoSetClass(envBuilder, this.argIoset);
+    const ioSet = new IoSetClass(this.io, envBuilder, this.argIoset);
 
     ioSet.prepare && ioSet.prepare();
 

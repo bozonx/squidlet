@@ -10,11 +10,13 @@ import System from '../../system';
 
 
 export default class IoSetDevelopLocal implements IoSet {
+  private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
   protected ioCollection: {[index: string]: IoItem} = {};
 
 
-  constructor(envBuilder: EnvBuilder) {
+  constructor(os: Os, envBuilder: EnvBuilder) {
+    this.os = os;
     this.envBuilder = envBuilder;
   }
 
