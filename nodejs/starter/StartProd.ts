@@ -28,9 +28,7 @@ export default class StartProd {
     configPath: string,
     argMachine?: NodejsMachines,
     argHostName?: string,
-    argWorkDir?: string,
-    argIoset?: string,
-    argIosetProps?: string
+    argWorkDir?: string
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
     this.props = new Props(
@@ -39,8 +37,6 @@ export default class StartProd {
       argMachine,
       argHostName,
       argWorkDir,
-      argIoset,
-      argIosetProps
     );
   }
 

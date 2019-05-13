@@ -32,7 +32,6 @@ export default class Props {
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly argIoset?: string;
-  private readonly argIosetProps?: string;
   private readonly groupConfig: GroupConfigParser;
   private _hostConfig?: PreHostConfig;
   private _machine?: NodejsMachines;
@@ -45,7 +44,6 @@ export default class Props {
     argHostName?: string,
     argWorkDir?: string,
     argIoset?: string,
-    argIosetProps?: string
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
@@ -53,7 +51,6 @@ export default class Props {
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
     this.argIoset = argIoset;
-    this.argIosetProps = argIosetProps;
   }
 
 

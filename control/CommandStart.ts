@@ -8,7 +8,6 @@ interface CommandStartArgs {
   name?: string;
   prod?: boolean;
   ioset?: string;
-  iosetProps: string;
 }
 
 
@@ -37,8 +36,6 @@ export default class CommandStart {
         this.args.machine as any,
         this.args.name,
         this.args.workDir,
-        this.args.ioset,
-        this.args.iosetProps
       );
 
       await starter.init();
@@ -54,7 +51,6 @@ export default class CommandStart {
       this.args.name,
       this.args.workDir,
       this.args.ioset,
-      this.args.iosetProps
     );
 
     await starter.init();
