@@ -14,6 +14,23 @@ export default class RemoteIoCollection {
     return this.remoteCall as any;
   }
 
+  // private wsClientProps: WsClientProps;
+  // private _client?: WsClient;
+  // private get client(): WsClient {
+  //   return this._client as any;
+  // }
+
+
+  constructor(host: string, port?: number) {
+
+    // TODO: set default port ???
+
+  }
+
+
+  async connect() {
+    // TODO: do connection
+  }
 
   /**
    * Replace init method to generate local proxy methods and instantiate RemoteCall

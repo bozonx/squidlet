@@ -22,16 +22,6 @@ export default class IoSetDevelopRemote implements IoSet {
   private ioCollection: {[index: string]: IoItem} = {};
   private remoteIoCollection = new RemoteIoCollection();
 
-  // private wsClientProps: WsClientProps;
-  // private _client?: WsClient;
-  // private get client(): WsClient {
-  //   return this._client as any;
-  // }
-
-
-  //private readonly envBuilder: EnvBuilder;
-  private readonly paramsString: string;
-
 
   constructor(os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) {
     if (!paramsString) {
@@ -42,12 +32,16 @@ export default class IoSetDevelopRemote implements IoSet {
     this.platform = platform;
     this.machine = machine;
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
-    this.paramsString = paramsString;
+
+    const {host, port} = this.parseIoSetString(paramsString);
+
+    this.remoteIoCollection = new RemoteIoCollection(host, port);
   }
 
 
   async prepare() {
     await this.storageWrapper.init();
+    await this.remoteIoCollection.connect();
   }
 
   async init(system: System) {
@@ -69,14 +63,6 @@ export default class IoSetDevelopRemote implements IoSet {
     await this.remoteIoCollection.destroy();
   }
 
-  // getIo<T extends IoItem>(ioName: string): T {
-  //   return this.ioCollection.getIo(ioName) as T;
-  // }
-  //
-  // getNames(): string[] {
-  //   return this.ioCollection.getNames();
-  // }
-
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.ioCollection[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
@@ -90,12 +76,12 @@ export default class IoSetDevelopRemote implements IoSet {
   }
 
 
-  private parseIoSetString(ioSetString?: string): {host: string, port?: number} | undefined {
-    if (!ioSetString) return;
+  private parseIoSetString(ioSetString?: string): {host: string, port?: number} {
+    if (!ioSetString) {
+      throw new Error(`IoSetDevelopRemote.parseIoSetString: You have to specify at leas a hostname`);
+    }
 
     const splat = ioSetString.split(IOSET_STRING_DELIMITER);
-
-    // TODO: set default port ???
 
     return {
       host: splat[0],
