@@ -84,15 +84,17 @@ export default class StartDevelop {
   private makeIoSet(): IoSet {
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = path.join(IOSET_DIR, ioSetFile);
-    const ioSetClass: new () => IoSet = require(ioSetPath).default;
+    const IoSetClass: new (connectionParams?: {host: string, port?: number}) => IoSet = require(ioSetPath).default;
+    const connectionParams = this.parseIoSetString();
 
-    console.info(`===> using io set "${ioSetType}"`);
+    console.info(`--> using io set "${ioSetFile}"`);
 
-    // TODO: review
+    const ioSet = new IoSetClass(connectionParams);
 
-    const ResolvedIoSet = resolveIoSetClass(ioSetType);
+    // TODO: configure
+    //ioSet.
 
-    return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
+    return ioSet;
   }
 
   private resolveIoSetType(): string {
@@ -101,6 +103,17 @@ export default class StartDevelop {
     }
 
     return 'IoSetDevelopLocal';
+  }
+
+  private parseIoSetString(ioSetString?: string): {host: string, port?: number} | undefined {
+    if (!ioSetString) return;
+
+    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
+
+    return {
+      host: splat[0],
+      port: splat[1] && parseInt(splat[1]) || undefined,
+    };
   }
 
   /**
@@ -126,21 +139,6 @@ export default class StartDevelop {
     }
 
     return ioSet;
-  }
-
-  private parseIoSetString(ioSetString: string): {type: IoSetTypes, host?: string, port?: number} {
-    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
-    const type = splat[0] as IoSetTypes;
-
-    if (!allowedIoSetTypes.includes(type)) {
-      throw new Error(`Incorrect ioSet type "${type}"`);
-    }
-
-    return {
-      type,
-      host: splat[1],
-      port: (splat[2]) ? parseInt(splat[2]) : undefined,
-    };
   }
 
 }
