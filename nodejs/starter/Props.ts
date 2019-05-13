@@ -47,7 +47,6 @@ export default class Props {
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
-    this.argIoset = argIoset;
   }
 
 

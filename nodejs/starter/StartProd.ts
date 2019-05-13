@@ -4,24 +4,18 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
-import BuildSystem from '../../shared/envSetBuild/BuildSystem';
-import {
-  BUILD_IO_DIR,
-  BUILD_SYSTEM_DIR,
-  HOST_ENVSET_DIR,
-} from '../../shared/constants';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import BuildHostEnv from '../../shared/envSetBuild/BuildHostEnv';
-import BuildIo from '../../shared/envSetBuild/BuildIo';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
 import {installNpmModules, makeSystemConfigExtend, SYSTEM_FILE_NAME} from './helpers';
+import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
 
 
 export default class StartProd {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
+  private readonly buildEnvSet: BuildEnvSet = new BuildEnvSet();
 
 
   constructor(
@@ -43,6 +37,7 @@ export default class StartProd {
   async init() {
     await this.groupConfig.init();
     await this.props.resolve();
+    this.buildEnvSet.init(this.props.envSetDir, this.props.tmpDir);
 
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
@@ -101,8 +96,6 @@ export default class StartProd {
     // else if it exists - do nothing
     if (await this.os.exists(pathToSystemDir)) return;
 
-    await this.buildSystem();
-
     const initialHostConfig: PreHostConfig = {
       // TODO: generate id or special guid
       id: 'initialHost',
@@ -110,10 +103,11 @@ export default class StartProd {
       machine: this.props.machine,
     };
 
+    await this.buildEnvSet.buildSystem();
     // build config and entities
-    await this.buildEnvSet(initialHostConfig);
+    await this.buildEnvSet.buildEnvSet(initialHostConfig);
     // build io
-    await this.buildIos();
+    await this.buildEnvSet.buildIos(this.props.platform, this.props.machine);
   }
 
   /**
@@ -131,53 +125,6 @@ export default class StartProd {
     const system = new System(undefined, systemConfigExtend);
 
     return system.start();
-  }
-
-  /**
-   * Build system to workDir/envset/system
-   */
-  private async buildSystem() {
-    const systemBuildDir = this.getPathToProdSystemDir();
-    const systemTmpDir = path.join(this.props.tmpDir, BUILD_SYSTEM_DIR);
-    const buildSystem: BuildSystem = new BuildSystem(this.os);
-
-    console.info(`===> Building system`);
-    await buildSystem.build(systemBuildDir, systemTmpDir);
-  }
-
-  /**
-   * Build workDir/configs and workDir/entities
-   */
-  private async buildEnvSet(hostConfig: PreHostConfig) {
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
-    const buildHostEnv: BuildHostEnv = new BuildHostEnv(
-      this.os,
-      hostConfig,
-      this.props.envSetDir,
-      tmpDir
-    );
-
-    console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
-    await buildHostEnv.build();
-  }
-
-  /**
-   * Build io files to workDir/io
-   */
-  private async buildIos() {
-    console.info(`===> Building io`);
-
-    const buildDir = path.join(this.props.envSetDir, BUILD_IO_DIR);
-    const tmpDir = path.join(this.props.tmpDir, BUILD_IO_DIR);
-    const buildIo: BuildIo = new BuildIo(
-      this.os,
-      this.props.platform,
-      this.props.machine,
-      buildDir,
-      tmpDir
-    );
-
-    await buildIo.build();
   }
 
   private getPathToProdSystemDir(): string {
