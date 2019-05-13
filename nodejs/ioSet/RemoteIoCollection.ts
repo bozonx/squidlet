@@ -10,54 +10,37 @@ import BackdoorClient from '../../shared/BackdoorClient';
 export default class RemoteIoCollection {
   readonly ioCollection: {[index: string]: IoItem} = {};
 
-  private readonly remoteCall: RemoteCall;
+  private _remoteCall?: RemoteCall;
+  private get remoteCall(): RemoteCall {
+    return this._remoteCall as any;
+  }
   private readonly client: BackdoorClient;
 
 
-  constructor(
-    responseTimoutSec: number,
-    logError: (message: string) => void,
-    generateUniqId: () => string,
-    host?: string,
-    port?: number
-  ) {
+  constructor(host?: string, port?: number) {
     this.client = new BackdoorClient(host, port);
-    this.remoteCall = new RemoteCall(
-      this.sendMessage,
-      undefined,
-      responseTimoutSec,
-      logError,
-      generateUniqId
-    );
   }
 
-
-  async connect() {
-    // TODO: do connection
-    // TODO: ask for io list
-  }
 
   /**
    * Replace init method to generate local proxy methods and instantiate RemoteCall
    */
   async init(system: System): Promise<void> {
-    // TODO: use backdoor client
+    // TODO: ask for io list
     // TODO: fill this.ioCollection
     // TODO: не указывать методы init and configure
 
     //this._client = new WsClient(this.system.host.id, this.wsClientProps);
 
-    this._system = system;
     this._remoteCall = new RemoteCall(
-      this.send,
-      // client don't have any local methods
-      {},
-      this.system.host.config.config.ioSetResponseTimoutSec,
-      this.system.log.error,
-      this.system.host.generateUniqId
+      this.sendMessage,
+      undefined,
+      system.host.config.config.ioSetResponseTimoutSec,
+      system.log.error,
+      system.host.generateUniqId
     );
 
-    await this.initAllIo();
+    //await this.initAllIo();
   }
 
 

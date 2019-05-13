@@ -33,7 +33,6 @@ export default class IoSetDevelopRemote implements IoSet {
 
   async prepare() {
     await this.storageWrapper.init();
-    await this.remoteIoCollection.connect();
   }
 
   async init(system: System) {
