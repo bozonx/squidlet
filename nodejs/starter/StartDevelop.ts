@@ -7,12 +7,17 @@ import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {makeSystemConfigExtend, SYSTEM_DIR, SYSTEM_FILE_NAME} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
+import {IOSET_STRING_DELIMITER} from '../../shared/constants';
+
+
+const IOSET_DIR = path.resolve(__dirname, '../ioSet');
 
 
 export default class StartDevelop {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
+  private readonly argIoset?: string;
 
 
   constructor(
@@ -21,17 +26,15 @@ export default class StartDevelop {
     argHostName?: string,
     argWorkDir?: string,
     argIoset?: string,
-    argIosetProps?: string
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
+    this.argIoset = argIoset;
     this.props = new Props(
       this.os,
       this.groupConfig,
       argMachine,
       argHostName,
-      argWorkDir,
-      argIoset,
-      argIosetProps
+      argWorkDir
     );
   }
 
@@ -64,49 +67,40 @@ export default class StartDevelop {
     const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
     const System = require(pathToSystem).default;
     const systemConfigExtend = makeSystemConfigExtend(this.props);
-    const ioSetType: IoSetTypes = this.resolveIoSetType();
+    const ioSet = this.makeIoSet();
 
-    console.info(`===> using io set "${ioSetType}"`);
-
-    const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
-
-    console.info(`===> Starting system`);
+    console.info(`===> Initializing system`);
 
     const system = new System(ioSet, systemConfigExtend);
+
+    console.info(`===> Starting system`);
 
     return system.start();
   }
 
   /**
-   * Only nodejs-developLocal or nodejs-developWs ioSet types are allowed
-   * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
-   */
-  private resolveIoSetType(): IoSetTypes {
-
-    // TODO: review
-
-    const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-
-    if (!ioSetConfig || ioSetConfig.type === 'nodejs-developLocal') {
-      return 'nodejs-developLocal';
-    }
-    else if (ioSetConfig.type !== 'nodejs-developWs') {
-      throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
-    }
-
-    return ioSetConfig.type;
-  }
-
-  /**
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
-  private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
+  private makeIoSet(): IoSet {
+    const ioSetFile: string = this.resolveIoSetType();
+    const ioSetPath = path.join(IOSET_DIR, ioSetFile);
+    const ioSetClass: new () => IoSet = require(ioSetPath).default;
+
+    console.info(`===> using io set "${ioSetType}"`);
 
     // TODO: review
 
     const ResolvedIoSet = resolveIoSetClass(ioSetType);
 
     return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
+  }
+
+  private resolveIoSetType(): string {
+    if (this.argIoset) {
+      return 'IoSetDevelopRemote';
+    }
+
+    return 'IoSetDevelopLocal';
   }
 
   /**
@@ -134,8 +128,43 @@ export default class StartDevelop {
     return ioSet;
   }
 
+  private parseIoSetString(ioSetString: string): {type: IoSetTypes, host?: string, port?: number} {
+    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
+    const type = splat[0] as IoSetTypes;
+
+    if (!allowedIoSetTypes.includes(type)) {
+      throw new Error(`Incorrect ioSet type "${type}"`);
+    }
+
+    return {
+      type,
+      host: splat[1],
+      port: (splat[2]) ? parseInt(splat[2]) : undefined,
+    };
+  }
+
 }
 
+
+// /**
+//  * Only nodejs-developLocal or nodejs-developWs ioSet types are allowed
+//  * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
+//  */
+// private resolveIoSetType(): IoSetTypes {
+//
+//   // TODO: review
+//
+//   const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
+//
+//   if (!ioSetConfig || ioSetConfig.type === 'nodejs-developLocal') {
+//     return 'nodejs-developLocal';
+//   }
+//   else if (ioSetConfig.type !== 'nodejs-developWs') {
+//     throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
+//   }
+//
+//   return ioSetConfig.type;
+// }
 
 // /**
 //  * Install node modules into squidlet repository in ./nodejs/<x86|rpi|arm>/ .

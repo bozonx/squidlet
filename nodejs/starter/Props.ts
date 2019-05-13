@@ -1,4 +1,3 @@
-import _isPlainObject = require('lodash/isPlainObject');
 import * as path from 'path';
 
 import Os from '../../shared/Os';
@@ -8,7 +7,7 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import {
   HOST_ENVSET_DIR,
   HOST_TMP_DIR,
-  HOSTS_WORK_DIRS, IOSET_STRING_DELIMITER
+  HOSTS_WORK_DIRS,
 } from '../../shared/constants';
 import {getOsMachine, resolveSquidletRoot} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
@@ -31,7 +30,6 @@ export default class Props {
   private readonly argMachine?: NodejsMachines;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
-  private readonly argIoset?: string;
   private readonly groupConfig: GroupConfigParser;
   private _hostConfig?: PreHostConfig;
   private _machine?: NodejsMachines;
@@ -43,7 +41,6 @@ export default class Props {
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
-    argIoset?: string,
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
@@ -59,10 +56,6 @@ export default class Props {
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
 
     this.validate();
-
-    // TODO: review
-
-    this._hostConfig.ioSet = this.resolveIoSetConfig(this._hostConfig.ioSet);
 
     this.hostId = this.hostConfig.id as any;
 
@@ -109,62 +102,49 @@ export default class Props {
     return getOsMachine(this.os);
   }
 
-  /**
-   * Replace ioSet config if specified --ioset and --ioset-props arguments.
-   * Merge if specified only --ioset
-   * Else just return as was specified in host config or undefined
-   */
-  private resolveIoSetConfig(specifiedIoSetConfig?: IoSetConfig): IoSetConfig | undefined {
-    // replace current ioSet host's config param
-    if (this.argIosetProps) {
-
-      if (!this.argIoset) {
-        throw new Error(`If you specified a "--ioset-props" you should specify a "--ioset" argument`);
-      }
-
-      const parsedProps = JSON.parse(this.argIosetProps);
-
-      if (!_isPlainObject(parsedProps)) {
-        throw new Error(`Incorrect type of ioset props which is set in "-ioset-props" argument`);
-      }
-
-      const ioSetProps = this.parseIoSetString(this.argIoset);
-
-      return {
-        ...parsedProps,
-        ...ioSetProps,
-      };
-    }
-    // merge with current ioSet host's config param
-    else if (this.argIoset) {
-      const ioSetProps = this.parseIoSetString(this.argIoset);
-
-      return {
-        ...specifiedIoSetConfig,
-        ...ioSetProps,
-      };
-    }
-
-    // else return as is
-    return specifiedIoSetConfig;
-  }
-
-  private parseIoSetString(ioSetString: string): {type: IoSetTypes, host?: string, port?: number} {
-    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
-    const type = splat[0] as IoSetTypes;
-
-    if (!allowedIoSetTypes.includes(type)) {
-      throw new Error(`Incorrect ioSet type "${type}"`);
-    }
-
-    return {
-      type,
-      host: splat[1],
-      port: (splat[2]) ? parseInt(splat[2]) : undefined,
-    };
-  }
-
 }
+
+
+//this._hostConfig.ioSet = this.resolveIoSetConfig(this._hostConfig.ioSet);
+// /**
+//  * Replace ioSet config if specified --ioset and --ioset-props arguments.
+//  * Merge if specified only --ioset
+//  * Else just return as was specified in host config or undefined
+//  */
+// private resolveIoSetConfig(specifiedIoSetConfig?: IoSetConfig): IoSetConfig | undefined {
+//   // replace current ioSet host's config param
+//   if (this.argIosetProps) {
+//
+//     if (!this.argIoset) {
+//       throw new Error(`If you specified a "--ioset-props" you should specify a "--ioset" argument`);
+//     }
+//
+//     const parsedProps = JSON.parse(this.argIosetProps);
+//
+//     if (!_isPlainObject(parsedProps)) {
+//       throw new Error(`Incorrect type of ioset props which is set in "-ioset-props" argument`);
+//     }
+//
+//     const ioSetProps = this.parseIoSetString(this.argIoset);
+//
+//     return {
+//       ...parsedProps,
+//       ...ioSetProps,
+//     };
+//   }
+//   // merge with current ioSet host's config param
+//   else if (this.argIoset) {
+//     const ioSetProps = this.parseIoSetString(this.argIoset);
+//
+//     return {
+//       ...specifiedIoSetConfig,
+//       ...ioSetProps,
+//     };
+//   }
+//
+//   // else return as is
+//   return specifiedIoSetConfig;
+// }
 
 // /**
 //  * Set config paths relative to squidlet work dir if it doesn't set.
