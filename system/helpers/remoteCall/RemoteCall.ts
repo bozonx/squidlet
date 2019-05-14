@@ -95,12 +95,16 @@ export default class RemoteCall {
    * It calls local callbacks or methods
    */
   async incomeMessage(rawMessage: {[index: string]: any}) {
+
+    // TODO: use throw or logError ???
+
     if (!isPlainObject(rawMessage) || !rawMessage.type) {
       return;
     }
     else if (!rawMessage.type || !REMOTE_CALL_MESSAGE_TYPES.includes(rawMessage.type)) {
 
       // TODO: может пытаться отдавать ответ с ошибкой ????
+
 
       return this.logError(`Io set: incorrect type of message ${JSON.stringify(rawMessage)}`);
     }

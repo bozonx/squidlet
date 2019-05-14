@@ -19,4 +19,8 @@ export default {
     updateFile: 'updater.updateFile',
     updateFileResult: 'updater.updateFileResult',
   },
+  ioSet: {
+    remoteCall: 'remoteCall',
+    askIoNames: 'askIoNames',
+  }
 };

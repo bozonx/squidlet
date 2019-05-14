@@ -8,11 +8,18 @@ import BackdoorClient from '../../shared/BackdoorClient';
 import {SYSTEM_DIR} from '../starter/helpers';
 import categories from '../../system/dict/categories';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
+import topics from '../../system/dict/topics';
+import IndexedEvents from '../../system/helpers/IndexedEvents';
 
 
 export default class RemoteIoCollection {
+  //private readonly incomeIoNamesEvents = new IndexedEvents<(data: string[]) => void>();
   readonly ioCollection: {[index: string]: IoItem} = {};
 
+  private _system?: System;
+  private get system(): System {
+    return this._system as any;
+  }
   private _remoteCall?: RemoteCall;
   private get remoteCall(): RemoteCall {
     return this._remoteCall as any;
@@ -29,25 +36,18 @@ export default class RemoteIoCollection {
    * Replace init method to generate local proxy methods and instantiate RemoteCall
    */
   async init(system: System): Promise<void> {
+    this._system = system;
     this._remoteCall = new RemoteCall(
       this.sendMessage,
       undefined,
-      system.host.config.config.ioSetResponseTimoutSec,
-      system.log.error,
-      system.host.generateUniqId
+      this.system.host.config.config.ioSetResponseTimoutSec,
+      this.system.log.error,
+      this.system.host.generateUniqId
     );
 
     // listen income messages of remoteCall
-    await this.client.addListener(categories.ioSet, undefined);
-    this.client.onIncomeMessage((message: BackdoorMessage) => {
-      if (
-        message.action !== BACKDOOR_ACTION.listenerResponse
-        || message.payload.category !== categories.ioSet
-      ) return;
-      // pass message to remoteCall
-      this.remoteCall.incomeMessage(message.payload.data)
-        .catch(system.log.error);
-    });
+    await this.client.addListener(categories.ioSet, topics.ioSet.remoteCall);
+    this.client.onIncomeMessage(this.handleBackDoorMessage);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -66,15 +66,31 @@ export default class RemoteIoCollection {
   }
 
 
+  /**
+   * Send message from remoteCall to other side
+   */
   private sendMessage(message: RemoteCallMessage): Promise<void> {
+    return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+  }
 
-    // TODO: нужно ли указывать топик ???
+  private handleBackDoorMessage(message: BackdoorMessage) {
+    if (
+      message.action !== BACKDOOR_ACTION.listenerResponse
+      || message.payload.category !== categories.ioSet
+    ) return;
 
-    return this.client.emit(categories.ioSet, undefined, message);
+    if (message.payload.topic === topics.ioSet.remoteCall) {
+      // pass message to remoteCall
+      this.remoteCall.incomeMessage(message.payload.data)
+        .catch(this.system.log.error);
+    }
+    // else if (message.payload.topic === topics.ioSet.askIoNames) {
+    //   this.incomeIoNamesEvents.emit(message.payload.data);
+    // }
   }
 
   private async askIoNames(): Promise<string[]> {
-    // TODO: ask for io list
+    return this.client.request(categories.ioSet, topics.ioSet.askIoNames);
   }
 
   private makeFakeIo(ioName: string): IoItem {

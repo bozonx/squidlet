@@ -7,6 +7,7 @@ import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Ba
 import {decodeBackdoorMessage, makeMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';
+import {rejects} from 'assert';
 
 
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
@@ -45,6 +46,17 @@ export default class BackdoorClient {
     const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.emit, category, topic, data);
 
     await this.client.send(binMsg);
+  }
+
+  /**
+   * Emit an event and wait for income message of specified category and topic
+   */
+  async request(category: string, topic?: string, data?: any): Promise<any> {
+    await this.emit(category, topic, data);
+
+    return new Promise<any>((resolve, reject) => {
+      // TODO: make it !!!!!!
+    });
   }
 
   /**
