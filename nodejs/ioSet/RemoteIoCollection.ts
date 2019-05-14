@@ -40,10 +40,7 @@ export default class RemoteIoCollection {
     );
 
     // listen income messages of remoteCall
-    await this.client.addListener(categories.ioSet, topics.ioSet.remoteCall, (data?: any) => {
-      this.remoteCall.incomeMessage(data)
-        .catch(this.system.log.error);
-    });
+    await this.client.addListener(categories.ioSet, topics.ioSet.remoteCall, this.handleIncomeData);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -69,6 +66,11 @@ export default class RemoteIoCollection {
    */
   private sendMessage(message: RemoteCallMessage): Promise<void> {
     return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+  }
+
+  private handleIncomeData = (data?: any) => {
+    this.remoteCall.incomeMessage(data)
+      .catch(this.system.log.error);
   }
 
   private async askIoNames(): Promise<string[]> {
