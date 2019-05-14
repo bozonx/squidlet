@@ -19,7 +19,7 @@ export interface BackdoorMessage {
   payload: {
     category: string;
     topic?: string;
-    data?: string;
+    data?: any;
   };
 }
 

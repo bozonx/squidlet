@@ -2,13 +2,12 @@ import * as path from 'path';
 
 import System from '../../system/System';
 import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
-import RemoteCallMessage, {REMOTE_CALL_MESSAGE_TYPES} from '../../system/interfaces/RemoteCallMessage';
-import {isPlainObject} from '../../system/helpers/lodashLike';
+import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import IoItem from '../../system/interfaces/IoItem';
 import BackdoorClient from '../../shared/BackdoorClient';
 import {SYSTEM_DIR} from '../starter/helpers';
 import categories from '../../system/dict/categories';
-import topics from '../../system/dict/topics';
+import {BACKDOOR_ACTION, BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
 
 
 export default class RemoteIoCollection {
@@ -38,8 +37,17 @@ export default class RemoteIoCollection {
       system.host.generateUniqId
     );
 
-    // TODO: listen messages
-    // this.client.onIncomeMessage(this.resolveIncomeMessage);
+    // listen income messages of remoteCall
+    await this.client.addListener(categories.ioSet, undefined);
+    this.client.onIncomeMessage((message: BackdoorMessage) => {
+      if (
+        message.action !== BACKDOOR_ACTION.listenerResponse
+        || message.payload.category !== categories.ioSet
+      ) return;
+      // pass message to remoteCall
+      this.remoteCall.incomeMessage(message.payload.data)
+        .catch(system.log.error);
+    });
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -50,6 +58,9 @@ export default class RemoteIoCollection {
   }
 
   async destroy() {
+
+    // TODO: review
+
     await this.remoteCall.destroy();
     await this.client.destroy();
   }
@@ -60,20 +71,6 @@ export default class RemoteIoCollection {
     // TODO: нужно ли указывать топик ???
 
     return this.client.emit(categories.ioSet, undefined, message);
-  }
-
-  /**
-   * Call this method when you has received a message
-   */
-  protected resolveIncomeMessage = async (message: {[index: string]: any}) => {
-    if (!isPlainObject(message)) {
-      return this.system.log.error(`Io set: received message is not an object`);
-    }
-    else if (!message.type || !REMOTE_CALL_MESSAGE_TYPES.includes(message.type)) {
-      return this.system.log.error(`Io set: incorrect type of message ${JSON.stringify(message)}`);
-    }
-
-    await this.remoteCall.incomeMessage(message);
   }
 
   private async askIoNames(): Promise<string[]> {
