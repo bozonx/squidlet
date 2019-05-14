@@ -38,6 +38,10 @@ export default class IoSetServer extends ServiceBase<IoSetServerProps> {
     this.env.events.addListener(categories.ioSet, topics.ioSet.askIoNames, this.handleAskIoNames);
   }
 
+  protected destroy = async () => {
+    await this.remoteCall.destroy();
+  }
+
 
   /**
    * Send message back to RemoteIoCollection

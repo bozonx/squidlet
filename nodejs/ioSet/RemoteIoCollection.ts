@@ -11,7 +11,7 @@ import topics from '../../system/dict/topics';
 
 
 export default class RemoteIoCollection {
-  readonly ioCollection: {[index: string]: IoItem} = {};
+  ioCollection: {[index: string]: IoItem} = {};
 
   private readonly client: BackdoorClient;
   private _system?: System;
@@ -51,9 +51,7 @@ export default class RemoteIoCollection {
   }
 
   async destroy() {
-
-    // TODO: review
-
+    this.ioCollection = {};
     await this.remoteCall.destroy();
     await this.client.destroy();
   }
