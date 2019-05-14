@@ -32,7 +32,7 @@ export default class RemoteIoCollection {
   async init(system: System): Promise<void> {
     this._system = system;
     this._remoteCall = new RemoteCall(
-      this.sendMessage,
+      this.sendToServer,
       undefined,
       this.system.host.config.config.ioSetResponseTimoutSec,
       this.system.log.error,
@@ -40,7 +40,7 @@ export default class RemoteIoCollection {
     );
 
     // listen income messages of remoteCall
-    await this.client.addListener(categories.ioSet, topics.ioSet.remoteCall, this.handleIncomeData);
+    this.client.addListener(categories.ioSet, topics.ioSet.remoteCall, this.handleIncomeRemoteCall);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -59,17 +59,15 @@ export default class RemoteIoCollection {
   }
 
 
-  // TODO: может работать с events а не с client???
-
   /**
    * Send message from remoteCall to other side (IoSetServer)
    */
-  private sendMessage(message: RemoteCallMessage): Promise<void> {
+  private sendToServer(message: RemoteCallMessage): Promise<void> {
     return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
   }
 
-  private handleIncomeData = (data?: any) => {
-    this.remoteCall.incomeMessage(data)
+  private handleIncomeRemoteCall = (rawMessage: {[index: string]: any}) => {
+    this.remoteCall.incomeMessage(rawMessage)
       .catch(this.system.log.error);
   }
 

@@ -61,7 +61,7 @@ export default class BackdoorClient {
   /**
    * Ask backdoor to send back data which emits on specified event
    */
-  async addListener(category: string, topic?: string, cb: (data?: any) => void): Promise<void> {
+  addListener(category: string, topic?: string, cb: (data?: any) => void) {
 
     // TODO: лучше сюда передать колбэш и его поднимать когда приходит сообщение
 

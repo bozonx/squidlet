@@ -19,7 +19,7 @@ export default class IoSetServer extends ServiceBase<IoSetServerProps> {
   protected willInit = async () => {
     const ioCollection: {[index: string]: ObjectToCall} = {};
 
-    // make dev instances
+    // make io collection
     for (let ioName of this.env.system.ioManager.getNames()) {
       ioCollection[ioName] = this.env.system.ioManager.getIo(ioName);
     }
@@ -28,12 +28,14 @@ export default class IoSetServer extends ServiceBase<IoSetServerProps> {
       this.sendToClient,
       ioCollection,
       this.env.system.host.config.config.ioSetResponseTimoutSec,
-      console.error,
+      this.env.log.error,
       this.env.system.host.generateUniqId
     );
 
-    this.env.system.events.addCategoryListener(categories.ioSet, this.handleIncomeData);
-
+    // listen income messages of remoteCall
+    this.env.events.addListener(categories.ioSet, topics.ioSet.remoteCall, this.handleIncomeRemoteCall);
+    // listen asking of io names
+    this.env.events.addListener(categories.ioSet, topics.ioSet.askIoNames, this.handleAskIoNames);
   }
 
 
@@ -41,12 +43,18 @@ export default class IoSetServer extends ServiceBase<IoSetServerProps> {
    * Send message back to RemoteIoCollection
    */
   private sendToClient = async (message: RemoteCallMessage) => {
-    this.env.system.events.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+    this.env.events.emit(categories.ioSet, topics.ioSet.remoteCall, message);
   }
 
-  private handleIncomeData = (data?: any) => {
-    this.remoteCall.incomeMessage(data)
+  private handleIncomeRemoteCall = (rawMessage: {[index: string]: any}) => {
+    this.remoteCall.incomeMessage(rawMessage)
       .catch(this.env.system.log.error);
+  }
+
+  private handleAskIoNames = () => {
+    const ioNames: string[] = this.env.system.ioManager.getNames();
+
+    this.env.events.emit(categories.ioSet, topics.ioSet.askIoNames, ioNames);
   }
 
 }
