@@ -38,6 +38,10 @@ export default class IoManager {
     return this.ioSet.getIo<T>(ioName);
   }
 
+  getNames(): string[] {
+    return this.ioSet.getNames();
+  }
+
 
   private async initAllIo() {
     const ioNames: string[] = this.ioSet.getNames();

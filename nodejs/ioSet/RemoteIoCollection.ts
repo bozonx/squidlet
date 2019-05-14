@@ -13,15 +13,15 @@ import topics from '../../system/dict/topics';
 export default class RemoteIoCollection {
   readonly ioCollection: {[index: string]: IoItem} = {};
 
+  private readonly client: BackdoorClient;
   private _system?: System;
+  private _remoteCall?: RemoteCall;
   private get system(): System {
     return this._system as any;
   }
-  private _remoteCall?: RemoteCall;
   private get remoteCall(): RemoteCall {
     return this._remoteCall as any;
   }
-  private readonly client: BackdoorClient;
 
 
   constructor(host?: string, port?: number) {
@@ -29,9 +29,6 @@ export default class RemoteIoCollection {
   }
 
 
-  /**
-   * Replace init method to generate local proxy methods and instantiate RemoteCall
-   */
   async init(system: System): Promise<void> {
     this._system = system;
     this._remoteCall = new RemoteCall(
@@ -47,7 +44,6 @@ export default class RemoteIoCollection {
       this.remoteCall.incomeMessage(data)
         .catch(this.system.log.error);
     });
-
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -66,8 +62,10 @@ export default class RemoteIoCollection {
   }
 
 
+  // TODO: может работать с events а не с client???
+
   /**
-   * Send message from remoteCall to other side
+   * Send message from remoteCall to other side (IoSetServer)
    */
   private sendMessage(message: RemoteCallMessage): Promise<void> {
     return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
