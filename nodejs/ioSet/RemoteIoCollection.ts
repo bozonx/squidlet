@@ -39,6 +39,8 @@ export default class RemoteIoCollection {
       this.system.host.generateUniqId
     );
 
+    // TODO: remake
+
     // listen income messages of remoteCall
     this.client.addListener(categories.ioSet, topics.ioSet.remoteCall, this.handleIncomeRemoteCall);
 

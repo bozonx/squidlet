@@ -5,6 +5,11 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import topics from 'system/dict/topics';
 
 
+export interface IoSetServerMessage {
+  clientId: string;
+  msg: RemoteCallMessage;
+}
+
 export interface IoSetServerProps {
 }
 
