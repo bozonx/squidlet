@@ -7,7 +7,6 @@ import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Ba
 import {decodeBackdoorMessage, makeMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';
-import {rejects} from 'assert';
 
 
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
@@ -62,7 +61,7 @@ export default class BackdoorClient {
   /**
    * Ask backdoor to send back data which emits on specified event
    */
-  async addListener(category: string, topic?: string): Promise<void> {
+  async addListener(category: string, topic?: string, cb: (data?: any) => void): Promise<void> {
 
     // TODO: лучше сюда передать колбэш и его поднимать когда приходит сообщение
 

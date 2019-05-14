@@ -3,6 +3,7 @@ import RemoteCall from 'system/helpers/remoteCall/RemoteCall';
 import IoItem from 'system/interfaces/IoItem';
 import categories from 'system/dict/categories';
 import ServiceBase from 'system/baseServices/ServiceBase';
+import {GetDriverDep} from '../../../system/entities/EntityBase';
 
 
 // TODO: remove
@@ -14,14 +15,24 @@ export interface IoSetServerProps {
 
 export default class IoSetServer extends ServiceBase<IoSetServerProps> {
   private readonly ioCollection: {[index: string]: IoItem} = {};
-  private readonly remoteCalls: {[index: string]: RemoteCall} = {};
+  private _remoteCall?: RemoteCall;
+  private get remoteCall(): RemoteCall {
+    return this._remoteCall as any;
+  }
 
 
-  // constructor(serverProps: WsServerProps, ioClasses: {[index: string]: IoItemClass}, verbose?: boolean) {
-  //
-  // }
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    // this.depsInstances.digitalInput = await getDriverDep('WsServer')
+    //   .getInstance();
 
-  async init() {
+    this._remoteCall = new RemoteCall(
+      this.sendToClient,
+      this.ioCollection as any,
+      this.env.system.host.config.config.ioSetResponseTimoutSec,
+      console.error,
+      this.generateUniqId
+    );
+
     this.env.system.events.addCategoryListener(categories.ioSet, this.handleIncomeMessages);
 
     // // make dev instances
@@ -40,25 +51,30 @@ export default class IoSetServer extends ServiceBase<IoSetServerProps> {
   }
 
 
+  private sendToClient = async (message: RemoteCallMessage): Promise<void> => {
+    return this.server.send(remoteHostId, message);
+  }
+
+
   private listen() {
     this.server.onError((err: string) => console.error(err));
     this.server.onIncomeMessage(this.parseIncomeMessage);
     this.server.onConnection(this.onConnection);
   }
 
-  private onConnection = (remoteHostId: string) => {
-    const sendToClient = async (message: RemoteCallMessage): Promise<void> => {
-      return this.server.send(remoteHostId, message);
-    };
-
-    this.remoteCalls[remoteHostId] = new RemoteCall(
-      sendToClient,
-      this.ioCollection as any,
-      hostDefaultConfig.config.ioSetResponseTimoutSec,
-      console.error,
-      this.generateUniqId
-    );
-  }
+  // private onConnection = (remoteHostId: string) => {
+  //   const sendToClient = async (message: RemoteCallMessage): Promise<void> => {
+  //     return this.server.send(remoteHostId, message);
+  //   };
+  //
+  //   this.remoteCalls[remoteHostId] = new RemoteCall(
+  //     sendToClient,
+  //     this.ioCollection as any,
+  //     hostDefaultConfig.config.ioSetResponseTimoutSec,
+  //     console.error,
+  //     this.generateUniqId
+  //   );
+  // }
 
   private parseIncomeMessage = async (remoteHostId: string, message: {[index: string]: any}) => {
     if (!this.remoteCalls[remoteHostId]) {
