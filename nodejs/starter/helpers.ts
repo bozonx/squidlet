@@ -3,7 +3,6 @@ import * as path from 'path';
 import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import Os, {SpawnCmdResult} from '../../shared/Os';
 import Props from './Props';
-import {IoItemClass} from '../../system/interfaces/IoItem';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import * as ts from 'typescript';
 import {loadMachineConfigInPlatformDir, getFileNameOfPath} from '../../shared/helpers';

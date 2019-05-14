@@ -1,46 +1,42 @@
-
-// TODO: прописать зависимость от драйверов
-
-
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import RemoteCall from 'system/helpers/remoteCall/RemoteCall';
-import IoItem, {IoItemClass} from 'system/interfaces/IoItem';
-import hostDefaultConfig from '../../../hostEnvBuilder/configs/hostDefaultConfig';
+import IoItem from 'system/interfaces/IoItem';
+import categories from 'system/dict/categories';
+import ServiceBase from 'system/baseServices/ServiceBase';
 
 
 // TODO: remove
 let uniqIndex = 10000;
 
-export interface WsServerProps {
-  host: string;
-  port: number;
+export interface IoSetServerProps {
 }
 
 
-export default class IoSetServer {
-  private readonly server: WsServer;
+export default class IoSetServer extends ServiceBase<IoSetServerProps> {
   private readonly ioCollection: {[index: string]: IoItem} = {};
   private readonly remoteCalls: {[index: string]: RemoteCall} = {};
 
 
-  constructor(serverProps: WsServerProps, ioClasses: {[index: string]: IoItemClass}, verbose?: boolean) {
-    this.server = new WsServer(serverProps, verbose);
-
-    // make dev instances
-    for (let ioName of Object.keys(ioClasses)) {
-      this.ioCollection[ioName] = new ioClasses[ioName]();
-    }
-
-    this.listen();
-  }
+  // constructor(serverProps: WsServerProps, ioClasses: {[index: string]: IoItemClass}, verbose?: boolean) {
+  //
+  // }
 
   async init() {
-    // call init() method of all the io
-    for (let ioName of Object.keys(this.ioCollection)) {
-      const ioItem: IoItem = this.ioCollection[ioName];
+    this.env.system.events.addCategoryListener(categories.ioSet, this.handleIncomeMessages);
 
-      if (ioItem.init) await ioItem.init();
-    }
+    // // make dev instances
+    // for (let ioName of Object.keys(ioClasses)) {
+    //   this.ioCollection[ioName] = new ioClasses[ioName]();
+    // }
+    //
+    // this.listen();
+    //
+    // // call init() method of all the io
+    // for (let ioName of Object.keys(this.ioCollection)) {
+    //   const ioItem: IoItem = this.ioCollection[ioName];
+    //
+    //   if (ioItem.init) await ioItem.init();
+    // }
   }
 
 

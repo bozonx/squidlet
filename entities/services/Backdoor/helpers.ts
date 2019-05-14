@@ -13,7 +13,7 @@ export function decodeBackdoorMessage(binMsg: Uint8Array): BackdoorMessage {
   return deserializeJson(binMsg);
 }
 
-export function makeMessage(action: number, category: string, topic?: string, data?: string): Uint8Array {
+export function makeMessage(action: number, category: string, topic?: string, data?: any): Uint8Array {
   const message: BackdoorMessage = {
     action,
     payload: {

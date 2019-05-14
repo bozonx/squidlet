@@ -1,5 +1,5 @@
 import IoSet from '../interfaces/IoSet';
-import IoItem, {IoItemClass} from '../interfaces/IoItem';
+import IoItem from '../interfaces/IoItem';
 import System from '../System';
 import {pathJoin} from '../helpers/nodeLike';
 
@@ -18,7 +18,7 @@ export default class IoSetLocal implements IoSet {
     );
 
     // Load io collection workDir/io/index.js
-    const ioClasses: {[index: string]: IoItemClass} = require(pathToIoSetIndex);
+    const ioClasses: {[index: string]: new () => IoItem} = require(pathToIoSetIndex);
 
     // make dev instances
     for (let ioName of Object.keys(ioClasses)) {
