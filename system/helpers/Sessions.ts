@@ -1,23 +1,22 @@
 import IndexedEvents from './IndexedEvents';
 
 
-let sessionIndex: number = 0;
-
-
 /**
  * Sessions allows not to operate connection itself because they might reconnect.
  * External code have to pass sessionId to client.
  */
 export default class Sessions {
-  private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
   private readonly sessionTimeout: number;
+  private readonly generateUniqId: () => string;
+  private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
   private sessionStorage: {[index: string]: any} = {};
   private closeConnectionTimeouts: {[index: string]: any} = {};
   private activeSession: {[index: string]: true} = {};
 
 
-  constructor(sessionTimeout: number) {
+  constructor(sessionTimeout: number, generateUniqId: () => string) {
     this.sessionTimeout = sessionTimeout;
+    this.generateUniqId = generateUniqId;
   }
 
   destroy() {
@@ -44,7 +43,7 @@ export default class Sessions {
    * @returns sessionId
    */
   newConnection(shortConnection: boolean = false): string {
-    const sessionId: string = this.makeSessionId();
+    const sessionId: string = this.generateUniqId();
 
     // if it is short connection like http then wait to a next connection to renew the session.
     // Otherwise session will be closed
@@ -112,15 +111,6 @@ export default class Sessions {
     delete this.closeConnectionTimeouts[sessionId];
     delete this.sessionStorage[sessionId];
     delete this.activeSession[sessionId];
-  }
-
-  private makeSessionId(): string {
-
-    // TODO: better to use generating uniq id
-
-    sessionIndex++;
-
-    return String(sessionIndex);
   }
 
 }
