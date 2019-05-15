@@ -10,8 +10,6 @@ import IndexedEvents from '../../../system/helpers/IndexedEvents';
 
 // TODO: merge props with WsServer
 // TODO: лучше наверное использовать драйвер а не server logic ?
-// TODO: может всетаки лучше использовать Sessions локально. Тогда можно вешаться на его события.
-//       И удалять сессии при дестрое
 
 
 export interface WsServerSessionsProps extends WebSocketServerProps {
@@ -61,6 +59,11 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       // TODO: при закрытии сессии очищать sessionConnections
       // TODO: удалять хэндлеры сообщений
     });
+
+    this.env.system.sessions.onSessionClossed((sessionId) => {
+      // TODO: remove sessionConnections[sessionId]
+      // TODO: наверное поднять событие?
+    });
   }
 
   protected appDidInit = async () => {
@@ -70,6 +73,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   destroy = async () => {
     if (!this.server) return;
 
+    // TODO: удалить все известные сессии
     // TODO: review
 
     await this.server.destroy();
