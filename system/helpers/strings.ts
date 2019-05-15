@@ -101,6 +101,26 @@ export function parseCookie(cookies?: string): {[index: string]: Primitives} {
   return result;
 }
 
+export function stringifyCookie(obj: {[index: string]: Primitives}): string {
+
+  // TODO: test
+
+  const result: string[] = [];
+
+  for (let key of Object.keys(obj)) {
+    const value: Primitives = obj[key];
+    if (
+      typeof value !== 'boolean'
+      && typeof value !== 'string'
+      && typeof value !== 'number'
+    ) throw new Error(`stringifyCookie: invalid received object`);
+
+    result.push(`${key}=${value}`);
+  }
+
+  return result.join('; ');
+}
+
 
 /*
 import * as querystring from 'querystring';
