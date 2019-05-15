@@ -14,6 +14,7 @@ import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
 import IoManager from './entities/IoManager';
+import Sessions from './helpers/Sessions';
 
 
 export default class System {
@@ -26,6 +27,7 @@ export default class System {
   readonly driversManager: DriversManager;
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
+  readonly sessions: Sessions;
 
   private _isDevicesInitialized: boolean = false;
   private _isAppInitialized: boolean = false;
@@ -54,6 +56,7 @@ export default class System {
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
+    this.sessions = new Sessions(this.host.generateUniqId);
   }
 
 
