@@ -14,6 +14,8 @@ export default class Sessions {
   private activeSession: {[index: string]: true} = {};
 
 
+  // TODO: наверное лучше expireSec ставить на каждую сессию чтобы не зависить от типа сессии
+
   constructor(expireSec: number, generateUniqId: () => string) {
     this.expireSec = expireSec;
     this.generateUniqId = generateUniqId;
@@ -42,7 +44,7 @@ export default class Sessions {
    *                          if false then session is established while closedConnection()
    * @returns sessionId
    */
-  newConnection(shortConnection: boolean = false): string {
+  newSession(shortConnection: boolean = false): string {
     const sessionId: string = this.generateUniqId();
 
     // if it is short connection like http then wait to a next connection to renew the session.
@@ -56,26 +58,21 @@ export default class Sessions {
   }
 
   /**
-   * If long connection is reconnected then timout of session will be cleared
+   * It uses on reconnect of long connections like websocket.
+   * It clears current timeout of finishing of session.
    */
-  reconnect(sessionId: string) {
+  recoverSession(sessionId: string) {
     clearTimeout(this.closeConnectionTimeouts[sessionId]);
     delete this.closeConnectionTimeouts[sessionId];
   }
 
   /**
    * Call this method if you use connection like websocket on connection close.
-   */
-  closedConnection(sessionId: string) {
-    // wait timeout to decide that session is elapsed
-    this.newSessionTimeout(sessionId);
-  }
-
-  /**
    * Call this method on each received data of connection with this sessionId
    * to mark that session is alive.
    */
-  renewShortConnection(sessionId: string) {
+  waitForShutDown(sessionId: string) {
+    // wait timeout to decide that session is elapsed
     this.newSessionTimeout(sessionId);
   }
 
