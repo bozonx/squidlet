@@ -4,6 +4,9 @@
 import IndexedEvents from './IndexedEvents';
 
 
+let sessionIndex: number = 0;
+
+
 export default class Sessions {
   private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
   private readonly sessionTimeout: number;
@@ -34,12 +37,13 @@ export default class Sessions {
    * @returns sessionId
    */
   newConnection(shortConnection: boolean = false): string {
-    // TODO: !!!!
+    const sessionId: string = this.makeSessionId();
 
-    if (shortConnection) {
+    // if it is short connection like http then wait to a next connection to renew the session.
+    // Otherwise session will be closed
+    if (shortConnection) this.newSessionTimeout(sessionId);
 
-    }
-    //this.newSessionTimeout(sessionId);
+    return sessionId;
   }
 
   /**
@@ -97,6 +101,12 @@ export default class Sessions {
     this.closeEvents.emit(sessionId);
     delete this.closeConnectionTimeouts[sessionId];
     delete this.sessionStorage[sessionId];
+  }
+
+  private makeSessionId(): string {
+    sessionIndex++;
+
+    return String(sessionIndex);
   }
 
 }
