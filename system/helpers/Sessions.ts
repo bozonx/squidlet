@@ -6,7 +6,7 @@ import IndexedEvents from './IndexedEvents';
  * External code have to pass sessionId to client.
  */
 export default class Sessions {
-  private readonly sessionTimeout: number;
+  private readonly expireSec: number;
   private readonly generateUniqId: () => string;
   private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
   private sessionStorage: {[index: string]: any} = {};
@@ -14,8 +14,8 @@ export default class Sessions {
   private activeSession: {[index: string]: true} = {};
 
 
-  constructor(sessionTimeout: number, generateUniqId: () => string) {
-    this.sessionTimeout = sessionTimeout;
+  constructor(expireSec: number, generateUniqId: () => string) {
+    this.expireSec = expireSec;
     this.generateUniqId = generateUniqId;
   }
 
@@ -102,7 +102,7 @@ export default class Sessions {
 
     this.closeConnectionTimeouts[sessionId] = setTimeout(() => {
       this.closeSession(sessionId);
-    }, this.sessionTimeout);
+    }, this.expireSec * 1000);
   }
 
   private closeSession(sessionId: string) {
