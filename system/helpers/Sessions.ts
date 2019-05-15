@@ -1,4 +1,5 @@
 import IndexedEvents from './IndexedEvents';
+import {JsonTypes} from '../interfaces/Types';
 
 
 /**
@@ -83,11 +84,11 @@ export default class Sessions {
     this.closeEvents.removeListener(handlerIndex);
   }
 
-  getStorage(sessionId: string): any | undefined {
+  getStorage(sessionId: string): JsonTypes | undefined {
     return this.sessionStorage[sessionId];
   }
 
-  setStorage(sessionId: string, data: any) {
+  setStorage(sessionId: string, data: JsonTypes) {
     this.sessionStorage[sessionId] = data;
   }
 

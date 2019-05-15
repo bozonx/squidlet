@@ -1,4 +1,4 @@
-import {Primitives} from './Types';
+import {JsonTypes} from './Types';
 
 
 export const REMOTE_CALL_MESSAGE_TYPES = [
@@ -24,13 +24,13 @@ export type RemoteCallMessageType =
 
 export interface ResultLikePayload {
   error: string | undefined;
-  result: Primitives;
+  result: JsonTypes;
 }
 
 export interface CallMethodPayload {
   objectName: string;
   method: string;
-  args: Primitives[];
+  args: JsonTypes[];
 }
 
 export interface ResultMethodPayload extends ResultLikePayload {
@@ -40,7 +40,7 @@ export interface ResultMethodPayload extends ResultLikePayload {
 
 export interface CallCbPayload {
   cbId: string;
-  args: Primitives[];
+  args: JsonTypes[];
 }
 
 export interface ResultCbPayload extends ResultLikePayload {
