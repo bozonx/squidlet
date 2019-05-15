@@ -1,25 +1,27 @@
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import RemoteCall, {ObjectToCall} from 'system/helpers/remoteCall/RemoteCall';
-import categories from 'system/dict/categories';
-import topics from 'system/dict/topics';
 import IoManager from 'system/entities/IoManager';
 
 
 export default class IoSetServer {
-  private ioManager: IoManager;
+  private readonly ioManager: IoManager;
+  private readonly sendToClient: (message: RemoteCallMessage) => Promise<void>;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
   private remoteCalls: {[index: string]: RemoteCall} = {};
-  private ioCollection: {[index: string]: ObjectToCall} = {};
+  private readonly ioCollection: {[index: string]: ObjectToCall} = {};
+
 
   constructor(
     ioManager: IoManager,
+    sendToClient: (message: RemoteCallMessage) => Promise<void>,
     responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.ioManager = ioManager;
+    this.sendToClient = sendToClient;
     this.responseTimoutSec = responseTimoutSec;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
@@ -30,11 +32,12 @@ export default class IoSetServer {
     }
   }
 
-
   async destroy () {
-    for (let clientId of Object.keys(this.remoteCalls)) {
-      await this.remoteCalls[clientId].destroy();
+    for (let sessionId of Object.keys(this.remoteCalls)) {
+      await this.remoteCalls[sessionId].destroy();
     }
+
+    this.remoteCalls = {};
   }
 
 
@@ -42,43 +45,26 @@ export default class IoSetServer {
     return this.ioManager.getNames();
   }
 
-  async incomeRemoteCallMessage(clientId: string, rawMessage: {[index: string]: any}) {
-    this._remoteCall = new RemoteCall(
-      this.sendToClient,
-      ioCollection,
-      this.responseTimoutSec,
-      this.logError,
-      this.generateUniqId
-    );
-    // TODO: use client id
+  async incomeMessage(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
+    if (!this.remoteCalls[sessionId]) {
+      this.remoteCalls[sessionId] = new RemoteCall(
+        this.sendToClient,
+        this.ioCollection,
+        this.responseTimoutSec,
+        this.logError,
+        this.generateUniqId
+      );
+    }
 
-    return this.remoteCall.incomeMessage(rawMessage);
-  }
-
-  connectionClosed(clientId: string) {
-
+    return this.remoteCalls[sessionId].incomeMessage(rawRemoteCallMessage);
   }
 
   /**
-   * Send message back to RemoteIoCollection
+   * Call this method if session has just been closed
    */
-  private sendToClient = async (message: RemoteCallMessage) => {
-    this.env.events.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+  async sessionClosed(sessionId: string) {
+    await this.remoteCalls[sessionId].destroy();
+    delete this.remoteCalls[sessionId];
   }
 
 }
-
-//this.server.onConnection(this.onConnection);
-// private onConnection = (remoteHostId: string) => {
-//   const sendToClient = async (message: RemoteCallMessage): Promise<void> => {
-//     return this.server.send(remoteHostId, message);
-//   };
-//
-//   this.remoteCalls[remoteHostId] = new RemoteCall(
-//     sendToClient,
-//     this.ioCollection as any,
-//     hostDefaultConfig.config.ioSetResponseTimoutSec,
-//     console.error,
-//     this.generateUniqId
-//   );
-// }
