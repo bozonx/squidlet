@@ -5,12 +5,28 @@ import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocke
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie} from '../../../system/helpers/strings';
+import IndexedEvents from '../../../system/helpers/IndexedEvents';
 
 
 // TODO: merge props with WsServer
+// TODO: лучше наверное использовать драйвер а не server logic ?
+// TODO: может всетаки лучше использовать Sessions локально. Тогда можно вешаться на его события.
+//       И удалять сессии при дестрое
 
 
-export class WsServerSessions extends DriverBase<WebSocketServerProps> {
+export interface WsServerSessionsProps extends WebSocketServerProps {
+  expiredSec: number;
+}
+
+type NewSessionHandler = (sessionId: string, connectionParams: ConnectionParams) => void;
+//type MessageHandler = (sessionId: string, data: string | Uint8Array) => void;
+
+
+export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
+  private readonly newSessionEvent = new IndexedEvents<NewSessionHandler>();
+  private readonly messageEvent = new IndexedEvents<(sessionId: string, data: string | Uint8Array) => void>();
+
+  // TODO: review
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     if (!this.server) {
@@ -27,6 +43,8 @@ export class WsServerSessions extends DriverBase<WebSocketServerProps> {
   private get closedMsg() {
     return `Server "${this.props.host}:${this.props.port}" has been closed`;
   }
+  // like {sessionId: connectionId}
+  private sessionConnections: {[index: string]: string} = {};
 
 
   protected willInit = async () => {
@@ -37,32 +55,16 @@ export class WsServerSessions extends DriverBase<WebSocketServerProps> {
       this.env.log.info,
       this.env.log.error
     );
+
+    this.server.onConnection(this.handleNewConnection);
+    this.server.onConnectionClose((connectionId: string) => {
+      // TODO: при закрытии сессии очищать sessionConnections
+      // TODO: удалять хэндлеры сообщений
+    });
   }
 
   protected appDidInit = async () => {
     this.server && this.server.init();
-
-    this.server.onConnection((connectionId: string, connectionParams: ConnectionParams) => {
-      if (connectionParams.headers.cookie) {
-        const parsedCookie = parseCookie(connectionParams.headers.cookie);
-
-        if (parsedCookie.sessionId) {
-
-          if (this.env.system.sessions.isSessionActive(parsedCookie.sessionId)) {
-            // TODO: use session
-          }
-          else {
-            // TODO: new session
-          }
-
-        }
-        else {
-          // TODO: new session
-        }
-      }
-
-      // TODO: new session
-    });
   }
 
   destroy = async () => {
@@ -74,6 +76,9 @@ export class WsServerSessions extends DriverBase<WebSocketServerProps> {
 
 
   send(sessionId: string, data: string | Uint8Array): Promise<void> {
+
+    // TODO: remake
+
     if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
 
     return this.server.send(connectionId, data);
@@ -81,17 +86,23 @@ export class WsServerSessions extends DriverBase<WebSocketServerProps> {
 
   onMessage(sessionId: string, cb: OnMessageHandler): number {
     if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.closedMsg}`);
+    if (!this.env.system.sessions.isSessionActive(sessionId)) {
+      throw new Error(`WebSocketServer.onMessage: Session ${sessionId} is inactive`);
+    }
 
-    return this.server.onMessage(connectionId, cb);
+    return this.messageEvent.addListener((msgSessionId: string, data: string | Uint8Array) => {
+      if (msgSessionId === sessionId) cb(data);
+    });
   }
 
-  onNewSession(cb: (sessionId: string, connectionParams: ConnectionParams) => void): number {
-    // if (!this.server) throw new Error(`WebSocketServer.onConnection: ${this.closedMsg}`);
-    //
-    // return this.server.onConnection(cb);
+  onNewSession(cb: NewSessionHandler): number {
+    return this.newSessionEvent.addListener(cb);
   }
 
   onSessionClose(cb: (sessionId: string) => void): number {
+
+    // TODO: remake
+
     if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.closedMsg}`);
 
     return this.server.onConnectionClose(cb);
@@ -104,6 +115,32 @@ export class WsServerSessions extends DriverBase<WebSocketServerProps> {
     this.server.removeListener(eventName, handlerIndex);
   }
 
+
+  private handleNewConnection = (connectionId: string, connectionParams: ConnectionParams) => {
+    const parsedCookie: {sessionId?: string} = parseCookie(connectionParams.headers.cookie);
+
+    if (parsedCookie.sessionId && this.env.system.sessions.isSessionActive(parsedCookie.sessionId)) {
+      this.env.system.sessions.recoverSession(parsedCookie.sessionId);
+      this.setupNewConnection(parsedCookie.sessionId, connectionId);
+
+      return;
+    }
+
+    const newSessionId: string = this.env.system.sessions.newSession(this.props.expiredSec);
+
+    this.setupNewConnection(newSessionId, connectionId);
+
+    // rise a new session event
+    this.newSessionEvent.emit(newSessionId, connectionParams);
+  }
+
+  private setupNewConnection(sessionId: string, connectionId: string) {
+    this.sessionConnections[sessionId] = connectionId;
+
+    this.server.onMessage(connectionId, (data: string | Uint8Array) => {
+      this.messageEvent.emit(sessionId, data);
+    });
+  }
 
   private onServerClosed = () => {
     this.env.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);

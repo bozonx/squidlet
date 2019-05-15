@@ -1,4 +1,5 @@
 import {trim} from './lodashLike';
+import {Primitives} from '../interfaces/Types';
 
 declare const btoa: ((data: any) => any) | undefined;
 declare const atob: ((data: any) => any) | undefined;
@@ -80,9 +81,11 @@ export function splitLastElement(
  * Parse cookie like "param1=value1; param2=valu2" to { param1: 'value1', param2: 'value2' }
  * example - lang=ru-RU; gdpr-cookie-consent=accepted;
  */
-export function parseCookie(cookies?: string): {[index: string]: any} {
+export function parseCookie(cookies?: string): {[index: string]: Primitives} {
 
   // TODO: test
+
+  // TODO: parse value
 
   if (!cookies) return {};
 

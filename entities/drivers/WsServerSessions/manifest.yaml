@@ -11,3 +11,7 @@ props:
   port:
     type: number
     default: 8080
+  # session expiration time in seconds
+  expiredSec:
+    type: number
+    default: 30
