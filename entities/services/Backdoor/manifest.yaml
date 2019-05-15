@@ -2,7 +2,7 @@ name: Backdoor
 main: Backdoor.ts
 
 drivers:
-  - WsServer
+  - WsServerSessions
 
 props:
   host:

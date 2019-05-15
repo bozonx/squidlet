@@ -1,10 +1,8 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {
-  WsServer
-} from '../../drivers/WsServer/WsServer';
 import {decodeBackdoorMessage, makeMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
+import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
 
 
 export enum BACKDOOR_ACTION {
@@ -12,10 +10,14 @@ export enum BACKDOOR_ACTION {
   addListener,
   listenerResponse,
   removeListener,
+  ioSet,
 }
 
 export interface BackdoorMessage {
   action: number;
+
+  // TODO: для ioSet буде другой payload
+
   payload: {
     category: string;
     topic?: string;
@@ -35,29 +37,33 @@ type HandlerItem = [string, (string | undefined), number];
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   private readonly handlers: {[index: string]: HandlerItem[]} = {};
-  private get wsServer(): WsServer {
-    return this.depsInstances.wsServerDriver as any;
+  private get wsServerSessions(): WsServerSessions {
+    return this.depsInstances.wsServer as any;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.wsServerDriver = await getDriverDep('WebSocketServer')
+    this.depsInstances.wsServer = await getDriverDep('WsServerSessions')
       .getInstance(this.props);
 
-    this.wsServer.onConnection((connectionId: string) => {
+    this.wsServerSessions.onNewSession((sessionId: string) => {
       // start listening income messages of this connection
-      this.wsServer.onMessage(connectionId, (data: string | Uint8Array) => {
-        return this.handleIncomeMessage(connectionId, data);
+      this.wsServerSessions.onMessage(sessionId, (data: string | Uint8Array) => {
+        return this.handleIncomeMessage(sessionId, data);
       });
     });
 
-    this.wsServer.onConnectionClose((connectionId: string) => {
+    // TODO: review
+    this.wsServerSessions.onSessionClose((sessionId: string) => {
       // remove all the listeners of this connection
       this.removeConnectionHandlers(connectionId);
     });
   }
 
   destroy = async () => {
+
+    // TODO: review
+
     // remove all the handlers
     for (let connectionId of Object.keys(this.handlers)) {
       this.removeConnectionHandlers(connectionId);
@@ -67,7 +73,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
 
-  private async handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
+  private async handleIncomeMessage(sessionId: string, data: string | Uint8Array) {
     let message: BackdoorMessage;
 
     try {
@@ -78,32 +84,42 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     }
 
     try {
-      await this.resolveJsonMessage(connectionId, message);
+      await this.resolveJsonMessage(sessionId, message);
     }
     catch (err) {
       return this.env.log.error(`Backdoor: ${err}`);
     }
   }
 
-  private async resolveJsonMessage(connectionId: string, message: BackdoorMessage) {
+  private async resolveJsonMessage(sessionId: string, message: BackdoorMessage) {
+
+    // TODO: use special api to ioSet - don't use events
+
     switch (message.action) {
       case BACKDOOR_ACTION.emit:
         // rise event on common event system
         return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
       case BACKDOOR_ACTION.addListener:
-        return this.startListenEvents(connectionId, message.payload.category, message.payload.topic);
+        return this.startListenEvents(sessionId, message.payload.category, message.payload.topic);
       case BACKDOOR_ACTION.removeListener:
-        return this.removeEventListener(connectionId, message.payload.category, message.payload.topic);
+        return this.removeEventListener(sessionId, message.payload.category, message.payload.topic);
+      case BACKDOOR_ACTION.ioSet:
+        return this.handleIncomeIoSetMsg(sessionId, message.payload);
       default:
         throw new Error(`Backdoor: Can't recognize message's action "${message.action}"`);
     }
+  }
+
+  private handleIncomeIoSetMsg(sessionId: string, data: any) {
+    // TODO: какое будет сообщение?
+
   }
 
   /**
    * Listen to event of common event system
    * and send it to backdoor client which has been subscribed to this event.
    */
-  private startListenEvents(connectionId: string, category: string, topic?: string) {
+  private startListenEvents(sessionId: string, category: string, topic?: string) {
     let handlerIndex: number;
 
     if (topic) {
@@ -161,7 +177,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   /**
    * Remove all the handlers of specified category and topic
    */
-  private removeEventListener(connectionId: string, category: string, topic?: string) {
+  private removeEventListener(sessionId: string, category: string, topic?: string) {
     if (!this.handlers[connectionId]) return;
 
     for (let handlerItemIndex in this.handlers[connectionId]) {

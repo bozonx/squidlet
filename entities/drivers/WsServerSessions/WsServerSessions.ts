@@ -1,11 +1,11 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {parseCookie, stringifyCookie} from '../../../system/helpers/strings';
-import IndexedEvents from '../../../system/helpers/IndexedEvents';
+import {parseCookie, stringifyCookie} from 'system/helpers/strings';
+import IndexedEvents from 'system/helpers/IndexedEvents';
+import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
 
 
 // TODO: merge props with WsServer
