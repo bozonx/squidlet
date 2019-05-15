@@ -3,6 +3,8 @@ import {GetDriverDep} from 'system/entities/EntityBase';
 import {decodeBackdoorMessage, makeMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
+import IoSetServerLogic from './IoSetServerLogic';
+import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 
 
 export enum BACKDOOR_ACTION {
@@ -10,7 +12,8 @@ export enum BACKDOOR_ACTION {
   addListener,
   listenerResponse,
   removeListener,
-  ioSet,
+  ioSetRemoteCall,
+  getIoNames,
 }
 
 export interface BackdoorMessage {
@@ -37,8 +40,12 @@ type HandlerItem = [string, (string | undefined), number];
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   private readonly handlers: {[index: string]: HandlerItem[]} = {};
+  private _ioSet?: IoSetServerLogic;
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer as any;
+  }
+  private get ioSet(): IoSetServerLogic {
+    return this._ioSet as any;
   }
 
 
@@ -52,6 +59,14 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
         return this.handleIncomeMessage(sessionId, data);
       });
     });
+
+    this._ioSet = new IoSetServerLogic(
+      this.env.system.ioManager,
+      this.sendIoSetMsg,
+      this.env.config.config.ioSetResponseTimoutSec,
+      this.env.log.error,
+      this.env.system.host.generateUniqId
+    );
 
     // TODO: review
     this.wsServerSessions.onSessionClose((sessionId: string) => {
@@ -72,6 +87,10 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     await this.wsServer.destroy();
   }
 
+
+  private sendIoSetMsg(message: RemoteCallMessage): Promise<void> {
+    // TODO: add !!!!
+  }
 
   private async handleIncomeMessage(sessionId: string, data: string | Uint8Array) {
     let message: BackdoorMessage;
@@ -103,17 +122,21 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
         return this.startListenEvents(sessionId, message.payload.category, message.payload.topic);
       case BACKDOOR_ACTION.removeListener:
         return this.removeEventListener(sessionId, message.payload.category, message.payload.topic);
-      case BACKDOOR_ACTION.ioSet:
-        return this.handleIncomeIoSetMsg(sessionId, message.payload);
+      case BACKDOOR_ACTION.ioSetRemoteCall:
+        //return this.handleIncomeIoSetRcMsg(sessionId, message.payload);
+        return this.ioSet.incomeMessage(sessionId, message.payload);
+      case BACKDOOR_ACTION.getIoNames:
+        // TODO: отправить обратным сообщением
+        //return this.ioSet.incomeMessage(sessionId, message.payload);
       default:
         throw new Error(`Backdoor: Can't recognize message's action "${message.action}"`);
     }
   }
 
-  private handleIncomeIoSetMsg(sessionId: string, data: any) {
-    // TODO: какое будет сообщение?
-
-  }
+  // private handleIncomeIoSetRcMsg(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
+  //   this.ioSet.incomeMessage(sessionId, rawRemoteCallMessage)
+  //     .catch(this.env.log.error);
+  // }
 
   /**
    * Listen to event of common event system

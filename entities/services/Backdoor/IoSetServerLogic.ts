@@ -3,7 +3,7 @@ import RemoteCall, {ObjectToCall} from 'system/helpers/remoteCall/RemoteCall';
 import IoManager from 'system/entities/IoManager';
 
 
-export default class IoSetServer {
+export default class IoSetServerLogic {
   private readonly ioManager: IoManager;
   private readonly sendToClient: (message: RemoteCallMessage) => Promise<void>;
   private readonly responseTimoutSec: number;
