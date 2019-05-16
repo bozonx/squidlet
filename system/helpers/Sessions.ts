@@ -4,7 +4,7 @@ import {JsonTypes} from '../interfaces/Types';
 
 /**
  * Sessions allows not to operate connection itself because they might reconnect.
- * External code have to pass sessionId to client.
+ * External code has to pass sessionId to a client.
  */
 export default class Sessions {
   private readonly generateUniqId: () => string;

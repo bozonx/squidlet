@@ -1,11 +1,13 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
+import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie, stringifyCookie} from 'system/helpers/strings';
 import IndexedEvents from 'system/helpers/IndexedEvents';
-import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
+import {GetDriverDep} from '../../../system/entities/EntityBase';
+import {WsServer} from '../WsServer/WsServer';
+import {WS_SERVER_EVENTS} from '../WsServer/WsServerLogic';
 
 
 // TODO: merge props with WsServer
@@ -24,35 +26,21 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private readonly newSessionEvent = new IndexedEvents<NewSessionHandler>();
   private readonly messageEvent = new IndexedEvents<(sessionId: string, data: string | Uint8Array) => void>();
 
-  // TODO: review
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
-    if (!this.server) {
-      throw new Error(`WebSocketServer.listeningPromise: ${this.closedMsg}`);
-    }
-
     return this.server.listeningPromise;
   }
+  private get server(): WsServer {
+    return this.depsInstances.server as any;
+  }
 
-  private get wsServerIo(): WebSocketServerIo {
-    return this.env.getIo('WebSocketServer') as any;
-  }
-  private server?: WsServerLogic;
-  private get closedMsg() {
-    return `Server "${this.props.host}:${this.props.port}" has been closed`;
-  }
   // like {sessionId: connectionId}
   private sessionConnections: {[index: string]: string} = {};
 
 
-  protected willInit = async () => {
-    this.server = new WsServerLogic(
-      this.wsServerIo,
-      this.props,
-      this.onServerClosed,
-      this.env.log.info,
-      this.env.log.error
-    );
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.server = await getDriverDep('WsServer')
+      .getInstance(this.props);
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onConnectionClose((connectionId: string) => {
@@ -67,17 +55,14 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   protected appDidInit = async () => {
-    this.server && this.server.init();
+    return this.server.init();
   }
 
   destroy = async () => {
-    if (!this.server) return;
-
     // TODO: удалить все известные сессии
     // TODO: review
 
     await this.server.destroy();
-    delete this.server;
   }
 
 
@@ -85,13 +70,11 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     if (!this.env.system.sessions.isSessionActive(sessionId)) {
       throw new Error(`WebSocketServer.onMessage: Session ${sessionId} is inactive`);
     }
-    if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
 
     return this.server.send(this.sessionConnections[sessionId], data);
   }
 
   onMessage(sessionId: string, cb: OnMessageHandler): number {
-    //if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.closedMsg}`);
     if (!this.env.system.sessions.isSessionActive(sessionId)) {
       throw new Error(`WebSocketServer.onMessage: Session ${sessionId} is inactive`);
     }
@@ -117,8 +100,6 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
   // TODO: review
   removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
-    if (!this.server) return;
-
     this.server.removeListener(eventName, handlerIndex);
   }
 
@@ -154,10 +135,6 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     this.server.onMessage(connectionId, (data: string | Uint8Array) => {
       this.messageEvent.emit(sessionId, data);
     });
-  }
-
-  private onServerClosed = () => {
-    this.env.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
   }
 
 }

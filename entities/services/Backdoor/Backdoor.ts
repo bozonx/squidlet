@@ -2,9 +2,9 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {decodeBackdoorMessage, makeMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import IoSetServerLogic from './IoSetServerLogic';
-import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
+import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
 
 
 export enum BACKDOOR_ACTION {
@@ -16,16 +16,20 @@ export enum BACKDOOR_ACTION {
   getIoNames,
 }
 
-export interface BackdoorMessage {
-  action: number;
 
-  // TODO: для ioSet буде другой payload
+// TODO: для ioSet буде другой payload
 
-  payload: {
+/*
+{
     category: string;
     topic?: string;
     data?: any;
-  };
+  }
+ */
+
+export interface BackdoorMessage {
+  action: number;
+  payload: any;
 }
 
 enum HANDLER_ITEM_POS {
@@ -39,6 +43,7 @@ type HandlerItem = [string, (string | undefined), number];
 
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
+  // TODO: review
   private readonly handlers: {[index: string]: HandlerItem[]} = {};
   private _ioSet?: IoSetServerLogic;
   private get wsServerSessions(): WsServerSessions {
