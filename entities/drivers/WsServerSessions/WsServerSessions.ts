@@ -4,14 +4,18 @@ import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie, stringifyCookie} from 'system/helpers/strings';
-import IndexedEvents from 'system/helpers/IndexedEvents';
 import {GetDriverDep} from '../../../system/entities/EntityBase';
 import {WsServer} from '../WsServer/WsServer';
-import {WS_SERVER_EVENTS} from '../WsServer/WsServerLogic';
+import IndexedEventEmitter from '../../../system/helpers/IndexedEventEmitter';
 
 
 // TODO: merge props with WsServer
 // TODO: лучше наверное использовать драйвер а не server logic ?
+
+export enum WsSessionsEvents {
+  newSession,
+  message
+}
 
 
 export interface WsServerSessionsProps extends WebSocketServerProps {
@@ -23,8 +27,9 @@ type NewSessionHandler = (sessionId: string, connectionParams: ConnectionParams)
 
 
 export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
-  private readonly newSessionEvent = new IndexedEvents<NewSessionHandler>();
-  private readonly messageEvent = new IndexedEvents<(sessionId: string, data: string | Uint8Array) => void>();
+  private readonly events = new IndexedEventEmitter();
+  // private readonly newSessionEvent = new IndexedEvents<NewSessionHandler>();
+  // private readonly messageEvent = new IndexedEvents<(sessionId: string, data: string | Uint8Array) => void>();
 
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
@@ -63,6 +68,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     // TODO: review
 
     await this.server.destroy();
+    this.events.destroy();
+    delete this.sessionConnections;
   }
 
 
@@ -79,13 +86,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       throw new Error(`WebSocketServer.onMessage: Session ${sessionId} is inactive`);
     }
 
-    return this.messageEvent.addListener((msgSessionId: string, data: string | Uint8Array) => {
+    return this.events.addListener(WsSessionsEvents.message, (msgSessionId: string, data: string | Uint8Array) => {
       if (msgSessionId === sessionId) cb(data);
     });
   }
 
   onNewSession(cb: NewSessionHandler): number {
-    return this.newSessionEvent.addListener(cb);
+    return this.events.addListener(WsSessionsEvents.newSession, cb);
   }
 
   onSessionClose(sessionId: string, cb: () => void): number {
@@ -98,9 +105,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     });
   }
 
-  // TODO: review
-  removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
-    this.server.removeListener(eventName, handlerIndex);
+  removeListener(eventName: WsSessionsEvents, handlerIndex: number) {
+    this.events.removeListener(eventName, handlerIndex);
   }
 
 
@@ -126,14 +132,14 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     // TODO: send cookie !!!!
 
     // rise a new session event
-    this.newSessionEvent.emit(sessionId, connectionParams);
+    this.events.emit(WsSessionsEvents.newSession, sessionId, connectionParams);
   }
 
   private setupNewConnection(sessionId: string, connectionId: string) {
     this.sessionConnections[sessionId] = connectionId;
 
     this.server.onMessage(connectionId, (data: string | Uint8Array) => {
-      this.messageEvent.emit(sessionId, data);
+      this.events.emit(WsSessionsEvents.message, sessionId, data);
     });
   }
 
