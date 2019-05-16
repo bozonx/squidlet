@@ -108,16 +108,15 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private handleNewConnection = (connectionId: string, connectionParams: ConnectionParams) => {
     const parsedCookie: {sessionId?: string} = parseCookie(connectionParams.headers.cookie);
 
-    // existent session
-    if (parsedCookie.sessionId && this.env.system.sessions.isSessionActive(parsedCookie.sessionId)) {
-      this.env.system.sessions.recoverSession(parsedCookie.sessionId);
-      this.setupNewConnection(parsedCookie.sessionId, connectionId);
-
-      return;
+    // create a new session
+    if (!parsedCookie.sessionId || !this.env.system.sessions.isSessionActive(parsedCookie.sessionId)) {
+      return this.createNewSession(connectionId, connectionParams);
     }
 
-    // create a new session
-    this.createNewSession(connectionId, connectionParams);
+    // continue existent session on reconnect
+    this.env.system.sessions.recoverSession(parsedCookie.sessionId);
+    this.setupNewConnection(parsedCookie.sessionId, connectionId);
+
   }
 
   private createNewSession(connectionId: string, connectionParams: ConnectionParams) {
