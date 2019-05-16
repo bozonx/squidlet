@@ -10,9 +10,8 @@ import IndexedEventEmitter from '../../../system/helpers/IndexedEventEmitter';
 
 
 // TODO: merge props with WsServer
-// TODO: лучше наверное использовать драйвер а не server logic ?
 
-export enum WsSessionsEvents {
+export enum WS_SESSIONS_EVENTS {
   newSession,
   message
 }
@@ -86,13 +85,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       throw new Error(`WebSocketServer.onMessage: Session ${sessionId} is inactive`);
     }
 
-    return this.events.addListener(WsSessionsEvents.message, (msgSessionId: string, data: string | Uint8Array) => {
+    return this.events.addListener(WS_SESSIONS_EVENTS.message, (msgSessionId: string, data: string | Uint8Array) => {
       if (msgSessionId === sessionId) cb(data);
     });
   }
 
   onNewSession(cb: NewSessionHandler): number {
-    return this.events.addListener(WsSessionsEvents.newSession, cb);
+    return this.events.addListener(WS_SESSIONS_EVENTS.newSession, cb);
   }
 
   onSessionClose(sessionId: string, cb: () => void): number {
@@ -105,7 +104,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     });
   }
 
-  removeListener(eventName: WsSessionsEvents, handlerIndex: number) {
+  removeListener(eventName: WS_SESSIONS_EVENTS, handlerIndex: number) {
     this.events.removeListener(eventName, handlerIndex);
   }
 
@@ -132,14 +131,14 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     // TODO: send cookie !!!!
 
     // rise a new session event
-    this.events.emit(WsSessionsEvents.newSession, sessionId, connectionParams);
+    this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, connectionParams);
   }
 
   private setupNewConnection(sessionId: string, connectionId: string) {
     this.sessionConnections[sessionId] = connectionId;
 
     this.server.onMessage(connectionId, (data: string | Uint8Array) => {
-      this.events.emit(WsSessionsEvents.message, sessionId, data);
+      this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
     });
   }
 
