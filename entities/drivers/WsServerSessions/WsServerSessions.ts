@@ -4,12 +4,10 @@ import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie, stringifyCookie} from 'system/helpers/strings';
-import {GetDriverDep} from '../../../system/entities/EntityBase';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {WsServer} from '../WsServer/WsServer';
-import IndexedEventEmitter from '../../../system/helpers/IndexedEventEmitter';
 
-
-// TODO: merge props with WsServer
 
 export enum WS_SESSIONS_EVENTS {
   newSession,
@@ -27,8 +25,6 @@ type NewSessionHandler = (sessionId: string, connectionParams: ConnectionParams)
 
 export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private readonly events = new IndexedEventEmitter();
-  // private readonly newSessionEvent = new IndexedEvents<NewSessionHandler>();
-  // private readonly messageEvent = new IndexedEvents<(sessionId: string, data: string | Uint8Array) => void>();
 
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
@@ -63,9 +59,6 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   destroy = async () => {
-    // TODO: удалить все известные сессии
-    // TODO: review
-
     await this.server.destroy();
     this.events.destroy();
     delete this.sessionConnections;
@@ -75,6 +68,9 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   send(sessionId: string, data: string | Uint8Array): Promise<void> {
     if (!this.env.system.sessions.isSessionActive(sessionId)) {
       throw new Error(`WebSocketServer.onMessage: Session ${sessionId} is inactive`);
+    }
+    else if (!this.sessionConnections[sessionId]) {
+      throw new Error(`WebSocketServer.onMessage: Can't find a connection of session "${sessionId}"`);
     }
 
     return this.server.send(this.sessionConnections[sessionId], data);
@@ -121,7 +117,10 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     }
 
     // create a new session
+    this.createNewSession(connectionId, connectionParams);
+  }
 
+  private createNewSession(connectionId: string, connectionParams: ConnectionParams) {
     const sessionId: string = this.env.system.sessions.newSession(this.props.expiredSec);
 
     this.setupNewConnection(sessionId, connectionId);
