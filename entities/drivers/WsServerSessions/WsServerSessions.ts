@@ -127,6 +127,9 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
    * Set session id to cookie of client if it doesn't have or session is inactive
    */
   private handleHeaders = (headers: {[index: string]: string}, request: ConnectionParams) => {
+
+    // TODO: headers это массив или объект ???
+
     const parsedCookie: {SESSIONID?: string} = parseCookie(request.headers.cookie);
 
     if (parsedCookie.SESSIONID && this.env.system.sessions.isSessionActive(parsedCookie.SESSIONID)) {
@@ -151,8 +154,12 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     request: ConnectionParams,
   ) => {
     const requestCookie: {SESSIONID?: string} = parseCookie(request.headers.cookie);
+
+    // TODO: проверить будет ли в request новый cookie который только установили в headers ???
+
     //const upgradeCookie: {SESSIONID?: string} = parseCookie(upgradeReq && upgradeReq.headers.cookie);
-    const sessionId: string | undefined = requestCookie.SESSIONID || upgradeCookie.SESSIONID;
+    //const sessionId: string | undefined = requestCookie.SESSIONID || upgradeCookie.SESSIONID;
+    const sessionId: string | undefined = requestCookie.SESSIONID;
 
     if (!sessionId) {
       return this.env.log.error(`WsServerSessions.handleNewConnection: Client doesn't have a SESSIONID cookie`);

@@ -185,6 +185,9 @@ export default class WebSocketServer implements WebSocketServerIo {
     server.on('close', () => events.emit(wsServerEventNames.close));
     server.on('listening', () => events.emit(wsServerEventNames.listening));
     server.on('error', () => events.emit(wsServerEventNames.error));
+    server.on('headers', (headers: {[index: string]: string}, request: IncomingMessage) => {
+      events.emit(wsServerEventNames.headers, headers, makeConnectionParams(request));
+    });
     server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
       this.handleIncomeConnection(serverId, socket, request);
     });
