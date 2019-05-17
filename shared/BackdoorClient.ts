@@ -39,9 +39,6 @@ export default class BackdoorClient {
    * Emit remote event
    */
   async emit(category: string, topic?: string, data?: any): Promise<void> {
-
-    // TODO: review data
-
     const binMsg: Uint8Array = makeMessage(BACKDOOR_ACTION.emit, category, topic, data);
 
     await this.client.send(binMsg);

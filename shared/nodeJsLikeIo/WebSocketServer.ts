@@ -73,13 +73,13 @@ export default class WebSocketServer implements WebSocketServerIo {
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.connection, cb);
   }
 
-  onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number {
-    const serverItem = this.getServerItem(serverId);
-
-    // TODO: как передавать модицифированный объект ????
-
-    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.headers, cb);
-  }
+  // onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number {
+  //   const serverItem = this.getServerItem(serverId);
+  //
+  //   // TODO: как передавать модицифированный объект ????
+  //
+  //   return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.headers, cb);
+  // }
 
   onServerListening(serverId: string, cb: () => void): number {
     const serverItem = this.getServerItem(serverId);
@@ -186,6 +186,9 @@ export default class WebSocketServer implements WebSocketServerIo {
     server.on('listening', () => events.emit(wsServerEventNames.listening));
     server.on('error', () => events.emit(wsServerEventNames.error));
     server.on('headers', (headers: {[index: string]: string}, request: IncomingMessage) => {
+
+      // TODO: нам же надо сразу изменить headers, а запрос remote io идет некоторое время!!!!
+
       events.emit(wsServerEventNames.headers, headers, makeConnectionParams(request));
     });
     server.on('connection', (socket: WebSocket, request: IncomingMessage) => {

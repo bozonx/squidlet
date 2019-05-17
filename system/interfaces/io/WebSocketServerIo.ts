@@ -71,10 +71,10 @@ export default interface WebSocketServerIo {
     cb: (connectionId: string, request: ConnectionParams) => void
   ): number;
 
-  /**
-   * Listen header at handshake to modify them
-   */
-  onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number;
+  // /**
+  //  * Listen header at handshake to modify them
+  //  */
+  // onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number;
 
   /**
    * when server starts listening
