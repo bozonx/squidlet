@@ -7,14 +7,14 @@ import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../starter/helpers';
 import categories from '../../system/dict/categories';
 import topics from '../../system/dict/topics';
-import BackdoorIoClient from '../../shared/BackdoorIoClient';
+import BackdoorClient from '../../shared/BackdoorClient';
 import {BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
 
 
 export default class RemoteIoCollection {
   ioCollection: {[index: string]: IoItem} = {};
 
-  private readonly ioClient: BackdoorIoClient;
+  private readonly client: BackdoorClient;
   private _system?: System;
   private _remoteCall?: RemoteCall;
   private get system(): System {
@@ -26,7 +26,7 @@ export default class RemoteIoCollection {
 
 
   constructor(host?: string, port?: number) {
-    this.ioClient = new BackdoorIoClient(host, port);
+    this.client = new BackdoorClient(host, port);
   }
 
 
@@ -41,7 +41,7 @@ export default class RemoteIoCollection {
     );
 
     // listen income messages of backdoor
-    this.ioClient.addListener(this.handleIncomeRemoteCall);
+    this.client.addListener(this.handleIncomeRemoteCall);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -54,7 +54,7 @@ export default class RemoteIoCollection {
   async destroy() {
     this.ioCollection = {};
     await this.remoteCall.destroy();
-    await this.ioClient.destroy();
+    await this.client.destroy();
   }
 
 
@@ -62,7 +62,7 @@ export default class RemoteIoCollection {
    * Send message from remoteCall to other side (IoSetServer)
    */
   private sendToServer(message: RemoteCallMessage): Promise<void> {
-    return this.ioClient.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+    return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
   }
 
   private handleIncomeRemoteCall = (msg: BackdoorMessage) => {
@@ -71,7 +71,7 @@ export default class RemoteIoCollection {
   }
 
   private async askIoNames(): Promise<string[]> {
-    return this.ioClient.request(categories.ioSet, topics.ioSet.askIoNames);
+    return this.client.request(categories.ioSet, topics.ioSet.askIoNames);
   }
 
   private makeFakeIo(ioName: string): IoItem {

@@ -15,7 +15,7 @@ const backdoorManifestPath = path.resolve(__dirname, '../entities/services/Backd
 const wsClientIo = new WebSocketClient();
 
 
-export default class BackdoorIoClient {
+export default class BackdoorClient {
   private readonly client: WsClientLogic;
 
   constructor(host?: string, port?: number) {
