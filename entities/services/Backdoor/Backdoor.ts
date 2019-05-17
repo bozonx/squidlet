@@ -24,7 +24,7 @@ export enum BACKDOOR_ACTION {
     category: string;
     topic?: string;
     data?: any;
-  }
+}
  */
 
 export interface BackdoorMessage {

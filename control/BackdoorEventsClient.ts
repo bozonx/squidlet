@@ -2,18 +2,19 @@ import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
-import WebSocketClient from './nodeJsLikeIo/WebSocketClient';
+import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import {decodeBackdoorMessage, makeMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
+// TODO: review
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
 const wsClientIo = new WebSocketClient();
 
 
-export default class BackdoorClient {
+export default class BackdoorEventsClient {
   private readonly incomeMessageEvents = new IndexedEvents<(message: BackdoorMessage) => void>();
   private readonly client: WsClientLogic;
 

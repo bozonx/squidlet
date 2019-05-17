@@ -1,4 +1,4 @@
-import BackdoorClient from '../shared/BackdoorClient';
+import BackdoorEventsClient from './BackdoorEventsClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 
 
@@ -8,7 +8,7 @@ export default class RemoteEvents {
       throw new Error(`You have to specify a category`);
     }
 
-    const backdoorClient = new BackdoorClient(args.host, args.port);
+    const backdoorClient = new BackdoorEventsClient(args.host, args.port);
 
     backdoorClient.onIncomeMessage((message: BackdoorMessage) => {
       // print only data which is send on previously added listener
@@ -25,7 +25,7 @@ export default class RemoteEvents {
       throw new Error(`You have to specify a category`);
     }
 
-    const backdoorClient = new BackdoorClient(args.host, args.port);
+    const backdoorClient = new BackdoorEventsClient(args.host, args.port);
 
     await backdoorClient.emit(args.category, args.topic, args.data);
 

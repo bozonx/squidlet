@@ -4,7 +4,7 @@ import System from '../../system/System';
 import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import IoItem from '../../system/interfaces/IoItem';
-import BackdoorClient from '../../shared/BackdoorClient';
+import BackdoorEventsClient from '../../control/BackdoorEventsClient';
 import {SYSTEM_DIR} from '../starter/helpers';
 import categories from '../../system/dict/categories';
 import topics from '../../system/dict/topics';
@@ -13,7 +13,7 @@ import topics from '../../system/dict/topics';
 export default class RemoteIoCollection {
   ioCollection: {[index: string]: IoItem} = {};
 
-  private readonly client: BackdoorClient;
+  private readonly client: BackdoorEventsClient;
   private _system?: System;
   private _remoteCall?: RemoteCall;
   private get system(): System {
@@ -25,7 +25,7 @@ export default class RemoteIoCollection {
 
 
   constructor(host?: string, port?: number) {
-    this.client = new BackdoorClient(host, port);
+    this.client = new BackdoorEventsClient(host, port);
   }
 
 
