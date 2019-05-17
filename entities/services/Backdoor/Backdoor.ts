@@ -59,6 +59,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       .getInstance(this.props);
 
     this.wsServerSessions.onNewSession((sessionId: string) => {
+      // TODO: учитывать что соединение ещё не создалось !!!!
       // start listening income messages of this connection
       this.wsServerSessions.onMessage(sessionId, (data: string | Uint8Array) => {
         return this.handleIncomeMessage(sessionId, data);

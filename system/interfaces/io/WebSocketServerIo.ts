@@ -23,10 +23,11 @@ export const wsServerEventNames: {[index: string]: WsServerEvents} = {
   close: 'close',
   connection: 'connection',
   error: 'error',
+  headers: 'headers',
 };
 
 
-export type WsServerEvents = 'listening' | 'close' | 'connection' | 'error';
+export type WsServerEvents = 'listening' | 'close' | 'connection' | 'error' | 'headers';
 
 export interface WebSocketServerProps {
   // The hostname where to bind the server
@@ -35,16 +36,19 @@ export interface WebSocketServerProps {
   port: number;
 }
 
+interface CommonHeaders {
+  authorization?: string;
+  cookie?: string;
+  'Set-Cookie'?: string;
+  'user-agent'?: string;
+}
+
 export interface ConnectionParams {
   url: string;
   method: string;
   statusCode: number;
   statusMessage: string;
-  headers: {
-    authorization?: string;
-    cookie?: string;
-    'user-agent'?: string;
-  };
+  headers: CommonHeaders;
 }
 
 
@@ -62,7 +66,15 @@ export default interface WebSocketServerIo {
   /**
    * when new client is connected
    */
-  onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number;
+  onConnection(
+    serverId: string,
+    cb: (connectionId: string, request: ConnectionParams) => void
+  ): number;
+
+  /**
+   * Listen header at handshake to modify them
+   */
+  onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number;
 
   /**
    * when server starts listening

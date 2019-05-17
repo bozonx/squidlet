@@ -67,10 +67,18 @@ export default class WebSocketServer implements WebSocketServerIo {
     delete this.servers[Number(serverId)];
   }
 
-  onConnection(serverId: string, cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+  onConnection(serverId: string, cb: (connectionId: string, request: ConnectionParams) => void): number {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.connection, cb);
+  }
+
+  onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number {
+    const serverItem = this.getServerItem(serverId);
+
+    // TODO: как передавать модицифированный объект ????
+
+    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.headers, cb);
   }
 
   onServerListening(serverId: string, cb: () => void): number {
@@ -193,7 +201,10 @@ export default class WebSocketServer implements WebSocketServerIo {
     const connections = this.servers[Number(serverId)][SERVER_POSITIONS.connections];
     const events = new IndexedEventEmitter();
     const connectionId: string = String(connections.length);
-    const connectionParams: ConnectionParams = makeConnectionParams(request);
+    const requestParams: ConnectionParams = makeConnectionParams(request);
+
+    // TODO: check socket.upgradeReq exists
+    //const upgradeReqParams: ConnectionParams | undefined = socket.upgradeReq && makeConnectionParams(socket.upgradeReq);
 
     connections.push([
       socket,
@@ -214,7 +225,7 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     // emit new connection
     this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .emit(wsServerEventNames.connection, connectionId, connectionParams);
+      .emit(wsServerEventNames.connection, connectionId, requestParams);
   }
 
   private getServerItem(serverId: string): ServerItem {

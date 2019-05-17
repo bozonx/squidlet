@@ -74,7 +74,9 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
     return this.server.onMessage(cb);
   }
 
-  onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+  onConnection(
+    cb: (connectionId: string, connectionParams: ConnectionParams) => void
+  ): number {
     if (!this.server) throw new Error(`WebSocketServer.onConnection: ${this.closedMsg}`);
 
     return this.server.onConnection(cb);

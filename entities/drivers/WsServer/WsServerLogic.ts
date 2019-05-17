@@ -105,7 +105,9 @@ export default class WsServerLogic {
   /**
    * It rises when new connection is come.
    */
-  onConnection(cb: (connectionId: string, connectionParams: ConnectionParams) => void): number {
+  onConnection(
+    cb: (connectionId: string, request: ConnectionParams) => void
+  ): number {
     return this.events.addListener(WS_SERVER_EVENTS.newConnection, cb);
   }
 
@@ -131,9 +133,11 @@ export default class WsServerLogic {
   /**
    * Start listen connection's events
    */
-  private onIncomeConnection = (connectionId: string, connectionParams: ConnectionParams) => {
+  private onIncomeConnection = (
+    connectionId: string, request: ConnectionParams
+  ) => {
     // rise a new connection events
-    this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, connectionParams);
+    this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
 
     this.wsServerIo.onMessage(this.serverId, connectionId, (data: string | Uint8Array) => {
       this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
