@@ -4,16 +4,17 @@ import System from '../../system/System';
 import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import IoItem from '../../system/interfaces/IoItem';
-import BackdoorEventsClient from '../../control/BackdoorEventsClient';
 import {SYSTEM_DIR} from '../starter/helpers';
 import categories from '../../system/dict/categories';
 import topics from '../../system/dict/topics';
+import BackdoorIoClient from '../../shared/BackdoorIoClient';
+import {BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
 
 
 export default class RemoteIoCollection {
   ioCollection: {[index: string]: IoItem} = {};
 
-  private readonly client: BackdoorEventsClient;
+  private readonly ioClient: BackdoorIoClient;
   private _system?: System;
   private _remoteCall?: RemoteCall;
   private get system(): System {
@@ -25,7 +26,7 @@ export default class RemoteIoCollection {
 
 
   constructor(host?: string, port?: number) {
-    this.client = new BackdoorEventsClient(host, port);
+    this.ioClient = new BackdoorIoClient(host, port);
   }
 
 
@@ -39,10 +40,8 @@ export default class RemoteIoCollection {
       this.system.host.generateUniqId
     );
 
-    // TODO: remake
-
-    // listen income messages of remoteCall
-    this.client.addListener(categories.ioSet, topics.ioSet.remoteCall, this.handleIncomeRemoteCall);
+    // listen income messages of backdoor
+    this.ioClient.addListener(this.handleIncomeRemoteCall);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -55,7 +54,7 @@ export default class RemoteIoCollection {
   async destroy() {
     this.ioCollection = {};
     await this.remoteCall.destroy();
-    await this.client.destroy();
+    await this.ioClient.destroy();
   }
 
 
@@ -63,16 +62,16 @@ export default class RemoteIoCollection {
    * Send message from remoteCall to other side (IoSetServer)
    */
   private sendToServer(message: RemoteCallMessage): Promise<void> {
-    return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+    return this.ioClient.emit(categories.ioSet, topics.ioSet.remoteCall, message);
   }
 
-  private handleIncomeRemoteCall = (rawMessage: {[index: string]: any}) => {
-    this.remoteCall.incomeMessage(rawMessage)
+  private handleIncomeRemoteCall = (msg: BackdoorMessage) => {
+    this.remoteCall.incomeMessage(msg.payload)
       .catch(this.system.log.error);
   }
 
   private async askIoNames(): Promise<string[]> {
-    return this.client.request(categories.ioSet, topics.ioSet.askIoNames);
+    return this.ioClient.request(categories.ioSet, topics.ioSet.askIoNames);
   }
 
   private makeFakeIo(ioName: string): IoItem {

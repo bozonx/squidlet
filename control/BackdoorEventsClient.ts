@@ -9,6 +9,9 @@ import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
+// TODO: можно сделать на основе BackdoorIoClient
+
+
 // TODO: review
 const backdoorManifestPath = '../entities/services/Backdoor/manifest.yaml';
 const wsClientIo = new WebSocketClient();

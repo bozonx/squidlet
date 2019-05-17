@@ -5,6 +5,10 @@ import * as fs from 'fs';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import WebSocketClient from './nodeJsLikeIo/WebSocketClient';
+import {BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+
+
+// TODO: может не нужно ????
 
 
 const backdoorManifestPath = path.resolve(__dirname, '../entities/services/Backdoor/manifest.yaml');
@@ -16,6 +20,21 @@ export default class BackdoorIoClient {
 
   constructor(host?: string, port?: number) {
     this.client = this.makeClientInstance(host, port);
+  }
+
+  destroy() {
+    // TODO: remove all the handlers
+
+    this.close();
+  }
+
+
+  close() {
+    this.client.close(0, 'finish');
+  }
+
+  addListener(cb: (msg: BackdoorMessage) => void) {
+    // TODO: add
   }
 
 
