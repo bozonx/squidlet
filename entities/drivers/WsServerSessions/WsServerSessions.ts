@@ -6,11 +6,13 @@ import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie, stringifyCookie} from 'system/helpers/strings';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
+import {getKeyOfObject} from 'system/helpers/collections';
 import {WsServer} from '../WsServer/WsServer';
 
 
 export enum WS_SESSIONS_EVENTS {
   newSession,
+  sessionClose,
   message
 }
 
@@ -18,9 +20,6 @@ export enum WS_SESSIONS_EVENTS {
 export interface WsServerSessionsProps extends WebSocketServerProps {
   expiredSec: number;
 }
-
-type NewSessionHandler = (sessionId: string, connectionParams: ConnectionParams) => void;
-//type MessageHandler = (sessionId: string, data: string | Uint8Array) => void;
 
 
 export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
@@ -44,13 +43,24 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onConnectionClose((connectionId: string) => {
-      // TODO: при закрытии сессии очищать sessionConnections
-      // TODO: удалять хэндлеры сообщений
+      const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
+
+      if (!sessionId) return;
+
+      // remove connection linked to session
+      delete this.sessionConnections[sessionId];
+    });
+    this.server.onMessage((connectionId: string, data: string | Uint8Array) => {
+      const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
+
+      if (!sessionId) return;
+
+      this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
     });
 
     this.env.system.sessions.onSessionClossed((sessionId) => {
-      // TODO: remove sessionConnections[sessionId]
-      // TODO: наверное поднять событие?
+      delete this.sessionConnections[sessionId];
+      this.events.emit(WS_SESSIONS_EVENTS.sessionClose, sessionId);
     });
   }
 
@@ -86,8 +96,12 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     });
   }
 
-  onNewSession(cb: NewSessionHandler): number {
+  onNewSession(cb: (sessionId: string, connectionParams: ConnectionParams) => void): number {
     return this.events.addListener(WS_SESSIONS_EVENTS.newSession, cb);
+  }
+
+  onCloseSession(cb: (sessionId: string) => void): number {
+    return this.events.addListener(WS_SESSIONS_EVENTS.sessionClose, cb);
   }
 
   onSessionClose(sessionId: string, cb: () => void): number {
@@ -115,14 +129,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     // continue existent session on reconnect
     this.env.system.sessions.recoverSession(parsedCookie.sessionId);
-    this.setupNewConnection(parsedCookie.sessionId, connectionId);
-
+    this.sessionConnections[parsedCookie.sessionId] = connectionId;
   }
 
   private createNewSession(connectionId: string, connectionParams: ConnectionParams) {
     const sessionId: string = this.env.system.sessions.newSession(this.props.expiredSec);
 
-    this.setupNewConnection(sessionId, connectionId);
+    this.sessionConnections[sessionId] = connectionId;
 
     const cookieString: string = stringifyCookie({ sessionId });
 
@@ -130,14 +143,6 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     // rise a new session event
     this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, connectionParams);
-  }
-
-  private setupNewConnection(sessionId: string, connectionId: string) {
-    this.sessionConnections[sessionId] = connectionId;
-
-    this.server.onMessage(connectionId, (data: string | Uint8Array) => {
-      this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
-    });
   }
 
 }

@@ -1,5 +1,4 @@
 import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 
 
@@ -85,15 +84,22 @@ export default class WsServerLogic {
     this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
+  // /**
+  //  * Listen income messages
+  //  */
+  // onMessage(connectionId: string, cb: OnMessageHandler): number {
+  //   const handler = (receivedConnectionId: string, data: string | Uint8Array) => {
+  //     if (connectionId === receivedConnectionId) cb(data);
+  //   };
+  //
+  //   return this.events.addListener(WS_SERVER_EVENTS.incomeMessage, handler);
+  // }
+
   /**
    * Listen income messages
    */
-  onMessage(connectionId: string, cb: OnMessageHandler): number {
-    const handler = (receivedConnectionId: string, data: string | Uint8Array) => {
-      if (connectionId === receivedConnectionId) cb(data);
-    };
-
-    return this.events.addListener(WS_SERVER_EVENTS.incomeMessage, handler);
+  onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {
+    return this.events.addListener(WS_SERVER_EVENTS.incomeMessage, cb);
   }
 
   /**
