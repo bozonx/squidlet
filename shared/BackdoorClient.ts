@@ -5,8 +5,8 @@ import * as fs from 'fs';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import WebSocketClient from './nodeJsLikeIo/WebSocketClient';
-import {BACKDOOR_ACTION, BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
-import {decodeBackdoorMessage, makeMessage} from '../entities/services/Backdoor/helpers';
+import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+import {decodeBackdoorMessage, makeMessage, validateMessage} from '../entities/services/Backdoor/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';
 
 
@@ -18,11 +18,20 @@ const BACKDOOR_REQUEST_TIMEOUT_SEC = 30;
 
 
 export default class BackdoorClient {
+  private readonly logInfo: (msg: string) => void;
+  private readonly logError: (msg: string) => void;
   private readonly incomeMessageEvents = new IndexedEvents<(message: BackdoorMessage) => void>();
   private readonly client: WsClientLogic;
 
 
-  constructor(host?: string, port?: number) {
+  constructor(
+    logInfo: (msg: string) => void,
+    logError: (msg: string) => void,
+    host?: string,
+    port?: number
+  ) {
+    this.logInfo = logInfo;
+    this.logError = logError;
     this.client = this.makeClientInstance(host, port);
     // listen income data
     this.client.onMessage(this.handleIncomeMessage);
@@ -89,6 +98,9 @@ export default class BackdoorClient {
     });
   }
 
+  /**
+   * Decode all the income messages
+   */
   private handleIncomeMessage = (data: string | Uint8Array) => {
     let message: BackdoorMessage;
 
@@ -96,8 +108,12 @@ export default class BackdoorClient {
       message = decodeBackdoorMessage(data as Uint8Array);
     }
     catch (err) {
-      return console.error(`Can't decode message: ${err}`);
+      return this.logError(`Can't decode message: ${err}`);
     }
+
+    const validationError: string | undefined = validateMessage(message);
+
+    if (validationError) return this.logError(validationError);
 
     this.incomeMessageEvents.emit(message);
   }
@@ -119,9 +135,9 @@ export default class BackdoorClient {
     return new WsClientLogic(
       wsClientIo,
       props,
-      () => console.info(`Websocket connection has been closed`),
-      console.info,
-      console.error
+      () => this.logInfo(`Websocket connection has been closed`),
+      this.logInfo,
+      this.logError
     );
   }
 

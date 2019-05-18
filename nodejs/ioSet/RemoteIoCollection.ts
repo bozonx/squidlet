@@ -24,7 +24,7 @@ export default class RemoteIoCollection {
 
 
   constructor(host?: string, port?: number) {
-    this.client = new BackdoorClient(host, port);
+    this.client = new BackdoorClient(console.info, console.error, host, port);
   }
 
 

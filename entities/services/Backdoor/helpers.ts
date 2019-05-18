@@ -2,7 +2,7 @@ import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
 import {BackdoorMessage} from './Backdoor';
 
 
-// TODO: remove
+// TODO: remove ????
 
 export function decodeBackdoorMessage(binMsg: Uint8Array): BackdoorMessage {
   if (!(binMsg instanceof Uint8Array)) {
@@ -24,4 +24,18 @@ export function makeMessage(type: number, action: number, payload?: any, request
   };
 
   return serializeJson(message);
+}
+
+export function validateMessage(message: any): string | undefined {
+  if (typeof message.type !== 'object') {
+    return `Backdoor message validation: Invalid message`;
+  }
+  else if (typeof message.type !== 'number') {
+    return `Backdoor message validation: Invalid "type" param`;
+  }
+  else if (typeof message.action !== 'number') {
+    return `Backdoor message validation: Invalid "action" param`;
+  }
+
+  return;
 }
