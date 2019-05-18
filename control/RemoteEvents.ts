@@ -1,5 +1,5 @@
-import BackdoorEventsClient from './BackdoorEventsClient';
-import {BACKDOOR_ACTION, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+import {BACKDOOR_ACTION, BackdoorMessage, EventPayload} from '../entities/services/Backdoor/Backdoor';
+import BackdoorClient from '../shared/BackdoorClient';
 
 
 export default class RemoteEvents {
@@ -8,16 +8,17 @@ export default class RemoteEvents {
       throw new Error(`You have to specify a category`);
     }
 
-    const backdoorClient = new BackdoorEventsClient(args.host, args.port);
+    const backdoorClient = new BackdoorClient(args.host, args.port);
 
-    backdoorClient.onIncomeMessage((message: BackdoorMessage) => {
-      // print only data which is send on previously added listener
-      if (message.action !== BACKDOOR_ACTION.listenerResponse) return;
+    //const listenerId = 0;
+    // const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.send, BACKDOOR_ACTION.addListener, listenerId);
+    //
+    // // Send intention to receive events
+    // await this.client.send(binMsg);
 
-      console.info(`${message.payload.category}:${message.payload.topic} - ${message.payload.data}`);
+    backdoorClient.addListener(BACKDOOR_ACTION.listenerResponse, (payload: EventPayload) => {
+      console.info(`${payload[0]}:${payload[1]} - ${payload[2]}`);
     });
-
-    // TODO: on ctl + C - call destroy of backdoorClient
   }
 
   async emitAndExit(args: {[index: string]: any}) {
@@ -25,9 +26,10 @@ export default class RemoteEvents {
       throw new Error(`You have to specify a category`);
     }
 
-    const backdoorClient = new BackdoorEventsClient(args.host, args.port);
+    const backdoorClient = new BackdoorClient(args.host, args.port);
+    const payload: EventPayload = [ args.category, args.topic, args.data ];
 
-    await backdoorClient.emit(args.category, args.topic, args.data);
+    await backdoorClient.send(BACKDOOR_ACTION.emit, payload);
 
     // exit
     backdoorClient.close();

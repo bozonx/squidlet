@@ -64,11 +64,6 @@ export default class BackdoorEventsClient {
    */
   addListener(category: string, topic?: string, cb: (data?: any) => void) {
     // TODO: make listener id
-    //const listenerId = 0;
-    // const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.send, BACKDOOR_ACTION.addListener, listenerId);
-    //
-    // // Send intention to receive events
-    // await this.client.send(binMsg);
 
     // TODO: лучше сюда передать колбэш и его поднимать когда приходит сообщение
 

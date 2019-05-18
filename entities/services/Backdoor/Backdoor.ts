@@ -17,24 +17,16 @@ export enum BACKDOOR_MSG_TYPE {
 }
 
 export enum BACKDOOR_ACTION {
-  // emit,
-  // addListener,
-  // listenerResponse,
+  emit,
+  startListen,
+  listenerResponse,
   // removeListener,
   ioSetRemoteCall,
   getIoNames,
 }
 
-
-// TODO: для ioSet буде другой payload
-
-/*
-{
-    category: string;
-    topic?: string;
-    data?: any;
-}
- */
+// category, topic, data
+export type EventPayload = [ string, string | undefined, any | undefined ];
 
 export interface BackdoorMessage {
   type: number;
