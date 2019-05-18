@@ -1,7 +1,6 @@
 export const servicesShortcut: {[index: string]: string} = {
   automation: 'Automation',
   consoleLogger: 'ConsoleLogger',
-  ioSetServer: 'IoSetServer',
   updater: 'Updater',
 
   mqtt: 'Mqtt',
@@ -13,6 +12,5 @@ export const servicesShortcut: {[index: string]: string} = {
 export const defaultServices = [
   //'automation',
   'consoleLogger',
-  'ioSetServer',
   //'updater',
 ];

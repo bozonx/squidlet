@@ -3,11 +3,11 @@
 // TODO: remove
 
 
-import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import RemoteCall, {ObjectToCall} from 'system/helpers/remoteCall/RemoteCall';
-import categories from 'system/dict/categories';
-import ServiceBase from 'system/baseServices/ServiceBase';
-import topics from 'system/dict/topics';
+import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
+import RemoteCall, {ObjectToCall} from '../../system/helpers/remoteCall/RemoteCall';
+import categories from '../../system/dict/categories';
+import ServiceBase from '../../system/baseServices/ServiceBase';
+import topics from '../../system/dict/topics';
 
 
 export interface IoSetServerMessage {

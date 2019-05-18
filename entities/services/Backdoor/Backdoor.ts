@@ -66,7 +66,6 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       this.env.log.error
     );
 
-    // TODO: наверное запускать когда придет комманда или подсоединится клиент
     this._ioSet = new IoSetServerLogic(
       this.env.system.ioManager,
       this.sendIoSetMsg,
