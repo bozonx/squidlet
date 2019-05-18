@@ -1,4 +1,4 @@
-import {BACKDOOR_ACTION, BackdoorMessage, EventPayload} from '../entities/services/Backdoor/Backdoor';
+import {BACKDOOR_ACTION, EventPayload} from '../entities/services/Backdoor/Backdoor';
 import BackdoorClient from '../shared/BackdoorClient';
 
 
@@ -9,13 +9,12 @@ export default class RemoteEvents {
     }
 
     const backdoorClient = new BackdoorClient(args.host, args.port);
+    const payload: EventPayload = [ args.category, args.topic, undefined ];
 
-    //const listenerId = 0;
-    // const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.send, BACKDOOR_ACTION.addListener, listenerId);
-    //
-    // // Send intention to receive events
-    // await this.client.send(binMsg);
+    // Send intention to receive events
+    await backdoorClient.send(BACKDOOR_ACTION.startListen, payload);
 
+    // listen remote events
     backdoorClient.addListener(BACKDOOR_ACTION.listenerResponse, (payload: EventPayload) => {
       console.info(`${payload[0]}:${payload[1]} - ${payload[2]}`);
     });
