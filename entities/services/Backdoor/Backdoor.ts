@@ -5,7 +5,7 @@ import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import IoSetServerLogic from './IoSetServerLogic';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
-import {EventPayload} from './MainEvents';
+import {EventPayload} from './MainEventsServer';
 
 
 export enum BACKDOOR_MSG_TYPE {

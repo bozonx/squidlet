@@ -1,6 +1,6 @@
 import {BACKDOOR_ACTION} from '../entities/services/Backdoor/Backdoor';
 import BackdoorClient from '../shared/BackdoorClient';
-import {EventPayload} from '../entities/services/Backdoor/MainEvents';
+import {EventPayload} from '../entities/services/Backdoor/MainEventsServer';
 
 
 export default class RemoteEvents {

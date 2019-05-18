@@ -16,7 +16,7 @@ enum HANDLER_ITEM_POS {
 type EventHandlerItem = [string, (string | undefined), number];
 
 
-export default class MainEvents {
+export default class MainEventsServer {
   private readonly eventHandlers: {[index: string]: EventHandlerItem[]} = {};
   private readonly events: CategorizedEvents;
 
