@@ -17,10 +17,10 @@ export enum BACKDOOR_MSG_TYPE {
 }
 
 export enum BACKDOOR_ACTION {
-  emit,
-  addListener,
-  listenerResponse,
-  removeListener,
+  // emit,
+  // addListener,
+  // listenerResponse,
+  // removeListener,
   ioSetRemoteCall,
   getIoNames,
 }
@@ -77,6 +77,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       });
     });
 
+    // TODO: наверное запускать когда придет комманда или подсоединится клиент
     this._ioSet = new IoSetServerLogic(
       this.env.system.ioManager,
       this.sendIoSetMsg,
