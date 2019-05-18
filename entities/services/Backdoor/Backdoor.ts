@@ -53,12 +53,10 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     this.depsInstances.wsServer = await getDriverDep('WsServerSessions')
       .getInstance(this.props);
 
-    this.wsServerSessions.onNewSession((sessionId: string) => {
-      // start listening income messages of this connection
-      this.wsServerSessions.onMessage(sessionId, (data: string | Uint8Array) => {
-        return this.handleIncomeMessage(sessionId, data);
-      });
-    });
+    // this.wsServerSessions.onNewSession((sessionId: string) => {
+    // });
+
+    this.wsServerSessions.onMessage(this.handleIncomeMessage);
 
     this._eventsServer = new MainEventsServer(
       this.env.events,
@@ -91,10 +89,10 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
 
 
   private sendIoSetMsg(message: RemoteCallMessage): Promise<void> {
-    // TODO: add !!!!
+    // TODO: add связать с сессией !!!!
   }
 
-  private async handleIncomeMessage(sessionId: string, data: string | Uint8Array) {
+  private handleIncomeMessage = async (sessionId: string, data: string | Uint8Array) => {
     let msg: BackdoorMessage;
 
     try {

@@ -1,7 +1,6 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie} from 'system/helpers/strings';
 import {GetDriverDep} from 'system/entities/EntityBase';
@@ -59,6 +58,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     });
 
     this.env.system.sessions.onSessionClossed((sessionId) => {
+      // listen only ours session
       if (!Object.keys(this.sessionConnections).includes(sessionId)) return;
 
       delete this.sessionConnections[sessionId];
@@ -88,17 +88,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     return this.server.send(this.sessionConnections[sessionId], data);
   }
 
-  onMessage(sessionId: string, cb: OnMessageHandler): number {
-
-    // TODO: Может тоже sessionId передавать в cb ???
-
-    if (!this.env.system.sessions.isSessionActive(sessionId)) {
-      throw new Error(`WsServerSessions.onMessage: Session ${sessionId} is inactive`);
-    }
-
-    return this.events.addListener(WS_SESSIONS_EVENTS.message, (msgSessionId: string, data: string | Uint8Array) => {
-      if (msgSessionId === sessionId) cb(data);
-    });
+  onMessage(cb: (sessionId: string, data: string | Uint8Array) => void): number {
+    return this.events.addListener(WS_SESSIONS_EVENTS.message, cb);
   }
 
   /**
@@ -175,6 +166,19 @@ export default class Factory extends DriverFactoryBase<WsServerSessions> {
   }
 }
 
+
+
+// onMessage(cb: (sessionId: string, data: string | Uint8Array) => void): number {
+//   return this.events.addListener(WS_SESSIONS_EVENTS.message, cb);
+//
+//   // if (!this.env.system.sessions.isSessionActive(sessionId)) {
+//   //   throw new Error(`WsServerSessions.onMessage: Session ${sessionId} is inactive`);
+//   // }
+//   //
+//   // return this.events.addListener(WS_SESSIONS_EVENTS.message, (msgSessionId: string, data: string | Uint8Array) => {
+//   //   if (msgSessionId === sessionId) cb(data);
+//   // });
+// }
 
 // /**
 //  * Force closing a connection
