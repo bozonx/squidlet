@@ -74,7 +74,6 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       this.env.system.host.generateUniqId
     );
 
-    // TODO: review
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       // remove all the listeners of this connection
       this.eventsServer.removeSessionHandlers(sessionId);

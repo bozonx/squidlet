@@ -59,6 +59,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     });
 
     this.env.system.sessions.onSessionClossed((sessionId) => {
+      if (!Object.keys(this.sessionConnections).includes(sessionId)) return;
+
       delete this.sessionConnections[sessionId];
       this.events.emit(WS_SESSIONS_EVENTS.sessionClose, sessionId);
     });
@@ -87,6 +89,9 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   onMessage(sessionId: string, cb: OnMessageHandler): number {
+
+    // TODO: Может тоже sessionId передавать в cb ???
+
     if (!this.env.system.sessions.isSessionActive(sessionId)) {
       throw new Error(`WsServerSessions.onMessage: Session ${sessionId} is inactive`);
     }
@@ -104,18 +109,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     return this.events.addListener(WS_SESSIONS_EVENTS.newSession, cb);
   }
 
-  onCloseSession(cb: (sessionId: string) => void): number {
+  onSessionClose(cb: (sessionId: string) => void): number {
     return this.events.addListener(WS_SESSIONS_EVENTS.sessionClose, cb);
-  }
-
-  onSessionClose(sessionId: string, cb: () => void): number {
-    if (!this.env.system.sessions.isSessionActive(sessionId)) {
-      throw new Error(`WsServerSessions.onSessionClose: Session ${sessionId} is inactive`);
-    }
-
-    return this.env.system.sessions.onSessionClossed((closedSession: string) => {
-      if (closedSession === sessionId) cb();
-    });
   }
 
   removeListener(eventName: WS_SESSIONS_EVENTS, handlerIndex: number) {
@@ -188,4 +183,14 @@ export default class Factory extends DriverFactoryBase<WsServerSessions> {
 //   if (!this.server) return;
 //
 //   this.server.closeConnection(connectionId, code, reason);
+// }
+
+// onSessionClose(sessionId: string, cb: () => void): number {
+//   if (!this.env.system.sessions.isSessionActive(sessionId)) {
+//     throw new Error(`WsServerSessions.onSessionClose: Session ${sessionId} is inactive`);
+//   }
+//
+//   return this.env.system.sessions.onSessionClossed((closedSession: string) => {
+//     if (closedSession === sessionId) cb();
+//   });
 // }
