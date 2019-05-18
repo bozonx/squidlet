@@ -26,7 +26,7 @@ export enum BACKDOOR_ACTION {
 }
 
 // category, topic, data
-export type EventPayload = [ string, string | undefined, any | undefined ];
+export type EventPayload = [string, (string | undefined), (any | undefined)];
 
 export interface BackdoorMessage {
   type: number;
@@ -42,12 +42,12 @@ enum HANDLER_ITEM_POS {
 }
 
 // see HANDLER_ITEM_POS
-type HandlerItem = [string, (string | undefined), number];
+type EventHandlerItem = [string, (string | undefined), number];
 
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   // TODO: review
-  private readonly handlers: {[index: string]: HandlerItem[]} = {};
+  private readonly eventHandlers: {[index: string]: EventHandlerItem[]} = {};
   private _ioSet?: IoSetServerLogic;
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer as any;
@@ -80,7 +80,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     // TODO: review
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       // remove all the listeners of this connection
-      this.removeConnectionHandlers(connectionId);
+      this.removeSessionHandlers(sessionId);
     });
   }
 
@@ -89,8 +89,8 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     // TODO: review
 
     // remove all the handlers
-    for (let connectionId of Object.keys(this.handlers)) {
-      this.removeConnectionHandlers(connectionId);
+    for (let sessionId of Object.keys(this.eventHandlers)) {
+      this.removeSessionHandlers(sessionId);
     }
 
     await this.wsServer.destroy();
@@ -159,23 +159,23 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
 
     if (topic) {
       handlerIndex = this.env.events.addListener(category, topic, (data: any) => {
-        return this.sendEventResponseMessage(connectionId, category, topic, data);
+        return this.sendEventResponseMessage(sessionId, category, topic, data);
       });
     }
     else {
       handlerIndex = this.env.events.addCategoryListener(category, (data: any) => {
-        return this.sendEventResponseMessage(connectionId, category, undefined, data);
+        return this.sendEventResponseMessage(sessionId, category, undefined, data);
       });
     }
 
-    const handlerItem: HandlerItem = [category, topic, handlerIndex];
+    const EventHandlerItem: EventHandlerItem = [category, topic, handlerIndex];
 
-    if (!this.handlers[connectionId]) this.handlers[connectionId] = [];
+    if (!this.eventHandlers[sessionId]) this.eventHandlers[sessionId] = [];
 
-    this.handlers[connectionId].push(handlerItem);
+    this.eventHandlers[sessionId].push(EventHandlerItem);
   }
 
-  private async sendEventResponseMessage(connectionId: string, category: string, topic?: string, data?: any) {
+  private async sendEventResponseMessage(sessionId: string, category: string, topic?: string, data?: any) {
     try {
       const binData: Uint8Array = makeMessage(BACKDOOR_ACTION.listenerResponse, category, topic, data);
 
@@ -186,45 +186,44 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     }
   }
 
-  private removeConnectionHandlers(connectionId: string) {
-    if (!this.handlers[connectionId]) return;
+  /**
+   * Remove all the event handlers of session.
+   */
+  private removeSessionHandlers(sessionId: string) {
+    if (!this.eventHandlers[sessionId]) return;
     
-    for (let handlerItem of this.handlers[connectionId]) {
-      this.removeHandler(handlerItem);
+    for (let eventHandlerItem of this.eventHandlers[sessionId]) {
+      const category: string = eventHandlerItem[HANDLER_ITEM_POS.category];
+      const topic: string | undefined = eventHandlerItem[HANDLER_ITEM_POS.topic];
+      const handlerIndex: number = eventHandlerItem[HANDLER_ITEM_POS.handlerIndex];
+
+      if (topic) {
+        this.env.events.removeListener(category, topic, handlerIndex);
+      }
+      else {
+        this.env.events.removeCategoryListener(category, handlerIndex);
+      }
     }
 
-    delete this.handlers[connectionId];
-  }
-
-  private removeHandler(handlerItem: HandlerItem) {
-    const category: string = handlerItem[HANDLER_ITEM_POS.category];
-    const topic: string | undefined = handlerItem[HANDLER_ITEM_POS.topic];
-    const handlerIndex: number = handlerItem[HANDLER_ITEM_POS.handlerIndex];
-
-    if (topic) {
-      this.env.events.removeListener(category, topic, handlerIndex);
-    }
-    else {
-      this.env.events.removeCategoryListener(category, handlerIndex);
-    }
+    delete this.eventHandlers[sessionId];
   }
 
   // /**
   //  * Remove all the handlers of specified category and topic
   //  */
   // private removeEventListener(sessionId: string, category: string, topic?: string) {
-  //   if (!this.handlers[connectionId]) return;
+  //   if (!this.eventHandlers[connectionId]) return;
   //
-  //   for (let handlerItemIndex in this.handlers[connectionId]) {
-  //     const handlerItem = this.handlers[connectionId][handlerItemIndex];
+  //   for (let EventHandlerItemIndex in this.eventHandlers[connectionId]) {
+  //     const EventHandlerItem = this.eventHandlers[connectionId][EventHandlerItemIndex];
   //     if (
-  //       category === handlerItem[HANDLER_ITEM_POS.category]
-  //       && topic === handlerItem[HANDLER_ITEM_POS.topic]
+  //       category === EventHandlerItem[HANDLER_ITEM_POS.category]
+  //       && topic === EventHandlerItem[HANDLER_ITEM_POS.topic]
   //     ) {
-  //       this.removeHandler(handlerItem);
+  //       this.removeHandler(EventHandlerItem);
   //
   //       // TODO: strongly test
-  //       this.handlers[connectionId].splice(Number(handlerItemIndex), 1);
+  //       this.eventHandlers[connectionId].splice(Number(EventHandlerItemIndex), 1);
   //     }
   //   }
   // }
