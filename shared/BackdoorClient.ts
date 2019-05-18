@@ -115,7 +115,7 @@ export default class BackdoorClient {
 
     if (validationError) return this.logError(validationError);
 
-    this.incomeMessageEvents.emit(message);
+    this.incomeMessageEvents.emit(msg);
   }
 
   private makeClientInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {

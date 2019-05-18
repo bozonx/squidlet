@@ -145,11 +145,6 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     }
   }
 
-  // private handleIncomeIoSetRcMsg(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
-  //   this.ioSet.incomeMessage(sessionId, rawRemoteCallMessage)
-  //     .catch(this.env.log.error);
-  // }
-
   /**
    * Listen to event of common event system
    * and send it to backdoor client which has been subscribed to this event.
@@ -176,10 +171,15 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
   private async sendEventResponseMessage(sessionId: string, category: string, topic?: string, data?: any) {
-    try {
-      const binData: Uint8Array = makeMessage(BACKDOOR_ACTION.listenerResponse, category, topic, data);
+    const payload: EventPayload = [ category, topic, data ];
+    const binData: Uint8Array = makeMessage(
+      BACKDOOR_MSG_TYPE.send,
+      BACKDOOR_ACTION.listenerResponse,
+      payload
+    );
 
-      await this.wsServer.send(connectionId, binData);
+    try {
+      await this.wsServerSessions.send(sessionId, binData);
     }
     catch (err) {
       this.env.log.error(`Backdoor: send error: ${err}`);
@@ -207,6 +207,11 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
 
     delete this.eventHandlers[sessionId];
   }
+
+  // private handleIncomeIoSetRcMsg(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
+  //   this.ioSet.incomeMessage(sessionId, rawRemoteCallMessage)
+  //     .catch(this.env.log.error);
+  // }
 
   // /**
   //  * Remove all the handlers of specified category and topic
