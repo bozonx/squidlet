@@ -1,6 +1,6 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {decodeBackdoorMessage, makeMessage} from './helpers';
+import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import IoSetServerLogic from './IoSetServerLogic';
@@ -31,8 +31,8 @@ export type EventPayload = [ string, string | undefined, any | undefined ];
 export interface BackdoorMessage {
   type: number;
   action: number;
-  requestId?: string;
   payload: any;
+  requestId?: string;
 }
 
 enum HANDLER_ITEM_POS {
@@ -62,7 +62,6 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       .getInstance(this.props);
 
     this.wsServerSessions.onNewSession((sessionId: string) => {
-      // TODO: учитывать что соединение ещё не создалось !!!!
       // start listening income messages of this connection
       this.wsServerSessions.onMessage(sessionId, (data: string | Uint8Array) => {
         return this.handleIncomeMessage(sessionId, data);
@@ -103,17 +102,21 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
   private async handleIncomeMessage(sessionId: string, data: string | Uint8Array) {
-    let message: BackdoorMessage;
+    let msg: BackdoorMessage;
 
     try {
-      message = decodeBackdoorMessage(data as Uint8Array);
+      msg = decodeBackdoorMessage(data);
     }
     catch (err) {
       return this.env.log.error(`Backdoor: Can't decode message: ${err}`);
     }
 
+    const validationError: string | undefined = validateMessage(msg);
+
+    if (validationError) return this.env.log.error(validationError);
+
     try {
-      await this.resolveJsonMessage(sessionId, message);
+      await this.resolveJsonMessage(sessionId, msg);
     }
     catch (err) {
       return this.env.log.error(`Backdoor: ${err}`);

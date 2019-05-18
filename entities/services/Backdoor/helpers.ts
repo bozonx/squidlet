@@ -2,9 +2,7 @@ import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
 import {BackdoorMessage} from './Backdoor';
 
 
-// TODO: remove ????
-
-export function decodeBackdoorMessage(binMsg: Uint8Array): BackdoorMessage {
+export function decodeBackdoorMessage(binMsg: any): BackdoorMessage {
   if (!(binMsg instanceof Uint8Array)) {
     throw new Error(`Backdoor: data has be a Uint8Array`);
   }

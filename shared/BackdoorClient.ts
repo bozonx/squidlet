@@ -102,16 +102,16 @@ export default class BackdoorClient {
    * Decode all the income messages
    */
   private handleIncomeMessage = (data: string | Uint8Array) => {
-    let message: BackdoorMessage;
+    let msg: BackdoorMessage;
 
     try {
-      message = decodeBackdoorMessage(data as Uint8Array);
+      msg = decodeBackdoorMessage(data as Uint8Array);
     }
     catch (err) {
       return this.logError(`Can't decode message: ${err}`);
     }
 
-    const validationError: string | undefined = validateMessage(message);
+    const validationError: string | undefined = validateMessage(msg);
 
     if (validationError) return this.logError(validationError);
 
