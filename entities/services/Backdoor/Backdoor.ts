@@ -1,10 +1,11 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';
+import {decodeBackdoorMessage, validateMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import IoSetServerLogic from './IoSetServerLogic';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
+import {EventPayload} from './MainEvents';
 
 
 export enum BACKDOOR_MSG_TYPE {
@@ -25,8 +26,6 @@ export enum BACKDOOR_ACTION {
   getIoNames,
 }
 
-// category, topic, data
-export type EventPayload = [string, (string | undefined), (any | undefined)];
 
 export interface BackdoorMessage {
   type: number;
@@ -35,19 +34,8 @@ export interface BackdoorMessage {
   requestId?: string;
 }
 
-enum HANDLER_ITEM_POS {
-  category,
-  topic,
-  handlerIndex
-}
-
-// see HANDLER_ITEM_POS
-type EventHandlerItem = [string, (string | undefined), number];
-
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
-  // TODO: review
-  private readonly eventHandlers: {[index: string]: EventHandlerItem[]} = {};
   private _ioSet?: IoSetServerLogic;
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer as any;
@@ -143,69 +131,6 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       default:
         throw new Error(`Backdoor: Can't recognize message's action "${message.action}"`);
     }
-  }
-
-  /**
-   * Listen to event of common event system
-   * and send it to backdoor client which has been subscribed to this event.
-   */
-  private startListenEvents(sessionId: string, category: string, topic?: string) {
-    let handlerIndex: number;
-
-    if (topic) {
-      handlerIndex = this.env.events.addListener(category, topic, (data: any) => {
-        return this.sendEventResponseMessage(sessionId, category, topic, data);
-      });
-    }
-    else {
-      handlerIndex = this.env.events.addCategoryListener(category, (data: any) => {
-        return this.sendEventResponseMessage(sessionId, category, undefined, data);
-      });
-    }
-
-    const EventHandlerItem: EventHandlerItem = [category, topic, handlerIndex];
-
-    if (!this.eventHandlers[sessionId]) this.eventHandlers[sessionId] = [];
-
-    this.eventHandlers[sessionId].push(EventHandlerItem);
-  }
-
-  private async sendEventResponseMessage(sessionId: string, category: string, topic?: string, data?: any) {
-    const payload: EventPayload = [ category, topic, data ];
-    const binData: Uint8Array = makeMessage(
-      BACKDOOR_MSG_TYPE.send,
-      BACKDOOR_ACTION.listenerResponse,
-      payload
-    );
-
-    try {
-      await this.wsServerSessions.send(sessionId, binData);
-    }
-    catch (err) {
-      this.env.log.error(`Backdoor: send error: ${err}`);
-    }
-  }
-
-  /**
-   * Remove all the event handlers of session.
-   */
-  private removeSessionHandlers(sessionId: string) {
-    if (!this.eventHandlers[sessionId]) return;
-    
-    for (let eventHandlerItem of this.eventHandlers[sessionId]) {
-      const category: string = eventHandlerItem[HANDLER_ITEM_POS.category];
-      const topic: string | undefined = eventHandlerItem[HANDLER_ITEM_POS.topic];
-      const handlerIndex: number = eventHandlerItem[HANDLER_ITEM_POS.handlerIndex];
-
-      if (topic) {
-        this.env.events.removeListener(category, topic, handlerIndex);
-      }
-      else {
-        this.env.events.removeCategoryListener(category, handlerIndex);
-      }
-    }
-
-    delete this.eventHandlers[sessionId];
   }
 
   // private handleIncomeIoSetRcMsg(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
