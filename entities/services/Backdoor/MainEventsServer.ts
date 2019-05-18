@@ -33,6 +33,13 @@ export default class MainEventsServer {
     this.logError = logError;
   }
 
+  destroy() {
+    // remove all the handlers
+    for (let sessionId of Object.keys(this.eventHandlers)) {
+      this.removeSessionHandlers(sessionId);
+    }
+  }
+
 
   emit(eventPayload: EventPayload) {
     this.events.emit(eventPayload[0], eventPayload[1], eventPayload[2]);

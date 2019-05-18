@@ -79,19 +79,16 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       // remove all the listeners of this connection
       this.eventsServer.removeSessionHandlers(sessionId);
+      // TODO: remote call долже быть дестроен
     });
   }
 
   destroy = async () => {
-
-    // TODO: review
-
-    // remove all the handlers
-    for (let sessionId of Object.keys(this.eventHandlers)) {
-      this.eventsServer.removeSessionHandlers(sessionId);
-    }
-
-    await this.wsServer.destroy();
+    await this.ioSet.destroy();
+    this.eventsServer.destroy();
+    await this.wsServerSessions.destroy();
+    delete this._ioSet;
+    delete this._eventsServer;
   }
 
 
@@ -128,12 +125,12 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
         return this.eventsServer.emit(msg.payload);
       case BACKDOOR_ACTION.startListen:
         return this.eventsServer.startListenEvents(sessionId, msg.payload);
-      // case BACKDOOR_ACTION.removeListener:
-      //   return this.removeEventListener(sessionId, message.payload.category, message.payload.topic);
       case BACKDOOR_ACTION.ioSetRemoteCall:
+        // TODO: review
         //return this.handleIncomeIoSetRcMsg(sessionId, message.payload);
         return this.ioSet.incomeMessage(sessionId, message.payload);
       case BACKDOOR_ACTION.getIoNames:
+        // TODO: review
         // TODO: отправить обратным сообщением
         //return this.ioSet.incomeMessage(sessionId, message.payload);
       default:
