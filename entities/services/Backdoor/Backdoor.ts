@@ -5,7 +5,7 @@ import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import IoSetServerLogic from './IoSetServerLogic';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
-import {EventPayload} from './MainEventsServer';
+import MainEventsServer from './MainEventsServer';
 
 
 export enum BACKDOOR_MSG_TYPE {
@@ -37,8 +37,12 @@ export interface BackdoorMessage {
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   private _ioSet?: IoSetServerLogic;
+  private _eventsServer?: MainEventsServer;
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer as any;
+  }
+  private get eventsServer(): MainEventsServer {
+    return this._eventsServer as any;
   }
   private get ioSet(): IoSetServerLogic {
     return this._ioSet as any;
@@ -56,6 +60,12 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       });
     });
 
+    this._eventsServer = new MainEventsServer(
+      this.env.events,
+      this.wsServerSessions.send,
+      this.env.log.error
+    );
+
     // TODO: наверное запускать когда придет комманда или подсоединится клиент
     this._ioSet = new IoSetServerLogic(
       this.env.system.ioManager,
@@ -68,7 +78,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     // TODO: review
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       // remove all the listeners of this connection
-      this.removeSessionHandlers(sessionId);
+      this.eventsServer.removeSessionHandlers(sessionId);
     });
   }
 
@@ -78,7 +88,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
 
     // remove all the handlers
     for (let sessionId of Object.keys(this.eventHandlers)) {
-      this.removeSessionHandlers(sessionId);
+      this.eventsServer.removeSessionHandlers(sessionId);
     }
 
     await this.wsServer.destroy();
@@ -112,14 +122,12 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
   private async resolveJsonMessage(sessionId: string, msg: BackdoorMessage) {
-    const eventPayload: EventPayload = msg.payload;
-
     switch (msg.action) {
       case BACKDOOR_ACTION.emit:
         // rise event on common event system
-        return this.env.events.emit(eventPayload[0], eventPayload[1], eventPayload[2]);
+        return this.eventsServer.emit(msg.payload);
       case BACKDOOR_ACTION.startListen:
-        return this.startListenEvents(sessionId, eventPayload[0], eventPayload[1]);
+        return this.eventsServer.startListenEvents(sessionId, msg.payload);
       // case BACKDOOR_ACTION.removeListener:
       //   return this.removeEventListener(sessionId, message.payload.category, message.payload.topic);
       case BACKDOOR_ACTION.ioSetRemoteCall:
@@ -136,26 +144,6 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   // private handleIncomeIoSetRcMsg(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
   //   this.ioSet.incomeMessage(sessionId, rawRemoteCallMessage)
   //     .catch(this.env.log.error);
-  // }
-
-  // /**
-  //  * Remove all the handlers of specified category and topic
-  //  */
-  // private removeEventListener(sessionId: string, category: string, topic?: string) {
-  //   if (!this.eventHandlers[connectionId]) return;
-  //
-  //   for (let EventHandlerItemIndex in this.eventHandlers[connectionId]) {
-  //     const EventHandlerItem = this.eventHandlers[connectionId][EventHandlerItemIndex];
-  //     if (
-  //       category === EventHandlerItem[HANDLER_ITEM_POS.category]
-  //       && topic === EventHandlerItem[HANDLER_ITEM_POS.topic]
-  //     ) {
-  //       this.removeHandler(EventHandlerItem);
-  //
-  //       // TODO: strongly test
-  //       this.eventHandlers[connectionId].splice(Number(EventHandlerItemIndex), 1);
-  //     }
-  //   }
   // }
 
 }
