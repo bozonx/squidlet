@@ -14,11 +14,13 @@ type ListenerHandler = (payload: any) => void;
 
 const backdoorManifestPath = path.resolve(__dirname, '../entities/services/Backdoor/manifest.yaml');
 const wsClientIo = new WebSocketClient();
+const BACKDOOR_REQUEST_TIMEOUT_SEC = 30;
 
 
 export default class BackdoorClient {
   private readonly incomeMessageEvents = new IndexedEvents<(message: BackdoorMessage) => void>();
   private readonly client: WsClientLogic;
+
 
   constructor(host?: string, port?: number) {
     this.client = this.makeClientInstance(host, port);
@@ -27,9 +29,8 @@ export default class BackdoorClient {
   }
 
   destroy() {
-    // TODO: remove all the handlers
-
-    this.close();
+    this.incomeMessageEvents.removeAll();
+    this.client.destroy();
   }
 
 
@@ -52,21 +53,10 @@ export default class BackdoorClient {
 
     await this.client.send(binMsg);
 
-    // TODO: wait for respond
-
-    return new Promise<any>((resolve, reject) => {
-      // TODO: make it !!!!!!
-    });
+    return this.waitForRespond(requestId);
   }
 
-  async addListener(action: number, cb: ListenerHandler): number {
-    // TODO: make listener id
-    //const listenerId = 0;
-    // const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.send, BACKDOOR_ACTION.addListener, listenerId);
-    //
-    // // Send intention to receive events
-    // await this.client.send(binMsg);
-
+  addListener(action: number, cb: ListenerHandler): number {
     const handlerWrapper = (msg: BackdoorMessage) => {
       if (msg.type === BACKDOOR_MSG_TYPE.send && msg.action === action) {
         cb(msg.payload);
@@ -76,6 +66,28 @@ export default class BackdoorClient {
     return this.incomeMessageEvents.addListener(handlerWrapper);
   }
 
+  removeListener(handlerIndex: number) {
+    this.incomeMessageEvents.removeListener(handlerIndex);
+  }
+
+
+  private waitForRespond(requestId: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      let handlerIndex: number;
+      const waitTimeout = setTimeout(() => {
+        this.incomeMessageEvents.removeListener(handlerIndex);
+        reject(`BackdoorClient.request: Timeout is exceeded`);
+      }, BACKDOOR_REQUEST_TIMEOUT_SEC * 1000);
+
+      handlerIndex = this.incomeMessageEvents.addListener((msg: BackdoorMessage) => {
+        if (msg.type !== BACKDOOR_MSG_TYPE.respond || msg.requestId !== requestId) return;
+
+        clearTimeout(waitTimeout);
+        this.incomeMessageEvents.removeListener(handlerIndex);
+        resolve(msg.payload);
+      });
+    });
+  }
 
   private handleIncomeMessage = (data: string | Uint8Array) => {
     let message: BackdoorMessage;

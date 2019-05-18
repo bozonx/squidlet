@@ -38,10 +38,8 @@ export default class RemoteIoCollection {
       this.system.host.generateUniqId
     );
 
-    // TODO: как обратная сторона поймет что надо отправлять сообщения?
-
     // listen income messages of backdoor
-    await this.client.addListener(BACKDOOR_ACTION.ioSetRemoteCall, this.handleIncomeMessage);
+    this.client.addListener(BACKDOOR_ACTION.ioSetRemoteCall, this.handleIncomeMessage);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -103,21 +101,3 @@ export default class RemoteIoCollection {
   }
 
 }
-
-
-//this.client.onIncomeMessage(this.handleBackDoorMessage);
-// private handleBackDoorMessage(message: BackdoorMessage) {
-//   if (
-//     message.action !== BACKDOOR_ACTION.listenerResponse
-//     || message.payload.category !== categories.ioSet
-//   ) return;
-//
-//   if (message.payload.topic === topics.ioSet.remoteCall) {
-//     // pass message to remoteCall
-//     this.remoteCall.incomeMessage(message.payload.data)
-//       .catch(this.system.log.error);
-//   }
-//   // else if (message.payload.topic === topics.ioSet.askIoNames) {
-//   //   this.incomeIoNamesEvents.emit(message.payload.data);
-//   // }
-// }
