@@ -7,6 +7,15 @@ import IoSetServerLogic from './IoSetServerLogic';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
 
 
+export enum BACKDOOR_MSG_TYPE {
+  // send to one way. Don't wait to answer
+  send,
+  // send and wait to answer
+  request,
+  // response of request
+  respond,
+}
+
 export enum BACKDOOR_ACTION {
   emit,
   addListener,
@@ -28,7 +37,9 @@ export enum BACKDOOR_ACTION {
  */
 
 export interface BackdoorMessage {
+  type: number;
   action: number;
+  requestId?: string;
   payload: any;
 }
 

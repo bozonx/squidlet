@@ -5,11 +5,10 @@ import * as fs from 'fs';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
 import WebSocketClient from './nodeJsLikeIo/WebSocketClient';
-import {BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+import {BACKDOOR_ACTION, BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 
 
-// TODO: может не нужно ????
-
+type ListenerHandler = (action: number, payload: any) => void;
 
 const backdoorManifestPath = path.resolve(__dirname, '../entities/services/Backdoor/manifest.yaml');
 const wsClientIo = new WebSocketClient();
@@ -33,14 +32,45 @@ export default class BackdoorClient {
     this.client.close(0, 'finish');
   }
 
-  addListener(cb: (msg: BackdoorMessage) => void) {
+  async send(action: number, payload?: any) {
+    const msg: BackdoorMessage = {
+      type: BACKDOOR_MSG_TYPE.send,
+      action,
+      payload,
+    };
+    // TODO: make message
     // TODO: add
   }
 
+  async request(action: number, payload?: any): Promise<any> {
 
-  private onClientClose() {
-    console.info(`Websocket connection has been closed`);
+    // TODO: generate uniq id
+    const requestId = 'a';
+
+    const msg: BackdoorMessage = {
+      type: BACKDOOR_MSG_TYPE.request,
+      action,
+      requestId,
+      payload,
+    };
+
+    // TODO: add
   }
+
+  addListener(cb: ListenerHandler) {
+
+    // TODO: make listener id
+    const listenerId = 0;
+
+    const msg: BackdoorMessage = {
+      type: BACKDOOR_MSG_TYPE.send,
+      action: BACKDOOR_ACTION.addListener,
+      payload: listenerId,
+    };
+
+    // TODO: add
+  }
+
 
   private makeClientInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {
     const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
@@ -59,7 +89,7 @@ export default class BackdoorClient {
     return new WsClientLogic(
       wsClientIo,
       props,
-      this.onClientClose,
+      () => console.info(`Websocket connection has been closed`),
       console.info,
       console.error
     );

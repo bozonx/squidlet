@@ -5,10 +5,8 @@ import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../starter/helpers';
-import categories from '../../system/dict/categories';
-import topics from '../../system/dict/topics';
 import BackdoorClient from '../../shared/BackdoorClient';
-import {BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
+import {BACKDOOR_ACTION} from '../../entities/services/Backdoor/Backdoor';
 
 
 export default class RemoteIoCollection {
@@ -41,7 +39,7 @@ export default class RemoteIoCollection {
     );
 
     // listen income messages of backdoor
-    this.client.addListener(this.handleIncomeRemoteCall);
+    this.client.addListener(this.handleIncomeMessage);
 
     const ioNames: string[] = await this.askIoNames();
 
@@ -62,16 +60,18 @@ export default class RemoteIoCollection {
    * Send message from remoteCall to other side (IoSetServer)
    */
   private sendToServer(message: RemoteCallMessage): Promise<void> {
-    return this.client.emit(categories.ioSet, topics.ioSet.remoteCall, message);
+    return this.client.send(BACKDOOR_ACTION.ioSetRemoteCall, message);
   }
 
-  private handleIncomeRemoteCall = (msg: BackdoorMessage) => {
-    this.remoteCall.incomeMessage(msg.payload)
+  private handleIncomeMessage = (action: number, payload: any) => {
+    if (action !== BACKDOOR_ACTION.ioSetRemoteCall) return;
+
+    this.remoteCall.incomeMessage(payload)
       .catch(this.system.log.error);
   }
 
   private async askIoNames(): Promise<string[]> {
-    return this.client.request(categories.ioSet, topics.ioSet.askIoNames);
+    return this.client.request(BACKDOOR_ACTION.getIoNames);
   }
 
   private makeFakeIo(ioName: string): IoItem {
