@@ -123,18 +123,17 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     }
   }
 
-  private async resolveJsonMessage(sessionId: string, message: BackdoorMessage) {
+  private async resolveJsonMessage(sessionId: string, msg: BackdoorMessage) {
+    const eventPayload: EventPayload = msg.payload;
 
-    // TODO: use special api to ioSet - don't use events
-
-    switch (message.action) {
+    switch (msg.action) {
       case BACKDOOR_ACTION.emit:
         // rise event on common event system
-        return this.env.events.emit(message.payload.category, message.payload.topic, message.payload.data);
-      case BACKDOOR_ACTION.addListener:
-        return this.startListenEvents(sessionId, message.payload.category, message.payload.topic);
-      case BACKDOOR_ACTION.removeListener:
-        return this.removeEventListener(sessionId, message.payload.category, message.payload.topic);
+        return this.env.events.emit(eventPayload[0], eventPayload[1], eventPayload[2]);
+      case BACKDOOR_ACTION.startListen:
+        return this.startListenEvents(sessionId, eventPayload[0], eventPayload[1]);
+      // case BACKDOOR_ACTION.removeListener:
+      //   return this.removeEventListener(sessionId, message.payload.category, message.payload.topic);
       case BACKDOOR_ACTION.ioSetRemoteCall:
         //return this.handleIncomeIoSetRcMsg(sessionId, message.payload);
         return this.ioSet.incomeMessage(sessionId, message.payload);
@@ -210,24 +209,24 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     }
   }
 
-  /**
-   * Remove all the handlers of specified category and topic
-   */
-  private removeEventListener(sessionId: string, category: string, topic?: string) {
-    if (!this.handlers[connectionId]) return;
-
-    for (let handlerItemIndex in this.handlers[connectionId]) {
-      const handlerItem = this.handlers[connectionId][handlerItemIndex];
-      if (
-        category === handlerItem[HANDLER_ITEM_POS.category]
-        && topic === handlerItem[HANDLER_ITEM_POS.topic]
-      ) {
-        this.removeHandler(handlerItem);
-
-        // TODO: strongly test
-        this.handlers[connectionId].splice(Number(handlerItemIndex), 1);
-      }
-    }
-  }
+  // /**
+  //  * Remove all the handlers of specified category and topic
+  //  */
+  // private removeEventListener(sessionId: string, category: string, topic?: string) {
+  //   if (!this.handlers[connectionId]) return;
+  //
+  //   for (let handlerItemIndex in this.handlers[connectionId]) {
+  //     const handlerItem = this.handlers[connectionId][handlerItemIndex];
+  //     if (
+  //       category === handlerItem[HANDLER_ITEM_POS.category]
+  //       && topic === handlerItem[HANDLER_ITEM_POS.topic]
+  //     ) {
+  //       this.removeHandler(handlerItem);
+  //
+  //       // TODO: strongly test
+  //       this.handlers[connectionId].splice(Number(handlerItemIndex), 1);
+  //     }
+  //   }
+  // }
 
 }
