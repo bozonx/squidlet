@@ -13,6 +13,4 @@ export default {
   logger: 'logger',
   // updater service
   updater: 'updater',
-  // IoSet service works via this category. Doesn't have topics
-  ioSet: 'ioSet',
 };
