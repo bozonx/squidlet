@@ -37,12 +37,14 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
       this.env.log.info,
       this.env.log.error
     );
+
+    await this.client.init();
   }
 
   destroy = async () => {
     if (!this.client) return;
 
-    this.client.destroy();
+    await this.client.destroy();
     delete this.client;
   }
 

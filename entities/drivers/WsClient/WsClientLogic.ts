@@ -2,7 +2,7 @@ import WebSocketClientIo, {
   OnMessageHandler,
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import IndexedEvents from '../../../system/helpers/IndexedEvents';
+import IndexedEvents from 'system/helpers/IndexedEvents';
 
 
 export interface WsClientLogicProps {
@@ -31,7 +31,7 @@ export default class WsClientLogic {
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
-  private readonly connectionId: string;
+  private connectionId: string = '';
   private openPromiseResolve: () => void = () => {};
   private openPromiseReject: () => void = () => {};
   // was previous open promise fulfilled
@@ -57,14 +57,17 @@ export default class WsClientLogic {
     this.logError = logError;
 
     this.openPromise = this.makeOpenPromise();
-    // make new connection and save connectionId of it
-    this.connectionId = this.wsClientIo.newConnection(this.props);
-
-    this.listen();
   }
 
-  destroy() {
-    this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+  async init() {
+    // make new connection and save connectionId of it
+    this.connectionId = await this.wsClientIo.newConnection(this.props);
+
+    await this.listen();
+  }
+
+  async destroy() {
+    await this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
     this.destroyInstance();
   }
 
@@ -78,8 +81,8 @@ export default class WsClientLogic {
     return this.wsClientIo.send(this.connectionId, data);
   }
 
-  close(code: number, reason?: string) {
-    this.wsClientIo.close(this.connectionId, code, reason);
+  async close(code: number, reason?: string) {
+    await this.wsClientIo.close(this.connectionId, code, reason);
     this.destroyInstance();
   }
 
@@ -92,12 +95,12 @@ export default class WsClientLogic {
   }
 
 
-  private listen() {
-    this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
-    this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
-    this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
-    this.wsClientIo.onMessage(this.connectionId, this.messageEvents.emit);
-    this.wsClientIo.onUnexpectedResponse(this.connectionId, (response: ConnectionParams) => {
+  private async listen() {
+    await this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
+    await this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
+    await this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
+    await this.wsClientIo.onMessage(this.connectionId, this.messageEvents.emit);
+    await this.wsClientIo.onUnexpectedResponse(this.connectionId, (response: ConnectionParams) => {
       this.logError(
         `The unexpected response has been received on ` +
         `connection "${this.connectionId}": ${JSON.stringify(response)}`
@@ -121,7 +124,8 @@ export default class WsClientLogic {
     // TODO: проверить действительно ли сработает close если даже соединение не открывалось
 
     this.logInfo(`WsClientLogic: connection closed. ${this.props.url} Id: ${this.connectionId}`);
-    this.resolveReconnection();
+    this.resolveReconnection()
+      .catch(this.logError);
   }
 
   /**
@@ -129,7 +133,7 @@ export default class WsClientLogic {
    * if tries more than -1(infinity) - increment it and close connection if can't connect
    * 0 means none
    */
-  private resolveReconnection() {
+  private async resolveReconnection() {
     if (
       !this.props.autoReconnect
       || this.props.maxTries === 0
@@ -138,10 +142,10 @@ export default class WsClientLogic {
       return this.finallyCloseConnection();
     }
 
-    this.reconnect();
+    await this.reconnect();
   }
 
-  private reconnect() {
+  private async reconnect() {
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
     
@@ -155,14 +159,14 @@ export default class WsClientLogic {
     this.reconnectTimeout = setTimeout(this.doReconnect, this.props.reconnectTimeoutMs);
   }
 
-  private doReconnect = () => {
+  private doReconnect = async () => {
     delete this.reconnectTimeout;
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
 
     // TODO: при этом не сработает close ??? или сработает???
     // try to reconnect and save current connectionId
     try {
-      this.wsClientIo.reConnect(this.connectionId, this.props);
+      await this.wsClientIo.reConnect(this.connectionId, this.props);
     }
     catch (err) {
       this.logError(`WsClientLogic.doReconnect: ${err}. Reconnecting...`);
@@ -170,17 +174,19 @@ export default class WsClientLogic {
       // increment connection tries if maxTries is greater than 0
       if (this.props.maxTries >= 0) this.connectionTries++;
 
-      return this.resolveReconnection();
+      this.resolveReconnection()
+        .catch(this.logError);
     }
 
-    this.listen();
+    this.listen()
+      .catch(this.logError);
   }
 
   /**
    * You can't reconnect anymore after this. You should create a new instance if need.
    */
-  private finallyCloseConnection() {
-    this.wsClientIo.close(this.connectionId, 0);
+  private async finallyCloseConnection() {
+    await this.wsClientIo.close(this.connectionId, 0);
 
     // // reject open promise if connection hasn't been established
     // if (!this.wasPrevOpenFulfilled) {

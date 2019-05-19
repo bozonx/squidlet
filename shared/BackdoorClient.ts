@@ -37,14 +37,21 @@ export default class BackdoorClient {
     this.client.onMessage(this.handleIncomeMessage);
   }
 
-  destroy() {
+  // TODO: вызвать выше
+  async init() {
+    await this.client.init();
+  }
+
+  // TODO: выше use promise
+  async destroy() {
     this.incomeMessageEvents.removeAll();
-    this.client.destroy();
+    await this.client.destroy();
   }
 
 
-  close() {
-    this.client.close(0, 'finish');
+  // TODO: выше use promise
+  async close() {
+    await this.client.close(0, 'finish');
   }
 
   async send(action: number, payload?: any) {
