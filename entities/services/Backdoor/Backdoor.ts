@@ -37,8 +37,11 @@ export interface BackdoorMessage {
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   // io servers by sessionId
-  private readonly ioSets: {[index: string]: IoSetServer} = {};
+  private _ioSet?: IoSetServer;
   private _eventsServer?: MainEventsServer;
+  private get ioSet(): IoSetServer {
+    return this._ioSet as any;
+  }
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer as any;
   }
@@ -51,24 +54,25 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     this.depsInstances.wsServer = await getDriverDep('WsServerSessions')
       .getInstance(this.props);
 
-    this.wsServerSessions.onNewSession((sessionId: string) => {
-      this.ioSets[sessionId] = new IoSetServer(
-        this.env.system.ioManager,
-        (message: RemoteCallMessage) => this.sendIoSetMsg(sessionId, message),
-        this.env.config.config.ioSetResponseTimoutSec,
-        this.env.log.error,
-        this.env.system.host.generateUniqId
-      );
-    });
+    // this.wsServerSessions.onNewSession((sessionId: string) => {
+    // });
 
     this.wsServerSessions.onMessage(this.handleIncomeMessage);
 
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       // remove all the listeners of this connection
       this.eventsServer.removeSessionHandlers(sessionId);
-      this.ioSets[sessionId].destroy();
-      delete this.ioSets[sessionId];
+      this.ioSet.sessionClosed(sessionId)
+        .catch(this.env.log.error);
     });
+
+    this._ioSet = new IoSetServer(
+      this.env.system.ioManager,
+      this.sendIoSetMsg,
+      this.env.config.config.ioSetResponseTimoutSec,
+      this.env.log.error,
+      this.env.system.host.generateUniqId
+    );
 
     this._eventsServer = new MainEventsServer(
       this.env.events,
@@ -78,14 +82,11 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
   destroy = async () => {
-    for (let sessionId of Object.keys(this.ioSets)) {
-      await this.ioSets[sessionId].destroy();
-      delete this.ioSets[sessionId];
-    }
-
     this.eventsServer.destroy();
+    await this.ioSet.destroy();
     await this.wsServerSessions.destroy();
     delete this._eventsServer;
+    delete this._ioSet;
   }
 
 
@@ -131,11 +132,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
         return this.eventsServer.startListenEvents(sessionId, msg.payload);
 
       case BACKDOOR_ACTION.ioSetRemoteCall:
-        if (!this.ioSets[sessionId]) {
-          return this.env.log.error(`Can't find registered ioSet server by session "${sessionId}"`);
-        }
-
-        return this.ioSets[sessionId].incomeMessage(sessionId, msg.payload);
+        return this.ioSet.incomeMessage(sessionId, msg.payload);
 
       case BACKDOOR_ACTION.getIoNames:
         return this.respondIoNames(sessionId, msg.requestId as string);
@@ -146,14 +143,10 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
   private async respondIoNames(sessionId: string, requestId: string) {
-    if (!this.ioSets[sessionId]) {
-      return this.env.log.error(`Can't find registered ioSet server by session "${sessionId}"`);
-    }
-
     const binMsg: Uint8Array = makeMessage(
       BACKDOOR_MSG_TYPE.respond,
       BACKDOOR_ACTION.getIoNames,
-      this.ioSets[sessionId].getIoNames(),
+      this.ioSet.getIoNames(),
       requestId
     );
 

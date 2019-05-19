@@ -5,7 +5,7 @@ import IoManager from 'system/entities/IoManager';
 
 export default class IoSetServer {
   private readonly ioManager: IoManager;
-  private readonly sendToClient: (message: RemoteCallMessage) => Promise<void>;
+  private readonly sendToClient: (sessionId: string, message: RemoteCallMessage) => Promise<void>;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
@@ -15,7 +15,7 @@ export default class IoSetServer {
 
   constructor(
     ioManager: IoManager,
-    sendToClient: (message: RemoteCallMessage) => Promise<void>,
+    sendToClient: (sessionId: string, message: RemoteCallMessage) => Promise<void>,
     responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
@@ -48,7 +48,7 @@ export default class IoSetServer {
   async incomeMessage(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
     if (!this.remoteCalls[sessionId]) {
       this.remoteCalls[sessionId] = new RemoteCall(
-        this.sendToClient,
+        (message: RemoteCallMessage) => this.sendToClient(sessionId, message),
         this.ioCollection,
         this.responseTimoutSec,
         this.logError,
