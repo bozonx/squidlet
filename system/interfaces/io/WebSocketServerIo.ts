@@ -70,7 +70,7 @@ export default interface WebSocketServerIo extends IoItem {
   onConnection(
     serverId: string,
     cb: (connectionId: string, request: ConnectionParams) => Promise<void>
-  ): number;
+  ): Promise<number>;
 
   // /**
   //  * Listen header at handshake to modify them

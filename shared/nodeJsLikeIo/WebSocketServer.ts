@@ -47,7 +47,7 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   /////// Server's methods
 
-  newServer(props: WebSocketServerProps): string {
+  async newServer(props: WebSocketServerProps): Promise<string> {
     const serverId: string = String(this.servers.length);
 
     this.servers.push( this.makeServer(serverId, props) );
@@ -67,7 +67,10 @@ export default class WebSocketServer implements WebSocketServerIo {
     delete this.servers[Number(serverId)];
   }
 
-  onConnection(serverId: string, cb: (connectionId: string, request: ConnectionParams) => void): number {
+  async onConnection(
+    serverId: string,
+    cb: (connectionId: string, request: ConnectionParams) => void
+  ): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.connection, cb);
@@ -81,25 +84,25 @@ export default class WebSocketServer implements WebSocketServerIo {
   //   return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.headers, cb);
   // }
 
-  onServerListening(serverId: string, cb: () => void): number {
+  async onServerListening(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.listening, cb);
   }
 
-  onServerClose(serverId: string, cb: () => void): number {
+  async onServerClose(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.close, cb);
   }
 
-  onServerError(serverId: string, cb: (err: Error) => void): number {
+  async onServerError(serverId: string, cb: (err: Error) => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.error, cb);
   }
 
-  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void {
+  async removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
     return this.servers[Number(serverId)][SERVER_POSITIONS.events].removeListener(eventName, handlerIndex);
@@ -108,31 +111,31 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   ////////// Connection's methods like in client, but without onOpen
 
-  onClose(serverId: string, connectionId: string, cb: () => void): number {
+  async onClose(serverId: string, connectionId: string, cb: () => void): Promise<number> {
     const connectionItem = this.getConnectionItem(serverId, connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
   }
 
-  onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number {
+  async onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number> {
     const connectionItem = this.getConnectionItem(serverId, connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
   }
 
-  onError(serverId: string, connectionId: string, cb: (err: Error) => void): number {
+  async onError(serverId: string, connectionId: string, cb: (err: Error) => void): Promise<number> {
     const connectionItem = this.getConnectionItem(serverId, connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
-  onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): number {
+  async onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): Promise<number> {
     const connectionItem = this.getConnectionItem(serverId, connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.unexpectedResponse, cb);
   }
 
-  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void {
+  async removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void> {
     if (
       !this.servers[Number(serverId)]
       || !this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]
@@ -145,7 +148,7 @@ export default class WebSocketServer implements WebSocketServerIo {
     return connectionItem[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
-  send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
+  async send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -155,10 +158,10 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     const connectionItem = this.getConnectionItem(serverId, connectionId);
 
-    return callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
+    await callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
   }
 
-  close(serverId: string, connectionId: string, code: number, reason: string): void {
+  async close(serverId: string, connectionId: string, code: number, reason: string): Promise<void> {
     if (
       !this.servers[Number(serverId)]
       || !this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]
