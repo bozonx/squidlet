@@ -1,3 +1,5 @@
+import IoItem from '../IoItem';
+
 export interface WifiParams {
   ssid?: string;
   password?: string;
@@ -9,6 +11,6 @@ export const Methods = [
 ];
 
 
-export default interface WifiIo {
+export default interface WifiIo extends IoItem {
   configure(params: WifiParams): Promise<void>;
 }

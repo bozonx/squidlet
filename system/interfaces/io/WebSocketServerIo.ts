@@ -1,4 +1,5 @@
 import {WsEvents} from './WebSocketClientIo';
+import IoItem from '../IoItem';
 
 
 export const Methods = [
@@ -52,11 +53,11 @@ export interface ConnectionParams {
 }
 
 
-export default interface WebSocketServerIo {
+export default interface WebSocketServerIo extends IoItem {
   /**
    * make new server and return serverId
    */
-  newServer(props: WebSocketServerProps): string;
+  newServer(props: WebSocketServerProps): Promise<string>;
 
   /**
    * Shut down a server which has been previously created
@@ -68,7 +69,7 @@ export default interface WebSocketServerIo {
    */
   onConnection(
     serverId: string,
-    cb: (connectionId: string, request: ConnectionParams) => void
+    cb: (connectionId: string, request: ConnectionParams) => Promise<void>
   ): number;
 
   // /**
@@ -79,33 +80,33 @@ export default interface WebSocketServerIo {
   /**
    * when server starts listening
    */
-  onServerListening(serverId: string, cb: () => void): number;
+  onServerListening(serverId: string, cb: () => void): Promise<number>;
 
   /**
    * on server close. Depend on http server close
    */
-  onServerClose(serverId: string, cb: () => void): number;
+  onServerClose(serverId: string, cb: () => void): Promise<number>;
 
   /**
    * Emits on server error
    */
-  onServerError(serverId: string, cb: (err: Error) => void): number;
+  onServerError(serverId: string, cb: (err: Error) => void): Promise<number>;
 
   /**
    * Remove one of server listeners
    */
-  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): void;
+  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): Promise<void>;
 
   ////////// Connection's methods like in client, but without onOpen
 
   /**
    * On connection close
    */
-  onClose(serverId: string, connectionId: string, cb: () => void): number;
-  onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): number;
-  onError(serverId: string, connectionId: string, cb: (err: Error) => void): number;
-  onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): number
-  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): void;
+  onClose(serverId: string, connectionId: string, cb: () => void): Promise<number>;
+  onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number>;
+  onError(serverId: string, connectionId: string, cb: (err: Error) => void): Promise<number>;
+  onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): Promise<number>
+  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void>;
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
-  close(serverId: string, connectionId: string, code: number, reason: string): void;
+  close(serverId: string, connectionId: string, code: number, reason: string): Promise<void>;
 }

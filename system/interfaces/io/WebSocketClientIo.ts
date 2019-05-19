@@ -1,4 +1,5 @@
 import {ConnectionParams} from './WebSocketServerIo';
+import IoItem from '../IoItem';
 
 export const Methods = [
   'newConnection',
@@ -28,16 +29,16 @@ export interface WebSocketClientProps {
   url: string;
 }
 
-export default interface WebSocketClientIo {
-  newConnection       (props: WebSocketClientProps): string;
-  reConnect           (connectionId: string, props: WebSocketClientProps): void;
+export default interface WebSocketClientIo extends IoItem {
+  newConnection       (props: WebSocketClientProps): Promise<string>;
+  reConnect           (connectionId: string, props: WebSocketClientProps): Promise<void>;
 
-  onOpen              (connectionId: string, cb: () => void): number;
-  onClose             (connectionId: string, cb: () => void): number;
-  onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): number;
-  onError             (connectionId: string, cb: (err: Error) => void): number;
-  onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): number;
-  removeEventListener (connectionId: string, eventName: WsEvents, handlerIndex: number): void;
+  onOpen              (connectionId: string, cb: () => void): Promise<number>;
+  onClose             (connectionId: string, cb: () => void): Promise<number>;
+  onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number>;
+  onError             (connectionId: string, cb: (err: Error) => void): Promise<number>;
+  onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): Promise<number>;
+  removeEventListener (connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void>;
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;
-  close               (connectionId: string, code: number, reason?: string): void;
+  close               (connectionId: string, code: number, reason?: string): Promise<void>;
 }

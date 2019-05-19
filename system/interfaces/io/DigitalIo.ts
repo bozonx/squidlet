@@ -1,3 +1,6 @@
+import IoItem from '../IoItem';
+
+
 export type WatchHandler = (state: boolean) => void;
 export type DigitalInputMode = 'input'
   | 'input_pullup'
@@ -18,7 +21,7 @@ export const Methods = [
 ];
 
 
-interface DigitalBase {
+interface DigitalBase extends IoItem {
   read(pin: number): Promise<boolean>;
 
   // only for output pins

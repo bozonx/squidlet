@@ -1,3 +1,6 @@
+import IoItem from '../IoItem';
+
+
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
 export type EventName = 'data' | 'dataString' | 'error' | 'open';
 
@@ -24,12 +27,12 @@ export const Methods = [
  * Uart api
  * uartNum - it's number of UART interface on specified platform
  */
-export default interface SerialIo {
-  on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): number;
-  on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): number;
-  on(uartNum: number, eventsName: 'error', handler: (err: string) => void): number;
+export default interface SerialIo extends IoItem {
+  on(uartNum: number, eventsName: 'data', handler: (data: Uint8Array) => void): Promise<number>;
+  on(uartNum: number, eventsName: 'dataString', handler: (data: string) => void): Promise<number>;
+  on(uartNum: number, eventsName: 'error', handler: (err: string) => void): Promise<number>;
   // It rises on Serial initialization event or immediately if serial is initialized
-  on(uartNum: number, eventsName: 'open', handler: () => void): number;
+  on(uartNum: number, eventsName: 'open', handler: () => void): Promise<number>;
 
   // write binary data
   write(uartNum: number, data: Uint8Array): Promise<void>;
@@ -51,7 +54,7 @@ export default interface SerialIo {
    * @param baudRate - default is 9600
    * @param options
    */
-  setup(uartNum: number, baudRate?: BaudRate, options?: Options): void;
+  setup(uartNum: number, baudRate?: BaudRate, options?: Options): Promise<void>;
 
-  removeListener(handlerIndex: number): void;
+  removeListener(handlerIndex: number): Promise<void>;
 }
