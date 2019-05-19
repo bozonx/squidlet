@@ -3,9 +3,9 @@ import RemoteCall, {ObjectToCall} from 'system/helpers/remoteCall/RemoteCall';
 import IoManager from 'system/entities/IoManager';
 
 
-export default class IoSetServerLogic {
+export default class IoSetServer {
   private readonly ioManager: IoManager;
-  private readonly sendToClient: (message: RemoteCallMessage) => Promise<void>;
+  private readonly sendToClient: (data: Uint8Array) => Promise<void>;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
@@ -15,7 +15,7 @@ export default class IoSetServerLogic {
 
   constructor(
     ioManager: IoManager,
-    sendToClient: (message: RemoteCallMessage) => Promise<void>,
+    sendToClient: (data: Uint8Array) => Promise<void>,
     responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
@@ -45,7 +45,14 @@ export default class IoSetServerLogic {
     return this.ioManager.getNames();
   }
 
-  async incomeMessage(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
+  // private handleIncomeIoSetRcMsg(sessionId: string, rawRemoteCallMessage: {[index: string]: any}) {
+  //   this.ioSet.incomeMessage(sessionId, rawRemoteCallMessage)
+  //     .catch(this.env.log.error);
+  // }
+
+  async incomeMessage(sessionId: string, data: Uint8Array) {
+    // message: RemoteCallMessage
+    //rawRemoteCallMessage: {[index: string]: any}
     if (!this.remoteCalls[sessionId]) {
       this.remoteCalls[sessionId] = new RemoteCall(
         this.sendToClient,

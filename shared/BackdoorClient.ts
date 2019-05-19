@@ -56,6 +56,7 @@ export default class BackdoorClient {
   async request(action: number, payload?: any): Promise<any> {
 
     // TODO: generate uniq id
+    // TODO: впринципе можно не делать requestId, а просто смотреть по action
     const requestId = 'a';
 
     const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.request, action, payload, requestId);
