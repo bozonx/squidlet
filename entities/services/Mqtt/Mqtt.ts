@@ -24,7 +24,7 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
   protected didInit = async () => {
-    this.mqttDev.onMessage(this.messagesHandler);
+    await this.mqttDev.onMessage(this.messagesHandler);
     this.listenHostsPublishes();
     // register subscribers after app init
     this.env.system.onAppInit(() => {
@@ -129,7 +129,8 @@ export default class MqttSevice extends ServiceBase<Props> {
 
         // TODO: обработать ошибку промиса
 
-        this.subscribe(topic);
+        this.subscribe(topic)
+          .catch(this.env.log.error);
       }
     }
   }

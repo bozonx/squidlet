@@ -33,7 +33,7 @@ export class MqttDevConnection implements MqttIo {
     });
   }
 
-  isConnected(): boolean {
+  async isConnected(): Promise<boolean> {
     return this._connected;
   }
 
@@ -71,7 +71,7 @@ export class MqttDevConnection implements MqttIo {
     });
   }
 
-  onMessage(handler: (topic: string, data: string) => void): void {
+  async onMessage(handler: (topic: string, data: string) => void) {
     const handlerWrapper = (topic: string, data: Buffer) => {
       handler(topic, data.toString());
     };
@@ -82,7 +82,7 @@ export class MqttDevConnection implements MqttIo {
   /**
    * Subscribe to binary data
    */
-  onMessageBin() {
+  async onMessageBin() {
     // TODO: convert to Uint8Array
   }
 
@@ -92,6 +92,7 @@ export class MqttDevConnection implements MqttIo {
 
 
 export default class Mqtt {
+  // TODO: rename to getInstance ????
   connect(params: Props): MqttDevConnection {
     return new MqttDevConnection(params);
   }
