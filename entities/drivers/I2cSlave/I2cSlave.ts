@@ -27,9 +27,9 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
     this.depsInstances.i2cSlave = this.env.getIo('I2cSlave');
   }
 
-  protected didMount = () => {
+  protected didMount = async () => {
     // listen all the income data
-    this.i2cSlaveDev.listenIncome(this.props.bus, this.handleIncomeData);
+    await this.i2cSlaveDev.listenIncome(this.props.bus, this.handleIncomeData);
   }
 
   // TODO: поддержка int
@@ -60,10 +60,12 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
           resolve(withoutFirstItemUint8Arr(data));
         }
 
-        this.i2cSlaveDev.removeListener(this.props.bus, handler);
+        this.i2cSlaveDev.removeListener(this.props.bus, handler)
+          .catch(reject);
       };
 
-      this.i2cSlaveDev.listenIncome(this.props.bus, handler);
+      this.i2cSlaveDev.listenIncome(this.props.bus, handler)
+        .catch(reject);
 
       // TODO: по таймауту 60 сек отписаться и поднять ошибку - reject
 
