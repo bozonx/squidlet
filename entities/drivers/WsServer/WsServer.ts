@@ -2,7 +2,6 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 
 
@@ -36,7 +35,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
   protected appDidInit = async () => {
-    this.server && this.server.init();
+    this.server && await this.server.init();
   }
 
   destroy = async () => {
@@ -56,10 +55,10 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   /**
    * Force closing a connection
    */
-  closeConnection(connectionId: string, code: number, reason: string) {
+  async closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
     if (!this.server) return;
 
-    this.server.closeConnection(connectionId, code, reason);
+    await this.server.closeConnection(connectionId, code, reason);
   }
 
   // onMessage(connectionId: string, cb: OnMessageHandler): number {

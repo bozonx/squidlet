@@ -46,13 +46,13 @@ export default class WsServerLogic {
   /**
    * Start server
    */
-  init() {
-    this.serverId = this.wsServerIo.newServer({
+  async init() {
+    this.serverId = await this.wsServerIo.newServer({
       host: this.props.host,
       port: this.props.port,
     });
 
-    this.listenServer();
+    await this.listenServer();
 
     // TODO: add timeout if server doesn't start listen and rise a promise reject
   }
@@ -80,8 +80,8 @@ export default class WsServerLogic {
   /**
    * Force closing a connection
    */
-  closeConnection(connectionId: string, code: number, reason: string) {
-    this.wsServerIo.close(this.serverId, connectionId, code, reason);
+  closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
+    return this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
   // /**
@@ -123,37 +123,42 @@ export default class WsServerLogic {
   }
 
 
-  private listenServer() {
-    this.wsServerIo.onConnection(this.serverId, this.onIncomeConnection);
-    this.wsServerIo.onServerListening(this.serverId, this.listeningPromiseResolve);
-    this.wsServerIo.onServerClose(this.serverId, () => this.onClose());
-    this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
+  private async listenServer() {
+    await this.wsServerIo.onConnection(this.serverId, this.onIncomeConnection);
+    await this.wsServerIo.onServerListening(this.serverId, this.listeningPromiseResolve);
+    await this.wsServerIo.onServerClose(this.serverId, () => this.onClose());
+    await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
   }
 
   /**
    * Start listen connection's events
    */
-  private onIncomeConnection = (
+  private onIncomeConnection = async (
     connectionId: string, request: ConnectionParams
   ) => {
     // rise a new connection events
     this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
 
-    this.wsServerIo.onMessage(this.serverId, connectionId, (data: string | Uint8Array) => {
-      this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
-    });
+    try {
+      await this.wsServerIo.onMessage(this.serverId, connectionId, (data: string | Uint8Array) => {
+        this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
+      });
 
-    this.wsServerIo.onClose(this.serverId, connectionId, () => {
-      this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
-    });
+      await this.wsServerIo.onClose(this.serverId, connectionId, () => {
+        this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
+      });
 
-    this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
-    this.wsServerIo.onUnexpectedResponse(this.serverId, connectionId, (response: ConnectionParams) => {
-      this.logError(
-        `Unexpected response has been received on server "${this.serverId}", ` +
-        `connection "${connectionId}": ${JSON.stringify(response)}`
-      );
-    });
+      await this.wsServerIo.onError(this.serverId, connectionId, (err: Error) => this.logError(String(err)));
+      await this.wsServerIo.onUnexpectedResponse(this.serverId, connectionId, (response: ConnectionParams) => {
+        this.logError(
+          `Unexpected response has been received on server "${this.serverId}", ` +
+          `connection "${connectionId}": ${JSON.stringify(response)}`
+        );
+      });
+    }
+    catch (err) {
+      this.logError(err);
+    }
   }
 
 }
