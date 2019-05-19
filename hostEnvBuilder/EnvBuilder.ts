@@ -86,14 +86,10 @@ export default class EnvBuilder {
   }
 
   /**
-   * Generate host config with integrated files set which points to original (ts or js) files.
-   * It uses only to start in nodejs environment.
+   * Generate host config and entities where src points to original (ts) files.
+   * It uses only in nodejs environment.
    */
-  generateHostEnvSet(): HostEnvSet {
-
-    // TODO: rename to developEnvSet - потомучто в src будут пути к оригинальным файлам
-    // TODO: либо их прописывать в отдельные свойства
-
+  generateDevelopEnvSet(): HostEnvSet {
     return {
       configs: this.configsSet.getConfigSet(),
       entities: this.usedEntities.getEntitiesSet(),

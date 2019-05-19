@@ -34,7 +34,7 @@ export default class StorageEnvMemoryWrapper {
 
     console.info(`--> generate development envSet`);
 
-    this.envSet = this.envBuilder.generateHostEnvSet();
+    this.envSet = this.envBuilder.generateDevelopEnvSet();
   }
 
 
