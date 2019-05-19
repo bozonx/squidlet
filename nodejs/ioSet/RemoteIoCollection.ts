@@ -30,6 +30,7 @@ export default class RemoteIoCollection {
 
   async init(system: System): Promise<void> {
     this._system = system;
+    await this.client.init();
     this._remoteCall = new RemoteCall(
       this.sendToServer,
       undefined,

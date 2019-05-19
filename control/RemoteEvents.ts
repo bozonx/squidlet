@@ -12,6 +12,7 @@ export default class RemoteEvents {
     const backdoorClient = new BackdoorClient(args.host, args.port);
     const payload: EventPayload = [ args.category, args.topic, undefined ];
 
+    await backdoorClient.init();
     // Send intention to receive events
     await backdoorClient.send(BACKDOOR_ACTION.startListen, payload);
 
@@ -29,10 +30,11 @@ export default class RemoteEvents {
     const backdoorClient = new BackdoorClient(args.host, args.port);
     const payload: EventPayload = [ args.category, args.topic, args.data ];
 
+    await backdoorClient.init();
     await backdoorClient.send(BACKDOOR_ACTION.emit, payload);
 
     // exit
-    backdoorClient.close();
+    await backdoorClient.close();
   }
 
 }
