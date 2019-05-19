@@ -28,7 +28,7 @@ export default class WebSocketClient implements WebSocketClientIo {
    * Make new connection to server.
    * It returns a connection id to use with other methods
    */
-  newConnection(props: WebSocketClientProps): string {
+  async newConnection(props: WebSocketClientProps): Promise<string> {
     const connectionId = String(this.connections.length);
 
     this.connections.push( this.connectToServer(connectionId, props) );
@@ -40,43 +40,43 @@ export default class WebSocketClient implements WebSocketClientIo {
    * It is used to reconnect on connections lost.
    * It closes previous connection and makes new one with the same id.
    */
-  reConnect(connectionId: string, props: WebSocketClientProps) {
+  async reConnect(connectionId: string, props: WebSocketClientProps) {
     this.close(connectionId, 0);
 
     this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
 
-  onOpen(connectionId: string, cb: () => void): number {
+  async onOpen(connectionId: string, cb: () => void): Promise<number> {
     const connectionItem = this.getConnectionItem(connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.open, cb);
   }
 
-  onClose(connectionId: string, cb: () => void): number {
+  async onClose(connectionId: string, cb: () => void): Promise<number> {
     const connectionItem = this.getConnectionItem(connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
   }
 
-  onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): number {
+  async onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number> {
     const connectionItem = this.getConnectionItem(connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
   }
 
-  onError(connectionId: string, cb: (err: Error) => void): number {
+  async onError(connectionId: string, cb: (err: Error) => void): Promise<number> {
     const connectionItem = this.getConnectionItem(connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
   }
 
-  onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): number {
+  async onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): Promise<number> {
     const connectionItem = this.getConnectionItem(connectionId);
 
     return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.unexpectedResponse, cb);
   }
 
-  removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
+  async removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
     const connectionItem = this.connections[Number(connectionId)];
 
     if (!connectionItem) return;
@@ -84,7 +84,7 @@ export default class WebSocketClient implements WebSocketClientIo {
     return connectionItem[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
-  send(connectionId: string, data: string | Uint8Array): Promise<void> {
+  async send(connectionId: string, data: string | Uint8Array) {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -94,10 +94,10 @@ export default class WebSocketClient implements WebSocketClientIo {
 
     const connectionItem = this.getConnectionItem(connectionId);
 
-    return callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
+    await callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
   }
 
-  close(connectionId: string, code: number, reason?: string) {
+  async close(connectionId: string, code: number, reason?: string) {
     const connectionItem = this.connections[Number(connectionId)];
 
     if (!connectionItem) return;
