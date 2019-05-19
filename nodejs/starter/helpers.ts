@@ -6,6 +6,8 @@ import Props from './Props';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import * as ts from 'typescript';
 import {loadMachineConfigInPlatformDir, getFileNameOfPath} from '../../shared/helpers';
+import System from '../../system';
+import IoSet from '../../system/interfaces/IoSet';
 
 
 //const REPO_ROOT = path.resolve(__dirname, '../');
@@ -30,6 +32,25 @@ export async function installNpmModules(os: Os, cwd: string) {
   }
 }
 
+export async function startSystem(
+  props: Props,
+  SystemClass: new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System,
+  ioSet?: IoSet,
+) {
+  const systemConfigExtend = makeSystemConfigExtend(props);
+
+  console.info(`===> Initializing system`);
+
+  const system = new SystemClass(ioSet, systemConfigExtend);
+
+  process.on('SIGTERM', () => {
+    system.destroy();
+  });
+
+  console.info(`===> Starting system`);
+
+  return system.start();
+}
 
 
 

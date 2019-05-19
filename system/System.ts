@@ -59,6 +59,10 @@ export default class System {
     this.sessions = new Sessions(this.host.generateUniqId);
   }
 
+  destroy() {
+    // TODO: make total destroy
+  }
+
 
   async start() {
     console.info(`---> Initializing io`);

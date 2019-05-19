@@ -4,7 +4,7 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {makeSystemConfigExtend, SYSTEM_DIR} from './helpers';
+import {makeSystemConfigExtend, startSystem, SYSTEM_DIR} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
@@ -69,16 +69,9 @@ export default class StartDevelop {
   private async startSystem() {
     const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
     const System = require(pathToSystem).default;
-    const systemConfigExtend = makeSystemConfigExtend(this.props);
     const ioSet = this.makeIoSet();
 
-    console.info(`===> Initializing system`);
-
-    const system = new System(ioSet, systemConfigExtend);
-
-    console.info(`===> Starting system`);
-
-    return system.start();
+    await startSystem(this.props, System, ioSet);
   }
 
   /**

@@ -7,9 +7,11 @@ import systemConfig from '../../system/config/systemConfig';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
-import {installNpmModules, makeSystemConfigExtend} from './helpers';
+import {installNpmModules, makeSystemConfigExtend, startSystem} from './helpers';
 import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
 import {SYSTEM_FILE_NAME} from '../../shared/constants';
+import System from '../../system/System';
+import IoSet from '../../system/interfaces/IoSet';
 
 
 export default class StartProd {
@@ -118,15 +120,9 @@ export default class StartProd {
    */
   private async startSystem() {
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
-    const System = require(pathToSystem).default;
-    const systemConfigExtend = makeSystemConfigExtend(this.props);
+    const SystemClass = require(pathToSystem).default;
 
-    console.info(`===> Starting system`);
-
-    // prod supports only local io set
-    const system = new System(undefined, systemConfigExtend);
-
-    return system.start();
+    await startSystem(this.props, SystemClass);
   }
 
   private getPathToProdSystemDir(): string {
