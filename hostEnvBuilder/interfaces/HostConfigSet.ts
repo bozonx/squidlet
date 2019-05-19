@@ -1,6 +1,6 @@
 import HostConfig from '../../system/interfaces/HostConfig';
 import EntityDefinition from '../../system/interfaces/EntityDefinition';
-import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
+import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
 export default interface HostConfigSet {

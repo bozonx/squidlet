@@ -1,5 +1,5 @@
 import Platforms from './Platforms';
-import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
+import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
 // export interface IoSetConfig {

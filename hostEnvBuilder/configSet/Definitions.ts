@@ -7,8 +7,8 @@ import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 import {validateProps} from '../../system/helpers/validate';
-import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
 import {collectPropsDefaults} from '../helpers';
+import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
 /**

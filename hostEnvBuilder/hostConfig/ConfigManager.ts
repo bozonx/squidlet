@@ -10,7 +10,7 @@ import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig, makeIoNames} from '../../shared/helpers';
-import IoItemDefinition from '../../system/interfaces/IoItemDefinition';
+import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
 export default class ConfigManager {
