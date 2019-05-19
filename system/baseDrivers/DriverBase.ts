@@ -15,9 +15,8 @@ export default class DriverBase<Props = {}> extends EntityBase<Props> {
   // TODO: review
   protected newSender(): Sender {
     return new Sender(
-      // TODO: don't use system.host
-      this.env.system.host.config.config.senderTimeout,
-      this.env.system.host.config.config.senderResendTimeout
+      this.env.config.config.senderTimeout,
+      this.env.config.config.senderResendTimeout
     );
   }
 
