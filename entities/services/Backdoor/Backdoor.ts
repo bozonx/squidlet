@@ -1,9 +1,10 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {decodeBackdoorMessage, validateMessage} from './helpers';
+import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import IoSetServer from './IoSetServer';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
+import IoSetServer from './IoSetServer';
 import MainEventsServer from './MainEventsServer';
 
 
@@ -53,7 +54,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     this.wsServerSessions.onNewSession((sessionId: string) => {
       this.ioSets[sessionId] = new IoSetServer(
         this.env.system.ioManager,
-        (data: Uint8Array) => this.sendIoSetMsg(sessionId, data),
+        (message: RemoteCallMessage) => this.sendIoSetMsg(sessionId, message),
         this.env.config.config.ioSetResponseTimoutSec,
         this.env.log.error,
         this.env.system.host.generateUniqId
@@ -88,11 +89,14 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   }
 
 
-  private sendIoSetMsg(sessionId: string, data: Uint8Array): Promise<void> {
+  private sendIoSetMsg(sessionId: string, message: RemoteCallMessage): Promise<void> {
+    const binMsg: Uint8Array = makeMessage(
+      BACKDOOR_MSG_TYPE.send,
+      BACKDOOR_ACTION.ioSetRemoteCall,
+      message,
+    );
 
-    // TODO: преобразовывать в backdoor message
-
-    return this.wsServerSessions.send(sessionId, data);
+    return this.wsServerSessions.send(sessionId, binMsg);
   }
 
   private handleIncomeMessage = async (sessionId: string, data: string | Uint8Array) => {
@@ -146,12 +150,14 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       return this.env.log.error(`Can't find registered ioSet server by session "${sessionId}"`);
     }
 
-    const msg: BackdoorMessage = {
-      type: BACKDOOR_MSG_TYPE.respond,
-      action: BACKDOOR_ACTION.getIoNames,
-      requestId,
-      payload: this.ioSets[sessionId].getIoNames(),
-    };
+    const binMsg: Uint8Array = makeMessage(
+      BACKDOOR_MSG_TYPE.respond,
+      BACKDOOR_ACTION.getIoNames,
+      this.ioSets[sessionId].getIoNames(),
+      requestId
+    );
+
+    await this.wsServerSessions.send(sessionId, binMsg);
   }
 
 }
