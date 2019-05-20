@@ -112,7 +112,7 @@ export default class BuildIo {
 
     for (let devPath of machineConfig.ios) {
       const devName: string = getFileNameOfPath(devPath);
-      const ioString = `${devName}: require("./${devName}")`;
+      const ioString = `${devName}: require("./${devName}").default`;
 
       ios.push(ioString);
     }
