@@ -42,6 +42,7 @@ Also you can specify the next params:
       [--machine=x86 | arm | rpi]
       [--work-dir]
       [--name]
+      [--force=true]
       ./groupOrHostConfig.yaml
 
 ### Start development host
@@ -50,6 +51,7 @@ Also you can specify the next params:
       [--machine=x86 | arm | rpi]
       [--work-dir]
       [--name]
+      [--force=true]
       [--ioset=localhost:8889]
       ./groupOrHostConfig.yaml
 
@@ -61,6 +63,8 @@ Also you can specify the next params:
   By default it uses $SQUIDLET_ROOT dir instead "build" of repository.
 * --name uses only if group config is specified
   and selects a host config from group config
+* --force - in production it rebuilds system and installs npm modules.
+   In development it installs npm modules.
 * --ioset=localhost:8889 - connect to ioSet of remote host. You should allow it in this host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)

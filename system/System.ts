@@ -87,7 +87,7 @@ export default class System {
     // remove initialization config
     delete this.initializationConfig;
 
-    console.info(`===> System initialization has finished`);
+    console.info(`===> System initialization has been finished`);
   }
 
   onDevicesInit(cb: () => void): number {

@@ -19,8 +19,12 @@ export default class BuildHostEnv {
 
   async build() {
     await this.os.mkdirP(this.hostBuildDir);
-    //await this.os.rimraf(`${this.hostBuildDir}/**/*`);
     await this.os.mkdirP(this.hostTmpDir);
+
+    // TODO: удалить старые
+
+    // await this.os.rimraf(`${this.hostBuildDir}/**/*`);
+    // await this.os.rimraf(`${this.hostTmpDir}/**/*`);
 
     const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, this.hostBuildDir, this.hostTmpDir);
 

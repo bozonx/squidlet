@@ -19,6 +19,7 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
+  readonly force: boolean;
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
   }
@@ -38,6 +39,7 @@ export default class Props {
   constructor(
     os: Os,
     groupConfig: GroupConfigParser,
+    argForce: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -47,6 +49,7 @@ export default class Props {
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
+    this.force = argForce;
   }
 
 

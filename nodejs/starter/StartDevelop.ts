@@ -28,6 +28,7 @@ export default class StartDevelop {
 
   constructor(
     configPath: string,
+    argForce: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -38,6 +39,7 @@ export default class StartDevelop {
     this.props = new Props(
       this.os,
       this.groupConfig,
+      argForce,
       argMachine,
       argHostName,
       argWorkDir

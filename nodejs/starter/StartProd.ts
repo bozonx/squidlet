@@ -24,6 +24,7 @@ export default class StartProd {
 
   constructor(
     configPath: string,
+    argForce: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string
@@ -32,6 +33,7 @@ export default class StartProd {
     this.props = new Props(
       this.os,
       this.groupConfig,
+      argForce,
       argMachine,
       argHostName,
       argWorkDir,
@@ -67,7 +69,7 @@ export default class StartProd {
    */
   private async installModules() {
     // do not install node modules if they have been installed previously
-    if (await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
+    if (!this.props.force && await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
     const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
     const packageJson: string = generatePackageJson(mergedHostConfig.dependencies);
@@ -101,7 +103,7 @@ export default class StartProd {
     const pathToSystemDir = this.getPathToProdSystemDir();
 
     // else if it exists - do nothing
-    if (await this.os.exists(pathToSystemDir)) return;
+    if (!this.props.force && await this.os.exists(pathToSystemDir)) return;
 
     await this.buildEnvSet.buildSystem();
   }
@@ -116,6 +118,7 @@ export default class StartProd {
     //   platform: this.props.platform,
     //   machine: this.props.machine,
     // };
+
 
     // build config and entities
     await this.buildEnvSet.buildEnvSet(this.props.hostConfig);

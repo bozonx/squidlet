@@ -7,6 +7,7 @@ interface CommandStartArgs {
   workDir?: string;
   name?: string;
   prod?: boolean;
+  force?: boolean;
   ioset?: string;
 }
 
@@ -14,7 +15,6 @@ interface CommandStartArgs {
 export default class CommandStart {
   private readonly configPath: string;
   private readonly args: CommandStartArgs;
-  private readonly isProd: boolean;
 
 
   constructor(positionArgs: string[], args: CommandStartArgs) {
@@ -24,15 +24,15 @@ export default class CommandStart {
 
     this.configPath = positionArgs[0];
     this.args = args;
-    this.isProd = Boolean(args.prod);
   }
 
 
   async start() {
     // run prod is specified
-    if (this.isProd) {
+    if (this.args.prod) {
       const starter: StartProd = new StartProd(
         this.configPath,
+        Boolean(this.args.force),
         this.args.machine as any,
         this.args.name,
         this.args.workDir,
@@ -47,6 +47,7 @@ export default class CommandStart {
     // or run dev
     const starter: StartDevelop = new StartDevelop(
       this.configPath,
+      Boolean(this.args.force),
       this.args.machine as any,
       this.args.name,
       this.args.workDir,

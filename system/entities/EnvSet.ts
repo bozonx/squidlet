@@ -4,6 +4,7 @@ import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 import {EntityClassType} from './EntityManagerBase';
 import {pathJoin} from '../helpers/nodeLike';
 import StorageIo from '../interfaces/io/StorageIo';
+import {splitFirstElement} from '../helpers/strings';
 
 
 /**
@@ -57,7 +58,7 @@ export default class EnvSet {
    */
   async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
     const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
-    const mainFileName: string = manifest.main;
+    const mainFileName: string = splitFirstElement(manifest.main, '.')[0];
     const filePath = pathJoin(
       this.system.systemConfig.rootDirs.envSet,
       this.system.systemConfig.envSetDirs.entities,
