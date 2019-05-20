@@ -1,10 +1,11 @@
 import * as path from 'path';
+import _isEmpty = require('lodash/isEmpty');
 
-import Os from '../../shared/Os';
+import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {startSystem, SYSTEM_DIR} from './helpers';
+import {REPO_ROOT, startSystem, SYSTEM_DIR} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
@@ -61,8 +62,30 @@ export default class StartDevelop {
 
 
   private async installModules() {
-    // TODO: проверить чтобы были установленны node_modules в корне самого squidlet
-    // TODO: install modules from config
+    // TODO: use force to reinstall
+
+    if (!this.props.hostConfig.dependencies || _isEmpty(this.props.hostConfig.dependencies)) return;
+
+    const toInstallModules: string[] = [];
+
+    for (let moduleName of Object.keys(this.props.hostConfig.dependencies)) {
+      if (await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
+
+      toInstallModules.push(`${moduleName}@${this.props.hostConfig.dependencies[moduleName]}`);
+    }
+
+    if (!toInstallModules.length) return;
+
+    console.info(`===> Installing npm modules`);
+
+    const cmd = `npm install ${toInstallModules.join(' ')}`;
+    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, REPO_ROOT);
+
+    if (result.status) {
+      console.error(`ERROR: npm ends with code ${result.status}`);
+      console.error(result.stdout);
+      console.error(result.stderr);
+    }
   }
 
   /**

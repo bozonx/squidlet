@@ -12,10 +12,10 @@ import System from '../../system';
 import IoSet from '../../system/interfaces/IoSet';
 
 
-//const REPO_ROOT = path.resolve(__dirname, '../');
-export const SYSTEM_DIR = path.resolve(__dirname, '../../system');
+export const REPO_ROOT = path.resolve(__dirname, '../../');
+export const SYSTEM_DIR = path.join(REPO_ROOT, 'system');
+const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
-const SQUIDLET_PACKAGE_JSON_PATH = path.resolve(__dirname, '../../package.json');
 
 
 export function makeSystemConfigExtend(props: Props): {[index: string]: any} {

@@ -6,7 +6,6 @@ import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {resolvePlatformDir} from '../../shared/helpers';
 import {generatePackageJson, installNpmModules, startSystem} from './helpers';
 import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
 import {SYSTEM_FILE_NAME} from '../../shared/constants';
