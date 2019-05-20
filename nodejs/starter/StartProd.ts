@@ -16,7 +16,10 @@ export default class StartProd {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
-  private readonly buildEnvSet: BuildEnvSet;
+  private _buildEnvSet?: BuildEnvSet;
+  private get buildEnvSet(): BuildEnvSet {
+    return this._buildEnvSet as any;
+  }
 
 
   constructor(
@@ -26,7 +29,6 @@ export default class StartProd {
     argWorkDir?: string
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
-    this.buildEnvSet = new BuildEnvSet(this.os);
     this.props = new Props(
       this.os,
       this.groupConfig,
@@ -39,7 +41,7 @@ export default class StartProd {
   async init() {
     await this.groupConfig.init();
     await this.props.resolve();
-    this.buildEnvSet.init(this.props.envSetDir, this.props.tmpDir);
+    this._buildEnvSet = new BuildEnvSet(this.os, this.props.envSetDir, this.props.tmpDir);
 
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
@@ -47,9 +49,12 @@ export default class StartProd {
 
 
   async start() {
+    const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
+    const SystemClass = require(pathToSystem).default;
+
     await this.installModules();
     await this.buildInitialSystem();
-    await this.startSystem();
+    await startSystem(this.props, SystemClass);
   }
 
 
@@ -110,17 +115,6 @@ export default class StartProd {
     await this.buildEnvSet.buildEnvSet(initialHostConfig);
     // build io
     await this.buildEnvSet.buildIos(this.props.platform, this.props.machine);
-  }
-
-  /**
-   * Resolve production io set (nodejs-ws or local)
-   * and start production version of System.
-   */
-  private async startSystem() {
-    const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
-    const SystemClass = require(pathToSystem).default;
-
-    await startSystem(this.props, SystemClass);
   }
 
   private getPathToProdSystemDir(): string {

@@ -10,17 +10,13 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 export default class BuildEnvSet {
-  private envSetDir: string = '';
-  private tmpDir: string = '';
+  private readonly envSetDir: string;
+  private readonly tmpDir: string;
   private readonly os: Os;
 
 
-  constructor(os: Os) {
+  constructor(os: Os, envSetDir: string, tmpDir: string) {
     this.os = os;
-  }
-
-
-  init(envSetDir: string, tmpDir: string) {
     this.envSetDir = envSetDir;
     this.tmpDir = tmpDir;
   }
