@@ -63,4 +63,7 @@ export default interface PreHostConfig {
   mqtt?: {[index: string]: any};
   // shortcut for logger service
   logger?: {[index: string]: any};
+
+  // additional npm packages which will be installed
+  dependencies?: {[index: string]: any};
 }
