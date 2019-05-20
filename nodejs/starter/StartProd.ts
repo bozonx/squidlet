@@ -71,6 +71,8 @@ export default class StartProd {
     // do not install node modules if they have been installed previously
     if (!this.props.force && await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
+    // TODO: может если force - то удалть node_modules ???
+
     const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
     const packageJson: string = generatePackageJson(mergedHostConfig.dependencies);
 

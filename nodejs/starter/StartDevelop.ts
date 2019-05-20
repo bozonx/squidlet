@@ -107,7 +107,7 @@ export default class StartDevelop {
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
     const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
-    console.info(`--> using io set "${ioSetFile}"`);
+    console.info(`using io set "${ioSetFile}"`);
 
     const ioSet = new IoSetClass(
       this.os,
