@@ -4,9 +4,9 @@ import System from '../../system/System';
 import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import IoItem from '../../system/interfaces/IoItem';
-import {SYSTEM_DIR} from '../starter/helpers';
 import BackdoorClient from '../../shared/BackdoorClient';
 import {BACKDOOR_ACTION} from '../../entities/services/Backdoor/Backdoor';
+import {SYSTEM_DIR} from '../../shared/helpers';
 
 
 export default class RemoteIoCollection {

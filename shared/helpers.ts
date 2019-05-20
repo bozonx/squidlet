@@ -4,12 +4,16 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
-import {HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME} from './constants';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import validateHostConfig from '../hostEnvBuilder/hostConfig/validateHostConfig';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
+
+
+export const REPO_ROOT = path.resolve(__dirname, '../../');
+export const SYSTEM_DIR = path.join(REPO_ROOT, 'system');
+export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 
 
 /**
@@ -49,21 +53,23 @@ export function loadMachineConfig(platform: Platforms, machine: string): Machine
 }
 
 /**
- * If SQUIDLET_ROOT environment variable is set, it will be used.
- * Else use default dir.
- * If $XDG_DATA_HOME is either not set or empty, a default equal to $HOME/.local/share should be used.
+ * If work dir is passed then it will be made an absolute according CWD.
+ * If isn't set then SQUIDLET_ROOT env variable will be used - $SQUIDLET_ROOT/<subDir>.
+ * Otherwise "build/<subDir>" dir or this repository will be used.
  */
-export function resolveSquidletRoot(): string {
-  const envVar: string | undefined = process.env['SQUIDLET_ROOT'];
-  const xdgDataHome: string | undefined = process.env['XDG_DATA_HOME'];
+export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
+  const envRoot: string | undefined = process.env['SQUIDLET_ROOT'];
 
-  if (envVar) return envVar;
-
-  if (xdgDataHome) {
-    return path.join(xdgDataHome, SQUIDLET_ROOT_DIR_NAME);
+  if (argWorkDir) {
+    // if it set as an argument - make it absolute
+    return path.resolve(process.cwd(), argWorkDir);
+  }
+  else if (envRoot) {
+    // else use under a $SQUIDLET_ROOT
+    return path.join(envRoot, subDir);
   }
 
-  return path.join(process.env['HOME'] as string, HOME_SHARE_DIR, SQUIDLET_ROOT_DIR_NAME);
+  return path.join(REPO_ROOT, 'build', subDir);
 }
 
 export async function getOsMachine(os: Os) {

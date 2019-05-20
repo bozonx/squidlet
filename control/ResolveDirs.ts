@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR, BUILD_SYSTEM_DIR} from '../shared/constants';
-import {resolveSquidletRoot} from '../shared/helpers';
+import {resolveWorkDir} from '../shared/helpers';
 
 
 export interface Args {
@@ -25,7 +25,7 @@ export default class ResolveDirs {
 
 
   resolve() {
-    this.workDir = this.resolveWorkDir();
+    this.workDir = resolveWorkDir(BUILD_ROOT_DIR, this.args.workDir);
     this.tmpDir = path.join(this.workDir, '__tmp');
     this.systemBuildDir = path.join(this.workDir, BUILD_SYSTEM_DIR);
     this.systemTmpDir = path.join(this.tmpDir, BUILD_SYSTEM_DIR);
@@ -33,25 +33,23 @@ export default class ResolveDirs {
     this.hostsTmpDir = path.join(this.tmpDir, BUILD_HOSTS_DIR);
   }
 
-
-  private resolveWorkDir(): string {
-    let workDirArg: string | undefined = this.args.workDir;
-
-    if (workDirArg) {
-      // if it set as an argument - make it absolute
-      return path.resolve(process.cwd(), workDirArg);
-    }
-
-    // or make default path using $SQUIDLET_ROOT
-    const squidletRoot: string = resolveSquidletRoot();
-
-    return path.join(squidletRoot, BUILD_ROOT_DIR);
-  }
-
-
 }
 
 
+// private resolveWorkDir(): string {
+//   let workDirArg: string | undefined = this.args.workDir;
+//
+//   // if (workDirArg) {
+//   //   // if it set as an argument - make it absolute
+//   //   return path.resolve(process.cwd(), workDirArg);
+//   // }
+//
+//   // or make default path using $SQUIDLET_ROOT
+//   const squidletRoot: string = resolveSquidletRoot();
+//
+//   return path.join(squidletRoot, BUILD_ROOT_DIR);
+// }
+//
 
 // interface ArgsDirs {
 //   buildDir: string | undefined;

@@ -5,16 +5,11 @@ import _template = require('lodash/template');
 import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import Os, {SpawnCmdResult} from '../../shared/Os';
 import Props from './Props';
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import * as ts from 'typescript';
-import {loadMachineConfigInPlatformDir, getFileNameOfPath} from '../../shared/helpers';
+import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
 import System from '../../system';
 import IoSet from '../../system/interfaces/IoSet';
 
 
-export const REPO_ROOT = path.resolve(__dirname, '../../');
-export const SYSTEM_DIR = path.join(REPO_ROOT, 'system');
-const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
 
 

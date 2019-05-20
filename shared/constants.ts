@@ -12,11 +12,6 @@ export const BUILD_HOSTS_DIR = 'hosts';
 export const BUILD_SYSTEM_DIR = 'system';
 export const BUILD_IO_DIR = 'io';
 
-// $HOME/.local/share
-export const HOME_SHARE_DIR = '.local/share';
-// root dir in $HOME/.local/share
-export const SQUIDLET_ROOT_DIR_NAME = 'squidlet';
-
 export const HOSTS_WORK_DIRS = 'workdirs';
 export const HOST_ENVSET_DIR = 'envSet';
 export const HOST_VAR_DATA_DIR = 'varData';

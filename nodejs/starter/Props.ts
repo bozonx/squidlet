@@ -9,7 +9,7 @@ import {
   HOST_TMP_DIR,
   HOSTS_WORK_DIRS,
 } from '../../shared/constants';
-import {getOsMachine, resolveSquidletRoot} from '../../shared/helpers';
+import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 
 
@@ -57,16 +57,7 @@ export default class Props {
     this.validate();
 
     this.hostId = this.hostConfig.id as any;
-
-    if (this.argWorkDir) {
-      this.workDir = path.resolve(process.cwd(), this.argWorkDir);
-    }
-    else {
-      // else use under a $SQUIDLET_ROOT
-      const squidletRoot: string = resolveSquidletRoot();
-
-      this.workDir = path.join(squidletRoot, HOSTS_WORK_DIRS, this.hostId);
-    }
+    this.workDir = resolveWorkDir(path.join(HOSTS_WORK_DIRS, this.hostId), this.argWorkDir);
 
     this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
     this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
@@ -103,6 +94,17 @@ export default class Props {
 
 }
 
+
+
+// if (this.argWorkDir) {
+//   this.workDir = path.resolve(process.cwd(), this.argWorkDir);
+// }
+// else {
+//   // else use under a $SQUIDLET_ROOT
+//   const squidletRoot: string = resolveSquidletRoot();
+//
+//   this.workDir = path.join(squidletRoot, HOSTS_WORK_DIRS, this.hostId);
+// }
 
 //this._hostConfig.ioSet = this.resolveIoSetConfig(this._hostConfig.ioSet);
 // /**
