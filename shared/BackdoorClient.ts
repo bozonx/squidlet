@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import {collectPropsDefaults} from '../hostEnvBuilder/helpers';
-import WebSocketClient from './nodeJsLikeIo/WebSocketClient';
+import WebSocketClient from '../nodejs/devs/WebSocketClient';
 import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import {decodeBackdoorMessage, makeMessage, validateMessage} from '../entities/services/Backdoor/helpers';
 import IndexedEvents from '../system/helpers/IndexedEvents';

@@ -3,9 +3,9 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 const machineConfig: MachineConfig = {
   ios: [
-    '../shared/nodeJsLikeIo/Storage.ts',
-    '../shared/nodeJsLikeIo/WebSocketClient.ts',
-    '../shared/nodeJsLikeIo/WebSocketServer.ts',
+    './ios/Storage.ts',
+    './ios/WebSocketClient.ts',
+    './ios/WebSocketServer.ts',
     //'Sha1',
     './ios/Digital.ts',
     //'Pwm',
@@ -21,10 +21,10 @@ const machineConfig: MachineConfig = {
     //'Dac',
     //'I2cSlave',
   ],
-  iosSupportFiles: [
-    //'./rpi/package.json',
-    '../shared/nodeJsLikeIo/helpers.js',
-  ],
+  // iosSupportFiles: [
+  //   //'./rpi/package.json',
+  //   '../shared/nodeJsLikeIo/helpers.js',
+  // ],
 
   hostConfig: {
     drivers: {
