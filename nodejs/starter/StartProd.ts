@@ -44,16 +44,17 @@ export default class StartProd {
     this._buildEnvSet = new BuildEnvSet(this.os, this.props.envSetDir, this.props.tmpDir);
 
     console.info(`Use working dir ${this.props.workDir}`);
-    console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
+    console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
 
   async start() {
+    await this.installModules();
+    await this.buildInitialSystem();
+
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
     const SystemClass = require(pathToSystem).default;
 
-    await this.installModules();
-    await this.buildInitialSystem();
     await startSystem(this.props, SystemClass);
   }
 
@@ -116,7 +117,7 @@ export default class StartProd {
   }
 
   private getPathToProdSystemDir(): string {
-    return path.join(this.props.workDir, this.props.envSetDir, systemConfig.envSetDirs.system);
+    return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
 }
