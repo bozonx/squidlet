@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as ts from 'typescript';
 
 import IoSet from '../../system/interfaces/IoSet';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
@@ -38,19 +37,13 @@ export default class IoSetDevelopLocal implements IoSet {
   async init(): Promise<void> {
     const platformDir: string = resolvePlatformDir(this.platform);
     const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, this.machine);
-    const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule');
-    const machineEvalModule: any = require(evalModulePath);
 
     for (let ioPath of machineConfig.ios) {
       const ioName: string = getFileNameOfPath(ioPath);
       const ioAbsPath = path.resolve(platformDir, ioPath);
+      const ioItemClass: new () => IoItem = require(ioAbsPath).default;
 
-      // TODO: review
-
-      const moduleContent: string = await this.os.getFileContent(ioAbsPath);
-      const compiledModuleContent: string = ts.transpile(moduleContent);
-      const ioItemClass: new () => IoItem = machineEvalModule(compiledModuleContent);
-
+      // make wrapper of Storage to get configs and manifests from memory
       if (ioName === 'Storage') {
         this.ioCollection[ioName] = this.storageWrapper.makeWrapper(new ioItemClass() as StorageIo);
       }
@@ -60,10 +53,10 @@ export default class IoSetDevelopLocal implements IoSet {
     }
   }
 
-
   async destroy() {
     delete this.ioCollection;
   }
+
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.ioCollection[ioName]) {
@@ -78,3 +71,30 @@ export default class IoSetDevelopLocal implements IoSet {
   }
 
 }
+
+
+//import * as ts from 'typescript';
+// async init(): Promise<void> {
+//   const platformDir: string = resolvePlatformDir(this.platform);
+//   const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, this.machine);
+//   const evalModulePath: string = path.join(platformDir, this.machine, 'evalModule');
+//   const machineEvalModule: any = require(evalModulePath);
+//
+//   for (let ioPath of machineConfig.ios) {
+//     const ioName: string = getFileNameOfPath(ioPath);
+//     const ioAbsPath = path.resolve(platformDir, ioPath);
+//
+//     // TODO: review
+//
+//     const moduleContent: string = await this.os.getFileContent(ioAbsPath);
+//     const compiledModuleContent: string = ts.transpile(moduleContent);
+//     const ioItemClass: new () => IoItem = machineEvalModule(compiledModuleContent);
+//
+//     if (ioName === 'Storage') {
+//       this.ioCollection[ioName] = this.storageWrapper.makeWrapper(new ioItemClass() as StorageIo);
+//     }
+//     else {
+//       this.ioCollection[ioName] = new ioItemClass();
+//     }
+//   }
+// }
