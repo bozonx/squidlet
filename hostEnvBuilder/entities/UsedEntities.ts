@@ -129,7 +129,7 @@ export default class UsedEntities {
   }
 
   private async finalizeManifest(preManifest: PreManifestBase): Promise<ManifestBase> {
-    const finalManifest: ManifestBase = _omit<any>(
+    const finalManifest: ManifestBase = _omit(
       preManifest,
       'files',
       'system',
