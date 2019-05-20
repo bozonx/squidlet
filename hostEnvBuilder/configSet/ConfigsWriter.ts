@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import ConfigManager from '../hostConfig/ConfigManager';
 import Os from '../../shared/Os';
 import ConfigsSet from './ConfigsSet';
 import HostConfigSet from '../interfaces/HostConfigSet';
@@ -13,14 +12,14 @@ import HostConfigSet from '../interfaces/HostConfigSet';
  */
 export default class ConfigsWriter {
   private readonly os: Os;
-  private readonly configManager: ConfigManager;
   private readonly configsSet: ConfigsSet;
+  private readonly buildDir: string;
 
 
-  constructor(os: Os, configManager: ConfigManager, configsSet: ConfigsSet) {
+  constructor(os: Os, configsSet: ConfigsSet, buildDir: string) {
     this.os = os;
-    this.configManager = configManager;
     this.configsSet = configsSet;
+    this.buildDir = buildDir;
   }
 
 
@@ -30,9 +29,8 @@ export default class ConfigsWriter {
   async write() {
     const hostConfigSet: HostConfigSet = this.configsSet.getConfigSet();
     //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
-    const buildDir = this.configManager.buildDir;
     const fileNames = systemConfig.hostInitCfg.fileNames;
-    const configDir = path.join(buildDir, systemConfig.hostSysCfg.envSetDirs.configs);
+    const configDir = path.join(this.buildDir, systemConfig.hostSysCfg.envSetDirs.configs);
 
     // write host's config
     await this.os.writeJson(

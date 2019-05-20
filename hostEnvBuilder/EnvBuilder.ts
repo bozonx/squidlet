@@ -16,6 +16,10 @@ import {checkIoExistance} from './helpers';
 
 
 export default class EnvBuilder {
+  private readonly tmpBuildDir: string;
+  // env build dir
+  private readonly buildDir: string;
+  private readonly pluginEnv: PluginEnv;
   private readonly configManager: ConfigManager;
   private readonly register: Register;
   private readonly usedEntities: UsedEntities;
@@ -25,23 +29,25 @@ export default class EnvBuilder {
   private readonly configsWriter: ConfigsWriter;
   private readonly log: Logger = defaultLogger;
   private readonly os = new Os();
-  readonly pluginEnv: PluginEnv;
 
 
   constructor(hostConfigOrConfigPath: string | PreHostConfig, absEnvBuildDir: string, tmpBuildDir: string) {
-    this.configManager = new ConfigManager(this.os, hostConfigOrConfigPath, absEnvBuildDir, tmpBuildDir);
+    this.buildDir = absEnvBuildDir;
+    this.tmpBuildDir = tmpBuildDir;
+    this.configManager = new ConfigManager(this.os, hostConfigOrConfigPath);
     this.register = new Register(this.os);
     this.usedEntities = new UsedEntities(this.configManager, this.register);
     this.pluginEnv = new PluginEnv(this.configManager, this.register, this.usedEntities);
     this.entitiesWriter = new EntitiesWriter(
       this.os,
       this.log,
-      this.configManager,
-      this.usedEntities
+      this.usedEntities,
+      this.buildDir,
+      this.tmpBuildDir
     );
     this.definitions = new Definitions(this.configManager, this.usedEntities);
     this.configsSet = new ConfigsSet(this.configManager, this.usedEntities, this.definitions);
-    this.configsWriter = new ConfigsWriter(this.os, this.configManager, this.configsSet);
+    this.configsWriter = new ConfigsWriter(this.os, this.configsSet, this.buildDir);
   }
 
 

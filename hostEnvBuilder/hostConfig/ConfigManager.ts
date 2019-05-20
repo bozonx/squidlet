@@ -16,7 +16,6 @@ import {IoItemDefinition} from '../../system/interfaces/IoItem';
 export default class ConfigManager {
   // path to plugins specified in config
   readonly plugins: string[] = [];
-  readonly tmpBuildDir: string;
   // normalized entities from preConfig
   preEntities: PreEntities = {
     devices: {},
@@ -26,8 +25,6 @@ export default class ConfigManager {
   iosDefinitions: IoItemDefinition = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
-  // env build dir
-  buildDir: string;
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
   }
@@ -42,16 +39,9 @@ export default class ConfigManager {
   private hostConfigOrConfigPath: string | PreHostConfig;
 
 
-  constructor(
-    os: Os,
-    hostConfigOrConfigPath: string | PreHostConfig,
-    absEnvBuildDir: string,
-    tmpBuildDir: string
-  ) {
+  constructor(os: Os, hostConfigOrConfigPath: string | PreHostConfig) {
     this.os = os;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
-    this.buildDir = absEnvBuildDir;
-    this.tmpBuildDir = tmpBuildDir;
   }
 
   async init() {

@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
-import ConfigManager from '../hostConfig/ConfigManager';
 import Os from '../../shared/Os';
 import Logger from '../interfaces/Logger';
 import buildEntity from './buildEntity';
@@ -14,21 +13,23 @@ import HostEntitySet from '../interfaces/HostEntitySet';
  * Write all the host's entities files to storage.
  */
 export default class EntitiesWriter {
-  private readonly configManager: ConfigManager;
   private readonly usedEntities: UsedEntities;
+  private readonly buildDir: string;
+  private readonly tmpBuildDir: string;
   private readonly os: Os;
   private readonly log: Logger;
   // entities dir in storage
   private get entitiesDstDir(): string {
-    return path.join(this.configManager.buildDir, systemConfig.hostSysCfg.envSetDirs.entities);
+    return path.join(this.buildDir, systemConfig.hostSysCfg.envSetDirs.entities);
   }
 
 
-  constructor(os: Os, log: Logger, configManager: ConfigManager, usedEntities: UsedEntities) {
+  constructor(os: Os, log: Logger, usedEntities: UsedEntities, buildDir: string, tmpBuildDir: string) {
     this.os = os;
     this.log = log;
-    this.configManager = configManager;
     this.usedEntities = usedEntities;
+    this.buildDir = buildDir;
+    this.tmpBuildDir = tmpBuildDir;
   }
 
 
@@ -36,14 +37,14 @@ export default class EntitiesWriter {
    * Copy used files of entities to storage
    */
   async writeUsed() {
-    if (!this.configManager.tmpBuildDir) {
+    if (!this.tmpBuildDir) {
       throw new Error(`Temporary build dir wasn't specified`);
     }
 
     const usedEntities: EntitiesNames = this.usedEntities.getEntitiesNames();
 
     // clear tmp dir
-    await this.os.rimraf(`${this.configManager.tmpBuildDir}/**/*`);
+    await this.os.rimraf(`${this.tmpBuildDir}/**/*`);
 
     for (let typeName of Object.keys(usedEntities)) {
       const pluralType = typeName as ManifestsTypePluralName;
@@ -98,11 +99,11 @@ export default class EntitiesWriter {
     srcDir: string,
     entityDstDir: string
   ) {
-    if (!this.configManager.tmpBuildDir) {
+    if (!this.tmpBuildDir) {
       throw new Error(`Temporary build dir wasn't specified`);
     }
 
-    return buildEntity(pluralType, entityName, this.configManager.tmpBuildDir, srcDir, entityDstDir);
+    return buildEntity(pluralType, entityName, this.tmpBuildDir, srcDir, entityDstDir);
   }
 
 }
