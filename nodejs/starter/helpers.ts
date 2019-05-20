@@ -1,4 +1,6 @@
 import * as path from 'path';
+import * as fs from 'fs';
+import _template = require('lodash/template');
 
 import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import Os, {SpawnCmdResult} from '../../shared/Os';
@@ -12,6 +14,8 @@ import IoSet from '../../system/interfaces/IoSet';
 
 //const REPO_ROOT = path.resolve(__dirname, '../');
 export const SYSTEM_DIR = path.resolve(__dirname, '../../system');
+const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
+const SQUIDLET_PACKAGE_JSON_PATH = path.resolve(__dirname, '../../package.json');
 
 
 export function makeSystemConfigExtend(props: Props): {[index: string]: any} {
@@ -52,6 +56,15 @@ export async function startSystem(
   return system.start();
 }
 
+export function generatePackageJson(dependencies: {[index: string]: any}): string {
+  const templateContent: string = fs.readFileSync(PACKAGE_JSON_TEMPLATE_PATH, 'utf8');
+  const squildletPackageJson: {version: string} = require(SQUIDLET_PACKAGE_JSON_PATH);
+
+  return _template(templateContent)({
+    version: squildletPackageJson.version,
+    dependencies: JSON.stringify(dependencies),
+  });
+}
 
 
 // /**

@@ -51,27 +51,18 @@ export default class StartDevelop {
 
 
   async start() {
-
-    // TODO: review может вообще pigpio устанавливать глобально??? он не билдятся на x86
-    // TODO: или лучше указывать в machine config
-
-    // TODO: проверить чтобы были установленны node_modules в корне самого squidlet
-
-    //await this.installModules();
-    await this.startSystem();
-  }
-
-
-  /**
-   * Resolve development io set (IoSetDevelopLocal or IoSetDevelopRemote)
-   * and start development version of System.
-   */
-  private async startSystem() {
     const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
     const System = require(pathToSystem).default;
     const ioSet = this.makeIoSet();
 
+    await this.installModules();
     await startSystem(this.props, System, ioSet);
+  }
+
+
+  private async installModules() {
+    // TODO: проверить чтобы были установленны node_modules в корне самого squidlet
+    // TODO: install modules from config
   }
 
   /**
