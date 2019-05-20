@@ -56,9 +56,9 @@ Also you can specify the next params:
 ### Parameters
 
 * --machine can be x86, arm or rpi. It tries recognize it automatically if this argument isn't set
-* --prod=true - if set production version will be used instead. Development if isn't set.
+* --prod=true - if set production version will be used instead. By default is development.
 * --work-dir - set working dir for host where envset, data and tmp dirs will be placed.
-  By default it is under $SQUIDLET_ROOT dir
+  By default it uses $SQUIDLET_ROOT dir instead "build" of repository.
 * --name uses only if group config is specified
   and selects a host config from group config
 * --ioset=localhost:8889 - connect to ioSet of remote host. You should allow it in this host
@@ -68,7 +68,8 @@ Also you can specify the next params:
 
 ### Environment variables
 
-* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
+* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed.
+  By default isn't set.
 
   
 ## Listen logs of remote host
