@@ -20,6 +20,9 @@ export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
  * Make io name from io path
  */
 export function getFileNameOfPath(pathToIo: string): string {
+
+  // TODO: вместо его использовать хэлпер из system который берет перый элемент пути
+
   const parsed = path.parse(pathToIo);
 
   if (!parsed.name) throw new Error(`Can't parse io name of path "${pathToIo}"`);

@@ -47,21 +47,22 @@ export default class StorageEnvMemoryWrapper {
 
 
   private readFile = async (originalStorage: StorageIo, pathTo: string): Promise<string> => {
+    // if it isn't config or entity file - just load it.
     if (pathTo.indexOf(this.envSetDir) === -1) return originalStorage.readFile(pathTo);
 
-    const splat = pathTo.split(pathTo);
-    const relativePath = _trimStart(splat[1], path.sep);
+    const splat: string[] = pathTo.split(this.envSetDir);
+    const relativePath: string = _trimStart(splat[1], path.sep);
 
     if (!relativePath) throw new Error(`StorageEnvMemoryWrapper.readFile: Can't read path "${pathTo}"`);
 
-    const [envsetDir, restPath] = splitFirstElement(relativePath, path.sep);
+    const [envSetDir, restPath] = splitFirstElement(relativePath, path.sep);
 
     if (!restPath) throw new Error(`StorageEnvMemoryWrapper.readFile: empty rest of path`);
 
-    if (envsetDir === systemConfig.envSetDirs.configs) {
+    if (envSetDir === systemConfig.envSetDirs.configs) {
       return JSON.stringify(this.loadConfig(restPath));
     }
-    else if (envsetDir === systemConfig.envSetDirs.entities) {
+    else if (envSetDir === systemConfig.envSetDirs.entities) {
       return JSON.stringify(this.loadManifest(restPath));
     }
 
@@ -86,11 +87,18 @@ export default class StorageEnvMemoryWrapper {
    * Get builtin manifest
    */
   private loadManifest(entityString: string) : Promise<ManifestBase> {
-    const [pluralTypeStr, entityName] = splitFirstElement(entityString, path.sep);
+    const [pluralTypeStr, rest] = splitFirstElement(entityString, path.sep);
     const pluralType = pluralTypeStr as ManifestsTypePluralName;
 
+    if (!rest) {
+      throw new Error(`StorageEnvMemoryWrapper.loadManifest("${entityString}"): Can't parse entity name`);
+    }
+
+    // get entity name of 'ConsoleLogger/manifest.json'
+    const entityName: string = splitFirstElement(rest, path.sep)[0];
+
     if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
-      throw new Error(`StorageEnvMemoryWrapper.loadManifest("${pluralType}", "${entityName}"): Can't find an entity`);
+      throw new Error(`StorageEnvMemoryWrapper.loadManifest("${entityString}"): Can't find an entity`);
     }
 
     return this.envSet.entities[pluralType][entityName].manifest as any;

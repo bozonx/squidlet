@@ -58,7 +58,7 @@ export default class StartDevelop {
   async start() {
     const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
     const System = require(pathToSystem).default;
-    const ioSet = this.makeIoSet();
+    const ioSet = await this.makeIoSet();
 
     await this.installModules();
     await startSystem(this.props, System, ioSet);
@@ -100,7 +100,7 @@ export default class StartDevelop {
   /**
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
-  private makeIoSet(): IoSet {
+  private async makeIoSet(): Promise<IoSet> {
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = path.join(IOSET_DIR, ioSetFile);
     const IoSetClass: IoSetClass = require(ioSetPath).default;
@@ -118,7 +118,7 @@ export default class StartDevelop {
       this.argIoset
     );
 
-    ioSet.prepare && ioSet.prepare();
+    ioSet.prepare && await ioSet.prepare();
 
     return ioSet;
   }
