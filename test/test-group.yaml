@@ -12,14 +12,14 @@ hosts:
       someParam: 1
       #storageDir: './masterStorage'
 
-    backdoor: {}
+#    backdoor: {}
 
     devices:
       bedroom:
         people-count-sensor:
           device: FakePeopleCount
 
-    ioSet:
-      type: ws
+#    ioSet:
+#      type: ws
 #      host: localhost
 #      port: 8889

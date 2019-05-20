@@ -59,10 +59,11 @@ export default interface PreHostConfig {
 
   // shortcut for automation service
   automation?: {[index: string]: any};
+  // shortcut for logger service
+  consoleLogger?: {[index: string]: any};
   // shortcut for mqtt service
   mqtt?: {[index: string]: any};
-  // shortcut for logger service
-  logger?: {[index: string]: any};
+  backdoor?: {[index: string]: any};
 
   // additional npm packages which will be installed
   dependencies?: {[index: string]: string};

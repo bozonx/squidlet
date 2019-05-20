@@ -1,7 +1,7 @@
 export const servicesShortcut: {[index: string]: string} = {
   automation: 'Automation',
   consoleLogger: 'ConsoleLogger',
-  updater: 'Updater',
+  //updater: 'Updater',
 
   mqtt: 'Mqtt',
   backdoor: 'Backdoor',

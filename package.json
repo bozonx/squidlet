@@ -1,6 +1,6 @@
 {
   "name": "squidlet",
-  "version": "2.3.0",
+  "version": "2.5.0",
   "description": "Easy make IoT devices and local net of devices which can be managed by master",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
