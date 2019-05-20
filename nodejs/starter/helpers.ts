@@ -56,7 +56,7 @@ export async function startSystem(
   return system.start();
 }
 
-export function generatePackageJson(dependencies: {[index: string]: any}): string {
+export function generatePackageJson(dependencies: {[index: string]: any} = {}): string {
   const templateContent: string = fs.readFileSync(PACKAGE_JSON_TEMPLATE_PATH, 'utf8');
   const squildletPackageJson: {version: string} = require(SQUIDLET_PACKAGE_JSON_PATH);
 

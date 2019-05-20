@@ -7,7 +7,7 @@ import systemConfig from '../../system/config/systemConfig';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {resolvePlatformDir} from '../../shared/helpers';
-import {installNpmModules, startSystem} from './helpers';
+import {generatePackageJson, installNpmModules, startSystem} from './helpers';
 import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
 import {SYSTEM_FILE_NAME} from '../../shared/constants';
 
@@ -64,20 +64,17 @@ export default class StartProd {
    * It installs only if node_modules directory doesn't exist.
    */
   private async installModules() {
-    // copy package.json
-    const platformDir: string = resolvePlatformDir(this.props.platform);
-    const machineDir: string = path.join(platformDir, this.props.machine);
-
     // do not install node modules if they have been installed previously
     if (await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
-    await this.os.mkdirP(this.props.workDir);
-    await this.os.copyFile(
-      path.join(machineDir, 'package.json'),
-      path.join(this.props.workDir, 'package.json')
-    );
+    const packageJson: string = generatePackageJson(this.props.hostConfig.dependencies);
 
-    console.info(`===> Install npm modules`);
+    console.info(`===> writing package.json`);
+
+    await this.os.mkdirP(this.props.workDir);
+    await this.os.writeFile(path.join(this.props.workDir, 'package.json'), packageJson);
+
+    console.info(`===> Installing npm modules`);
 
     await installNpmModules(this.os, this.props.workDir);
 
@@ -89,7 +86,7 @@ export default class StartProd {
       );
     }
     catch (e) {
-      // do nothing
+      // do nothing - link exists
     }
   }
 
@@ -123,6 +120,14 @@ export default class StartProd {
 
 }
 
+
+
+//const platformDir: string = resolvePlatformDir(this.props.platform);
+//const machineDir: string = path.join(platformDir, this.props.machine);
+// await this.os.copyFile(
+//   path.join(machineDir, 'package.json'),
+//   path.join(this.props.workDir, 'package.json')
+// );
 
 //const ioSetType: IoSetTypes = this.resolveIoSetType();
 //console.info(`===> using io set "${ioSetType}"`);
