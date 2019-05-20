@@ -9,6 +9,7 @@ import NodejsMachines from '../interfaces/NodejsMachines';
 import {generatePackageJson, installNpmModules, startSystem} from './helpers';
 import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
 import {SYSTEM_FILE_NAME} from '../../shared/constants';
+import {preparePreHostConfig} from '../../shared/helpers';
 
 
 export default class StartProd {
@@ -66,7 +67,8 @@ export default class StartProd {
     // do not install node modules if they have been installed previously
     if (await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
-    const packageJson: string = generatePackageJson(this.props.hostConfig.dependencies);
+    const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
+    const packageJson: string = generatePackageJson(mergedHostConfig.dependencies);
 
     console.info(`===> writing package.json`);
 

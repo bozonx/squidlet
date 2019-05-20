@@ -98,8 +98,6 @@ export default class GroupConfigParser {
       ...this.plugins || [],
     ]);
 
-    // TODO: merge with machine config
-
     return preparedHostConfig;
   }
 

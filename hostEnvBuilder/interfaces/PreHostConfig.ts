@@ -65,5 +65,5 @@ export default interface PreHostConfig {
   logger?: {[index: string]: any};
 
   // additional npm packages which will be installed
-  dependencies?: {[index: string]: any};
+  dependencies?: {[index: string]: string};
 }

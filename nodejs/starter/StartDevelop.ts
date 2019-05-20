@@ -10,6 +10,8 @@ import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import {preparePreHostConfig} from '../../shared/helpers';
 
 
 type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
@@ -64,14 +66,16 @@ export default class StartDevelop {
   private async installModules() {
     // TODO: use force to reinstall
 
-    if (!this.props.hostConfig.dependencies || _isEmpty(this.props.hostConfig.dependencies)) return;
+    const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
+
+    if (!mergedHostConfig.dependencies || _isEmpty(this.props.hostConfig.dependencies)) return;
 
     const toInstallModules: string[] = [];
 
-    for (let moduleName of Object.keys(this.props.hostConfig.dependencies)) {
+    for (let moduleName of Object.keys(mergedHostConfig.dependencies)) {
       if (await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
 
-      toInstallModules.push(`${moduleName}@${this.props.hostConfig.dependencies[moduleName]}`);
+      toInstallModules.push(`${moduleName}@${mergedHostConfig.dependencies[moduleName]}`);
     }
 
     if (!toInstallModules.length) return;
@@ -79,6 +83,9 @@ export default class StartDevelop {
     console.info(`===> Installing npm modules`);
 
     const cmd = `npm install ${toInstallModules.join(' ')}`;
+
+    // TODO: use installNpmModules function ???
+
     const result: SpawnCmdResult = await this.os.spawnCmd(cmd, REPO_ROOT);
 
     if (result.status) {
