@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {BUILD_IO_DIR, BUILD_SYSTEM_DIR, HOST_ENVSET_DIR} from '../constants';
+import {HOST_ENVSET_DIR} from '../constants';
 import BuildSystem from './BuildSystem';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import BuildHostEnv from './BuildHostEnv';
@@ -27,7 +27,7 @@ export default class BuildEnvSet {
    */
   async buildSystem() {
     const systemBuildDir = path.join(this.envSetDir, systemConfig.envSetDirs.system);
-    const systemTmpDir = path.join(this.tmpDir, BUILD_SYSTEM_DIR);
+    const systemTmpDir = path.join(this.tmpDir, systemConfig.envSetDirs.system);
     const buildSystem: BuildSystem = new BuildSystem(this.os);
 
     console.info(`===> Building system`);
@@ -56,8 +56,8 @@ export default class BuildEnvSet {
   async buildIos(platform: Platforms, machine: string) {
     console.info(`===> Building io`);
 
-    const buildDir = path.join(this.envSetDir, BUILD_IO_DIR);
-    const tmpDir = path.join(this.tmpDir, BUILD_IO_DIR);
+    const buildDir = path.join(this.envSetDir, systemConfig.envSetDirs.ios);
+    const tmpDir = path.join(this.tmpDir, systemConfig.envSetDirs.ios);
     const buildIo: BuildIo = new BuildIo(
       this.os,
       platform,

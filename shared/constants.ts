@@ -9,8 +9,8 @@ export const IO_SET_INDEX_FILE = 'index.js';
 // dirs inside build dir squidlet update command
 export const BUILD_ROOT_DIR = 'build';
 export const BUILD_HOSTS_DIR = 'hosts';
-export const BUILD_SYSTEM_DIR = 'system';
-export const BUILD_IO_DIR = 'io';
+//export const BUILD_SYSTEM_DIR = 'system';
+//export const BUILD_IO_DIR = 'io';
 
 export const HOSTS_WORK_DIRS = 'workdirs';
 export const HOST_ENVSET_DIR = 'envSet';

@@ -109,7 +109,7 @@ export default class StartProd {
   private async buildEnv() {
 
     // TODO: generate id or special guid
-    // TODO: если не задан host config - то использовать умолчальный
+    // TODO: если не задан host config - то использовать умолчальный ???
 
     // const initialHostConfig: PreHostConfig = {
     //   id: 'initialHost',

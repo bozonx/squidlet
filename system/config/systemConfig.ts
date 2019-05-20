@@ -10,7 +10,6 @@ const systemConfig: SystemConfig = {
   },
   // dirs of file system root
   envSetDirs: {
-    // TODO: rename to system
     // files which received from master
     system: 'system',
     configs: 'configs',

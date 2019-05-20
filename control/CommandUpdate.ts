@@ -8,7 +8,7 @@ import BuildHostEnv from '../shared/envSetBuild/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/envSetBuild/BuildSystem';
 import BuildIo from '../shared/envSetBuild/BuildIo';
-import {BUILD_IO_DIR} from '../shared/constants';
+import systemConfig from '../system/config/systemConfig';
 
 
 interface UpdateCommandParams {
@@ -99,8 +99,8 @@ export default class CommandUpdate {
       throw new Error(`Host config doesn't have a machine param`);
     }
 
-    const buildDir = path.join(this.dirs.hostsBuildDir, preHostConfig.id, BUILD_IO_DIR);
-    const tmpDir = path.join(this.dirs.hostsTmpDir, preHostConfig.id, BUILD_IO_DIR);
+    const buildDir = path.join(this.dirs.hostsBuildDir, preHostConfig.id, systemConfig.envSetDirs.ios);
+    const tmpDir = path.join(this.dirs.hostsTmpDir, preHostConfig.id, systemConfig.envSetDirs.ios);
     const buildIo: BuildIo = new BuildIo(
       this.os,
       preHostConfig.platform,
