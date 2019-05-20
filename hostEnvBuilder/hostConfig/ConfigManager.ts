@@ -1,15 +1,11 @@
-import _defaultsDeep = require('lodash/defaultsDeep');
-
 import PreHostConfig from '../interfaces/PreHostConfig';
-import validateHostConfig from './validateHostConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
-import hostDefaultConfig from '../configs/hostDefaultConfig';
 import MachineConfig from '../interfaces/MachineConfig';
 import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig, makeIoNames} from '../../shared/helpers';
+import {makeIoNames, preparePreHostConfig} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
@@ -46,14 +42,9 @@ export default class ConfigManager {
 
   async init() {
     const preHostConfig: PreHostConfig = await this.resolveHostConfig();
-    const validateError: string | undefined = validateHostConfig(preHostConfig);
 
-    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
-
-    this._machineConfig = this.loadMachineConfig(preHostConfig);
-
-    const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
-    const normalizedConfig: PreHostConfig = normalizeHostConfig(mergedConfig);
+    const preparedConfig: PreHostConfig = await preparePreHostConfig(preHostConfig);
+    const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
 
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     if (normalizedConfig.ios) this.iosDefinitions = normalizedConfig.ios;
@@ -86,17 +77,6 @@ export default class ConfigManager {
     }
   }
 
-  /**
-   * Merge host config with platform config
-   */
-  private async mergePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
-    return _defaultsDeep({},
-      preHostConfig,
-      this.machineConfig.hostConfig,
-      hostDefaultConfig,
-    );
-  }
-
   private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
       id: normalizedConfig.id as any,
@@ -106,15 +86,33 @@ export default class ConfigManager {
     };
   }
 
-  private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
-    if (!preHostConfig.platform) {
-      throw new Error(`Platform param has to be specified in host config`);
-    }
-
-    return loadMachineConfig(preHostConfig.platform, preHostConfig.machine as string);
-  }
-
 }
+
+
+// const validateError: string | undefined = validateHostConfig(preHostConfig);
+//
+// if (validateError) throw new Error(`Invalid host config: ${validateError}`);
+//this._machineConfig = this.loadMachineConfig(preHostConfig);
+//const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
+
+// /**
+//  * Merge host config with platform config
+//  */
+// private async mergePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
+//   return _defaultsDeep({},
+//     preHostConfig,
+//     this.machineConfig.hostConfig,
+//     hostDefaultConfig,
+//   );
+// }
+
+// private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
+//   if (!preHostConfig.platform) {
+//     throw new Error(`Platform param has to be specified in host config`);
+//   }
+//
+//   return loadMachineConfig(preHostConfig.platform, preHostConfig.machine as string);
+// }
 
 
 // private resolveBuildDir(normalizedConfig: PreHostConfig): string {
