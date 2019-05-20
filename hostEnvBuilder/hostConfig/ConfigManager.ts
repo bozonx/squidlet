@@ -5,7 +5,7 @@ import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {makeIoNames, preparePreHostConfig} from '../../shared/helpers';
+import {loadMachineConfig, makeIoNames, preparePreHostConfig} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
@@ -46,6 +46,9 @@ export default class ConfigManager {
     const preparedConfig: PreHostConfig = await preparePreHostConfig(preHostConfig);
     const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
 
+    if (!preHostConfig.platform || !preHostConfig.machine) throw new Error(`No platform or machine`);
+
+    this._machineConfig = loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     if (normalizedConfig.ios) this.iosDefinitions = normalizedConfig.ios;
     this.preEntities = {
@@ -92,7 +95,6 @@ export default class ConfigManager {
 // const validateError: string | undefined = validateHostConfig(preHostConfig);
 //
 // if (validateError) throw new Error(`Invalid host config: ${validateError}`);
-//this._machineConfig = this.loadMachineConfig(preHostConfig);
 //const mergedConfig: PreHostConfig = await this.mergePreHostConfig(preHostConfig);
 
 // /**

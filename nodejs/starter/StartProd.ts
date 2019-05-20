@@ -51,6 +51,7 @@ export default class StartProd {
   async start() {
     await this.installModules();
     await this.buildInitialSystem();
+    await this.buildEnv();
 
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
     const SystemClass = require(pathToSystem).default;
@@ -102,16 +103,22 @@ export default class StartProd {
     // else if it exists - do nothing
     if (await this.os.exists(pathToSystemDir)) return;
 
-    const initialHostConfig: PreHostConfig = {
-      // TODO: generate id or special guid
-      id: 'initialHost',
-      platform: this.props.platform,
-      machine: this.props.machine,
-    };
-
     await this.buildEnvSet.buildSystem();
+  }
+
+  private async buildEnv() {
+
+    // TODO: generate id or special guid
+    // TODO: если не задан host config - то использовать умолчальный
+
+    // const initialHostConfig: PreHostConfig = {
+    //   id: 'initialHost',
+    //   platform: this.props.platform,
+    //   machine: this.props.machine,
+    // };
+
     // build config and entities
-    await this.buildEnvSet.buildEnvSet(initialHostConfig);
+    await this.buildEnvSet.buildEnvSet(this.props.hostConfig);
     // build io
     await this.buildEnvSet.buildIos(this.props.platform, this.props.machine);
   }

@@ -6,8 +6,8 @@ import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 import {omit} from 'system/helpers/lodashLike';
+import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';
-import {ConnectionParams} from '../../system/interfaces/io/WebSocketServerIo';
 
 
 export type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];

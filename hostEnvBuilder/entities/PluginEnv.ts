@@ -51,6 +51,7 @@ export default class PluginEnv {
    * Call it after registering.
    */
   addUsedEntity = async (pluralType: ManifestsTypePluralName, className: string) => {
+    // TODO: промис специально опущен ???
     this.usedEntities.addEntity(pluralType, className);
   }
 
