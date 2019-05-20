@@ -5,7 +5,7 @@ import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {startSystem} from './helpers';
+import {installNpmModules, startSystem} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
@@ -51,7 +51,7 @@ export default class StartDevelop {
     await this.props.resolve();
 
     console.info(`Use working dir ${this.props.workDir}`);
-    console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}"`);
+    console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
 
@@ -66,16 +66,14 @@ export default class StartDevelop {
 
 
   private async installModules() {
-    // TODO: use force to reinstall
-
     const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
 
-    if (!mergedHostConfig.dependencies || _isEmpty(this.props.hostConfig.dependencies)) return;
+    if (!mergedHostConfig.dependencies || _isEmpty(mergedHostConfig.dependencies)) return;
 
     const toInstallModules: string[] = [];
 
     for (let moduleName of Object.keys(mergedHostConfig.dependencies)) {
-      if (await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
+      if (!this.props.force && await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
 
       toInstallModules.push(`${moduleName}@${mergedHostConfig.dependencies[moduleName]}`);
     }
@@ -84,17 +82,7 @@ export default class StartDevelop {
 
     console.info(`===> Installing npm modules`);
 
-    const cmd = `npm install ${toInstallModules.join(' ')}`;
-
-    // TODO: use installNpmModules function ???
-
-    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, REPO_ROOT);
-
-    if (result.status) {
-      console.error(`ERROR: npm ends with code ${result.status}`);
-      console.error(result.stdout);
-      console.error(result.stderr);
-    }
+    await installNpmModules(this.os, REPO_ROOT, toInstallModules);
   }
 
   /**

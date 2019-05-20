@@ -23,11 +23,14 @@ export function makeSystemConfigExtend(props: Props): {[index: string]: any} {
   };
 }
 
-export async function installNpmModules(os: Os, cwd: string) {
-  const result: SpawnCmdResult = await os.spawnCmd('npm install', cwd);
+export async function installNpmModules(os: Os, cwd: string, modules: string[] = []) {
+  const cmd = `npm install ${modules.join(' ')}`;
+  const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
 
   if (result.status) {
-    throw new Error(`Can't install npm modules:\n${result.stderr}`);
+    console.error(`ERROR: npm ends with code ${result.status}`);
+    console.error(result.stdout);
+    console.error(result.stderr);
   }
 }
 
