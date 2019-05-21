@@ -2,7 +2,7 @@ import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 import {EntityClassType} from './EntityManagerBase';
-import {pathJoin} from '../helpers/nodeLike';
+import {pathIsAbsolute, pathJoin} from '../helpers/nodeLike';
 import StorageIo from '../interfaces/io/StorageIo';
 import {splitFirstElement} from '../helpers/strings';
 
@@ -23,13 +23,15 @@ export default class EnvSet {
 
 
   /**
-   * Get builtin config
-   * @param configName - config name with ".json" extension
+   * Get builtin config.
+   * In development mode it will be loaded from memory by devlopment ioSet.
+   * @param configFileName - config name with ".json" extension
    */
-  loadConfig<T>(configName: string): Promise<T> {
+  loadConfig<T>(configFileName: string): Promise<T> {
     const pathToFile: string = pathJoin(
+      this.system.systemConfig.rootDirs.envSet,
       this.system.systemConfig.envSetDirs.configs,
-      configName
+      configFileName
     );
 
     return this.readJsonObjectFile(pathToFile) as Promise<T>;
@@ -37,11 +39,13 @@ export default class EnvSet {
 
   /**
    * Get builtin manifest
+   * In development mode it will be loaded from memory by devlopment ioSet.
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
    */
   loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
     const pathToFile = pathJoin(
+      this.system.systemConfig.rootDirs.envSet,
       this.system.systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
@@ -56,70 +60,90 @@ export default class EnvSet {
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
    */
-  async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
+  async loadMain<T extends EntityClassType>(
+    pluralType: ManifestsTypePluralName,
+    entityName: string
+  ): Promise<T> {
     const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
     const mainFileName: string = splitFirstElement(manifest.main, '.')[0];
-    const filePath = pathJoin(
-      this.system.systemConfig.rootDirs.envSet,
-      this.system.systemConfig.envSetDirs.entities,
-      pluralType,
-      entityName,
-      mainFileName
-    );
+    // by default use a absolute path (in development mode)
+    let filePath: string = manifest.main;
+
+    if (!pathIsAbsolute(manifest.main)) {
+      filePath = pathJoin(
+        this.system.systemConfig.rootDirs.envSet,
+        this.system.systemConfig.envSetDirs.entities,
+        pluralType,
+        entityName,
+        mainFileName
+      );
+    }
 
     return require(filePath).default;
   }
 
-  loadEntityFile(
+  /**
+   * Load entity file as a string.
+   * @param pluralType - devices, drivers or services
+   * @param entityName - name of entity
+   * @param fileName - relative file name
+   */
+  async loadEntityFile(
     pluralType: ManifestsTypePluralName,
     entityName: string,
     fileName: string
   ): Promise<string> {
-    //await this.checkEntity(pluralType, entityName, fileName);
+    // by default use a absolute path (in development mode)
+    let filePath: string = fileName;
 
-    const pathToFile: string = pathJoin(
-      this.system.systemConfig.envSetDirs.entities,
-      entityName,
-      fileName
-    );
+    if (!pathIsAbsolute(fileName)) {
+      filePath = pathJoin(
+        this.system.systemConfig.rootDirs.envSet,
+        this.system.systemConfig.envSetDirs.entities,
+        pluralType,
+        entityName,
+        fileName
+      );
+    }
 
-    return this.readStringFile(pathToFile);
+    return this.storageIo.readFile(filePath);
   }
 
-  loadEntityBinFile(
+  /**
+   * Load entity file as a binary.
+   * @param pluralType - devices, drivers or services
+   * @param entityName - name of entity
+   * @param fileName - relative file name
+   */
+  async loadEntityBinFile(
     pluralType: ManifestsTypePluralName,
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    //await this.checkEntity(pluralType, entityName, fileName);
+    // by default use a absolute path (in development mode)
+    let filePath: string = fileName;
 
-    const pathToFile: string = pathJoin(
-      this.system.systemConfig.rootDirs.envSet,
-      this.system.systemConfig.envSetDirs.entities,
-      entityName,
-      fileName
-    );
+    if (!pathIsAbsolute(fileName)) {
+      filePath = pathJoin(
+        this.system.systemConfig.rootDirs.envSet,
+        this.system.systemConfig.envSetDirs.entities,
+        pluralType,
+        entityName,
+        fileName
+      );
+    }
 
-    return this.storageIo.readBinFile(pathToFile);
+    return this.storageIo.readBinFile(filePath);
   }
 
 
   /**
-   * Read json object file relative to envSetDir
+   * Read json object file
    */
-  private async readJsonObjectFile(fileName: string): Promise<{[index: string]: any}> {
-    const fileContent: string = await this.readStringFile(fileName);
+  private async readJsonObjectFile(filePath: string): Promise<{[index: string]: any}> {
+    const fileContent: string = await this.storageIo.readFile(filePath);
 
     return JSON.parse(fileContent);
-  }
-
-  /**
-   * Read string file relative to envSetDir
-   */
-  private async readStringFile(fileName: string): Promise<string> {
-    const filePath = pathJoin(this.system.systemConfig.rootDirs.envSet, fileName);
-
-    return this.storageIo.readFile(filePath);
   }
 
 }
