@@ -51,6 +51,8 @@ export default class StartProd {
 
 
   async start() {
+    await this.os.mkdirP(this.props.varDataDir);
+
     await this.installModules();
     await this.buildInitialSystem();
     await this.buildEnv();
@@ -78,7 +80,6 @@ export default class StartProd {
 
     console.info(`===> writing package.json`);
 
-    await this.os.mkdirP(this.props.workDir);
     await this.os.writeFile(path.join(this.props.workDir, 'package.json'), packageJson);
 
     console.info(`===> Installing npm modules`);

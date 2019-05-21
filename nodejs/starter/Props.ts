@@ -6,7 +6,7 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {
   HOST_ENVSET_DIR,
-  HOST_TMP_DIR,
+  HOST_TMP_DIR, HOST_VAR_DATA_DIR,
   HOSTS_WORK_DIRS,
 } from '../../shared/constants';
 import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
@@ -16,6 +16,7 @@ import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachi
 export default class Props {
   workDir: string = '';
   envSetDir: string = '';
+  varDataDir: string = '';
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
@@ -63,6 +64,7 @@ export default class Props {
     this.workDir = resolveWorkDir(path.join(HOSTS_WORK_DIRS, this.hostId), this.argWorkDir);
 
     this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
+    this.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
     this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
   }
 

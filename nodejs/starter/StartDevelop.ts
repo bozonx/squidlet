@@ -60,6 +60,7 @@ export default class StartDevelop {
     const System = require(pathToSystem).default;
     const ioSet = await this.makeIoSet();
 
+    await this.makeDirs();
     await this.installModules();
     await startSystem(this.props, System, ioSet);
   }
@@ -117,6 +118,14 @@ export default class StartDevelop {
     }
 
     return 'IoSetDevelopLocal';
+  }
+
+  /**
+   * Make envSet and varData dirs
+   */
+  private async makeDirs() {
+    await this.os.mkdirP(this.props.varDataDir);
+    await this.os.mkdirP(this.props.envSetDir);
   }
 
 }
