@@ -2,15 +2,7 @@ import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import Env from '../interfaces/Env';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
-
-
-interface BaseEntityInstance {
-  init?: () => Promise<void>;
-  //$riseDidInit?: () => Promise<void>;
-}
-
-// TODO: move to separate file
-export type EntityClassType = new (definition: EntityDefinition, env: Env) => BaseEntityInstance;
+import BaseEntityInstance, {EntityClassType} from '../interfaces/EntityInstanceBase';
 
 
 export default abstract class EntityManagerBase<EntityInstance extends BaseEntityInstance, EntityEnv extends Env> {
@@ -27,6 +19,14 @@ export default abstract class EntityManagerBase<EntityInstance extends BaseEntit
   constructor(system: System, EnvClass: new (system: System) => EntityEnv) {
     this.system = system;
     this._env = new EnvClass(this.system);
+  }
+
+  async destroy() {
+    for (let name of Object.keys(this.instances)) {
+      const instance: EntityInstance = this.instances[name];
+
+      if (instance.destroy) await instance.destroy();
+    }
   }
 
 

@@ -1,7 +1,5 @@
-export default interface DriverInstance {
+import BaseEntityInstance from './EntityInstanceBase';
 
-  // TODO: add constructor
-
-  init?: () => Promise<void>;
+export default interface DriverInstance extends BaseEntityInstance {
   [index: string]: any;
 }

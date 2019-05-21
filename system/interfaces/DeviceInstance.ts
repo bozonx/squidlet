@@ -1,6 +1,7 @@
-export default interface DeviceInstance {
-  init?: () => Promise<void>;
+import BaseEntityInstance from './EntityInstanceBase';
 
+
+export default interface DeviceInstance extends BaseEntityInstance {
   actions?: {[index: string]: (...p: any[]) => any};
 
   // TODO: review

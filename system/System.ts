@@ -59,8 +59,14 @@ export default class System {
     this.sessions = new Sessions(this.host.generateUniqId);
   }
 
-  destroy() {
-    // TODO: make total destroy
+  async destroy() {
+    this.riseEvent(topics.system.beforeDestroy);
+    await this.devicesManager.destroy();
+    await this.servicesManager.destroy();
+    await this.driversManager.destroy();
+    await this.ioManager.destroy();
+    this.sessions.destroy();
+    this.events.destroy();
   }
 
 

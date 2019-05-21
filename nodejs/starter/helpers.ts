@@ -46,7 +46,8 @@ export async function startSystem(
   const system = new SystemClass(ioSet, systemConfigExtend);
 
   process.on('SIGTERM', () => {
-    system.destroy();
+    system.destroy()
+      .catch(console.error);
   });
 
   console.info(`===> Starting system`);

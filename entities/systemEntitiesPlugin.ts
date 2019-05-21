@@ -6,7 +6,6 @@ const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
 const driversRoot = path.resolve(__dirname, systemEntitiesRoot, 'drivers');
 const servicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'services');
-//const networkConnectionDriversRoot = path.resolve(__dirname, systemEntitiesRoot, 'network/connections');
 
 
 export default async function systemEntitiesPlugin (env: PluginEnv) {
@@ -48,9 +47,6 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'WsClient/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServerSessions/manifest.yaml'));
-
-  // network connections drivers
-  //await env.addDriver(path.join(networkConnectionDriversRoot, 'I2c.connection'));
 
   // services
   await env.addService(path.join(servicesRoot, 'Backdoor/manifest.yaml'));

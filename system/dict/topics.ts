@@ -6,6 +6,7 @@ export default {
     systemServicesInitialized: 'system.systemServicesInitialized',
     devicesManagerInitialized: 'system.devicesManagerInitialized',
     appInitialized: 'system.appInitialized',
+    beforeDestroy: 'beforeDestroy',
   },
   updater: {
     versionsRequest: 'updater.versionsRequest',

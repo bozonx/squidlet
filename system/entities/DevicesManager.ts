@@ -47,18 +47,4 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
     return device as T;
   }
 
-  destroy() {
-
-    // TODO: make
-    // TODO: use async
-    // TODO: событие поднять в App
-
-    // // run destroy of devices instances
-    // _.each(this._devicesInstances, (device) => {
-    //   device.destroy && device.destroy();
-    // });
-    //
-    // this._app.events.emit(`app.afterDestroy`);
-  }
-
 }

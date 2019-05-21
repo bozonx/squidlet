@@ -11,6 +11,8 @@ export default class EntityBase<Props = {}> {
   readonly id: string;
   readonly className: string;
   readonly props: Props;
+  destroy?: () => void;
+
   protected readonly env: Env;
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: DriverInstance} = {};
@@ -26,7 +28,7 @@ export default class EntityBase<Props = {}> {
   protected appDidInit?: () => Promise<void>;
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
-  protected destroy?: () => void;
+
 
   protected get definition(): EntityDefinition {
     const {id, className, props} = this;
