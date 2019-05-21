@@ -82,62 +82,62 @@ export default class EnvSet {
     return require(filePath).default;
   }
 
-  /**
-   * Load entity file as a string.
-   * @param pluralType - devices, drivers or services
-   * @param entityName - name of entity
-   * @param fileName - relative file name
-   */
-  async loadEntityFile(
-    pluralType: ManifestsTypePluralName,
-    entityName: string,
-    fileName: string
-  ): Promise<string> {
-
-    // TODO: а разве путь будет абсолютный ???? - наверное надо брать из манифеста
-
-    // by default use a absolute path (in development mode)
-    let filePath: string = fileName;
-
-    if (!pathIsAbsolute(fileName)) {
-      filePath = pathJoin(
-        this.system.systemConfig.rootDirs.envSet,
-        this.system.systemConfig.envSetDirs.entities,
-        pluralType,
-        entityName,
-        fileName
-      );
-    }
-
-    return this.storageIo.readFile(filePath);
-  }
-
-  /**
-   * Load entity file as a binary.
-   * @param pluralType - devices, drivers or services
-   * @param entityName - name of entity
-   * @param fileName - relative file name
-   */
-  async loadEntityBinFile(
-    pluralType: ManifestsTypePluralName,
-    entityName: string,
-    fileName: string
-  ): Promise<Uint8Array> {
-    // by default use a absolute path (in development mode)
-    let filePath: string = fileName;
-
-    if (!pathIsAbsolute(fileName)) {
-      filePath = pathJoin(
-        this.system.systemConfig.rootDirs.envSet,
-        this.system.systemConfig.envSetDirs.entities,
-        pluralType,
-        entityName,
-        fileName
-      );
-    }
-
-    return this.storageIo.readBinFile(filePath);
-  }
+  // /**
+  //  * Load entity file as a string.
+  //  * @param pluralType - devices, drivers or services
+  //  * @param entityName - name of entity
+  //  * @param fileName - relative file name
+  //  */
+  // async loadEntityFile(
+  //   pluralType: ManifestsTypePluralName,
+  //   entityName: string,
+  //   fileName: string
+  // ): Promise<string> {
+  //
+  //   // TODO: а разве путь будет абсолютный ???? - наверное надо брать из манифеста
+  //
+  //   // by default use a absolute path (in development mode)
+  //   let filePath: string = fileName;
+  //
+  //   if (!pathIsAbsolute(fileName)) {
+  //     filePath = pathJoin(
+  //       this.system.systemConfig.rootDirs.envSet,
+  //       this.system.systemConfig.envSetDirs.entities,
+  //       pluralType,
+  //       entityName,
+  //       fileName
+  //     );
+  //   }
+  //
+  //   return this.storageIo.readFile(filePath);
+  // }
+  //
+  // /**
+  //  * Load entity file as a binary.
+  //  * @param pluralType - devices, drivers or services
+  //  * @param entityName - name of entity
+  //  * @param fileName - relative file name
+  //  */
+  // async loadEntityBinFile(
+  //   pluralType: ManifestsTypePluralName,
+  //   entityName: string,
+  //   fileName: string
+  // ): Promise<Uint8Array> {
+  //   // by default use a absolute path (in development mode)
+  //   let filePath: string = fileName;
+  //
+  //   if (!pathIsAbsolute(fileName)) {
+  //     filePath = pathJoin(
+  //       this.system.systemConfig.rootDirs.envSet,
+  //       this.system.systemConfig.envSetDirs.entities,
+  //       pluralType,
+  //       entityName,
+  //       fileName
+  //     );
+  //   }
+  //
+  //   return this.storageIo.readBinFile(filePath);
+  // }
 
 
   /**

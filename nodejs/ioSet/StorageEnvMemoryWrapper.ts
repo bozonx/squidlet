@@ -88,7 +88,7 @@ export default class StorageEnvMemoryWrapper {
   /**
    * Get builtin manifest
    */
-  private async loadManifest(entityString: string) : Promise<ManifestBase> {
+  private loadManifest(entityString: string): ManifestBase {
     const [pluralTypeStr, rest] = splitFirstElement(entityString, path.sep);
     const pluralType = pluralTypeStr as ManifestsTypePluralName;
 
