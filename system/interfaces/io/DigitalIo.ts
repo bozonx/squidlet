@@ -21,7 +21,7 @@ export const Methods = [
 ];
 
 
-interface DigitalBase extends IoItem {
+interface DigitalBase {
   read(pin: number): Promise<boolean>;
 
   // only for output pins
@@ -41,7 +41,7 @@ export interface DigitalSubDriver extends DigitalBase {
 }
 
 // Digital.dev
-export default interface DigitalIo extends DigitalBase {
+export default interface DigitalIo extends DigitalBase, IoItem {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
   setupOutput(pin: number, initialValue?: boolean): Promise<void>;
   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;

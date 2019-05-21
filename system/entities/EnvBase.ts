@@ -12,13 +12,16 @@ import LogPublisher from '../LogPublisher';
  */
 export default abstract class EnvBase implements Env {
   readonly system: System;
-  readonly log: LogPublisher;
-  readonly config: HostConfig;
+  get log(): LogPublisher {
+    return this.system.log;
+  }
+  get config(): HostConfig {
+    return this.system.host.config;
+  }
 
   constructor(system: System) {
     this.system = system;
-    this.log = system.log;
-    this.config = system.host.config;
+
   }
 
   getIo<T extends IoItem>(shortDevName: string): T {
