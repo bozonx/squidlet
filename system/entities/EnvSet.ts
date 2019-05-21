@@ -93,6 +93,9 @@ export default class EnvSet {
     entityName: string,
     fileName: string
   ): Promise<string> {
+
+    // TODO: а разве путь будет абсолютный ???? - наверное надо брать из манифеста
+
     // by default use a absolute path (in development mode)
     let filePath: string = fileName;
 

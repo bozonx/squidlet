@@ -1,5 +1,6 @@
 import * as path from 'path';
 import _trimStart = require('lodash/trimStart');
+import _cloneDeep = require('lodash/cloneDeep');
 
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
@@ -9,6 +10,7 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement} from '../../system/helpers/strings';
 import systemConfig from '../../system/config/systemConfig';
 import {getFileNameOfPath} from '../../shared/helpers';
+import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
 
 
 /**
@@ -86,7 +88,7 @@ export default class StorageEnvMemoryWrapper {
   /**
    * Get builtin manifest
    */
-  private loadManifest(entityString: string) : Promise<ManifestBase> {
+  private async loadManifest(entityString: string) : Promise<ManifestBase> {
     const [pluralTypeStr, rest] = splitFirstElement(entityString, path.sep);
     const pluralType = pluralTypeStr as ManifestsTypePluralName;
 
@@ -97,13 +99,26 @@ export default class StorageEnvMemoryWrapper {
     // get entity name of 'ConsoleLogger/manifest.json'
     const entityName: string = splitFirstElement(rest, path.sep)[0];
 
-    if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
-      throw new Error(`StorageEnvMemoryWrapper.loadManifest("${entityString}"): Can't find an entity`);
-    }
-
-    return this.envSet.entities[pluralType][entityName].manifest as any;
+    return this.prepareManifest(pluralType, entityName);
   }
 
+  /**
+   * Make all the paths absolute
+   */
+  private prepareManifest(pluralType: ManifestsTypePluralName, entityName: string): ManifestBase {
+    if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
+      throw new Error(`StorageEnvMemoryWrapper.prepareManifest("${pluralType}", "${entityName}"): Can't find an entity`);
+    }
+
+    const entitySet: HostEntitySet = this.envSet.entities[pluralType][entityName];
+    const manifest: ManifestBase = _cloneDeep(this.envSet.entities[pluralType][entityName].manifest);
+
+    manifest.main = path.join(entitySet.srcDir, manifest.main);
+
+    // TODO: что делать с файлами ????
+
+    return manifest;
+  }
 
 }
 
