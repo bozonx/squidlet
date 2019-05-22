@@ -1,7 +1,7 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ManifestBase from '../interfaces/ManifestBase';
-import Env from '../interfaces/Env';
 import DriverBase from '../baseDrivers/DriverBase';
+import EnvBase from './EnvBase';
 
 
 export type GetDriverDep = (driverName: string) => DriverBase;
@@ -13,7 +13,7 @@ export default class EntityBase<Props = {}> {
   readonly props: Props;
   destroy?: () => void;
 
-  protected readonly env: Env;
+  protected readonly env: EnvBase;
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: DriverBase} = {};
   // better place to instantiate dependencies if need
@@ -41,7 +41,7 @@ export default class EntityBase<Props = {}> {
   }
 
 
-  constructor(definition: EntityDefinition, env: Env) {
+  constructor(definition: EntityDefinition, env: EnvBase) {
     this.env = env;
     this.id = definition.id;
     this.className = definition.className;

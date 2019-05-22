@@ -1,14 +1,14 @@
 import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import Env from '../interfaces/Env';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 import EntityBase from './EntityBase';
+import EnvBase from './EnvBase';
 
 
-export type EntityClassType = new (definition: EntityDefinition, env: Env) => EntityBase;
+export type EntityClassType = new (definition: EntityDefinition, env: EnvBase) => EntityBase;
 
 
-export default abstract class EntityManagerBase<EntityInstance extends EntityBase, EntityEnv extends Env> {
+export default abstract class EntityManagerBase<EntityInstance extends EntityBase, EntityEnv extends EnvBase> {
   //protected readonly abstract EnvClass: new (system: System) => EntityEnv;
   protected readonly system: System;
   protected readonly instances: {[index: string]: EntityInstance} = {};

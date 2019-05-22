@@ -1,9 +1,9 @@
-import ManifestBase from './ManifestBase';
-import System from '../System';
-import HostConfig from './HostConfig';
-import IoItem from './IoItem';
-import LogPublisher from '../LogPublisher';
-import DriverBase from '../baseDrivers/DriverBase';
+import ManifestBase from '../system/interfaces/ManifestBase';
+import System from '../system/System';
+import HostConfig from '../system/interfaces/HostConfig';
+import IoItem from '../system/interfaces/IoItem';
+import LogPublisher from '../system/LogPublisher';
+import DriverBase from '../system/baseDrivers/DriverBase';
 
 
 export default interface Env {
