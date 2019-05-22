@@ -3,7 +3,7 @@ path = require('path')
 ConfigsWriter = require('../../hostEnvBuilder/configSet/ConfigsWriter').default
 
 
-describe.only 'envBuilder.ConfigsWriter', ->
+describe 'envBuilder.ConfigsWriter', ->
   beforeEach ->
     @hostConfigSet = {
       config: 'config'
@@ -21,54 +21,52 @@ describe.only 'envBuilder.ConfigsWriter', ->
       writeJson: sinon.spy()
     }
 
-    @configManager = {
-      buildDir: '/path/to/buildDir'
-    }
+    @buildDir = '/path/to/buildDir'
 
     @configsSet = {
       getConfigSet: () => @hostConfigSet
     }
 
-    @configsWriter = new ConfigsWriter(@io, @configManager, @configsSet)
+    @configsWriter = new ConfigsWriter(@io, @configsSet, @buildDir)
 
 
   it 'write', ->
     await @configsWriter.write()
 
     sinon.assert.calledWith(@io.writeJson.getCall(0),
-      "#{@configManager.buildDir}/configs/config.json",
+      "#{@buildDir}/configs/config.json",
       @hostConfigSet.config
     )
     sinon.assert.calledWith(@io.writeJson.getCall(1),
-      "#{@configManager.buildDir}/configs/systemDrivers.json",
+      "#{@buildDir}/configs/systemDrivers.json",
       @hostConfigSet.systemDrivers
     )
     sinon.assert.calledWith(@io.writeJson.getCall(2),
-      "#{@configManager.buildDir}/configs/regularDrivers.json",
+      "#{@buildDir}/configs/regularDrivers.json",
       @hostConfigSet.regularDrivers
     )
     sinon.assert.calledWith(@io.writeJson.getCall(3),
-      "#{@configManager.buildDir}/configs/systemServices.json",
+      "#{@buildDir}/configs/systemServices.json",
       @hostConfigSet.systemServices
     )
     sinon.assert.calledWith(@io.writeJson.getCall(4),
-      "#{@configManager.buildDir}/configs/regularServices.json",
+      "#{@buildDir}/configs/regularServices.json",
       @hostConfigSet.regularServices
     )
     sinon.assert.calledWith(@io.writeJson.getCall(5),
-      "#{@configManager.buildDir}/configs/devicesDefinitions.json",
+      "#{@buildDir}/configs/devicesDefinitions.json",
       @hostConfigSet.devicesDefinitions
     )
     sinon.assert.calledWith(@io.writeJson.getCall(6),
-      "#{@configManager.buildDir}/configs/driversDefinitions.json",
+      "#{@buildDir}/configs/driversDefinitions.json",
       @hostConfigSet.driversDefinitions
     )
     sinon.assert.calledWith(@io.writeJson.getCall(7),
-      "#{@configManager.buildDir}/configs/servicesDefinitions.json",
+      "#{@buildDir}/configs/servicesDefinitions.json",
       @hostConfigSet.servicesDefinitions
     )
     sinon.assert.calledWith(@io.writeJson.getCall(8),
-      "#{@configManager.buildDir}/configs/iosDefinitions.json",
+      "#{@buildDir}/configs/iosDefinitions.json",
       @hostConfigSet.iosDefinitions
     )
 #    sinon.assert.calledWith(@io.writeJson.getCall(8),

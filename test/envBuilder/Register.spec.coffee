@@ -1,7 +1,7 @@
 Register = require('../../hostEnvBuilder/entities/Register').default
 
 
-describe.only 'envBuilder.Register', ->
+describe 'envBuilder.Register', ->
   beforeEach ->
     @plugin = sinon.spy()
     @entity = {
@@ -13,8 +13,8 @@ describe.only 'envBuilder.Register', ->
       @entity...
       type: 'some'
     }
-    @main = {}
-    @register = new Register(@main)
+    @os = {}
+    @register = new Register(@os)
 
   it 'addPlugin as function and init', ->
     @register.addPlugin(@plugin)
@@ -60,19 +60,19 @@ describe.only 'envBuilder.Register', ->
     assert.isRejected(@register.addDriver({ @entity..., baseDir: 'some' }))
 
   it "resolveManifest - load from file", ->
-    @register.io.exists = () => Promise.resolve(true)
-    @register.io.stat = () => Promise.resolve({dir: true})
-    @register.io.loadYamlFile = sinon.stub().returns(Promise.resolve(@entity))
+    @os.exists = () => Promise.resolve(true)
+    @os.stat = () => Promise.resolve({dir: true})
+    @os.loadYamlFile = sinon.stub().returns(Promise.resolve(@entity))
 
     result = await @register.resolveManifest('/path/to/entity')
 
     assert.deepEqual(result, @entity)
-    sinon.assert.calledWith(@register.io.loadYamlFile, '/path/to/entity/manifest.yaml')
+    sinon.assert.calledWith(@os.loadYamlFile, '/path/to/entity/manifest.yaml')
 
   it "resolveManifest - load props from file", ->
-    @register.io.exists = () => Promise.resolve(true)
-    @register.io.stat = () => Promise.resolve({dir: true})
-    @register.io.loadYamlFile = sinon.stub().returns(Promise.resolve({
+    @os.exists = () => Promise.resolve(true)
+    @os.stat = () => Promise.resolve({dir: true})
+    @os.loadYamlFile = sinon.stub().returns(Promise.resolve({
       param: 1
     }))
 
@@ -93,4 +93,4 @@ describe.only 'envBuilder.Register', ->
         param: 1
       }
     })
-    sinon.assert.calledWith(@register.io.loadYamlFile, '/myDir/props.yaml')
+    sinon.assert.calledWith(@os.loadYamlFile, '/myDir/props.yaml')

@@ -1,7 +1,7 @@
 EntitiesWriter = require('../../hostEnvBuilder/entities/EntitiesWriter').default
 
 
-describe.only 'envBuilder.EntitiesWriter', ->
+describe 'envBuilder.EntitiesWriter', ->
   beforeEach ->
     @entitiesNames = {
       devices: ['MyDevice']
@@ -65,59 +65,57 @@ describe.only 'envBuilder.EntitiesWriter', ->
       info: () =>
     }
 
-    @configManager = {
-      buildDir: '/path/to/buildDir'
-      tmpBuildDir: '/path/to/tmpBuildDir'
-    }
+    @buildDir = '/path/to/buildDir'
+    @tmpBuildDir = '/path/to/tmpBuildDir'
 
     @usedEntities = {
       getEntitiesNames: () => @entitiesNames
       getEntitySet: (type, name) => @entitiesSet[type][name]
     }
 
-    @entitiesWriter = new EntitiesWriter(@io, @logger, @configManager, @usedEntities)
+    @entitiesWriter = new EntitiesWriter(@io, @logger, @usedEntities, @buildDir, @tmpBuildDir)
 
     @entitiesWriter.buildEntity = sinon.spy()
 
   it 'writeUsed', ->
     await @entitiesWriter.writeUsed()
 
-    sinon.assert.calledWith(@io.rimraf, "#{@configManager.tmpBuildDir}/**/*")
+    sinon.assert.calledWith(@io.rimraf, "#{@tmpBuildDir}/**/*")
 
     #### Devices
     sinon.assert.calledWith(@io.writeJson.getCall(0),
-      "#{@configManager.buildDir}/entities/devices/MyDevice/manifest.json",
+      "#{@buildDir}/entities/devices/MyDevice/manifest.json",
       @entitiesSet.devices.MyDevice.manifest
     )
     sinon.assert.calledWith(@entitiesWriter.buildEntity.getCall(0),
       'devices',
       'MyDevice'
       '/srcDir',
-      "#{@configManager.buildDir}/entities/devices/MyDevice"
+      "#{@buildDir}/entities/devices/MyDevice"
     )
-    sinon.assert.calledWith(@io.mkdirP, "#{@configManager.buildDir}/entities/devices/MyDevice/subDir")
-    sinon.assert.calledWith(@io.copyFile, '/srcDir/subDir/someFile.json', "#{@configManager.buildDir}/entities/devices/MyDevice/subDir/someFile.json")
+    sinon.assert.calledWith(@io.mkdirP, "#{@buildDir}/entities/devices/MyDevice/subDir")
+    sinon.assert.calledWith(@io.copyFile, '/srcDir/subDir/someFile.json', "#{@buildDir}/entities/devices/MyDevice/subDir/someFile.json")
 
     #### Drivers
     sinon.assert.calledWith(@io.writeJson.getCall(1),
-      "#{@configManager.buildDir}/entities/drivers/MyDriver/manifest.json",
+      "#{@buildDir}/entities/drivers/MyDriver/manifest.json",
       @entitiesSet.drivers.MyDriver.manifest
     )
     sinon.assert.calledWith(@entitiesWriter.buildEntity.getCall(1),
       'drivers',
       'MyDriver'
       '/srcDir',
-      "#{@configManager.buildDir}/entities/drivers/MyDriver"
+      "#{@buildDir}/entities/drivers/MyDriver"
     )
 
     #### Services
     sinon.assert.calledWith(@io.writeJson.getCall(2),
-      "#{@configManager.buildDir}/entities/services/MyService/manifest.json",
+      "#{@buildDir}/entities/services/MyService/manifest.json",
       @entitiesSet.services.MyService.manifest
     )
     sinon.assert.calledWith(@entitiesWriter.buildEntity.getCall(2),
       'services',
       'MyService'
       '/srcDir',
-      "#{@configManager.buildDir}/entities/services/MyService"
+      "#{@buildDir}/entities/services/MyService"
     )
