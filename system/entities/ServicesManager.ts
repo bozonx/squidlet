@@ -1,11 +1,11 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import ServiceInstance from '../interfaces/ServiceInstance';
 import EntityManagerBase from './EntityManagerBase';
 import ServiceEnv from '../baseServices/ServiceEnv';
 import System from '../System';
+import ServiceBase from '../baseServices/ServiceBase';
 
 
-export default class ServicesManager extends EntityManagerBase<ServiceInstance, ServiceEnv> {
+export default class ServicesManager extends EntityManagerBase<ServiceBase, ServiceEnv> {
   constructor(system: System) {
     super(system, ServiceEnv);
   }
@@ -28,8 +28,8 @@ export default class ServicesManager extends EntityManagerBase<ServiceInstance, 
     await this.initServices(servicesIds);
   }
 
-  getService<T extends ServiceInstance>(serviceId: string): T {
-    const service: ServiceInstance | undefined = this.instances[serviceId];
+  getService<T extends ServiceBase>(serviceId: string): T {
+    const service: ServiceBase | undefined = this.instances[serviceId];
 
     if (!service) {
       this.env.log.error(`ServicesManager.getService: Can't find the service "${serviceId}"`);

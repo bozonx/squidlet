@@ -17,7 +17,7 @@ export interface DeviceBaseProps {
 }
 
 
-export default class DeviceBase<Props extends DeviceBaseProps> extends EntityBase<Props> {
+export default class DeviceBase<Props extends DeviceBaseProps = {}> extends EntityBase<Props> {
   protected readonly env: DeviceEnv;
   /**
    * Callback to setup initial status to not use statusGetter at init time.

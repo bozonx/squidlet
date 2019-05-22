@@ -1,14 +1,14 @@
-import DeviceInstance from '../interfaces/DeviceInstance';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DeviceEnv from '../baseDevice/DeviceEnv';
 import EntityManagerBase from './EntityManagerBase';
 import System from '../System';
+import DeviceBase from '../baseDevice/DeviceBase';
 
 
 /**
  * Creates instances of local devices and prepare config for them.
  */
-export default class DevicesManager extends EntityManagerBase<DeviceInstance, DeviceEnv> {
+export default class DevicesManager extends EntityManagerBase<DeviceBase, DeviceEnv> {
   constructor(system: System) {
     super(system, DeviceEnv);
   }
@@ -36,8 +36,8 @@ export default class DevicesManager extends EntityManagerBase<DeviceInstance, De
    * Get device instance.
    * It rises an error if device hasn't found.
    */
-  getDevice<T extends DeviceInstance>(deviceId: string): T {
-    const device: DeviceInstance | undefined = this.instances[deviceId];
+  getDevice<T extends DeviceBase>(deviceId: string): T {
+    const device: DeviceBase | undefined = this.instances[deviceId];
 
     if (!device) {
       this.env.log.error(`DevicesManager.getDevice: Can't find the device "${deviceId}"`);
