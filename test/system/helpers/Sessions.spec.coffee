@@ -1,7 +1,7 @@
 Sessions = require('../../../system/helpers/Sessions').default;
 
 
-describe.only 'system.helpers.Sessions', ->
+describe 'system.helpers.Sessions', ->
   beforeEach ->
     @generateUniqId = () => '123'
     @expireSec = 10

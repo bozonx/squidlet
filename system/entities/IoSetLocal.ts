@@ -18,7 +18,7 @@ export default class IoSetLocal implements IoSet {
     );
 
     // Load io collection workDir/io/index.js
-    const ioClasses: {[index: string]: new () => IoItem} = require(pathToIoSetIndex);
+    const ioClasses = this.requireIoSetIndex(pathToIoSetIndex);
 
     // make dev instances
     for (let ioName of Object.keys(ioClasses)) {
@@ -41,6 +41,12 @@ export default class IoSetLocal implements IoSet {
 
   getNames(): string[] {
     return Object.keys(this.ioCollection);
+  }
+
+
+  // it is need for test purpose
+  private requireIoSetIndex(pathToIoSetIndex: string): {[index: string]: new () => IoItem} {
+    return require(pathToIoSetIndex);
   }
 
 }
