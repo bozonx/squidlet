@@ -9,7 +9,6 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import topics from './dict/topics';
 import categories from './dict/categories';
 import EnvSet from './entities/EnvSet';
-import SystemConfig from './interfaces/SystemConfig';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
@@ -18,7 +17,7 @@ import Sessions from './helpers/Sessions';
 
 
 export default class System {
-  readonly systemConfig: SystemConfig;
+  readonly systemConfig: typeof systemConfig;
   readonly events: CategorizedEvents;
   readonly log: LogPublisher;
   readonly ioManager: IoManager;

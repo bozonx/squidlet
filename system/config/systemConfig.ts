@@ -1,7 +1,4 @@
-import SystemConfig from '../interfaces/SystemConfig';
-
-
-const systemConfig: SystemConfig = {
+const systemConfig = {
   // default root dirs on micro controller
   rootDirs: {
     envSet: '/envSet',

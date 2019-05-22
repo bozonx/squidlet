@@ -5,15 +5,13 @@
 import initializationConfig from '../../system/config/initializationConfig';
 import InitializationConfig from '../../system/interfaces/InitializationConfig';
 import systemConfig from '../../system/config/systemConfig';
-import SystemConfig from '../../system/interfaces/SystemConfig';
 
 
 const hostInitCfg: InitializationConfig = initializationConfig();
-const hostSysCfg: SystemConfig = systemConfig;
 
 export default {
   hostInitCfg,
-  hostSysCfg,
+  hostSysCfg: systemConfig,
 
   indexManifestFileNames: ['manifest.yaml'],
   // dir in storage where will be generated devices, drivers and services main files

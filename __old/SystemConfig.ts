@@ -1,3 +1,5 @@
+
+
 export default interface SystemConfig {
   rootDirs: {
     // path to host's configs and entities
