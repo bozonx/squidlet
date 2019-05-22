@@ -1,7 +1,7 @@
 normalize = require('../../hostEnvBuilder/hostConfig/normalizeHostConfig').default
 
 
-describe.only 'envBuilder.normalizeHostConfig', ->
+describe 'envBuilder.normalizeHostConfig', ->
   it 'devices, drviers and services', ->
     hostConfig = {
       devices: {
@@ -40,8 +40,8 @@ describe.only 'envBuilder.normalizeHostConfig', ->
       }
       services: {
         # default service
-        logger: {
-          className: 'Logger'
+        consoleLogger: {
+          className: 'ConsoleLogger'
         }
         myService: {
           className: 'ServiceClass'
@@ -67,7 +67,7 @@ describe.only 'envBuilder.normalizeHostConfig', ->
       mqtt: {
         param: 2
       }
-      logger: {
+      consoleLogger: {
         param: 3
       }
     }
@@ -88,8 +88,8 @@ describe.only 'envBuilder.normalizeHostConfig', ->
           className: 'Mqtt'
           param: 2
         }
-        logger: {
-          className: 'Logger'
+        consoleLogger: {
+          className: 'ConsoleLogger'
           param: 3
         }
       }

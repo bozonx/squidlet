@@ -1,6 +1,6 @@
 validateHostConfig = require('../../hostEnvBuilder/hostConfig/validateHostConfig').default
 
-describe.only 'envBuilder.validateHostConfig', ->
+describe 'envBuilder.validateHostConfig', ->
   beforeEach ->
     @hostConfig = {
       platform: 'nodejs'
@@ -38,16 +38,18 @@ describe.only 'envBuilder.validateHostConfig', ->
     assert.isUndefined(validateHostConfig({ @hostConfig..., services: {param: 1} }))
     assert.isUndefined(validateHostConfig({ @hostConfig..., ios: {param: 1} }))
     assert.isUndefined(validateHostConfig({ @hostConfig..., automation: {param: 1} }))
+    assert.isUndefined(validateHostConfig({ @hostConfig..., consoleLogger: {param: 1} }))
     assert.isUndefined(validateHostConfig({ @hostConfig..., mqtt: {param: 1} }))
-    assert.isUndefined(validateHostConfig({ @hostConfig..., logger: {param: 1} }))
+    assert.isUndefined(validateHostConfig({ @hostConfig..., backdoor: {param: 1} }))
     # not object
     assert.isString(validateHostConfig({ @hostConfig..., devices: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., drivers: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., services: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., ios: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., automation: 'str' }))
+    assert.isString(validateHostConfig({ @hostConfig..., consoleLogger: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., mqtt: 'str' }))
-    assert.isString(validateHostConfig({ @hostConfig..., logger: 'str' }))
+    assert.isString(validateHostConfig({ @hostConfig..., backdoor: 'str' }))
 
   it 'devicesDefaults', ->
     # success
