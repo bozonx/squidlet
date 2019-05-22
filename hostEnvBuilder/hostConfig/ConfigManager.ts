@@ -7,6 +7,7 @@ import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig, makeIoNames, preparePreHostConfig} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
+import Platforms from '../interfaces/Platforms';
 
 
 export default class ConfigManager {
@@ -42,12 +43,17 @@ export default class ConfigManager {
 
   async init() {
     const preHostConfig: PreHostConfig = await this.resolveHostConfig();
+
+    // TODO: тут не должно загружаться loadMachineConfig !!!!
     const preparedConfig: PreHostConfig = await preparePreHostConfig(preHostConfig);
     const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
 
     if (!preHostConfig.platform || !preHostConfig.machine) throw new Error(`No platform or machine`);
 
-    this._machineConfig = loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
+    this._machineConfig = this.loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
+
+    console.log(11111111, this._machineConfig)
+
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     if (normalizedConfig.ios) this.iosDefinitions = normalizedConfig.ios;
     this.preEntities = {
@@ -86,6 +92,11 @@ export default class ConfigManager {
       machine: normalizedConfig.machine as any,
       config: normalizedConfig.config as any,
     };
+  }
+
+  // This wrapper needs for test purpose
+  private loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
+    return loadMachineConfig(platform, machine);
   }
 
 }

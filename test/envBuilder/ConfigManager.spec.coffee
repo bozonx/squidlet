@@ -3,7 +3,7 @@ ConfigManager = require('../../hostEnvBuilder/hostConfig/ConfigManager').default
 
 describe.only 'envBuilder.ConfigManager', ->
   beforeEach ->
-    @io = {}
+    @os = {}
     @preHostConfig = {
       id: 'myHost'
       platform: 'nodejs'
@@ -26,7 +26,7 @@ describe.only 'envBuilder.ConfigManager', ->
     @machineConfig = {
       ios: ['./Storage.ts']
       iosSupportFiles: [
-        './package.json'
+        './helper.js'
       ]
       hostConfig: {
         config: {
@@ -38,17 +38,13 @@ describe.only 'envBuilder.ConfigManager', ->
         }
       }
     }
-    @buildDir = '/buildDir'
-    @tmpDir = '/tmpDir'
 
   it 'init', ->
-    @configManager = new ConfigManager(@io, @preHostConfig, @buildDir, @tmpDir)
+    @configManager = new ConfigManager(@os, @preHostConfig)
     @configManager.loadMachineConfig = () => @machineConfig
 
     await @configManager.init()
 
-    assert.equal(@configManager.buildDir, @buildDir)
-    assert.equal(@configManager.tmpBuildDir, @tmpDir)
     assert.deepEqual(@configManager.preEntities, {
       devices: {
         myDevice: {
@@ -58,8 +54,8 @@ describe.only 'envBuilder.ConfigManager', ->
       drivers: {}
       services: {
         # default service
-        logger: {
-          className: 'Logger'
+        consoleLogger: {
+          className: 'ConsoleLogger'
         }
       }
     })
@@ -85,12 +81,10 @@ describe.only 'envBuilder.ConfigManager', ->
       platform: 'nodejs'
     })
 
-  it 'use buildDir from config', ->
-    @configManager = new ConfigManager(@io, @preHostConfig)
-    @configManager.loadMachineConfig = () => @machineConfig
-
-    await @configManager.init()
-
-    # TODO: review envSetDir
-
-    assert.equal(@configManager.buildDir, @machineConfig.hostConfig.config.envSetDir)
+#  it 'use buildDir from config', ->
+#    @configManager = new ConfigManager(@io, @preHostConfig)
+#    @configManager.loadMachineConfig = () => @machineConfig
+#
+#    await @configManager.init()
+#
+#    assert.equal(@configManager.buildDir, @machineConfig.hostConfig.config.envSetDir)
