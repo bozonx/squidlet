@@ -16,13 +16,14 @@ import {checkIoExistance} from './helpers';
 
 
 export default class EnvBuilder {
+  readonly usedEntities: UsedEntities;
+
   private readonly tmpBuildDir: string;
   // env build dir
   private readonly buildDir: string;
   private readonly pluginEnv: PluginEnv;
   private readonly configManager: ConfigManager;
   private readonly register: Register;
-  private readonly usedEntities: UsedEntities;
   private readonly entitiesWriter: EntitiesWriter;
   private readonly definitions: Definitions;
   private readonly configsSet: ConfigsSet;

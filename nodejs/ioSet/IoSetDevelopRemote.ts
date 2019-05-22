@@ -8,10 +8,12 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
+import {checkIoExistance} from '../../hostEnvBuilder/helpers';
 
 
 export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
+  private readonly envBuilder: EnvBuilder;
   private readonly storageWrapper: StorageEnvMemoryWrapper;
   private readonly ioCollection: {[index: string]: IoItem} = {};
   private remoteIoCollection: RemoteIoCollection;
@@ -23,6 +25,7 @@ export default class IoSetDevelopRemote implements IoSet {
     }
 
     this.os = os;
+    this.envBuilder = envBuilder;
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
 
     const {host, port} = this.parseIoSetString(paramsString);
@@ -37,6 +40,9 @@ export default class IoSetDevelopRemote implements IoSet {
 
   async init(system: System) {
     await this.remoteIoCollection.init(system);
+
+    // check io dependencies
+    checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.ioNames);
 
     for (let ioName of Object.keys(this.remoteIoCollection.ioCollection)) {
       if (ioName === 'Storage') {

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import _isEmpty = require('lodash/isEmpty');
 
-import Os, {SpawnCmdResult} from '../../shared/Os';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
