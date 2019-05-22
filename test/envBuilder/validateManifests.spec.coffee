@@ -31,14 +31,6 @@ describe 'envBuilder.validateManifests', ->
       param: { type: 'unknown' }
     }, type: 'str' }))
 
-#  it 'driver', ->
-#    # correct type
-#    assert.isUndefined(validate('driver', { @manifest..., type: 'str' }))
-#    # required
-#    assert.isString(validate('driver', { @manifest... }))
-#    # type
-#    assert.isString(validate('driver', { @manifest..., type: 5 }))
-
   it 'base params - success', ->
     assert.isUndefined(validate('service', {
       @manifest...

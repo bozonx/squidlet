@@ -1,7 +1,7 @@
 ConfigManager = require('../../hostEnvBuilder/hostConfig/ConfigManager').default
 
 
-describe 'envBuilder.ConfigManager', ->
+describe.only 'envBuilder.ConfigManager', ->
   beforeEach ->
     @io = {}
     @preHostConfig = {

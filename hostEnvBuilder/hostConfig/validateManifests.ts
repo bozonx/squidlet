@@ -67,14 +67,6 @@ export default function validateManifest (
       if (manifestType === 'device') return validateDeviceManifest(manifest);
 
       return;
-      // switch (manifestType) {
-      //   case 'device':
-      //     return validateDeviceManifest(manifest);
-      //   case 'driver':
-      //     return validateDriverManifest(manifest);
-      //   case 'service':
-      //     return validateServiceManifest(manifest);
-      // }
     }
   ]);
 }

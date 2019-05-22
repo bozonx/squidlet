@@ -1,4 +1,3 @@
-import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
 import {
   isBoolean,
   required,

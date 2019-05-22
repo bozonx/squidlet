@@ -1,6 +1,6 @@
 helpers = require('../../hostEnvBuilder/helpers')
 
-describe 'envBuilder.helpers', ->
+describe.only 'envBuilder.helpers', ->
   it 'sortByIncludeInList', ->
     assert.deepEqual(
       helpers.sortByIncludeInList(['three', 'one', 'four', 'two'], ['one', 'two']),
@@ -10,7 +10,6 @@ describe 'envBuilder.helpers', ->
       ]
     )
 
-  # TODO: rename
   it 'checkIoExistance', ->
     assert.doesNotThrow(() => helpers.checkIoExistance(['one'], ['one']))
     assert.throws(() => helpers.checkIoExistance(['one'], ['two']))

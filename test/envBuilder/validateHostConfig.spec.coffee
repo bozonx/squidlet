@@ -1,6 +1,6 @@
 validateHostConfig = require('../../hostEnvBuilder/hostConfig/validateHostConfig').default
 
-describe 'envBuilder.validateHostConfig', ->
+describe.only 'envBuilder.validateHostConfig', ->
   beforeEach ->
     @hostConfig = {
       platform: 'nodejs'

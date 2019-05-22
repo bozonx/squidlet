@@ -1,7 +1,7 @@
 normalize = require('../../hostEnvBuilder/hostConfig/normalizeHostConfig').default
 
 
-describe 'envBuilder.normalizeHostConfig', ->
+describe.only 'envBuilder.normalizeHostConfig', ->
   it 'devices, drviers and services', ->
     hostConfig = {
       devices: {

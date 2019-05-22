@@ -1,7 +1,7 @@
 EntitiesWriter = require('../../hostEnvBuilder/entities/EntitiesWriter').default
 
 
-describe 'envBuilder.EntitiesWriter', ->
+describe.only 'envBuilder.EntitiesWriter', ->
   beforeEach ->
     @entitiesNames = {
       devices: ['MyDevice']
