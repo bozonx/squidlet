@@ -8,6 +8,9 @@ export default interface ManifestBase {
   // relative path to main file
   main: string;
   props?: {[index: string]: SchemaElement};
+  // dir where manifest and other entity files are placed.
+  // It uses in development environment to load source ts files.
+  srcDir?: string;
   // custom values of manifest
   [index: string]: any;
 }

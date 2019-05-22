@@ -2,7 +2,7 @@ import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 import {EntityClassType} from './EntityManagerBase';
-import {pathIsAbsolute, pathJoin} from '../helpers/nodeLike';
+import {pathJoin} from '../helpers/nodeLike';
 import StorageIo from '../interfaces/io/StorageIo';
 import {splitFirstElement} from '../helpers/strings';
 
@@ -66,18 +66,7 @@ export default class EnvSet {
   ): Promise<T> {
     const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
     const mainFileName: string = splitFirstElement(manifest.main, '.')[0];
-    // by default use a absolute path (in development mode)
-    let filePath: string = manifest.main;
-
-    if (!pathIsAbsolute(manifest.main)) {
-      filePath = pathJoin(
-        this.system.systemConfig.rootDirs.envSet,
-        this.system.systemConfig.envSetDirs.entities,
-        pluralType,
-        entityName,
-        mainFileName
-      );
-    }
+    const filePath: string = await this.resolveFilePath(pluralType, entityName, mainFileName, manifest.srcDir);
 
     return require(filePath).default;
   }
@@ -86,28 +75,15 @@ export default class EnvSet {
    * Load entity file as a string.
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
-   * @param fileName - relative file path
+   * @param fileName - file path relative to entity dir
    */
   async loadEntityFile(
     pluralType: ManifestsTypePluralName,
     entityName: string,
     fileName: string
   ): Promise<string> {
-
-    // TODO: а разве путь будет абсолютный ???? - наверное надо брать из манифеста
-
-    // by default use a absolute path (in development mode)
-    let filePath: string = fileName;
-
-    if (!pathIsAbsolute(fileName)) {
-      filePath = pathJoin(
-        this.system.systemConfig.rootDirs.envSet,
-        this.system.systemConfig.envSetDirs.entities,
-        pluralType,
-        entityName,
-        fileName
-      );
-    }
+    const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
+    const filePath: string = await this.resolveFilePath(pluralType, entityName, fileName, manifest.srcDir);
 
     return this.storageIo.readFile(filePath);
   }
@@ -116,29 +92,38 @@ export default class EnvSet {
    * Load entity file as a binary.
    * @param pluralType - devices, drivers or services
    * @param entityName - name of entity
-   * @param fileName - relative file path
+   * @param fileName - file path relative to entity dir
    */
   async loadEntityBinFile(
     pluralType: ManifestsTypePluralName,
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    // by default use a absolute path (in development mode)
-    let filePath: string = fileName;
-
-    if (!pathIsAbsolute(fileName)) {
-      filePath = pathJoin(
-        this.system.systemConfig.rootDirs.envSet,
-        this.system.systemConfig.envSetDirs.entities,
-        pluralType,
-        entityName,
-        fileName
-      );
-    }
+    const manifest: ManifestBase = await this.loadManifest(pluralType, entityName);
+    const filePath: string = await this.resolveFilePath(pluralType, entityName, fileName, manifest.srcDir);
 
     return this.storageIo.readBinFile(filePath);
   }
 
+
+  private async resolveFilePath(
+    pluralType: ManifestsTypePluralName,
+    entityName: string,
+    fileName: string,
+    entitySrcDir?: string
+  ): Promise<string> {
+    // relative to entity src root (development mode)
+    if (entitySrcDir) return pathJoin(entitySrcDir, fileName);
+
+    // make absolute path
+    return pathJoin(
+      this.system.systemConfig.rootDirs.envSet,
+      this.system.systemConfig.envSetDirs.entities,
+      pluralType,
+      entityName,
+      fileName
+    );
+  }
 
   /**
    * Read json object file
