@@ -34,17 +34,17 @@ export function checkIoExistance(hostIos: string[], machineIos: string[]) {
 }
 
 /**
- * Clear
- * @param rawPath
+ * Remove "./" and "../" from the path.
+ * e.g '../rel/../to' => 'rel/to'
  */
 export function clearRelativePath(rawPath: string): string {
   return rawPath.replace(/\.{1,2}\//g, '');
 }
 
+/**
+ * Collect values which are set in default param of props schema
+ */
 export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
-
-  // TODO: test
-
   const result: {[index: string]: any} = {};
 
   if (!manifestProps) return result;

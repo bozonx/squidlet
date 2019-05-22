@@ -1,6 +1,6 @@
 helpers = require('../../hostEnvBuilder/helpers')
 
-describe.only 'envBuilder.helpers', ->
+describe 'envBuilder.helpers', ->
   it 'sortByIncludeInList', ->
     assert.deepEqual(
       helpers.sortByIncludeInList(['three', 'one', 'four', 'two'], ['one', 'two']),
@@ -19,6 +19,27 @@ describe.only 'envBuilder.helpers', ->
     assert.equal(helpers.clearRelativePath('./rel'), 'rel')
     assert.equal(helpers.clearRelativePath('../rel'), 'rel')
     assert.equal(helpers.clearRelativePath('../rel/../to'), 'rel/to')
+
+  it 'collectPropsDefaults', ->
+    props = {
+      stringProp: {
+        type: 'string'
+        default: 'value'
+      }
+      numberProp: {
+        type: 'number'
+        default: 5
+      }
+      noProp: {
+        type: 'string'
+      }
+    }
+
+    assert.deepEqual(helpers.collectPropsDefaults(props), {
+      stringProp: 'value'
+      numberProp: 5
+    })
+
 
  # it 'yamlToJs', ->
 #    testYaml = '''
