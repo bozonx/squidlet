@@ -76,13 +76,13 @@ describe.only 'system.helpers.Sessions', ->
 
     clock.tick(7000)
 
-    #sinon.assert.notCalled(@handler)
-    #assert.isTrue(@sessions.isSessionActive(sessionId))
+    sinon.assert.notCalled(@handler)
+    assert.isTrue(@sessions.isSessionActive(sessionId))
 
     clock.tick(3000)
     clock.restore()
 
-    #assert.isFalse(@sessions.isSessionActive(sessionId))
+    assert.isFalse(@sessions.isSessionActive(sessionId))
 
   it "session data", ->
     sessionId = @sessions.newSession(@expireSec)

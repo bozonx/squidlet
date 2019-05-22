@@ -46,12 +46,12 @@ export default class Sessions {
   newSession(expireSec: number, shortConnection: boolean = false): string {
     const sessionId: string = this.generateUniqId();
 
+    // mark session active
+    this.activeSession[sessionId] = expireSec;
+
     // if it is short connection like http then wait to a next connection to renew the session.
     // Otherwise session will be closed
     if (shortConnection) this.newSessionTimeout(sessionId);
-
-    // mark session active
-    this.activeSession[sessionId] = expireSec;
 
     return sessionId;
   }
