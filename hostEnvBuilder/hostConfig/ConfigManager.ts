@@ -42,7 +42,6 @@ export default class ConfigManager {
 
   async init() {
     const preHostConfig: PreHostConfig = await this.resolveHostConfig();
-
     const preparedConfig: PreHostConfig = await preparePreHostConfig(preHostConfig);
     const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
 

@@ -68,6 +68,13 @@ export default class EnvBuilder {
     this.log.info(`--> Checking platform io dependencies`);
     checkIoExistance(this.usedEntities.getUsedIo(), this.configManager.getMachineIos());
 
+    try {
+      checkIoExistance(Object.keys(this.configManager.iosDefinitions), this.configManager.getMachineIos());
+    }
+    catch (err) {
+      throw new Error(`Invalid config's ios definitions: ${err}`);
+    }
+
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
     await this.pluginEnv.$riseAfterInit();

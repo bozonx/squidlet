@@ -7,6 +7,7 @@ import IoItem from '../../system/interfaces/IoItem';
 import BackdoorClient from '../../shared/BackdoorClient';
 import {BACKDOOR_ACTION} from '../../entities/services/Backdoor/Backdoor';
 import {SYSTEM_DIR} from '../../shared/helpers';
+import {checkIoExistance} from '../../hostEnvBuilder/helpers';
 
 
 export default class RemoteIoCollection {
@@ -43,6 +44,9 @@ export default class RemoteIoCollection {
     this.client.addListener(BACKDOOR_ACTION.ioSetRemoteCall, this.handleIncomeMessage);
 
     const ioNames: string[] = await this.askIoNames();
+
+    // TODO: валидировать что зависимости всех io есть в ioNames.
+    //       см EvnBuilder checkIoExistance(this.usedEntities.getUsedIo(), this.configManager.getMachineIos());
 
     // make fake io items
     for (let ioName of ioNames) {
