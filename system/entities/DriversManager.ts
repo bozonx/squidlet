@@ -1,14 +1,14 @@
 import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverInstance from '../interfaces/DriverInstance';
 import DriverEnv from '../baseDrivers/DriverEnv';
 import EntityManagerBase from './EntityManagerBase';
+import DriverBase from '../baseDrivers/DriverBase';
 
 
 /**
  * Driver manager
  */
-export default class DriversManager extends EntityManagerBase<DriverInstance, DriverEnv> {
+export default class DriversManager extends EntityManagerBase<DriverBase, DriverEnv> {
   constructor(system: System) {
     super(system, DriverEnv);
   }
@@ -45,8 +45,8 @@ export default class DriversManager extends EntityManagerBase<DriverInstance, Dr
    * Get driver instance.
    * It rises an error if driver hasn't found.
    */
-  getDriver<T extends DriverInstance>(driverName: string): T {
-    const driver: DriverInstance | undefined = this.instances[driverName];
+  getDriver<T extends DriverBase>(driverName: string): T {
+    const driver: DriverBase | undefined = this.instances[driverName];
 
     if (!driver) {
       this.env.log.error(`DriversManager.getDriver: Can't find the driver "${driverName}"`);

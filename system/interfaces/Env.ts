@@ -1,9 +1,9 @@
-import DriverInstance from './DriverInstance';
 import ManifestBase from './ManifestBase';
 import System from '../System';
 import HostConfig from './HostConfig';
 import IoItem from './IoItem';
 import LogPublisher from '../LogPublisher';
+import DriverBase from '../baseDrivers/DriverBase';
 
 
 export default interface Env {
@@ -15,7 +15,7 @@ export default interface Env {
 
   // TODO generic не обязателен наверное
 
-  getDriver<T extends DriverInstance>(driverName: string): T;
+  getDriver<T extends DriverBase>(driverName: string): T;
   // load manifest of entity type
   loadManifest(entityName: string): Promise<ManifestBase>;
   [index: string]: any;

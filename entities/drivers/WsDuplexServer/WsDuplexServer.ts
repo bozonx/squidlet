@@ -2,7 +2,6 @@ import DriverBase from 'system/baseDrivers/DriverBase';
 import {mergeDeep} from '../../../system/helpers/collections';
 import DriverFactoryBase, {WsServer, WebSocketServerDriverProps} from '../WsServer/WsServer';
 import WsDuplexServerLogic from './WsDuplexServerLogic';
-import DriverInstance from 'system/interfaces/DriverInstance';
 
 
 export interface WebSocketServerRouterPropsDriverProps extends WebSocketServerDriverProps {

@@ -1,5 +1,4 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverInstance from '../interfaces/DriverInstance';
 import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from './DriverBase';
 import DriverEnv from './DriverEnv';
@@ -17,7 +16,7 @@ import {mergeDeep} from '../helpers/collections';
  *   "1" is unique id for instances
  * * if instanceIdCalc is set method getInstance will call this function to get unique id
  */
-export default abstract class DriverFactoryBase<Instance extends DriverInstance> extends DriverBase {
+export default abstract class DriverFactoryBase<Instance extends DriverBase> extends DriverBase {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
   protected instanceAlwaysNew: boolean = false;

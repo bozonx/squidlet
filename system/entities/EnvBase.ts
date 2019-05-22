@@ -1,10 +1,10 @@
 import System from '../System';
-import DriverInstance from '../interfaces/DriverInstance';
 import Env from '../interfaces/Env';
 import ManifestBase from '../interfaces/ManifestBase';
 import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import LogPublisher from '../LogPublisher';
+import DriverBase from '../baseDrivers/DriverBase';
 
 
 /**
@@ -29,7 +29,7 @@ export default abstract class EnvBase implements Env {
     return this.system.ioManager.getIo<T>(shortDevName);
   }
 
-  getDriver<T extends DriverInstance>(driverName: string): T {
+  getDriver<T extends DriverBase>(driverName: string): T {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 

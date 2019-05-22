@@ -1,10 +1,10 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ManifestBase from '../interfaces/ManifestBase';
 import Env from '../interfaces/Env';
-import DriverInstance from '../interfaces/DriverInstance';
+import DriverBase from '../baseDrivers/DriverBase';
 
 
-export type GetDriverDep = (driverName: string) => DriverInstance;
+export type GetDriverDep = (driverName: string) => DriverBase;
 
 
 export default class EntityBase<Props = {}> {
@@ -15,7 +15,7 @@ export default class EntityBase<Props = {}> {
 
   protected readonly env: Env;
   // you can store there drivers instances if need
-  protected depsInstances: {[index: string]: DriverInstance} = {};
+  protected depsInstances: {[index: string]: DriverBase} = {};
   // better place to instantiate dependencies if need
   protected willInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // init process
@@ -103,7 +103,7 @@ export default class EntityBase<Props = {}> {
   }
 
   private getDriverDepCb(): GetDriverDep {
-    return (driverName: string): DriverInstance => {
+    return (driverName: string): DriverBase => {
       return this.env.getDriver(driverName);
     };
   }
