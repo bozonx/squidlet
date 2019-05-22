@@ -1,4 +1,4 @@
-import MyAddress from '../../../system/interfaces/MyAddress';
+import MyAddress from '../../interfaces/MyAddress';
 import DriverFactoryBase from '../../../system/baseDrivers/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData';
 import { uint8ArrayToText, textToUint8Array} from '../../../system/helpers/binaryHelpers';
