@@ -1,7 +1,7 @@
 strings = require('../../../system/helpers/strings')
 
 
-describe 'helpers.strings', ->
+describe.only 'helpers.strings', ->
   it 'base64ToString', ->
     assert.equal(strings.base64ToString('str строка'), 'c3RyINGB0YLRgNC+0LrQsA==')
 
@@ -20,3 +20,34 @@ describe 'helpers.strings', ->
   it 'splitLastElement', ->
     assert.deepEqual(strings.splitLastElement('path/to/dest', '/'), [ 'dest', 'path/to' ])
     assert.deepEqual(strings.splitLastElement('path', '/'), [ 'path', undefined ])
+
+  it 'parseCookie', ->
+    assert.deepEqual(strings.parseCookie('param1=value1; param2=2; param3=true'), {
+      param1: 'value1'
+      param2: 2
+      param3: true
+    })
+
+  it 'parseCookie', ->
+    obj = {
+      param1: 'value1'
+      param2: 2
+      param3: true
+      param4: null
+      param5: undefined
+    }
+    cookie = 'param1=value1; param2=2; param3=true; param4=null; param5=undefined'
+
+    assert.deepEqual(strings.parseCookie(cookie), obj)
+
+  it 'stringifyCookie', ->
+    obj = {
+      param1: 'value1'
+      param2: 2
+      param3: true
+      param4: null
+      param5: undefined
+    }
+    cookie = 'param1=value1; param2=2; param3=true; param4=null; param5=undefined'
+
+    assert.deepEqual(strings.stringifyCookie(obj), cookie)

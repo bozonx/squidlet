@@ -1,5 +1,6 @@
 import {trim} from './lodashLike';
 import {Primitives} from '../interfaces/Types';
+import {parseValue} from './helpers';
 
 declare const btoa: ((data: any) => any) | undefined;
 declare const atob: ((data: any) => any) | undefined;
@@ -78,15 +79,10 @@ export function splitLastElement(
 }
 
 /**
- * Parse cookie like "param1=value1; param2=valu2" to { param1: 'value1', param2: 'value2' }
+ * Parse cookie like "param1=value1; param2=value2;" to { param1: 'value1', param2: 'value2' }
  * example - lang=ru-RU; gdpr-cookie-consent=accepted;
  */
 export function parseCookie(cookies?: string): {[index: string]: Primitives} {
-
-  // TODO: test
-
-  // TODO: parse value
-
   if (!cookies) return {};
 
   const splat: string[] = cookies.split(';');
@@ -95,16 +91,13 @@ export function parseCookie(cookies?: string): {[index: string]: Primitives} {
   for (let item of splat) {
     const [key, value] = item.split('=');
 
-    result[trim(key)] = trim(value);
+    result[trim(key)] = parseValue(trim(value));
   }
 
   return result;
 }
 
 export function stringifyCookie(obj: {[index: string]: Primitives}): string {
-
-  // TODO: test
-
   const result: string[] = [];
 
   for (let key of Object.keys(obj)) {
@@ -113,6 +106,8 @@ export function stringifyCookie(obj: {[index: string]: Primitives}): string {
       typeof value !== 'boolean'
       && typeof value !== 'string'
       && typeof value !== 'number'
+      && typeof value !== 'undefined'
+      && value !== null
     ) throw new Error(`stringifyCookie: invalid received object`);
 
     result.push(`${key}=${value}`);
