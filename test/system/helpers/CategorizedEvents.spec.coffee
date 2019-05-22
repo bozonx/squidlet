@@ -1,16 +1,16 @@
-Events = require('../../system/helpers/CategorizedEvents').default
+CategorizedEvents = require('../../../system/helpers/CategorizedEvents').default
 
 
-describe 'app.Events', ->
+describe 'system.CategorizedEvents', ->
   beforeEach ->
-    @events = new Events()
+    @events = new CategorizedEvents('|')
 
   it 'addListener, emit, removeListener', ->
     handler = sinon.spy()
-    @events.addListener('cat', 'topic', handler)
+    handlerIndex = @events.addListener('cat', 'topic', handler)
 
     @events.emit('cat', 'topic', 'payload')
-    @events.removeListener('cat', 'topic', handler)
+    @events.removeListener('cat', 'topic', handlerIndex)
     @events.emit('cat', 'topic', 'payload2')
 
     sinon.assert.calledOnce(handler)
@@ -18,10 +18,10 @@ describe 'app.Events', ->
 
   it 'addCategoryListener', ->
     handler = sinon.spy()
-    @events.addCategoryListener('cat', handler)
+    handlerIndex = @events.addCategoryListener('cat', handler)
 
     @events.emit('cat', 'topic', 'payload')
-    @events.removeCategoryListener('cat', handler)
+    @events.removeCategoryListener('cat', handlerIndex)
     @events.emit('cat', 'topic', 'payload2')
 
     sinon.assert.calledOnce(handler)
@@ -42,3 +42,19 @@ describe 'app.Events', ->
     @events.emit('otherCat', 'payload')
 
     sinon.assert.notCalled(handler)
+
+  it 'removeAllListeners', ->
+    @events.addListener('cat', 'topic', sinon.spy())
+    @events.addListener('cat', 'topic', sinon.spy())
+
+    @events.removeAllListeners('cat', 'topic')
+
+    assert.deepEqual(@events.eventEmitter.indexedEvents, {})
+
+  it 'destroy', ->
+    @events.addCategoryListener('cat', sinon.spy())
+    @events.addCategoryListener('cat', sinon.spy())
+
+    @events.destroy()
+
+    assert.deepEqual(@events.eventEmitter.indexedEvents, {})

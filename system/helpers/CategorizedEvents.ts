@@ -71,7 +71,9 @@ export default class CategorizedEvents {
    * Make combined event name.
    * makeEventName('cat', 'topic') => 'cat|topic'
    */
-  private makeEventName(category: string, topic: string): string {
+  private makeEventName(category: string, topic?: string): string {
+    if (!topic) return category;
+
     return [ category, topic ].join(this.separator);
   }
 

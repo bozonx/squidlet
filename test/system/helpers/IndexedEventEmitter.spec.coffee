@@ -41,3 +41,11 @@ describe 'helpers.IndexedEventEmitter', ->
 
     sinon.assert.notCalled(@handler)
     sinon.assert.notCalled(handler2)
+
+  it 'destroy', ->
+    @events.addListener(@eventName, sinon.spy())
+    @events.addListener(@eventName, sinon.spy())
+
+    @events.destroy()
+
+    assert.deepEqual(@events.indexedEvents, {})
