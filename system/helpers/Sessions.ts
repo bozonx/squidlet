@@ -9,7 +9,7 @@ import {JsonTypes} from '../interfaces/Types';
 export default class Sessions {
   private readonly generateUniqId: () => string;
   private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
-  private sessionStorage: {[index: string]: any} = {};
+  private sessionStorage: {[index: string]: {[index: string]: any}} = {};
   private closeConnectionTimeouts: {[index: string]: any} = {};
   // like {sessionId: expireSec}
   private activeSession: {[index: string]: number} = {};
@@ -76,6 +76,10 @@ export default class Sessions {
     this.newSessionTimeout(sessionId);
   }
 
+  shutDownImmediately(sessionId: string) {
+    this.closeSession(sessionId);
+  }
+
   onSessionClosed(cb: (sessionId: string) => void): number {
     return this.closeEvents.addListener(cb);
   }
@@ -84,12 +88,16 @@ export default class Sessions {
     this.closeEvents.removeListener(handlerIndex);
   }
 
-  getStorage(sessionId: string): JsonTypes | undefined {
-    return this.sessionStorage[sessionId];
+  getStorage(sessionId: string, name: string): JsonTypes | undefined {
+    if (!this.sessionStorage[sessionId]) return;
+
+    return this.sessionStorage[sessionId][name];
   }
 
-  setStorage(sessionId: string, data: JsonTypes) {
-    this.sessionStorage[sessionId] = data;
+  setStorage(sessionId: string, name: string, data: JsonTypes) {
+    if (!this.sessionStorage[sessionId]) this.sessionStorage[sessionId] = {};
+
+    this.sessionStorage[sessionId][name] = data;
   }
 
 
