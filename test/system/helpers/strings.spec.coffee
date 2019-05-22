@@ -1,7 +1,7 @@
 strings = require('../../../system/helpers/strings')
 
 
-describe 'helpers.strings', ->
+describe 'system.helpers.strings', ->
   it 'base64ToString', ->
     assert.equal(strings.base64ToString('str строка'), 'c3RyINGB0YLRgNC+0LrQsA==')
 

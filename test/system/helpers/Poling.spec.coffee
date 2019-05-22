@@ -1,7 +1,7 @@
 Polling = require('../../../system/helpers/Polling').default;
 
 
-describe 'helpers.Polling', ->
+describe 'system.helpers.Polling', ->
   beforeEach ->
     @id = 'myId'
     @polling = new Polling()

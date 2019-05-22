@@ -1,7 +1,7 @@
 validate = require('../../../system/helpers/validate');
 
 
-describe 'helpers.validate', ->
+describe 'system.helpers.validate', ->
   it "isValueOfType", ->
     # success
     assert.isUndefined(validate.isValueOfType('string', 'str'));

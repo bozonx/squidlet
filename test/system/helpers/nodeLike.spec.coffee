@@ -1,7 +1,7 @@
 nodeLike = require('../../../system/helpers/nodeLike');
 
 
-describe 'helpers.nodeLike', ->
+describe 'system.helpers.nodeLike', ->
   it "pathJoin", ->
     assert.equal(nodeLike.pathJoin('/path/', '/to/', './dir'), '/path/to/./dir')
 

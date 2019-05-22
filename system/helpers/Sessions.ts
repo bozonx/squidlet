@@ -76,7 +76,7 @@ export default class Sessions {
     this.newSessionTimeout(sessionId);
   }
 
-  onSessionClossed(cb: (sessionId: string) => void): number {
+  onSessionClosed(cb: (sessionId: string) => void): number {
     return this.closeEvents.addListener(cb);
   }
 

@@ -1,7 +1,7 @@
 helpers = require('../../../system/helpers/helpers')
 
 
-describe 'helpers.helpers', ->
+describe 'system.helpers.helpers', ->
   it 'convertToLevel', ->
     assert.isTrue(helpers.convertToLevel(true))
     assert.isTrue(helpers.convertToLevel(1))

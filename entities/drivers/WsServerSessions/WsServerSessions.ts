@@ -58,7 +58,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
     });
 
-    this.env.system.sessions.onSessionClossed((sessionId) => {
+    this.env.system.sessions.onSessionClosed((sessionId) => {
       // listen only ours session
       if (!Object.keys(this.sessionConnections).includes(sessionId)) return;
 

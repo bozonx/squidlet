@@ -1,7 +1,7 @@
 collections = require('../../../system/helpers/collections')
 
 
-describe 'helpers.collections', ->
+describe 'system.helpers.collections', ->
   it 'appendArray', ->
     arr = [1]
     collections.appendArray(arr, [2])

@@ -1,7 +1,7 @@
 Events = require('../../../system/helpers/IndexedEventEmitter').default;
 
 
-describe 'helpers.IndexedEventEmitter', ->
+describe 'system.helpers.IndexedEventEmitter', ->
   beforeEach ->
     @eventName = 'name'
     @handler = sinon.spy()

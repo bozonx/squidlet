@@ -1,7 +1,7 @@
 CategorizedEvents = require('../../../system/helpers/CategorizedEvents').default
 
 
-describe 'system.CategorizedEvents', ->
+describe 'system.helpers.CategorizedEvents', ->
   beforeEach ->
     @events = new CategorizedEvents('|')
 

@@ -1,7 +1,7 @@
 Republish = require('../../../system/helpers/Republish').default;
 
 
-describe 'helpers.Republish', ->
+describe 'system.helpers.Republish', ->
   it "start", ->
     clock = sinon.useFakeTimers()
     handler = sinon.spy()
