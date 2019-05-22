@@ -14,7 +14,7 @@ interface Props extends DeviceBaseProps, BinaryOutputProps {
 
 export default class Switch extends DeviceBase<Props> {
   private get binaryOutput(): BinaryOutput {
-    return this.depsInstances.binaryOutput as any;
+    return this.depsInstances.binaryOutput;
   }
   protected get status(): Status {
     return this._status as Status;

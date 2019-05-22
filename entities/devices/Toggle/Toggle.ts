@@ -18,7 +18,7 @@ export default class Toggle extends DeviceBase<Props> {
 
 
   private get binaryClick(): BinaryClick {
-    return this.depsInstances.binaryClick as any;
+    return this.depsInstances.binaryClick;
   }
 
 

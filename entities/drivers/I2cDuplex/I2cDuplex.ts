@@ -16,7 +16,7 @@ export interface I2cDuplexProps extends MasterSlaveBaseProps {
 
 export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDriver {
   private get i2cDriver(): MasterSlaveBaseNodeDriver<I2cDuplexProps> {
-    return this.depsInstances.i2cDriver as any;
+    return this.depsInstances.i2cDriver;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {

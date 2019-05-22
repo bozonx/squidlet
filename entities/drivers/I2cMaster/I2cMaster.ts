@@ -19,7 +19,7 @@ export interface I2cMasterInstanceProps {
 
 export class I2cMaster extends DriverBase<I2cMasterInstanceProps> {
   private get i2cMasterDev(): I2cMasterIo {
-    return this.depsInstances.i2cMaster as any;
+    return this.depsInstances.i2cMaster;
   }
 
 

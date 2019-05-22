@@ -15,7 +15,7 @@ interface Props extends DeviceBaseProps, PortExpanderProps {
 
 export default class PortExpanderEsp32 extends DeviceBase<Props> {
   get expander(): PortExpander {
-    return this.depsInstances.expander as any;
+    return this.depsInstances.expander;
   }
 
   protected willInit = async (getDriverDep: GetDriverDep) => {

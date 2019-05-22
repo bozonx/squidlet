@@ -27,7 +27,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   private blockTimeTimeout: any;
 
   private get binaryInput(): BinaryInput {
-    return this.depsInstances.binaryInput as any;
+    return this.depsInstances.binaryInput;
   }
 
 

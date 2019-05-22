@@ -36,7 +36,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private _isInverted: boolean = false;
 
   private get digitalInput(): DigitalPinInput {
-    return this.depsInstances.digitalInput as any;
+    return this.depsInstances.digitalInput;
   }
 
 

@@ -26,7 +26,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private blockTimeInProgress: boolean = false;
 
   private get digitalOutput(): DigitalPinOutput {
-    return this.depsInstances.digitalOutput as any;
+    return this.depsInstances.digitalOutput;
   }
 
 

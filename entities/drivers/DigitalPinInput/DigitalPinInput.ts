@@ -34,7 +34,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
   private secondCheckTimeout: number = 0;
 
   private get source(): DigitalSubDriver {
-    return this.depsInstances.source as any;
+    return this.depsInstances.source;
   }
 
 

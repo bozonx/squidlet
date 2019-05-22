@@ -18,7 +18,7 @@ export interface DigitalPinOutputProps extends DigitalBaseProps {
  */
 export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
   private get source(): DigitalSubDriver {
-    return this.depsInstances.source as any;
+    return this.depsInstances.source;
   }
 
 

@@ -15,7 +15,7 @@ interface Props extends DeviceBaseProps, BinaryClickProps {
 
 export default class ClickSensor extends DeviceBase<Props> {
   private get binaryClick(): BinaryClick {
-    return this.depsInstances.binaryClick as any;
+    return this.depsInstances.binaryClick;
   }
 
 

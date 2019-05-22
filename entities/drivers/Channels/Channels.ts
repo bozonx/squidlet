@@ -19,7 +19,7 @@ export interface ChannelsProps {
 
 export class Channels extends DriverBase<ChannelsProps> {
   private get driver(): DuplexDriver {
-    return this.depsInstances.driver as any;
+    return this.depsInstances.driver;
   }
 
 

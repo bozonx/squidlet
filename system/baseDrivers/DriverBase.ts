@@ -4,7 +4,7 @@ import DriverEnv from './DriverEnv';
 import Sender from '../helpers/Sender';
 
 
-export default class DriverBase<Props = {}> extends EntityBase<Props> {
+export default class DriverBase<Props extends {[index: string]: any} = any> extends EntityBase<Props> {
   protected readonly env: DriverEnv;
 
   constructor(definition: EntityDefinition, env: DriverEnv) {

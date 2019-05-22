@@ -103,7 +103,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   // TODO: does it really need?
   readonly log: LogPublisher = this.env.log;
   get node(): DuplexDriver {
-    return this.depsInstances.node as any;
+    return this.depsInstances.node;
   }
 
   readonly digitalPins: DigitalPins = new DigitalPins(this);

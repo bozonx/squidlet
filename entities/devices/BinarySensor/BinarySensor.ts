@@ -12,7 +12,7 @@ interface Props extends DeviceBaseProps, BinaryInputProps {
 
 export default class BinarySensor extends DeviceBase<Props> {
   private get binaryInput(): BinaryInput {
-    return this.depsInstances.binaryInput as any;
+    return this.depsInstances.binaryInput;
   }
 
 

@@ -30,7 +30,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     return this.server.listeningPromise;
   }
   private get server(): WsServer {
-    return this.depsInstances.server as any;
+    return this.depsInstances.server;
   }
 
   // like {sessionId: connectionId}

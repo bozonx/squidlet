@@ -33,6 +33,9 @@ export default class MqttSevice extends ServiceBase<Props> {
     });
   }
 
+  destroy = async () => {
+    // TODO: remove listener
+  }
 
   /**
    * Publish custom topic
@@ -49,9 +52,7 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
 
-  protected destroy = () => {
-    // TODO: remove listener
-  }
+
 
 
   /**

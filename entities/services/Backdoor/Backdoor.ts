@@ -43,7 +43,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     return this._ioSet as any;
   }
   private get wsServerSessions(): WsServerSessions {
-    return this.depsInstances.wsServer as any;
+    return this.depsInstances.wsServer;
   }
   private get eventsServer(): MainEventsServer {
     return this._eventsServer as any;

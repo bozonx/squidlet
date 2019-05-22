@@ -48,7 +48,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
   private readonly sendDataRegister: number = 0x1b;
 
   private get i2cDriver(): I2cDriverClass {
-    return this.depsInstances.i2cDriver as I2cDriverClass;
+    return this.depsInstances.i2cDriver;
   }
 
 
