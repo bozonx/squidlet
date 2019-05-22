@@ -41,23 +41,6 @@ export function clearRelativePath(rawPath: string): string {
   return rawPath.replace(/\.{1,2}\//g, '');
 }
 
-/**
- * Collect values which are set in default param of props schema
- */
-export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
-  const result: {[index: string]: any} = {};
-
-  if (!manifestProps) return result;
-
-  for (let propName of Object.keys(manifestProps)) {
-    if (!manifestProps[propName] || typeof manifestProps[propName].default === 'undefined') continue;
-
-    result[propName] = manifestProps[propName].default;
-  }
-
-  return result;
-}
-
 
 // export function yamlToJs(yamlString: string): any {
 //
