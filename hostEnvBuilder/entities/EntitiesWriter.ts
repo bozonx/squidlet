@@ -82,15 +82,10 @@ export default class EntitiesWriter {
 
   private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
-    //const preManifest: PreManifestBase = this.getPreManifest(pluralType, entityName);
     const entityDstDir: string = path.join(this.entitiesDstDir, pluralType, entityName);
-    // const mainDstFile = path.join(entityDstDir, path.parse(entitySet.main).name);
-    // const renamedMainDstFile = path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.mainJs);
 
     this.log.info(`- building main file of entity "${entityName}"`);
     await this.buildEntity(pluralType, entityName, entitySet.srcDir, entityDstDir);
-    // rename main file
-    //await this.os.renameFile(`${mainDstFile}.js`, renamedMainDstFile);
   }
 
   private async buildEntity(

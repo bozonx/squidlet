@@ -7,3 +7,5 @@ status:
     type: number
     default: 0
 
+files:
+  - testFile.txt
