@@ -28,10 +28,6 @@ export default class StorageEnvMemoryWrapper {
 
 
   async init() {
-    console.info(`===> collect env set`);
-
-    await this.envBuilder.collect();
-
     console.info(`===> generate development envSet`);
 
     this.envSet = this.envBuilder.generateDevelopEnvSet();

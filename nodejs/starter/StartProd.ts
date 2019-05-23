@@ -42,11 +42,13 @@ export default class StartProd {
   async init() {
     await this.groupConfig.init();
     await this.props.resolve();
-    await this.envBuilder.collect();
 
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
 
     this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+
+    console.info(`===> collect env set`);
+    await this.envBuilder.collect();
 
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);

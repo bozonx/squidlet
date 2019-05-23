@@ -57,6 +57,9 @@ export default class StartDevelop {
 
     this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
+    console.info(`===> collect env set`);
+    await this.envBuilder.collect();
+
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
