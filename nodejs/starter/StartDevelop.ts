@@ -15,7 +15,7 @@ import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 
 type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
 
-const IOSET_DIR = path.resolve(__dirname, '../ioSet');
+//const IOSET_DIR = path.resolve(__dirname, '../ioSet');
 
 
 export default class StartDevelop {
@@ -101,7 +101,7 @@ export default class StartDevelop {
    */
   private async makeIoSet(): Promise<IoSet> {
     const ioSetFile: string = this.resolveIoSetType();
-    const ioSetPath = path.join(IOSET_DIR, ioSetFile);
+    const ioSetPath = path.join('.', ioSetFile);
     const IoSetClass: IoSetClass = require(ioSetPath).default;
 
 
