@@ -9,7 +9,6 @@ import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {loadMachineConfig, makeIoNames} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
-import Platforms from '../interfaces/Platforms';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 
@@ -48,25 +47,22 @@ export default class ConfigManager {
 
   async init() {
     const preHostConfig: PreHostConfig = await this.resolveHostConfig();
-    const validateError: string | undefined = validateHostConfig(preHostConfig);
-
-    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
-    else if (!preHostConfig.platform) throw new Error(`Platform param has to be specified in host config`);
 
     this._machineConfig = this.loadMachineConfig(preHostConfig);
 
     const preparedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
     const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
 
-    this.dependencies = preparedConfig.dependencies;
+    this.dependencies = normalizedConfig.dependencies;
     this.devicesDefaults = normalizedConfig.devicesDefaults;
-    if (normalizedConfig.ios) this.iosDefinitions = normalizedConfig.ios;
+    this.iosDefinitions = normalizedConfig.ios || {};
+
     this.preEntities = {
       devices: normalizedConfig.devices || {},
       drivers: normalizedConfig.drivers || {},
       services: normalizedConfig.services || {},
     };
-    this._hostConfig = this.prepareHostConfig(normalizedConfig);
+    this._hostConfig = this.finalizeHostConfig(normalizedConfig);
 
     appendArray(this.plugins, normalizedConfig.plugins);
 
@@ -91,7 +87,7 @@ export default class ConfigManager {
     }
   }
 
-  private prepareHostConfig(normalizedConfig: PreHostConfig): HostConfig {
+  private finalizeHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
       id: normalizedConfig.id as any,
       platform: normalizedConfig.platform as any,
@@ -100,7 +96,18 @@ export default class ConfigManager {
     };
   }
 
+  private preparePreHostConfig() {
+
+  }
+
+  /**
+   * Merge specified host config with machine config and defaults
+   */
   private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    const validateError: string | undefined = validateHostConfig(preHostConfig);
+
+    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
+
     return _defaultsDeep({},
       preHostConfig,
       this.machineConfig.hostConfig,
