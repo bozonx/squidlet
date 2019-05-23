@@ -10,8 +10,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import {preparePreHostConfig, REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
+import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 
 
 type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
@@ -24,6 +23,10 @@ export default class StartDevelop {
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
   private readonly argIoset?: string;
+  private _envBuilder?: EnvBuilder;
+  private get envBuilder(): EnvBuilder {
+    return this._envBuilder as any;
+  }
 
 
   constructor(
@@ -50,6 +53,10 @@ export default class StartDevelop {
     await this.groupConfig.init();
     await this.props.resolve();
 
+    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+
+    this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
@@ -67,16 +74,16 @@ export default class StartDevelop {
 
 
   private async installModules() {
-    const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
+    const dependencies = this.envBuilder.configManager.dependencies;
 
-    if (!mergedHostConfig.dependencies || _isEmpty(mergedHostConfig.dependencies)) return;
+    if (!dependencies || _isEmpty(dependencies)) return;
 
     const toInstallModules: string[] = [];
 
-    for (let moduleName of Object.keys(mergedHostConfig.dependencies)) {
+    for (let moduleName of Object.keys(dependencies)) {
       if (!this.props.force && await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
 
-      toInstallModules.push(`${moduleName}@${mergedHostConfig.dependencies[moduleName]}`);
+      toInstallModules.push(`${moduleName}@${dependencies[moduleName]}`);
     }
 
     if (!toInstallModules.length) return;
@@ -93,14 +100,13 @@ export default class StartDevelop {
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = path.join(IOSET_DIR, ioSetFile);
     const IoSetClass: IoSetClass = require(ioSetPath).default;
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
-    const envBuilder: EnvBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+
 
     console.info(`using io set "${ioSetFile}"`);
 
     const ioSet = new IoSetClass(
       this.os,
-      envBuilder,
+      this.envBuilder,
       this.props.envSetDir,
       this.props.platform,
       this.props.machine,

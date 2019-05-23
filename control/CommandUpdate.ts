@@ -4,11 +4,11 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import UpdateHost from './UpdateHost';
 import GroupConfigParser from '../shared/GroupConfigParser';
 import Os from '../shared/Os';
-import BuildHostEnv from '../shared/envSetBuild/BuildHostEnv';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/envSetBuild/BuildSystem';
 import BuildIo from '../shared/envSetBuild/BuildIo';
 import systemConfig from '../system/config/systemConfig';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
 interface UpdateCommandParams {
@@ -121,15 +121,18 @@ export default class CommandUpdate {
 
     const hostBuildDir = path.join(this.dirs.hostsBuildDir, hostConfig.id);
     const hostTmpDir = path.join(this.dirs.hostsTmpDir, hostConfig.id);
-    const buildHostEnv: BuildHostEnv = new BuildHostEnv(
-      this.os,
-      hostConfig,
-      hostBuildDir,
-      hostTmpDir
-    );
+
+    // TODO: remake - build configs and entities
+
+    // const buildHostEnv: BuildHostEnv = new BuildHostEnv(
+    //   this.os,
+    //   hostConfig,
+    //   hostBuildDir,
+    //   hostTmpDir
+    // );
 
     console.info(`===> generating configs and entities of host "${hostConfig.id}"`);
-    await buildHostEnv.build();
+    //await buildHostEnv.build();
   }
 
   private async uploadToHost(hostConfig: PreHostConfig) {
@@ -143,5 +146,21 @@ export default class CommandUpdate {
     console.info(`===> updating host "${hostConfig.id}"`);
     await updateHost.update();
   }
+
+  // async build() {
+  //   await this.os.mkdirP(this.hostBuildDir);
+  //   await this.os.mkdirP(this.hostTmpDir);
+  //
+  //   // TODO: удалить старые
+  //
+  //   // await this.os.rimraf(`${this.hostBuildDir}/**/*`);
+  //   // await this.os.rimraf(`${this.hostTmpDir}/**/*`);
+  //
+  //   const envBuilder: EnvBuilder = new EnvBuilder(this.preHostConfig, this.hostBuildDir, this.hostTmpDir);
+  //
+  //   await envBuilder.collect();
+  //   await envBuilder.writeConfigs();
+  //   await envBuilder.writeEntities();
+  // }
 
 }

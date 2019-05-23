@@ -1,3 +1,5 @@
+import _defaultsDeep = require('lodash/defaultsDeep');
+
 import PreHostConfig from '../interfaces/PreHostConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
 import MachineConfig from '../interfaces/MachineConfig';
@@ -5,9 +7,11 @@ import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig, makeIoNames, preparePreHostConfig} from '../../shared/helpers';
+import {loadMachineConfig, makeIoNames} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import Platforms from '../interfaces/Platforms';
+import validateHostConfig from './validateHostConfig';
+import hostDefaultConfig from '../configs/hostDefaultConfig';
 
 
 export default class ConfigManager {
@@ -22,6 +26,7 @@ export default class ConfigManager {
   iosDefinitions: IoItemDefinition = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
+  dependencies?: {[index: string]: any};
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
   }
@@ -43,17 +48,17 @@ export default class ConfigManager {
 
   async init() {
     const preHostConfig: PreHostConfig = await this.resolveHostConfig();
+    const validateError: string | undefined = validateHostConfig(preHostConfig);
 
-    // TODO: тут не должно загружаться loadMachineConfig !!!!
-    const preparedConfig: PreHostConfig = await preparePreHostConfig(preHostConfig);
+    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
+    else if (!preHostConfig.platform) throw new Error(`Platform param has to be specified in host config`);
+
+    this._machineConfig = this.loadMachineConfig(preHostConfig);
+
+    const preparedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
     const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
 
-    if (!preHostConfig.platform || !preHostConfig.machine) throw new Error(`No platform or machine`);
-
-    this._machineConfig = this.loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
-
-    console.log(11111111, this._machineConfig)
-
+    this.dependencies = preparedConfig.dependencies;
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     if (normalizedConfig.ios) this.iosDefinitions = normalizedConfig.ios;
     this.preEntities = {
@@ -72,6 +77,7 @@ export default class ConfigManager {
   getMachineIos(): string[] {
     return makeIoNames(this.machineConfig.ios);
   }
+
 
   private async resolveHostConfig(): Promise<PreHostConfig> {
     if (typeof this.hostConfigOrConfigPath === 'string') {
@@ -94,9 +100,24 @@ export default class ConfigManager {
     };
   }
 
+  private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    return _defaultsDeep({},
+      preHostConfig,
+      this.machineConfig.hostConfig,
+      hostDefaultConfig,
+    );
+  }
+
   // This wrapper needs for test purpose
-  private loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
-    return loadMachineConfig(platform, machine);
+  private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
+    if (!preHostConfig.platform) {
+      throw new Error(`Host config "${preHostConfig.id}" doesn't have a platform param`);
+    }
+    else if (!preHostConfig.machine) {
+      throw new Error(`Host config "${preHostConfig.id}" doesn't have a machine param`);
+    }
+
+    return loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
   }
 
 }

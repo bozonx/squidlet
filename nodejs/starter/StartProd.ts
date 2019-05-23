@@ -4,23 +4,22 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {generatePackageJson, installNpmModules, startSystem} from './helpers';
-import BuildEnvSet from '../../shared/envSetBuild/BuildEnvSet';
-import {SYSTEM_FILE_NAME} from '../../shared/constants';
-import {preparePreHostConfig} from '../../shared/helpers';
+import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import BuildSystem from '../../shared/envSetBuild/BuildSystem';
+import BuildIo from '../../shared/envSetBuild/BuildIo';
 
 
 export default class StartProd {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
-  private _buildEnvSet?: BuildEnvSet;
-  private get buildEnvSet(): BuildEnvSet {
-    return this._buildEnvSet as any;
+  private _envBuilder?: EnvBuilder;
+  private get envBuilder(): EnvBuilder {
+    return this._envBuilder as any;
   }
-
 
   constructor(
     configPath: string,
@@ -43,7 +42,11 @@ export default class StartProd {
   async init() {
     await this.groupConfig.init();
     await this.props.resolve();
-    this._buildEnvSet = new BuildEnvSet(this.os, this.props.envSetDir, this.props.tmpDir);
+    await this.envBuilder.collect();
+
+    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+
+    this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
@@ -55,7 +58,10 @@ export default class StartProd {
 
     await this.installModules();
     await this.buildInitialSystem();
-    await this.buildEnv();
+    // build config and entities
+    await this.envBuilder.writeEnv();
+    // build io
+    await this.buildIos();
 
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
     const SystemClass = require(pathToSystem).default;
@@ -75,8 +81,7 @@ export default class StartProd {
 
     // TODO: может если force - то удалть node_modules ???
 
-    const mergedHostConfig: PreHostConfig = await preparePreHostConfig(this.props.hostConfig);
-    const packageJson: string = generatePackageJson(mergedHostConfig.dependencies);
+    const packageJson: string = generatePackageJson(this.envBuilder.configManager.dependencies);
 
     console.info(`===> writing package.json`);
 
@@ -108,31 +113,38 @@ export default class StartProd {
     // else if it exists - do nothing
     if (!this.props.force && await this.os.exists(pathToSystemDir)) return;
 
-    await this.buildEnvSet.buildSystem();
-  }
+    // Build system to workDir/envset/system
 
-  private async buildEnv() {
+    const systemBuildDir = path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
+    const systemTmpDir = path.join(this.props.tmpDir, systemConfig.envSetDirs.system);
+    const buildSystem: BuildSystem = new BuildSystem(this.os);
 
-    // TODO: generate id or special guid
-    // TODO: если не задан host config - то использовать умолчальный ???
-
-    // const initialHostConfig: PreHostConfig = {
-    //   id: 'initialHost',
-    //   platform: this.props.platform,
-    //   machine: this.props.machine,
-    // };
-
-
-    // build config and entities
-    await this.buildEnvSet.buildEnvSet(this.props.hostConfig);
-    // build io
-    await this.buildEnvSet.buildIos(this.props.platform, this.props.machine);
+    console.info(`===> Building system`);
+    await buildSystem.build(systemBuildDir, systemTmpDir);
   }
 
   private getPathToProdSystemDir(): string {
     return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
+  /**
+   * Build io files to workDir/io
+   */
+  async buildIos() {
+    console.info(`===> Building io`);
+
+    const buildDir = path.join(this.props.envSetDir, systemConfig.envSetDirs.ios);
+    const tmpDir = path.join(this.props.tmpDir, systemConfig.envSetDirs.ios);
+    const buildIo: BuildIo = new BuildIo(
+      this.os,
+      this.props.platform,
+      this.props.machine,
+      buildDir,
+      tmpDir
+    );
+
+    await buildIo.build();
+  }
 }
 
 

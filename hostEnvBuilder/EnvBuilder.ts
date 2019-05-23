@@ -17,12 +17,12 @@ import {checkIoExistance} from './helpers';
 
 export default class EnvBuilder {
   readonly usedEntities: UsedEntities;
+  readonly configManager: ConfigManager;
 
   private readonly tmpBuildDir: string;
   // env build dir
   private readonly buildDir: string;
   private readonly pluginEnv: PluginEnv;
-  private readonly configManager: ConfigManager;
   private readonly register: Register;
   private readonly entitiesWriter: EntitiesWriter;
   private readonly definitions: Definitions;
@@ -79,6 +79,14 @@ export default class EnvBuilder {
     this.log.info(`--> Initialization has finished`);
     // call handlers after init
     await this.pluginEnv.$riseAfterInit();
+  }
+
+  /**
+   * Write configs and entities files
+   */
+  async writeEnv() {
+    await this.writeConfigs();
+    await this.writeEntities();
   }
 
   /**

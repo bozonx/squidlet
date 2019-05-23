@@ -1,6 +1,9 @@
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import Os from '../Os';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+// TODO: remove
+
+
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import Os from '../shared/Os';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 
 export default class BuildHostEnv {

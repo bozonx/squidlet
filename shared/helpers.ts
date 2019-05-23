@@ -1,6 +1,5 @@
 import * as path from 'path';
 import _trim = require('lodash/trim');
-import _defaultsDeep = require('lodash/defaultsDeep');
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
@@ -143,20 +142,20 @@ export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsM
   throw new Error(`Unsupported architecture "${arch}"`);
 }
 
-/**
- * Validate and merge config with machine config of specified machine
- */
-export async function preparePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
-  const validateError: string | undefined = validateHostConfig(preHostConfig);
-
-  if (validateError) throw new Error(`Invalid host config: ${validateError}`);
-  else if (!preHostConfig.platform) throw new Error(`Platform param has to be specified in host config`);
-
-  const machineConfig: MachineConfig = loadMachineConfig(preHostConfig.platform, preHostConfig.machine as string);
-
-  return _defaultsDeep({},
-    preHostConfig,
-    machineConfig.hostConfig,
-    hostDefaultConfig,
-  );
-}
+// /**
+//  * Validate and merge config with machine config of specified machine
+//  */
+// export async function preparePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
+//   const validateError: string | undefined = validateHostConfig(preHostConfig);
+//
+//   if (validateError) throw new Error(`Invalid host config: ${validateError}`);
+//   else if (!preHostConfig.platform) throw new Error(`Platform param has to be specified in host config`);
+//
+//   const machineConfig: MachineConfig = loadMachineConfig(preHostConfig.platform, preHostConfig.machine as string);
+//
+//   return _defaultsDeep({},
+//     preHostConfig,
+//     machineConfig.hostConfig,
+//     hostDefaultConfig,
+//   );
+// }
