@@ -21,9 +21,9 @@ const machineConfig: MachineConfig = {
     //'Dac',
     //'I2cSlave',
   ],
-  iosSupportFiles: [
-    '../shared/nodejs/helpers.js',
-  ],
+  // iosSupportFiles: [
+  //   '../shared/nodejs/helpers.js',
+  // ],
 
   hostConfig: {
     drivers: {

@@ -12,9 +12,9 @@ const machineConfig: MachineConfig = {
     //'Wifi',
     //'Bluetooth',
   ],
-  iosSupportFiles: [
-    './ios/helpers.js',
-  ],
+  // iosSupportFiles: [
+  //   './ios/helpers.js',
+  // ],
 
   hostConfig: {
   }

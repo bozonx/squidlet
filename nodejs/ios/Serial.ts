@@ -2,8 +2,7 @@ import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/helpers/binaryHelpers';
 import SerialIo, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialIo';
-
-const {convertBufferToUint8Array} = require('./helpers');
+import {convertBufferToUint8Array} from 'system/helpers/binaryHelpers';
 
 
 

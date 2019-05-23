@@ -362,6 +362,23 @@ export function deserializeJson(serialized: Uint8Array) {
   });
 }
 
+export function convertBufferToUint8Array(data: Buffer) {
+
+  // TODO: test
+
+  if (typeof Buffer === 'undefined') {
+    throw new Error(`convertBufferToUint8Array: Your system doesn't support a Buffer`);
+  }
+
+  const uIntArr = new Uint8Array(data.length);
+
+  for (let i = 0; i < data.length; i++) {
+    uIntArr[i] = data.readInt8(i);
+  }
+
+  return uIntArr;
+}
+
 
 // export function isUint8Array(value: any): boolean {
 //   if (typeof value !== 'object') return false;

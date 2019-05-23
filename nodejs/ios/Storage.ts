@@ -2,8 +2,7 @@ import * as fs from 'fs';
 
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/helpers/helpers';
-
-const {convertBufferToUint8Array} = require('./helpers');
+import {convertBufferToUint8Array} from 'system/helpers/binaryHelpers';
 
 
 const DEFAULT_ENCODE = 'utf8';
