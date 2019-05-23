@@ -22,7 +22,6 @@ import './baseDevice/DeviceBase';
 import './baseDrivers/DriverFactoryBase';
 import './baseDrivers/MasterSlaveBaseNodeDriver';
 import './baseServices/ServiceBase';
-import '../nodejs/ioSet/RemoteIoCollection';
 
 import System from './System';
 

@@ -8,7 +8,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement} from '../../system/helpers/strings';
 import systemConfig from '../../system/config/systemConfig';
-import {getFileNameOfPath} from '../../shared/helpers';
+import {getFileNameOfPath} from '../helpers';
 
 
 /**

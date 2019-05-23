@@ -7,7 +7,7 @@ import Os from '../../shared/Os';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import {loadMachineConfigInPlatformDir, getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
+import StorageEnvMemoryWrapper from '../../shared/ioSet/StorageEnvMemoryWrapper';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
