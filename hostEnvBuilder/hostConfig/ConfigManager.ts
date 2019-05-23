@@ -50,8 +50,7 @@ export default class ConfigManager {
 
     this._machineConfig = this.loadMachineConfig(preHostConfig);
 
-    const preparedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
-    const normalizedConfig: PreHostConfig = normalizeHostConfig(preparedConfig);
+    const normalizedConfig: PreHostConfig = this.preparePreHostConfig(preHostConfig);
 
     this.dependencies = normalizedConfig.dependencies;
     this.devicesDefaults = normalizedConfig.devicesDefaults;
@@ -96,18 +95,20 @@ export default class ConfigManager {
     };
   }
 
-  private preparePreHostConfig() {
+  private preparePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
+    const validateError: string | undefined = validateHostConfig(preHostConfig);
 
+    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
+
+    const preparedConfig: PreHostConfig = this.mergePreHostConfig(preHostConfig);
+
+    return  normalizeHostConfig(preparedConfig);
   }
 
   /**
    * Merge specified host config with machine config and defaults
    */
   private mergePreHostConfig(preHostConfig: PreHostConfig): PreHostConfig {
-    const validateError: string | undefined = validateHostConfig(preHostConfig);
-
-    if (validateError) throw new Error(`Invalid host config: ${validateError}`);
-
     return _defaultsDeep({},
       preHostConfig,
       this.machineConfig.hostConfig,

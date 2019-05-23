@@ -30,7 +30,6 @@ describe.only 'envBuilder.ConfigManager', ->
       ]
       hostConfig: {
         config: {
-          #envSetDir: '/path/to/env'
           platformParam: 1
         },
         ios: {
@@ -68,11 +67,10 @@ describe.only 'envBuilder.ConfigManager', ->
       config: {
         defaultConfigRepublishIntervalMs: 600000
         defaultStatusRepublishIntervalMs: 60000
-        #logLevel: 'info'
         senderResendTimeout: 1
         senderTimeout: 60
+        ioSetResponseTimoutSec: 30
 
-        #envSetDir: @machineConfig.hostConfig.config.envSetDir
         platformParam: 1
         hostParam: 1
       }
@@ -80,11 +78,3 @@ describe.only 'envBuilder.ConfigManager', ->
       machine: 'rpi'
       platform: 'nodejs'
     })
-
-#  it 'use buildDir from config', ->
-#    @configManager = new ConfigManager(@io, @preHostConfig)
-#    @configManager.loadMachineConfig = () => @machineConfig
-#
-#    await @configManager.init()
-#
-#    assert.equal(@configManager.buildDir, @machineConfig.hostConfig.config.envSetDir)
