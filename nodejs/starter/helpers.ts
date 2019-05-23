@@ -44,11 +44,24 @@ export async function startSystem(
   console.info(`===> Initializing system`);
 
   const system = new SystemClass(ioSet, systemConfigExtend);
+  const gracefullyDestroy = async () => {
+    setTimeout(() => {
+      console.error(`ERROR: System hasn't been gracefully destroyed during "${props.destroyTimeoutSec}" seconds`);
+      process.exit(3);
+    }, props.destroyTimeoutSec * 1000);
 
-  process.on('SIGTERM', () => {
-    system.destroy()
-      .catch(console.error);
-  });
+    try {
+      await system.destroy();
+      process.exit(0);
+    }
+    catch (err) {
+      console.error(err);
+      process.exit(2);
+    }
+  };
+
+  process.on('SIGTERM', gracefullyDestroy);
+  process.on('SIGINT', gracefullyDestroy);
 
   console.info(`===> Starting system`);
 

@@ -59,6 +59,7 @@ export default class System {
   }
 
   async destroy() {
+    this.log.info('destroying...');
     this.riseEvent(topics.system.beforeDestroy);
     await this.devicesManager.destroy();
     await this.servicesManager.destroy();
@@ -66,6 +67,7 @@ export default class System {
     await this.ioManager.destroy();
     this.sessions.destroy();
     this.events.destroy();
+    console.info('System has been successfully destroyed');
   }
 
 

@@ -13,6 +13,9 @@ import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 
 
+const DESTROY_TIMEOUT_SEC = 60;
+
+
 export default class Props {
   workDir: string = '';
   envSetDir: string = '';
@@ -20,6 +23,7 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
+  destroyTimeoutSec: number = DESTROY_TIMEOUT_SEC;
   readonly force: boolean;
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
