@@ -52,18 +52,6 @@ export default class Api {
   }
 
 
-  /**
-   * Generate unique id.
-   * It places here for easy testing and mocking.
-   */
-  generateUniqId(): string {
-    // TODO: make - system id + timestamp + index
-
-    lastId++;
-
-    return String(lastId);
-  }
-
   exec(topic: string, data?: string | Uint8Array): Promise<void> {
     const message: ApiMessage = this.parseCmd(topic, data);
 
@@ -73,7 +61,7 @@ export default class Api {
     // TODO: add other types
   }
 
-  subscribe(cb: (type: ApiTypes, topic: string, data?: string | Uint8Array) => void): number {
+  onOutcome(cb: (type: ApiTypes, topic: string, data?: string | Uint8Array) => void): number {
     const message: ApiMessage = this.parseCmd();
 
     //this.env.events.addCategoryListener(categories.externalDataOutcome, this.externalOutcomeHandler);
@@ -91,15 +79,22 @@ export default class Api {
   }
 
   /**
+   * Generate unique id.
+   * It places here for easy testing and mocking.
+   */
+  generateUniqId(): string {
+    // TODO: make - system id + timestamp + index
+
+    lastId++;
+
+    return String(lastId);
+  }
+
+  /**
    * Get object like {deviceId: [actionName, ...]}
    */
   getDevicesActions(): {[index: string]: string[]} {
-
-    // TODO: get all the hosts from master config
-
-
     const result: {[index: string]: string[]} = {};
-
     const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
 
     for (let devicesId of devicesIds) {
@@ -115,6 +110,39 @@ export default class Api {
     return result;
   }
 
+  /**
+   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
+   */
+  getDevicesActionTopics(): string[] {
+    for (let deviceId of Object.keys(devicesActions)) {
+      for (let action of devicesActions[deviceId]) {
+        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, action);
+
+        this.env.log.info(`MQTT subscribe: ${topic}`);
+
+        // TODO: обработать ошибку промиса
+
+        this.subscribe(topic)
+          .catch(this.env.log.error);
+      }
+    }
+
+
+    const result: {[index: string]: string[]} = {};
+    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
+
+    for (let devicesId of devicesIds) {
+      const device = this.system.devicesManager.getDevice(devicesId);
+
+      // TODO: review
+
+      if (isEmpty((device as any).actions)) continue;
+
+      result[devicesId] = Object.keys((device as any).actions);
+    }
+
+    return result;
+  }
 
   /**
    * Call device's action and receive a result

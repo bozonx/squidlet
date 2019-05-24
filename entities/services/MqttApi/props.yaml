@@ -10,7 +10,3 @@ host:
 port:
   type: number
   default: 1883
-## List of hosts which will be listened to. By default - all the hosts (an empty array)
-#listenHosts:
-#  type: string[]
-#  default: []

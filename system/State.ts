@@ -2,6 +2,9 @@ import System from './System';
 import {JsonTypes} from './interfaces/Types';
 
 
+// TODO: add republish
+
+
 export default class State {
   private readonly system: System;
 
@@ -19,7 +22,7 @@ export default class State {
 
   }
 
-  onChange(stateName: string, cb: (state: JsonTypes) => void): number {
+  onChange(stateName: string, cb: (state: JsonTypes, isRepublish?: true) => void): number {
 
   }
 

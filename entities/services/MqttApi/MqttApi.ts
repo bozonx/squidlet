@@ -1,5 +1,4 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import {combineTopic} from 'system/helpers/helpers';
 import MqttIo from 'system/interfaces/io/MqttIo';
 import {ApiTypes} from 'system/Api';
 
@@ -8,7 +7,6 @@ interface Props {
   protocol: string;
   host: string;
   port: string;
-  //listenHosts: string[];
 }
 
 export default class MqttSevice extends ServiceBase<Props> {
@@ -24,12 +22,14 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
   protected didInit = async () => {
+    // listen to income messages from mqtt broker
     await this.mqttIo.onMessage(this.messagesHandler);
-    this.env.api.subscribe(this.apiSubscribeHandler);
+    // listen to outcome messages from api and send them to mqtt broker
+    this.env.api.onOutcome(this.outcomeHandler);
     // register subscribers after app init
-    this.env.system.onAppInit(() => {
+    this.env.system.onAppInit(async () => {
       this.env.log.info(`--> Register MQTT subscribers of devices actions`);
-      this.subscribeToDevices();
+      await this.subscribeToDevices();
     });
   }
 
@@ -48,7 +48,7 @@ export default class MqttSevice extends ServiceBase<Props> {
       .catch(this.env.log.error);
   }
 
-  private apiSubscribeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
+  private outcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
     if (type === 'deviceOutcome') {
       this.mqttIo.publish(topic, data)
         .catch(this.env.log.error);
@@ -56,20 +56,13 @@ export default class MqttSevice extends ServiceBase<Props> {
     // TODO: support other types
   }
 
-  private subscribeToDevices() {
-    const devicesActions: {[index: string]: string[]} = this.env.api.getDevicesActions();
+  private async subscribeToDevices() {
+    const devicesActions: string[] = this.env.api.getDevicesActionTopics();
 
-    for (let deviceId of Object.keys(devicesActions)) {
-      for (let action of devicesActions[deviceId]) {
-        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, action);
+    for (let topic of devicesActions) {
+      this.env.log.info(`MQTT subscribe: ${topic}`);
 
-        this.env.log.info(`MQTT subscribe: ${topic}`);
-
-        // TODO: обработать ошибку промиса
-
-        this.subscribe(topic)
-          .catch(this.env.log.error);
-      }
+      await this.mqttIo.subscribe(topic);
     }
   }
 
