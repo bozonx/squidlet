@@ -6,9 +6,9 @@ export default {
   // messengerBridge: 'messengerBridge',
   //devicesChannel: 'devicesChannel',
   // devices publish to this category, topic is deviceId
-  externalDataOutcome: 'externalDataOutcome',
+  //externalDataOutcome: 'externalDataOutcome',
   // data from mqtt or backend moves to this category
-  externalDataIncome: 'externalDataIncome',
+  //externalDataIncome: 'externalDataIncome',
   // all the logs. Topic is level
   logger: 'logger',
   // updater service

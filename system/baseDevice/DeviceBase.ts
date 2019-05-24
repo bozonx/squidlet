@@ -8,6 +8,7 @@ import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import categories from '../dict/categories';
 import DeviceData from '../interfaces/DeviceData';
+import {ApiPayload, ApiTypes, DeviceIncomePayload, DeviceOutcomePayload} from '../Api';
 
 
 export interface DeviceBaseProps {
@@ -83,8 +84,10 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
 
     // handle actions call
     if (this.actions) {
+      // TODO: use api
       // subscribe to external messages where topic is this device id to call action
-      this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
+      //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
+      this.env.api.onIncome(this.handleIncomeData);
     }
 
     await Promise.all([
@@ -159,20 +162,25 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
 
 
   protected publish = (subTopic: string, value: any, params?: PublishParams) => {
-    const data: DeviceData = {
-      id: this.id,
+    const payload: DeviceOutcomePayload = {
+      deviceId: this.id,
       subTopic,
       data: (this.transformPublishValue) ? this.transformPublishValue(value) : value,
       params,
     };
 
-    // TODO: использовать формат Api
-
-    this.env.events.emit(categories.externalDataOutcome, this.id, data);
+    //this.env.events.emit(categories.externalDataOutcome, this.id, data);
+    this.env.api.emit('deviceOutcome', payload);
   }
 
-  private handleIncomeData = (incomeData: DeviceData) => {
-    return this.action(incomeData.subTopic, incomeData.data);
+  private handleIncomeData = (type: ApiTypes, apiPayload: ApiPayload) => {
+    if (type !== 'deviceIncome') return;
+
+    const payload = apiPayload as DeviceIncomePayload;
+
+    if (payload.deviceId !== this.id) return;
+
+    return this.action(payload.action, ...payload.params);
   }
 
 }

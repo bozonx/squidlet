@@ -13,6 +13,10 @@ export default class State {
     this.system = system;
   }
 
+  destroy() {
+    // TODO: add
+  }
+
 
   getState(stateName: string): JsonTypes {
 

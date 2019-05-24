@@ -2,7 +2,9 @@ import System from './System';
 import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import DeviceData from './interfaces/DeviceData';
-import {isEmpty} from './helpers/lodashLike';
+import IndexedEvents from './helpers/IndexedEvents';
+import categories from './dict/categories';
+import PublishParams from './interfaces/PublishParams';
 
 
 // TODO: add call type
@@ -10,9 +12,7 @@ import {isEmpty} from './helpers/lodashLike';
 // TODO: add remoteCall
 
 
-export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'event';
-
-interface DeviceIncomePayload {
+export interface DeviceIncomePayload {
   // room and device id
   deviceId: string;
   action: string;
@@ -25,6 +25,8 @@ export interface DeviceOutcomePayload {
   // e.g status, status/temperature, config
   subTopic: string;
   data: JsonTypes;
+  // TODO: может просто isRepeat ????
+  params?: PublishParams;
 }
 
 interface EmitEventPayload {
@@ -33,9 +35,14 @@ interface EmitEventPayload {
   data: any;
 }
 
+export type ApiPayload = DeviceIncomePayload | DeviceOutcomePayload | EmitEventPayload;
+export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'event';
+type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
+export type IncomeHandler = (type: ApiTypes, payload: ApiPayload) => void;
+
 export interface ApiMessage {
   type: ApiTypes;
-  payload: DeviceIncomePayload | DeviceOutcomePayload | EmitEventPayload;
+  payload: ApiPayload;
 }
 
 
@@ -45,10 +52,17 @@ let lastId: number = 0;
 
 export default class Api {
   private readonly system: System;
+  // TODO: может лучше использовать общие события ????
+  private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
 
 
   constructor(system: System) {
     this.system = system;
+    //this.system.events.addCategoryListener(categories.externalDataOutcome, this.externalOutcomeHandler);
+  }
+
+  destroy() {
+    this.outcomeEvents.removeAll();
   }
 
 
@@ -113,10 +127,23 @@ export default class Api {
   /**
    * Listen to outcome requests.
    */
-  onOutcome(cb: (type: ApiTypes, topic: string, data?: string | Uint8Array) => void): number {
-    const message: ApiMessage = this.parseCmd();
+  onOutcome(cb: OutcomeHandler): number {
+    return this.outcomeEvents.addListener(cb);
+  }
 
-    //this.env.events.addCategoryListener(categories.externalDataOutcome, this.externalOutcomeHandler);
+  onIncome(cb: IncomeHandler): number {
+
+    //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
+  }
+
+  /**
+   * Call this method if you want to send outcome data
+   */
+  emit(type: ApiTypes, payload: ApiPayload) {
+
+    //const message: ApiMessage = this.parseCmd();
+
+    //
 
     //const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, data.id, data.subTopic);
 
@@ -129,6 +156,7 @@ export default class Api {
     // }
 
   }
+
 
   /**
    * Call device's action and receive a result
@@ -143,7 +171,7 @@ export default class Api {
       data: parseValue(data),
     };
 
-    this.system.events.emit(categories.externalDataIncome, id, incomeData);
+    //this.system.events.emit(categories.externalDataIncome, id, incomeData);
   }
 
   setDeviceConfig(deviceId: string, partialConfig: {[index: string]: any}): Promise<void> {
@@ -158,6 +186,10 @@ export default class Api {
     // TODO: add
   }
 
+
+  // private externalOutcomeHandler() {
+  //
+  // }
 
   private parseCmd(topic: string, data?: any): ApiMessage {
     // TODO: add
