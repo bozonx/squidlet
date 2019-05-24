@@ -52,7 +52,9 @@ export default class Api {
   }
 
 
-  exec(topic: string, data?: string | Uint8Array): Promise<void> {
+  income(topic: string, data?: string | Uint8Array): Promise<void> {
+    //this.env.log.info(`MQTT income: ${topic} - ${data}`);
+
     const message: ApiMessage = this.parseCmd(topic, data);
 
     if (message.type === 'deviceIncome') {

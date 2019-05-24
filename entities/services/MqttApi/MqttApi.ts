@@ -32,20 +32,21 @@ export default class MqttApi extends ServiceBase<Props> {
   }
 
   destroy = async () => {
-    // TODO: remove listener
+    // TODO: может закрывать соединение на destroy и писать об этом ???
   }
 
 
   /**
-   * Processing income messages
+   * Processing income messages from broker
    */
   private messagesHandler = async (topic: string, data?: string | Uint8Array): Promise<void> => {
-    this.env.log.info(`MQTT income: ${topic} - ${data}`);
-
-    this.env.api.exec(topic, data)
+    this.env.api.income(topic, data)
       .catch(this.env.log.error);
   }
 
+  /**
+   * Publish outcome messages to broker
+   */
   private outcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
     if (type === 'deviceOutcome') {
       this.mqttConnection.publish(topic, data)
@@ -54,12 +55,15 @@ export default class MqttApi extends ServiceBase<Props> {
     // TODO: support other types
   }
 
+  /**
+   * Subscribe to all the device's actions calls on broker
+   */
   private subscribeToDevices = async () => {
     this.env.log.info(`--> Register MQTT subscribers of devices actions`);
 
-    const devicesActions: string[] = this.env.api.getDevicesActionTopics();
+    const devicesActionsTopics: string[] = this.env.api.getDevicesActionTopics();
 
-    for (let topic of devicesActions) {
+    for (let topic of devicesActionsTopics) {
       this.env.log.info(`MQTT subscribe: ${topic}`);
 
       await this.mqttConnection.subscribe(topic);
@@ -67,18 +71,3 @@ export default class MqttApi extends ServiceBase<Props> {
   }
 
 }
-
-
-// /**
-//  * Publish custom topic
-//  */
-// async publish(topic: string, data: string | Uint8Array | undefined) {
-//   await this.mqttIo.publish(topic, data);
-// }
-//
-// /**
-//  * Subscribe on custom topic
-//  */
-// async subscribe(topic: string) {
-//   await this.mqttIo.subscribe(topic);
-// }

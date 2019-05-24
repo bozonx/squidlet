@@ -31,6 +31,8 @@ export class MqttDevConnection implements MqttConnection {
     return this._connected;
   }
 
+
+
   publish(topic: string, data?: string | Uint8Array): Promise<void> {
     // TODO: support of options
 
@@ -81,13 +83,23 @@ export class MqttDevConnection implements MqttConnection {
   // }
 
   // TODO: сделать offMessage и тд
+  // TODO: add close connection
 
 }
 
 
 export default class Mqtt {
+
+  // TODO: add onConnection event
+
   // TODO: rename to getInstance ????
   connect(params: MqttProps): MqttDevConnection {
     return new MqttDevConnection(params);
   }
+
+
+  destroy = async () => {
+    // TODO: close connections
+  }
+
 }
