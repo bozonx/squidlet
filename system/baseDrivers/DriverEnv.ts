@@ -9,5 +9,4 @@ export default class DriverEnv extends EnvBase {
   async loadManifest(driverName: string): Promise<DriverManifest> {
     return this.system.envSet.loadManifest<DriverManifest>('drivers', driverName);
   }
-
 }

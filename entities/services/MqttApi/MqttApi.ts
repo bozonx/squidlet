@@ -25,7 +25,7 @@ export default class MqttSevice extends ServiceBase<Props> {
 
   protected didInit = async () => {
     await this.mqttIo.onMessage(this.messagesHandler);
-    this.env.system.api.subscribe(this.apiSubscribeHandler);
+    this.env.api.subscribe(this.apiSubscribeHandler);
     // register subscribers after app init
     this.env.system.onAppInit(() => {
       this.env.log.info(`--> Register MQTT subscribers of devices actions`);
@@ -38,28 +38,13 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
 
-  // /**
-  //  * Publish custom topic
-  //  */
-  // async publish(topic: string, data: string | Uint8Array | undefined) {
-  //   await this.mqttIo.publish(topic, data);
-  // }
-  //
-  // /**
-  //  * Subscribe on custom topic
-  //  */
-  // async subscribe(topic: string) {
-  //   await this.mqttIo.subscribe(topic);
-  // }
-
-
   /**
    * Processing income messages
    */
   private messagesHandler = async (topic: string, data?: string | Uint8Array): Promise<void> => {
     this.env.log.info(`MQTT income: ${topic} - ${data}`);
 
-    this.env.system.api.exec(topic, data)
+    this.env.api.exec(topic, data)
       .catch(this.env.log.error);
   }
 
@@ -71,9 +56,8 @@ export default class MqttSevice extends ServiceBase<Props> {
     // TODO: support other types
   }
 
-  // TODO: review
   private subscribeToDevices() {
-    const devicesActions: {[index: string]: string[]} = this.env.host.getDevicesActions();
+    const devicesActions: {[index: string]: string[]} = this.env.api.getDevicesActions();
 
     for (let deviceId of Object.keys(devicesActions)) {
       for (let action of devicesActions[deviceId]) {
@@ -90,3 +74,18 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
 }
+
+
+// /**
+//  * Publish custom topic
+//  */
+// async publish(topic: string, data: string | Uint8Array | undefined) {
+//   await this.mqttIo.publish(topic, data);
+// }
+//
+// /**
+//  * Subscribe on custom topic
+//  */
+// async subscribe(topic: string) {
+//   await this.mqttIo.subscribe(topic);
+// }

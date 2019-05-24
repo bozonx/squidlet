@@ -50,13 +50,13 @@ export default class Host {
     return String(lastId);
   }
 
-  /**
-   * Resolve hostId by looking for device or service id in the master config.
-   */
-  resolveHostIdByEntityId(entityId: string): string {
-    // TODO: get from config
-    return 'master';
-  }
+  // /**
+  //  * Resolve hostId by looking for device or service id in the master config.
+  //  */
+  // resolveHostIdByEntityId(entityId: string): string {
+  //   // TODO: get from config
+  //   return 'master';
+  // }
 
   // getAllTheHostsIds(): string[] {
   //   // TODO: get from config
@@ -82,29 +82,29 @@ export default class Host {
   //   }
   // }
 
-  /**
-   * Get object like {deviceId: [actionName, ...]}
-   */
-  getDevicesActions(): {[index: string]: string[]} {
-
-    // TODO: get all the hosts from master config
-
-
-    const result: {[index: string]: string[]} = {};
-
-    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
-
-    for (let devicesId of devicesIds) {
-      const device = this.system.devicesManager.getDevice(devicesId);
-
-      // TODO: review
-
-      if (isEmpty((device as any).actions)) continue;
-
-      result[devicesId] = Object.keys((device as any).actions);
-    }
-
-    return result;
-  }
+  // /**
+  //  * Get object like {deviceId: [actionName, ...]}
+  //  */
+  // getDevicesActions(): {[index: string]: string[]} {
+  //
+  //   // TODO: get all the hosts from master config
+  //
+  //
+  //   const result: {[index: string]: string[]} = {};
+  //
+  //   const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
+  //
+  //   for (let devicesId of devicesIds) {
+  //     const device = this.system.devicesManager.getDevice(devicesId);
+  //
+  //     // TODO: review
+  //
+  //     if (isEmpty((device as any).actions)) continue;
+  //
+  //     result[devicesId] = Object.keys((device as any).actions);
+  //   }
+  //
+  //   return result;
+  // }
 
 }

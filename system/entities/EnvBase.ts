@@ -4,6 +4,8 @@ import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import LogPublisher from '../LogPublisher';
 import DriverBase from '../baseDrivers/DriverBase';
+import {Api} from '../Api';
+import CategorizedEvents from '../helpers/CategorizedEvents';
 
 
 /**
@@ -11,6 +13,12 @@ import DriverBase from '../baseDrivers/DriverBase';
  */
 export default abstract class EnvBase {
   readonly system: System;
+  get api(): Api {
+    return this.system.api;
+  }
+  get events(): CategorizedEvents {
+    return this.system.events;
+  }
   get log(): LogPublisher {
     return this.system.log;
   }

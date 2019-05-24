@@ -2,6 +2,7 @@ import System from './System';
 import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import DeviceData from './interfaces/DeviceData';
+import {isEmpty} from './helpers/lodashLike';
 
 
 // TODO: add call type
@@ -72,6 +73,32 @@ export class Api {
     // }
 
   }
+
+  /**
+   * Get object like {deviceId: [actionName, ...]}
+   */
+  getDevicesActions(): {[index: string]: string[]} {
+
+    // TODO: get all the hosts from master config
+
+
+    const result: {[index: string]: string[]} = {};
+
+    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
+
+    for (let devicesId of devicesIds) {
+      const device = this.system.devicesManager.getDevice(devicesId);
+
+      // TODO: review
+
+      if (isEmpty((device as any).actions)) continue;
+
+      result[devicesId] = Object.keys((device as any).actions);
+    }
+
+    return result;
+  }
+
 
   /**
    * Call device's action and receive a result
