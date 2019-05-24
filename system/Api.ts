@@ -23,7 +23,7 @@ export interface DeviceOutcomePayload {
   deviceId: string;
   // e.g status, status/temperature, config
   subTopic: string;
-  data: JsonTypes;
+  data?: string | Uint8Array;
   // TODO: может просто isRepeat ????
   params?: PublishParams;
 }
@@ -80,7 +80,7 @@ export default class Api {
 
 
       default:
-        this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
+        return this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
     }
   }
 
@@ -99,7 +99,24 @@ export default class Api {
   /**
    * Call this method if you want to send outcome data. (E.g after device state is changed)
    */
-  emit(type: ApiTypes, payload: ApiPayload) {
+  emit(type: ApiTypes, apiPayload: ApiPayload) {
+    switch (type) {
+      case 'deviceOutcome':
+        const payload = apiPayload as DeviceOutcomePayload;
+        const topic: string = combineTopic(
+          this.system.systemConfig.topicSeparator,
+          payload.deviceId,
+          payload.subTopic
+        );
+
+        return this.outcomeEvents.emit(type, topic, payload.data);
+
+      // TODO: add other types
+
+
+      default:
+        return this.system.log.error(`Api.emit: Unsupported message type "${type}"`);
+    }
 
     // TODO: emit event
     // TODO: log to console

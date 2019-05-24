@@ -154,7 +154,7 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     const payload: DeviceOutcomePayload = {
       deviceId: this.id,
       subTopic,
-      data: (this.transformPublishValue) ? this.transformPublishValue(value) : value,
+      data: String((this.transformPublishValue) ? this.transformPublishValue(value) : value),
       params,
     };
 
