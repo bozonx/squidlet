@@ -23,7 +23,7 @@ export default abstract class EnvBase {
     return this.system.log;
   }
   get config(): HostConfig {
-    return this.system.host.config;
+    return this.system.config;
   }
 
 

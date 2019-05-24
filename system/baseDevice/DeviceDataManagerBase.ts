@@ -51,7 +51,7 @@ export default abstract class DeviceDataManagerBase {
     this.schema = schema;
 
     const realRepublishInterval = (typeof republishInterval === 'undefined')
-      ? this.system.host.config.config.defaultStatusRepublishIntervalMs
+      ? this.system.config.config.defaultStatusRepublishIntervalMs
       : republishInterval;
 
     this.republish = new Republish(realRepublishInterval);

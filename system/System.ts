@@ -15,6 +15,7 @@ import IoSet from './interfaces/IoSet';
 import IoManager from './entities/IoManager';
 import Sessions from './helpers/Sessions';
 import {Api} from './Api';
+import HostConfig from './interfaces/HostConfig';
 
 
 export default class System {
@@ -23,13 +24,19 @@ export default class System {
   readonly log: LogPublisher;
   readonly ioManager: IoManager;
   readonly envSet: EnvSet;
-  readonly host: Host;
   readonly driversManager: DriversManager;
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
   readonly sessions: Sessions;
   readonly api: Api;
+  get id(): string {
+    return this.config.id;
+  }
+  get config(): HostConfig {
+    return this.hostConfig as HostConfig;
+  }
 
+  private hostConfig?: HostConfig;
   private _isDevicesInitialized: boolean = false;
   private _isAppInitialized: boolean = false;
   // only for initialization time - it will be deleted after it
@@ -53,11 +60,10 @@ export default class System {
     this.initializationConfig = initializationConfig();
     this.events = new CategorizedEvents(this.systemConfig.eventNameSeparator);
     this.log = new LogPublisher(this);
-    this.host = new Host(this);
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
-    this.sessions = new Sessions(this.host.generateUniqId);
+    this.sessions = new Sessions(this.api.generateUniqId);
     this.api = new Api(this);
   }
 
@@ -79,7 +85,10 @@ export default class System {
     await this.ioManager.init();
 
     console.info(`---> Initializing configs`);
-    await this.host.init();
+    // TODO: нет смыла это сохранять, лучше каждый раз брать из configSet где будет кэш
+    this.hostConfig = await this.envSet.loadConfig<HostConfig>(
+      this.initCfg.fileNames.hostConfig
+    );
 
     console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();

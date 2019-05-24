@@ -35,9 +35,9 @@ export default class RemoteIoCollection {
     this._remoteCall = new RemoteCall(
       this.sendToServer,
       undefined,
-      this.system.host.config.config.ioSetResponseTimoutSec,
+      this.system.config.config.ioSetResponseTimoutSec,
       this.system.log.error,
-      this.system.host.generateUniqId
+      this.system.api.generateUniqId
     );
 
     // listen income messages of backdoor

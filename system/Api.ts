@@ -39,6 +39,10 @@ export interface ApiMessage {
 }
 
 
+// TODO: remove
+let lastId: number = 0;
+
+
 export class Api {
   private readonly system: System;
 
@@ -47,6 +51,18 @@ export class Api {
     this.system = system;
   }
 
+
+  /**
+   * Generate unique id.
+   * It places here for easy testing and mocking.
+   */
+  generateUniqId(): string {
+    // TODO: make - system id + timestamp + index
+
+    lastId++;
+
+    return String(lastId);
+  }
 
   exec(topic: string, data?: string | Uint8Array): Promise<void> {
     const message: ApiMessage = this.parseCmd(topic, data);
