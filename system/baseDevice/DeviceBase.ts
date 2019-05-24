@@ -126,6 +126,10 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     return this.status.onChange(cb);
   }
 
+  getActionsList(): string[] {
+    return Object.keys(this.actions);
+  }
+
   /**
    * Call action and publish it's result.
    */

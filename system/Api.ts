@@ -77,9 +77,7 @@ export default class Api {
     for (let deviceId of devicesIds) {
       const device = this.system.devicesManager.getDevice(deviceId);
 
-      if (isEmpty(device.actions)) continue;
-
-      for (let actionName of Object.keys(device.actions || {})) {
+      for (let actionName of device.getActionsList()) {
         const topic: string = combineTopic(this.system.systemConfig.topicSeparator, deviceId, actionName);
 
         topics.push(topic);
