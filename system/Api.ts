@@ -2,7 +2,6 @@ import System from './System';
 import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
-import categories from './dict/categories';
 import PublishParams from './interfaces/PublishParams';
 
 
@@ -38,7 +37,7 @@ interface EmitEventPayload {
 export type ApiPayload = DeviceIncomePayload | DeviceOutcomePayload | EmitEventPayload;
 export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'event';
 type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
-export type IncomeHandler = (type: ApiTypes, payload: ApiPayload) => void;
+//export type IncomeHandler = (type: ApiTypes, payload: ApiPayload) => void;
 
 export interface ApiMessage {
   type: ApiTypes;
@@ -49,7 +48,7 @@ export interface ApiMessage {
 export default class Api {
   private readonly system: System;
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
-  private readonly incomeEvents = new IndexedEvents<IncomeHandler>();
+  //private readonly incomeEvents = new IndexedEvents<IncomeHandler>();
 
 
   constructor(system: System) {
@@ -61,29 +60,6 @@ export default class Api {
   }
 
 
-
-  /**
-   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
-   */
-  getDevicesActionTopics(): string[] {
-    // TODO: может перенсти в helpers or system или devices manager???
-
-    const topics: string[] = [];
-    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
-
-    for (let deviceId of devicesIds) {
-      const device = this.system.devicesManager.getDevice(deviceId);
-
-      for (let actionName of device.getActionsList()) {
-        const topic: string = combineTopic(this.system.systemConfig.topicSeparator, deviceId, actionName);
-
-        topics.push(topic);
-      }
-    }
-
-    return topics;
-  }
-
   /**
    * Call this method if external income request is received (e.g from remote host by mqtt or ws)
    */
@@ -92,22 +68,20 @@ export default class Api {
 
     const msg: ApiMessage = this.parseCmd(topic, data);
 
-    // TODO: в самом девайсе можно не слушать api.onIncome - а вызов action делать в api
+    //this.incomeEvents.emit(msg.type, msg.payload);
 
-    this.incomeEvents.emit(msg.type, msg.payload);
+    switch (msg.type) {
+      case 'deviceIncome':
+        const payload = msg.payload as DeviceIncomePayload;
 
-    // switch (msg.type) {
-    //   case 'deviceIncome':
-    //     const payload = msg.payload as DeviceIncomePayload;
-    //
-    //     return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
-    //
-    //   // TODO: add other types
-    //
-    //
-    //   default:
-    //     this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
-    // }
+        return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
+
+      // TODO: add other types
+
+
+      default:
+        this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
+    }
   }
 
   /**
@@ -117,10 +91,10 @@ export default class Api {
     return this.outcomeEvents.addListener(cb);
   }
 
-  onIncome(cb: IncomeHandler): number {
-    return this.incomeEvents.addListener(cb);
-    //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
-  }
+  // onIncome(cb: IncomeHandler): number {
+  //   return this.incomeEvents.addListener(cb);
+  //   //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
+  // }
 
   /**
    * Call this method if you want to send outcome data. (E.g after device state is changed)
@@ -149,17 +123,10 @@ export default class Api {
   /**
    * Call device's action and receive a result
    */
-  callDeviceAction(deviceId: string, actionName: string, ...params: any[]): Promise<any> {
-    // TODO: вызвать напрямую без события
-    // const incomeData: DeviceData = {
-    //   id,
-    //   subTopic,
-    //   // TODO: а если json ????
-    //   // parse number, boolean etc
-    //   data: parseValue(data),
-    // };
+  callDeviceAction(deviceId: string, actionName: string, ...params: any[]): Promise<JsonTypes> {
+    const device = this.system.devicesManager.getDevice(deviceId);
 
-    //this.system.events.emit(categories.externalDataIncome, id, incomeData);
+    return device.action(actionName, ...params);
   }
 
   switchAutomation(toState: boolean): Promise<void> {
@@ -175,6 +142,29 @@ export default class Api {
   //
   // listenDeviceConfig(): number {
   // }
+
+  /**
+   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
+   */
+  getDevicesActionTopics(): string[] {
+    // TODO: может перенсти в system или devices manager???
+
+    const topics: string[] = [];
+    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
+
+    for (let deviceId of devicesIds) {
+      const device = this.system.devicesManager.getDevice(deviceId);
+
+      for (let actionName of device.getActionsList()) {
+        const topic: string = combineTopic(this.system.systemConfig.topicSeparator, deviceId, actionName);
+
+        topics.push(topic);
+      }
+    }
+
+    return topics;
+  }
+
 
   private parseCmd(topic: string, data?: any): ApiMessage {
     // TODO: add

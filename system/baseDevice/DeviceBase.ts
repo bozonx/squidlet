@@ -6,9 +6,8 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import categories from '../dict/categories';
-import DeviceData from '../interfaces/DeviceData';
-import {ApiPayload, ApiTypes, DeviceIncomePayload, DeviceOutcomePayload} from '../Api';
+import {DeviceOutcomePayload} from '../Api';
+import {JsonTypes} from '../interfaces/Types';
 
 
 export interface DeviceBaseProps {
@@ -82,13 +81,6 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     this.status && this.status.onPublish(this.publish);
     this.config && this.config.onPublish(this.publish);
 
-    // handle actions call
-    if (this.actions) {
-      // subscribe to external messages where topic is this device id to call action
-      //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
-      this.env.api.onIncome(this.handleIncomeData);
-    }
-
     await Promise.all([
       this.status && this.status.init(this.initialStatus, this.statusGetter, this.statusSetter),
       this.config && this.config.init(this.initialConfig, this.configGetter, this.configSetter),
@@ -135,10 +127,8 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
   /**
    * Call action and publish it's result.
    */
-  async action(actionName: string, ...params: any[]): Promise<any> {
+  async action(actionName: string, ...params: any[]): Promise<JsonTypes> {
     if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
-
-    // TODO: ??? валидация входных параметров действия
 
     let result: any;
 
@@ -172,14 +162,21 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     this.env.api.emit('deviceOutcome', payload);
   }
 
-  private handleIncomeData = (type: ApiTypes, apiPayload: ApiPayload) => {
-    if (type !== 'deviceIncome') return;
-
-    const payload = apiPayload as DeviceIncomePayload;
-
-    if (payload.deviceId !== this.id) return;
-
-    return this.action(payload.action, ...payload.params);
-  }
-
 }
+
+
+// // handle actions call
+// if (this.actions) {
+//   // subscribe to external messages where topic is this device id to call action
+//   //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
+//   this.env.api.onIncome(this.handleIncomeData);
+// }
+// private handleIncomeData = (type: ApiTypes, apiPayload: ApiPayload) => {
+//   if (type !== 'deviceIncome') return;
+//
+//   const payload = apiPayload as DeviceIncomePayload;
+//
+//   if (payload.deviceId !== this.id) return;
+//
+//   return this.action(payload.action, ...payload.params);
+// }
