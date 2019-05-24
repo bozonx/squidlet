@@ -2,6 +2,7 @@ import System from './System';
 import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
+import RemoteCall from './helpers/remoteCall/RemoteCall';
 
 
 export interface DeviceIncomePayload {
@@ -55,10 +56,18 @@ export interface ApiMessage {
 export default class Api {
   private readonly system: System;
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
+  private readonly remoteCall: RemoteCall;
 
 
   constructor(system: System) {
     this.system = system;
+    this.remoteCall = new RemoteCall(
+      (message: RemoteCallMessage) => this.sendToClient(sessionId, message),
+      this.callApi,
+      this.system.config.config.ioSetResponseTimoutSec,
+      this.system.log.error,
+      this.system.generateUniqId
+    );
   }
 
   destroy() {
@@ -180,6 +189,10 @@ export default class Api {
 
     // const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
     //if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
+  }
+
+  private callApi(objectName: string, method: string, args: any[]): Promise<any> {
+    if ()
   }
 
 }

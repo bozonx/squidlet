@@ -1,5 +1,5 @@
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import RemoteCall, {ObjectToCall} from 'system/helpers/remoteCall/RemoteCall';
+import RemoteCall from 'system/helpers/remoteCall/RemoteCall';
 import IoManager from 'system/entities/IoManager';
 
 
@@ -49,7 +49,9 @@ export default class IoSetServer {
     if (!this.remoteCalls[sessionId]) {
       this.remoteCalls[sessionId] = new RemoteCall(
         (message: RemoteCallMessage) => this.sendToClient(sessionId, message),
-        this.ioCollection,
+        (objectName: string, method: string, args: any[]): Promise<any> => {
+          return this.ioCollection[objectName][method](...args);
+        },
         this.responseTimoutSec,
         this.logError,
         this.generateUniqId

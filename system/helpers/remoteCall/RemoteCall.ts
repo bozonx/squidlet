@@ -11,10 +11,11 @@ import {waitForResponse} from './helpers';
 
 type MethodResultHandler = (payload: ResultMethodPayload) => void;
 
-export interface ObjectToCall {
-  // method name: method()
-  [index: string]: (...args: any[]) => Promise<any>;
-}
+// export interface ObjectToCall {
+//   // method name: method()
+//   [index: string]: (...args: any[]) => Promise<any>;
+// }
+export type MethodCaller = (objectName: string, method: string, args: any[]) => Promise<any>;
 
 
 /**
@@ -28,7 +29,8 @@ export default class RemoteCall {
   private readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
   private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
-  private readonly localMethods: {[index: string]: ObjectToCall};
+  //private readonly localMethods: {[index: string]: ObjectToCall};
+  private readonly methodCaller: MethodCaller;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
@@ -37,13 +39,15 @@ export default class RemoteCall {
   constructor(
     send: (message: RemoteCallMessage) => Promise<void>,
     // objects with methods which will be called from other host
-    localMethods: {[index: string]: ObjectToCall} = {},
+    //localMethods: {[index: string]: ObjectToCall} = {},
+    // function which is called a method and returns its result with promise
+    methodCaller: MethodCaller,
     responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
   ) {
     this.send = send;
-    this.localMethods = localMethods;
+    this.methodCaller = methodCaller;
     this.responseTimoutSec = responseTimoutSec;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
@@ -195,20 +199,29 @@ export default class RemoteCall {
   ): Promise<{result: any, error: string}> {
     let result: any;
     let error;
-    
-    if (this.localMethods[objectName] && this.localMethods[objectName][method]) {
-      const preparedArgs: any[] = this.prepareArgsToCall(args);
 
-      try {
-        result = await this.localMethods[objectName][method](...preparedArgs);
-      }
-      catch (err) {
-        error = err;
-      }
+    const preparedArgs: any[] = this.prepareArgsToCall(args);
+
+    try {
+      result = await this.methodCaller(objectName, method, preparedArgs);
     }
-    else {
-      error = `Method "${objectName}.${method}" hasn't been found`;
+    catch (err) {
+      error = err;
     }
+
+    // if (this.localMethods[objectName] && this.localMethods[objectName][method]) {
+    //   const preparedArgs: any[] = this.prepareArgsToCall(args);
+    //
+    //   try {
+    //     result = await this.localMethods[objectName][method](...preparedArgs);
+    //   }
+    //   catch (err) {
+    //     error = err;
+    //   }
+    // }
+    // else {
+    //   error = `Method "${objectName}.${method}" hasn't been found`;
+    // }
     
     return { result, error };
   }
