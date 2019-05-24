@@ -26,7 +26,7 @@ export default class MqttSevice extends ServiceBase<Props> {
 
   protected didInit = async () => {
     await this.mqttDev.onMessage(this.messagesHandler);
-    this.listenHostsPublishes();
+    this.env.events.addCategoryListener(categories.externalDataOutcome, this.hostPublishHandler);
     // register subscribers after app init
     this.env.system.onAppInit(() => {
       this.env.log.info(`--> Register MQTT subscribers of devices actions`);
@@ -65,34 +65,7 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
 
-
-  /**
-   * Start listen to publish messages of all the hosts.
-   */
-  private listenHostsPublishes() {
-    // get hosts list from props or use all the hosts
-    // const hosts: string[] = (this.props.listenHosts.length)
-    //   ? this.props.listenHosts
-    //   : this.env.host.getAllTheHostsIds();
-
-    const hosts: string[] = ['master'];
-
-    for (let hostId of hosts) {
-      // TODO: можно обойтись и без создания отдельного хэндлера - ипользвать метод класса, но при удалении он удалиться везде
-      const handler = (data: DeviceData) => {
-        // TODO: обработка ошибки промиса
-        this.hostPublishHandler(hostId, data);
-      };
-
-
-      // TODO: save id
-
-      // listen to publish messages
-      this.env.events.addCategoryListener(categories.externalDataOutcome, handler);
-    }
-  }
-
-  private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
+  private hostPublishHandler = async (data: DeviceData): Promise<void> => {
     const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, data.id, data.subTopic);
 
     if (data.params && data.params.isRepeat) {
