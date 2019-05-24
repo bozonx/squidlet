@@ -37,7 +37,7 @@ export class MqttDevConnection implements MqttIo {
     return this._connected;
   }
 
-  publish(topic: string, data: string | Uint8Array | undefined): Promise<void> {
+  publish(topic: string, data?: string | Uint8Array): Promise<void> {
     // TODO: support of options
 
     return new Promise((resolve, reject) => {
@@ -79,12 +79,12 @@ export class MqttDevConnection implements MqttIo {
     this.client.on('message', handlerWrapper);
   }
 
-  /**
-   * Subscribe to binary data
-   */
-  async onMessageBin() {
-    // TODO: convert to Uint8Array
-  }
+  // /**
+  //  * Subscribe to binary data
+  //  */
+  // async onMessageBin() {
+  //   // TODO: convert to Uint8Array
+  // }
 
   // TODO: сделать offMessage и тд
 

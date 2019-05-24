@@ -1,8 +1,7 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import DeviceData from 'system/interfaces/DeviceData';
 import {combineTopic} from 'system/helpers/helpers';
 import MqttIo from 'system/interfaces/io/MqttIo';
-import categories from 'system/dict/categories';
+import {ApiTypes} from 'system/Api';
 
 
 interface Props {
@@ -13,20 +12,20 @@ interface Props {
 }
 
 export default class MqttSevice extends ServiceBase<Props> {
-  private get mqttDev(): MqttIo {
-    return this.depsInstances.mqttDev as any;
+  private get mqttIo(): MqttIo {
+    return this.depsInstances.mqttIo as any;
   }
 
 
   protected willInit = async () => {
-    const mqttDev: any = this.env.getIo('Mqtt');
+    const mqttIo: any = this.env.getIo('Mqtt');
 
-    this.depsInstances.mqttDev = await mqttDev.connect(this.props);
+    this.depsInstances.mqttIo = await mqttIo.connect(this.props);
   }
 
   protected didInit = async () => {
-    await this.mqttDev.onMessage(this.messagesHandler);
-    this.env.events.addCategoryListener(categories.externalDataOutcome, this.hostPublishHandler);
+    await this.mqttIo.onMessage(this.messagesHandler);
+    this.env.system.api.subscribe(this.apiSubscribeHandler);
     // register subscribers after app init
     this.env.system.onAppInit(() => {
       this.env.log.info(`--> Register MQTT subscribers of devices actions`);
@@ -43,41 +42,36 @@ export default class MqttSevice extends ServiceBase<Props> {
    * Publish custom topic
    */
   async publish(topic: string, data: string | Uint8Array | undefined) {
-    await this.mqttDev.publish(topic, data);
+    await this.mqttIo.publish(topic, data);
   }
 
   /**
    * Subscribe on custom topic
    */
   async subscribe(topic: string) {
-    await this.mqttDev.subscribe(topic);
+    await this.mqttIo.subscribe(topic);
   }
 
 
   /**
    * Processing income messages
    */
-  private messagesHandler = async (topic: string, data: string | Uint8Array): Promise<void> => {
+  private messagesHandler = async (topic: string, data?: string | Uint8Array): Promise<void> => {
     this.env.log.info(`MQTT income: ${topic} - ${data}`);
 
     this.env.system.api.exec(topic, data)
       .catch(this.env.log.error);
   }
 
-
-  private hostPublishHandler = async (data: DeviceData): Promise<void> => {
-    const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, data.id, data.subTopic);
-
-    if (data.params && data.params.isRepeat) {
-      this.env.log.debug(`MQTT outcome (republish): ${topic} - ${JSON.stringify(data.data)}`);
+  private apiSubscribeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
+    if (type === 'deviceOutcome') {
+      this.mqttIo.publish(topic, data)
+        .catch(this.env.log.error);
     }
-    else {
-      this.env.log.info(`MQTT outcome: ${topic} - ${JSON.stringify(data.data)}`);
-    }
-
-    await this.mqttDev.publish(topic, String(data.data));
+    // TODO: support other types
   }
 
+  // TODO: review
   private subscribeToDevices() {
     const devicesActions: {[index: string]: string[]} = this.env.host.getDevicesActions();
 

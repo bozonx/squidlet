@@ -1,6 +1,6 @@
 import System from './System';
 import {JsonTypes} from './interfaces/Types';
-import {parseValue, splitTopicId} from './helpers/helpers';
+import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import DeviceData from './interfaces/DeviceData';
 
 
@@ -9,13 +9,21 @@ import DeviceData from './interfaces/DeviceData';
 // TODO: add remoteCall
 
 
-type ApiTypes = 'device' | 'event';
+export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'event';
 
-interface DeviceActionPayload {
+interface DeviceIncomePayload {
   // room and device id
   deviceId: string;
   action: string;
   params: JsonTypes;
+}
+
+export interface DeviceOutcomePayload {
+  // room and device id
+  deviceId: string;
+  // e.g status, status/temperature, config
+  subTopic: string;
+  data: JsonTypes;
 }
 
 interface EmitEventPayload {
@@ -24,9 +32,9 @@ interface EmitEventPayload {
   data: any;
 }
 
-interface ApiMessage {
+export interface ApiMessage {
   type: ApiTypes;
-  payload: DeviceActionPayload | EmitEventPayload;
+  payload: DeviceIncomePayload | DeviceOutcomePayload | EmitEventPayload;
 }
 
 
@@ -39,17 +47,30 @@ export class Api {
   }
 
 
-  exec(cmd: string, data?: any): Promise<void> {
-    const message: ApiMessage = this.parseCmd(cmd, data);
+  exec(topic: string, data?: string | Uint8Array): Promise<void> {
+    const message: ApiMessage = this.parseCmd(topic, data);
 
-    if (message.type === 'device') {
+    if (message.type === 'deviceIncome') {
       this.callDeviceAction(message.payload);
     }
     // TODO: add other types
   }
 
-  subscribe(): number {
+  subscribe(cb: (type: ApiTypes, topic: string, data?: string | Uint8Array) => void): number {
     const message: ApiMessage = this.parseCmd();
+
+    //this.env.events.addCategoryListener(categories.externalDataOutcome, this.externalOutcomeHandler);
+
+    //const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, data.id, data.subTopic);
+
+
+    // if (data.params && data.params.isRepeat) {
+    //   this.env.log.debug(`MQTT outcome (republish): ${topic} - ${JSON.stringify(data.data)}`);
+    // }
+    // else {
+    //   this.env.log.info(`MQTT outcome: ${topic} - ${JSON.stringify(data.data)}`);
+    // }
+
   }
 
   /**
@@ -81,7 +102,7 @@ export class Api {
   }
 
 
-  private parseCmd(cmd: string, data?: any): ApiMessage {
+  private parseCmd(topic: string, data?: any): ApiMessage {
     // TODO: add
 
     // TODO: если data - binary???

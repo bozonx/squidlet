@@ -162,6 +162,8 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
       params,
     };
 
+    // TODO: использовать формат Api
+
     this.env.events.emit(categories.externalDataOutcome, this.id, data);
   }
 
