@@ -46,20 +46,14 @@ export interface ApiMessage {
 }
 
 
-// TODO: remove
-let lastId: number = 0;
-
-
 export default class Api {
   private readonly system: System;
-  // TODO: может лучше использовать общие события ????
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
   private readonly incomeEvents = new IndexedEvents<IncomeHandler>();
 
 
   constructor(system: System) {
     this.system = system;
-    //this.system.events.addCategoryListener(categories.externalDataOutcome, this.externalOutcomeHandler);
   }
 
   destroy() {
@@ -67,18 +61,6 @@ export default class Api {
   }
 
 
-  /**
-   * Generate unique id.
-   * It places here for easy testing and mocking.
-   */
-  generateUniqId(): string {
-    // TODO: make - system id + timestamp + index
-    // TODO: может перенести в system???
-
-    lastId++;
-
-    return String(lastId);
-  }
 
   /**
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]

@@ -119,6 +119,7 @@ export default class Factory extends DriverFactoryBase<DigitalPcf8574> {
   protected instanceAlwaysNew = true;
   protected DriverClass = DigitalPcf8574;
 
+  // TODO: почему так канзывается???
   /**
    * It generates unique id for DigitalPin input and output driver
    */

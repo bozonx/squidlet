@@ -37,7 +37,7 @@ export default class RemoteIoCollection {
       undefined,
       this.system.config.config.ioSetResponseTimoutSec,
       this.system.log.error,
-      this.system.api.generateUniqId
+      this.system.generateUniqId
     );
 
     // listen income messages of backdoor

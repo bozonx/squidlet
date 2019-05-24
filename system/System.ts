@@ -18,6 +18,10 @@ import HostConfig from './interfaces/HostConfig';
 import State from './State';
 
 
+// TODO: remove
+let lastId: number = 0;
+
+
 export default class System {
   readonly systemConfig: typeof systemConfig;
   readonly events: CategorizedEvents;
@@ -65,7 +69,7 @@ export default class System {
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
     this.api = new Api(this);
-    this.sessions = new Sessions(this.api.generateUniqId);
+    this.sessions = new Sessions(this.generateUniqId);
     this.state = new State(this);
   }
 
@@ -134,6 +138,20 @@ export default class System {
 
     return this.events.once(categories.system, topics.system.appInitialized, cb);
   }
+
+  /**
+   * Generate unique id.
+   * It places here for easy testing and mocking.
+   */
+  generateUniqId(): string {
+    // TODO: make - system id + timestamp + index
+    // TODO: может перенести в system???
+
+    lastId++;
+
+    return String(lastId);
+  }
+
 
   // private async initNetwork(): Promise<void> {
   //   console.info(`---> Initializing network`);

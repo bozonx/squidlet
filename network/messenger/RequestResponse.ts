@@ -109,7 +109,7 @@ export default class RequestResponse {
       to: toHost,
       payload,
 
-      requestId: this.system.api.generateUniqId(),
+      requestId: this.system.generateUniqId(),
       isRequest: true,
     };
   }

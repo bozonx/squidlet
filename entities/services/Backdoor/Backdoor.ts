@@ -71,7 +71,7 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       this.sendIoSetMsg,
       this.env.config.config.ioSetResponseTimoutSec,
       this.env.log.error,
-      this.env.system.api.generateUniqId
+      this.env.system.generateUniqId
     );
 
     this._eventsServer = new MainEventsServer(
