@@ -1,5 +1,4 @@
 import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
-import PublishParams from '../interfaces/PublishParams';
 
 
 /**
@@ -26,12 +25,8 @@ export default class Config extends DeviceDataManagerBase {
    * Publish whole config on each change
    */
   protected publishState = (changedParams: string[], isRepeat: boolean) => {
-    const params: PublishParams = {
-      isRepeat,
-    };
-
     // publish all the statuses
-    this.publishEvents.emit(this.typeNameOfData, this.getState(), params);
+    this.publishEvents.emit(this.typeNameOfData, this.getState(), isRepeat);
   }
 
 }

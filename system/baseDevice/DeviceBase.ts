@@ -1,12 +1,11 @@
 import {ChangeHandler, Getter, Initialize, Setter} from './DeviceDataManagerBase';
 import Status, {DEFAULT_STATUS} from './Status';
 import Config from './Config';
-import PublishParams from '../interfaces/PublishParams';
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import {DeviceOutcomePayload} from '../Api';
+import {DeviceStateOutcomePayload} from '../Api';
 import {JsonTypes} from '../interfaces/Types';
 
 
@@ -150,12 +149,12 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
   }
 
 
-  protected publish = (subTopic: string, value: any, params?: PublishParams) => {
-    const payload: DeviceOutcomePayload = {
+  protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
+    const payload: DeviceStateOutcomePayload = {
       deviceId: this.id,
       subTopic,
       data: String((this.transformPublishValue) ? this.transformPublishValue(value) : value),
-      params,
+      isRepeat,
     };
 
     //this.env.events.emit(categories.externalDataOutcome, this.id, data);

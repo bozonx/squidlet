@@ -2,7 +2,6 @@ import System from './System';
 import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
-import PublishParams from './interfaces/PublishParams';
 
 
 // TODO: add call type
@@ -18,14 +17,14 @@ export interface DeviceIncomePayload {
   params: JsonTypes[];
 }
 
-export interface DeviceOutcomePayload {
+export interface DeviceStateOutcomePayload {
   // room and device id
   deviceId: string;
   // e.g status, status/temperature, config
   subTopic: string;
   data?: string | Uint8Array;
-  // TODO: может просто isRepeat ????
-  params?: PublishParams;
+  // mark that it is status repeating or not
+  isRepeat?: boolean;
 }
 
 interface EmitEventPayload {
@@ -34,7 +33,7 @@ interface EmitEventPayload {
   data: any;
 }
 
-export type ApiPayload = DeviceIncomePayload | DeviceOutcomePayload | EmitEventPayload;
+export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload | EmitEventPayload;
 export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'event';
 type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
 //export type IncomeHandler = (type: ApiTypes, payload: ApiPayload) => void;
@@ -102,7 +101,7 @@ export default class Api {
   emit(type: ApiTypes, apiPayload: ApiPayload) {
     switch (type) {
       case 'deviceOutcome':
-        const payload = apiPayload as DeviceOutcomePayload;
+        const payload = apiPayload as DeviceStateOutcomePayload;
         const topic: string = combineTopic(
           this.system.systemConfig.topicSeparator,
           payload.deviceId,

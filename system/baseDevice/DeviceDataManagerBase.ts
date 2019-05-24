@@ -1,13 +1,12 @@
 import System from '../System';
 import Republish from '../helpers/Republish';
-import PublishParams from '../interfaces/PublishParams';
 import IndexedEvents from '../helpers/IndexedEvents';
 import {isEmpty} from '../helpers/lodashLike';
 import {getDifferentKeys} from '../helpers/collections';
 import {validateParam} from '../helpers/validate';
 
 
-export type Publisher = (subtopic: string, value: any, params?: PublishParams) => void;
+export type Publisher = (subtopic: string, value: any, isRepeat?: boolean) => void;
 export type PublishState = (changedParams: string[], isRepeat: boolean) => void;
 export type Initialize = () => Promise<Data>;
 export type Getter = (paramNames?: string[]) => Promise<Data>;
