@@ -28,13 +28,11 @@ export interface ResultLikePayload {
 }
 
 export interface CallMethodPayload {
-  objectName: string;
   method: string;
   args: JsonTypes[];
 }
 
 export interface ResultMethodPayload extends ResultLikePayload {
-  objectName: string;
   method: string;
 }
 

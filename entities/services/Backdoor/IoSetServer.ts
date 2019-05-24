@@ -10,7 +10,7 @@ export default class IoSetServer {
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
   private remoteCalls: {[index: string]: RemoteCall} = {};
-  private readonly ioCollection: {[index: string]: ObjectToCall} = {};
+  private readonly ioCollection: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
   constructor(

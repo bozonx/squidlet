@@ -11,11 +11,7 @@ import {waitForResponse} from './helpers';
 
 type MethodResultHandler = (payload: ResultMethodPayload) => void;
 
-// export interface ObjectToCall {
-//   // method name: method()
-//   [index: string]: (...args: any[]) => Promise<any>;
-// }
-export type MethodCaller = (objectName: string, method: string, args: any[]) => Promise<any>;
+export type MethodCaller = (pathToMethod: string, args: any[]) => Promise<any>;
 
 
 /**
@@ -29,7 +25,6 @@ export default class RemoteCall {
   private readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
   private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
-  //private readonly localMethods: {[index: string]: ObjectToCall};
   private readonly methodCaller: MethodCaller;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
@@ -38,8 +33,6 @@ export default class RemoteCall {
 
   constructor(
     send: (message: RemoteCallMessage) => Promise<void>,
-    // objects with methods which will be called from other host
-    //localMethods: {[index: string]: ObjectToCall} = {},
     // function which is called a method and returns its result with promise
     methodCaller: MethodCaller,
     responseTimoutSec: number,
@@ -67,10 +60,9 @@ export default class RemoteCall {
   /**
    * Call method on remote machine
    */
-  async callMethod(objectName: string, method: string, ...args: any[]): Promise<any> {
+  async callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
     const payload: CallMethodPayload = {
-      objectName,
-      method,
+      method: pathToMethod,
       args: this.prepareArgsToSend(args),
     };
     const message: RemoteCallMessage = {
@@ -84,7 +76,7 @@ export default class RemoteCall {
     const resultPromise = waitForResponse(
       this.methodsResultEvents,
       (payload: ResultMethodPayload) => {
-        return objectName === payload.objectName && method === payload.method;
+        return pathToMethod === payload.method;
       },
       this.responseTimoutSec
     );
@@ -169,12 +161,11 @@ export default class RemoteCall {
    * Call real local method when message to do it has been received.
    */
   private async callLocalMethod(payload: CallMethodPayload) {
-    const { result, error } = await this.safeCallMethod(payload.objectName, payload.method, payload.args);
+    const { result, error } = await this.safeCallMethod(payload.method, payload.args);
 
     // next is sending response
 
     const resultPayload: ResultMethodPayload = {
-      objectName: payload.objectName,
       method: payload.method,
       error,
       result,
@@ -192,37 +183,19 @@ export default class RemoteCall {
     }
   }
   
-  private async safeCallMethod(
-    objectName: string,
-    method: string,
-    args: any[]
-  ): Promise<{result: any, error: string}> {
+  private async safeCallMethod(pathToMethod: string, args: any[]): Promise<{result: any, error: string}> {
     let result: any;
     let error;
 
     const preparedArgs: any[] = this.prepareArgsToCall(args);
 
     try {
-      result = await this.methodCaller(objectName, method, preparedArgs);
+      result = await this.methodCaller(pathToMethod, preparedArgs);
     }
     catch (err) {
       error = err;
     }
 
-    // if (this.localMethods[objectName] && this.localMethods[objectName][method]) {
-    //   const preparedArgs: any[] = this.prepareArgsToCall(args);
-    //
-    //   try {
-    //     result = await this.localMethods[objectName][method](...preparedArgs);
-    //   }
-    //   catch (err) {
-    //     error = err;
-    //   }
-    // }
-    // else {
-    //   error = `Method "${objectName}.${method}" hasn't been found`;
-    // }
-    
     return { result, error };
   }
 
