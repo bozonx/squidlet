@@ -1,6 +1,6 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import DeviceData from 'system/interfaces/DeviceData';
-import {combineTopic, parseValue, splitTopicId} from 'system/helpers/helpers';
+import {combineTopic} from 'system/helpers/helpers';
 import MqttIo from 'system/interfaces/io/MqttIo';
 import categories from 'system/dict/categories';
 
@@ -16,6 +16,7 @@ export default class MqttSevice extends ServiceBase<Props> {
   private get mqttDev(): MqttIo {
     return this.depsInstances.mqttDev as any;
   }
+
 
   protected willInit = async () => {
     const mqttDev: any = this.env.getIo('Mqtt');
@@ -37,6 +38,7 @@ export default class MqttSevice extends ServiceBase<Props> {
     // TODO: remove listener
   }
 
+
   /**
    * Publish custom topic
    */
@@ -45,13 +47,22 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
   /**
-   * Subscribe on suctom topic
+   * Subscribe on custom topic
    */
   async subscribe(topic: string) {
     await this.mqttDev.subscribe(topic);
   }
 
 
+  /**
+   * Processing income messages
+   */
+  private messagesHandler = async (topic: string, data: string | Uint8Array): Promise<void> => {
+    this.env.log.info(`MQTT income: ${topic} - ${data}`);
+
+    this.env.system.api.exec(topic, data)
+      .catch(this.env.log.error);
+  }
 
 
 
@@ -79,31 +90,6 @@ export default class MqttSevice extends ServiceBase<Props> {
       // listen to publish messages
       this.env.events.addCategoryListener(categories.externalDataOutcome, handler);
     }
-  }
-
-  /**
-   * Process income messages
-   */
-  private messagesHandler = async (topic: string, data: string): Promise<void> => {
-    this.env.log.info(`MQTT income: ${topic} - ${data}`);
-
-    // TODO: если data - binary???
-    // TODO: что если неизвестный формат или хоста не существует ???
-
-    const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
-
-    if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
-
-    //const toHost = this.env.host.resolveHostIdByEntityId(id);
-    const incomeData: DeviceData = {
-      id,
-      subTopic,
-      // TODO: а если json ????
-      // parse number, boolean etc
-      data: parseValue(data),
-    };
-
-    this.env.events.emit(categories.externalDataIncome, id, incomeData);
   }
 
   private hostPublishHandler = async (hostId: string, data: DeviceData): Promise<void> => {
