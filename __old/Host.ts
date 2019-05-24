@@ -1,6 +1,6 @@
-import System from './System';
-import HostConfig from './interfaces/HostConfig';
-import {isEmpty} from './helpers/lodashLike';
+import System from '../system/System';
+import HostConfig from '../system/interfaces/HostConfig';
+import {isEmpty} from '../system/helpers/lodashLike';
 
 
 // TODO: remove

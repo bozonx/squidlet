@@ -1,4 +1,3 @@
-import Host from './Host';
 import CategorizedEvents from './helpers/CategorizedEvents';
 import LogPublisher from './LogPublisher';
 import DevicesManager from './entities/DevicesManager';
