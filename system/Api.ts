@@ -16,7 +16,7 @@ interface DeviceIncomePayload {
   // room and device id
   deviceId: string;
   action: string;
-  params: JsonTypes;
+  params: JsonTypes[];
 }
 
 export interface DeviceOutcomePayload {
@@ -90,15 +90,24 @@ export default class Api {
   /**
    * Call this method if income request is received
    */
-  income(topic: string, data?: string | Uint8Array): Promise<void> {
-    //this.env.log.info(`MQTT income: ${topic} - ${data}`);
+  async income(topic: string, data?: string | Uint8Array) {
+    this.system.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
 
-    const message: ApiMessage = this.parseCmd(topic, data);
+    const msg: ApiMessage = this.parseCmd(topic, data);
 
-    if (message.type === 'deviceIncome') {
-      this.callDeviceAction(message.payload);
+    switch (msg.type) {
+      case 'deviceIncome':
+        const payload = msg.payload as DeviceIncomePayload;
+
+        return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
+
+      // TODO: add other types
+
+
+      default:
+        this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
     }
-    // TODO: add other types
+
   }
 
   /**
