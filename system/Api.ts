@@ -4,12 +4,6 @@ import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
 
 
-// TODO: add call type
-// TODO: add event
-// TODO: add remoteCall
-// TODO: порреджка переключения automation
-
-
 export interface DeviceIncomePayload {
   // room and device id
   deviceId: string;
@@ -27,16 +21,16 @@ export interface DeviceStateOutcomePayload {
   isRepeat?: boolean;
 }
 
-interface EmitEventPayload {
-  category: string;
-  topic?: string;
-  data: any;
-}
+// TODO: does it need ???
+// interface EmitEventPayload {
+//   category: string;
+//   topic?: string;
+//   data: any;
+// }
 
-export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload | EmitEventPayload;
-export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'event';
+export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
+export type ApiTypes = 'deviceIncome' | 'deviceOutcome';
 type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
-//export type IncomeHandler = (type: ApiTypes, payload: ApiPayload) => void;
 
 export interface ApiMessage {
   type: ApiTypes;
@@ -44,10 +38,23 @@ export interface ApiMessage {
 }
 
 
+/**
+ * Api for acting remotely via ws or mqtt or others.
+ * Types of topics:
+ * * Calling device action:
+ *   * device.room.deviceId/myAction value
+ *   * room.deviceId/myAction value
+ * * RemoteCall api:
+ *   * Getting state
+ *   * Subscribe to state change
+ *   * Getting config param
+ *   * Getting session store
+ *   * Initiate updating
+ *   * Switch automation
+ */
 export default class Api {
   private readonly system: System;
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
-  //private readonly incomeEvents = new IndexedEvents<IncomeHandler>();
 
 
   constructor(system: System) {
@@ -65,9 +72,7 @@ export default class Api {
   async income(topic: string, data?: string | Uint8Array) {
     this.system.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
 
-    const msg: ApiMessage = this.parseCmd(topic, data);
-
-    //this.incomeEvents.emit(msg.type, msg.payload);
+    const msg: ApiMessage = this.parseMessage(topic, data);
 
     switch (msg.type) {
       case 'deviceIncome':
@@ -76,7 +81,6 @@ export default class Api {
         return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
 
       // TODO: add other types
-
 
       default:
         return this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
@@ -90,25 +94,13 @@ export default class Api {
     return this.outcomeEvents.addListener(cb);
   }
 
-  // onIncome(cb: IncomeHandler): number {
-  //   return this.incomeEvents.addListener(cb);
-  //   //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
-  // }
-
   /**
    * Call this method if you want to send outcome data. (E.g after device state is changed)
    */
   emit(type: ApiTypes, apiPayload: ApiPayload) {
     switch (type) {
       case 'deviceOutcome':
-        const payload = apiPayload as DeviceStateOutcomePayload;
-        const topic: string = combineTopic(
-          this.system.systemConfig.topicSeparator,
-          payload.deviceId,
-          payload.subTopic
-        );
-
-        return this.outcomeEvents.emit(type, topic, payload.data);
+        return this.emitDeviceOutcome(type, apiPayload as DeviceStateOutcomePayload);
 
       // TODO: add other types
 
@@ -116,24 +108,6 @@ export default class Api {
       default:
         return this.system.log.error(`Api.emit: Unsupported message type "${type}"`);
     }
-
-    // TODO: emit event
-    // TODO: log to console
-
-    //const message: ApiMessage = this.parseCmd();
-
-    //
-
-    //const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, data.id, data.subTopic);
-
-
-    // if (data.params && data.params.isRepeat) {
-    //   this.env.log.debug(`MQTT outcome (republish): ${topic} - ${JSON.stringify(data.data)}`);
-    // }
-    // else {
-    //   this.env.log.info(`MQTT outcome: ${topic} - ${JSON.stringify(data.data)}`);
-    // }
-
   }
 
   /**
@@ -145,12 +119,12 @@ export default class Api {
     return device.action(actionName, ...params);
   }
 
-  switchAutomation(toState: boolean): Promise<void> {
-    // TODO: turn on or off automation
+  async setDeviceConfig(deviceId: string, partialConfig: {[index: string]: any}): Promise<void> {
+    // TODO: add
   }
 
-  setDeviceConfig(deviceId: string, partialConfig: {[index: string]: any}): Promise<void> {
-    // TODO: add
+  async switchAutomation(toState: boolean): Promise<void> {
+    // TODO: turn on or off automation
   }
 
   // listenDeviceStatus(): number {
@@ -163,8 +137,6 @@ export default class Api {
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
   getDevicesActionTopics(): string[] {
-    // TODO: может перенсти в system или devices manager???
-
     const topics: string[] = [];
     const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
 
@@ -182,7 +154,24 @@ export default class Api {
   }
 
 
-  private parseCmd(topic: string, data?: any): ApiMessage {
+  private emitDeviceOutcome(type: ApiTypes, payload: DeviceStateOutcomePayload) {
+    const topic: string = combineTopic(
+      this.system.systemConfig.topicSeparator,
+      payload.deviceId,
+      payload.subTopic
+    );
+
+    if (payload.isRepeat) {
+      this.system.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(payload.data)}`);
+    }
+    else {
+      this.system.log.info(`Api outcome: ${topic} - ${JSON.stringify(payload.data)}`);
+    }
+
+    return this.outcomeEvents.emit(type, topic, payload.data);
+  }
+
+  private parseMessage(topic: string, data?: string | Uint8Array): ApiMessage {
     // TODO: add
 
     // TODO: если data - binary???
