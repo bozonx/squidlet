@@ -43,7 +43,7 @@ export interface ApiMessage {
 let lastId: number = 0;
 
 
-export class Api {
+export default class Api {
   private readonly system: System;
 
 

@@ -1,0 +1,8 @@
+name: WsApi
+main: WsApi.ts
+
+drivers:
+  - WsServerSessions
+
+props:
+  $base: 'drivers.WsServerSessions'

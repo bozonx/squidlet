@@ -4,7 +4,7 @@ import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import LogPublisher from '../LogPublisher';
 import DriverBase from '../baseDrivers/DriverBase';
-import {Api} from '../Api';
+import Api from '../Api';
 import CategorizedEvents from '../helpers/CategorizedEvents';
 
 
