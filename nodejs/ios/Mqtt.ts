@@ -4,16 +4,10 @@
 
 import * as mqtt from 'mqtt';
 
-import MqttIo from 'system/interfaces/io/MqttIo';
+import {MqttConnection, MqttProps} from 'system/interfaces/io/MqttIo';
 
 
-interface Props {
-  protocol: string;
-  host: string;
-  port: string;
-}
-
-export class MqttDevConnection implements MqttIo {
+export class MqttDevConnection implements MqttConnection {
   connectPromise: Promise<void>;
 
   private _connected: boolean = false;
@@ -21,7 +15,7 @@ export class MqttDevConnection implements MqttIo {
 
   // TODO: поддержка нескольких соединений как в ws
 
-  constructor(params: Props) {
+  constructor(params: MqttProps) {
     const url = `${params.protocol}://${params.host}:${params.port}`;
     this.client = mqtt.connect(url);
 
@@ -93,7 +87,7 @@ export class MqttDevConnection implements MqttIo {
 
 export default class Mqtt {
   // TODO: rename to getInstance ????
-  connect(params: Props): MqttDevConnection {
+  connect(params: MqttProps): MqttDevConnection {
     return new MqttDevConnection(params);
   }
 }

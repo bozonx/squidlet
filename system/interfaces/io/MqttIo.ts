@@ -10,7 +10,14 @@ export const Methods = [
 ];
 
 
-export default interface MqttIo extends IoItem {
+
+export interface MqttProps {
+  protocol: string;
+  host: string;
+  port: string;
+}
+
+export interface MqttConnection extends IoItem {
   isConnected(): Promise<boolean>;
   publish(topic: string, data?: string | Uint8Array): Promise<void>;
 
@@ -25,4 +32,8 @@ export default interface MqttIo extends IoItem {
    */
   onMessage(handler: (topic: string, data?: string | Uint8Array) => void): Promise<number>;
   //onMessageBin(): Promise<void>;
+}
+
+export default interface MqttIo extends IoItem {
+  connect(params: MqttProps): MqttConnection;
 }

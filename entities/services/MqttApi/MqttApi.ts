@@ -1,5 +1,5 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import MqttIo from 'system/interfaces/io/MqttIo';
+import MqttIo, {MqttConnection} from 'system/interfaces/io/MqttIo';
 import {ApiTypes} from 'system/Api';
 
 
@@ -9,28 +9,26 @@ interface Props {
   port: string;
 }
 
-export default class MqttSevice extends ServiceBase<Props> {
-  private get mqttIo(): MqttIo {
-    return this.depsInstances.mqttIo as any;
+
+export default class MqttApi extends ServiceBase<Props> {
+  private get mqttConnection(): MqttConnection {
+    return this.depsInstances.mqttIo;
   }
 
 
   protected willInit = async () => {
-    const mqttIo: any = this.env.getIo('Mqtt');
+    const mqttIo: MqttIo = this.env.getIo('Mqtt');
 
     this.depsInstances.mqttIo = await mqttIo.connect(this.props);
   }
 
   protected didInit = async () => {
     // listen to income messages from mqtt broker
-    await this.mqttIo.onMessage(this.messagesHandler);
+    await this.mqttConnection.onMessage(this.messagesHandler);
     // listen to outcome messages from api and send them to mqtt broker
     this.env.api.onOutcome(this.outcomeHandler);
     // register subscribers after app init
-    this.env.system.onAppInit(async () => {
-      this.env.log.info(`--> Register MQTT subscribers of devices actions`);
-      await this.subscribeToDevices();
-    });
+    this.env.system.onAppInit(this.subscribeToDevices);
   }
 
   destroy = async () => {
@@ -50,19 +48,21 @@ export default class MqttSevice extends ServiceBase<Props> {
 
   private outcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
     if (type === 'deviceOutcome') {
-      this.mqttIo.publish(topic, data)
+      this.mqttConnection.publish(topic, data)
         .catch(this.env.log.error);
     }
     // TODO: support other types
   }
 
-  private async subscribeToDevices() {
+  private subscribeToDevices = async () => {
+    this.env.log.info(`--> Register MQTT subscribers of devices actions`);
+
     const devicesActions: string[] = this.env.api.getDevicesActionTopics();
 
     for (let topic of devicesActions) {
       this.env.log.info(`MQTT subscribe: ${topic}`);
 
-      await this.mqttIo.subscribe(topic);
+      await this.mqttConnection.subscribe(topic);
     }
   }
 
