@@ -1,5 +1,5 @@
-name: Mqtt
-main: Mqtt.ts
+name: MqttApi
+main: MqttApi.ts
 system: true
 
 ios:

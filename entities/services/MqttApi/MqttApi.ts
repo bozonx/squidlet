@@ -38,19 +38,19 @@ export default class MqttSevice extends ServiceBase<Props> {
   }
 
 
-  /**
-   * Publish custom topic
-   */
-  async publish(topic: string, data: string | Uint8Array | undefined) {
-    await this.mqttIo.publish(topic, data);
-  }
-
-  /**
-   * Subscribe on custom topic
-   */
-  async subscribe(topic: string) {
-    await this.mqttIo.subscribe(topic);
-  }
+  // /**
+  //  * Publish custom topic
+  //  */
+  // async publish(topic: string, data: string | Uint8Array | undefined) {
+  //   await this.mqttIo.publish(topic, data);
+  // }
+  //
+  // /**
+  //  * Subscribe on custom topic
+  //  */
+  // async subscribe(topic: string) {
+  //   await this.mqttIo.subscribe(topic);
+  // }
 
 
   /**

@@ -3,7 +3,7 @@ export const servicesShortcut: {[index: string]: string} = {
   consoleLogger: 'ConsoleLogger',
   //updater: 'Updater',
 
-  mqtt: 'Mqtt',
+  mqttApi: 'MqttApi',
   backdoor: 'Backdoor',
 };
 
