@@ -1,7 +1,6 @@
 import System from './System';
 import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
-import DeviceData from './interfaces/DeviceData';
 import IndexedEvents from './helpers/IndexedEvents';
 import categories from './dict/categories';
 import PublishParams from './interfaces/PublishParams';
@@ -10,6 +9,7 @@ import PublishParams from './interfaces/PublishParams';
 // TODO: add call type
 // TODO: add event
 // TODO: add remoteCall
+// TODO: порреджка переключения automation
 
 
 export interface DeviceIncomePayload {
@@ -54,6 +54,7 @@ export default class Api {
   private readonly system: System;
   // TODO: может лучше использовать общие события ????
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
+  private readonly incomeEvents = new IndexedEvents<IncomeHandler>();
 
 
   constructor(system: System) {
@@ -83,7 +84,7 @@ export default class Api {
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
   getDevicesActionTopics(): string[] {
-    // TODO: может перенсти в helpers or system ???
+    // TODO: может перенсти в helpers or system или devices manager???
 
     const topics: string[] = [];
     const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
@@ -102,44 +103,50 @@ export default class Api {
   }
 
   /**
-   * Call this method if income request is received
+   * Call this method if external income request is received (e.g from remote host by mqtt or ws)
    */
   async income(topic: string, data?: string | Uint8Array) {
     this.system.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
 
     const msg: ApiMessage = this.parseCmd(topic, data);
 
-    switch (msg.type) {
-      case 'deviceIncome':
-        const payload = msg.payload as DeviceIncomePayload;
+    // TODO: в самом девайсе можно не слушать api.onIncome - а вызов action делать в api
 
-        return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
+    this.incomeEvents.emit(msg.type, msg.payload);
 
-      // TODO: add other types
-
-
-      default:
-        this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
-    }
-
+    // switch (msg.type) {
+    //   case 'deviceIncome':
+    //     const payload = msg.payload as DeviceIncomePayload;
+    //
+    //     return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
+    //
+    //   // TODO: add other types
+    //
+    //
+    //   default:
+    //     this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
+    // }
   }
 
   /**
-   * Listen to outcome requests.
+   * Listen to outcome requests. E.g Which devices send to remote host.
    */
   onOutcome(cb: OutcomeHandler): number {
     return this.outcomeEvents.addListener(cb);
   }
 
   onIncome(cb: IncomeHandler): number {
-
+    return this.incomeEvents.addListener(cb);
     //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
   }
 
   /**
-   * Call this method if you want to send outcome data
+   * Call this method if you want to send outcome data. (E.g after device state is changed)
    */
   emit(type: ApiTypes, payload: ApiPayload) {
+
+    // TODO: emit event
+    // TODO: log to console
 
     //const message: ApiMessage = this.parseCmd();
 
@@ -157,38 +164,34 @@ export default class Api {
 
   }
 
-
   /**
    * Call device's action and receive a result
    */
   callDeviceAction(deviceId: string, actionName: string, ...params: any[]): Promise<any> {
-    // TODO: add
-    const incomeData: DeviceData = {
-      id,
-      subTopic,
-      // TODO: а если json ????
-      // parse number, boolean etc
-      data: parseValue(data),
-    };
+    // TODO: вызвать напрямую без события
+    // const incomeData: DeviceData = {
+    //   id,
+    //   subTopic,
+    //   // TODO: а если json ????
+    //   // parse number, boolean etc
+    //   data: parseValue(data),
+    // };
 
     //this.system.events.emit(categories.externalDataIncome, id, incomeData);
+  }
+
+  switchAutomation(toState: boolean): Promise<void> {
+    // TODO: turn on or off automation
   }
 
   setDeviceConfig(deviceId: string, partialConfig: {[index: string]: any}): Promise<void> {
     // TODO: add
   }
 
-  listenDeviceStatus(): number {
-    // TODO: add
-  }
-
-  listenDeviceConfig(): number {
-    // TODO: add
-  }
-
-
-  // private externalOutcomeHandler() {
+  // listenDeviceStatus(): number {
+  // }
   //
+  // listenDeviceConfig(): number {
   // }
 
   private parseCmd(topic: string, data?: any): ApiMessage {

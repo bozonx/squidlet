@@ -12,5 +12,5 @@ export default {
   // all the logs. Topic is level
   logger: 'logger',
   // updater service
-  updater: 'updater',
+  //updater: 'updater',
 };

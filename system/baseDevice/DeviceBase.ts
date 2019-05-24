@@ -84,7 +84,6 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
 
     // handle actions call
     if (this.actions) {
-      // TODO: use api
       // subscribe to external messages where topic is this device id to call action
       //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
       this.env.api.onIncome(this.handleIncomeData);
