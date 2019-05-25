@@ -27,13 +27,13 @@ export interface DeviceStateOutcomePayload {
 export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
 export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';
 
-type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
+type PublishHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
 export type RcOutcomeHandler = (message: RemoteCallMessage) => void;
 
-export interface ApiMessage {
-  type: ApiTypes;
-  payload: ApiPayload;
-}
+// export interface ApiMessage {
+//   type: ApiTypes;
+//   payload: ApiPayload;
+// }
 
 
 /**
@@ -58,7 +58,7 @@ export interface ApiMessage {
  */
 export default class Api {
   private readonly system: System;
-  private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
+  private readonly publishEvents = new IndexedEvents<PublishHandler>();
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   private readonly remoteCall: RemoteCall;
 
@@ -76,7 +76,7 @@ export default class Api {
   }
 
   destroy() {
-    this.outcomeEvents.removeAll();
+    this.publishEvents.removeAll();
   }
 
   incomeRemoteCall(message: RemoteCallMessage): Promise<void> {
@@ -88,49 +88,27 @@ export default class Api {
   }
 
 
-
-  /**
-   * Call this method if external income request is received (e.g from remote host by mqtt or ws)
-   */
-  async income(topic: string, data?: string | Uint8Array) {
-    this.system.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
-
-    const msg: ApiMessage = this.parseMessage(topic, data);
-
-    switch (msg.type) {
-      case 'deviceIncome':
-        const payload = msg.payload as DeviceIncomePayload;
-
-        return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
-
-      // TODO: add other types
-
-      default:
-        return this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
-    }
-  }
-
   /**
    * Listen to outcome requests. E.g Which devices send to remote host.
    */
-  onOutcome(cb: OutcomeHandler): number {
-    return this.outcomeEvents.addListener(cb);
+  onPublish(cb: PublishHandler): number {
+    return this.publishEvents.addListener(cb);
   }
 
   /**
    * Call this method if you want to send outcome data. (E.g after device state is changed)
    */
-  emit(type: ApiTypes, apiPayload: ApiPayload) {
-    switch (type) {
-      case 'deviceOutcome':
-        return this.emitDeviceOutcome(type, apiPayload as DeviceStateOutcomePayload);
+  // TODO: remake
+  publish(type: ApiTypes, apiPayload: ApiPayload) {
 
-      // TODO: add other types
-
-
-      default:
-        return this.system.log.error(`Api.emit: Unsupported message type "${type}"`);
+    if (payload.isRepeat) {
+      this.system.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(payload.data)}`);
     }
+    else {
+      this.system.log.info(`Api outcome: ${topic} - ${JSON.stringify(payload.data)}`);
+    }
+
+    return this.publishEvents.emit(type, topic, payload.data);
   }
 
   /**
@@ -163,34 +141,6 @@ export default class Api {
   }
 
 
-  private emitDeviceOutcome(type: ApiTypes, payload: DeviceStateOutcomePayload) {
-    const topic: string = combineTopic(
-      this.system.systemConfig.topicSeparator,
-      payload.deviceId,
-      payload.subTopic
-    );
-
-    if (payload.isRepeat) {
-      this.system.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(payload.data)}`);
-    }
-    else {
-      this.system.log.info(`Api outcome: ${topic} - ${JSON.stringify(payload.data)}`);
-    }
-
-    return this.outcomeEvents.emit(type, topic, payload.data);
-  }
-
-  private parseMessage(topic: string, data?: string | Uint8Array): ApiMessage {
-    // TODO: add
-
-    // TODO: если data - binary???
-    // TODO: что если неизвестный формат или хоста не существует ???
-
-
-    // const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
-    //if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
-  }
-
   private async callApi(pathToMethod: string, args: any[]): Promise<any> {
     switch (pathToMethod) {
       case 'deviceAction':
@@ -218,6 +168,28 @@ export default class Api {
 
 }
 
+
+
+// /**
+//  * Call this method if external income request is received (e.g from remote host by mqtt or ws)
+//  */
+// async income(topic: string, data?: string | Uint8Array) {
+//   this.system.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
+//
+//   const msg: ApiMessage = this.parseMessage(topic, data);
+//
+//   switch (msg.type) {
+//     case 'deviceIncome':
+//       const payload = msg.payload as DeviceIncomePayload;
+//
+//       return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
+//
+//     // TODO: add other types
+//
+//     default:
+//       return this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);
+//   }
+// }
 
 // /**
 //  * Get object like {deviceId: [actionName, ...]}

@@ -158,7 +158,7 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     };
 
     //this.env.events.emit(categories.externalDataOutcome, this.id, data);
-    this.env.api.emit('deviceOutcome', payload);
+    this.env.api.publish('deviceOutcome', payload);
   }
 
 }

@@ -1,6 +1,9 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import MqttIo, {MqttConnection} from 'system/interfaces/io/MqttIo';
 import {ApiTypes} from 'system/Api';
+import {deserializeJson} from '../../../system/helpers/binaryHelpers';
+import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
+import {combineTopic} from '../../../system/helpers/helpers';
 
 
 interface Props {
@@ -8,6 +11,8 @@ interface Props {
   host: string;
   port: string;
 }
+
+const REMOTE_CALL_TOPIC = 'remoteCall';
 
 
 export default class MqttApi extends ServiceBase<Props> {
@@ -29,7 +34,7 @@ export default class MqttApi extends ServiceBase<Props> {
     // TODO: при обрыве соединения убить все хэндлеры
 
     // listen to outcome messages from api and send them to mqtt broker
-    this.env.api.onOutcome(this.outcomeHandler);
+    this.env.api.onPublish(this.publishHandler);
     // register subscribers after app init
     this.env.system.onAppInit(this.subscribeToDevices);
   }
@@ -43,19 +48,55 @@ export default class MqttApi extends ServiceBase<Props> {
    * Processing income messages from broker
    */
   private messagesHandler = async (topic: string, data?: string | Uint8Array): Promise<void> => {
-    this.env.api.income(topic, data)
+    if (topic === REMOTE_CALL_TOPIC) {
+      // income remoteCall message
+      const message: RemoteCallMessage = deserializeJson(data);
+
+      this.env.api.incomeRemoteCall(message)
+        .catch(this.env.log.error);
+
+      return;
+    }
+
+    // income string-type api message - call device action
+    this.env.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
+
+    // TODO: если парамеры через запятую - то распарсить их
+    // TODO: строковые параметры превратить в нормальные - parseValue
+    // TODO: разложить topic на deviceId, action
+
+    this.env.api.callDeviceAction(deviceId, action, data)
       .catch(this.env.log.error);
+
+    // this.env.api.income(topic, data)
+    //   .catch(this.env.log.error);
   }
 
   /**
    * Publish outcome messages to broker
    */
-  private outcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
+  private publishHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
     if (type === 'deviceOutcome') {
       this.mqttConnection.publish(topic, data)
         .catch(this.env.log.error);
     }
     // TODO: support other types
+  }
+
+  private parseMessage(topic: string, data?: string | Uint8Array): ApiMessage {
+    // TODO: add
+
+    // TODO: если data - binary???
+    // TODO: что если неизвестный формат или хоста не существует ???
+    const topic: string = combineTopic(
+      this.system.systemConfig.topicSeparator,
+      payload.deviceId,
+      payload.subTopic
+    );
+
+
+    // const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
+    //if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
   }
 
   /**
