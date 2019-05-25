@@ -1,9 +1,9 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import MqttIo, {MqttConnection} from 'system/interfaces/io/MqttIo';
-import {ApiTypes} from 'system/Api';
 import {deserializeJson} from '../../../system/helpers/binaryHelpers';
 import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 import {combineTopic} from '../../../system/helpers/helpers';
+import {JsonTypes} from '../../../system/interfaces/Types';
 
 
 interface Props {
@@ -75,7 +75,14 @@ export default class MqttApi extends ServiceBase<Props> {
   /**
    * Publish outcome messages to broker
    */
-  private publishHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => {
+  private publishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => {
+    if (isRepeat) {
+      this.system.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(data)}`);
+    }
+    else {
+      this.system.log.info(`Api outcome: ${topic} - ${JSON.stringify(data)}`);
+    }
+
     if (type === 'deviceOutcome') {
       this.mqttConnection.publish(topic, data)
         .catch(this.env.log.error);
@@ -94,6 +101,7 @@ export default class MqttApi extends ServiceBase<Props> {
       payload.subTopic
     );
 
+    // , parseValue, splitTopicId
 
     // const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
     //if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);

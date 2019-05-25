@@ -5,7 +5,6 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import {DeviceStateOutcomePayload} from '../Api';
 import {JsonTypes} from '../interfaces/Types';
 
 

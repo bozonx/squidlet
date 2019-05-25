@@ -1,33 +1,33 @@
 import System from './System';
 import {JsonTypes} from './interfaces/Types';
-import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
+import {combineTopic} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {objGet} from './helpers/lodashLike';
 
 
-export interface DeviceIncomePayload {
-  // room and device id
-  deviceId: string;
-  action: string;
-  params: JsonTypes[];
-}
+// export interface DeviceIncomePayload {
+//   // room and device id
+//   deviceId: string;
+//   action: string;
+//   params: JsonTypes[];
+// }
 
-export interface DeviceStateOutcomePayload {
-  // room and device id
-  deviceId: string;
-  // e.g status, status/temperature, config
-  subTopic: string;
-  data?: string | Uint8Array;
-  // mark that it is status repeating or not
-  isRepeat?: boolean;
-}
+// export interface DeviceStateOutcomePayload {
+//   // room and device id
+//   deviceId: string;
+//   // e.g status, status/temperature, config
+//   subTopic: string;
+//   data?: string | Uint8Array;
+//   // mark that it is status repeating or not
+//   isRepeat?: boolean;
+// }
 
-export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
-export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';
+//export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
+//export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';
 
-type PublishHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
+type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
 export type RcOutcomeHandler = (message: RemoteCallMessage) => void;
 
 // export interface ApiMessage {
@@ -79,36 +79,33 @@ export default class Api {
     this.publishEvents.removeAll();
   }
 
+
+  /**
+   * Call it when you received income data of remoteCall channel
+   */
   incomeRemoteCall(message: RemoteCallMessage): Promise<void> {
     return this.remoteCall.incomeMessage(message);
   }
 
+  /**
+   * Listen it to send remoteCall message to other side
+   */
   onOutcomeRemoteCall(cb: RcOutcomeHandler) {
     this.rcOutcomeEvents.addListener(cb);
-  }
-
-
-  /**
-   * Listen to outcome requests. E.g Which devices send to remote host.
-   */
-  onPublish(cb: PublishHandler): number {
-    return this.publishEvents.addListener(cb);
   }
 
   /**
    * Call this method if you want to send outcome data. (E.g after device state is changed)
    */
-  // TODO: remake
-  publish(type: ApiTypes, apiPayload: ApiPayload) {
+  publish(topic: string, data: any, isRepeat?: boolean) {
+    return this.publishEvents.emit(topic, data, isRepeat);
+  }
 
-    if (payload.isRepeat) {
-      this.system.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(payload.data)}`);
-    }
-    else {
-      this.system.log.info(`Api outcome: ${topic} - ${JSON.stringify(payload.data)}`);
-    }
-
-    return this.publishEvents.emit(type, topic, payload.data);
+  /**
+   * Listen to outcome requests. E.g devices sends their status or config to remote host.
+   */
+  onPublish(cb: PublishHandler): number {
+    return this.publishEvents.addListener(cb);
   }
 
   /**
