@@ -4,7 +4,6 @@ import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
-import {splitFirstElement} from './helpers/strings';
 import {objGet} from './helpers/lodashLike';
 
 
@@ -24,13 +23,6 @@ export interface DeviceStateOutcomePayload {
   // mark that it is status repeating or not
   isRepeat?: boolean;
 }
-
-// TODO: does it need ???
-// interface EmitEventPayload {
-//   category: string;
-//   topic?: string;
-//   data: any;
-// }
 
 export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
 export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';

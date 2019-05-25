@@ -25,7 +25,7 @@ export default class RemoteCall {
   private readonly methodsResultEvents = new IndexedEvents<MethodResultHandler>();
   private readonly remoteCallbacks: RemoteCallbacks;
   private readonly send: (message: RemoteCallMessage) => Promise<void>;
-  private readonly methodCaller: MethodCaller;
+  private readonly methodCaller?: MethodCaller;
   private readonly responseTimoutSec: number;
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
@@ -34,7 +34,7 @@ export default class RemoteCall {
   constructor(
     send: (message: RemoteCallMessage) => Promise<void>,
     // function which is called a method and returns its result with promise
-    methodCaller: MethodCaller,
+    methodCaller: MethodCaller | undefined,
     responseTimoutSec: number,
     logError: (message: string) => void,
     generateUniqId: () => string
@@ -47,15 +47,6 @@ export default class RemoteCall {
     this.remoteCallbacks = new RemoteCallbacks(send, responseTimoutSec, logError, generateUniqId);
   }
 
-
-  // /**
-  //  * Send signal that connection is inited which removes previously set callback on other side
-  //  */
-  // async init() {
-  //   const message: RemoteCallMessage = { type: 'init' };
-  //
-  //   await this.send(message);
-  // }
 
   /**
    * Call method on remote machine
@@ -185,6 +176,10 @@ export default class RemoteCall {
   }
   
   private async safeCallMethod(pathToMethod: string, args: any[]): Promise<{result: any, error: string}> {
+    if (!this.methodCaller) {
+      throw new Error(`Can't call a method "${pathToMethod}" because there isn't a methodCaller`);
+    }
+
     let result: any;
     let error;
 

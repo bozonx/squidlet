@@ -2,35 +2,55 @@ import * as yaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import IndexedEvents from '../system/helpers/IndexedEvents';
-import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+import RemoteCall from '../system/helpers/remoteCall/RemoteCall';
+import {deserializeJson, serializeJson} from '../system/helpers/binaryHelpers';
+import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
-import {decodeBackdoorMessage, makeMessage, validateMessage} from '../entities/services/Backdoor/helpers';
 import {collectPropsDefaults} from './helpers';
 
 
+const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');
 const wsClientIo = new WebSocketClient();
 
 
 export default class WsApiClient {
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
-  private readonly incomeMessageEvents = new IndexedEvents<(message: BackdoorMessage) => void>();
   private readonly client: WsClientLogic;
+  private readonly remoteCall: RemoteCall;
 
 
   constructor(
+    responseTimoutSec: number,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void,
+    generateUniqId: () => string,
     host?: string,
     port?: number
   ) {
     this.logInfo = logInfo;
     this.logError = logError;
-    this.client = this.makeClientInstance(host, port);
+
+    const clientProps = this.makeClientProps(host, port);
+
+    this.client = new WsClientLogic(
+      wsClientIo,
+      clientProps,
+      () => this.logInfo(`Websocket connection has been closed`),
+      this.logInfo,
+      this.logError
+    );
     // listen income data
     this.client.onMessage(this.handleIncomeMessage);
+
+    this.remoteCall = new RemoteCall(
+      this.sendToServer,
+      undefined,
+      responseTimoutSec,
+      this.logError,
+      generateUniqId
+    );
   }
 
   async init() {
@@ -38,108 +58,53 @@ export default class WsApiClient {
   }
 
   async destroy() {
-    this.incomeMessageEvents.removeAll();
+    await this.remoteCall.destroy();
     await this.client.destroy();
   }
 
+
+  callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
+    return this.remoteCall.callMethod(pathToMethod, ...args);
+  }
 
   async close() {
     await this.client.close(0, 'finish');
   }
 
-  async send(action: number, payload?: any) {
-    const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.send, action, payload);
 
-    await this.client.send(binMsg);
-  }
+  /**
+   * Encode and send remote call message to server
+   */
+  private sendToServer = (message: RemoteCallMessage): Promise<void> => {
+    const binData: Uint8Array = serializeJson(message);
 
-  async request(action: number, payload?: any): Promise<any> {
-
-    // TODO: generate uniq id
-    // TODO: впринципе можно не делать requestId, а просто смотреть по action
-    const requestId = 'a';
-
-    const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.request, action, payload, requestId);
-
-    await this.client.send(binMsg);
-
-    return this.waitForRespond(requestId);
-  }
-
-  addListener(action: number, cb: ListenerHandler): number {
-    const handlerWrapper = (msg: BackdoorMessage) => {
-      if (msg.type === BACKDOOR_MSG_TYPE.send && msg.action === action) {
-        cb(msg.payload);
-      }
-    };
-
-    return this.incomeMessageEvents.addListener(handlerWrapper);
-  }
-
-  removeListener(handlerIndex: number) {
-    this.incomeMessageEvents.removeListener(handlerIndex);
-  }
-
-
-  private waitForRespond(requestId: string): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      let handlerIndex: number;
-      const waitTimeout = setTimeout(() => {
-        this.incomeMessageEvents.removeListener(handlerIndex);
-        reject(`BackdoorClient.request: Timeout is exceeded`);
-      }, BACKDOOR_REQUEST_TIMEOUT_SEC * 1000);
-
-      handlerIndex = this.incomeMessageEvents.addListener((msg: BackdoorMessage) => {
-        if (msg.type !== BACKDOOR_MSG_TYPE.respond || msg.requestId !== requestId) return;
-
-        clearTimeout(waitTimeout);
-        this.incomeMessageEvents.removeListener(handlerIndex);
-        resolve(msg.payload);
-      });
-    });
+    return this.client.send(binData);
   }
 
   /**
-   * Decode all the income messages
+   * Decode income messages from server and pass it to remoteCall
    */
   private handleIncomeMessage = (data: string | Uint8Array) => {
-    let msg: BackdoorMessage;
+    const message: RemoteCallMessage = deserializeJson(data);
 
-    try {
-      msg = decodeBackdoorMessage(data as Uint8Array);
-    }
-    catch (err) {
-      return this.logError(`Can't decode message: ${err}`);
-    }
-
-    const validationError: string | undefined = validateMessage(msg);
-
-    if (validationError) return this.logError(validationError);
-
-    this.incomeMessageEvents.emit(msg);
+    this.remoteCall.incomeMessage(message)
+      .catch(this.logError);
   }
 
-  private makeClientInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {
-    const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');
-    const backdoorManifest = yaml.safeLoad(yamlContent);
-    const backdoorProps = collectPropsDefaults(backdoorManifest.props);
-    const host: string = specifiedHost || backdoorProps.host;
-    const port: number= specifiedPort || backdoorProps.port;
+  private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
+    const yamlContent: string = fs.readFileSync(wsClientManifestPath, 'utf8');
+    const clientManifest = yaml.safeLoad(yamlContent);
+    const clientProps = collectPropsDefaults(clientManifest.props);
+    const host: string = specifiedHost || clientProps.host;
+    const port: number= specifiedPort || clientProps.port;
     const url = `ws://${host}:${port}`;
-    const props: WsClientLogicProps = {
+
+    return  {
       url,
       autoReconnect: false,
       reconnectTimeoutMs: 0,
       maxTries: 0,
     };
-
-    return new WsClientLogic(
-      wsClientIo,
-      props,
-      () => this.logInfo(`Websocket connection has been closed`),
-      this.logInfo,
-      this.logError
-    );
   }
 
 }
