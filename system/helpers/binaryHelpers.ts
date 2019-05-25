@@ -340,7 +340,11 @@ export function serializeJson(data: any): Uint8Array {
  * Convert previously serialized json which mights content binary data
  * to js object as it was before serialization.
  */
-export function deserializeJson(serialized: Uint8Array) {
+export function deserializeJson(serialized: Uint8Array | any) {
+  if (!(serialized instanceof Uint8Array)) {
+    throw new Error(`deserializeJson: serialized data has to be a Uint8Array`);
+  }
+
   const binJsonLength: Uint8Array = serialized.slice(0, 4);
   const jsonLength: number = uint8ToNum(binJsonLength);
   // 4 is 4 bytes of length 32 bit number

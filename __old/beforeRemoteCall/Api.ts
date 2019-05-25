@@ -36,7 +36,7 @@ export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
 export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';
 
 type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
-export type RcOutcomeHandler = (message: RemoteCallMessage) => void;
+type RcOutcomeHandler = (message: RemoteCallMessage) => void;
 
 export interface ApiMessage {
   type: ApiTypes;
