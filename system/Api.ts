@@ -3,6 +3,9 @@ import {JsonTypes} from './interfaces/Types';
 import {combineTopic, parseValue, splitTopicId} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
+import RemoteCallMessage from './interfaces/RemoteCallMessage';
+import {splitFirstElement} from './helpers/strings';
+import {objGet} from './helpers/lodashLike';
 
 
 export interface DeviceIncomePayload {
@@ -30,8 +33,10 @@ export interface DeviceStateOutcomePayload {
 // }
 
 export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
-export type ApiTypes = 'deviceIncome' | 'deviceOutcome';
+export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';
+
 type OutcomeHandler = (type: ApiTypes, topic: string, data?: string | Uint8Array) => void;
+type RcOutcomeHandler = (message: RemoteCallMessage) => void;
 
 export interface ApiMessage {
   type: ApiTypes;
@@ -45,24 +50,32 @@ export interface ApiMessage {
  * * Calling device action:
  *   * device.room.deviceId/myAction value
  *   * room.deviceId/myAction value
- * * RemoteCall api:
- *   * Getting state
- *   * Subscribe to state change
- *   * Getting config param
- *   * Getting session store
- *   * Initiate updating
- *   * Switch automation
+ *
+ * RemoteCall api:
+ * * Call device's action - ('deviceAction', 'room.deviceId', 'turn', 'param1', 'param2')
+ * * Listen to device's status - ('listenDeviceStatus', 'room.deviceId', 'temperature')
+ * *            default status - ('listenDeviceStatus', 'room.deviceId')
+ * * Listen to device's config - ('listenDeviceConfig', 'room.deviceId')
+ * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
+ * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
+ * * Getting session store - ('getSessionStore', 'mySessionId', 'key')
+ * * Getting state
+ * * Subscribe to state change
+ * * Initiate updating
+ * * Switch automation
  */
 export default class Api {
   private readonly system: System;
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
+  private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   private readonly remoteCall: RemoteCall;
 
 
   constructor(system: System) {
     this.system = system;
     this.remoteCall = new RemoteCall(
-      (message: RemoteCallMessage) => this.sendToClient(sessionId, message),
+      // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
+      async (message: RemoteCallMessage) => this.rcOutcomeEvents.emit(message),
       this.callApi,
       this.system.config.config.ioSetResponseTimoutSec,
       this.system.log.error,
@@ -191,8 +204,29 @@ export default class Api {
     //if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
   }
 
-  private callApi(objectName: string, method: string, args: any[]): Promise<any> {
-    if ()
+  private async callApi(pathToMethod: string, args: any[]): Promise<any> {
+    switch (pathToMethod) {
+      case 'deviceAction':
+        return this.callDeviceAction(args[0], args[1], ...args.slice(2));
+      case 'listenDeviceStatus':
+        // TODO: !!! ('listenDeviceStatus', 'room.deviceId', 'temperature')
+      case 'listenDeviceConfig':
+        // TODO: !!! ('listenDeviceConfig', 'room.deviceId')
+      case 'setDeviceConfig':
+        // TODO: !!! ('setDeviceConfig', 'room.deviceId', {... partial config})
+      case 'getConfig':
+        return objGet(this.system.config, args[0]);
+      case 'getSessionStore':
+        return this.system.sessions.getStorage(args[0], args[1]);
+      default:
+
+    }
+
+    // TODO: add other types
+    // Getting state
+    // Subscribe to state change
+    // Initiate updating
+    // Switch automation
   }
 
 }

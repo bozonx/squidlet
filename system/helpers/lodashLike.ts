@@ -173,6 +173,10 @@ export function difference(testArr: any[], samples: any[]): any[] {
   return diffArr;
 }
 
+export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
+  // TODO: add
+}
+
 // /**
 //  * Deep merge two objects.
 //  * It mutates target object.

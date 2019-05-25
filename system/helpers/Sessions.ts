@@ -88,16 +88,16 @@ export default class Sessions {
     this.closeEvents.removeListener(handlerIndex);
   }
 
-  getStorage(sessionId: string, name: string): JsonTypes | undefined {
+  getStorage(sessionId: string, key: string): JsonTypes | undefined {
     if (!this.sessionStorage[sessionId]) return;
 
-    return this.sessionStorage[sessionId][name];
+    return this.sessionStorage[sessionId][key];
   }
 
-  setStorage(sessionId: string, name: string, data: JsonTypes) {
+  setStorage(sessionId: string, key: string, data: JsonTypes) {
     if (!this.sessionStorage[sessionId]) this.sessionStorage[sessionId] = {};
 
-    this.sessionStorage[sessionId][name] = data;
+    this.sessionStorage[sessionId][key] = data;
   }
 
 

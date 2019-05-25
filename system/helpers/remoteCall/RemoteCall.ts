@@ -71,6 +71,7 @@ export default class RemoteCall {
     };
 
     // TODO: refactor
+    // TODO: поидее send promise не гарантированно отработает когда клиент получит сообщение или гарантированно???
 
     const sendPromise = this.send(message);
     const resultPromise = waitForResponse(
