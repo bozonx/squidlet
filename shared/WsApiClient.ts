@@ -3,10 +3,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import IndexedEvents from '../system/helpers/IndexedEvents';
-import {BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
+import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
-import {collectPropsDefaults} from './helpers';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
+import {decodeBackdoorMessage, makeMessage, validateMessage} from '../entities/services/Backdoor/helpers';
+import {collectPropsDefaults} from './helpers';
 
 
 const wsClientIo = new WebSocketClient();
@@ -32,8 +33,91 @@ export default class WsApiClient {
     this.client.onMessage(this.handleIncomeMessage);
   }
 
+  async init() {
+    await this.client.init();
+  }
+
+  async destroy() {
+    this.incomeMessageEvents.removeAll();
+    await this.client.destroy();
+  }
 
 
+  async close() {
+    await this.client.close(0, 'finish');
+  }
+
+  async send(action: number, payload?: any) {
+    const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.send, action, payload);
+
+    await this.client.send(binMsg);
+  }
+
+  async request(action: number, payload?: any): Promise<any> {
+
+    // TODO: generate uniq id
+    // TODO: впринципе можно не делать requestId, а просто смотреть по action
+    const requestId = 'a';
+
+    const binMsg: Uint8Array = makeMessage(BACKDOOR_MSG_TYPE.request, action, payload, requestId);
+
+    await this.client.send(binMsg);
+
+    return this.waitForRespond(requestId);
+  }
+
+  addListener(action: number, cb: ListenerHandler): number {
+    const handlerWrapper = (msg: BackdoorMessage) => {
+      if (msg.type === BACKDOOR_MSG_TYPE.send && msg.action === action) {
+        cb(msg.payload);
+      }
+    };
+
+    return this.incomeMessageEvents.addListener(handlerWrapper);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.incomeMessageEvents.removeListener(handlerIndex);
+  }
+
+
+  private waitForRespond(requestId: string): Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      let handlerIndex: number;
+      const waitTimeout = setTimeout(() => {
+        this.incomeMessageEvents.removeListener(handlerIndex);
+        reject(`BackdoorClient.request: Timeout is exceeded`);
+      }, BACKDOOR_REQUEST_TIMEOUT_SEC * 1000);
+
+      handlerIndex = this.incomeMessageEvents.addListener((msg: BackdoorMessage) => {
+        if (msg.type !== BACKDOOR_MSG_TYPE.respond || msg.requestId !== requestId) return;
+
+        clearTimeout(waitTimeout);
+        this.incomeMessageEvents.removeListener(handlerIndex);
+        resolve(msg.payload);
+      });
+    });
+  }
+
+  /**
+   * Decode all the income messages
+   */
+  private handleIncomeMessage = (data: string | Uint8Array) => {
+    let msg: BackdoorMessage;
+
+    try {
+      msg = decodeBackdoorMessage(data as Uint8Array);
+    }
+    catch (err) {
+      return this.logError(`Can't decode message: ${err}`);
+    }
+
+    const validationError: string | undefined = validateMessage(msg);
+
+    if (validationError) return this.logError(validationError);
+
+    this.incomeMessageEvents.emit(msg);
+  }
 
   private makeClientInstance(specifiedHost?: string, specifiedPort?: number): WsClientLogic {
     const yamlContent: string = fs.readFileSync(backdoorManifestPath, 'utf8');

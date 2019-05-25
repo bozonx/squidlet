@@ -89,6 +89,20 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     return this.server.send(this.sessionConnections[sessionId], data);
   }
 
+  /**
+   * Close connection of session
+   */
+  async close(sessionId: string) {
+    const connectionId = this.sessionConnections[sessionId];
+
+    if (!connectionId) return;
+
+    await this.server.closeConnection(connectionId, 0, 'Close session request');
+
+    this.env.system.sessions.shutDownImmediately(sessionId);
+    delete this.sessionConnections[sessionId];
+  }
+
   onMessage(cb: (sessionId: string, data: string | Uint8Array) => void): number {
     return this.events.addListener(WS_SESSIONS_EVENTS.message, cb);
   }

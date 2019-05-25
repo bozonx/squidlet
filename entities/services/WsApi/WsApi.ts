@@ -34,9 +34,13 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
   }
 
   destroy = async () => {
-    // TODO: destroy connections
+    for (let sessionId of this.sessions) {
+      await this.wsServerSessions.close(sessionId);
+    }
+
     delete this.sessions;
   }
+
 
   private handleIncomeMessages(sessionId: string, data: string | Uint8Array) {
     const message: RemoteCallMessage = deserializeJson(data);
