@@ -10,7 +10,6 @@ export default class IoSetServer {
   private readonly logError: (message: string) => void;
   private readonly generateUniqId: () => string;
   private remoteCalls: {[index: string]: RemoteCall} = {};
-  private readonly ioCollection: {[index: string]: (...args: any[]) => Promise<any>} = {};
 
 
   constructor(
@@ -25,11 +24,6 @@ export default class IoSetServer {
     this.responseTimoutSec = responseTimoutSec;
     this.logError = logError;
     this.generateUniqId = generateUniqId;
-
-    // make io collection
-    for (let ioName of this.ioManager.getNames()) {
-      this.ioCollection[ioName] = this.ioManager.getIo(ioName);
-    }
   }
 
   async destroy () {
@@ -49,9 +43,7 @@ export default class IoSetServer {
     if (!this.remoteCalls[sessionId]) {
       this.remoteCalls[sessionId] = new RemoteCall(
         (message: RemoteCallMessage) => this.sendToClient(sessionId, message),
-        (objectName: string, method: string, args: any[]): Promise<any> => {
-          return this.ioCollection[objectName][method](...args);
-        },
+        this.callIoMethod,
         this.responseTimoutSec,
         this.logError,
         this.generateUniqId
@@ -67,6 +59,15 @@ export default class IoSetServer {
   async sessionClosed(sessionId: string) {
     await this.remoteCalls[sessionId].destroy();
     delete this.remoteCalls[sessionId];
+  }
+
+
+  private callIoMethod = (pathToMethod: string, ...args: any[]): Promise<any> => {
+    const [ioName, methodName] = pathToMethod.split('.');
+
+    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioManager.getIo(ioName);
+
+    return IoItem[methodName](...args);
   }
 
 }

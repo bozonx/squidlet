@@ -11,7 +11,7 @@ import {waitForResponse} from './helpers';
 
 type MethodResultHandler = (payload: ResultMethodPayload) => void;
 
-export type MethodCaller = (pathToMethod: string, args: any[]) => Promise<any>;
+export type MethodCaller = (pathToMethod: string, ...args: any[]) => Promise<any>;
 
 
 /**
@@ -186,7 +186,7 @@ export default class RemoteCall {
     const preparedArgs: any[] = this.prepareArgsToCall(args);
 
     try {
-      result = await this.methodCaller(pathToMethod, preparedArgs);
+      result = await this.methodCaller(pathToMethod, ...preparedArgs);
     }
     catch (err) {
       error = err;
