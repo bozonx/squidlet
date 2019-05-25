@@ -2,8 +2,10 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import MqttIo, {MqttConnection} from 'system/interfaces/io/MqttIo';
 import {deserializeJson} from 'system/helpers/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import {combineTopic} from 'system/helpers/helpers';
+import {combineTopic, parseValue} from 'system/helpers/helpers';
 import {JsonTypes} from 'system/interfaces/Types';
+import {splitFirstElement} from 'system/helpers/strings';
+import {trim} from 'system/helpers/lodashLike';
 
 
 interface Props {
@@ -47,7 +49,7 @@ export default class MqttApi extends ServiceBase<Props> {
   /**
    * Processing income messages from broker
    */
-  private messagesHandler = async (topic: string, data?: string | Uint8Array): Promise<void> => {
+  private messagesHandler = async (topic: string, data?: string | Uint8Array) => {
     if (topic === REMOTE_CALL_TOPIC) {
       // income remoteCall message
       const message: RemoteCallMessage = deserializeJson(data);
@@ -58,18 +60,22 @@ export default class MqttApi extends ServiceBase<Props> {
       return;
     }
 
-    // income string-type api message - call device action
-    this.env.log.info(`Api income: ${topic} - ${JSON.stringify(data)}`);
-
-    // TODO: если парамеры через запятую - то распарсить их
-    // TODO: строковые параметры превратить в нормальные - parseValue
-    // TODO: разложить topic на deviceId, action
-
-    this.env.api.callDeviceAction(deviceId, action, data)
+    this.callDeviceAction(topic, data)
       .catch(this.env.log.error);
+  }
 
-    // this.env.api.income(topic, data)
-    //   .catch(this.env.log.error);
+  async callDeviceAction(topic: string, data?: string | Uint8Array) {
+    // income string-type api message - call device action
+    this.env.log.info(`MqttApi income device action call: ${topic} ${JSON.stringify(data)}`);
+
+    const args: JsonTypes[] = this.parseArgs(data);
+    const [deviceId, actionName] = splitFirstElement(topic, this.env.system.systemConfig.topicSeparator);
+
+    if (!actionName) {
+      throw new Error(`MqttApi.callDeviceAction: Not actionName: "${topic}"`);
+    }
+
+    await this.env.api.callDeviceAction(deviceId, actionName, args);
   }
 
   /**
@@ -77,34 +83,52 @@ export default class MqttApi extends ServiceBase<Props> {
    */
   private publishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => {
     if (isRepeat) {
-      this.system.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(data)}`);
+      this.env.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(data)}`);
     }
     else {
-      this.system.log.info(`Api outcome: ${topic} - ${JSON.stringify(data)}`);
+      this.env.log.info(`Api outcome: ${topic} - ${JSON.stringify(data)}`);
     }
 
-    if (type === 'deviceOutcome') {
-      this.mqttConnection.publish(topic, data)
-        .catch(this.env.log.error);
-    }
-    // TODO: support other types
+    // TODO: если это массив то не известно это список параметров или массив для передачи как один параметр
+
+    this.mqttConnection.publish(topic, data)
+      .catch(this.env.log.error);
   }
 
-  private parseMessage(topic: string, data?: string | Uint8Array): ApiMessage {
-    // TODO: add
+  /**
+   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
+   */
+  getDevicesActionTopics(): string[] {
+    const topics: string[] = [];
+    const devicesIds: string[] = this.env.system.devicesManager.getInstantiatedDevicesIds();
 
-    // TODO: если data - binary???
-    // TODO: что если неизвестный формат или хоста не существует ???
-    const topic: string = combineTopic(
-      this.system.systemConfig.topicSeparator,
-      payload.deviceId,
-      payload.subTopic
-    );
+    for (let deviceId of devicesIds) {
+      const device = this.env.system.devicesManager.getDevice(deviceId);
 
-    // , parseValue, splitTopicId
+      for (let actionName of device.getActionsList()) {
+        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, actionName);
 
-    // const [ id, subTopic ] = splitTopicId(this.env.system.systemConfig.topicSeparator, topic);
-    //if (!subTopic) throw new Error(`There isn't a subtopic of topic: "${topic}"`);
+        topics.push(topic);
+      }
+    }
+
+    return topics;
+  }
+
+  private parseArgs(data: any): JsonTypes[] {
+    if (typeof data === 'undefined') return [];
+    else if (typeof data !== 'string') {
+      throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
+    }
+
+    const splat: string[] = data.split(',');
+    const result: JsonTypes[] = [];
+
+    for (let item of splat) {
+      result.push( parseValue(trim(item)) );
+    }
+
+    return result;
   }
 
   /**
@@ -113,7 +137,7 @@ export default class MqttApi extends ServiceBase<Props> {
   private subscribeToDevices = async () => {
     this.env.log.info(`--> Register MQTT subscribers of devices actions`);
 
-    const devicesActionsTopics: string[] = this.env.api.getDevicesActionTopics();
+    const devicesActionsTopics: string[] = this.getDevicesActionTopics();
 
     for (let topic of devicesActionsTopics) {
       this.env.log.info(`MQTT subscribe: ${topic}`);

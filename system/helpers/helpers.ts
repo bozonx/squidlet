@@ -129,12 +129,12 @@ export function combineTopic(topicSeparator: string, basePath: string, ...subPat
   return [ basePath, ...subPaths ].join(topicSeparator);
 }
 
-/**
- * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
- */
-export function splitTopicId(topicSeparator: string, topic: string): [ string, string | undefined ] {
-  return splitFirstElement(topic, topicSeparator);
-}
+// /**
+//  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
+//  */
+// export function splitTopicId(topicSeparator: string, topic: string): [ string, string | undefined ] {
+//   return splitFirstElement(topic, topicSeparator);
+// }
 
 // TODO: review
 // TODO: test

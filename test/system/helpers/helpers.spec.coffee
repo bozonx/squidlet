@@ -83,8 +83,8 @@ describe 'system.helpers.helpers', ->
   it 'combineTopic', ->
     assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
 
-  it 'splitTopicId', ->
-    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
+#  it 'splitTopicId', ->
+#    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
 
   it 'makeEventName', ->
     assert.equal(helpers.makeEventName('|', 'cat', 'topic', 'name', 'otherName'), 'cat|topic|name|otherName')

@@ -1,6 +1,5 @@
 import System from './System';
 import {JsonTypes} from './interfaces/Types';
-import {combineTopic} from './helpers/helpers';
 import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
@@ -117,35 +116,16 @@ export default class Api {
     return device.action(actionName, ...params);
   }
 
-  // TODO: move to mqttApi ???
-  /**
-   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
-   */
-  getDevicesActionTopics(): string[] {
-    const topics: string[] = [];
-    const devicesIds: string[] = this.system.devicesManager.getInstantiatedDevicesIds();
-
-    for (let deviceId of devicesIds) {
-      const device = this.system.devicesManager.getDevice(deviceId);
-
-      for (let actionName of device.getActionsList()) {
-        const topic: string = combineTopic(this.system.systemConfig.topicSeparator, deviceId, actionName);
-
-        topics.push(topic);
-      }
-    }
-
-    return topics;
-  }
-
 
   private async callApi(pathToMethod: string, args: any[]): Promise<any> {
     switch (pathToMethod) {
       case 'deviceAction':
         return this.callDeviceAction(args[0], args[1], ...args.slice(2));
       case 'listenDeviceStatus':
+        // TODO: use this.publishEvents
         // TODO: !!! ('listenDeviceStatus', 'room.deviceId', 'temperature')
       case 'listenDeviceConfig':
+        // TODO: use this.publishEvents
         // TODO: !!! ('listenDeviceConfig', 'room.deviceId')
       case 'setDeviceConfig':
         // TODO: !!! ('setDeviceConfig', 'room.deviceId', {... partial config})
@@ -154,7 +134,6 @@ export default class Api {
       case 'getSessionStore':
         return this.system.sessions.getStorage(args[0], args[1]);
       default:
-
     }
 
     // TODO: add other types
