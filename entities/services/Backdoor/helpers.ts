@@ -1,4 +1,5 @@
 import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {BackdoorMessage} from './Backdoor';
 
 
@@ -13,11 +14,9 @@ export function decodeBackdoorMessage(binMsg: any): BackdoorMessage {
   return deserializeJson(binMsg);
 }
 
-export function makeMessage(type: number, action: number, payload?: any, requestId?: string): Uint8Array {
+export function makeMessage(type: number, payload: RemoteCallMessage): Uint8Array {
   const message: BackdoorMessage = {
     type,
-    action,
-    requestId,
     payload,
   };
 
@@ -25,14 +24,11 @@ export function makeMessage(type: number, action: number, payload?: any, request
 }
 
 export function validateMessage(message: any): string | undefined {
-  if (typeof message.type !== 'object') {
+  if (typeof message !== 'object') {
     return `Backdoor message validation: Invalid message`;
   }
   else if (typeof message.type !== 'number') {
     return `Backdoor message validation: Invalid "type" param`;
-  }
-  else if (typeof message.action !== 'number') {
-    return `Backdoor message validation: Invalid "action" param`;
   }
 
   return;

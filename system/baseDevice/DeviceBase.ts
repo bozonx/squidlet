@@ -96,16 +96,6 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     return this.status.readParam(statusName);
   }
 
-  setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
-    if (!this.status) {
-      this.env.log.error(`You called setStatus(${JSON.stringify(newValue)}, "${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
-
-      return;
-    }
-
-    return this.status.write({[statusName]: newValue});
-  }
-
   /**
    * Listen status change
    */
@@ -154,6 +144,16 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
     const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
 
     this.env.api.publish(topic, data, isRepeat);
+  }
+
+  protected setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
+    if (!this.status) {
+      this.env.log.error(`You called setStatus(${JSON.stringify(newValue)}, "${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+
+      return;
+    }
+
+    return this.status.write({[statusName]: newValue});
   }
 
 }

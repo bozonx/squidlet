@@ -137,6 +137,7 @@ export default class Api {
     }
 
     // TODO: add other types
+    // TODO: add get io Names
     // Getting state
     // Subscribe to state change
     // Initiate updating
