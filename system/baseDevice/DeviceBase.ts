@@ -6,6 +6,7 @@ import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {JsonTypes} from '../interfaces/Types';
+import {combineTopic} from '../helpers/helpers';
 
 
 export interface DeviceBaseProps {
@@ -149,15 +150,10 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
 
 
   protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
-    const payload: DeviceStateOutcomePayload = {
-      deviceId: this.id,
-      subTopic,
-      data: String((this.transformPublishValue) ? this.transformPublishValue(value) : value),
-      isRepeat,
-    };
+    const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, this.id, subTopic);
+    const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
 
-    //this.env.events.emit(categories.externalDataOutcome, this.id, data);
-    this.env.api.publish('deviceOutcome', payload);
+    this.env.api.publish(topic, data, isRepeat);
   }
 
 }

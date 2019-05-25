@@ -117,6 +117,7 @@ export default class Api {
     return device.action(actionName, ...params);
   }
 
+  // TODO: move to mqttApi ???
   /**
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
