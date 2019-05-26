@@ -25,6 +25,9 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
     });
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       this.sessions = removeItemFromArray(this.sessions, sessionId);
+
+      this.env.api.remoteCallSessionClosed(sessionId)
+        .catch(this.env.log.error);
     });
 
     // listen income api requests
@@ -52,18 +55,15 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       return this.env.log.error(`WsApi: Can't decode message: ${err}`);
     }
 
-    this.env.api.incomeRemoteCall(msg)
+    this.env.api.incomeRemoteCall(sessionId, msg)
       .catch(this.env.log.error);
   }
 
-  private handleOutcomeMessages = (message: RemoteCallMessage) => {
+  private handleOutcomeMessages = (sessionId: string, message: RemoteCallMessage) => {
     const binData: Uint8Array = serializeJson(message);
 
-    // send to all the clients
-    for (let sessionId of this.sessions) {
-      this.wsServerSessions.send(sessionId, binData)
-        .catch(this.env.log.error);
-    }
+    this.wsServerSessions.send(sessionId, binData)
+      .catch(this.env.log.error);
   }
 
 }
