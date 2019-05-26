@@ -4,39 +4,39 @@ import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
-import IoSetServer from './IoSetServer';
+import IoSetServer from '../IoSetServer/IoSetServer';
 import MainEventsServer from './MainEventsServer';
 
 
-export enum BACKDOOR_MSG_TYPE {
-  // remoteCall interface
-  apiRemoteCall,
-  // ioSet remoteCall
-  ioSet,
-  // // send to one way. Don't wait to answer
-  // send,
-  // // send and wait to answer
-  // request,
-  // // response of request
-  // respond,
-}
-
-// export enum BACKDOOR_ACTION {
-//   emit,
-//   startListen,
-//   listenerResponse,
-//   // removeListener,
-//   ioSetRemoteCall,
-//   getIoNames,
+// export enum BACKDOOR_MSG_TYPE {
+//   // remoteCall interface
+//   apiRemoteCall,
+//   // ioSet remoteCall
+//   ioSet,
+//   // // send to one way. Don't wait to answer
+//   // send,
+//   // // send and wait to answer
+//   // request,
+//   // // response of request
+//   // respond,
 // }
-
-
-export interface BackdoorMessage {
-  type: number;
-  payload: RemoteCallMessage;
-  //action: number;
-  //requestId?: string;
-}
+//
+// // export enum BACKDOOR_ACTION {
+// //   emit,
+// //   startListen,
+// //   listenerResponse,
+// //   // removeListener,
+// //   ioSetRemoteCall,
+// //   getIoNames,
+// // }
+//
+//
+// export interface BackdoorMessage {
+//   type: number;
+//   payload: RemoteCallMessage;
+//   //action: number;
+//   //requestId?: string;
+// }
 
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {

@@ -1,9 +1,12 @@
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import RemoteCall from 'system/helpers/remoteCall/RemoteCall';
 import IoManager from 'system/entities/IoManager';
+import ServiceBase from '../../../system/baseServices/ServiceBase';
 
 
-export default class IoSetServer {
+// TODO: remake as service
+
+export default class IoSetServer extends ServiceBase {
   private readonly ioManager: IoManager;
   private readonly sendToClient: (sessionId: string, message: RemoteCallMessage) => Promise<void>;
   private readonly responseTimoutSec: number;

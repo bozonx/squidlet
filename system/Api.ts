@@ -4,6 +4,7 @@ import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {objGet} from './helpers/lodashLike';
+import IoSetServer from '../entities/services/IoSetServer/IoSetServer';
 
 
 // export interface DeviceIncomePayload {
@@ -60,6 +61,10 @@ export default class Api {
   private readonly publishEvents = new IndexedEvents<PublishHandler>();
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   private readonly remoteCall: RemoteCall;
+  private readonly _ioSet?: IoSetServer;
+  private get ioSet(): IoSetServer {
+    return this._ioSet as IoSetServer;
+  }
 
 
   constructor(system: System) {
@@ -72,6 +77,8 @@ export default class Api {
       this.system.log.error,
       this.system.generateUniqId
     );
+
+    this._ioSet = this.system.servicesManager.getService<IoSetServer>('IoSetServer');
   }
 
   destroy() {
