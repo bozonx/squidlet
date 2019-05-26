@@ -4,7 +4,6 @@ import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {objGet} from './helpers/lodashLike';
-import IoSetServer from '../entities/services/IoSetServer/IoSetServer';
 
 
 type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
@@ -26,6 +25,8 @@ export type RcOutcomeHandler = (message: RemoteCallMessage) => void;
  * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
  * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
  * * Getting session store - ('getSessionStore', 'mySessionId', 'key')
+ * * Get io names list - ('getIoNames')
+ *
  * * Getting state
  * * Subscribe to state change
  * * Initiate updating
@@ -36,7 +37,8 @@ export default class Api {
   private readonly publishEvents = new IndexedEvents<PublishHandler>();
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   // TODO: создавать инстанс на каждую сессию
-  private readonly remoteCall: RemoteCall;
+  //private readonly remoteCall: RemoteCall;
+  private remoteCalls: {[index: string]: RemoteCall} = {};
   private readonly _ioSet?: IoSetServer;
   private get ioSet(): IoSetServer {
     return this._ioSet as IoSetServer;
@@ -59,13 +61,39 @@ export default class Api {
 
   destroy() {
     this.publishEvents.removeAll();
+
+    for (let sessionId of Object.keys(this.remoteCalls)) {
+      await this.remoteCalls[sessionId].destroy();
+    }
+
+    this.remoteCalls = {};
   }
 
 
   /**
+   * Call this method if session has just been closed
+   */
+  async sessionClosed(sessionId: string) {
+    await this.remoteCalls[sessionId].destroy();
+    delete this.remoteCalls[sessionId];
+  }
+
+  /**
    * Call it when you received income data of remoteCall channel
    */
-  incomeRemoteCall(message: RemoteCallMessage): Promise<void> {
+  incomeRemoteCall(sessionId: string, message: RemoteCallMessage): Promise<void> {
+    if (!this.remoteCalls[sessionId]) {
+      this.remoteCalls[sessionId] = new RemoteCall(
+        (message: RemoteCallMessage) => this.sendEvents.emit(sessionId, message),
+        this.callIoMethod,
+        this.env.system.config.config.ioSetResponseTimoutSec,
+        this.env.log.error,
+        this.env.system.generateUniqId
+      );
+    }
+
+    return this.remoteCalls[sessionId].incomeMessage(rawRemoteCallMessage);
+
     return this.remoteCall.incomeMessage(message);
   }
 
@@ -116,6 +144,8 @@ export default class Api {
         return objGet(this.system.config, args[0]);
       case 'getSessionStore':
         return this.system.sessions.getStorage(args[0], args[1]);
+      case 'getIoNames':
+        return this.system.ioManager.getNames();
       default:
     }
 
@@ -125,6 +155,14 @@ export default class Api {
     // Subscribe to state change
     // Initiate updating
     // Switch automation
+  }
+
+  private callIoMethod = (pathToMethod: string, ...args: any[]): Promise<any> => {
+    const [ioName, methodName] = pathToMethod.split('.');
+
+    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioManager.getIo(ioName);
+
+    return IoItem[methodName](...args);
   }
 
 }
