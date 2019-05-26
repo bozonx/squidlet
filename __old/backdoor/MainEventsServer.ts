@@ -1,6 +1,6 @@
-import CategorizedEvents from 'system/helpers/CategorizedEvents';
-import {makeMessage} from './helpers';
-import {BACKDOOR_ACTION, BACKDOOR_MSG_TYPE} from './Backdoor';
+import CategorizedEvents from 'helpers/CategorizedEvents';
+import {makeMessage} from '../../entities/services/Backdoor/helpers';
+import {BACKDOOR_ACTION, BACKDOOR_MSG_TYPE} from '../../entities/services/Backdoor/Backdoor';
 
 
 // category, topic, data

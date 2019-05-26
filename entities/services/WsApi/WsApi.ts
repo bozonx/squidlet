@@ -42,14 +42,21 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
   }
 
 
-  private handleIncomeMessages(sessionId: string, data: string | Uint8Array) {
-    const message: RemoteCallMessage = deserializeJson(data);
+  private handleIncomeMessages = async (sessionId: string, data: string | Uint8Array) => {
+    let msg: RemoteCallMessage;
 
-    this.env.api.incomeRemoteCall(message)
+    try {
+      msg = deserializeJson(data);
+    }
+    catch (err) {
+      return this.env.log.error(`WsApi: Can't decode message: ${err}`);
+    }
+
+    this.env.api.incomeRemoteCall(msg)
       .catch(this.env.log.error);
   }
 
-  private handleOutcomeMessages(message: RemoteCallMessage) {
+  private handleOutcomeMessages = (message: RemoteCallMessage) => {
     const binData: Uint8Array = serializeJson(message);
 
     // send to all the clients

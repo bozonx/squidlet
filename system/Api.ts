@@ -7,33 +7,8 @@ import {objGet} from './helpers/lodashLike';
 import IoSetServer from '../entities/services/IoSetServer/IoSetServer';
 
 
-// export interface DeviceIncomePayload {
-//   // room and device id
-//   deviceId: string;
-//   action: string;
-//   params: JsonTypes[];
-// }
-
-// export interface DeviceStateOutcomePayload {
-//   // room and device id
-//   deviceId: string;
-//   // e.g status, status/temperature, config
-//   subTopic: string;
-//   data?: string | Uint8Array;
-//   // mark that it is status repeating or not
-//   isRepeat?: boolean;
-// }
-
-//export type ApiPayload = DeviceIncomePayload | DeviceStateOutcomePayload;
-//export type ApiTypes = 'deviceIncome' | 'deviceOutcome' | 'remoteCall';
-
 type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
 export type RcOutcomeHandler = (message: RemoteCallMessage) => void;
-
-// export interface ApiMessage {
-//   type: ApiTypes;
-//   payload: ApiPayload;
-// }
 
 
 /**

@@ -2,101 +2,48 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import {deserializeJson} from 'system/helpers/binaryHelpers';
+import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
+import {removeItemFromArray} from 'system/helpers/collections';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
 
 
-// export enum BACKDOOR_MSG_TYPE {
-//   // remoteCall interface
-//   apiRemoteCall,
-//   // ioSet remoteCall
-//   ioSet,
-//   // // send to one way. Don't wait to answer
-//   // send,
-//   // // send and wait to answer
-//   // request,
-//   // // response of request
-//   // respond,
-// }
-//
-// // export enum BACKDOOR_ACTION {
-// //   emit,
-// //   startListen,
-// //   listenerResponse,
-// //   // removeListener,
-// //   ioSetRemoteCall,
-// //   getIoNames,
-// // }
-//
-//
-// export interface BackdoorMessage {
-//   type: number;
-//   payload: RemoteCallMessage;
-//   //action: number;
-//   //requestId?: string;
-// }
+// TODO: использовать общй код с WsApi
 
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
-  // io servers by sessionId
-  //private _ioSet?: IoSetServer;
-  // private _eventsServer?: MainEventsServer;
-  // private get ioSet(): IoSetServer {
-  //   return this._ioSet as any;
-  // }
+  private sessions: string[] = [];
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer;
   }
-  // private get eventsServer(): MainEventsServer {
-  //   return this._eventsServer as any;
-  // }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.wsServer = await getDriverDep('WsServerSessions')
       .getInstance(this.props);
 
-    // TODO: review
-
-    // this.wsServerSessions.onNewSession((sessionId: string) => {
-    // });
-
-    this.wsServerSessions.onMessage(this.handleIncomeMessage);
-
+    this.wsServerSessions.onNewSession((sessionId: string) => {
+      this.sessions.push(sessionId);
+    });
     this.wsServerSessions.onSessionClose((sessionId: string) => {
-      // remove all the listeners of this connection
-      //this.eventsServer.removeSessionHandlers(sessionId);
-      this.ioSet.sessionClosed(sessionId)
-        .catch(this.env.log.error);
+      this.sessions = removeItemFromArray(this.sessions, sessionId);
     });
 
-    // this._ioSet = new IoSetServer(
-    //   this.env.system.ioManager,
-    //   this.sendIoSetMsg,
-    //   this.env.config.config.ioSetResponseTimoutSec,
-    //   this.env.log.error,
-    //   this.env.system.generateUniqId
-    // );
-
-    // TODO: listen api to send to client
-
-    // this._eventsServer = new MainEventsServer(
-    //   this.env.events,
-    //   this.wsServerSessions.send,
-    //   this.env.log.error
-    // );
+    // listen income api requests
+    this.wsServerSessions.onMessage(this.handleIncomeMessages);
+    // listen outcome api requests
+    this.env.api.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
   destroy = async () => {
-    //this.eventsServer.destroy();
-    //await this.ioSet.destroy();
-    await this.wsServerSessions.destroy();
-    //delete this._eventsServer;
-    //delete this._ioSet;
+    for (let sessionId of this.sessions) {
+      await this.wsServerSessions.close(sessionId);
+    }
+
+    delete this.sessions;
   }
 
 
-  private handleIncomeMessage = async (sessionId: string, data: string | Uint8Array) => {
+  private handleIncomeMessages = async (sessionId: string, data: string | Uint8Array) => {
     let msg: RemoteCallMessage;
 
     try {
@@ -106,54 +53,18 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
       return this.env.log.error(`Backdoor: Can't decode message: ${err}`);
     }
 
-    // const validationError: string | undefined = validateMessage(msg);
-    //
-    // if (validationError) return this.env.log.error(validationError);
-
     this.env.api.incomeRemoteCall(msg)
       .catch(this.env.log.error);
   }
 
-  // TODO: remake
-  private sendIoSetMsg(sessionId: string, message: RemoteCallMessage): Promise<void> {
-    const binMsg: Uint8Array = makeMessage(
-      BACKDOOR_MSG_TYPE.send,
-      message,
-    );
+  private handleOutcomeMessages = (message: RemoteCallMessage) => {
+    const binData: Uint8Array = serializeJson(message);
 
-    return this.wsServerSessions.send(sessionId, binMsg);
+    // send to all the clients
+    for (let sessionId of this.sessions) {
+      this.wsServerSessions.send(sessionId, binData)
+        .catch(this.env.log.error);
+    }
   }
-
-  // private async resolveJsonMessage(sessionId: string, msg: BackdoorMessage) {
-  //   switch (msg.type) {
-  //     // case BACKDOOR_ACTION.emit:
-  //     //   // rise event on common event system
-  //     //   return this.eventsServer.emit(msg.payload);
-  //     //
-  //     // case BACKDOOR_ACTION.startListen:
-  //     //   return this.eventsServer.startListenEvents(sessionId, msg.payload);
-  //
-  //     case BACKDOOR_MSG_TYPE.ioSet:
-  //       return this.ioSet.incomeMessage(sessionId, msg.payload);
-  //
-  //     case BACKDOOR_MSG_TYPE.apiRemoteCall:
-  //       return this.env.api.incomeRemoteCall(msg.payload);
-  //       //return this.respondIoNames(sessionId, msg.requestId as string);
-  //
-  //     default:
-  //       throw new Error(`Backdoor: Can't recognize message's action "${msg.action}"`);
-  //   }
-  // }
-
-  // private async respondIoNames(sessionId: string, requestId: string) {
-  //   const binMsg: Uint8Array = makeMessage(
-  //     BACKDOOR_MSG_TYPE.respond,
-  //     BACKDOOR_ACTION.getIoNames,
-  //     this.ioSet.getIoNames(),
-  //     requestId
-  //   );
-  //
-  //   await this.wsServerSessions.send(sessionId, binMsg);
-  // }
 
 }

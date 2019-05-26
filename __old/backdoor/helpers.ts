@@ -1,6 +1,6 @@
-import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
-import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import {BackdoorMessage} from './Backdoor';
+import {deserializeJson, serializeJson} from 'helpers/binaryHelpers';
+import RemoteCallMessage from 'interfaces/RemoteCallMessage';
+import {BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
 
 
 export function decodeBackdoorMessage(binMsg: any): BackdoorMessage {
