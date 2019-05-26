@@ -85,6 +85,7 @@ export default class WsApiClient {
    * Decode income messages from server and pass it to remoteCall
    */
   private handleIncomeMessage = (data: string | Uint8Array) => {
+    // TODO: use try
     const message: RemoteCallMessage = deserializeJson(data);
 
     this.remoteCall.incomeMessage(message)

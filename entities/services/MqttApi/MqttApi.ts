@@ -51,6 +51,7 @@ export default class MqttApi extends ServiceBase<Props> {
    */
   private messagesHandler = async (topic: string, data?: string | Uint8Array) => {
     if (topic === REMOTE_CALL_TOPIC) {
+      // TODO: use try
       // income remoteCall message
       const message: RemoteCallMessage = deserializeJson(data);
 

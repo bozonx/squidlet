@@ -1,11 +1,9 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
+import {deserializeJson} from 'system/helpers/binaryHelpers';
 import {WsServerSessions} from '../../drivers/WsServerSessions/WsServerSessions';
-import IoSetServer from '../IoSetServer/IoSetServer';
-import MainEventsServer from './MainEventsServer';
 
 
 // export enum BACKDOOR_MSG_TYPE {
@@ -41,11 +39,11 @@ import MainEventsServer from './MainEventsServer';
 
 export default class Backdoor extends ServiceBase<WebSocketServerProps> {
   // io servers by sessionId
-  private _ioSet?: IoSetServer;
-  private _eventsServer?: MainEventsServer;
-  private get ioSet(): IoSetServer {
-    return this._ioSet as any;
-  }
+  //private _ioSet?: IoSetServer;
+  // private _eventsServer?: MainEventsServer;
+  // private get ioSet(): IoSetServer {
+  //   return this._ioSet as any;
+  // }
   private get wsServerSessions(): WsServerSessions {
     return this.depsInstances.wsServer;
   }
@@ -72,13 +70,13 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
         .catch(this.env.log.error);
     });
 
-    this._ioSet = new IoSetServer(
-      this.env.system.ioManager,
-      this.sendIoSetMsg,
-      this.env.config.config.ioSetResponseTimoutSec,
-      this.env.log.error,
-      this.env.system.generateUniqId
-    );
+    // this._ioSet = new IoSetServer(
+    //   this.env.system.ioManager,
+    //   this.sendIoSetMsg,
+    //   this.env.config.config.ioSetResponseTimoutSec,
+    //   this.env.log.error,
+    //   this.env.system.generateUniqId
+    // );
 
     // TODO: listen api to send to client
 
@@ -91,33 +89,29 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
 
   destroy = async () => {
     //this.eventsServer.destroy();
-    await this.ioSet.destroy();
+    //await this.ioSet.destroy();
     await this.wsServerSessions.destroy();
-    delete this._eventsServer;
-    delete this._ioSet;
+    //delete this._eventsServer;
+    //delete this._ioSet;
   }
 
 
   private handleIncomeMessage = async (sessionId: string, data: string | Uint8Array) => {
-    let msg: BackdoorMessage;
+    let msg: RemoteCallMessage;
 
     try {
-      msg = decodeBackdoorMessage(data);
+      msg = deserializeJson(data);
     }
     catch (err) {
       return this.env.log.error(`Backdoor: Can't decode message: ${err}`);
     }
 
-    const validationError: string | undefined = validateMessage(msg);
+    // const validationError: string | undefined = validateMessage(msg);
+    //
+    // if (validationError) return this.env.log.error(validationError);
 
-    if (validationError) return this.env.log.error(validationError);
-
-    try {
-      await this.resolveJsonMessage(sessionId, msg);
-    }
-    catch (err) {
-      return this.env.log.error(`Backdoor: ${err}`);
-    }
+    this.env.api.incomeRemoteCall(msg)
+      .catch(this.env.log.error);
   }
 
   // TODO: remake
@@ -130,26 +124,26 @@ export default class Backdoor extends ServiceBase<WebSocketServerProps> {
     return this.wsServerSessions.send(sessionId, binMsg);
   }
 
-  private async resolveJsonMessage(sessionId: string, msg: BackdoorMessage) {
-    switch (msg.type) {
-      // case BACKDOOR_ACTION.emit:
-      //   // rise event on common event system
-      //   return this.eventsServer.emit(msg.payload);
-      //
-      // case BACKDOOR_ACTION.startListen:
-      //   return this.eventsServer.startListenEvents(sessionId, msg.payload);
-
-      case BACKDOOR_MSG_TYPE.ioSet:
-        return this.ioSet.incomeMessage(sessionId, msg.payload);
-
-      case BACKDOOR_MSG_TYPE.apiRemoteCall:
-        return this.env.api.incomeRemoteCall(msg.payload);
-        //return this.respondIoNames(sessionId, msg.requestId as string);
-
-      default:
-        throw new Error(`Backdoor: Can't recognize message's action "${msg.action}"`);
-    }
-  }
+  // private async resolveJsonMessage(sessionId: string, msg: BackdoorMessage) {
+  //   switch (msg.type) {
+  //     // case BACKDOOR_ACTION.emit:
+  //     //   // rise event on common event system
+  //     //   return this.eventsServer.emit(msg.payload);
+  //     //
+  //     // case BACKDOOR_ACTION.startListen:
+  //     //   return this.eventsServer.startListenEvents(sessionId, msg.payload);
+  //
+  //     case BACKDOOR_MSG_TYPE.ioSet:
+  //       return this.ioSet.incomeMessage(sessionId, msg.payload);
+  //
+  //     case BACKDOOR_MSG_TYPE.apiRemoteCall:
+  //       return this.env.api.incomeRemoteCall(msg.payload);
+  //       //return this.respondIoNames(sessionId, msg.requestId as string);
+  //
+  //     default:
+  //       throw new Error(`Backdoor: Can't recognize message's action "${msg.action}"`);
+  //   }
+  // }
 
   // private async respondIoNames(sessionId: string, requestId: string) {
   //   const binMsg: Uint8Array = makeMessage(

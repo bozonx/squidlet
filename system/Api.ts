@@ -60,6 +60,7 @@ export default class Api {
   private readonly system: System;
   private readonly publishEvents = new IndexedEvents<PublishHandler>();
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
+  // TODO: создавать инстанс на каждую сессию
   private readonly remoteCall: RemoteCall;
   private readonly _ioSet?: IoSetServer;
   private get ioSet(): IoSetServer {
