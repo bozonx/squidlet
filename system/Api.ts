@@ -4,6 +4,7 @@ import IndexedEvents from './helpers/IndexedEvents';
 import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {objGet} from './helpers/lodashLike';
+import {Data} from './baseDevice/DeviceDataManagerBase';
 
 
 type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
@@ -81,7 +82,6 @@ export default class Api {
     this.rcOutcomeEvents.addListener(cb);
   }
 
-  // TODO: use it
   /**
    * Call this method if session has just been closed
    */
@@ -90,7 +90,7 @@ export default class Api {
     delete this.remoteCalls[sessionId];
   }
 
-  // TODO: может перенести в другое место ????
+  // TODO: может перенести в другое место DeviceManager или State??? ????
   /**
    * Call this method if you want to send outcome data. (E.g after device state is changed)
    */
@@ -114,6 +114,12 @@ export default class Api {
     return device.action(actionName, ...params);
   }
 
+  async sedDeviceConfig(deviceId: string, partialData: Data): Promise<void> {
+    const device = this.system.devicesManager.getDevice(deviceId);
+
+    if (device.setConfig) return device.setConfig(partialData);
+  }
+
 
   private async callApi(pathToMethod: string, args: any[]): Promise<any> {
     switch (pathToMethod) {
@@ -126,7 +132,7 @@ export default class Api {
         // TODO: use this.publishEvents
         // TODO: !!! ('listenDeviceConfig', 'room.deviceId')
       case 'setDeviceConfig':
-        // TODO: !!! ('setDeviceConfig', 'room.deviceId', {... partial config})
+        return this.sedDeviceConfig(args[0], args[1]);
       case 'getConfig':
         return objGet(this.system.config, args[0]);
       case 'getSessionStore':
@@ -136,6 +142,7 @@ export default class Api {
       case 'callIoMethod':
         return this.callIoMethod(args[0], args[1], ...args.slice(2));
       default:
+        throw new Error(`Api.callApi: Unknown method`);
     }
 
     // TODO: add other types

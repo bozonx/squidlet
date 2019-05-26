@@ -18,6 +18,7 @@ const REMOTE_CALL_TOPIC = 'remoteCall';
 
 
 export default class MqttApi extends ServiceBase<Props> {
+  private sessionId: string = '';
   private get mqttConnection(): MqttConnection {
     return this.depsInstances.mqttIo;
   }
@@ -27,6 +28,11 @@ export default class MqttApi extends ServiceBase<Props> {
     const mqttIo: MqttIo = this.env.getIo('Mqtt');
 
     this.depsInstances.mqttIo = await mqttIo.connect(this.props);
+    // TODO: use it on new connection
+    // TODO: сессия должна быть беконечной
+    this.sessionId = this.env.system.sessions.newSession(0);
+
+    // TODO: слушать - api.onOutcomeRemoteCall
   }
 
   protected didInit = async () => {
@@ -55,7 +61,7 @@ export default class MqttApi extends ServiceBase<Props> {
       // income remoteCall message
       const message: RemoteCallMessage = deserializeJson(data);
 
-      this.env.api.incomeRemoteCall(message)
+      this.env.api.incomeRemoteCall(this.sessionId, message)
         .catch(this.env.log.error);
 
       return;
