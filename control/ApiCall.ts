@@ -10,7 +10,7 @@ export interface ApiCallArgs {
   host?: string;
   port?: number;
   methodName: string;
-  methodArgs: any[];
+  methodArgs?: any[];
 }
 
 

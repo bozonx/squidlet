@@ -26,6 +26,8 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
  * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
  * * Getting session store - ('getSessionStore', 'mySessionId', 'key')
+ * * Listen log - ('listenLog', 'info')
+ * * blockIo - ('blockIo', true)
  * * Get io names list - ('getIoNames')
  * * Call io method - ('callIoMethod', 'ioName', 'methodName', ...methodArguments)
  *
@@ -137,6 +139,11 @@ export default class Api {
         return objGet(this.system.config, args[0]);
       case 'getSessionStore':
         return this.system.sessions.getStorage(args[0], args[1]);
+      case 'listenLog':
+      // TODO: add
+        //return this.system.sessions.getStorage(args[0], args[1]);
+      case 'blockIo':
+        // TODO: add
       case 'getIoNames':
         return this.system.ioManager.getNames();
       case 'callIoMethod':

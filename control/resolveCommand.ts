@@ -16,13 +16,12 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      // TODO: review
-      return apiCall.callMethod({ ...args, category: 'logger', topic: undefined });
+      // TODO: писать в консоль
+      return apiCall.callMethod({ ...args, methodName: 'listenLog' });
     case 'call':
-      return apiCall.callMethod(args);
+      return apiCall.callMethod({ ...args, methodName: args.method, methodArgs: positionArgsRest });
     case 'block-io':
-      // TODO: review
-      return apiCall.callAndExit({ ...args, category: 'system', topic: 'block-io' });
+      return apiCall.callAndExit({ ...args, methodName: 'blockIo', methodArgs: [true] });
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);

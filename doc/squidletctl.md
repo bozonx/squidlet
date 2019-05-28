@@ -75,7 +75,7 @@ Also you can specify the next params:
 * SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed.
   By default isn't set.
 
-  
+
 ## Listen logs of remote host
 
     squidletctl log --host [--port=8889]
@@ -84,35 +84,11 @@ Also you can specify the next params:
 * --port - set remote port. Is isn't set - default will be used
 
 
-## Publish and subscript to remote events
-Publish
+## Call api method
 
-    squidletctl pub --host --category="myCategory" [--topic] [--data] [--port=8889]
-    
-Subscribe
-    
-    squidletctl sub --host --category="myCategory" [--topic] [--port=8889]
+    squidletctl call --host --method=apiMethodName [--port=8889] [param1] [param2] ...
 
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
-* --category - category of event
-* --topic - topic of event
-* --data - data to send in json format
-
-
-## ????? Run IO server
-
-Os server starts independently from host.
-System can connect to It via websocket and manipulate IO devices which IO server serves.
-It especially suitable for development to run IO server e.g on raspberry pi and connect to it
-from your laptop where development version of System is being running.
-
-    squidletctl io-server [--machine=x86 | rpi] [--host=localhost] [--port=8889] [--verbose=true]
-
-### Parameters
-
-* --machine can be x86 or rpi. It means which machine is used.
-  It tries recognize it if this argument isn't set
-* --host - host where websocket server will be run. Default is localhost
-* --port - port of websocket server. Default if 8889
-* --verbose - print incoming messages if true
+* --method - api method to call
+* arguments are positional arguments like `param1 param2`
