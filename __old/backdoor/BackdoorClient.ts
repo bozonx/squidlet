@@ -6,12 +6,12 @@ import * as yaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
-import WebSocketClient from '../nodejs/ios/WebSocketClient';
-import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../entities/services/Backdoor/Backdoor';
-import {decodeBackdoorMessage, makeMessage, validateMessage} from '../__old/backdoor/helpers';
-import IndexedEvents from '../system/helpers/IndexedEvents';
-import {collectPropsDefaults} from './helpers';
+import WsClientLogic, {WsClientLogicProps} from '../../entities/drivers/WsClient/WsClientLogic';
+import WebSocketClient from '../../nodejs/ios/WebSocketClient';
+import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
+import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';
+import IndexedEvents from '../../system/helpers/IndexedEvents';
+import {collectPropsDefaults} from '../../shared/helpers';
 
 
 type ListenerHandler = (payload: any) => void;

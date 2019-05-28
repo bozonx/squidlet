@@ -4,7 +4,7 @@ import System from '../../system/System';
 import RemoteCall from '../../system/helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import IoItem from '../../system/interfaces/IoItem';
-import BackdoorClient from '../BackdoorClient';
+import BackdoorClient from '../../__old/backdoor/BackdoorClient';
 import {BACKDOOR_ACTION} from '../../entities/services/Backdoor/Backdoor';
 import {SYSTEM_DIR} from '../helpers';
 

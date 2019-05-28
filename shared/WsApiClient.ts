@@ -68,6 +68,7 @@ export default class WsApiClient {
   }
 
   async close() {
+    await this.remoteCall.destroy();
     await this.client.close(0, 'finish');
   }
 
