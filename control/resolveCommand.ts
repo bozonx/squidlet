@@ -16,8 +16,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      // TODO: писать в консоль
-      return apiCall.callMethod({ ...args, methodName: 'listenLog' });
+      return apiCall.listenLogs(args, args.level);
     case 'call':
       return apiCall.callMethod({ ...args, methodName: args.method, methodArgs: positionArgsRest });
     case 'block-io':

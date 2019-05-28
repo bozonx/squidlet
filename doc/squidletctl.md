@@ -78,10 +78,11 @@ Also you can specify the next params:
 
 ## Listen logs of remote host
 
-    squidletctl log --host [--port=8889]
+    squidletctl log --host [--port=8889] [--level=info]
     
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
+* --level - max level to listen to. Default is info
 
 
 ## Call api method

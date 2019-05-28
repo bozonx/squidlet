@@ -6,9 +6,12 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 let uniqIdIndex = 0;
 
 
-export interface ApiCallArgs {
+interface ApiConnectionParams {
   host?: string;
   port?: number;
+}
+
+export interface ApiCallArgs extends ApiConnectionParams {
   methodName: string;
   methodArgs?: any[];
 }
@@ -28,6 +31,14 @@ export default class ApiCall {
     await apiClient.close();
   }
 
+  async listenLogs(args: ApiConnectionParams, level?: string) {
+    const apiClient = this.connect(args);
+
+    await apiClient.callMethod('listenLog', level, (message: string) => {
+      console.log(message);
+    });
+  }
+
 
   private generateUniqId = (): string => {
 
@@ -38,7 +49,7 @@ export default class ApiCall {
     return String(uniqIdIndex);
   }
 
-  private connect({host, port}: ApiCallArgs): WsApiClient {
+  private connect({host, port}: ApiConnectionParams): WsApiClient {
     return new WsApiClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,

@@ -26,7 +26,7 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
  * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
  * * Getting session store - ('getSessionStore', 'mySessionId', 'key')
- * * Listen log - ('listenLog', 'info')
+ * * Listen log - ('listenLog', 'info', yourCallback)
  * * blockIo - ('blockIo', true)
  * * Get io names list - ('getIoNames')
  * * Call io method - ('callIoMethod', 'ioName', 'methodName', ...methodArguments)
