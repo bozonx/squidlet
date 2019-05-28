@@ -3,10 +3,10 @@ import * as yargs from 'yargs';
 
 import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
-import RemoteEvents from './RemoteEvents';
+import ApiCall from './ApiCall';
 
 
-const remoteEvents = new RemoteEvents();
+const apiCall = new ApiCall();
 
 
 async function startCommand(command: string, positionArgsRest: string[], args: {[index: string]: any}) {
@@ -16,14 +16,13 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      return remoteEvents.startListen({ ...args, category: 'logger', topic: undefined });
-    case 'pub':
-      return remoteEvents.emitAndExit(args);
-    case 'sub':
-      return remoteEvents.startListen(args);
+      // TODO: review
+      return apiCall.callMethod({ ...args, category: 'logger', topic: undefined });
+    case 'call':
+      return apiCall.callMethod(args);
     case 'block-io':
       // TODO: review
-      return remoteEvents.emitAndExit({ ...args, category: 'system', topic: 'block-io' });
+      return apiCall.callAndExit({ ...args, category: 'system', topic: 'block-io' });
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);

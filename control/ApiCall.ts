@@ -1,9 +1,25 @@
-import {BACKDOOR_ACTION} from '../entities/services/Backdoor/Backdoor';
 import BackdoorClient from '../shared/BackdoorClient';
 import {EventPayload} from '../__old/backdoor/MainEventsServer';
+import WsApiClient from '../shared/WsApiClient';
+import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
-export default class RemoteEvents {
+export interface ApiCallArgs {
+  host?: string;
+  port?: number;
+  methodName: string;
+  methodArgs: any[];
+}
+
+
+export default class ApiCall {
+  async callMethod(args: ApiCallArgs) {
+    const apiClient = this.connect(args);
+
+    await apiClient.callMethod(args.methodName, ...args.methodArgs);
+  }
+
+
   async startListen(args: {[index: string]: any}) {
     if (!args.category) {
       throw new Error(`You have to specify a category`);
@@ -22,7 +38,7 @@ export default class RemoteEvents {
     });
   }
 
-  async emitAndExit(args: {[index: string]: any}) {
+  async callAndExit(args: {[index: string]: any}) {
     if (!args.category) {
       throw new Error(`You have to specify a category`);
     }
@@ -37,4 +53,19 @@ export default class RemoteEvents {
     await backdoorClient.close();
   }
 
+
+  private generateUniqId = (): string => {
+    // TODO: !!!!
+  }
+
+  private connect({host, port}: ApiCallArgs): WsApiClient {
+    return new WsApiClient(
+      hostDefaultConfig.config.ioSetResponseTimoutSec,
+      console.info,
+      console.error,
+      this.generateUniqId,
+      host,
+      port
+    );
+  }
 }
