@@ -177,6 +177,21 @@ export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue
   // TODO: add
 }
 
+export function compact(arr: any[]): any[] {
+
+  // TODO: test
+
+  const result: any[] = [];
+
+  for (let value of arr) {
+    if (typeof value !== 'undefined' && value !== null && value !== '') {
+      result.push(value);
+    }
+  }
+
+  return result;
+}
+
 // /**
 //  * Deep merge two objects.
 //  * It mutates target object.

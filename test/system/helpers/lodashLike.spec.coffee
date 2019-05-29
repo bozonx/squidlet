@@ -110,6 +110,9 @@ describe 'system.helpers.lodashLike', ->
     assert.deepEqual(lodashLike.difference([], [1,2,3]), [])
     assert.deepEqual(lodashLike.difference([1,4], []), [1,4])
 
+  it 'compact', ->
+    assert.deepEqual(nodeLike.compact([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
+
 #  it 'defaultsDeep', ->
 #    mutated = {}
 #    top = {top: 'top'}
