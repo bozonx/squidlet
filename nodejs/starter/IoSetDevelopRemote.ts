@@ -1,13 +1,13 @@
 import IoSet from '../../system/interfaces/IoSet';
-import {IOSET_STRING_DELIMITER} from '../../shared/constants';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import System from '../../system';
-import RemoteIoCollection from '../../shared/ioSet/RemoteIoCollection';
-import Os from '../../shared/Os';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import StorageEnvMemoryWrapper from '../../shared/ioSet/StorageEnvMemoryWrapper';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
+import {IOSET_STRING_DELIMITER} from '../../shared/constants';
+import StorageEnvMemoryWrapper from '../../shared/ioSet/StorageEnvMemoryWrapper';
+import RemoteIoCollection from '../../shared/ioSet/RemoteIoCollection';
+import Os from '../../shared/Os';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {checkIoExistance} from '../../hostEnvBuilder/helpers';
 
 
@@ -44,7 +44,7 @@ export default class IoSetDevelopRemote implements IoSet {
     // check io dependencies
     checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.ioNames);
 
-    for (let ioName of Object.keys(this.remoteIoCollection.ioCollection)) {
+    for (let ioName of this.remoteIoCollection.ioNames) {
       if (ioName === 'Storage') {
         this.ioCollection[ioName] = this.storageWrapper.makeWrapper(
           this.remoteIoCollection.ioCollection[ioName] as StorageIo
