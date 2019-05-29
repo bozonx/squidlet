@@ -19,15 +19,18 @@ export default class State {
 
 
   getState(stateName: string): JsonTypes {
-
+    // TODO: add
+    return 0;
   }
 
   updateState(stateName: string, newState: JsonTypes) {
+    // TODO: add
 
   }
 
   onChange(stateName: string, cb: (state: JsonTypes, isRepublish?: true) => void): number {
-
+    // TODO: add
+    return 0;
   }
 
 }

@@ -113,6 +113,9 @@ export function mergeDeep(
  */
 export function removeItemFromArray(arr: any[], item: any, firstEntry: boolean = true): any[] {
   // TODO: add
+  const result: any[] = [];
+
+  return result;
 }
 
 // /**

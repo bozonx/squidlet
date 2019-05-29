@@ -1,7 +1,7 @@
 IoSetLocal = require('../../../system/entities/IoSetLocal').default;
 
 
-describe.only 'system.helpers.Sessions', ->
+describe 'system.entities.IoSetLocal', ->
   beforeEach ->
     @IoClass = class
       param: 'value'

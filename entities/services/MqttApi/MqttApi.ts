@@ -97,8 +97,11 @@ export default class MqttApi extends ServiceBase<Props> {
     }
 
     // TODO: если это массив то не известно это список параметров или массив для передачи как один параметр
+    // TODO: можен надо сериализовать ????
 
-    this.mqttConnection.publish(topic, data)
+    const dataToSend: string = JSON.stringify(data);
+
+    this.mqttConnection.publish(topic, dataToSend)
       .catch(this.env.log.error);
   }
 
