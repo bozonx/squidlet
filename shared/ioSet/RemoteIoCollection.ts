@@ -7,36 +7,33 @@ import WsApiClient from '../WsApiClient';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 
 
-// TODO: remove
-let uniqIdIndex = 0;
-
-
 export default class RemoteIoCollection {
   ioCollection: {[index: string]: IoItem} = {};
   ioNames: string[] = [];
 
-  private readonly client: WsApiClient;
-  private _system?: System;
-  private get system(): System {
-    return this._system as any;
+  private readonly host?: string;
+  private readonly port?: number;
+  private _client?: WsApiClient;
+  private get client(): WsApiClient {
+    return this._client as any;
   }
 
 
   constructor(host?: string, port?: number) {
-    // TODO: review - может перенсти в init - но проверить чтобы соединилось до использования io
-    this.client = new WsApiClient(
-      hostDefaultConfig.config.ioSetResponseTimoutSec,
-      console.info,
-      console.error,
-      this.system.generateUniqId,
-      host,
-      port
-    );
+    this.host = host;
+    this.port = port;
   }
 
 
   async init(system: System): Promise<void> {
-    this._system = system;
+    this._client = new WsApiClient(
+      hostDefaultConfig.config.ioSetResponseTimoutSec,
+      console.info,
+      console.error,
+      system.generateUniqId,
+      this.host,
+      this.port
+    );
     await this.client.init();
 
     this.ioNames = await this.askIoNames();
@@ -48,10 +45,9 @@ export default class RemoteIoCollection {
   }
 
   async destroy() {
-    //this.ioCollection = {};
-    delete this.ioNames;
-    //await this.remoteCall.destroy();
     await this.client.destroy();
+    delete this._client;
+    delete this.ioNames;
   }
 
 
@@ -85,15 +81,6 @@ export default class RemoteIoCollection {
     return (...args: any[]): Promise<any> => {
       return this.client.callMethod(ioName, methodName, ...args);
     };
-  }
-
-  private generateUniqId = (): string => {
-
-    // TODO: use real uniq id
-
-    uniqIdIndex++;
-
-    return String(uniqIdIndex);
   }
 
 }
