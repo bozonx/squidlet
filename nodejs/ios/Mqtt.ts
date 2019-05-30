@@ -7,19 +7,20 @@ import * as mqtt from 'mqtt';
 import MqttIo, {MqttProps} from 'system/interfaces/io/MqttIo';
 
 
-export class MqttDevConnection {
-
-}
-
-
 export default class Mqtt implements MqttIo {
+  newConnection(params: MqttProps) {
+    const url = `${params.protocol}://${params.host}:${params.port}`;
+    this.client = mqtt.connect(url);
 
-  // TODO: add onConnection event
-
-  // TODO: rename to getInstance ????
-  connect(params: MqttProps): MqttDevConnection {
-    return new MqttDevConnection(params);
+    this.connectPromise = new Promise((resolve) => {
+      this.client.on('connect', () => {
+        this._connected = true;
+        resolve();
+      });
+    });
   }
+
+
 
 
   destroy = async () => {
@@ -32,18 +33,6 @@ export default class Mqtt implements MqttIo {
   private readonly client: any;
 
   // TODO: поддержка нескольких соединений как в ws
-
-  constructor(params: MqttProps) {
-    const url = `${params.protocol}://${params.host}:${params.port}`;
-    this.client = mqtt.connect(url);
-
-    this.connectPromise = new Promise((resolve) => {
-      this.client.on('connect', () => {
-        this._connected = true;
-        resolve();
-      });
-    });
-  }
 
   async isConnected(): Promise<boolean> {
     return this._connected;

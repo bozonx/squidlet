@@ -24,6 +24,14 @@ export enum CONNECTION_POSITIONS {
 export default class WebSocketClient implements WebSocketClientIo {
   private readonly connections: ConnectionItem[] = [];
 
+
+  async destroy() {
+    for (let connectionId in this.connections) {
+      await this.close(connectionId, 0, 'destroy');
+    }
+  }
+
+
   /**
    * Make new connection to server.
    * It returns a connection id to use with other methods
@@ -41,7 +49,7 @@ export default class WebSocketClient implements WebSocketClientIo {
    * It closes previous connection and makes new one with the same id.
    */
   async reConnect(connectionId: string, props: WebSocketClientProps) {
-    this.close(connectionId, 0);
+    await this.close(connectionId, 0);
 
     this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
