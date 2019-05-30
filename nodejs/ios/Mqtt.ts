@@ -4,10 +4,28 @@
 
 import * as mqtt from 'mqtt';
 
-import {MqttConnection, MqttProps} from 'system/interfaces/io/MqttIo';
+import MqttIo, {MqttProps} from 'system/interfaces/io/MqttIo';
 
 
-export class MqttDevConnection implements MqttConnection {
+export class MqttDevConnection {
+
+}
+
+
+export default class Mqtt implements MqttIo {
+
+  // TODO: add onConnection event
+
+  // TODO: rename to getInstance ????
+  connect(params: MqttProps): MqttDevConnection {
+    return new MqttDevConnection(params);
+  }
+
+
+  destroy = async () => {
+    // TODO: close connections
+  }
+
   connectPromise: Promise<void>;
 
   private _connected: boolean = false;
@@ -84,22 +102,5 @@ export class MqttDevConnection implements MqttConnection {
 
   // TODO: сделать offMessage и тд
   // TODO: add close connection
-
-}
-
-
-export default class Mqtt {
-
-  // TODO: add onConnection event
-
-  // TODO: rename to getInstance ????
-  connect(params: MqttProps): MqttDevConnection {
-    return new MqttDevConnection(params);
-  }
-
-
-  destroy = async () => {
-    // TODO: close connections
-  }
 
 }

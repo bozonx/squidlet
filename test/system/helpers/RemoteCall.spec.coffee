@@ -4,7 +4,7 @@ RemoteCall = require('../../../system/helpers/remoteCall/RemoteCall').default;
 uniqId = 0
 
 
-describe.only 'system.helpers.RemoteCall', ->
+describe 'system.helpers.RemoteCall', ->
   beforeEach ->
     @fakeCb = undefined
     @clientSend = (message) =>
