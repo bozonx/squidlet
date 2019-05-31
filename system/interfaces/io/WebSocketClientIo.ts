@@ -1,6 +1,7 @@
 import {ConnectionParams} from './WebSocketServerIo';
 import IoItem from '../IoItem';
 
+
 export const Methods = [
   'newConnection',
   'reConnect',
@@ -37,6 +38,7 @@ export default interface WebSocketClientIo extends IoItem {
   onClose             (connectionId: string, cb: () => void): Promise<number>;
   onMessage           (connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number>;
   onError             (connectionId: string, cb: (err: Error) => void): Promise<number>;
+
   onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): Promise<number>;
   removeEventListener (connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void>;
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;

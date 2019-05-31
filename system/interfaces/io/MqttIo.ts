@@ -1,5 +1,4 @@
 import IoItem from '../IoItem';
-import {WebSocketClientProps} from './WebSocketClientIo';
 
 
 export const Methods = [
@@ -11,6 +10,13 @@ export const Methods = [
 ];
 
 
+//export type MqttIoEvents = 'open' | 'close' | 'message' | 'error';
+export enum MqttIoEvents {
+  open,
+  close,
+  message,
+  error
+}
 
 export interface MqttProps {
   protocol: string;
@@ -30,7 +36,7 @@ export default interface MqttIo extends IoItem {
   onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number>;
   onError(cb: (connectionId: string, err: Error) => void): Promise<number>;
 
-
+  removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void>;
 
   close(connectionId: string, code: number, reason?: string): Promise<void>;
   //isConnected(): Promise<boolean>;

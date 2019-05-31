@@ -6,59 +6,61 @@ import * as mqtt from 'mqtt';
 
 import MqttIo, {MqttProps} from 'system/interfaces/io/MqttIo';
 import IndexedEventEmitter from '../../system/helpers/IndexedEventEmitter';
+import {MqttIoEvents} from '../../system/interfaces/io/MqttIo';
 
 
 export default class Mqtt implements MqttIo {
   private readonly events = new IndexedEventEmitter();
-  private readonly clients: mqtt.Client[];
+  private readonly connections: mqtt.Client[] = [];
 
 
-  destroy = async () => {
-    // TODO: close connections
+  async destroy() {
+    for (let connectionId in this.connections) {
+      await this.close(connectionId, 0, 'destroy');
+    }
   }
 
 
-  newConnection(params: MqttProps): Promise<string> {
-    const url = `${params.protocol}://${params.host}:${params.port}`;
-    this.client = mqtt.connect(url);
+  async newConnection(props: MqttProps): Promise<string> {
+    const connectionId = String(this.connections.length);
 
-    this.connectPromise = new Promise((resolve) => {
-      this.client.on('connect', () => {
-        this._connected = true;
-        resolve();
-      });
-    });
+    this.connections.push( this.connectToServer(connectionId, props) );
+
+    return connectionId;
   }
 
-  reConnect(connectionId: string, props: MqttProps): Promise<void> {
+  async reConnect(connectionId: string, props: MqttProps): Promise<void> {
+    await this.close(connectionId, 0);
 
+    this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
 
-  onOpen(cb: (connectionId: string) => void): Promise<number> {
-
+  async onOpen(cb: (connectionId: string) => void): Promise<number> {
+    return this.events.addListener(MqttIoEvents.open, cb);
   }
 
-  onClose(cb: (connectionId: string) => void): Promise<number> {
-
+  async onClose(cb: (connectionId: string) => void): Promise<number> {
+    return this.events.addListener(MqttIoEvents.close, cb);
   }
 
-  async onMessage(handler: (connectionId: string, topic: string, data: string) => void) {
-    const handlerWrapper = (topic: string, data: Buffer) => {
-      handler(topic, data.toString());
-    };
-
-    this.client.on('message', handlerWrapper);
+  async onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number> {
+    return this.events.addListener(MqttIoEvents.message, cb);
   }
 
-  onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
+  async onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
+    return this.events.addListener(MqttIoEvents.error, cb);
+  }
 
+  async removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void> {
+    this.events.removeListener(eventName, handlerId);
   }
 
   close(connectionId: string, code: number, reason?: string): Promise<void> {
-
+    // TODO: !!!!
   }
 
   publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void> {
+    // TODO: !!!!
     // TODO: support of options
 
     return new Promise((resolve, reject) => {
@@ -76,6 +78,7 @@ export default class Mqtt implements MqttIo {
   }
 
   subscribe(connectionId: string, topic: string): Promise<void> {
+    // TODO: !!!!
     // TODO: support of options
 
     return new Promise((resolve, reject) => {
@@ -90,6 +93,28 @@ export default class Mqtt implements MqttIo {
           });
         });
     });
+  }
+
+
+  private connectToServer(connectionId: string, props: MqttProps): mqtt.Client {
+    // TODO: !!!!
+    const url = `${params.protocol}://${params.host}:${params.port}`;
+    this.client = mqtt.connect(url);
+
+    this.connectPromise = new Promise((resolve) => {
+      this.client.on('connect', () => {
+        this._connected = true;
+        resolve();
+      });
+    });
+
+    const handlerWrapper = (topic: string, data: Buffer) => {
+      handler(topic, data.toString());
+    };
+
+    this.client.on('message', handlerWrapper);
+
+    // TODO: add events - error, open, close , message
   }
 
 }
