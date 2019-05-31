@@ -5,10 +5,20 @@
 import * as mqtt from 'mqtt';
 
 import MqttIo, {MqttProps} from 'system/interfaces/io/MqttIo';
+import IndexedEventEmitter from '../../system/helpers/IndexedEventEmitter';
 
 
 export default class Mqtt implements MqttIo {
-  newConnection(params: MqttProps) {
+  private readonly events = new IndexedEventEmitter();
+  private readonly clients: mqtt.Client[];
+
+
+  destroy = async () => {
+    // TODO: close connections
+  }
+
+
+  newConnection(params: MqttProps): Promise<string> {
     const url = `${params.protocol}://${params.host}:${params.port}`;
     this.client = mqtt.connect(url);
 
@@ -20,27 +30,35 @@ export default class Mqtt implements MqttIo {
     });
   }
 
+  reConnect(connectionId: string, props: MqttProps): Promise<void> {
 
-
-
-  destroy = async () => {
-    // TODO: close connections
   }
 
-  connectPromise: Promise<void>;
+  onOpen(cb: (connectionId: string) => void): Promise<number> {
 
-  private _connected: boolean = false;
-  private readonly client: any;
-
-  // TODO: поддержка нескольких соединений как в ws
-
-  async isConnected(): Promise<boolean> {
-    return this._connected;
   }
 
+  onClose(cb: (connectionId: string) => void): Promise<number> {
 
+  }
 
-  publish(topic: string, data?: string | Uint8Array): Promise<void> {
+  async onMessage(handler: (connectionId: string, topic: string, data: string) => void) {
+    const handlerWrapper = (topic: string, data: Buffer) => {
+      handler(topic, data.toString());
+    };
+
+    this.client.on('message', handlerWrapper);
+  }
+
+  onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
+
+  }
+
+  close(connectionId: string, code: number, reason?: string): Promise<void> {
+
+  }
+
+  publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void> {
     // TODO: support of options
 
     return new Promise((resolve, reject) => {
@@ -57,7 +75,7 @@ export default class Mqtt implements MqttIo {
     });
   }
 
-  subscribe(topic: string): Promise<void> {
+  subscribe(connectionId: string, topic: string): Promise<void> {
     // TODO: support of options
 
     return new Promise((resolve, reject) => {
@@ -73,23 +91,5 @@ export default class Mqtt implements MqttIo {
         });
     });
   }
-
-  async onMessage(handler: (topic: string, data: string) => void) {
-    const handlerWrapper = (topic: string, data: Buffer) => {
-      handler(topic, data.toString());
-    };
-
-    this.client.on('message', handlerWrapper);
-  }
-
-  // /**
-  //  * Subscribe to binary data
-  //  */
-  // async onMessageBin() {
-  //   // TODO: convert to Uint8Array
-  // }
-
-  // TODO: сделать offMessage и тд
-  // TODO: add close connection
 
 }
