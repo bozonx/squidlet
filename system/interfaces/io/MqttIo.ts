@@ -38,7 +38,7 @@ export default interface MqttIo extends IoItem {
 
   removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void>;
 
-  close(connectionId: string, code: number, reason?: string): Promise<void>;
+  close(connectionId: string, force?: boolean): Promise<void>;
   //isConnected(): Promise<boolean>;
   publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void>;
 
