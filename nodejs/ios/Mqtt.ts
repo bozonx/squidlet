@@ -16,7 +16,7 @@ export default class Mqtt implements MqttIo {
 
   async destroy() {
     for (let connectionId in this.connections) {
-      await this.close(connectionId);
+      await this.end(connectionId);
     }
   }
 
@@ -35,7 +35,7 @@ export default class Mqtt implements MqttIo {
     this.connections[Number(connectionId)].reconnect();
   }
 
-  async close(connectionId: string, force: boolean = false): Promise<void> {
+  async end(connectionId: string, force: boolean = false): Promise<void> {
     if (!this.connections[Number(connectionId)]) return;
 
     return callPromised(this.connections[Number(connectionId)].end, force);
@@ -83,9 +83,7 @@ export default class Mqtt implements MqttIo {
       throw new Error(`Mqtt.publish: There isn't a connection "${connectionId}"`);
     }
 
-    // TODO: convert bin data to buffer
-    // TODO: ??? set contentType ???
-    const preparedData: string | Buffer = '';
+    const preparedData: string | Buffer = new Buffer(data as any);
 
     return callPromised(this.connections[Number(connectionId)].publish, topic, preparedData);
   }

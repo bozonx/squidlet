@@ -27,7 +27,7 @@ export interface MqttOptions {
 export default interface MqttIo extends IoItem {
   newConnection(url: string, options: MqttOptions): Promise<string>;
   reConnect(connectionId: string): Promise<void>;
-  close(connectionId: string, force?: boolean): Promise<void>;
+  end(connectionId: string, force?: boolean): Promise<void>;
   isConnected(connectionId: string): Promise<boolean>;
   isDisconnecting(connectionId: string): Promise<boolean>;
   isDisconnected(connectionId: string): Promise<boolean>;
@@ -43,7 +43,6 @@ export default interface MqttIo extends IoItem {
   removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void>;
 
   publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;
-
   /**
    * Tell broker that you want to listen this topic.
    * And then use onMessage method
