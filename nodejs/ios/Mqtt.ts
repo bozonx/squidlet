@@ -20,7 +20,6 @@ export default class Mqtt implements MqttIo {
     }
   }
 
-  // TODO: add isConnected - mqtt.Client#connected
 
   async newConnection(url: string, options: MqttOptions): Promise<string> {
     const connectionId = String(this.connections.length);
@@ -60,14 +59,14 @@ export default class Mqtt implements MqttIo {
 
 
   async onConnect(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(MqttIoEvents.open, cb);
+    return this.events.addListener(MqttIoEvents.connect, cb);
   }
 
   async onClose(cb: (connectionId: string) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.close, cb);
   }
 
-  async onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number> {
+  async onMessage(cb: (connectionId: string, topic: string, data: string | Uint8Array) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.message, cb);
   }
 
@@ -79,40 +78,32 @@ export default class Mqtt implements MqttIo {
     this.events.removeListener(eventName, handlerId);
   }
 
-  publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void> {
-    // TODO: !!!!
-    // TODO: support of options
+  async publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void> {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`Mqtt.publish: There isn't a connection "${connectionId}"`);
+    }
 
-    return new Promise((resolve, reject) => {
-      this.connectPromise
-        .then(() => {
-          this.client.publish(topic, data, {}, (err: string): void => {
-            if (err) {
-              return reject(err);
-            }
+    // TODO: convert bin data to buffer
+    // TODO: ??? set contentType ???
+    const preparedData: string | Buffer = '';
 
-            resolve();
-          });
-        });
-    });
+    return callPromised(this.connections[Number(connectionId)].publish, topic, preparedData);
   }
 
   subscribe(connectionId: string, topic: string): Promise<void> {
-    // TODO: !!!!
-    // TODO: support of options
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`Mqtt.subscribe: There isn't a connection "${connectionId}"`);
+    }
 
-    return new Promise((resolve, reject) => {
-      this.connectPromise
-        .then(() => {
-          this.client.subscribe(topic, {}, (err: string, granted: {topic: string, qos: number}) => {
-            if (err) {
-              return reject(err);
-            }
+    return callPromised(this.connections[Number(connectionId)].subscribe, topic, {});
+  }
 
-            resolve();
-          });
-        });
-    });
+  unsubscribe(connectionId: string, topic: string): Promise<void> {
+    if (!this.connections[Number(connectionId)]) {
+      throw new Error(`Mqtt.unsubscribe: There isn't a connection "${connectionId}"`);
+    }
+
+    return callPromised(this.connections[Number(connectionId)].unsubscribe, topic, {});
   }
 
 
@@ -132,7 +123,7 @@ export default class Mqtt implements MqttIo {
   private handleIncomeMessage = (connectionId: string, topic: string, data: Buffer) => {
     // TODO: check if it is a bin and don't convert
 
-    const preparedData: undefined | string | Uint8Array = data.toString();
+    const preparedData: string | Uint8Array = data.toString();
 
     this.events.emit(MqttIoEvents.message, connectionId, topic, preparedData);
   }

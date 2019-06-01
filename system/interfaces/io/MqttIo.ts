@@ -38,15 +38,16 @@ export default interface MqttIo extends IoItem {
   /**
    * Listen all the subscribed messages
    */
-  onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number>;
+  onMessage(cb: (connectionId: string, topic: string, data: string | Uint8Array) => void): Promise<number>;
   onError(cb: (connectionId: string, err: Error) => void): Promise<number>;
   removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void>;
 
-  publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void>;
+  publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;
 
   /**
    * Tell broker that you want to listen this topic.
    * And then use onMessage method
    */
   subscribe(connectionId: string, topic: string): Promise<void>;
+  unsubscribe(connectionId: string, topic: string): Promise<void>;
 }

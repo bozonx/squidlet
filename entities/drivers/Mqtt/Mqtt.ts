@@ -17,3 +17,5 @@
 //     resolve();
 //   });
 // });
+
+// TODO: делать publish только с connectionPromise
