@@ -25,7 +25,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
   }
   private client?: WsClientLogic;
   private get closedMsg() {
-    return `You can't send message because connection "${this.props.url}" has been closed`;
+    return `Connection "${this.props.url}" has been closed`;
   }
 
 
@@ -96,5 +96,6 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 export default class Factory extends DriverFactoryBase<WsClient> {
   protected DriverClass = WsClient;
 
-  protected instanceAlwaysNew: boolean = false;
+  // TODO: review
+  protected instanceAlwaysNew: boolean = true;
 }

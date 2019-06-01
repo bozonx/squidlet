@@ -95,7 +95,6 @@ export default class WsApiClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
-    // TODO: use default const
     const yamlContent: string = fs.readFileSync(wsClientManifestPath, ENCODE);
     const clientManifest = yaml.safeLoad(yamlContent);
     const clientProps = collectPropsDefaults(clientManifest.props);
