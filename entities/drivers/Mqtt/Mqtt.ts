@@ -1,7 +1,7 @@
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
-import WsClientLogic from '../WsClient/WsClientLogic';
+import {omit} from '../../../system/helpers/lodashLike';
 
 
 export interface MqttProps {
@@ -11,14 +11,14 @@ export interface MqttProps {
 
 export class Mqtt extends DriverBase<MqttProps> {
   get openPromise(): Promise<void> {
-    if (!this.client) {
+    if (!this.connectionId) {
       throw new Error(`WebSocketClient.openPromise: ${this.closedMsg}`);
     }
 
     return this.client.openPromise;
   }
 
-  private client?: MqttIo;
+  private connectionId: string = '';
 
   private get mqttIo(): MqttIo {
     return this.env.getIo('Mqtt') as any;
@@ -29,13 +29,60 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
   protected willInit = async () => {
-    // TODO: make connection and add listeners
+    this.mqttIo.onClose();
+    this.mqttIo.onConnect();
+    this.mqttIo.onError((connectionId: string, error: Error) => {
+      this.env.log.error(`Mqtt connection "${connectionId}": ${error}`);
+    });
+    this.mqttIo.onMessage();
+
+    this.connectionId = await this.mqttIo.newConnection(
+      this.props.url,
+      omit(this.props, 'url')
+    );
   }
 
   destroy = async () => {
-    if (!this.client) return;
+    if (!this.connectionId) return;
+
+    // TODO: remove handlers
+
+    this.client.end();
   }
 
+
+  isConnected(): boolean {
+    if (!this.connectionId) return false;
+
+    return this.client.isConnected();
+  }
+
+  publish(topic: string, data: string | Uint8Array): Promise<void> {
+    // TODO: add
+    // TODO: отсылать только после connection
+  }
+
+  subscribe(topic: string): Promise<void> {
+    // TODO: add
+  }
+
+  onMessage(): number {
+    // TODO: add
+  }
+
+  onClose(cb: () => void): number {
+    // TODO: add
+  }
+
+  removeMessageListener(handlerId: number) {
+    if (!this.connectionId) return;
+
+    this.client.removeMessageListener(handlerId);
+  }
+
+  removeCloseListener(handlerIndex: number) {
+    this.closeEvents.removeListener(handlerIndex);
+  }
 
 // connectPromise: Promise<void>;
 //
