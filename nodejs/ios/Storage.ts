@@ -3,9 +3,7 @@ import * as fs from 'fs';
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/helpers/helpers';
 import {convertBufferToUint8Array} from 'system/helpers/binaryHelpers';
-
-
-const DEFAULT_ENCODE = 'utf8';
+import {ENCODE} from 'system/dict/constants';
 
 
 /**
@@ -14,7 +12,7 @@ const DEFAULT_ENCODE = 'utf8';
 export default class Storage implements StorageIo {
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.appendFile, pathTo, data, DEFAULT_ENCODE);
+      return callPromised(fs.appendFile, pathTo, data, ENCODE);
     }
     else {
       return callPromised(fs.appendFile, pathTo, data);
@@ -26,11 +24,11 @@ export default class Storage implements StorageIo {
   }
 
   readdir(pathTo: string): Promise<string[]> {
-    return callPromised(fs.readdir, pathTo, DEFAULT_ENCODE) as Promise<string[]>;
+    return callPromised(fs.readdir, pathTo, ENCODE) as Promise<string[]>;
   }
 
   readFile(pathTo: string): Promise<string> {
-    return callPromised(fs.readFile, pathTo, DEFAULT_ENCODE) as Promise<string>;
+    return callPromised(fs.readFile, pathTo, ENCODE) as Promise<string>;
   }
 
   readlink(pathTo: string): Promise<string> {
@@ -53,7 +51,7 @@ export default class Storage implements StorageIo {
 
   writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.writeFile, pathTo, data, DEFAULT_ENCODE);
+      return callPromised(fs.writeFile, pathTo, data, ENCODE);
     }
     else {
       return callPromised(fs.writeFile, pathTo, data);

@@ -8,6 +8,7 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {collectPropsDefaults} from './helpers';
+import {ENCODE} from '../system/dict/constants';
 
 
 const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');
@@ -94,7 +95,8 @@ export default class WsApiClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
-    const yamlContent: string = fs.readFileSync(wsClientManifestPath, 'utf8');
+    // TODO: use default const
+    const yamlContent: string = fs.readFileSync(wsClientManifestPath, ENCODE);
     const clientManifest = yaml.safeLoad(yamlContent);
     const clientProps = collectPropsDefaults(clientManifest.props);
     const host: string = specifiedHost || clientProps.host;

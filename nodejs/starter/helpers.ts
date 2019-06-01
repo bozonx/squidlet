@@ -8,6 +8,7 @@ import Props from './Props';
 import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
 import System from '../../system';
 import IoSet from '../../system/interfaces/IoSet';
+import {ENCODE} from '../../system/dict/constants';
 
 
 const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
@@ -69,7 +70,7 @@ export async function startSystem(
 }
 
 export function generatePackageJson(dependencies: {[index: string]: any} = {}): string {
-  const templateContent: string = fs.readFileSync(PACKAGE_JSON_TEMPLATE_PATH, 'utf8');
+  const templateContent: string = fs.readFileSync(PACKAGE_JSON_TEMPLATE_PATH, ENCODE);
   const squildletPackageJson: {version: string} = require(SQUIDLET_PACKAGE_JSON_PATH);
 
   return _template(templateContent)({

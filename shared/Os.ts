@@ -6,9 +6,9 @@ import * as yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
-import systemConfig from '../hostEnvBuilder/configs/systemConfig';
 import {Stats} from '../system/interfaces/io/StorageIo';
 import {callPromised} from '../system/helpers/helpers';
+import {ENCODE} from '../system/dict/constants';
 
 
 export interface SpawnCmdResult {
@@ -20,7 +20,7 @@ export interface SpawnCmdResult {
 
 export default class Os {
   getFileContent(pathTo: string): Promise<string> {
-    return callPromised(fs.readFile, pathTo, systemConfig.filesEncode) as Promise<string>;
+    return callPromised(fs.readFile, pathTo, ENCODE) as Promise<string>;
   }
 
   async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
@@ -31,7 +31,7 @@ export default class Os {
 
   async writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.writeFile, pathTo, data, systemConfig.filesEncode);
+      return callPromised(fs.writeFile, pathTo, data, ENCODE);
     }
     else {
       return callPromised(fs.writeFile, pathTo, data);
@@ -51,7 +51,7 @@ export default class Os {
   }
 
   readdir(pathTo: string): Promise<string[]> {
-    return callPromised(fs.readdir, pathTo, systemConfig.filesEncode) as Promise<string[]>;
+    return callPromised(fs.readdir, pathTo, ENCODE) as Promise<string[]>;
   }
 
   readlink(pathTo: string): Promise<string> {
@@ -107,7 +107,7 @@ export default class Os {
     const options = {
       cwd,
       shell: '/bin/bash',
-      encoding: 'utf8',
+      encoding: ENCODE,
     };
     const spawnedCmd: ChildProcess | null = childProcess.spawn(cmd, options);
 

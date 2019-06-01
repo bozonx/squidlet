@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as shelljs from 'shelljs';
 import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
+import {ENCODE} from '../../system/dict/constants';
 
 // TODO: !!!!
 //const {makeSafeModuleName} = require('../../host/helpers');
@@ -26,7 +27,7 @@ class Collect {
   constructor(buildConfigYaml: string, dstDir: string) {
     this.buildConfigYaml = buildConfigYaml;
     this.dstDir = dstDir;
-    this.buildConfig = yaml.load(fs.readFileSync(buildConfigYaml, 'utf8'));
+    this.buildConfig = yaml.load(fs.readFileSync(buildConfigYaml, ENCODE));
 
     //this.validateBuildConfig();
   }

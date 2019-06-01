@@ -30,6 +30,7 @@ class Upload {
 
     const filesInFlashDir: string[] = await fsPromises.readdir(this.flashDir);
     const fileWriteExprs: string[] = await this.collectUploadExpressions(filesInFlashDir);
+    // TODO: use default const
     const bootrstContent: string = await fsPromises.readFile(this.bootrstPath, {encoding: 'utf8'});
 
     let uploadExpressions: string[] = [

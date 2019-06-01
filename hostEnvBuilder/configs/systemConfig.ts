@@ -20,5 +20,4 @@ export default {
   //usedEntitiesNamesFile: 'usedEntities.json',
   //pathToSaveHostsFileSet: 'hosts',
   //pathToSaveHostsFileSet: `${hostInitCfg.hostDirs.services}/ConfigUpdater/hosts`,
-  filesEncode: 'utf8',
 };
