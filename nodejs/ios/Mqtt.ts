@@ -4,7 +4,7 @@
 
 import * as mqtt from 'mqtt';
 
-import MqttIo, {MqttProps, MqttIoEvents} from 'system/interfaces/io/MqttIo';
+import MqttIo, {MqttOptions, MqttIoEvents} from 'system/interfaces/io/MqttIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {callPromised} from 'system/helpers/helpers';
 
@@ -22,10 +22,10 @@ export default class Mqtt implements MqttIo {
 
   // TODO: add isConnected - mqtt.Client#connected
 
-  async newConnection(props: MqttProps): Promise<string> {
+  async newConnection(url: string, options: MqttOptions): Promise<string> {
     const connectionId = String(this.connections.length);
 
-    this.connections.push( this.connectToServer(connectionId, props) );
+    this.connections.push( this.connectToServer(connectionId, url, options) );
 
     return connectionId;
   }
@@ -34,13 +34,32 @@ export default class Mqtt implements MqttIo {
     if (!this.connections[Number(connectionId)]) return;
 
     this.connections[Number(connectionId)].reconnect();
-
-    // await this.close(connectionId, 0);
-    //
-    // this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
 
-  async onOpen(cb: (connectionId: string) => void): Promise<number> {
+  async close(connectionId: string, force: boolean = false): Promise<void> {
+    if (!this.connections[Number(connectionId)]) return;
+
+    return callPromised(this.connections[Number(connectionId)].end, force);
+  }
+
+  async isConnected(connectionId: string): Promise<boolean> {
+    return this.connections[Number(connectionId)].connected;
+  }
+
+  async isDisconnecting(connectionId: string): Promise<boolean> {
+    return this.connections[Number(connectionId)].disconnecting;
+  }
+
+  async isDisconnected(connectionId: string): Promise<boolean> {
+    return this.connections[Number(connectionId)].disconnected;
+  }
+
+  async isReconnecting(connectionId: string): Promise<boolean> {
+    return this.connections[Number(connectionId)].reconnecting;
+  }
+
+
+  async onConnect(cb: (connectionId: string) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.open, cb);
   }
 
@@ -58,12 +77,6 @@ export default class Mqtt implements MqttIo {
 
   async removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void> {
     this.events.removeListener(eventName, handlerId);
-  }
-
-  async close(connectionId: string, force: boolean = false): Promise<void> {
-    if (!this.connections[Number(connectionId)]) return;
-
-    return callPromised(this.connections[Number(connectionId)].end, force);
   }
 
   publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void> {
@@ -103,25 +116,25 @@ export default class Mqtt implements MqttIo {
   }
 
 
-  private connectToServer(connectionId: string, props: MqttProps): mqtt.MqttClient {
-    // TODO: !!!!
-    const url = `${params.protocol}://${params.host}:${params.port}`;
-    this.client = mqtt.connect(url);
+  private connectToServer(connectionId: string, url: string, options: MqttOptions): mqtt.MqttClient {
+    const connection = mqtt.connect(url, options);
 
-    this.connectPromise = new Promise((resolve) => {
-      this.client.on('connect', () => {
-        this._connected = true;
-        resolve();
-      });
+    connection.on('message', (topic: string, data: Buffer) => {
+      this.handleIncomeMessage(connectionId, topic, data);
     });
+    connection.on('error', (err) => this.events.emit(MqttIoEvents.error, connectionId, err));
+    connection.on('connect', () => this.events.emit(MqttIoEvents.connect, connectionId));
+    connection.on('close', () => this.events.emit(MqttIoEvents.close, connectionId));
 
-    const handlerWrapper = (topic: string, data: Buffer) => {
-      handler(topic, data.toString());
-    };
+    return connection;
+  }
 
-    this.client.on('message', handlerWrapper);
+  private handleIncomeMessage = (connectionId: string, topic: string, data: Buffer) => {
+    // TODO: check if it is a bin and don't convert
 
-    // TODO: add events - error, open, close , message
+    const preparedData: undefined | string | Uint8Array = data.toString();
+
+    this.events.emit(MqttIoEvents.message, connectionId, topic, preparedData);
   }
 
 }

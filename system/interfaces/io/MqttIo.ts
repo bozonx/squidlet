@@ -12,34 +12,36 @@ export const Methods = [
 
 //export type MqttIoEvents = 'open' | 'close' | 'message' | 'error';
 export enum MqttIoEvents {
-  open,
+  connect,
   close,
   message,
   error
 }
 
-export interface MqttProps {
-  protocol: string;
-  host: string;
-  port: string;
+export interface MqttOptions {
+  username?: string;
+  password?: string;
+  resubscribe?: boolean;
 }
 
 export default interface MqttIo extends IoItem {
-  newConnection(params: MqttProps): Promise<string>;
-  reConnect(connectionId: string, props: MqttProps): Promise<void>;
+  newConnection(url: string, options: MqttOptions): Promise<string>;
+  reConnect(connectionId: string): Promise<void>;
+  close(connectionId: string, force?: boolean): Promise<void>;
+  isConnected(connectionId: string): Promise<boolean>;
+  isDisconnecting(connectionId: string): Promise<boolean>;
+  isDisconnected(connectionId: string): Promise<boolean>;
+  isReconnecting(connectionId: string): Promise<boolean>;
 
-  onOpen(cb: (connectionId: string) => void): Promise<number>;
+  onConnect(cb: (connectionId: string) => void): Promise<number>;
   onClose(cb: (connectionId: string) => void): Promise<number>;
   /**
    * Listen all the subscribed messages
    */
   onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number>;
   onError(cb: (connectionId: string, err: Error) => void): Promise<number>;
-
   removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void>;
 
-  close(connectionId: string, force?: boolean): Promise<void>;
-  //isConnected(): Promise<boolean>;
   publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void>;
 
   /**

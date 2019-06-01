@@ -10,3 +10,10 @@
 //   return this._connected;
 // }
 
+
+// this.connectPromise = new Promise((resolve) => {
+//   this.client.on('connect', () => {
+//     this._connected = true;
+//     resolve();
+//   });
+// });
