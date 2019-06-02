@@ -73,7 +73,7 @@ export default class System {
     this.state = new State(this);
   }
 
-  async destroy() {
+  destroy = async () => {
     this.log.info('destroying...');
     this.riseEvent(topics.system.beforeDestroy);
     await this.devicesManager.destroy();

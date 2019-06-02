@@ -35,24 +35,15 @@ export async function installNpmModules(os: Os, cwd: string, modules: string[] =
   }
 }
 
-export async function startSystem(
-  props: Props,
-  SystemClass: new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System,
-  ioSet?: IoSet,
-) {
-  const systemConfigExtend = makeSystemConfigExtend(props);
-
-  console.info(`===> Initializing system`);
-
-  const system = new SystemClass(ioSet, systemConfigExtend);
+export function listenDestroySignals(destroyTimeoutSec: number, destroy: () => Promise<void>) {
   const gracefullyDestroy = async () => {
     setTimeout(() => {
-      console.error(`ERROR: System hasn't been gracefully destroyed during "${props.destroyTimeoutSec}" seconds`);
+      console.error(`ERROR: App hasn't been gracefully destroyed during "${destroyTimeoutSec}" seconds`);
       process.exit(3);
-    }, props.destroyTimeoutSec * 1000);
+    }, destroyTimeoutSec * 1000);
 
     try {
-      await system.destroy();
+      await destroy();
       process.exit(0);
     }
     catch (err) {
@@ -63,6 +54,20 @@ export async function startSystem(
 
   process.on('SIGTERM', gracefullyDestroy);
   process.on('SIGINT', gracefullyDestroy);
+}
+
+export async function startSystem(
+  props: Props,
+  SystemClass: new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System,
+  ioSet?: IoSet,
+) {
+  const systemConfigExtend = makeSystemConfigExtend(props);
+
+  console.info(`===> Initializing system`);
+
+  const system = new SystemClass(ioSet, systemConfigExtend);
+
+  listenDestroySignals(props.destroyTimeoutSec, system.destroy);
 
   console.info(`===> Starting system`);
 
