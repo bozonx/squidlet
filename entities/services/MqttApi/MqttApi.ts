@@ -65,22 +65,6 @@ export default class MqttApi extends ServiceBase<Props> {
   }
 
 
-  // TODO: review
-  async callDeviceAction(topic: string, data?: string | Uint8Array) {
-    // income string-type api message - call device action
-    this.env.log.info(`MqttApi income device action call: ${topic} ${JSON.stringify(data)}`);
-
-    const args: JsonTypes[] = this.parseArgs(data);
-    const [deviceId, actionName] = splitFirstElement(topic, this.env.system.systemConfig.topicSeparator);
-
-    if (!actionName) {
-      throw new Error(`MqttApi.callDeviceAction: Not actionName: "${topic}"`);
-    }
-
-    await this.env.api.callDeviceAction(deviceId, actionName, args);
-  }
-
-
   /**
    * Processing income messages from broker
    */
@@ -93,6 +77,7 @@ export default class MqttApi extends ServiceBase<Props> {
       return this.env.api.incomeRemoteCall(this.sessionId, message);
     }
 
+    // if not remote call that it is a device action call
     await this.callDeviceAction(topic, data);
   }
 
@@ -122,24 +107,18 @@ export default class MqttApi extends ServiceBase<Props> {
     return this.mqtt.publish(topic, dataToSend);
   }
 
-  /**
-   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
-   */
-  private getDevicesActionTopics(): string[] {
-    const topics: string[] = [];
-    const devicesIds: string[] = this.env.system.devicesManager.getInstantiatedDevicesIds();
+  private async callDeviceAction(topic: string, data: string | Uint8Array) {
+    // income string-type api message - call device action
+    this.env.log.info(`MqttApi income device action call: ${topic} ${JSON.stringify(data)}`);
 
-    for (let deviceId of devicesIds) {
-      const device = this.env.system.devicesManager.getDevice(deviceId);
+    const args: JsonTypes[] = this.parseArgs(data);
+    const [deviceId, actionName] = splitFirstElement(topic, this.env.system.systemConfig.topicSeparator);
 
-      for (let actionName of device.getActionsList()) {
-        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, actionName);
-
-        topics.push(topic);
-      }
+    if (!actionName) {
+      throw new Error(`MqttApi.callDeviceAction: Not actionName: "${topic}"`);
     }
 
-    return topics;
+    await this.env.api.callDeviceAction(deviceId, actionName, args);
   }
 
   private parseArgs(data: any): JsonTypes[] {
@@ -171,6 +150,26 @@ export default class MqttApi extends ServiceBase<Props> {
 
       await this.mqtt.subscribe(topic);
     }
+  }
+
+  /**
+   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
+   */
+  private getDevicesActionTopics(): string[] {
+    const topics: string[] = [];
+    const devicesIds: string[] = this.env.system.devicesManager.getInstantiatedDevicesIds();
+
+    for (let deviceId of devicesIds) {
+      const device = this.env.system.devicesManager.getDevice(deviceId);
+
+      for (let actionName of device.getActionsList()) {
+        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, actionName);
+
+        topics.push(topic);
+      }
+    }
+
+    return topics;
   }
 
 }
