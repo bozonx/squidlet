@@ -10,7 +10,8 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  get openPromise(): Promise<void> {
+  // TODO: make
+  get connectedPromise(): Promise<void> {
     if (!this.connectionId) {
       throw new Error(`WebSocketClient.openPromise: ${this.closedMsg}`);
     }
@@ -18,7 +19,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.client.openPromise;
   }
 
-  private connectionId: string = '';
+  private connectionId?: string;
 
   private get mqttIo(): MqttIo {
     return this.env.getIo('Mqtt') as any;
@@ -29,17 +30,27 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
   protected willInit = async () => {
-    this.mqttIo.onClose();
-    this.mqttIo.onConnect();
-    this.mqttIo.onError((connectionId: string, error: Error) => {
-      this.env.log.error(`Mqtt connection "${connectionId}": ${error}`);
-    });
-    this.mqttIo.onMessage();
-
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
       omit(this.props, 'url')
     );
+
+    this.mqttIo.onMessage();
+    this.mqttIo.onClose((connectionId: string) => {
+      if (connectionId !== this.connectionId) return;
+
+      // TODO: resolve connection promise
+    });
+    this.mqttIo.onConnect((connectionId: string) => {
+      if (connectionId !== this.connectionId) return;
+
+      // TODO: resolve connection promise
+    });
+    this.mqttIo.onError((connectionId: string, error: Error) => {
+      if (connectionId !== this.connectionId) return;
+
+      this.env.log.error(`Mqtt connection "${connectionId}": ${error}`);
+    });
   }
 
   destroy = async () => {
@@ -51,19 +62,33 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
-  isConnected(): boolean {
+  async isConnected(): Promise<boolean> {
     if (!this.connectionId) return false;
 
-    return this.client.isConnected();
+    return this.mqttIo.isConnected(this.connectionId);
   }
 
-  publish(topic: string, data: string | Uint8Array): Promise<void> {
+  async publish(topic: string, data: string | Uint8Array): Promise<void> {
     // TODO: add
     // TODO: отсылать только после connection
+
+
   }
 
-  subscribe(topic: string): Promise<void> {
-    // TODO: add
+  async subscribe(topic: string): Promise<void> {
+    await this.connectedPromise;
+
+    if (!this.connectionId) {
+      throw new Error(`Mqtt driver subscribe: ${this.closedMsg}`);
+    }
+
+    return this.mqttIo.subscribe(this.connectionId, topic);
+  }
+
+  async end(): Promise<void> {
+    if (!this.connectionId) return;
+
+    return this.mqttIo.end(this.connectionId);
   }
 
   onMessage(): number {
