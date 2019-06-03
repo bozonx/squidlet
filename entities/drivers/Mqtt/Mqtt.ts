@@ -1,8 +1,11 @@
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
-import {omit} from '../../../system/helpers/lodashLike';
+import {omit} from 'system/helpers/lodashLike';
+import IndexedEvents from 'system/helpers/IndexedEvents';
 
+
+type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
 
 export interface MqttProps {
   url: string;
@@ -10,6 +13,8 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
+  private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
+
   // TODO: make
   get connectedPromise(): Promise<void> {
     if (!this.connectionId) {
@@ -35,18 +40,25 @@ export class Mqtt extends DriverBase<MqttProps> {
       omit(this.props, 'url')
     );
 
-    this.mqttIo.onMessage();
-    this.mqttIo.onClose((connectionId: string) => {
+    await this.mqttIo.onMessage((connectionId: string, topic: string, data: string | Uint8Array) => {
+      if (connectionId !== this.connectionId) return;
+
+      this.messageEvents.emit(topic, data);
+    });
+
+    await this.mqttIo.onClose((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 
       // TODO: resolve connection promise
     });
-    this.mqttIo.onConnect((connectionId: string) => {
+
+    await this.mqttIo.onConnect((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 
       // TODO: resolve connection promise
     });
-    this.mqttIo.onError((connectionId: string, error: Error) => {
+
+    await this.mqttIo.onError((connectionId: string, error: Error) => {
       if (connectionId !== this.connectionId) return;
 
       this.env.log.error(`Mqtt connection "${connectionId}": ${error}`);
@@ -58,7 +70,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
     // TODO: remove handlers
 
-    this.client.end();
+    await this.end();
   }
 
 
@@ -69,10 +81,13 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   async publish(topic: string, data: string | Uint8Array): Promise<void> {
-    // TODO: add
-    // TODO: отсылать только после connection
+    await this.connectedPromise;
 
+    if (!this.connectionId) {
+      throw new Error(`Mqtt driver publish: ${this.closedMsg}`);
+    }
 
+    return this.mqttIo.publish(this.connectionId, topic, data);
   }
 
   async subscribe(topic: string): Promise<void> {
@@ -91,44 +106,15 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.mqttIo.end(this.connectionId);
   }
 
-  onMessage(): number {
-    // TODO: add
-  }
-
-  onClose(cb: () => void): number {
-    // TODO: add
+  onMessage(cb: MqttMessageHandler): number {
+    return this.messageEvents.addListener(cb);
   }
 
   removeMessageListener(handlerId: number) {
     if (!this.connectionId) return;
 
-    this.client.removeMessageListener(handlerId);
+    this.messageEvents.removeListener(handlerId);
   }
-
-  removeCloseListener(handlerIndex: number) {
-    this.closeEvents.removeListener(handlerIndex);
-  }
-
-// connectPromise: Promise<void>;
-//
-// private _connected: boolean = false;
-// private readonly client: any;
-
-// TODO: поддержка нескольких соединений как в ws
-
-// async isConnected(): Promise<boolean> {
-//   return this._connected;
-// }
-
-
-// this.connectPromise = new Promise((resolve) => {
-//   this.client.on('connect', () => {
-//     this._connected = true;
-//     resolve();
-//   });
-// });
-
-// TODO: делать publish только с connectionPromise
 
 }
 
