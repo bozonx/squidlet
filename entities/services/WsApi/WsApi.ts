@@ -31,9 +31,15 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
     });
 
     // listen income api requests
-    this.wsServerSessions.onMessage(this.handleIncomeMessages);
+    this.wsServerSessions.onMessage((sessionId: string, data: string | Uint8Array) => {
+      this.handleIncomeMessages(sessionId, data)
+        .catch(this.env.log.error);
+    });
     // listen outcome api requests
-    this.env.api.onOutcomeRemoteCall(this.handleOutcomeMessages);
+    this.env.api.onOutcomeRemoteCall((sessionId: string, message: RemoteCallMessage) => {
+      this.handleOutcomeMessages(sessionId, message)
+        .catch(this.env.log.error);
+    });
   }
 
   destroy = async () => {
@@ -55,15 +61,13 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       return this.env.log.error(`WsApi: Can't decode message: ${err}`);
     }
 
-    this.env.api.incomeRemoteCall(sessionId, msg)
-      .catch(this.env.log.error);
+    return this.env.api.incomeRemoteCall(sessionId, msg);
   }
 
-  private handleOutcomeMessages = (sessionId: string, message: RemoteCallMessage) => {
+  private handleOutcomeMessages = async (sessionId: string, message: RemoteCallMessage) => {
     const binData: Uint8Array = serializeJson(message);
 
-    this.wsServerSessions.send(sessionId, binData)
-      .catch(this.env.log.error);
+    return this.wsServerSessions.send(sessionId, binData);
   }
 
 }

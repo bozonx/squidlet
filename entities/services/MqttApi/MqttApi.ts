@@ -1,11 +1,12 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import MqttIo, {MqttConnection} from 'system/interfaces/io/MqttIo';
-import {deserializeJson} from 'system/helpers/binaryHelpers';
+import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {combineTopic, parseValue} from 'system/helpers/helpers';
 import {JsonTypes} from 'system/interfaces/Types';
 import {splitFirstElement} from 'system/helpers/strings';
 import {trim} from 'system/helpers/lodashLike';
+import {GetDriverDep} from 'system/entities/EntityBase';
+import {Mqtt} from '../../drivers/Mqtt/Mqtt';
 
 
 interface Props {
@@ -18,59 +19,50 @@ const REMOTE_CALL_TOPIC = 'remoteCall';
 
 
 export default class MqttApi extends ServiceBase<Props> {
+  // infinity session
   private sessionId: string = '';
-  private get mqttConnection(): MqttConnection {
-    return this.depsInstances.mqttIo;
+  private get mqtt(): Mqtt {
+    return this.depsInstances.mqtt;
   }
 
 
-  protected willInit = async () => {
-    const mqttIo: MqttIo = this.env.getIo('Mqtt');
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.mqtt = await getDriverDep('WsServerSessions')
+      .getInstance(this.props);
 
-    this.depsInstances.mqttIo = await mqttIo.connect(this.props);
-    // TODO: use it on new connection
-    // TODO: сессия должна быть беконечной
     this.sessionId = this.env.system.sessions.newSession(0);
-
-    // TODO: слушать - api.onOutcomeRemoteCall
   }
 
   protected didInit = async () => {
-    // listen to income messages from mqtt broker
-    await this.mqttConnection.onMessage(this.messagesHandler);
+    this.env.api.onOutcomeRemoteCall((sessionId: string, message: RemoteCallMessage) => {
+      if (sessionId !== this.sessionId) return;
 
-    // TODO: при обрыве соединения убить все хэндлеры
+      this.handleOutcomeRemoteCall(message);
+    });
+
+    // listen to income messages from mqtt broker
+    await this.mqtt.onMessage((topic: string, data: string | Uint8Array) => {
+      this.handleIncomeMessages(topic, data)
+        .catch(this.env.log.error);
+    });
 
     // listen to outcome messages from api and send them to mqtt broker
-    this.env.api.onPublish(this.publishHandler);
+    this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
+      this.publishHandler(topic, data, isRepeat)
+        .catch(this.env.log.error);
+    });
+
     // register subscribers after app init
     this.env.system.onAppInit(this.subscribeToDevices);
   }
 
   destroy = async () => {
-    // TODO: может закрывать соединение на destroy и писать об этом ???
+    this.env.system.sessions.shutDownImmediately(this.sessionId);
+    await this.mqtt.destroy();
   }
 
 
-  /**
-   * Processing income messages from broker
-   */
-  private messagesHandler = async (topic: string, data?: string | Uint8Array) => {
-    if (topic === REMOTE_CALL_TOPIC) {
-      // TODO: use try
-      // income remoteCall message
-      const message: RemoteCallMessage = deserializeJson(data);
-
-      this.env.api.incomeRemoteCall(this.sessionId, message)
-        .catch(this.env.log.error);
-
-      return;
-    }
-
-    this.callDeviceAction(topic, data)
-      .catch(this.env.log.error);
-  }
-
+  // TODO: review
   async callDeviceAction(topic: string, data?: string | Uint8Array) {
     // income string-type api message - call device action
     this.env.log.info(`MqttApi income device action call: ${topic} ${JSON.stringify(data)}`);
@@ -85,10 +77,33 @@ export default class MqttApi extends ServiceBase<Props> {
     await this.env.api.callDeviceAction(deviceId, actionName, args);
   }
 
+
+  /**
+   * Processing income messages from broker
+   */
+  private handleIncomeMessages = async (topic: string, data: string | Uint8Array) => {
+    // TODO: use prefix
+    if (topic === REMOTE_CALL_TOPIC) {
+      // income remoteCall message
+      const message: RemoteCallMessage = deserializeJson(data);
+
+      return this.env.api.incomeRemoteCall(this.sessionId, message);
+    }
+
+    await this.callDeviceAction(topic, data);
+  }
+
+  private handleOutcomeRemoteCall = async (message: RemoteCallMessage) => {
+    const binData: Uint8Array = serializeJson(message);
+
+    // TODO: use prefix
+    return this.mqtt.publish(REMOTE_CALL_TOPIC, binData);
+  }
+
   /**
    * Publish outcome messages to broker
    */
-  private publishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => {
+  private publishHandler = async (topic: string, data: JsonTypes, isRepeat?: boolean) => {
     if (isRepeat) {
       this.env.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(data)}`);
     }
@@ -108,7 +123,7 @@ export default class MqttApi extends ServiceBase<Props> {
   /**
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
-  getDevicesActionTopics(): string[] {
+  private getDevicesActionTopics(): string[] {
     const topics: string[] = [];
     const devicesIds: string[] = this.env.system.devicesManager.getInstantiatedDevicesIds();
 
