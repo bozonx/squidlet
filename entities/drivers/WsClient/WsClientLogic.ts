@@ -31,6 +31,7 @@ export default class WsClientLogic {
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
+  // TODO: maybe better to use undefined
   private connectionId: string = '';
   private openPromiseResolve: () => void = () => {};
   private openPromiseReject: () => void = () => {};

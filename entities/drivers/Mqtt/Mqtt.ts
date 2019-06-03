@@ -13,19 +13,23 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
-
-  // TODO: make
+  // TODO: maybe use common code with WsClientLogic
+  // on first time connect or reconnect
   get connectedPromise(): Promise<void> {
-    if (!this.connectionId) {
-      throw new Error(`WebSocketClient.openPromise: ${this.closedMsg}`);
+    if (!this.connectionId || !this.openPromise) {
+      throw new Error(`Mqtt.connectedPromise: ${this.closedMsg}`);
     }
 
-    return this.client.openPromise;
+    return this.openPromise;
   }
 
+  private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
+  private openPromise?: Promise<void>;
+  private openPromiseResolve: () => void = () => {};
+  private openPromiseReject: () => void = () => {};
+  // was previous open promise fulfilled
+  private wasPrevOpenFulfilled: boolean = false;
   private connectionId?: string;
-
   private get mqttIo(): MqttIo {
     return this.env.getIo('Mqtt') as any;
   }
@@ -35,6 +39,8 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
   protected willInit = async () => {
+    this.openPromise = this.makeOpenPromise();
+
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
       omit(this.props, 'url')
@@ -49,13 +55,16 @@ export class Mqtt extends DriverBase<MqttProps> {
     await this.mqttIo.onClose((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 
-      // TODO: resolve connection promise
+      this.openPromiseReject();
+
+      this.env.log.error(`Mqtt broker has closed a connection`);
+      //this.mqttIo.reConnect(this.connectionId);
     });
 
     await this.mqttIo.onConnect((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 
-      // TODO: resolve connection promise
+      this.openPromiseReject();
     });
 
     await this.mqttIo.onError((connectionId: string, error: Error) => {
@@ -66,9 +75,11 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   destroy = async () => {
-    if (!this.connectionId) return;
+    this.messageEvents.removeAll();
 
-    // TODO: remove handlers
+    delete this.openPromise;
+    delete this.openPromiseResolve;
+    delete this.openPromiseReject;
 
     await this.end();
   }
@@ -114,6 +125,16 @@ export class Mqtt extends DriverBase<MqttProps> {
     if (!this.connectionId) return;
 
     this.messageEvents.removeListener(handlerId);
+  }
+
+
+  private makeOpenPromise(): Promise<void> {
+    this.wasPrevOpenFulfilled = false;
+
+    return new Promise<void>((resolve, reject) => {
+      this.openPromiseResolve = resolve;
+      this.openPromiseReject = reject;
+    });
   }
 
 }
