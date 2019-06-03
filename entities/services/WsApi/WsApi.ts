@@ -23,6 +23,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
     this.wsServerSessions.onNewSession((sessionId: string) => {
       this.sessions.push(sessionId);
     });
+
     this.wsServerSessions.onSessionClose((sessionId: string) => {
       this.sessions = removeItemFromArray(this.sessions, sessionId);
 
@@ -35,6 +36,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       this.handleIncomeMessages(sessionId, data)
         .catch(this.env.log.error);
     });
+
     // listen outcome api requests
     this.env.api.onOutcomeRemoteCall((sessionId: string, message: RemoteCallMessage) => {
       this.handleOutcomeMessages(sessionId, message)

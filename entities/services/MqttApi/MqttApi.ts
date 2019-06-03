@@ -54,7 +54,7 @@ export default class MqttApi extends ServiceBase<Props> {
     });
   }
 
-  protected appDidInit = async () => {
+  protected devicesDidInit = async () => {
     // register subscribers after app init
     await this.subscribeToDevices();
   }
