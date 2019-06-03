@@ -37,7 +37,8 @@ export default class MqttApi extends ServiceBase<Props> {
     this.env.api.onOutcomeRemoteCall((sessionId: string, message: RemoteCallMessage) => {
       if (sessionId !== this.sessionId) return;
 
-      this.handleOutcomeRemoteCall(message);
+      this.handleOutcomeRemoteCall(message)
+        .catch(this.env.log.error);
     });
 
     // listen to income messages from mqtt broker
@@ -51,9 +52,11 @@ export default class MqttApi extends ServiceBase<Props> {
       this.publishHandler(topic, data, isRepeat)
         .catch(this.env.log.error);
     });
+  }
 
+  protected appDidInit = async () => {
     // register subscribers after app init
-    this.env.system.onAppInit(this.subscribeToDevices);
+    await this.subscribeToDevices();
   }
 
   destroy = async () => {
@@ -105,10 +108,10 @@ export default class MqttApi extends ServiceBase<Props> {
    */
   private publishHandler = async (topic: string, data: JsonTypes, isRepeat?: boolean) => {
     if (isRepeat) {
-      this.env.log.debug(`Api outcome (republish): ${topic} - ${JSON.stringify(data)}`);
+      this.env.log.debug(`MqttApi outcome (republish): ${topic} - ${JSON.stringify(data)}`);
     }
     else {
-      this.env.log.info(`Api outcome: ${topic} - ${JSON.stringify(data)}`);
+      this.env.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
     }
 
     // TODO: если это массив то не известно это список параметров или массив для передачи как один параметр
@@ -116,8 +119,7 @@ export default class MqttApi extends ServiceBase<Props> {
 
     const dataToSend: string = JSON.stringify(data);
 
-    this.mqttConnection.publish(topic, dataToSend)
-      .catch(this.env.log.error);
+    return this.mqtt.publish(topic, dataToSend);
   }
 
   /**
@@ -167,7 +169,7 @@ export default class MqttApi extends ServiceBase<Props> {
     for (let topic of devicesActionsTopics) {
       this.env.log.info(`MQTT subscribe: ${topic}`);
 
-      await this.mqttConnection.subscribe(topic);
+      await this.mqtt.subscribe(topic);
     }
   }
 
