@@ -6,15 +6,8 @@ ios:
   - WebSocketClient
 
 props:
-#  host:
-#    type: string
-#    default: localhost
-#  port:
-#    type: number
-#    default: 8080
   url:
     type: string
-    #required: true
     default: "ws://localhost:8080"
   autoReconnect:
     type: boolean

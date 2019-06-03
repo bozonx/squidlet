@@ -95,7 +95,5 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
 export default class Factory extends DriverFactoryBase<WsClient> {
   protected DriverClass = WsClient;
-
-  // TODO: review
-  protected instanceAlwaysNew: boolean = true;
+  protected instanceByPropName = 'url';
 }
