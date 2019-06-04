@@ -22,6 +22,7 @@ export default class WsServerLogic {
   private readonly logError: (message: string) => void;
   private serverId: string = '';
   private listeningPromiseResolve: () => void = () => {};
+  private listeningPromiseReject: () => void = () => {};
 
 
   constructor(
@@ -38,8 +39,9 @@ export default class WsServerLogic {
     this.onClose = onClose;
     this.logInfo = logInfo;
     this.logError = logError;
-    this.listeningPromise = new Promise<void>((resolve) => {
+    this.listeningPromise = new Promise<void>((resolve, reject) => {
       this.listeningPromiseResolve = resolve;
+      this.listeningPromiseReject = reject;
     });
   }
 
@@ -47,14 +49,11 @@ export default class WsServerLogic {
    * Start server
    */
   async init() {
-    this.serverId = await this.wsServerIo.newServer({
-      host: this.props.host,
-      port: this.props.port,
-    });
+    this.serverId = await this.wsServerIo.newServer(this.props);
 
     await this.listenServer();
 
-    // TODO: add timeout if server doesn't start listen and rise a promise reject
+    // TODO: add timeout if server doesn't start listen and rise a promise reject - listeningPromiseReject
   }
 
   async destroy() {
@@ -88,17 +87,6 @@ export default class WsServerLogic {
     return this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
-  // /**
-  //  * Listen income messages
-  //  */
-  // onMessage(connectionId: string, cb: OnMessageHandler): number {
-  //   const handler = (receivedConnectionId: string, data: string | Uint8Array) => {
-  //     if (connectionId === receivedConnectionId) cb(data);
-  //   };
-  //
-  //   return this.events.addListener(WS_SERVER_EVENTS.incomeMessage, handler);
-  // }
-
   /**
    * Listen income messages
    */
@@ -109,9 +97,7 @@ export default class WsServerLogic {
   /**
    * It rises when new connection is come.
    */
-  onConnection(
-    cb: (connectionId: string, request: ConnectionParams) => void
-  ): number {
+  onConnection(cb: (connectionId: string, request: ConnectionParams) => void): number {
     return this.events.addListener(WS_SERVER_EVENTS.newConnection, cb);
   }
 

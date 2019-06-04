@@ -33,8 +33,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private get server(): WsServer {
     return this.depsInstances.server;
   }
-  // like {sessionId: connectionId}
-  private sessionConnections: {[index: string]: string} = {};
+  // like {sessionId: connectionId} - null means connection is closed
+  private sessionConnections: {[index: string]: string | null} = {};
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
@@ -47,10 +47,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       if (!sessionId) return;
 
-      // TODO: why ??? поидее сессию надо удалять если намеренно разорвали соединение
-
-      // remove connection linked to session
-      delete this.sessionConnections[sessionId];
+      // clear connectionId
+      this.sessionConnections[sessionId] = null;
     });
     this.server.onMessage((connectionId: string, data: string | Uint8Array) => {
       const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
@@ -92,7 +90,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       throw new Error(`WsServerSessions.send: Can't find a connection of session "${sessionId}"`);
     }
 
-    return this.server.send(this.sessionConnections[sessionId], data);
+    return this.server.send(this.sessionConnections[sessionId] as string, data);
   }
 
   /**
