@@ -69,13 +69,8 @@ export default interface WebSocketServerIo extends IoItem {
    */
   onConnection(
     serverId: string,
-    cb: (connectionId: string, request: ConnectionParams) => Promise<void>
+    cb: (connectionId: string, request: ConnectionParams) => void
   ): Promise<number>;
-
-  // /**
-  //  * Listen header at handshake to modify them
-  //  */
-  // onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number;
 
   /**
    * when server starts listening
@@ -102,11 +97,12 @@ export default interface WebSocketServerIo extends IoItem {
   /**
    * On connection close
    */
-  onClose(serverId: string, connectionId: string, cb: () => void): Promise<number>;
-  onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number>;
-  onError(serverId: string, connectionId: string, cb: (err: Error) => void): Promise<number>;
-  onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): Promise<number>
+  onClose(serverId: string, cb: (connectionId: string) => void): Promise<number>;
+  onMessage(serverId: string, cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number>;
+  onError(serverId: string, cb: (connectionId: string, err: Error) => void): Promise<number>;
+  onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>
   removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void>;
+
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
   close(serverId: string, connectionId: string, code: number, reason: string): Promise<void>;
 }

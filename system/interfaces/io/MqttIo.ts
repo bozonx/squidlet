@@ -2,11 +2,21 @@ import IoItem from '../IoItem';
 
 
 export const Methods = [
+  'newConnection',
+  'reConnect',
+  'end',
   'isConnected',
+  'isDisconnecting',
+  'isDisconnected',
+  'isReconnecting',
+  'onConnect',
+  'onClose',
+  'onMessage',
+  'onError',
+  'removeEventListener',
   'publish',
   'subscribe',
-  'onMessage',
-  //'onMessageBin',
+  'unsubscribe',
 ];
 
 
