@@ -61,8 +61,10 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
     await this.server.closeConnection(connectionId, code, reason);
   }
 
-  async setCookie(cookie: string) {
-    // TODO: !!!!
+  async setCookie(connectionId: string, cookie: string) {
+    if (!this.server) return;
+
+    await this.server.setCookie(connectionId, cookie);
   }
 
   onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {

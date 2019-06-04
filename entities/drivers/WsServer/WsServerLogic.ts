@@ -77,6 +77,10 @@ export default class WsServerLogic {
     return this.wsServerIo.send(this.serverId, connectionId, data);
   }
 
+  async setCookie(connectionId: string, cookie: string) {
+    // TODO: add
+  }
+
   /**
    * Force closing a connection
    */
