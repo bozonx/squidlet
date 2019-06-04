@@ -27,7 +27,7 @@ export default class MqttApi extends ServiceBase<Props> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.mqtt = await getDriverDep('WsServerSessions')
+    this.depsInstances.mqtt = await getDriverDep('Mqtt')
       .getInstance(this.props);
 
     this.sessionId = this.env.system.sessions.newSession(0);
