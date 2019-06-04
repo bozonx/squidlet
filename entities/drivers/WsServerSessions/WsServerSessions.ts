@@ -129,7 +129,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   /**
    * Set session id to cookie of client if it doesn't have or session is inactive
    */
-  private handleHeaders = this.env.wrapErrors((headers: {[index: string]: string}, request: ConnectionParams) => {
+  private handleHeaders = this.wrapErrors(async (headers: {[index: string]: string}, request: ConnectionParams) => {
 
     // TODO: headers это массив или объект ???
 

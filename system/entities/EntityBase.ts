@@ -112,4 +112,19 @@ export default class EntityBase<Props = {}> {
     };
   }
 
+  /**
+   * Print errors to console of async functions
+   */
+  wrapErrors(cb: (...cbArgs: any[]) => Promise<void>): (...args: any[]) => void {
+    return (...args: any[]) => {
+      try {
+        cb(...args)
+          .catch(this.env.log.error);
+      }
+      catch (err) {
+        this.env.log.error(err);
+      }
+    };
+  }
+
 }
