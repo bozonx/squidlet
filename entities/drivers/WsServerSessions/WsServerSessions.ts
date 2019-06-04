@@ -16,23 +16,23 @@ export enum WS_SESSIONS_EVENTS {
   message
 }
 
-
 export interface WsServerSessionsProps extends WebSocketServerProps {
   expiredSec: number;
 }
 
+const SESSIONID_COOKIE = 'SESSIONID';
+
 
 export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
-  private readonly events = new IndexedEventEmitter();
-
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     return this.server.listeningPromise;
   }
+
+  private readonly events = new IndexedEventEmitter();
   private get server(): WsServer {
     return this.depsInstances.server;
   }
-
   // like {sessionId: connectionId}
   private sessionConnections: {[index: string]: string} = {};
 
@@ -74,9 +74,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   destroy = async () => {
+    for (let sessionId of Object.keys(this.sessionConnections)) {
+      this.env.system.sessions.shutDownImmediately(sessionId);
+    }
+
+    delete this.sessionConnections;
     await this.server.destroy();
     this.events.destroy();
-    delete this.sessionConnections;
   }
 
 
@@ -102,6 +106,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     await this.server.closeConnection(connectionId, 0, 'Close session request');
 
     this.env.system.sessions.shutDownImmediately(sessionId);
+
     delete this.sessionConnections[sessionId];
   }
 
@@ -126,57 +131,34 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
 
-  /**
-   * Set session id to cookie of client if it doesn't have or session is inactive
-   */
-  private handleHeaders = this.wrapErrors(async (headers: {[index: string]: string}, request: ConnectionParams) => {
-
-    // TODO: headers это массив или объект ???
-
-    const parsedCookie: {SESSIONID?: string} = parseCookie(request.headers.cookie);
-
-    if (parsedCookie.SESSIONID && this.env.system.sessions.isSessionActive(parsedCookie.SESSIONID)) {
-      // if session exists - recover it
-      return this.env.system.sessions.recoverSession(parsedCookie.SESSIONID);
-    }
-
-    // or create a new session
-
-    const sessionId: string = this.env.system.sessions.newSession(this.props.expiredSec);
-    headers['Set-Cookie'] = `SESSIONID=${sessionId}`;
-    // rise a new session event
-    this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, request);
-
-    // TODO: что если создали новую сессию а соединение так и не установилось????
-    //       Тогда наверное не подниметься connection close event
-
-  })
-
-  private handleNewConnection = (
+  private handleNewConnection = this.wrapErrors(async (
     connectionId: string,
     request: ConnectionParams,
   ) => {
-    const requestCookie: {SESSIONID?: string} = parseCookie(request.headers.cookie);
+    const requestCookie: { [SESSIONID_COOKIE]?: string } = parseCookie(request.headers.cookie);
+    let sessionId: string | undefined = requestCookie[SESSIONID_COOKIE];
 
-    // TODO: проверить будет ли в request новый cookie который только установили в headers ???
+    if (sessionId && this.env.system.sessions.isSessionActive(sessionId)) {
+      // if session exists - recover it
+      this.env.system.sessions.recoverSession(sessionId);
+    }
+    else {
+      // create a new session if there isn't cookie of session is inactive
+      sessionId = this.env.system.sessions.newSession(this.props.expiredSec);
 
-    //const upgradeCookie: {SESSIONID?: string} = parseCookie(upgradeReq && upgradeReq.headers.cookie);
-    //const sessionId: string | undefined = requestCookie.SESSIONID || upgradeCookie.SESSIONID;
-    const sessionId: string | undefined = requestCookie.SESSIONID;
+      const cookie = `${SESSIONID_COOKIE}=${sessionId}`;
 
-    if (!sessionId) {
-      return this.env.log.error(`WsServerSessions.handleNewConnection: Client doesn't have a SESSIONID cookie`);
+      await this.server.setCookie(cookie);
     }
 
     this.sessionConnections[sessionId] = connectionId;
-  }
+  });
 
 }
 
+
 export default class Factory extends DriverFactoryBase<WsServerSessions> {
   protected DriverClass = WsServerSessions;
-
-  // TODO: поидее можно выдавать всего новый инстанс если используется драйвер WsServer
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;
@@ -184,6 +166,32 @@ export default class Factory extends DriverFactoryBase<WsServerSessions> {
 }
 
 
+
+// /**
+//  * Set session id to cookie of client if it doesn't have or session is inactive
+//  */
+// private handleHeaders = this.wrapErrors(async (headers: {[index: string]: string}, request: ConnectionParams) => {
+//
+//   // T-O-D-O: headers это массив или объект ???
+//
+//   const parsedCookie: {SESSIONID?: string} = parseCookie(request.headers.cookie);
+//
+//   if (parsedCookie.SESSIONID && this.env.system.sessions.isSessionActive(parsedCookie.SESSIONID)) {
+//     // if session exists - recover it
+//     return this.env.system.sessions.recoverSession(parsedCookie.SESSIONID);
+//   }
+//
+//   // or create a new session
+//
+//   const sessionId: string = this.env.system.sessions.newSession(this.props.expiredSec);
+//   headers['Set-Cookie'] = `SESSIONID=${sessionId}`;
+//   // rise a new session event
+//   this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, request);
+//
+//   // T-O-D-O: что если создали новую сессию а соединение так и не установилось????
+//   //       Тогда наверное не подниметься connection close event
+//
+// })
 
 // onMessage(cb: (sessionId: string, data: string | Uint8Array) => void): number {
 //   return this.events.addListener(WS_SESSIONS_EVENTS.message, cb);
