@@ -43,4 +43,19 @@ export default abstract class EnvBase {
 
   abstract async loadManifest(className: string): Promise<ManifestBase>;
 
+  /**
+   * Print errors to console of async functions
+   */
+  wrapErrors(cb: (...cbArgs: any[]) => Promise<void>) {
+    return (...args: any[]) => {
+      try {
+        cb(...args)
+          .catch(this.log.error);
+      }
+      catch (err) {
+        this.log.error(err);
+      }
+    };
+  }
+
 }

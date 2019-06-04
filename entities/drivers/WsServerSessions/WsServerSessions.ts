@@ -47,6 +47,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       if (!sessionId) return;
 
+      // TODO: why ??? поидее сессию надо удалять если намеренно разорвали соединение
+
       // remove connection linked to session
       delete this.sessionConnections[sessionId];
     });
@@ -127,7 +129,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   /**
    * Set session id to cookie of client if it doesn't have or session is inactive
    */
-  private handleHeaders = (headers: {[index: string]: string}, request: ConnectionParams) => {
+  private handleHeaders = this.env.wrapErrors((headers: {[index: string]: string}, request: ConnectionParams) => {
 
     // TODO: headers это массив или объект ???
 
@@ -148,7 +150,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     // TODO: что если создали новую сессию а соединение так и не установилось????
     //       Тогда наверное не подниметься connection close event
 
-  }
+  })
 
   private handleNewConnection = (
     connectionId: string,
