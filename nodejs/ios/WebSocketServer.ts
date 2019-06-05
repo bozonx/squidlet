@@ -4,18 +4,15 @@ import {ClientRequest, IncomingMessage} from 'http';
 import WebSocketServerIo, {
   ConnectionParams,
   WebSocketServerProps,
-  wsServerEventNames,
-  WsServerEvents
+  WsServerEvent,
 } from 'system/interfaces/io/WebSocketServerIo';
-import {wsEventNames, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
-import {CONNECTION_POSITIONS, ConnectionItem} from './WebSocketClient';
 
 
 // Server instance, server's events, [connection, connection's events]
-type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, ConnectionItem[] ];
+type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
 
 enum SERVER_POSITIONS {
   wsServer,
@@ -43,6 +40,7 @@ export function makeConnectionParams(request: IncomingMessage): ConnectionParams
  * The same for lowjs and nodejs
  */
 export default class WebSocketServer implements WebSocketServerIo {
+  private readonly events = new IndexedEventEmitter();
   private readonly servers: ServerItem[] = [];
 
   /////// Server's methods
@@ -73,79 +71,58 @@ export default class WebSocketServer implements WebSocketServerIo {
   ): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.connection, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.newConnection, cb);
   }
-
-  // onHeaders(serverId: string, cb: (headers: {[index: string]: string}, request: ConnectionParams) => void): number {
-  //   const serverItem = this.getServerItem(serverId);
-  //
-  //   // TODO: как передавать модицифированный объект ????
-  //
-  //   return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.headers, cb);
-  // }
 
   async onServerListening(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.listening, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.listening, cb);
   }
 
   async onServerClose(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.close, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.serverClose, cb);
   }
 
   async onServerError(serverId: string, cb: (err: Error) => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[SERVER_POSITIONS.events].addListener(wsServerEventNames.error, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.serverError, cb);
   }
 
-  async removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): Promise<void> {
+  async removeEventListener(serverId: string, eventName: WsServerEvent, handlerIndex: number): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
     return this.servers[Number(serverId)][SERVER_POSITIONS.events].removeListener(eventName, handlerIndex);
   }
 
 
-  ////////// Connection's methods like in client, but without onOpen
+  ////////// Connection's methods like client's, but without onOpen
 
-  async onClose(serverId: string, connectionId: string, cb: () => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(serverId, connectionId);
+  async onClose(serverId: string, cb: (connectionId: string) => void): Promise<number> {
+    const serverItem = this.getServerItem(serverId);
 
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.clientClose, cb);
   }
 
-  async onMessage(serverId: string, connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(serverId, connectionId);
+  async onMessage(serverId: string, cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number> {
+    const serverItem = this.getServerItem(serverId);
 
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.clientMessage, cb);
   }
 
-  async onError(serverId: string, connectionId: string, cb: (err: Error) => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(serverId, connectionId);
+  async onError(serverId: string, cb: (connectionId: string, err: Error) => void): Promise<number> {
+    const serverItem = this.getServerItem(serverId);
 
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.clientError, cb);
   }
 
-  async onUnexpectedResponse(serverId: string, connectionId: string, cb: (response: ConnectionParams) => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(serverId, connectionId);
+  async onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
+    const serverItem = this.getServerItem(serverId);
 
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.unexpectedResponse, cb);
-  }
-
-  async removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void> {
-    if (
-      !this.servers[Number(serverId)]
-      || !this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]
-    ) {
-      return;
-    }
-
-    const connectionItem = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
-
-    return connectionItem[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
+    return serverItem[SERVER_POSITIONS.events].addListener(WsServerEvent.clientUnexpectedResponse, cb);
   }
 
   async send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
@@ -156,9 +133,10 @@ export default class WebSocketServer implements WebSocketServerIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    const connectionItem = this.getConnectionItem(serverId, connectionId);
+    const serverItem = this.getServerItem(serverId);
+    const socket = serverItem[SERVER_POSITIONS.connections][Number(connectionId)];
 
-    await callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
+    await callPromised(socket.send, data);
   }
 
   async close(serverId: string, connectionId: string, code: number, reason: string): Promise<void> {
@@ -171,8 +149,7 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     const connectionItem = this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
 
-    connectionItem[CONNECTION_POSITIONS.webSocket].close(code, reason);
-    connectionItem[CONNECTION_POSITIONS.events].destroy();
+    connectionItem.close(code, reason);
 
     delete this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
 
@@ -185,15 +162,9 @@ export default class WebSocketServer implements WebSocketServerIo {
     const events = new IndexedEventEmitter();
     const server = new WebSocket.Server(props);
 
-    server.on('close', () => events.emit(wsServerEventNames.close));
-    server.on('listening', () => events.emit(wsServerEventNames.listening));
-    server.on('error', () => events.emit(wsServerEventNames.error));
-    server.on('headers', (headers: {[index: string]: string}, request: IncomingMessage) => {
-
-      // TODO: нам же надо сразу изменить headers, а запрос remote io идет некоторое время!!!!
-
-      events.emit(wsServerEventNames.headers, headers, makeConnectionParams(request));
-    });
+    server.on('close', () => events.emit(WsServerEvent.serverClose));
+    server.on('listening', () => events.emit(WsServerEvent.listening));
+    server.on('error', () => events.emit(WsServerEvent.serverError));
     server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
       this.handleIncomeConnection(serverId, socket, request);
     });
@@ -207,34 +178,35 @@ export default class WebSocketServer implements WebSocketServerIo {
   }
 
   private handleIncomeConnection(serverId: string, socket: WebSocket, request: IncomingMessage) {
-    const connections = this.servers[Number(serverId)][SERVER_POSITIONS.connections];
-    const events = new IndexedEventEmitter();
+    const serverItem = this.getServerItem(serverId);
+    const connections = serverItem[SERVER_POSITIONS.connections];
     const connectionId: string = String(connections.length);
     const requestParams: ConnectionParams = makeConnectionParams(request);
 
-    // TODO: check socket.upgradeReq exists
-    //const upgradeReqParams: ConnectionParams | undefined = socket.upgradeReq && makeConnectionParams(socket.upgradeReq);
+    connections.push(socket);
 
-    connections.push([
-      socket,
-      events
-    ]);
+    socket.on('error', (err: Error) => {
+      serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.clientError, connectionId, err);
+    });
 
-    socket.on('error', (err: Error) => events.emit(wsEventNames.error, err));
-    socket.on('open', () => events.emit(wsEventNames.open));
     socket.on('close', (code: number, reason: string) => {
-      events.emit(wsEventNames.close, code, reason);
+      serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.clientClose, connectionId, code, reason);
     });
+
     socket.on('message', (data: string | Uint8Array) => {
-      events.emit(wsEventNames.message, data);
+      serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.clientMessage, connectionId, data);
     });
+
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      events.emit(wsEventNames.unexpectedResponse, makeConnectionParams(response));
+      serverItem[SERVER_POSITIONS.events].emit(
+        WsServerEvent.clientUnexpectedResponse,
+        connectionId,
+        makeConnectionParams(response)
+      );
     });
 
     // emit new connection
-    this.servers[Number(serverId)][SERVER_POSITIONS.events]
-      .emit(wsServerEventNames.connection, connectionId, requestParams);
+    serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.newConnection, connectionId, requestParams);
   }
 
   private getServerItem(serverId: string): ServerItem {
@@ -243,17 +215,6 @@ export default class WebSocketServer implements WebSocketServerIo {
     }
 
     return this.servers[Number(serverId)];
-  }
-
-  private getConnectionItem(serverId: string, connectionId: string): ConnectionItem {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
-    }
-    else if (!this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]) {
-      throw new Error(`WebSocketServer: Connection "${connectionId}" hasn't been found on server "${serverId}"`);
-    }
-
-    return this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)];
   }
 
 }

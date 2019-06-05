@@ -1,4 +1,3 @@
-import {WsEvents} from './WebSocketClientIo';
 import IoItem from '../IoItem';
 
 
@@ -9,7 +8,6 @@ export const Methods = [
   'onServerListening',
   'onServerClose',
   'onServerError',
-  'removeServerEventListener',
   'onClose',
   'onMessage',
   'onError',
@@ -19,16 +17,17 @@ export const Methods = [
   'close',
 ];
 
-export const wsServerEventNames: {[index: string]: WsServerEvents} = {
-  listening: 'listening',
-  close: 'close',
-  connection: 'connection',
-  error: 'error',
-  headers: 'headers',
-};
+export enum WsServerEvent {
+  newConnection,
+  listening,
+  serverClose,
+  serverError,
+  clientClose,
+  clientMessage,
+  clientError,
+  clientUnexpectedResponse,
+}
 
-
-export type WsServerEvents = 'listening' | 'close' | 'connection' | 'error' | 'headers';
 
 export interface WebSocketServerProps {
   // The hostname where to bind the server
@@ -88,20 +87,19 @@ export default interface WebSocketServerIo extends IoItem {
   onServerError(serverId: string, cb: (err: Error) => void): Promise<number>;
 
   /**
-   * Remove one of server listeners
-   */
-  removeServerEventListener(serverId: string, eventName: WsServerEvents, handlerIndex: number): Promise<void>;
-
-  ////////// Connection's methods like in client, but without onOpen
-
-  /**
    * On connection close
    */
   onClose(serverId: string, cb: (connectionId: string) => void): Promise<number>;
   onMessage(serverId: string, cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number>;
   onError(serverId: string, cb: (connectionId: string, err: Error) => void): Promise<number>;
   onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>
-  removeEventListener(serverId: string, connectionId: string, eventName: WsEvents, handlerIndex: number): Promise<void>;
+
+  /**
+   * Remove one of server listeners
+   */
+  removeEventListener(serverId: string, eventName: WsServerEvent, handlerIndex: number): Promise<void>;
+
+  ////////// Connection's methods like in client, but without onOpen
 
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
   close(serverId: string, connectionId: string, code: number, reason: string): Promise<void>;
