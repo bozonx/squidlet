@@ -11,7 +11,6 @@ import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 
 
-// Server instance, server's events, [connection, connection's events]
 type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
 
 enum SERVER_POSITIONS {
@@ -40,8 +39,15 @@ export function makeConnectionParams(request: IncomingMessage): ConnectionParams
  * The same for lowjs and nodejs
  */
 export default class WebSocketServer implements WebSocketServerIo {
-  private readonly events = new IndexedEventEmitter();
   private readonly servers: ServerItem[] = [];
+
+
+  async destroy() {
+    for (let serverId in this.servers) {
+      await this.closeServer(serverId);
+    }
+  }
+
 
   /////// Server's methods
 

@@ -1,28 +1,20 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
-import WebSocketClientIo, {WebSocketClientProps, wsEventNames, WsEvents} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {WebSocketClientProps, WsClientEvent} from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
-import {AnyHandler} from 'system/helpers/IndexedEvents';
 import {callPromised} from 'system/helpers/helpers';
 import {omit} from 'system/helpers/lodashLike';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';
 
 
-export type ConnectionItem = [ WebSocket, IndexedEventEmitter<AnyHandler> ];
-
-export enum CONNECTION_POSITIONS {
-  webSocket,
-  events
-}
-
-
 /**
  * The same for lowjs and nodejs
  */
 export default class WebSocketClient implements WebSocketClientIo {
-  private readonly connections: ConnectionItem[] = [];
+  private readonly events = new IndexedEventEmitter();
+  private readonly connections: WebSocket[] = [];
 
 
   async destroy() {
@@ -54,42 +46,32 @@ export default class WebSocketClient implements WebSocketClientIo {
     this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
 
-  async onOpen(connectionId: string, cb: () => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(connectionId);
-
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.open, cb);
+  async onOpen(cb: (connectionId: string) => void): Promise<number> {
+    return this.events.addListener(WsClientEvent.open, cb);
   }
 
-  async onClose(connectionId: string, cb: () => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(connectionId);
-
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.close, cb);
+  async onClose(cb: (connectionId: string) => void): Promise<number> {
+    return this.events.addListener(WsClientEvent.close, cb);
   }
 
-  async onMessage(connectionId: string, cb: (data: string | Uint8Array) => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(connectionId);
-
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.message, cb);
+  async onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number> {
+    return this.events.addListener(WsClientEvent.message, cb);
   }
 
-  async onError(connectionId: string, cb: (err: Error) => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(connectionId);
-
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.error, cb);
+  async onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
+    return this.events.addListener(WsClientEvent.error, cb);
   }
 
-  async onUnexpectedResponse(connectionId: string, cb: (response: ConnectionParams) => void): Promise<number> {
-    const connectionItem = this.getConnectionItem(connectionId);
-
-    return connectionItem[CONNECTION_POSITIONS.events].addListener(wsEventNames.unexpectedResponse, cb);
+  async onUnexpectedResponse(cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
+    return this.events.addListener(WsClientEvent.unexpectedResponse, cb);
   }
 
-  async removeEventListener(connectionId: string, eventName: WsEvents, handlerIndex: number) {
+  async removeEventListener(connectionId: string, eventName: WsClientEvent, handlerIndex: number) {
     const connectionItem = this.connections[Number(connectionId)];
 
     if (!connectionItem) return;
 
-    return connectionItem[CONNECTION_POSITIONS.events].removeListener(eventName, handlerIndex);
+    this.events.removeListener(eventName, handlerIndex);
   }
 
   async send(connectionId: string, data: string | Uint8Array) {
@@ -142,7 +124,7 @@ export default class WebSocketClient implements WebSocketClientIo {
     ];
   }
 
-  private getConnectionItem(connectionId: string): ConnectionItem {
+  private getWebSocketItem(connectionId: string): WebSocket {
     if (!this.connections[Number(connectionId)]) {
       throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
     }
