@@ -102,26 +102,22 @@ export default class WebSocketClient implements WebSocketClientIo {
   }
 
 
-  private connectToServer(connectionId: string, props: WebSocketClientProps): ConnectionItem {
-    const events = new IndexedEventEmitter();
+  private connectToServer(connectionId: string, props: WebSocketClientProps): WebSocket {
     const client = new WebSocket(props.url, omit(props, 'url'));
 
-    client.on(wsEventNames.open, () => events.emit(wsEventNames.open));
-    client.on(wsEventNames.close, () => events.emit(wsEventNames.close));
-    client.on(wsEventNames.message, (data: string | Uint8Array) => {
-      events.emit(wsEventNames.message, data);
+    client.on('open', () => this.events.emit(WsClientEvent.open, connectionId));
+    client.on('close', () => this.events.emit(WsClientEvent.close, connectionId));
+    client.on('message', (data: string | Uint8Array) => {
+      this.events.emit(WsClientEvent.message, connectionId, data);
     });
-    client.on(wsEventNames.error, (err: Error) => {
-      events.emit(wsEventNames.error, err);
+    client.on('error', (err: Error) => {
+      this.events.emit(WsClientEvent.error, connectionId, err);
     });
     client.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      events.emit(wsEventNames.unexpectedResponse, makeConnectionParams(response));
+      this.events.emit(WsClientEvent.unexpectedResponse, connectionId, makeConnectionParams(response));
     });
 
-    return [
-      client,
-      events,
-    ];
+    return client;
   }
 
   private getWebSocketItem(connectionId: string): WebSocket {
