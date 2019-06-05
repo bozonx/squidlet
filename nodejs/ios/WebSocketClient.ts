@@ -82,18 +82,15 @@ export default class WebSocketClient implements WebSocketClientIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    const connectionItem = this.getConnectionItem(connectionId);
-
-    await callPromised(connectionItem[CONNECTION_POSITIONS.webSocket].send, data);
+    await callPromised(this.connections[Number(connectionId)].send, data);
   }
 
   async close(connectionId: string, code: number, reason?: string) {
-    const connectionItem = this.connections[Number(connectionId)];
+    const connection = this.connections[Number(connectionId)];
 
-    if (!connectionItem) return;
+    if (!connection) return;
 
-    connectionItem[CONNECTION_POSITIONS.webSocket].close(code, reason);
-    connectionItem[CONNECTION_POSITIONS.events].destroy();
+    connection.close(code, reason);
 
     delete this.connections[Number(connectionId)];
 
@@ -118,14 +115,6 @@ export default class WebSocketClient implements WebSocketClientIo {
     });
 
     return client;
-  }
-
-  private getWebSocketItem(connectionId: string): WebSocket {
-    if (!this.connections[Number(connectionId)]) {
-      throw new Error(`WebSocketClient: Connection "${connectionId}" hasn't been found`);
-    }
-
-    return this.connections[Number(connectionId)];
   }
 
 }
