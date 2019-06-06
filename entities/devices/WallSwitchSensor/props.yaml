@@ -26,5 +26,5 @@ doubleCheck:
 # sorce: {}
 #
 #### Device base props
-# statusRepublishInterval: {}
-# configRepublishInterval: {}
+#------ statusRepublishInterval: {}
+#------ configRepublishInterval: {}

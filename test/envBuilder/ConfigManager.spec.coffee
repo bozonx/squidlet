@@ -65,8 +65,8 @@ describe 'envBuilder.ConfigManager', ->
     assert.deepEqual(@configManager.devicesDefaults, @preHostConfig.devicesDefaults)
     assert.deepEqual(@configManager.hostConfig, {
       config: {
-        defaultConfigRepublishIntervalMs: 600000
-        defaultStatusRepublishIntervalMs: 60000
+        #defaultConfigRepublishIntervalMs: 600000
+        #defaultStatusRepublishIntervalMs: 60000
         senderResendTimeout: 1
         senderTimeout: 60
         ioSetResponseTimoutSec: 30

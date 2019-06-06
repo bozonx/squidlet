@@ -1,5 +1,4 @@
 import System from '../System';
-import Republish from '../helpers/Republish';
 import IndexedEvents from '../helpers/IndexedEvents';
 import {isEmpty} from '../helpers/lodashLike';
 import {getDifferentKeys} from '../helpers/collections';
@@ -44,16 +43,17 @@ export default abstract class DeviceDataManagerBase {
   protected tmpState?: Data;
 
 
-  constructor(deviceId: string, system: System, schema: Schema, republishInterval?: number) {
+  //, republishInterval?: number
+  constructor(deviceId: string, system: System, schema: Schema) {
     this.deviceId = deviceId;
     this.system = system;
     this.schema = schema;
 
-    const realRepublishInterval = (typeof republishInterval === 'undefined')
-      ? this.system.config.config.defaultStatusRepublishIntervalMs
-      : republishInterval;
-
-    this.republish = new Republish(realRepublishInterval);
+    // const realRepublishInterval = (typeof republishInterval === 'undefined')
+    //   ? this.system.config.config.defaultStatusRepublishIntervalMs
+    //   : republishInterval;
+    //
+    // this.republish = new Republish(realRepublishInterval);
   }
 
   async init(initialize?: Initialize, getter?: Getter, setter?: Setter): Promise<void> {

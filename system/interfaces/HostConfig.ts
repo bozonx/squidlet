@@ -5,9 +5,9 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 export interface HostConfigConfig {
   //logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
-  defaultStatusRepublishIntervalMs: number;
+  //defaultStatusRepublishIntervalMs: number;
   // republish config silently every 10 minutes if it hasn't been changed
-  defaultConfigRepublishIntervalMs: number;
+  //defaultConfigRepublishIntervalMs: number;
   // main timeout in seconds
   senderTimeout: number;
   // resend timeout in seconds

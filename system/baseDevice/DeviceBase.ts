@@ -10,8 +10,8 @@ import {combineTopic} from '../helpers/helpers';
 
 
 export interface DeviceBaseProps {
-  statusRepublishInterval?: number;
-  configRepublishInterval?: number;
+  //statusRepublishInterval?: number;
+  //configRepublishInterval?: number;
   [index: string]: any;
 }
 
@@ -63,7 +63,7 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
         this.id,
         this.env.system,
         manifest.status,
-        this.props.statusRepublishInterval,
+        //this.props.statusRepublishInterval,
       );
     }
 
@@ -72,7 +72,7 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
         this.id,
         this.env.system,
         manifest.config,
-        this.props.configRepublishInterval,
+        //this.props.configRepublishInterval,
       );
     }
 

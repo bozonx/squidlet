@@ -1,3 +1,5 @@
+// TODO: remove
+
 import IndexedEventEmitter from './IndexedEventEmitter';
 
 

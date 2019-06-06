@@ -7,7 +7,7 @@ describe 'baseDevice.Config', ->
       host: {
         config: {
           config: {
-            defaultStatusRepublishIntervalMs: 1000
+            #defaultStatusRepublishIntervalMs: 1000
           }
         }
       }
