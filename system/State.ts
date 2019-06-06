@@ -1,36 +1,38 @@
-import System from './System';
 import {JsonTypes} from './interfaces/Types';
+import IndexedEvents from './helpers/IndexedEvents';
+import {mergeDeep} from './helpers/collections';
 
 
-// TODO: add republish
+// TODO: add republish - общий интервал
+
+type ChangeHandler = (stateName: string) => void;
 
 
 export default class State {
-  private readonly system: System;
+  private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  private readonly state: {[index: string]: {[index: string]: JsonTypes}} = {};
 
 
-  constructor(system: System) {
-    this.system = system;
+  constructor(republishInterval: string) {
   }
 
   destroy() {
-    // TODO: add
+    this.changeEvents.removeAll();
   }
 
 
   getState(stateName: string): JsonTypes {
-    // TODO: add
-    return 0;
+    return this.state[stateName];
   }
 
-  updateState(stateName: string, newState: JsonTypes) {
-    // TODO: add
+  updateState(stateName: string, newPartialState: {[index: string]: JsonTypes}) {
+    this.state[stateName] = mergeDeep(newPartialState, this.state[stateName]);
 
+    this.changeEvents.emit(stateName);
   }
 
-  onChange(stateName: string, cb: (state: JsonTypes, isRepublish?: true) => void): number {
-    // TODO: add
-    return 0;
+  onChange(stateName: string, cb: (stateName: string, isRepublish?: true) => void): number {
+    return this.changeEvents.addListener(cb);
   }
 
 }
