@@ -1,11 +1,12 @@
 import WebSocketClientIo, {
-  OnMessageHandler,
+  OnMessageHandler, WebSocketClientProps,
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/helpers/IndexedEvents';
-import {JsonTypes} from 'system/interfaces/Types';
+import {Primitives} from 'system/interfaces/Types';
+import {mergeDeep} from 'system/helpers/collections';
+import {parseCookie, stringifyCookie} from 'system/helpers/strings';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
-import {mergeDeep} from '../../../system/helpers/collections';
 
 
 export interface WsClientLogicProps {
@@ -42,7 +43,7 @@ export default class WsClientLogic {
   private connectionTries: number = 0;
   private reconnectTimeout: any;
   private isConnectionOpened: boolean = false;
-  private cookies: {[index: string]: JsonTypes} = {};
+  private cookies: {[index: string]: Primitives} = {};
   private waitingCookies: boolean = true;
 
 
@@ -66,7 +67,12 @@ export default class WsClientLogic {
 
   async init() {
     // make new connection and save connectionId of it
-    this.connectionId = await this.wsClientIo.newConnection(this.props);
+
+    const connectionProps: WebSocketClientProps = {
+      url: this.props.url,
+    };
+
+    this.connectionId = await this.wsClientIo.newConnection(connectionProps);
 
     await this.listen();
   }
@@ -196,10 +202,17 @@ export default class WsClientLogic {
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
 
     // TODO: при этом не сработает close ??? или сработает???
-    // TODO: использовать cookie
+
+    const connectionProps: WebSocketClientProps = {
+      url: this.props.url,
+      headers: {
+        'Cookie': stringifyCookie(this.cookies),
+      }
+    };
+
     // try to reconnect and save current connectionId
     try {
-      await this.wsClientIo.reConnect(this.connectionId, this.props);
+      await this.wsClientIo.reConnect(this.connectionId, connectionProps);
     }
     catch (err) {
       this.logError(`WsClientLogic.doReconnect: ${err}. Reconnecting...`);
@@ -255,10 +268,10 @@ export default class WsClientLogic {
   private setCookie(data: string | Uint8Array) {
     if (typeof data !== 'string' || data.indexOf(SETCOOKIE_LABEL) !== 0) return;
 
-    const [left, jsonPart] = data.split(SETCOOKIE_LABEL);
+    const [left, cookiePart] = data.split(SETCOOKIE_LABEL);
 
     try {
-      const cookies: {[index: string]: JsonTypes} = JSON.parse(jsonPart);
+      const cookies: {[index: string]: Primitives} = parseCookie(cookiePart);
 
       this.cookies = mergeDeep(this.cookies, cookies);
     }
@@ -268,12 +281,3 @@ export default class WsClientLogic {
   }
 
 }
-
-// private makeIoProps(): WebSocketClientProps {
-//   return {
-//     url: this.props.url,
-//     //url: `ws://${this.props.host}:${this.props.port}?clientid=${this.props.clientId}`,
-//     // additional io client params
-//     //...omit(this.props, 'host', 'port')
-//   };
-// }

@@ -40,6 +40,7 @@ export type OnMessageHandler = (data: string | Uint8Array) => void;
 
 export interface WebSocketClientProps {
   url: string;
+  headers?: {[index: string]: string};
 }
 
 export default interface WebSocketClientIo extends IoItem {
