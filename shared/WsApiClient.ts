@@ -77,21 +77,29 @@ export default class WsApiClient {
   /**
    * Encode and send remote call message to server
    */
-  private sendToServer = (message: RemoteCallMessage): Promise<void> => {
-    const binData: Uint8Array = serializeJson(message);
+  private sendToServer = async (message: RemoteCallMessage): Promise<void> => {
+    try {
+      const binData: Uint8Array = serializeJson(message);
 
-    return this.client.send(binData);
+      return this.client.send(binData);
+    }
+    catch (err) {
+      this.logError(err);
+    }
   }
 
   /**
    * Decode income messages from server and pass it to remoteCall
    */
-  private handleIncomeMessage = (data: string | Uint8Array) => {
-    // TODO: use try
-    const message: RemoteCallMessage = deserializeJson(data);
+  private handleIncomeMessage = async (data: string | Uint8Array) => {
+    try {
+      const message: RemoteCallMessage = deserializeJson(data);
 
-    this.remoteCall.incomeMessage(message)
-      .catch(this.logError);
+      await this.remoteCall.incomeMessage(message);
+    }
+    catch (err) {
+      this.logError(err);
+    }
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {

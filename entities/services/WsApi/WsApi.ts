@@ -32,16 +32,10 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
     });
 
     // listen income api requests
-    this.wsServerSessions.onMessage((sessionId: string, data: string | Uint8Array) => {
-      this.handleIncomeMessages(sessionId, data)
-        .catch(this.env.log.error);
-    });
+    this.wsServerSessions.onMessage(this.handleIncomeMessages);
 
     // listen outcome api requests
-    this.env.api.onOutcomeRemoteCall((sessionId: string, message: RemoteCallMessage) => {
-      this.handleOutcomeMessages(sessionId, message)
-        .catch(this.env.log.error);
-    });
+    this.env.api.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
   destroy = async () => {
@@ -53,7 +47,9 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
   }
 
 
-  private handleIncomeMessages = async (sessionId: string, data: string | Uint8Array) => {
+  private handleIncomeMessages = this.wrapErrors(async (sessionId: string, data: string | Uint8Array) => {
+    if (!this.sessions.includes(sessionId)) return;
+
     let msg: RemoteCallMessage;
 
     try {
@@ -64,12 +60,12 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
     }
 
     return this.env.api.incomeRemoteCall(sessionId, msg);
-  }
+  });
 
-  private handleOutcomeMessages = async (sessionId: string, message: RemoteCallMessage) => {
+  private handleOutcomeMessages = this.wrapErrors(async (sessionId: string, message: RemoteCallMessage) => {
     const binData: Uint8Array = serializeJson(message);
 
     return this.wsServerSessions.send(sessionId, binData);
-  }
+  });
 
 }
