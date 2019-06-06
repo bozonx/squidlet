@@ -43,6 +43,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onConnectionClose((connectionId: string) => {
+      // handle only ours active sessions
       const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
 
       if (!sessionId) return;
@@ -51,6 +52,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       this.sessionConnections[sessionId] = null;
     });
     this.server.onMessage((connectionId: string, data: string | Uint8Array) => {
+      // handle only ours active sessions
       const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
 
       if (!sessionId) return;

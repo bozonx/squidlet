@@ -19,7 +19,7 @@ export interface WsClientLogicProps {
 /**
  * Websocket client simplified interface.
  * It can automatically reconnect if "autoReconnect" param is true.
- * But if connection is closed you should create a new instance to reconnect.
+ * But if connection is closed by calling the close method you should create a new instance to reconnect.
  */
 export default class WsClientLogic {
   // on first time connect or reconnect
@@ -31,7 +31,6 @@ export default class WsClientLogic {
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
-  // TODO: maybe better to use undefined
   private connectionId: string = '';
   private openPromiseResolve: () => void = () => {};
   private openPromiseReject: () => void = () => {};
@@ -77,8 +76,9 @@ export default class WsClientLogic {
     return this.isConnectionOpened;
   }
 
-  // TODO: если вызывается вовремя реконнекта - повешать в очередь и выполнить когда создастся новое соединение
   async send(data: string | Uint8Array): Promise<void> {
+    await this.openPromise;
+
     return this.wsClientIo.send(this.connectionId, data);
   }
 
@@ -97,11 +97,24 @@ export default class WsClientLogic {
 
 
   private async listen() {
-    await this.wsClientIo.onOpen(this.connectionId, this.handleConnectionOpen);
-    await this.wsClientIo.onClose(this.connectionId, this.handleConnectionClose);
-    await this.wsClientIo.onError(this.connectionId, (err: Error) => this.logError(String(err)));
-    await this.wsClientIo.onMessage(this.connectionId, this.messageEvents.emit);
-    await this.wsClientIo.onUnexpectedResponse(this.connectionId, (response: ConnectionParams) => {
+    await this.wsClientIo.onOpen(this.handleConnectionOpen);
+    await this.wsClientIo.onClose(this.handleConnectionClose);
+
+    await this.wsClientIo.onError((connectionId: string, err: Error) => {
+      if (connectionId !== this.connectionId) return;
+
+      this.logError(String(err));
+    });
+
+    await this.wsClientIo.onMessage((connectionId: string, data: string | Uint8Array) => {
+      if (connectionId !== this.connectionId) return;
+
+      this.messageEvents.emit(data);
+    });
+
+    await this.wsClientIo.onUnexpectedResponse((connectionId: string, response: ConnectionParams) => {
+      if (connectionId !== this.connectionId) return;
+
       this.logError(
         `The unexpected response has been received on ` +
         `connection "${this.connectionId}": ${JSON.stringify(response)}`
@@ -109,7 +122,9 @@ export default class WsClientLogic {
     });
   }
 
-  private handleConnectionOpen = () => {
+  private handleConnectionOpen = (connectionId: string) => {
+    if (connectionId !== this.connectionId) return;
+
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
     this.isConnectionOpened = true;
@@ -120,7 +135,9 @@ export default class WsClientLogic {
   /**
    * Trying to reconnect on connection closed.
    */
-  private handleConnectionClose = () => {
+  private handleConnectionClose = (connectionId: string) => {
+    if (connectionId !== this.connectionId) return;
+
     this.isConnectionOpened = false;
     // TODO: проверить действительно ли сработает close если даже соединение не открывалось
 
