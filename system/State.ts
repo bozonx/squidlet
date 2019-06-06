@@ -3,17 +3,19 @@ import IndexedEvents from './helpers/IndexedEvents';
 import {mergeDeep} from './helpers/collections';
 
 
-// TODO: add republish - общий интервал
+// TODO: задать наверное тип категории deviceStatus, deviceConfig, etc ???
 
-type ChangeHandler = (stateName: string) => void;
+type ChangeHandler = (category: string, stateName: string) => void;
+type StateObject = {[index: string]: JsonTypes};
 
 
 export default class State {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  private readonly state: {[index: string]: {[index: string]: JsonTypes}} = {};
+  // like { category: { stateName: { ... stateParams } } }
+  private readonly state: {[index: string]: {[index: string]: StateObject}} = {};
 
 
-  constructor(republishInterval: string) {
+  constructor() {
   }
 
   destroy() {
@@ -21,17 +23,21 @@ export default class State {
   }
 
 
-  getState(stateName: string): JsonTypes {
-    return this.state[stateName];
+  getState(category: string, stateName: string): StateObject | undefined {
+    if (!this.state[category]) return;
+
+    return this.state[category][stateName];
   }
 
-  updateState(stateName: string, newPartialState: {[index: string]: JsonTypes}) {
-    this.state[stateName] = mergeDeep(newPartialState, this.state[stateName]);
+  updateState(category: string, stateName: string, newPartialState: StateObject) {
+    if (!this.state[category]) this.state[category] = {};
 
-    this.changeEvents.emit(stateName);
+    this.state[category][stateName] = mergeDeep(newPartialState, this.state[category][stateName]);
+
+    this.changeEvents.emit(category, stateName);
   }
 
-  onChange(stateName: string, cb: (stateName: string, isRepublish?: true) => void): number {
+  onChange(stateName: string, cb: (category: string, stateName: string, isRepublish?: true) => void): number {
     return this.changeEvents.addListener(cb);
   }
 
