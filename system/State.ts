@@ -3,10 +3,8 @@ import IndexedEvents from './helpers/IndexedEvents';
 import {mergeDeep} from './helpers/collections';
 
 
-// TODO: задать наверное тип категории deviceStatus, deviceConfig, etc ???
-
-type ChangeHandler = (category: string, stateName: string, isRepublish?: true) => void;
-type CategoryChangeHandler = (category: string, isRepublish?: true) => void;
+type ChangeHandler = (category: number, stateName: string, isRepublish?: true) => void;
+type CategoryChangeHandler = (category: number, isRepublish?: true) => void;
 type StateObject = {[index: string]: JsonTypes};
 
 
@@ -26,13 +24,13 @@ export default class State {
   }
 
 
-  getState(category: string, stateName: string): StateObject | undefined {
+  getState(category: number, stateName: string): StateObject | undefined {
     if (!this.state[category]) return;
 
     return this.state[category][stateName];
   }
 
-  updateState(category: string, stateName: string, newPartialState: StateObject) {
+  updateState(category: number, stateName: string, newPartialState: StateObject) {
     if (!this.state[category]) this.state[category] = {};
 
     this.state[category][stateName] = mergeDeep(newPartialState, this.state[category][stateName]);
@@ -41,19 +39,19 @@ export default class State {
     this.categoryChangeEvents.emit(category);
   }
 
-  onChange(cb: (category: string, stateName: string, isRepublish?: true) => void): number {
+  onChange(cb: (category: number, stateName: string, isRepublish?: true) => void): number {
     return this.changeEvents.addListener(cb);
   }
 
-  onChangeCategory(cb: (category: string, isRepublish?: true) => void): number {
+  onChangeCategory(cb: (category: number, isRepublish?: true) => void): number {
     return this.categoryChangeEvents.addListener(cb);
   }
 
-  removeListener(category: string, stateName: string, handlerIndex: number) {
+  removeListener(category: number, stateName: string, handlerIndex: number) {
     this.changeEvents.removeListener(handlerIndex);
   }
 
-  removeCategoryListener(category: string, handlerIndex: number) {
+  removeCategoryListener(category: number, handlerIndex: number) {
     this.categoryChangeEvents.removeListener(handlerIndex);
   }
 

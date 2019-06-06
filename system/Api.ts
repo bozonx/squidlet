@@ -5,6 +5,7 @@ import RemoteCall from './helpers/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {objGet} from './helpers/lodashLike';
 import {Data} from './baseDevice/DeviceDataManagerBase';
+import {StateCategories} from './interfaces/States';
 
 
 type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
@@ -20,9 +21,8 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  *
  * RemoteCall api:
  * * Call device's action - ('deviceAction', 'room.deviceId', 'turn', 'param1', 'param2')
- * * Listen to device's status - ('listenDeviceStatus', 'room.deviceId', 'temperature')
- * *            default status - ('listenDeviceStatus', 'room.deviceId')
- * * Listen to device's config - ('listenDeviceConfig', 'room.deviceId')
+ * * Listen to device's status change - ('listenDeviceStatus', 'room.deviceId', cb: () => void)
+ * * Listen to device's config change - ('listenDeviceConfig', 'room.deviceId', cb: () => void)
  * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
  * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
  * * Getting session store - ('getSessionStore', 'mySessionId', 'key')
@@ -128,8 +128,7 @@ export default class Api {
       case 'deviceAction':
         return this.callDeviceAction(args[0], args[1], ...args.slice(2));
       case 'listenDeviceStatus':
-        // TODO: use this.publishEvents
-        // TODO: !!! ('listenDeviceStatus', 'room.deviceId', 'temperature')
+        return this.listenDeviceStatus(args[0], args[1]);
       case 'listenDeviceConfig':
         // TODO: use this.publishEvents
         // TODO: !!! ('listenDeviceConfig', 'room.deviceId')
@@ -140,7 +139,7 @@ export default class Api {
       case 'getSessionStore':
         return this.system.sessions.getStorage(args[0], args[1]);
       case 'listenLog':
-      // TODO: add
+        // TODO: add
         //return this.system.sessions.getStorage(args[0], args[1]);
       case 'blockIo':
         // TODO: add
@@ -163,6 +162,20 @@ export default class Api {
     const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.system.ioManager.getIo(ioName);
 
     return IoItem[methodName](...args);
+  }
+
+  private listenDeviceStatus(deviceId: string, cb: () => void): number {
+    // TODO: use this.publishEvents
+    // TODO: !!! ('listenDeviceStatus', 'room.deviceId', cb())
+    // TODO: как потом убить хэндлеры ???
+    // TODO: а можно ли слушать отдельный статус ???? temperature ???
+    const handlerWrapper = (category: number, stateName: string, isRepublish?: true) => {
+      if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
+
+      cb();
+    };
+
+    return this.system.state.onChange(handlerWrapper);
   }
 
 }
