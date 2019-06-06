@@ -3,6 +3,9 @@ import WebSocketClientIo, {
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/helpers/IndexedEvents';
+import {JsonTypes} from 'system/interfaces/Types';
+import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
+import {mergeDeep} from '../../../system/helpers/collections';
 
 
 export interface WsClientLogicProps {
@@ -39,6 +42,8 @@ export default class WsClientLogic {
   private connectionTries: number = 0;
   private reconnectTimeout: any;
   private isConnectionOpened: boolean = false;
+  private cookies: {[index: string]: JsonTypes} = {};
+  private waitingCookies: boolean = true;
 
 
   constructor(
@@ -99,17 +104,12 @@ export default class WsClientLogic {
   private async listen() {
     await this.wsClientIo.onOpen(this.handleConnectionOpen);
     await this.wsClientIo.onClose(this.handleConnectionClose);
+    await this.wsClientIo.onMessage(this.handleMessage);
 
     await this.wsClientIo.onError((connectionId: string, err: Error) => {
       if (connectionId !== this.connectionId) return;
 
       this.logError(String(err));
-    });
-
-    await this.wsClientIo.onMessage((connectionId: string, data: string | Uint8Array) => {
-      if (connectionId !== this.connectionId) return;
-
-      this.messageEvents.emit(data);
     });
 
     await this.wsClientIo.onUnexpectedResponse((connectionId: string, response: ConnectionParams) => {
@@ -128,6 +128,7 @@ export default class WsClientLogic {
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
     this.isConnectionOpened = true;
+    this.waitingCookies = true;
     this.openPromiseResolve();
     this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
@@ -144,6 +145,19 @@ export default class WsClientLogic {
     this.logInfo(`WsClientLogic: connection closed. ${this.props.url} Id: ${this.connectionId}`);
     this.resolveReconnection()
       .catch(this.logError);
+  }
+
+  private handleMessage = (connectionId: string, data: string | Uint8Array) => {
+    if (connectionId !== this.connectionId) return;
+
+    // if the first message is cookie - set it
+    if (this.waitingCookies) {
+      this.waitingCookies = false;
+
+      this.setCookie(data);
+    }
+
+    this.messageEvents.emit(data);
   }
 
   /**
@@ -182,6 +196,7 @@ export default class WsClientLogic {
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
 
     // TODO: при этом не сработает close ??? или сработает???
+    // TODO: использовать cookie
     // try to reconnect and save current connectionId
     try {
       await this.wsClientIo.reConnect(this.connectionId, this.props);
@@ -235,6 +250,21 @@ export default class WsClientLogic {
     delete this.reconnectTimeout;
     this.messageEvents.removeAll();
     delete this.openPromiseResolve;
+  }
+
+  private setCookie(data: string | Uint8Array) {
+    if (typeof data !== 'string' || data.indexOf(SETCOOKIE_LABEL) !== 0) return;
+
+    const [left, jsonPart] = data.split(SETCOOKIE_LABEL);
+
+    try {
+      const cookies: {[index: string]: JsonTypes} = JSON.parse(jsonPart);
+
+      this.cookies = mergeDeep(this.cookies, cookies);
+    }
+    catch (err) {
+      return this.logError(`WsClientLogic.setCookie: ${err}`);
+    }
   }
 
 }

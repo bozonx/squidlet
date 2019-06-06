@@ -79,7 +79,7 @@ export default class WsServerLogic {
   }
 
   async setCookie(connectionId: string, cookie: string) {
-    const data = `${SETCOOKIE_LABEL}:${cookie}`;
+    const data = `${SETCOOKIE_LABEL}${cookie}`;
 
     return this.wsServerIo.send(this.serverId, connectionId, data);
   }
