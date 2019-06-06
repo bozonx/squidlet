@@ -70,7 +70,7 @@ export default class System {
     this.devicesManager = new DevicesManager(this);
     this.api = new Api(this);
     this.sessions = new Sessions(this.generateUniqId);
-    this.state = new State(this);
+    this.state = new State();
   }
 
   destroy = async () => {
