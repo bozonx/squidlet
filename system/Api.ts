@@ -130,8 +130,7 @@ export default class Api {
       case 'listenDeviceStatus':
         return this.listenDeviceStatus(args[0], args[1]);
       case 'listenDeviceConfig':
-        // TODO: use this.publishEvents
-        // TODO: !!! ('listenDeviceConfig', 'room.deviceId')
+        // TODO: add
       case 'setDeviceConfig':
         return this.sedDeviceConfig(args[0], args[1]);
       case 'getConfig':

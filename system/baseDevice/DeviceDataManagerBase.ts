@@ -28,7 +28,6 @@ export default abstract class DeviceDataManagerBase {
   protected readonly deviceId: string;
   protected readonly system: System;
   protected readonly schema: Schema;
-  protected readonly republish: Republish;
   protected initialize?: Initialize;
   protected getter?: Getter;
   protected setter?: Setter;

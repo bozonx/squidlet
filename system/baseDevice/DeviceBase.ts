@@ -9,14 +9,7 @@ import {JsonTypes} from '../interfaces/Types';
 import {combineTopic} from '../helpers/helpers';
 
 
-export interface DeviceBaseProps {
-  //statusRepublishInterval?: number;
-  //configRepublishInterval?: number;
-  [index: string]: any;
-}
-
-
-export default class DeviceBase<Props extends DeviceBaseProps = {}> extends EntityBase<Props> {
+export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
   protected readonly env: DeviceEnv;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
@@ -29,7 +22,7 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
   protected configSetter?: Setter;
   protected transformPublishValue?: (value: any) => any;
   protected actions: {[index: string]: Function} = {};
-  protected _status?: Status;
+  private _status?: Status;
   private _config?: Config;
 
 
@@ -63,7 +56,6 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
         this.id,
         this.env.system,
         manifest.status,
-        //this.props.statusRepublishInterval,
       );
     }
 
@@ -72,7 +64,6 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
         this.id,
         this.env.system,
         manifest.config,
-        //this.props.configRepublishInterval,
       );
     }
 
@@ -142,6 +133,8 @@ export default class DeviceBase<Props extends DeviceBaseProps = {}> extends Enti
   protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
     const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, this.id, subTopic);
     const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
+
+    // TODO: наверное надо установить стейт а не publish
 
     this.env.api.publish(topic, data, isRepeat);
   }
