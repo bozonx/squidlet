@@ -22,17 +22,18 @@ export type ChangeHandler = (changedParams: string[]) => void;
  * * publish - it emits on changes and on republish
  */
 export default abstract class DeviceDataManagerBase {
-  protected readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  protected readonly publishEvents = new IndexedEvents<Publisher>();
+  // protected readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  // protected readonly publishEvents = new IndexedEvents<Publisher>();
   protected abstract readonly typeNameOfData: string;
   protected readonly deviceId: string;
   protected readonly system: System;
   protected readonly schema: Schema;
+  // TODO: review
   protected initialize?: Initialize;
   protected getter?: Getter;
   protected setter?: Setter;
 
-  protected abstract publishState: PublishState;
+  //protected abstract publishState: PublishState;
   abstract read: () => Promise<Data>;
   abstract write: (partialData: Data) => Promise<void>;
 
@@ -70,31 +71,10 @@ export default abstract class DeviceDataManagerBase {
    * Get local state. It returns temporary state if it set else local state.
    */
   getState(): Data {
+    // TODO: review
     if (this.tmpState) return this.tmpState;
 
     return this.localState;
-  }
-
-  onChange(cb: ChangeHandler): number {
-    return this.changeEvents.addListener(cb);
-  }
-
-  onPublish(cb: Publisher): number {
-    return this.publishEvents.addListener(cb);
-  }
-
-  /**
-   * Remove listener which was set by 'onChange'
-   */
-  removeListener(handlerIndex: number): void {
-    this.changeEvents.removeListener(handlerIndex);
-  }
-
-  /**
-   * Remove listener which was set by 'onPublish'
-   */
-  removePublishListener(handlerIndex: number): void {
-    this.publishEvents.removeListener(handlerIndex);
   }
 
 
@@ -104,18 +84,17 @@ export default abstract class DeviceDataManagerBase {
    * It there isn't a getter - return "localData"
    */
   protected async readAllData(): Promise<Data> {
-    // if there isn't a data getter - just return local config
-    if (!this.getter) return this.getState();
-    // if there is a writing request in progress
+    // if there isn't a data getter - just return local state
+    // or if there is a writing request in progress
     // then disallow making read request and return data which will be saved
-    else if (this.tmpState) return this.getState();
+    if (!this.getter || this.isWriting()) return this.getState();
 
     // else fetch data if getter is defined
 
     const result: Data = await this.justReadAllData();
-    // set to local data
-    const updatedParams = getDifferentKeys(this.localState, result);
+    const updatedParams: string[] = getDifferentKeys(this.localState, result);
 
+    // TODO: use State ???
     this.localState = {
       ...this.localState,
       ...result,
@@ -135,11 +114,10 @@ export default abstract class DeviceDataManagerBase {
    */
   protected async readJustParam(paramName: string): Promise<any> {
     // if there isn't a data getter - just return local status
-    if (!this.getter) return this.getState()[paramName];
-    // else fetch status if getter is defined
+    // or if fetch status if getter is defined
     // if there is a writing request in progress
     // then disallow making read request and return data which will be saved
-    else if (this.tmpState) return this.getState()[paramName];
+    if (!this.getter || this.isWriting()) return this.getState()[paramName];
 
     const result: Data = await this.doRequest(
       () => this.getter && this.getter([paramName]),
@@ -192,6 +170,10 @@ export default abstract class DeviceDataManagerBase {
     return this.writeAllDataAndSetState(partialData, silent);
   }
 
+
+  isWriting(): boolean {
+    return Boolean(this.tmpState);
+  }
 
   /**
    * Gets initial value:
@@ -339,86 +321,110 @@ export default abstract class DeviceDataManagerBase {
     return result;
   }
 
+
+  // onChange(cb: ChangeHandler): number {
+  //   return this.changeEvents.addListener(cb);
+  // }
+  //
+  // onPublish(cb: Publisher): number {
+  //   return this.publishEvents.addListener(cb);
+  // }
+
   // /**
-  //  * Set whole structure to local data.
-  //  * It clears tmp state and set consistent new state.
-  //  * @returns {string} List of params names which were updated
+  //  * Remove listener which was set by 'onChange'
   //  */
-  // private setLocalState(partialData: Data): string[] {
+  // removeListener(handlerIndex: number): void {
+  //   this.changeEvents.removeListener(handlerIndex);
+  // }
   //
-  //   // TODO: remove
+  // /**
+  //  * Remove listener which was set by 'onPublish'
+  //  */
+  // removePublishListener(handlerIndex: number): void {
+  //   this.publishEvents.removeListener(handlerIndex);
+  // }
+
+  // private emitOnChange(updatedParams: string[], silent?: boolean) {
+  //   if (!updatedParams.length) return;
   //
-  //   const updatedParams: string[] = [];
+  //   // emit change event
+  //   this.changeEvents.emit(updatedParams);
+  //   // start/restart republish logic
+  //   this.republish.start(this.republishCb);
+  //   // emit publish event
+  //   if (!silent) this.publishState(updatedParams, false);
+  // }
+
+  // /**
+  //  * Republish current state.
+  //  * It reads current data and set it to localState.
+  //  * And do publish.
+  //  */
+  // private republishCb = async () => {
+  //   // read current data
+  //   const result: Data = await this.justReadAllData();
   //
-  //   for (let name of Object.keys(partialData)) {
-  //     if (partialData[name] !== this.localState[name]) updatedParams.push(name);
-  //   }
+  //   // set to local data
+  //   const updatedParams = getDifferentKeys(this.localState, result);
   //
-  //   // do nothing if there isn't changed data
-  //   if (!updatedParams.length) return updatedParams;
-  //
-  //   // update local data
   //   this.localState = {
   //     ...this.localState,
-  //     ...partialData,
+  //     ...result,
   //   };
+  //   // clear temporary state because we have the last one
+  //   this.tmpState = undefined;
   //
-  //   return updatedParams;
+  //   // rise events change event
+  //   if (updatedParams.length) {
+  //     // emit change event
+  //     this.changeEvents.emit(updatedParams);
+  //   }
+  //
+  //   // publish state any way even values hasn't changed
+  //   this.publishState(Object.keys(this.getState()), true);
   // }
-
-  // /**
-  //  * Set param to local data.
-  //  * If param was set it returns true else false
-  //  */
-  // private setLocalStateParam(paramName: string, value: any): boolean {
-  //
-  //   // TODO: revew
-  //
-  //   if (this.localState[paramName] === value) return false;
-  //
-  //   this.localState[paramName] = value;
-  //
-  //   return true;
-  // }
-
-  private emitOnChange(updatedParams: string[], silent?: boolean) {
-    if (!updatedParams.length) return;
-
-    // emit change event
-    this.changeEvents.emit(updatedParams);
-    // start/restart republish logic
-    this.republish.start(this.republishCb);
-    // emit publish event
-    if (!silent) this.publishState(updatedParams, false);
-  }
-
-  /**
-   * Republish current state.
-   * It reads current data and set it to localState.
-   * And do publish.
-   */
-  private republishCb = async () => {
-    // read current data
-    const result: Data = await this.justReadAllData();
-
-    // set to local data
-    const updatedParams = getDifferentKeys(this.localState, result);
-
-    this.localState = {
-      ...this.localState,
-      ...result,
-    };
-    // clear temporary state because we have the last one
-    this.tmpState = undefined;
-
-    // rise events change event
-    if (updatedParams.length) {
-      // emit change event
-      this.changeEvents.emit(updatedParams);
-    }
-
-    // publish state any way even values hasn't changed
-    this.publishState(Object.keys(this.getState()), true);
-  }
 
 }
+
+
+// /**
+//  * Set whole structure to local data.
+//  * It clears tmp state and set consistent new state.
+//  * @returns {string} List of params names which were updated
+//  */
+// private setLocalState(partialData: Data): string[] {
+//
+//   // TODO: remove
+//
+//   const updatedParams: string[] = [];
+//
+//   for (let name of Object.keys(partialData)) {
+//     if (partialData[name] !== this.localState[name]) updatedParams.push(name);
+//   }
+//
+//   // do nothing if there isn't changed data
+//   if (!updatedParams.length) return updatedParams;
+//
+//   // update local data
+//   this.localState = {
+//     ...this.localState,
+//     ...partialData,
+//   };
+//
+//   return updatedParams;
+// }
+
+// /**
+//  * Set param to local data.
+//  * If param was set it returns true else false
+//  */
+// private setLocalStateParam(paramName: string, value: any): boolean {
+//
+//   // TODO: revew
+//
+//   if (this.localState[paramName] === value) return false;
+//
+//   this.localState[paramName] = value;
+//
+//   return true;
+// }
