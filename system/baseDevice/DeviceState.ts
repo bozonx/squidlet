@@ -1,4 +1,5 @@
 import {JsonTypes} from '../interfaces/Types';
+import Promised from '../helpers/Promised';
 
 
 type DeviceStateData = {[index: string]: JsonTypes};
@@ -8,15 +9,16 @@ export type Setter = (partialData: DeviceStateData) => Promise<void>;
 
 
 export default class DeviceState {
-  protected readonly deviceId: string;
-  protected initialize?: Initialize;
-  protected getter?: Getter;
-  protected setter?: Setter;
+  private readonly deviceId: string;
+  private readonly initialize?: Initialize;
+  private readonly getter?: Getter;
+  private readonly setter?: Setter;
   private tmpOldState?: DeviceStateData;
-  private readingPromise?: Promise<void>;
+  private readingPromise?: Promised<void>;
 
 
-  constructor(initialize?: Initialize, getter?: Getter, setter?: Setter) {
+  constructor(deviceId: string, initialize?: Initialize, getter?: Getter, setter?: Setter) {
+    this.deviceId = deviceId;
     this.initialize = initialize;
     this.getter = getter;
     this.setter = setter;
@@ -24,7 +26,7 @@ export default class DeviceState {
 
 
   isWriting(): boolean {
-
+    // TODO: add!!!
   }
 
   isReading(): boolean {
@@ -47,7 +49,7 @@ export default class DeviceState {
 
     if (this.isReading()) {
       try {
-        await this.readingPromise;
+        this.readingPromise && await this.readingPromise.promise;
       }
       catch (e) {
         return this.getState();
@@ -77,12 +79,7 @@ export default class DeviceState {
   private async requestGetter(): Promise<DeviceStateData> {
     if (!this.getter) throw new Error(`No getter: ${this.deviceId}`);
 
-    let promiseResolve: () => void;
-    let promiseReject: () => void;
-    this.readingPromise = new Promise<void>((resolve, reject) => {
-      promiseResolve = resolve;
-      promiseReject = reject;
-    });
+    this.readingPromise = new Promised<void>();
     let result: DeviceStateData;
 
     // make a request
@@ -90,14 +87,15 @@ export default class DeviceState {
       result = await this.getter();
     }
     catch (err) {
-      if (typeof promiseReject !== 'undefined') promiseReject(err);
+      //if (typeof promiseReject !== 'undefined') promiseReject(err);
+      this.readingPromise.reject(err);
 
       delete this.readingPromise;
 
       throw new Error(`Can't fetch device state "${this.deviceId}": ${err}`);
     }
 
-    if (typeof promiseResolve !== 'undefined') promiseResolve();
+    this.readingPromise.resolve();
 
     delete this.readingPromise;
 

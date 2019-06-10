@@ -28,7 +28,7 @@ export default class Promised<T = any> {
   }
 
   isResolved(): boolean {
-    return this.resolved;;
+    return this.resolved;
   }
 
   isRejected(): boolean {
