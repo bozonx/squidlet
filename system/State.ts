@@ -1,6 +1,6 @@
 import {JsonTypes} from './interfaces/Types';
 import IndexedEvents from './helpers/IndexedEvents';
-import {mergeDeep} from './helpers/collections';
+import {getDifferentKeys, mergeDeep} from './helpers/collections';
 
 
 type ChangeHandler = (category: number, stateName: string, isRepublish?: true) => void;
@@ -34,6 +34,10 @@ export default class State {
     if (!this.state[category]) this.state[category] = {};
 
     this.state[category][stateName] = mergeDeep(newPartialState, this.state[category][stateName]);
+
+    // TODO: не поднимать событие если значения не изменилсь
+    // TODO: add updated keys to emit
+    //const updatedParams: string[] = getDifferentKeys(this.localState, result);
 
     this.changeEvents.emit(category, stateName);
     this.categoryChangeEvents.emit(category);

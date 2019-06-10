@@ -84,6 +84,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       return;
     }
 
+    // TODO: обрабоатть ошибку ???
+
     return this.status.readParam(statusName);
   }
 
@@ -145,6 +147,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
       return;
     }
+
+    // TODO: обрабоатть ошибку ???
 
     return this.status.write({[statusName]: newValue});
   }

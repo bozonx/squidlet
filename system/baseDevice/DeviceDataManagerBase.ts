@@ -3,10 +3,11 @@ import IndexedEvents from '../helpers/IndexedEvents';
 import {isEmpty} from '../helpers/lodashLike';
 import {getDifferentKeys} from '../helpers/collections';
 import {validateParam} from '../helpers/validate';
+import {StateCategories} from '../interfaces/States';
 
 
-export type Publisher = (subtopic: string, value: any, isRepeat?: boolean) => void;
-export type PublishState = (changedParams: string[], isRepeat: boolean) => void;
+// export type Publisher = (subtopic: string, value: any, isRepeat?: boolean) => void;
+// export type PublishState = (changedParams: string[], isRepeat: boolean) => void;
 export type Initialize = () => Promise<Data>;
 export type Getter = (paramNames?: string[]) => Promise<Data>;
 export type Setter = (partialData: Data) => Promise<void>;
@@ -25,6 +26,7 @@ export default abstract class DeviceDataManagerBase {
   // protected readonly changeEvents = new IndexedEvents<ChangeHandler>();
   // protected readonly publishEvents = new IndexedEvents<Publisher>();
   protected abstract readonly typeNameOfData: string;
+  protected abstract readonly stateCategory: StateCategories;
   protected readonly deviceId: string;
   protected readonly system: System;
   protected readonly schema: Schema;
@@ -38,7 +40,8 @@ export default abstract class DeviceDataManagerBase {
   abstract write: (partialData: Data) => Promise<void>;
 
   // state which in consistency with remote state
-  protected localState: Data = {};
+  //protected localState: Data = {};
+  // TODO: review - хранить старый стейт чтобы его востановить если произошла ошибка
   // temporary state which contents the newest state while saving of request is in progress
   protected tmpState?: Data;
 
@@ -92,17 +95,19 @@ export default abstract class DeviceDataManagerBase {
     // else fetch data if getter is defined
 
     const result: Data = await this.justReadAllData();
-    const updatedParams: string[] = getDifferentKeys(this.localState, result);
+    //const updatedParams: string[] = getDifferentKeys(this.localState, result);
 
-    // TODO: use State ???
-    this.localState = {
-      ...this.localState,
-      ...result,
-    };
+    // this.localState = {
+    //   ...this.localState,
+    //   ...result,
+    // };
     // clear temporary state because we have the last one
     this.tmpState = undefined;
+
+    this.system.state.updateState(this.stateCategory, this.deviceId, result);
+
     //  rise events change event and publish
-    this.emitOnChange(updatedParams);
+    //this.emitOnChange(updatedParams);
 
     return this.getState();
   }
@@ -119,22 +124,27 @@ export default abstract class DeviceDataManagerBase {
     // then disallow making read request and return data which will be saved
     if (!this.getter || this.isWriting()) return this.getState()[paramName];
 
+    const getter = this.getter;
     const result: Data = await this.doRequest(
-      () => this.getter && this.getter([paramName]),
+      () => getter([paramName]),
       `Can't fetch "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`
     );
 
     this.validateParam(paramName, result[paramName], `Invalid "${this.typeNameOfData}" "${paramName}" of device "${this.deviceId}"`);
 
-    // set to local data and rise events
+
+    // set to local data and rise events if the value changed
     if (this.localState[paramName] !== result[paramName]) {
-      this.localState[paramName] = result[paramName];
+      //this.localState[paramName] = result[paramName];
+
       // update last consistent param value if there is a temporary state
       if (this.tmpState) (this.tmpState as any)[paramName] = result[paramName];
 
       //  rise events change event and publish
-      this.emitOnChange([paramName]);
+      //this.emitOnChange([paramName]);
     }
+
+    this.system.state.updateState(this.stateCategory, this.deviceId, result);
 
     return this.getState()[paramName];
   }
