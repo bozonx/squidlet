@@ -1,9 +1,10 @@
 import {JsonTypes} from './interfaces/Types';
 import IndexedEvents from './helpers/IndexedEvents';
 import {getDifferentKeys, mergeDeep} from './helpers/collections';
+import {isEqual} from './helpers/lodashLike';
 
 
-type ChangeHandler = (category: number, stateName: string, isRepublish?: true) => void;
+type ChangeHandler = (category: number, stateName: string, changedParams: string[], isRepublish?: true) => void;
 type CategoryChangeHandler = (category: number, isRepublish?: true) => void;
 type StateObject = {[index: string]: JsonTypes};
 
@@ -31,19 +32,22 @@ export default class State {
   }
 
   updateState(category: number, stateName: string, newPartialState: StateObject) {
+    const newState = mergeDeep(newPartialState, this.state[category][stateName]);
+
+    // don't do anything if value isn't changed
+    if (isEqual(newState, this.state[category][stateName])) return;
+
     if (!this.state[category]) this.state[category] = {};
 
-    this.state[category][stateName] = mergeDeep(newPartialState, this.state[category][stateName]);
+    const updatedParams: string[] = getDifferentKeys(this.state[category][stateName], newState);
 
-    // TODO: не поднимать событие если значения не изменилсь
-    // TODO: add updated keys to emit
-    //const updatedParams: string[] = getDifferentKeys(this.localState, result);
+    this.state[category][stateName] = newState;
 
-    this.changeEvents.emit(category, stateName);
+    this.changeEvents.emit(category, stateName, updatedParams);
     this.categoryChangeEvents.emit(category);
   }
 
-  onChange(cb: (category: number, stateName: string, isRepublish?: true) => void): number {
+  onChange(cb: (category: number, stateName: string, changedParams: string[], isRepublish?: true) => void): number {
     return this.changeEvents.addListener(cb);
   }
 
