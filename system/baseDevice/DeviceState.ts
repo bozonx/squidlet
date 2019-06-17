@@ -2,6 +2,7 @@ import {JsonTypes} from '../interfaces/Types';
 import Promised from '../helpers/Promised';
 import System from '../System';
 import {StateObject} from '../State';
+import {isEmpty} from '../helpers/lodashLike';
 
 
 export type Initialize = () => Promise<StateObject>;
@@ -16,8 +17,9 @@ export default class DeviceState {
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
-  private tmpOldState?: StateObject;
+  private tmpWritingPartialState?: StateObject;
   private readingPromise?: Promised<void>;
+  //private queuedWriting?: () => void;
 
 
   constructor(
@@ -38,7 +40,7 @@ export default class DeviceState {
 
 
   isWriting(): boolean {
-    // TODO: add!!!
+    return Boolean(this.tmpWritingPartialState);
   }
 
   isReading(): boolean {
@@ -46,11 +48,10 @@ export default class DeviceState {
   }
 
   getState(): StateObject {
-    const currentState: StateObject | undefined = this.system.state.getState(this.stateCategory, this.deviceId);
+    // TODO: смержить стейт
+    if (this.tmpWritingPartialState) return this.tmpWritingPartialState;
 
-    if (!currentState) return {};
-
-    return currentState;
+    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
   }
 
   /**
@@ -64,46 +65,67 @@ export default class DeviceState {
     if (!this.getter || this.isWriting()) return this.getState();
 
     if (this.isReading()) {
-      try {
-        this.readingPromise && await this.readingPromise.promise;
-      }
-      catch (e) {
-        return this.getState();
-      }
+      // wait for current reading. And throw an error if it throws
+      this.readingPromise && await this.readingPromise.promise;
 
       return this.getState();
     }
 
-    const result: DeviceStateData = await this.requestGetter();
+    const result: StateObject = await this.requestGetter();
 
-    // TODO:  нужно ли очищать tmpState ???
+    // TODO: наверное сделать validate ???
 
-    this.state.updateState(DEVICE_STATE_CATEGORY, this.deviceId, result);
+    this.system.state.updateState(this.stateCategory, this.deviceId, result);
 
     return this.getState();
   }
 
   readParam(paramName: string): Promise<JsonTypes> {
-
+    // TODO: !!!!
   }
 
-  write(partialData: DeviceStateData): Promise<void> {
+  /**
+   * Update state and write it to setter.
+   * If writing is in progress then a new writing will be queued.
+   * If reading is in progress ???
+   */
+  async write(partialData: StateObject): Promise<void> {
+    if (isEmpty(partialData)) return;
 
+    this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
+
+    if (!this.setter) return;
+
+    if (this.isReading()) {
+      // TODO: !!!!
+    }
+
+    if (this.isWriting()) {
+      this.tmpWritingPartialState = partialData;
+
+      return;
+    }
+
+    this.validateDict(partialData,
+      `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
+
+    // TODO: !!!! выполнить и очистить this.queuedWriting
+
+    await this.requestSetter(partialData);
   }
 
 
-  private async requestGetter(): Promise<DeviceStateData> {
+  private async requestGetter(): Promise<StateObject> {
     if (!this.getter) throw new Error(`No getter: ${this.deviceId}`);
 
     this.readingPromise = new Promised<void>();
-    let result: DeviceStateData;
+    let result: StateObject;
 
     // make a request
     try {
       result = await this.getter();
     }
     catch (err) {
-      //if (typeof promiseReject !== 'undefined') promiseReject(err);
       this.readingPromise.reject(err);
 
       delete this.readingPromise;
@@ -116,6 +138,10 @@ export default class DeviceState {
     delete this.readingPromise;
 
     return result;
+  }
+
+  private async requestSetter(partialData: StateObject): Promise<void> {
+
   }
 
 }
