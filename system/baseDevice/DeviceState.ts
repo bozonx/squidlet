@@ -1,12 +1,12 @@
 import {JsonTypes} from '../interfaces/Types';
 import Promised from '../helpers/Promised';
 import System from '../System';
+import {StateObject} from '../State';
 
 
-type DeviceStateData = {[index: string]: JsonTypes};
-export type Initialize = () => Promise<DeviceStateData>;
-export type Getter = (paramNames?: string[]) => Promise<DeviceStateData>;
-export type Setter = (partialData: DeviceStateData) => Promise<void>;
+export type Initialize = () => Promise<StateObject>;
+export type Getter = (paramNames?: string[]) => Promise<StateObject>;
+export type Setter = (partialData: StateObject) => Promise<void>;
 
 
 export default class DeviceState {
@@ -16,7 +16,7 @@ export default class DeviceState {
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
-  private tmpOldState?: DeviceStateData;
+  private tmpOldState?: StateObject;
   private readingPromise?: Promised<void>;
 
 
@@ -45,8 +45,12 @@ export default class DeviceState {
     return Boolean(this.readingPromise);
   }
 
-  getState(): DeviceStateData {
-    return this.system.state.getState(this.stateCategory, this.deviceId);
+  getState(): StateObject {
+    const currentState: StateObject | undefined = this.system.state.getState(this.stateCategory, this.deviceId);
+
+    if (!currentState) return {};
+
+    return currentState;
   }
 
   /**
@@ -56,7 +60,7 @@ export default class DeviceState {
    * If writing is in progress it will return current state which is being writing at the moment
    * If reading is in progress it will wait for current reading request and will return its data
    */
-  async readAll(): Promise<DeviceStateData> {
+  async readAll(): Promise<StateObject> {
     if (!this.getter || this.isWriting()) return this.getState();
 
     if (this.isReading()) {

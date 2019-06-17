@@ -6,7 +6,7 @@ import {isEqual} from './helpers/lodashLike';
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[], isRepublish?: true) => void;
 type CategoryChangeHandler = (category: number, isRepublish?: true) => void;
-type StateObject = {[index: string]: JsonTypes};
+export type StateObject = {[index: string]: JsonTypes};
 
 
 export default class State {
