@@ -1,5 +1,6 @@
 import {JsonTypes} from '../interfaces/Types';
 import Promised from '../helpers/Promised';
+import System from '../System';
 
 
 type DeviceStateData = {[index: string]: JsonTypes};
@@ -9,6 +10,8 @@ export type Setter = (partialData: DeviceStateData) => Promise<void>;
 
 
 export default class DeviceState {
+  private readonly system: System;
+  private readonly stateCategory: number;
   private readonly deviceId: string;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
@@ -17,7 +20,16 @@ export default class DeviceState {
   private readingPromise?: Promised<void>;
 
 
-  constructor(deviceId: string, initialize?: Initialize, getter?: Getter, setter?: Setter) {
+  constructor(
+    system: System,
+    stateCategory: number,
+    deviceId: string,
+    initialize?: Initialize,
+    getter?: Getter,
+    setter?: Setter
+  ) {
+    this.system = system;
+    this.stateCategory = stateCategory;
     this.deviceId = deviceId;
     this.initialize = initialize;
     this.getter = getter;
@@ -34,7 +46,7 @@ export default class DeviceState {
   }
 
   getState(): DeviceStateData {
-    // TODO: просто отдать стейт
+    return this.system.state.getState(this.stateCategory, this.deviceId);
   }
 
   /**
@@ -62,7 +74,7 @@ export default class DeviceState {
 
     // TODO:  нужно ли очищать tmpState ???
 
-    this.state.updateState(this.stateCategory, this.deviceId, result);
+    this.state.updateState(DEVICE_STATE_CATEGORY, this.deviceId, result);
 
     return this.getState();
   }
