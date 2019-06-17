@@ -19,6 +19,7 @@ export default class DeviceState {
   private readonly setter?: Setter;
   private tmpWritingPartialState?: StateObject;
   private readingPromise?: Promised<void>;
+  private writeQueued: boolean = false;
   //private queuedWriting?: () => void;
 
 
@@ -97,11 +98,13 @@ export default class DeviceState {
     if (!this.setter) return;
 
     if (this.isReading()) {
-      // TODO: !!!!
+      // TODO: !!!! отменить текущее чтение и делать запись
     }
 
+    this.tmpWritingPartialState = partialData;
+
     if (this.isWriting()) {
-      this.tmpWritingPartialState = partialData;
+      this.writeQueued = true;
 
       return;
     }
@@ -141,7 +144,7 @@ export default class DeviceState {
   }
 
   private async requestSetter(partialData: StateObject): Promise<void> {
-
+    // TODO: !!!!
   }
 
 }
