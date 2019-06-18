@@ -41,7 +41,13 @@ export default class Promised<T = any> {
     this.rejected = true;
   }
 
+  /**
+   * After cancel promise won't be able to be fulfilled.
+   * If promise was fulfilled it can't be cancelled.
+   */
   cancel() {
+    if (this.isFulfiled()) return;
+
     this.canceled = true;
     delete this.promiseResolve;
     delete this.promiseReject;
