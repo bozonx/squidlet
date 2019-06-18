@@ -1,30 +1,50 @@
 export default class Promised<T = any> {
-  readonly promise: Promise<T>;
+  get promise() {
+    return this._promise;
+  }
 
+  private _promise: Promise<T>;
   private promiseResolve?: (result: T) => void;
   private promiseReject?: (err: Error) => void;
   private resolved: boolean = false;
   private rejected: boolean = false;
+  private canceled: boolean = false;
 
 
   constructor() {
-    this.promise = new Promise<T>((resolve, reject) => {
+    this._promise = new Promise<T>((resolve, reject) => {
       this.promiseResolve = resolve;
       this.promiseReject = reject;
     });
   }
 
+  destroy() {
+    delete this.promiseResolve;
+    delete this.promiseReject;
+    delete this._promise;
+  }
+
 
   resolve(result: T) {
+    if (this.canceled) return;
+
     if (this.promiseResolve) this.promiseResolve(result);
 
     this.resolved = true;
   }
 
   reject(err: Error) {
+    if (this.canceled) return;
+
     if (this.promiseReject) this.promiseReject(err);
 
     this.rejected = true;
+  }
+
+  cancel() {
+    this.canceled = true;
+    delete this.promiseResolve;
+    delete this.promiseReject;
   }
 
   isResolved(): boolean {
@@ -33,6 +53,10 @@ export default class Promised<T = any> {
 
   isRejected(): boolean {
     return this.rejected;
+  }
+
+  isCanceled(): boolean {
+    return this.canceled;
   }
 
   isFulfiled(): boolean {
