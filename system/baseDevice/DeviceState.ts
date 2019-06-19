@@ -25,7 +25,8 @@ export default class DeviceState {
   private readonly setter?: Setter;
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
-  private tmpWritingPartialState?: StateObject;
+  //private tmpWritingPartialState?: StateObject;
+  private tmpWritingOldState?: StateObject;
   
 
   constructor(
@@ -56,13 +57,19 @@ export default class DeviceState {
   }
 
   getState(): StateObject {
-    const currentState = this.system.state.getState(this.stateCategory, this.deviceId) || {};
+    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
 
-    if (this.tmpWritingPartialState) {
-      return mergeDeep(this.tmpWritingPartialState, currentState);
-    }
+    // if (this.tmpWritingOldState) return this.tmpWritingOldState;
+    //
+    // return this.system.state.getState(this.stateCategory, this.deviceId) || {};
 
-    return currentState;
+    // const currentState = this.system.state.getState(this.stateCategory, this.deviceId) || {};
+    //
+    // if (this.tmpWritingPartialState) {
+    //   return mergeDeep(this.tmpWritingPartialState, currentState);
+    // }
+    //
+    // return currentState;
   }
 
   /**
@@ -104,15 +111,24 @@ export default class DeviceState {
   async write(partialData: StateObject): Promise<void> {
     if (isEmpty(partialData)) return;
 
-    // TODO: это надо сделать в конце же !!!!
-    // update state and rise an event
+    const oldState = this.getState();
+
     this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
 
+    // in mode without setter - just update state and rise an event
     if (!this.setter) return;
 
-    // TODO: мержить так как новые запросы могут менять разные поля
-    this.tmpWritingPartialState = partialData;
+    // // make old state which was before writing
+    // if (this.tmpWritingOldState) {
+    //   this.tmpWritingOldState = mergeDeep(partialData, this.tmpWritingOldState);
+    // }
+    // else {
+    //   this.tmpWritingOldState = partialData;
+    //   //this.tmpWritingOldState = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
+    // }
 
+    this.tmpWritingOldState = oldState;
+    
     if (this.isReading()) {
       // TODO: ??? отменить запрос текущего чтения и резолвить текущий getState
       //       проблема в том что мы можем читать другой параметр а записывать другой
@@ -155,23 +171,61 @@ export default class DeviceState {
    * Write new or add to queue
    */
   private async requestSetter(): Promise<void> {
+
+    // TODO: надо записывать смерженный стейт с предыдущими попытками после 1й
+
     const callPromise = this.writingQueuedCall.callIt(async () => {
       if (!this.tmpWritingPartialState) throw new Error(`There isn't "tmpWritingPartialState"`);
 
-      return this.setter && this.setter(this.tmpWritingPartialState);
+      return this.setter && this.setter(partialData);
     });
 
-    try {
-      this.writingQueuedCall.wholePromise && await this.writingQueuedCall.wholePromise;
-      await callPromise;
-    }
-    catch (err) {
-      // TODO: вернуть прежнее состояние тех параметров которые сохраняем причем тех что в очереди тоже
-      //       они могут отличаться
-      // TODO: должно произойти 1 раз
+    this.writingQueuedCall.callOnceOnSuccess(() => {
+      delete this.tmpWritingOldState;
+    });
+
+    this.writingQueuedCall.callOnceOnError((err: Error) => {
+      // TODO: print error ????
+
+      if (!this.tmpWritingOldState) return;
+
+      this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpWritingOldState);
+
+      delete this.tmpWritingOldState;
+    });
+
+    await callPromise;
+
+    // TODO: проверить сработает ли
+    // if there is a queue - update old tmp state
+    if (this.writingQueuedCall.isExecuting()) {
+      this.tmpWritingOldState = this.getState();
     }
 
-    delete this.tmpWritingPartialState;
+    // try {
+    //   await callPromise;
+    //
+    //   // TODO: проверить сработает ли
+    //   // if there is a queue - update old tmp state
+    //   if (this.writingQueuedCall.isExecuting()) {
+    //     this.tmpWritingOldState = this.getState();
+    //   }
+    //
+    //   this.writingQueuedCall.wholePromise && await this.writingQueuedCall.wholePromise;
+    // }
+    // catch (err) {
+    //   // TODO: должно произойти 1 раз
+    //   if (!this.tmpWritingOldState) throw err;
+    //
+    //   this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpWritingOldState);
+    //
+    //   delete this.tmpWritingOldState;
+    //
+    //   throw err;
+    // }
+    //
+    // // on success - just remove old state
+    // delete this.tmpWritingOldState;
   }
 
   private validateDict(dict: {[index: string]: any}, errorMsg: string) {

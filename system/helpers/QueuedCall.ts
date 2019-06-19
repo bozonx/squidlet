@@ -8,11 +8,11 @@ import Promised from './Promised';
 
 
 export default class QueuedCall {
-  wholePromise?: Promised<void>;
-
   private queuedCb?: () => Promise<void>;
   private queuedPromise?: Promised<void>;
   private executing: boolean = false;
+  private onSuccessCb?: () => void;
+  private onErrorCb?: (err: Error) => void;
 
 
   isExecuting(): boolean {
@@ -34,11 +34,24 @@ export default class QueuedCall {
     this.executing = true;
 
     // TODO: если произошла ошибка - то очистить очередь
-    // TODO: wholePromise
 
     await cb();
 
     this.finish();
+  }
+
+  /**
+   * Only one the last cb will be called on success
+   */
+  callOnceOnSuccess(cb: () => void) {
+    this.onSuccessCb = cb;
+  }
+
+  /**
+   * Only one the last cb will be called on error
+   */
+  callOnceOnError(cb: (err: Error) => void) {
+    this.onErrorCb = cb;
   }
 
 
@@ -57,6 +70,8 @@ export default class QueuedCall {
         .then(prevQueuedPromise.resolve)
         .catch(prevQueuedPromise.reject);
     }
+
+    // TODO: add onSuccessCb and onErrorCb and remove them
   }
 
 }
