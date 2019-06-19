@@ -1,12 +1,11 @@
-import {JsonTypes} from '../interfaces/Types';
-import Promised from '../helpers/Promised';
 import System from '../System';
 import {StateObject} from '../State';
+import {JsonTypes} from '../interfaces/Types';
+import SchemaElement from '../interfaces/SchemaElement';
+import Promised from '../helpers/Promised';
 import {isEmpty} from '../helpers/lodashLike';
 import QueuedCall from '../helpers/QueuedCall';
 import {validateParam} from '../helpers/validate';
-import {mergeDeep} from '../helpers/collections';
-import SchemaElement from '../interfaces/SchemaElement';
 
 
 export type Initialize = () => Promise<StateObject>;
@@ -25,8 +24,8 @@ export default class DeviceState {
   private readonly setter?: Setter;
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
-  //private tmpWritingPartialState?: StateObject;
-  private tmpWritingOldState?: StateObject;
+  private tmpWritingPartialState?: StateObject;
+  private tmpStateBeforeWriting?: StateObject;
   
 
   constructor(
@@ -58,18 +57,6 @@ export default class DeviceState {
 
   getState(): StateObject {
     return this.system.state.getState(this.stateCategory, this.deviceId) || {};
-
-    // if (this.tmpWritingOldState) return this.tmpWritingOldState;
-    //
-    // return this.system.state.getState(this.stateCategory, this.deviceId) || {};
-
-    // const currentState = this.system.state.getState(this.stateCategory, this.deviceId) || {};
-    //
-    // if (this.tmpWritingPartialState) {
-    //   return mergeDeep(this.tmpWritingPartialState, currentState);
-    // }
-    //
-    // return currentState;
   }
 
   /**
@@ -106,39 +93,35 @@ export default class DeviceState {
   /**
    * Update state and write it to setter.
    * If writing is in progress then a new writing will be queued.
-   * If reading is in progress it will be cancelled and a new writing will be processed.
+   * If reading is in progress it will wait for its completion.
+   * On error it will return state which was before saving started.
    */
   async write(partialData: StateObject): Promise<void> {
     if (isEmpty(partialData)) return;
 
-    const oldState = this.getState();
-
-    this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
-
-    // in mode without setter - just update state and rise an event
-    if (!this.setter) return;
-
-    // // make old state which was before writing
-    // if (this.tmpWritingOldState) {
-    //   this.tmpWritingOldState = mergeDeep(partialData, this.tmpWritingOldState);
-    // }
-    // else {
-    //   this.tmpWritingOldState = partialData;
-    //   //this.tmpWritingOldState = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
-    // }
-
-    this.tmpWritingOldState = oldState;
-    
-    if (this.isReading()) {
-      // TODO: ??? отменить запрос текущего чтения и резолвить текущий getState
-      //       проблема в том что мы можем читать другой параметр а записывать другой
-      //       наверное тогда лучше запись сделать после чтения
-    }
-
     this.validateDict(partialData,
       `Invalid device state to write: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(partialData)}"`);
 
-    await this.requestSetter();
+    let oldState = this.getState();
+    
+    this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
+
+    // if mode without setter - just update state and rise an event
+    if (!this.setter) return;
+
+    if (this.isReading()) {
+      // wait while current reading is completed
+      try {
+        this.readingPromise && await this.readingPromise.promise;
+      }
+      catch (err) {
+        // do nothing, do saving anyway.
+      }
+
+      oldState = this.getState();
+    }
+
+    await this.requestSetter(oldState, partialData);
   }
 
 
@@ -170,28 +153,44 @@ export default class DeviceState {
   /**
    * Write new or add to queue
    */
-  private async requestSetter(): Promise<void> {
+  private async requestSetter(oldState: StateObject, newPartialData: StateObject): Promise<void> {
+    // save old state
+    this.tmpStateBeforeWriting = oldState;
 
-    // TODO: надо записывать смерженный стейт с предыдущими попытками после 1й
+
+    // // make old state which was before writing
+    // if (this.tmpStateBeforeWriting) {
+    //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
+    // }
+    // else {
+    //   this.tmpStateBeforeWriting = partialData;
+    //   //this.tmpStateBeforeWriting = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
+    // }
+
+    // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
+    this.tmpWritingPartialState = newPartialData;
 
     const callPromise = this.writingQueuedCall.callIt(async () => {
       if (!this.tmpWritingPartialState) throw new Error(`There isn't "tmpWritingPartialState"`);
 
-      return this.setter && this.setter(partialData);
+      return this.setter && this.setter(this.tmpWritingPartialState);
     });
 
     this.writingQueuedCall.callOnceOnSuccess(() => {
-      delete this.tmpWritingOldState;
+      delete this.tmpWritingPartialState;
+      delete this.tmpStateBeforeWriting;
     });
 
     this.writingQueuedCall.callOnceOnError((err: Error) => {
       // TODO: print error ????
 
-      if (!this.tmpWritingOldState) return;
+      delete this.tmpWritingPartialState;
 
-      this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpWritingOldState);
+      if (!this.tmpStateBeforeWriting) return;
 
-      delete this.tmpWritingOldState;
+      this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpStateBeforeWriting);
+
+      delete this.tmpStateBeforeWriting;
     });
 
     await callPromise;
@@ -199,33 +198,8 @@ export default class DeviceState {
     // TODO: проверить сработает ли
     // if there is a queue - update old tmp state
     if (this.writingQueuedCall.isExecuting()) {
-      this.tmpWritingOldState = this.getState();
+      this.tmpStateBeforeWriting = this.getState();
     }
-
-    // try {
-    //   await callPromise;
-    //
-    //   // TODO: проверить сработает ли
-    //   // if there is a queue - update old tmp state
-    //   if (this.writingQueuedCall.isExecuting()) {
-    //     this.tmpWritingOldState = this.getState();
-    //   }
-    //
-    //   this.writingQueuedCall.wholePromise && await this.writingQueuedCall.wholePromise;
-    // }
-    // catch (err) {
-    //   // TODO: должно произойти 1 раз
-    //   if (!this.tmpWritingOldState) throw err;
-    //
-    //   this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpWritingOldState);
-    //
-    //   delete this.tmpWritingOldState;
-    //
-    //   throw err;
-    // }
-    //
-    // // on success - just remove old state
-    // delete this.tmpWritingOldState;
   }
 
   private validateDict(dict: {[index: string]: any}, errorMsg: string) {
