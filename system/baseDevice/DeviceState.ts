@@ -5,12 +5,14 @@ import {StateObject} from '../State';
 import {isEmpty} from '../helpers/lodashLike';
 import QueuedCall from '../helpers/QueuedCall';
 import {validateParam} from '../helpers/validate';
-import {Schema} from './DeviceDataManagerBase';
+import {mergeDeep} from '../helpers/collections';
+import SchemaElement from '../interfaces/SchemaElement';
 
 
 export type Initialize = () => Promise<StateObject>;
 export type Getter = (paramNames?: string[]) => Promise<StateObject>;
 export type Setter = (partialData: StateObject) => Promise<void>;
+export type Schema = {[index: string]: SchemaElement};
 
 
 export default class DeviceState {
@@ -54,10 +56,13 @@ export default class DeviceState {
   }
 
   getState(): StateObject {
-    // TODO: смержить стейт
-    if (this.tmpWritingPartialState) return this.tmpWritingPartialState;
+    const currentState = this.system.state.getState(this.stateCategory, this.deviceId) || {};
 
-    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
+    if (this.tmpWritingPartialState) {
+      return mergeDeep(this.tmpWritingPartialState, currentState);
+    }
+
+    return currentState;
   }
 
   /**
@@ -99,16 +104,19 @@ export default class DeviceState {
   async write(partialData: StateObject): Promise<void> {
     if (isEmpty(partialData)) return;
 
+    // TODO: это надо сделать в конце же !!!!
     // update state and rise an event
     this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
 
     if (!this.setter) return;
 
+    // TODO: мержить так как новые запросы могут менять разные поля
     this.tmpWritingPartialState = partialData;
 
     if (this.isReading()) {
-      // TODO: !!!! отменить текущее чтение и делать запись
-
+      // TODO: ??? отменить запрос текущего чтения и резолвить текущий getState
+      //       проблема в том что мы можем читать другой параметр а записывать другой
+      //       наверное тогда лучше запись сделать после чтения
     }
 
     this.validateDict(partialData,
@@ -158,7 +166,8 @@ export default class DeviceState {
       await callPromise;
     }
     catch (err) {
-      // TODO: вернуть прежнее состояние
+      // TODO: вернуть прежнее состояние тех параметров которые сохраняем причем тех что в очереди тоже
+      //       они могут отличаться
       // TODO: должно произойти 1 раз
     }
 
