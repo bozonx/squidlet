@@ -3,6 +3,7 @@ import Promised from '../helpers/Promised';
 import System from '../System';
 import {StateObject} from '../State';
 import {isEmpty} from '../helpers/lodashLike';
+import QueuedCall from '../helpers/QueuedCall';
 
 
 export type Initialize = () => Promise<StateObject>;
@@ -20,7 +21,7 @@ export default class DeviceState {
   private tmpWritingPartialState?: StateObject;
   private readingPromise?: Promised<void>;
   private writeQueued: boolean = false;
-  //private queuedWriting?: () => void;
+  private savingQueuedCall: QueuedCall = new QueuedCall();
 
 
   constructor(
@@ -41,6 +42,7 @@ export default class DeviceState {
 
 
   isWriting(): boolean {
+    // TODO: better to use savingQueuedCall
     return Boolean(this.tmpWritingPartialState);
   }
 
@@ -93,15 +95,16 @@ export default class DeviceState {
   async write(partialData: StateObject): Promise<void> {
     if (isEmpty(partialData)) return;
 
+    // update state and rise an event
     this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
 
     if (!this.setter) return;
 
+    this.tmpWritingPartialState = partialData;
+
     if (this.isReading()) {
       // TODO: !!!! отменить текущее чтение и делать запись
     }
-
-    this.tmpWritingPartialState = partialData;
 
     if (this.isWriting()) {
       this.writeQueued = true;
