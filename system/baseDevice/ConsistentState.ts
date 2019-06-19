@@ -2,12 +2,16 @@ import {StateObject} from '../State';
 import System from '../System';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
+import {Getter, Initialize, Setter} from './DeviceState';
 
 
 export default class ConsistentState {
   private readonly system: System;
   private readonly stateCategory: number;
   private readonly deviceId: string;
+  private readonly initialize?: Initialize;
+  private readonly getter?: Getter;
+  private readonly setter?: Setter;
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
   private tmpWritingPartialState?: StateObject;
@@ -17,11 +21,17 @@ export default class ConsistentState {
   constructor(
     system: System,
     stateCategory: number,
-    deviceId: string
+    deviceId: string,
+    initialize?: Initialize,
+    getter?: Getter,
+    setter?: Setter
   ) {
     this.system = system;
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
+    this.initialize = initialize;
+    this.getter = getter;
+    this.setter = setter;
   }
 
 

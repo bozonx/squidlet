@@ -18,9 +18,9 @@ export default class DeviceState {
   private readonly schema: Schema;
   private readonly stateCategory: number;
   private readonly deviceId: string;
-  private readonly initialize?: Initialize;
+  // private readonly initialize?: Initialize;
   private readonly getter?: Getter;
-  private readonly setter?: Setter;
+  // private readonly setter?: Setter;
   private readonly consistentState: ConsistentState;
 
 
@@ -37,13 +37,15 @@ export default class DeviceState {
     this.schema = schema;
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
-    this.initialize = initialize;
     this.getter = getter;
-    this.setter = setter;
+
     this.consistentState = new ConsistentState(
       this.system,
       this.stateCategory,
-      this.deviceId
+      this.deviceId,
+      initialize,
+      this.getter,
+      setter
     );
   }
 
