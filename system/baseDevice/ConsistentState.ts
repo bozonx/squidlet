@@ -2,7 +2,10 @@ import {StateObject} from '../State';
 import System from '../System';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
-import {Getter, Initialize, Setter} from './DeviceState';
+
+export type Initialize = () => Promise<StateObject>;
+export type Getter = (paramNames?: string[]) => Promise<StateObject>;
+export type Setter = (partialData: StateObject) => Promise<void>;
 
 
 export default class ConsistentState {
@@ -34,6 +37,20 @@ export default class ConsistentState {
     this.setter = setter;
   }
 
+  async init() {
+    let getter = this.getter;
+
+    if (this.initialize) getter = this.initialize;
+
+    const result: StateObject = await this.requestGetter(getter as Getter);
+
+    this.system.state.updateState(this.stateCategory, this.deviceId, result);
+  }
+
+  destroy() {
+    // TODO: add
+  }
+
 
   isWriting(): boolean {
     return this.writingQueuedCall.isExecuting();
@@ -54,19 +71,19 @@ export default class ConsistentState {
    * If writing is in progress it will return current state which is being writing at the moment
    * If reading is in progress it will wait for current reading request and will return its data
    */
-  async readAll(): Promise<StateObject> {
+  async loadAll(): Promise<void> {
+    if (!this.getter) return;
+
     if (this.isReading()) {
       // wait for current reading. And throw an error if it throws
       this.readingPromise && await this.readingPromise.promise;
 
-      return this.getState();
+      return;
     }
 
-    const result: StateObject = await this.requestGetter();
+    const result: StateObject = await this.requestGetter(this.getter);
 
     this.system.state.updateState(this.stateCategory, this.deviceId, result);
-
-    return this.getState();
   }
 
   /**
@@ -76,7 +93,6 @@ export default class ConsistentState {
    * On error it will return state which was before saving started.
    */
   async write(partialData: StateObject): Promise<void> {
-
     let oldState = this.getState();
 
     this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
@@ -100,7 +116,7 @@ export default class ConsistentState {
   }
 
 
-  private async requestGetter(): Promise<StateObject> {
+  private async requestGetter(getter: Getter): Promise<StateObject> {
     if (!this.getter) throw new Error(`No getter: ${this.deviceId}`);
 
     this.readingPromise = new Promised<void>();
@@ -108,7 +124,7 @@ export default class ConsistentState {
 
     // make a request
     try {
-      result = await this.getter();
+      result = await getter();
     }
     catch (err) {
       this.readingPromise.reject(err);
