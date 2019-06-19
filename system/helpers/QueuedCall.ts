@@ -2,15 +2,23 @@
  * Call a function which returns a promise.
  * And if while it waits another call will be called after this.
  * But only the last function will be queued.
+ * If there was an error - queue will be cleared.
  */
 import Promised from './Promised';
 
 
 export default class QueuedCall {
+  wholePromise?: Promised<void>;
+
   private queuedCb?: () => Promise<void>;
   private queuedPromise?: Promised<void>;
   private executing: boolean = false;
 
+
+  isExecuting(): boolean {
+    // TODO: review - может использовать queuedCb
+    return this.executing;
+  }
 
   async callIt(cb: () => Promise<void>): Promise<void> {
     // set to queue
@@ -24,6 +32,9 @@ export default class QueuedCall {
 
     // start new
     this.executing = true;
+
+    // TODO: если произошла ошибка - то очистить очередь
+    // TODO: wholePromise
 
     await cb();
 

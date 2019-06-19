@@ -4,6 +4,8 @@ import System from '../System';
 import {StateObject} from '../State';
 import {isEmpty} from '../helpers/lodashLike';
 import QueuedCall from '../helpers/QueuedCall';
+import {validateParam} from '../helpers/validate';
+import {Schema} from './DeviceDataManagerBase';
 
 
 export type Initialize = () => Promise<StateObject>;
@@ -13,19 +15,20 @@ export type Setter = (partialData: StateObject) => Promise<void>;
 
 export default class DeviceState {
   private readonly system: System;
+  private readonly schema: Schema;
   private readonly stateCategory: number;
   private readonly deviceId: string;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
-  private tmpWritingPartialState?: StateObject;
   private readingPromise?: Promised<void>;
-  private writeQueued: boolean = false;
-  private savingQueuedCall: QueuedCall = new QueuedCall();
-
+  private writingQueuedCall: QueuedCall = new QueuedCall();
+  private tmpWritingPartialState?: StateObject;
+  
 
   constructor(
     system: System,
+    schema: Schema,
     stateCategory: number,
     deviceId: string,
     initialize?: Initialize,
@@ -33,6 +36,7 @@ export default class DeviceState {
     setter?: Setter
   ) {
     this.system = system;
+    this.schema = schema;
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
     this.initialize = initialize;
@@ -42,8 +46,7 @@ export default class DeviceState {
 
 
   isWriting(): boolean {
-    // TODO: better to use savingQueuedCall
-    return Boolean(this.tmpWritingPartialState);
+    return this.writingQueuedCall.isExecuting();
   }
 
   isReading(): boolean {
@@ -83,14 +86,15 @@ export default class DeviceState {
     return this.getState();
   }
 
-  readParam(paramName: string): Promise<JsonTypes> {
+  async readParam(paramName: string): Promise<JsonTypes> {
     // TODO: !!!!
+    return;
   }
 
   /**
    * Update state and write it to setter.
    * If writing is in progress then a new writing will be queued.
-   * If reading is in progress ???
+   * If reading is in progress it will be cancelled and a new writing will be processed.
    */
   async write(partialData: StateObject): Promise<void> {
     if (isEmpty(partialData)) return;
@@ -104,20 +108,13 @@ export default class DeviceState {
 
     if (this.isReading()) {
       // TODO: !!!! отменить текущее чтение и делать запись
-    }
 
-    if (this.isWriting()) {
-      this.writeQueued = true;
-
-      return;
     }
 
     this.validateDict(partialData,
-      `Invalid ${this.typeNameOfData} "${JSON.stringify(partialData)}" which tried to set to device "${this.deviceId}"`);
+      `Invalid device state to write: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(partialData)}"`);
 
-    // TODO: !!!! выполнить и очистить this.queuedWriting
-
-    await this.requestSetter(partialData);
+    await this.requestSetter();
   }
 
 
@@ -146,8 +143,42 @@ export default class DeviceState {
     return result;
   }
 
-  private async requestSetter(partialData: StateObject): Promise<void> {
-    // TODO: !!!!
+  /**
+   * Write new or add to queue
+   */
+  private async requestSetter(): Promise<void> {
+    const callPromise = this.writingQueuedCall.callIt(async () => {
+      if (!this.tmpWritingPartialState) throw new Error(`There isn't "tmpWritingPartialState"`);
+
+      return this.setter && this.setter(this.tmpWritingPartialState);
+    });
+
+    try {
+      this.writingQueuedCall.wholePromise && await this.writingQueuedCall.wholePromise;
+      await callPromise;
+    }
+    catch (err) {
+      // TODO: вернуть прежнее состояние
+      // TODO: должно произойти 1 раз
+    }
+
+    delete this.tmpWritingPartialState;
+  }
+
+  private validateDict(dict: {[index: string]: any}, errorMsg: string) {
+    let validateError: string | undefined;
+
+    for (let paramName of Object.keys(dict)) {
+      validateError = validateParam(this.schema, paramName, dict[paramName]);
+
+      if (validateError) break;
+    }
+
+    if (validateError) {
+      const completeErrMsg = `${errorMsg}: ${validateError}`;
+
+      throw new Error(completeErrMsg);
+    }
   }
 
 }
