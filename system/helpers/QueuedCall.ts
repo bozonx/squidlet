@@ -16,6 +16,7 @@ export default class QueuedCall {
   private queuedCb?: QueuedCb;
   private executing: boolean = false;
   private onSuccessCb?: () => void;
+  private onAfterEachSuccess?: () => void;
   private onErrorCb?: (err: Error) => void;
 
 
@@ -26,16 +27,16 @@ export default class QueuedCall {
     delete this.queuedPromise;
     delete this.executing;
     delete this.onSuccessCb;
+    delete this.onAfterEachSuccess;
     delete this.onErrorCb;
   }
 
 
-  // TODO: проверить сработает ли когда завершиться одна из записей
   isExecuting(): boolean {
-    // TODO: review - может использовать queuedCb
     return this.executing;
   }
 
+  // TODO: ошибка должна произойти на текущий cb
   async callIt(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
     // set to queue
     if (this.isExecuting()) {
@@ -50,14 +51,9 @@ export default class QueuedCall {
       await cb();
     }
     catch (err) {
-      // clean up queue on error
-      this.queuedPromise && this.queuedPromise.reject(err);
-      this.onErrorCb && this.onErrorCb(err);
+      this.stopOnError(err);
 
-      delete this.queuedPromise;
-      delete this.queuedCb;
-
-      this.executing = false;
+      // TODO: делать throw если это 1й запуск ???
 
       throw err;
     }
@@ -70,6 +66,13 @@ export default class QueuedCall {
    */
   callOnceOnSuccess(cb: () => void) {
     this.onSuccessCb = cb;
+  }
+
+  /**
+   * It will be called after each successfully called callback.
+   */
+  onAfterEachCb(cb: (err?: Error) => void) {
+    this.onAfterEachSuccess = cb;
   }
 
   /**
@@ -103,6 +106,8 @@ export default class QueuedCall {
     const prevQueuedPromise = this.queuedPromise;
     delete this.queuedPromise;
 
+    this.onAfterEachSuccess && this.onAfterEachSuccess();
+
     if (this.queuedCb && prevQueuedPromise) {
       // start queue
       const queuedCb = this.queuedCb;
@@ -119,6 +124,18 @@ export default class QueuedCall {
     this.wholeCycleFinished();
   }
 
+  private stopOnError(err: Error) {
+    // clean up queue on error
+    this.queuedPromise && this.queuedPromise.reject(err);
+    this.onAfterEachSuccess && this.onAfterEachSuccess(err);
+    this.onErrorCb && this.onErrorCb(err);
+
+    delete this.queuedPromise;
+    delete this.queuedCb;
+
+    this.executing = false;
+  }
+
   private wholeCycleFinished() {
     this.executing = false;
 
@@ -126,6 +143,7 @@ export default class QueuedCall {
     this.onSuccessCb && this.onSuccessCb();
 
     delete this.onSuccessCb;
+    delete this.onAfterEachSuccess;
     delete this.onErrorCb;
   }
 

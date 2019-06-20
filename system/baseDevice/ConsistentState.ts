@@ -150,10 +150,6 @@ export default class ConsistentState {
     // save old state
     this.tmpStateBeforeWriting = oldState;
 
-    const callPromise = this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
-      return this.setter && this.setter(data as StateObject);
-    }, newPartialData);
-
     this.writingQueuedCall.callOnceOnSuccess(() => {
       delete this.tmpStateBeforeWriting;
     });
@@ -169,12 +165,16 @@ export default class ConsistentState {
       delete this.tmpStateBeforeWriting;
     });
 
-    await callPromise;
+    this.writingQueuedCall.onAfterEachCb((err?: Error) => {
+      if (err) return;
 
-    // if there is a queue - update old tmp state
-    if (this.writingQueuedCall.isExecuting()) {
+      // if writing was success and there is a queue - update old tmp state
       this.tmpStateBeforeWriting = this.getState();
-    }
+    });
+
+    await this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
+      return this.setter && this.setter(data as StateObject);
+    }, newPartialData);
   }
 
 }
