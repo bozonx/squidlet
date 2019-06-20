@@ -7,6 +7,9 @@ import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
 export default class Config extends DeviceDataManagerBase {
   protected readonly typeNameOfData: string = 'config';
 
+  // TODO: add getState
+  // TODO: add isWriting
+
   /**
    * Get whole config from device.
    */

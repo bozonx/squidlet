@@ -11,6 +11,10 @@ export const DEFAULT_STATUS = 'default';
 export default class Status extends DeviceDataManagerBase {
   protected readonly typeNameOfData: string = 'status';
 
+  // TODO: add getState
+  // TODO: add isWriting
+  // TODO: ??? onChange
+
   /**
    * Get all the statuses
    */

@@ -20,6 +20,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected initialConfig?: Initialize;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
+  // TODO: review
   protected transformPublishValue?: (value: any) => any;
   protected actions: {[index: string]: Function} = {};
   private _status?: Status;
@@ -56,6 +57,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
         this.id,
         this.env.system,
         manifest.status,
+        this.initialStatus,
+        this.statusGetter,
+        this.statusSetter
       );
     }
 
@@ -64,16 +68,19 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
         this.id,
         this.env.system,
         manifest.config,
+        this.initialConfig,
+        this.configGetter,
+        this.configSetter
       );
     }
 
-    // listen publish events and call publish
-    this.status && this.status.onPublish(this.publish);
-    this.config && this.config.onPublish(this.publish);
+    // // listen publish events and call publish
+    // this.status && this.status.onPublish(this.publish);
+    // this.config && this.config.onPublish(this.publish);
 
     await Promise.all([
-      this.status && this.status.init(this.initialStatus, this.statusGetter, this.statusSetter),
-      this.config && this.config.init(this.initialConfig, this.configGetter, this.configSetter),
+      this.status && this.status.init(),
+      this.config && this.config.init(),
     ]);
   }
 
@@ -132,6 +139,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
 
+  // TODO: ????? review
   protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
     const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, this.id, subTopic);
     const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
