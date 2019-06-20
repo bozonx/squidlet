@@ -17,7 +17,6 @@ export default class ConsistentState {
   private readonly setter?: Setter;
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
-  private tmpWritingPartialState?: StateObject;
   private tmpStateBeforeWriting?: StateObject;
 
 
@@ -48,7 +47,10 @@ export default class ConsistentState {
   }
 
   destroy() {
-    // TODO: add
+    this.writingQueuedCall.destroy();
+    delete this.readingPromise;
+    delete this.writingQueuedCall;
+    delete this.tmpStateBeforeWriting;
   }
 
 
@@ -148,37 +150,20 @@ export default class ConsistentState {
     // save old state
     this.tmpStateBeforeWriting = oldState;
 
-
-    // // make old state which was before writing
-    // if (this.tmpStateBeforeWriting) {
-    //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
-    // }
-    // else {
-    //   this.tmpStateBeforeWriting = partialData;
-    //   //this.tmpStateBeforeWriting = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
-    // }
-
-    // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
-    this.tmpWritingPartialState = newPartialData;
-
-    const callPromise = this.writingQueuedCall.callIt(async () => {
-      if (!this.tmpWritingPartialState) throw new Error(`There isn't "tmpWritingPartialState"`);
-
-      return this.setter && this.setter(this.tmpWritingPartialState);
-    });
+    const callPromise = this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
+      return this.setter && this.setter(data as StateObject);
+    }, newPartialData);
 
     this.writingQueuedCall.callOnceOnSuccess(() => {
-      delete this.tmpWritingPartialState;
       delete this.tmpStateBeforeWriting;
     });
 
     this.writingQueuedCall.callOnceOnError((err: Error) => {
-      // TODO: print error ????
-
-      delete this.tmpWritingPartialState;
+      this.system.log.error(String(err));
 
       if (!this.tmpStateBeforeWriting) return;
 
+      // restore old state
       this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpStateBeforeWriting);
 
       delete this.tmpStateBeforeWriting;
@@ -186,7 +171,6 @@ export default class ConsistentState {
 
     await callPromise;
 
-    // TODO: проверить сработает ли
     // if there is a queue - update old tmp state
     if (this.writingQueuedCall.isExecuting()) {
       this.tmpStateBeforeWriting = this.getState();
