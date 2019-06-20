@@ -11,6 +11,7 @@ export type QueuedCb = (data?: {[index: string]: any}) => Promise<void>;
 
 
 export default class QueuedCall {
+  // promise which will be resolved after next cb in queue will be resolve. Or on the first error.
   private queuedPromise?: Promised<void>;
   private queuedCb?: QueuedCb;
   private executing: boolean = false;
@@ -89,14 +90,18 @@ export default class QueuedCall {
     this.onAfterEachSuccessCb && this.onAfterEachSuccessCb();
 
     // start queue if there is a queuedCb
-    if (this.queuedCb && prevQueuedPromise) return this.startQueue(prevQueuedPromise);
+    if (this.queuedCb && prevQueuedPromise) {
+      this.startQueue(prevQueuedPromise);
+
+      return;
+    }
+
     // or finish cycle
     this.wholeCycleFinished();
   }
 
   private setToQueue(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
     // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
-    // TODO: на resolve или reject промиса который возвращает ф-я должен произойти на все отложенные cb
     // // make old state which was before writing
     // if (this.tmpStateBeforeWriting) {
     //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
@@ -121,7 +126,6 @@ export default class QueuedCall {
 
     delete this.queuedCb;
 
-    // TODO: review - ???? что на ошибке ???
     this.startNew(queuedCb)
       .then(prevQueuedPromise.resolve)
       .catch(prevQueuedPromise.reject);
@@ -131,7 +135,7 @@ export default class QueuedCall {
     this.executing = false;
 
     // clean up queue on error
-    this.queuedPromise && this.queuedPromise.reject(err);
+    //this.queuedPromise && this.queuedPromise.reject(err);
     this.onErrorCb && this.onErrorCb(err);
 
     delete this.queuedPromise;
