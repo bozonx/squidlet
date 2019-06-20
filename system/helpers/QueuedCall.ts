@@ -16,7 +16,7 @@ export default class QueuedCall {
   private queuedCb?: QueuedCb;
   private executing: boolean = false;
   private onSuccessCb?: () => void;
-  private onAfterEachSuccess?: () => void;
+  private onAfterEachSuccessCb?: () => void;
   private onErrorCb?: (err: Error) => void;
 
 
@@ -27,7 +27,7 @@ export default class QueuedCall {
     delete this.queuedPromise;
     delete this.executing;
     delete this.onSuccessCb;
-    delete this.onAfterEachSuccess;
+    delete this.onAfterEachSuccessCb;
     delete this.onErrorCb;
   }
 
@@ -62,23 +62,23 @@ export default class QueuedCall {
   }
 
   /**
-   * Only one the last cb will be called on success
+   * Only when the last cb will be called successful
    */
-  callOnceOnSuccess(cb: () => void) {
+  onSuccess(cb: () => void) {
     this.onSuccessCb = cb;
   }
 
   /**
    * It will be called after each successfully called callback.
    */
-  onAfterEachCb(cb: (err?: Error) => void) {
-    this.onAfterEachSuccess = cb;
+  onAfterEachSuccess(cb: () => void) {
+    this.onAfterEachSuccessCb = cb;
   }
 
   /**
    * Only one the last cb will be called on error
    */
-  callOnceOnError(cb: (err: Error) => void) {
+  onError(cb: (err: Error) => void) {
     this.onErrorCb = cb;
   }
 
@@ -106,7 +106,7 @@ export default class QueuedCall {
     const prevQueuedPromise = this.queuedPromise;
     delete this.queuedPromise;
 
-    this.onAfterEachSuccess && this.onAfterEachSuccess();
+    this.onAfterEachSuccessCb && this.onAfterEachSuccessCb();
 
     if (this.queuedCb && prevQueuedPromise) {
       // start queue
@@ -127,7 +127,6 @@ export default class QueuedCall {
   private stopOnError(err: Error) {
     // clean up queue on error
     this.queuedPromise && this.queuedPromise.reject(err);
-    this.onAfterEachSuccess && this.onAfterEachSuccess(err);
     this.onErrorCb && this.onErrorCb(err);
 
     delete this.queuedPromise;
@@ -143,7 +142,7 @@ export default class QueuedCall {
     this.onSuccessCb && this.onSuccessCb();
 
     delete this.onSuccessCb;
-    delete this.onAfterEachSuccess;
+    delete this.onAfterEachSuccessCb;
     delete this.onErrorCb;
   }
 

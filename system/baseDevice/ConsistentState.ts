@@ -150,11 +150,11 @@ export default class ConsistentState {
     // save old state
     this.tmpStateBeforeWriting = oldState;
 
-    this.writingQueuedCall.callOnceOnSuccess(() => {
+    this.writingQueuedCall.onSuccess(() => {
       delete this.tmpStateBeforeWriting;
     });
 
-    this.writingQueuedCall.callOnceOnError((err: Error) => {
+    this.writingQueuedCall.onError((err: Error) => {
       this.system.log.error(String(err));
 
       if (!this.tmpStateBeforeWriting) return;
@@ -165,9 +165,7 @@ export default class ConsistentState {
       delete this.tmpStateBeforeWriting;
     });
 
-    this.writingQueuedCall.onAfterEachCb((err?: Error) => {
-      if (err) return;
-
+    this.writingQueuedCall.onAfterEachSuccess(() => {
       // if writing was success and there is a queue - update old tmp state
       this.tmpStateBeforeWriting = this.getState();
     });
