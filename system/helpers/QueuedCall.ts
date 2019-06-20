@@ -36,7 +36,6 @@ export default class QueuedCall {
     return this.executing;
   }
 
-  // TODO: ошибка должна произойти на текущий cb
   async callIt(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
     // set to queue
     if (this.isExecuting()) {
@@ -44,21 +43,7 @@ export default class QueuedCall {
     }
 
     // or start new
-
-    this.executing = true;
-
-    try {
-      await cb();
-    }
-    catch (err) {
-      this.stopOnError(err);
-
-      // TODO: делать throw если это 1й запуск ???
-
-      throw err;
-    }
-
-    this.finish();
+    return this.startNew(cb);
   }
 
   /**
@@ -83,9 +68,34 @@ export default class QueuedCall {
   }
 
 
+  private async startNew(cb: QueuedCb): Promise<void> {
+    this.executing = true;
+
+    try {
+      await cb();
+    }
+    catch (err) {
+      // cancel queue on eror
+      this.stopOnError(err);
+      // throw error of first cb
+      throw err;
+    }
+
+    const prevQueuedPromise = this.queuedPromise;
+
+    delete this.queuedPromise;
+
+    this.onAfterEachSuccessCb && this.onAfterEachSuccessCb();
+
+    // start queue if there is a queuedCb
+    if (this.queuedCb && prevQueuedPromise) return this.startQueue(prevQueuedPromise);
+    // or finish cycle
+    this.wholeCycleFinished();
+  }
+
   private setToQueue(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
     // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
-
+    // TODO: на resolve или reject промиса который возвращает ф-я должен произойти на все отложенные cb
     // // make old state which was before writing
     // if (this.tmpStateBeforeWriting) {
     //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
@@ -102,37 +112,27 @@ export default class QueuedCall {
     return this.queuedPromise.promise;
   }
 
-  private finish() {
-    const prevQueuedPromise = this.queuedPromise;
-    delete this.queuedPromise;
+  private startQueue(prevQueuedPromise: Promised) {
+    // start queue
+    const queuedCb = this.queuedCb;
 
-    this.onAfterEachSuccessCb && this.onAfterEachSuccessCb();
+    delete this.queuedCb;
 
-    if (this.queuedCb && prevQueuedPromise) {
-      // start queue
-      const queuedCb = this.queuedCb;
-
-      delete this.queuedCb;
-
-      this.callIt(queuedCb)
-        .then(prevQueuedPromise.resolve)
-        .catch(prevQueuedPromise.reject);
-
-      return;
-    }
-
-    this.wholeCycleFinished();
+    // TODO: review
+    this.startNew(queuedCb)
+      .then(prevQueuedPromise.resolve)
+      .catch(prevQueuedPromise.reject);
   }
 
   private stopOnError(err: Error) {
+    this.executing = false;
+
     // clean up queue on error
     this.queuedPromise && this.queuedPromise.reject(err);
     this.onErrorCb && this.onErrorCb(err);
 
     delete this.queuedPromise;
     delete this.queuedCb;
-
-    this.executing = false;
   }
 
   private wholeCycleFinished() {
