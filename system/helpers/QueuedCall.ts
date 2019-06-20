@@ -82,22 +82,7 @@ export default class QueuedCall {
     }
 
     // success
-
-    const prevQueuedPromise = this.queuedPromise;
-
-    delete this.queuedPromise;
-
-    this.onAfterEachSuccessCb && this.onAfterEachSuccessCb();
-
-    // start queue if there is a queuedCb
-    if (this.queuedCb && prevQueuedPromise) {
-      this.startQueue(prevQueuedPromise);
-
-      return;
-    }
-
-    // or finish cycle
-    this.wholeCycleFinished();
+    this.afterCbSuccess();
   }
 
   private setToQueue(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
@@ -118,7 +103,25 @@ export default class QueuedCall {
     return this.queuedPromise.promise;
   }
 
-  private startQueue(prevQueuedPromise: Promised) {
+  private afterCbSuccess() {
+    const prevQueuedPromise = this.queuedPromise;
+
+    delete this.queuedPromise;
+
+    this.onAfterEachSuccessCb && this.onAfterEachSuccessCb();
+
+    // start queue if there is a queuedCb
+    if (this.queuedCb && prevQueuedPromise) {
+      this.startQueue(prevQueuedPromise);
+
+      return;
+    }
+
+    // or finish cycle
+    this.wholeCycleFinished();
+  }
+
+  private startQueue(prevQueuedPromise: Promised<void>) {
     if (!this.queuedCb) throw new Error(`No queuedCb`);
 
     // start queue
@@ -126,16 +129,22 @@ export default class QueuedCall {
 
     delete this.queuedCb;
 
-    this.startNew(queuedCb)
-      .then(prevQueuedPromise.resolve)
-      .catch(prevQueuedPromise.reject);
+    queuedCb()
+      .then(() => {
+        prevQueuedPromise.resolve();
+        this.afterCbSuccess();
+      })
+      .catch((err) => {
+        prevQueuedPromise.reject(err);
+        // cancel queue on error
+        this.stopOnError(err);
+      });
   }
 
   private stopOnError(err: Error) {
     this.executing = false;
 
     // clean up queue on error
-    //this.queuedPromise && this.queuedPromise.reject(err);
     this.onErrorCb && this.onErrorCb(err);
 
     delete this.queuedPromise;
@@ -151,6 +160,8 @@ export default class QueuedCall {
     // call on success
     this.onSuccessCb && this.onSuccessCb();
 
+    delete this.queuedPromise;
+    delete this.queuedCb;
     delete this.onSuccessCb;
     delete this.onAfterEachSuccessCb;
     delete this.onErrorCb;
