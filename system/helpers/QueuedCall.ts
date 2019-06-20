@@ -11,7 +11,6 @@ export type QueuedCb = (data?: {[index: string]: any}) => Promise<void>;
 
 
 export default class QueuedCall {
-  // TODO: review
   private queuedPromise?: Promised<void>;
   private queuedCb?: QueuedCb;
   private executing: boolean = false;
@@ -81,6 +80,8 @@ export default class QueuedCall {
       throw err;
     }
 
+    // success
+
     const prevQueuedPromise = this.queuedPromise;
 
     delete this.queuedPromise;
@@ -113,12 +114,14 @@ export default class QueuedCall {
   }
 
   private startQueue(prevQueuedPromise: Promised) {
+    if (!this.queuedCb) throw new Error(`No queuedCb`);
+
     // start queue
     const queuedCb = this.queuedCb;
 
     delete this.queuedCb;
 
-    // TODO: review
+    // TODO: review - ???? что на ошибке ???
     this.startNew(queuedCb)
       .then(prevQueuedPromise.resolve)
       .catch(prevQueuedPromise.reject);
@@ -133,6 +136,9 @@ export default class QueuedCall {
 
     delete this.queuedPromise;
     delete this.queuedCb;
+    delete this.onSuccessCb;
+    delete this.onAfterEachSuccessCb;
+    delete this.onErrorCb;
   }
 
   private wholeCycleFinished() {
