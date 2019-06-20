@@ -5,6 +5,7 @@ import SchemaElement from '../interfaces/SchemaElement';
 import {isEmpty} from '../helpers/lodashLike';
 import {validateParam} from '../helpers/validate';
 import ConsistentState, {Getter, Setter, Initialize} from './ConsistentState';
+import {collectPropsDefaults} from '../helpers/helpers';
 
 
 export type Schema = {[index: string]: SchemaElement};
@@ -49,7 +50,11 @@ export default class DeviceState {
 
   async init() {
     if (!this.getter && !this.initialize) {
-      return this.getDefaultValues();
+      const initState = collectPropsDefaults(this.schema);
+
+      this.system.state.updateState(this.stateCategory, this.deviceId, initState);
+
+      return;
     }
 
     await this.consistentState.init();
@@ -61,7 +66,7 @@ export default class DeviceState {
   }
 
   destroy() {
-    // TODO: add
+    this.consistentState.destroy();
   }
 
 

@@ -15,25 +15,6 @@ export const SYSTEM_DIR = path.join(REPO_ROOT, 'system');
 export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 
 
-/**
- * Collect values which are set in default param of props schema
- */
-export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
-  const result: {[index: string]: any} = {};
-
-  if (!manifestProps) return result;
-
-  for (let propName of Object.keys(manifestProps)) {
-    if (!manifestProps[propName] || typeof manifestProps[propName].default === 'undefined') continue;
-
-    result[propName] = manifestProps[propName].default;
-  }
-
-  return result;
-}
-
-
-
 // TODO: !!! test bellow
 
 /**

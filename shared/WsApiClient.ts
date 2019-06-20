@@ -7,8 +7,8 @@ import {deserializeJson, serializeJson} from '../system/helpers/binaryHelpers';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
-import {collectPropsDefaults} from './helpers';
 import {ENCODE} from '../system/dict/constants';
+import {collectPropsDefaults} from '../system/helpers/helpers';
 
 
 const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');
