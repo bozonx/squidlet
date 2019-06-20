@@ -7,9 +7,13 @@
 import Promised from './Promised';
 
 
+export type QueuedCb = (data?: {[index: string]: any}) => Promise<void>;
+
+
 export default class QueuedCall {
+  // TODO: review
   private queuedPromise?: Promised<void>;
-  private queuedCb?: (data?: {[index: string]: any}) => Promise<void>;
+  private queuedCb?: QueuedCb;
   private executing: boolean = false;
   private onSuccessCb?: () => void;
   private onErrorCb?: (err: Error) => void;
@@ -26,39 +30,37 @@ export default class QueuedCall {
   }
 
 
-  // TODO: проверить сработает ли
+  // TODO: проверить сработает ли когда завершиться одна из записей
   isExecuting(): boolean {
     // TODO: review - может использовать queuedCb
     return this.executing;
   }
 
-  async callIt(cb: () => Promise<void>, data?: {[index: string]: any}): Promise<void> {
-    // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
-
-    // // make old state which was before writing
-    // if (this.tmpStateBeforeWriting) {
-    //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
-    // }
-    // else {
-    //   this.tmpStateBeforeWriting = partialData;
-    //   //this.tmpStateBeforeWriting = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
-    // }
-
+  async callIt(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
     // set to queue
-    if (this.executing) {
-      this.queuedCb = cb;
-
-      if (!this.queuedPromise) this.queuedPromise = new Promised();
-
-      return this.queuedPromise.promise;
+    if (this.isExecuting()) {
+      return this.setToQueue(cb, data);
     }
 
-    // start new
+    // or start new
+
     this.executing = true;
 
-    // TODO: если произошла ошибка - то очистить очередь
+    try {
+      await cb();
+    }
+    catch (err) {
+      // clean up queue on error
+      this.queuedPromise && this.queuedPromise.reject(err);
+      this.onErrorCb && this.onErrorCb(err);
 
-    await cb();
+      delete this.queuedPromise;
+      delete this.queuedCb;
+
+      this.executing = false;
+
+      throw err;
+    }
 
     this.finish();
   }
@@ -78,13 +80,31 @@ export default class QueuedCall {
   }
 
 
-  private finish() {
-    this.executing = false;
+  private setToQueue(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
+    // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
 
+    // // make old state which was before writing
+    // if (this.tmpStateBeforeWriting) {
+    //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
+    // }
+    // else {
+    //   this.tmpStateBeforeWriting = partialData;
+    //   //this.tmpStateBeforeWriting = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
+    // }
+
+    this.queuedCb = cb;
+
+    if (!this.queuedPromise) this.queuedPromise = new Promised();
+
+    return this.queuedPromise.promise;
+  }
+
+  private finish() {
     const prevQueuedPromise = this.queuedPromise;
     delete this.queuedPromise;
 
     if (this.queuedCb && prevQueuedPromise) {
+      // start queue
       const queuedCb = this.queuedCb;
 
       delete this.queuedCb;
@@ -92,9 +112,21 @@ export default class QueuedCall {
       this.callIt(queuedCb)
         .then(prevQueuedPromise.resolve)
         .catch(prevQueuedPromise.reject);
+
+      return;
     }
 
-    // TODO: add onSuccessCb and onErrorCb and remove them
+    this.wholeCycleFinished();
+  }
+
+  private wholeCycleFinished() {
+    this.executing = false;
+
+    // call on success
+    this.onSuccessCb && this.onSuccessCb();
+
+    delete this.onSuccessCb;
+    delete this.onErrorCb;
   }
 
 }
