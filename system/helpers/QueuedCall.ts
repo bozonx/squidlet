@@ -5,6 +5,8 @@
  * If there was an error - queue will be cleared.
  */
 import Promised from './Promised';
+import {mergeDeep} from './collections';
+import {isPlainObject} from './lodashLike';
 
 
 export type QueuedCb = (data?: {[index: string]: any}) => Promise<void>;
@@ -18,12 +20,14 @@ export default class QueuedCall {
   private onSuccessCb?: () => void;
   private onAfterEachSuccessCb?: () => void;
   private onErrorCb?: (err: Error) => void;
+  private queuedData?: {[index: string]: any};
 
 
   destroy() {
     this.queuedPromise && this.queuedPromise.destroy();
 
     delete this.queuedCb;
+    delete this.queuedData;
     delete this.queuedPromise;
     delete this.executing;
     delete this.onSuccessCb;
@@ -43,7 +47,7 @@ export default class QueuedCall {
     }
 
     // or start new
-    return this.startNew(cb);
+    return this.startNew(cb, data);
   }
 
   /**
@@ -68,11 +72,11 @@ export default class QueuedCall {
   }
 
 
-  private async startNew(cb: QueuedCb): Promise<void> {
+  private async startNew(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
     this.executing = true;
 
     try {
-      await cb();
+      await cb(data);
     }
     catch (err) {
       // cancel queue on eror
@@ -86,15 +90,18 @@ export default class QueuedCall {
   }
 
   private setToQueue(cb: QueuedCb, data?: {[index: string]: any}): Promise<void> {
-    // TODO: надо записывать смерженный стейт с предыдущими попытками после  - 2й раз и далее
-    // // make old state which was before writing
-    // if (this.tmpStateBeforeWriting) {
-    //   this.tmpStateBeforeWriting = mergeDeep(partialData, this.tmpStateBeforeWriting);
-    // }
-    // else {
-    //   this.tmpStateBeforeWriting = partialData;
-    //   //this.tmpStateBeforeWriting = mergeDeep(partialData, this.system.state.getState(this.stateCategory, this.deviceId));
-    // }
+    if (data) {
+      if (!isPlainObject(data)) {
+        throw new Error(`QueuedCall.setToQueue: data is not plain object: ${JSON.stringify(data)}`);
+      }
+
+      if (this.queuedData) {
+        this.queuedData = mergeDeep(data, this.queuedData);
+      }
+      else {
+        this.queuedData = data;
+      }
+    }
 
     this.queuedCb = cb;
 
@@ -129,7 +136,7 @@ export default class QueuedCall {
 
     delete this.queuedCb;
 
-    queuedCb()
+    queuedCb(this.queuedData)
       .then(() => {
         prevQueuedPromise.resolve();
         this.afterCbSuccess();
@@ -149,6 +156,7 @@ export default class QueuedCall {
 
     delete this.queuedPromise;
     delete this.queuedCb;
+    delete this.queuedData;
     delete this.onSuccessCb;
     delete this.onAfterEachSuccessCb;
     delete this.onErrorCb;
@@ -162,6 +170,7 @@ export default class QueuedCall {
 
     delete this.queuedPromise;
     delete this.queuedCb;
+    delete this.queuedData;
     delete this.onSuccessCb;
     delete this.onAfterEachSuccessCb;
     delete this.onErrorCb;

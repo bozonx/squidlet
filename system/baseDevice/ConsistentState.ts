@@ -114,7 +114,10 @@ export default class ConsistentState {
       oldState = this.getState();
     }
 
-    await this.requestSetter(oldState, partialData);
+    // save old state
+    this.tmpStateBeforeWriting = oldState;
+
+    await this.requestSetter(partialData);
   }
 
 
@@ -146,10 +149,7 @@ export default class ConsistentState {
   /**
    * Write new or add to queue
    */
-  private async requestSetter(oldState: StateObject, newPartialData: StateObject): Promise<void> {
-    // save old state
-    this.tmpStateBeforeWriting = oldState;
-
+  private async requestSetter(newPartialData: StateObject): Promise<void> {
     this.writingQueuedCall.onSuccess(() => {
       delete this.tmpStateBeforeWriting;
     });
