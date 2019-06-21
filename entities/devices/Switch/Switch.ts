@@ -34,9 +34,9 @@ export default class Switch extends DeviceBase<Props> {
     await this.binaryOutput.write(partialData[DEFAULT_STATUS]);
   }
 
-  protected transformPublishValue = (value: boolean): number => {
-    return Number(value);
-  }
+  // protected transformPublishValue = (value: boolean): number => {
+  //   return Number(value);
+  // }
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {

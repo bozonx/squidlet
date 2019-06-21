@@ -36,9 +36,9 @@ export default class Toggle extends DeviceBase<Props> {
     this.binaryClick.addUpListener(this.onUp);
   }
 
-  protected transformPublishValue = (value: boolean): number => {
-    return Number(value);
-  }
+  // protected transformPublishValue = (value: boolean): number => {
+  //   return Number(value);
+  // }
 
   protected initialStatus = async (): Promise<Data> => {
     return { [DEFAULT_STATUS]: invertIfNeed(false, this.props.invert) };

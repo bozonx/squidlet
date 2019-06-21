@@ -20,8 +20,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected initialConfig?: Initialize;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
-  // TODO: review
-  protected transformPublishValue?: (value: any) => any;
+  //protected transformPublishValue?: (value: any) => any;
   protected actions: {[index: string]: Function} = {};
   private _status?: Status;
   private _config?: Config;

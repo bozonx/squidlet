@@ -46,9 +46,9 @@ export default class ClickSensor extends DeviceBase<Props> {
     return { [DEFAULT_STATUS]: this.binaryClick.isDown() };
   }
 
-  protected transformPublishValue = (value: boolean): number => {
-    return Number(value);
-  }
+  // protected transformPublishValue = (value: boolean): number => {
+  //   return Number(value);
+  // }
 
 
   private onSilentStatusChange = this.wrapErrors(async () => {
