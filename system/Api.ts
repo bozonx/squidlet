@@ -39,7 +39,6 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  */
 export default class Api {
   private readonly system: System;
-  //private readonly publishEvents = new IndexedEvents<PublishHandler>();
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   private remoteCalls: {[index: string]: RemoteCall} = {};
 
@@ -49,7 +48,6 @@ export default class Api {
   }
 
   async destroy() {
-    //this.publishEvents.removeAll();
     this.rcOutcomeEvents.removeAll();
 
     for (let sessionId of Object.keys(this.remoteCalls)) {
@@ -92,21 +90,6 @@ export default class Api {
     await this.remoteCalls[sessionId].destroy();
     delete this.remoteCalls[sessionId];
   }
-
-  // TODO: может перенести в другое место DeviceManager или State??? ????
-  // /**
-  //  * Call this method if you want to send outcome data. (E.g after device state is changed)
-  //  */
-  // publish(topic: string, data: any, isRepeat?: boolean) {
-  //   return this.publishEvents.emit(topic, data, isRepeat);
-  // }
-  //
-  // /**
-  //  * Listen to outcome requests. E.g devices sends their status or config to remote host.
-  //  */
-  // onPublish(cb: PublishHandler): number {
-  //   return this.publishEvents.addListener(cb);
-  // }
 
   // TODO: может перенести в другое место
   /**
@@ -168,12 +151,13 @@ export default class Api {
 
   private listenDeviceStatus(deviceId: string, statusName: string | undefined, cb: (changedParams: string[]) => void): number {
     // TODO: как потом убить хэндлеры ???
-    // TODO: а можно ли слушать отдельный статус ???? temperature ???
 
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
+      if (category !== StateCategories.devicesStatus || stateName.indexOf(deviceId) !== 0) return;
+
       const topic = combineTopic(this.system.systemConfig.topicSeparator, deviceId, statusName);
 
-      if (category !== StateCategories.devicesStatus || stateName !== topic) return;
+      if (stateName !== topic) return;
 
       cb(changedParams);
     };
