@@ -1,4 +1,4 @@
-import DeviceBase, {DeviceBaseProps} from 'system/baseDevice/DeviceBase';
+import DeviceBase from 'system/baseDevice/DeviceBase';
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from 'system/baseDevice/Status';
 import {GetDriverDep} from 'system/entities/EntityBase';
@@ -8,7 +8,7 @@ import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryCli
 
 
 
-interface Props extends DeviceBaseProps, BinaryClickProps {
+interface Props extends BinaryClickProps {
   publish: 'down' | 'up' | 'both';
 }
 
@@ -51,26 +51,28 @@ export default class ClickSensor extends DeviceBase<Props> {
   }
 
 
-  private onSilentStatusChange = async () => {
+  private onSilentStatusChange = this.wrapErrors(async () => {
     if (!this.status) return;
 
     await this.status.write({[DEFAULT_STATUS]: true}, true);
-  }
+  });
 
-  private onDown = () => {
+  private onDown = this.wrapErrors(async () => {
     if (!this.status) return;
 
-    this.status.publish(true);
-  }
+    //this.status.publish(true);
+    await this.setStatus(true);
+  });
 
-  private onUp = () => {
+  private onUp = this.wrapErrors(async () => {
     if (!this.status) return;
 
-    this.status.publish(false);
-  }
+    //this.status.publish(false);
+    await this.setStatus(false);
+  });
 
-  private onClickStateChange = async (level: boolean) => {
+  private onClickStateChange = this.wrapErrors(async (level: boolean) => {
     await this.setStatus(level);
-  }
+  });
 
 }

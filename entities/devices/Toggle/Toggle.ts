@@ -1,5 +1,5 @@
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
-import DeviceBase, {DeviceBaseProps} from 'system/baseDevice/DeviceBase';
+import DeviceBase from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
 import {DEFAULT_STATUS} from 'system/baseDevice/Status';
@@ -7,7 +7,7 @@ import {DEFAULT_STATUS} from 'system/baseDevice/Status';
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
 
-interface Props extends DeviceBaseProps, BinaryClickProps {
+interface Props extends BinaryClickProps {
   // in this time driver doesn't receive any data
   blockTime: number;
 }

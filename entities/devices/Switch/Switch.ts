@@ -1,4 +1,4 @@
-import DeviceBase, {DeviceBaseProps} from 'system/baseDevice/DeviceBase';
+import DeviceBase from 'system/baseDevice/DeviceBase';
 import {convertToLevel} from 'system/helpers/helpers';
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
 import {DEFAULT_STATUS} from 'system/baseDevice/Status';
@@ -7,7 +7,7 @@ import {GetDriverDep} from 'system/entities/EntityBase';
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';
 
 
-interface Props extends DeviceBaseProps, BinaryOutputProps {
+interface Props extends BinaryOutputProps {
 }
 
 

@@ -36,6 +36,7 @@ export default class Status extends DeviceDataManagerBase {
     await this.writeData(partialData, silent);
   }
 
+  // TODO: why publish and not set state ????
   publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
     this.publishOneStatus(value, statusName, false);
   }
