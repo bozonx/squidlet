@@ -47,6 +47,7 @@ export default class MqttApi extends ServiceBase<Props> {
         .catch(this.env.log.error);
     });
 
+    // TODO: use state
     // listen to outcome messages from api and send them to mqtt broker
     this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
       this.publishHandler(topic, data, isRepeat)

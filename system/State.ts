@@ -4,8 +4,8 @@ import {getDifferentKeys, mergeDeep} from './helpers/collections';
 import {isEqual} from './helpers/lodashLike';
 
 
-type ChangeHandler = (category: number, stateName: string, changedParams: string[], isRepublish?: true) => void;
-type CategoryChangeHandler = (category: number, isRepublish?: true) => void;
+type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
+type CategoryChangeHandler = (category: number) => void;
 export type StateObject = {[index: string]: JsonTypes};
 
 
@@ -15,9 +15,6 @@ export default class State {
   // like { category: { stateName: { ... stateParams } } }
   private readonly state: {[index: string]: {[index: string]: StateObject}} = {};
 
-
-  constructor() {
-  }
 
   destroy() {
     this.changeEvents.removeAll();
@@ -47,11 +44,11 @@ export default class State {
     this.categoryChangeEvents.emit(category);
   }
 
-  onChange(cb: (category: number, stateName: string, changedParams: string[], isRepublish?: true) => void): number {
+  onChange(cb: (category: number, stateName: string, changedParams: string[]) => void): number {
     return this.changeEvents.addListener(cb);
   }
 
-  onChangeCategory(cb: (category: number, isRepublish?: true) => void): number {
+  onChangeCategory(cb: (category: number) => void): number {
     return this.categoryChangeEvents.addListener(cb);
   }
 

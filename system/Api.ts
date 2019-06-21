@@ -6,9 +6,10 @@ import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {objGet} from './helpers/lodashLike';
 import {Data} from './baseDevice/DeviceDataManagerBase';
 import {StateCategories} from './interfaces/States';
+import {combineTopic} from './helpers/helpers';
 
 
-type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
+//type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
 
 
@@ -21,7 +22,7 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  *
  * RemoteCall api:
  * * Call device's action - ('deviceAction', 'room.deviceId', 'turn', 'param1', 'param2')
- * * Listen to device's status change - ('listenDeviceStatus', 'room.deviceId', cb: () => void)
+ * * Listen to device's status change - ('listenDeviceStatus', 'room.deviceId', stateName, cb: (changedParams) => void)
  * * Listen to device's config change - ('listenDeviceConfig', 'room.deviceId', cb: () => void)
  * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
  * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
@@ -38,7 +39,7 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  */
 export default class Api {
   private readonly system: System;
-  private readonly publishEvents = new IndexedEvents<PublishHandler>();
+  //private readonly publishEvents = new IndexedEvents<PublishHandler>();
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   private remoteCalls: {[index: string]: RemoteCall} = {};
 
@@ -48,7 +49,7 @@ export default class Api {
   }
 
   async destroy() {
-    this.publishEvents.removeAll();
+    //this.publishEvents.removeAll();
     this.rcOutcomeEvents.removeAll();
 
     for (let sessionId of Object.keys(this.remoteCalls)) {
@@ -93,20 +94,21 @@ export default class Api {
   }
 
   // TODO: может перенести в другое место DeviceManager или State??? ????
-  /**
-   * Call this method if you want to send outcome data. (E.g after device state is changed)
-   */
-  publish(topic: string, data: any, isRepeat?: boolean) {
-    return this.publishEvents.emit(topic, data, isRepeat);
-  }
+  // /**
+  //  * Call this method if you want to send outcome data. (E.g after device state is changed)
+  //  */
+  // publish(topic: string, data: any, isRepeat?: boolean) {
+  //   return this.publishEvents.emit(topic, data, isRepeat);
+  // }
+  //
+  // /**
+  //  * Listen to outcome requests. E.g devices sends their status or config to remote host.
+  //  */
+  // onPublish(cb: PublishHandler): number {
+  //   return this.publishEvents.addListener(cb);
+  // }
 
-  /**
-   * Listen to outcome requests. E.g devices sends their status or config to remote host.
-   */
-  onPublish(cb: PublishHandler): number {
-    return this.publishEvents.addListener(cb);
-  }
-
+  // TODO: может перенести в другое место
   /**
    * Call device's action and receive a result
    */
@@ -116,6 +118,7 @@ export default class Api {
     return device.action(actionName, ...params);
   }
 
+  // TODO: может перенести в другое место
   async sedDeviceConfig(deviceId: string, partialData: Data): Promise<void> {
     const device = this.system.devicesManager.getDevice(deviceId);
 
@@ -128,7 +131,7 @@ export default class Api {
       case 'deviceAction':
         return this.callDeviceAction(args[0], args[1], ...args.slice(2));
       case 'listenDeviceStatus':
-        return this.listenDeviceStatus(args[0], args[1]);
+        return this.listenDeviceStatus(args[0], args[1], args[2]);
       case 'listenDeviceConfig':
         // TODO: add
       case 'setDeviceConfig':
@@ -163,15 +166,16 @@ export default class Api {
     return IoItem[methodName](...args);
   }
 
-  private listenDeviceStatus(deviceId: string, cb: () => void): number {
-    // TODO: use this.publishEvents
-    // TODO: !!! ('listenDeviceStatus', 'room.deviceId', cb())
+  private listenDeviceStatus(deviceId: string, statusName: string | undefined, cb: (changedParams: string[]) => void): number {
     // TODO: как потом убить хэндлеры ???
     // TODO: а можно ли слушать отдельный статус ???? temperature ???
-    const handlerWrapper = (category: number, stateName: string, isRepublish?: true) => {
-      if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
-      cb();
+    const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
+      const topic = combineTopic(this.system.systemConfig.topicSeparator, deviceId, statusName);
+
+      if (category !== StateCategories.devicesStatus || stateName !== topic) return;
+
+      cb(changedParams);
     };
 
     return this.system.state.onChange(handlerWrapper);

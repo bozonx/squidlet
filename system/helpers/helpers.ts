@@ -128,7 +128,7 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
 /**
  * Join topic paths using special path separator
  */
-export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string>): string {
+export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string | undefined>): string {
   if (isEmpty(subPaths)) return basePath;
 
   return [ basePath, ...subPaths ].join(topicSeparator);
