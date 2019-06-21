@@ -13,6 +13,7 @@ import CategorizedEvents from '../helpers/CategorizedEvents';
  */
 export default abstract class EnvBase {
   readonly system: System;
+  // TODO: review
   get api(): ApiManager {
     return this.system.api;
   }

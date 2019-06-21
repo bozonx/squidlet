@@ -16,6 +16,7 @@ import Sessions from './helpers/Sessions';
 import ApiManager from './ApiManager';
 import HostConfig from './interfaces/HostConfig';
 import State from './State';
+import Api from './Api';
 
 
 // TODO: remove
@@ -32,7 +33,8 @@ export default class System {
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
   readonly sessions: Sessions;
-  readonly api: ApiManager;
+  readonly apiManager: ApiManager;
+  readonly api: Api;
   readonly state: State;
   get id(): string {
     return this.config.id;
@@ -68,7 +70,8 @@ export default class System {
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
-    this.api = new ApiManager(this);
+    this.apiManager = new ApiManager(this);
+    this.api = new Api(this);
     this.sessions = new Sessions(this.generateUniqId);
     this.state = new State();
   }
@@ -80,7 +83,7 @@ export default class System {
     await this.servicesManager.destroy();
     await this.driversManager.destroy();
     await this.ioManager.destroy();
-    await this.api.destroy();
+    await this.apiManager.destroy();
     this.sessions.destroy();
     this.state.destroy();
     this.events.destroy();

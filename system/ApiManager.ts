@@ -65,34 +65,8 @@ export default class ApiManager {
   }
 
 
-  private async callApi(pathToMethod: string, args: any[]): Promise<any> {
-    // TODO: call api
-
-    // switch (pathToMethod) {
-    //   case 'deviceAction':
-    //     return this.callDeviceAction(args[0], args[1], ...args.slice(2));
-    //   case 'listenDeviceStatus':
-    //     return this.listenDeviceStatus(args[0], args[1], args[2]);
-    //   case 'listenDeviceConfig':
-    //     // TODO: add
-    //   case 'setDeviceConfig':
-    //     return this.sedDeviceConfig(args[0], args[1]);
-    //   case 'getConfig':
-    //     return objGet(this.system.config, args[0]);
-    //   case 'getSessionStore':
-    //     return this.system.sessions.getStorage(args[0], args[1]);
-    //   case 'listenLog':
-    //     // TODO: add
-    //     //return this.system.sessions.getStorage(args[0], args[1]);
-    //   case 'blockIo':
-    //     // TODO: add
-    //   case 'getIoNames':
-    //     return this.system.ioManager.getNames();
-    //   case 'callIoMethod':
-    //     return this.callIoMethod(args[0], args[1], ...args.slice(2));
-    //   default:
-    //     throw new Error(`Api.callApi: Unknown method`);
-    // }
+  private async callApi(methodName: string, args: any[]): Promise<any> {
+    return (this.system.api as any)[methodName](...args);
   }
 
 }
