@@ -87,7 +87,7 @@ export default class ApiManager {
 //
 //       return this.callDeviceAction(payload.deviceId, payload.action, ...payload.params);
 //
-//     // TODO: add other types
+//     // T-O-D-O: add other types
 //
 //     default:
 //       return this.system.log.error(`Api.income: Unsupported message type "${msg.type}"`);

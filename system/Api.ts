@@ -1,36 +1,12 @@
 import {JsonTypes} from './interfaces/Types';
 import {objGet} from './helpers/lodashLike';
 import System from './System';
-import {Data} from './baseDevice/DeviceDataManagerBase';
 import {StateCategories} from './interfaces/States';
 import {combineTopic} from './helpers/helpers';
-import {STATE_SEPARATOR} from './State';
+import {STATE_SEPARATOR, StateObject} from './State';
+import LogLevel from './interfaces/LogLevel';
 
 
-/**
- *
- * Types of topics:
- * * Calling device action:
- *   * device.room.deviceId/myAction value
- *   * room.deviceId/myAction value
- *
- * RemoteCall api:
- * * Call device's action - ('deviceAction', 'room.deviceId', 'turn', 'param1', 'param2')
- * * Listen to device's status change - ('listenDeviceStatus', 'room.deviceId', stateName, cb: (changedParams) => void)
- * * Listen to device's config change - ('listenDeviceConfig', 'room.deviceId', cb: () => void)
- * * Set device config - ('setDeviceConfig', 'room.deviceId', {... partial config})
- * * Getting config param - ('getConfig', 'config.ioSetResponseTimoutSec')
- * * Getting session store - ('getSessionStore', 'mySessionId', 'key')
- * * Listen log - ('listenLog', 'info', yourCallback)
- * * blockIo - ('blockIo', true)
- * * Get io names list - ('getIoNames')
- * * Call io method - ('callIoMethod', 'ioName', 'methodName', ...methodArguments)
- *
- * * Getting state
- * * Subscribe to state change
- * * Initiate updating
- * * Switch automation
- */
 export default class Api {
   private readonly system: System;
 
@@ -63,29 +39,36 @@ export default class Api {
     return this.system.state.onChange(handlerWrapper);
   }
 
-  listenDeviceConfig() {
+  listenDeviceConfig(deviceId: string, cb: () => void): number {
     // TODO: add
+    return 0;
   }
 
-  async setDeviceConfig(deviceId: string, partialData: Data): Promise<void> {
+  getDeviceConfig(deviceId: string): StateObject {
+    // TODO: add
+    return {};
+  }
+
+  async setDeviceConfig(deviceId: string, partialState: StateObject): Promise<void> {
     const device = this.system.devicesManager.getDevice(deviceId);
 
-    if (device.setConfig) return device.setConfig(partialData);
+    if (device.setConfig) return device.setConfig(partialState);
   }
 
-  getConfig() {
-    return objGet(this.system.config, args[0]);
+  getConfig(configParam: string): JsonTypes {
+    return objGet(this.system.config, configParam);
   }
 
-  getSessionStore() {
-    return this.system.sessions.getStorage(args[0], args[1]);
+  getSessionStore(sessionId: string, key: string): JsonTypes | undefined {
+    return this.system.sessions.getStorage(sessionId, key);
   }
 
-  listenLog() {
+  listenLog(logLevel: LogLevel, cb: (msg: string) => void): number {
     // TODO: add
+    return 0;
   }
 
-  blockIo() {
+  blockIo(block: boolean) {
     // TODO: add
   }
 
