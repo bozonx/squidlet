@@ -13,7 +13,7 @@ import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
 import IoManager from './entities/IoManager';
 import Sessions from './helpers/Sessions';
-import Api from './Api';
+import ApiManager from './ApiManager';
 import HostConfig from './interfaces/HostConfig';
 import State from './State';
 
@@ -32,7 +32,7 @@ export default class System {
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
   readonly sessions: Sessions;
-  readonly api: Api;
+  readonly api: ApiManager;
   readonly state: State;
   get id(): string {
     return this.config.id;
@@ -68,7 +68,7 @@ export default class System {
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);
     this.devicesManager = new DevicesManager(this);
-    this.api = new Api(this);
+    this.api = new ApiManager(this);
     this.sessions = new Sessions(this.generateUniqId);
     this.state = new State();
   }
