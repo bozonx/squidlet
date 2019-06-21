@@ -7,6 +7,7 @@ import {objGet} from './helpers/lodashLike';
 import {Data} from './baseDevice/DeviceDataManagerBase';
 import {StateCategories} from './interfaces/States';
 import {combineTopic} from './helpers/helpers';
+import {STATE_SEPARATOR} from './State';
 
 
 //type PublishHandler = (topic: string, data: JsonTypes, isRepeat?: boolean) => void;
@@ -155,7 +156,8 @@ export default class Api {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesStatus || stateName.indexOf(deviceId) !== 0) return;
 
-      const topic = combineTopic(this.system.systemConfig.topicSeparator, deviceId, statusName);
+      // TODO: наверное будет ещё указан status или config
+      const topic = combineTopic(STATE_SEPARATOR, deviceId, statusName);
 
       if (stateName !== topic) return;
 
