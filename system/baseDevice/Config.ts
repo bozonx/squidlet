@@ -34,9 +34,11 @@ export default class Config {
       schema,
       this.stateCategory,
       this.deviceId,
+      this.stateGetter,
+      this.stateUpdater,
       initialize,
       getter,
-      setter
+      setter,
     );
   }
 
@@ -75,6 +77,15 @@ export default class Config {
     // TODO: use it system.state - но отфильтровывать только нужные данные
 
     this.system.state.onChange();
+  }
+
+
+  private stateGetter = (): StateObject => {
+    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
+  }
+
+  private stateUpdater = (partialState: StateObject): void => {
+    this.system.state.updateState(this.stateCategory, this.deviceId, partialState);
   }
 
 

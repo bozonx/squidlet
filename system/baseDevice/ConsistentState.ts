@@ -13,6 +13,8 @@ export default class ConsistentState {
   private readonly system: System;
   private readonly stateCategory: StateCategories;
   private readonly deviceId: string;
+  private readonly stateGetter: () => StateObject;
+  private readonly stateUpdater: (partialState: StateObject) => void;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
@@ -25,6 +27,8 @@ export default class ConsistentState {
     system: System,
     stateCategory: StateCategories,
     deviceId: string,
+    stateGetter: () => StateObject,
+    stateUpdater: (partialState: StateObject) => void,
     initialize?: Initialize,
     getter?: Getter,
     setter?: Setter
@@ -32,6 +36,8 @@ export default class ConsistentState {
     this.system = system;
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
+    this.stateGetter = stateGetter;
+    this.stateUpdater = stateUpdater;
     this.initialize = initialize;
     this.getter = getter;
     this.setter = setter;
@@ -44,7 +50,7 @@ export default class ConsistentState {
 
     const result: StateObject = await this.requestGetter(getter as Getter);
 
-    this.system.state.updateState(this.stateCategory, this.deviceId, result);
+    this.stateUpdater(result);
   }
 
   destroy() {
@@ -64,7 +70,7 @@ export default class ConsistentState {
   }
 
   getState(): StateObject {
-    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
+    return this.stateGetter();
   }
 
   /**
@@ -86,7 +92,7 @@ export default class ConsistentState {
 
     const result: StateObject = await this.requestGetter(this.getter);
 
-    this.system.state.updateState(this.stateCategory, this.deviceId, result);
+    this.stateUpdater(result);
   }
 
   /**
@@ -98,7 +104,7 @@ export default class ConsistentState {
   async write(partialData: StateObject): Promise<void> {
     let oldState = this.getState();
 
-    this.system.state.updateState(this.stateCategory, this.deviceId, partialData);
+    this.stateUpdater(partialData);
 
     // if mode without setter - just update state and rise an event
     if (!this.setter) return;
@@ -161,7 +167,7 @@ export default class ConsistentState {
       if (!this.tmpStateBeforeWriting) return;
 
       // restore old state
-      this.system.state.updateState(this.stateCategory, this.deviceId, this.tmpStateBeforeWriting);
+      this.stateUpdater(this.tmpStateBeforeWriting);
 
       delete this.tmpStateBeforeWriting;
     });

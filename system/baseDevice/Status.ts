@@ -37,9 +37,11 @@ export default class Status {
       schema,
       this.stateCategory,
       this.deviceId,
+      this.stateGetter,
+      this.stateUpdater,
       initialize,
       getter,
-      setter
+      setter,
     );
   }
 
@@ -94,6 +96,15 @@ export default class Status {
     };
 
     return this.system.state.onChange(wrapper);
+  }
+
+
+  private stateGetter = (): StateObject => {
+    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
+  }
+
+  private stateUpdater = (partialState: StateObject): void => {
+    this.system.state.updateState(this.stateCategory, this.deviceId, partialState);
   }
 
 }

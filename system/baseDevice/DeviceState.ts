@@ -17,6 +17,8 @@ export default class DeviceState {
   private readonly schema: Schema;
   private readonly stateCategory: StateCategories;
   private readonly deviceId: string;
+  private readonly stateGetter: () => StateObject;
+  private readonly stateUpdater: (partialState: StateObject) => void;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   // private readonly setter?: Setter;
@@ -24,18 +26,24 @@ export default class DeviceState {
 
 
   constructor(
+    // TODO: не нуно
     system: System,
     schema: Schema,
+    // TODO: не нуно
     stateCategory: StateCategories,
+    // TODO: не нуно
     deviceId: string,
+    stateGetter: () => StateObject,
+    stateUpdater: (partialState: StateObject) => void,
     initialize?: Initialize,
     getter?: Getter,
-    setter?: Setter
+    setter?: Setter,
   ) {
-    this.system = system;
     this.schema = schema;
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
+    this.stateGetter = stateGetter;
+    this.stateUpdater = stateUpdater;
     this.initialize = initialize;
     this.getter = getter;
 
@@ -43,9 +51,11 @@ export default class DeviceState {
       this.system,
       this.stateCategory,
       this.deviceId,
+      this.stateGetter,
+      this.stateUpdater,
       this.initialize,
       this.getter,
-      setter
+      setter,
     );
   }
 
@@ -53,7 +63,7 @@ export default class DeviceState {
     if (!this.getter && !this.initialize) {
       const initState = collectPropsDefaults(this.schema);
 
-      this.system.state.updateState(this.stateCategory, this.deviceId, initState);
+      this.stateUpdater(initState);
 
       return;
     }
