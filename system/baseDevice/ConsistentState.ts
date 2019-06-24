@@ -1,5 +1,4 @@
 import {StateObject} from '../State';
-import System from '../System';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
 import {StateCategories} from '../interfaces/States';
@@ -10,7 +9,7 @@ export type Setter = (partialData: StateObject) => Promise<void>;
 
 
 export default class ConsistentState {
-  private readonly system: System;
+  private readonly logError: (msg: string) => void;
   private readonly stateCategory: StateCategories;
   private readonly deviceId: string;
   private readonly stateGetter: () => StateObject;
@@ -24,7 +23,7 @@ export default class ConsistentState {
 
 
   constructor(
-    system: System,
+    logError: (msg: string) => void,
     stateCategory: StateCategories,
     deviceId: string,
     stateGetter: () => StateObject,
@@ -33,7 +32,8 @@ export default class ConsistentState {
     getter?: Getter,
     setter?: Setter
   ) {
-    this.system = system;
+    this.logError = logError;
+
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
     this.stateGetter = stateGetter;
@@ -162,7 +162,7 @@ export default class ConsistentState {
     });
 
     this.writingQueuedCall.onError((err: Error) => {
-      this.system.log.error(String(err));
+      this.logError(String(err));
 
       if (!this.tmpStateBeforeWriting) return;
 

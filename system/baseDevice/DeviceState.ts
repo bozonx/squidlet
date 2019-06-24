@@ -1,4 +1,3 @@
-import System from '../System';
 import {StateObject} from '../State';
 import {JsonTypes} from '../interfaces/Types';
 import SchemaElement from '../interfaces/SchemaElement';
@@ -13,7 +12,7 @@ export type Schema = {[index: string]: SchemaElement};
 
 
 export default class DeviceState {
-  private readonly system: System;
+  private readonly logError: (msg: string) => void;
   private readonly schema: Schema;
   private readonly stateCategory: StateCategories;
   private readonly deviceId: string;
@@ -26,8 +25,7 @@ export default class DeviceState {
 
 
   constructor(
-    // TODO: не нуно
-    system: System,
+    logError: (msg: string) => void,
     schema: Schema,
     // TODO: не нуно
     stateCategory: StateCategories,
@@ -39,6 +37,7 @@ export default class DeviceState {
     getter?: Getter,
     setter?: Setter,
   ) {
+    this.logError = logError;
     this.schema = schema;
     this.stateCategory = stateCategory;
     this.deviceId = deviceId;
@@ -48,7 +47,7 @@ export default class DeviceState {
     this.getter = getter;
 
     this.consistentState = new ConsistentState(
-      this.system,
+      this.logError,
       this.stateCategory,
       this.deviceId,
       this.stateGetter,
@@ -71,8 +70,8 @@ export default class DeviceState {
     await this.consistentState.init();
 
     this.validateDict(
-      this.getState(),
-      `Invalid device state on init: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(this.getState())}"`
+      this.consistentState.getState(),
+      `Invalid device state on init: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(this.consistentState.getState())}"`
     );
   }
 
@@ -89,21 +88,21 @@ export default class DeviceState {
     return this.consistentState.isWriting();
   }
 
-  getState(): StateObject {
-    return this.consistentState.getState();
-  }
+  // getState(): StateObject {
+  //   return this.consistentState.getState();
+  // }
 
   async readAll(): Promise<StateObject> {
-    if (!this.getter || this.isWriting()) return this.getState();
+    if (!this.getter || this.isWriting()) return this.consistentState.getState();
 
     await this.consistentState.loadAll();
 
     this.validateDict(
-      this.getState(),
-      `Invalid device state readAll: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(this.getState())}"`
+      this.consistentState.getState(),
+      `Invalid device state readAll: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(this.consistentState.getState())}"`
     );
 
-    return this.getState();
+    return this.consistentState.getState();
   }
 
   async readParam(paramName: string): Promise<JsonTypes> {

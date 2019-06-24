@@ -33,7 +33,7 @@ export default class Status {
     this.deviceId = deviceId;
 
     this.deviceState = new DeviceState(
-      this.system,
+      this.system.log.error,
       schema,
       this.stateCategory,
       this.deviceId,

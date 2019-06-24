@@ -30,7 +30,7 @@ export default class Config {
     this.deviceId = deviceId;
 
     this.deviceState = new DeviceState(
-      this.system,
+      this.system.log.error,
       schema,
       this.stateCategory,
       this.deviceId,
