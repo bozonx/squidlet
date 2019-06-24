@@ -1,7 +1,7 @@
 import DeviceBase from 'system/baseDevice/DeviceBase';
 import {convertToLevel} from 'system/helpers/helpers';
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from 'system/baseDevice/Status';
+import {DEFAULT_STATUS} from 'system/baseDevice/StatusState';
 import {GetDriverDep} from 'system/entities/EntityBase';
 
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';

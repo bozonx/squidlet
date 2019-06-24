@@ -1,5 +1,5 @@
-import Status, {DEFAULT_STATUS, StatusChangeHandler} from './Status';
-import Config, {ConfigChangeHandler} from './Config';
+import StatusState, {DEFAULT_STATUS, StatusChangeHandler} from './StatusState';
+import ConfigState, {ConfigChangeHandler} from './ConfigState';
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
@@ -10,24 +10,24 @@ import {StateObject} from '../State';
 
 
 export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
-  get status(): Status | undefined {
-    return this._status;
+  get statusState(): StatusState | undefined {
+    return this._statusState;
   }
 
-  get config(): Config | undefined {
-    return this._config;
+  get configState(): ConfigState | undefined {
+    return this._configState;
   }
 
   get isStatusFetching(): boolean {
-    if (!this.status) return false;
+    if (!this.statusState) return false;
 
-    return this.status.isReading() || this.status.isWriting();
+    return this.statusState.isReading() || this.statusState.isWriting();
   }
 
   get isConfigFetching(): boolean {
-    if (!this.config) return false;
+    if (!this.configState) return false;
 
-    return this.config.isReading() || this.config.isWriting();
+    return this.configState.isReading() || this.configState.isWriting();
   }
 
   protected readonly env: DeviceEnv;
@@ -41,8 +41,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected configGetter?: Getter;
   protected configSetter?: Setter;
   protected actions: {[index: string]: Function} = {};
-  private _status?: Status;
-  private _config?: Config;
+  private _statusState?: StatusState;
+  private _configState?: ConfigState;
 
 
   constructor(definition: EntityDefinition, env: DeviceEnv) {
@@ -54,7 +54,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     if (manifest.status) {
-      this._status = new Status(
+      this._status = new StatusState(
         this.env.system,
         manifest.status,
         this.id,
@@ -65,7 +65,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     if (manifest.config) {
-      this._config = new Config(
+      this._config = new ConfigState(
         this.env.system,
         manifest.config,
         this.id,
@@ -76,8 +76,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     await Promise.all([
-      this.status && this.status.init(),
-      this.config && this.config.init(),
+      this.statusState && this.statusState.init(),
+      this.configState && this.configState.init(),
     ]);
   }
 
@@ -89,58 +89,58 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
    * @param statusName
    */
   getStatus = async (statusName?: string): Promise<JsonTypes> => {
-    if (!this.status) {
+    if (!this.statusState) {
       throw new Error(`DeviceBase.getStatus: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.status.readParam(statusName);
+    return this.statusState.readParam(statusName);
   }
 
   setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
-    if (!this.status) {
+    if (!this.statusState) {
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.status.write({[statusName]: newValue});
+    return this.statusState.write({[statusName]: newValue});
   }
 
   /**
    * Listen status change
    */
   onChange(cb: StatusChangeHandler): number {
-    if (!this.status) {
+    if (!this.statusState) {
       throw new Error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.status.onChange(cb);
+    return this.statusState.onChange(cb);
   }
 
 
   getConfig(): Promise<StateObject> {
-    if (!this.config) {
+    if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
     }
 
-    return this.config.read();
+    return this.configState.read();
   }
 
   setConfig(partialData: StateObject): Promise<void> {
-    if (!this.config) {
+    if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
     }
 
-    return this.config.write(partialData);
+    return this.configState.write(partialData);
   }
 
   /**
    * Listen status change
    */
   onConfigChange(cb: ConfigChangeHandler): number {
-    if (!this.config) {
+    if (!this.configState) {
       throw new Error(`DeviceBase.onConfigChange: device "${this.id}", config hasn't been set.`);
     }
 
-    return this.config.onChange(cb);
+    return this.configState.onChange(cb);
   }
 
 

@@ -11,7 +11,7 @@ export type ConfigChangeHandler = () => void;
 /**
  * Manage config of device
  */
-export default class Config {
+export default class ConfigState {
   private readonly system: System;
   private readonly deviceId: string;
   private readonly deviceState: DeviceState;

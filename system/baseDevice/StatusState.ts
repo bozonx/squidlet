@@ -15,7 +15,7 @@ export type StatusChangeHandler = (changedParams: string[]) => void;
 /**
  * Manage status of device
  */
-export default class Status {
+export default class StatusState {
   private readonly system: System;
   private readonly deviceId: string;
   private readonly deviceState: DeviceState;
