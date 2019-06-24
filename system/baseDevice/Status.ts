@@ -4,6 +4,7 @@ import DeviceState, {Schema} from './DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {StateObject} from '../State';
 import {JsonTypes} from '../interfaces/Types';
+import {combineTopic} from '../helpers/helpers';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -33,12 +34,10 @@ export default class Status {
     this.deviceId = deviceId;
 
     this.deviceState = new DeviceState(
-      this.system.log.error,
       schema,
-      this.stateCategory,
-      this.deviceId,
       this.stateGetter,
       this.stateUpdater,
+      this.system.log.error,
       initialize,
       getter,
       setter,
@@ -115,18 +114,16 @@ export default class Status {
 
 
   private stateGetter = (): StateObject => {
-
-    // TODO: make topic
-
     return this.system.state.getState(this.stateCategory, this.deviceId) || {};
   }
 
   private stateUpdater = (partialState: StateObject): void => {
-
-    // TODO: make topic
-
     this.system.state.updateState(this.stateCategory, this.deviceId, partialState);
   }
+
+  // private makeStateName(): string {
+  //   return combineTopic(STATE_SEPARATOR, this.deviceId, paramName: string);
+  // }
 
 }
 

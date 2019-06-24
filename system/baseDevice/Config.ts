@@ -30,12 +30,10 @@ export default class Config {
     this.deviceId = deviceId;
 
     this.deviceState = new DeviceState(
-      this.system.log.error,
       schema,
-      this.stateCategory,
-      this.deviceId,
       this.stateGetter,
       this.stateUpdater,
+      this.system.log.error,
       initialize,
       getter,
       setter,
@@ -62,15 +60,25 @@ export default class Config {
   /**
    * Get whole config from device.
    */
-  read = (): Promise<StateObject> => {
-    return this.deviceState.readAll();
+  read = async (): Promise<StateObject> => {
+    try {
+      return await this.deviceState.readAll();
+    }
+    catch (err) {
+      throw new Error(`Status.read device "${this.deviceId}": ${err}`);
+    }
   }
 
   /**
    * Set config to device
    */
   write = async (partialData: StateObject): Promise<void> => {
-    await this.deviceState.write(partialData);
+    try {
+      await this.deviceState.write(partialData);
+    }
+    catch (err) {
+      throw new Error(`Status.write device "${this.deviceId}": ${err}`);
+    }
   }
 
   onChange(cb: ConfigChangeHandler): number {
@@ -88,15 +96,13 @@ export default class Config {
     this.system.state.updateState(this.stateCategory, this.deviceId, partialState);
   }
 
-
-  // TODO: review !!!!!
-
-  /**
-   * Publish whole config on each change
-   */
-  protected publishState = (changedParams: string[], isRepeat: boolean) => {
-    // publish all the statuses
-    this.publishEvents.emit(this.typeNameOfData, this.getState(), isRepeat);
-  }
-
 }
+
+
+// /**
+//  * Publish whole config on each change
+//  */
+// protected publishState = (changedParams: string[], isRepeat: boolean) => {
+//   // publish all the statuses
+//   this.publishEvents.emit(this.typeNameOfData, this.getState(), isRepeat);
+// }

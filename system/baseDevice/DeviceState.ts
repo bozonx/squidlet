@@ -5,7 +5,6 @@ import {isEmpty} from '../helpers/lodashLike';
 import {validateParam} from '../helpers/validate';
 import ConsistentState, {Getter, Setter, Initialize} from './ConsistentState';
 import {collectPropsDefaults} from '../helpers/helpers';
-import {StateCategories} from '../interfaces/States';
 
 
 export type Schema = {[index: string]: SchemaElement};
@@ -14,8 +13,6 @@ export type Schema = {[index: string]: SchemaElement};
 export default class DeviceState {
   private readonly logError: (msg: string) => void;
   private readonly schema: Schema;
-  private readonly stateCategory: StateCategories;
-  private readonly deviceId: string;
   private readonly stateGetter: () => StateObject;
   private readonly stateUpdater: (partialState: StateObject) => void;
   private readonly initialize?: Initialize;
@@ -25,22 +22,16 @@ export default class DeviceState {
 
 
   constructor(
-    logError: (msg: string) => void,
     schema: Schema,
-    // TODO: не нуно
-    stateCategory: StateCategories,
-    // TODO: не нуно
-    deviceId: string,
     stateGetter: () => StateObject,
     stateUpdater: (partialState: StateObject) => void,
+    logError: (msg: string) => void,
     initialize?: Initialize,
     getter?: Getter,
     setter?: Setter,
   ) {
     this.logError = logError;
     this.schema = schema;
-    this.stateCategory = stateCategory;
-    this.deviceId = deviceId;
     this.stateGetter = stateGetter;
     this.stateUpdater = stateUpdater;
     this.initialize = initialize;
@@ -69,7 +60,7 @@ export default class DeviceState {
 
     this.validateDict(
       this.consistentState.getState(),
-      `Invalid device state on init: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(this.consistentState.getState())}"`
+      `Invalid device state on init: "${JSON.stringify(this.consistentState.getState())}"`
     );
   }
 
@@ -97,7 +88,7 @@ export default class DeviceState {
 
     this.validateDict(
       this.consistentState.getState(),
-      `Invalid device state readAll: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(this.consistentState.getState())}"`
+      `Invalid device state readAll: "${JSON.stringify(this.consistentState.getState())}"`
     );
 
     return this.consistentState.getState();
@@ -113,7 +104,7 @@ export default class DeviceState {
 
     this.validateDict(
       partialData,
-      `Invalid device state to write: ${this.stateCategory}, ${this.deviceId}: "${JSON.stringify(partialData)}"`
+      `Invalid device state to write: "${JSON.stringify(partialData)}"`
     );
 
     return this.consistentState.write(partialData);

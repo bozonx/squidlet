@@ -93,6 +93,7 @@ export default class MqttApi extends ServiceBase<Props> {
    * Publish outcome messages to broker
    */
   private publishHandler = async (topic: string, data: JsonTypes, isRepeat?: boolean) => {
+    // TODO: remove
     if (isRepeat) {
       this.env.log.debug(`MqttApi outcome (republish): ${topic} - ${JSON.stringify(data)}`);
     }
