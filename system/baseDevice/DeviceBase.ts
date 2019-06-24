@@ -6,6 +6,7 @@ import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from './ConsistentState';
+import {StateObject} from '../State';
 
 
 export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
@@ -81,28 +82,24 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
 
-  get getConfig(): Config['read'] | undefined {
-    return this.config && this.config.read;
-  }
-
-  get setConfig(): Config['write'] | undefined {
-    return this.config && this.config.write;
-  }
-
   /**
    * Get specified status or default status.
    * @param statusName
    */
   getStatus = async (statusName?: string): Promise<JsonTypes> => {
     if (!this.status) {
-      throw new Error(`You called getStatus("${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+      throw new Error(`DeviceBase.getStatus: device "${this.id}", status hasn't been set.`);
     }
 
     return this.status.readParam(statusName);
   }
 
-  getActionsList(): string[] {
-    return Object.keys(this.actions);
+  setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
+    if (!this.status) {
+      throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
+    }
+
+    return this.status.write({[statusName]: newValue});
   }
 
   /**
@@ -116,6 +113,23 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.status.onChange(cb);
   }
 
+
+  getConfig(): Promise<StateObject> {
+    if (!this.config) {
+      throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
+    }
+
+    return this.config.read();
+  }
+
+  setConfig(partialData: StateObject): Promise<void> {
+    if (!this.config) {
+      throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
+    }
+
+    return this.config.write(partialData);
+  }
+
   /**
    * Listen status change
    */
@@ -127,12 +141,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.config.onChange(cb);
   }
 
-  setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
-    if (!this.status) {
-      throw new Error(`You called setStatus(${JSON.stringify(newValue)}, "${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
-    }
 
-    return this.status.write({[statusName]: newValue});
+  getActionsList(): string[] {
+    return Object.keys(this.actions);
   }
 
   /**
