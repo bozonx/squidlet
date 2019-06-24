@@ -65,22 +65,37 @@ export default class Status {
   /**
    * Get all the statuses
    */
-  read = (): Promise<StateObject> => {
-    return this.deviceState.readAll();
+  read = async (): Promise<StateObject> => {
+    try {
+      return await this.deviceState.readAll();
+    }
+    catch (err) {
+      throw new Error(`Status.read device "${this.deviceId}": ${err}`);
+    }
   }
 
   /**
    * Get status from device.
    */
-  readParam = (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
-    return this.deviceState.readParam(statusName);
+  readParam = async (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
+    try {
+      return await this.deviceState.readParam(statusName);
+    }
+    catch (err) {
+      throw new Error(`Status.readParam device "${this.deviceId}": ${err}`);
+    }
   }
 
   /**
    * Set status of device.
    */
   write = async (partialData: StateObject): Promise<void> => {
-    await this.deviceState.write(partialData);
+    try {
+      await this.deviceState.write(partialData);
+    }
+    catch (err) {
+      throw new Error(`Status.write device "${this.deviceId}": ${err}`);
+    }
   }
 
   onChange(cb: StatusChangeHandler): number {
