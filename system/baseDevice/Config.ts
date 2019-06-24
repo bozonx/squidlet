@@ -13,7 +13,10 @@ export type ConfigChangeHandler = () => void;
  */
 export default class Config {
   private readonly system: System;
+  private readonly deviceId: string;
   private readonly deviceState: DeviceState;
+  private stateCategory = StateCategories.devicesConfig;
+
 
   constructor(
     system: System,
@@ -24,12 +27,13 @@ export default class Config {
     setter?: Setter
   ) {
     this.system = system;
+    this.deviceId = deviceId;
 
     this.deviceState = new DeviceState(
       this.system,
       schema,
-      StateCategories.devicesConfig,
-      deviceId,
+      this.stateCategory,
+      this.deviceId,
       initialize,
       getter,
       setter
@@ -53,13 +57,11 @@ export default class Config {
     return this.deviceState.isWriting();
   }
 
-  // TODO: add getState
-
   /**
    * Get whole config from device.
    */
-  read = async (): Promise<Data> => {
-    return this.readAllData();
+  read = (): Promise<StateObject> => {
+    return this.deviceState.readAll();
   }
 
   /**

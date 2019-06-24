@@ -97,7 +97,7 @@ export default class DeviceState {
   }
 
   async readParam(paramName: string): Promise<JsonTypes> {
-    // TODO: !!!!
+    // TODO: !!!! может объединить с readAll только добавить список параметров ???
     return;
   }
 

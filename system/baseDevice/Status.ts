@@ -1,9 +1,9 @@
-import {combineTopic} from '../helpers/helpers';
 import System from '../System';
 import {Getter, Initialize, Setter} from './ConsistentState';
 import DeviceState, {Schema} from './DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {StateObject} from '../State';
+import {JsonTypes} from '../interfaces/Types';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -16,7 +16,9 @@ export type StatusChangeHandler = (changedParams: string[]) => void;
  */
 export default class Status {
   private readonly system: System;
+  private readonly deviceId: string;
   private readonly deviceState: DeviceState;
+  private stateCategory = StateCategories.devicesStatus;
 
 
   constructor(
@@ -28,12 +30,13 @@ export default class Status {
     setter?: Setter
   ) {
     this.system = system;
+    this.deviceId = deviceId;
 
     this.deviceState = new DeviceState(
       this.system,
       schema,
-      StateCategories.devicesStatus,
-      deviceId,
+      this.stateCategory,
+      this.deviceId,
       initialize,
       getter,
       setter
@@ -57,20 +60,18 @@ export default class Status {
     return this.deviceState.isWriting();
   }
 
-  // TODO: add getState
-
   /**
    * Get all the statuses
    */
-  read = async (): Promise<Data> => {
-    return this.readAllData();
+  read = (): Promise<StateObject> => {
+    return this.deviceState.readAll();
   }
 
   /**
    * Get status from device.
    */
-  readParam = async (statusName: string = DEFAULT_STATUS): Promise<any> => {
-    return this.readJustParam(statusName);
+  readParam = (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
+    return this.deviceState.readParam(statusName);
   }
 
   /**
@@ -82,39 +83,45 @@ export default class Status {
 
   onChange(cb: StatusChangeHandler): number {
     // TODO: use it system.state - но отфильтровывать только нужные данные
+    // TODO: use it system.state - может использовать onChangeStateParam ???
 
-    this.system.state.onChange();
-  }
+    const wrapper = (category: number, stateName: string, changedParams: string[]): void => {
+      // TODO: check state name correctly (contents status) !!!!
 
+      if (category !== this.stateCategory || stateName !== this.deviceId) return;
 
-  // TODO: review !!!!!
+      cb(changedParams);
+    };
 
-  /**
-   * Publish all the statuses by separate message.
-   */
-  protected publishState = (changedParams: string[], isRepeat: boolean) => {
-    // publish all the statuses
-    for (let statusName of changedParams) {
-      this.publishOneStatus(this.getState()[statusName], statusName, isRepeat);
-    }
-  }
-
-  private publishOneStatus(value: any, statusName: string, isRepeat: boolean) {
-    if (statusName === DEFAULT_STATUS) {
-      this.publishEvents.emit(this.typeNameOfData, value, isRepeat);
-
-      return;
-    }
-
-    const subStatus = combineTopic(this.system.systemConfig.topicSeparator, this.typeNameOfData, statusName);
-
-    this.publishEvents.emit(subStatus, value, isRepeat);
-  }
-
-
-  // TODO: why publish and not set state ????
-  publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
-    this.publishOneStatus(value, statusName, false);
+    return this.system.state.onChange(wrapper);
   }
 
 }
+
+// /**
+//  * Publish all the statuses by separate message.
+//  */
+// protected publishState = (changedParams: string[], isRepeat: boolean) => {
+//   // publish all the statuses
+//   for (let statusName of changedParams) {
+//     this.publishOneStatus(this.getState()[statusName], statusName, isRepeat);
+//   }
+// }
+//
+// private publishOneStatus(value: any, statusName: string, isRepeat: boolean) {
+//   if (statusName === DEFAULT_STATUS) {
+//     this.publishEvents.emit(this.typeNameOfData, value, isRepeat);
+//
+//     return;
+//   }
+//
+//   const subStatus = combineTopic(this.system.systemConfig.topicSeparator, this.typeNameOfData, statusName);
+//
+//   this.publishEvents.emit(subStatus, value, isRepeat);
+// }
+//
+//
+// // T-O-D-O: why publish and not set state ????
+// publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
+//   this.publishOneStatus(value, statusName, false);
+// }
