@@ -100,10 +100,16 @@ export default class Status {
 
 
   private stateGetter = (): StateObject => {
+
+    // TODO: make topic
+
     return this.system.state.getState(this.stateCategory, this.deviceId) || {};
   }
 
   private stateUpdater = (partialState: StateObject): void => {
+
+    // TODO: make topic
+
     this.system.state.updateState(this.stateCategory, this.deviceId, partialState);
   }
 

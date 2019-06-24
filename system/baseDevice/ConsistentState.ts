@@ -1,7 +1,6 @@
 import {StateObject} from '../State';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
-import {StateCategories} from '../interfaces/States';
 
 export type Initialize = () => Promise<StateObject>;
 export type Getter = (paramNames?: string[]) => Promise<StateObject>;
@@ -10,8 +9,6 @@ export type Setter = (partialData: StateObject) => Promise<void>;
 
 export default class ConsistentState {
   private readonly logError: (msg: string) => void;
-  private readonly stateCategory: StateCategories;
-  private readonly deviceId: string;
   private readonly stateGetter: () => StateObject;
   private readonly stateUpdater: (partialState: StateObject) => void;
   private readonly initialize?: Initialize;
@@ -24,8 +21,6 @@ export default class ConsistentState {
 
   constructor(
     logError: (msg: string) => void,
-    stateCategory: StateCategories,
-    deviceId: string,
     stateGetter: () => StateObject,
     stateUpdater: (partialState: StateObject) => void,
     initialize?: Initialize,
@@ -34,8 +29,6 @@ export default class ConsistentState {
   ) {
     this.logError = logError;
 
-    this.stateCategory = stateCategory;
-    this.deviceId = deviceId;
     this.stateGetter = stateGetter;
     this.stateUpdater = stateUpdater;
     this.initialize = initialize;
@@ -129,7 +122,7 @@ export default class ConsistentState {
 
 
   private async requestGetter(getter: Getter): Promise<StateObject> {
-    if (!this.getter) throw new Error(`No getter: ${this.deviceId}`);
+    if (!this.getter) throw new Error(`No getter`);
 
     this.readingPromise = new Promised<void>();
     let result: StateObject;
@@ -143,7 +136,7 @@ export default class ConsistentState {
 
       delete this.readingPromise;
 
-      throw new Error(`Can't fetch device state "${this.deviceId}": ${err}`);
+      throw new Error(`Can't fetch device state: ${err}`);
     }
 
     this.readingPromise.resolve();

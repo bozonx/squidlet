@@ -48,8 +48,6 @@ export default class DeviceState {
 
     this.consistentState = new ConsistentState(
       this.logError,
-      this.stateCategory,
-      this.deviceId,
       this.stateGetter,
       this.stateUpdater,
       this.initialize,
