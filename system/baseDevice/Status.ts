@@ -1,4 +1,9 @@
 import {combineTopic} from '../helpers/helpers';
+import System from '../System';
+import {Getter, Initialize, Setter} from './ConsistentState';
+import DeviceState, {Schema} from './DeviceState';
+import {StateCategories} from '../interfaces/States';
+import {StateObject} from '../State';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -10,11 +15,45 @@ export type StatusChangeHandler = (changedParams: string[]) => void;
  * Manage status of device
  */
 export default class Status {
-  protected readonly typeNameOfData: string = 'status';
+  private readonly system: System;
+  private readonly deviceState: DeviceState;
+
+
+  constructor(
+    system: System,
+    schema: Schema,
+    deviceId: string,
+    initialize?: Initialize,
+    getter?: Getter,
+    setter?: Setter
+  ) {
+    this.system = system;
+
+    this.deviceState = new DeviceState(
+      this.system,
+      schema,
+      StateCategories.devicesStatus,
+      deviceId,
+      initialize,
+      getter,
+      setter
+    );
+  }
+
+  async init() {
+    await this.deviceState.init();
+  }
+
+
+  isReading(): boolean {
+    return this.deviceState.isReading();
+  }
+
+  isWriting(): boolean {
+    return this.deviceState.isWriting();
+  }
 
   // TODO: add getState
-  // TODO: add isWriting
-  // TODO: ??? onChange
 
   /**
    * Get all the statuses
@@ -33,13 +72,8 @@ export default class Status {
   /**
    * Set status of device.
    */
-  write = async (partialData: Data, silent?: boolean) => {
-    await this.writeData(partialData, silent);
-  }
-
-  // TODO: why publish and not set state ????
-  publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
-    this.publishOneStatus(value, statusName, false);
+  write = async (partialData: StateObject): Promise<void> => {
+    await this.deviceState.write(partialData);
   }
 
   onChange(cb: StatusChangeHandler): number {
@@ -48,6 +82,8 @@ export default class Status {
     this.system.state.onChange();
   }
 
+
+  // TODO: review !!!!!
 
   /**
    * Publish all the statuses by separate message.
@@ -59,7 +95,6 @@ export default class Status {
     }
   }
 
-
   private publishOneStatus(value: any, statusName: string, isRepeat: boolean) {
     if (statusName === DEFAULT_STATUS) {
       this.publishEvents.emit(this.typeNameOfData, value, isRepeat);
@@ -70,6 +105,12 @@ export default class Status {
     const subStatus = combineTopic(this.system.systemConfig.topicSeparator, this.typeNameOfData, statusName);
 
     this.publishEvents.emit(subStatus, value, isRepeat);
+  }
+
+
+  // TODO: why publish and not set state ????
+  publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
+    this.publishOneStatus(value, statusName, false);
   }
 
 }

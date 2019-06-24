@@ -1,5 +1,5 @@
 import Status, {DEFAULT_STATUS, StatusChangeHandler} from './Status';
-import Config from './Config';
+import Config, {ConfigChangeHandler} from './Config';
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
@@ -9,6 +9,26 @@ import {Getter, Initialize, Setter} from './ConsistentState';
 
 
 export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
+  get status(): Status | undefined {
+    return this._status;
+  }
+
+  get config(): Config | undefined {
+    return this._config;
+  }
+
+  get isStatusFetching(): boolean {
+    if (!this.status) return false;
+
+    return this.status.isReading() || this.status.isWriting();
+  }
+
+  get isConfigFetching(): boolean {
+    if (!this.config) return false;
+
+    return this.config.isReading() || this.config.isWriting();
+  }
+
   protected readonly env: DeviceEnv;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
@@ -24,15 +44,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   private _config?: Config;
 
 
-  protected get status(): Status | undefined {
-    return this._status;
-  }
-
-  protected get config(): Config | undefined {
-    return this._config;
-  }
-
-
   constructor(definition: EntityDefinition, env: DeviceEnv) {
     super(definition, env);
     this.env = env;
@@ -43,9 +54,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
     if (manifest.status) {
       this._status = new Status(
-        this.id,
         this.env.system,
         manifest.status,
+        this.id,
         this.initialStatus,
         this.statusGetter,
         this.statusSetter
@@ -54,18 +65,14 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
     if (manifest.config) {
       this._config = new Config(
-        this.id,
         this.env.system,
         manifest.config,
+        this.id,
         this.initialConfig,
         this.configGetter,
         this.configSetter
       );
     }
-
-    // // listen publish events and call publish
-    // this.status && this.status.onPublish(this.publish);
-    // this.config && this.config.onPublish(this.publish);
 
     await Promise.all([
       this.status && this.status.init(),
@@ -103,10 +110,21 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
    */
   onChange(cb: StatusChangeHandler): number {
     if (!this.status) {
-      throw new Error(`You called onChange method of device "${this.id}", but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+      throw new Error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
     }
 
     return this.status.onChange(cb);
+  }
+
+  /**
+   * Listen status change
+   */
+  onConfigChange(cb: ConfigChangeHandler): number {
+    if (!this.config) {
+      throw new Error(`DeviceBase.onConfigChange: device "${this.id}", config hasn't been set.`);
+    }
+
+    return this.config.onChange(cb);
   }
 
   setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {

@@ -2,6 +2,7 @@ import {StateObject} from '../State';
 import System from '../System';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
+import {StateCategories} from '../interfaces/States';
 
 export type Initialize = () => Promise<StateObject>;
 export type Getter = (paramNames?: string[]) => Promise<StateObject>;
@@ -10,7 +11,7 @@ export type Setter = (partialData: StateObject) => Promise<void>;
 
 export default class ConsistentState {
   private readonly system: System;
-  private readonly stateCategory: number;
+  private readonly stateCategory: StateCategories;
   private readonly deviceId: string;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
@@ -22,7 +23,7 @@ export default class ConsistentState {
 
   constructor(
     system: System,
-    stateCategory: number,
+    stateCategory: StateCategories,
     deviceId: string,
     initialize?: Initialize,
     getter?: Getter,

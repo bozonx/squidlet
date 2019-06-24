@@ -6,6 +6,7 @@ import {isEmpty} from '../helpers/lodashLike';
 import {validateParam} from '../helpers/validate';
 import ConsistentState, {Getter, Setter, Initialize} from './ConsistentState';
 import {collectPropsDefaults} from '../helpers/helpers';
+import {StateCategories} from '../interfaces/States';
 
 
 export type Schema = {[index: string]: SchemaElement};
@@ -14,7 +15,7 @@ export type Schema = {[index: string]: SchemaElement};
 export default class DeviceState {
   private readonly system: System;
   private readonly schema: Schema;
-  private readonly stateCategory: number;
+  private readonly stateCategory: StateCategories;
   private readonly deviceId: string;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
@@ -25,7 +26,7 @@ export default class DeviceState {
   constructor(
     system: System,
     schema: Schema,
-    stateCategory: number,
+    stateCategory: StateCategories,
     deviceId: string,
     initialize?: Initialize,
     getter?: Getter,
@@ -70,12 +71,12 @@ export default class DeviceState {
   }
 
 
-  isWriting(): boolean {
-    return this.consistentState.isWriting();
-  }
-
   isReading(): boolean {
     return this.consistentState.isReading();
+  }
+
+  isWriting(): boolean {
+    return this.consistentState.isWriting();
   }
 
   getState(): StateObject {
