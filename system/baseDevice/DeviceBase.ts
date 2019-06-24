@@ -81,6 +81,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     ]);
   }
 
+  // TODO: add destroy - status and config
+
 
   /**
    * Get specified status or default status.

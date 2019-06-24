@@ -44,6 +44,10 @@ export default class Status {
     await this.deviceState.init();
   }
 
+  destroy() {
+    this.deviceState.destroy();
+  }
+
 
   isReading(): boolean {
     return this.deviceState.isReading();
