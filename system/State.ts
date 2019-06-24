@@ -70,11 +70,11 @@ export default class State {
     this.categoryChangeEvents.emit(category);
   }
 
-  onChange(cb: (category: number, stateName: string, changedParams: string[]) => void): number {
+  onChange(cb: ChangeHandler): number {
     return this.changeEvents.addListener(cb);
   }
 
-  onChangeCategory(cb: (category: number) => void): number {
+  onChangeCategory(cb: CategoryChangeHandler): number {
     return this.categoryChangeEvents.addListener(cb);
   }
 

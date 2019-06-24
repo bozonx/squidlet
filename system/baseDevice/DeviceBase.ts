@@ -1,12 +1,11 @@
-import {ChangeHandler, Getter, Initialize, Setter} from './DeviceDataManagerBase';
-import Status, {DEFAULT_STATUS} from './Status';
+import Status, {DEFAULT_STATUS, StatusChangeHandler} from './Status';
 import Config from './Config';
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {JsonTypes} from '../interfaces/Types';
-import {combineTopic} from '../helpers/helpers';
+import {Getter, Initialize, Setter} from './ConsistentState';
 
 
 export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
@@ -20,7 +19,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected initialConfig?: Initialize;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
-  //protected transformPublishValue?: (value: any) => any;
   protected actions: {[index: string]: Function} = {};
   private _status?: Status;
   private _config?: Config;
@@ -32,14 +30,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
   protected get config(): Config | undefined {
     return this._config;
-  }
-
-  get getConfig(): Config['read'] | undefined {
-    return this.config && this.config.read;
-  }
-
-  get setConfig(): Config['write'] | undefined {
-    return this.config && this.config.write;
   }
 
 
@@ -83,33 +73,48 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     ]);
   }
 
-  getStatus = async (statusName?: string): Promise<any> => {
-    if (!this.status) {
-      this.env.log.error(`You called getStatus("${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
 
-      return;
+  get getConfig(): Config['read'] | undefined {
+    return this.config && this.config.read;
+  }
+
+  get setConfig(): Config['write'] | undefined {
+    return this.config && this.config.write;
+  }
+
+  /**
+   * Get specified status or default status.
+   * @param statusName
+   */
+  getStatus = async (statusName?: string): Promise<JsonTypes> => {
+    if (!this.status) {
+      throw new Error(`You called getStatus("${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
     }
 
-    // TODO: обрабоатть ошибку ???
-
     return this.status.readParam(statusName);
+  }
+
+  getActionsList(): string[] {
+    return Object.keys(this.actions);
   }
 
   /**
    * Listen status change
    */
-  onChange(cb: ChangeHandler): number {
+  onChange(cb: StatusChangeHandler): number {
     if (!this.status) {
-      this.env.log.error(`You called onChange device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
-
-      return -1;
+      throw new Error(`You called onChange method of device "${this.id}", but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
     }
 
     return this.status.onChange(cb);
   }
 
-  getActionsList(): string[] {
-    return Object.keys(this.actions);
+  setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
+    if (!this.status) {
+      throw new Error(`You called setStatus(${JSON.stringify(newValue)}, "${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
+    }
+
+    return this.status.write({[statusName]: newValue});
   }
 
   /**
@@ -137,31 +142,16 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return result;
   }
 
-
-  // TODO: ????? review
-  protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
-    const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, this.id, subTopic);
-    const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
-
-    // TODO: наверное надо установить стейт а не publish
-
-    this.env.api.publish(topic, data, isRepeat);
-  }
-
-  protected setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
-    if (!this.status) {
-      this.env.log.error(`You called setStatus(${JSON.stringify(newValue)}, "${statusName}") device method, but status of this devices hasn't been set. Props "${JSON.stringify(this.props)}"`);
-
-      return;
-    }
-
-    // TODO: обрабоатть ошибку ???
-
-    return this.status.write({[statusName]: newValue});
-  }
-
 }
 
+// protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
+//   const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, this.id, subTopic);
+//   const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
+//
+//   // T-O-D-O: наверное надо установить стейт а не publish
+//
+//   this.env.api.publish(topic, data, isRepeat);
+// }
 
 // // handle actions call
 // if (this.actions) {

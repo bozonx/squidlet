@@ -1,14 +1,15 @@
-import DeviceDataManagerBase, {Data} from './DeviceDataManagerBase';
 import {combineTopic} from '../helpers/helpers';
 
 
 export const DEFAULT_STATUS = 'default';
 
+export type StatusChangeHandler = (changedParams: string[]) => void;
+
 
 /**
  * Manage status of device
  */
-export default class Status extends DeviceDataManagerBase {
+export default class Status {
   protected readonly typeNameOfData: string = 'status';
 
   // TODO: add getState
@@ -39,6 +40,12 @@ export default class Status extends DeviceDataManagerBase {
   // TODO: why publish and not set state ????
   publish(value: string | number | boolean, statusName: string = DEFAULT_STATUS) {
     this.publishOneStatus(value, statusName, false);
+  }
+
+  onChange(cb: StatusChangeHandler): number {
+    // TODO: use it system.state - но отфильтровывать только нужные данные
+
+    this.system.state.onChange();
   }
 
 
