@@ -54,7 +54,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     if (manifest.status) {
-      this._status = new StatusState(
+      this._statusState = new StatusState(
         this.env.system,
         manifest.status,
         this.id,
@@ -65,7 +65,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     if (manifest.config) {
-      this._config = new ConfigState(
+      this._configState = new ConfigState(
         this.env.system,
         manifest.config,
         this.id,
@@ -81,7 +81,14 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     ]);
   }
 
-  // TODO: add destroy - status and config
+  async doDestroy() {
+    await super.doDestroy();
+    this._statusState && this._statusState.destroy();
+    this._configState && this._configState.destroy();
+
+    delete this._statusState;
+    delete this._configState;
+  }
 
 
   /**

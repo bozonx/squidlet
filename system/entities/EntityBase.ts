@@ -15,6 +15,7 @@ export default class EntityBase<Props = {}> {
   readonly id: string;
   readonly className: string;
   readonly props: Props;
+  // destroy method for entity
   destroy?: () => void;
 
   protected readonly env: EnvBase;
@@ -99,6 +100,11 @@ export default class EntityBase<Props = {}> {
     }
   }
 
+  async doDestroy() {
+    if (this.destroy) await this.destroy();
+  }
+
+
   /**
    * Load manifest of this entity
    */
@@ -106,16 +112,10 @@ export default class EntityBase<Props = {}> {
     return this.env.loadManifest(this.className) as Promise<T>;
   }
 
-  private getDriverDepCb(): GetDriverDep {
-    return (driverName: string): KindOfDriver => {
-      return this.env.getDriver(driverName) as any;
-    };
-  }
-
   /**
    * Print errors to console of async functions
    */
-  wrapErrors(cb: (...cbArgs: any[]) => Promise<void>): (...args: any[]) => void {
+  protected wrapErrors(cb: (...cbArgs: any[]) => Promise<void>): (...args: any[]) => void {
     return (...args: any[]) => {
       try {
         cb(...args)
@@ -124,6 +124,13 @@ export default class EntityBase<Props = {}> {
       catch (err) {
         this.env.log.error(err);
       }
+    };
+  }
+
+
+  private getDriverDepCb(): GetDriverDep {
+    return (driverName: string): KindOfDriver => {
+      return this.env.getDriver(driverName) as any;
     };
   }
 
