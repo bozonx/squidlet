@@ -7,7 +7,7 @@ import {combineTopic} from './helpers/helpers';
 
 export const STATE_SEPARATOR = '.';
 
-type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
+type ChangeHandler = (category: number, stateName: string, changedParams?: string[]) => void;
 type CategoryChangeHandler = (category: number) => void;
 export type StateObject = {[index: string]: JsonTypes};
 
@@ -44,6 +44,13 @@ export default class State {
 
     this.state[category][stateName] = newState;
 
+    // emit all the params events
+    for (let paramName of Object.keys(newPartialState)) {
+      const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
+
+      this.changeEvents.emit(category, fullStateName);
+    }
+
     this.changeEvents.emit(category, stateName, changedParams);
     this.categoryChangeEvents.emit(category);
   }
@@ -65,7 +72,7 @@ export default class State {
 
     this.state[category][stateName] = newState;
 
-    this.changeEvents.emit(category, fullStateName, changedParams);
+    this.changeEvents.emit(category, fullStateName);
     this.changeEvents.emit(category, stateName, changedParams);
     this.categoryChangeEvents.emit(category);
   }
