@@ -2,18 +2,20 @@ import {JsonTypes} from './interfaces/Types';
 import IndexedEvents from './helpers/IndexedEvents';
 import {getDifferentKeys, mergeDeep} from './helpers/collections';
 import {isEqual} from './helpers/lodashLike';
-import {combineTopic} from './helpers/helpers';
+//import {combineTopic} from './helpers/helpers';
 
 
-export const STATE_SEPARATOR = '.';
+//export const STATE_SEPARATOR = '.';
 
-type ChangeHandler = (category: number, stateName: string, changedParams?: string[]) => void;
+type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
+type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;
 type CategoryChangeHandler = (category: number) => void;
 export type StateObject = {[index: string]: JsonTypes};
 
 
 export default class State {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  private readonly changeParamEvents = new IndexedEvents<ChangeParamHandler>();
   private readonly categoryChangeEvents = new IndexedEvents<CategoryChangeHandler>();
   // like { category: { stateName: { ... stateParams } } }
   private readonly state: {[index: string]: {[index: string]: StateObject}} = {};
@@ -21,6 +23,7 @@ export default class State {
 
   destroy() {
     this.changeEvents.removeAll();
+    this.changeParamEvents.removeAll();
     this.categoryChangeEvents.removeAll();
   }
 
@@ -46,9 +49,9 @@ export default class State {
 
     // emit all the params events
     for (let paramName of Object.keys(newPartialState)) {
-      const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
+      //const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
 
-      this.changeEvents.emit(category, fullStateName);
+      this.changeParamEvents.emit(category, stateName, paramName, newPartialState[paramName]);
     }
 
     this.changeEvents.emit(category, stateName, changedParams);
@@ -68,11 +71,11 @@ export default class State {
     if (!this.state[category]) this.state[category] = {};
 
     const changedParams: string[] = [paramName];
-    const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
+    //const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
 
     this.state[category][stateName] = newState;
 
-    this.changeEvents.emit(category, fullStateName);
+    this.changeParamEvents.emit(category, stateName, paramName, value);
     this.changeEvents.emit(category, stateName, changedParams);
     this.categoryChangeEvents.emit(category);
   }
@@ -81,15 +84,23 @@ export default class State {
     return this.changeEvents.addListener(cb);
   }
 
+  onChangeParam(cb: ChangeParamHandler): number {
+    return this.changeParamEvents.addListener(cb);
+  }
+
   onChangeCategory(cb: CategoryChangeHandler): number {
     return this.categoryChangeEvents.addListener(cb);
   }
 
-  removeListener(category: number, stateName: string, handlerIndex: number) {
+  removeListener(handlerIndex: number) {
     this.changeEvents.removeListener(handlerIndex);
   }
 
-  removeCategoryListener(category: number, handlerIndex: number) {
+  removeParamListener(handlerIndex: number) {
+    this.changeParamEvents.removeListener(handlerIndex);
+  }
+
+  removeCategoryListener(handlerIndex: number) {
     this.categoryChangeEvents.removeListener(handlerIndex);
   }
 

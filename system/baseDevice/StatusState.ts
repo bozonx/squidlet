@@ -9,7 +9,7 @@ import {combineTopic} from '../helpers/helpers';
 
 export const DEFAULT_STATUS = 'default';
 
-export type StatusChangeHandler = (changedParams: string[]) => void;
+export type StatusChangeHandler = (paramName: string, value: JsonTypes) => void;
 
 
 /**
@@ -98,18 +98,13 @@ export default class StatusState {
   }
 
   onChange(cb: StatusChangeHandler): number {
-    // TODO: use it system.state - но отфильтровывать только нужные данные
-    // TODO: use it system.state - может использовать onChangeStateParam ???
-
-    const wrapper = (category: number, stateName: string, changedParams: string[]): void => {
-      // TODO: check state name correctly (contents status) !!!!
-
+    const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
       if (category !== this.stateCategory || stateName !== this.deviceId) return;
 
-      cb(changedParams);
+      cb(paramName, value);
     };
 
-    return this.system.state.onChange(wrapper);
+    return this.system.state.onChangeParam(wrapper);
   }
 
 

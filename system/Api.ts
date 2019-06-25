@@ -3,7 +3,7 @@ import {objGet} from './helpers/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
 import {combineTopic} from './helpers/helpers';
-import {STATE_SEPARATOR, StateObject} from './State';
+import {StateObject} from './State';
 import LogLevel from './interfaces/LogLevel';
 
 
