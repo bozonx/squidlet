@@ -97,7 +97,7 @@ export default class StatusState {
     }
   }
 
-  onChange(cb: StatusChangeHandler): number {
+  onChangeParam(cb: StatusChangeHandler): number {
     const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
       if (category !== this.stateCategory || stateName !== this.deviceId) return;
 

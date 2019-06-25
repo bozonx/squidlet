@@ -82,9 +82,13 @@ export default class ConfigState {
   }
 
   onChange(cb: ConfigChangeHandler): number {
-    // TODO: use it system.state - но отфильтровывать только нужные данные
+    const wrapper = (category: number, stateName: string): void => {
+      if (category !== this.stateCategory || stateName !== this.deviceId) return;
 
-    this.system.state.onChange();
+      cb();
+    };
+
+    return this.system.state.onChange(wrapper);
   }
 
 

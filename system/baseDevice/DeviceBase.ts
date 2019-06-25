@@ -119,7 +119,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.statusState.onChange(cb);
+    return this.statusState.onChangeParam(cb);
   }
 
 
