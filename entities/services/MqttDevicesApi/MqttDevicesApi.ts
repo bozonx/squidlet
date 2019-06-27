@@ -1,5 +1,5 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
+import {serializeJson} from 'system/helpers/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {combineTopic, parseValue} from 'system/helpers/helpers';
 import {JsonTypes} from 'system/interfaces/Types';
@@ -34,13 +34,6 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
   }
 
   protected didInit = async () => {
-    this.env.api.onOutcomeRemoteCall((sessionId: string, message: RemoteCallMessage) => {
-      if (sessionId !== this.sessionId) return;
-
-      this.handleOutcomeRemoteCall(message)
-        .catch(this.env.log.error);
-    });
-
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage((topic: string, data: string | Uint8Array) => {
       this.handleIncomeMessages(topic, data)
@@ -62,7 +55,6 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
 
   destroy = async () => {
     this.env.system.sessions.shutDownImmediately(this.sessionId);
-    await this.mqtt.destroy();
   }
 
 
@@ -71,12 +63,8 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
    */
   private handleIncomeMessages = async (topic: string, data: string | Uint8Array) => {
     // TODO: use prefix
-    if (topic === REMOTE_CALL_TOPIC) {
-      // income remoteCall message
-      const message: RemoteCallMessage = deserializeJson(data);
-
-      return this.env.api.incomeRemoteCall(this.sessionId, message);
-    }
+    // if (topic === REMOTE_CALL_TOPIC) {
+    // }
 
     // if not remote call that it is a device action call
     await this.callDeviceAction(topic, data);
