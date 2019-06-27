@@ -6,6 +6,7 @@ import {JsonTypes} from 'system/interfaces/Types';
 import {splitFirstElement} from 'system/helpers/strings';
 import {trim} from 'system/helpers/lodashLike';
 import {GetDriverDep} from 'system/entities/EntityBase';
+import {StateCategories} from 'system/interfaces/States';
 import {Mqtt} from '../../drivers/Mqtt/Mqtt';
 
 
@@ -33,17 +34,14 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
 
   protected didInit = async () => {
     // listen to income messages from mqtt broker
-    await this.mqtt.onMessage((topic: string, data: string | Uint8Array) => {
-      this.handleIncomeMessages(topic, data)
-        .catch(this.env.log.error);
-    });
+    await this.mqtt.onMessage(this.handleIncomeMessages);
 
-    // TODO: use state
     // listen to outcome messages from api and send them to mqtt broker
-    this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
-      this.publishHandler(topic, data, isRepeat)
-        .catch(this.env.log.error);
-    });
+    this.env.system.state.onChange(this.handlerStateChange);
+    // this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
+    //   this.publishHandler(topic, data, isRepeat)
+    //     .catch(this.env.log.error);
+    // });
   }
 
   protected devicesDidInit = async () => {
@@ -59,13 +57,22 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
   /**
    * Processing income messages from broker
    */
-  private handleIncomeMessages = async (topic: string, data: string | Uint8Array) => {
+  private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
     // TODO: use prefix - device.
     // if (topic === REMOTE_CALL_TOPIC) {
     // }
 
     // if not remote call that it is a device action call
     await this.callDeviceAction(topic, data);
+  });
+
+  private handlerStateChange = (category: number, stateName: string, changedParams: string[]) => {
+    if (category === StateCategories.devicesStatus) {
+      // TODO: publish to mqtt
+    }
+    else if (category === StateCategories.devicesConfig) {
+      // TODO: publish to mqtt
+    }
   }
 
   private handleOutcomeRemoteCall = async (message: RemoteCallMessage) => {

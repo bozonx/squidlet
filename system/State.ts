@@ -9,14 +9,14 @@ import {isEqual} from './helpers/lodashLike';
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
 type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;
-type CategoryChangeHandler = (category: number) => void;
+//type CategoryChangeHandler = (category: number) => void;
 export type StateObject = {[index: string]: JsonTypes};
 
 
 export default class State {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private readonly changeParamEvents = new IndexedEvents<ChangeParamHandler>();
-  private readonly categoryChangeEvents = new IndexedEvents<CategoryChangeHandler>();
+  //private readonly categoryChangeEvents = new IndexedEvents<CategoryChangeHandler>();
   // like { category: { stateName: { ... stateParams } } }
   private readonly state: {[index: string]: {[index: string]: StateObject}} = {};
 
@@ -24,7 +24,7 @@ export default class State {
   destroy() {
     this.changeEvents.removeAll();
     this.changeParamEvents.removeAll();
-    this.categoryChangeEvents.removeAll();
+    //this.categoryChangeEvents.removeAll();
   }
 
 
@@ -55,7 +55,7 @@ export default class State {
     }
 
     this.changeEvents.emit(category, stateName, changedParams);
-    this.categoryChangeEvents.emit(category);
+    //this.categoryChangeEvents.emit(category);
   }
 
   updateStateParam(category: number, stateName: string, paramName: string, value: JsonTypes) {
@@ -77,7 +77,7 @@ export default class State {
 
     this.changeParamEvents.emit(category, stateName, paramName, value);
     this.changeEvents.emit(category, stateName, changedParams);
-    this.categoryChangeEvents.emit(category);
+    //this.categoryChangeEvents.emit(category);
   }
 
   onChange(cb: ChangeHandler): number {
@@ -88,9 +88,9 @@ export default class State {
     return this.changeParamEvents.addListener(cb);
   }
 
-  onChangeCategory(cb: CategoryChangeHandler): number {
-    return this.categoryChangeEvents.addListener(cb);
-  }
+  // onChangeCategory(cb: CategoryChangeHandler): number {
+  //   return this.categoryChangeEvents.addListener(cb);
+  // }
 
   removeListener(handlerIndex: number) {
     this.changeEvents.removeListener(handlerIndex);
@@ -100,8 +100,8 @@ export default class State {
     this.changeParamEvents.removeListener(handlerIndex);
   }
 
-  removeCategoryListener(handlerIndex: number) {
-    this.categoryChangeEvents.removeListener(handlerIndex);
-  }
+  // removeCategoryListener(handlerIndex: number) {
+  //   this.categoryChangeEvents.removeListener(handlerIndex);
+  // }
 
 }

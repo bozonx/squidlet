@@ -4,7 +4,7 @@ import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import LogPublisher from '../LogPublisher';
 import DriverBase from '../baseDrivers/DriverBase';
-import ApiManager from '../ApiManager';
+import Api from '../Api';
 import CategorizedEvents from '../helpers/CategorizedEvents';
 
 
@@ -13,8 +13,8 @@ import CategorizedEvents from '../helpers/CategorizedEvents';
  */
 export default abstract class EnvBase {
   readonly system: System;
-  // TODO: review
-  get api(): ApiManager {
+
+  get api(): Api {
     return this.system.api;
   }
   get events(): CategorizedEvents {
