@@ -1,13 +1,10 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import {serializeJson} from 'system/helpers/binaryHelpers';
-import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import {combineTopic, parseValue} from 'system/helpers/helpers';
+import {combineTopic} from 'system/helpers/helpers';
 import {JsonTypes} from 'system/interfaces/Types';
-import {splitFirstElement} from 'system/helpers/strings';
-import {trim} from 'system/helpers/lodashLike';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {StateCategories} from 'system/interfaces/States';
 import {Mqtt} from '../../drivers/Mqtt/Mqtt';
+import ApiTopics from './ApiTopics';
 
 
 interface Props {
@@ -17,9 +14,10 @@ interface Props {
 }
 
 
-export default class MqttDevicesApi extends ServiceBase<Props> {
+export default class MqttApiTopics extends ServiceBase<Props> {
   // infinity session
   private sessionId: string = '';
+  private apiTopics?: ApiTopics;
   private get mqtt(): Mqtt {
     return this.depsInstances.mqtt;
   }
@@ -30,6 +28,7 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
       .getInstance(this.props);
 
     this.sessionId = this.env.system.sessions.newSession(0);
+    this.apiTopics = new ApiTopics();
   }
 
   protected didInit = async () => {
@@ -75,13 +74,6 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
     }
   }
 
-  private handleOutcomeRemoteCall = async (message: RemoteCallMessage) => {
-    const binData: Uint8Array = serializeJson(message);
-
-    // TODO: use prefix - device.
-    return this.mqtt.publish(REMOTE_CALL_TOPIC, binData);
-  }
-
   /**
    * Publish outcome messages to broker
    */
@@ -100,36 +92,6 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
     const dataToSend: string = JSON.stringify(data);
 
     return this.mqtt.publish(topic, dataToSend);
-  }
-
-  private async callDeviceAction(topic: string, data: string | Uint8Array) {
-    // income string-type api message - call device action
-    this.env.log.info(`MqttApi income device action call: ${topic} ${JSON.stringify(data)}`);
-
-    const args: JsonTypes[] = this.parseArgs(data);
-    const [deviceId, actionName] = splitFirstElement(topic, this.env.system.systemConfig.topicSeparator);
-
-    if (!actionName) {
-      throw new Error(`MqttApi.callDeviceAction: Not actionName: "${topic}"`);
-    }
-
-    await this.env.api.callDeviceAction(deviceId, actionName, args);
-  }
-
-  private parseArgs(data: any): JsonTypes[] {
-    if (typeof data === 'undefined') return [];
-    else if (typeof data !== 'string') {
-      throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
-    }
-
-    const splat: string[] = data.split(',');
-    const result: JsonTypes[] = [];
-
-    for (let item of splat) {
-      result.push( parseValue(trim(item)) );
-    }
-
-    return result;
   }
 
   /**

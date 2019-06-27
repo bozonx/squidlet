@@ -1,5 +1,5 @@
-name: MqttDevicesApi
-main: MqttDevicesApi.ts
+name: MqttApiTopics
+main: MqttApiTopics.ts
 system: true
 
 drivers:
