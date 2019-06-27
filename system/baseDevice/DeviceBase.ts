@@ -75,12 +75,14 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       );
     }
 
-    // TODO: on add did init - set initial state
-    await Promise.all([
-      this.statusState && this.statusState.init(),
-      this.configState && this.configState.init(),
-    ]);
+    this.env.system.onAppInit(async () => {
+      await Promise.all([
+        this.statusState && this.statusState.init(),
+        this.configState && this.configState.init(),
+      ]);
+    });
   }
+
 
   async doDestroy() {
     await super.doDestroy();

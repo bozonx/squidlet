@@ -3,7 +3,7 @@ import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
 
 export type Initialize = () => Promise<StateObject>;
-export type Getter = (paramNames?: string[]) => Promise<StateObject>;
+export type Getter = () => Promise<StateObject>;
 export type Setter = (partialData: StateObject) => Promise<void>;
 
 
@@ -37,6 +37,8 @@ export default class ConsistentState {
   }
 
   async init() {
+    if (!this.initialize && !this.getter) throw new Error(`There aren't any getter or initialize callbacks`);
+
     let getter = this.getter;
 
     if (this.initialize) getter = this.initialize;
@@ -73,7 +75,7 @@ export default class ConsistentState {
    * If writing is in progress it will return current state which is being writing at the moment
    * If reading is in progress it will wait for current reading request and will return its data
    */
-  async loadAll(): Promise<void> {
+  async load(): Promise<void> {
     if (!this.getter) return;
 
     if (this.isReading()) {

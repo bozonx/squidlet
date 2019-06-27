@@ -84,7 +84,7 @@ export default class DeviceState {
   async readAll(): Promise<StateObject> {
     if (!this.getter || this.isWriting()) return this.consistentState.getState();
 
-    await this.consistentState.loadAll();
+    await this.consistentState.load();
 
     this.validateDict(
       this.consistentState.getState(),
@@ -94,10 +94,9 @@ export default class DeviceState {
     return this.consistentState.getState();
   }
 
-  async readParam(paramName: string): Promise<JsonTypes> {
-    // TODO: !!!! может объединить с readAll только добавить список параметров ???
-    return;
-  }
+  // async readParam(paramName: string): Promise<JsonTypes> {
+  //   return;
+  // }
 
   async write(partialData: StateObject): Promise<void> {
     if (isEmpty(partialData)) return;
