@@ -30,10 +30,6 @@ export default class BinarySensor extends DeviceBase<Props> {
     return { [DEFAULT_STATUS]: await this.binaryInput.read() };
   }
 
-  // protected transformPublishValue = (value: boolean): number => {
-  //   return Number(value);
-  // }
-
 
   private onInputChange = async (level: boolean) => {
 

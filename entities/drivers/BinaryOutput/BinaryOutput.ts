@@ -80,6 +80,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   onIncomeChange(cb: (newLevel: boolean) => void): number {
     // TODO: !!!
     // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
+    return 0;
   }
 
   removeIncomeChangeListener(handlerIndex: number) {

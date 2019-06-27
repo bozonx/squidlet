@@ -3,7 +3,7 @@ main: WsClient.ts
 system: true
 
 ios:
-  - WebSocketClient
+  - Mqtt
 
 props:
   url:
