@@ -47,11 +47,13 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'WsClient/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServerSessions/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'Mqtt/manifest.yaml'));
 
   // services
   await env.addService(path.join(servicesRoot, 'Backdoor/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'ConsoleLogger/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'MqttApi/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'MqttDevicesApi/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Updater/manifest.yaml'));
 
   // add used on host drivers related on ios

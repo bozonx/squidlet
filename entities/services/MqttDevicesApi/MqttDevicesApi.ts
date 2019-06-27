@@ -18,7 +18,7 @@ interface Props {
 const REMOTE_CALL_TOPIC = 'remoteCall';
 
 
-export default class MqttApi extends ServiceBase<Props> {
+export default class MqttDevicesApi extends ServiceBase<Props> {
   // infinity session
   private sessionId: string = '';
   private get mqtt(): Mqtt {
