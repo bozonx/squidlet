@@ -4,7 +4,6 @@ import DeviceState, {Schema} from './DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {StateObject} from '../State';
 import {JsonTypes} from '../interfaces/Types';
-import {combineTopic} from '../helpers/helpers';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -61,12 +60,20 @@ export default class StatusState {
     return this.deviceState.isWriting();
   }
 
+  getState(): StateObject {
+    return this.deviceState.getState();
+  }
+
+  setIncomeState(partialState: StateObject) {
+    // TODO: add !!!
+  }
+
   /**
-   * Get all the statuses
+   * Force load state from getter.
    */
-  read = async (): Promise<StateObject> => {
+  forceLoad = async (): Promise<void> => {
     try {
-      return await this.deviceState.readAll();
+      return await this.deviceState.forceLoad();
     }
     catch (err) {
       throw new Error(`Status.read device "${this.deviceId}": ${err}`);
@@ -109,7 +116,7 @@ export default class StatusState {
 
 
   private stateGetter = (): StateObject => {
-    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
+    return this.getState();
   }
 
   private stateUpdater = (partialState: StateObject): void => {

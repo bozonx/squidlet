@@ -57,6 +57,10 @@ export default class ConfigState {
     return this.deviceState.isWriting();
   }
 
+  getState(): StateObject {
+    // TODO: add !!!
+  }
+
   /**
    * Get whole config from device.
    */

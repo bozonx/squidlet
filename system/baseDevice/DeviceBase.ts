@@ -75,6 +75,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       );
     }
 
+    // TODO: on add did init - set initial state
     await Promise.all([
       this.statusState && this.statusState.init(),
       this.configState && this.configState.init(),
@@ -93,14 +94,24 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
   /**
    * Get specified status or default status.
-   * @param statusName
    */
-  getStatus = async (statusName?: string): Promise<JsonTypes> => {
-    if (!this.statusState) {
-      throw new Error(`DeviceBase.getStatus: device "${this.id}", status hasn't been set.`);
-    }
+  getStatus = (statusName: string = DEFAULT_STATUS): JsonTypes => {
+    if (!this.statusState) return;
 
-    return this.statusState.readParam(statusName);
+    const state = this.statusState.getState();
+
+    return state[statusName];
+  }
+
+  /**
+   * Force load status
+   */
+  forceLoadStatus = async (): Promise<void> => {
+    if (!this.statusState) return;
+
+    // TODO: wait statusState saving complete and read it
+
+    await this.statusState.forceLoad();
   }
 
   setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
@@ -122,13 +133,21 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.statusState.onChangeParam(cb);
   }
 
+  getConfig(): StateObject {
+    // if (!this.configState) {
+    //   throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
+    // }
+    //
+    // return this.configState.read();
+    // //return this.configState.getState();
 
-  getConfig(): Promise<StateObject> {
-    if (!this.configState) {
-      throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
-    }
+    if (!this.configState) return {};
 
-    return this.configState.read();
+    return  this.configState.getState();
+  }
+
+  forceLoadConfig = async (): Promise<void> => {
+    // TODO: !!! add
   }
 
   setConfig(partialData: StateObject): Promise<void> {

@@ -77,9 +77,9 @@ export default class DeviceState {
     return this.consistentState.isWriting();
   }
 
-  // getState(): StateObject {
-  //   return this.consistentState.getState();
-  // }
+  getState(): StateObject {
+    return this.consistentState.getState();
+  }
 
   async readAll(): Promise<StateObject> {
     if (!this.getter || this.isWriting()) return this.consistentState.getState();
