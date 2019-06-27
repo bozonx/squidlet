@@ -1,8 +1,7 @@
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
-import DeviceBase from 'system/baseDevice/DeviceBase';
+import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
-import {DEFAULT_STATUS} from 'system/baseDevice/StatusState';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 

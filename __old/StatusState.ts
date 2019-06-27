@@ -1,9 +1,9 @@
-import System from '../System';
-import {Getter, Initialize, Setter} from './ConsistentState';
-import DeviceState, {Schema} from './DeviceState';
-import {StateCategories} from '../interfaces/States';
-import {StateObject} from '../State';
-import {JsonTypes} from '../interfaces/Types';
+import System from '../system/System';
+import {Getter, Initialize, Setter} from '../system/baseDevice/ConsistentState';
+import DeviceState, {Schema} from '../system/baseDevice/DeviceState';
+import {StateCategories} from '../system/interfaces/States';
+import {StateObject} from '../system/State';
+import {JsonTypes} from '../system/interfaces/Types';
 
 
 export const DEFAULT_STATUS = 'default';

@@ -1,6 +1,5 @@
-import DeviceBase from 'system/baseDevice/DeviceBase';
+import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from 'system/baseDevice/StatusState';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {omit} from 'system/helpers/lodashLike';
 
@@ -52,20 +51,22 @@ export default class ClickSensor extends DeviceBase<Props> {
 
 
   private onSilentStatusChange = this.wrapErrors(async () => {
-    if (!this.status) return;
+    if (!this.statusState) return;
 
-    await this.status.write({[DEFAULT_STATUS]: true}, true);
+    // TODO: почему тут silent write был ????
+
+    await this.statusState.write({[DEFAULT_STATUS]: true});
   });
 
   private onDown = this.wrapErrors(async () => {
-    if (!this.status) return;
+    if (!this.statusState) return;
 
     //this.status.publish(true);
     await this.setStatus(true);
   });
 
   private onUp = this.wrapErrors(async () => {
-    if (!this.status) return;
+    if (!this.statusState) return;
 
     //this.status.publish(false);
     await this.setStatus(false);

@@ -175,12 +175,12 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
-      if (category !== this.stateCategory || stateName !== this.deviceId) return;
+      if (category !== StateCategories.devicesStatus || stateName !== this.id) return;
 
       cb(paramName, value);
     };
 
-    return this.system.state.onChangeParam(wrapper);
+    return this.env.system.state.onChangeParam(wrapper);
   }
 
   getConfig(): StateObject {
@@ -219,12 +219,12 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     const wrapper = (category: number, stateName: string): void => {
-      if (category !== this.stateCategory || stateName !== this.deviceId) return;
+      if (category !== StateCategories.devicesConfig || stateName !== this.id) return;
 
       cb();
     };
 
-    return this.system.state.onChange(wrapper);
+    return this.env.system.state.onChange(wrapper);
   }
 
 

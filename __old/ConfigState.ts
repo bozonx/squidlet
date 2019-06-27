@@ -1,8 +1,8 @@
-import System from '../System';
-import DeviceState, {Schema} from './DeviceState';
-import {Getter, Initialize, Setter} from './ConsistentState';
-import {StateCategories} from '../interfaces/States';
-import {StateObject} from '../State';
+import System from '../system/System';
+import DeviceState, {Schema} from '../system/baseDevice/DeviceState';
+import {Getter, Initialize, Setter} from '../system/baseDevice/ConsistentState';
+import {StateCategories} from '../system/interfaces/States';
+import {StateObject} from '../system/State';
 
 
 export type ConfigChangeHandler = () => void;
