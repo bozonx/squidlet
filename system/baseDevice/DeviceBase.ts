@@ -108,12 +108,15 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   /**
    * Force load status
    */
-  forceLoadStatus = async (): Promise<void> => {
+  loadStatus = async (): Promise<void> => {
     if (!this.statusState) return;
 
-    // TODO: wait statusState saving complete and read it
-
-    await this.statusState.forceLoad();
+    try {
+      await this.statusState.load();
+    }
+    catch (err) {
+      throw new Error(`Device "${this.id}" loadStatus: ${err}`);
+    }
   }
 
   setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
@@ -121,7 +124,12 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.statusState.write({[statusName]: newValue});
+    try {
+      return this.statusState.write({[statusName]: newValue});
+    }
+    catch (err) {
+      throw new Error(`Device "${this.id}" setStatus: ${err}`);
+    }
   }
 
   /**
@@ -148,7 +156,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return  this.configState.getState();
   }
 
-  forceLoadConfig = async (): Promise<void> => {
+  loadConfig = async (): Promise<void> => {
     // TODO: !!! add
   }
 
@@ -156,6 +164,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
     }
+
+    // TODO: !!! handle error
 
     return this.configState.write(partialData);
   }

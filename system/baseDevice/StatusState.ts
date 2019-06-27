@@ -65,43 +65,33 @@ export default class StatusState {
   }
 
   setIncomeState(partialState: StateObject) {
-    // TODO: add !!!
+    this.deviceState.setIncomeState(partialState);
   }
 
   /**
    * Force load state from getter.
    */
-  forceLoad = async (): Promise<void> => {
-    try {
-      return await this.deviceState.forceLoad();
-    }
-    catch (err) {
-      throw new Error(`Status.read device "${this.deviceId}": ${err}`);
-    }
+  load = async (): Promise<void> => {
+    return this.deviceState.load();
   }
 
-  /**
-   * Get status from device.
-   */
-  readParam = async (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
-    try {
-      return await this.deviceState.readParam(statusName);
-    }
-    catch (err) {
-      throw new Error(`Status.readParam device "${this.deviceId}": ${err}`);
-    }
-  }
+  // /**
+  //  * Get status from device.
+  //  */
+  // readParam = async (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
+  //   try {
+  //     return await this.deviceState.readParam(statusName);
+  //   }
+  //   catch (err) {
+  //     throw new Error(`Status.readParam device "${this.deviceId}": ${err}`);
+  //   }
+  // }
 
   /**
    * Set status of device.
    */
   write = async (partialData: StateObject): Promise<void> => {
-    try {
-      await this.deviceState.write(partialData);
-    }
-    catch (err) {
-      throw new Error(`Status.write device "${this.deviceId}": ${err}`);
-    }
+    await this.deviceState.write(partialData);
   }
 
   onChangeParam(cb: StatusChangeHandler): number {

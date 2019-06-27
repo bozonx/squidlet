@@ -1,6 +1,7 @@
 import {StateObject} from '../State';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
+import {mergeDeep} from '../helpers/collections';
 
 export type Initialize = () => Promise<StateObject>;
 export type Getter = () => Promise<StateObject>;
@@ -66,6 +67,23 @@ export default class ConsistentState {
 
   getState(): StateObject {
     return this.stateGetter();
+  }
+
+  setIncomeState(partialState: StateObject) {
+    if (this.isReading()) {
+      // do nothing if force reading is in progress. It will return the truly state
+      return;
+    }
+    else if (this.isWriting()) {
+      this.stateUpdater(partialState);
+
+      this.tmpStateBeforeWriting = mergeDeep(partialState, this.tmpStateBeforeWriting);
+
+      return;
+    }
+
+    // there aren't reading and writing - just update
+    this.stateUpdater(partialState);
   }
 
   /**
