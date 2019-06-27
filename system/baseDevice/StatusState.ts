@@ -94,18 +94,19 @@ export default class StatusState {
     await this.deviceState.write(partialData);
   }
 
-  onChangeParam(cb: StatusChangeHandler): number {
-    const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
-      if (category !== this.stateCategory || stateName !== this.deviceId) return;
-
-      cb(paramName, value);
-    };
-
-    return this.system.state.onChangeParam(wrapper);
-  }
+  // onChangeParam(cb: StatusChangeHandler): number {
+  //   const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
+  //     if (category !== this.stateCategory || stateName !== this.deviceId) return;
+  //
+  //     cb(paramName, value);
+  //   };
+  //
+  //   return this.system.state.onChangeParam(wrapper);
+  // }
 
 
   private stateGetter = (): StateObject => {
+    // TODO: use system
     return this.getState();
   }
 
