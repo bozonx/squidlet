@@ -8,6 +8,9 @@ export type Getter = () => Promise<StateObject>;
 export type Setter = (partialData: StateObject) => Promise<void>;
 
 
+/**
+ * State which is consistent while reading and writing.
+ */
 export default class ConsistentState {
   private readonly logError: (msg: string) => void;
   private readonly stateGetter: () => StateObject;

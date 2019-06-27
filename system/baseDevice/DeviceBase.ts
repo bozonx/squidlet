@@ -60,15 +60,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     if (manifest.status) {
-      // this._statusState = new StatusState(
-      //   this.env.system,
-      //   manifest.status,
-      //   this.id,
-      //   this.initialStatus,
-      //   this.statusGetter,
-      //   this.statusSetter
-      // );
-
       this._statusState = new DeviceState(
         manifest.status,
         (): StateObject => {
@@ -85,15 +76,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     if (manifest.config) {
-      // this._configState = new ConfigState(
-      //   this.env.system,
-      //   manifest.config,
-      //   this.id,
-      //   this.initialConfig,
-      //   this.configGetter,
-      //   this.configSetter
-      // );
-
       this._configState = new DeviceState(
         manifest.config,
         (): StateObject => {
@@ -184,30 +166,34 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
   getConfig(): StateObject {
-    // if (!this.configState) {
-    //   throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
-    // }
-    //
-    // return this.configState.read();
-    // //return this.configState.getState();
-
     if (!this.configState) return {};
 
     return  this.configState.getState();
   }
 
   loadConfig = async (): Promise<void> => {
-    // TODO: !!! add
+    if (!this.configState) return;
+
+    try {
+      await this.configState.load();
+    }
+    catch (err) {
+      throw new Error(`Device "${this.id}" loadConfig: ${err}`);
+    }
   }
 
-  setConfig(partialData: StateObject): Promise<void> {
+  setConfig = async (partialData: StateObject): Promise<void> => {
     if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
     }
 
-    // TODO: !!! handle error
+    try {
+      await this.configState.write(partialData);
+    }
+    catch (err) {
+      throw new Error(`Device "${this.id}" setConfig: ${err}`);
+    }
 
-    return this.configState.write(partialData);
   }
 
   /**
