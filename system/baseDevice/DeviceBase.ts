@@ -1,5 +1,3 @@
-import StatusState, {DEFAULT_STATUS, StatusChangeHandler} from './StatusState';
-import ConfigState, {ConfigChangeHandler} from './ConfigState';
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
@@ -7,14 +5,22 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import {JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from './ConsistentState';
 import {StateObject} from '../State';
+import DeviceState from './DeviceState';
+import {StateCategories} from '../interfaces/States';
+
+
+export const DEFAULT_STATUS = 'default';
+
+export type StatusChangeHandler = (paramName: string, value: JsonTypes) => void;
+export type ConfigChangeHandler = () => void;
 
 
 export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
-  get statusState(): StatusState | undefined {
+  get statusState(): DeviceState | undefined {
     return this._statusState;
   }
 
-  get configState(): ConfigState | undefined {
+  get configState(): DeviceState | undefined {
     return this._configState;
   }
 
@@ -41,8 +47,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected configGetter?: Getter;
   protected configSetter?: Setter;
   protected actions: {[index: string]: Function} = {};
-  private _statusState?: StatusState;
-  private _configState?: ConfigState;
+  private _statusState?: DeviceState;
+  private _configState?: DeviceState;
 
 
   constructor(definition: EntityDefinition, env: DeviceEnv) {
@@ -54,10 +60,24 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
     if (manifest.status) {
-      this._statusState = new StatusState(
-        this.env.system,
+      // this._statusState = new StatusState(
+      //   this.env.system,
+      //   manifest.status,
+      //   this.id,
+      //   this.initialStatus,
+      //   this.statusGetter,
+      //   this.statusSetter
+      // );
+
+      this._statusState = new DeviceState(
         manifest.status,
-        this.id,
+        (): StateObject => {
+          return this.env.system.state.getState(StateCategories.devicesStatus, this.id) || {};
+        },
+        (partialState: StateObject): void => {
+          this.env.system.state.updateState(StateCategories.devicesStatus, this.id, partialState);
+        },
+        this.env.system.log.error,
         this.initialStatus,
         this.statusGetter,
         this.statusSetter
@@ -65,21 +85,38 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     if (manifest.config) {
-      this._configState = new ConfigState(
-        this.env.system,
+      // this._configState = new ConfigState(
+      //   this.env.system,
+      //   manifest.config,
+      //   this.id,
+      //   this.initialConfig,
+      //   this.configGetter,
+      //   this.configSetter
+      // );
+
+      this._configState = new DeviceState(
         manifest.config,
-        this.id,
+        (): StateObject => {
+          return this.env.system.state.getState(StateCategories.devicesConfig, this.id) || {};
+        },
+        (partialState: StateObject): void => {
+          this.env.system.state.updateState(StateCategories.devicesConfig, this.id, partialState);
+        },
+        this.env.system.log.error,
         this.initialConfig,
         this.configGetter,
         this.configSetter
       );
     }
 
-    await Promise.all([
-      this.statusState && this.statusState.init(),
-      this.configState && this.configState.init(),
-    ]);
+    this.env.system.onAppInit(async () => {
+      await Promise.all([
+        this.statusState && this.statusState.init(),
+        this.configState && this.configState.init(),
+      ]);
+    });
   }
+
 
   async doDestroy() {
     await super.doDestroy();
@@ -93,14 +130,27 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
   /**
    * Get specified status or default status.
-   * @param statusName
    */
-  getStatus = async (statusName?: string): Promise<JsonTypes> => {
-    if (!this.statusState) {
-      throw new Error(`DeviceBase.getStatus: device "${this.id}", status hasn't been set.`);
-    }
+  getStatus = (statusName: string = DEFAULT_STATUS): JsonTypes => {
+    if (!this.statusState) return;
 
-    return this.statusState.readParam(statusName);
+    const state = this.statusState.getState();
+
+    return state[statusName];
+  }
+
+  /**
+   * Force load status
+   */
+  loadStatus = async (): Promise<void> => {
+    if (!this.statusState) return;
+
+    try {
+      await this.statusState.load();
+    }
+    catch (err) {
+      throw new Error(`Device "${this.id}" loadStatus: ${err}`);
+    }
   }
 
   setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
@@ -108,7 +158,12 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.statusState.write({[statusName]: newValue});
+    try {
+      return this.statusState.write({[statusName]: newValue});
+    }
+    catch (err) {
+      throw new Error(`Device "${this.id}" setStatus: ${err}`);
+    }
   }
 
   /**
@@ -119,22 +174,38 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
     }
 
-    return this.statusState.onChangeParam(cb);
+    const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
+      if (category !== StateCategories.devicesStatus || stateName !== this.id) return;
+
+      cb(paramName, value);
+    };
+
+    return this.env.system.state.onChangeParam(wrapper);
   }
 
+  getConfig(): StateObject {
+    // if (!this.configState) {
+    //   throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
+    // }
+    //
+    // return this.configState.read();
+    // //return this.configState.getState();
 
-  getConfig(): Promise<StateObject> {
-    if (!this.configState) {
-      throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
-    }
+    if (!this.configState) return {};
 
-    return this.configState.read();
+    return  this.configState.getState();
+  }
+
+  loadConfig = async (): Promise<void> => {
+    // TODO: !!! add
   }
 
   setConfig(partialData: StateObject): Promise<void> {
     if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
     }
+
+    // TODO: !!! handle error
 
     return this.configState.write(partialData);
   }
@@ -147,7 +218,13 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`DeviceBase.onConfigChange: device "${this.id}", config hasn't been set.`);
     }
 
-    return this.configState.onChange(cb);
+    const wrapper = (category: number, stateName: string): void => {
+      if (category !== StateCategories.devicesConfig || stateName !== this.id) return;
+
+      cb();
+    };
+
+    return this.env.system.state.onChange(wrapper);
   }
 
 

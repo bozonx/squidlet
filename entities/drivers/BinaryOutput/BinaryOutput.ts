@@ -77,6 +77,15 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return this.doWrite(level);
   }
 
+  onIncomeChange(cb: (newLevel: boolean) => void): number {
+    // TODO: !!!
+    // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
+  }
+
+  removeIncomeChangeListener(handlerIndex: number) {
+    // TODO: !!!
+  }
+
 
   private async doWrite(level: boolean): Promise<void> {
     const resolvedValue: boolean = invertIfNeed(level, this.props.invert);

@@ -1,8 +1,7 @@
 import {Data} from 'system/baseDevice/DeviceDataManagerBase';
-import DeviceBase from 'system/baseDevice/DeviceBase';
+import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
-import {DEFAULT_STATUS} from 'system/baseDevice/StatusState';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
@@ -36,10 +35,6 @@ export default class Toggle extends DeviceBase<Props> {
     this.binaryClick.addUpListener(this.onUp);
   }
 
-  // protected transformPublishValue = (value: boolean): number => {
-  //   return Number(value);
-  // }
-
   protected initialStatus = async (): Promise<Data> => {
     return { [DEFAULT_STATUS]: invertIfNeed(false, this.props.invert) };
   }
@@ -47,7 +42,7 @@ export default class Toggle extends DeviceBase<Props> {
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
-      if (this.blockTimeInProgress) return this.getStatus();
+      if (this.blockTimeInProgress) return this.getStatus() as boolean;
 
       this.blockTimeInProgress = true;
 
@@ -71,11 +66,11 @@ export default class Toggle extends DeviceBase<Props> {
   }
 
   private async doToggle(): Promise<boolean> {
-    if (this.blockTimeInProgress) return this.getStatus();
+    if (this.blockTimeInProgress) return this.getStatus() as boolean;
 
     this.blockTimeInProgress = true;
 
-    const level: boolean = !await this.getStatus();
+    const level: boolean = !this.getStatus();
 
     await this.setStatus(level);
 

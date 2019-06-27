@@ -1,4 +1,4 @@
-Status = require('../../../system/baseDevice/StatusState').default
+Status = require('../../../__old/StatusState').default
 
 
 describe 'baseDevice.Status', ->

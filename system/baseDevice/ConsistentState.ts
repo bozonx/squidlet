@@ -1,9 +1,10 @@
 import {StateObject} from '../State';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
+import {mergeDeep} from '../helpers/collections';
 
 export type Initialize = () => Promise<StateObject>;
-export type Getter = (paramNames?: string[]) => Promise<StateObject>;
+export type Getter = () => Promise<StateObject>;
 export type Setter = (partialData: StateObject) => Promise<void>;
 
 
@@ -37,6 +38,8 @@ export default class ConsistentState {
   }
 
   async init() {
+    if (!this.initialize && !this.getter) throw new Error(`There aren't any getter or initialize callbacks`);
+
     let getter = this.getter;
 
     if (this.initialize) getter = this.initialize;
@@ -66,6 +69,23 @@ export default class ConsistentState {
     return this.stateGetter();
   }
 
+  setIncomeState(partialState: StateObject) {
+    if (this.isReading()) {
+      // do nothing if force reading is in progress. It will return the truly state
+      return;
+    }
+    else if (this.isWriting()) {
+      this.stateUpdater(partialState);
+
+      this.tmpStateBeforeWriting = mergeDeep(partialState, this.tmpStateBeforeWriting);
+
+      return;
+    }
+
+    // there aren't reading and writing - just update
+    this.stateUpdater(partialState);
+  }
+
   /**
    * Read whole state.
    * If getter is set it will call it and return state.
@@ -73,7 +93,7 @@ export default class ConsistentState {
    * If writing is in progress it will return current state which is being writing at the moment
    * If reading is in progress it will wait for current reading request and will return its data
    */
-  async loadAll(): Promise<void> {
+  async load(): Promise<void> {
     if (!this.getter) return;
 
     if (this.isReading()) {

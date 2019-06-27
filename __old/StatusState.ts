@@ -1,10 +1,9 @@
-import System from '../System';
-import {Getter, Initialize, Setter} from './ConsistentState';
-import DeviceState, {Schema} from './DeviceState';
-import {StateCategories} from '../interfaces/States';
-import {StateObject} from '../State';
-import {JsonTypes} from '../interfaces/Types';
-import {combineTopic} from '../helpers/helpers';
+import System from '../system/System';
+import {Getter, Initialize, Setter} from '../system/baseDevice/ConsistentState';
+import DeviceState, {Schema} from '../system/baseDevice/DeviceState';
+import {StateCategories} from '../system/interfaces/States';
+import {StateObject} from '../system/State';
+import {JsonTypes} from '../system/interfaces/Types';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -61,55 +60,54 @@ export default class StatusState {
     return this.deviceState.isWriting();
   }
 
-  /**
-   * Get all the statuses
-   */
-  read = async (): Promise<StateObject> => {
-    try {
-      return await this.deviceState.readAll();
-    }
-    catch (err) {
-      throw new Error(`Status.read device "${this.deviceId}": ${err}`);
-    }
+  getState(): StateObject {
+    return this.deviceState.getState();
+  }
+
+  setIncomeState(partialState: StateObject) {
+    this.deviceState.setIncomeState(partialState);
   }
 
   /**
-   * Get status from device.
+   * Force load state from getter.
    */
-  readParam = async (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
-    try {
-      return await this.deviceState.readParam(statusName);
-    }
-    catch (err) {
-      throw new Error(`Status.readParam device "${this.deviceId}": ${err}`);
-    }
+  load = async (): Promise<void> => {
+    return this.deviceState.load();
   }
+
+  // /**
+  //  * Get status from device.
+  //  */
+  // readParam = async (statusName: string = DEFAULT_STATUS): Promise<JsonTypes> => {
+  //   try {
+  //     return await this.deviceState.readParam(statusName);
+  //   }
+  //   catch (err) {
+  //     throw new Error(`Status.readParam device "${this.deviceId}": ${err}`);
+  //   }
+  // }
 
   /**
    * Set status of device.
    */
   write = async (partialData: StateObject): Promise<void> => {
-    try {
-      await this.deviceState.write(partialData);
-    }
-    catch (err) {
-      throw new Error(`Status.write device "${this.deviceId}": ${err}`);
-    }
+    await this.deviceState.write(partialData);
   }
 
-  onChangeParam(cb: StatusChangeHandler): number {
-    const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
-      if (category !== this.stateCategory || stateName !== this.deviceId) return;
-
-      cb(paramName, value);
-    };
-
-    return this.system.state.onChangeParam(wrapper);
-  }
+  // onChangeParam(cb: StatusChangeHandler): number {
+  //   const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
+  //     if (category !== this.stateCategory || stateName !== this.deviceId) return;
+  //
+  //     cb(paramName, value);
+  //   };
+  //
+  //   return this.system.state.onChangeParam(wrapper);
+  // }
 
 
   private stateGetter = (): StateObject => {
-    return this.system.state.getState(this.stateCategory, this.deviceId) || {};
+    // TODO: use system
+    return this.getState();
   }
 
   private stateUpdater = (partialState: StateObject): void => {

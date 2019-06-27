@@ -1,8 +1,7 @@
-import DeviceBase from 'system/baseDevice/DeviceBase';
+import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {convertToLevel} from 'system/helpers/helpers';
-import {Data} from 'system/baseDevice/DeviceDataManagerBase';
-import {DEFAULT_STATUS} from 'system/baseDevice/StatusState';
 import {GetDriverDep} from 'system/entities/EntityBase';
+import {StateObject} from 'system/State';
 
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';
 
@@ -15,35 +14,34 @@ export default class Switch extends DeviceBase<Props> {
   private get binaryOutput(): BinaryOutput {
     return this.depsInstances.binaryOutput;
   }
-  // protected get status(): Status {
-  //   return super.status as any;
-  // }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryOutput = await getDriverDep('BinaryOutput')
       .getInstance(this.props);
+
+    this.depsInstances.binaryOutput.onIncomeChange((newLevel: boolean) => {
+      if (!this.statusState) throw new Error(`No status`);
+
+      this.statusState.setIncomeState({ [DEFAULT_STATUS]: newLevel });
+    });
   }
 
 
-  protected statusGetter = async (): Promise<Data> => {
+  protected statusGetter = async (): Promise<StateObject> => {
     return { [DEFAULT_STATUS]: await this.binaryOutput.read() };
   }
 
-  protected statusSetter = async (partialData: Data) => {
-    await this.binaryOutput.write(partialData[DEFAULT_STATUS]);
+  protected statusSetter = async (partialData: StateObject) => {
+    await this.binaryOutput.write(partialData[DEFAULT_STATUS] as boolean);
   }
-
-  // protected transformPublishValue = (value: boolean): number => {
-  //   return Number(value);
-  // }
 
   protected actions = {
     turn: async (onOrOff: any): Promise<boolean> => {
-      if (!this.status) throw new Error(`No status`);
+      if (!this.statusState) throw new Error(`No status`);
 
       // skip while switch at block time
-      if (this.binaryOutput.isBlocked()) return this.status.getState().default;
+      if (this.binaryOutput.isBlocked()) return this.getStatus() as boolean;
 
       const level: boolean = convertToLevel(onOrOff);
 
@@ -53,12 +51,13 @@ export default class Switch extends DeviceBase<Props> {
     },
 
     toggle: async (): Promise<boolean> => {
-      if (!this.status) throw new Error(`No status`);
+      if (!this.statusState) throw new Error(`No status`);
+
+      const currentLevel: boolean = this.getStatus() as boolean;
 
       // skip while switch at block time
-      if (this.binaryOutput.isBlocked()) return this.status.getState().default;
+      if (this.binaryOutput.isBlocked()) return currentLevel;
 
-      const currentLevel: boolean = await this.getStatus();
       const resultLevel: boolean = !currentLevel;
 
       await this.setStatus(resultLevel);

@@ -1,8 +1,8 @@
-import System from '../System';
-import DeviceState, {Schema} from './DeviceState';
-import {Getter, Initialize, Setter} from './ConsistentState';
-import {StateCategories} from '../interfaces/States';
-import {StateObject} from '../State';
+import System from '../system/System';
+import DeviceState, {Schema} from '../system/baseDevice/DeviceState';
+import {Getter, Initialize, Setter} from '../system/baseDevice/ConsistentState';
+import {StateCategories} from '../system/interfaces/States';
+import {StateObject} from '../system/State';
 
 
 export type ConfigChangeHandler = () => void;
@@ -57,39 +57,40 @@ export default class ConfigState {
     return this.deviceState.isWriting();
   }
 
+  getState(): StateObject {
+    return this.deviceState.getState();
+  }
+
+  setIncomeState(partialState: StateObject) {
+    this.deviceState.setIncomeState(partialState);
+  }
+
   /**
    * Get whole config from device.
    */
-  read = async (): Promise<StateObject> => {
-    try {
-      return await this.deviceState.readAll();
-    }
-    catch (err) {
-      throw new Error(`Status.read device "${this.deviceId}": ${err}`);
-    }
+  /**
+   * Force load state from getter.
+   */
+  load = async (): Promise<void> => {
+    return this.deviceState.load();
   }
 
   /**
    * Set config to device
    */
   write = async (partialData: StateObject): Promise<void> => {
-    try {
-      await this.deviceState.write(partialData);
-    }
-    catch (err) {
-      throw new Error(`Status.write device "${this.deviceId}": ${err}`);
-    }
+    await this.deviceState.write(partialData);
   }
 
-  onChange(cb: ConfigChangeHandler): number {
-    const wrapper = (category: number, stateName: string): void => {
-      if (category !== this.stateCategory || stateName !== this.deviceId) return;
-
-      cb();
-    };
-
-    return this.system.state.onChange(wrapper);
-  }
+  // onChange(cb: ConfigChangeHandler): number {
+  //   const wrapper = (category: number, stateName: string): void => {
+  //     if (category !== this.stateCategory || stateName !== this.deviceId) return;
+  //
+  //     cb();
+  //   };
+  //
+  //   return this.system.state.onChange(wrapper);
+  // }
 
 
   private stateGetter = (): StateObject => {
