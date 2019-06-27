@@ -38,8 +38,7 @@ export default class MqttApi extends ServiceBase<Props> {
   }
 
   protected devicesDidInit = async () => {
-    // register subscribers after app init
-    await this.subscribeToTopics();
+    await this.subscribeToTopic();
   }
 
   destroy = async () => {
@@ -51,8 +50,8 @@ export default class MqttApi extends ServiceBase<Props> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
-    // TODO: use prefix
-    if (topic !== REMOTE_CALL_TOPIC) return;
+    // TODO: use host prefix
+    if (topic !== this.makeTopic()) return;
 
     let msg: RemoteCallMessage;
 
@@ -71,25 +70,22 @@ export default class MqttApi extends ServiceBase<Props> {
 
     const binData: Uint8Array = serializeJson(message);
 
-    return this.mqtt.publish(REMOTE_CALL_TOPIC, binData);
+    return this.mqtt.publish(this.makeTopic(), binData);
   });
 
   /**
    * Subscribe to all the device's actions calls on broker
    */
-  private subscribeToTopics = async () => {
+  private subscribeToTopic = async () => {
+    this.env.log.info(`--> Register MQTT subscriber of remote call api topic`);
 
-    // TODO: remake - subscribe to remoteCall topic
+    await this.mqtt.subscribe(this.makeTopic());
+  }
 
-    // this.env.log.info(`--> Register MQTT subscribers of devices actions`);
-    //
-    // const devicesActionsTopics: string[] = this.getDevicesActionTopics();
-    //
-    // for (let topic of devicesActionsTopics) {
-    //   this.env.log.info(`MQTT subscribe: ${topic}`);
-    //
-    //   await this.mqtt.subscribe(topic);
-    // }
+  private makeTopic(): string {
+    // TODO: use host prefix
+
+    return REMOTE_CALL_TOPIC;
   }
 
 }

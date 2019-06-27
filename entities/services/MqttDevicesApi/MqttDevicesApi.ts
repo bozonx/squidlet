@@ -15,8 +15,6 @@ interface Props {
   port: string;
 }
 
-const REMOTE_CALL_TOPIC = 'remoteCall';
-
 
 export default class MqttDevicesApi extends ServiceBase<Props> {
   // infinity session
@@ -62,7 +60,7 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = async (topic: string, data: string | Uint8Array) => {
-    // TODO: use prefix
+    // TODO: use prefix - device.
     // if (topic === REMOTE_CALL_TOPIC) {
     // }
 
@@ -73,7 +71,7 @@ export default class MqttDevicesApi extends ServiceBase<Props> {
   private handleOutcomeRemoteCall = async (message: RemoteCallMessage) => {
     const binData: Uint8Array = serializeJson(message);
 
-    // TODO: use prefix
+    // TODO: use prefix - device.
     return this.mqtt.publish(REMOTE_CALL_TOPIC, binData);
   }
 
