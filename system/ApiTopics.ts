@@ -1,10 +1,9 @@
-// TODO: review paths
-import {splitFirstElement} from '../../../system/helpers/strings';
-import {combineTopic, parseValue} from '../../../system/helpers/helpers';
-import {JsonTypes} from '../../../system/interfaces/Types';
-import {trim} from '../../../system/helpers/lodashLike';
-import System from '../../../system/System';
-import {StateCategories} from '../../../system/interfaces/States';
+import {splitFirstElement} from './helpers/strings';
+import {combineTopic, parseValue} from './helpers/helpers';
+import {JsonTypes} from './interfaces/Types';
+import {trim} from './helpers/lodashLike';
+import System from './System';
+import {StateCategories} from './interfaces/States';
 
 type TopicType = 'device' | 'api';
 
@@ -12,8 +11,6 @@ const topicTypes = ['device', 'api'];
 const TOPIC_TYPE_SEPARATOR = '|';
 export const TOPIC_SEPARATOR = '/';
 
-
-// TODO: поидее должен быть синглтон
 
 /**
  * Types of topics

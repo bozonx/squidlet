@@ -17,6 +17,7 @@ import ApiManager from './ApiManager';
 import HostConfig from './interfaces/HostConfig';
 import State from './State';
 import Api from './Api';
+import ApiTopics from './ApiTopics';
 
 
 // TODO: remove
@@ -35,6 +36,7 @@ export default class System {
   readonly sessions: Sessions;
   readonly apiManager: ApiManager;
   readonly api: Api;
+  readonly apiTopics: ApiTopics;
   readonly state: State;
   get id(): string {
     return this.config.id;
@@ -72,6 +74,7 @@ export default class System {
     this.devicesManager = new DevicesManager(this);
     this.apiManager = new ApiManager(this);
     this.api = new Api(this);
+    this.apiTopics = new ApiTopics(this);
     this.sessions = new Sessions(this.generateUniqId);
     this.state = new State();
   }

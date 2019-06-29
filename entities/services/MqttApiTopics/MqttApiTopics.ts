@@ -2,7 +2,7 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {combineTopic} from 'system/helpers/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {Mqtt} from '../../drivers/Mqtt/Mqtt';
-import ApiTopics, {TOPIC_SEPARATOR} from './ApiTopics';
+import {TOPIC_SEPARATOR} from '../../../system/ApiTopics';
 
 
 interface Props {
@@ -15,7 +15,6 @@ interface Props {
 export default class MqttApiTopics extends ServiceBase<Props> {
   // infinity session
   private sessionId: string = '';
-  private apiTopics?: ApiTopics;
   private get mqtt(): Mqtt {
     return this.depsInstances.mqtt;
   }
@@ -26,14 +25,13 @@ export default class MqttApiTopics extends ServiceBase<Props> {
       .getInstance(this.props);
 
     this.sessionId = this.env.system.sessions.newSession(0);
-    this.apiTopics = new ApiTopics(this.env.system);
   }
 
   protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
     // listen to outcome messages and pass them to mqtt
-    this.apiTopics.onOutcome(this.publishOutcomeHandler);
+    this.env.system.apiTopics.onOutcome(this.publishOutcomeHandler);
   }
 
   protected devicesDidInit = async () => {
@@ -51,7 +49,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
     // TODO: use prefix - device.
-    await this.apiTopics.incomeMessage(topic, data);
+    await this.env.system.apiTopics.incomeMessage(topic, data);
   });
 
   /**
