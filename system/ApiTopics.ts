@@ -4,8 +4,10 @@ import {JsonTypes} from './interfaces/Types';
 import {trim} from './helpers/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
+import IndexedEvents from './helpers/IndexedEvents';
 
 type TopicType = 'device' | 'api';
+type OutcomeHandler = (topic: string, data: string) => void;
 
 const topicTypes = ['device', 'api'];
 const TOPIC_TYPE_SEPARATOR = '|';
@@ -20,6 +22,7 @@ export const TOPIC_SEPARATOR = '/';
  * * blockIo true|false
  */
 export default class ApiTopics {
+  private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
   private readonly system: System;
 
 
@@ -28,13 +31,12 @@ export default class ApiTopics {
   }
 
   init() {
-    // this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
-    //   this.publishHandler(topic, data, isRepeat)
-    //     .catch(this.env.log.error);
-    // });
-
     // listen to outcome messages from api and send them to mqtt broker
     this.system.state.onChange(this.handlerStateChange);
+  }
+
+  destroy() {
+    this.outcomeEvents.removeAll();
   }
 
 
@@ -42,7 +44,7 @@ export default class ApiTopics {
     // TODO: publish all the states of all the devices etc
   }
 
-  async incomeMessage(topic: string, data: string | Uint8Array) {
+  incomeMessage = async (topic: string, data: string) => {
     const [topicType, body] = this.parseTopic(topic);
 
     switch (topicType) {
@@ -55,26 +57,36 @@ export default class ApiTopics {
     }
   }
 
-  onOutcome(cb: (topic: string, data: string | Uint8Array) => void) {
-    // TODO: !!!!
-
-    this.env.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
+  onOutcome(cb: OutcomeHandler): number {
+    return this.outcomeEvents.addListener(cb);
   }
 
-  // run(topicType: TopicType, topicBody: string, data: string | Uint8Array) {
-  //   const topic: string = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
-  // }
+  removeOutcomeListener(handlerIndex: number) {
+    this.outcomeEvents.removeListener(handlerIndex);
+  }
 
   private handlerStateChange = (category: number, stateName: string, changedParams: string[]) => {
+    let topic: string;
+    let data: string;
+
     if (category === StateCategories.devicesStatus) {
-      // TODO: publish to mqtt
+      // TODO: prepare and call outcomeEvents.emit
+
+
+      const dataToSend: string = JSON.stringify(data);
+
     }
     else if (category === StateCategories.devicesConfig) {
-      // TODO: publish to mqtt
+      // TODO: prepare and call outcomeEvents.emit
+
+
     }
+
+    this.system.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
+    this.outcomeEvents.emit(topic, data);
   }
 
-  private async callApi(methodName: string, data: string | Uint8Array) {
+  private async callApi(methodName: string, data: string) {
     const args: JsonTypes[] = this.parseArgs(data);
 
     switch (methodName) {
@@ -87,7 +99,7 @@ export default class ApiTopics {
     }
   }
 
-  private async callDeviceAction(topic: string, data: string | Uint8Array) {
+  private async callDeviceAction(topic: string, data: string) {
     // income string-type api message - call device action
     this.system.log.info(`ApiTopics income device action call: ${topic} ${JSON.stringify(data)}`);
 

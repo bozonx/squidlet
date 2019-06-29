@@ -87,6 +87,7 @@ export default class System {
     await this.driversManager.destroy();
     await this.ioManager.destroy();
     await this.apiManager.destroy();
+    await this.apiTopics.destroy();
     this.sessions.destroy();
     this.state.destroy();
     this.events.destroy();

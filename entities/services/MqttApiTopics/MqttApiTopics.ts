@@ -1,8 +1,8 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {combineTopic} from 'system/helpers/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
+import {TOPIC_SEPARATOR} from 'system/ApiTopics';
 import {Mqtt} from '../../drivers/Mqtt/Mqtt';
-import {TOPIC_SEPARATOR} from '../../../system/ApiTopics';
 
 
 interface Props {
@@ -48,17 +48,16 @@ export default class MqttApiTopics extends ServiceBase<Props> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
-    // TODO: use prefix - device.
+    if (typeof data !== 'string') throw new Error(`MqttApiTopics incorrect data. It has to be a string`);
+
     await this.env.system.apiTopics.incomeMessage(topic, data);
   });
 
   /**
    * Publish outcome messages to broker
    */
-  private publishOutcomeHandler = async (topic: string, data: string | Uint8Array) => {
-    const dataToSend: string = JSON.stringify(data);
-
-    return this.mqtt.publish(topic, dataToSend);
+  private publishOutcomeHandler = async (topic: string, data: string) => {
+    return this.mqtt.publish(topic, data);
   }
 
   /**
