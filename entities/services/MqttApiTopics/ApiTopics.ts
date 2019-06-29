@@ -3,11 +3,13 @@ import {splitFirstElement} from '../../../system/helpers/strings';
 import {combineTopic, parseValue} from '../../../system/helpers/helpers';
 import {JsonTypes} from '../../../system/interfaces/Types';
 import {trim} from '../../../system/helpers/lodashLike';
+import System from '../../../system';
 
 type TopicType = 'device' | 'api';
 
 const topicTypes = ['device', 'api'];
-const TOPIC_TYPE_SEPARATOR = '/';
+const TOPIC_TYPE_SEPARATOR = '|';
+export const TOPIC_SEPARATOR = '/';
 
 
 /**
@@ -18,8 +20,11 @@ const TOPIC_TYPE_SEPARATOR = '/';
  * * blockIo true|false
  */
 export default class ApiTopics {
-  constructor() {
+  private readonly system: System;
 
+
+  constructor(system: System) {
+    this.system = system;
   }
 
 
@@ -41,7 +46,7 @@ export default class ApiTopics {
   }
 
   onOutcome(cb: (topic: string, data: string | Uint8Array) => void) {
-
+    // TODO: !!!!
   }
 
   // run(topicType: TopicType, topicBody: string, data: string | Uint8Array) {
@@ -51,16 +56,16 @@ export default class ApiTopics {
 
   private async callDeviceAction(topic: string, data: string | Uint8Array) {
     // income string-type api message - call device action
-    this.env.log.info(`MqttApi income device action call: ${topic} ${JSON.stringify(data)}`);
+    this.system.log.info(`ApiTopics income device action call: ${topic} ${JSON.stringify(data)}`);
 
     const args: JsonTypes[] = this.parseArgs(data);
-    const [deviceId, actionName] = splitFirstElement(topic, this.env.system.systemConfig.topicSeparator);
+    const [deviceId, actionName] = splitFirstElement(topic, TOPIC_SEPARATOR);
 
     if (!actionName) {
       throw new Error(`MqttApi.callDeviceAction: Not actionName: "${topic}"`);
     }
 
-    await this.env.api.callDeviceAction(deviceId, actionName, args);
+    await this.system.api.callDeviceAction(deviceId, actionName, args);
   }
 
   private parseArgs(data: any): JsonTypes[] {

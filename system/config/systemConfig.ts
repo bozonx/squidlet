@@ -33,9 +33,10 @@ const systemConfig = {
   // },
 
   // separator of device id like - room.deviceId
+  // TODO: remove - use constant
   deviceIdSeparator: '.',
-  topicSeparator: '/',
-  eventNameSeparator: '|',
+  //topicSeparator: '/',
+  //eventNameSeparator: '|',
 
   channels: {
     network: 255,

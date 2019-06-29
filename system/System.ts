@@ -65,7 +65,7 @@ export default class System {
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.events = new CategorizedEvents(this.systemConfig.eventNameSeparator);
+    this.events = new CategorizedEvents('|');
     this.log = new LogPublisher(this);
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);

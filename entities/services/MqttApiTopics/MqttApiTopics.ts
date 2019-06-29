@@ -4,7 +4,7 @@ import {JsonTypes} from 'system/interfaces/Types';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {StateCategories} from 'system/interfaces/States';
 import {Mqtt} from '../../drivers/Mqtt/Mqtt';
-import ApiTopics from './ApiTopics';
+import ApiTopics, {TOPIC_SEPARATOR} from './ApiTopics';
 
 
 interface Props {
@@ -120,7 +120,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
       const device = this.env.system.devicesManager.getDevice(deviceId);
 
       for (let actionName of device.getActionsList()) {
-        const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, deviceId, actionName);
+        const topic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);
 
         topics.push(topic);
       }
