@@ -68,7 +68,7 @@ export default class Api {
     return 0;
   }
 
-  blockIo(block: boolean) {
+  blockIo(doBlock: boolean) {
     // TODO: add
   }
 

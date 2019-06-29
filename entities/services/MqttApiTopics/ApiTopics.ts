@@ -3,7 +3,8 @@ import {splitFirstElement} from '../../../system/helpers/strings';
 import {combineTopic, parseValue} from '../../../system/helpers/helpers';
 import {JsonTypes} from '../../../system/interfaces/Types';
 import {trim} from '../../../system/helpers/lodashLike';
-import System from '../../../system';
+import System from '../../../system/System';
+import {StateCategories} from '../../../system/interfaces/States';
 
 type TopicType = 'device' | 'api';
 
@@ -11,6 +12,8 @@ const topicTypes = ['device', 'api'];
 const TOPIC_TYPE_SEPARATOR = '|';
 export const TOPIC_SEPARATOR = '/';
 
+
+// TODO: поидее должен быть синглтон
 
 /**
  * Types of topics
@@ -27,6 +30,16 @@ export default class ApiTopics {
     this.system = system;
   }
 
+  init() {
+    // this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
+    //   this.publishHandler(topic, data, isRepeat)
+    //     .catch(this.env.log.error);
+    // });
+
+    // listen to outcome messages from api and send them to mqtt broker
+    this.system.state.onChange(this.handlerStateChange);
+  }
+
 
   publishWholeState() {
     // TODO: publish all the states of all the devices etc
@@ -40,19 +53,42 @@ export default class ApiTopics {
         await this.callDeviceAction(body, data);
         break;
       case 'api':
-        // TODO: !!!!
+        await this.callApi(body, data);
         break;
     }
   }
 
   onOutcome(cb: (topic: string, data: string | Uint8Array) => void) {
     // TODO: !!!!
+
+    this.env.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
   }
 
   // run(topicType: TopicType, topicBody: string, data: string | Uint8Array) {
   //   const topic: string = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
   // }
 
+  private handlerStateChange = (category: number, stateName: string, changedParams: string[]) => {
+    if (category === StateCategories.devicesStatus) {
+      // TODO: publish to mqtt
+    }
+    else if (category === StateCategories.devicesConfig) {
+      // TODO: publish to mqtt
+    }
+  }
+
+  private async callApi(methodName: string, data: string | Uint8Array) {
+    const args: JsonTypes[] = this.parseArgs(data);
+
+    switch (methodName) {
+      case 'publishWholeState':
+        await this.publishWholeState();
+        break;
+      case 'blockIo':
+        await this.system.api.blockIo(args[0] as boolean);
+        break;
+    }
+  }
 
   private async callDeviceAction(topic: string, data: string | Uint8Array) {
     // income string-type api message - call device action

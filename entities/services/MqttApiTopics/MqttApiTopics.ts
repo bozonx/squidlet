@@ -1,8 +1,6 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {combineTopic} from 'system/helpers/helpers';
-import {JsonTypes} from 'system/interfaces/Types';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {StateCategories} from 'system/interfaces/States';
 import {Mqtt} from '../../drivers/Mqtt/Mqtt';
 import ApiTopics, {TOPIC_SEPARATOR} from './ApiTopics';
 
@@ -28,19 +26,14 @@ export default class MqttApiTopics extends ServiceBase<Props> {
       .getInstance(this.props);
 
     this.sessionId = this.env.system.sessions.newSession(0);
-    this.apiTopics = new ApiTopics();
+    this.apiTopics = new ApiTopics(this.env.system);
   }
 
   protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
-
-    // listen to outcome messages from api and send them to mqtt broker
-    this.env.system.state.onChange(this.handlerStateChange);
-    // this.env.api.onPublish((topic: string, data: JsonTypes, isRepeat?: boolean) => {
-    //   this.publishHandler(topic, data, isRepeat)
-    //     .catch(this.env.log.error);
-    // });
+    // listen to outcome messages and pass them to mqtt
+    this.apiTopics.onOutcome(this.publishOutcomeHandler);
   }
 
   protected devicesDidInit = async () => {
@@ -58,37 +51,13 @@ export default class MqttApiTopics extends ServiceBase<Props> {
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
     // TODO: use prefix - device.
-    // if (topic === REMOTE_CALL_TOPIC) {
-    // }
-
-    // if not remote call that it is a device action call
-    await this.callDeviceAction(topic, data);
+    await this.apiTopics.incomeMessage(topic, data);
   });
-
-  private handlerStateChange = (category: number, stateName: string, changedParams: string[]) => {
-    if (category === StateCategories.devicesStatus) {
-      // TODO: publish to mqtt
-    }
-    else if (category === StateCategories.devicesConfig) {
-      // TODO: publish to mqtt
-    }
-  }
 
   /**
    * Publish outcome messages to broker
    */
-  private publishHandler = async (topic: string, data: JsonTypes, isRepeat?: boolean) => {
-    // TODO: remove
-    if (isRepeat) {
-      this.env.log.debug(`MqttApi outcome (republish): ${topic} - ${JSON.stringify(data)}`);
-    }
-    else {
-      this.env.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
-    }
-
-    // TODO: если это массив то не известно это список параметров или массив для передачи как один параметр
-    // TODO: можен надо сериализовать ????
-
+  private publishOutcomeHandler = async (topic: string, data: string | Uint8Array) => {
     const dataToSend: string = JSON.stringify(data);
 
     return this.mqtt.publish(topic, dataToSend);
