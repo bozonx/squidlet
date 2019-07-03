@@ -5,8 +5,10 @@ import {trim} from './helpers/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
 import IndexedEvents from './helpers/IndexedEvents';
+import {StateObject} from './State';
 
 type TopicType = 'device' | 'api';
+type DeviceStateType = 'status' | 'config';
 type OutcomeHandler = (topic: string, data: string) => void;
 
 const topicTypes = ['device', 'api'];
@@ -66,24 +68,12 @@ export default class ApiTopics {
   }
 
   private handlerStateChange = (category: number, stateName: string, changedParams: string[]) => {
-    let topic: string;
-    let data: string;
-
     if (category === StateCategories.devicesStatus) {
-      // TODO: prepare and call outcomeEvents.emit
-
-
-      const dataToSend: string = JSON.stringify(data);
-
+      this.publishDeviceState('status', category, stateName, changedParams);
     }
     else if (category === StateCategories.devicesConfig) {
-      // TODO: prepare and call outcomeEvents.emit
-
-
+      this.publishDeviceState('config', category, stateName, changedParams);
     }
-
-    this.system.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
-    this.outcomeEvents.emit(topic, data);
   }
 
   private async callApi(methodName: string, data: string) {
@@ -129,6 +119,9 @@ export default class ApiTopics {
     return result;
   }
 
+  /**
+   * Parse topic to topicType and topicBody.
+   */
   private parseTopic(topic: string): [TopicType, string] {
     const splat = splitFirstElement(TOPIC_TYPE_SEPARATOR, topic);
 
@@ -143,6 +136,32 @@ export default class ApiTopics {
       splat[0] as TopicType,
       splat[1],
     ];
+  }
+
+  private publishDeviceState(
+    stateType: DeviceStateType,
+    category: number,
+    stateName: string,
+    changedParams: string[]
+  ) {
+    const topicType: TopicType = 'device';
+    const state: StateObject | undefined = this.system.state.getState(category, stateName);
+
+    if (!state) return;
+
+    for (let paramName of changedParams) {
+      const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, stateType, paramName);
+      const data: string = JSON.stringify(state[paramName]);
+
+      this.emitOutcomeMsg(topicType, topicBody, data);
+    }
+  }
+
+  private emitOutcomeMsg(topicType: TopicType, topicBody: string, data: string) {
+    const topic = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
+
+    this.system.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
+    this.outcomeEvents.emit(topic, data);
   }
 
 }
