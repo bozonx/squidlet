@@ -4,7 +4,7 @@ export default class Promised<T = any> {
   }
 
   private _promise: Promise<T>;
-  private promiseResolve?: (result: T) => void;
+  private promiseResolve?: (result?: T) => void;
   private promiseReject?: (err: Error) => void;
   private resolved: boolean = false;
   private rejected: boolean = false;
@@ -25,7 +25,7 @@ export default class Promised<T = any> {
   }
 
 
-  resolve(result: T) {
+  resolve(result?: T) {
     if (this.canceled) return;
 
     if (this.promiseResolve) this.promiseResolve(result);

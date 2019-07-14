@@ -36,6 +36,7 @@ export default class WsClientLogic {
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private connectionId: string = '';
+  // TODO: remake to Promised
   private openPromiseResolve: () => void = () => {};
   private openPromiseReject: () => void = () => {};
   // was previous open promise fulfilled

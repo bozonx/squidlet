@@ -3,6 +3,7 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
 import {omit} from 'system/helpers/lodashLike';
 import IndexedEvents from 'system/helpers/IndexedEvents';
+import Promised from 'system/helpers/Promised';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
@@ -13,22 +14,19 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  // TODO: maybe use common code with WsClientLogic
   // on first time connect or reconnect
   get connectedPromise(): Promise<void> {
     if (!this.connectionId || !this.openPromise) {
       throw new Error(`Mqtt.connectedPromise: ${this.closedMsg}`);
     }
 
-    return this.openPromise;
+    return this.openPromise.promise;
   }
 
   private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
-  private openPromise?: Promise<void>;
-  private openPromiseResolve: () => void = () => {};
-  private openPromiseReject: () => void = () => {};
+  private openPromise?: Promised<void>;
   // was previous open promise fulfilled
-  private wasPrevOpenFulfilled: boolean = false;
+  //private wasPrevOpenFulfilled: boolean = false;
   private connectionId?: string;
   private get mqttIo(): MqttIo {
     return this.env.getIo('Mqtt') as any;
@@ -39,7 +37,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
   protected willInit = async () => {
-    this.openPromise = this.makeOpenPromise();
+    this.openPromise = new Promised<void>();
 
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
@@ -55,16 +53,17 @@ export class Mqtt extends DriverBase<MqttProps> {
     await this.mqttIo.onClose((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 
-      this.openPromiseReject();
+      const msg = `Mqtt broker has closed a connection`;
 
-      this.env.log.error(`Mqtt broker has closed a connection`);
-      //this.mqttIo.reConnect(this.connectionId);
+      this.openPromise && this.openPromise.reject(new Error(msg));
+
+      this.env.log.error(msg);
     });
 
     await this.mqttIo.onConnect((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 
-      this.openPromiseReject();
+      this.openPromise && this.openPromise.resolve();
     });
 
     await this.mqttIo.onError((connectionId: string, error: Error) => {
@@ -76,12 +75,13 @@ export class Mqtt extends DriverBase<MqttProps> {
 
   destroy = async () => {
     this.messageEvents.removeAll();
+    this.openPromise && this.openPromise.destroy();
 
     delete this.openPromise;
-    delete this.openPromiseResolve;
-    delete this.openPromiseReject;
 
-    await this.end();
+    if (this.connectionId) {
+      await this.mqttIo.end(this.connectionId);
+    }
   }
 
 
@@ -112,9 +112,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   async end(): Promise<void> {
-    if (!this.connectionId) return;
-
-    return this.mqttIo.end(this.connectionId);
+    return this.destroy();
   }
 
   onMessage(cb: MqttMessageHandler): number {
@@ -125,16 +123,6 @@ export class Mqtt extends DriverBase<MqttProps> {
     if (!this.connectionId) return;
 
     this.messageEvents.removeListener(handlerId);
-  }
-
-
-  private makeOpenPromise(): Promise<void> {
-    this.wasPrevOpenFulfilled = false;
-
-    return new Promise<void>((resolve, reject) => {
-      this.openPromiseResolve = resolve;
-      this.openPromiseReject = reject;
-    });
   }
 
 }
