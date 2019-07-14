@@ -26,6 +26,7 @@ let lastId: number = 0;
 
 export default class System {
   readonly systemConfig: typeof systemConfig;
+  // TODO: remove - use simple system events
   readonly events: CategorizedEvents;
   readonly log: LogPublisher;
   readonly ioManager: IoManager;
