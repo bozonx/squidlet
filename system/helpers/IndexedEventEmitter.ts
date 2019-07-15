@@ -23,6 +23,12 @@ export default class IndexedEventEmitter<T extends AnyHandler> {
     return this.indexedEvents[eventName].addListener(handler);
   }
 
+  getHandlers(eventName: string | number): (T | undefined)[] {
+    if (!this.indexedEvents[eventName]) return [];
+
+    return this.indexedEvents[eventName].getHandlers();
+  }
+
   once(eventName: string | number, handler: T): number {
     let wrapperIndex: number = -1;
     const wrapper = ((...args: any[]) => {
