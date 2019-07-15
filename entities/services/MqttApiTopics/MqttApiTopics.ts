@@ -32,7 +32,14 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
-    await this.env.system.apiTopics.incomeMessage(topic, data as any);
+    // skip not apiTopic's messages
+    if (!this.env.system.apiTopics.isSupportedTopic(topic)) return;
+
+    if (typeof data !== 'string') {
+      throw new Error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
+    }
+
+    await this.env.system.apiTopics.incomeMessage(topic, data);
   });
 
   /**

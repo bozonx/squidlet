@@ -6,7 +6,7 @@ import {removeItemFromArray} from 'system/helpers/collections';
 import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
 
 
-// TODO: может лучше использовать Channels driver ???
+// TODO: use Channels|Duplex driver
 
 
 export default class WsApi extends ServiceBase<WsServerSessionsProps> {
@@ -24,18 +24,17 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       this.sessions.push(sessionId);
     });
 
-    this.wsServerSessions.onSessionClose((sessionId: string) => {
+    this.wsServerSessions.onSessionClose(this.wrapErrors(async (sessionId: string) => {
       this.sessions = removeItemFromArray(this.sessions, sessionId);
 
-      this.env.api.remoteCallSessionClosed(sessionId)
-        .catch(this.env.log.error);
-    });
+      await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
+    }));
 
     // listen income api requests
     this.wsServerSessions.onMessage(this.handleIncomeMessages);
 
     // listen outcome api requests
-    this.env.api.onOutcomeRemoteCall(this.handleOutcomeMessages);
+    this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
   destroy = async () => {
@@ -59,7 +58,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       return this.env.log.error(`WsApi: Can't decode message: ${err}`);
     }
 
-    return this.env.api.incomeRemoteCall(sessionId, msg);
+    return this.env.system.apiManager.incomeRemoteCall(sessionId, msg);
   });
 
   private handleOutcomeMessages = this.wrapErrors(async (sessionId: string, message: RemoteCallMessage) => {

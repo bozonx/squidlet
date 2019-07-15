@@ -48,14 +48,6 @@ export default class ApiTopics {
   incomeMessage = async (topic: string, data: string) => {
     const [topicType, body] = this.parseTopic(topic);
 
-    // if (!topicTypes.includes(topicType)) {
-    //   throw new Error(`Invalid topic "${topic}": unknown type`);
-    // }
-    //
-    // if (typeof data !== 'string') {
-    //   throw new Error(`MqttApiTopics incorrect data. It has to be a string`);
-    // }
-    //
     switch (topicType) {
       case 'device':
         await this.callDeviceAction(body, data);
@@ -75,6 +67,12 @@ export default class ApiTopics {
 
   removeOutcomeListener(handlerIndex: number) {
     this.outcomeEvents.removeListener(handlerIndex);
+  }
+
+  isSupportedTopic(topic: string): boolean {
+    const splat = splitFirstElement(TOPIC_TYPE_SEPARATOR, topic);
+
+    return topicTypes.includes(splat[0]);
   }
 
 
@@ -144,7 +142,6 @@ export default class ApiTopics {
   private parseTopic(topic: string): [TopicType, string] {
     const splat = splitFirstElement(TOPIC_TYPE_SEPARATOR, topic);
 
-    // TODO: review
     if (!topicTypes.includes(splat[0])) {
       throw new Error(`Invalid topic "${topic}": unknown type`);
     }
