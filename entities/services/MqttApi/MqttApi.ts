@@ -2,20 +2,13 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {Mqtt} from '../../drivers/Mqtt/Mqtt';
+import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
 
-
-// TODO: why not url ????
-interface Props {
-  protocol: string;
-  host: string;
-  port: string;
-}
 
 const REMOTE_CALL_TOPIC = 'remoteCall';
 
 
-export default class MqttApi extends ServiceBase<Props> {
+export default class MqttApi extends ServiceBase<MqttProps> {
   // infinity session
   private sessionId: string = '';
   private get mqtt(): Mqtt {
@@ -35,7 +28,7 @@ export default class MqttApi extends ServiceBase<Props> {
     await this.mqtt.onMessage(this.handleIncomeMessages);
 
     // listen outcome api requests
-    this.env.api.onOutcomeRemoteCall(this.handleOutcomeMessages);
+    this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
   protected devicesDidInit = async () => {
@@ -48,10 +41,9 @@ export default class MqttApi extends ServiceBase<Props> {
 
 
   /**
-   * Processing income messages from broker
+   * Processing income messages from MQTT broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
-    // TODO: use host prefix
     if (topic !== this.makeTopic()) return;
 
     let msg: RemoteCallMessage;
@@ -63,7 +55,7 @@ export default class MqttApi extends ServiceBase<Props> {
       return this.env.log.error(`MqttApi: Can't decode message: ${err}`);
     }
 
-    return this.env.api.incomeRemoteCall(this.sessionId, msg);
+    return this.env.system.apiManager.incomeRemoteCall(this.sessionId, msg);
   });
 
   private handleOutcomeMessages = this.wrapErrors(async (sessionId: string, message: RemoteCallMessage) => {
@@ -75,7 +67,7 @@ export default class MqttApi extends ServiceBase<Props> {
   });
 
   /**
-   * Subscribe to all the device's actions calls on broker
+   * Subscribe to remoteCall topic
    */
   private subscribeToTopic = async () => {
     this.env.log.info(`--> Register MQTT subscriber of remote call api topic`);
@@ -84,7 +76,7 @@ export default class MqttApi extends ServiceBase<Props> {
   }
 
   private makeTopic(): string {
-    // TODO: use host prefix
+    // TODO: use host id prefix
 
     return REMOTE_CALL_TOPIC;
   }

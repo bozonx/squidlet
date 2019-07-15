@@ -8,7 +8,7 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
 
 
 /**
- * Api for acting remotely via ws or mqtt or others.
+ * RemoteCall Api for acting remotely via ws or mqtt or others services.
  */
 export default class ApiManager {
   private readonly system: System;
@@ -36,14 +36,7 @@ export default class ApiManager {
    */
   incomeRemoteCall(sessionId: string, message: RemoteCallMessage): Promise<void> {
     if (!this.remoteCalls[sessionId]) {
-      this.remoteCalls[sessionId] = new RemoteCall(
-        // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
-        async (message: RemoteCallMessage) => this.rcOutcomeEvents.emit(sessionId, message),
-        this.callApi,
-        this.system.config.config.ioSetResponseTimoutSec,
-        this.system.log.error,
-        this.system.generateUniqId
-      );
+      this.makeNewSession(sessionId);
     }
 
     return this.remoteCalls[sessionId].incomeMessage(message);
@@ -67,6 +60,17 @@ export default class ApiManager {
 
   private async callApi(methodName: string, args: any[]): Promise<any> {
     return (this.system.api as any)[methodName](...args);
+  }
+
+  private makeNewSession(sessionId: string) {
+    this.remoteCalls[sessionId] = new RemoteCall(
+      // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
+      async (message: RemoteCallMessage) => this.rcOutcomeEvents.emit(sessionId, message),
+      this.callApi,
+      this.system.config.config.ioSetResponseTimoutSec,
+      this.system.log.error,
+      this.system.generateUniqId
+    );
   }
 
 }
