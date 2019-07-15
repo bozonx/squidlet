@@ -34,7 +34,7 @@ export default class ApiTopics {
 
   init() {
     // listen to outcome messages from api and send them to mqtt broker
-    this.system.state.onChange(this.handlerStateChange);
+    this.system.state.onChange(this.handleStateChange);
   }
 
   destroy() {
@@ -42,10 +42,9 @@ export default class ApiTopics {
   }
 
 
-  publishWholeState() {
-    // TODO: publish all the states of all the devices etc
-  }
-
+  /**
+   * Call this when you have received an income message
+   */
   incomeMessage = async (topic: string, data: string) => {
     const [topicType, body] = this.parseTopic(topic);
 
@@ -59,6 +58,9 @@ export default class ApiTopics {
     }
   }
 
+  /**
+   * Listen messages which are sent outcome from this host.
+   */
   onOutcome(cb: OutcomeHandler): number {
     return this.outcomeEvents.addListener(cb);
   }
@@ -67,12 +69,19 @@ export default class ApiTopics {
     this.outcomeEvents.removeListener(handlerIndex);
   }
 
-  private handlerStateChange = (category: number, stateName: string, changedParams: string[]) => {
-    if (category === StateCategories.devicesStatus) {
-      this.publishDeviceState('status', category, stateName, changedParams);
+
+  private handleStateChange = (category: number, stateName: string, changedParams: string[]) => {
+    try {
+      // send outcome all the devices status and config changes
+      if (category === StateCategories.devicesStatus) {
+        this.publishDeviceState('status', category, stateName, changedParams);
+      }
+      else if (category === StateCategories.devicesConfig) {
+        this.publishDeviceState('config', category, stateName, changedParams);
+      }
     }
-    else if (category === StateCategories.devicesConfig) {
-      this.publishDeviceState('config', category, stateName, changedParams);
+    catch (err) {
+      this.system.log.error(`Can't publish device state: ${err}`);
     }
   }
 
@@ -97,14 +106,16 @@ export default class ApiTopics {
     const [deviceId, actionName] = splitFirstElement(topic, TOPIC_SEPARATOR);
 
     if (!actionName) {
-      throw new Error(`MqttApi.callDeviceAction: Not actionName: "${topic}"`);
+      throw new Error(`MqttApi.callDeviceAction: Topic doesn't contents an actionName: "${topic}"`);
     }
 
     await this.system.api.callDeviceAction(deviceId, actionName, args);
   }
 
   private parseArgs(data: any): JsonTypes[] {
-    if (typeof data === 'undefined') return [];
+    if (typeof data === 'undefined') {
+      return [];
+    }
     else if (typeof data !== 'string') {
       throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
     }
@@ -129,7 +140,7 @@ export default class ApiTopics {
       throw new Error(`Invalid topic "${topic}": unknown type`);
     }
     else if (!splat[1]) {
-      throw new Error(`Invalid topic "${topic}": no body`);
+      throw new Error(`Invalid topic "${topic}": Doesn't have the body`);
     }
 
     return [
@@ -162,6 +173,10 @@ export default class ApiTopics {
 
     this.system.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
     this.outcomeEvents.emit(topic, data);
+  }
+
+  private publishWholeState() {
+    // TODO: publish all the states of all the devices etc
   }
 
 }

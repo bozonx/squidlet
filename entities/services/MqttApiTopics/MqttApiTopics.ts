@@ -2,17 +2,10 @@ import ServiceBase from 'system/baseServices/ServiceBase';
 import {combineTopic} from 'system/helpers/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {TOPIC_SEPARATOR} from 'system/ApiTopics';
-import {Mqtt} from '../../drivers/Mqtt/Mqtt';
+import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
 
 
-interface Props {
-  protocol: string;
-  host: string;
-  port: string;
-}
-
-
-export default class MqttApiTopics extends ServiceBase<Props> {
+export default class MqttApiTopics extends ServiceBase<MqttProps> {
   // infinity session
   private sessionId: string = '';
   private get mqtt(): Mqtt {

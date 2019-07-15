@@ -34,6 +34,8 @@ export default class State {
     return this.state[category][stateName];
   }
 
+  // TODO: add getStateParam ???
+
 
   updateState(category: number, stateName: string, newPartialState: StateObject) {
     const newState = mergeDeep(newPartialState, this.state[category][stateName]);
