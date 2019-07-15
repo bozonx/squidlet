@@ -6,8 +6,6 @@ import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
 
 
 export default class MqttApiTopics extends ServiceBase<MqttProps> {
-  // infinity session
-  private sessionId: string = '';
   private get mqtt(): Mqtt {
     return this.depsInstances.mqtt;
   }
@@ -16,24 +14,17 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.mqtt = await getDriverDep('Mqtt')
       .getInstance(this.props);
-
-    this.sessionId = this.env.system.sessions.newSession(0);
   }
 
   protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
     // listen to outcome messages and pass them to mqtt
-    this.env.system.apiTopics.onOutcome(this.publishOutcomeHandler);
+    this.env.system.apiTopics.onOutcome(this.handleOutcomeMessages);
   }
 
   protected devicesDidInit = async () => {
-    // register subscribers after app init
     await this.subscribeToDevices();
-  }
-
-  destroy = async () => {
-    this.env.system.sessions.shutDownImmediately(this.sessionId);
   }
 
 
@@ -41,15 +32,13 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
-    if (typeof data !== 'string') throw new Error(`MqttApiTopics incorrect data. It has to be a string`);
-
-    await this.env.system.apiTopics.incomeMessage(topic, data);
+    await this.env.system.apiTopics.incomeMessage(topic, data as any);
   });
 
   /**
    * Publish outcome messages to broker
    */
-  private publishOutcomeHandler = async (topic: string, data: string) => {
+  private handleOutcomeMessages = async (topic: string, data: string) => {
     return this.mqtt.publish(topic, data);
   }
 

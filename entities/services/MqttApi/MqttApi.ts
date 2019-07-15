@@ -26,7 +26,6 @@ export default class MqttApi extends ServiceBase<MqttProps> {
   protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
-
     // listen outcome api requests
     this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
