@@ -1,7 +1,7 @@
 lodashLike = require('../../../system/helpers/lodashLike')
 
 
-describe 'system.helpers.lodashLike', ->
+describe.only 'system.helpers.lodashLike', ->
   it 'isEmpty', ->
     assert.equal(lodashLike.isEmpty(undefined), true)
     assert.equal(lodashLike.isEmpty(null), true)
@@ -19,6 +19,9 @@ describe 'system.helpers.lodashLike', ->
 
   it 'omit', ->
     assert.deepEqual(lodashLike.omit({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
+
+  it 'pick', ->
+    assert.deepEqual(lodashLike.pick({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
 
   it 'find', ->
     # object
@@ -110,8 +113,22 @@ describe 'system.helpers.lodashLike', ->
     assert.deepEqual(lodashLike.difference([], [1,2,3]), [])
     assert.deepEqual(lodashLike.difference([1,4], []), [1,4])
 
+  it 'objGet', ->
+    obj = {
+      level1: {
+        level2: {
+          level3: 1
+        }
+      }
+    }
+
+    assert.equal(lodashLike.objGet(obj, 'level1.level2.level3'), obj.level1.level2.level3)
+    assert.deepEqual(lodashLike.objGet(obj, 'level1.level2'), obj.level1.level2)
+    assert.deepEqual(lodashLike.objGet(obj, 'level1'), obj.level1)
+    assert.isUndefined(lodashLike.objGet(obj, 'level1.level2.unknown'))
+
   it 'compact', ->
-    assert.deepEqual(nodeLike.compact([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
+    assert.deepEqual(lodashLike.compact([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
 
 #  it 'defaultsDeep', ->
 #    mutated = {}

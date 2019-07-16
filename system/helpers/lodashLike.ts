@@ -30,8 +30,6 @@ export function omit(obj: {[index: string]: any} | undefined, ...propToExclude: 
 }
 
 export function pick(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
-  // TODO: test
-
   if (!obj) return {};
 
   const result: {[index: string]: any} = {};
@@ -194,9 +192,6 @@ export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue
 }
 
 export function compact(arr: any[]): any[] {
-
-  // TODO: test
-
   const result: any[] = [];
 
   for (let value of arr) {
