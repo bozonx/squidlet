@@ -16,7 +16,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      return apiCall.listenLogs(args, args.level);
+      return apiCall.log(args.host, args.port, args.level);
     case 'action':
       return apiCall.action(
         positionArgsRest[0],

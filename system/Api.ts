@@ -24,7 +24,11 @@ export default class Api {
     return device.action(actionName, ...params);
   }
 
-  listenDeviceStatus(deviceId: string, statusName: string | undefined, cb: (changedParams: string[]) => void): number {
+  listenDeviceStatus(
+    deviceId: string,
+    statusName: string | undefined,
+    cb: (changedValues: StateObject) => void
+  ): number {
     // TODO: как потом убить хэндлеры ???
 
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
@@ -35,23 +39,29 @@ export default class Api {
 
       if (stateName !== topic) return;
 
+      // TODO: передавай объект где только измененные параметры
       cb(changedParams);
     };
 
     return this.system.state.onChange(handlerWrapper);
   }
 
-  listenDeviceConfig(deviceId: string, cb: () => void): number {
+  listenDeviceConfig(deviceId: string, cb: (changedValues: StateObject) => void): number {
     // TODO: add
+    // TODO: передавай объект где только измененные параметры
     return 0;
   }
 
-  getDeviceStatus(deviceId: string): StateObject {
+  listenState(category: StateCategories, stateName: string, cb: (changedValues: StateObject) => void): number {
+
+  }
+
+  getDeviceStatus(deviceId: string): Promise<StateObject> {
     // TODO: add
     return {};
   }
 
-  getDeviceConfig(deviceId: string): StateObject {
+  getDeviceConfig(deviceId: string): Promise<StateObject> {
     // TODO: add
     return {};
   }
@@ -60,6 +70,11 @@ export default class Api {
     const device = this.system.devicesManager.getDevice(deviceId);
 
     if (device.setConfig) return device.setConfig(partialState);
+  }
+
+  getState(category: StateCategories, stateName: string): Promise<StateObject> {
+    // TODO: add
+    return {};
   }
 
   getHostConfig(): HostConfig {
@@ -101,10 +116,4 @@ export default class Api {
     return IoItem[methodName](...args);
   }
 
-
-  // TODO: add other types
-  // Getting state
-  // Subscribe to state change
-  // Initiate updating
-  // Switch automation
 }
