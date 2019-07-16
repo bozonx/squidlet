@@ -21,28 +21,31 @@ export default class ApiCall {
   async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
     const apiClient = this.connect(host, port);
 
-    // TODO: better to use apiTopics
-
-    //await apiClient.callMethod(args.methodName, ...args.methodArgs);
+    await apiClient.callMethod('callDeviceAction', actionName, ...args);
   }
 
   async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
+    const apiClient = this.connect(host, port);
     // TODO: !!!
   }
 
   async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
+    const apiClient = this.connect(host, port);
     // TODO: !!!
   }
 
   async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
+    const apiClient = this.connect(host, port);
     // TODO: !!!
   }
 
-  async systemConfig(host?: string, port?: string, watch?: boolean) {
+  async hostConfig(host?: string, port?: string, watch?: boolean) {
+    const apiClient = this.connect(host, port);
     // TODO: !!!
   }
 
-  async systemInfo(host?: string, port?: string, watch?: boolean) {
+  async hostInfo(host?: string, port?: string, watch?: boolean) {
+    const apiClient = this.connect(host, port);
     // TODO: !!!
   }
 

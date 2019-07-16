@@ -136,17 +136,17 @@ Params
 * --port - set remote port. Is isn't set - default will be used
 * --watch - watch changes of state and print them.
 
-## Get system config
+## Get host config
 
-    squidletctl system-config --host=my-host [--port=8889]
+    squidletctl host-config --host=my-host [--port=8889]
     
 Params
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
 
-## Get system info
+## Get host info
 
-    squidletctl system-info --host=my-host [--port=8889]
+    squidletctl host-info --host=my-host [--port=8889]
     
 Params
 * --host - set remote host

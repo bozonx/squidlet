@@ -31,10 +31,10 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       return apiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
     case 'state':
       return apiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
-    case 'systemConfig':
-      return apiCall.systemConfig(args.host, args.port);
-    case 'systemInfo':
-      return apiCall.systemInfo(args.host, args.port);
+    case 'hostConfig':
+      return apiCall.hostConfig(args.host, args.port);
+    case 'hostInfo':
+      return apiCall.hostInfo(args.host, args.port);
 
     // case 'block-io':
     //   return apiCall.callAndExit({ ...args, methodName: 'blockIo', methodArgs: [true] });

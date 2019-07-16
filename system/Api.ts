@@ -5,6 +5,8 @@ import {StateCategories} from './interfaces/States';
 import {combineTopic} from './helpers/helpers';
 import {StateObject} from './State';
 import LogLevel from './interfaces/LogLevel';
+import HostConfig from './interfaces/HostConfig';
+import HostInfo from './interfaces/HostInfo';
 
 
 export default class Api {
@@ -55,8 +57,18 @@ export default class Api {
     if (device.setConfig) return device.setConfig(partialState);
   }
 
-  getConfig(configParam: string): JsonTypes {
+  getHostConfig(configParam: string): HostConfig {
+    return this.system.config;
+  }
+
+  getSystemConfigParam(configParam: string): JsonTypes {
     return objGet(this.system.config, configParam);
+  }
+
+  getHostInfo(configParam: string): HostInfo {
+    return {
+      usedIo: this.system.ioManager.getNames(),
+    };
   }
 
   getSessionStore(sessionId: string, key: string): JsonTypes | undefined {
@@ -73,6 +85,7 @@ export default class Api {
   // }
 
   getIoNames() {
+    // TODO: не нужно наверное - можно использовать getHostInfo ????
     return this.system.ioManager.getNames();
   }
 
