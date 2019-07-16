@@ -11,12 +11,12 @@ import IndexedEvents from 'system/helpers/IndexedEvents';
  * By calling getInstance() you will get always a new one. There isn't any sessions.
  */
 export class WsClient extends DriverBase<WsClientLogicProps> {
-  get openPromise(): Promise<void> {
+  get connectedPromise(): Promise<void> {
     if (!this.client) {
-      throw new Error(`WebSocketClient.openPromise: ${this.closedMsg}`);
+      throw new Error(`WebSocketClient.connectedPromise: ${this.closedMsg}`);
     }
 
-    return this.client.openPromise;
+    return this.client.connectedPromise;
   }
 
   private readonly closeEvents = new IndexedEvents<() => void>();

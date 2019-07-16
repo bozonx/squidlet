@@ -7,6 +7,7 @@ import {Primitives} from 'system/interfaces/Types';
 import {mergeDeep} from 'system/helpers/collections';
 import {parseCookie, stringifyCookie} from 'system/helpers/strings';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
+import Promised from '../../../system/helpers/Promised';
 
 
 export interface WsClientLogicProps {
@@ -27,7 +28,14 @@ export interface WsClientLogicProps {
  */
 export default class WsClientLogic {
   // on first time connect or reconnect
-  openPromise: Promise<void>;
+  // TODO: review logic
+  get connectedPromise(): Promise<void> {
+    if (!this.connectionId || !this.openPromise) {
+      throw new Error(`WsClientLogic.connectedPromise: ${this.closedMsg}`);
+    }
+
+    return this.openPromise.promise;
+  }
 
   private readonly messageEvents = new IndexedEvents<OnMessageHandler>();
   private readonly wsClientIo: WebSocketClientIo;
@@ -36,9 +44,9 @@ export default class WsClientLogic {
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private connectionId: string = '';
-  // TODO: remake to Promised
-  private openPromiseResolve: () => void = () => {};
-  private openPromiseReject: () => void = () => {};
+  // TODO: review logic
+  private openPromise: Promised<void>;
+  // TODO: review logic
   // was previous open promise fulfilled
   private wasPrevOpenFulfilled: boolean = false;
   private connectionTries: number = 0;
@@ -46,6 +54,10 @@ export default class WsClientLogic {
   private isConnectionOpened: boolean = false;
   private cookies: {[index: string]: Primitives} = {};
   private waitingCookies: boolean = true;
+  // TODO: use in other cases
+  private get closedMsg() {
+    return `Connection "${this.props.url}" has been closed`;
+  }
 
 
   constructor(
@@ -89,7 +101,7 @@ export default class WsClientLogic {
   }
 
   async send(data: string | Uint8Array): Promise<void> {
-    await this.openPromise;
+    await this.connectedPromise;
 
     return this.wsClientIo.send(this.connectionId, data);
   }
@@ -136,7 +148,7 @@ export default class WsClientLogic {
     this.wasPrevOpenFulfilled = true;
     this.isConnectionOpened = true;
     this.waitingCookies = true;
-    this.openPromiseResolve();
+    this.openPromise.resolve();
     this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
 
@@ -246,24 +258,25 @@ export default class WsClientLogic {
     return this.onClose();
   }
 
-  private makeOpenPromise(): Promise<void> {
+  // TODO: review
+  private makeOpenPromise(): Promised<void> {
     this.wasPrevOpenFulfilled = false;
-    
-    return new Promise<void>((resolve, reject) => {
-      this.openPromiseResolve = resolve;
-      this.openPromiseReject = reject;
-    });
+
+    return new Promised<void>();
+
+    // return new Promise<void>((resolve, reject) => {
+    //   this.openPromiseResolve = resolve;
+    //   this.openPromiseReject = reject;
+    // });
   }
 
   private destroyInstance() {
     this.isConnectionOpened = false;
-    this.openPromiseReject && this.openPromiseReject();
+    this.openPromise.destroy();
     clearTimeout(this.reconnectTimeout);
-    delete this.openPromiseReject;
     delete this.openPromise;
     delete this.reconnectTimeout;
     this.messageEvents.removeAll();
-    delete this.openPromiseResolve;
   }
 
   private setCookie(data: string | Uint8Array) {
