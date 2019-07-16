@@ -15,13 +15,29 @@ export function values(obj: {[index: string]: any}): any[] {
   return Object.keys(obj).map(key => obj[key]);
 }
 
-export function omit(obj: {[index: string]: any}, ...propToExclude: string[]): {[index: string]: any} {
+export function omit(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
+  if (!obj) return {};
+
   const result: {[index: string]: any} = {};
 
   for (let key of Object.keys(obj)) {
     if (propToExclude.indexOf(key) < 0) {
       result[key] = obj[key];
     }
+  }
+
+  return result;
+}
+
+export function pick(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
+  // TODO: test
+
+  if (!obj) return {};
+
+  const result: {[index: string]: any} = {};
+
+  for (let key of propToPick) {
+    result[key] = obj[key];
   }
 
   return result;

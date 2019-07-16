@@ -1,8 +1,7 @@
 import {JsonTypes} from './interfaces/Types';
-import {objGet} from './helpers/lodashLike';
+import {objGet, pick} from './helpers/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
-import {combineTopic} from './helpers/helpers';
 import {StateObject} from './State';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
@@ -29,31 +28,48 @@ export default class Api {
     statusName: string | undefined,
     cb: (changedValues: StateObject) => void
   ): number {
-    // TODO: как потом убить хэндлеры ???
-
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
-      if (category !== StateCategories.devicesStatus || stateName.indexOf(deviceId) !== 0) return;
+      if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
-      // TODO: наверное будет ещё указан status или config
-      const topic = combineTopic(STATE_SEPARATOR, deviceId, statusName);
+      const changedValues: StateObject = pick(
+        this.system.state.getState(category, stateName),
+        ...changedParams
+      );
 
-      if (stateName !== topic) return;
-
-      // TODO: передавай объект где только измененные параметры
-      cb(changedParams);
+      cb(changedValues);
     };
 
     return this.system.state.onChange(handlerWrapper);
   }
 
   listenDeviceConfig(deviceId: string, cb: (changedValues: StateObject) => void): number {
-    // TODO: add
-    // TODO: передавай объект где только измененные параметры
-    return 0;
+    const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
+      if (category !== StateCategories.devicesConfig || stateName !== deviceId) return;
+
+      const changedValues: StateObject = pick(
+        this.system.state.getState(category, stateName),
+        ...changedParams
+      );
+
+      cb(changedValues);
+    };
+
+    return this.system.state.onChange(handlerWrapper);
   }
 
   listenState(category: StateCategories, stateName: string, cb: (changedValues: StateObject) => void): number {
+    const handlerWrapper = (currentCategory: number, currentStateName: string, changedParams: string[]) => {
+      if (category !== currentCategory || stateName !== currentStateName) return;
 
+      const changedValues: StateObject = pick(
+        this.system.state.getState(category, stateName),
+        ...changedParams
+      );
+
+      cb(changedValues);
+    };
+
+    return this.system.state.onChange(handlerWrapper);
   }
 
   getDeviceStatus(deviceId: string): Promise<StateObject> {
