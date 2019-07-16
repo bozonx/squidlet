@@ -46,6 +46,11 @@ export default class Api {
     return 0;
   }
 
+  getDeviceStatus(deviceId: string): StateObject {
+    // TODO: add
+    return {};
+  }
+
   getDeviceConfig(deviceId: string): StateObject {
     // TODO: add
     return {};
@@ -57,15 +62,16 @@ export default class Api {
     if (device.setConfig) return device.setConfig(partialState);
   }
 
-  getHostConfig(configParam: string): HostConfig {
+  getHostConfig(): HostConfig {
     return this.system.config;
   }
 
+  // TODO: is it really need???
   getSystemConfigParam(configParam: string): JsonTypes {
     return objGet(this.system.config, configParam);
   }
 
-  getHostInfo(configParam: string): HostInfo {
+  getHostInfo(): HostInfo {
     return {
       usedIo: this.system.ioManager.getNames(),
     };

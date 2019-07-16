@@ -21,47 +21,61 @@ export default class ApiCall {
   async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
     const apiClient = this.connect(host, port);
 
-    await apiClient.callMethod('callDeviceAction', actionName, ...args);
+    const result = await apiClient.callMethod('callDeviceAction', actionName, ...args);
+
+    console.info(JSON.stringify(result));
   }
 
   async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
     const apiClient = this.connect(host, port);
-    // TODO: !!!
+
+    if (watch) {
+      // TODO: !!!
+    }
+    else {
+      const result = await apiClient.callMethod('getDeviceStatus');
+
+      console.info(JSON.stringify(result));
+    }
   }
 
   async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
     const apiClient = this.connect(host, port);
-    // TODO: !!!
+
+    if (watch) {
+      // TODO: !!!
+    }
+    else {
+      const result = await apiClient.callMethod('getDeviceConfig');
+
+      console.info(JSON.stringify(result));
+    }
   }
 
   async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
     const apiClient = this.connect(host, port);
+
     // TODO: !!!
   }
 
   async hostConfig(host?: string, port?: string, watch?: boolean) {
     const apiClient = this.connect(host, port);
-    // TODO: !!!
+
+    const result = await apiClient.callMethod('getHostConfig');
+
+    console.info(JSON.stringify(result));
   }
 
   async hostInfo(host?: string, port?: string, watch?: boolean) {
     const apiClient = this.connect(host, port);
-    // TODO: !!!
+
+    const result =  await apiClient.callMethod('getHostInfo');
+
+    console.info(JSON.stringify(result));
+    // await apiClient.close();
   }
 
-  // async callMethod(args: ApiCallArgs) {
-  //   const apiClient = this.connect(args);
-  //
-  //   await apiClient.callMethod(args.methodName, ...args.methodArgs);
-  // }
-
-  // async callAndExit(args: ApiCallArgs) {
-  //   const apiClient = this.connect(args);
-  //
-  //   await apiClient.callMethod(args.methodName, ...args.methodArgs);
-  //   await apiClient.close();
-  // }
-
+  // TODO: review
   async listenLogs(args: ApiConnectionParams, level?: string) {
     const apiClient = this.connect(args);
 
