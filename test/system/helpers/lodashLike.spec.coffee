@@ -1,7 +1,7 @@
 lodashLike = require('../../../system/helpers/lodashLike')
 
 
-describe.only 'system.helpers.lodashLike', ->
+describe 'system.helpers.lodashLike', ->
   it 'isEmpty', ->
     assert.equal(lodashLike.isEmpty(undefined), true)
     assert.equal(lodashLike.isEmpty(null), true)
@@ -126,9 +126,11 @@ describe.only 'system.helpers.lodashLike', ->
     assert.deepEqual(lodashLike.objGet(obj, 'level1.level2'), obj.level1.level2)
     assert.deepEqual(lodashLike.objGet(obj, 'level1'), obj.level1)
     assert.isUndefined(lodashLike.objGet(obj, 'level1.level2.unknown'))
+    assert.equal(lodashLike.objGet(obj, 'level1.level2.unknown', 'default'), 'default')
 
   it 'compact', ->
     assert.deepEqual(lodashLike.compact([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
+
 
 #  it 'defaultsDeep', ->
 #    mutated = {}

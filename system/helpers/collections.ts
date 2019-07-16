@@ -106,16 +106,30 @@ export function mergeDeep(
 /**
  * Remove item from array. E.g removeItemFromArray(['a', 'b', 'c'], 'b') => ['a', 'c']
  * It can remove all the found items
- *     removeItemFromArray(['a', 'b', 'c', 'b'], 'b') => ['a', 'c']
+ *     removeItemFromArray(['a', 'b', 'c', 'b'], 'b', false) => ['a', 'c']
  * Or remove only the first found item:
- *     removeItemFromArray(['a', 'b', 'c', 'b'], 'b', false) => ['a', 'c', 'b']
+ *     removeItemFromArray(['a', 'b', 'c', 'b'], 'b') => ['a', 'c', 'b']
  * It doesn't mutates an array, it just returns a new one.
  */
-export function removeItemFromArray(arr: any[], item: any, firstEntry: boolean = true): any[] {
-  // TODO: add
-  const result: any[] = [];
+export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntry: boolean = true): any[] {
+  if (!arr) return [];
 
-  return result;
+  if (firstEntry) {
+    const index: number = arr.indexOf(item);
+
+    if (index < 0) return arr;
+
+    const clonedArr = [...arr];
+
+    clonedArr.splice(index, 1);
+
+    return clonedArr;
+  }
+  else {
+    return arr.filter((currentItem: any) => {
+      return currentItem !== item;
+    });
+  }
 }
 
 // /**

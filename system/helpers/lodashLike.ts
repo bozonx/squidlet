@@ -188,7 +188,23 @@ export function difference(testArr: any[], samples: any[]): any[] {
 }
 
 export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
-  // TODO: add
+  const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
+    for (let itemName of Object.keys(currentObj)) {
+      const pathOfItem: string = compact([currentPath, itemName]).join('.');
+
+      if (pathOfItem === pathTo) return currentObj[itemName];
+
+      if (isPlainObject(currentObj[itemName])) {
+        return recursive(currentObj[itemName], pathOfItem);
+      }
+    }
+  };
+
+  const result = recursive(obj, '');
+
+  if (typeof result === 'undefined' && typeof defaultValue !== 'undefined') return defaultValue;
+
+  return result;
 }
 
 export function compact(arr: any[]): any[] {

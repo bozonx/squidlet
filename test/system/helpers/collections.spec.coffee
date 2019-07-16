@@ -41,3 +41,9 @@ describe 'system.helpers.collections', ->
     assert.deepEqual(collections.mergeDeep(top, bottom), result)
     # not mutated
     assert.deepEqual(top, {top: 'top', nested: {nestedTop: 'top'}})
+
+  it 'removeItemFromArray', ->
+    arr = ['a', 'b', 'c', 'b']
+
+    assert.deepEqual(collections.removeItemFromArray(arr, 'b'), ['a', 'c', 'b'])
+    assert.deepEqual(collections.removeItemFromArray(arr, 'b', false), ['a', 'c'])
