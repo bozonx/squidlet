@@ -1,5 +1,6 @@
 import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
+import Promised from '../../../system/helpers/Promised';
 
 
 export enum WS_SERVER_EVENTS {
@@ -13,19 +14,19 @@ export const SETCOOKIE_LABEL = '__SET_COOKIE__';
 
 
 export default class WsServerLogic {
-  private readonly events = new IndexedEventEmitter<(...args: any[]) => void>();
-
   // it fulfils when server is start listening
-  listeningPromise: Promise<void>;
+  get listeningPromise(): Promise<void> {
+    return this._listeningPromised.promise;
+  }
 
+  private readonly events = new IndexedEventEmitter<(...args: any[]) => void>();
   private readonly wsServerIo: WebSocketServerIo;
   private readonly props: WebSocketServerProps;
   private readonly onClose: () => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private serverId: string = '';
-  private listeningPromiseResolve: () => void = () => {};
-  private listeningPromiseReject: () => void = () => {};
+  private _listeningPromised: Promised<void>;
 
 
   constructor(
@@ -42,10 +43,7 @@ export default class WsServerLogic {
     this.onClose = onClose;
     this.logInfo = logInfo;
     this.logError = logError;
-    this.listeningPromise = new Promise<void>((resolve, reject) => {
-      this.listeningPromiseResolve = resolve;
-      this.listeningPromiseReject = reject;
-    });
+    this._listeningPromised = new Promised<void>();
   }
 
   /**
@@ -119,14 +117,14 @@ export default class WsServerLogic {
 
   private async listenServerEvents() {
     const listeningTimeout = setTimeout(() => {
-      this.listeningPromiseReject();
+      this._listeningPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
       this.wsServerIo.closeServer(this.serverId)
         .catch(this.logError);
     }, SERVER_START_LISTENING_SEC * 1000);
 
     await this.wsServerIo.onServerListening(this.serverId, () => {
       clearTimeout(listeningTimeout);
-      this.listeningPromiseResolve();
+      this._listeningPromised.resolve();
     });
 
     await this.wsServerIo.onConnection(this.serverId, (connectionId: string, request: ConnectionParams) => {

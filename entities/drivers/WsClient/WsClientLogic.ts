@@ -45,6 +45,7 @@ export default class WsClientLogic {
   private readonly logError: (message: string) => void;
   private connectionId: string = '';
   // TODO: review logic
+  // TODO: where is reject????
   private openPromise: Promised<void>;
   // TODO: review logic
   // was previous open promise fulfilled
@@ -263,11 +264,6 @@ export default class WsClientLogic {
     this.wasPrevOpenFulfilled = false;
 
     return new Promised<void>();
-
-    // return new Promise<void>((resolve, reject) => {
-    //   this.openPromiseResolve = resolve;
-    //   this.openPromiseReject = reject;
-    // });
   }
 
   private destroyInstance() {
