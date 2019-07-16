@@ -6,30 +6,58 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 let uniqIdIndex = 0;
 
 
-interface ApiConnectionParams {
-  host?: string;
-  port?: number;
-}
-
-export interface ApiCallArgs extends ApiConnectionParams {
-  methodName: string;
-  methodArgs?: any[];
-}
+// interface ApiConnectionParams {
+//   host?: string;
+//   port?: number;
+// }
+//
+// export interface ApiCallArgs extends ApiConnectionParams {
+//   methodName: string;
+//   methodArgs?: any[];
+// }
 
 
 export default class ApiCall {
-  async callMethod(args: ApiCallArgs) {
-    const apiClient = this.connect(args);
+  async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
+    const apiClient = this.connect(host, port);
 
-    await apiClient.callMethod(args.methodName, ...args.methodArgs);
+    // TODO: better to use apiTopics
+
+    //await apiClient.callMethod(args.methodName, ...args.methodArgs);
   }
 
-  async callAndExit(args: ApiCallArgs) {
-    const apiClient = this.connect(args);
-
-    await apiClient.callMethod(args.methodName, ...args.methodArgs);
-    await apiClient.close();
+  async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
+    // TODO: !!!
   }
+
+  async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
+    // TODO: !!!
+  }
+
+  async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
+    // TODO: !!!
+  }
+
+  async systemConfig(host?: string, port?: string, watch?: boolean) {
+    // TODO: !!!
+  }
+
+  async systemInfo(host?: string, port?: string, watch?: boolean) {
+    // TODO: !!!
+  }
+
+  // async callMethod(args: ApiCallArgs) {
+  //   const apiClient = this.connect(args);
+  //
+  //   await apiClient.callMethod(args.methodName, ...args.methodArgs);
+  // }
+
+  // async callAndExit(args: ApiCallArgs) {
+  //   const apiClient = this.connect(args);
+  //
+  //   await apiClient.callMethod(args.methodName, ...args.methodArgs);
+  //   await apiClient.close();
+  // }
 
   async listenLogs(args: ApiConnectionParams, level?: string) {
     const apiClient = this.connect(args);
@@ -49,7 +77,7 @@ export default class ApiCall {
     return String(uniqIdIndex);
   }
 
-  private connect({host, port}: ApiConnectionParams): WsApiClient {
+  private connect(host?: string, port?: string): WsApiClient {
     return new WsApiClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,

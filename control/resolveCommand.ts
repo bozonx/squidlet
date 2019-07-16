@@ -17,10 +17,27 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
       return apiCall.listenLogs(args, args.level);
-    case 'call':
-      return apiCall.callMethod({ ...args, methodName: args.method, methodArgs: positionArgsRest });
-    case 'block-io':
-      return apiCall.callAndExit({ ...args, methodName: 'blockIo', methodArgs: [true] });
+    case 'action':
+      return apiCall.action(
+        positionArgsRest[0],
+        positionArgsRest[1],
+        positionArgsRest.slice(2),
+        args.host,
+        args.port
+      );
+    case 'status':
+      return apiCall.status(positionArgsRest[0], args.host, args.port, args.watch);
+    case 'config':
+      return apiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
+    case 'state':
+      return apiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
+    case 'systemConfig':
+      return apiCall.systemConfig(args.host, args.port);
+    case 'systemInfo':
+      return apiCall.systemInfo(args.host, args.port);
+
+    // case 'block-io':
+    //   return apiCall.callAndExit({ ...args, methodName: 'blockIo', methodArgs: [true] });
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);
