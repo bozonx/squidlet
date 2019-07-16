@@ -193,7 +193,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     catch (err) {
       throw new Error(`Device "${this.id}" setConfig: ${err}`);
     }
-
   }
 
   /**

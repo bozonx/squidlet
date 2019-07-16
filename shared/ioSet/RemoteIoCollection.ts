@@ -52,6 +52,9 @@ export default class RemoteIoCollection {
 
 
   private async askIoNames(): Promise<string[]> {
+
+    // TODO: use getHostInfo.usedIo
+
     return this.client.callMethod('getIoNames');
   }
 

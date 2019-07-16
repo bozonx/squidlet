@@ -77,7 +77,7 @@ export default class ApiCall {
     if (watch) {
       await apiClient.callMethod(
         'listenState',
-        category,
+        parseInt(category),
         stateName,
         (changedValues: StateObject) => {
 
@@ -85,7 +85,7 @@ export default class ApiCall {
       );
     }
     else {
-      const result = await apiClient.callMethod('getState', category, stateName);
+      const result = await apiClient.callMethod('getState', parseInt(category),stateName);
 
       console.info(JSON.stringify(result));
     }

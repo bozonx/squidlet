@@ -6,6 +6,7 @@ import {StateObject} from './State';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
+import categories from './dict/categories';
 
 
 export default class Api {
@@ -72,14 +73,12 @@ export default class Api {
     return this.system.state.onChange(handlerWrapper);
   }
 
-  getDeviceStatus(deviceId: string): Promise<StateObject> {
-    // TODO: add
-    return {};
+  getDeviceStatus(deviceId: string): StateObject | undefined {
+    return this.system.state.getState(StateCategories.devicesStatus, deviceId);
   }
 
-  getDeviceConfig(deviceId: string): Promise<StateObject> {
-    // TODO: add
-    return {};
+  getDeviceConfig(deviceId: string): StateObject | undefined {
+    return this.system.state.getState(StateCategories.devicesConfig, deviceId);
   }
 
   async setDeviceConfig(deviceId: string, partialState: StateObject): Promise<void> {
@@ -88,16 +87,14 @@ export default class Api {
     if (device.setConfig) return device.setConfig(partialState);
   }
 
-  getState(category: StateCategories, stateName: string): Promise<StateObject> {
-    // TODO: add
-    return {};
+  getState(category: StateCategories, stateName: string): StateObject | undefined {
+    return this.system.state.getState(category, stateName);
   }
 
   getHostConfig(): HostConfig {
     return this.system.config;
   }
 
-  // TODO: is it really need???
   getSystemConfigParam(configParam: string): JsonTypes {
     return objGet(this.system.config, configParam);
   }
@@ -112,24 +109,22 @@ export default class Api {
     return this.system.sessions.getStorage(sessionId, key);
   }
 
-  listenLog(logLevel: LogLevel, cb: (msg: string) => void): number {
-    // TODO: add
-    return 0;
-  }
-
-  // blockIo(doBlock: boolean) {
-  //   // TODO: add ????
-  // }
-
-  getIoNames() {
-    // TODO: не нужно наверное - можно использовать getHostInfo ????
-    return this.system.ioManager.getNames();
-  }
-
-  callIoMethod = async (ioName: string, methodName: string, ...args: any[]): Promise<any> => {
-    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.system.ioManager.getIo(ioName);
-
-    return IoItem[methodName](...args);
+  listenLog(logLevel: LogLevel = 'info', cb: (msg: string) => void): number {
+    return this.system.events.addListener(categories.logger, logLevel, cb);
   }
 
 }
+
+
+// callIoMethod = async (ioName: string, methodName: string, ...args: any[]): Promise<any> => {
+//   const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.system.ioManager.getIo(ioName);
+//
+//   return IoItem[methodName](...args);
+// }
+
+// blockIo(doBlock: boolean) {
+// }
+
+// getIoNames() {
+//   return this.system.ioManager.getNames();
+// }
