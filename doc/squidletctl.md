@@ -78,18 +78,76 @@ Also you can specify the next params:
 
 ## Listen logs of remote host
 
-    squidletctl log --host [--port=8889] [--level=info]
+    squidletctl log --host=my-host [--port=8889] [--level=info]
     
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
 * --level - max level to listen to. Default is info
 
 
-## Call api method
+## Call device's action
 
-    squidletctl call --host --method=apiMethodName [--port=8889] [param1] [param2] ...
+Call device action and print the result.
 
+
+    squidletctl action <fullDeviceId> <actionName> [value1] [value2] ... --host=my-host [--port=8889]
+
+    # example
+    squidletctl action bedroom.switch turn 1 --host=remotehost
+
+Params
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
-* --method - api method to call
-* arguments are positional arguments like `param1 param2`
+
+
+## Get device's status
+
+    squidletctl status <fullDeviceId> --host=my-host [--port=8889] [--watch]
+    
+    # example
+    squidletctl status bedroom.switch --host=remotehost
+    
+Params
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+* --watch - watch changes of status and print them.
+
+## Get device's config
+
+    squidletctl config <fullDeviceId> --host=my-host [--port=8889] [--watch]
+    
+    # example
+    squidletctl config bedroom.switch --host=remotehost
+    
+Params
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+* --watch - watch changes of config and print them.
+
+## Get state
+
+    squidletctl state <category> <stateName> --host=my-host [--port=8889] [--watch]
+    
+    # example
+    squidletctl state 0 bedroom.switch --host=remotehost
+        
+Params
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+* --watch - watch changes of state and print them.
+
+## Get system config
+
+    squidletctl system-config --host=my-host [--port=8889]
+    
+Params
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+
+## Get system info
+
+    squidletctl system-info --host=my-host [--port=8889]
+    
+Params
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
