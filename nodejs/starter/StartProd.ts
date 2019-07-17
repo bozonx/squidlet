@@ -58,8 +58,8 @@ export default class StartProd {
     await this.envBuilder.collect();
 
     await this.os.mkdirP(this.props.varDataDir);
-
     await this.installModules();
+
     await this.buildInitialSystem();
     // build config and entities
     await this.envBuilder.writeEnv();
@@ -163,58 +163,3 @@ export default class StartProd {
     await startSystem(this.props, SystemClass);
   }
 }
-
-
-
-//const platformDir: string = resolvePlatformDir(this.props.platform);
-//const machineDir: string = path.join(platformDir, this.props.machine);
-// await this.os.copyFile(
-//   path.join(machineDir, 'package.json'),
-//   path.join(this.props.workDir, 'package.json')
-// );
-
-//const ioSetType: IoSetTypes = this.resolveIoSetType();
-//console.info(`===> using io set "${ioSetType}"`);
-//const ioSet: IoSet | undefined = this.makeIoSet(ioSetType);
-
-// /**
-//  * Only nodejs-ws or local ioSet types are allowed
-//  * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
-//  */
-// private resolveIoSetType(): IoSetTypes {
-//   const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-//
-//   if (!ioSetConfig || ioSetConfig.type === 'local') {
-//     return 'local';
-//   }
-//   else if (ioSetConfig.type !== 'nodejs-ws') {
-//     throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
-//   }
-//
-//   return ioSetConfig.type;
-// }
-
-// /**
-//  * Make ioSet instance or return undefined if local is used.
-//  */
-// private makeIoSet(ioSetType: IoSetTypes): IoSet | undefined {
-//   if (ioSetType === 'local') return;
-//
-//   const ResolvedIoSet = resolveIoSetClass(ioSetType);
-//
-//   return new ResolvedIoSet(_omit(this.props.hostConfig.ioSet, 'type'));
-// }
-
-// const devsSet: {[index: string]: new (...params: any[]) => any} = {};
-// const envSetDevsDir = path.join(this.props.workDir, BUILD_IO_DIR);
-// const machineConfig: MachineConfig = loadMachineConfig(this.props.platform, this.props.machine);
-//
-// for (let devPath of machineConfig.devs) {
-//   const devName: string = getFileNameOfPath(devPath);
-//   const devFileName: string = `${devName}.js`;
-//   const devAbsPath: string = path.join(envSetDevsDir, devFileName);
-//
-//   devsSet[devName] = require(devAbsPath).default;
-// }
-//
-// return devsSet;

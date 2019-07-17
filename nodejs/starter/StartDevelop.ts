@@ -5,7 +5,7 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules, startSystem} from './helpers';
+import {installNpmModules, startSystem, SystemClassType} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
@@ -14,8 +14,6 @@ import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 
 
 type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
-
-//const IOSET_DIR = path.resolve(__dirname, '../ioSet');
 
 
 export default class StartDevelop {
@@ -66,13 +64,15 @@ export default class StartDevelop {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
-    const System = require(pathToSystem).default;
-    const ioSet = await this.makeIoSet();
-
-    await this.makeDirs();
+    await this.os.mkdirP(this.props.varDataDir);
+    await this.os.mkdirP(this.props.envSetDir);
     await this.installModules();
-    await startSystem(this.props, System, ioSet);
+
+    const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
+    const SystemClass = this.requireSystemClass(pathToSystem);
+    const ioSet: IoSet = await this.makeIoSet();
+
+    await this.startSystem(SystemClass, ioSet);
   }
 
 
@@ -129,50 +129,16 @@ export default class StartDevelop {
   }
 
   /**
-   * Make envSet and varData dirs
+   * Wrapper for test purpose
    */
-  private async makeDirs() {
-    await this.os.mkdirP(this.props.varDataDir);
-    await this.os.mkdirP(this.props.envSetDir);
+  private requireSystemClass(pathToSystem: string): SystemClassType {
+    return require(pathToSystem).default;
   }
 
+  /**
+   * Wrapper for test purpose
+   */
+  private async startSystem(SystemClass: SystemClassType, ioSet: IoSet) {
+    await startSystem(this.props, SystemClass, ioSet);
+  }
 }
-
-
-// /**
-//  * Only nodejs-developLocal or nodejs-developWs ioSet types are allowed
-//  * If there isn't hostConfig.ioSet or ioSet.type = local it returns undefined.
-//  */
-// private resolveIoSetType(): IoSetTypes {
-//
-//   // TODO: review
-//
-//   const ioSetConfig: IoSetConfig | undefined = this.props.hostConfig.ioSet;
-//
-//   if (!ioSetConfig || ioSetConfig.type === 'nodejs-developLocal') {
-//     return 'nodejs-developLocal';
-//   }
-//   else if (ioSetConfig.type !== 'nodejs-developWs') {
-//     throw new Error(`Unsupported ioSet type: "${ioSetConfig.type}"`);
-//   }
-//
-//   return ioSetConfig.type;
-// }
-
-// /**
-//  * Install node modules into squidlet repository in ./nodejs/<x86|rpi|arm>/ .
-//  * It installs only if node_modules directory doesn't exist.
-//  */
-// private async installModules() {
-//
-//
-//   const platformDir = resolvePlatformDir(this.props.platform);
-//   const machineCwd: string = path.join(platformDir, this.props.machine);
-//
-//   // do not install node modules if they have been installed previously
-//   if (await this.os.exists(path.join(machineCwd, 'node_modules'))) return;
-//
-//   console.info(`===> Install npm modules`);
-//
-//   await installNpmModules(this.os, machineCwd);
-// }
