@@ -46,7 +46,7 @@ export default class Promised<T = any> {
    * If promise was fulfilled it can't be cancelled.
    */
   cancel() {
-    if (this.isFulfiled()) return;
+    if (this.isFulfilled()) return;
 
     this.canceled = true;
     delete this.promiseResolve;
@@ -65,7 +65,7 @@ export default class Promised<T = any> {
     return this.canceled;
   }
 
-  isFulfiled(): boolean {
+  isFulfilled(): boolean {
     return this.resolved || this.rejected;
   }
 
