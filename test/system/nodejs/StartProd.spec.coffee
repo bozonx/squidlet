@@ -11,6 +11,16 @@ describe.only 'nodejs.StartProd', ->
       id: @argHostName
       platform: 'nodejs'
     }
+    @fakeProps = {
+      workDir: @workDir
+      envSetDir: 'envSetDir'
+      varDataDir: 'varDataDir'
+      tmpDir: 'tmoDir'
+      platform: 'nodejs'
+      hostId: @argHostName
+      force: false
+      hostConfig: @hostConfog
+    }
 
     @newInstance = (argMachine, argWorkDir, argForce = false) =>
       new StartProd(@configPath, argForce, argMachine, @argHostName, argWorkDir)
@@ -27,6 +37,39 @@ describe.only 'nodejs.StartProd', ->
     assert.deepEqual(startProd._envBuilder.configManager.hostConfigOrConfigPath, @hostConfog)
     assert.equal(startProd._envBuilder.buildDir, startProd.props.envSetDir)
     assert.equal(startProd._envBuilder.tmpBuildDir, "#{startProd.props.tmpDir}/envSet")
+
+  it 'start', ->
+    SystemClass = class Sys
+    startProd = @newInstance(@x86Machine, @workDir)
+
+    startProd.props = @fakeProps
+    startProd._envBuilder = {
+      collect: sinon.stub().returns(Promise.resolve())
+      writeEnv: sinon.stub().returns(Promise.resolve())
+    }
+    startProd.os = {
+      mkdirP: sinon.stub().returns(Promise.resolve())
+    }
+    startProd.installModules = sinon.stub().returns(Promise.resolve())
+    startProd.buildInitialSystem = sinon.stub().returns(Promise.resolve())
+    startProd.buildIos = sinon.stub().returns(Promise.resolve())
+    startProd.requireSystemClass = sinon.stub().returns(SystemClass)
+    startProd.startSystem = sinon.stub().returns(Promise.resolve())
+
+    await startProd.start()
+
+    sinon.assert.calledOnce(startProd.envBuilder.collect)
+    sinon.assert.calledOnce(startProd.os.mkdirP)
+    sinon.assert.calledWith(startProd.os.mkdirP, @fakeProps.varDataDir)
+    sinon.assert.calledOnce(startProd.installModules)
+    sinon.assert.calledOnce(startProd.buildInitialSystem)
+    sinon.assert.calledOnce(startProd.envBuilder.writeEnv)
+    sinon.assert.calledOnce(startProd.buildIos)
+    sinon.assert.calledOnce(startProd.requireSystemClass)
+    sinon.assert.calledWith(startProd.requireSystemClass, 'envSetDir/system/System')
+    sinon.assert.calledOnce(startProd.startSystem)
+    sinon.assert.calledWith(startProd.startSystem, SystemClass)
+
 
 # TODO: test force
 # TODO: test resolving a machine

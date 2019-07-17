@@ -13,6 +13,8 @@ import {ENCODE} from '../../system/dict/constants';
 
 const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
 
+export type SystemClassType = new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System;
+
 
 export function makeSystemConfigExtend(props: Props): {[index: string]: any} {
   return {
@@ -58,7 +60,7 @@ export function listenDestroySignals(destroyTimeoutSec: number, destroy: () => P
 
 export async function startSystem(
   props: Props,
-  SystemClass: new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System,
+  SystemClass: SystemClassType,
   ioSet?: IoSet,
 ) {
   const systemConfigExtend = makeSystemConfigExtend(props);

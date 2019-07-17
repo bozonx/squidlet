@@ -23,6 +23,7 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
+  // TODO: review
   destroyTimeoutSec: number = DESTROY_TIMEOUT_SEC;
   readonly force: boolean;
   get hostConfig(): PreHostConfig {

@@ -5,7 +5,7 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {generatePackageJson, installNpmModules, startSystem} from './helpers';
+import {generatePackageJson, installNpmModules, startSystem, SystemClassType} from './helpers';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import BuildSystem from '../../shared/envSetBuild/BuildSystem';
@@ -67,9 +67,9 @@ export default class StartProd {
     await this.buildIos();
 
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
-    const SystemClass = require(pathToSystem).default;
+    const SystemClass = this.requireSystemClass(pathToSystem);
 
-    await startSystem(this.props, SystemClass);
+    await this.startSystem(SystemClass);
   }
 
 
@@ -147,6 +147,20 @@ export default class StartProd {
     );
 
     await buildIo.build();
+  }
+
+  /**
+   * Wrapper for test purpose
+   */
+  private requireSystemClass(pathToSystem: string): SystemClassType {
+    return require(pathToSystem).default;
+  }
+
+  /**
+   * Wrapper for test purpose
+   */
+  private async startSystem(SystemClass: SystemClassType) {
+    await startSystem(this.props, SystemClass);
   }
 }
 
