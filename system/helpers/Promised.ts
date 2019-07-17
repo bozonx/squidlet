@@ -31,6 +31,9 @@ export default class Promised<T = any> {
     if (this.promiseResolve) this.promiseResolve(result);
 
     this.resolved = true;
+
+    delete this.promiseResolve;
+    delete this.promiseReject;
   }
 
   reject(err: Error) {
@@ -39,6 +42,9 @@ export default class Promised<T = any> {
     if (this.promiseReject) this.promiseReject(err);
 
     this.rejected = true;
+
+    delete this.promiseResolve;
+    delete this.promiseReject;
   }
 
   /**
@@ -49,6 +55,7 @@ export default class Promised<T = any> {
     if (this.isFulfilled()) return;
 
     this.canceled = true;
+
     delete this.promiseResolve;
     delete this.promiseReject;
   }
