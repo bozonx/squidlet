@@ -2,7 +2,7 @@ import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/helpers/binaryHelpers';
 import SerialIo, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialIo';
-import {convertBufferToUint8Array} from 'system/helpers/binaryHelpers';
+import {convertBufferToUint8Array} from 'system/helpers/buffer';
 
 
 

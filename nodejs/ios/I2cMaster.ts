@@ -1,7 +1,7 @@
 import {I2cBus, openSync} from 'i2c-bus';
 
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
-import {convertBufferToUint8Array} from 'system/helpers/binaryHelpers';
+import {convertBufferToUint8Array} from 'system/helpers/buffer';
 
 
 /**

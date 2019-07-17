@@ -7,6 +7,16 @@ import * as mqtt from 'mqtt';
 import MqttIo, {MqttOptions, MqttIoEvents} from 'system/interfaces/io/MqttIo';
 import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
 import {callPromised} from 'system/helpers/helpers';
+import {convertBufferToUint8Array} from 'system/helpers/buffer';
+
+
+type MqttContentTypes = 'string' | 'binary';
+
+interface MqttPacket {
+  properties: {
+    contentType: MqttContentTypes;
+  };
+}
 
 
 export default class Mqtt implements MqttIo {
@@ -83,9 +93,25 @@ export default class Mqtt implements MqttIo {
       throw new Error(`Mqtt.publish: There isn't a connection "${connectionId}"`);
     }
 
-    const preparedData: string | Buffer = new Buffer(data as any);
+    let contentType: MqttContentTypes;
+    let preparedData: string | Buffer;
 
-    return callPromised(this.connections[Number(connectionId)].publish, topic, preparedData);
+    if (typeof data === 'string') {
+      contentType = 'string';
+      preparedData = data;
+    }
+    else {
+      contentType = 'binary';
+      preparedData = new Buffer(data);
+    }
+
+    const options = {
+      properties: {
+        contentType
+      }
+    };
+
+    return callPromised(this.connections[Number(connectionId)].publish, topic, preparedData, options);
   }
 
   subscribe(connectionId: string, topic: string): Promise<void> {
@@ -108,8 +134,8 @@ export default class Mqtt implements MqttIo {
   private connectToServer(connectionId: string, url: string, options: MqttOptions): mqtt.MqttClient {
     const connection = mqtt.connect(url, options);
 
-    connection.on('message', (topic: string, data: Buffer) => {
-      this.handleIncomeMessage(connectionId, topic, data);
+    connection.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
+      this.handleIncomeMessage(connectionId, topic, data, packet.properties.contentType);
     });
     connection.on('error', (err) => this.events.emit(MqttIoEvents.error, connectionId, err));
     connection.on('connect', () => this.events.emit(MqttIoEvents.connect, connectionId));
@@ -118,10 +144,21 @@ export default class Mqtt implements MqttIo {
     return connection;
   }
 
-  private handleIncomeMessage = (connectionId: string, topic: string, data: Buffer) => {
-    // TODO: check if it is a bin and don't convert
+  private handleIncomeMessage = (
+    connectionId: string,
+    topic: string,
+    data: Buffer,
+    contentType: MqttContentTypes
+  ) => {
+    let preparedData: string | Uint8Array;
 
-    const preparedData: string | Uint8Array = data.toString();
+    if (contentType === 'binary') {
+      preparedData = convertBufferToUint8Array(data);
+    }
+    else {
+      // not contentType or 'string'
+      preparedData = data.toString();
+    }
 
     this.events.emit(MqttIoEvents.message, connectionId, topic, preparedData);
   }
