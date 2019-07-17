@@ -126,10 +126,6 @@ export default class StartProd {
     await buildSystem.build(systemBuildDir, systemTmpDir);
   }
 
-  private getPathToProdSystemDir(): string {
-    return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
-  }
-
   /**
    * Build io files to workDir/io
    */
@@ -147,6 +143,10 @@ export default class StartProd {
     );
 
     await buildIo.build();
+  }
+
+  private getPathToProdSystemDir(): string {
+    return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
   /**

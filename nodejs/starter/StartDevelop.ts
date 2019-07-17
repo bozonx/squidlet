@@ -68,7 +68,7 @@ export default class StartDevelop {
     await this.os.mkdirP(this.props.envSetDir);
     await this.installModules();
 
-    const pathToSystem = path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
+    const pathToSystem = this.getPathToProdSystemFile();
     const SystemClass = this.requireSystemClass(pathToSystem);
     const ioSet: IoSet = await this.makeIoSet();
 
@@ -126,6 +126,10 @@ export default class StartDevelop {
     }
 
     return 'IoSetDevelopLocal';
+  }
+
+  private getPathToProdSystemFile(): string {
+    return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
   }
 
   /**
