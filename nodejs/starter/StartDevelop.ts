@@ -101,9 +101,8 @@ export default class StartDevelop {
    */
   private async makeIoSet(): Promise<IoSet> {
     const ioSetFile: string = this.resolveIoSetType();
-    const ioSetPath = path.join('.', ioSetFile);
+    const ioSetPath = `.${path.sep}${ioSetFile}`;
     const IoSetClass: IoSetClass = require(ioSetPath).default;
-
 
     console.info(`using io set "${ioSetFile}"`);
 
