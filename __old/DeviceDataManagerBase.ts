@@ -2,12 +2,12 @@
 // TODO: remove
 
 
-import System from '../System';
-import IndexedEvents from '../helpers/IndexedEvents';
-import {isEmpty} from '../helpers/lodashLike';
-import {getDifferentKeys} from '../helpers/collections';
-import {validateParam} from '../helpers/validate';
-import {StateCategories} from '../interfaces/States';
+import System from '../system/System';
+import IndexedEvents from '../system/helpers/IndexedEvents';
+import {isEmpty} from '../system/helpers/lodashLike';
+import {getDifferentKeys} from '../system/helpers/collections';
+import {validateParam} from '../system/helpers/validate';
+import {StateCategories} from '../system/interfaces/States';
 
 
 // export type Publisher = (subtopic: string, value: any, isRepeat?: boolean) => void;

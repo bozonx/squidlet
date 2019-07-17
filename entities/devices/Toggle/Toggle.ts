@@ -1,7 +1,7 @@
-import {Data} from 'system/baseDevice/DeviceDataManagerBase';
 import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
+import {StateObject} from 'system/State';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
@@ -35,7 +35,7 @@ export default class Toggle extends DeviceBase<Props> {
     this.binaryClick.addUpListener(this.onUp);
   }
 
-  protected initialStatus = async (): Promise<Data> => {
+  protected initialStatus = async (): Promise<StateObject> => {
     return { [DEFAULT_STATUS]: invertIfNeed(false, this.props.invert) };
   }
 
