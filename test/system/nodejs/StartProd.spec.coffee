@@ -70,6 +70,15 @@ describe.only 'nodejs.StartProd', ->
     sinon.assert.calledOnce(startProd.startSystem)
     sinon.assert.calledWith(startProd.startSystem, SystemClass)
 
+  it 'installModules - not force and node_modules exists', ->
+
+
+  it 'installModules - not force and node_modules doesnt exist', ->
+
+
+  it 'installModules - force', ->
+
+
 
 # TODO: test force
 # TODO: test resolving a machine

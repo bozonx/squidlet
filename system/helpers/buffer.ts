@@ -1,9 +1,6 @@
 // use it with nodejs
 
 export function convertBufferToUint8Array(data: Buffer) {
-
-  // TODO: test
-
   if (typeof Buffer === 'undefined') {
     throw new Error(`convertBufferToUint8Array: Your system doesn't support a Buffer`);
   }
