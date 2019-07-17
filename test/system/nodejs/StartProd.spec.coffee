@@ -15,7 +15,7 @@ describe.only 'nodejs.StartProd', ->
     @newInstance = (argMachine, argWorkDir, argForce = false) =>
       new StartProd(@configPath, argForce, argMachine, @argHostName, argWorkDir)
 
-  it 'init', ->
+  it 'init - init groupConfig, props and make envBuilder instance', ->
     startProd = @newInstance(@x86Machine, @workDir)
 
     startProd.groupConfig.init = sinon.stub().returns(Promise.resolve());
