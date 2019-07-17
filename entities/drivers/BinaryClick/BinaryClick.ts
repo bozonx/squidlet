@@ -3,9 +3,9 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
+import {omit} from 'system/helpers/lodashLike';
 
 import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
-import {omit} from '../../../system/helpers/lodashLike';
 
 
 type Handler = () => void;

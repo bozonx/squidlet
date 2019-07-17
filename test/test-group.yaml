@@ -1,3 +1,5 @@
+# ./squidletctl start --name=testHost ./test/test-group.yaml
+
 plugins: []
 
 hostDefaults: {}

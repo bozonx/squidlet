@@ -1,0 +1,12 @@
+# ./squidletctl start ./test/test-x86.yaml
+
+id: testHost
+platform: nodejs
+machine: x86
+config: {}
+backdoor: {}
+
+devices:
+  bedroom:
+    people-count-sensor:
+      device: FakePeopleCount
