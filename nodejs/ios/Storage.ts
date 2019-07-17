@@ -2,7 +2,7 @@ import * as fs from 'fs';
 
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/helpers/helpers';
-import {convertBufferToUint8Array} from 'system/helpers/binaryHelpers';
+import {convertBufferToUint8Array} from 'system/helpers/buffer';
 import {ENCODE} from 'system/dict/constants';
 
 

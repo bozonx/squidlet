@@ -1,6 +1,7 @@
 // TODO: remove
 
 import DeviceBase from 'system/baseDevice/DeviceBase';
+import {JsonTypes} from 'system/interfaces/Types';
 
 
 interface Props {
@@ -8,16 +9,18 @@ interface Props {
 
 
 export default class FakePeopleCount extends DeviceBase<Props> {
-  actions = {
+  protected actions = {
     toggle: async (): Promise<number> => {
-      if (await this.getStatus() > 0) {
+      const status: JsonTypes = this.getStatus();
+
+      if (typeof status === 'number' && status > 0) {
         await this.setStatus(0);
       }
       else {
         await this.setStatus(1);
       }
 
-      return this.getStatus();
+      return this.getStatus() as number;
     }
   };
 }

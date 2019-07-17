@@ -1,11 +1,8 @@
 name: FakePeopleCount
-type: none
 main: FakePeopleCount.ts
+type: none
 
 status:
   default:
     type: number
     default: 0
-
-files:
-  - testFile.txt
