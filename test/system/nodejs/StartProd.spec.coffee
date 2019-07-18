@@ -22,11 +22,33 @@ describe.only 'nodejs.StartProd', ->
       hostConfig: @hostConfog
     }
 
-    @newInstance = (argMachine, argWorkDir, argForce = false) =>
-      new StartProd(@configPath, argForce, argMachine, @argHostName, argWorkDir)
+    @newInstance = (argMachine, argWorkDir) =>
+      startProd = new StartProd(@configPath, false, argMachine, @argHostName, argWorkDir)
+
+      startProd.props = @fakeProps
+      startProd.os = {
+        mkdirP: sinon.stub().returns(Promise.resolve())
+        symlink: sinon.stub().returns(Promise.resolve())
+      }
+      startProd._envBuilder = {
+        collect: sinon.stub().returns(Promise.resolve())
+        writeEnv: sinon.stub().returns(Promise.resolve())
+        configManager: {
+          dependencies: {dep: '1.2.3'}
+        }
+      }
+      startProd.prodBuild = {
+        buildInitialSystem: sinon.stub().returns(Promise.resolve())
+        buildIos: sinon.stub().returns(Promise.resolve())
+        buildPackageJson: sinon.stub().returns(Promise.resolve())
+      }
+      startProd.installNpmModules = sinon.stub().returns(Promise.resolve())
+      startProd.startSystem = sinon.stub().returns(Promise.resolve())
+
+      return startProd
 
   it 'init - init groupConfig, props and make envBuilder instance', ->
-    startProd = @newInstance(@x86Machine, @workDir)
+    startProd = new StartProd(@configPath, false, @x86Machine, @argHostName, argWorkDir)
 
     startProd.groupConfig.init = sinon.stub().returns(Promise.resolve());
     startProd.groupConfig.getHostConfig = () => @hostConfog
@@ -42,21 +64,8 @@ describe.only 'nodejs.StartProd', ->
     SystemClass = class Sys
     startProd = @newInstance(@x86Machine, @workDir)
 
-    startProd.props = @fakeProps
-    startProd._envBuilder = {
-      collect: sinon.stub().returns(Promise.resolve())
-      writeEnv: sinon.stub().returns(Promise.resolve())
-    }
-    startProd.os = {
-      mkdirP: sinon.stub().returns(Promise.resolve())
-    }
-    startProd.prodBuild = {
-      buildInitialSystem: sinon.stub().returns(Promise.resolve())
-      buildIos: sinon.stub().returns(Promise.resolve())
-    }
     startProd.installModules = sinon.stub().returns(Promise.resolve())
     startProd.requireSystemClass = sinon.stub().returns(SystemClass)
-    startProd.startSystem = sinon.stub().returns(Promise.resolve())
 
     await startProd.start()
 
@@ -75,33 +84,14 @@ describe.only 'nodejs.StartProd', ->
   it 'installModules - not force and node_modules exists - do nothing', ->
     startProd = @newInstance(@x86Machine, @workDir)
 
-    startProd.props = @fakeProps
-    startProd.os = {
-      exists: () => true
-    }
-    startProd.prodBuild = {
-      buildPackageJson: sinon.stub().returns(Promise.resolve())
-    }
+    startProd.os.exists = () => true
 
     sinon.assert.notCalled(startProd.prodBuild.buildPackageJson)
 
   it 'installModules - not force and node_modules doesnt exist', ->
     startProd = @newInstance(@x86Machine, @workDir)
 
-    startProd.props = @fakeProps
-    startProd.os = {
-      exists: () => false
-      symlink: sinon.stub().returns(Promise.resolve())
-    }
-    startProd.envBuilder = {
-      configManager: {
-        dependencies: {dep: '1.2.3'}
-      }
-    }
-    startProd.prodBuild = {
-      buildPackageJson: sinon.stub().returns(Promise.resolve())
-    }
-    startProd.installNpmModules = sinon.stub().returns(Promise.resolve())
+    startProd.os.exists = () => false
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledWith(startProd.prodBuild.buildPackageJson, {dep: '1.2.3'})
@@ -112,21 +102,8 @@ describe.only 'nodejs.StartProd', ->
   it 'installModules - force', ->
     startProd = @newInstance(@x86Machine, @workDir)
 
-    startProd.props = @fakeProps
     startProd.props.force = true
-    startProd.os = {
-      exists: () => true
-      symlink: sinon.stub().returns(Promise.resolve())
-    }
-    startProd.envBuilder = {
-      configManager: {
-        dependencies: {dep: '1.2.3'}
-      }
-    }
-    startProd.prodBuild = {
-      buildPackageJson: sinon.stub().returns(Promise.resolve())
-    }
-    startProd.installNpmModules = sinon.stub().returns(Promise.resolve())
+    startProd.os.exists = () => true
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledOnce(startProd.installNpmModules)
