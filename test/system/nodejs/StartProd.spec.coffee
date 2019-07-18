@@ -50,9 +50,11 @@ describe.only 'nodejs.StartProd', ->
     startProd.os = {
       mkdirP: sinon.stub().returns(Promise.resolve())
     }
+    startProd.prodBuild = {
+      buildInitialSystem: sinon.stub().returns(Promise.resolve())
+      buildIos: sinon.stub().returns(Promise.resolve())
+    }
     startProd.installModules = sinon.stub().returns(Promise.resolve())
-    startProd.buildInitialSystem = sinon.stub().returns(Promise.resolve())
-    startProd.buildIos = sinon.stub().returns(Promise.resolve())
     startProd.requireSystemClass = sinon.stub().returns(SystemClass)
     startProd.startSystem = sinon.stub().returns(Promise.resolve())
 
@@ -62,40 +64,40 @@ describe.only 'nodejs.StartProd', ->
     sinon.assert.calledOnce(startProd.os.mkdirP)
     sinon.assert.calledWith(startProd.os.mkdirP, @fakeProps.varDataDir)
     sinon.assert.calledOnce(startProd.installModules)
-    sinon.assert.calledOnce(startProd.buildInitialSystem)
+    sinon.assert.calledOnce(startProd.prodBuild.buildInitialSystem)
     sinon.assert.calledOnce(startProd.envBuilder.writeEnv)
-    sinon.assert.calledOnce(startProd.buildIos)
+    sinon.assert.calledOnce(startProd.prodBuild.buildIos)
     sinon.assert.calledOnce(startProd.requireSystemClass)
     sinon.assert.calledWith(startProd.requireSystemClass, 'envSetDir/system/System')
     sinon.assert.calledOnce(startProd.startSystem)
     sinon.assert.calledWith(startProd.startSystem, SystemClass)
 
-  it 'installModules - not force and node_modules exists - do nothing', ->
-    startProd = @newInstance(@x86Machine, @workDir)
-
-    startProd.props = @fakeProps
-    startProd.os = {
-      exists: () => true
-    }
-
-
-  it 'installModules - not force and node_modules doesnt exist', ->
-    startProd = @newInstance(@x86Machine, @workDir)
-
-    startProd.props = @fakeProps
-    startProd.os = {
-      exists: () => false
-    }
-
-
-  it 'installModules - force', ->
-    startProd = @newInstance(@x86Machine, @workDir)
-
-    startProd.props = @fakeProps
-    startProd.props.force = true
-    startProd.os = {
-      exists: () => true
-    }
+#  it 'installModules - not force and node_modules exists - do nothing', ->
+#    startProd = @newInstance(@x86Machine, @workDir)
+#
+#    startProd.props = @fakeProps
+#    startProd.os = {
+#      exists: () => true
+#    }
+#
+#
+#  it 'installModules - not force and node_modules doesnt exist', ->
+#    startProd = @newInstance(@x86Machine, @workDir)
+#
+#    startProd.props = @fakeProps
+#    startProd.os = {
+#      exists: () => false
+#    }
+#
+#
+#  it 'installModules - force', ->
+#    startProd = @newInstance(@x86Machine, @workDir)
+#
+#    startProd.props = @fakeProps
+#    startProd.props.force = true
+#    startProd.os = {
+#      exists: () => true
+#    }
 
 
 # TODO: test force
