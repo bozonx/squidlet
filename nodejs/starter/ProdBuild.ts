@@ -46,15 +46,8 @@ export default class ProdBuild {
 
     const buildDir = path.join(this.props.envSetDir, systemConfig.envSetDirs.ios);
     const tmpDir = path.join(this.props.tmpDir, systemConfig.envSetDirs.ios);
-    const buildIo: BuildIo = new BuildIo(
-      this.os,
-      this.props.platform,
-      this.props.machine,
-      buildDir,
-      tmpDir
-    );
 
-    await buildIo.build();
+    await this.doBuildIo(buildDir, tmpDir);
   }
 
   async buildPackageJson(dependencies: {[index: string]: any} = {}) {
@@ -73,10 +66,23 @@ export default class ProdBuild {
     });
   }
 
+  private async doBuildIo(buildDir: string, tmpDir: string) {
+    const buildIo: BuildIo = new BuildIo(
+      this.os,
+      this.props.platform,
+      this.props.machine,
+      buildDir,
+      tmpDir
+    );
+
+    await buildIo.build();
+  }
+
   /**
    * Wrapper for test purpose
    */
   private requireSquidletPackageJson(): PackageJson {
     return require(SQUIDLET_PACKAGE_JSON_PATH);
   }
+
 }

@@ -24,11 +24,11 @@ export default class BuildIo {
   private readonly os: Os;
 
 
-  constructor(os: Os, platform: Platforms, machine: string, hostsBuildDir: string, hostsTmpDir: string) {
+  constructor(os: Os, platform: Platforms, machine: string, iosBuildDir: string, iosTmpDir: string) {
     this.platform = platform;
     this.machine = machine;
-    this.iosBuildDir = hostsBuildDir;
-    this.iosTmpDir = hostsTmpDir;
+    this.iosBuildDir = iosBuildDir;
+    this.iosTmpDir = iosTmpDir;
     this.os = os;
   }
 
