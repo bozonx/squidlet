@@ -47,7 +47,7 @@ export default class StartDevelop {
       argHostName,
       argWorkDir
     );
-    this.systemStarter = new SystemStarter(this.props);
+    this.systemStarter = new SystemStarter(this.os, this.props);
   }
 
   async init() {

@@ -44,7 +44,7 @@ describe 'nodejs.ProdBuild', ->
   it 'generatePackageJson', ->
     squidletVersion = '1.2.3'
     deps = { myDep: '1.2.3' }
-    @prodBuild.requireSquidletPackageJson = () => { version: squidletVersion }
+    @prodBuild.os.require = () => { version: squidletVersion }
 
     result = await @prodBuild.generatePackageJson(deps)
 

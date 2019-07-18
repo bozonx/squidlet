@@ -41,7 +41,7 @@ export default class StartProd {
       argWorkDir,
     );
     this.prodBuild = new ProdBuild(this.os, this.props);
-    this.systemStarter = new SystemStarter(this.props);
+    this.systemStarter = new SystemStarter(this.os, this.props);
   }
 
   async init() {
@@ -117,9 +117,6 @@ export default class StartProd {
     return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
-  /**
-   * Wrapper for test purpose
-   */
   private async installNpmModules() {
     await installNpmModules(this.os, this.props.workDir);
   }

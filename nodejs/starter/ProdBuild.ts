@@ -58,7 +58,7 @@ export default class ProdBuild {
 
   private async generatePackageJson(dependencies: {[index: string]: any}): Promise<string> {
     const templateContent: string = await this.os.getFileContent(PACKAGE_JSON_TEMPLATE_PATH);
-    const squildletPackageJson: PackageJson = this.requireSquidletPackageJson();
+    const squildletPackageJson: PackageJson = this.os.require(SQUIDLET_PACKAGE_JSON_PATH);
 
     return _template(templateContent)({
       version: squildletPackageJson.version,
@@ -76,13 +76,6 @@ export default class ProdBuild {
     );
 
     await buildIo.build();
-  }
-
-  /**
-   * Wrapper for test purpose
-   */
-  private requireSquidletPackageJson(): PackageJson {
-    return require(SQUIDLET_PACKAGE_JSON_PATH);
   }
 
 }

@@ -3,13 +3,16 @@ SystemStarter = require('../../../nodejs/starter/SystemStarter').default
 
 describe.only 'nodejs.ProdBuild', ->
   beforeEach ->
+    @os = {
+      processExit: sinon.spy()
+    }
     @props = {
       workDir: 'workDir'
       envSetDir: 'envSetDir'
       tmpDir: 'tmpDir'
       destroyTimeoutSec: 0
     }
-    @systemStarter = new SystemStarter(@props)
+    @systemStarter = new SystemStarter(@os, @props)
 
   it 'start', ->
     pathToSystem = 'path/to/system'
@@ -27,13 +30,13 @@ describe.only 'nodejs.ProdBuild', ->
       start: startMethod
       destroy: destroyMethod
 
-    @systemStarter.requireSystemClass = sinon.stub().returns(SystemClass)
+    @os.require = sinon.stub().returns({default: SystemClass})
     @systemStarter.listenDestroySignals = sinon.spy()
 
     await @systemStarter.start(pathToSystem, ioSet);
 
-    sinon.assert.calledOnce(@systemStarter.requireSystemClass)
-    sinon.assert.calledWith(@systemStarter.requireSystemClass, pathToSystem)
+    sinon.assert.calledOnce(@os.require)
+    sinon.assert.calledWith(@os.require, pathToSystem)
     sinon.assert.calledOnce(@systemStarter.listenDestroySignals)
     sinon.assert.calledWith(@systemStarter.listenDestroySignals, destroyMethod)
     sinon.assert.calledOnce(startMethod)
@@ -48,23 +51,21 @@ describe.only 'nodejs.ProdBuild', ->
 
   it 'gracefullyDestroyCb - normally destroy', ->
     destroy = sinon.stub().returns(Promise.resolve())
-    @systemStarter.processExit = sinon.spy()
 
     await @systemStarter.gracefullyDestroyCb(destroy)
 
     sinon.assert.calledOnce(destroy)
-    sinon.assert.calledOnce(@systemStarter.processExit)
-    sinon.assert.calledWith(@systemStarter.processExit, 0)
+    sinon.assert.calledOnce(@os.processExit)
+    sinon.assert.calledWith(@os.processExit, 0)
 
   it 'gracefullyDestroyCb - badly destroy', ->
     destroy = sinon.stub().returns(Promise.reject('err'))
-    @systemStarter.processExit = sinon.spy()
 
     await @systemStarter.gracefullyDestroyCb(destroy)
 
     sinon.assert.calledOnce(destroy)
-    sinon.assert.calledOnce(@systemStarter.processExit)
-    sinon.assert.calledWith(@systemStarter.processExit, 2)
+    sinon.assert.calledOnce(@os.processExit)
+    sinon.assert.calledWith(@os.processExit, 2)
 
   it 'gracefullyDestroyCb - timeout exceeded', ->
     destroyPromise = new Promise((resolve) =>
@@ -73,10 +74,9 @@ describe.only 'nodejs.ProdBuild', ->
       , 1)
     )
     destroy = sinon.stub().returns(destroyPromise)
-    @systemStarter.processExit = sinon.spy()
 
     await @systemStarter.gracefullyDestroyCb(destroy)
 
     sinon.assert.notCalled(destroy)
-    sinon.assert.calledOnce(@systemStarter.processExit)
-    sinon.assert.calledWith(@systemStarter.processExit, 3)
+    sinon.assert.calledOnce(@os.processExit)
+    sinon.assert.calledWith(@os.processExit, 3)

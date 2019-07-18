@@ -94,6 +94,14 @@ export default class Os {
     });
   }
 
+  processExit(code: number) {
+    process.exit(code);
+  }
+
+  require(pathToModule: string): any {
+    return require(pathToModule);
+  }
+
   /**
    * Spawn command via /bin/bash and wait while it will be finished.
    * It don't write to console by itself, it just returns a complete result.
