@@ -7,7 +7,7 @@ describe.only 'nodejs.ProdBuild', ->
       workDir: 'workDir'
       envSetDir: 'envSetDir'
       tmpDir: 'tmpDir'
-      destroyTimeoutSec: 60
+      destroyTimeoutSec: 0
     }
     @systemStarter = new SystemStarter(@props)
 
@@ -46,8 +46,37 @@ describe.only 'nodejs.ProdBuild', ->
       }
     })
 
-  it 'makeSystemConfigExtend', ->
-    # TODO: !!!
+  it 'gracefullyDestroyCb - normally destroy', ->
+    destroy = sinon.stub().returns(Promise.resolve())
+    @systemStarter.processExit = sinon.spy()
 
-  it 'listenDestroySignals', ->
-    # TODO: !!!
+    await @systemStarter.gracefullyDestroyCb(destroy)
+
+    sinon.assert.calledOnce(destroy)
+    sinon.assert.calledOnce(@systemStarter.processExit)
+    sinon.assert.calledWith(@systemStarter.processExit, 0)
+
+  it 'gracefullyDestroyCb - badly destroy', ->
+    destroy = sinon.stub().returns(Promise.reject('err'))
+    @systemStarter.processExit = sinon.spy()
+
+    await @systemStarter.gracefullyDestroyCb(destroy)
+
+    sinon.assert.calledOnce(destroy)
+    sinon.assert.calledOnce(@systemStarter.processExit)
+    sinon.assert.calledWith(@systemStarter.processExit, 2)
+
+  it 'gracefullyDestroyCb - timeout exceeded', ->
+    destroyPromise = new Promise((resolve) =>
+      setTimeout(() =>
+        resolve()
+      , 1)
+    )
+    destroy = sinon.stub().returns(destroyPromise)
+    @systemStarter.processExit = sinon.spy()
+
+    await @systemStarter.gracefullyDestroyCb(destroy)
+
+    sinon.assert.notCalled(destroy)
+    sinon.assert.calledOnce(@systemStarter.processExit)
+    sinon.assert.calledWith(@systemStarter.processExit, 3)

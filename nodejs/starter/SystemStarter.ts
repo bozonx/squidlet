@@ -45,24 +45,24 @@ export default class SystemStarter {
   }
 
   private listenDestroySignals(destroy: () => Promise<void>) {
-    const gracefullyDestroy = async () => {
-      setTimeout(() => {
-        console.error(`ERROR: App hasn't been gracefully destroyed during "${this.props.destroyTimeoutSec}" seconds`);
-        process.exit(3);
-      }, this.props.destroyTimeoutSec * 1000);
+    process.on('SIGTERM', () => this.gracefullyDestroyCb(destroy));
+    process.on('SIGINT', () => this.gracefullyDestroyCb(destroy));
+  }
 
-      try {
-        await destroy();
-        process.exit(0);
-      }
-      catch (err) {
-        console.error(err);
-        process.exit(2);
-      }
-    };
+  private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
+    setTimeout(() => {
+      console.error(`ERROR: App hasn't been gracefully destroyed during "${this.props.destroyTimeoutSec}" seconds`);
+      this.processExit(3);
+    }, this.props.destroyTimeoutSec * 1000);
 
-    process.on('SIGTERM', gracefullyDestroy);
-    process.on('SIGINT', gracefullyDestroy);
+    try {
+      await destroy();
+      this.processExit(0);
+    }
+    catch (err) {
+      console.error(err);
+      this.processExit(2);
+    }
   }
 
   /**
@@ -70,6 +70,13 @@ export default class SystemStarter {
    */
   private requireSystemClass(pathToSystem: string): SystemClassType {
     return require(pathToSystem).default;
+  }
+
+  /**
+   * Wrapper for test purpose
+   */
+  private processExit(code: number) {
+    process.exit(code);
   }
 
 }
