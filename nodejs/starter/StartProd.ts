@@ -1,15 +1,19 @@
 import * as path from 'path';
+import _template = require('lodash/template');
 
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {generatePackageJson, installNpmModules, startSystem, SystemClassType} from './helpers';
+import {installNpmModules, startSystem, SystemClassType} from './helpers';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import BuildSystem from '../../shared/envSetBuild/BuildSystem';
 import BuildIo from '../../shared/envSetBuild/BuildIo';
+import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
+
+const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
 
 
 export default class StartProd {
@@ -82,9 +86,7 @@ export default class StartProd {
     // do not install node modules if they have been installed previously
     if (!this.props.force && await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
 
-    // TODO: может если force - то удалть node_modules ???
-
-    const packageJson: string = generatePackageJson(this.envBuilder.configManager.dependencies);
+    const packageJson: string = await this.generatePackageJson(this.envBuilder.configManager.dependencies);
 
     console.info(`===> writing package.json`);
 
@@ -112,6 +114,11 @@ export default class StartProd {
    */
   private async buildInitialSystem() {
     const pathToSystemDir = this.getPathToProdSystemDir();
+
+    // TODO: проверять версию system - если не совпадает то перебилдить, если совпадает то нет.
+    //       если стоит force - то билдить
+
+    // TODO: сохранять версию system
 
     // else if it exists - do nothing
     if (!this.props.force && await this.os.exists(pathToSystemDir)) return;
@@ -143,6 +150,16 @@ export default class StartProd {
     );
 
     await buildIo.build();
+  }
+
+  async generatePackageJson(dependencies: {[index: string]: any} = {}): Promise<string> {
+    const templateContent: string = await this.os.getFileContent(PACKAGE_JSON_TEMPLATE_PATH);
+    const squildletPackageJson: {version: string} = require(SQUIDLET_PACKAGE_JSON_PATH);
+
+    return _template(templateContent)({
+      version: squildletPackageJson.version,
+      dependencies: JSON.stringify(dependencies),
+    });
   }
 
   private getPathToProdSystemDir(): string {

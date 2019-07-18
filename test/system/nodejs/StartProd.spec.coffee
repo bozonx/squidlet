@@ -70,14 +70,32 @@ describe.only 'nodejs.StartProd', ->
     sinon.assert.calledOnce(startProd.startSystem)
     sinon.assert.calledWith(startProd.startSystem, SystemClass)
 
-  it 'installModules - not force and node_modules exists', ->
+  it 'installModules - not force and node_modules exists - do nothing', ->
+    startProd = @newInstance(@x86Machine, @workDir)
+
+    startProd.props = @fakeProps
+    startProd.os = {
+      exists: () => true
+    }
 
 
   it 'installModules - not force and node_modules doesnt exist', ->
+    startProd = @newInstance(@x86Machine, @workDir)
+
+    startProd.props = @fakeProps
+    startProd.os = {
+      exists: () => false
+    }
 
 
   it 'installModules - force', ->
+    startProd = @newInstance(@x86Machine, @workDir)
 
+    startProd.props = @fakeProps
+    startProd.props.force = true
+    startProd.os = {
+      exists: () => true
+    }
 
 
 # TODO: test force
