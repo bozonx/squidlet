@@ -1,13 +1,13 @@
 StartProd = require('../../../nodejs/starter/StartProd').default
 
 
-describe.only 'nodejs.StartProd', ->
+describe 'nodejs.StartProd', ->
   beforeEach ->
     @configPath = 'path/to/config'
     @argHostName = 'testHost'
     @x86Machine = 'x86'
     @workDir = 'testHost'
-    @hostConfog = {
+    @hostConfig = {
       id: @argHostName
       platform: 'nodejs'
     }
@@ -19,7 +19,7 @@ describe.only 'nodejs.StartProd', ->
       platform: 'nodejs'
       hostId: @argHostName
       force: false
-      hostConfig: @hostConfog
+      hostConfig: @hostConfig
     }
 
     @newInstance = () =>
@@ -51,12 +51,12 @@ describe.only 'nodejs.StartProd', ->
     startProd = new StartProd(@configPath, false, @x86Machine, @argHostName, @workDir)
 
     startProd.groupConfig.init = sinon.stub().returns(Promise.resolve());
-    startProd.groupConfig.getHostConfig = () => @hostConfog
+    startProd.groupConfig.getHostConfig = () => @hostConfig
 
     await startProd.init()
 
     sinon.assert.calledOnce(startProd.groupConfig.init)
-    assert.deepEqual(startProd._envBuilder.configManager.hostConfigOrConfigPath, @hostConfog)
+    assert.deepEqual(startProd._envBuilder.configManager.hostConfigOrConfigPath, @hostConfig)
     assert.equal(startProd._envBuilder.buildDir, startProd.props.envSetDir)
     assert.equal(startProd._envBuilder.tmpBuildDir, "#{startProd.props.tmpDir}/envSet")
 
