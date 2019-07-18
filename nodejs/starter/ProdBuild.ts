@@ -17,7 +17,7 @@ export default class ProdBuild {
   private readonly props: Props;
 
 
-  constructor(os: Os, props: Props, ) {
+  constructor(os: Os, props: Props) {
     this.os = os;
     this.props = props;
   }

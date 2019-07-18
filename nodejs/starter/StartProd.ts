@@ -75,13 +75,17 @@ export default class StartProd {
 
 
   /**
-   * It copies package.json and installs node modules into root of working directory.
+   * It builds package.json and installs node modules into root of working directory.
    * And it makes link to system in node_modules/system.
-   * It installs only if node_modules directory doesn't exist.
+   * It installs only if node_modules directory doesn't exist it force parameter isn't set.
    */
   private async installModules() {
     // do not install node modules if they have been installed previously
-    if (!this.props.force && await this.os.exists(path.join(this.props.workDir, 'node_modules'))) return;
+    if (!this.props.force && await this.os.exists(path.join(this.props.workDir, 'node_modules'))) {
+      console.info(`Directory node_modules exists. It doesn't need to run npm install`);
+
+      return;
+    }
 
     console.info(`===> writing package.json`);
 
@@ -89,7 +93,7 @@ export default class StartProd {
 
     console.info(`===> Installing npm modules`);
 
-    await installNpmModules(this.os, this.props.workDir);
+    await this.installNpmModules();
 
     // make sym link to system
     try {
@@ -119,5 +123,12 @@ export default class StartProd {
    */
   private async startSystem(SystemClass: SystemClassType) {
     await startSystem(this.props, SystemClass);
+  }
+
+  /**
+   * Wrapper for test purpose
+   */
+  private async installNpmModules() {
+    await installNpmModules(this.os, this.props.workDir);
   }
 }
