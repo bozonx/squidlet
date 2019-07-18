@@ -39,7 +39,6 @@ describe.only 'nodejs.StartDevelop', ->
     assert.equal(startDevelop._envBuilder.tmpBuildDir, "#{startDevelop.props.tmpDir}/envSet")
 
   it 'start', ->
-    SystemClass = class Sys
     ioSet = { init: () -> }
     pathToSystemFile = 'path/to/System'
     startDevelop = @newInstance(@x86Machine, @workDir)
@@ -53,9 +52,10 @@ describe.only 'nodejs.StartDevelop', ->
     }
     startDevelop.installModules = sinon.stub().returns(Promise.resolve())
     startDevelop.getPathToProdSystemFile = sinon.stub().returns(pathToSystemFile)
-    startDevelop.requireSystemClass = sinon.stub().returns(SystemClass)
     startDevelop.makeIoSet = sinon.stub().returns(ioSet)
-    startDevelop.startSystem = sinon.stub().returns(Promise.resolve())
+    startDevelop.systemStarter = {
+      start: sinon.stub().returns(Promise.resolve())
+    }
 
     await startDevelop.start()
 
@@ -64,7 +64,5 @@ describe.only 'nodejs.StartDevelop', ->
     sinon.assert.calledWith(startDevelop.os.mkdirP.getCall(0), @fakeProps.varDataDir)
     sinon.assert.calledWith(startDevelop.os.mkdirP.getCall(1), @fakeProps.envSetDir)
     sinon.assert.calledOnce(startDevelop.installModules)
-    sinon.assert.calledOnce(startDevelop.requireSystemClass)
-    sinon.assert.calledWith(startDevelop.requireSystemClass, pathToSystemFile)
-    sinon.assert.calledOnce(startDevelop.startSystem)
-    sinon.assert.calledWith(startDevelop.startSystem, SystemClass, ioSet)
+    sinon.assert.calledOnce(startDevelop.systemStarter.start)
+    sinon.assert.calledWith(startDevelop.systemStarter.start, 'path/to/System', ioSet)

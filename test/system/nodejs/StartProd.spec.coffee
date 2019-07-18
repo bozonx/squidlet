@@ -1,7 +1,7 @@
 StartProd = require('../../../nodejs/starter/StartProd').default
 
 
-describe 'nodejs.StartProd', ->
+describe.only 'nodejs.StartProd', ->
   beforeEach ->
     @configPath = 'path/to/config'
     @argHostName = 'testHost'
@@ -42,8 +42,10 @@ describe 'nodejs.StartProd', ->
         buildIos: sinon.stub().returns(Promise.resolve())
         buildPackageJson: sinon.stub().returns(Promise.resolve())
       }
+      startProd.systemStarter = {
+        start: sinon.stub().returns(Promise.resolve())
+      }
       startProd.installNpmModules = sinon.stub().returns(Promise.resolve())
-      startProd.startSystem = sinon.stub().returns(Promise.resolve())
 
       return startProd
 
@@ -61,11 +63,9 @@ describe 'nodejs.StartProd', ->
     assert.equal(startProd._envBuilder.tmpBuildDir, "#{startProd.props.tmpDir}/envSet")
 
   it 'start', ->
-    SystemClass = class Sys
     startProd = @newInstance()
 
     startProd.installModules = sinon.stub().returns(Promise.resolve())
-    startProd.requireSystemClass = sinon.stub().returns(SystemClass)
 
     await startProd.start()
 
@@ -76,10 +76,8 @@ describe 'nodejs.StartProd', ->
     sinon.assert.calledOnce(startProd.prodBuild.buildInitialSystem)
     sinon.assert.calledOnce(startProd.envBuilder.writeEnv)
     sinon.assert.calledOnce(startProd.prodBuild.buildIos)
-    sinon.assert.calledOnce(startProd.requireSystemClass)
-    sinon.assert.calledWith(startProd.requireSystemClass, 'envSetDir/system/System')
-    sinon.assert.calledOnce(startProd.startSystem)
-    sinon.assert.calledWith(startProd.startSystem, SystemClass)
+    sinon.assert.calledOnce(startProd.systemStarter.start)
+    sinon.assert.calledWith(startProd.systemStarter.start, 'envSetDir/system/System')
 
   it 'installModules - not force and node_modules exists - do nothing', ->
     startProd = @newInstance()
