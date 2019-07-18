@@ -6,6 +6,7 @@ import BuildSystem from '../../shared/envSetBuild/BuildSystem';
 import BuildIo from '../../shared/envSetBuild/BuildIo';
 import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
 import Os from '../../shared/Os';
+import PackageJson from '../../shared/interfaces/PackageJson';
 import Props from './Props';
 
 
@@ -64,7 +65,7 @@ export default class ProdBuild {
 
   private async generatePackageJson(dependencies: {[index: string]: any}): Promise<string> {
     const templateContent: string = await this.os.getFileContent(PACKAGE_JSON_TEMPLATE_PATH);
-    const squildletPackageJson: {version: string} = require(SQUIDLET_PACKAGE_JSON_PATH);
+    const squildletPackageJson: PackageJson = this.requireSquidletPackageJson();
 
     return _template(templateContent)({
       version: squildletPackageJson.version,
@@ -72,4 +73,10 @@ export default class ProdBuild {
     });
   }
 
+  /**
+   * Wrapper for test purpose
+   */
+  private requireSquidletPackageJson(): PackageJson {
+    return require(SQUIDLET_PACKAGE_JSON_PATH);
+  }
 }

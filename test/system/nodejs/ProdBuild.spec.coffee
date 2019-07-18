@@ -1,13 +1,9 @@
 ProdBuild = require('../../../nodejs/starter/ProdBuild').default
+Os = require('../../../shared/Os').default
 
 
 describe.only 'nodejs.ProdBuild', ->
   beforeEach ->
-    @os = {
-      #exists: () =>
-      #writeFile
-      #getFileContent
-    }
     @props = {
       workDir: 'workDir'
       envSetDir: 'envSetDir'
@@ -15,7 +11,7 @@ describe.only 'nodejs.ProdBuild', ->
       platform: 'nodejs'
       force: false
     }
-    @prodBuild = new ProdBuild(@os, @props)
+    @prodBuild = new ProdBuild(new Os(), @props)
 
   it 'buildInitialSystem', ->
     @prodBuild.buildSystem = {
@@ -31,7 +27,31 @@ describe.only 'nodejs.ProdBuild', ->
     # TODO: !!
 
   it 'buildPackageJson', ->
-    # TODO: !!
+    packageJson = '{version: "1.2.3"}'
+    @prodBuild.generatePackageJson = () => Promise.resolve(packageJson)
+    @prodBuild.os.writeFile = sinon.stub().returns(Promise.resolve())
+
+    await @prodBuild.buildPackageJson()
+
+    sinon.assert.calledOnce(@prodBuild.os.writeFile)
+    sinon.assert.calledWith(@prodBuild.os.writeFile, 'workDir/package.json', packageJson)
 
   it 'generatePackageJson', ->
-    # TODO: !!
+    #packageJson = { name: 'myName', version: '1.2.3' }
+    #@prodBuild.os.getFileContent = () => Promise.resolve(packageJson)
+    squidletVersion = '1.2.3'
+    deps = { myDep: '1.2.3' }
+    @prodBuild.requireSquidletPackageJson = () => { version: squidletVersion }
+
+    result = await @prodBuild.generatePackageJson(deps)
+
+    testResult = """
+    {
+      "name": "squidlet-host",
+      "version": "#{squidletVersion}",
+      "dependencies": #{JSON.stringify(deps)}
+    }
+
+    """
+
+    assert.equal(result, testResult)
