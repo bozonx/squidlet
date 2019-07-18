@@ -37,6 +37,9 @@ Also you can specify the next params:
  
 ### Start production host
 
+System and entities are rebuilt each time you start prod build. Node modules are installed
+only first time or if `--force` parameter is set.
+
     squidletctl start
       --prod=true
       [--machine=x86 | arm | rpi]
@@ -63,8 +66,7 @@ Also you can specify the next params:
   By default it uses $SQUIDLET_ROOT dir instead "build" of repository.
 * --name uses only if group config is specified
   and selects a host config from group config
-* --force - in production it rebuilds system and installs npm modules.
-   In development it installs npm modules.
+* --force - it runs `npm install`
 * --ioset=localhost:8889 - connect to ioSet of remote host. You should allow it in this host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
