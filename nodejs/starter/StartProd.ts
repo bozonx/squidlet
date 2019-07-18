@@ -61,7 +61,8 @@ export default class StartProd {
     await this.os.mkdirP(this.props.varDataDir);
     await this.installModules();
 
-    await this.prodBuild.buildInitialSystem(this.getPathToProdSystemDir());
+    //if (!this.props.force && await this.os.exists(prodSystemDirPath)) return;
+    await this.prodBuild.buildInitialSystem();
     // build config and entities
     await this.envBuilder.writeEnv();
     // build io
@@ -97,7 +98,7 @@ export default class StartProd {
 
     const symLinkDst = path.join(this.props.workDir, 'node_modules', 'system');
 
-    console.info(`===> Making symlink from ${this.getPathToProdSystemDir()} to ${symLinkDst}`);
+    console.info(`===> Making symlink from "${this.getPathToProdSystemDir()}" to "${symLinkDst}"`);
 
     try {
       await this.os.symlink(

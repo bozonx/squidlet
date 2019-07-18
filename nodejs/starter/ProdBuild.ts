@@ -15,35 +15,26 @@ const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.templ
 export default class ProdBuild {
   private readonly os: Os;
   private readonly props: Props;
+  private buildSystem: BuildSystem;
 
 
   constructor(os: Os, props: Props) {
     this.os = os;
     this.props = props;
+    this.buildSystem = new BuildSystem(this.os);
   }
 
 
   /**
-   * Build system only at first time.
-   * It builds to workDir/envset/system
+   * Build system to workDir/envsSet/system
    */
-  async buildInitialSystem(prodSystemDirPath: string) {
-    // TODO: проверять версию system - если не совпадает то перебилдить, если совпадает то нет.
-    //       если стоит force - то билдить
-
-    // TODO: сохранять версию system
-
-    // else if it exists - do nothing
-    if (!this.props.force && await this.os.exists(prodSystemDirPath)) return;
-
-    // Build system to workDir/envset/system
-
+  async buildInitialSystem() {
     const systemBuildDir = path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
     const systemTmpDir = path.join(this.props.tmpDir, systemConfig.envSetDirs.system);
-    const buildSystem: BuildSystem = new BuildSystem(this.os);
 
-    console.info(`===> Building system`);
-    await buildSystem.build(systemBuildDir, systemTmpDir);
+    console.info(`===> Building system to "${systemBuildDir}"`);
+
+    await this.buildSystem.build(systemBuildDir, systemTmpDir);
   }
 
   /**
