@@ -22,8 +22,8 @@ describe.only 'nodejs.StartProd', ->
       hostConfig: @hostConfog
     }
 
-    @newInstance = (argMachine, argWorkDir) =>
-      startProd = new StartProd(@configPath, false, argMachine, @argHostName, argWorkDir)
+    @newInstance = () =>
+      startProd = new StartProd(@configPath, false, @x86Machine, @argHostName, @workDir)
 
       startProd.props = @fakeProps
       startProd.os = {
@@ -48,7 +48,7 @@ describe.only 'nodejs.StartProd', ->
       return startProd
 
   it 'init - init groupConfig, props and make envBuilder instance', ->
-    startProd = new StartProd(@configPath, false, @x86Machine, @argHostName, argWorkDir)
+    startProd = new StartProd(@configPath, false, @x86Machine, @argHostName, @workDir)
 
     startProd.groupConfig.init = sinon.stub().returns(Promise.resolve());
     startProd.groupConfig.getHostConfig = () => @hostConfog
@@ -62,7 +62,7 @@ describe.only 'nodejs.StartProd', ->
 
   it 'start', ->
     SystemClass = class Sys
-    startProd = @newInstance(@x86Machine, @workDir)
+    startProd = @newInstance()
 
     startProd.installModules = sinon.stub().returns(Promise.resolve())
     startProd.requireSystemClass = sinon.stub().returns(SystemClass)
@@ -82,34 +82,36 @@ describe.only 'nodejs.StartProd', ->
     sinon.assert.calledWith(startProd.startSystem, SystemClass)
 
   it 'installModules - not force and node_modules exists - do nothing', ->
-    startProd = @newInstance(@x86Machine, @workDir)
+    startProd = @newInstance()
 
-    startProd.os.exists = () => true
+    startProd.os.exists = () => Promise.resolve(true)
+
+    await startProd.installModules()
 
     sinon.assert.notCalled(startProd.prodBuild.buildPackageJson)
 
   it 'installModules - not force and node_modules doesnt exist', ->
-    startProd = @newInstance(@x86Machine, @workDir)
+    startProd = @newInstance()
 
-    startProd.os.exists = () => false
+    startProd.os.exists = () => Promise.resolve(false)
+
+    await startProd.installModules()
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledWith(startProd.prodBuild.buildPackageJson, {dep: '1.2.3'})
     sinon.assert.calledOnce(startProd.installNpmModules)
     sinon.assert.calledOnce(startProd.os.symlink)
-    sinon.assert.calledWith(startProd.os.symlink, '', '')
+    sinon.assert.calledWith(startProd.os.symlink, 'envSetDir/system', 'testHost/node_modules/system')
 
   it 'installModules - force', ->
-    startProd = @newInstance(@x86Machine, @workDir)
+    startProd = @newInstance()
 
     startProd.props.force = true
-    startProd.os.exists = () => true
+    startProd.os.exists = () => Promise.resolve(true)
+
+    await startProd.installModules()
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledOnce(startProd.installNpmModules)
     sinon.assert.calledOnce(startProd.os.symlink)
-    sinon.assert.calledWith(startProd.os.symlink, '', '')
-
-
-# TODO: test force
-# TODO: test resolving a machine
+    sinon.assert.calledWith(startProd.os.symlink, 'envSetDir/system', 'testHost/node_modules/system')

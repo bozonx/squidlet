@@ -95,11 +95,14 @@ export default class StartProd {
 
     await this.installNpmModules();
 
-    // make sym link to system
+    const symLinkDst = path.join(this.props.workDir, 'node_modules', 'system');
+
+    console.info(`===> Making symlink from ${this.getPathToProdSystemDir()} to ${symLinkDst}`);
+
     try {
       await this.os.symlink(
         this.getPathToProdSystemDir(),
-        path.join(this.props.workDir, 'node_modules', 'system')
+        symLinkDst
       );
     }
     catch (e) {
