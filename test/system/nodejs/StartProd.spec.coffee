@@ -1,7 +1,7 @@
 StartProd = require('../../../nodejs/starter/StartProd').default
 
 
-describe.only 'nodejs.StartProd', ->
+describe 'nodejs.StartProd', ->
   beforeEach ->
     @configPath = 'path/to/config'
     @argHostName = 'testHost'

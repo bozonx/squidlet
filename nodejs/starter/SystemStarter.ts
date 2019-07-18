@@ -19,7 +19,7 @@ export default class SystemStarter {
 
 
   async start(pathToSystem: string, ioSet?: IoSet) {
-    const SystemClass = this.requireSystemClass(pathToSystem);
+    const SystemClass: SystemClassType = this.requireSystemClass(pathToSystem);
     const systemConfigExtend = this.makeSystemConfigExtend();
 
     console.info(`===> Initializing system`);
