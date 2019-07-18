@@ -5,12 +5,13 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules, startSystem, SystemClassType} from './helpers';
+import {installNpmModules} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
+import SystemStarter from './SystemStarter';
 
 
 type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
@@ -21,6 +22,7 @@ export default class StartDevelop {
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
   private readonly argIoset?: string;
+  private readonly systemStarter: SystemStarter;
   private _envBuilder?: EnvBuilder;
   private get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
@@ -45,6 +47,7 @@ export default class StartDevelop {
       argHostName,
       argWorkDir
     );
+    this.systemStarter = new SystemStarter(this.props);
   }
 
   async init() {
@@ -69,10 +72,9 @@ export default class StartDevelop {
     await this.installModules();
 
     const pathToSystem = this.getPathToProdSystemFile();
-    const SystemClass = this.requireSystemClass(pathToSystem);
     const ioSet: IoSet = await this.makeIoSet();
 
-    await this.startSystem(SystemClass, ioSet);
+    await this.systemStarter.start(pathToSystem, ioSet);
   }
 
 
@@ -132,17 +134,4 @@ export default class StartDevelop {
     return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
   }
 
-  /**
-   * Wrapper for test purpose
-   */
-  private requireSystemClass(pathToSystem: string): SystemClassType {
-    return require(pathToSystem).default;
-  }
-
-  /**
-   * Wrapper for test purpose
-   */
-  private async startSystem(SystemClass: SystemClassType, ioSet: IoSet) {
-    await startSystem(this.props, SystemClass, ioSet);
-  }
 }

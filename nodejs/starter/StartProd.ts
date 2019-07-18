@@ -4,11 +4,12 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules, startSystem, SystemClassType} from './helpers';
+import {installNpmModules} from './helpers';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
+import SystemStarter from './SystemStarter';
 
 
 export default class StartProd {
@@ -16,6 +17,7 @@ export default class StartProd {
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
   private readonly prodBuild: ProdBuild;
+  private readonly systemStarter: SystemStarter;
   private _envBuilder?: EnvBuilder;
   private get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
@@ -39,6 +41,7 @@ export default class StartProd {
       argWorkDir,
     );
     this.prodBuild = new ProdBuild(this.os, this.props);
+    this.systemStarter = new SystemStarter(this.props);
   }
 
   async init() {
@@ -69,9 +72,8 @@ export default class StartProd {
     await this.prodBuild.buildIos();
 
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
-    const SystemClass = this.requireSystemClass(pathToSystem);
 
-    await this.startSystem(SystemClass);
+    await this.systemStarter.start(pathToSystem);
   }
 
 
@@ -118,21 +120,8 @@ export default class StartProd {
   /**
    * Wrapper for test purpose
    */
-  private requireSystemClass(pathToSystem: string): SystemClassType {
-    return require(pathToSystem).default;
-  }
-
-  /**
-   * Wrapper for test purpose
-   */
-  private async startSystem(SystemClass: SystemClassType) {
-    await startSystem(this.props, SystemClass);
-  }
-
-  /**
-   * Wrapper for test purpose
-   */
   private async installNpmModules() {
     await installNpmModules(this.os, this.props.workDir);
   }
+
 }

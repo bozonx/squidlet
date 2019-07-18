@@ -6,7 +6,7 @@ import Props from './Props';
 import System from '../../system';
 
 
-export type SystemClassType = new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System;
+type SystemClassType = new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System;
 
 
 export default class SystemStarter {
@@ -18,14 +18,15 @@ export default class SystemStarter {
   }
 
 
-  async startSystem(props: Props, SystemClass: SystemClassType, ioSet?: IoSet) {
-    const systemConfigExtend = this.makeSystemConfigExtend(props);
+  async start(pathToSystem: string, ioSet?: IoSet) {
+    const SystemClass = this.requireSystemClass(pathToSystem);
+    const systemConfigExtend = this.makeSystemConfigExtend();
 
     console.info(`===> Initializing system`);
 
     const system = new SystemClass(ioSet, systemConfigExtend);
 
-    this.listenDestroySignals(props.destroyTimeoutSec, system.destroy);
+    this.listenDestroySignals(system.destroy);
 
     console.info(`===> Starting system`);
 
@@ -33,22 +34,22 @@ export default class SystemStarter {
   }
 
 
-  private makeSystemConfigExtend(props: Props): {[index: string]: any} {
+  private makeSystemConfigExtend(): {[index: string]: any} {
     return {
       rootDirs: {
-        envSet: props.envSetDir,
-        varData: path.join(props.workDir, HOST_VAR_DATA_DIR),
-        tmp: path.join(props.tmpDir, HOST_TMP_HOST_DIR),
+        envSet: this.props.envSetDir,
+        varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
+        tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
       },
     };
   }
 
-  private listenDestroySignals(destroyTimeoutSec: number, destroy: () => Promise<void>) {
+  private listenDestroySignals(destroy: () => Promise<void>) {
     const gracefullyDestroy = async () => {
       setTimeout(() => {
-        console.error(`ERROR: App hasn't been gracefully destroyed during "${destroyTimeoutSec}" seconds`);
+        console.error(`ERROR: App hasn't been gracefully destroyed during "${this.props.destroyTimeoutSec}" seconds`);
         process.exit(3);
-      }, destroyTimeoutSec * 1000);
+      }, this.props.destroyTimeoutSec * 1000);
 
       try {
         await destroy();
@@ -62,6 +63,13 @@ export default class SystemStarter {
 
     process.on('SIGTERM', gracefullyDestroy);
     process.on('SIGINT', gracefullyDestroy);
+  }
+
+  /**
+   * Wrapper for test purpose
+   */
+  private requireSystemClass(pathToSystem: string): SystemClassType {
+    return require(pathToSystem).default;
   }
 
 }
