@@ -8,9 +8,7 @@ import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
 import Os from '../../shared/Os';
 import PackageJson from '../../shared/interfaces/PackageJson';
 import Props from './Props';
-
-
-const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');
+import {PACKAGE_JSON_TEMPLATE_PATH} from './constanats';
 
 
 export default class ProdBuild {

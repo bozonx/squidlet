@@ -11,9 +11,7 @@ import {
 } from '../../shared/constants';
 import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
-
-
-const DESTROY_TIMEOUT_SEC = 60;
+import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
 
 
 export default class Props {
@@ -23,8 +21,7 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
-  // TODO: review
-  destroyTimeoutSec: number = DESTROY_TIMEOUT_SEC;
+  destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
@@ -52,10 +49,10 @@ export default class Props {
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
+    this.force = argForce;
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
-    this.force = argForce;
   }
 
 
@@ -103,77 +100,3 @@ export default class Props {
   }
 
 }
-
-
-
-// if (this.argWorkDir) {
-//   this.workDir = path.resolve(process.cwd(), this.argWorkDir);
-// }
-// else {
-//   // else use under a $SQUIDLET_ROOT
-//   const squidletRoot: string = resolveSquidletRoot();
-//
-//   this.workDir = path.join(squidletRoot, HOSTS_WORK_DIRS, this.hostId);
-// }
-
-//this._hostConfig.ioSet = this.resolveIoSetConfig(this._hostConfig.ioSet);
-// /**
-//  * Replace ioSet config if specified --ioset and --ioset-props arguments.
-//  * Merge if specified only --ioset
-//  * Else just return as was specified in host config or undefined
-//  */
-// private resolveIoSetConfig(specifiedIoSetConfig?: IoSetConfig): IoSetConfig | undefined {
-//   // replace current ioSet host's config param
-//   if (this.argIosetProps) {
-//
-//     if (!this.argIoset) {
-//       throw new Error(`If you specified a "--ioset-props" you should specify a "--ioset" argument`);
-//     }
-//
-//     const parsedProps = JSON.parse(this.argIosetProps);
-//
-//     if (!_isPlainObject(parsedProps)) {
-//       throw new Error(`Incorrect type of ioset props which is set in "-ioset-props" argument`);
-//     }
-//
-//     const ioSetProps = this.parseIoSetString(this.argIoset);
-//
-//     return {
-//       ...parsedProps,
-//       ...ioSetProps,
-//     };
-//   }
-//   // merge with current ioSet host's config param
-//   else if (this.argIoset) {
-//     const ioSetProps = this.parseIoSetString(this.argIoset);
-//
-//     return {
-//       ...specifiedIoSetConfig,
-//       ...ioSetProps,
-//     };
-//   }
-//
-//   // else return as is
-//   return specifiedIoSetConfig;
-// }
-
-// /**
-//  * Set config paths relative to squidlet work dir if it doesn't set.
-//  */
-// private setPathsToHostConfig() {
-//   if (!this.hostConfig.config) {
-//     this.hostConfig.config = {};
-//   }
-//
-//   if (!this.hostConfig.config.envSetDir) {
-//     this.hostConfig.config.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
-//   }
-//
-//   if (!this.hostConfig.config.varDataDir) {
-//     this.hostConfig.config.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
-//   }
-//
-//   if (!this.hostConfig.config.tmpDir) {
-//     this.hostConfig.config.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
-//   }
-// }

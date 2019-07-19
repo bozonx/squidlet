@@ -3,11 +3,8 @@ import * as path from 'path';
 import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
-import System from '../../system';
 import Os from '../../shared/Os';
-
-
-type SystemClassType = new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System;
+import {SystemClassType} from '../../shared/interfaces/SystemClassType';
 
 
 export default class SystemStarter {

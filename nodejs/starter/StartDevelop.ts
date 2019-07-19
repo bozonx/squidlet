@@ -9,12 +9,9 @@ import {installNpmModules} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 import SystemStarter from './SystemStarter';
-
-
-type IoSetClass = new (os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) => IoSet;
+import {IoSetClass} from '../interfaces/IoSetClass';
 
 
 export default class StartDevelop {
