@@ -1,7 +1,7 @@
 SystemStarter = require('../../../nodejs/starter/SystemStarter').default
 
 
-describe.only 'nodejs.ProdBuild', ->
+describe 'nodejs.SystemStarter', ->
   beforeEach ->
     @os = {
       processExit: sinon.spy()
@@ -68,6 +68,8 @@ describe.only 'nodejs.ProdBuild', ->
     sinon.assert.calledWith(@os.processExit, 2)
 
   it 'gracefullyDestroyCb - timeout exceeded', ->
+    clock = sinon.useFakeTimers()
+
     destroyPromise = new Promise((resolve) =>
       setTimeout(() =>
         resolve()
@@ -75,8 +77,16 @@ describe.only 'nodejs.ProdBuild', ->
     )
     destroy = sinon.stub().returns(destroyPromise)
 
-    await @systemStarter.gracefullyDestroyCb(destroy)
+    @systemStarter.gracefullyDestroyCb(destroy)
 
-    sinon.assert.notCalled(destroy)
+    clock.tick(100)
+
+    sinon.assert.calledOnce(destroy)
     sinon.assert.calledOnce(@os.processExit)
     sinon.assert.calledWith(@os.processExit, 3)
+
+    clock.tick(1000)
+
+    clock.restore()
+
+
