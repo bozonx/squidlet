@@ -63,7 +63,10 @@ export default class Props {
     this.validate();
 
     this.hostId = this.hostConfig.id as any;
-    this.workDir = resolveWorkDir(path.join(HOSTS_WORK_DIRS, this.hostId), this.argWorkDir);
+
+    const hostWorkDir = path.join(HOSTS_WORK_DIRS, this.hostId);
+
+    this.workDir = this.resolveWorkDir(hostWorkDir);
 
     this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
     this.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
@@ -97,6 +100,10 @@ export default class Props {
     }
 
     return getOsMachine(this.os);
+  }
+
+  private resolveWorkDir(hostWorkDir: string): string {
+    return resolveWorkDir(hostWorkDir, this.argWorkDir);
   }
 
 }
