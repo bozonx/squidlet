@@ -84,10 +84,8 @@ export default class StartProd {
    * It installs only if node_modules directory doesn't exist it force parameter isn't set.
    */
   private async installModules() {
-    const nodeModulesDir = path.join(this.props.workDir, 'node_modules');
-
     // do not install node modules if they have been installed previously
-    if (!this.props.force && await this.os.exists(nodeModulesDir)) {
+    if (!this.props.force && await this.os.exists(this.getNodeModulesDir())) {
       console.info(`Directory node_modules exists. It doesn't need to run npm install`);
 
       return;
@@ -103,13 +101,15 @@ export default class StartProd {
       await this.runNpmInstall();
     }
 
-    // TODO: move make symlink to separate method
+    await this.makeSystemSymLink();
+  }
 
+  private async makeSystemSymLink() {
+    const nodeModulesDir = this.getNodeModulesDir();
     const symLinkDst = path.join(nodeModulesDir, 'system');
 
     console.info(`===> Making symlink from "${this.getPathToProdSystemDir()}" to "${symLinkDst}"`);
 
-    // TODO: test
     await this.os.mkdirP(nodeModulesDir);
 
     try {
@@ -125,6 +125,10 @@ export default class StartProd {
 
   private getPathToProdSystemDir(): string {
     return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
+  }
+
+  private getNodeModulesDir(): string {
+    return path.join(this.props.workDir, 'node_modules');
   }
 
   private async runNpmInstall() {

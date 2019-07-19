@@ -92,24 +92,35 @@ describe 'nodejs.StartProd', ->
     startProd = @newInstance()
 
     startProd.os.exists = () => Promise.resolve(false)
+    startProd.makeSystemSymLink = sinon.stub().returns(Promise.resolve())
 
     await startProd.installModules()
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledWith(startProd.prodBuild.buildPackageJson, {dep: '1.2.3'})
     sinon.assert.calledOnce(startProd.runNpmInstall)
-    sinon.assert.calledOnce(startProd.os.symlink)
-    sinon.assert.calledWith(startProd.os.symlink, 'envSetDir/system', 'testHost/node_modules/system')
+    sinon.assert.calledOnce(startProd.makeSystemSymLink)
+
 
   it 'installModules - force', ->
     startProd = @newInstance()
 
     startProd.props.force = true
     startProd.os.exists = () => Promise.resolve(true)
+    startProd.makeSystemSymLink = sinon.stub().returns(Promise.resolve())
 
     await startProd.installModules()
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledOnce(startProd.runNpmInstall)
+    sinon.assert.calledOnce(startProd.makeSystemSymLink)
+
+  it 'makeSystemSymLink', ->
+    startProd = @newInstance()
+
+    await startProd.makeSystemSymLink()
+
+    sinon.assert.calledOnce(startProd.os.mkdirP)
+    sinon.assert.calledWith(startProd.os.mkdirP, 'testHost/node_modules')
     sinon.assert.calledOnce(startProd.os.symlink)
     sinon.assert.calledWith(startProd.os.symlink, 'envSetDir/system', 'testHost/node_modules/system')

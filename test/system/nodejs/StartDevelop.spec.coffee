@@ -74,11 +74,11 @@ describe.only 'nodejs.StartDevelop', ->
     sinon.assert.calledOnce(startDevelop.systemStarter.start)
     sinon.assert.calledWith(startDevelop.systemStarter.start, 'path/to/System', ioSet)
 
-  it 'installModules - not force and node_modules exists - do nothing', ->
-    startDevelop = @newInstance()
-
-  it 'installModules - not force and node_modules doesnt exist', ->
-    startDevelop = @newInstance()
-
-  it 'installModules - force', ->
-    startDevelop = @newInstance()
+#  it 'installModules - not force and node_modules exists - do nothing', ->
+#    startDevelop = @newInstance()
+#
+#  it 'installModules - not force and node_modules doesnt exist', ->
+#    startDevelop = @newInstance()
+#
+#  it 'installModules - force', ->
+#    startDevelop = @newInstance()

@@ -74,7 +74,15 @@ export default class StartDevelop {
   }
 
 
+  /**
+   * Install modules that specified in host config according to platform.
+   * It installs modules into root node_modules dir of squidlet repository.
+   */
   private async installModules() {
+
+    // TODO: review
+    // TODO: why REPO_ROOT ????
+
     const dependencies = this.envBuilder.configManager.dependencies;
 
     if (!dependencies || _isEmpty(dependencies)) return;
@@ -91,16 +99,17 @@ export default class StartDevelop {
 
     console.info(`===> Installing npm modules`);
 
-    await this.installNpmModules(toInstallModules);
+    await this.installNpmModules(toInstallModules, REPO_ROOT);
   }
 
   /**
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   private async makeIoSet(): Promise<IoSet> {
+    // TODO: review
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = `.${path.sep}${ioSetFile}`;
-    const IoSetClass: IoSetClass = require(ioSetPath).default;
+    const IoSetClass: IoSetClass = this.os.require(ioSetPath).default;
 
     console.info(`using io set "${ioSetFile}"`);
 
@@ -118,6 +127,7 @@ export default class StartDevelop {
     return ioSet;
   }
 
+  // TODO: review
   private resolveIoSetType(): string {
     if (this.argIoset) {
       return 'IoSetDevelopRemote';
@@ -130,11 +140,13 @@ export default class StartDevelop {
     return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
   }
 
-  private async installNpmModules(modules: string[] = []) {
+  /**
+   * Install npm modules into node_modules of repository and don't save them to package.json
+   */
+  private async installNpmModules(modules: string[] = [], cwd: string) {
     const cmd = `npm install ${modules.join(' ')}`;
 
-    // TODO: why REPO_ROOT ????
-    await runCmd(this.os, cmd, REPO_ROOT);
+    await runCmd(this.os, cmd, cwd);
   }
 
 }
