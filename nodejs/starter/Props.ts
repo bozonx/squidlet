@@ -89,11 +89,15 @@ export default class Props {
       return this.argMachine;
     }
 
-    return getOsMachine(this.os);
+    return this.getOsMachine();
   }
 
   private resolveWorkDir(hostWorkDir: string): string {
     return resolveWorkDir(hostWorkDir, this.argWorkDir);
+  }
+
+  private getOsMachine(): Promise<NodejsMachines> {
+    return getOsMachine(this.os);
   }
 
 }

@@ -1,7 +1,7 @@
 Props = require('../../../nodejs/starter/Props').default
 
 
-describe.only 'nodejs.Props', ->
+describe 'nodejs.Props', ->
   beforeEach ->
     @os = {}
     @hostConfig = { id: 'myhost', platform: 'nodejs' }
@@ -37,5 +37,23 @@ describe.only 'nodejs.Props', ->
 
     assert.throws(() => @props.validate())
 
-  it 'resolveMachine', ->
+  it 'resolveMachine - have argMachine', ->
+    @props.argMachine = @machine
+    @props.getOsMachine = sinon.spy()
 
+    result = await @props.resolveMachine()
+
+    sinon.assert.notCalled(@props.getOsMachine)
+    assert.equal(result, @machine)
+
+  it 'resolveMachine - unsupported machine', ->
+    @props.argMachine = 'unsupported'
+
+    assert.isRejected(@props.resolveMachine())
+
+  it 'resolveMachine - not set arg machine', ->
+    @props.getOsMachine = sinon.stub().returns(Promise.resolve(@machine))
+
+    result = await @props.resolveMachine()
+
+    assert.equal(result, @machine)

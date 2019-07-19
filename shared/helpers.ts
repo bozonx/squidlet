@@ -76,7 +76,7 @@ export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
   return path.join(REPO_ROOT, 'build', subDir);
 }
 
-export async function getOsMachine(os: Os) {
+export async function getOsMachine(os: Os): Promise<NodejsMachines> {
   const spawnResult: SpawnCmdResult = await os.spawnCmd('hostnamectl');
 
   if (spawnResult.status !== 0) {
