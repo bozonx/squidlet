@@ -75,17 +75,7 @@ export default class Props {
 
 
   private validate() {
-    if (!this._hostConfig) {
-      throw new Error(`You have to define host config`);
-    }
-    else if (!this._hostConfig.id) {
-      throw new Error(`You have to specify an host id in your host config`);
-    }
-    else if (this.argHostName && this.argHostName !== this.hostConfig.id) {
-      throw new Error(`Param "id" of host config "${this.hostId}" is not as specified as`
-        + ` a command argument "${this.argHostName}"`);
-    }
-    else if (this.platform !== this.hostConfig.platform) {
+    if (this.platform !== this.hostConfig.platform) {
       throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
     }
   }

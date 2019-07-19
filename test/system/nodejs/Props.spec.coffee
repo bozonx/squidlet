@@ -31,3 +31,11 @@ describe.only 'nodejs.Props', ->
     assert.isTrue(@props.force)
     assert.equal(@props.hostConfig, @hostConfig)
     assert.equal(@props.machine, @machine)
+
+  it 'validate - platform doesnt match hostConfig.platform', ->
+    @hostConfig.platform = 'other'
+
+    assert.throws(() => @props.validate())
+
+  it 'resolveMachine', ->
+
