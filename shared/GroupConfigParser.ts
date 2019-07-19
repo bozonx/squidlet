@@ -1,7 +1,7 @@
-import _isPlainObject = require('lodash/isPlainObject');
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
+import {isPlainObject} from '../system/helpers/lodashLike';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from './Os';
 import GroupConfig from './interfaces/GroupConfig';
@@ -26,7 +26,7 @@ export default class GroupConfigParser {
   async init() {
     const preConfig = await this.os.loadYamlFile(this.groupConfigPath) as any;
 
-    if (!_isPlainObject(preConfig)) {
+    if (!isPlainObject(preConfig)) {
       throw new Error(`Config has to be an object`);
     }
 
@@ -76,7 +76,7 @@ export default class GroupConfigParser {
       if (typeof hostConfigPathOrObj === 'string') {
         hostConfig = await this.os.loadYamlFile(hostConfigPathOrObj);
       }
-      else if (_isPlainObject(hostConfigPathOrObj)) {
+      else if (isPlainObject(hostConfigPathOrObj)) {
         hostConfig = hostConfigPathOrObj;
       }
       else {
@@ -117,7 +117,7 @@ export default class GroupConfigParser {
       throw new Error(`"plugins" param of group config has to be an array`);
     }
     // hostDefaults
-    else if (preGroupConfig.hostDefaults && !_isPlainObject(preGroupConfig.hostDefaults)) {
+    else if (preGroupConfig.hostDefaults && !isPlainObject(preGroupConfig.hostDefaults)) {
       throw new Error(`"plugins" param of group config has to be an array`);
     }
   }

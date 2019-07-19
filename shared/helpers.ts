@@ -5,9 +5,6 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
-import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import validateHostConfig from '../hostEnvBuilder/hostConfig/validateHostConfig';
-import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 export const REPO_ROOT = path.resolve(__dirname, '../');
@@ -23,6 +20,7 @@ export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 export function getFileNameOfPath(pathToIo: string): string {
 
   // TODO: вместо его использовать хэлпер из system который берет перый элемент пути
+  // TODO: что насчет расширения ???
 
   const parsed = path.parse(pathToIo);
 

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os, {SpawnCmdResult} from '../../shared/Os';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';

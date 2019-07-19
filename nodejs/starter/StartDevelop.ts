@@ -1,6 +1,6 @@
 import * as path from 'path';
-import _isEmpty = require('lodash/isEmpty');
 
+import {isEmpty} from '../../system/helpers/lodashLike';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
@@ -85,7 +85,7 @@ export default class StartDevelop {
 
     const dependencies = this.envBuilder.configManager.dependencies;
 
-    if (!dependencies || _isEmpty(dependencies)) return;
+    if (!dependencies || isEmpty(dependencies)) return;
 
     const toInstallModules: string[] = [];
 
