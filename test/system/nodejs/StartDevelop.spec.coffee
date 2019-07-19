@@ -22,11 +22,25 @@ describe.only 'nodejs.StartDevelop', ->
       hostConfig: @hostConfog
     }
 
-    @newInstance = (argMachine, argWorkDir, argForce = false) =>
-      new StartDevelop(@configPath, argForce, argMachine, @argHostName, argWorkDir)
+    @newInstance = () =>
+      startDevelop = new StartDevelop(@configPath, false, @x86Machine, @argHostName, @workDir)
+
+      startDevelop.props = @fakeProps
+      startDevelop.os = {
+        mkdirP: sinon.stub().returns(Promise.resolve())
+      }
+      startDevelop._envBuilder = {
+        collect: sinon.stub().returns(Promise.resolve())
+      }
+      startDevelop.systemStarter = {
+        start: sinon.stub().returns(Promise.resolve())
+      }
+      startDevelop.installNpmModules = sinon.stub().returns(Promise.resolve())
+
+      return startDevelop
 
   it 'init - init groupConfig, props and make envBuilder instance', ->
-    startDevelop = @newInstance(@x86Machine, @workDir)
+    startDevelop = new StartDevelop(@configPath, false, @x86Machine, @argHostName, @workDir)
 
     startDevelop.groupConfig.init = sinon.stub().returns(Promise.resolve());
     startDevelop.groupConfig.getHostConfig = () => @hostConfog
@@ -43,19 +57,9 @@ describe.only 'nodejs.StartDevelop', ->
     pathToSystemFile = 'path/to/System'
     startDevelop = @newInstance(@x86Machine, @workDir)
 
-    startDevelop.props = @fakeProps
-    startDevelop._envBuilder = {
-      collect: sinon.stub().returns(Promise.resolve())
-    }
-    startDevelop.os = {
-      mkdirP: sinon.stub().returns(Promise.resolve())
-    }
     startDevelop.installModules = sinon.stub().returns(Promise.resolve())
     startDevelop.getPathToProdSystemFile = sinon.stub().returns(pathToSystemFile)
     startDevelop.makeIoSet = sinon.stub().returns(ioSet)
-    startDevelop.systemStarter = {
-      start: sinon.stub().returns(Promise.resolve())
-    }
 
     await startDevelop.start()
 
