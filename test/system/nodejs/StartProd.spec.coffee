@@ -45,7 +45,7 @@ describe 'nodejs.StartProd', ->
       startProd.systemStarter = {
         start: sinon.stub().returns(Promise.resolve())
       }
-      startProd.installNpmModules = sinon.stub().returns(Promise.resolve())
+      startProd.runNpmInstall = sinon.stub().returns(Promise.resolve())
 
       return startProd
 
@@ -97,7 +97,7 @@ describe 'nodejs.StartProd', ->
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
     sinon.assert.calledWith(startProd.prodBuild.buildPackageJson, {dep: '1.2.3'})
-    sinon.assert.calledOnce(startProd.installNpmModules)
+    sinon.assert.calledOnce(startProd.runNpmInstall)
     sinon.assert.calledOnce(startProd.os.symlink)
     sinon.assert.calledWith(startProd.os.symlink, 'envSetDir/system', 'testHost/node_modules/system')
 
@@ -110,6 +110,6 @@ describe 'nodejs.StartProd', ->
     await startProd.installModules()
 
     sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
-    sinon.assert.calledOnce(startProd.installNpmModules)
+    sinon.assert.calledOnce(startProd.runNpmInstall)
     sinon.assert.calledOnce(startProd.os.symlink)
     sinon.assert.calledWith(startProd.os.symlink, 'envSetDir/system', 'testHost/node_modules/system')

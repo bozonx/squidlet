@@ -5,11 +5,10 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules} from './helpers';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
+import {REPO_ROOT, runCmd, SYSTEM_DIR} from '../../shared/helpers';
 import SystemStarter from './SystemStarter';
 import {IoSetClass} from '../interfaces/IoSetClass';
 
@@ -92,7 +91,7 @@ export default class StartDevelop {
 
     console.info(`===> Installing npm modules`);
 
-    await installNpmModules(this.os, REPO_ROOT, toInstallModules);
+    await this.installNpmModules(toInstallModules);
   }
 
   /**
@@ -129,6 +128,13 @@ export default class StartDevelop {
 
   private getPathToProdSystemFile(): string {
     return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
+  }
+
+  private async installNpmModules(modules: string[] = []) {
+    const cmd = `npm install ${modules.join(' ')}`;
+
+    // TODO: why REPO_ROOT ????
+    await runCmd(this.os, cmd, REPO_ROOT);
   }
 
 }

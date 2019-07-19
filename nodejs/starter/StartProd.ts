@@ -1,15 +1,16 @@
 import * as path from 'path';
 
-import Os from '../../shared/Os';
+import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {installNpmModules} from './helpers';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
 import SystemStarter from './SystemStarter';
+import {isEmpty} from '../../system/helpers/lodashLike';
+import {runCmd} from '../../shared/helpers';
 
 
 export default class StartProd {
@@ -83,8 +84,10 @@ export default class StartProd {
    * It installs only if node_modules directory doesn't exist it force parameter isn't set.
    */
   private async installModules() {
+    const nodeModulesDir = path.join(this.props.workDir, 'node_modules');
+
     // do not install node modules if they have been installed previously
-    if (!this.props.force && await this.os.exists(path.join(this.props.workDir, 'node_modules'))) {
+    if (!this.props.force && await this.os.exists(nodeModulesDir)) {
       console.info(`Directory node_modules exists. It doesn't need to run npm install`);
 
       return;
@@ -96,11 +99,18 @@ export default class StartProd {
 
     console.info(`===> Installing npm modules`);
 
-    await this.installNpmModules();
+    if (!isEmpty(this.envBuilder.configManager.dependencies)) {
+      await this.runNpmInstall();
+    }
 
-    const symLinkDst = path.join(this.props.workDir, 'node_modules', 'system');
+    // TODO: move make symlink to separate method
+
+    const symLinkDst = path.join(nodeModulesDir, 'system');
 
     console.info(`===> Making symlink from "${this.getPathToProdSystemDir()}" to "${symLinkDst}"`);
+
+    // TODO: test
+    await this.os.mkdirP(nodeModulesDir);
 
     try {
       await this.os.symlink(
@@ -117,8 +127,8 @@ export default class StartProd {
     return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
   }
 
-  private async installNpmModules() {
-    await installNpmModules(this.os, this.props.workDir);
+  private async runNpmInstall() {
+    await runCmd(this.os, `npm install`, this.props.workDir);
   }
 
 }

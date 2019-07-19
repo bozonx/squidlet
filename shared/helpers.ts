@@ -123,6 +123,16 @@ export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsM
   throw new Error(`Unsupported architecture "${arch}"`);
 }
 
+export async function runCmd(os: Os, cmd: string, cwd: string) {
+  const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
+
+  if (result.status) {
+    console.error(`ERROR: npm ends with code ${result.status}`);
+    console.error(result.stdout);
+    console.error(result.stderr);
+  }
+}
+
 // /**
 //  * Validate and merge config with machine config of specified machine
 //  */

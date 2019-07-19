@@ -31,6 +31,9 @@ describe.only 'nodejs.StartDevelop', ->
       }
       startDevelop._envBuilder = {
         collect: sinon.stub().returns(Promise.resolve())
+        configManager: {
+          dependencies: {dep: '1.2.3'}
+        }
       }
       startDevelop.systemStarter = {
         start: sinon.stub().returns(Promise.resolve())
@@ -55,7 +58,7 @@ describe.only 'nodejs.StartDevelop', ->
   it 'start', ->
     ioSet = { init: () -> }
     pathToSystemFile = 'path/to/System'
-    startDevelop = @newInstance(@x86Machine, @workDir)
+    startDevelop = @newInstance()
 
     startDevelop.installModules = sinon.stub().returns(Promise.resolve())
     startDevelop.getPathToProdSystemFile = sinon.stub().returns(pathToSystemFile)
@@ -70,3 +73,12 @@ describe.only 'nodejs.StartDevelop', ->
     sinon.assert.calledOnce(startDevelop.installModules)
     sinon.assert.calledOnce(startDevelop.systemStarter.start)
     sinon.assert.calledWith(startDevelop.systemStarter.start, 'path/to/System', ioSet)
+
+  it 'installModules - not force and node_modules exists - do nothing', ->
+    startDevelop = @newInstance()
+
+  it 'installModules - not force and node_modules doesnt exist', ->
+    startDevelop = @newInstance()
+
+  it 'installModules - force', ->
+    startDevelop = @newInstance()
