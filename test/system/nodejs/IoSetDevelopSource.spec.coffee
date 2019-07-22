@@ -11,5 +11,11 @@ describe.only 'nodejs.IoSetDevelopSource', ->
     @ioSource = new IoSetDevelopSource(@os, @envBuilder, @envSetDir, @platform, @machine)
 
   it 'prepare', ->
+    @ioSource.storageWrapper.init = sinon.stub().returns(Promise.resolve())
+
+    await @ioSource.prepare()
+
+    sinon.assert.calledOnce(@ioSource.storageWrapper.init)
 
   it 'init', ->
+

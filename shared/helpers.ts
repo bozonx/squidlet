@@ -12,28 +12,16 @@ export const SYSTEM_DIR = path.join(REPO_ROOT, 'system');
 export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 
 
-// TODO: !!! test bellow
-
 /**
- * Make io name from io path
+ * Make io name from io path without extension.
+ * E.g "/path/to/file.ts" -> "file"
  */
 export function getFileNameOfPath(pathToIo: string): string {
-
-  // TODO: вместо его использовать хэлпер из system который берет перый элемент пути
-  // TODO: что насчет расширения ???
-
   const parsed = path.parse(pathToIo);
 
   if (!parsed.name) throw new Error(`Can't parse io name of path "${pathToIo}"`);
 
   return parsed.name;
-}
-
-/**
- * Make list of io names from list of io paths.
- */
-export function makeIoNames(devPaths: string[]): string[] {
-  return devPaths.map((devPath) => getFileNameOfPath(devPath));
 }
 
 export function resolvePlatformDir(platform: Platforms): string {
@@ -44,6 +32,50 @@ export function loadMachineConfigInPlatformDir(platformDir: string, machine: str
   const machineConfigPath = path.join(platformDir, `machine-${machine}`);
 
   return require(machineConfigPath).default;
+}
+
+export function parseHostNameCtlResult(stdout: string): {osName: string, arch: string} {
+  const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
+  const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
+
+  if (!osMatch) {
+    throw new Error(`Can't resolve an operating system of the machine`);
+  }
+  else if (!architectureMatch) {
+    throw new Error(`Can't resolve an architecture of the machine`);
+  }
+
+  return {
+    osName: _trim(osMatch[1]),
+    arch: architectureMatch[1],
+  };
+}
+
+export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsMachines {
+  if (arch.match(/x86/)) {
+    // no matter which OS and 32 or 64 bits
+    return 'x86';
+  }
+  else if (arch === 'arm') {
+    // TODO: use cpuinfo to resolve Revision or other method
+    if (osName.match(/Raspbian/)) {
+      return 'rpi';
+    }
+    else {
+      return 'arm';
+    }
+  }
+
+  throw new Error(`Unsupported architecture "${arch}"`);
+}
+
+// TODO: !!! test bellow
+
+/**
+ * Make list of io names from list of io paths.
+ */
+export function makeIoNames(devPaths: string[]): string[] {
+  return devPaths.map((devPath) => getFileNameOfPath(devPath));
 }
 
 // TODO: remove, may be use loadMachineConfigInPlatformDir instead of it
@@ -86,41 +118,6 @@ export async function getOsMachine(os: Os): Promise<NodejsMachines> {
   return resolveMachineByOsAndArch(osName, arch);
 }
 
-export function parseHostNameCtlResult(stdout: string): {osName: string, arch: string} {
-  const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
-  const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
-
-  if (!osMatch) {
-    throw new Error(`Can't resolve an operating system of the machine`);
-  }
-  else if (!architectureMatch) {
-    throw new Error(`Can't resolve an architecture of the machine`);
-  }
-
-  return {
-    osName: _trim(osMatch[1]),
-    arch: architectureMatch[1],
-  };
-}
-
-export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsMachines {
-  if (arch.match(/x86/)) {
-    // no matter which OS and 32 or 64 bits
-    return 'x86';
-  }
-  else if (arch === 'arm') {
-    // TODO: use cpuinfo to resolve Revision or other method
-    if (osName.match(/Raspbian/)) {
-      return 'rpi';
-    }
-    else {
-      return 'arm';
-    }
-  }
-
-  throw new Error(`Unsupported architecture "${arch}"`);
-}
-
 export async function runCmd(os: Os, cmd: string, cwd: string) {
   const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
 
@@ -130,21 +127,3 @@ export async function runCmd(os: Os, cmd: string, cwd: string) {
     console.error(result.stderr);
   }
 }
-
-// /**
-//  * Validate and merge config with machine config of specified machine
-//  */
-// export async function preparePreHostConfig(preHostConfig: PreHostConfig): Promise<PreHostConfig> {
-//   const validateError: string | undefined = validateHostConfig(preHostConfig);
-//
-//   if (validateError) throw new Error(`Invalid host config: ${validateError}`);
-//   else if (!preHostConfig.platform) throw new Error(`Platform param has to be specified in host config`);
-//
-//   const machineConfig: MachineConfig = loadMachineConfig(preHostConfig.platform, preHostConfig.machine as string);
-//
-//   return _defaultsDeep({},
-//     preHostConfig,
-//     machineConfig.hostConfig,
-//     hostDefaultConfig,
-//   );
-// }
