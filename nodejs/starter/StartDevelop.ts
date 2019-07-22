@@ -106,7 +106,6 @@ export default class StartDevelop {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   private async makeIoSet(): Promise<IoSet> {
-    // TODO: review
     const ioSetFile: string = this.resolveIoSetType();
     const ioSetPath = `.${path.sep}${ioSetFile}`;
     const IoSetClass: IoSetClass = this.os.require(ioSetPath).default;

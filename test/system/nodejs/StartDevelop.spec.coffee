@@ -21,9 +21,10 @@ describe.only 'nodejs.StartDevelop', ->
       force: false
       hostConfig: @hostConfog
     }
+    @argIoset = 'localhost:8080'
 
-    @newInstance = () =>
-      startDevelop = new StartDevelop(@configPath, false, @x86Machine, @argHostName, @workDir)
+    @newInstance = (argIoset) =>
+      startDevelop = new StartDevelop(@configPath, false, @x86Machine, @argHostName, @workDir, argIoset)
 
       startDevelop.props = @fakeProps
       startDevelop.os = {
@@ -73,6 +74,40 @@ describe.only 'nodejs.StartDevelop', ->
     sinon.assert.calledOnce(startDevelop.installModules)
     sinon.assert.calledOnce(startDevelop.systemStarter.start)
     sinon.assert.calledWith(startDevelop.systemStarter.start, 'path/to/System', ioSet)
+
+  it 'makeIoSet', ->
+    startDevelop = @newInstance(@argIoset)
+    constructorArgs = []
+    prepareStub = sinon.stub().returns(Promise.resolve())
+    class IoSetClass
+      constructor: (args...) ->
+        constructorArgs = args
+      prepare: prepareStub
+
+    startDevelop.os.require = sinon.stub().returns({default: IoSetClass})
+
+    result = await startDevelop.makeIoSet()
+
+    assert.isTrue(result instanceof IoSetClass)
+    sinon.assert.calledOnce(prepareStub)
+    sinon.assert.calledWith(startDevelop.os.require, './IoSetDevelopRemote')
+    assert.equal(constructorArgs[0], startDevelop.os)
+    assert.equal(constructorArgs[1], startDevelop.envBuilder)
+    assert.equal(constructorArgs[2], startDevelop.props.envSetDir)
+    assert.equal(constructorArgs[3], startDevelop.props.platform)
+    assert.equal(constructorArgs[4], startDevelop.props.machine)
+    assert.equal(constructorArgs[5], @argIoset)
+
+  it 'resolveIoSetType - with --ioset arg', ->
+    startDevelop = @newInstance(@argIoset)
+
+    assert.equal(startDevelop.resolveIoSetType(), 'IoSetDevelopRemote')
+
+  it 'resolveIoSetType - no arg --ioset', ->
+    startDevelop = @newInstance()
+
+    assert.equal(startDevelop.resolveIoSetType(), 'IoSetDevelopSource')
+
 
 #  it 'installModules - not force and node_modules exists - do nothing', ->
 #    startDevelop = @newInstance()
