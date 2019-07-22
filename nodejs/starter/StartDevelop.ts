@@ -127,13 +127,16 @@ export default class StartDevelop {
     return ioSet;
   }
 
-  // TODO: review
+  /**
+   * If is --ioset parameter defined then remote io set will be used.
+   * Otherwise source io set which gets configs and manifests from memory and uses source modules.
+   */
   private resolveIoSetType(): string {
     if (this.argIoset) {
       return 'IoSetDevelopRemote';
     }
 
-    return 'IoSetDevelopLocal';
+    return 'IoSetDevelopSource';
   }
 
   private getPathToProdSystemFile(): string {

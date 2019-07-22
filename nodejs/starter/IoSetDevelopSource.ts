@@ -11,7 +11,10 @@ import StorageEnvMemoryWrapper from '../../shared/ioSet/StorageEnvMemoryWrapper'
 import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
-export default class IoSetDevelopLocal implements IoSet {
+/**
+ * It gets configs and manifests from memory and uses source modules.
+ */
+export default class IoSetDevelopSource implements IoSet {
   private readonly os: Os;
   private readonly platform: Platforms;
   private readonly machine: string;
@@ -32,7 +35,8 @@ export default class IoSetDevelopLocal implements IoSet {
   }
 
   /**
-   * Collect io items instances
+   * Collect io items instances.
+   * And replace Storage io with wrapper which actually gets configs and manifests from memory.
    */
   async init(): Promise<void> {
     const platformDir: string = resolvePlatformDir(this.platform);

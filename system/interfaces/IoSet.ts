@@ -16,6 +16,10 @@ export default interface IoSet {
 
   destroy(): Promise<void>;
 
+  /**
+   * It returns the instance of IO which was created on initialization
+   * @param ioName
+   */
   getIo<T extends IoItem>(ioName: string): T;
 
   /**
