@@ -83,11 +83,24 @@ export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsM
 
 /**
  * Make list of io names from list of io paths.
+ * E.g ['/path/to/file1.ts', '/path/file2'] -> ['file1', 'file2']
  */
 export function makeListOfNamesFromPaths(paths: string[]): string[] {
   return paths.map((item) => getFileNameOfPath(item));
 }
 
+/**
+ * Run command and don't print stdout if it returns code 0
+ */
+export async function runCmd(os: Os, cmd: string, cwd: string) {
+  const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
+
+  if (result.status) {
+    console.error(`ERROR: npm ends with code ${result.status}`);
+    console.error(result.stdout);
+    console.error(result.stderr);
+  }
+}
 
 // TODO: !!! test bellow
 
@@ -109,16 +122,6 @@ export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
   }
 
   return path.join(REPO_ROOT, 'build', subDir);
-}
-
-export async function runCmd(os: Os, cmd: string, cwd: string) {
-  const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
-
-  if (result.status) {
-    console.error(`ERROR: npm ends with code ${result.status}`);
-    console.error(result.stdout);
-    console.error(result.stderr);
-  }
 }
 
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {

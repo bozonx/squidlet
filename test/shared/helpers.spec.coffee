@@ -40,7 +40,7 @@ describe.only 'shared.helpers', ->
       stdout: @hostnameCtlResult.split("\n")
     }
     os = {
-      spawnCmd: sinon.stub().returns(Promise.resolve(cmdResult))
+      spawnCmd: () => Promise.resolve(cmdResult)
     }
 
     result = await helpers.getOsMachine(os);
@@ -61,3 +61,13 @@ describe.only 'shared.helpers', ->
       helpers.makeListOfNamesFromPaths(['/path/to/file1.ts', '/path/file2']),
       ['file1', 'file2']
     )
+
+  it "runCmd", ->
+    os = {
+      spawnCmd: sinon.stub().returns(Promise.resolve({status: 0}))
+    }
+
+    helpers.runCmd(os, 'cmd', 'cwd')
+
+    sinon.assert.calledOnce(os.spawnCmd)
+    sinon.assert.calledWith(os.spawnCmd, 'cmd', 'cwd')
