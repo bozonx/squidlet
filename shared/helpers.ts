@@ -28,10 +28,10 @@ export function resolvePlatformDir(platform: Platforms): string {
   return path.resolve(__dirname, `../${platform}`);
 }
 
-export function loadMachineConfigInPlatformDir(platformDir: string, machine: string): MachineConfig {
+export function loadMachineConfigInPlatformDir(os: Os, platformDir: string, machine: string): MachineConfig {
   const machineConfigPath = path.join(platformDir, `machine-${machine}`);
 
-  return require(machineConfigPath).default;
+  return os.require(machineConfigPath).default;
 }
 
 export async function getOsMachine(os: Os): Promise<NodejsMachines> {
@@ -91,14 +91,6 @@ export function makeListOfNamesFromPaths(paths: string[]): string[] {
 
 // TODO: !!! test bellow
 
-// TODO: remove, may be use loadMachineConfigInPlatformDir instead of it
-export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
-  const platformDir: string = resolvePlatformDir(platform);
-  const machineConfigPath = path.join(platformDir, `machine-${machine}`);
-
-  return require(machineConfigPath).default;
-}
-
 /**
  * If work dir is passed then it will be made an absolute according CWD.
  * If isn't set then SQUIDLET_ROOT env variable will be used - $SQUIDLET_ROOT/<subDir>.
@@ -128,3 +120,10 @@ export async function runCmd(os: Os, cmd: string, cwd: string) {
     console.error(result.stderr);
   }
 }
+
+// export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
+//   const platformDir: string = resolvePlatformDir(platform);
+//   const machineConfigPath = path.join(platformDir, `machine-${machine}`);
+//
+//   return require(machineConfigPath).default;
+// }

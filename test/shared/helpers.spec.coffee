@@ -24,11 +24,15 @@ describe.only 'shared.helpers', ->
     assert.throws(() => helpers.getFileNameOfPath(''))
 
   it "resolvePlatformDir and loadMachineConfigInPlatformDir", ->
+    machineConfig = { ios: [] }
+    os = {
+      require: () => {default: machineConfig}
+    }
     platformDir = helpers.resolvePlatformDir('nodejs')
 
-    machineConfig = helpers.loadMachineConfigInPlatformDir(platformDir, 'x86')
+    result = helpers.loadMachineConfigInPlatformDir(os, platformDir, 'x86')
 
-    assert.isArray(machineConfig.ios)
+    assert.equal(machineConfig, result)
 
   it "getOsMachine", ->
     cmdResult = {

@@ -7,7 +7,7 @@ import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig, makeListOfNamesFromPaths} from '../../shared/helpers';
+import {loadMachineConfigInPlatformDir, makeListOfNamesFromPaths, resolvePlatformDir} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
@@ -125,7 +125,11 @@ export default class ConfigManager {
       throw new Error(`Host config "${preHostConfig.id}" doesn't have a machine param`);
     }
 
-    return loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
+    const platformDir = resolvePlatformDir(preHostConfig.platform);
+
+    return loadMachineConfigInPlatformDir(this.os, platformDir, preHostConfig.machine);
+
+    //return loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
   }
 
 }

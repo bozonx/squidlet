@@ -40,7 +40,7 @@ export default class IoSetDevelopSource implements IoSet {
    */
   async init(): Promise<void> {
     const platformDir: string = resolvePlatformDir(this.platform);
-    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, this.machine);
+    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(this.os, platformDir, this.machine);
 
     for (let ioPath of machineConfig.ios) {
       const ioName: string = getFileNameOfPath(ioPath);

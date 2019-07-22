@@ -6,7 +6,7 @@ import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import {loadMachineConfig, getFileNameOfPath, resolvePlatformDir} from '../helpers';
+import {getFileNameOfPath, loadMachineConfigInPlatformDir, resolvePlatformDir} from '../helpers';
 import {
   IO_SET_INDEX_FILE,
   LEGACY_DIR,
@@ -36,7 +36,8 @@ export default class BuildIo {
   async build() {
     console.info(`--> Build ios of platform: "${this.platform}", machine "${this.machine}"`);
 
-    const machineConfig: MachineConfig = loadMachineConfig(this.platform, this.machine);
+    const platformDir = resolvePlatformDir(this.platform);
+    const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(this.os, platformDir, this.machine);
 
     await this.os.rimraf(`${this.iosBuildDir}/**/*`);
     await this.os.mkdirP(this.iosBuildDir);
