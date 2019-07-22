@@ -1,6 +1,6 @@
 import * as path from 'path';
 import PluginEnv from '../hostEnvBuilder/entities/PluginEnv';
-import {makeIoNames} from '../shared/helpers';
+import {makeListOfNamesFromPaths} from '../shared/helpers';
 
 const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
@@ -60,7 +60,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
 
   // add used on host drivers related on ios
   env.afterRegistering(async () => {
-    const machineIos: string[] = makeIoNames(env.getMachineConfig().ios);
+    const machineIos: string[] = makeListOfNamesFromPaths(env.getMachineConfig().ios);
 
     if (machineIos.includes('Digital')) {
       await env.addUsedEntity('drivers', 'Digital_local');

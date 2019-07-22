@@ -43,7 +43,6 @@ export default class IoSetDevelopSource implements IoSet {
     const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(platformDir, this.machine);
 
     for (let ioPath of machineConfig.ios) {
-      // TODO: нужно без расширения ???
       const ioName: string = getFileNameOfPath(ioPath);
       const ioAbsPath = path.resolve(platformDir, ioPath);
       const ioItemClass: new () => IoItem = require(ioAbsPath).default;

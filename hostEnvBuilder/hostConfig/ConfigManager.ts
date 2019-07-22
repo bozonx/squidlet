@@ -7,7 +7,7 @@ import Os from '../../shared/Os';
 import {appendArray} from '../../system/helpers/collections';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfig, makeIoNames} from '../../shared/helpers';
+import {loadMachineConfig, makeListOfNamesFromPaths} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
@@ -70,7 +70,7 @@ export default class ConfigManager {
 
 
   getMachineIos(): string[] {
-    return makeIoNames(this.machineConfig.ios);
+    return makeListOfNamesFromPaths(this.machineConfig.ios);
   }
 
 

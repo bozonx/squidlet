@@ -81,14 +81,15 @@ export function resolveMachineByOsAndArch(osName: string, arch: string): NodejsM
   throw new Error(`Unsupported architecture "${arch}"`);
 }
 
-// TODO: !!! test bellow
-
 /**
  * Make list of io names from list of io paths.
  */
-export function makeIoNames(devPaths: string[]): string[] {
-  return devPaths.map((devPath) => getFileNameOfPath(devPath));
+export function makeListOfNamesFromPaths(paths: string[]): string[] {
+  return paths.map((item) => getFileNameOfPath(item));
 }
+
+
+// TODO: !!! test bellow
 
 // TODO: remove, may be use loadMachineConfigInPlatformDir instead of it
 export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {

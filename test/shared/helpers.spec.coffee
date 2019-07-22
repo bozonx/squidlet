@@ -51,3 +51,9 @@ describe.only 'shared.helpers', ->
     assert.equal(helpers.resolveMachineByOsAndArch('Linux Mint 19.1', 'arm'), 'arm')
     assert.equal(helpers.resolveMachineByOsAndArch('Raspbian', 'arm'), 'rpi')
     assert.throws(() => helpers.resolveMachineByOsAndArch('Raspbian', 'unknown'))
+
+  it "makeListOfNamesFromPaths", ->
+    assert.deepEqual(
+      helpers.makeListOfNamesFromPaths(['/path/to/file1.ts', '/path/file2']),
+      ['file1', 'file2']
+    )
