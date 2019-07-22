@@ -1,7 +1,7 @@
 StartDevelop = require('../../../nodejs/starter/StartDevelop').default
 
 
-describe.only 'nodejs.StartDevelop', ->
+describe 'nodejs.StartDevelop', ->
   beforeEach ->
     @configPath = 'path/to/config'
     @argHostName = 'testHost'
