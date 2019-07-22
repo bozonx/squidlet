@@ -34,6 +34,18 @@ export function loadMachineConfigInPlatformDir(platformDir: string, machine: str
   return require(machineConfigPath).default;
 }
 
+export async function getOsMachine(os: Os): Promise<NodejsMachines> {
+  const spawnResult: SpawnCmdResult = await os.spawnCmd('hostnamectl');
+
+  if (spawnResult.status !== 0) {
+    throw new Error(`Can't execute a "hostnamectl" command: ${spawnResult.stderr.join('\n')}`);
+  }
+
+  const {osName, arch} = parseHostNameCtlResult(spawnResult.stdout.join('\n'));
+
+  return resolveMachineByOsAndArch(osName, arch);
+}
+
 export function parseHostNameCtlResult(stdout: string): {osName: string, arch: string} {
   const osMatch = stdout.match(/Operating System:\s*(.+)$/m);
   const architectureMatch = stdout.match(/Architecture:\s*([\w\d\-]+)/);
@@ -104,18 +116,6 @@ export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
   }
 
   return path.join(REPO_ROOT, 'build', subDir);
-}
-
-export async function getOsMachine(os: Os): Promise<NodejsMachines> {
-  const spawnResult: SpawnCmdResult = await os.spawnCmd('hostnamectl');
-
-  if (spawnResult.status !== 0) {
-    throw new Error(`Can't execute a "hostnamectl" command: ${spawnResult.stderr.join('\n')}`);
-  }
-
-  const {osName, arch} = parseHostNameCtlResult(spawnResult.stdout.join('\n'));
-
-  return resolveMachineByOsAndArch(osName, arch);
 }
 
 export async function runCmd(os: Os, cmd: string, cwd: string) {

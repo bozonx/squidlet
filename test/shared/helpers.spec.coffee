@@ -3,6 +3,16 @@ helpers = require('../../shared/helpers')
 
 describe.only 'shared.helpers', ->
   beforeEach ->
+    @hostnameCtlResult = """
+       Static hostname: ivan-laptop
+             Icon name: computer-laptop
+               Chassis: laptop
+            Machine ID: a2b294175f2c42048160e63ed8a1e0e5
+               Boot ID: 1aabb936f33f4f9c86a0c6f78d06a84d
+      Operating System: Linux Mint 19.1
+                Kernel: Linux 4.15.0-51-generic
+          Architecture: x86-64
+    """
 
 
   it "getFileNameOfPath", ->
@@ -20,19 +30,21 @@ describe.only 'shared.helpers', ->
 
     assert.isArray(machineConfig.ios)
 
-  it "parseHostNameCtlResult", ->
-    hostnameCtlResult = """
-       Static hostname: ivan-laptop
-             Icon name: computer-laptop
-               Chassis: laptop
-            Machine ID: a2b294175f2c42048160e63ed8a1e0e5
-               Boot ID: 1aabb936f33f4f9c86a0c6f78d06a84d
-      Operating System: Linux Mint 19.1
-                Kernel: Linux 4.15.0-51-generic
-          Architecture: x86-64
-    """
+  it "getOsMachine", ->
+    cmdResult = {
+      status: 0
+      stdout: @hostnameCtlResult.split("\n")
+    }
+    os = {
+      spawnCmd: sinon.stub().returns(Promise.resolve(cmdResult))
+    }
 
-    assert.deepEqual(helpers.parseHostNameCtlResult(hostnameCtlResult), {arch: 'x86-64', osName: 'Linux Mint 19.1'})
+    result = await helpers.getOsMachine(os);
+
+    assert.equal(result, 'x86')
+
+  it "parseHostNameCtlResult", ->
+    assert.deepEqual(helpers.parseHostNameCtlResult(@hostnameCtlResult), {arch: 'x86-64', osName: 'Linux Mint 19.1'})
 
   it "resolveMachineByOsAndArch", ->
     assert.equal(helpers.resolveMachineByOsAndArch('Linux Mint 19.1', 'x86-64'), 'x86')
