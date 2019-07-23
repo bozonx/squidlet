@@ -1,5 +1,5 @@
-ProdBuild = require('../../../nodejs/starter/ProdBuild').default
-Os = require('../../../shared/Os').default
+ProdBuild = require('../../nodejs/starter/ProdBuild').default
+Os = require('../../shared/Os').default
 
 
 describe 'nodejs.ProdBuild', ->

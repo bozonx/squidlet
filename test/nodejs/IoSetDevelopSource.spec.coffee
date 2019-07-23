@@ -1,5 +1,5 @@
-IoSetDevelopSource = require('../../../nodejs/starter/IoSetDevelopSource').default
-helpers = require('../../../shared/helpers')
+IoSetDevelopSource = require('../../nodejs/starter/IoSetDevelopSource').default
+helpers = require('../../shared/helpers')
 
 
 describe 'nodejs.IoSetDevelopSource', ->

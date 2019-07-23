@@ -37,6 +37,7 @@ export default class System {
   readonly sessions: Sessions;
   readonly apiManager: ApiManager;
   readonly api: Api;
+  // TODO: move to Mqtt service or driver
   readonly apiTopics: ApiTopics;
   readonly state: State;
   get id(): string {
