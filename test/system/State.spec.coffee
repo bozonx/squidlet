@@ -1,7 +1,7 @@
 State = require('../../system/State').default
 
 
-describe.only 'system.State', ->
+describe 'system.State', ->
   beforeEach ->
     @category = 0
     @stateName = 'deviceId'
@@ -136,8 +136,31 @@ describe.only 'system.State', ->
       param2: 'not changed'
     })
 
+  it 'removeListener', ->
+    handler = sinon.spy()
+    handlerIndex = @state.onChange(handler)
 
+    @state.removeListener(handlerIndex)
 
-  # TODO: removeListener
-  # TODO: removeParamListener
-  # TODO: destroy
+    @state.updateState(@category, @stateName, @partialState)
+
+    sinon.assert.notCalled(handler)
+
+  it 'removeParamListener', ->
+    handler = sinon.spy()
+    handlerIndex = @state.onChangeParam(handler)
+
+    @state.removeParamListener(handlerIndex)
+
+    @state.updateStateParam(@category, @stateName, 'param', 'value')
+
+    sinon.assert.notCalled(handler)
+
+  it 'destroy', ->
+    @state.onChange(sinon.spy())
+    @state.onChangeParam(sinon.spy())
+
+    @state.destroy()
+
+    assert.isFalse(@state.changeEvents.hasListeners())
+    assert.isFalse(@state.changeParamEvents.hasListeners())
