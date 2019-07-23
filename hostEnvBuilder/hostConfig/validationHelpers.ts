@@ -1,4 +1,5 @@
 import * as path from 'path';
+import {isExactlyObject} from '../../system/helpers/collections';
 
 
 export function sequence(exprs: (() => string | undefined)[]): string | undefined {
@@ -40,7 +41,7 @@ export function isBoolean(value: any | undefined, paramName: string): string | u
 
 export function isObject(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
-  else if (typeof value !== 'object') return `${paramName} is not object`;
+  else if (!isExactlyObject(value)) return `${paramName} is not object`;
 
   return;
 }

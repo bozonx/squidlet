@@ -75,16 +75,6 @@ describe 'system.helpers.lodashLike', ->
     assert.isFalse(lodashLike.isEqual(uint1, new Uint8Array(1)))
     assert.isFalse(lodashLike.isEqual(uint1, []))
 
-  it 'isObject', ->
-    cl = () ->
-    assert.isTrue(lodashLike.isObject({}))
-    assert.isTrue(lodashLike.isObject(new cl()))
-    assert.isFalse(lodashLike.isObject([]))
-    assert.isFalse(lodashLike.isObject(''))
-    assert.isFalse(lodashLike.isObject(undefined))
-    assert.isFalse(lodashLike.isObject(null))
-    assert.isFalse(lodashLike.isObject(0))
-
   it 'isPlainObject', ->
     cl = () ->
     assert.isTrue(lodashLike.isPlainObject({}))

@@ -36,6 +36,23 @@ describe.only 'system.helpers.collections', ->
     assert.deepEqual(collections.getDifferentKeys(undefined, {a:1, b:2}), ['a', 'b'])
     assert.deepEqual(collections.getDifferentKeys({a:1, b:1, c:1}, undefined), [])
 
+  it 'isExactlyObject', ->
+    cl = () ->
+    assert.isTrue(collections.isExactlyObject({}))
+    assert.isTrue(collections.isExactlyObject(new cl()))
+    assert.isFalse(collections.isExactlyObject([]))
+    assert.isFalse(collections.isExactlyObject(''))
+    assert.isFalse(collections.isExactlyObject(undefined))
+    assert.isFalse(collections.isExactlyObject(null))
+    assert.isFalse(collections.isExactlyObject(0))
+
+  it 'clearObject', ->
+    obj = {a:1}
+
+    collections.clearObject(obj)
+
+    assert.deepEqual(obj, {})
+
   it 'mergeDeep', ->
     top = {top: 'top', nested: {nestedTop: 'top'}}
     bottom = {top: 'bottom', bottom: 'bottom', nested: {nestedTop: 'bottom', nestedBottom: 'bottom'}}

@@ -1,4 +1,4 @@
-import {isEqual, isObject, isPlainObject, values} from './lodashLike';
+import {isEqual, isPlainObject, values} from './lodashLike';
 
 
 /**
@@ -35,7 +35,7 @@ export function setArrayDimension(arr: any[], count: number): any[] {
  * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
  */
 export function getKeyOfObject(obj: {[index: string]: any}, value: any): string | undefined {
-  if (!isObject(obj)) {
+  if (!isExactlyObject(obj)) {
     throw new Error(`collection.getKeyOfObject: obj param has to be an object!`);
   }
 
@@ -77,10 +77,14 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
  * Clear all the props in object
  */
 export function clearObject(obj: {[index: string]: any}) {
-
-  // TODO: test
-
   for (let name of Object.keys(obj)) delete obj[name];
+}
+
+/**
+ * Is an object, not an array
+ */
+export function isExactlyObject(item: any): boolean {
+  return item && typeof item === 'object' && !Array.isArray(item) || false;
 }
 
 /**
@@ -141,6 +145,7 @@ export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntr
   }
 }
 
+
 // /**
 //  * It works with common structures like
 //  *     {
@@ -153,9 +158,6 @@ export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntr
 //  *                        If it returns false it means don't go deeper.
 //  */
 // export function findRecursively(rootObject: object, cb: (item: any, itemPath: string) => boolean) {
-//
-//   // TODO: test, review
-//
 //   const recursive = (obj: object, rootPath: string): object | undefined => {
 //     return find(obj, (item: any, name: string | number): any => {
 //       const itemPath = trim(`${rootPath}.${name}`, '.');
