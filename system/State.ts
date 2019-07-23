@@ -2,10 +2,7 @@ import {JsonTypes} from './interfaces/Types';
 import IndexedEvents from './helpers/IndexedEvents';
 import {getDifferentKeys, mergeDeep} from './helpers/collections';
 import {isEqual} from './helpers/lodashLike';
-//import {combineTopic} from './helpers/helpers';
 
-
-//export const STATE_SEPARATOR = '.';
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
 type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;

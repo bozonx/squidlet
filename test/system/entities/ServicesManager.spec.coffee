@@ -2,7 +2,7 @@ ServicesManager = require('../../../system/entities/ServicesManager').default
 initializationConfig = require('../../../system/config/initializationConfig').default
 
 
-describe 'app.ServicesManager', ->
+describe 'system.ServicesManager', ->
   beforeEach ->
     @service = class
       constructor: (definition) ->
