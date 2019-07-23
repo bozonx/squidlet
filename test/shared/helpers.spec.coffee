@@ -1,7 +1,7 @@
 helpers = require('../../shared/helpers')
 
 
-describe.only 'shared.helpers', ->
+describe 'shared.helpers', ->
   beforeEach ->
     @hostnameCtlResult = """
        Static hostname: ivan-laptop

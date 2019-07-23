@@ -2,7 +2,7 @@ IoSetDevelopSource = require('../../../nodejs/starter/IoSetDevelopSource').defau
 helpers = require('../../../shared/helpers')
 
 
-describe.only 'nodejs.IoSetDevelopSource', ->
+describe 'nodejs.IoSetDevelopSource', ->
   beforeEach ->
     @os = {}
     @envBuilder = {}
@@ -47,4 +47,23 @@ describe.only 'nodejs.IoSetDevelopSource', ->
     assert.isTrue(@ioSource.ioCollection['Digital'] instanceof DigitalClass)
 
   it 'instantiateIo - Storage io - it uses storage wrapper', ->
-    # TODO: !!!!
+    ioPath = './io/Storage.ts'
+    platformDir = helpers.resolvePlatformDir('nodejs')
+    class StorageClass
+    wrapperArg = undefined
+    wrapperObject = {
+      readFile: () =>
+    }
+    @ioSource.os = {
+      require: () => {default: StorageClass}
+    }
+    @ioSource.storageWrapper = {
+      makeWrapper: (arg) =>
+        wrapperArg = arg
+        wrapperObject
+    }
+
+    @ioSource.instantiateIo(ioPath, platformDir)
+
+    assert.isTrue(wrapperArg instanceof StorageClass)
+    assert.equal(@ioSource.ioCollection['Storage'], wrapperObject)
