@@ -171,6 +171,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return  this.configState.getState();
   }
 
+  /**
+   * Force load config
+   */
   loadConfig = async (): Promise<void> => {
     if (!this.configState) return;
 
@@ -218,7 +221,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
   /**
-   * Call action and publish it's result.
+   * Call action and return it's result.
    */
   async action(actionName: string, ...params: any[]): Promise<JsonTypes> {
     if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
@@ -234,37 +237,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       return;
     }
 
-    // TODO: если публиковать результат действия то происходит зацикливание
-
-    // publish action's result where subtopic is action name
-    //this.publish(actionName, result);
-
     return result;
   }
 
 }
-
-// protected publish = (subTopic: string, value: any, isRepeat?: boolean) => {
-//   const topic: string = combineTopic(this.env.system.systemConfig.topicSeparator, this.id, subTopic);
-//   const data = String((this.transformPublishValue) ? this.transformPublishValue(value) : value);
-//
-//   // T-O-D-O: наверное надо установить стейт а не publish
-//
-//   this.env.api.publish(topic, data, isRepeat);
-// }
-
-// // handle actions call
-// if (this.actions) {
-//   // subscribe to external messages where topic is this device id to call action
-//   //this.env.events.addListener(categories.externalDataIncome, this.id, this.handleIncomeData);
-//   this.env.api.onIncome(this.handleIncomeData);
-// }
-// private handleIncomeData = (type: ApiTypes, apiPayload: ApiPayload) => {
-//   if (type !== 'deviceIncome') return;
-//
-//   const payload = apiPayload as DeviceIncomePayload;
-//
-//   if (payload.deviceId !== this.id) return;
-//
-//   return this.action(payload.action, ...payload.params);
-// }
