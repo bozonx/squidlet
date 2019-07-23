@@ -35,14 +35,14 @@ export default class State {
 
 
   updateState(category: number, stateName: string, newPartialState: StateObject) {
-    const newState = mergeDeep(newPartialState, this.state[category][stateName]);
+    const newState: StateObject = mergeDeep(newPartialState, this.getState(category, stateName));
 
     // don't do anything if value isn't changed
-    if (isEqual(newState, this.state[category][stateName])) return;
+    if (isEqual(newState, this.getState(category, stateName))) return;
 
     if (!this.state[category]) this.state[category] = {};
 
-    const changedParams: string[] = getDifferentKeys(this.state[category][stateName], newState);
+    const changedParams: string[] = getDifferentKeys(this.getState(category, stateName), newState);
 
     this.state[category][stateName] = newState;
 

@@ -33,6 +33,8 @@ describe 'system.helpers.collections', ->
 
   it 'getDifferentKeys', ->
     assert.deepEqual(collections.getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}), ['b'])
+    assert.deepEqual(collections.getDifferentKeys(undefined, {a:1, b:2}), ['a', 'b'])
+    assert.deepEqual(collections.getDifferentKeys({a:1, b:1, c:1}, undefined), [])
 
   it 'mergeDeep', ->
     top = {top: 'top', nested: {nestedTop: 'top'}}

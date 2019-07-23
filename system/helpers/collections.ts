@@ -54,7 +54,14 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
  * PartialObj can omit some props of sourceObj
  * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
  */
-export function getDifferentKeys(sourceObj: {[index: string]: any}, partialObj: {[index: string]: any}): string[] {
+export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?: {[index: string]: any}): string[] {
+  if (!partialObj) {
+    return [];
+  }
+  else if (!sourceObj) {
+    return Object.keys(partialObj);
+  }
+
   const diffKeys: string[] = [];
 
   for (let key of Object.keys(sourceObj)) {
