@@ -1,4 +1,4 @@
-import {cloneDeep, isEqual, isObject, isPlainObject, values} from './lodashLike';
+import {isEqual, isObject, isPlainObject, values} from './lodashLike';
 
 
 /**
@@ -86,6 +86,7 @@ export function clearObject(obj: {[index: string]: any}) {
 /**
  * Merges two objects deeply.
  * It doesn't mutate any object.
+ * If you obviously set undefined to one of top's param - it will keep its undefined value
  */
 export function mergeDeep(
   top: {[index: string]: any} | undefined,
@@ -94,13 +95,14 @@ export function mergeDeep(
   if (typeof top === 'undefined') return bottom || {};
   if (typeof bottom === 'undefined') return top;
 
-  const result: {[index: string]: any} = cloneDeep(top);
+  const result: {[index: string]: any} = { ...top };
 
   for (let key of Object.keys(bottom)) {
-    if (typeof result[key] === 'undefined') {
+    if (!(key in result)) {
       // set value which is absent on top
       result[key] = bottom[key];
     }
+    // go deeper if bottom and top are objects
     else if (isPlainObject(result[key]) && isPlainObject(bottom[key])) {
       result[key] = mergeDeep(result[key], bottom[key]);
     }

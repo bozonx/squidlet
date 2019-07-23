@@ -69,6 +69,23 @@ describe.only 'system.State', ->
       param2: 'not changed'
     })
 
+  it 'updateState - set param to undefined', ->
+    @state.state = {
+      '0': {
+        deviceId: {
+          param: 'value old'
+          param2: 'not changed'
+        }
+      }
+    }
+
+    @state.updateState(@category, @stateName, {param: undefined})
+
+    assert.deepEqual(@state.getState(@category, @stateName), {
+      param: undefined
+      param2: 'not changed'
+    })
+
   it 'updateStateParam - dont rise event if value doesnt changed', ->
     handler = sinon.spy()
     paramHandler = sinon.spy()
@@ -99,6 +116,23 @@ describe.only 'system.State', ->
 
     assert.deepEqual(@state.getState(@category, @stateName), {
       param: 'value'
+      param2: 'not changed'
+    })
+
+  it 'updateStateParam - set param to undefined', ->
+    @state.state = {
+      '0': {
+        deviceId: {
+          param: 'value old'
+          param2: 'not changed'
+        }
+      }
+    }
+
+    @state.updateStateParam(@category, @stateName, 'param', undefined)
+
+    assert.deepEqual(@state.getState(@category, @stateName), {
+      param: undefined
       param2: 'not changed'
     })
 

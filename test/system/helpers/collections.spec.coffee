@@ -1,7 +1,7 @@
 collections = require('../../../system/helpers/collections')
 
 
-describe 'system.helpers.collections', ->
+describe.only 'system.helpers.collections', ->
   it 'appendArray', ->
     arr = [1]
     collections.appendArray(arr, [2])
@@ -43,6 +43,11 @@ describe 'system.helpers.collections', ->
     assert.deepEqual(collections.mergeDeep(top, bottom), result)
     # not mutated
     assert.deepEqual(top, {top: 'top', nested: {nestedTop: 'top'}})
+    # set undefined obviously
+    assert.deepEqual(
+      collections.mergeDeep({top: undefined}, {top: 'top', bottom: 'bottom'}),
+      {top: undefined, bottom: 'bottom'}
+    )
 
   it 'removeItemFromArray', ->
     arr = ['a', 'b', 'c', 'b']

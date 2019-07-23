@@ -36,7 +36,6 @@ export default class State {
   }
 
   updateState(category: number, stateName: string, newPartialState: StateObject) {
-    // TODO: как поступать с undefined - он должен затереть старое значение или ничего не делать???
     const newState: StateObject = mergeDeep(newPartialState, this.getState(category, stateName));
 
     // don't do anything if value isn't changed
