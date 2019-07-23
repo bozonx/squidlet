@@ -1,4 +1,4 @@
-ImpulseOutput = require('../../../entities/drivers/ImpulseOutput/ImpulseOutput').default
+ImpulseOutput = require('../../../../entities/drivers/ImpulseOutput/ImpulseOutput').default
 
 
 describe 'ImpulseOutput.driver', ->

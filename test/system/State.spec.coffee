@@ -1,4 +1,4 @@
-State = require('../../../system/State').default
+State = require('../../system/State').default
 
 
 describe.only 'system.State', ->

@@ -1,7 +1,7 @@
-ImpulseInput = require('../../../entities/drivers/ImpulseInput/ImpulseInput').default
+BinaryInput = require('../../../../entities/drivers/BinaryInput/BinaryInput').default
 
 
-describe 'ImpulseInput.driver', ->
+describe 'BinaryInput.driver', ->
   beforeEach ->
     @digitalListenHandler = undefined
     @digitalOutput = {
@@ -12,13 +12,14 @@ describe 'ImpulseInput.driver', ->
     }
 
     @definition = {
-      id: 'ImpulseInput.driver'
-      className: 'ImpulseInput.driver'
+      id: 'BinaryInput.driver'
+      className: 'BinaryInput.driver'
     }
     @props = {
       pin: 1
-      impulseLength: 0
-      blockTime: 1
+      debounce: 0
+      debounceType: 'debounce'
+      blockTime: 0
     }
     @env = {
       loadManifest: => Promise.resolve({ drivers: ['DigitalPinInput.driver'] })
@@ -29,12 +30,12 @@ describe 'ImpulseInput.driver', ->
     @handler = sinon.spy()
 
     @instantiate = =>
-      @driver = await (new ImpulseInput(@definition, @env)).getInstance(@props)
+      @driver = await (new BinaryInput(@definition, @env)).getInstance(@props)
 
   it 'listen - simple debounce', ->
     await @instantiate()
     @driver.throttle = sinon.stub().returns(Promise.resolve())
-    @driver.startImpulse = sinon.stub().returns(Promise.resolve())
+    @driver.startBlockTime = sinon.stub().returns(Promise.resolve())
     @driver.blockTimeFinished = sinon.stub().returns(Promise.resolve())
     await @driver.init()
 
@@ -42,14 +43,14 @@ describe 'ImpulseInput.driver', ->
 
     await @digitalListenHandler(true)
 
-    sinon.assert.calledOnce(@driver.startImpulse)
+    sinon.assert.calledOnce(@driver.startBlockTime)
     sinon.assert.notCalled(@driver.throttle)
 
   it 'listen - throttle', ->
-    @props.throttle = 1
+    @props.debounceType = 'throttle'
     await @instantiate()
     @driver.throttle = sinon.stub().returns(Promise.resolve())
-    @driver.startImpulse = sinon.stub().returns(Promise.resolve())
+    @driver.startBlockTime = sinon.stub().returns(Promise.resolve())
     @driver.blockTimeFinished = sinon.stub().returns(Promise.resolve())
     await @driver.init()
 
@@ -57,29 +58,22 @@ describe 'ImpulseInput.driver', ->
 
     await @digitalListenHandler(true)
 
-    sinon.assert.notCalled(@driver.startImpulse)
+    sinon.assert.notCalled(@driver.startBlockTime)
     sinon.assert.calledOnce(@driver.throttle)
 
-  it 'startImpulse', ->
-    risingHandler = sinon.spy()
+  it 'throttle', ->
+    @props.debounceType = 'throttle'
     await @instantiate()
     @driver.startBlockTime = sinon.stub().returns(Promise.resolve())
     await @driver.init()
-    @driver.addListener(@handler)
-    @driver.addRisingListener(risingHandler)
 
-    startImpulsePromise = @driver.startImpulse()
+    throttlePromise = @driver.throttle()
 
-    assert.isTrue(@driver.impulseInProgress)
-    sinon.assert.calledOnce(risingHandler)
-    sinon.assert.calledOnce(@handler)
-    sinon.assert.calledWith(@handler, true)
+    assert.isTrue(@driver.throttleInProgress)
 
-    await startImpulsePromise
+    await throttlePromise
 
-    sinon.assert.calledTwice(@handler)
-    sinon.assert.calledWith(@handler.getCall(1), false)
-    assert.isFalse(@driver.impulseInProgress)
+    assert.isFalse(@driver.throttleInProgress)
     sinon.assert.calledOnce(@driver.startBlockTime)
 
   it 'startBlockTime', ->

@@ -1,4 +1,4 @@
-DigitalPinOutput = require('../../../entities/drivers/DigitalPinOutput/DigitalPinOutput').default
+DigitalPinOutput = require('../../../../entities/drivers/DigitalPinOutput/DigitalPinOutput').default
 
 
 describe 'DigitalPinOutput.driver', ->
