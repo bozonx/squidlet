@@ -68,14 +68,14 @@ export default class IoSetDevelopSource implements IoSet {
   private instantiateIo(ioPath: string, platformDir: string) {
     const ioName: string = getFileNameOfPath(ioPath);
     const ioAbsPath = path.resolve(platformDir, ioPath);
-    const ioItemClass: new () => IoItem = this.os.require(ioAbsPath);
+    const IoItemClass: new () => IoItem = this.os.require(ioAbsPath).default;
 
     // make wrapper of Storage to get configs and manifests from memory
     if (ioName === 'Storage') {
-      this.ioCollection[ioName] = this.storageWrapper.makeWrapper(new ioItemClass() as StorageIo);
+      this.ioCollection[ioName] = this.storageWrapper.makeWrapper(new IoItemClass() as StorageIo);
     }
     else {
-      this.ioCollection[ioName] = new ioItemClass();
+      this.ioCollection[ioName] = new IoItemClass();
     }
   }
 
