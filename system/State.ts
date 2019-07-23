@@ -6,14 +6,12 @@ import {isEqual} from './helpers/lodashLike';
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
 type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;
-//type CategoryChangeHandler = (category: number) => void;
 export type StateObject = {[index: string]: JsonTypes};
 
 
 export default class State {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private readonly changeParamEvents = new IndexedEvents<ChangeParamHandler>();
-  //private readonly categoryChangeEvents = new IndexedEvents<CategoryChangeHandler>();
   // like { category: { stateName: { ... stateParams } } }
   private readonly state: {[index: string]: {[index: string]: StateObject}} = {};
 
@@ -21,7 +19,6 @@ export default class State {
   destroy() {
     this.changeEvents.removeAll();
     this.changeParamEvents.removeAll();
-    //this.categoryChangeEvents.removeAll();
   }
 
 
@@ -31,35 +28,35 @@ export default class State {
     return this.state[category][stateName];
   }
 
-  // TODO: add getStateParam ???
+  getStateParam(category: number, stateName: string, paramName: string): JsonTypes {
+    if (!this.state[category]) return;
+    if (!this.state[category][stateName]) return;
 
+    return this.state[category][stateName][paramName];
+  }
 
   updateState(category: number, stateName: string, newPartialState: StateObject) {
+    // TODO: как поступать с undefined - он должен затереть старое значение или ничего не делать???
     const newState: StateObject = mergeDeep(newPartialState, this.getState(category, stateName));
 
     // don't do anything if value isn't changed
     if (isEqual(newState, this.getState(category, stateName))) return;
 
-    if (!this.state[category]) this.state[category] = {};
-
     const changedParams: string[] = getDifferentKeys(this.getState(category, stateName), newState);
+
+    if (!this.state[category]) this.state[category] = {};
 
     this.state[category][stateName] = newState;
 
     // emit all the params events
     for (let paramName of Object.keys(newPartialState)) {
-      //const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
-
       this.changeParamEvents.emit(category, stateName, paramName, newPartialState[paramName]);
     }
 
     this.changeEvents.emit(category, stateName, changedParams);
-    //this.categoryChangeEvents.emit(category);
   }
 
   updateStateParam(category: number, stateName: string, paramName: string, value: JsonTypes) {
-    const newState = mergeDeep({ [paramName]: value }, this.state[category][stateName]);
-
     // don't do anything if value isn't changed
     if (
       this.state[category]
@@ -67,18 +64,21 @@ export default class State {
       && this.state[category][stateName][paramName] === value
     ) return;
 
+    const newState = mergeDeep({ [paramName]: value }, this.getState(category, stateName));
+
     if (!this.state[category]) this.state[category] = {};
 
     const changedParams: string[] = [paramName];
-    //const fullStateName: string = combineTopic(STATE_SEPARATOR, stateName, paramName);
 
     this.state[category][stateName] = newState;
 
     this.changeParamEvents.emit(category, stateName, paramName, value);
     this.changeEvents.emit(category, stateName, changedParams);
-    //this.categoryChangeEvents.emit(category);
   }
 
+  /**
+   * Listen each change in each category and state
+   */
   onChange(cb: ChangeHandler): number {
     return this.changeEvents.addListener(cb);
   }
@@ -87,10 +87,6 @@ export default class State {
     return this.changeParamEvents.addListener(cb);
   }
 
-  // onChangeCategory(cb: CategoryChangeHandler): number {
-  //   return this.categoryChangeEvents.addListener(cb);
-  // }
-
   removeListener(handlerIndex: number) {
     this.changeEvents.removeListener(handlerIndex);
   }
@@ -98,9 +94,5 @@ export default class State {
   removeParamListener(handlerIndex: number) {
     this.changeParamEvents.removeListener(handlerIndex);
   }
-
-  // removeCategoryListener(handlerIndex: number) {
-  //   this.categoryChangeEvents.removeListener(handlerIndex);
-  // }
 
 }
