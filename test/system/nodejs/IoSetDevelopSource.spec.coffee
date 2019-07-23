@@ -24,7 +24,6 @@ describe.only 'nodejs.IoSetDevelopSource', ->
     }
 
     @ioSource.os = {
-      #require: sinon.stub()
       require: () => {default: machineConfig}
     }
 
@@ -35,5 +34,17 @@ describe.only 'nodejs.IoSetDevelopSource', ->
     sinon.assert.calledOnce(@ioSource.instantiateIo)
     sinon.assert.calledWith(@ioSource.instantiateIo, machineConfig.ios[0], helpers.resolvePlatformDir('nodejs'))
 
-  it 'instantiateIo', ->
-    @ioSource.instantiateIo()
+  it 'instantiateIo - common io', ->
+    ioPath = './io/Digital.ts'
+    platformDir = helpers.resolvePlatformDir('nodejs')
+    class DigitalClass
+    @ioSource.os = {
+      require: () => {default: DigitalClass}
+    }
+
+    @ioSource.instantiateIo(ioPath, platformDir)
+
+    assert.isTrue(@ioSource.ioCollection['Digital'] instanceof DigitalClass)
+
+  it 'instantiateIo - Storage io - it uses storage wrapper', ->
+    # TODO: !!!!
