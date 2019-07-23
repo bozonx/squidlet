@@ -96,6 +96,7 @@ export default class QueuedCall {
       }
 
       if (this.queuedData) {
+        // TODO: можно ли от mergeDeep отказаться????
         this.queuedData = mergeDeep(data, this.queuedData);
       }
       else {

@@ -99,6 +99,7 @@ export function last(arr: any[]) {
   return arr[arr.length - 1];
 }
 
+// TODO: better to not use it at all
 export function isEqual(first: any, second: any): boolean {
   if (
     first === null
@@ -124,7 +125,8 @@ export function isEqual(first: any, second: any): boolean {
     return first.toString() === second.toString();
   }
 
-  // TODO: не будет учитываться undefined в объектах
+  // TODO: не будет учитываться undefined в объектах и array (переводятся в null)
+  // TODO: слишком дорогая процедура
   // arrays and objects
   return JSON.stringify(first) === JSON.stringify(second);
 }

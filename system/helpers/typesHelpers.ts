@@ -3,6 +3,7 @@ import {trim} from './lodashLike';
 
 export interface ParsedType {
   types: string[];
+  // TODO: use Primitives
   constants: (string | number | boolean | null | undefined)[];
 }
 

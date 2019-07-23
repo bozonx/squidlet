@@ -55,7 +55,7 @@ export default class State {
     this.changeEvents.emit(category, stateName, changedParams);
   }
 
-  updateStateParam(category: number, stateName: string, paramName: string, value: JsonTypes) {
+  updateStateParam(category: number, stateName: string, paramName: string, value?: JsonTypes) {
     // don't do anything if value isn't changed
     if (
       this.state[category]
@@ -63,7 +63,10 @@ export default class State {
       && this.state[category][stateName][paramName] === value
     ) return;
 
-    const newState = mergeDeep({ [paramName]: value }, this.getState(category, stateName));
+    const newState = {
+      ...this.getState(category, stateName),
+      [paramName]: value,
+    };
 
     if (!this.state[category]) this.state[category] = {};
 

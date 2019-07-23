@@ -2,7 +2,8 @@ import {isEqual, isPlainObject, values} from './lodashLike';
 
 
 /**
- * Concat arrays but not create a new one, it mutates the srcArr.
+ * Concat arrays but not create a new one.
+ * It mutates the srcArr.
  */
 export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
   if (!arrToAppend) return;
@@ -11,7 +12,8 @@ export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
 }
 
 /**
- * Replace values if array. It mutates an "arrToUpdate" array.
+ * Replace values if array.
+ * It mutates an "arrToUpdate" array.
  */
 export function updateArray(arrToUpdate: any[], newValues: any[]): void {
   for (let index in newValues) arrToUpdate[index] = newValues[index];
@@ -65,6 +67,9 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
   const diffKeys: string[] = [];
 
   for (let key of Object.keys(sourceObj)) {
+    // TODO: isEqual не правильно отрабоатает с параметрами с undefined
+    // TODO: желательно не делать глубокого сравнения
+    // TODO: может использовать конструкцию - key in obj
     if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
       diffKeys.push(key);
     }
@@ -81,7 +86,7 @@ export function clearObject(obj: {[index: string]: any}) {
 }
 
 /**
- * Is an object, not an array
+ * Is an object (plain or instance of some class), not an array
  */
 export function isExactlyObject(item: any): boolean {
   return item && typeof item === 'object' && !Array.isArray(item) || false;

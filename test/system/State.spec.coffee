@@ -119,7 +119,7 @@ describe.only 'system.State', ->
       param2: 'not changed'
     })
 
-  it 'updateStateParam - set param to undefined', ->
+  it 'updateStateParam - set param to undefined obviously', ->
     @state.state = {
       '0': {
         deviceId: {
@@ -136,7 +136,8 @@ describe.only 'system.State', ->
       param2: 'not changed'
     })
 
-  # TODO: updateState and updateStateParam - как работает с undefined
+
+
   # TODO: removeListener
   # TODO: removeParamListener
   # TODO: destroy
