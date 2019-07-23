@@ -1,11 +1,13 @@
-import {StateObject} from '../State';
 import Promised from '../helpers/Promised';
 import QueuedCall from '../helpers/QueuedCall';
 import {mergeDeep} from '../helpers/collections';
+import {JsonTypes} from '../interfaces/Types';
 
-export type Initialize = () => Promise<StateObject>;
-export type Getter = () => Promise<StateObject>;
-export type Setter = (partialData: StateObject) => Promise<void>;
+
+export type ConsistentStateData = {[index: string]: JsonTypes};
+export type Initialize = () => Promise<ConsistentStateData>;
+export type Getter = () => Promise<ConsistentStateData>;
+export type Setter = (partialData: ConsistentStateData) => Promise<void>;
 
 
 /**
@@ -13,20 +15,20 @@ export type Setter = (partialData: StateObject) => Promise<void>;
  */
 export default class ConsistentState {
   private readonly logError: (msg: string) => void;
-  private readonly stateGetter: () => StateObject;
-  private readonly stateUpdater: (partialState: StateObject) => void;
+  private readonly stateGetter: () => ConsistentStateData;
+  private readonly stateUpdater: (partialState: ConsistentStateData) => void;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
-  private tmpStateBeforeWriting?: StateObject;
+  private tmpStateBeforeWriting?: ConsistentStateData;
 
 
   constructor(
     logError: (msg: string) => void,
-    stateGetter: () => StateObject,
-    stateUpdater: (partialState: StateObject) => void,
+    stateGetter: () => ConsistentStateData,
+    stateUpdater: (partialState: ConsistentStateData) => void,
     initialize?: Initialize,
     getter?: Getter,
     setter?: Setter
@@ -47,7 +49,7 @@ export default class ConsistentState {
 
     if (this.initialize) getter = this.initialize;
 
-    const result: StateObject = await this.requestGetter(getter as Getter);
+    const result: ConsistentStateData = await this.requestGetter(getter as Getter);
 
     this.stateUpdater(result);
   }
@@ -68,11 +70,11 @@ export default class ConsistentState {
     return Boolean(this.readingPromise);
   }
 
-  getState(): StateObject {
+  getState(): ConsistentStateData {
     return this.stateGetter();
   }
 
-  setIncomeState(partialState: StateObject) {
+  setIncomeState(partialState: ConsistentStateData) {
     if (this.isReading()) {
       // do nothing if force reading is in progress. It will return the truly state
       return;
@@ -106,7 +108,7 @@ export default class ConsistentState {
       return;
     }
 
-    const result: StateObject = await this.requestGetter(this.getter);
+    const result: ConsistentStateData = await this.requestGetter(this.getter);
 
     this.stateUpdater(result);
   }
@@ -117,7 +119,7 @@ export default class ConsistentState {
    * If reading is in progress it will wait for its completion.
    * On error it will return state which was before saving started.
    */
-  async write(partialData: StateObject): Promise<void> {
+  async write(partialData: ConsistentStateData): Promise<void> {
     let oldState = this.getState();
 
     this.stateUpdater(partialData);
@@ -144,11 +146,11 @@ export default class ConsistentState {
   }
 
 
-  private async requestGetter(getter: Getter): Promise<StateObject> {
+  private async requestGetter(getter: Getter): Promise<ConsistentStateData> {
     if (!this.getter) throw new Error(`No getter`);
 
     this.readingPromise = new Promised<void>();
-    let result: StateObject;
+    let result: ConsistentStateData;
 
     // make a request
     try {
@@ -172,7 +174,7 @@ export default class ConsistentState {
   /**
    * Write new or add to queue
    */
-  private async requestSetter(newPartialData: StateObject): Promise<void> {
+  private async requestSetter(newPartialData: ConsistentStateData): Promise<void> {
     this.writingQueuedCall.onSuccess(() => {
       delete this.tmpStateBeforeWriting;
     });
@@ -194,7 +196,7 @@ export default class ConsistentState {
     });
 
     await this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
-      return this.setter && this.setter(data as StateObject);
+      return this.setter && this.setter(data as ConsistentStateData);
     }, newPartialData);
   }
 

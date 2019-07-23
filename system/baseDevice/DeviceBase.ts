@@ -100,6 +100,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
 
+  // TODO: review - why doDestroy instead of just destroy ???
   async doDestroy() {
     await super.doDestroy();
     this._statusState && this._statusState.destroy();
@@ -109,6 +110,29 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     delete this._configState;
   }
 
+  getActionsList(): string[] {
+    return Object.keys(this.actions);
+  }
+
+  /**
+   * Call action and return it's result.
+   */
+  async action(actionName: string, ...params: any[]): Promise<JsonTypes> {
+    if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
+
+    let result: any;
+
+    try {
+      result = await this.actions[actionName](...params);
+    }
+    catch (err) {
+      this.env.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
+
+      return;
+    }
+
+    return result;
+  }
 
   /**
    * Get specified status or default status.
@@ -213,31 +237,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     };
 
     return this.env.system.state.onChange(wrapper);
-  }
-
-
-  getActionsList(): string[] {
-    return Object.keys(this.actions);
-  }
-
-  /**
-   * Call action and return it's result.
-   */
-  async action(actionName: string, ...params: any[]): Promise<JsonTypes> {
-    if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
-
-    let result: any;
-
-    try {
-      result = await this.actions[actionName](...params);
-    }
-    catch (err) {
-      this.env.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
-
-      return;
-    }
-
-    return result;
   }
 
 }
