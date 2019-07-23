@@ -1,6 +1,6 @@
-import Promised from '../helpers/Promised';
-import QueuedCall from '../helpers/QueuedCall';
-import {mergeDeep} from '../helpers/collections';
+import Promised from './Promised';
+import QueuedCall from './QueuedCall';
+import {mergeDeep} from './collections';
 import {JsonTypes} from '../interfaces/Types';
 
 

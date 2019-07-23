@@ -2,7 +2,7 @@ import {StateObject} from '../State';
 import SchemaElement from '../interfaces/SchemaElement';
 import {isEmpty} from '../helpers/lodashLike';
 import {validateParam} from '../helpers/validate';
-import ConsistentState, {Getter, Setter, Initialize} from './ConsistentState';
+import ConsistentState, {Getter, Setter, Initialize} from '../helpers/ConsistentState';
 import {collectPropsDefaults} from '../helpers/helpers';
 
 

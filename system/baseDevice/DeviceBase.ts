@@ -3,7 +3,7 @@ import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {JsonTypes} from '../interfaces/Types';
-import {Getter, Initialize, Setter} from './ConsistentState';
+import {Getter, Initialize, Setter} from '../helpers/ConsistentState';
 import {StateObject} from '../State';
 import DeviceState from './DeviceState';
 import {StateCategories} from '../interfaces/States';
