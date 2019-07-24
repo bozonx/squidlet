@@ -26,6 +26,7 @@ let unnamedJobIdCounter = -1;
  */
 export default class RequestQueue {
   private readonly jobTimeoutSec: number;
+  private readonly logError: (msg: string) => void;
   private readonly startJobEvents = new IndexedEvents<StartJobHandler>();
   private readonly endJobEvents = new IndexedEvents<EndJobHandler>();
   private jobs: Job[] = [];
@@ -33,7 +34,8 @@ export default class RequestQueue {
   private runningTimeout?: any;
 
 
-  constructor(jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
+  constructor(logError: (msg: string) => void, jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
+    this.logError = logError;
     this.jobTimeoutSec = jobTimeoutSec;
   }
 
@@ -217,7 +219,6 @@ export default class RequestQueue {
 
     // start cb
     try {
-      // TODO: как поднять ошибку в endOfJob ???
       this.currentJob[CB_POSITION]()
         .then(() => this.endOfJob(undefined, currentJob))
         .catch((err: Error) => this.endOfJob(err, currentJob));
@@ -232,10 +233,10 @@ export default class RequestQueue {
     if (job[CANCELED_POSITION]) return;
 
     if (!this.currentJob) {
-      throw new Error(`Not current job when a job finished`);
+      return this.logError(`Not current job when a job finished`);
     }
     else if (this.currentJob[ID_POSITION] !== job[ID_POSITION]) {
-      throw new Error(`Current job id doesn't match with the finished job id`);
+      return this.logError(`Current job id doesn't match with the finished job id`);
     }
 
     clearTimeout(this.runningTimeout);
