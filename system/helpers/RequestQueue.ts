@@ -9,7 +9,8 @@ type Job = [JobId, RequestCb];
 
 const ID_POSITION = 0;
 const CB_POSITION = 1;
-let unnamedJobId = -1;
+const DEFAULT_JOB_TIMEOUT_SEC = 120;
+let unnamedJobIdCounter = -1;
 
 
 // TODO: можно добавить режим запрещающий добавлять колбыки с тем же id
@@ -22,20 +23,24 @@ let unnamedJobId = -1;
  * Please don't use only numbers like "0" as an id. Use any other string as an id.
  */
 export default class RequestQueue {
-  private startJobEvents = new IndexedEvents<StartJobHandler>();
-  private endJobEvents = new IndexedEvents<EndJobHandler>();
+  private readonly jobTimeoutSec: number;
+  private readonly startJobEvents = new IndexedEvents<StartJobHandler>();
+  private readonly endJobEvents = new IndexedEvents<EndJobHandler>();
   private jobs: Job[] = [];
   private currentJob?: Job;
+  private runningTimeout?: any;
 
 
-  constructor() {
+  constructor(jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
+    this.jobTimeoutSec = jobTimeoutSec;
   }
 
   destroy() {
     this.startJobEvents.removeAll();
     this.endJobEvents.removeAll();
+    clearTimeout(this.runningTimeout);
+    delete this.runningTimeout;
     delete this.jobs;
-
     // TODO: cancel and delete current job
   }
 
@@ -111,6 +116,7 @@ export default class RequestQueue {
       this.updateDelayedJob(resolvedId, cb);
     }
     else {
+      // add a new job
       this.addToEndOfQueue(resolvedId, cb);
       this.startNextJob();
     }
@@ -138,9 +144,9 @@ export default class RequestQueue {
   private resolveJobId(jobId: JobId | undefined): JobId {
     if (typeof jobId === 'string') return jobId;
 
-    unnamedJobId++;
+    unnamedJobIdCounter++;
 
-    return String(unnamedJobId);
+    return String(unnamedJobIdCounter);
   }
 
   private getJobIndex(jobId: JobId): number {
@@ -185,7 +191,12 @@ export default class RequestQueue {
 
     this.startJobEvents.emit(currentJobId);
 
-    // TODO: add running timeout
+    this.runningTimeout = setTimeout(() => {
+
+      // TODO: отменить выполнение промиса текущего колбэка
+
+      this.endOfJob(new Error(`Timeout of job "${currentJobId}" has been exceeded`), currentJobId);
+    }, this.jobTimeoutSec * 1000);
 
     // start cb
     try {
@@ -207,6 +218,9 @@ export default class RequestQueue {
       throw new Error(`Current job id doesn't match with the finished job id`);
     }
 
+    clearTimeout(this.runningTimeout);
+
+    delete this.runningTimeout;
     // delete finished job
     delete this.currentJob;
 
