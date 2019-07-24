@@ -42,7 +42,7 @@ export function pick(obj: {[index: string]: any} | undefined, ...propToPick: str
 }
 
 export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
-  if (typeof collection === 'undefined' || collection === null) {
+  if (typeof collection === 'undefined') {
     return;
   }
   else if (Array.isArray(collection)) {
@@ -62,6 +62,34 @@ export function find(collection: any[] | {[index: string]: any}, cb: (item: any,
   else {
     throw new Error(`find: unsupported type of collection "${JSON.stringify(collection)}"`);
   }
+
+  return;
+}
+
+// TODO: test
+export function findIndex(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
+  if (typeof collection === 'undefined') {
+    return -1;
+  }
+  else if (Array.isArray(collection)) {
+    for (let index in collection) {
+      const result: any | undefined = cb(collection[index], parseInt(index));
+
+      if (result) return parseInt(index);
+    }
+  }
+  else if (typeof collection === 'object') {
+    for (let key of Object.keys(collection)) {
+      const result: any = cb(collection[key], key);
+
+      if (result) return key;
+    }
+  }
+  else {
+    throw new Error(`findIndex: unsupported type of collection "${JSON.stringify(collection)}"`);
+  }
+
+  return -1;
 }
 
 export function trimStart(src: string, char: string = ' '): string {

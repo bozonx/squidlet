@@ -1,4 +1,5 @@
 import IndexedEvents from './IndexedEvents';
+import {findIndex} from './lodashLike';
 
 type RequestCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
@@ -77,9 +78,23 @@ export default class RequestQueue {
   }
   
   waitJobFinished(jobId: JobId): Promise<void> {
-    // TODO: !!!! если нет такого id - то наверное выполнить resolve ??? или throw error ???
-    // TODO: !!!! может использовать soft mode???
-    // TODO: !!!! use event once
+    if (!this.hasJob(jobId)) {
+      throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const handlerIndex = this.endJobEvents.addListener(
+        (error: Error | undefined, finishedJobId: JobId) => {
+          if (finishedJobId === jobId) {
+            this.endJobEvents.removeListener(handlerIndex);
+
+            if (error) return reject(error);
+
+            resolve();
+          }
+        }
+      );
+    });
   }
 
   /**
@@ -91,11 +106,13 @@ export default class RequestQueue {
   request(jobId: JobId | undefined, cb: RequestCb): JobId {
     const resolvedId: JobId = this.resolveJobId(jobId);
 
+    // if job is in progress or delayed - update delayed job or add to queue
     if (this.hasJob(resolvedId)) {
       this.updateDelayedJob(resolvedId, cb);
     }
     else {
       this.addToEndOfQueue(resolvedId, cb);
+      this.startNextJob();
     }
 
     return resolvedId;
@@ -126,19 +143,28 @@ export default class RequestQueue {
     return String(unnamedJobId);
   }
 
-  private addToEndOfQueue(jobId: JobId, cb: RequestCb) {
-    this.jobs.push([jobId, cb]);
-    this.startNextJob();
+  private getJobIndex(jobId: JobId): number {
+    return findIndex(this.jobs, (item: Job) => item[ID_POSITION] === jobId) as number;
   }
 
+  private addToEndOfQueue(jobId: JobId, cb: RequestCb) {
+    this.jobs.push([jobId, cb]);
+  }
+
+  /**
+   * Update cb of delayed job or add a new job to queue.
+   */
   private updateDelayedJob(jobId: JobId, cb: RequestCb) {
-    // TODO: !!!!
-    // if (this.getCurrentJobId() === resolvedId) {
-    //
-    // }
-    // else {
-    //
-    // }
+    const jobIndex: number = this.getJobIndex(jobId);
+
+    if (jobIndex >= 0) {
+      // update delayed job cb
+      this.jobs[jobIndex][CB_POSITION] = cb;
+    }
+    else {
+      // add a new job
+      this.addToEndOfQueue(jobId, cb);
+    }
   }
 
   /**

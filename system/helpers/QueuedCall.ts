@@ -1,3 +1,6 @@
+// TODO: наверное не нужно
+
+
 /**
  * Call a function which returns a promise.
  * And if while it waits another call will be called after this.
