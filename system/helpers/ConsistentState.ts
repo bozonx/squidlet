@@ -122,19 +122,21 @@ export default class ConsistentState {
     this.stateUpdater(result);
   }
 
-  // TODO: test
   /**
-   * Update state and write it to setter.
-   * If writing is in progress then a new writing will be queued.
-   * If reading is in progress it will wait for its completion.
-   * On error it will return state which was before saving started.
+   * Update local state and pass it to setter.
+   * Call it when you want to set a new state e.g when some button changed its state.
+   * The logic:
+   * * If writing is in progress then a new writing will be queued.
+   * * If reading is in progress it will wait for its completion.
+   * * On error it will return state which was before saving started.
    */
   async write(partialData: Dictionary): Promise<void> {
     let oldState = this.getState();
 
+    // update local state at the beginning of process
     this.stateUpdater(partialData);
 
-    // if mode without setter - just update state and rise an event
+    // if mode without setter - do noting else updating local state
     if (!this.setter) return;
 
     if (this.isReading()) {
@@ -149,9 +151,11 @@ export default class ConsistentState {
       oldState = this.getState();
     }
 
+    // TODO: правильно ли обновлять стейт если уже идет запись???
     // save old state
     this.tmpStateBeforeWriting = oldState;
 
+    // do writing request any way if it is a new request or there is writing is in progress
     await this.requestSetter(partialData);
   }
 

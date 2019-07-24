@@ -68,3 +68,10 @@ describe.only 'system.helpers.ConsistentState', ->
 
     sinon.assert.notCalled(@consistentState.requestGetter)
     sinon.assert.notCalled(@stateUpdater)
+
+  it "write", ->
+
+  it "write - no setter - just update the local state", ->
+
+  it "write - reading is in progress - wait reading promise", ->
+
