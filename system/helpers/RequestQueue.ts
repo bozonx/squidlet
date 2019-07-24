@@ -1,4 +1,8 @@
+import IndexedEvents from './IndexedEvents';
+
 type RequestCb = () => Promise<void>;
+type StartJobHandler = (jobId: JobId) => void;
+type EndJobHandler = (error: Error | undefined, jobId: JobId) => void;
 type JobId = string;
 type Job = [JobId, RequestCb];
 
@@ -14,12 +18,21 @@ let unnamedJobId = -1;
  * Please don't use only numbers like "0" as an id. Use any other string as an id.
  */
 export default class RequestQueue {
-  //private jobs: Job[] = [];
+  private startJobEvents = new IndexedEvents<StartJobHandler>();
+  private endJobEvents = new IndexedEvents<EndJobHandler>();
   private jobs: Job[] = [];
   private currentJob?: Job;
 
 
   constructor() {
+  }
+
+  destroy() {
+    this.startJobEvents.removeAll();
+    this.endJobEvents.removeAll();
+    delete this.jobs;
+
+    // TODO: cancel and delete current job
   }
 
 
@@ -55,7 +68,9 @@ export default class RequestQueue {
   }
   
   waitJobFinished(jobId: JobId): Promise<void> {
-    // TODO: !!!!
+    // TODO: !!!! если нет такого id - то наверное выполнить resolve ??? или throw error ???
+    // TODO: !!!! может использовать soft mode???
+    // TODO: !!!! use event once
   }
 
   /**
@@ -77,12 +92,20 @@ export default class RequestQueue {
     return resolvedId;
   }
 
-  onJobStart(cb: (jobId: JobId) => void) {
-    // TODO: !!!!
+  onJobStart(cb: StartJobHandler): number {
+    return this.startJobEvents.addListener(cb);
   }
 
-  onJobEnd(cb: (error: Error | undefined, jobId: JobId) => void) {
-    // TODO: !!!!
+  onJobEnd(cb: EndJobHandler): number {
+    return this.endJobEvents.addListener(cb);
+  }
+
+  removeStartJobListener(handlerIndex: number) {
+    this.startJobEvents.removeListener(handlerIndex);
+  }
+
+  removeEndJobListener(handlerIndex: number) {
+    this.endJobEvents.removeListener(handlerIndex);
   }
 
   
@@ -109,23 +132,50 @@ export default class RequestQueue {
     // }
   }
 
+  /**
+   * Start a new job if there isn't a current job and queue has some items.
+   * It doesn't start a new job while current is in progress.
+   */
   private startNextJob() {
     // do nothing if there is current job or no one in queue
     if (this.currentJob || !this.jobs.length) return;
 
-    this.currentJob = this.jobs[ID_POSITION];
+    // set first job in queue as current
+    this.currentJob = this.jobs[0];
+
+    const currentJobId: JobId = this.currentJob[ID_POSITION];
 
     // remove the first element
     this.jobs.shift();
 
+    this.startJobEvents.emit(currentJobId);
+
     // start cb
-    this.currentJob[CB_POSITION]()
-      .then(() => {
-        // TODO: !!!
-      })
-      .catch((err: Error) => {
-        // TODO: !!!
-      });
+    try {
+      // TODO: как поднять ошибку в endOfJob ???
+      this.currentJob[CB_POSITION]()
+        .then(() => this.endOfJob(undefined, currentJobId))
+        .catch((err: Error) => this.endOfJob(err, currentJobId));
+    }
+    catch (err) {
+      this.endOfJob(err, currentJobId);
+    }
+  }
+
+  private endOfJob(err: Error | undefined, jobId: JobId) {
+
+    if (!this.currentJob) {
+      throw new Error(`Not current job when a job finished`);
+    }
+    else if (this.currentJob[ID_POSITION] !== jobId) {
+      throw new Error(`Current job id doesn't match with the finished job id`);
+    }
+
+    // delete finished job
+    delete this.currentJob;
+
+    this.endJobEvents.emit(err, jobId);
+    this.startNextJob();
   }
 
 }
