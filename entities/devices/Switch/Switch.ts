@@ -1,7 +1,7 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {convertToLevel} from 'system/helpers/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {StateObject} from 'system/State';
+import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';
 
@@ -28,11 +28,11 @@ export default class Switch extends DeviceBase<Props> {
   }
 
 
-  protected statusGetter = async (): Promise<StateObject> => {
+  protected statusGetter = async (): Promise<Dictionary> => {
     return { [DEFAULT_STATUS]: await this.binaryOutput.read() };
   }
 
-  protected statusSetter = async (partialData: StateObject) => {
+  protected statusSetter = async (partialData: Dictionary) => {
     await this.binaryOutput.write(partialData[DEFAULT_STATUS] as boolean);
   }
 

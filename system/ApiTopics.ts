@@ -1,11 +1,10 @@
 import {splitFirstElement} from './helpers/strings';
 import {combineTopic, parseValue} from './helpers/helpers';
-import {JsonTypes} from './interfaces/Types';
+import {Dictionary, JsonTypes} from './interfaces/Types';
 import {trim} from './helpers/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
 import IndexedEvents from './helpers/IndexedEvents';
-import {StateObject} from './State';
 
 type TopicType = 'device' | 'api';
 type DeviceStateType = 'status' | 'config';
@@ -162,7 +161,7 @@ export default class ApiTopics {
     changedParams: string[]
   ) {
     const topicType: TopicType = 'device';
-    const state: StateObject | undefined = this.system.state.getState(category, stateName);
+    const state: Dictionary | undefined = this.system.state.getState(category, stateName);
 
     if (!state) return;
 

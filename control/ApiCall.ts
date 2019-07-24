@@ -1,6 +1,6 @@
 import WsApiClient from '../shared/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
-import {StateObject} from '../system/State';
+import {Dictionary} from '../system/interfaces/Types';
 
 
 // TODO: remove
@@ -36,7 +36,7 @@ export default class ApiCall {
         'listenDeviceStatus',
         deviceId,
         undefined,
-        (changedValues: StateObject) => {
+        (changedValues: Dictionary) => {
           console.info(JSON.stringify(changedValues));
           // for (let name of Object.keys(changedValues)) {
           //   console.log(`${name}: ${JSON.stringify(changedValues[name])}`);
@@ -59,7 +59,7 @@ export default class ApiCall {
       await apiClient.callMethod(
         'listenDeviceConfig',
         deviceId,
-        (changedValues: StateObject) => {
+        (changedValues: Dictionary) => {
           console.info(JSON.stringify(changedValues));
         }
       );
@@ -79,7 +79,7 @@ export default class ApiCall {
         'listenState',
         parseInt(category),
         stateName,
-        (changedValues: StateObject) => {
+        (changedValues: Dictionary) => {
 
         }
       );

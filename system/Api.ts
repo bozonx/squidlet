@@ -1,8 +1,7 @@
-import {JsonTypes} from './interfaces/Types';
+import {Dictionary, JsonTypes} from './interfaces/Types';
 import {objGet, pick} from './helpers/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
-import {StateObject} from './State';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
@@ -27,12 +26,12 @@ export default class Api {
   listenDeviceStatus(
     deviceId: string,
     statusName: string | undefined,
-    cb: (changedValues: StateObject) => void
+    cb: (changedValues: Dictionary) => void
   ): number {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
-      const changedValues: StateObject = pick(
+      const changedValues: Dictionary = pick(
         this.system.state.getState(category, stateName),
         ...changedParams
       );
@@ -43,11 +42,11 @@ export default class Api {
     return this.system.state.onChange(handlerWrapper);
   }
 
-  listenDeviceConfig(deviceId: string, cb: (changedValues: StateObject) => void): number {
+  listenDeviceConfig(deviceId: string, cb: (changedValues: Dictionary) => void): number {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesConfig || stateName !== deviceId) return;
 
-      const changedValues: StateObject = pick(
+      const changedValues: Dictionary = pick(
         this.system.state.getState(category, stateName),
         ...changedParams
       );
@@ -58,11 +57,11 @@ export default class Api {
     return this.system.state.onChange(handlerWrapper);
   }
 
-  listenState(category: StateCategories, stateName: string, cb: (changedValues: StateObject) => void): number {
+  listenState(category: StateCategories, stateName: string, cb: (changedValues: Dictionary) => void): number {
     const handlerWrapper = (currentCategory: number, currentStateName: string, changedParams: string[]) => {
       if (category !== currentCategory || stateName !== currentStateName) return;
 
-      const changedValues: StateObject = pick(
+      const changedValues: Dictionary = pick(
         this.system.state.getState(category, stateName),
         ...changedParams
       );
@@ -73,21 +72,21 @@ export default class Api {
     return this.system.state.onChange(handlerWrapper);
   }
 
-  getDeviceStatus(deviceId: string): StateObject | undefined {
+  getDeviceStatus(deviceId: string): Dictionary | undefined {
     return this.system.state.getState(StateCategories.devicesStatus, deviceId);
   }
 
-  getDeviceConfig(deviceId: string): StateObject | undefined {
+  getDeviceConfig(deviceId: string): Dictionary | undefined {
     return this.system.state.getState(StateCategories.devicesConfig, deviceId);
   }
 
-  async setDeviceConfig(deviceId: string, partialState: StateObject): Promise<void> {
+  async setDeviceConfig(deviceId: string, partialState: Dictionary): Promise<void> {
     const device = this.system.devicesManager.getDevice(deviceId);
 
     if (device.setConfig) return device.setConfig(partialState);
   }
 
-  getState(category: StateCategories, stateName: string): StateObject | undefined {
+  getState(category: StateCategories, stateName: string): Dictionary | undefined {
     return this.system.state.getState(category, stateName);
   }
 

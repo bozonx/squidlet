@@ -1,13 +1,12 @@
 import Promised from './Promised';
 import QueuedCall from './QueuedCall';
 import {mergeDeep} from './collections';
-import {JsonTypes} from '../interfaces/Types';
+import {Dictionary} from '../interfaces/Types';
 
 
-export type ConsistentStateData = {[index: string]: JsonTypes};
-export type Initialize = () => Promise<ConsistentStateData>;
-export type Getter = () => Promise<ConsistentStateData>;
-export type Setter = (partialData: ConsistentStateData) => Promise<void>;
+export type Initialize = () => Promise<Dictionary>;
+export type Getter = () => Promise<Dictionary>;
+export type Setter = (partialData: Dictionary) => Promise<void>;
 
 
 /**
@@ -15,20 +14,20 @@ export type Setter = (partialData: ConsistentStateData) => Promise<void>;
  */
 export default class ConsistentState {
   private readonly logError: (msg: string) => void;
-  private readonly stateGetter: () => ConsistentStateData;
-  private readonly stateUpdater: (partialState: ConsistentStateData) => void;
+  private readonly stateGetter: () => Dictionary;
+  private readonly stateUpdater: (partialState: Dictionary) => void;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
-  private tmpStateBeforeWriting?: ConsistentStateData;
+  private tmpStateBeforeWriting?: Dictionary;
 
 
   constructor(
     logError: (msg: string) => void,
-    stateGetter: () => ConsistentStateData,
-    stateUpdater: (partialState: ConsistentStateData) => void,
+    stateGetter: () => Dictionary,
+    stateUpdater: (partialState: Dictionary) => void,
     initialize?: Initialize,
     getter?: Getter,
     setter?: Setter
@@ -49,7 +48,7 @@ export default class ConsistentState {
 
     if (this.initialize) getter = this.initialize;
 
-    const result: ConsistentStateData = await this.requestGetter(getter as Getter);
+    const result: Dictionary = await this.requestGetter(getter as Getter);
 
     this.stateUpdater(result);
   }
@@ -70,11 +69,11 @@ export default class ConsistentState {
     return Boolean(this.readingPromise);
   }
 
-  getState(): ConsistentStateData {
+  getState(): Dictionary {
     return this.stateGetter();
   }
 
-  setIncomeState(partialState: ConsistentStateData) {
+  setIncomeState(partialState: Dictionary) {
     if (this.isReading()) {
       // do nothing if force reading is in progress. It will return the truly state
       return;
@@ -108,7 +107,7 @@ export default class ConsistentState {
       return;
     }
 
-    const result: ConsistentStateData = await this.requestGetter(this.getter);
+    const result: Dictionary = await this.requestGetter(this.getter);
 
     this.stateUpdater(result);
   }
@@ -119,7 +118,7 @@ export default class ConsistentState {
    * If reading is in progress it will wait for its completion.
    * On error it will return state which was before saving started.
    */
-  async write(partialData: ConsistentStateData): Promise<void> {
+  async write(partialData: Dictionary): Promise<void> {
     let oldState = this.getState();
 
     this.stateUpdater(partialData);
@@ -146,11 +145,11 @@ export default class ConsistentState {
   }
 
 
-  private async requestGetter(getter: Getter): Promise<ConsistentStateData> {
+  private async requestGetter(getter: Getter): Promise<Dictionary> {
     if (!this.getter) throw new Error(`No getter`);
 
     this.readingPromise = new Promised<void>();
-    let result: ConsistentStateData;
+    let result: Dictionary;
 
     // make a request
     try {
@@ -174,7 +173,7 @@ export default class ConsistentState {
   /**
    * Write new or add to queue
    */
-  private async requestSetter(newPartialData: ConsistentStateData): Promise<void> {
+  private async requestSetter(newPartialData: Dictionary): Promise<void> {
     this.writingQueuedCall.onSuccess(() => {
       delete this.tmpStateBeforeWriting;
     });
@@ -196,7 +195,7 @@ export default class ConsistentState {
     });
 
     await this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
-      return this.setter && this.setter(data as ConsistentStateData);
+      return this.setter && this.setter(data as Dictionary);
     }, newPartialData);
   }
 

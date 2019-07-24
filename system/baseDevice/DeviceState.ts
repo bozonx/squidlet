@@ -1,9 +1,9 @@
-import {StateObject} from '../State';
 import SchemaElement from '../interfaces/SchemaElement';
 import {isEmpty} from '../helpers/lodashLike';
 import {validateParam} from '../helpers/validate';
 import ConsistentState, {Getter, Setter, Initialize} from '../helpers/ConsistentState';
 import {collectPropsDefaults} from '../helpers/helpers';
+import {Dictionary} from '../interfaces/Types';
 
 
 export type Schema = {[index: string]: SchemaElement};
@@ -16,8 +16,8 @@ export type Schema = {[index: string]: SchemaElement};
 export default class DeviceState {
   private readonly logError: (msg: string) => void;
   private readonly schema: Schema;
-  private readonly stateGetter: () => StateObject;
-  private readonly stateUpdater: (partialState: StateObject) => void;
+  private readonly stateGetter: () => Dictionary;
+  private readonly stateUpdater: (partialState: Dictionary) => void;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
@@ -26,8 +26,8 @@ export default class DeviceState {
 
   constructor(
     schema: Schema,
-    stateGetter: () => StateObject,
-    stateUpdater: (partialState: StateObject) => void,
+    stateGetter: () => Dictionary,
+    stateUpdater: (partialState: Dictionary) => void,
     logError: (msg: string) => void,
     initialize?: Initialize,
     getter?: Getter,
@@ -81,11 +81,11 @@ export default class DeviceState {
     return this.consistentState.isWriting();
   }
 
-  getState(): StateObject {
+  getState(): Dictionary {
     return this.consistentState.getState();
   }
 
-  setIncomeState(partialState: StateObject) {
+  setIncomeState(partialState: Dictionary) {
     this.consistentState.setIncomeState(partialState);
   }
 
@@ -105,7 +105,7 @@ export default class DeviceState {
     return;
   }
 
-  async write(partialData: StateObject): Promise<void> {
+  async write(partialData: Dictionary): Promise<void> {
     if (isEmpty(partialData)) return;
 
     this.validateDict(

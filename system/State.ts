@@ -1,4 +1,4 @@
-import {JsonTypes} from './interfaces/Types';
+import {Dictionary, JsonTypes} from './interfaces/Types';
 import IndexedEvents from './helpers/IndexedEvents';
 import {getDifferentKeys, mergeDeep} from './helpers/collections';
 import {isEqual} from './helpers/lodashLike';
@@ -6,14 +6,13 @@ import {isEqual} from './helpers/lodashLike';
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
 type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;
-export type StateObject = {[index: string]: JsonTypes};
 
 
 export default class State {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private readonly changeParamEvents = new IndexedEvents<ChangeParamHandler>();
   // like { category: { stateName: { ... stateParams } } }
-  private readonly state: {[index: string]: {[index: string]: StateObject}} = {};
+  private readonly state: {[index: string]: {[index: string]: Dictionary}} = {};
 
 
   destroy() {
@@ -22,7 +21,7 @@ export default class State {
   }
 
 
-  getState(category: number, stateName: string): StateObject | undefined {
+  getState(category: number, stateName: string): Dictionary | undefined {
     if (!this.state[category]) return;
 
     return this.state[category][stateName];
@@ -35,8 +34,8 @@ export default class State {
     return this.state[category][stateName][paramName];
   }
 
-  updateState(category: number, stateName: string, newPartialState: StateObject) {
-    const newState: StateObject = mergeDeep(newPartialState, this.getState(category, stateName));
+  updateState(category: number, stateName: string, newPartialState: Dictionary) {
+    const newState: Dictionary = mergeDeep(newPartialState, this.getState(category, stateName));
 
     // don't do anything if value isn't changed
     if (isEqual(newState, this.getState(category, stateName))) return;

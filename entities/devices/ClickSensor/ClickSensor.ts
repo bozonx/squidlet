@@ -1,7 +1,7 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {omit} from 'system/helpers/lodashLike';
-import {StateObject} from 'system/State';
+import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
@@ -41,7 +41,7 @@ export default class ClickSensor extends DeviceBase<Props> {
     }
   }
 
-  protected statusGetter = async (): Promise<StateObject> => {
+  protected statusGetter = async (): Promise<Dictionary> => {
     return { [DEFAULT_STATUS]: this.binaryClick.isDown() };
   }
 

@@ -2,9 +2,8 @@ import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
 import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import {JsonTypes} from '../interfaces/Types';
+import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../helpers/ConsistentState';
-import {StateObject} from '../State';
 import DeviceState from './DeviceState';
 import {StateCategories} from '../interfaces/States';
 
@@ -62,10 +61,10 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     if (manifest.status) {
       this._statusState = new DeviceState(
         manifest.status,
-        (): StateObject => {
+        (): Dictionary => {
           return this.env.system.state.getState(StateCategories.devicesStatus, this.id) || {};
         },
-        (partialState: StateObject): void => {
+        (partialState: Dictionary): void => {
           this.env.system.state.updateState(StateCategories.devicesStatus, this.id, partialState);
         },
         this.env.system.log.error,
@@ -78,10 +77,10 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     if (manifest.config) {
       this._configState = new DeviceState(
         manifest.config,
-        (): StateObject => {
+        (): Dictionary => {
           return this.env.system.state.getState(StateCategories.devicesConfig, this.id) || {};
         },
-        (partialState: StateObject): void => {
+        (partialState: Dictionary): void => {
           this.env.system.state.updateState(StateCategories.devicesConfig, this.id, partialState);
         },
         this.env.system.log.error,
@@ -189,7 +188,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.env.system.state.onChangeParam(wrapper);
   }
 
-  getConfig(): StateObject {
+  getConfig(): Dictionary {
     if (!this.configState) return {};
 
     return  this.configState.getState();
@@ -209,7 +208,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
   }
 
-  setConfig = async (partialData: StateObject): Promise<void> => {
+  setConfig = async (partialData: Dictionary): Promise<void> => {
     if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
     }

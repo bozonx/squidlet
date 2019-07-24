@@ -1,6 +1,6 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {StateObject} from 'system/State';
+import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryInput, BinaryInputProps} from '../../drivers/BinaryInput/BinaryInput';
 
@@ -26,7 +26,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
 
-  protected statusGetter = async (): Promise<StateObject> => {
+  protected statusGetter = async (): Promise<Dictionary> => {
     return { [DEFAULT_STATUS]: await this.binaryInput.read() };
   }
 
