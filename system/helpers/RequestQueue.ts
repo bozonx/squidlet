@@ -11,6 +11,9 @@ const CB_POSITION = 1;
 let unnamedJobId = -1;
 
 
+// TODO: можно добавить режим запрещающий добавлять колбыки с тем же id
+
+
 /**
  * Put callback to queue.
  * Callbacks with the same id will be make delayed.
@@ -40,6 +43,10 @@ export default class RequestQueue {
     return this.jobs.length;
   }
 
+  getJobIds(): string[] {
+    return this.jobs.map((item: Job) => item[ID_POSITION]);
+  }
+
   isJobInProgress(jobId: JobId): boolean {
     return this.getCurrentJobId() === jobId;
   }
@@ -48,7 +55,9 @@ export default class RequestQueue {
    * Check if queue has job with specified jobId even it is a current job.
    */
   hasJob(jobId: JobId): boolean {
-    // TODO: !!!!
+    if (this.currentJob && this.currentJob[ID_POSITION] === jobId) return true;
+
+    return this.getJobIds().includes(jobId);
   }
 
   /**
@@ -150,6 +159,8 @@ export default class RequestQueue {
 
     this.startJobEvents.emit(currentJobId);
 
+    // TODO: add running timeout
+
     // start cb
     try {
       // TODO: как поднять ошибку в endOfJob ???
@@ -163,7 +174,6 @@ export default class RequestQueue {
   }
 
   private endOfJob(err: Error | undefined, jobId: JobId) {
-
     if (!this.currentJob) {
       throw new Error(`Not current job when a job finished`);
     }
