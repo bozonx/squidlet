@@ -14,7 +14,9 @@ export type Setter = (partialData: Dictionary) => Promise<void>;
  */
 export default class ConsistentState {
   private readonly logError: (msg: string) => void;
+  // getter of local state
   private readonly stateGetter: () => Dictionary;
+  // updater of local state
   private readonly stateUpdater: (partialState: Dictionary) => void;
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
