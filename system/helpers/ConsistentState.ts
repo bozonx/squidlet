@@ -55,6 +55,7 @@ export default class ConsistentState {
     this.stateUpdater(result);
   }
 
+  // TODO: test
   destroy() {
     this.writingQueuedCall.destroy();
     delete this.readingPromise;
@@ -63,6 +64,7 @@ export default class ConsistentState {
   }
 
 
+  // TODO: test
   isWriting(): boolean {
     return this.writingQueuedCall.isExecuting();
   }
@@ -71,10 +73,13 @@ export default class ConsistentState {
     return Boolean(this.readingPromise);
   }
 
+  // TODO: test
   getState(): Dictionary {
     return this.stateGetter();
   }
 
+  // TODO: test
+  // TODO: review
   setIncomeState(partialState: Dictionary) {
     if (this.isReading()) {
       // do nothing if force reading is in progress. It will return the truly state
@@ -93,20 +98,23 @@ export default class ConsistentState {
   }
 
   /**
-   * Read whole state.
-   * If getter is set it will call it and return state.
-   * If there isn't setter - it will just return current state.
-   * If writing is in progress it will return current state which is being writing at the moment
-   * If reading is in progress it will wait for current reading request and will return its data
+   * Read whole state manually.
+   * It useful when for example you want to make state actual after connection lost.
+   * But usually it doesn't need because it's better to pass income state which you received by listening
+   * to income data events to setIncomeState() method.
+   * The logic of this method:
+   * * If getter is set it will be called
+   * * If there isn't any getter - it will do nothing
+   * * If reading is in progress it will return promise of current reading process
    */
   async load(): Promise<void> {
     if (!this.getter) return;
 
+    // TODO: ??? If writing is in progress it will return current state which is being writing at the moment
+
     if (this.isReading()) {
       // wait for current reading. And throw an error if it throws
-      this.readingPromise && await this.readingPromise.promise;
-
-      return;
+      return this.readingPromise && this.readingPromise.promise;
     }
 
     const result: Dictionary = await this.requestGetter(this.getter);
@@ -114,6 +122,7 @@ export default class ConsistentState {
     this.stateUpdater(result);
   }
 
+  // TODO: test
   /**
    * Update state and write it to setter.
    * If writing is in progress then a new writing will be queued.
@@ -147,6 +156,7 @@ export default class ConsistentState {
   }
 
 
+  // TODO: test
   private async requestGetter(getter: Getter): Promise<Dictionary> {
     if (!this.getter) throw new Error(`No getter`);
 
@@ -172,6 +182,7 @@ export default class ConsistentState {
     return result;
   }
 
+  // TODO: test
   /**
    * Write new or add to queue
    */
