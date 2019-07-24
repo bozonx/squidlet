@@ -5,10 +5,12 @@ type RequestCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
 type EndJobHandler = (error: Error | undefined, jobId: JobId) => void;
 type JobId = string;
-type Job = [JobId, RequestCb];
+// array like [JobId, RequestCb, isCanceled]
+type Job = [JobId, RequestCb, boolean];
 
 const ID_POSITION = 0;
 const CB_POSITION = 1;
+const CANCELED_POSITION = 2;
 const DEFAULT_JOB_TIMEOUT_SEC = 120;
 let unnamedJobIdCounter = -1;
 
@@ -39,9 +41,12 @@ export default class RequestQueue {
     this.startJobEvents.removeAll();
     this.endJobEvents.removeAll();
     clearTimeout(this.runningTimeout);
+
+    if (this.currentJob) this.cancelCurrentJob(this.currentJob[ID_POSITION]);
+
     delete this.runningTimeout;
     delete this.jobs;
-    // TODO: cancel and delete current job
+    delete this.currentJob;
   }
 
 
@@ -49,8 +54,17 @@ export default class RequestQueue {
     return this.jobs.length;
   }
 
+  /**
+   * Get ids of jobs include current job.
+   */
   getJobIds(): string[] {
-    return this.jobs.map((item: Job) => item[ID_POSITION]);
+    const queued = this.jobs.map((item: Job) => item[ID_POSITION]);
+
+    if (this.currentJob) {
+      return [this.currentJob[ID_POSITION], ...queued];
+    }
+
+    return queued;
   }
 
   isJobInProgress(jobId: JobId): boolean {
@@ -58,11 +72,9 @@ export default class RequestQueue {
   }
 
   /**
-   * Check if queue has job with specified jobId even it is a current job.
+   * Check if queue has job with specified jobId even it it is a current job.
    */
   hasJob(jobId: JobId): boolean {
-    if (this.currentJob && this.currentJob[ID_POSITION] === jobId) return true;
-
     return this.getJobIds().includes(jobId);
   }
 
@@ -79,9 +91,10 @@ export default class RequestQueue {
    * Cancel current and delayed job with uniq id.
    */
   cancelJob(jobId: JobId) {
-    // TODO: !!!!
+    this.cancelCurrentJob(jobId);
+    this.removeJobFromQueue(jobId);
   }
-  
+
   waitJobFinished(jobId: JobId): Promise<void> {
     if (!this.hasJob(jobId)) {
       throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
@@ -140,7 +153,10 @@ export default class RequestQueue {
     this.endJobEvents.removeListener(handlerIndex);
   }
 
-  
+
+  /**
+   * It uses passed jobId or generate a new one
+   */
   private resolveJobId(jobId: JobId | undefined): JobId {
     if (typeof jobId === 'string') return jobId;
 
@@ -154,7 +170,9 @@ export default class RequestQueue {
   }
 
   private addToEndOfQueue(jobId: JobId, cb: RequestCb) {
-    this.jobs.push([jobId, cb]);
+    const job: Job = [jobId, cb, false];
+
+    this.jobs.push(job);
   }
 
   /**
@@ -168,7 +186,7 @@ export default class RequestQueue {
       this.jobs[jobIndex][CB_POSITION] = cb;
     }
     else {
-      // add a new job
+      // add a new job to the end of queue
       this.addToEndOfQueue(jobId, cb);
     }
   }
@@ -181,10 +199,11 @@ export default class RequestQueue {
     // do nothing if there is current job or no one in queue
     if (this.currentJob || !this.jobs.length) return;
 
-    // set first job in queue as current
-    this.currentJob = this.jobs[0];
+    const currentJob: Job = this.jobs[0];
+    const currentJobId: JobId = currentJob[ID_POSITION];
 
-    const currentJobId: JobId = this.currentJob[ID_POSITION];
+    // set first job in queue as current
+    this.currentJob = currentJob;
 
     // remove the first element
     this.jobs.shift();
@@ -192,29 +211,30 @@ export default class RequestQueue {
     this.startJobEvents.emit(currentJobId);
 
     this.runningTimeout = setTimeout(() => {
-
-      // TODO: отменить выполнение промиса текущего колбэка
-
-      this.endOfJob(new Error(`Timeout of job "${currentJobId}" has been exceeded`), currentJobId);
+      currentJob[CANCELED_POSITION] = true;
+      this.endOfJob(new Error(`Timeout of job "${currentJobId}" has been exceeded`), currentJob);
     }, this.jobTimeoutSec * 1000);
 
     // start cb
     try {
       // TODO: как поднять ошибку в endOfJob ???
       this.currentJob[CB_POSITION]()
-        .then(() => this.endOfJob(undefined, currentJobId))
-        .catch((err: Error) => this.endOfJob(err, currentJobId));
+        .then(() => this.endOfJob(undefined, currentJob))
+        .catch((err: Error) => this.endOfJob(err, currentJob));
     }
     catch (err) {
-      this.endOfJob(err, currentJobId);
+      this.endOfJob(err, currentJob);
     }
   }
 
-  private endOfJob(err: Error | undefined, jobId: JobId) {
+  private endOfJob(err: Error | undefined, job: Job) {
+    // do nothing if it was canceled
+    if (job[CANCELED_POSITION]) return;
+
     if (!this.currentJob) {
       throw new Error(`Not current job when a job finished`);
     }
-    else if (this.currentJob[ID_POSITION] !== jobId) {
+    else if (this.currentJob[ID_POSITION] !== job[ID_POSITION]) {
       throw new Error(`Current job id doesn't match with the finished job id`);
     }
 
@@ -224,8 +244,25 @@ export default class RequestQueue {
     // delete finished job
     delete this.currentJob;
 
-    this.endJobEvents.emit(err, jobId);
+    this.endJobEvents.emit(err, job[ID_POSITION]);
     this.startNextJob();
+  }
+
+  private cancelCurrentJob(jobId: string) {
+    if (this.currentJob && this.currentJob[ID_POSITION] === jobId) {
+      this.currentJob[CANCELED_POSITION] = true;
+    }
+  }
+
+  /**
+   * remove job or delayed job in queue
+   */
+  private removeJobFromQueue(jobId: JobId) {
+    const jobIndex: number = this.getJobIndex(jobId);
+
+    if (jobIndex < 0) return;
+
+    this.jobs.splice(jobIndex);
   }
 
 }
