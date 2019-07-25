@@ -33,6 +33,8 @@ export default interface PreHostConfig {
     senderResendTimeout?: number;
     // response of remote ioSet
     ioSetResponseTimoutSec?: number;
+    // default timeout for jobs in RequestQueue
+    queueJobTimeoutSec?: number;
 
     // custom params
     //params?: {[index: string]: any};

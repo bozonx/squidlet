@@ -7,6 +7,7 @@ export default {
     senderTimeout: 60,
     senderResendTimeout: 1,
     ioSetResponseTimoutSec: 30,
+    queueJobTimeoutSec: 120,
 
     // default params for connections
     // connections: {

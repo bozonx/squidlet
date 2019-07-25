@@ -1,5 +1,5 @@
-import IndexedEvents from './IndexedEvents';
-import {findIndex} from './lodashLike';
+import IndexedEvents from '../system/helpers/IndexedEvents';
+import {findIndex} from '../system/helpers/lodashLike';
 
 type RequestCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;

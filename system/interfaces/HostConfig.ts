@@ -14,6 +14,8 @@ export interface HostConfigConfig {
   senderResendTimeout: number;
   // response of remote ioSet in seconds
   ioSetResponseTimoutSec: number;
+  // default timeout for jobs in RequestQueue
+  queueJobTimeoutSec: number;
 
   // custom params
   //params: {[index: string]: any};

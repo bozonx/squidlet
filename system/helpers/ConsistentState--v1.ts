@@ -2,7 +2,6 @@ import Promised from './Promised';
 import QueuedCall from './QueuedCall';
 import {mergeDeep} from './collections';
 import {Dictionary} from '../interfaces/Types';
-import RequestQueue from './RequestQueue';
 
 
 export type Initialize = () => Promise<Dictionary>;
@@ -25,14 +24,12 @@ export default class ConsistentState {
   private readingPromise?: Promised<void>;
   private writingQueuedCall: QueuedCall = new QueuedCall();
   private tmpStateBeforeWriting?: Dictionary;
-  private readonly queue: RequestQueue;
 
 
   constructor(
     logError: (msg: string) => void,
     stateGetter: () => Dictionary,
     stateUpdater: (partialState: Dictionary) => void,
-    jobTimeoutSec?: number,
     initialize?: Initialize,
     getter?: Getter,
     setter?: Setter
@@ -44,7 +41,6 @@ export default class ConsistentState {
     this.initialize = initialize;
     this.getter = getter;
     this.setter = setter;
-    this.queue = new RequestQueue(this.logError, jobTimeoutSec);
   }
 
   async init() {

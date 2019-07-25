@@ -68,6 +68,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
           this.env.system.state.updateState(StateCategories.devicesStatus, this.id, partialState);
         },
         this.env.system.log.error,
+        this.env.config.config.queueJobTimeoutSec,
         this.initialStatus,
         this.statusGetter,
         this.statusSetter
@@ -84,6 +85,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
           this.env.system.state.updateState(StateCategories.devicesConfig, this.id, partialState);
         },
         this.env.system.log.error,
+        this.env.config.config.queueJobTimeoutSec,
         this.initialConfig,
         this.configGetter,
         this.configSetter
