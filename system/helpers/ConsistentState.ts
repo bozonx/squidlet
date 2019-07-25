@@ -24,11 +24,11 @@ export default class ConsistentState {
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
+  private readonly queue: RequestQueue;
   // actual state on server before saving
   private fullStateBeforeSaving?: Dictionary;
   // list of parameters which are saving to server
   private paramsListToSave?: string[];
-  private readonly queue: RequestQueue;
 
 
   constructor(
@@ -41,12 +41,12 @@ export default class ConsistentState {
     setter?: Setter
   ) {
     this.logError = logError;
-
     this.stateGetter = stateGetter;
     this.stateUpdater = stateUpdater;
     this.initialize = initialize;
     this.getter = getter;
     this.setter = setter;
+
     this.queue = new RequestQueue(this.logError, jobTimeoutSec);
   }
 
@@ -65,7 +65,8 @@ export default class ConsistentState {
   // TODO: test
   destroy() {
     this.queue.destroy();
-    // delete this.tmpStateBeforeWriting;
+    delete this.fullStateBeforeSaving;
+    delete this.paramsListToSave;
   }
 
 
@@ -121,7 +122,7 @@ export default class ConsistentState {
 
     if (this.isReading()) {
       // wait for current reading. And throw an error if it throws
-      return this.queue.waitJobFinished(READING_ID);
+      return this.queue.waitCurrentJobFinished();
     }
 
     const result: Dictionary = await this.requestGetter(this.getter);

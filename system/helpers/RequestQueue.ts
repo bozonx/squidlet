@@ -112,6 +112,15 @@ export default class RequestQueue {
   }
 
   /**
+   * Return the promise which will be fulfilled when the current job is finished.
+   */
+  async waitCurrentJobFinished(): Promise<void> {
+    if (!this.currentJob) return;
+
+    return this.getWaitJobPromise(this.currentJob[ID_POSITION]);
+  }
+
+  /**
    * Return the promise which will be fulfilled when the job is finished.
    * You should check that the queue has this job by calling `hasJob(jobId)`.
    */
@@ -120,19 +129,7 @@ export default class RequestQueue {
       throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
-    return new Promise<void>((resolve, reject) => {
-      const handlerIndex = this.endJobEvents.addListener(
-        (error: Error | undefined, finishedJobId: JobId) => {
-          if (finishedJobId === jobId) {
-            this.endJobEvents.removeListener(handlerIndex);
-
-            if (error) return reject(error);
-
-            resolve();
-          }
-        }
-      );
-    });
+    return this.getWaitJobPromise(jobId);
   }
 
   /**
@@ -195,6 +192,22 @@ export default class RequestQueue {
     unnamedJobIdCounter++;
 
     return String(unnamedJobIdCounter);
+  }
+
+  private getWaitJobPromise(jobId: JobId): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const handlerIndex = this.endJobEvents.addListener(
+        (error: Error | undefined, finishedJobId: JobId) => {
+          if (finishedJobId === jobId) {
+            this.endJobEvents.removeListener(handlerIndex);
+
+            if (error) return reject(error);
+
+            resolve();
+          }
+        }
+      );
+    });
   }
 
   private getJobIndex(jobId: JobId): number {
