@@ -1,5 +1,3 @@
-import Promised from './Promised';
-import QueuedCall from './QueuedCall';
 import {mergeDeep} from './collections';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue from './RequestQueue';
@@ -8,6 +6,9 @@ import RequestQueue from './RequestQueue';
 export type Initialize = () => Promise<Dictionary>;
 export type Getter = () => Promise<Dictionary>;
 export type Setter = (partialData: Dictionary) => Promise<void>;
+
+const WRITING_ID = 'write';
+const READING_ID = 'read';
 
 
 /**
@@ -22,9 +23,10 @@ export default class ConsistentState {
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
-  private readingPromise?: Promised<void>;
-  private writingQueuedCall: QueuedCall = new QueuedCall();
-  private tmpStateBeforeWriting?: Dictionary;
+  // private readingPromise?: Promised<void>;
+  // private writingQueuedCall: QueuedCall = new QueuedCall();
+  // TODO: review
+  //private tmpStateBeforeWriting?: Dictionary;
   private readonly queue: RequestQueue;
 
 
@@ -61,20 +63,24 @@ export default class ConsistentState {
 
   // TODO: test
   destroy() {
-    this.writingQueuedCall.destroy();
-    delete this.readingPromise;
-    delete this.writingQueuedCall;
-    delete this.tmpStateBeforeWriting;
+    //this.writingQueuedCall.destroy();
+    this.queue.destroy();
+    // delete this.readingPromise;
+    // delete this.writingQueuedCall;
+    // delete this.tmpStateBeforeWriting;
   }
 
 
   // TODO: test
   isWriting(): boolean {
-    return this.writingQueuedCall.isExecuting();
+    //return this.writingQueuedCall.isExecuting();
+    return this.queue.getCurrentJobId() === WRITING_ID;
   }
 
+  // TODO: test
   isReading(): boolean {
-    return Boolean(this.readingPromise);
+    //return Boolean(this.readingPromise);
+    return this.queue.getCurrentJobId() === READING_ID;
   }
 
   // TODO: test
@@ -116,10 +122,12 @@ export default class ConsistentState {
 
     // TODO: ??? If writing is in progress it will return current state which is being writing at the moment
 
-    if (this.isReading()) {
-      // wait for current reading. And throw an error if it throws
-      return this.readingPromise && this.readingPromise.promise;
-    }
+    // if (this.isReading()) {
+    //   // TODO: review - наверное не нужно так как это в очереди обработается
+    //   // wait for current reading. And throw an error if it throws
+    //   //return this.readingPromise && this.readingPromise.promise;
+    //   return this.queue.waitJobFinished(READING_ID);
+    // }
 
     const result: Dictionary = await this.requestGetter(this.getter);
 
@@ -135,6 +143,9 @@ export default class ConsistentState {
    * * On error it will return state which was before saving started.
    */
   async write(partialData: Dictionary): Promise<void> {
+
+    // TODO: review
+
     let oldState = this.getState();
 
     // update local state at the beginning of process
@@ -166,26 +177,15 @@ export default class ConsistentState {
 
   // TODO: test
   private async requestGetter(getter: Getter): Promise<Dictionary> {
-    if (!this.getter) throw new Error(`No getter`);
+    let result: Dictionary | undefined = undefined;
 
-    this.readingPromise = new Promised<void>();
-    let result: Dictionary;
-
-    // make a request
-    try {
+    this.queue.request(READING_ID, async () => {
       result = await getter();
-    }
-    catch (err) {
-      this.readingPromise.reject(err);
+    });
 
-      delete this.readingPromise;
+    await this.queue.waitJobFinished(READING_ID);
 
-      throw new Error(`Can't fetch device state: ${err}`);
-    }
-
-    this.readingPromise.resolve();
-
-    delete this.readingPromise;
+    if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
 
     return result;
   }

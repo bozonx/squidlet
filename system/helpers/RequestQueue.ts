@@ -141,7 +141,7 @@ export default class RequestQueue {
    * It there is queued delayed job - it just replace the callback with a new one.
    * It you doesn't set the id - it means just add cb to the end of queue.
    */
-  request(jobId: JobId | undefined, mode: Mode = 'default', cb: RequestCb): JobId {
+  request(jobId: JobId | undefined, cb: RequestCb, mode: Mode = 'default'): JobId {
     const resolvedId: JobId = this.resolveJobId(jobId);
 
     // if the job is running

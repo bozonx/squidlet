@@ -162,7 +162,7 @@ export default class ConsistentState {
 
   // TODO: test
   private async requestGetter(getter: Getter): Promise<Dictionary> {
-    if (!this.getter) throw new Error(`No getter`);
+    //if (!this.getter) throw new Error(`No getter`);
 
     this.readingPromise = new Promised<void>();
     let result: Dictionary;
