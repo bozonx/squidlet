@@ -305,11 +305,9 @@ export default class RequestQueue {
 
     this.finalizeCurrentJob();
 
-    if (job[MODE_POSITION] === 'recall') {
-      if (!err && job[RECALL_CB_POSITION]) return this.recallJob(job);
-      // if there is a error - go to the next job
-      // if there isn't a recall cb - go to the next job like in the default mode
-    }
+    if (!err && job[MODE_POSITION] === 'recall' && job[RECALL_CB_POSITION]) return this.recallJob(job);
+    // if there is a error - go to the next job
+    // if there isn't a recall cb - go to the next job like in the default mode
     // in default mode - just go to the next job
 
     this.endJobEvents.emit(err, job[ID_POSITION]);

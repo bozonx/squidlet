@@ -148,17 +148,28 @@ export default class ConsistentState {
     // if mode without setter - do noting else updating local state
     if (!this.setter) return this.stateUpdater(partialData);
 
-    // TODO: наверное нужно клонировать deeply ???
-    // TODO: сохранять только в первый раз перед первой записью чтобы потом вернуться сюда
-    this.fullStateBeforeSaving = { ...this.getState() };
+    const firstTimeSaving: boolean = !this.fullStateBeforeSaving;
+
+    // save actual state on first saving of cycle
+    if (firstTimeSaving) {
+      // TODO: наверное нужно клонировать deeply ???
+      this.fullStateBeforeSaving = { ...this.getState() };
+    }
+
     this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
 
     // update local state at the beginning of process
     this.stateUpdater(partialData);
 
-    // TODO: при ошибке сохранения - сбросить текущий стейт на fullStateBeforeSaving
     // do writing request any way if it is a new request or there is writing is in progress
-    await this.requestSetter(this.setter);
+    try {
+      await this.requestSetter(this.setter);
+    }
+    catch (err) {
+      // TODO: при ошибке сохранения - сбросить текущий стейт на fullStateBeforeSaving
+
+      throw err;
+    }
 
     // TODO: после завершения всего цикла сохранения - удалить fullStateBeforeSaving и paramsListToSave
   }
