@@ -21,6 +21,10 @@ export default class State {
   }
 
 
+  /**
+   * Get state of category and stateName
+   * WARNING! please do not modify the result!
+   */
   getState(category: number, stateName: string): Dictionary | undefined {
     if (!this.state[category]) return;
 

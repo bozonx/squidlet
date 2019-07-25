@@ -126,6 +126,10 @@ export function padStart(srcString: string, length: number = 0, chars: string = 
 export function last(arr: any[]) {
   return arr[arr.length - 1];
 }
+//
+// export function uniq(arr: string[]): string[] {
+//   // TODO: !!!!
+// }
 
 // TODO: better to not use it at all
 export function isEqual(first: any, second: any): boolean {

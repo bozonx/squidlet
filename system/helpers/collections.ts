@@ -78,6 +78,19 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
   return diffKeys;
 }
 
+// TODO: test
+export function concatUniqStrArrays(...arrays: string[][]): string[] {
+  const result: {[index: string]: true} = {};
+
+  for (let arr of arrays) {
+    for (let value of arr) {
+      result[value] = true;
+    }
+  }
+
+  return Object.keys(result);
+}
+
 /**
  * Clear all the props in object
  */

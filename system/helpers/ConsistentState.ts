@@ -1,6 +1,7 @@
-import {mergeDeep} from './collections';
+import {concatUniqStrArrays, mergeDeep} from './collections';
 import {Dictionary} from '../interfaces/Types';
-import RequestQueue from './RequestQueue';
+import RequestQueue, {Mode} from './RequestQueue';
+import {pick} from './lodashLike';
 
 
 export type Initialize = () => Promise<Dictionary>;
@@ -23,10 +24,10 @@ export default class ConsistentState {
   private readonly initialize?: Initialize;
   private readonly getter?: Getter;
   private readonly setter?: Setter;
-  // private readingPromise?: Promised<void>;
-  // private writingQueuedCall: QueuedCall = new QueuedCall();
-  // TODO: review
-  //private tmpStateBeforeWriting?: Dictionary;
+  // actual state on server before saving
+  private fullStateBeforeSaving?: Dictionary;
+  // list of parameters which are saving to server
+  private paramsListToSave?: string[];
   private readonly queue: RequestQueue;
 
 
@@ -63,23 +64,18 @@ export default class ConsistentState {
 
   // TODO: test
   destroy() {
-    //this.writingQueuedCall.destroy();
     this.queue.destroy();
-    // delete this.readingPromise;
-    // delete this.writingQueuedCall;
     // delete this.tmpStateBeforeWriting;
   }
 
 
   // TODO: test
   isWriting(): boolean {
-    //return this.writingQueuedCall.isExecuting();
     return this.queue.getCurrentJobId() === WRITING_ID;
   }
 
   // TODO: test
   isReading(): boolean {
-    //return Boolean(this.readingPromise);
     return this.queue.getCurrentJobId() === READING_ID;
   }
 
@@ -118,18 +114,24 @@ export default class ConsistentState {
    * * If reading is in progress it will return promise of current reading process
    */
   async load(): Promise<void> {
+
+    // TODO: test
+
     if (!this.getter) return;
 
-    // TODO: ??? If writing is in progress it will return current state which is being writing at the moment
-
-    // if (this.isReading()) {
-    //   // TODO: review - наверное не нужно так как это в очереди обработается
-    //   // wait for current reading. And throw an error if it throws
-    //   //return this.readingPromise && this.readingPromise.promise;
-    //   return this.queue.waitJobFinished(READING_ID);
-    // }
+    if (this.isReading()) {
+      // wait for current reading. And throw an error if it throws
+      return this.queue.waitJobFinished(READING_ID);
+    }
 
     const result: Dictionary = await this.requestGetter(this.getter);
+
+    // if reading was in progress when saving started - it needs to update actual server state
+    if (this.fullStateBeforeSaving) {
+      this.fullStateBeforeSaving = result;
+
+      // TODO: сделать this.stateUpdater() смерженные новые полные данные с тем что должно сохраниться
+    }
 
     this.stateUpdater(result);
   }
@@ -143,35 +145,22 @@ export default class ConsistentState {
    * * On error it will return state which was before saving started.
    */
   async write(partialData: Dictionary): Promise<void> {
+    // if mode without setter - do noting else updating local state
+    if (!this.setter) return this.stateUpdater(partialData);
 
-    // TODO: review
-
-    let oldState = this.getState();
+    // TODO: наверное нужно клонировать deeply ???
+    // TODO: сохранять только в первый раз перед первой записью чтобы потом вернуться сюда
+    this.fullStateBeforeSaving = { ...this.getState() };
+    this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
 
     // update local state at the beginning of process
     this.stateUpdater(partialData);
 
-    // if mode without setter - do noting else updating local state
-    if (!this.setter) return;
-
-    if (this.isReading()) {
-      // wait while current reading is completed
-      try {
-        this.readingPromise && await this.readingPromise.promise;
-      }
-      catch (err) {
-        // do nothing, do saving anyway.
-      }
-
-      oldState = this.getState();
-    }
-
-    // TODO: правильно ли обновлять стейт если уже идет запись???
-    // save old state
-    this.tmpStateBeforeWriting = oldState;
-
+    // TODO: при ошибке сохранения - сбросить текущий стейт на fullStateBeforeSaving
     // do writing request any way if it is a new request or there is writing is in progress
-    await this.requestSetter(partialData);
+    await this.requestSetter(this.setter);
+
+    // TODO: после завершения всего цикла сохранения - удалить fullStateBeforeSaving и paramsListToSave
   }
 
 
@@ -194,30 +183,44 @@ export default class ConsistentState {
   /**
    * Write new or add to queue
    */
-  private async requestSetter(newPartialData: Dictionary): Promise<void> {
-    this.writingQueuedCall.onSuccess(() => {
-      delete this.tmpStateBeforeWriting;
-    });
+  private async requestSetter(setter: Setter): Promise<void> {
+    const recallMode: Mode = 'recall';
 
-    this.writingQueuedCall.onError((err: Error) => {
-      this.logError(String(err));
+    this.queue.request(WRITING_ID, async () => {
+      if (!this.paramsListToSave) {
+        throw new Error(`ConsistentState.requestSetter: no paramsListToSave`);
+      }
 
-      if (!this.tmpStateBeforeWriting) return;
+      const dataToSave = pick(this.getState(), ...this.paramsListToSave);
 
-      // restore old state
-      this.stateUpdater(this.tmpStateBeforeWriting);
+      await setter(dataToSave);
+    }, recallMode);
 
-      delete this.tmpStateBeforeWriting;
-    });
+    await this.queue.waitJobFinished(WRITING_ID);
 
-    this.writingQueuedCall.onAfterEachSuccess(() => {
-      // if writing was success and there is a queue - update old tmp state
-      this.tmpStateBeforeWriting = this.getState();
-    });
-
-    await this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
-      return this.setter && this.setter(data as Dictionary);
-    }, newPartialData);
+    // this.writingQueuedCall.onSuccess(() => {
+    //   delete this.tmpStateBeforeWriting;
+    // });
+    //
+    // this.writingQueuedCall.onError((err: Error) => {
+    //   this.logError(String(err));
+    //
+    //   if (!this.tmpStateBeforeWriting) return;
+    //
+    //   // restore old state
+    //   this.stateUpdater(this.tmpStateBeforeWriting);
+    //
+    //   delete this.tmpStateBeforeWriting;
+    // });
+    //
+    // this.writingQueuedCall.onAfterEachSuccess(() => {
+    //   // if writing was success and there is a queue - update old tmp state
+    //   this.tmpStateBeforeWriting = this.getState();
+    // });
+    //
+    // await this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
+    //   return this.setter && this.setter(data as Dictionary);
+    // }, newPartialData);
   }
 
 }

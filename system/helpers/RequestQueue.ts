@@ -14,7 +14,7 @@ import {findIndex} from './lodashLike';
  * * If there is job with the same id in the queue the cb will be replaced to the new one
  * * If the current job will failed then delayed cb won't be called, the next job in queue will be started
  */
-type Mode = 'default' | 'recall';
+export type Mode = 'default' | 'recall';
 
 type RequestCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
