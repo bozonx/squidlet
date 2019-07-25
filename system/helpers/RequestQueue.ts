@@ -43,7 +43,7 @@ export default class RequestQueue {
   private readonly logError: (msg: string) => void;
   private readonly startJobEvents = new IndexedEvents<StartJobHandler>();
   private readonly endJobEvents = new IndexedEvents<EndJobHandler>();
-  private jobs: Job[] = [];
+  private queue: Job[] = [];
   private currentJob?: Job;
   private runningTimeout?: any;
 
@@ -59,14 +59,14 @@ export default class RequestQueue {
 
     if (this.currentJob) this.cancelCurrentJob(this.currentJob[ID_POSITION]);
 
-    delete this.jobs;
+    delete this.queue;
 
     this.finalizeCurrentJob();
   }
 
 
   getQueueLength(): number {
-    return this.jobs.length;
+    return this.queue.length;
   }
 
   /**
@@ -180,7 +180,7 @@ export default class RequestQueue {
 
 
   private getQueuedJobs(): string[] {
-    return this.jobs.map((item: Job) => item[ID_POSITION]);
+    return this.queue.map((item: Job) => item[ID_POSITION]);
   }
 
   /**
@@ -211,7 +211,7 @@ export default class RequestQueue {
   }
 
   private getJobIndex(jobId: JobId): number {
-    return findIndex(this.jobs, (item: Job) => item[ID_POSITION] === jobId) as number;
+    return findIndex(this.queue, (item: Job) => item[ID_POSITION] === jobId) as number;
   }
 
   private cancelCurrentJob(jobId: string) {
@@ -231,13 +231,13 @@ export default class RequestQueue {
 
     if (jobIndex < 0) return;
 
-    this.jobs.splice(jobIndex);
+    this.queue.splice(jobIndex);
   }
 
   private addToEndOfQueue(jobId: JobId, mode: Mode, cb: RequestCb) {
     const job: Job = [jobId, cb, mode, false];
 
-    this.jobs.push(job);
+    this.queue.push(job);
   }
 
   /**
@@ -250,8 +250,8 @@ export default class RequestQueue {
       throw new Error(`RequestQueue.updateQueuedJob: Can't find job index "${jobId}"`);
     }
 
-    this.jobs[jobIndex][CB_POSITION] = cb;
-    this.jobs[jobIndex][MODE_POSITION] = mode;
+    this.queue[jobIndex][CB_POSITION] = cb;
+    this.queue[jobIndex][MODE_POSITION] = mode;
   }
 
   /**
@@ -260,15 +260,15 @@ export default class RequestQueue {
    */
   private startNextJob() {
     // do nothing if there is current job or no one in queue
-    if (this.currentJob || !this.jobs.length) return;
+    if (this.currentJob || !this.queue.length) return;
 
-    const currentJob: Job = this.jobs[0];
+    const currentJob: Job = this.queue[0];
 
     // set first job in queue as current
     this.currentJob = currentJob;
 
     // remove the first element from queue
-    this.jobs.shift();
+    this.queue.shift();
 
     this.startCb(currentJob);
   }
