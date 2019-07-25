@@ -1,30 +1,16 @@
 import IndexedEvents from './IndexedEvents';
 import {findIndex} from './lodashLike';
 
-/**
- * Mode default (useful for read requests):
- * * don't add to queue cb with the same id as current job.
- * * If there isn't a job with the same id the new job will be added to the end of queue
- * * If there is job with the same id in the queue the cb will be replaced to the new one
- * Mode recall (useful for write requests):
- * * if job with the same id is running - it will call a new delayed job straight after current cb.
- * * New cb will replace delayed cb
- * * If there isn't a job with the same id the new job will be added to the end of queue
- * * If there is job with the same id in the queue the cb will be replaced to the new one
- */
-type Mode = 'default' | 'recall';
-
 type RequestCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
 type EndJobHandler = (error: Error | undefined, jobId: JobId) => void;
 type JobId = string;
-// array like [JobId, RequestCb, node, isCanceled]
-type Job = [JobId, RequestCb, Mode, boolean];
+// array like [JobId, RequestCb, isCanceled]
+type Job = [JobId, RequestCb, boolean];
 
 const ID_POSITION = 0;
 const CB_POSITION = 1;
-const MODE_POSITION = 2;
-const CANCELED_POSITION = 3;
+const CANCELED_POSITION = 2;
 const DEFAULT_JOB_TIMEOUT_SEC = 120;
 let unnamedJobIdCounter = -1;
 
@@ -74,7 +60,7 @@ export default class RequestQueue {
    * Get ids of jobs include current job.
    */
   getJobIds(): string[] {
-    const queued = this.getQueuedJobs();
+    const queued = this.jobs.map((item: Job) => item[ID_POSITION]);
 
     if (this.currentJob) {
       return [this.currentJob[ID_POSITION], ...queued];
@@ -88,19 +74,19 @@ export default class RequestQueue {
   }
 
   /**
+   * Check if queue has job with specified jobId even it it is a current job.
+   */
+  hasJob(jobId: JobId): boolean {
+    return this.getJobIds().includes(jobId);
+  }
+
+  /**
    * Returns id of current job of undefined
    */
   getCurrentJobId(): JobId | undefined {
     if (!this.currentJob) return;
 
     return this.currentJob[ID_POSITION];
-  }
-
-  /**
-   * Check if queue has job with specified jobId even it it is a current job.
-   */
-  hasJob(jobId: JobId): boolean {
-    return this.getJobIds().includes(jobId);
   }
 
   /**
@@ -111,10 +97,6 @@ export default class RequestQueue {
     this.removeJobFromQueue(jobId);
   }
 
-  /**
-   * Return the promise which will be fulfilled when the job is finished.
-   * You should check that the queue has this job by calling `hasJob(jobId)`.
-   */
   waitJobFinished(jobId: JobId): Promise<void> {
     if (!this.hasJob(jobId)) {
       throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
@@ -141,20 +123,16 @@ export default class RequestQueue {
    * It there is queued delayed job - it just replace the callback with a new one.
    * It you doesn't set the id - it means just add cb to the end of queue.
    */
-  request(jobId: JobId | undefined, mode: Mode = 'default', cb: RequestCb): JobId {
+  request(jobId: JobId | undefined, cb: RequestCb): JobId {
     const resolvedId: JobId = this.resolveJobId(jobId);
 
-    // if the job is running
-    if (this.getCurrentJobId() === resolvedId) {
-      // TODO: use mode
-    }
-    // if the job in a queue
-    else if (this.getQueuedJobs().includes(resolvedId)) {
-      this.updateQueuedJob(resolvedId, mode, cb);
+    // if job is in progress or delayed - update delayed job or add to queue
+    if (this.hasJob(resolvedId)) {
+      this.updateDelayedJob(resolvedId, cb);
     }
     else {
       // add a new job
-      this.addToEndOfQueue(resolvedId, mode, cb);
+      this.addToEndOfQueue(resolvedId, cb);
       this.startNextJob();
     }
 
@@ -178,10 +156,6 @@ export default class RequestQueue {
   }
 
 
-  private getQueuedJobs(): string[] {
-    return this.jobs.map((item: Job) => item[ID_POSITION]);
-  }
-
   /**
    * It uses passed jobId or generate a new one
    */
@@ -197,25 +171,8 @@ export default class RequestQueue {
     return findIndex(this.jobs, (item: Job) => item[ID_POSITION] === jobId) as number;
   }
 
-  private cancelCurrentJob(jobId: string) {
-    if (!this.currentJob || this.currentJob[ID_POSITION] !== jobId) return;
-
-    this.currentJob[CANCELED_POSITION] = true;
-  }
-
-  /**
-   * remove job or delayed job in queue
-   */
-  private removeJobFromQueue(jobId: JobId) {
-    const jobIndex: number = this.getJobIndex(jobId);
-
-    if (jobIndex < 0) return;
-
-    this.jobs.splice(jobIndex);
-  }
-
-  private addToEndOfQueue(jobId: JobId, mode: Mode, cb: RequestCb) {
-    const job: Job = [jobId, cb, mode, false];
+  private addToEndOfQueue(jobId: JobId, cb: RequestCb) {
+    const job: Job = [jobId, cb, false];
 
     this.jobs.push(job);
   }
@@ -223,15 +180,17 @@ export default class RequestQueue {
   /**
    * Update cb of delayed job or add a new job to queue.
    */
-  private updateQueuedJob(jobId: JobId, mode: Mode, cb: RequestCb) {
+  private updateDelayedJob(jobId: JobId, cb: RequestCb) {
     const jobIndex: number = this.getJobIndex(jobId);
 
-    if (jobIndex < 0) {
-      throw new Error(`RequestQueue.updateQueuedJob: Can't find job index "${jobId}"`);
+    if (jobIndex >= 0) {
+      // update delayed job cb
+      this.jobs[jobIndex][CB_POSITION] = cb;
     }
-
-    this.jobs[jobIndex][CB_POSITION] = cb;
-    this.jobs[jobIndex][MODE_POSITION] = mode;
+    else {
+      // add a new job to the end of queue
+      this.addToEndOfQueue(jobId, cb);
+    }
   }
 
   /**
@@ -239,9 +198,6 @@ export default class RequestQueue {
    * It doesn't start a new job while current is in progress.
    */
   private startNextJob() {
-
-    // TODO: review
-
     // do nothing if there is current job or no one in queue
     if (this.currentJob || !this.jobs.length) return;
 
@@ -273,9 +229,6 @@ export default class RequestQueue {
   }
 
   private endOfJob(err: Error | undefined, job: Job) {
-
-    // TODO: review
-
     // do nothing if it was canceled
     if (job[CANCELED_POSITION]) return;
 
@@ -294,6 +247,23 @@ export default class RequestQueue {
 
     this.endJobEvents.emit(err, job[ID_POSITION]);
     this.startNextJob();
+  }
+
+  private cancelCurrentJob(jobId: string) {
+    if (this.currentJob && this.currentJob[ID_POSITION] === jobId) {
+      this.currentJob[CANCELED_POSITION] = true;
+    }
+  }
+
+  /**
+   * remove job or delayed job in queue
+   */
+  private removeJobFromQueue(jobId: JobId) {
+    const jobIndex: number = this.getJobIndex(jobId);
+
+    if (jobIndex < 0) return;
+
+    this.jobs.splice(jobIndex);
   }
 
 }
