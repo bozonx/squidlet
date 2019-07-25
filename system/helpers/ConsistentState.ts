@@ -1,7 +1,7 @@
 import {concatUniqStrArrays, mergeDeep} from './collections';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue, {Mode} from './RequestQueue';
-import {pick} from './lodashLike';
+import {cloneDeep, pick} from './lodashLike';
 
 
 export type Initialize = () => Promise<Dictionary>;
@@ -120,21 +120,9 @@ export default class ConsistentState {
 
     if (!this.getter) return;
 
-    if (this.isReading()) {
-      // wait for current reading. And throw an error if it throws
-      return this.queue.waitCurrentJobFinished();
-    }
+    this.queue.request(READING_ID, this.handleLoading);
 
-    const result: Dictionary = await this.requestGetter(this.getter);
-
-    // if reading was in progress when saving started - it needs to update actual server state
-    if (this.fullStateBeforeSaving) {
-      this.fullStateBeforeSaving = result;
-
-      // TODO: сделать this.stateUpdater() смерженные новые полные данные с тем что должно сохраниться
-    }
-
-    this.stateUpdater(result);
+    await this.queue.waitJobFinished(READING_ID);
   }
 
   /**
@@ -153,8 +141,7 @@ export default class ConsistentState {
 
     // save actual state on first saving of cycle
     if (firstTimeSaving) {
-      // TODO: наверное нужно клонировать deeply ???
-      this.fullStateBeforeSaving = { ...this.getState() };
+      this.fullStateBeforeSaving = cloneDeep(this.getState());
     }
 
     this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
@@ -167,16 +154,39 @@ export default class ConsistentState {
       await this.requestSetter(this.setter);
     }
     catch (err) {
-      // TODO: при ошибке сохранения - сбросить текущий стейт на fullStateBeforeSaving
+      if (!this.fullStateBeforeSaving) {
+        throw new Error(`ConsistentState.write: no fullStateBeforeSaving`);
+      }
+
+      this.stateUpdater(this.fullStateBeforeSaving);
+
+      delete this.fullStateBeforeSaving;
+      delete this.paramsListToSave;
 
       throw err;
     }
 
+    // TODO: после удачного сохранения в цикле - обновить fullStateBeforeSaving
     // TODO: после завершения всего цикла сохранения - удалить fullStateBeforeSaving и paramsListToSave
   }
 
 
-  // TODO: test
+  private handleLoading = async () => {
+    if (!this.getter) throw new Error(`No getter`);
+
+    const result: Dictionary = await this.getter();
+
+    // if reading was in progress when saving started - it needs to update actual server state
+    if (this.fullStateBeforeSaving) {
+      this.fullStateBeforeSaving = result;
+
+      // TODO: сделать this.stateUpdater() смерженные новые полные данные с тем что должно сохраниться
+    }
+
+    this.stateUpdater(result);
+  }
+
+  // TODO: REMOVE
   private async requestGetter(getter: Getter): Promise<Dictionary> {
     let result: Dictionary | undefined = undefined;
 

@@ -219,37 +219,37 @@ export function compact(arr: any[]): any[] {
   return result;
 }
 
-// // it works properly but very expensive because of using of JSON.stringify -> JSON.parse.
-// // !WARNING: undefined values which are obviously set in objects will be omitted
-// // !WARNING: undefined values in arrays will be converted to null
-// export function cloneDeep(value: any): any {
-//   // not cloneable
-//   if (
-//     value === null
-//     || typeof value === 'number'
-//     || typeof value === 'undefined'
-//     || typeof value === 'function'
-//   ) {
-//     return value;
-//   }
-//   if (typeof value === 'string') {
-//     return '' + value;
-//   }
-//   else if (value instanceof Uint8Array) {
-//     const oldArr: Uint8Array = value;
-//     const newArr: Uint8Array = new Uint8Array(oldArr.length);
-//
-//     for (let index in oldArr) newArr[index] = value[index];
-//
-//     return newArr;
-//   }
-//   else if (isPlainObject(value) || Array.isArray(value)) {
-//     // arrays or plain object. Don't support of class instances.
-//     return JSON.parse(JSON.stringify(value));
-//   }
-//
-//   throw new Error(`cloneDeep: unsupported type of value "${JSON.stringify(value)}"`);
-// }
+// it works properly but very expensive because of using of JSON.stringify -> JSON.parse.
+// !WARNING: undefined values which are obviously set in objects will be omitted
+// !WARNING: undefined values in arrays will be converted to null
+export function cloneDeep(value: any): any {
+  // not cloneable
+  if (
+    value === null
+    || typeof value === 'number'
+    || typeof value === 'undefined'
+    || typeof value === 'function'
+  ) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return '' + value;
+  }
+  else if (value instanceof Uint8Array) {
+    const oldArr: Uint8Array = value;
+    const newArr: Uint8Array = new Uint8Array(oldArr.length);
+
+    for (let index in oldArr) newArr[index] = value[index];
+
+    return newArr;
+  }
+  else if (isPlainObject(value) || Array.isArray(value)) {
+    // arrays or plain object. Don't support of class instances.
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  throw new Error(`cloneDeep: unsupported type of value "${JSON.stringify(value)}"`);
+}
 
 
 // /**
