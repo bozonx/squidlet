@@ -102,6 +102,18 @@ export default class RequestQueue {
     return this.getJobIds().includes(jobId);
   }
 
+  jobHasRecallCb(jobId: JobId): boolean {
+    if (this.currentJob && this.currentJob[ID_POSITION] === jobId) {
+      return Boolean(this.currentJob[RECALL_CB_POSITION]);
+    }
+
+    const jobIndex: number = this.getJobIndex(jobId);
+
+    if (jobIndex < 0) return false;
+
+    return Boolean(this.queue[jobIndex][RECALL_CB_POSITION]);
+  }
+
   /**
    * Cancel current and delayed job with uniq id.
    */
