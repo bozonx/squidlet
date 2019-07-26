@@ -137,6 +137,8 @@ export default class ConsistentState {
     // if mode without setter - do noting else updating local state
     if (!this.setter) return this.stateUpdater(partialData);
 
+    // TODO: может сразу в очередь поставить все вместе ???
+
     const firstTimeSaving: boolean = !this.fullStateBeforeSaving;
 
     // save actual state on first saving of cycle

@@ -222,6 +222,7 @@ export function compact(arr: any[]): any[] {
 // it works properly but very expensive because of using of JSON.stringify -> JSON.parse.
 // !WARNING: undefined values which are obviously set in objects will be omitted
 // !WARNING: undefined values in arrays will be converted to null
+// WARNING!: expensive operation
 export function cloneDeep(value: any): any {
   // not cloneable
   if (
