@@ -192,12 +192,7 @@ export default class ConsistentState {
     // and carefully update the state.
     this.actualRemoteState = result;
 
-    // get key witch won't be saved
-    const keysToUpdate: string[] = difference(Object.keys(result), this.paramsListToSave || []);
-    const newState = {
-      ...this.getState(),
-      ...pick(result, ...keysToUpdate),
-    };
+    const newState = this.generateSafeNewState(result);
 
     this.stateUpdater(newState);
   }
@@ -247,6 +242,16 @@ export default class ConsistentState {
       delete this.actualRemoteState;
       delete this.paramsListToSave;
     }
+  }
+
+  private generateSafeNewState(mostActualState: Dictionary): Dictionary {
+    // get key witch won't be saved
+    const keysToUpdate: string[] = difference(Object.keys(mostActualState), this.paramsListToSave || []);
+
+    return {
+      ...this.getState(),
+      ...pick(mostActualState, ...keysToUpdate),
+    };
   }
 
 }
