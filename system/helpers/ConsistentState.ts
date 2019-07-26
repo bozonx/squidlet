@@ -1,7 +1,7 @@
 import {concatUniqStrArrays, mergeDeep} from './collections';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue, {Mode} from './RequestQueue';
-import {cloneDeep, pick} from './lodashLike';
+import {cloneDeep, difference, pick} from './lodashLike';
 
 
 export type Initialize = () => Promise<Dictionary>;
@@ -14,6 +14,7 @@ const READING_ID = 'read';
 
 /**
  * State which is consistent while reading and writing.
+ * WARNING!: don't use nested state - it will work badly on save and reading when it combines a state to change
  */
 export default class ConsistentState {
   private readonly logError: (msg: string) => void;
@@ -26,7 +27,7 @@ export default class ConsistentState {
   private readonly setter?: Setter;
   private readonly queue: RequestQueue;
   // actual state on server before saving
-  private fullStateBeforeSaving?: Dictionary;
+  private actualRemoteState?: Dictionary;
   // list of parameters which are saving to server
   private paramsListToSave?: string[];
 
@@ -80,7 +81,7 @@ export default class ConsistentState {
   // TODO: test
   destroy() {
     this.queue.destroy();
-    delete this.fullStateBeforeSaving;
+    delete this.actualRemoteState;
     delete this.paramsListToSave;
   }
 
@@ -152,26 +153,31 @@ export default class ConsistentState {
     // if mode without setter - do noting else updating local state
     if (!this.setter) return this.stateUpdater(partialData);
 
+    // Save actual state. It has to be called only once on starting of cycle
+    if (!this.actualRemoteState) {
+      this.actualRemoteState = cloneDeep(this.getState());
+    }
+
     // collect list of params which will be actually written
     this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
 
     // update local state on each call of write
     this.stateUpdater(partialData);
-
-
-    const firstTimeSaving: boolean = !this.fullStateBeforeSaving;
-
-    // TODO: это должно выполниться 1 раз при старте сохранения
-    // save actual state on first saving of cycle
-    if (firstTimeSaving) {
-      this.fullStateBeforeSaving = cloneDeep(this.getState());
-    }
-
+    
     // do writing request any way if it is a new request or there is writing is in progress
     this.queue.request(WRITING_ID, this.handleSaving, 'recall');
 
-    // TODO: будет ждать пока закончится ближайший колбэк а не последний - нужно разграничить
-    await this.queue.waitJobFinished(WRITING_ID);
+    // wait while passed data will be actually saved
+    if (this.queue.isJobInProgress(WRITING_ID)) {
+      // wait current saving
+      await this.queue.waitJobFinished(WRITING_ID);
+      // wait the next recall. And don't wait if the current is fail
+      await this.queue.waitJobFinished(WRITING_ID);
+    }
+    else {
+      // wait current saving
+      await this.queue.waitJobFinished(WRITING_ID);
+    }
   }
 
   private handleLoading = async () => {
@@ -179,14 +185,21 @@ export default class ConsistentState {
 
     const result: Dictionary = await this.getter();
 
-    // // if reading was in progress when saving started - it needs to update actual server state
-    // if (this.fullStateBeforeSaving) {
-    //   this.fullStateBeforeSaving = result;
-    //
-    //   // TODO: сделать this.stateUpdater() смерженные новые полные данные с тем что должно сохраниться
-    // }
+    // just update state in ordinary mode
+    if (!this.actualRemoteState) return this.stateUpdater(result);
 
-    this.stateUpdater(result);
+    // if reading was in progress when saving started - it needs to update actual server state
+    // and carefully update the state.
+    this.actualRemoteState = result;
+
+    // get key witch won't be saved
+    const keysToUpdate: string[] = difference(Object.keys(result), this.paramsListToSave || []);
+    const newState = {
+      ...this.getState(),
+      ...pick(result, ...keysToUpdate),
+    };
+
+    this.stateUpdater(newState);
   }
 
   private handleSaving = async () => {
@@ -204,13 +217,13 @@ export default class ConsistentState {
       await this.setter(dataToSave);
     }
     catch (err) {
-      if (!this.fullStateBeforeSaving) {
-        throw new Error(`ConsistentState.write: no fullStateBeforeSaving`);
+      if (!this.actualRemoteState) {
+        throw new Error(`ConsistentState.write: no actualRemoteState`);
       }
 
-      this.stateUpdater(this.fullStateBeforeSaving);
+      this.stateUpdater(this.actualRemoteState);
 
-      delete this.fullStateBeforeSaving;
+      delete this.actualRemoteState;
       delete this.paramsListToSave;
 
       throw err;
@@ -218,14 +231,20 @@ export default class ConsistentState {
 
     if (this.queue.jobHasRecallCb(WRITING_ID)) {
       // there is a next recall cb
-      this.fullStateBeforeSaving = {
-        ...this.fullStateBeforeSaving,
+      this.actualRemoteState = {
+        ...this.actualRemoteState,
         ...dataToSave,
       };
+
+      // TODO: удалить из paramsListToSave сохраненные параметры
+      //  - но мы достоверно не знаем может были запросы на пересохранение тех же параметров
+      //  надо удалить те параметры значения которых не отличаются
+      //  между this.actualRemoteState и dataToSave.
+      //  Иначе будут сохраняться все параметры на наждый recall
     }
     else {
       // end of cycle
-      delete this.fullStateBeforeSaving;
+      delete this.actualRemoteState;
       delete this.paramsListToSave;
     }
   }
