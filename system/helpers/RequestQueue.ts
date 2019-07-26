@@ -117,7 +117,21 @@ export default class RequestQueue {
   async waitCurrentJobFinished(): Promise<void> {
     if (!this.currentJob) return;
 
-    return this.getWaitJobPromise(this.currentJob[ID_POSITION]);
+    return this.getWaitJobPromise(this.endJobEvents, this.currentJob[ID_POSITION]);
+  }
+
+  /**
+   * Return the promise which will be fulfilled before the job is get started.
+   * You should check that the queue has this job by calling `hasJob(jobId)`.
+   */
+  waitJobStart(jobId: JobId): Promise<void> {
+    if (this.isJobInProgress(jobId)) return Promise.resolve();
+
+    if (!this.hasJob(jobId)) {
+      throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
+    }
+
+    return this.getWaitJobPromise(this.startJobEvents, jobId);
   }
 
   /**
@@ -129,7 +143,7 @@ export default class RequestQueue {
       throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
-    return this.getWaitJobPromise(jobId);
+    return this.getWaitJobPromise(this.endJobEvents, jobId);
   }
 
   /**
@@ -194,12 +208,12 @@ export default class RequestQueue {
     return String(unnamedJobIdCounter);
   }
 
-  private getWaitJobPromise(jobId: JobId): Promise<void> {
+  private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const handlerIndex = this.endJobEvents.addListener(
+      const handlerIndex = events.addListener(
         (error: Error | undefined, finishedJobId: JobId) => {
           if (finishedJobId === jobId) {
-            this.endJobEvents.removeListener(handlerIndex);
+            events.removeListener(handlerIndex);
 
             if (error) return reject(error);
 
