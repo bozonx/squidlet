@@ -62,6 +62,21 @@ export default class ConsistentState {
     this.stateUpdater(result);
   }
 
+  // TODO: REMOVE
+  private async requestGetter(getter: Getter): Promise<Dictionary> {
+    let result: Dictionary | undefined = undefined;
+
+    this.queue.request(READING_ID, async () => {
+      result = await getter();
+    });
+
+    await this.queue.waitJobFinished(READING_ID);
+
+    if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
+
+    return result;
+  }
+
   // TODO: test
   destroy() {
     this.queue.destroy();
@@ -137,21 +152,56 @@ export default class ConsistentState {
     // if mode without setter - do noting else updating local state
     if (!this.setter) return this.stateUpdater(partialData);
 
+    // collect list of params which will be actually written
+    this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
+
+    // update local state on each call of write
+    this.stateUpdater(partialData);
+
+
     const firstTimeSaving: boolean = !this.fullStateBeforeSaving;
 
+    // TODO: это должно выполниться 1 раз при старте сохранения
     // save actual state on first saving of cycle
     if (firstTimeSaving) {
       this.fullStateBeforeSaving = cloneDeep(this.getState());
     }
 
-    this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
-
-    // update local state at the beginning of process
-    this.stateUpdater(partialData);
-
     // do writing request any way if it is a new request or there is writing is in progress
+    this.queue.request(WRITING_ID, this.handleSaving, 'recall');
+
+    // TODO: будет ждать пока закончится ближайший колбэк а не последний - нужно разграничить
+    await this.queue.waitJobFinished(WRITING_ID);
+  }
+
+  private handleLoading = async () => {
+    if (!this.getter) throw new Error(`No getter`);
+
+    const result: Dictionary = await this.getter();
+
+    // // if reading was in progress when saving started - it needs to update actual server state
+    // if (this.fullStateBeforeSaving) {
+    //   this.fullStateBeforeSaving = result;
+    //
+    //   // TODO: сделать this.stateUpdater() смерженные новые полные данные с тем что должно сохраниться
+    // }
+
+    this.stateUpdater(result);
+  }
+
+  private handleSaving = async () => {
+    if (!this.setter) {
+      throw new Error(`ConsistentState.write: no setter`);
+    }
+    else if (!this.paramsListToSave) {
+      throw new Error(`ConsistentState.write: no paramsListToSave`);
+    }
+
+    // generate the last combined data to save
+    const dataToSave = pick(this.getState(), ...this.paramsListToSave);
+
     try {
-      await this.requestSetter(this.setter);
+      await this.setter(dataToSave);
     }
     catch (err) {
       if (!this.fullStateBeforeSaving) {
@@ -166,83 +216,18 @@ export default class ConsistentState {
       throw err;
     }
 
-    // TODO: после удачного сохранения в цикле - обновить fullStateBeforeSaving
-    // TODO: после завершения всего цикла сохранения - удалить fullStateBeforeSaving и paramsListToSave
-  }
-
-
-  private handleLoading = async () => {
-    if (!this.getter) throw new Error(`No getter`);
-
-    const result: Dictionary = await this.getter();
-
-    // if reading was in progress when saving started - it needs to update actual server state
-    if (this.fullStateBeforeSaving) {
-      this.fullStateBeforeSaving = result;
-
-      // TODO: сделать this.stateUpdater() смерженные новые полные данные с тем что должно сохраниться
+    if (this.queue.jobHasRecallCb(WRITING_ID)) {
+      // there is a next recall cb
+      this.fullStateBeforeSaving = {
+        ...this.fullStateBeforeSaving,
+        ...dataToSave,
+      };
     }
-
-    this.stateUpdater(result);
-  }
-
-  // TODO: REMOVE
-  private async requestGetter(getter: Getter): Promise<Dictionary> {
-    let result: Dictionary | undefined = undefined;
-
-    this.queue.request(READING_ID, async () => {
-      result = await getter();
-    });
-
-    await this.queue.waitJobFinished(READING_ID);
-
-    if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
-
-    return result;
-  }
-
-  // TODO: test
-  /**
-   * Write new or add to queue
-   */
-  private async requestSetter(setter: Setter): Promise<void> {
-    const recallMode: Mode = 'recall';
-
-    this.queue.request(WRITING_ID, async () => {
-      if (!this.paramsListToSave) {
-        throw new Error(`ConsistentState.requestSetter: no paramsListToSave`);
-      }
-
-      const dataToSave = pick(this.getState(), ...this.paramsListToSave);
-
-      await setter(dataToSave);
-    }, recallMode);
-
-    await this.queue.waitJobFinished(WRITING_ID);
-
-    // this.writingQueuedCall.onSuccess(() => {
-    //   delete this.tmpStateBeforeWriting;
-    // });
-    //
-    // this.writingQueuedCall.onError((err: Error) => {
-    //   this.logError(String(err));
-    //
-    //   if (!this.tmpStateBeforeWriting) return;
-    //
-    //   // restore old state
-    //   this.stateUpdater(this.tmpStateBeforeWriting);
-    //
-    //   delete this.tmpStateBeforeWriting;
-    // });
-    //
-    // this.writingQueuedCall.onAfterEachSuccess(() => {
-    //   // if writing was success and there is a queue - update old tmp state
-    //   this.tmpStateBeforeWriting = this.getState();
-    // });
-    //
-    // await this.writingQueuedCall.callIt(async (data?: {[index: string]: any}) => {
-    //   return this.setter && this.setter(data as Dictionary);
-    // }, newPartialData);
+    else {
+      // end of cycle
+      delete this.fullStateBeforeSaving;
+      delete this.paramsListToSave;
+    }
   }
 
 }
