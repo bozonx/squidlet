@@ -102,16 +102,16 @@ export default class ConsistentState {
   }
 
   // TODO: test
-  // TODO: review
   setIncomeState(partialState: Dictionary) {
     if (this.isReading()) {
-      // do nothing if force reading is in progress. It will return the truly state
+      // do nothing if force reading is in progress. It will return the full actual state
       return;
     }
     else if (this.isWriting()) {
       this.stateUpdater(partialState);
 
-      this.tmpStateBeforeWriting = mergeDeep(partialState, this.tmpStateBeforeWriting);
+      // TODO: не обновлять то что пойдет на запись !!!!
+      this.actualRemoteState = mergeDeep(partialState, this.actualRemoteState);
 
       return;
     }
@@ -161,11 +161,25 @@ export default class ConsistentState {
     // collect list of params which will be actually written
     this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
 
+    // do writing request any way if it is a new request or there is writing is in progress
+    try {
+      this.queue.request(WRITING_ID, this.handleSaving, 'recall');
+    }
+    catch (err) {
+      if (!this.actualRemoteState) {
+        throw new Error(`ConsistentState.write: no actualRemoteState`);
+      }
+
+      this.stateUpdater(this.actualRemoteState);
+
+      delete this.actualRemoteState;
+      delete this.paramsListToSave;
+
+      throw err;
+    }
+
     // update local state on each call of write
     this.stateUpdater(partialData);
-    
-    // do writing request any way if it is a new request or there is writing is in progress
-    this.queue.request(WRITING_ID, this.handleSaving, 'recall');
 
     // wait while passed data will be actually saved
     if (this.queue.isJobInProgress(WRITING_ID)) {

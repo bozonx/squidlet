@@ -177,6 +177,7 @@ export default class RequestQueue {
     }
     // if the job in a queue
     else if (this.getQueuedJobs().includes(resolvedId)) {
+      // TODO: постараться избавиться от throw
       this.updateQueuedJob(resolvedId, mode, cb);
     }
     else {
