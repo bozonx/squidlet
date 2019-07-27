@@ -215,12 +215,10 @@ export default class RequestQueue {
   }
 
 
-  // TODO: test
   private getQueuedJobs(): string[] {
     return this.queue.map((item: Job) => item[ID_POSITION]);
   }
 
-  // TODO: test
   /**
    * It uses passed jobId or generate a new one
    */
@@ -232,7 +230,6 @@ export default class RequestQueue {
     return String(unnamedJobIdCounter);
   }
 
-  // TODO: test
   private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const handlerIndex = events.addListener(
@@ -276,7 +273,6 @@ export default class RequestQueue {
     this.queue.splice(jobIndex);
   }
 
-  // TODO: test
   private addToEndOfQueue(jobId: JobId, mode: Mode, cb: RequestCb) {
     const job: Job = [jobId, cb, mode, false];
 

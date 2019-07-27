@@ -10,7 +10,7 @@ describe.only 'system.helpers.RequestQueue', ->
     @logError = sinon.spy()
     @queue = new RequestQueue(@logError)
 
-  it "ordinary queue with jobs with different id", ->
+  it "ordinary queue with jobs with different id. Check queue states", ->
     resolvedJobId1 = @queue.request(@jobId1, @cb1)
     @queue.request(@jobId2, @cb2)
 
@@ -22,12 +22,41 @@ describe.only 'system.helpers.RequestQueue', ->
     assert.isTrue(@queue.hasJob(@jobId1))
     assert.isTrue(@queue.hasJob(@jobId2))
 
-    @queue.waitJobFinished(@jobId2)
+    # TODO: do it
+#    await @queue.waitCurrentJobFinished()
+
+#    sinon.assert.calledOnce(@cb1)
+#    sinon.assert.notCalled(@cb2)
+#    assert.equal(@queue.getQueueLength(), 0)
+#    assert.deepEqual(@queue.getJobIds(), [@jobId1])
+#    assert.isFalse(@queue.isJobInProgress(@jobId1))
+#    assert.isTrue(@queue.isJobInProgress(@jobId2))
+#    assert.equal(@queue.getCurrentJobId(), @jobId2)
+#    assert.isFalse(@queue.hasJob(@jobId1))
+#    assert.isTrue(@queue.hasJob(@jobId2))
+
+    await @queue.waitJobFinished(@jobId2)
 
     sinon.assert.calledOnce(@cb1)
     sinon.assert.calledOnce(@cb2)
+    assert.equal(@queue.getQueueLength(), 0)
+    assert.deepEqual(@queue.getJobIds(), [])
+    assert.isFalse(@queue.isJobInProgress(@jobId1))
+    assert.isFalse(@queue.isJobInProgress(@jobId2))
+    assert.isUndefined(@queue.getCurrentJobId())
+    assert.isFalse(@queue.hasJob(@jobId1))
+    assert.isFalse(@queue.hasJob(@jobId2))
 
-  it "ordinary queue - auto generated ids", ->
+  it "auto generated ids", ->
+    resolvedJobId1 = @queue.request(undefined, @cb1)
+    resolvedJobId2 = @queue.request(undefined, @cb2)
+
+    assert.equal(resolvedJobId1, '0')
+    assert.equal(resolvedJobId2, '1')
 
   # TODO: test timeout
   # TODO: add cb witch throws an error
+  # TODO: events
+  # TODO: default mode
+  # TODO: recall mode
+  # TODO: cancel
