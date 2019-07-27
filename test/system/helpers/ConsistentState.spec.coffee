@@ -1,7 +1,7 @@
 ConsistentState = require('../../../system/helpers/ConsistentState').default;
 
 
-describe.only 'system.helpers.ConsistentState', ->
+describe 'system.helpers.ConsistentState', ->
   beforeEach ->
     @logError = sinon.spy()
     @stateGetterResult = {}

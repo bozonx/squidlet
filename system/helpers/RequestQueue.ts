@@ -53,6 +53,7 @@ export default class RequestQueue {
     this.jobTimeoutSec = jobTimeoutSec;
   }
 
+  // TODO: test
   destroy() {
     this.startJobEvents.removeAll();
     this.endJobEvents.removeAll();
@@ -102,6 +103,7 @@ export default class RequestQueue {
     return this.getJobIds().includes(jobId);
   }
 
+  // TODO: test
   jobHasRecallCb(jobId: JobId): boolean {
     if (this.currentJob && this.currentJob[ID_POSITION] === jobId) {
       return Boolean(this.currentJob[RECALL_CB_POSITION]);
@@ -114,6 +116,7 @@ export default class RequestQueue {
     return Boolean(this.queue[jobIndex][RECALL_CB_POSITION]);
   }
 
+  // TODO: test
   /**
    * Cancel current and delayed job with uniq id.
    */
@@ -123,6 +126,7 @@ export default class RequestQueue {
     this.startNextJob();
   }
 
+  // TODO: test
   /**
    * Return the promise which will be fulfilled when the current job is finished.
    */
@@ -132,6 +136,7 @@ export default class RequestQueue {
     return this.getWaitJobPromise(this.endJobEvents, this.currentJob[ID_POSITION]);
   }
 
+  // TODO: test
   /**
    * Return the promise which will be fulfilled before the job is get started.
    * You should check that the queue has this job by calling `hasJob(jobId)`.
@@ -156,6 +161,26 @@ export default class RequestQueue {
     }
 
     return this.getWaitJobPromise(this.endJobEvents, jobId);
+  }
+
+  // TODO: test
+  onJobStart(cb: StartJobHandler): number {
+    return this.startJobEvents.addListener(cb);
+  }
+
+  // TODO: test
+  onJobEnd(cb: EndJobHandler): number {
+    return this.endJobEvents.addListener(cb);
+  }
+
+  // TODO: test
+  removeStartJobListener(handlerIndex: number) {
+    this.startJobEvents.removeListener(handlerIndex);
+  }
+
+  // TODO: test
+  removeEndJobListener(handlerIndex: number) {
+    this.endJobEvents.removeListener(handlerIndex);
   }
 
   /**
@@ -189,27 +214,13 @@ export default class RequestQueue {
     return resolvedId;
   }
 
-  onJobStart(cb: StartJobHandler): number {
-    return this.startJobEvents.addListener(cb);
-  }
 
-  onJobEnd(cb: EndJobHandler): number {
-    return this.endJobEvents.addListener(cb);
-  }
-
-  removeStartJobListener(handlerIndex: number) {
-    this.startJobEvents.removeListener(handlerIndex);
-  }
-
-  removeEndJobListener(handlerIndex: number) {
-    this.endJobEvents.removeListener(handlerIndex);
-  }
-
-
+  // TODO: test
   private getQueuedJobs(): string[] {
     return this.queue.map((item: Job) => item[ID_POSITION]);
   }
 
+  // TODO: test
   /**
    * It uses passed jobId or generate a new one
    */
@@ -221,6 +232,7 @@ export default class RequestQueue {
     return String(unnamedJobIdCounter);
   }
 
+  // TODO: test
   private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const handlerIndex = events.addListener(
@@ -237,10 +249,12 @@ export default class RequestQueue {
     });
   }
 
+  // TODO: test
   private getJobIndex(jobId: JobId): number {
     return findIndex(this.queue, (item: Job) => item[ID_POSITION] === jobId) as number;
   }
 
+  // TODO: test
   private cancelCurrentJob(jobId: string) {
     if (!this.currentJob || this.currentJob[ID_POSITION] !== jobId) return;
 
@@ -250,6 +264,7 @@ export default class RequestQueue {
     this.endJobEvents.emit(new Error(`Job was cancelled`), jobId);
   }
 
+  // TODO: test
   /**
    * remove job or delayed job in queue
    */
@@ -261,12 +276,14 @@ export default class RequestQueue {
     this.queue.splice(jobIndex);
   }
 
+  // TODO: test
   private addToEndOfQueue(jobId: JobId, mode: Mode, cb: RequestCb) {
     const job: Job = [jobId, cb, mode, false];
 
     this.queue.push(job);
   }
 
+  // TODO: test
   /**
    * Update cb of delayed job or add a new job to queue.
    */
@@ -281,6 +298,7 @@ export default class RequestQueue {
     this.queue[jobIndex][MODE_POSITION] = mode;
   }
 
+  // TODO: test
   /**
    * Start a new job if there isn't a current job and queue has some jobs.
    * It doesn't start a new job while current is in progress.
@@ -300,6 +318,7 @@ export default class RequestQueue {
     this.startCb(currentJob);
   }
 
+  // TODO: test
   private startCb(job: Job) {
     this.startJobEvents.emit(job[ID_POSITION]);
 
@@ -319,6 +338,7 @@ export default class RequestQueue {
     }
   }
 
+  // TODO: test
   private handleTimeoutOfJob = (job: Job) => {
     // mark as canceled to get not called handleCbFinished() if promise will finally fulfilled
     job[CANCELED_POSITION] = true;
@@ -330,6 +350,7 @@ export default class RequestQueue {
     this.startNextJob();
   }
 
+  // TODO: test
   private handleCbFinished(err: Error | undefined, job: Job) {
     // do nothing if it was canceled
     if (job[CANCELED_POSITION]) return;
@@ -354,6 +375,7 @@ export default class RequestQueue {
     this.startNextJob();
   }
 
+  // TODO: test
   private recallJob(job: Job) {
     const recallCb: RequestCb | undefined = job[RECALL_CB_POSITION];
 
@@ -371,6 +393,7 @@ export default class RequestQueue {
     this.startCb(job);
   }
 
+  // TODO: test
   private finalizeCurrentJob() {
     clearTimeout(this.runningTimeout);
 
