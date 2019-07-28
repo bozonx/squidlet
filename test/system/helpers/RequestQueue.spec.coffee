@@ -5,8 +5,9 @@ describe.only 'system.helpers.RequestQueue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
-    @cb1 = sinon.stub().returns(Promise.resolve())
-    @cb2 = sinon.stub().returns(Promise.resolve())
+    @cbPromise = () => new Promise((resolve) => setTimeout(resolve, 1))
+    @cb1 = sinon.stub().returns(@cbPromise())
+    @cb2 = sinon.stub().returns(@cbPromise())
     @logError = sinon.spy()
     @queue = new RequestQueue(@logError)
 
@@ -22,18 +23,18 @@ describe.only 'system.helpers.RequestQueue', ->
     assert.isTrue(@queue.hasJob(@jobId1))
     assert.isTrue(@queue.hasJob(@jobId2))
 
-    # TODO: do it
-#    await @queue.waitCurrentJobFinished()
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.notCalled(@cb2)
 
-#    sinon.assert.calledOnce(@cb1)
-#    sinon.assert.notCalled(@cb2)
-#    assert.equal(@queue.getQueueLength(), 0)
-#    assert.deepEqual(@queue.getJobIds(), [@jobId1])
-#    assert.isFalse(@queue.isJobInProgress(@jobId1))
-#    assert.isTrue(@queue.isJobInProgress(@jobId2))
-#    assert.equal(@queue.getCurrentJobId(), @jobId2)
-#    assert.isFalse(@queue.hasJob(@jobId1))
-#    assert.isTrue(@queue.hasJob(@jobId2))
+    await @queue.waitCurrentJobFinished()
+
+    assert.equal(@queue.getQueueLength(), 0)
+    assert.deepEqual(@queue.getJobIds(), [@jobId2])
+    assert.isFalse(@queue.isJobInProgress(@jobId1))
+    assert.isTrue(@queue.isJobInProgress(@jobId2))
+    assert.equal(@queue.getCurrentJobId(), @jobId2)
+    assert.isFalse(@queue.hasJob(@jobId1))
+    assert.isTrue(@queue.hasJob(@jobId2))
 
     await @queue.waitJobFinished(@jobId2)
 

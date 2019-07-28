@@ -1,6 +1,6 @@
 import {concatUniqStrArrays, mergeDeep} from './collections';
 import {Dictionary} from '../interfaces/Types';
-import RequestQueue, {Mode} from './RequestQueue';
+import RequestQueue from './RequestQueue';
 import {cloneDeep, difference, pick} from './lodashLike';
 
 

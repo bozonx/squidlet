@@ -126,7 +126,6 @@ export default class RequestQueue {
     this.startNextJob();
   }
 
-  // TODO: test
   /**
    * Return the promise which will be fulfilled when the current job is finished.
    */
@@ -200,11 +199,12 @@ export default class RequestQueue {
       }
       // in default mode do noting - don't update the current job and don't add job to queue
     }
-    // if the job in a queue
+    // if the job in a queue - update queued job
     else if (this.getQueuedJobs().includes(resolvedId)) {
       // TODO: постараться избавиться от throw
       this.updateQueuedJob(resolvedId, mode, cb);
     }
+    // add a new job to queue
     else {
       // add a new job
       this.addToEndOfQueue(resolvedId, mode, cb);
@@ -234,13 +234,13 @@ export default class RequestQueue {
     return new Promise<void>((resolve, reject) => {
       const handlerIndex = events.addListener(
         (error: Error | undefined, finishedJobId: JobId) => {
-          if (finishedJobId === jobId) {
-            events.removeListener(handlerIndex);
+          if (finishedJobId !== jobId) return;
 
-            if (error) return reject(error);
+          events.removeListener(handlerIndex);
 
-            resolve();
-          }
+          if (error) return reject(error);
+
+          resolve();
         }
       );
     });
