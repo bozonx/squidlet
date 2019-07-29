@@ -1,4 +1,4 @@
-strings = require('../../../system/helpers/strings')
+strings = require('../../../system/lib/strings')
 
 
 describe 'system.helpers.strings', ->

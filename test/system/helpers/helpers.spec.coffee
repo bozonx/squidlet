@@ -1,4 +1,4 @@
-helpers = require('../../../system/helpers/helpers')
+helpers = require('../../../system/lib/helpers')
 
 
 describe 'system.helpers.helpers', ->

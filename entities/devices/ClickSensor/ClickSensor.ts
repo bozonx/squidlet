@@ -1,6 +1,6 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {omit} from 'system/helpers/lodashLike';
+import {omit} from 'system/lib/lodashLike';
 import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';

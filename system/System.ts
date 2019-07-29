@@ -5,17 +5,17 @@ import ServicesManager from './entities/ServicesManager';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import EnvSet from './entities/EnvSet';
-import {mergeDeep} from './helpers/collections';
+import {mergeDeep} from './lib/collections';
 import systemConfig from './config/systemConfig';
 import IoSet from './interfaces/IoSet';
 import IoManager from './entities/IoManager';
-import Sessions from './helpers/Sessions';
+import Sessions from './lib/Sessions';
 import ApiManager from './ApiManager';
 import HostConfig from './interfaces/HostConfig';
 import State from './State';
 import Api from './Api';
 import ApiTopics from './ApiTopics';
-import IndexedEventEmitter from './helpers/IndexedEventEmitter';
+import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './dict/systemEvents';
 
 

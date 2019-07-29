@@ -5,7 +5,7 @@ import IoItem from '../interfaces/IoItem';
 import LogPublisher from '../LogPublisher';
 import DriverBase from '../baseDrivers/DriverBase';
 import Api from '../Api';
-import IndexedEventEmitter from '../helpers/IndexedEventEmitter';
+import IndexedEventEmitter from '../lib/IndexedEventEmitter';
 
 
 /**

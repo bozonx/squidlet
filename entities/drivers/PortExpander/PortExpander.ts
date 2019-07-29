@@ -10,14 +10,14 @@
 
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {firstLetterToUpperCase} from 'system/helpers/strings';
+import {firstLetterToUpperCase} from 'system/lib/strings';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
-import {omit} from 'system/helpers/lodashLike';
+import {omit} from 'system/lib/lodashLike';
 import {PollProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';
-import {uint8ToNum} from 'system/helpers/binaryHelpers';
+import {uint8ToNum} from 'system/lib/binaryHelpers';
 
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';
 import State, {AnalogState, DigitalState, ExpanderState} from './State';

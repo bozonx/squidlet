@@ -1,4 +1,4 @@
-ConsistentState = require('../../../system/helpers/ConsistentState').default;
+ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 
 describe.only 'system.helpers.ConsistentState', ->

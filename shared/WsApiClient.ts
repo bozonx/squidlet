@@ -2,13 +2,13 @@ import * as yaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import RemoteCall from '../system/helpers/remoteCall/RemoteCall';
-import {deserializeJson, serializeJson} from '../system/helpers/binaryHelpers';
+import RemoteCall from '../system/lib/remoteCall/RemoteCall';
+import {deserializeJson, serializeJson} from '../system/lib/binaryHelpers';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {ENCODE} from '../system/dict/constants';
-import {collectPropsDefaults} from '../system/helpers/helpers';
+import {collectPropsDefaults} from '../system/lib/helpers';
 
 
 const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');

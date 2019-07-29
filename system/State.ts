@@ -1,7 +1,7 @@
 import {Dictionary, JsonTypes} from './interfaces/Types';
-import IndexedEvents from './helpers/IndexedEvents';
-import {getDifferentKeys, mergeDeep} from './helpers/collections';
-import {isEqual} from './helpers/lodashLike';
+import IndexedEvents from './lib/IndexedEvents';
+import {getDifferentKeys, mergeDeep} from './lib/collections';
+import {isEqual} from './lib/lodashLike';
 
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;

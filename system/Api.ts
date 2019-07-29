@@ -1,12 +1,12 @@
 import {Dictionary, JsonTypes} from './interfaces/Types';
-import {objGet, pick} from './helpers/lodashLike';
+import {objGet, pick} from './lib/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
 import {LOGGER_EVENT} from './dict/systemEvents';
-import {calcAllowedLogLevels} from './helpers/helpers';
+import {calcAllowedLogLevels} from './lib/helpers';
 
 
 export default class Api {

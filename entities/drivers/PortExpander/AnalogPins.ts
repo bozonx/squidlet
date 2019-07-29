@@ -1,6 +1,6 @@
-import {numToUint8Word} from 'system/helpers/binaryHelpers';
+import {numToUint8Word} from 'system/lib/binaryHelpers';
 import {BYTES_IN_WORD} from 'system/dict/constants';
-import {getKeyOfObject} from 'system/helpers/collections';
+import {getKeyOfObject} from 'system/lib/collections';
 
 import {
   COMMANDS,

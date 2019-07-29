@@ -1,5 +1,5 @@
 import DriverBase from 'system/baseDrivers/DriverBase';
-import {mergeDeep} from '../../../system/helpers/collections';
+import {mergeDeep} from '../../../system/lib/collections';
 import DriverFactoryBase, {WsServer, WebSocketServerDriverProps} from '../WsServer/WsServer';
 import WsDuplexServerLogic from './WsDuplexServerLogic';
 

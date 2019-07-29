@@ -1,6 +1,6 @@
 import System from './System';
-import IndexedEvents from './helpers/IndexedEvents';
-import RemoteCall from './helpers/remoteCall/RemoteCall';
+import IndexedEvents from './lib/IndexedEvents';
+import RemoteCall from './lib/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 
 

@@ -2,7 +2,7 @@ import WebSocketClientIo, {OnMessageHandler} from 'system/interfaces/io/WebSocke
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
-import IndexedEvents from 'system/helpers/IndexedEvents';
+import IndexedEvents from 'system/lib/IndexedEvents';
 
 
 /**

@@ -1,10 +1,10 @@
-import IndexedEvents from 'system/helpers/IndexedEvents';
+import IndexedEvents from 'system/lib/IndexedEvents';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
-import {omit} from 'system/helpers/lodashLike';
-import {isDigitalInputInverted, resolveEdge} from 'system/helpers/helpers';
+import {omit} from 'system/lib/lodashLike';
+import {isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 
 import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
 

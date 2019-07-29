@@ -1,4 +1,4 @@
-buffer = require('../../../system/helpers/buffer')
+buffer = require('../../../system/lib/buffer')
 
 
 describe 'system.helpers.buffer', ->

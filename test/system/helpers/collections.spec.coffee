@@ -1,4 +1,4 @@
-collections = require('../../../system/helpers/collections')
+collections = require('../../../system/lib/collections')
 
 
 describe 'system.helpers.collections', ->

@@ -2,11 +2,11 @@ import WebSocketClientIo, {
   OnMessageHandler, WebSocketClientProps,
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import IndexedEvents from 'system/helpers/IndexedEvents';
+import IndexedEvents from 'system/lib/IndexedEvents';
 import {Primitives} from 'system/interfaces/Types';
-import {mergeDeep} from 'system/helpers/collections';
-import {parseCookie, stringifyCookie} from 'system/helpers/strings';
-import Promised from 'system/helpers/Promised';
+import {mergeDeep} from 'system/lib/collections';
+import {parseCookie, stringifyCookie} from 'system/lib/strings';
+import Promised from 'system/lib/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
 
 

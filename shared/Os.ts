@@ -7,7 +7,7 @@ import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
 import {Stats} from '../system/interfaces/io/StorageIo';
-import {callPromised} from '../system/helpers/helpers';
+import {callPromised} from '../system/lib/helpers';
 import {ENCODE} from '../system/dict/constants';
 
 

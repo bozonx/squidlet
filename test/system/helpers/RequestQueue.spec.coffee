@@ -1,4 +1,4 @@
-RequestQueue = require('../../../system/helpers/RequestQueue').default;
+RequestQueue = require('../../../system/lib/RequestQueue').default;
 
 
 describe 'system.helpers.RequestQueue', ->

@@ -1,5 +1,5 @@
 import {isString, isNumber, isStringArray, isObject, oneOf, required, sequence} from './validationHelpers';
-import {whiteList} from '../../system/helpers/validate';
+import {whiteList} from '../../system/lib/validate';
 
 
 // function checkBuildConfig(rawConfig: {[index: string]: any}): string | undefined {

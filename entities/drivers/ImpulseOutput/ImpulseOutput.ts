@@ -1,8 +1,8 @@
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
-import {omit} from 'system/helpers/lodashLike';
-import {deferCall, invertIfNeed} from 'system/helpers/helpers';
+import {omit} from 'system/lib/lodashLike';
+import {deferCall, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';
 
 import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPinOutput/DigitalPinOutput';

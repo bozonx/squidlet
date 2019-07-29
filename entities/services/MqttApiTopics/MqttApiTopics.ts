@@ -1,5 +1,5 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import {combineTopic} from 'system/helpers/helpers';
+import {combineTopic} from 'system/lib/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {TOPIC_SEPARATOR} from 'system/ApiTopics';
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';

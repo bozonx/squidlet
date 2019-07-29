@@ -1,4 +1,4 @@
-RemoteCall = require('../../../system/helpers/remoteCall/RemoteCall').default;
+RemoteCall = require('../../../system/lib/remoteCall/RemoteCall').default;
 
 
 uniqId = 0

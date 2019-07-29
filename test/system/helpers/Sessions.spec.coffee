@@ -1,4 +1,4 @@
-Sessions = require('../../../system/helpers/Sessions').default;
+Sessions = require('../../../system/lib/Sessions').default;
 
 
 describe 'system.helpers.Sessions', ->

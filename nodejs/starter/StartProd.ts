@@ -9,7 +9,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
 import SystemStarter from './SystemStarter';
-import {isEmpty} from '../../system/helpers/lodashLike';
+import {isEmpty} from '../../system/lib/lodashLike';
 import {runCmd} from '../../shared/helpers';
 
 

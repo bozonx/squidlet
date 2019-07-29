@@ -2,9 +2,9 @@ import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
 import WebSocketClientIo, {WebSocketClientProps, WsClientEvent} from 'system/interfaces/io/WebSocketClientIo';
-import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
-import {callPromised} from 'system/helpers/helpers';
-import {omit} from 'system/helpers/lodashLike';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {callPromised} from 'system/lib/helpers';
+import {omit} from 'system/lib/lodashLike';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';
 

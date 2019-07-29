@@ -6,7 +6,7 @@ import ManifestBase from '../../system/interfaces/ManifestBase';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import {splitFirstElement} from '../../system/helpers/strings';
+import {splitFirstElement} from '../../system/lib/strings';
 import systemConfig from '../../system/config/systemConfig';
 import {getFileNameOfPath} from '../helpers';
 

@@ -4,7 +4,7 @@ import {
   uint8ArrToHexString,
   numToWord,
   hexStringToHexNum
-} from 'system/helpers/binaryHelpers';
+} from 'system/lib/binaryHelpers';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';

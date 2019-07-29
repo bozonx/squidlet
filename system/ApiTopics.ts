@@ -1,10 +1,10 @@
-import {splitFirstElement} from './helpers/strings';
-import {combineTopic, parseValue} from './helpers/helpers';
+import {splitFirstElement} from './lib/strings';
+import {combineTopic, parseValue} from './lib/helpers';
 import {Dictionary, JsonTypes} from './interfaces/Types';
-import {trim} from './helpers/lodashLike';
+import {trim} from './lib/lodashLike';
 import System from './System';
 import {StateCategories} from './interfaces/States';
-import IndexedEvents from './helpers/IndexedEvents';
+import IndexedEvents from './lib/IndexedEvents';
 
 type TopicType = 'device' | 'api';
 type DeviceStateType = 'status' | 'config';

@@ -1,5 +1,5 @@
 import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
-import IndexedEvents from '../../system/helpers/IndexedEvents';
+import IndexedEvents from '../../system/lib/IndexedEvents';
 import Register from './Register';
 import ConfigManager from '../hostConfig/ConfigManager';
 import {HostEntitiesSet} from '../interfaces/HostEntitySet';

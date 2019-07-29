@@ -6,10 +6,10 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/helpers/binaryHelpers';
+import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {Edge} from 'system/interfaces/io/DigitalIo';
-import DebounceCall from 'system/helpers/DebounceCall';
-import IndexedEvents from 'system/helpers/IndexedEvents';
+import DebounceCall from 'system/lib/DebounceCall';
+import IndexedEvents from 'system/lib/IndexedEvents';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 

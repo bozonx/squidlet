@@ -1,9 +1,9 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import IndexedEvents from 'system/helpers/IndexedEvents';
-import {omit} from 'system/helpers/lodashLike';
-import {convertToLevel, invertIfNeed} from 'system/helpers/helpers';
+import IndexedEvents from 'system/lib/IndexedEvents';
+import {omit} from 'system/lib/lodashLike';
+import {convertToLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';

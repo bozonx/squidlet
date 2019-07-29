@@ -6,9 +6,9 @@ import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';
 import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
-import {validateProps} from '../../system/helpers/validate';
+import {validateProps} from '../../system/lib/validate';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
-import {collectPropsDefaults} from '../../system/helpers/helpers';
+import {collectPropsDefaults} from '../../system/lib/helpers';
 
 
 /**

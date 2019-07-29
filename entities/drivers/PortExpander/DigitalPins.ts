@@ -1,6 +1,6 @@
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
-import {bitsToBytes} from 'system/helpers/binaryHelpers';
-import {getKeyOfObject, setArrayDimension} from 'system/helpers/collections';
+import {bitsToBytes} from 'system/lib/binaryHelpers';
+import {getKeyOfObject, setArrayDimension} from 'system/lib/collections';
 
 import {
   COMMANDS,

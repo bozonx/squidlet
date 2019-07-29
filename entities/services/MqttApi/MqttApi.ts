@@ -1,5 +1,5 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import {deserializeJson, serializeJson} from 'system/helpers/binaryHelpers';
+import {deserializeJson, serializeJson} from 'system/lib/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';

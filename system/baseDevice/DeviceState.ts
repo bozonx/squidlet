@@ -1,8 +1,8 @@
 import SchemaElement from '../interfaces/SchemaElement';
-import {isEmpty} from '../helpers/lodashLike';
-import {validateParam} from '../helpers/validate';
-import ConsistentState, {Getter, Setter, Initialize} from '../helpers/ConsistentState';
-import {collectPropsDefaults} from '../helpers/helpers';
+import {isEmpty} from '../lib/lodashLike';
+import {validateParam} from '../lib/validate';
+import ConsistentState, {Getter, Setter, Initialize} from '../lib/ConsistentState';
+import {collectPropsDefaults} from '../lib/helpers';
 import {Dictionary} from '../interfaces/Types';
 
 

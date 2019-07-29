@@ -1,6 +1,6 @@
 import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
-import Promised from 'system/helpers/Promised';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import Promised from 'system/lib/Promised';
 
 
 export enum WS_SERVER_EVENTS {

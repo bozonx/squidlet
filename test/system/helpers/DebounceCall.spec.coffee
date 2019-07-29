@@ -1,4 +1,4 @@
-DebounceCall = require('../../../system/helpers/DebounceCall').default;
+DebounceCall = require('../../../system/lib/DebounceCall').default;
 
 
 describe 'system.helpers.DebounceCall', ->

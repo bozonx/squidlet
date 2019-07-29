@@ -2,9 +2,9 @@ import System from '../System';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 import {EntityClassType} from './EntityManagerBase';
-import {pathJoin} from '../helpers/nodeLike';
+import {pathJoin} from '../lib/nodeLike';
 import StorageIo from '../interfaces/io/StorageIo';
-import {splitFirstElement} from '../helpers/strings';
+import {splitFirstElement} from '../lib/strings';
 
 
 /**

@@ -1,6 +1,6 @@
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import DriverBase from 'system/baseDrivers/DriverBase';
-import {pathDirname, pathJoin} from 'system/helpers/nodeLike';
+import {pathDirname, pathJoin} from 'system/lib/nodeLike';
 
 
 /**

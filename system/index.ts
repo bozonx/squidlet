@@ -3,12 +3,12 @@
 
 // import './helpers/binaryHelpers';
 // import './helpers/collections';
-import './helpers/DebounceCall';
+import './lib/DebounceCall';
 // import './helpers/helpers';
 // import './helpers/IndexedEventEmitter';
 // import './helpers/IndexedEvents';
 // import './helpers/lodashLike';
-import './helpers/mkdirPLogic';
+import './lib/mkdirPLogic';
 // import './helpers/nodeLike';
 // import './helpers/Polling';
 // import './helpers/Sender';

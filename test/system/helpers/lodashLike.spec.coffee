@@ -1,4 +1,4 @@
-lodashLike = require('../../../system/helpers/lodashLike')
+lodashLike = require('../../../system/lib/lodashLike')
 
 
 describe 'system.helpers.lodashLike', ->

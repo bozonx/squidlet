@@ -1,4 +1,4 @@
-validate = require('../../../system/helpers/validate');
+validate = require('../../../system/lib/validate');
 
 
 describe 'system.helpers.validate', ->

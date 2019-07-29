@@ -1,4 +1,4 @@
-Promised = require('../../../system/helpers/Promised').default;
+Promised = require('../../../system/lib/Promised').default;
 
 
 describe 'system.helpers.Promised', ->

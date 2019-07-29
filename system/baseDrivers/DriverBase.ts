@@ -1,7 +1,7 @@
 import EntityBase from '../entities/EntityBase';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverEnv from './DriverEnv';
-import Sender from '../helpers/Sender';
+import Sender from '../lib/Sender';
 
 
 export default class DriverBase<Props extends {[index: string]: any} = any> extends EntityBase<Props> {

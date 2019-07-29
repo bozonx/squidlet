@@ -6,9 +6,9 @@ import WebSocketServerIo, {
   WebSocketServerProps,
   WsServerEvent,
 } from 'system/interfaces/io/WebSocketServerIo';
-import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
-import {AnyHandler} from 'system/helpers/IndexedEvents';
-import {callPromised} from 'system/helpers/helpers';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {AnyHandler} from 'system/lib/IndexedEvents';
+import {callPromised} from 'system/lib/helpers';
 
 
 type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];

@@ -1,9 +1,9 @@
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
-import {omit} from 'system/helpers/lodashLike';
-import IndexedEvents from 'system/helpers/IndexedEvents';
-import Promised from 'system/helpers/Promised';
+import {omit} from 'system/lib/lodashLike';
+import IndexedEvents from 'system/lib/IndexedEvents';
+import Promised from 'system/lib/Promised';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;

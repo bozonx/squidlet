@@ -4,8 +4,8 @@ import {
   sequence
 } from './validationHelpers';
 import SchemaElement from '../../system/interfaces/SchemaElement';
-import {parseType} from '../../system/helpers/typesHelpers';
-import {isValueOfType, whiteList} from '../../system/helpers/validate';
+import {parseType} from '../../system/lib/typesHelpers';
+import {isValueOfType, whiteList} from '../../system/lib/validate';
 
 
 function checkType(type: string | undefined, ruleName: string): string | undefined {

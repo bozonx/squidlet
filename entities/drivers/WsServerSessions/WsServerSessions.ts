@@ -2,11 +2,11 @@ import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {parseCookie} from 'system/helpers/strings';
+import {parseCookie} from 'system/lib/strings';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
-import {getKeyOfObject} from 'system/helpers/collections';
-import {omit} from 'system/helpers/lodashLike';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {getKeyOfObject} from 'system/lib/collections';
+import {omit} from 'system/lib/lodashLike';
 import {WsServer} from '../WsServer/WsServer';
 
 

@@ -5,9 +5,9 @@
 import * as mqtt from 'mqtt';
 
 import MqttIo, {MqttOptions, MqttIoEvents} from 'system/interfaces/io/MqttIo';
-import IndexedEventEmitter from 'system/helpers/IndexedEventEmitter';
-import {callPromised} from 'system/helpers/helpers';
-import {convertBufferToUint8Array} from 'system/helpers/buffer';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {callPromised} from 'system/lib/helpers';
+import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 
 type MqttContentTypes = 'string' | 'binary';

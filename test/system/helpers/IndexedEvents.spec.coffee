@@ -1,4 +1,4 @@
-Events = require('../../../system/helpers/IndexedEvents').default;
+Events = require('../../../system/lib/IndexedEvents').default;
 
 
 describe 'system.helpers.IndexedEvents', ->

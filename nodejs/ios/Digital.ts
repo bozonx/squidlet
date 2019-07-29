@@ -7,7 +7,7 @@ import DigitalIo, {
   WatchHandler,
   DigitalInputMode
 } from 'system/interfaces/io/DigitalIo';
-import DebounceCall from 'system/helpers/DebounceCall';
+import DebounceCall from 'system/lib/DebounceCall';
 
 
 type GpioHandler = (level: number) => void;

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import {isEmpty} from '../../system/helpers/lodashLike';
+import {isEmpty} from '../../system/lib/lodashLike';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
