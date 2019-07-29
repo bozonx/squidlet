@@ -61,26 +61,34 @@ describe.only 'system.helpers.ConsistentState', ->
     sinon.assert.calledOnce(@getter)
 
   it "load - no getter - do nothing", ->
-#    @consistentState.getter = undefined
-#    @consistentState.requestGetter = sinon.spy()
-#
-#    await @consistentState.load()
-#
-#    sinon.assert.notCalled(@consistentState.requestGetter)
-#    sinon.assert.notCalled(@stateUpdater)
+    @consistentState.getter = undefined
+    @consistentState.queue.request = sinon.spy()
 
-  it "load - when there is a reading process - return it's promise", ->
-#    @consistentState.readingPromise = Promise.resolve()
-#    @consistentState.requestGetter = sinon.spy()
-#
-#    await @consistentState.load()
-#
-#    sinon.assert.notCalled(@consistentState.requestGetter)
-#    sinon.assert.notCalled(@stateUpdater)
+    await @consistentState.load()
 
-  it "write", ->
+    sinon.assert.notCalled(@consistentState.queue.request)
+
+  it "write once", ->
+    data = {writeParam: 1}
+
+    promise = await @consistentState.write(data)
+
+    assert.deepEqual(@consistentState.actualRemoteState, {})
+    assert.deepEqual(@consistentState.paramsListToSave, ['writeParam'])
+
+    await promise
+
 
   it "write - no setter - just update the local state", ->
+    data = {writeParam: 1}
+    @consistentState.setter = undefined
+    @consistentState.queue.request = sinon.spy()
 
-  it "write - reading is in progress - wait reading promise", ->
+    await @consistentState.write(data)
 
+    sinon.assert.notCalled(@consistentState.queue.request)
+
+  #it "write - reading is in progress - wait reading promise", ->
+
+  # TODO: test error loading
+  # TODO: test error writing

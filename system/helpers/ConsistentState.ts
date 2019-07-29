@@ -134,31 +134,29 @@ export default class ConsistentState {
    * * On error it will return state which was before saving started.
    */
   async write(partialData: Dictionary): Promise<void> {
-    // TODO: test
     // if mode without setter - do noting else updating local state
     if (!this.setter) return this.stateUpdater(partialData);
 
     // Save actual state. It has to be called only once on starting of cycle
     if (!this.actualRemoteState) {
+      // TODO: моно использовать mergeDeep
       this.actualRemoteState = cloneDeep(this.getState());
     }
 
     // collect list of params which will be actually written
     this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
 
+    await this.doWriteRequest(partialData);
+  }
+
+  // TODO: test
+  private async doWriteRequest(partialData: Dictionary) {
     // do writing request any way if it is a new request or there is writing is in progress
     try {
       this.queue.request(WRITING_ID, this.handleSaving, 'recall');
     }
     catch (err) {
-      if (!this.actualRemoteState) {
-        throw new Error(`ConsistentState.write: no actualRemoteState`);
-      }
-
-      this.stateUpdater(this.actualRemoteState);
-
-      delete this.actualRemoteState;
-      delete this.paramsListToSave;
+      this.handleSaveError();
 
       throw err;
     }
@@ -232,14 +230,7 @@ export default class ConsistentState {
       await this.setter(dataToSave);
     }
     catch (err) {
-      if (!this.actualRemoteState) {
-        throw new Error(`ConsistentState.write: no actualRemoteState`);
-      }
-
-      this.stateUpdater(this.actualRemoteState);
-
-      delete this.actualRemoteState;
-      delete this.paramsListToSave;
+      this.handleSaveError();
 
       throw err;
     }
@@ -262,6 +253,18 @@ export default class ConsistentState {
       delete this.actualRemoteState;
       delete this.paramsListToSave;
     }
+  }
+
+  // TODO: test
+  private handleSaveError() {
+    if (!this.actualRemoteState) {
+      throw new Error(`ConsistentState.write: no actualRemoteState`);
+    }
+
+    this.stateUpdater(this.actualRemoteState);
+
+    delete this.actualRemoteState;
+    delete this.paramsListToSave;
   }
 
   // TODO: test
