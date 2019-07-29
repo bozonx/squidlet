@@ -116,7 +116,33 @@ describe.only 'system.helpers.RequestQueue', ->
 
     assert.deepEqual(@queue.getJobIds(), [])
 
+  it "cancelJob job in queue", ->
+    @queue.request(@jobId1, @cb1)
+    @queue.request(@jobId2, @cb2)
+
+    @queue.cancelJob(@jobId2)
+
+    assert.equal(@queue.getQueueLength(), 0)
+
+  it "cancelJob current job. It won't called ever", ->
+    handler = sinon.spy()
+    @queue.onJobEnd(handler)
+    @queue.request(@jobId1, @cb1)
+    @queue.request(@jobId2, @cb2)
+
+    @queue.cancelJob(@jobId1)
+
+    assert.deepEqual(@queue.getJobIds(), [@jobId2])
+    assert.isTrue(@queue.isJobInProgress(@jobId2))
+
+    await @queue.waitCurrentJobFinished()
+
+    sinon.assert.calledTwice(handler)
+    sinon.assert.calledWith(handler.getCall(0), 'Job was cancelled', @jobId1)
+    sinon.assert.calledWith(handler.getCall(1), undefined , @jobId2)
+
+
   # TODO: test timeout
   # TODO: add cb witch throws an error
   # TODO: events
-  # TODO: cancel
+  # TODO: destroy

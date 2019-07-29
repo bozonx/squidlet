@@ -18,7 +18,7 @@ export type Mode = 'default' | 'recall';
 
 type RequestCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
-type EndJobHandler = (error: Error | undefined, jobId: JobId) => void;
+type EndJobHandler = (error: string | undefined, jobId: JobId) => void;
 type JobId = string;
 // array like [JobId, RequestCb, node, isCanceled, recallCb]
 type Job = [JobId, RequestCb, Mode, boolean, RequestCb?];
@@ -115,7 +115,6 @@ export default class RequestQueue {
     return Boolean(this.queue[jobIndex][RECALL_CB_POSITION]);
   }
 
-  // TODO: test
   /**
    * Cancel current and delayed job with uniq id.
    */
@@ -174,7 +173,6 @@ export default class RequestQueue {
     return this.startJobEvents.addListener(cb);
   }
 
-  // TODO: test
   onJobEnd(cb: EndJobHandler): number {
     return this.endJobEvents.addListener(cb);
   }
@@ -240,7 +238,7 @@ export default class RequestQueue {
   private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const handlerIndex = events.addListener(
-        (error: Error | undefined, finishedJobId: JobId) => {
+        (error: string | undefined, finishedJobId: JobId) => {
           if (finishedJobId !== jobId) return;
 
           events.removeListener(handlerIndex);
@@ -257,17 +255,15 @@ export default class RequestQueue {
     return findIndex(this.queue, (item: Job) => item[ID_POSITION] === jobId) as number;
   }
 
-  // TODO: test
   private cancelCurrentJob(jobId: string) {
     if (!this.currentJob || this.currentJob[ID_POSITION] !== jobId) return;
 
     this.currentJob[CANCELED_POSITION] = true;
 
     this.finalizeCurrentJob();
-    this.endJobEvents.emit(new Error(`Job was cancelled`), jobId);
+    this.endJobEvents.emit(`Job was cancelled`, jobId);
   }
 
-  // TODO: test
   /**
    * remove job or delayed job in queue
    */
@@ -330,7 +326,7 @@ export default class RequestQueue {
     try {
       job[CB_POSITION]()
         .then(() => this.handleCbFinished(undefined, job))
-        .catch((err: Error) => this.handleCbFinished(err, job));
+        .catch((err: Error) => this.handleCbFinished(String(err), job));
     }
     catch (err) {
       this.handleCbFinished(err, job);
@@ -345,11 +341,11 @@ export default class RequestQueue {
     const errMsg = `RequestQueue: Timeout of job "${job[ID_POSITION]}" has been exceeded`;
 
     this.finalizeCurrentJob();
-    this.endJobEvents.emit(new Error(errMsg), job[ID_POSITION]);
+    this.endJobEvents.emit(errMsg, job[ID_POSITION]);
     this.startNextJob();
   }
 
-  private handleCbFinished(err: Error | undefined, job: Job) {
+  private handleCbFinished(err: string | undefined, job: Job) {
     // do nothing if it was canceled
     if (job[CANCELED_POSITION]) return;
 
