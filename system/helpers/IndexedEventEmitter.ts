@@ -1,7 +1,7 @@
 import IndexedEvents, {AnyHandler} from './IndexedEvents';
 
 
-export default class IndexedEventEmitter<T extends AnyHandler> {
+export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
   // IndexedEvents instances by event name
   private indexedEvents: {[index: string]: IndexedEvents<T>} = {};
 

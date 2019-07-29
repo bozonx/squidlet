@@ -5,7 +5,8 @@ import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
-import categories from './dict/categories';
+import {LOGGER_EVENT} from './dict/systemEvents';
+import {calcAllowedLogLevels} from './helpers/helpers';
 
 
 export default class Api {
@@ -109,7 +110,11 @@ export default class Api {
   }
 
   listenLog(logLevel: LogLevel = 'info', cb: (msg: string) => void): number {
-    return this.system.events.addListener(categories.logger, logLevel, cb);
+    const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(logLevel);
+
+    return this.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
+      if (allowedLogLevels.includes(level)) cb(message);
+    });
   }
 
 }

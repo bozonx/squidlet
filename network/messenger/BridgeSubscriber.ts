@@ -1,5 +1,4 @@
 import {ALL_TOPICS} from '../dict/constants';
-import categories from '../dict/categories';
 import System from '../System';
 import Messenger from './Messenger';
 import Message from './interfaces/Message';

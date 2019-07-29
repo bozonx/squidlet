@@ -1,17 +1,13 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import LogLevel, {LOG_LEVELS} from 'system/interfaces/LogLevel';
-import categories from 'system/dict/categories';
-import {calcAllowedLogLevels} from '../../../system/helpers/helpers';
+import {LOGGER_EVENT} from 'system/dict/systemEvents';
+import {calcAllowedLogLevels} from 'system/helpers/helpers';
 
 
 const consoleLog = {
   debug(message: string) {
     console.info(`DEBUG: ${message}`);
   },
-
-  // verbose(message: string) {
-  //   console.log(message);
-  // },
 
   info(message: string) {
     console.info(message);
@@ -41,12 +37,31 @@ export default class ConsoleLogger extends ServiceBase<Props> {
 
     // listen to allowed levels
     for (let level of allowedLogLevels) {
-      this.env.events.addListener(categories.logger, level, (message: string) => {
+      const eventName = `${LOGGER_EVENT}_${level}`;
+
+      this.env.events.addListener(eventName, (message: string, level: LogLevel) => {
         if (!LOG_LEVELS.includes(level)) return consoleLog.error(`Unsupported level: ${level}`);
 
         (consoleLog as any)[level](message);
       });
     }
+
+    // this.env.events.addListener(LOGGER_EVENT, (level: LogLevel, message: string) => {
+    //   if (!allowedLogLevels.includes(level)) return;
+    //
+    //   (consoleLog as any)[level](message);
+    // });
+
+    // const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(this.props.logLevel);
+    //
+    // // listen to allowed levels
+    // for (let level of allowedLogLevels) {
+    //   this.env.events.addListener(LOGGER_EVENT, (level: LogLevel, message: string) => {
+    //     if (!LOG_LEVELS.includes(level)) return consoleLog.error(`Unsupported level: ${level}`);
+    //
+    //     (consoleLog as any)[level](message);
+    //   });
+    // }
   }
 
 }

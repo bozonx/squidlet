@@ -1,4 +1,3 @@
-import CategorizedEvents from './helpers/CategorizedEvents';
 import LogPublisher from './LogPublisher';
 import DevicesManager from './entities/DevicesManager';
 import DriversManager from './entities/DriversManager';
@@ -6,7 +5,6 @@ import ServicesManager from './entities/ServicesManager';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import topics from './dict/topics';
-import categories from './dict/categories';
 import EnvSet from './entities/EnvSet';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
@@ -18,6 +16,7 @@ import HostConfig from './interfaces/HostConfig';
 import State from './State';
 import Api from './Api';
 import ApiTopics from './ApiTopics';
+import IndexedEventEmitter from './helpers/IndexedEventEmitter';
 
 
 // TODO: remove
@@ -26,8 +25,7 @@ let lastId: number = 0;
 
 export default class System {
   readonly systemConfig: typeof systemConfig;
-  // TODO: remove - use simple system events
-  readonly events: CategorizedEvents;
+  readonly events = new IndexedEventEmitter();
   readonly log: LogPublisher;
   readonly ioManager: IoManager;
   readonly envSet: EnvSet;
@@ -69,7 +67,6 @@ export default class System {
 
     // config which is used only on initialization time
     this.initializationConfig = initializationConfig();
-    this.events = new CategorizedEvents('|');
     this.log = new LogPublisher(this);
     this.driversManager = new DriversManager(this);
     this.servicesManager = new ServicesManager(this);

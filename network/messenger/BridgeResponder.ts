@@ -8,7 +8,6 @@ import {
   SUBSCRIBE_CATEGORY,
   UNSUBSCRIBE_CATEGORY
 } from './BridgeSubscriber';
-import categories from '../dict/categories';
 import {ALL_TOPICS} from '../dict/constants';
 
 

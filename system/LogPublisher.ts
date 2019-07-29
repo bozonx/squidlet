@@ -1,5 +1,6 @@
 import System from './System';
-import categories from './dict/categories';
+import {LOGGER_EVENT} from './dict/systemEvents';
+import LogLevel from './interfaces/LogLevel';
 
 
 export default class LogPublisher {
@@ -27,8 +28,11 @@ export default class LogPublisher {
   }
 
 
-  private send(level: string, message: string) {
-    this.system.events.emit(categories.logger, level, message);
+  private send(level: LogLevel, message: string) {
+    const eventName = `${LOGGER_EVENT}_${level}`;
+
+    this.system.events.emit(eventName, message, level);
+    this.system.events.emit(LOGGER_EVENT, message, level);
   }
 
 }

@@ -5,7 +5,7 @@ import IoItem from '../interfaces/IoItem';
 import LogPublisher from '../LogPublisher';
 import DriverBase from '../baseDrivers/DriverBase';
 import Api from '../Api';
-import CategorizedEvents from '../helpers/CategorizedEvents';
+import IndexedEventEmitter from '../helpers/IndexedEventEmitter';
 
 
 /**
@@ -17,7 +17,7 @@ export default abstract class EnvBase {
   get api(): Api {
     return this.system.api;
   }
-  get events(): CategorizedEvents {
+  get events(): IndexedEventEmitter {
     return this.system.events;
   }
   get log(): LogPublisher {
