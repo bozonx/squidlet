@@ -52,30 +52,19 @@ export default class ConsistentState {
   }
 
   async init() {
-    if (!this.initialize && !this.getter) throw new Error(`There aren't any getter or initialize callbacks`);
+    let getter: Getter;
 
-    let getter = this.getter;
+    if (this.initialize) {
+      getter = this.initialize;
+    }
+    else if (this.getter) {
+      getter = this.getter;
+    }
+    else {
+      throw new Error(`There aren't any getter or initialize callbacks`);
+    }
 
-    if (this.initialize) getter = this.initialize;
-
-    const result: Dictionary = await this.requestGetter(getter as Getter);
-
-    this.stateUpdater(result);
-  }
-
-  // TODO: REMOVE
-  private async requestGetter(getter: Getter): Promise<Dictionary> {
-    let result: Dictionary | undefined = undefined;
-
-    this.queue.request(READING_ID, async () => {
-      result = await getter();
-    });
-
-    await this.queue.waitJobFinished(READING_ID);
-
-    if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
-
-    return result;
+    await this.doInitialize(getter);
   }
 
   // TODO: test
@@ -192,6 +181,20 @@ export default class ConsistentState {
       // wait current saving
       await this.queue.waitJobFinished(WRITING_ID);
     }
+  }
+
+  private async doInitialize(getter: Getter): Promise<void> {
+    let result: Dictionary | undefined = undefined;
+
+    this.queue.request(READING_ID, async () => {
+      result = await getter();
+    });
+
+    await this.queue.waitJobFinished(READING_ID);
+
+    if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
+
+    this.stateUpdater(result);
   }
 
   private handleLoading = async () => {

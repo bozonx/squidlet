@@ -1,7 +1,7 @@
 ConsistentState = require('../../../system/helpers/ConsistentState').default;
 
 
-describe 'system.helpers.ConsistentState', ->
+describe.only 'system.helpers.ConsistentState', ->
   beforeEach ->
     @logError = sinon.spy()
     @stateGetterResult = {}
@@ -12,7 +12,14 @@ describe 'system.helpers.ConsistentState', ->
     @getterResult = {getterParam: 1}
     @getter = sinon.stub().returns(Promise.resolve(@getterResult))
     @setter = sinon.stub().returns(Promise.resolve())
-    @consistentState = new ConsistentState(@logError, @stateGetter, @stateUpdater, @initialize, @getter, @setter)
+    @consistentState = new ConsistentState(
+      @logError,
+      @stateGetter,
+      @stateUpdater,
+      @initialize,
+      @getter,
+      @setter
+    )
 
   it "init - no initialize and getter - error", ->
     @consistentState.initialize = undefined
@@ -21,24 +28,22 @@ describe 'system.helpers.ConsistentState', ->
     assert.isRejected(@consistentState.init())
 
   it "init - use initialize cb", ->
-    result = {param: 1}
-    @consistentState.getter = undefined
-    @consistentState.requestGetter = sinon.stub().returns(Promise.resolve(result))
+    @consistentState.initialize = () ->
+    @consistentState.doInitialize = sinon.stub().returns(Promise.resolve())
 
     await @consistentState.init()
 
-    sinon.assert.calledOnce(@consistentState.requestGetter)
-    sinon.assert.calledWith(@consistentState.requestGetter, @initialize)
-    sinon.assert.calledOnce(@stateUpdater)
-    sinon.assert.calledWith(@stateUpdater, result)
+    sinon.assert.calledOnce(@consistentState.doInitialize)
+    sinon.assert.calledWith(@consistentState.doInitialize, @consistentState.initialize)
 
   it "init - use getter", ->
     @consistentState.initialize = undefined
-    @consistentState.requestGetter = sinon.stub().returns(Promise.resolve({param: 1}))
+    @consistentState.getter = () ->
+    @consistentState.doInitialize = sinon.stub().returns(Promise.resolve())
 
     await @consistentState.init()
 
-    sinon.assert.calledWith(@consistentState.requestGetter, @getter)
+    sinon.assert.calledWith(@consistentState.doInitialize, @consistentState.getter)
 
   it "load", ->
     result = {param: 1}
