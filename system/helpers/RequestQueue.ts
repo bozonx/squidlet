@@ -285,7 +285,6 @@ export default class RequestQueue {
     this.queue.push(job);
   }
 
-  // TODO: test
   /**
    * Update cb of delayed job or add a new job to queue.
    */
@@ -300,7 +299,6 @@ export default class RequestQueue {
     this.queue[jobIndex][MODE_POSITION] = mode;
   }
 
-  // TODO: test
   /**
    * Start a new job if there isn't a current job and queue has some jobs.
    * It doesn't start a new job while current is in progress.
@@ -320,7 +318,6 @@ export default class RequestQueue {
     this.startCb(currentJob);
   }
 
-  // TODO: test
   private startCb(job: Job) {
     this.startJobEvents.emit(job[ID_POSITION]);
 
@@ -352,7 +349,6 @@ export default class RequestQueue {
     this.startNextJob();
   }
 
-  // TODO: test
   private handleCbFinished(err: Error | undefined, job: Job) {
     // do nothing if it was canceled
     if (job[CANCELED_POSITION]) return;
@@ -377,7 +373,6 @@ export default class RequestQueue {
     this.startNextJob();
   }
 
-  // TODO: test
   private recallJob(job: Job) {
     const recallCb: RequestCb | undefined = job[RECALL_CB_POSITION];
 
@@ -395,7 +390,6 @@ export default class RequestQueue {
     this.startCb(job);
   }
 
-  // TODO: test
   private finalizeCurrentJob() {
     clearTimeout(this.runningTimeout);
 

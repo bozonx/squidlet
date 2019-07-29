@@ -98,6 +98,24 @@ describe.only 'system.helpers.RequestQueue', ->
 
     assert.equal(@queue.currentJob[4], @cb2)
 
+  it "recall mode: call recall job", ->
+    @queue.request(@jobId1, @cb1, 'recall')
+    @queue.request(@jobId1, @cb2, 'recall')
+
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.notCalled(@cb2)
+    assert.deepEqual(@queue.getJobIds(), [@jobId1])
+
+    await @queue.waitJobFinished(@jobId1)
+
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.calledOnce(@cb2)
+    assert.deepEqual(@queue.getJobIds(), [@jobId1])
+
+    await @queue.waitJobFinished(@jobId1)
+
+    assert.deepEqual(@queue.getJobIds(), [])
+
   # TODO: test timeout
   # TODO: add cb witch throws an error
   # TODO: events
