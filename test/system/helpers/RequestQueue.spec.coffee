@@ -67,9 +67,38 @@ describe.only 'system.helpers.RequestQueue', ->
     assert.equal(resolvedJobId1, '0')
     assert.equal(resolvedJobId2, '1')
 
+  it "update job in queue with the same id", ->
+    @queue.request(@jobId1, () => Promise.resolve())
+    @queue.request(@jobId2, @cb1)
+    @queue.request(@jobId2, @cb2)
+
+    assert.equal(@queue.getQueueLength(), 1)
+    assert.equal(@queue.queue[0][1], @cb2)
+
+  it "default mode: refuse new jobs which is in progress with the same id", ->
+    @queue.request(@jobId1, @cb1)
+    @queue.request(@jobId1, @cb2)
+
+    assert.equal(@queue.getQueueLength(), 0)
+    assert.equal(@queue.currentJob[1], @cb1)
+
+  it "recall mode: set recallCb to which is in progress with the same id", ->
+    @queue.request(@jobId1, @cb1, 'recall')
+    @queue.request(@jobId1, @cb2, 'recall')
+
+    assert.equal(@queue.getQueueLength(), 0)
+    assert.isTrue(@queue.jobHasRecallCb(@jobId1))
+    assert.equal(@queue.currentJob[1], @cb1)
+    assert.equal(@queue.currentJob[4], @cb2)
+
+  it "recall mode: update recallCb to which is in progress with the same id", ->
+    @queue.request(@jobId1, (() => Promise.resolve()), 'recall')
+    @queue.request(@jobId1, @cb1, 'recall')
+    @queue.request(@jobId1, @cb2, 'recall')
+
+    assert.equal(@queue.currentJob[4], @cb2)
+
   # TODO: test timeout
   # TODO: add cb witch throws an error
   # TODO: events
-  # TODO: default mode
-  # TODO: recall mode
   # TODO: cancel

@@ -103,7 +103,6 @@ export default class RequestQueue {
     return this.getJobIds().includes(jobId);
   }
 
-  // TODO: test
   jobHasRecallCb(jobId: JobId): boolean {
     if (this.currentJob && this.currentJob[ID_POSITION] === jobId) {
       return Boolean(this.currentJob[RECALL_CB_POSITION]);
@@ -254,7 +253,6 @@ export default class RequestQueue {
     });
   }
 
-  // TODO: test
   private getJobIndex(jobId: JobId): number {
     return findIndex(this.queue, (item: Job) => item[ID_POSITION] === jobId) as number;
   }
@@ -324,8 +322,6 @@ export default class RequestQueue {
 
   // TODO: test
   private startCb(job: Job) {
-    console.log('---- emit', job[ID_POSITION])
-
     this.startJobEvents.emit(job[ID_POSITION]);
 
     this.runningTimeout = setTimeout(
