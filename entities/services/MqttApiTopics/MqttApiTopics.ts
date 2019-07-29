@@ -1,17 +1,25 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
 import {combineTopic} from 'system/lib/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import {TOPIC_SEPARATOR} from 'system/ApiTopics';
+
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
+import ApiTopicsLogic, {TOPIC_SEPARATOR} from './ApiTopicsLogic';
 
 
 export default class MqttApiTopics extends ServiceBase<MqttProps> {
+  get apiTopicsLogic(): ApiTopicsLogic {
+    return this._apiTopicsLogic as any;
+  }
+
+  private _apiTopicsLogic?: ApiTopicsLogic;
+
   private get mqtt(): Mqtt {
     return this.depsInstances.mqtt;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
+    this._apiTopicsLogic = new ApiTopicsLogic(this.env.system);
     this.depsInstances.mqtt = await getDriverDep('Mqtt')
       .getInstance(this.props);
   }
@@ -20,11 +28,15 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
     // listen to outcome messages and pass them to mqtt
-    this.env.system.apiTopics.onOutcome(this.handleOutcomeMessages);
+    this.apiTopicsLogic.onOutcome(this.handleOutcomeMessages);
   }
 
   protected devicesDidInit = async () => {
     await this.subscribeToDevices();
+  }
+
+  destroy = async () => {
+    await this.apiTopicsLogic.destroy();
   }
 
 
@@ -33,13 +45,13 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
     // skip not apiTopic's messages
-    if (!this.env.system.apiTopics.isSupportedTopic(topic)) return;
+    if (!this.apiTopicsLogic.isSupportedTopic(topic)) return;
 
     if (typeof data !== 'string') {
       throw new Error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
     }
 
-    await this.env.system.apiTopics.incomeMessage(topic, data);
+    await this.apiTopicsLogic.incomeMessage(topic, data);
   });
 
   /**

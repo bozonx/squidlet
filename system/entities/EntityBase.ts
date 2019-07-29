@@ -16,7 +16,7 @@ export default class EntityBase<Props = {}> {
   readonly className: string;
   readonly props: Props;
   // destroy method for entity
-  destroy?: () => void;
+  destroy?: () => Promise<void>;
 
   protected readonly env: EnvBase;
   // you can store there drivers instances if need

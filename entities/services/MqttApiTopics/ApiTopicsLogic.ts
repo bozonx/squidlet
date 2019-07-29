@@ -1,10 +1,11 @@
-import {splitFirstElement} from './lib/strings';
-import {combineTopic, parseValue} from './lib/helpers';
-import {Dictionary, JsonTypes} from './interfaces/Types';
-import {trim} from './lib/lodashLike';
-import System from './System';
-import {StateCategories} from './interfaces/States';
-import IndexedEvents from './lib/IndexedEvents';
+import {splitFirstElement} from 'system/lib/strings';
+import {combineTopic, parseValue} from 'system/lib/helpers';
+import {Dictionary, JsonTypes} from 'system/interfaces/Types';
+import {trim} from 'system/lib/lodashLike';
+import System from 'system/System';
+import {StateCategories} from 'system/interfaces/States';
+import IndexedEvents from 'system/lib/IndexedEvents';
+
 
 type TopicType = 'device' | 'api';
 type DeviceStateType = 'status' | 'config';
@@ -22,7 +23,7 @@ export const TOPIC_SEPARATOR = '/';
  * * publishWholeState - publish while device etc states
  * * blockIo true|false
  */
-export default class ApiTopics {
+export default class ApiTopicsLogic {
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
   private readonly system: System;
 
