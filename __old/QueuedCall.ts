@@ -7,9 +7,9 @@
  * But only the last function will be queued.
  * If there was an error - queue will be cleared.
  */
-import Promised from './Promised';
-import {mergeDeep} from './collections';
-import {isPlainObject} from './lodashLike';
+import Promised from '../system/helpers/Promised';
+import {mergeDeep} from '../system/helpers/collections';
+import {isPlainObject} from '../system/helpers/lodashLike';
 
 
 export type QueuedCb = (data?: {[index: string]: any}) => Promise<void>;

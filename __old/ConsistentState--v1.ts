@@ -1,7 +1,7 @@
-import Promised from './Promised';
+import Promised from '../system/helpers/Promised';
 import QueuedCall from './QueuedCall';
-import {mergeDeep} from './collections';
-import {Dictionary} from '../interfaces/Types';
+import {mergeDeep} from '../system/helpers/collections';
+import {Dictionary} from '../system/interfaces/Types';
 
 
 export type Initialize = () => Promise<Dictionary>;
