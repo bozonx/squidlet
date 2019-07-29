@@ -3,6 +3,9 @@ ConsistentState = require('../../../system/helpers/ConsistentState').default;
 
 describe.only 'system.helpers.ConsistentState', ->
   beforeEach ->
+    @cbPromise = (dataToResolve) => new Promise((resolve) =>
+      setTimeout((() -> resolve(dataToResolve)), 1)
+    )
     @stateObj = {}
     @logError = sinon.spy()
     @stateGetter = () => @stateObj
@@ -11,8 +14,8 @@ describe.only 'system.helpers.ConsistentState', ->
     @initializeResult = {initParam: 1}
     @initialize = () => Promise.resolve(@initializeResult)
     @getterResult = {getterParam: 1}
-    @getter = sinon.stub().returns(Promise.resolve(@getterResult))
-    @setter = sinon.stub().returns(Promise.resolve())
+    @getter = sinon.stub().returns(@cbPromise(@getterResult))
+    @setter = sinon.stub().returns(@cbPromise())
     @consistentState = new ConsistentState(
       @logError,
       @stateGetter,
@@ -69,15 +72,21 @@ describe.only 'system.helpers.ConsistentState', ->
     sinon.assert.notCalled(@consistentState.queue.request)
 
   it "write once", ->
-    data = {writeParam: 1}
+    @stateObj = {oldState: 1}
 
-    promise = await @consistentState.write(data)
+    promise = @consistentState.write({writeParam: 1})
 
-    assert.deepEqual(@consistentState.actualRemoteState, {})
+    assert.deepEqual(@consistentState.actualRemoteState, {oldState: 1})
     assert.deepEqual(@consistentState.paramsListToSave, ['writeParam'])
+    assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
 
     await promise
 
+    assert.isUndefined(@consistentState.actualRemoteState)
+    assert.isUndefined(@consistentState.paramsListToSave)
+    assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
+    sinon.assert.calledOnce(@setter)
+    sinon.assert.calledWith(@setter, {writeParam: 1})
 
   it "write - no setter - just update the local state", ->
     data = {writeParam: 1}

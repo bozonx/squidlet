@@ -97,7 +97,7 @@ export default class ConsistentState {
     else if (this.isWriting()) {
       this.stateUpdater(partialState);
 
-      // TODO: не обновлять то что пойдет на запись !!!!
+      // TODO: не обновлять то что пойдет на запись !!!! - use generateSafeNewState ????
       this.actualRemoteState = mergeDeep(partialState, this.actualRemoteState);
 
       return;
@@ -149,27 +149,29 @@ export default class ConsistentState {
     await this.doWriteRequest(partialData);
   }
 
-  // TODO: test
   private async doWriteRequest(partialData: Dictionary) {
+    // update local state on each call of write
+    this.stateUpdater(partialData);
+
     // do writing request any way if it is a new request or there is writing is in progress
     try {
-      this.queue.request(WRITING_ID, this.handleSaving, 'recall');
+      this.queue.request(WRITING_ID, this.handleWrite, 'recall');
     }
     catch (err) {
-      this.handleSaveError();
+      // TODO: test
+      this.handleWriteError();
 
       throw err;
     }
 
-    // update local state on each call of write
-    this.stateUpdater(partialData);
-
+    // TODO: !!! wrong - уточнить условие, иначе срабатывает на самый первый write
     // wait while passed data will be actually saved
     if (this.queue.isJobInProgress(WRITING_ID)) {
+      // TODO: test
       // wait current saving
       await this.queue.waitJobFinished(WRITING_ID);
       // wait the next recall. And don't wait if the current is fail
-      await this.queue.waitJobFinished(WRITING_ID);
+      //await this.queue.waitJobFinished(WRITING_ID);
     }
     else {
       // wait current saving
@@ -214,8 +216,7 @@ export default class ConsistentState {
     this.stateUpdater(newState);
   }
 
-  // TODO: test
-  private handleSaving = async () => {
+  private handleWrite = async () => {
     if (!this.setter) {
       throw new Error(`ConsistentState.write: no setter`);
     }
@@ -230,12 +231,14 @@ export default class ConsistentState {
       await this.setter(dataToSave);
     }
     catch (err) {
-      this.handleSaveError();
+      // TODO: test
+      this.handleWriteError();
 
       throw err;
     }
 
     if (this.queue.jobHasRecallCb(WRITING_ID)) {
+      // TODO: test
       // there is a next recall cb
       this.actualRemoteState = {
         ...this.actualRemoteState,
@@ -255,8 +258,11 @@ export default class ConsistentState {
     }
   }
 
-  // TODO: test
-  private handleSaveError() {
+  /**
+   * Restore previously actual state on write error.
+   */
+  private handleWriteError() {
+    // TODO: test
     if (!this.actualRemoteState) {
       throw new Error(`ConsistentState.write: no actualRemoteState`);
     }
