@@ -22,9 +22,10 @@ export default class ConsistentState {
   private readonly stateGetter: () => Dictionary;
   // updater of local state
   private readonly stateUpdater: (partialState: Dictionary) => void;
-  private readonly initialize?: Initialize;
-  private readonly getter?: Getter;
-  private readonly setter?: Setter;
+  protected initialize?: Initialize;
+  protected readonly getter?: Getter;
+  protected readonly setter?: Setter;
+
   private readonly queue: RequestQueue;
   // actual state on server before saving
   private actualRemoteState?: Dictionary;
@@ -75,7 +76,6 @@ export default class ConsistentState {
   }
 
 
-  // TODO: test
   isWriting(): boolean {
     return this.queue.getCurrentJobId() === WRITING_ID;
   }
@@ -205,7 +205,7 @@ export default class ConsistentState {
       return;
     }
 
-    // TODO: test - wait writing
+    // TODO: test
 
     // if reading was in progress when saving started - it needs to update actual server state
     // and carefully update the state.

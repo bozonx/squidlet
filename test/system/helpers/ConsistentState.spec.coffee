@@ -76,12 +76,14 @@ describe.only 'system.helpers.ConsistentState', ->
 
     promise = @consistentState.write({writeParam: 1})
 
+    assert.isTrue(@consistentState.isWriting())
     assert.deepEqual(@consistentState.actualRemoteState, {oldState: 1})
     assert.deepEqual(@consistentState.paramsListToSave, ['writeParam'])
     assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
 
     await promise
 
+    assert.isFalse(@consistentState.isWriting())
     assert.isUndefined(@consistentState.actualRemoteState)
     assert.isUndefined(@consistentState.paramsListToSave)
     assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
@@ -99,5 +101,7 @@ describe.only 'system.helpers.ConsistentState', ->
 
   #it "write - reading is in progress - wait reading promise", ->
 
+  # TODO: setIncomeState
   # TODO: test error loading
   # TODO: test error writing
+  # TODO: destroy

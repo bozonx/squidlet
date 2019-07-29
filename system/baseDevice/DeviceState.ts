@@ -13,15 +13,8 @@ export type Schema = {[index: string]: SchemaElement};
  * It adds layer where state can be in memory or linked to remote device via setter and getter.
  * Also state is checked corresponding its schema.
  */
-export default class DeviceState {
-  private readonly logError: (msg: string) => void;
+export default class DeviceState extends ConsistentState {
   private readonly schema: Schema;
-  private readonly stateGetter: () => Dictionary;
-  private readonly stateUpdater: (partialState: Dictionary) => void;
-  private readonly initialize?: Initialize;
-  private readonly getter?: Getter;
-  private readonly setter?: Setter;
-  private readonly consistentState: ConsistentState;
 
 
   constructor(
@@ -34,79 +27,55 @@ export default class DeviceState {
     getter?: Getter,
     setter?: Setter,
   ) {
-    this.logError = logError;
-    this.schema = schema;
-    this.stateGetter = stateGetter;
-    this.stateUpdater = stateUpdater;
-    this.initialize = initialize;
-    this.getter = getter;
-    this.setter = setter;
-
-    this.consistentState = new ConsistentState(
-      this.logError,
-      this.stateGetter,
-      this.stateUpdater,
+    super(
+      logError,
+      stateGetter,
+      stateUpdater,
       jobTimeoutSec,
-      this.initialize,
-      this.getter,
-      this.setter,
+      initialize,
+      getter,
+      setter,
     );
+
+    this.schema = schema;
   }
 
+  // TODO: test
   async init() {
     if (!this.getter && !this.initialize) {
-      const initState = collectPropsDefaults(this.schema);
-
-      this.stateUpdater(initState);
+      // TODO: job может выполниться мгновенно!
+      this.initialize = async (): Promise<Dictionary> => {
+        return collectPropsDefaults(this.schema);
+      };
 
       return;
     }
 
-    await this.consistentState.init();
-
-    this.validateDict(
-      this.consistentState.getState(),
-      `Invalid device state on init: "${JSON.stringify(this.consistentState.getState())}"`
-    );
-  }
-
-  destroy() {
-    this.consistentState.destroy();
-  }
-
-
-  isReading(): boolean {
-    return this.consistentState.isReading();
-  }
-
-  isWriting(): boolean {
-    return this.consistentState.isWriting();
-  }
-
-  getState(): Dictionary {
-    return this.consistentState.getState();
-  }
-
-  setIncomeState(partialState: Dictionary) {
-    this.consistentState.setIncomeState(partialState);
-  }
-
-  /**
-   * Load whole state. After that you can get the actual state via getState()
-   */
-  async load(): Promise<void> {
-    if (!this.getter || this.isWriting()) return;
-
-    await this.consistentState.load();
+    await super.init();
 
     this.validateDict(
       this.getState(),
-      `Invalid device state readAll: "${JSON.stringify(this.consistentState.getState())}"`
+      `Invalid device state on init: "${JSON.stringify(this.getState())}"`
     );
-
-    return;
   }
 
+  // TODO: test
+  /**
+   * Load whole state and validate it. After that you can get the actual state via getState()
+   */
+  async load(): Promise<void> {
+    await super.load();
+
+    this.validateDict(
+      this.getState(),
+      `Invalid device state on load: "${JSON.stringify(this.getState())}"`
+    );
+  }
+
+  // TODO: test
+  /**
+   * Validate data which will be saved and save it.
+   */
   async write(partialData: Dictionary): Promise<void> {
     if (isEmpty(partialData)) return;
 
@@ -115,15 +84,11 @@ export default class DeviceState {
       `Invalid device state to write: "${JSON.stringify(partialData)}"`
     );
 
-    // just update current state and exit method
-    if (!this.setter) {
-      return this.stateUpdater(partialData);
-    }
-
-    return this.consistentState.write(partialData);
+    return super.write(partialData);
   }
 
 
+  // TODO: test
   private validateDict(dict: {[index: string]: any}, errorMsg: string) {
     let validateError: string | undefined;
 
@@ -140,14 +105,15 @@ export default class DeviceState {
     }
   }
 
-  // private validateParam(paramName: string, value: any, errorMsg: string) {
-  //   const validateError: string | undefined = validateParam(this.schema, paramName, value);
-  //
-  //   if (validateError) {
-  //     const completeErrMsg = `${errorMsg}: ${validateError}`;
-  //
-  //     throw new Error(completeErrMsg);
-  //   }
-  // }
-
 }
+
+
+// private validateParam(paramName: string, value: any, errorMsg: string) {
+//   const validateError: string | undefined = validateParam(this.schema, paramName, value);
+//
+//   if (validateError) {
+//     const completeErrMsg = `${errorMsg}: ${validateError}`;
+//
+//     throw new Error(completeErrMsg);
+//   }
+// }
