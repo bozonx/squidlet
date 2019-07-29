@@ -1,5 +1,5 @@
 export default class Promised<T = any> {
-  get promise() {
+  get promise(): Promise<T> {
     return this._promise;
   }
 

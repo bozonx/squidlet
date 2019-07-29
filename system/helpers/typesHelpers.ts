@@ -1,10 +1,10 @@
 import {trim} from './lodashLike';
+import {Primitives} from '../interfaces/Types';
 
 
 export interface ParsedType {
   types: string[];
-  // TODO: use Primitives
-  constants: (string | number | boolean | null | undefined)[];
+  constants: Primitives[];
 }
 
 
@@ -23,7 +23,7 @@ export const basicTypes: string[] = [
 /**
  * Read type and decide is it type or constant
  */
-export function parseType(type: string | number | boolean | undefined): ParsedType {
+export function parseType(type: Primitives): ParsedType {
   if (typeof type === 'undefined') throw new  Error(`Type is required`);
   else if (
     (typeof type !== 'string' && typeof type !== 'number' && typeof type !== 'boolean')
