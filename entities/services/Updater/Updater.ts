@@ -1,5 +1,4 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import topics from 'system/dict/topics';
 import {ManifestsTypeName} from 'system/interfaces/ManifestTypes';
 
 

@@ -4,7 +4,6 @@ import DriversManager from './entities/DriversManager';
 import ServicesManager from './entities/ServicesManager';
 import initializationConfig from './config/initializationConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
-import topics from './dict/topics';
 import EnvSet from './entities/EnvSet';
 import {mergeDeep} from './helpers/collections';
 import systemConfig from './config/systemConfig';
@@ -17,6 +16,7 @@ import State from './State';
 import Api from './Api';
 import ApiTopics from './ApiTopics';
 import IndexedEventEmitter from './helpers/IndexedEventEmitter';
+import {SystemEvents} from './dict/systemEvents';
 
 
 // TODO: remove
@@ -80,7 +80,7 @@ export default class System {
 
   destroy = async () => {
     this.log.info('destroying...');
-    this.riseEvent(topics.system.beforeDestroy);
+    this.riseEvent(SystemEvents.beforeDestroy);
     await this.devicesManager.destroy();
     await this.servicesManager.destroy();
     await this.driversManager.destroy();
@@ -106,16 +106,16 @@ export default class System {
 
     console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();
-    this.riseEvent(topics.system.systemDriversInitialized);
+    this.riseEvent(SystemEvents.systemDriversInitialized);
 
     console.info(`---> Initializing system services`);
     await this.servicesManager.initSystemServices();
-    this.riseEvent(topics.system.systemServicesInitialized);
+    this.riseEvent(SystemEvents.systemServicesInitialized);
 
     await this.initTopLayer();
 
     this._isAppInitialized = true;
-    this.riseEvent(topics.system.appInitialized);
+    this.riseEvent(SystemEvents.appInitialized);
 
     // remove initialization config
     delete this.initializationConfig;
@@ -131,7 +131,7 @@ export default class System {
       return -1;
     }
 
-    return this.events.once(categories.system, topics.system.devicesManagerInitialized, cb);
+    return this.events.once(SystemEvents.devicesInitialized, cb);
   }
 
   onAppInit(cb: () => void): number {
@@ -142,7 +142,7 @@ export default class System {
       return -1;
     }
 
-    return this.events.once(categories.system, topics.system.appInitialized, cb);
+    return this.events.once(SystemEvents.appInitialized, cb);
   }
 
   /**
@@ -181,11 +181,11 @@ export default class System {
     console.info(`---> Initializing devices`);
     await this.devicesManager.init();
     this._isDevicesInitialized = true;
-    this.riseEvent(topics.system.devicesManagerInitialized);
+    this.riseEvent(SystemEvents.devicesInitialized);
   }
 
-  private riseEvent(eventName: string) {
-    this.events.emit(categories.system, eventName);
+  private riseEvent(eventName: number) {
+    this.events.emit(eventName);
   }
 
 }

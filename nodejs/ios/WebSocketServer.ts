@@ -140,6 +140,9 @@ export default class WebSocketServer implements WebSocketServerIo {
     }
 
     const serverItem = this.getServerItem(serverId);
+
+    console.log(11111111, connectionId, serverItem[SERVER_POSITIONS.connections])
+
     const socket = serverItem[SERVER_POSITIONS.connections][Number(connectionId)];
 
     await callPromised(socket.send, data);
