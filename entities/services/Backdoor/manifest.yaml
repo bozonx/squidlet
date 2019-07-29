@@ -1,9 +1,6 @@
 name: Backdoor
 main: Backdoor.ts
 
-drivers:
-  - WsServerSessions
-
 services:
   - WsApi
 

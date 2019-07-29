@@ -6,8 +6,8 @@ import IndexedEvents from 'system/helpers/IndexedEvents';
 import {Primitives} from 'system/interfaces/Types';
 import {mergeDeep} from 'system/helpers/collections';
 import {parseCookie, stringifyCookie} from 'system/helpers/strings';
+import Promised from 'system/helpers/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
-import Promised from '../../../system/helpers/Promised';
 
 
 export interface WsClientLogicProps {
