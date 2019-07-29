@@ -135,7 +135,6 @@ export default class RequestQueue {
     return this.getWaitJobPromise(this.endJobEvents, this.currentJob[ID_POSITION]);
   }
 
-  // TODO: test
   /**
    * Return the promise which will be fulfilled before the job is get started.
    * You should check that the queue has this job by calling `hasJob(jobId)`.
@@ -147,7 +146,16 @@ export default class RequestQueue {
       throw new Error(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
-    return this.getWaitJobPromise(this.startJobEvents, jobId);
+    return new Promise<void>((resolve) => {
+      const handlerIndex = this.startJobEvents.addListener(
+        (finishedJobId: JobId) => {
+          if (finishedJobId !== jobId) return;
+
+          this.startJobEvents.removeListener(handlerIndex);
+          resolve();
+        }
+      );
+    });
   }
 
   /**
@@ -316,6 +324,8 @@ export default class RequestQueue {
 
   // TODO: test
   private startCb(job: Job) {
+    console.log('---- emit', job[ID_POSITION])
+
     this.startJobEvents.emit(job[ID_POSITION]);
 
     this.runningTimeout = setTimeout(

@@ -48,6 +48,18 @@ describe.only 'system.helpers.RequestQueue', ->
     assert.isFalse(@queue.hasJob(@jobId1))
     assert.isFalse(@queue.hasJob(@jobId2))
 
+  it "waitJobStart", ->
+    @queue.request(@jobId1, @cb1)
+    @queue.request(@jobId2, @cb2)
+
+    assert.isTrue(@queue.isJobInProgress(@jobId1))
+
+    console.log('---- before wait')
+
+    await @queue.waitJobStart(@jobId2)
+
+    assert.isTrue(@queue.isJobInProgress(@jobId2))
+
   it "auto generated ids", ->
     resolvedJobId1 = @queue.request(undefined, @cb1)
     resolvedJobId2 = @queue.request(undefined, @cb2)
