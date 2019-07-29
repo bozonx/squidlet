@@ -11,7 +11,7 @@ describe.only 'system.helpers.ConsistentState', ->
     @initializeResult = {initParam: 1}
     @initialize = () => Promise.resolve(@initializeResult)
     @getterResult = {getterParam: 1}
-    @getter = () => Promise.resolve(@getterResult)
+    @getter = sinon.stub().returns(Promise.resolve(@getterResult))
     @setter = sinon.stub().returns(Promise.resolve())
     @consistentState = new ConsistentState(
       @logError,
@@ -30,22 +30,18 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.isRejected(@consistentState.init())
 
   it "init - use initialize cb", ->
-    @consistentState.doInitialize = sinon.stub().returns(Promise.resolve())
-
     await @consistentState.init()
 
-    sinon.assert.calledOnce(@consistentState.doInitialize)
-    sinon.assert.calledWith(@consistentState.doInitialize, @initialize)
+    assert.deepEqual(@consistentState.getState(), @initializeResult)
 
   it "init - use getter", ->
     @consistentState.initialize = undefined
-    @consistentState.doInitialize = sinon.stub().returns(Promise.resolve())
 
     await @consistentState.init()
 
-    sinon.assert.calledWith(@consistentState.doInitialize, @getter)
+    assert.deepEqual(@consistentState.getState(), @getterResult)
 
-  it "load", ->
+  it "load once", ->
     promise = @consistentState.load()
 
     assert.isTrue(@consistentState.isReading())
@@ -55,10 +51,14 @@ describe.only 'system.helpers.ConsistentState', ->
 
     assert.deepEqual(@consistentState.getState(), @getterResult)
 
-#    sinon.assert.calledOnce(@consistentState.requestGetter)
-#    sinon.assert.calledWith(@consistentState.requestGetter, @getter)
-#    sinon.assert.calledOnce(@stateUpdater)
-#    sinon.assert.calledWith(@stateUpdater, result)
+  it "load twice - don't do two request", ->
+    promise1 =  @consistentState.load()
+    promise2 =  @consistentState.load()
+
+    await promise1
+    await promise2
+
+    sinon.assert.calledOnce(@getter)
 
   it "load - no getter - do nothing", ->
 #    @consistentState.getter = undefined

@@ -84,7 +84,6 @@ export default class ConsistentState {
     return this.queue.getCurrentJobId() === READING_ID;
   }
 
-  // TODO: test
   getState(): Dictionary {
     return this.stateGetter();
   }
@@ -119,9 +118,6 @@ export default class ConsistentState {
    * * If reading is in progress it will return promise of current reading process
    */
   async load(): Promise<void> {
-
-    // TODO: test
-
     if (!this.getter) return;
 
     this.queue.request(READING_ID, this.handleLoading);
@@ -183,8 +179,6 @@ export default class ConsistentState {
     }
   }
 
-  // TODO: test
-  // TODO: maybe use handleLoading
   private async doInitialize(getter: Getter): Promise<void> {
     let result: Dictionary | undefined = undefined;
 
@@ -199,22 +193,19 @@ export default class ConsistentState {
     this.stateUpdater(result);
   }
 
-  // TODO: test - wait writing
   private handleLoading = async () => {
     if (!this.getter) throw new Error(`No getter`);
 
     const result: Dictionary = await this.getter();
 
-    console.log(1111111, result)
-
     // just update state in ordinary mode
     if (!this.actualRemoteState) {
       this.stateUpdater(result);
 
-      console.log(222222222)
-
       return;
     }
+
+    // TODO: test - wait writing
 
     // if reading was in progress when saving started - it needs to update actual server state
     // and carefully update the state.
