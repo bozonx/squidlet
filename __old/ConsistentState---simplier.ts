@@ -1,7 +1,7 @@
-import {concatUniqStrArrays, mergeDeep} from './collections';
-import {Dictionary} from '../interfaces/Types';
-import RequestQueue, {Mode} from './RequestQueue';
-import {cloneDeep, pick} from './lodashLike';
+import {concatUniqStrArrays, mergeDeep} from '../system/helpers/collections';
+import {Dictionary} from '../system/interfaces/Types';
+import RequestQueue, {Mode} from '../system/helpers/RequestQueue';
+import {cloneDeep, pick} from '../system/helpers/lodashLike';
 
 
 export type Initialize = () => Promise<Dictionary>;
