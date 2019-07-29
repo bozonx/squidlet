@@ -80,7 +80,6 @@ export default class ConsistentState {
     return this.queue.getCurrentJobId() === WRITING_ID;
   }
 
-  // TODO: test
   isReading(): boolean {
     return this.queue.getCurrentJobId() === READING_ID;
   }
@@ -139,6 +138,7 @@ export default class ConsistentState {
    * * On error it will return state which was before saving started.
    */
   async write(partialData: Dictionary): Promise<void> {
+    // TODO: test
     // if mode without setter - do noting else updating local state
     if (!this.setter) return this.stateUpdater(partialData);
 
@@ -183,6 +183,8 @@ export default class ConsistentState {
     }
   }
 
+  // TODO: test
+  // TODO: maybe use handleLoading
   private async doInitialize(getter: Getter): Promise<void> {
     let result: Dictionary | undefined = undefined;
 
@@ -197,13 +199,22 @@ export default class ConsistentState {
     this.stateUpdater(result);
   }
 
+  // TODO: test - wait writing
   private handleLoading = async () => {
     if (!this.getter) throw new Error(`No getter`);
 
     const result: Dictionary = await this.getter();
 
+    console.log(1111111, result)
+
     // just update state in ordinary mode
-    if (!this.actualRemoteState) return this.stateUpdater(result);
+    if (!this.actualRemoteState) {
+      this.stateUpdater(result);
+
+      console.log(222222222)
+
+      return;
+    }
 
     // if reading was in progress when saving started - it needs to update actual server state
     // and carefully update the state.
@@ -214,6 +225,7 @@ export default class ConsistentState {
     this.stateUpdater(newState);
   }
 
+  // TODO: test
   private handleSaving = async () => {
     if (!this.setter) {
       throw new Error(`ConsistentState.write: no setter`);
@@ -261,6 +273,7 @@ export default class ConsistentState {
     }
   }
 
+  // TODO: test
   private generateSafeNewState(mostActualState: Dictionary): Dictionary {
     // get key witch won't be saved
     const keysToUpdate: string[] = difference(Object.keys(mostActualState), this.paramsListToSave || []);

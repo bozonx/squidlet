@@ -3,19 +3,21 @@ ConsistentState = require('../../../system/helpers/ConsistentState').default;
 
 describe.only 'system.helpers.ConsistentState', ->
   beforeEach ->
+    @stateObj = {}
     @logError = sinon.spy()
-    @stateGetterResult = {}
-    @stateGetter = sinon.stub().returns(@stateGetterResult)
-    @stateUpdater = sinon.spy()
+    @stateGetter = () => @stateObj
+    @stateUpdater = (partialState) =>
+      @stateObj = {@stateObj..., partialState...}
     @initializeResult = {initParam: 1}
-    @initialize = sinon.stub().returns(Promise.resolve(@initializeResult))
+    @initialize = () => Promise.resolve(@initializeResult)
     @getterResult = {getterParam: 1}
-    @getter = sinon.stub().returns(Promise.resolve(@getterResult))
+    @getter = () => Promise.resolve(@getterResult)
     @setter = sinon.stub().returns(Promise.resolve())
     @consistentState = new ConsistentState(
       @logError,
       @stateGetter,
       @stateUpdater,
+      undefined,
       @initialize,
       @getter,
       @setter
@@ -28,51 +30,53 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.isRejected(@consistentState.init())
 
   it "init - use initialize cb", ->
-    @consistentState.initialize = () ->
     @consistentState.doInitialize = sinon.stub().returns(Promise.resolve())
 
     await @consistentState.init()
 
     sinon.assert.calledOnce(@consistentState.doInitialize)
-    sinon.assert.calledWith(@consistentState.doInitialize, @consistentState.initialize)
+    sinon.assert.calledWith(@consistentState.doInitialize, @initialize)
 
   it "init - use getter", ->
     @consistentState.initialize = undefined
-    @consistentState.getter = () ->
     @consistentState.doInitialize = sinon.stub().returns(Promise.resolve())
 
     await @consistentState.init()
 
-    sinon.assert.calledWith(@consistentState.doInitialize, @consistentState.getter)
+    sinon.assert.calledWith(@consistentState.doInitialize, @getter)
 
   it "load", ->
-    result = {param: 1}
-    @consistentState.requestGetter = sinon.stub().returns(Promise.resolve(result))
+    promise = @consistentState.load()
 
-    await @consistentState.load()
+    assert.isTrue(@consistentState.isReading())
+    assert.deepEqual(@consistentState.getState(), {})
 
-    sinon.assert.calledOnce(@consistentState.requestGetter)
-    sinon.assert.calledWith(@consistentState.requestGetter, @getter)
-    sinon.assert.calledOnce(@stateUpdater)
-    sinon.assert.calledWith(@stateUpdater, result)
+    await promise
+
+    assert.deepEqual(@consistentState.getState(), @getterResult)
+
+#    sinon.assert.calledOnce(@consistentState.requestGetter)
+#    sinon.assert.calledWith(@consistentState.requestGetter, @getter)
+#    sinon.assert.calledOnce(@stateUpdater)
+#    sinon.assert.calledWith(@stateUpdater, result)
 
   it "load - no getter - do nothing", ->
-    @consistentState.getter = undefined
-    @consistentState.requestGetter = sinon.spy()
-
-    await @consistentState.load()
-
-    sinon.assert.notCalled(@consistentState.requestGetter)
-    sinon.assert.notCalled(@stateUpdater)
+#    @consistentState.getter = undefined
+#    @consistentState.requestGetter = sinon.spy()
+#
+#    await @consistentState.load()
+#
+#    sinon.assert.notCalled(@consistentState.requestGetter)
+#    sinon.assert.notCalled(@stateUpdater)
 
   it "load - when there is a reading process - return it's promise", ->
-    @consistentState.readingPromise = Promise.resolve()
-    @consistentState.requestGetter = sinon.spy()
-
-    await @consistentState.load()
-
-    sinon.assert.notCalled(@consistentState.requestGetter)
-    sinon.assert.notCalled(@stateUpdater)
+#    @consistentState.readingPromise = Promise.resolve()
+#    @consistentState.requestGetter = sinon.spy()
+#
+#    await @consistentState.load()
+#
+#    sinon.assert.notCalled(@consistentState.requestGetter)
+#    sinon.assert.notCalled(@stateUpdater)
 
   it "write", ->
 
