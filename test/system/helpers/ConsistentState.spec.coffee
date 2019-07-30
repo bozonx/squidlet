@@ -99,7 +99,46 @@ describe.only 'system.helpers.ConsistentState', ->
 
     sinon.assert.notCalled(@consistentState.queue.request)
 
-  #it "write - reading is in progress - wait reading promise", ->
+  it "add writing to queue while reading is in progress - wait while reading is finished", ->
+    loadPromise = @consistentState.load()
+    writePromise = @consistentState.write({writeParam: 1})
+
+    assert.isTrue(@consistentState.isReading())
+    assert.isFalse(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {writeParam: 1})
+
+    await loadPromise
+
+    assert.isFalse(@consistentState.isReading())
+    assert.isTrue(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+
+    await writePromise
+
+    assert.isFalse(@consistentState.isReading())
+    assert.isFalse(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+
+  it "add reading to queue while writing is in progress - wait while reading is finished", ->
+    writePromise = @consistentState.write({writeParam: 1})
+    loadPromise = @consistentState.load()
+
+    assert.isFalse(@consistentState.isReading())
+    assert.isTrue(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {writeParam: 1})
+
+    await writePromise
+
+    assert.isTrue(@consistentState.isReading())
+    assert.isFalse(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {writeParam: 1})
+
+    await loadPromise
+
+    assert.isFalse(@consistentState.isReading())
+    assert.isFalse(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+
 
   # TODO: setIncomeState
   # TODO: test error loading
