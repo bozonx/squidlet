@@ -52,7 +52,7 @@ export default class ConsistentState {
     this.queue = new RequestQueue(this.logError, jobTimeoutSec);
   }
 
-  async init() {
+  init(): Promise<void> {
     let getter: Getter;
 
     if (this.initialize) {
@@ -65,7 +65,7 @@ export default class ConsistentState {
       throw new Error(`There aren't any getter or initialize callbacks`);
     }
 
-    await this.doInitialize(getter);
+    return this.doInitialize(getter);
   }
 
   // TODO: test
@@ -179,20 +179,18 @@ export default class ConsistentState {
     }
   }
 
-  private doInitialize(getter: Getter): Promise<void> {
+  private async doInitialize(getter: Getter): Promise<void> {
     let result: Dictionary | undefined = undefined;
 
     this.queue.request(READING_ID, async () => {
       result = await getter();
     });
 
-    const promise: Promise<void> = this.queue.waitJobFinished(READING_ID);
+    await this.queue.waitJobFinished(READING_ID);
 
     if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
 
     this.stateUpdater(result);
-
-    return promise;
   }
 
   private handleLoading = async () => {
