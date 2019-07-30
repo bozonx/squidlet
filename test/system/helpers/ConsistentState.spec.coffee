@@ -30,7 +30,7 @@ describe.only 'system.helpers.ConsistentState', ->
     @consistentState.initialize = undefined
     @consistentState.getter = undefined
 
-    assert.isRejected(@consistentState.init())
+    assert.throws(() => @consistentState.init())
 
   it "init - use initialize cb", ->
     await @consistentState.init()
@@ -139,6 +139,33 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.isFalse(@consistentState.isWriting())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
 
+  it "add writing several times while the first writing is in progress - it will combine stat", ->
+    writePromise1 = @consistentState.write({param1: 1})
+    @consistentState.write({param2: 2})
+    writePromise3 = @consistentState.write({param2: 3, param3: 3})
+
+    assert.isTrue(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
+    sinon.assert.calledOnce(@setter)
+    sinon.assert.calledWith(@setter, {param1: 1})
+    assert.deepEqual(@consistentState.actualRemoteState, {});
+    assert.deepEqual(@consistentState.paramsListToSave, ['param1', 'param2', 'param3']);
+
+    await writePromise1
+
+    assert.isTrue(@consistentState.isWriting())
+    sinon.assert.calledTwice(@setter)
+    sinon.assert.calledWith(@setter.getCall(1), {param1: 1, param2: 3, param3: 3})
+    assert.deepEqual(@consistentState.actualRemoteState, {param1: 1});
+    assert.deepEqual(@consistentState.paramsListToSave, ['param2', 'param3']);
+
+    await writePromise3
+
+    assert.isFalse(@consistentState.isWriting())
+    sinon.assert.calledTwice(@setter)
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
+    assert.isUndefined(@consistentState.actualRemoteState);
+    assert.isUndefined(@consistentState.paramsListToSave);
 
   # TODO: setIncomeState
   # TODO: test error loading
