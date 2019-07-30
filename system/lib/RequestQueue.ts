@@ -159,6 +159,9 @@ export default class RequestQueue {
   /**
    * Return the promise which will be fulfilled when the job is finished.
    * You should check that the queue has this job by calling `hasJob(jobId)`.
+   * WARNING! If you use it to wait for job finished and the next job started you should not to use async
+   * functions and return from your function exactly this promise otherwise it will be fulfilled
+   * not exactly at time when job actually get finished.
    */
   waitJobFinished(jobId: JobId): Promise<void> {
     if (!this.hasJob(jobId)) {
@@ -236,18 +239,24 @@ export default class RequestQueue {
   }
 
   private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
+    if (typeof jobId !== 'string') {
+      throw new Error(`RequestQueue.getWaitJobPromise: JobId has to be a string`);
+    }
+
     return new Promise<void>((resolve, reject) => {
-      const handlerIndex = events.addListener(
-        (error: string | undefined, finishedJobId: JobId) => {
-          if (finishedJobId !== jobId) return;
+      let handlerIndex: number;
 
-          events.removeListener(handlerIndex);
+      const cb = (error: string | undefined, finishedJobId: JobId) => {
+        if (finishedJobId !== jobId) return;
 
-          if (error) return reject(error);
+        events.removeListener(handlerIndex);
 
-          resolve();
-        }
-      );
+        if (error) return reject(error);
+
+        resolve();
+      };
+
+      handlerIndex = events.addListener(cb);
     });
   }
 
@@ -299,7 +308,7 @@ export default class RequestQueue {
    * Start a new job if there isn't a current job and queue has some jobs.
    * It doesn't start a new job while current is in progress.
    */
-  private startNextJob() {
+  private startNextJob = () => {
     // do nothing if there is current job or no one in queue
     if (this.currentJob || !this.queue.length) return;
 

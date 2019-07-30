@@ -117,12 +117,12 @@ export default class ConsistentState {
    * * If there isn't any getter - it will do nothing
    * * If reading is in progress it will return promise of current reading process
    */
-  async load(): Promise<void> {
-    if (!this.getter) return;
+  load(): Promise<void> {
+    if (!this.getter) return Promise.resolve();
 
     this.queue.request(READING_ID, this.handleLoading);
 
-    await this.queue.waitJobFinished(READING_ID);
+    return this.queue.waitJobFinished(READING_ID);
   }
 
   /**
@@ -146,10 +146,10 @@ export default class ConsistentState {
     // collect list of params which will be actually written
     this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
 
-    await this.doWriteRequest(partialData);
+    return this.doWriteRequest(partialData);
   }
 
-  private async doWriteRequest(partialData: Dictionary) {
+  private doWriteRequest(partialData: Dictionary): Promise<void> {
     // update local state on each call of write
     this.stateUpdater(partialData);
 
@@ -169,28 +169,30 @@ export default class ConsistentState {
     if (this.queue.isJobInProgress(WRITING_ID)) {
       // TODO: test
       // wait current saving
-      await this.queue.waitJobFinished(WRITING_ID);
+      return this.queue.waitJobFinished(WRITING_ID);
       // wait the next recall. And don't wait if the current is fail
       //await this.queue.waitJobFinished(WRITING_ID);
     }
     else {
       // wait current saving
-      await this.queue.waitJobFinished(WRITING_ID);
+      return this.queue.waitJobFinished(WRITING_ID);
     }
   }
 
-  private async doInitialize(getter: Getter): Promise<void> {
+  private doInitialize(getter: Getter): Promise<void> {
     let result: Dictionary | undefined = undefined;
 
     this.queue.request(READING_ID, async () => {
       result = await getter();
     });
 
-    await this.queue.waitJobFinished(READING_ID);
+    const promise: Promise<void> = this.queue.waitJobFinished(READING_ID);
 
     if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
 
     this.stateUpdater(result);
+
+    return promise;
   }
 
   private handleLoading = async () => {
