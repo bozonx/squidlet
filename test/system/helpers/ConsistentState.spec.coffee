@@ -112,6 +112,7 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.isFalse(@consistentState.isReading())
     assert.isTrue(@consistentState.isWriting())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+    assert.deepEqual(@consistentState.actualRemoteState, {getterParam: 1});
 
     await writePromise
 
@@ -167,7 +168,47 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.isUndefined(@consistentState.actualRemoteState);
     assert.isUndefined(@consistentState.paramsListToSave);
 
+  it "add writing several times while the reading is in progress - it will combine state", ->
+    loadPromise = @consistentState.load()
+    @consistentState.write({param1: 1})
+    writePromise2 = @consistentState.write({param2: 2})
+
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
+    sinon.assert.notCalled(@setter)
+
+    await loadPromise
+
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: 1, param2: 2})
+
+    await writePromise2
+
+    sinon.assert.calledOnce(@setter)
+    sinon.assert.calledWith(@setter, {param1: 1, param2: 2})
+
+  it "clear state on error while writing - restore state", ->
+    @consistentState.setter = () => Promise.reject('err')
+
+    loadPromise = @consistentState.load()
+    @consistentState.write({param1: 1})
+    writePromise2 = @consistentState.write({param2: 2})
+
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
+
+    await loadPromise
+
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: 1, param2: 2})
+
+    try
+      await writePromise2
+    catch err
+      assert.deepEqual(@consistentState.getState(), {getterParam: 1})
+      assert.isUndefined(@consistentState.actualRemoteState);
+      assert.isUndefined(@consistentState.paramsListToSave);
+
+      return
+
+    throw new Error('Setter has to be rejected');
+
   # TODO: setIncomeState
   # TODO: test error loading
-  # TODO: test error writing
   # TODO: destroy

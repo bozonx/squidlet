@@ -205,8 +205,6 @@ export default class ConsistentState {
       return;
     }
 
-    // TODO: test
-
     // if reading was in progress when saving started - it needs to update actual server state
     // and carefully update the state.
     this.actualRemoteState = result;
@@ -231,7 +229,6 @@ export default class ConsistentState {
       await this.setter(dataToSave);
     }
     catch (err) {
-      // TODO: test
       this.handleWriteError();
 
       throw err;
@@ -263,11 +260,11 @@ export default class ConsistentState {
    * Restore previously actual state on write error.
    */
   private handleWriteError() {
-    // TODO: test
     if (!this.actualRemoteState) {
       throw new Error(`ConsistentState.write: no actualRemoteState`);
     }
 
+    // TODO: должны быть undefined новые параметры, которые сохраняются
     this.stateUpdater(this.actualRemoteState);
 
     delete this.actualRemoteState;
