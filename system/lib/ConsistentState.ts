@@ -260,15 +260,33 @@ export default class ConsistentState {
    * Restore previously actual state on write error.
    */
   private handleWriteError() {
-    if (!this.actualRemoteState) {
-      throw new Error(`ConsistentState.write: no actualRemoteState`);
-    }
-
-    // TODO: должны быть undefined новые параметры, которые сохраняются
-    this.stateUpdater(this.actualRemoteState);
+    this.stateUpdater(this.restorePreviousState());
 
     delete this.actualRemoteState;
     delete this.paramsListToSave;
+  }
+
+  /**
+   * Make undefined that keys which weren't before string writing
+   */
+  private restorePreviousState(): Dictionary {
+    if (!this.actualRemoteState) {
+      throw new Error(`ConsistentState.handleWriteError: no actualRemoteState`);
+    }
+    else if (!this.paramsListToSave) {
+      throw new Error(`ConsistentState.handleWriteError: no paramsListToSave`);
+    }
+
+    const newParams: Dictionary = {};
+
+    for (let paramName of difference(this.paramsListToSave, Object.keys(this.actualRemoteState))) {
+      newParams[paramName] = undefined;
+    }
+
+    return {
+      ...this.actualRemoteState,
+      ...newParams
+    };
   }
 
   // TODO: test

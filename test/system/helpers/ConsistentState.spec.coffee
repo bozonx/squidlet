@@ -201,7 +201,7 @@ describe.only 'system.helpers.ConsistentState', ->
     try
       await writePromise2
     catch err
-      assert.deepEqual(@consistentState.getState(), {getterParam: 1})
+      assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: undefined, param2: undefined})
       assert.isUndefined(@consistentState.actualRemoteState);
       assert.isUndefined(@consistentState.paramsListToSave);
 
