@@ -155,7 +155,7 @@ describe.only 'system.helpers.ConsistentState', ->
 
     assert.isTrue(@consistentState.isWriting())
     sinon.assert.calledTwice(@setter)
-    sinon.assert.calledWith(@setter.getCall(1), {param1: 1, param2: 3, param3: 3})
+    sinon.assert.calledWith(@setter.getCall(1), {param2: 3, param3: 3})
     assert.deepEqual(@consistentState.actualRemoteState, {param1: 1});
     assert.deepEqual(@consistentState.paramsListToSave, ['param2', 'param3']);
 

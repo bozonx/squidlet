@@ -225,7 +225,7 @@ export default class ConsistentState {
     }
 
     // generate the last combined data to save
-    const dataToSave = pick(this.getState(), ...this.paramsListToSave);
+    const dataToSave: Dictionary = pick(this.getState(), ...this.paramsListToSave);
 
     try {
       await this.setter(dataToSave);
@@ -237,22 +237,26 @@ export default class ConsistentState {
       throw err;
     }
 
+    this.finalizeWriting(dataToSave);
+  }
+
+  private finalizeWriting(dataToSave: Dictionary) {
+    // If there is the next recall cb - then update actualRemoteState and paramsListToSave
     if (this.queue.jobHasRecallCb(WRITING_ID)) {
-      // TODO: test
-      // there is a next recall cb
+      if (!this.paramsListToSave) {
+        throw new Error(`ConsistentState.finalizeWriting: no paramsListToSave`);
+      }
+
+      // update actualRemoteState
       this.actualRemoteState = {
         ...this.actualRemoteState,
         ...dataToSave,
       };
-
-      // TODO: удалить из paramsListToSave сохраненные параметры
-      //  - но мы достоверно не знаем может были запросы на пересохранение тех же параметров
-      //  надо удалить те параметры значения которых не отличаются
-      //  между this.actualRemoteState и dataToSave.
-      //  Иначе будут сохраняться все параметры на наждый recall
+      // remove saved keys from the list
+      this.paramsListToSave = difference(this.paramsListToSave, Object.keys(dataToSave));
     }
+    // end of cycle
     else {
-      // end of cycle
       delete this.actualRemoteState;
       delete this.paramsListToSave;
     }
