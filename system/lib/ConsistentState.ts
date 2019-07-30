@@ -241,25 +241,22 @@ export default class ConsistentState {
   }
 
   private finalizeWriting(dataToSave: Dictionary) {
-    // If there is the next recall cb - then update actualRemoteState and paramsListToSave
-    if (this.queue.jobHasRecallCb(WRITING_ID)) {
-      if (!this.paramsListToSave) {
-        throw new Error(`ConsistentState.finalizeWriting: no paramsListToSave`);
-      }
-
-      // update actualRemoteState
-      this.actualRemoteState = {
-        ...this.actualRemoteState,
-        ...dataToSave,
-      };
-      // remove saved keys from the list
-      this.paramsListToSave = difference(this.paramsListToSave, Object.keys(dataToSave));
-    }
-    // end of cycle
-    else {
+    if (!this.queue.jobHasRecallCb(WRITING_ID)) {
+      // end of cycle
       delete this.actualRemoteState;
       delete this.paramsListToSave;
+
+      return;
     }
+
+    // If there is the next recall cb - then update actualRemoteState and paramsListToSave.
+    // Update actualRemoteState
+    this.actualRemoteState = {
+      ...this.actualRemoteState,
+      ...dataToSave,
+    };
+    // remove saved keys from the list
+    this.paramsListToSave = difference(this.paramsListToSave || [], Object.keys(dataToSave));
   }
 
   /**
