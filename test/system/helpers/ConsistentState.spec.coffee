@@ -1,7 +1,7 @@
 ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 
-describe.only 'system.helpers.ConsistentState', ->
+describe 'system.helpers.ConsistentState', ->
   beforeEach ->
     @cbPromise = (dataToResolve) => new Promise((resolve) =>
       setTimeout((() -> resolve(dataToResolve)), 1)
@@ -186,7 +186,7 @@ describe.only 'system.helpers.ConsistentState', ->
     sinon.assert.calledOnce(@setter)
     sinon.assert.calledWith(@setter, {param1: 1, param2: 2})
 
-  it "clear state on error while writing - restore state", ->
+  it.only "clear state on error while writing - restore state", ->
     @consistentState.setter = sinon.stub().returns(Promise.reject('err'))
 
     loadPromise = @consistentState.load()

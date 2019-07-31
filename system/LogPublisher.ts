@@ -11,24 +11,24 @@ export default class LogPublisher {
     this.system = system;
   }
 
-  debug(message: string) {
-    this.send('debug', message);
+  debug = (message: string) => {
+    this.emit('debug', message);
   }
 
-  info(message: string) {
-    this.send('info', message);
+  info = (message: string) => {
+    this.emit('info', message);
   }
 
-  warn(message: string) {
-    this.send('warn', message);
+  warn = (message: string) => {
+    this.emit('warn', message);
   }
 
-  error(message: string) {
-    this.send('error', message);
+  error = (message: string) => {
+    this.emit('error', message);
   }
 
 
-  private send(level: LogLevel, message: string) {
+  private emit(level: LogLevel, message: string) {
     const eventName = `${LOGGER_EVENT}_${level}`;
 
     this.system.events.emit(eventName, message, level);

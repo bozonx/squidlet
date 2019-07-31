@@ -140,9 +140,6 @@ export default class WebSocketServer implements WebSocketServerIo {
     }
 
     const serverItem = this.getServerItem(serverId);
-
-    console.log(11111111, connectionId, serverItem[SERVER_POSITIONS.connections])
-
     const socket = serverItem[SERVER_POSITIONS.connections][Number(connectionId)];
 
     await callPromised(socket.send, data);
@@ -173,7 +170,7 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     server.on('close', () => events.emit(WsServerEvent.serverClose));
     server.on('listening', () => events.emit(WsServerEvent.listening));
-    server.on('error', () => events.emit(WsServerEvent.serverError));
+    server.on('error', (err) => events.emit(WsServerEvent.serverError, err));
     server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
       this.handleIncomeConnection(serverId, socket, request);
     });
