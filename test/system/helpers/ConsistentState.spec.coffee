@@ -1,11 +1,12 @@
 ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 
-describe.only 'system.helpers.ConsistentState', ->
+describe 'system.helpers.ConsistentState', ->
   beforeEach ->
-    @cbPromise = (dataToResolve) => new Promise((resolve) =>
-      setTimeout((() -> resolve(dataToResolve)), 1)
-    )
+#    @cbPromise = (dataToResolve) => new Promise((resolve) =>
+#      setTimeout((() -> resolve(dataToResolve)), 1)
+#    )
+    @cbPromise = (dataToResolve) => Promise.resolve(dataToResolve)
     @stateObj = {}
     @logError = sinon.spy()
     @stateGetter = () => @stateObj

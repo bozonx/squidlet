@@ -209,7 +209,6 @@ export default class RequestQueue {
     }
     // if the job in a queue - update queued job
     else if (this.getQueuedJobs().includes(resolvedId)) {
-      // TODO: постараться избавиться от throw
       this.updateQueuedJob(resolvedId, mode, cb);
     }
     // add a new job to queue
@@ -375,7 +374,14 @@ export default class RequestQueue {
 
     this.finalizeCurrentJob();
 
-    if (!err && job[MODE_POSITION] === 'recall' && job[RECALL_CB_POSITION]) return this.recallJob(job);
+    if (!err && job[MODE_POSITION] === 'recall' && job[RECALL_CB_POSITION]) {
+      try {
+        return this.recallJob(job);
+      }
+      catch (err) {
+        this.logError(`Error occurred on starting a recall job "${jobId}": ${err}`);
+      }
+    }
     // if there is a error - go to the next job
     // if there isn't a recall cb - go to the next job like in the default mode
     // in default mode - just go to the next job

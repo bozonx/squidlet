@@ -1,11 +1,12 @@
 RequestQueue = require('../../../system/lib/RequestQueue').default;
 
 
-describe 'system.helpers.RequestQueue', ->
+describe.only 'system.helpers.RequestQueue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
     @cbPromise = () => new Promise((resolve) => setTimeout(resolve, 1))
+    #@cbPromise = () => Promise.resolve()
     @cb1 = sinon.stub().returns(@cbPromise())
     @cb2 = sinon.stub().returns(@cbPromise())
     @logError = sinon.spy()
@@ -53,9 +54,6 @@ describe 'system.helpers.RequestQueue', ->
     @queue.request(@jobId2, @cb2)
 
     assert.isTrue(@queue.isJobInProgress(@jobId1))
-
-    console.log('---- before wait')
-
     await @queue.waitJobStart(@jobId2)
 
     assert.isTrue(@queue.isJobInProgress(@jobId2))
@@ -141,8 +139,18 @@ describe 'system.helpers.RequestQueue', ->
     sinon.assert.calledWith(handler.getCall(0), 'Job was cancelled', @jobId1)
     sinon.assert.calledWith(handler.getCall(1), undefined , @jobId2)
 
+  it "job throws an error - the next job will start", ->
+    @cb1 = sinon.stub().returns(Promise.reject('err1'))
+    handler = sinon.spy()
+    @queue.onJobEnd(handler)
 
-  # TODO: test timeout
-  # TODO: add cb witch throws an error
-  # TODO: events
-  # TODO: destroy
+    @queue.request(@jobId1, @cb1)
+    @queue.request(@jobId2, @cb2)
+
+    await @queue.waitJobFinished(@jobId2)
+
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.calledOnce(@cb2)
+    sinon.assert.calledTwice(handler)
+    sinon.assert.calledWith(handler.getCall(0), 'err1', @jobId1)
+    sinon.assert.calledWith(handler.getCall(1), undefined, @jobId2)
