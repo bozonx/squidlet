@@ -351,7 +351,13 @@ export default class RequestQueue {
 
     this.finalizeCurrentJob();
     this.endJobEvents.emit(errMsg, job[ID_POSITION]);
-    this.startNextJob();
+
+    try {
+      this.startNextJob();
+    }
+    catch (err) {
+      this.logError(`Error occurred on starting a new job after exceeded timeout: ${err}`);
+    }
   }
 
   private handleCbFinished(err: string | undefined, job: Job) {
@@ -375,7 +381,13 @@ export default class RequestQueue {
     // in default mode - just go to the next job
 
     this.endJobEvents.emit(err, job[ID_POSITION]);
-    this.startNextJob();
+
+    try {
+      this.startNextJob();
+    }
+    catch (err) {
+      this.logError(`Error occurred on starting a new job after successful previous job: ${err}`);
+    }
   }
 
   private recallJob(job: Job) {

@@ -189,7 +189,7 @@ describe.only 'system.helpers.ConsistentState', ->
     @consistentState.setter = () => Promise.reject('err')
 
     loadPromise = @consistentState.load()
-    @consistentState.write({param1: 1})
+    writePromise1 = @consistentState.write({param1: 1})
     writePromise2 = @consistentState.write({param2: 2})
 
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
@@ -199,6 +199,7 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: 1, param2: 2})
 
     try
+      await writePromise1
       await writePromise2
     catch err
       assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: undefined, param2: undefined})
