@@ -375,6 +375,9 @@ export default class RequestQueue {
     this.finalizeCurrentJob();
 
     if (!err && job[MODE_POSITION] === 'recall' && job[RECALL_CB_POSITION]) {
+      // TODO: что есл ипроизошла ошибка и есть recall cb - следующий recall cb не должен выполниться
+
+
       try {
         return this.recallJob(job);
       }

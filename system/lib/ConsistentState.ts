@@ -133,9 +133,13 @@ export default class ConsistentState {
    * * If reading is in progress it will wait for its completion.
    * * On error it will return state which was before saving started.
    */
-  async write(partialData: Dictionary): Promise<void> {
+  write(partialData: Dictionary): Promise<void> {
     // if mode without setter - do noting else updating local state
-    if (!this.setter) return this.stateUpdater(partialData);
+    if (!this.setter) {
+      this.stateUpdater(partialData);
+
+      return Promise.resolve();
+    }
 
     // Save actual state. It has to be called only once on starting of cycle
     if (!this.actualRemoteState) {
@@ -161,7 +165,7 @@ export default class ConsistentState {
       // TODO: test
       this.handleWriteError();
 
-      throw err;
+      return Promise.reject(err);
     }
 
     // TODO: !!! wrong - уточнить условие, иначе срабатывает на самый первый write
@@ -170,8 +174,13 @@ export default class ConsistentState {
       // TODO: test
       // wait current saving
       return this.queue.waitJobFinished(WRITING_ID);
-      // wait the next recall. And don't wait if the current is fail
-      //await this.queue.waitJobFinished(WRITING_ID);
+        // wait the next recall. And don't wait if the current is fail
+        //.then(() => this.queue.waitJobFinished(WRITING_ID));
+
+      // // wait current saving
+      // await this.queue.waitJobFinished(WRITING_ID);
+      // // wait the next recall. And don't wait if the current is fail
+      // return this.queue.waitJobFinished(WRITING_ID);
     }
     else {
       // wait current saving

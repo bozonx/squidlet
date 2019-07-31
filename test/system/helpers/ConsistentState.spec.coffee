@@ -3,10 +3,10 @@ ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 describe.only 'system.helpers.ConsistentState', ->
   beforeEach ->
-#    @cbPromise = (dataToResolve) => new Promise((resolve) =>
-#      setTimeout((() -> resolve(dataToResolve)), 1)
-#    )
-    @cbPromise = (dataToResolve) => Promise.resolve(dataToResolve)
+    @cbPromise = (dataToResolve) => new Promise((resolve) =>
+      setTimeout((() -> resolve(dataToResolve)), 1)
+    )
+    #@cbPromise = (dataToResolve) => Promise.resolve(dataToResolve)
     @stateObj = {}
     @logError = sinon.spy()
     @stateGetter = () => @stateObj
@@ -187,7 +187,7 @@ describe.only 'system.helpers.ConsistentState', ->
     sinon.assert.calledWith(@setter, {param1: 1, param2: 2})
 
   it "clear state on error while writing - restore state", ->
-    @consistentState.setter = () => Promise.reject('err')
+    @consistentState.setter = sinon.stub().returns(Promise.reject('err'))
 
     loadPromise = @consistentState.load()
     writePromise1 = @consistentState.write({param1: 1})
@@ -206,6 +206,10 @@ describe.only 'system.helpers.ConsistentState', ->
       assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: undefined, param2: undefined})
       assert.isUndefined(@consistentState.actualRemoteState);
       assert.isUndefined(@consistentState.paramsListToSave);
+
+      #await new Promise((resolve) => setTimeout(resolve, 100))
+
+      sinon.assert.calledOnce(@consistentState.setter)
 
       return
 
