@@ -10,4 +10,4 @@ props:
     default: localhost
   port:
     type: number
-    default: 8889
+    default: 8089

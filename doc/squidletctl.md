@@ -55,7 +55,7 @@ only first time or if `--force` parameter is set.
       [--work-dir]
       [--name]
       [--force=true]
-      [--ioset=localhost:8889]
+      [--ioset=localhost:8089]
       ./groupOrHostConfig.yaml
 
 ### Parameters
@@ -67,7 +67,7 @@ only first time or if `--force` parameter is set.
 * --name uses only if group config is specified
   and selects a host config from group config
 * --force - it runs `npm install`
-* --ioset=localhost:8889 - connect to ioSet of remote host. You should allow it in this host
+* --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in this host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
@@ -80,7 +80,7 @@ only first time or if `--force` parameter is set.
 
 ## Listen logs of remote host
 
-    squidletctl log --host=my-host [--port=8889] [--level=info]
+    squidletctl log --host=my-host [--port=8089] [--level=info]
     
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
@@ -92,7 +92,7 @@ only first time or if `--force` parameter is set.
 Call device action and print the result.
 
 
-    squidletctl action <fullDeviceId> <actionName> [value1] [value2] ... --host=my-host [--port=8889]
+    squidletctl action <fullDeviceId> <actionName> [value1] [value2] ... --host=my-host [--port=8089]
 
     # example
     squidletctl action bedroom.switch turn 1 --host=remotehost
@@ -104,7 +104,7 @@ Params
 
 ## Get device's status
 
-    squidletctl status <fullDeviceId> --host=my-host [--port=8889] [--watch]
+    squidletctl status <fullDeviceId> --host=my-host [--port=8089] [--watch]
     
     # example
     squidletctl status bedroom.switch --host=remotehost
@@ -116,7 +116,7 @@ Params
 
 ## Get device's config
 
-    squidletctl config <fullDeviceId> --host=my-host [--port=8889] [--watch]
+    squidletctl config <fullDeviceId> --host=my-host [--port=8089] [--watch]
     
     # example
     squidletctl config bedroom.switch --host=remotehost
@@ -128,7 +128,7 @@ Params
 
 ## Get state
 
-    squidletctl state <category> <stateName> --host=my-host [--port=8889] [--watch]
+    squidletctl state <category> <stateName> --host=my-host [--port=8089] [--watch]
     
     # example
     squidletctl state 0 bedroom.switch --host=remotehost
@@ -140,7 +140,7 @@ Params
 
 ## Get host config
 
-    squidletctl host-config --host=my-host [--port=8889]
+    squidletctl host-config --host=my-host [--port=8089]
     
 Params
 * --host - set remote host
@@ -148,7 +148,7 @@ Params
 
 ## Get host info
 
-    squidletctl host-info --host=my-host [--port=8889]
+    squidletctl host-info --host=my-host [--port=8089]
     
 Params
 * --host - set remote host
