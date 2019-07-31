@@ -271,10 +271,10 @@ export default class ConsistentState {
    */
   private restorePreviousState(): Dictionary {
     if (!this.actualRemoteState) {
-      throw new Error(`ConsistentState.handleWriteError: no actualRemoteState`);
+      throw new Error(`ConsistentState.restorePreviousState: no actualRemoteState`);
     }
     else if (!this.paramsListToSave) {
-      throw new Error(`ConsistentState.handleWriteError: no paramsListToSave`);
+      throw new Error(`ConsistentState.restorePreviousState: no paramsListToSave`);
     }
 
     const newParams: Dictionary = {};
