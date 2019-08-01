@@ -39,6 +39,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   protected willInit = async () => {
     this.openPromise = new Promised<void>();
 
+    this.env.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
       omit(this.props, 'url')
@@ -71,6 +72,9 @@ export class Mqtt extends DriverBase<MqttProps> {
 
       this.env.log.error(`Mqtt connection "${connectionId}": ${error}`);
     });
+
+    // wait for connection established
+    await this.connectedPromise;
   }
 
   destroy = async () => {

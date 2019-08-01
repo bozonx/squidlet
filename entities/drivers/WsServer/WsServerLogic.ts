@@ -50,6 +50,7 @@ export default class WsServerLogic {
    * Start server
    */
   async init() {
+    this.logInfo(`... Starting websocket server: ${this.props.host}:${this.props.port}`);
     this.serverId = await this.wsServerIo.newServer(this.props);
 
     await this.listenServerEvents();
