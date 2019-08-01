@@ -93,11 +93,9 @@ export default class ConsistentState {
       return;
     }
     else if (this.isWriting()) {
-      // TODO: test
+      const newState = this.generateSafeNewState(partialState);
 
-      this.stateUpdater(partialState);
-
-      // TODO: не обновлять то что пойдет на запись !!!! - use generateSafeNewState ????
+      this.stateUpdater(newState);
       this.actualRemoteState = mergeDeep(partialState, this.actualRemoteState);
 
       return;
@@ -298,7 +296,10 @@ export default class ConsistentState {
     };
   }
 
-  // TODO: test
+  /**
+   * Generate a new state object with a new actual params
+   * but don't update params which are saving at the moment.
+   */
   private generateSafeNewState(mostActualState: Dictionary): Dictionary {
     // get key witch won't be saved
     const keysToUpdate: string[] = difference(Object.keys(mostActualState), this.paramsListToSave || []);

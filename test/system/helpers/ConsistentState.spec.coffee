@@ -227,13 +227,26 @@ describe.only 'system.helpers.ConsistentState', ->
 
     assert.deepEqual(@consistentState.getState(), {})
 
-  it "setIncomeState - while writing - ????", ->
+  it "setIncomeState - while writing - carefully update state", ->
+    @stateObj = { actualParam: 1, savingParam: 2 }
     @consistentState.isWriting = () => true
+    @consistentState.actualRemoteState = {
+      actualParam: 1
+    }
+    @consistentState.paramsListToSave = ['savingParam']
 
-    @consistentState.setIncomeState({param: 1})
+    @consistentState.setIncomeState({newParam: 3, actualParam: 3, savingParam: 3})
 
-    # TODO: !!!!
-
+    assert.deepEqual(@consistentState.getState(), {
+      newParam: 3
+      actualParam: 3
+      savingParam: 2
+    })
+    assert.deepEqual(@consistentState.actualRemoteState, {
+      newParam: 3
+      actualParam: 3
+      savingParam: 3
+    })
 
   it "destroy", ->
     @consistentState.queue.destroy = sinon.spy()
