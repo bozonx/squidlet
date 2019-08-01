@@ -68,7 +68,6 @@ export default class ConsistentState {
     return this.doInitialize(getter);
   }
 
-  // TODO: test
   destroy() {
     this.queue.destroy();
     delete this.actualRemoteState;
@@ -88,13 +87,14 @@ export default class ConsistentState {
     return this.stateGetter();
   }
 
-  // TODO: test
   setIncomeState(partialState: Dictionary) {
     if (this.isReading()) {
       // do nothing if force reading is in progress. It will return the full actual state
       return;
     }
     else if (this.isWriting()) {
+      // TODO: test
+
       this.stateUpdater(partialState);
 
       // TODO: не обновлять то что пойдет на запись !!!! - use generateSafeNewState ????

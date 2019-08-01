@@ -1,7 +1,7 @@
 ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 
-describe 'system.helpers.ConsistentState', ->
+describe.only 'system.helpers.ConsistentState', ->
   beforeEach ->
     @cbPromise = (dataToResolve) => new Promise((resolve) =>
       setTimeout((() -> resolve(dataToResolve)), 1)
@@ -186,7 +186,7 @@ describe 'system.helpers.ConsistentState', ->
     sinon.assert.calledOnce(@setter)
     sinon.assert.calledWith(@setter, {param1: 1, param2: 2})
 
-  it.only "clear state on error while writing - restore state", ->
+  it "clear state on error while writing - restore state", ->
     @consistentState.setter = sinon.stub().returns(Promise.reject('err'))
 
     loadPromise = @consistentState.load()
@@ -215,6 +215,31 @@ describe 'system.helpers.ConsistentState', ->
 
     throw new Error('Setter has to be rejected');
 
-  # TODO: setIncomeState
-  # TODO: test error loading
-  # TODO: destroy
+  it "setIncomeState - just set", ->
+    @consistentState.setIncomeState({param: 1})
+
+    assert.deepEqual(@consistentState.getState(), {param: 1})
+
+  it "setIncomeState - while reading - do nothing", ->
+    @consistentState.isReading = () => true
+
+    @consistentState.setIncomeState({param: 1})
+
+    assert.deepEqual(@consistentState.getState(), {})
+
+  it "setIncomeState - while writing - ????", ->
+    @consistentState.isWriting = () => true
+
+    @consistentState.setIncomeState({param: 1})
+
+    # TODO: !!!!
+
+
+  it "destroy", ->
+    @consistentState.queue.destroy = sinon.spy()
+
+    @consistentState.destroy()
+
+    sinon.assert.calledOnce(@consistentState.queue.destroy)
+    assert.isUndefined(@consistentState.actualRemoteState)
+    assert.isUndefined(@consistentState.paramsListToSave)
