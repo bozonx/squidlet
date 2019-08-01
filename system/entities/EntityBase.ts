@@ -63,6 +63,7 @@ export default class EntityBase<Props = {}> {
     const getDriverDep: GetDriverDep = this.getDriverDepCb();
 
     if (this.devicesDidInit) {
+      // TODO: будет не синхронно
       this.env.system.onDevicesInit(async () => {
         try {
           this.devicesDidInit && await this.devicesDidInit();
@@ -74,6 +75,7 @@ export default class EntityBase<Props = {}> {
     }
 
     if (this.appDidInit) {
+      // TODO: будет не синхронно
       this.env.system.onAppInit(async () => {
         try {
           this.appDidInit && await this.appDidInit();

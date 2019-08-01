@@ -143,7 +143,9 @@ export default class Mqtt implements MqttIo {
     const connection = mqtt.connect(url, options);
 
     connection.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
-      this.handleIncomeMessage(connectionId, topic, data, packet.properties.contentType);
+      const contentType: string | undefined = packet.properties && packet.properties.contentType;
+
+      this.handleIncomeMessage(connectionId, topic, data, contentType);
     });
     connection.on('error', (err) => this.events.emit(MqttIoEvents.error, connectionId, err));
     connection.on('connect', () => this.events.emit(MqttIoEvents.connect, connectionId));
@@ -156,11 +158,12 @@ export default class Mqtt implements MqttIo {
     connectionId: string,
     topic: string,
     data: Buffer,
-    contentType: MqttContentTypes
+    contentTypeProperty: string | undefined
   ) => {
     let preparedData: string | Uint8Array;
+    const binaryContentType: MqttContentTypes = 'binary';
 
-    if (contentType === 'binary') {
+    if (contentTypeProperty === binaryContentType) {
       preparedData = convertBufferToUint8Array(data);
     }
     else {
