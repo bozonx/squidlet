@@ -82,7 +82,9 @@ export default class WebSocketClient implements WebSocketClientIo {
       throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
     }
 
-    await callPromised(this.connections[Number(connectionId)].send, data);
+    const client = this.connections[Number(connectionId)];
+
+    await callPromised(client.send.bind(client), data);
   }
 
   async close(connectionId: string, code: number, reason?: string) {

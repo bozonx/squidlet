@@ -61,6 +61,9 @@ export class Mqtt extends DriverBase<MqttProps> {
       this.env.log.error(msg);
     });
 
+    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
+    //  - возможно это уже реализованно в самам mqtt
+    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
     await this.mqttIo.onConnect((connectionId: string) => {
       if (connectionId !== this.connectionId) return;
 

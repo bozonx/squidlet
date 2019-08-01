@@ -48,7 +48,9 @@ export default class Mqtt implements MqttIo {
   async end(connectionId: string, force: boolean = false): Promise<void> {
     if (!this.connections[Number(connectionId)]) return;
 
-    return callPromised(this.connections[Number(connectionId)].end, force);
+    const client = this.connections[Number(connectionId)];
+
+    return callPromised(client.end.bind(client), force);
   }
 
   async isConnected(connectionId: string): Promise<boolean> {
@@ -111,7 +113,9 @@ export default class Mqtt implements MqttIo {
       }
     };
 
-    return callPromised(this.connections[Number(connectionId)].publish, topic, preparedData, options);
+    const client = this.connections[Number(connectionId)];
+
+    return callPromised(client.publish.bind(client), topic, preparedData, options);
   }
 
   subscribe(connectionId: string, topic: string): Promise<void> {
@@ -119,7 +123,9 @@ export default class Mqtt implements MqttIo {
       throw new Error(`Mqtt.subscribe: There isn't a connection "${connectionId}"`);
     }
 
-    return callPromised(this.connections[Number(connectionId)].subscribe, topic, {});
+    const client = this.connections[Number(connectionId)];
+
+    return callPromised(client.subscribe.bind(client), topic);
   }
 
   unsubscribe(connectionId: string, topic: string): Promise<void> {
@@ -127,7 +133,9 @@ export default class Mqtt implements MqttIo {
       throw new Error(`Mqtt.unsubscribe: There isn't a connection "${connectionId}"`);
     }
 
-    return callPromised(this.connections[Number(connectionId)].unsubscribe, topic, {});
+    const client = this.connections[Number(connectionId)];
+
+    return callPromised(client.unsubscribe.bind(client), topic);
   }
 
 
