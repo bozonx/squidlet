@@ -4,6 +4,7 @@ export const servicesShortcut: {[index: string]: string} = {
   //updater: 'Updater',
 
   mqttApi: 'MqttApi',
+  wsApi: 'WsApi',
   backdoor: 'Backdoor',
 };
 
@@ -13,4 +14,5 @@ export const defaultServices = [
   //'automation',
   'consoleLogger',
   //'updater',
+  'wsApi',
 ];

@@ -50,7 +50,8 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     () => isObject(rawConfig.ios, 'ios'),
     () => isObject(rawConfig.automation, 'automation'),
     () => isObject(rawConfig.consoleLogger, 'consoleLogger'),
-    () => isObject(rawConfig.mqtt, 'mqtt'),
+    () => isObject(rawConfig.mqttApi, 'mqttApi'),
+    () => isObject(rawConfig.wsApi, 'wsApi'),
     () => isObject(rawConfig.backdoor, 'backdoor'),
 
     () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
@@ -73,7 +74,8 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
       'devicesDefaults',
       'automation',
       'consoleLogger',
-      'mqtt',
+      'mqttApi',
+      'wsApi',
       'backdoor',
     ], 'host config'),
   ]);
