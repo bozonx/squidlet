@@ -74,8 +74,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.setupFeedback();
   }
 
-  destroy = () => {
-  }
+  // destroy = () => {
+  // }
 
 
   getLastData(dataAddressStr: string | number | undefined): Uint8Array | undefined {

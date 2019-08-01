@@ -64,9 +64,9 @@ export default class WebSocketServer implements WebSocketServerIo {
 
     this.servers[Number(serverId)][SERVER_POSITIONS.events].destroy();
 
-    // TODO: does it need closing connections ???
+    const server = this.servers[Number(serverId)][SERVER_POSITIONS.wsServer];
 
-    await callPromised(this.servers[Number(serverId)][SERVER_POSITIONS.wsServer].close);
+    await callPromised(server.close.bind(server));
 
     delete this.servers[Number(serverId)];
   }
@@ -142,7 +142,7 @@ export default class WebSocketServer implements WebSocketServerIo {
     const serverItem = this.getServerItem(serverId);
     const socket = serverItem[SERVER_POSITIONS.connections][Number(connectionId)];
 
-    await callPromised(socket.send, data);
+    await callPromised(socket.send.bind(socket), data);
   }
 
   async close(serverId: string, connectionId: string, code: number, reason: string): Promise<void> {
