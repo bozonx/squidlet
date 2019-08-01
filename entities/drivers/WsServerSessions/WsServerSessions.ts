@@ -69,10 +69,6 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     });
   }
 
-  protected appDidInit = async () => {
-    return this.server.init();
-  }
-
   destroy = async () => {
     for (let sessionId of Object.keys(this.sessionConnections)) {
       this.env.system.sessions.shutDownImmediately(sessionId);

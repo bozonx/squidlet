@@ -4,6 +4,7 @@ import DriverBase from './DriverBase';
 import DriverEnv from './DriverEnv';
 import {validateProps, validateRequiredProps} from '../lib/validate';
 import {mergeDeep} from '../lib/collections';
+import EnvBase from '../entities/EnvBase';
 
 
 /**
@@ -16,7 +17,7 @@ import {mergeDeep} from '../lib/collections';
  *   "1" is unique id for instances
  * * if instanceIdCalc is set method getInstance will call this function to get unique id
  */
-export default abstract class DriverFactoryBase<Instance extends DriverBase> extends DriverBase {
+export default abstract class DriverFactoryBase<Instance extends DriverBase> {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
   protected instanceAlwaysNew: boolean = false;
@@ -25,6 +26,14 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
   protected instanceByPropName?: string;
   // calculate instance id by calling a function
   protected instanceIdCalc?: (props: {[index: string]: any}) => string;
+  protected readonly definition: EntityDefinition;
+  protected readonly env: EnvBase;
+
+
+  constructor(definition: EntityDefinition, env: EnvBase) {
+    this.definition = definition;
+    this.env = env;
+  }
 
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
@@ -32,6 +41,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
     const props: {[index: string]: any} = mergeDeep(instanceProps, this.definition.props);
     const instanceId: string | undefined = this.getInstanceId(props);
 
+    // TODO: лучше не ждать до создания инстанса
     await this.validateInstanceProps(instanceProps, props);
 
     if (typeof instanceId === 'undefined') {
@@ -39,11 +49,14 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
       return this.makeInstance(props);
     }
 
-    // return previously saved instance if it is
-    if (this.instances[instanceId]) return this.instances[instanceId];
+    // return previously instantiated instance if it is
+    if (this.instances[instanceId]) {
+      return this.instances[instanceId];
+    }
+
     // create and save instance
     this.instances[instanceId] = await this.makeInstance(props);
-    // return created instance
+    // return just created instance
     return this.instances[instanceId];
   }
 
@@ -52,7 +65,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
     if (this.instanceAlwaysNew) {
       return;
     }
-    if (this.instanceAlwaysSame) {
+    else if (this.instanceAlwaysSame) {
       return 'same';
     }
     else if (this.instanceByPropName) {
@@ -72,6 +85,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
   }
 
   private async makeInstance(props: {[index: string]: any}): Promise<Instance> {
+    // replace merged props
     const definition = {
       ...this.definition,
       props,
@@ -89,7 +103,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
     instanceProps: {[index: string]: any},
     mergedProps: {[index: string]: any}
   ) {
-    const manifest: DriverManifest = await this.env.loadManifest(this.id);
+    const manifest: DriverManifest = await this.env.loadManifest(this.definition.id);
 
     if (!manifest.props) return;
 
@@ -97,7 +111,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> ext
       || validateRequiredProps(mergedProps, manifest.props);
 
     if (validationErr) {
-      throw new Error(`Can't make instance of driver "${this.id}": ${validationErr}`);
+      throw new Error(`Can't make instance of driver "${this.definition.id}": ${validationErr}`);
     }
   }
 
