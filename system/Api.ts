@@ -18,10 +18,10 @@ export default class Api {
   }
 
 
-  callDeviceAction(deviceId: string, actionName: string, ...params: any[]): Promise<JsonTypes> {
+  callDeviceAction(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
     const device = this.system.devicesManager.getDevice(deviceId);
 
-    return device.action(actionName, ...params);
+    return device.action(actionName, ...args);
   }
 
   listenDeviceStatus(

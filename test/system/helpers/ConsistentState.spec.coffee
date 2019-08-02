@@ -225,6 +225,19 @@ describe.only 'system.helpers.ConsistentState', ->
     assert.isUndefined(@consistentState.actualRemoteState);
     assert.isUndefined(@consistentState.paramsListToSave);
 
+  it "after failed load the next saving will run", ->
+    @consistentState.getter = () => Promise.reject('err')
+
+    loadPromise = @consistentState.load()
+    writePromise = @consistentState.write({param: 1})
+
+    assert.isRejected(loadPromise)
+
+    await writePromise
+
+    sinon.assert.calledOnce(@setter)
+    assert.deepEqual(@consistentState.getState(), {param: 1})
+
   it "setIncomeState - just set", ->
     @consistentState.setIncomeState({param: 1})
 
