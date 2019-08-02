@@ -5,6 +5,7 @@ import {trim} from 'system/lib/lodashLike';
 import System from 'system/System';
 import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
+import {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
 
 
 export type TopicType = 'device' | 'api';
@@ -45,12 +46,14 @@ export default class ApiTopicsLogic {
   /**
    * Call this when you have received an income message
    */
-  incomeMessage = async (topic: string, data: string) => {
-    const [topicType, body] = this.parseTopic(topic);
+  incomeMessage = async (fullTopic: string, data: string) => {
+    const [topicType, body] = this.parseTopic(fullTopic);
 
     switch (topicType) {
       case 'device':
-        await this.callDeviceAction(body, data);
+        const [deviceId, actionName] = splitFirstElement(body, TOPIC_SEPARATOR);
+
+        await this.callDeviceAction(deviceId, actionName, data);
         break;
       case 'api':
         await this.callApi(body, data);
@@ -104,21 +107,20 @@ export default class ApiTopicsLogic {
     }
   }
 
-  private async callDeviceAction(topic: string, data: string) {
-    // income string-type api message - call device action
-    this.system.log.info(`ApiTopics income device action call: ${topic} ${JSON.stringify(data)}`);
-
-    const args: JsonTypes[] = this.parseArgs(data);
-    const [deviceId, actionName] = splitFirstElement(topic, TOPIC_SEPARATOR);
-
+  private async callDeviceAction(deviceId: string, actionName?: string, data?: string) {
     if (!actionName) {
-      throw new Error(`MqttApi.callDeviceAction: Topic doesn't contents an actionName: "${topic}"`);
+      throw new Error(`MqttApi.callDeviceAction: no actionName: "${deviceId}"`);
     }
 
-    await this.system.api.callDeviceAction(deviceId, actionName, args);
+    // income string-type api message - call device action
+    this.system.log.info(`ApiTopics income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${JSON.stringify(data)}`);
+
+    const args: JsonTypes[] = this.parseArgs(data);
+
+    await this.system.api.callDeviceAction(deviceId, actionName, ...args);
   }
 
-  private parseArgs(data: any): JsonTypes[] {
+  private parseArgs(data: string | undefined): JsonTypes[] {
     if (typeof data === 'undefined') {
       return [];
     }
@@ -167,7 +169,8 @@ export default class ApiTopicsLogic {
     if (!state) return;
 
     for (let paramName of changedParams) {
-      const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, stateType, paramName);
+      const resolvedParamName: string | undefined = (paramName === DEFAULT_STATUS) ? undefined : paramName;
+      const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, stateType, resolvedParamName);
       const data: string = JSON.stringify(state[paramName]);
 
       this.emitOutcomeMsg(topicType, topicBody, data);

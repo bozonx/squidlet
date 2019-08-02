@@ -166,7 +166,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
 
     try {
-      return this.statusState.write({[statusName]: newValue});
+      await this.statusState.write({[statusName]: newValue});
     }
     catch (err) {
       throw new Error(`Device "${this.id}" setStatus: ${err}`);

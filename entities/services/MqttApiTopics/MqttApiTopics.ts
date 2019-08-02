@@ -20,6 +20,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this._apiTopicsLogic = new ApiTopicsLogic(this.env.system);
+    this.apiTopicsLogic.init();
     this.depsInstances.mqtt = await getDriverDep('Mqtt')
       .getInstance(this.props);
   }
