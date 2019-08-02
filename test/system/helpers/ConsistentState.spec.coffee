@@ -215,7 +215,31 @@ describe.only 'system.helpers.ConsistentState', ->
 
     throw new Error('Setter has to be rejected');
 
-  it "write - error in queue.request  cleanup", ->
+  it "first write is OK and second failed - revert state to first save step", ->
+    saveCounter = 0
+
+    @consistentState.setter = (params...) =>
+      saveCounter++
+      if (saveCounter > 1)
+        return Promise.reject('err')
+      else
+        return @setter(params...)
+
+    writePromise1 = @consistentState.write({param1: 1})
+    writePromise2 = @consistentState.write({param1: 2, param2: 2})
+
+    await writePromise1
+
+    try
+      await writePromise2
+
+    assert.isRejected(writePromise2)
+    sinon.assert.calledOnce(@setter)
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: undefined})
+    assert.isUndefined(@consistentState.actualRemoteState);
+    assert.isUndefined(@consistentState.paramsListToSave);
+
+  it "write - error in queue.request - cleanup", ->
     @stateUpdater({param: 1})
     @consistentState.queue.request = () => throw new Error('err')
 

@@ -339,6 +339,26 @@ export default class RequestQueue {
     catch (err) {
       this.handleCbFinished(err, job);
     }
+
+    // // start job on next tick
+    // setTimeout(() => {
+    //   this.startJobEvents.emit(job[ID_POSITION]);
+    //
+    //   this.runningTimeout = setTimeout(
+    //     () => this.handleTimeoutOfJob(job),
+    //     this.jobTimeoutSec * 1000
+    //   );
+    //
+    //   // start cb
+    //   try {
+    //     job[CB_POSITION]()
+    //       .then(() => this.handleCbFinished(undefined, job))
+    //       .catch((err: Error) => this.handleCbFinished(String(err), job));
+    //   }
+    //   catch (err) {
+    //     this.handleCbFinished(err, job);
+    //   }
+    // }, 0);
   }
 
   // TODO: test
