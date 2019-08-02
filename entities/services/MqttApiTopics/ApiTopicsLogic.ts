@@ -7,12 +7,12 @@ import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
 
-type TopicType = 'device' | 'api';
+export type TopicType = 'device' | 'api';
 type DeviceStateType = 'status' | 'config';
 type OutcomeHandler = (topic: string, data: string) => void;
 
 const topicTypes = ['device', 'api'];
-const TOPIC_TYPE_SEPARATOR = '|';
+export const TOPIC_TYPE_SEPARATOR = '|';
 export const TOPIC_SEPARATOR = '/';
 
 
@@ -70,7 +70,7 @@ export default class ApiTopicsLogic {
   }
 
   isSupportedTopic(topic: string): boolean {
-    const splat = splitFirstElement(TOPIC_TYPE_SEPARATOR, topic);
+    const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
 
     return topicTypes.includes(splat[0]);
   }
@@ -140,7 +140,7 @@ export default class ApiTopicsLogic {
    * Parse topic to topicType and topicBody.
    */
   private parseTopic(topic: string): [TopicType, string] {
-    const splat = splitFirstElement(TOPIC_TYPE_SEPARATOR, topic);
+    const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
 
     if (!topicTypes.includes(splat[0])) {
       throw new Error(`Invalid topic "${topic}": unknown type`);
