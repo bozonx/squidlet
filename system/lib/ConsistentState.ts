@@ -160,7 +160,6 @@ export default class ConsistentState {
       this.queue.request(WRITING_ID, this.handleWrite, 'recall');
     }
     catch (err) {
-      // TODO: test
       this.handleWriteError();
 
       return Promise.reject(err);

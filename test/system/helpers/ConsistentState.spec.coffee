@@ -215,6 +215,16 @@ describe.only 'system.helpers.ConsistentState', ->
 
     throw new Error('Setter has to be rejected');
 
+  it "write - error in queue.request  cleanup", ->
+    @stateUpdater({param: 1})
+    @consistentState.queue.request = () => throw new Error('err')
+
+    assert.isRejected(@consistentState.write({newParam: 1}))
+
+    assert.deepEqual(@consistentState.getState(), {param: 1, newParam: undefined})
+    assert.isUndefined(@consistentState.actualRemoteState);
+    assert.isUndefined(@consistentState.paramsListToSave);
+
   it "setIncomeState - just set", ->
     @consistentState.setIncomeState({param: 1})
 
