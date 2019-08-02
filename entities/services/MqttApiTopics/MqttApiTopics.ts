@@ -3,7 +3,7 @@ import {combineTopic} from 'system/lib/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
 
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
-import ApiTopicsLogic, {TOPIC_SEPARATOR} from './ApiTopicsLogic';
+import ApiTopicsLogic, {TOPIC_SEPARATOR, TOPIC_TYPE_SEPARATOR, TopicType} from './ApiTopicsLogic';
 
 
 export default class MqttApiTopics extends ServiceBase<MqttProps> {
@@ -32,6 +32,8 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
   }
 
   protected devicesDidInit = async () => {
+    // TODO: должно ожидать соединения
+    await this.mqtt.connectedPromise;
     await this.subscribeToDevices();
   }
 
@@ -76,6 +78,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
     }
   }
 
+  // TODO: move to logic
   /**
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
@@ -87,7 +90,9 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
       const device = this.env.system.devicesManager.getDevice(deviceId);
 
       for (let actionName of device.getActionsList()) {
-        const topic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);
+        const deviceActionTopic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);
+        const deviceType: TopicType = 'device';
+        const topic: string = combineTopic(TOPIC_TYPE_SEPARATOR, deviceType, deviceActionTopic);
 
         topics.push(topic);
       }
