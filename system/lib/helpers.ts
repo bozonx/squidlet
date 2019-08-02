@@ -2,6 +2,7 @@ import {isEmpty} from './lodashLike';
 import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {splitFirstElement} from './strings';
+import {compactUndefined} from './arrays';
 
 
 export const PATH_SEPARATOR = '/';
@@ -131,7 +132,7 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
 export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string | undefined>): string {
   if (isEmpty(subPaths)) return basePath;
 
-  return [ basePath, ...subPaths ].join(topicSeparator);
+  return [ basePath, ...compactUndefined(subPaths) ].join(topicSeparator);
 }
 
 // /**

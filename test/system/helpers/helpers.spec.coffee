@@ -82,6 +82,8 @@ describe 'system.helpers.helpers', ->
 
   it 'combineTopic', ->
     assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
+    assert.equal(helpers.combineTopic('/', 'first', undefined, 'third'), 'first/third')
+    assert.equal(helpers.combineTopic('/', 'first', 'second', undefined), 'first/second')
 
 #  it 'splitTopicId', ->
 #    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
