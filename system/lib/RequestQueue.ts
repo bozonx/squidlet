@@ -199,20 +199,24 @@ export default class RequestQueue {
 
     // if the job is running
     if (this.currentJob && this.currentJob[JobPositions.id] === resolvedId) {
-      if (mode === 'recall') {
-        // set or replace recall cb in recall mode
-        this.currentJob[JobPositions.recall] = cb;
-      }
+      // set or replace recall cb in recall mode
+      if (mode === 'recall') this.currentJob[JobPositions.recall] = cb;
+
       // in default mode do noting - don't update the current job and don't add job to queue
+      return resolvedId;
     }
+
+    const jobIndex: number = this.getJobIndex(resolvedId);
+
     // if the job in a queue - update queued job
-    else if (this.getQueuedJobs().includes(resolvedId)) {
-      this.updateQueuedJob(resolvedId, mode, cb);
+    if (jobIndex >= 0) {
+      this.queue[jobIndex][JobPositions.cb] = cb;
+      this.queue[jobIndex][JobPositions.mode] = mode;
     }
     // add a new job to queue
     else {
       // add a new job
-      this.addToEndOfQueue(resolvedId, mode, cb);
+      this.queue.push([resolvedId, cb, mode, false]);
       this.startNextJob();
     }
 
@@ -279,26 +283,6 @@ export default class RequestQueue {
     if (jobIndex < 0) return;
 
     this.queue.splice(jobIndex);
-  }
-
-  private addToEndOfQueue(jobId: JobId, mode: Mode, cb: RequestCb) {
-    const job: Job = [jobId, cb, mode, false];
-
-    this.queue.push(job);
-  }
-
-  /**
-   * Update cb of delayed job or add a new job to queue.
-   */
-  private updateQueuedJob(jobId: JobId, mode: Mode, cb: RequestCb) {
-    const jobIndex: number = this.getJobIndex(jobId);
-
-    if (jobIndex < 0) {
-      throw new Error(`RequestQueue.updateQueuedJob: Can't find job index "${jobId}"`);
-    }
-
-    this.queue[jobIndex][JobPositions.cb] = cb;
-    this.queue[jobIndex][JobPositions.mode] = mode;
   }
 
   /**
