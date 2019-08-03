@@ -242,46 +242,29 @@ export default class RequestQueue {
   }
 
   private startCurrentJob() {
-    if (!this.currentJob) throw new Error(`RequestQueue.startCurrentJob: no currentJob`);
+    // start job on next tick
+    setTimeout(() => {
+      if (!this.currentJob) throw new Error(`RequestQueue.startCurrentJob: no currentJob`);
 
-    const job: Job = this.currentJob;
+      const job: Job = this.currentJob;
 
-    this.startJobEvents.emit(job[JobPositions.id]);
+      this.startJobEvents.emit(job[JobPositions.id]);
 
-    this.runningTimeout = setTimeout(
-      () => this.handleTimeoutOfJob(job),
-      this.jobTimeoutSec * 1000
-    );
+      this.runningTimeout = setTimeout(
+        () => this.handleTimeoutOfJob(job),
+        this.jobTimeoutSec * 1000
+      );
 
-    // start cb
-    try {
-      job[JobPositions.cb]()
-        .then(() => this.handleCbFinished(undefined, job))
-        .catch((err: Error) => this.handleCbFinished(String(err), job));
-    }
-    catch (err) {
-      this.handleCbFinished(err, job);
-    }
-
-    // // start job on next tick
-    // setTimeout(() => {
-    //   this.startJobEvents.emit(job[JobPositions.id]);
-    //
-    //   this.runningTimeout = setTimeout(
-    //     () => this.handleTimeoutOfJob(job),
-    //     this.jobTimeoutSec * 1000
-    //   );
-    //
-    //   // start cb
-    //   try {
-    //     job[JobPositions.cb]()
-    //       .then(() => this.handleCbFinished(undefined, job))
-    //       .catch((err: Error) => this.handleCbFinished(String(err), job));
-    //   }
-    //   catch (err) {
-    //     this.handleCbFinished(err, job);
-    //   }
-    // }, 0);
+      // start cb
+      try {
+        job[JobPositions.cb]()
+          .then(() => this.handleCbFinished(undefined, job))
+          .catch((err: Error) => this.handleCbFinished(String(err), job));
+      }
+      catch (err) {
+        this.handleCbFinished(err, job);
+      }
+    }, 0);
   }
 
   // TODO: test
@@ -306,33 +289,38 @@ export default class RequestQueue {
     // do nothing if it was canceled
     if (job[JobPositions.canceled]) return;
 
-    const jobId: JobId = job[JobPositions.id];
-
     if (!this.currentJob) {
       return this.logError(`RequestQueue: Not current job when a job finished`);
     }
-    else if (this.currentJob[JobPositions.id] !== jobId) {
+    else if (this.currentJob[JobPositions.id] !== job[JobPositions.id]) {
       return this.logError(`RequestQueue: Current job id doesn't match with the finished job id`);
     }
 
     this.finalizeCurrentJob();
+    this.endJobEvents.emit(err, job[JobPositions.id]);
+    this.afterJobFinished(err, job);
+  }
 
+  private afterJobFinished(err: string | undefined, job: Job) {
     if (!err && job[JobPositions.mode] === 'recall' && job[JobPositions.recall]) {
       // TODO: что есл ипроизошла ошибка и есть recall cb - следующий recall cb не должен выполниться
 
 
       try {
-        return this.recallJob(job);
+        this.switchRecallJob(job);
       }
       catch (err) {
-        this.logError(`Error occurred on starting a recall job "${jobId}": ${err}`);
+        this.logError(`Error occurred on starting a recall job "${job[JobPositions.id]}": ${err}`);
       }
+
+      this.currentJob = job;
+      this.startCurrentJob();
+
+      return;
     }
     // if there is a error - go to the next job
     // if there isn't a recall cb - go to the next job like in the default mode
     // in default mode - just go to the next job
-
-    this.endJobEvents.emit(err, job[JobPositions.id]);
 
     try {
       this.startNextJob();
@@ -342,21 +330,16 @@ export default class RequestQueue {
     }
   }
 
-  private recallJob(job: Job) {
+  private switchRecallJob(job: Job) {
     const recallCb: RequestCb | undefined = job[JobPositions.recall];
 
     if (!recallCb) {
       throw new Error(`RequestQueue.recallJob: no recall cb`);
     }
 
-    // mutate just finished job
+    // move recall cb to a main cb in the job
     job[JobPositions.cb] = recallCb;
     delete job[JobPositions.recall];
-
-    this.currentJob = job;
-
-    this.endJobEvents.emit(undefined, job[JobPositions.id]);
-    this.startCurrentJob();
   }
 
   private finalizeCurrentJob() {

@@ -5,8 +5,8 @@ describe.only 'system.helpers.RequestQueue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
-    @cbPromise = () => new Promise((resolve) => setTimeout(resolve, 1))
-    #@cbPromise = () => Promise.resolve()
+    #@cbPromise = () => new Promise((resolve) => setTimeout(resolve, 1))
+    @cbPromise = () => Promise.resolve()
     @cb1 = sinon.stub().returns(@cbPromise())
     @cb2 = sinon.stub().returns(@cbPromise())
     @logError = sinon.spy()
