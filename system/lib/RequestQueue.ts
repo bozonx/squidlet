@@ -224,67 +224,6 @@ export default class RequestQueue {
   }
 
 
-  private getQueuedJobs(): string[] {
-    return this.queue.map((item: Job) => item[JobPositions.id]);
-  }
-
-  /**
-   * It uses passed jobId or generate a new one
-   */
-  private resolveJobId(jobId: JobId | undefined): JobId {
-    if (typeof jobId === 'string') return jobId;
-
-    unnamedJobIdCounter++;
-
-    return String(unnamedJobIdCounter);
-  }
-
-  private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
-    if (typeof jobId !== 'string') {
-      throw new Error(`RequestQueue.getWaitJobPromise: JobId has to be a string`);
-    }
-
-    return new Promise<void>((resolve, reject) => {
-      let handlerIndex: number;
-
-      const cb = (error: string | undefined, finishedJobId: JobId) => {
-        if (finishedJobId !== jobId) return;
-
-        events.removeListener(handlerIndex);
-
-        if (error) return reject(error);
-
-        resolve();
-      };
-
-      handlerIndex = events.addListener(cb);
-    });
-  }
-
-  private getJobIndex(jobId: JobId): number {
-    return findIndex(this.queue, (item: Job) => item[JobPositions.id] === jobId) as number;
-  }
-
-  private cancelCurrentJob(jobId: string) {
-    if (!this.currentJob || this.currentJob[JobPositions.id] !== jobId) return;
-
-    this.currentJob[JobPositions.canceled] = true;
-
-    this.finalizeCurrentJob();
-    this.endJobEvents.emit(`Job was cancelled`, jobId);
-  }
-
-  /**
-   * remove job or delayed job in queue
-   */
-  private removeJobFromQueue(jobId: JobId) {
-    const jobIndex: number = this.getJobIndex(jobId);
-
-    if (jobIndex < 0) return;
-
-    this.queue.splice(jobIndex);
-  }
-
   /**
    * Start a new job if there isn't a current job and queue has some jobs.
    * It doesn't start a new job while current is in progress.
@@ -424,6 +363,67 @@ export default class RequestQueue {
     delete this.runningTimeout;
     // delete finished job
     delete this.currentJob;
+  }
+
+  private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
+    if (typeof jobId !== 'string') {
+      throw new Error(`RequestQueue.getWaitJobPromise: JobId has to be a string`);
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      let handlerIndex: number;
+
+      const cb = (error: string | undefined, finishedJobId: JobId) => {
+        if (finishedJobId !== jobId) return;
+
+        events.removeListener(handlerIndex);
+
+        if (error) return reject(error);
+
+        resolve();
+      };
+
+      handlerIndex = events.addListener(cb);
+    });
+  }
+
+  private cancelCurrentJob(jobId: string) {
+    if (!this.currentJob || this.currentJob[JobPositions.id] !== jobId) return;
+
+    this.currentJob[JobPositions.canceled] = true;
+
+    this.finalizeCurrentJob();
+    this.endJobEvents.emit(`Job was cancelled`, jobId);
+  }
+
+  /**
+   * remove job or delayed job in queue
+   */
+  private removeJobFromQueue(jobId: JobId) {
+    const jobIndex: number = this.getJobIndex(jobId);
+
+    if (jobIndex < 0) return;
+
+    this.queue.splice(jobIndex);
+  }
+
+  private getJobIndex(jobId: JobId): number {
+    return findIndex(this.queue, (item: Job) => item[JobPositions.id] === jobId) as number;
+  }
+
+  private getQueuedJobs(): string[] {
+    return this.queue.map((item: Job) => item[JobPositions.id]);
+  }
+
+  /**
+   * It uses passed jobId or generate a new one
+   */
+  private resolveJobId(jobId: JobId | undefined): JobId {
+    if (typeof jobId === 'string') return jobId;
+
+    unnamedJobIdCounter++;
+
+    return String(unnamedJobIdCounter);
   }
 
 }
