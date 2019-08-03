@@ -232,18 +232,20 @@ export default class RequestQueue {
     // do nothing if there is current job or no one in queue
     if (this.currentJob || !this.queue.length) return;
 
-    const currentJob: Job = this.queue[0];
-
     // set first job in queue as current
-    this.currentJob = currentJob;
+    this.currentJob = this.queue[0];
 
     // remove the first element from queue
     this.queue.shift();
 
-    this.startCb(currentJob);
+    this.startCurrentJob();
   }
 
-  private startCb(job: Job) {
+  private startCurrentJob() {
+    if (!this.currentJob) throw new Error(`RequestQueue.startCurrentJob: no currentJob`);
+
+    const job: Job = this.currentJob;
+
     this.startJobEvents.emit(job[JobPositions.id]);
 
     this.runningTimeout = setTimeout(
@@ -354,7 +356,7 @@ export default class RequestQueue {
     this.currentJob = job;
 
     this.endJobEvents.emit(undefined, job[JobPositions.id]);
-    this.startCb(job);
+    this.startCurrentJob();
   }
 
   private finalizeCurrentJob() {
