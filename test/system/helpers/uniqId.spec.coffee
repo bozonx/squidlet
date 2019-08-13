@@ -1,7 +1,7 @@
-uniqId = require('../../../system/lib/uniqId').default
+uniqId = require('../../../system/lib/uniqId')
 
 
-describe 'system.helpers.uniqId', ->
+describe.only 'system.helpers.uniqId', ->
   it 'make it', ->
-    assert.isFalse(uniqId() == uniqId())
-    assert.equal(uniqId().length, 8)
+    assert.isFalse(uniqId.makeUniqId() == uniqId())
+    assert.equal(uniqId.makeUniqId().length, 8)

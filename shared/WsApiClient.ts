@@ -9,7 +9,7 @@ import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/Ws
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {ENCODE} from '../system/dict/constants';
 import {collectPropsDefaults} from '../system/lib/helpers';
-import uniqId from '../system/lib/uniqId';
+import {makeUniqId} from '../system/lib/uniqId';
 
 
 const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');
@@ -50,7 +50,7 @@ export default class WsApiClient {
       undefined,
       responseTimoutSec,
       this.logError,
-      uniqId
+      makeUniqId
     );
   }
 

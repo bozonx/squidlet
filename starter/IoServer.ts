@@ -6,7 +6,7 @@ import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 import RemoteCall from '../system/lib/remoteCall/RemoteCall';
 import systemConfig from '../system/config/systemConfig';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
-import uniqId from '../system/lib/uniqId';
+import {makeUniqId} from '../system/lib/uniqId';
 
 
 // localhost:8089
@@ -45,7 +45,7 @@ export default class IoServer {
       // TODO: merge with ioServer or host's config - ioSetResponseTimoutSec
       30,
       this.logError,
-      uniqId
+      makeUniqId
     );
   }
 

@@ -2,7 +2,7 @@ import System from './System';
 import IndexedEvents from './lib/IndexedEvents';
 import RemoteCall from './lib/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
-import uniqId from './lib/uniqId';
+import {makeUniqId} from './lib/uniqId';
 
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
@@ -70,7 +70,7 @@ export default class ApiManager {
       this.callApi,
       this.system.config.config.ioSetResponseTimoutSec,
       this.system.log.error,
-      uniqId
+      makeUniqId
     );
   }
 

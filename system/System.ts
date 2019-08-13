@@ -16,7 +16,7 @@ import State from './State';
 import Api from './Api';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './dict/systemEvents';
-import uniqId from './lib/uniqId';
+import {makeUniqId} from './lib/uniqId';
 
 
 export default class System {
@@ -67,7 +67,7 @@ export default class System {
     this.devicesManager = new DevicesManager(this);
     this.apiManager = new ApiManager(this);
     this.api = new Api(this);
-    this.sessions = new Sessions(uniqId);
+    this.sessions = new Sessions(makeUniqId);
     this.state = new State();
   }
 
