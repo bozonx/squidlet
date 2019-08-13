@@ -1,44 +1,78 @@
 import IoSet from '../system/interfaces/IoSet';
 import RemoteCallMessage from '../entities/services/WsApi/WsApi';
 import {deserializeJson, serializeJson} from '../system/lib/binaryHelpers';
-import {WsServerSessions} from '../entities/drivers/WsServerSessions/WsServerSessions';
+import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
+import {ConnectionParams, WebSocketServerProps} from '../system/interfaces/io/WebSocketServerIo';
 
 
 // localhost:8089
 
+const defaultProps: WebSocketServerProps = {
+  host: 'localhost',
+  port: 8089,
+}
+
+
 export default class IoServer {
-  private readonly ioSet: IoSet;
+  private readonly wsServer: WebSocketServerIo;
+  private serverId: string = '';
+  private connectionId?: string;
 
 
   constructor(ioSet: IoSet) {
-    this.ioSet = ioSet;
+    this.wsServer = ioSet.getIo<WebSocketServerIo>('WebSocketServer');
   }
 
   async init() {
-    // TODO: режим io сервера - нужен конфиг(запрашиваем в ioSet)
-    // TODO: запретить больше 1й сессии одновременно
-    // TODO: ошибки отправлять обратным сообщением
-    // TODO: может не использовать драйвер - а сразу работать с io
 
-    // TODO: это же драйвер!!!
-    this.depsInstances.wsServer = await this.ioSet.getIo<WsServerSessions>('WsServerSessions')
-      .getInstance(this.props);
 
-    this.wsServerSessions.onNewSession((sessionId: string) => {
-      this.sessions.push(sessionId);
-    });
+    // this.depsInstances.wsServer = await this.ioSet.getIo<WsServerSessions>('WsServerSessions')
+    //   .getInstance(this.props);
 
-    this.wsServerSessions.onSessionClose(this.wrapErrors(async (sessionId: string) => {
-      this.sessions = removeItemFromArray(this.sessions, sessionId);
+    // this.wsServerSessions.onNewSession((sessionId: string) => {
+    //   this.sessions.push(sessionId);
+    // });
 
-      await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
-    }));
+    // this.wsServerSessions.onSessionClose(this.wrapErrors(async (sessionId: string) => {
+    //   this.sessions = removeItemFromArray(this.sessions, sessionId);
+    //
+    //   await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
+    // }));
+
+
 
     // listen income api requests
-    this.wsServerSessions.onMessage(this.handleIncomeMessages);
+    //this.wsServerSessions.onMessage(this.handleIncomeMessages);
+
+
 
     // listen outcome api requests
-    this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
+    //this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
+
+
+    // TODO: добавить переопределение props - см в конфиге
+    this.serverId = await this.wsServer.newServer(defaultProps);
+
+    await this.wsServer.onConnection(this.serverId, (connectionId: string) => {
+      // TODO: отправить ошибку на это же соединение
+      if (this.connectionId) return this.logError(`Only one connection is allowed`);
+    });
+
+    await this.wsServer.onClose(this.serverId, () => {
+
+    });
+
+    await this.wsServer.onMessage(this.serverId, () => {
+
+    });
+
+    await this.wsServer.onError(this.serverId, () => {
+
+    });
+
+    await this.wsServer.onUnexpectedResponse(this.serverId, () => {
+
+    });
   }
 
 
@@ -81,4 +115,7 @@ export default class IoServer {
       .catch(console.error);
   }
 
+  private logError(msg: string) {
+    // TODO: ошибки отправлять обратным сообщением
+  }
 }
