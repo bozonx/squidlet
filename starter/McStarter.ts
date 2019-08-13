@@ -1,14 +1,19 @@
 import {SystemClassType} from '../shared/interfaces/SystemClassType';
 import IoSetLocal from '../system/entities/IoSetLocal';
 import IoSet from '../system/interfaces/IoSet';
-import IoBackdoor from './IoBackdoor';
+import IoServer from './IoServer';
+import StorageIo from '../system/interfaces/io/StorageIo';
+import systemConfig from '../system/config/systemConfig';
+
+
+const MODE_MARK_FILE_NAME = 'ioserver';
 
 
 class McStarter {
   private pathToBundle: string;
 
 
-  constructor(pathToBundle = '/envSet/system/System') {
+  constructor(pathToBundle = `${systemConfig.rootDirs.envSet}/${systemConfig.envSetDirs.system}/System`) {
     this.pathToBundle = pathToBundle;
   }
 
@@ -17,7 +22,7 @@ class McStarter {
     const ioSet = new IoSetLocal();
 
     if (await this.isIoServerMode(ioSet)) {
-      await this.startIoBackdoor(ioSet);
+      await this.startIoServer(ioSet);
     }
     else {
       await this.startSystem(ioSet);
@@ -25,8 +30,11 @@ class McStarter {
   }
 
 
-  private async isIoServerMode(ioSet: IoSet): boolean {
-    // TODO: как определить режим io сервера - может создать файл и при загрузке его считать???
+  private async isIoServerMode(ioSet: IoSet): Promise<boolean> {
+    const storage = ioSet.getIo<StorageIo>('Storage');
+    const markFilePath = `${systemConfig.rootDirs.tmp}/${MODE_MARK_FILE_NAME}`;
+
+    return storage.exists(markFilePath);
   }
 
   private async startSystem(ioSet: IoSet) {
@@ -36,10 +44,10 @@ class McStarter {
     await system.start();
   }
 
-  private async startIoBackdoor(ioSet: IoSet) {
-    const ioBackdoor = new IoBackdoor(ioSet);
+  private async startIoServer(ioSet: IoSet) {
+    const ioServer = new IoServer(ioSet);
 
-    await ioBackdoor.init();
+    await ioServer.init();
   }
 
 }

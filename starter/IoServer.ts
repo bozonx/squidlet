@@ -6,7 +6,7 @@ import {WsServerSessions} from '../entities/drivers/WsServerSessions/WsServerSes
 
 // localhost:8089
 
-export default class IoBackdoor {
+export default class IoServer {
   private readonly ioSet: IoSet;
 
 
