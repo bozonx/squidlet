@@ -3,10 +3,6 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {Dictionary} from '../system/interfaces/Types';
 
 
-// TODO: remove
-let uniqIdIndex = 0;
-
-
 // interface ApiConnectionParams {
 //   host?: string;
 //   port?: number;
@@ -118,21 +114,11 @@ export default class ApiCall {
   }
 
 
-  private generateUniqId = (): string => {
-
-    // TODO: use real uniq id
-
-    uniqIdIndex++;
-
-    return String(uniqIdIndex);
-  }
-
   private connect(host?: string, port?: string): WsApiClient {
     return new WsApiClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,
       console.error,
-      this.generateUniqId,
       host,
       (port) ? parseInt(port) : undefined
     );

@@ -16,10 +16,7 @@ import State from './State';
 import Api from './Api';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './dict/systemEvents';
-
-
-// TODO: remove
-let lastId: number = 0;
+import uniqId from './lib/uniqId';
 
 
 export default class System {
@@ -70,7 +67,7 @@ export default class System {
     this.devicesManager = new DevicesManager(this);
     this.apiManager = new ApiManager(this);
     this.api = new Api(this);
-    this.sessions = new Sessions(this.generateUniqId);
+    this.sessions = new Sessions(uniqId);
     this.state = new State();
   }
 
@@ -139,20 +136,6 @@ export default class System {
 
     return this.events.once(SystemEvents.appInitialized, cb);
   }
-
-  /**
-   * Generate unique id.
-   * It places here for easy testing and mocking.
-   */
-  generateUniqId(): string {
-    // TODO: make - system id + timestamp + index
-    // TODO: может перенести в system???
-
-    lastId++;
-
-    return String(lastId);
-  }
-
 
   // private async initNetwork(): Promise<void> {
   //   console.info(`---> Initializing network`);

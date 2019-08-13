@@ -1,7 +1,7 @@
 import hashSum from './hashSum';
 
 
-let counter = Number.MIN_SAFE_INTEGER + Math.floor(Math.random() * 100000);
+let counter = Number.MIN_SAFE_INTEGER + Math.floor(Math.random() * 1000000);
 
 
 export default function (): string {

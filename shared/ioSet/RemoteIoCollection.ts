@@ -26,11 +26,13 @@ export default class RemoteIoCollection {
 
 
   async init(system: System): Promise<void> {
+
+    // TODO: system не нужен ???
+
     this._client = new WsApiClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,
       console.error,
-      system.generateUniqId,
       this.host,
       this.port
     );
