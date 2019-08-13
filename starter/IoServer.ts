@@ -8,12 +8,11 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import {makeUniqId} from '../system/lib/uniqId';
 
 
-// localhost:8089
-
+const METHOD_DELIMITER = '.';
 const defaultProps: WebSocketServerProps = {
   host: 'localhost',
   port: 8089,
-}
+};
 
 
 export default class IoServer {
@@ -43,8 +42,7 @@ export default class IoServer {
 
     this.wsServer.onMessage(this.handleIncomeMessages);
     this.wsServer.onConnection(this.handleNewConnection);
-
-    this.wsServer.onConnectionClose((connectionId: string) => {
+    this.wsServer.onConnectionClose(() => {
       this.connectionId = undefined;
 
       this.remoteCall && this.remoteCall.destroy()
@@ -59,12 +57,39 @@ export default class IoServer {
   }
 
 
-  private async callIo(fullName: string, args: any[]): Promise<any> {
-    // TODO: распарсить methodName на ioName и methodName
+  private handleNewConnection = (connectionId: string) => {
+    if (this.connectionId) {
+      const msg = `Only one connection is allowed`;
 
-    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
+      this.logError(msg);
+      this.wsServer.closeConnection(connectionId, 1, msg)
+        .catch(this.logError);
 
-    return IoItem[methodName](...args);
+      return;
+    }
+
+    this.remoteCall = new RemoteCall(
+      // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
+      this.sendBack,
+      this.callIo,
+      // TODO: merge with ioServer or host's config - ioSetResponseTimoutSec
+      30,
+      this.logError,
+      makeUniqId
+    );
+  }
+
+  private handleIncomeMessages = (connectionId: string, data: string | Uint8Array) => {
+    let msg: RemoteCallMessage;
+
+    try {
+      msg = deserializeJson(data);
+    }
+    catch (err) {
+      return this.logError(`WsApi: Can't decode message: ${err}`);
+    }
+
+    return this.remoteCall && this.remoteCall.incomeMessage(msg);
   }
 
   private sendBack = async (message: RemoteCallMessage): Promise<void> => {
@@ -82,38 +107,31 @@ export default class IoServer {
     return this.wsServer.send(this.connectionId, binData);
   }
 
-  private handleNewConnection = (connectionId: string) => {
-    if (!this.connectionId) return;
+  private async callIo(fullName: string, args: any[]): Promise<any> {
+    const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
 
-    const msg = `Only one connection is allowed`;
-    this.logError(msg);
-
-    this.wsServer.closeConnection(connectionId, 1, msg)
-      .catch(this.logError);
-  }
-
-  private handleIncomeMessages = (connectionId: string, data: string | Uint8Array) => {
-    let msg: RemoteCallMessage;
-
-    try {
-      msg = deserializeJson(data);
-    }
-    catch (err) {
-      return this.logError(`WsApi: Can't decode message: ${err}`);
+    if (!methodName) {
+      return this.logError(`No method name: "${fullName}"`);
     }
 
-    return this.remoteCall.incomeMessage(msg);
+    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
+
+    if (!IoItem[methodName]) {
+      return this.logError(`Method doesn't exist: "${fullName}"`);
+    }
+
+    return IoItem[methodName](...args);
   }
 
   private loInfo = (msg: string) => {
-    // TODO: ошибки отправлять обратным сообщением
+    console.info(msg);
   }
 
   private logError = (msg: string) => {
-    // TODO: ошибки отправлять обратным сообщением
+    console.error(msg);
   }
 
   private handleClose = () => {
-    // TODO: !!!
+    console.error(`Websocket server was closed`);
   }
 }
