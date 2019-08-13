@@ -66,6 +66,6 @@ function toString (o: any) {
 }
 
 
-export default function sum (o: any) {
+export default function(o: any) {
   return pad(foldValue(0, o, '', []).toString(16), 8);
 }
