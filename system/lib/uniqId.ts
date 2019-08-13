@@ -5,6 +5,11 @@ let counter: number = Number.MIN_SAFE_INTEGER + Math.floor(Math.random() * (Numb
 let instanceId: string | undefined;
 
 
+/**
+ * Generate unique number.
+ * It increments a counter on each call.
+ * Counter is initialized with a random value.
+ */
 export function makeUniqNumber(): number {
   counter++;
 
@@ -13,16 +18,24 @@ export function makeUniqNumber(): number {
   return counter;
 }
 
-export function getInstanceId(): string {
+/**
+ * It returns id of runtime. This id is generating on first call of this function.
+ * This id will never changed while runtime.
+ * It contains of 8 chars.
+ */
+export function getRuntimeId(): string {
   if (typeof instanceId === 'undefined') {
-    instanceId = hashSum(makeUniqNumber());
+    instanceId = hashSum( String(Math.random() * (Number.MAX_SAFE_INTEGER)) );
   }
 
-  return instanceId;
+  return instanceId as string;
 }
 
+/**
+ * Make always a unique id which contains of 8 chars.
+ */
 export function makeUniqId (): string {
-  const str = Date.now().toString() + makeUniqNumber();
+  const str: string = getRuntimeId() + String(makeUniqNumber());
 
   return hashSum(str);
 }
