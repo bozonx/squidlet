@@ -118,17 +118,3 @@ export default class Api {
   }
 
 }
-
-
-// callIoMethod = async (ioName: string, methodName: string, ...args: any[]): Promise<any> => {
-//   const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.system.ioManager.getIo(ioName);
-//
-//   return IoItem[methodName](...args);
-// }
-
-// blockIo(doBlock: boolean) {
-// }
-
-// getIoNames() {
-//   return this.system.ioManager.getNames();
-// }
