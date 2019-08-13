@@ -40,7 +40,7 @@ export function getRuntimeId(): string {
  * Make always a unique id which contains of 8 chars.
  */
 export function makeUniqId (): string {
-  const str: string = getRuntimeId() + String(makeUniqNumber()) + String(randomInt());
+  const str: string = getRuntimeId() + String(makeUniqNumber());
 
   return hashSum(str);
 }
