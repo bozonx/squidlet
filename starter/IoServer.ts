@@ -1,8 +1,11 @@
 import IoSet from '../system/interfaces/IoSet';
-import RemoteCallMessage from '../entities/services/WsApi/WsApi';
 import {deserializeJson, serializeJson} from '../system/lib/binaryHelpers';
 import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
 import {ConnectionParams, WebSocketServerProps} from '../system/interfaces/io/WebSocketServerIo';
+import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
+import RemoteCall from '../system/lib/remoteCall/RemoteCall';
+import systemConfig from '../system/config/systemConfig';
+import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 
 
 // localhost:8089
@@ -14,13 +17,35 @@ const defaultProps: WebSocketServerProps = {
 
 
 export default class IoServer {
-  private readonly wsServer: WebSocketServerIo;
-  private serverId: string = '';
-  private connectionId?: string;
+  private readonly ioSet: IoSet;
+  private readonly wsServer: WsServerLogic;
+  private remoteCall: RemoteCall;
+  //private connectionId?: string;
 
 
   constructor(ioSet: IoSet) {
-    this.wsServer = ioSet.getIo<WebSocketServerIo>('WebSocketServer');
+    this.ioSet = ioSet;
+
+    const wsServerIo = ioSet.getIo<WebSocketServerIo>('WebSocketServer');
+
+    this.wsServer = new WsServerLogic(
+      wsServerIo,
+      // TODO: добавить переопределение props - см в конфиге
+      defaultProps,
+      this.handleClose,
+      this.loInfo,
+      this.logError,
+    );
+
+    this.remoteCall = new RemoteCall(
+      // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
+      this.sendBack,
+      this.callIo,
+      // TODO: merge with ioServer or host's config - ioSetResponseTimoutSec
+      30,
+      this.logError,
+      this.system.generateUniqId
+    );
   }
 
   async init() {
@@ -33,59 +58,63 @@ export default class IoServer {
     //   this.sessions.push(sessionId);
     // });
 
-    // this.wsServerSessions.onSessionClose(this.wrapErrors(async (sessionId: string) => {
-    //   this.sessions = removeItemFromArray(this.sessions, sessionId);
-    //
-    //   await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
-    // }));
-
-
-
-    // listen income api requests
-    //this.wsServerSessions.onMessage(this.handleIncomeMessages);
-
-
-
     // listen outcome api requests
     //this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
 
 
     // TODO: добавить переопределение props - см в конфиге
-    this.serverId = await this.wsServer.newServer(defaultProps);
+    //this.serverId = await this.wsServer.newServer(defaultProps);
 
-    await this.wsServer.onConnection(this.serverId, (connectionId: string) => {
-      // TODO: отправить ошибку на это же соединение
-      if (this.connectionId) return this.logError(`Only one connection is allowed`);
+    // await this.wsServer.onConnection(this.serverId, (connectionId: string) => {
+    //   // TODO: отправить ошибку на это же соединение
+    //   if (this.connectionId) return this.logError(`Only one connection is allowed`);
+    // });
+    //
+    // await this.wsServer.onClose(this.serverId, () => {
+    //   //await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
+    // });
+    //
+    // await this.wsServer.onMessage(this.serverId, (connectionId: string, data: string | Uint8Array) => {
+    //   if (this.connectionId !== connectionId) return this.logError(`Only one connection is allowed`);
+    // });
+    //
+    // await this.wsServer.onError(this.serverId, (connectionId: string, err: Error) => {
+    //   if (this.connectionId !== connectionId) return this.logError(`Only one connection is allowed`);
+    // });
+    //
+    // await this.wsServer.onUnexpectedResponse(this.serverId, (connectionId: string, response: ConnectionParams) => {
+    //   if (this.connectionId !== connectionId) return this.logError(`Only one connection is allowed`);
+    // });
+
+    await this.wsServer.init();
+
+    this.wsServer.onMessage(this.handleIncomeMessages);
+
+    this.wsServer.onConnection((connectionId: string) => {
+      // TODO: !!!
     });
 
-    await this.wsServer.onClose(this.serverId, () => {
-
-    });
-
-    await this.wsServer.onMessage(this.serverId, () => {
-
-    });
-
-    await this.wsServer.onError(this.serverId, () => {
-
-    });
-
-    await this.wsServer.onUnexpectedResponse(this.serverId, () => {
-
+    this.wsServer.onConnectionClose((connectionId: string) => {
+      // TODO: !!!
+      //await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
     });
   }
 
 
   destroy = async () => {
-    for (let sessionId of this.sessions) {
-      await this.wsServerSessions.close(sessionId);
-    }
-
-    delete this.sessions;
+    await this.wsServer.destroy();
   }
 
 
-  private handleIncomeMessages = this.wrapErrors(async (sessionId: string, data: string | Uint8Array) => {
+  private async callIo(methodName: string, args: any[]): Promise<any> {
+    return (this.system.api as any)[methodName](...args);
+  }
+
+  private sendBack = (message: RemoteCallMessage): Promise<void> => {
+    // TODO: !!!
+  }
+
+  private handleIncomeMessages = (connectionId: string, data: string | Uint8Array) => {
     if (!this.sessions.includes(sessionId)) return;
 
     let msg: RemoteCallMessage;
@@ -98,7 +127,7 @@ export default class IoServer {
     }
 
     return this.env.system.apiManager.incomeRemoteCall(sessionId, msg);
-  });
+  };
 
   private handleOutcomeMessages = (sessionId: string, message: RemoteCallMessage) => {
     let binData: Uint8Array;
@@ -115,7 +144,15 @@ export default class IoServer {
       .catch(console.error);
   }
 
-  private logError(msg: string) {
+  private loInfo = (msg: string) => {
     // TODO: ошибки отправлять обратным сообщением
+  }
+
+  private logError = (msg: string) => {
+    // TODO: ошибки отправлять обратным сообщением
+  }
+
+  private handleClose = () => {
+    // TODO: !!!
   }
 }
