@@ -1,5 +1,10 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ManifestBase from '../interfaces/ManifestBase';
+import Context from '../Context';
+import LogPublisher from '../LogPublisher';
+import HostConfig from '../interfaces/HostConfig';
+import IoItem from '../interfaces/IoItem';
+import DriverBase from '../baseDrivers/DriverBase';
 
 
 interface KindOfDriver {
@@ -11,13 +16,26 @@ export type GetDriverDep = (driverName: string) => KindOfDriver;
 
 
 export default class EntityBase<Props = {}> {
+  readonly context: Context;
   readonly id: string;
   readonly className: string;
   readonly props: Props;
   // destroy method for entity
   destroy?: () => Promise<void>;
 
-  protected readonly env: EnvBase;
+  // get api(): Api {
+  //   return this.system.api;
+  // }
+  // get events(): IndexedEventEmitter {
+  //   return this.system.events;
+  // }
+  get log(): LogPublisher {
+    return this.context.log;
+  }
+  get config(): HostConfig {
+    return this.context.config;
+  }
+
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: any} = {};
   // better place to instantiate dependencies if need
@@ -45,8 +63,8 @@ export default class EntityBase<Props = {}> {
   }
 
 
-  constructor(definition: EntityDefinition, env: EnvBase) {
-    this.env = env;
+  constructor(context: Context, definition: EntityDefinition) {
+    this.context = context;
     this.id = definition.id;
     this.className = definition.className;
     this.props = definition.props as Props;
@@ -105,6 +123,15 @@ export default class EntityBase<Props = {}> {
     if (this.destroy) await this.destroy();
   }
 
+
+  getIo<T extends IoItem>(shortDevName: string): T {
+    //return this.system.driversManager.getDev<T>(shortDevName);
+    return this.context.system.ioManager.getIo<T>(shortDevName);
+  }
+
+  getDriver<T extends DriverBase>(driverName: string): T {
+    return this.context.system.driversManager.getDriver<T>(driverName);
+  }
 
   /**
    * Load manifest of this entity

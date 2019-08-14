@@ -1,7 +1,6 @@
 import EntityBase from '../entities/EntityBase';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ServiceManifest from '../interfaces/ServiceManifest';
-import EntityEnv from '../entities/EntityEnv';
 
 
 export default class ServiceBase<Props extends {[index: string]: any;} = {}> extends EntityBase<Props> {

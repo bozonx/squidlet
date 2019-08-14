@@ -5,7 +5,6 @@ import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../lib/ConsistentState';
 import DeviceState from './DeviceState';
 import {StateCategories} from '../interfaces/States';
-import EntityEnv from '../entities/EntityEnv';
 
 
 export const DEFAULT_STATUS = 'default';
