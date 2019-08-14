@@ -49,7 +49,7 @@ export default class EnvSet {
       this.system.systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
-      this.system.initCfg.fileNames.manifest
+      this.system.initializationConfig.fileNames.manifest
     );
 
     return this.readJsonObjectFile(pathToFile) as Promise<T>;

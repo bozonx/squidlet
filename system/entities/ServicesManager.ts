@@ -12,7 +12,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
 
   async initSystemServices() {
     const systemServicesList: string[] = await this.system.envSet.loadConfig<string[]>(
-      this.system.initCfg.fileNames.systemServices
+      this.system.initializationConfig.fileNames.systemServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(systemServicesList);
 
@@ -21,7 +21,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
 
   async initRegularServices() {
     const regularServicesList = await this.system.envSet.loadConfig<string[]>(
-      this.system.initCfg.fileNames.regularServices
+      this.system.initializationConfig.fileNames.regularServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(regularServicesList);
 
@@ -42,7 +42,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
 
   private async initServices(servicesIds: string[]) {
     const definitions = await this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initCfg.fileNames.servicesDefinitions
+      this.system.initializationConfig.fileNames.servicesDefinitions
     );
 
     for (let serviceId of servicesIds) {
@@ -55,7 +55,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
   private async generateServiceIdsList(allowedClassNames: string[]): Promise<string[]> {
     const servicesIds: string[] = [];
     const definitions = await this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initCfg.fileNames.servicesDefinitions
+      this.system.initializationConfig.fileNames.servicesDefinitions
     );
 
     for (let serviceId of Object.keys(definitions)) {

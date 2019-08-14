@@ -5,7 +5,6 @@ import EnvSet from './entities/EnvSet';
 import IoSet from './interfaces/IoSet';
 import IoManager from './entities/IoManager';
 import ApiManager from './ApiManager';
-import HostConfig from './interfaces/HostConfig';
 import Api from './Api';
 import Context, {AppLifeCycleEvents} from './Context';
 import InitializationConfig from './interfaces/InitializationConfig';
@@ -14,24 +13,33 @@ import initializationConfig from './config/initializationConfig';
 
 export default class System {
   readonly context: Context;
-  readonly ioManager: IoManager;
   readonly envSet: EnvSet;
+  readonly ioManager: IoManager;
   readonly driversManager: DriversManager;
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
   readonly apiManager: ApiManager;
   readonly api: Api;
-  // only for initialization time - it will be deleted after it
-  private initializationConfig?: InitializationConfig;
 
-  get initCfg(): InitializationConfig {
-    return this.initializationConfig as InitializationConfig;
+  get initializationConfig(): InitializationConfig {
+    return this._initializationConfig as InitializationConfig;
   }
+  get isDevicesInitialized(): boolean {
+    return this._isDevicesInitialized;
+  }
+  get isAppInitialized(): boolean {
+    return this._isAppInitialized;
+  }
+
+  // only for initialization time - it will be deleted after it
+  private _initializationConfig?: InitializationConfig;
+  private _isDevicesInitialized: boolean = false;
+  private _isAppInitialized: boolean = false;
 
 
   constructor(ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) {
     // config which is used only on initialization time
-    this.initializationConfig = initializationConfig();
+    this._initializationConfig = initializationConfig();
     this.ioManager = new IoManager(this, ioSet);
     this.envSet = new EnvSet(this);
     this.driversManager = new DriversManager(this);
@@ -60,10 +68,7 @@ export default class System {
     await this.ioManager.init();
 
     console.info(`---> Initializing configs`);
-    // TODO: нет смыла это сохранять, лучше каждый раз брать из configSet где будет кэш
-    this.hostConfig = await this.envSet.loadConfig<HostConfig>(
-      this.initCfg.fileNames.hostConfig
-    );
+    await this.context.initConfig();
 
     console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();
@@ -79,7 +84,7 @@ export default class System {
     this.riseSystemEvent(AppLifeCycleEvents.appInitialized);
 
     // remove initialization config
-    delete this.initializationConfig;
+    delete this._initializationConfig;
 
     console.info(`===> System initialization has been finished`);
   }

@@ -55,7 +55,7 @@ export default class IoManager {
   private async configureAllIo() {
     const ioNames: string[] = this.ioSet.getNames();
     const ioParams = await this.system.envSet.loadConfig<IoItemDefinition>(
-      this.system.initCfg.fileNames.iosDefinitions
+      this.system.initializationConfig.fileNames.iosDefinitions
     );
 
     // configure ios if need

@@ -18,7 +18,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase, Device
    */
   async init() {
     const definitions = await this.system.envSet.loadConfig<EntityDefinition[]>(
-      this.system.initCfg.fileNames.devicesDefinitions
+      this.system.initializationConfig.fileNames.devicesDefinitions
     );
 
     for (let definition of definitions) {

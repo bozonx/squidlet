@@ -20,6 +20,7 @@ export enum AppLifeCycleEvents {
 
 export default class Context {
   readonly system: System;
+  // TODO: лучше пусть будет в system - но сделать обертку здесь для навешивания на события
   readonly events = new IndexedEventEmitter();
   readonly systemConfig: typeof systemConfig;
   readonly log: LogPublisher = new LogPublisher(this);
@@ -29,15 +30,16 @@ export default class Context {
     return this.config.id;
   }
   get config(): HostConfig {
-    return this.hostConfig as HostConfig;
+    //return this.hostConfig as HostConfig;
+    return await this.envSet.loadConfig<HostConfig>(
+      this.system.initializationConfig.fileNames.hostConfig
+    );
   }
-  private _isDevicesInitialized: boolean = false;
-  private _isAppInitialized: boolean = false;
 
   private hostConfig?: HostConfig;
 
   get isInitialized() {
-    return this._isAppInitialized;
+    return this.system.isAppInitialized;
   }
 
 
@@ -51,6 +53,10 @@ export default class Context {
 
   }
 
+  async initConfig() {
+    // TODO: load host config
+  }
+
   destroy() {
     this.sessions.destroy();
     this.state.destroy();
@@ -60,7 +66,7 @@ export default class Context {
 
   onDevicesInit(cb: () => void): number {
     // call immediately if devices are initialized
-    if (this._isDevicesInitialized) {
+    if (this.system.isDevicesInitialized) {
       cb();
 
       return -1;
@@ -71,7 +77,7 @@ export default class Context {
 
   onAppInit(cb: () => void): number {
     // call immediately if app is initialized
-    if (this._isAppInitialized) {
+    if (this.system.isAppInitialized) {
       cb();
 
       return -1;
