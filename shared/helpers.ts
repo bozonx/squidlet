@@ -124,6 +124,14 @@ export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
   return path.join(REPO_ROOT, 'build', subDir);
 }
 
+/**
+ * Call cb on SIGTERM and SIGINT signals
+ */
+export function listenScriptEnd(cb: () => void) {
+  process.on('SIGTERM', cb);
+  process.on('SIGINT', cb);
+}
+
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
 //   const platformDir: string = resolvePlatformDir(platform);
 //   const machineConfigPath = path.join(platformDir, `machine-${machine}`);

@@ -95,7 +95,7 @@ export default class Api {
     return this.system.config;
   }
 
-  getSystemConfigParam(configParam: string): JsonTypes {
+  getHostConfigValue(configParam: string): JsonTypes {
     return objGet(this.system.config, configParam);
   }
 
@@ -115,6 +115,17 @@ export default class Api {
     return this.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
       if (allowedLogLevels.includes(level)) cb(message);
     });
+  }
+
+  removeLogListener(handlerIndex: number) {
+    this.system.events.removeListener(LOGGER_EVENT, handlerIndex);
+  }
+
+  /**
+   * Remove listeners for state, device status and device config
+   */
+  removeStateListener(handlerIndex: number) {
+    this.system.state.removeListener(handlerIndex);
   }
 
 }

@@ -5,6 +5,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
 import Os from '../../shared/Os';
 import {SystemClassType} from '../../shared/interfaces/SystemClassType';
+import {listenScriptEnd} from '../../shared/helpers';
 
 
 export default class SystemStarter {
@@ -45,8 +46,7 @@ export default class SystemStarter {
   }
 
   private listenDestroySignals(destroy: () => Promise<void>) {
-    process.on('SIGTERM', () => this.gracefullyDestroyCb(destroy));
-    process.on('SIGINT', () => this.gracefullyDestroyCb(destroy));
+    listenScriptEnd(() => this.gracefullyDestroyCb(destroy));
   }
 
   private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
