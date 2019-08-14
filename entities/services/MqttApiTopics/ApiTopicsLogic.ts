@@ -2,7 +2,6 @@ import {splitFirstElement} from 'system/lib/strings';
 import {combineTopic, parseValue} from 'system/lib/helpers';
 import {Dictionary, JsonTypes} from 'system/interfaces/Types';
 import {trim} from 'system/lib/lodashLike';
-import System from 'system/System';
 import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
@@ -26,16 +25,16 @@ export const TOPIC_SEPARATOR = '/';
  */
 export default class ApiTopicsLogic {
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
-  private readonly system: System;
+  private readonly context: Context;
 
 
-  constructor(system: System) {
-    this.system = system;
+  constructor(context: Context) {
+    this.context = context;
   }
 
   init() {
     // listen to outcome messages from api and send them to mqtt broker
-    this.system.state.onChange(this.handleStateChange);
+    this.context.state.onChange(this.handleStateChange);
   }
 
   destroy() {
@@ -90,7 +89,7 @@ export default class ApiTopicsLogic {
       }
     }
     catch (err) {
-      this.system.log.error(`Can't publish device state: ${err}`);
+      this.context.log.error(`Can't publish device state: ${err}`);
     }
   }
 
@@ -113,11 +112,11 @@ export default class ApiTopicsLogic {
     }
 
     // income string-type api message - call device action
-    this.system.log.info(`ApiTopics income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${JSON.stringify(data)}`);
+    this.context.log.info(`ApiTopics income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${JSON.stringify(data)}`);
 
     const args: JsonTypes[] = this.parseArgs(data);
 
-    await this.system.api.callDeviceAction(deviceId, actionName, ...args);
+    await this.context.system.api.callDeviceAction(deviceId, actionName, ...args);
   }
 
   private parseArgs(data: string | undefined): JsonTypes[] {
@@ -164,7 +163,7 @@ export default class ApiTopicsLogic {
     changedParams: string[]
   ) {
     const topicType: TopicType = 'device';
-    const state: Dictionary | undefined = this.system.state.getState(category, stateName);
+    const state: Dictionary | undefined = this.context.state.getState(category, stateName);
 
     if (!state) return;
 
@@ -180,7 +179,7 @@ export default class ApiTopicsLogic {
   private emitOutcomeMsg(topicType: TopicType, topicBody: string, data: string) {
     const topic = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
 
-    this.system.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
+    this.context.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
     this.outcomeEvents.emit(topic, data);
   }
 

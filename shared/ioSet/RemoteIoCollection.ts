@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import System from '../../system/System';
+import Context from '../../system/Context';
 import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../helpers';
 import WsApiClient from '../WsApiClient';
@@ -25,7 +25,7 @@ export default class RemoteIoCollection {
   }
 
 
-  async init(system: System): Promise<void> {
+  async init(context: Context): Promise<void> {
 
     // TODO: system не нужен ???
 

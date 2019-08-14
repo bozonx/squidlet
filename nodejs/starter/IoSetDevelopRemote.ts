@@ -1,5 +1,5 @@
 import IoSet from '../../system/interfaces/IoSet';
-import System from '../../system';
+import Context from '../../system/Context';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
@@ -38,8 +38,8 @@ export default class IoSetDevelopRemote implements IoSet {
     await this.storageWrapper.init();
   }
 
-  async init(system: System) {
-    await this.remoteIoCollection.init(system);
+  async init(context: Context) {
+    await this.remoteIoCollection.init(context);
 
     // check io dependencies
     checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.ioNames);
