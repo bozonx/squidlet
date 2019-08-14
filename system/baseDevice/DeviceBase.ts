@@ -1,11 +1,11 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
-import DeviceEnv from './DeviceEnv';
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../lib/ConsistentState';
 import DeviceState from './DeviceState';
 import {StateCategories} from '../interfaces/States';
+import EntityEnv from '../entities/EntityEnv';
 
 
 export const DEFAULT_STATUS = 'default';
@@ -35,7 +35,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.configState.isReading() || this.configState.isWriting();
   }
 
-  protected readonly env: DeviceEnv;
+  protected readonly env: EntityEnv;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
    */
@@ -50,7 +50,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   private _configState?: DeviceState;
 
 
-  constructor(definition: EntityDefinition, env: DeviceEnv) {
+  constructor(definition: EntityDefinition, env: EntityEnv) {
     super(definition, env);
     this.env = env;
   }
@@ -113,6 +113,10 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
   getActionsList(): string[] {
     return Object.keys(this.actions);
+  }
+
+  async loadManifest(className: string): Promise<DeviceManifest> {
+    return this.system.envSet.loadManifest<DeviceManifest>('devices', className);
   }
 
   /**
