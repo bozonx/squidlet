@@ -1,5 +1,5 @@
 import {padStart} from './lodashLike';
-import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../dict/constants';
+import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../constants';
 import {base64ToString, stringToBase64} from './strings';
 
 

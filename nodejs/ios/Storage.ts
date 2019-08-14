@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/lib/helpers';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
-import {ENCODE} from 'system/dict/constants';
+import {ENCODE} from 'system/constants';
 
 
 /**

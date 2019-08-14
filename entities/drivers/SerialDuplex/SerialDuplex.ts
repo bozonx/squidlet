@@ -3,7 +3,7 @@ import DriverBase from 'system/baseDrivers/DriverBase';
 import SerialIo from 'system/interfaces/io/SerialIo';
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
-import {DATA_ADDRESS_LENGTH} from 'system/dict/constants';
+import {DATA_ADDRESS_LENGTH} from 'system/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 
 

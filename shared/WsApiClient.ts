@@ -7,7 +7,7 @@ import {deserializeJson, serializeJson} from '../system/lib/binaryHelpers';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
-import {ENCODE} from '../system/dict/constants';
+import {ENCODE} from '../system/constants';
 import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
 

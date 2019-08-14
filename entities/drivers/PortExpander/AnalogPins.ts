@@ -1,5 +1,5 @@
 import {numToUint8Word} from 'system/lib/binaryHelpers';
-import {BYTES_IN_WORD} from 'system/dict/constants';
+import {BYTES_IN_WORD} from 'system/constants';
 import {getKeyOfObject} from 'system/lib/collections';
 
 import {

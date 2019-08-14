@@ -1,4 +1,4 @@
-import {LENGTH_AND_START_ARR_DIFFERENCE} from '../dict/constants';
+import {LENGTH_AND_START_ARR_DIFFERENCE} from '../constants';
 
 
 export type AnyHandler = (...args: any[]) => void;

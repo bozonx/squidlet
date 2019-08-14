@@ -13,7 +13,7 @@ import {GetDriverDep} from 'system/entities/EntityBase';
 import {firstLetterToUpperCase} from 'system/lib/strings';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
-import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/dict/constants';
+import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {omit} from 'system/lib/lodashLike';
 import {PollProps} from 'system/baseDrivers/MasterSlaveBaseNodeDriver';

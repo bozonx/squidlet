@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as shelljs from 'shelljs';
 import * as _ from 'lodash';
 import * as yaml from 'js-yaml';
-import {ENCODE} from '../../system/dict/constants';
+import {ENCODE} from '../../system/constants';
 
 // TODO: !!!!
 //const {makeSafeModuleName} = require('../../host/helpers');

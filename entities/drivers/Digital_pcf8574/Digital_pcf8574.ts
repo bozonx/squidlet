@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
 import DriverBase from 'system/baseDrivers/DriverBase';
 import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
-import {LENGTH_AND_START_ARR_DIFFERENCE} from 'system/dict/constants';
+import {LENGTH_AND_START_ARR_DIFFERENCE} from 'system/constants';
 
 import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';
 
