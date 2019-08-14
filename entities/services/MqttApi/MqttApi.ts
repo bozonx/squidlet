@@ -1,4 +1,4 @@
-import ServiceBase from 'system/baseServices/ServiceBase';
+import ServiceBase from 'system/entities/ServiceBase';
 import {deserializeJson, serializeJson} from 'system/lib/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {GetDriverDep} from 'system/entities/EntityBase';

@@ -1,4 +1,4 @@
-import DeviceBase from 'system/baseDevice/DeviceBase';
+import DeviceBase from 'system/entities/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 
 import {

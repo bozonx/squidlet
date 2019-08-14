@@ -4,7 +4,7 @@ import Context from '../Context';
 import LogPublisher from '../LogPublisher';
 import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
-import DriverBase from '../baseDrivers/DriverBase';
+import DriverBase from './DriverBase';
 import ServiceManifest from '../interfaces/ServiceManifest';
 
 

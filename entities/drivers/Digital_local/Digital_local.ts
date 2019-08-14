@@ -4,8 +4,8 @@ import DigitalIo, {
   WatchHandler,
   DigitalInputMode
 } from 'system/interfaces/io/DigitalIo';
-import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
-import DriverBase from 'system/baseDrivers/DriverBase';
+import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverBase from 'system/entities/DriverBase';
 
 
 export class DigitalLocal extends DriverBase implements DigitalSubDriver {

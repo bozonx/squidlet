@@ -1,4 +1,4 @@
-import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
+import DeviceBase, {DEFAULT_STATUS} from 'system/entities/DeviceBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {omit} from 'system/lib/lodashLike';
 import {Dictionary} from 'system/interfaces/Types';

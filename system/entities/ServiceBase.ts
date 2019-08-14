@@ -1,4 +1,4 @@
-import EntityBase from '../entities/EntityBase';
+import EntityBase from './EntityBase';
 import ServiceManifest from '../interfaces/ServiceManifest';
 
 

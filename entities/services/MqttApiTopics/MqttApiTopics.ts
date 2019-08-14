@@ -1,4 +1,4 @@
-import ServiceBase from 'system/baseServices/ServiceBase';
+import ServiceBase from 'system/entities/ServiceBase';
 import {combineTopic} from 'system/lib/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
 

@@ -3,9 +3,9 @@
  * Handling a PCF8574/PCF8574A IC.
  */
 
-import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import DriverFactoryBase from 'system/entities/DriverFactoryBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import DriverBase from 'system/baseDrivers/DriverBase';
+import DriverBase from 'system/entities/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {Edge} from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/DebounceCall';

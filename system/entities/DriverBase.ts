@@ -1,4 +1,4 @@
-import EntityBase from '../entities/EntityBase';
+import EntityBase from './EntityBase';
 import Sender from '../lib/Sender';
 import DriverManifest from '../interfaces/DriverManifest';
 

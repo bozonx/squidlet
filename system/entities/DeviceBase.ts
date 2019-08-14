@@ -1,8 +1,8 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
-import EntityBase from '../entities/EntityBase';
+import EntityBase from './EntityBase';
 import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../lib/ConsistentState';
-import DeviceState from './DeviceState';
+import DeviceState from '../DeviceState';
 import {StateCategories} from '../interfaces/States';
 
 

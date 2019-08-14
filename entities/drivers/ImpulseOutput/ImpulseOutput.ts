@@ -1,6 +1,6 @@
-import DriverBase from 'system/baseDrivers/DriverBase';
+import DriverBase from 'system/entities/DriverBase';
 import {GetDriverDep} from 'system/entities/EntityBase';
-import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
+import DriverFactoryBase from 'system/entities/DriverFactoryBase';
 import {omit} from 'system/lib/lodashLike';
 import {deferCall, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';

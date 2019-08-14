@@ -1,4 +1,4 @@
-import DeviceBase, {DEFAULT_STATUS} from 'system/baseDevice/DeviceBase';
+import DeviceBase, {DEFAULT_STATUS} from 'system/entities/DeviceBase';
 import {convertToLevel} from 'system/lib/helpers';
 import {GetDriverDep} from 'system/entities/EntityBase';
 import {Dictionary} from 'system/interfaces/Types';

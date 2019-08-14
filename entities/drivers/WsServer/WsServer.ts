@@ -1,5 +1,5 @@
-import DriverFactoryBase from 'system/baseDrivers/DriverFactoryBase';
-import DriverBase from 'system/baseDrivers/DriverBase';
+import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverBase from 'system/entities/DriverBase';
 import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
