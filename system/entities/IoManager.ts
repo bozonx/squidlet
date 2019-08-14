@@ -15,7 +15,7 @@ export default class IoManager {
   }
 
   async init(): Promise<void> {
-    await this.ioSet.init(this.system);
+    await this.ioSet.init(this.context);
     await this.initAllIo();
     await this.configureAllIo();
   }
@@ -54,8 +54,8 @@ export default class IoManager {
 
   private async configureAllIo() {
     const ioNames: string[] = this.ioSet.getNames();
-    const ioParams = await this.system.envSet.loadConfig<IoItemDefinition>(
-      this.system.initializationConfig.fileNames.iosDefinitions
+    const ioParams = await this.context.system.envSet.loadConfig<IoItemDefinition>(
+      this.context.system.initializationConfig.fileNames.iosDefinitions
     );
 
     // configure ios if need
@@ -63,7 +63,7 @@ export default class IoManager {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
       if (!ioItem) {
-        this.system.log.warn(`ioDefinitions config has definition of io item which doesn't exist in ioSet`);
+        this.context.log.warn(`ioDefinitions config has definition of io item which doesn't exist in ioSet`);
 
         continue;
       }

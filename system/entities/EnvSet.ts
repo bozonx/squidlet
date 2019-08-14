@@ -13,7 +13,7 @@ import {splitFirstElement} from '../lib/strings';
 export default class EnvSet {
   private readonly context: Context;
   private get storageIo(): StorageIo {
-    return this.system.ioManager.getIo('Storage') as any;
+    return this.context.system.ioManager.getIo('Storage') as any;
   }
 
 
