@@ -18,7 +18,9 @@ function randomInt(): number {
 export function makeUniqNumber(): number {
   counter++;
 
-  if (counter === Number.MAX_SAFE_INTEGER) counter = Number.MIN_SAFE_INTEGER;
+  if (counter === Number.MAX_SAFE_INTEGER) {
+    counter = Number.MIN_SAFE_INTEGER;
+  }
 
   return counter;
 }
@@ -30,7 +32,7 @@ export function makeUniqNumber(): number {
  */
 export function getRuntimeId(): string {
   if (typeof instanceId === 'undefined') {
-    instanceId = hashSum( String(randomInt()) );
+    instanceId = hashSum( String(randomInt()) + String(randomInt()) );
   }
 
   return instanceId as string;
