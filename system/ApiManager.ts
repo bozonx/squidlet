@@ -1,4 +1,4 @@
-import System from './System';
+import Context from './Context';
 import IndexedEvents from './lib/IndexedEvents';
 import RemoteCall from './lib/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
@@ -12,13 +12,13 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  * RemoteCall Api for acting remotely via ws or mqtt or others services.
  */
 export default class ApiManager {
-  private readonly system: System;
+  private readonly context: Context;
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   private remoteCalls: {[index: string]: RemoteCall} = {};
 
 
-  constructor(system: System) {
-    this.system = system;
+  constructor(context: Context) {
+    this.context = context;
   }
 
   async destroy() {

@@ -40,14 +40,14 @@ export default class System {
   constructor(ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) {
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
-    this.ioManager = new IoManager(this, ioSet);
-    this.envSet = new EnvSet(this);
-    this.driversManager = new DriversManager(this);
-    this.servicesManager = new ServicesManager(this);
-    this.devicesManager = new DevicesManager(this);
-    this.apiManager = new ApiManager(this);
-    this.api = new Api(this);
     this.context = new Context(this, systemConfigExtend);
+    this.ioManager = new IoManager(this.context, ioSet);
+    this.envSet = new EnvSet(this.context);
+    this.driversManager = new DriversManager(this.context);
+    this.servicesManager = new ServicesManager(this.context);
+    this.devicesManager = new DevicesManager(this.context);
+    this.apiManager = new ApiManager(this.context);
+    this.api = new Api(this.context);
   }
 
   destroy = async () => {

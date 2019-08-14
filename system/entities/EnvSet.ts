@@ -1,4 +1,4 @@
-import System from '../System';
+import Context from '../Context';
 import ManifestBase from '../interfaces/ManifestBase';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
 import {EntityClassType} from './EntityManagerBase';
@@ -11,14 +11,14 @@ import {splitFirstElement} from '../lib/strings';
  * Base class for builds which use src files or which use requireJs to load modules.
  */
 export default class EnvSet {
-  private readonly system: System;
+  private readonly context: Context;
   private get storageIo(): StorageIo {
     return this.system.ioManager.getIo('Storage') as any;
   }
 
 
-  constructor(system: System) {
-    this.system = system;
+  constructor(context: Context) {
+    this.context = context;
   }
 
 

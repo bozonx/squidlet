@@ -1,6 +1,6 @@
 import {Dictionary, JsonTypes} from './interfaces/Types';
 import {objGet, pick} from './lib/lodashLike';
-import System from './System';
+import Context from './Context';
 import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
@@ -10,11 +10,11 @@ import {LOGGER_EVENT} from './LogPublisher';
 
 
 export default class Api {
-  private readonly system: System;
+  private readonly context: Context;
 
 
-  constructor(system: System) {
-    this.system = system;
+  constructor(context: Context) {
+    this.context = context;
   }
 
 

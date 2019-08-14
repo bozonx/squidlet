@@ -1,16 +1,16 @@
 import IoSet from '../interfaces/IoSet';
 import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
-import System from '../System';
 import IoSetLocal from './IoSetLocal';
+import Context from '../Context';
 
 
 export default class IoManager {
-  private readonly system: System;
+  private readonly context: Context;
   private readonly ioSet: IoSet;
 
 
-  constructor(system: System, ioSet?: IoSet) {
-    this.system = system;
+  constructor(context: Context, ioSet?: IoSet) {
+    this.context = context;
     this.ioSet = this.resolveIoSet(ioSet);
   }
 
