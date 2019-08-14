@@ -117,8 +117,8 @@ export default class Api {
     });
   }
 
-  removeLogListener(handlerIndex: number) {
-    this.system.events.removeListener(LOGGER_EVENT, handlerIndex);
+  switchToIoServer() {
+    // TODO: !!!!
   }
 
   /**
@@ -126,6 +126,10 @@ export default class Api {
    */
   removeStateListener(handlerIndex: number) {
     this.system.state.removeListener(handlerIndex);
+  }
+
+  removeLogListener(handlerIndex: number) {
+    this.system.events.removeListener(LOGGER_EVENT, handlerIndex);
   }
 
 }

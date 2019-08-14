@@ -134,7 +134,7 @@ export default class ApiCall {
   /**
    * Listen logs and print them to console
    */
-  async log(host?: string, port?: string, level?: string) {
+  async log(level?: string, host?: string, port?: string) {
     const apiClient = this.connect(host, port);
 
     const handlerIndex = await apiClient.callMethod('listenLog', level, (message: string) => {
@@ -145,6 +145,15 @@ export default class ApiCall {
       apiClient.callMethod('removeLogListener', handlerIndex)
         .catch(console.error);
     });
+  }
+
+  async switchToIoServer(host?: string, port?: string) {
+    const apiClient = this.connect(host, port);
+
+    await apiClient.callMethod('switchToIoServer');
+
+    console.info(`Switched to io server successfully`);
+    await apiClient.close();
   }
 
 

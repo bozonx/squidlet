@@ -46,6 +46,8 @@ only first time or if `--force` parameter is set.
       [--work-dir]
       [--name]
       [--force=true]
+      [--user=username]
+      [--group=groupname]
       ./groupOrHostConfig.yaml
 
 ### Start development host
@@ -55,6 +57,8 @@ only first time or if `--force` parameter is set.
       [--work-dir]
       [--name]
       [--force=true]
+      [--user=username]
+      [--group=groupname]
       [--ioset=localhost:8089]
       ./groupOrHostConfig.yaml
 
@@ -67,6 +71,8 @@ only first time or if `--force` parameter is set.
 * --name uses only if group config is specified
   and selects a host config from group config
 * --force - it runs `npm install`
+* --user - owner of files which will be written
+* --user - group of files which will be written
 * --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in this host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
@@ -78,24 +84,14 @@ only first time or if `--force` parameter is set.
   By default isn't set.
 
 
-## Listen logs of remote host
-
-    squidletctl log --host=my-host [--port=8089] [--level=info]
-    
-* --host - set remote host
-* --port - set remote port. Is isn't set - default will be used
-* --level - max level to listen to. Default is info
-
-
 ## Call device's action
 
 Call device action and print the result.
 
-
     squidletctl action <fullDeviceId> <actionName> [value1] [value2] ... --host=my-host [--port=8089]
 
     # example
-    squidletctl action bedroom.switch turn 1 --host=remotehost
+    squidletctl action bedroom.switch turn true --host=remotehost
 
 Params
 * --host - set remote host
@@ -153,3 +149,17 @@ Params
 Params
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
+
+## Listen logs of remote host
+
+    squidletctl log --host=my-host [--port=8089] [--level=info]
+    
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
+* --level - max level to listen to. Default is info
+
+## switchToIoServer
+
+Switch host to io server for development purpose
+
+    squidletctl ioServer --host=my-host [--port=8089]

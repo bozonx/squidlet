@@ -16,7 +16,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      return apiCall.log(args.host, args.port, args.level);
+      return apiCall.log(args.level, args.host, args.port);
     case 'action':
       return apiCall.action(
         positionArgsRest[0],
@@ -35,9 +35,8 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       return apiCall.hostConfig(args.host, args.port);
     case 'hostInfo':
       return apiCall.hostInfo(args.host, args.port);
-
-    // case 'block-io':
-    //   return apiCall.callAndExit({ ...args, methodName: 'blockIo', methodArgs: [true] });
+    case 'ioServer':
+      return apiCall.switchToIoServer(args.host, args.port);
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);
