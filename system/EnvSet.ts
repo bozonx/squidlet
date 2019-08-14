@@ -1,10 +1,10 @@
-import Context from '../Context';
-import ManifestBase from '../interfaces/ManifestBase';
-import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
-import {EntityClassType} from '../managers/EntityManagerBase';
-import {pathJoin} from '../lib/nodeLike';
-import StorageIo from '../interfaces/io/StorageIo';
-import {splitFirstElement} from '../lib/strings';
+import Context from './Context';
+import ManifestBase from './interfaces/ManifestBase';
+import {ManifestsTypePluralName} from './interfaces/ManifestTypes';
+import {EntityClassType} from './managers/EntityManagerBase';
+import {pathJoin} from './lib/nodeLike';
+import StorageIo from './interfaces/io/StorageIo';
+import {splitFirstElement} from './lib/strings';
 
 
 /**

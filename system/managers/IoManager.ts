@@ -1,6 +1,6 @@
 import IoSet from '../interfaces/IoSet';
 import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
-import IoSetLocal from '../entities/IoSetLocal';
+import IoSetLocal from '../IoSetLocal';
 import Context from '../Context';
 
 
