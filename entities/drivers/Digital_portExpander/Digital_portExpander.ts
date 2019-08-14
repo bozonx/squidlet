@@ -16,10 +16,19 @@ export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> im
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];
   private get expanderDriver(): PortExpander | undefined {
-    if (!this.env.system.devicesManager.getDevice(this.props.expander)) return;
-
     // TODO: use system.devices
-    return (this.env.system.devicesManager.getDevice(this.props.expander) as any).expander;
+    let device: {expander?: PortExpander};
+
+    try {
+      device = this.context.system.devicesManager.getDevice(this.props.expander) as any;
+    }
+    catch (e) {
+      return;
+    }
+
+    if (!device) return;
+
+    return device.expander;
   }
 
 
@@ -100,7 +109,7 @@ export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> im
 
   private callOnDevicesInit<T>(cb: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      this.env.system.onDevicesInit(() => {
+      this.context.onDevicesInit(() => {
         cb()
           .then(resolve)
           .catch(reject);

@@ -36,6 +36,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase> {
 
     if (!device) {
       this.context.log.error(`DevicesManager.getDevice: Can't find the device "${deviceId}"`);
+
       throw new Error(`Can't find the device "${deviceId}"`);
     }
 

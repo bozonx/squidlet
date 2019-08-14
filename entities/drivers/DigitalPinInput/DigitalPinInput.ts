@@ -59,7 +59,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
     // setup pin as an input with resistor if specified
     await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
       .catch((err) => {
-        this.env.log.error(
+        this.log.error(
           `DigitalPinInputDriver: Can't setup pin. ` +
           `"${JSON.stringify(this.props)}": ${err.toString()}`
         );
