@@ -1,14 +1,15 @@
-import System from './System';
-import {LOGGER_EVENT} from './dict/systemEvents';
 import LogLevel from './interfaces/LogLevel';
 
 
+export const LOGGER_EVENT = 'LOGGER';
+
+
 export default class LogPublisher {
-  readonly system: System;
+  readonly context: Context;
 
 
-  constructor(system: System) {
-    this.system = system;
+  constructor(context: Context) {
+    this.context = context;
   }
 
   debug = (message: string) => {
@@ -31,8 +32,8 @@ export default class LogPublisher {
   private emit(level: LogLevel, message: string) {
     const eventName = `${LOGGER_EVENT}_${level}`;
 
-    this.system.events.emit(eventName, message, level);
-    this.system.events.emit(LOGGER_EVENT, message, level);
+    this.context.events.emit(eventName, message, level);
+    this.context.events.emit(LOGGER_EVENT, message, level);
   }
 
 }

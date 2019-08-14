@@ -5,8 +5,8 @@ import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
-import {LOGGER_EVENT} from './dict/systemEvents';
 import {calcAllowedLogLevels} from './lib/helpers';
+import {LOGGER_EVENT} from './LogPublisher';
 
 
 export default class Api {
