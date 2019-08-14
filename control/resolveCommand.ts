@@ -13,6 +13,8 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
   switch (command) {
     case 'start':
       return (new CommandStart(positionArgsRest, args as any)).start();
+    case 'io-server':
+      return (new CommandStart(positionArgsRest, args as any)).startIoServer();
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
@@ -31,11 +33,11 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       return apiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
     case 'state':
       return apiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
-    case 'hostConfig':
+    case 'host-config':
       return apiCall.hostConfig(args.host, args.port);
-    case 'hostInfo':
+    case 'host-info':
       return apiCall.hostInfo(args.host, args.port);
-    case 'ioServer':
+    case 'switch-to-ioserver':
       return apiCall.switchToIoServer(args.host, args.port);
     default:
       console.error(`Unknown command "${command}"`);

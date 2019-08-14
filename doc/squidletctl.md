@@ -62,6 +62,20 @@ only first time or if `--force` parameter is set.
       [--ioset=localhost:8089]
       ./groupOrHostConfig.yaml
 
+### Start development io server
+
+Start only io server which you can connect from your workstation for development purpose.
+Config is optional, if it does not includes io definitions you don't have to specify a config.
+
+    squidletctl io-server
+      [--machine=x86 | arm | rpi]
+      [--work-dir]
+      [--name]
+      [--force=true]
+      [--user=username]
+      [--group=groupname]
+      [./groupOrHostConfig.yaml]
+
 ### Parameters
 
 * --machine can be x86, arm or rpi. It tries recognize it automatically if this argument isn't set
@@ -158,8 +172,9 @@ Params
 * --port - set remote port. Is isn't set - default will be used
 * --level - max level to listen to. Default is info
 
-## switchToIoServer
+## Switch to io server
 
-Switch host to io server for development purpose
+Switch host to io server for development purpose.
+It reboot a micro-controller and boots to io-server mode.
 
-    squidletctl ioServer --host=my-host [--port=8089]
+    squidletctl switch-to-ioserver --host=my-host [--port=8089]

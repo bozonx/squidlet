@@ -1,5 +1,6 @@
 import StartDevelop from '../nodejs/starter/StartDevelop';
 import StartProd from '../nodejs/starter/StartProd';
+import StartIoServer from '../nodejs/starter/StartIoServer';
 
 
 interface CommandStartArgs {
@@ -32,7 +33,7 @@ export default class CommandStart {
   async start() {
     // run prod is specified
     if (this.args.prod) {
-      const starter: StartProd = new StartProd(
+      const starter = new StartProd(
         this.configPath,
         Boolean(this.args.force),
         this.args.machine as any,
@@ -47,7 +48,24 @@ export default class CommandStart {
     }
 
     // or run dev
-    const starter: StartDevelop = new StartDevelop(
+    const starter = new StartDevelop(
+      this.configPath,
+      Boolean(this.args.force),
+      this.args.machine as any,
+      this.args.name,
+      this.args.workDir,
+      this.args.ioset,
+    );
+
+    await starter.init();
+    await starter.start();
+  }
+
+  /**
+   * Start development io server on nodejs
+   */
+  async startIoServer() {
+    const starter = new StartIoServer(
       this.configPath,
       Boolean(this.args.force),
       this.args.machine as any,
