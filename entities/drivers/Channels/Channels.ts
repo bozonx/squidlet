@@ -1,7 +1,7 @@
-import DriverBase from '../../../system/entities/DriverBase';
+import DriverBase from '../../../system/base/DriverBase';
 import DuplexDriver from '../../../system/interfaces/DuplexDriver';
-import DriverFactoryBase from '../../../system/entities/DriverFactoryBase';
-import {GetDriverDep} from '../../../system/entities/EntityBase';
+import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
+import {GetDriverDep} from '../../../system/base/EntityBase';
 import {omit} from '../../../system/lib/lodashLike';
 import {addFirstItemUint8Arr} from '../../../system/lib/binaryHelpers';
 

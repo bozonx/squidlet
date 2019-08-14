@@ -1,8 +1,8 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
-import DriverBase from 'system/entities/DriverBase';
-import {GetDriverDep} from 'system/entities/EntityBase';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
+import {GetDriverDep} from 'system/base/EntityBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omit} from 'system/lib/lodashLike';
 import {isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 

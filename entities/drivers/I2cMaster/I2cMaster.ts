@@ -1,7 +1,7 @@
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import { addFirstItemUint8Arr } from 'system/lib/binaryHelpers';
-import DriverBase from 'system/entities/DriverBase';
+import DriverBase from 'system/base/DriverBase';
 import {DATA_ADDRESS_LENGTH} from 'system/constants';
 
 

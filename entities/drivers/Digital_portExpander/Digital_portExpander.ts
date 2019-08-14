@@ -1,5 +1,5 @@
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
-import DriverBase from 'system/entities/DriverBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
 import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import {LENGTH_AND_START_ARR_DIFFERENCE} from 'system/constants';
 

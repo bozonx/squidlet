@@ -8,15 +8,15 @@
  * * ?Bluetooth
  */
 
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
-import {GetDriverDep} from 'system/entities/EntityBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import {GetDriverDep} from 'system/base/EntityBase';
 import {firstLetterToUpperCase} from 'system/lib/strings';
-import DriverBase from 'system/entities/DriverBase';
+import DriverBase from 'system/base/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {omit} from 'system/lib/lodashLike';
-import {PollProps} from 'system/entities/MasterSlaveBaseNodeDriver';
+import {PollProps} from 'system/base/MasterSlaveBaseNodeDriver';
 import {uint8ToNum} from 'system/lib/binaryHelpers';
 
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';

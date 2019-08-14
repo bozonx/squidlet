@@ -1,8 +1,8 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
-import DriverBase from 'system/entities/DriverBase';
-import {GetDriverDep} from 'system/entities/EntityBase';
+import DriverBase from 'system/base/DriverBase';
+import {GetDriverDep} from 'system/base/EntityBase';
 import {omit} from 'system/lib/lodashLike';
 
 import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';

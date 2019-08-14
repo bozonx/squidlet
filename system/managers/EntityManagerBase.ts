@@ -1,6 +1,6 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
-import EntityBase from '../entities/EntityBase';
+import EntityBase from '../base/EntityBase';
 import Context from '../Context';
 
 

@@ -1,5 +1,5 @@
-import DriverBase from 'system/entities/DriverBase';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
 import {omit} from 'system/lib/lodashLike';
 import IndexedEvents from 'system/lib/IndexedEvents';

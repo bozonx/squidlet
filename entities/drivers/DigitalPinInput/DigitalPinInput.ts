@@ -1,7 +1,7 @@
 import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
-import DriverBase from 'system/entities/DriverBase';
-import {GetDriverDep} from 'system/entities/EntityBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
+import {GetDriverDep} from 'system/base/EntityBase';
 import {omit} from 'system/lib/lodashLike';
 import IndexedEvents from 'system/lib/IndexedEvents';
 

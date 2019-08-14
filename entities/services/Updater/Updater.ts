@@ -1,4 +1,4 @@
-import ServiceBase from 'system/entities/ServiceBase';
+import ServiceBase from 'system/base/ServiceBase';
 import {ManifestsTypeName} from 'system/interfaces/ManifestTypes';
 
 

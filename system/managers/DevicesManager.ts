@@ -1,6 +1,6 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import DeviceBase from '../entities/DeviceBase';
+import DeviceBase from '../base/DeviceBase';
 
 
 /**

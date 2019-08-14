@@ -16,11 +16,11 @@ import './lib/mkdirPLogic';
 // import './helpers/validate';
 
 // base classes
-import './entities/DeviceBase';
+import './base/DeviceBase';
 // import './baseDrivers/DriverBase';
-import './entities/DriverFactoryBase';
-import './entities/MasterSlaveBaseNodeDriver';
-import './entities/ServiceBase';
+import './base/DriverFactoryBase';
+import './base/MasterSlaveBaseNodeDriver';
+import './base/ServiceBase';
 
 import System from './System';
 

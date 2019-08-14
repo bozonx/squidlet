@@ -5,9 +5,9 @@ import {
   numToWord,
   hexStringToHexNum
 } from 'system/lib/binaryHelpers';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
-import DriverBase from 'system/entities/DriverBase';
-import {GetDriverDep} from 'system/entities/EntityBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
+import {GetDriverDep} from 'system/base/EntityBase';
 
 
 const MAX_BLOCK_LENGTH = 65535;

@@ -1,4 +1,4 @@
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 
 
 export class I2cToMaster {

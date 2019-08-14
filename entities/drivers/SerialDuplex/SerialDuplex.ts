@@ -1,7 +1,7 @@
 import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
-import DriverBase from 'system/entities/DriverBase';
+import DriverBase from 'system/base/DriverBase';
 import SerialIo from 'system/interfaces/io/SerialIo';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
 import {DATA_ADDRESS_LENGTH} from 'system/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';

@@ -1,6 +1,6 @@
-import ServiceBase from 'system/entities/ServiceBase';
+import ServiceBase from 'system/base/ServiceBase';
 import {combineTopic} from 'system/lib/helpers';
-import {GetDriverDep} from 'system/entities/EntityBase';
+import {GetDriverDep} from 'system/base/EntityBase';
 
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
 import ApiTopicsLogic, {TOPIC_SEPARATOR, TOPIC_TYPE_SEPARATOR, TopicType} from './ApiTopicsLogic';

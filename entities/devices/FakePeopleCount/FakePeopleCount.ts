@@ -1,6 +1,6 @@
 // TODO: remove
 
-import DeviceBase from 'system/entities/DeviceBase';
+import DeviceBase from 'system/base/DeviceBase';
 import {JsonTypes} from 'system/interfaces/Types';
 
 

@@ -1,6 +1,6 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import DriverBase from '../entities/DriverBase';
+import DriverBase from '../base/DriverBase';
 
 
 /**

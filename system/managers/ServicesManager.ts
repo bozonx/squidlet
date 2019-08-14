@@ -1,6 +1,6 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import ServiceBase from '../entities/ServiceBase';
+import ServiceBase from '../base/ServiceBase';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceBase> {

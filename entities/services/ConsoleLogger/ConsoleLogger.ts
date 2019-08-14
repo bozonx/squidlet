@@ -1,4 +1,4 @@
-import ServiceBase from 'system/entities/ServiceBase';
+import ServiceBase from 'system/base/ServiceBase';
 import LogLevel, {LOG_LEVELS} from 'system/interfaces/LogLevel';
 import {calcAllowedLogLevels} from 'system/lib/helpers';
 import {LOGGER_EVENT} from 'system/LogPublisher';

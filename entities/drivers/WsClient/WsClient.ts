@@ -1,6 +1,6 @@
 import WebSocketClientIo, {OnMessageHandler} from 'system/interfaces/io/WebSocketClientIo';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
-import DriverBase from 'system/entities/DriverBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
 import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 import IndexedEvents from 'system/lib/IndexedEvents';
 

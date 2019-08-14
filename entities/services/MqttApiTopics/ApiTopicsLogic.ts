@@ -4,7 +4,7 @@ import {Dictionary, JsonTypes} from 'system/interfaces/Types';
 import {trim} from 'system/lib/lodashLike';
 import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {DEFAULT_STATUS} from 'system/entities/DeviceBase';
+import {DEFAULT_STATUS} from 'system/base/DeviceBase';
 
 
 export type TopicType = 'device' | 'api';

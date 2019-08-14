@@ -1,5 +1,5 @@
 import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
-import DriverBase from 'system/entities/DriverBase';
+import DriverBase from 'system/base/DriverBase';
 import {pathDirname, pathJoin} from 'system/lib/nodeLike';
 
 

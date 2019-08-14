@@ -1,7 +1,7 @@
 import I2cSlaveIo from 'system/interfaces/io/I2cSlaveIo';
-import DriverFactoryBase from 'system/entities/DriverFactoryBase';
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'system/lib/binaryHelpers';
-import DriverBase from 'system/entities/DriverBase';
+import DriverBase from 'system/base/DriverBase';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 
