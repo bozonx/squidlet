@@ -6,7 +6,7 @@ import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
 import {calcAllowedLogLevels} from './lib/helpers';
-import {LOGGER_EVENT} from './LogPublisher';
+import {LOGGER_EVENT} from './constants';
 
 
 export default class Api {
@@ -19,7 +19,7 @@ export default class Api {
 
 
   callDeviceAction(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
-    const device = this.system.devicesManager.getDevice(deviceId);
+    const device = this.context.system.devicesManager.getDevice(deviceId);
 
     return device.action(actionName, ...args);
   }
@@ -33,14 +33,14 @@ export default class Api {
       if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
       const changedValues: Dictionary = pick(
-        this.system.state.getState(category, stateName),
+        this.context.state.getState(category, stateName),
         ...changedParams
       );
 
       cb(changedValues);
     };
 
-    return this.system.state.onChange(handlerWrapper);
+    return this.context.state.onChange(handlerWrapper);
   }
 
   listenDeviceConfig(deviceId: string, cb: (changedValues: Dictionary) => void): number {
@@ -48,14 +48,14 @@ export default class Api {
       if (category !== StateCategories.devicesConfig || stateName !== deviceId) return;
 
       const changedValues: Dictionary = pick(
-        this.system.state.getState(category, stateName),
+        this.context.state.getState(category, stateName),
         ...changedParams
       );
 
       cb(changedValues);
     };
 
-    return this.system.state.onChange(handlerWrapper);
+    return this.context.state.onChange(handlerWrapper);
   }
 
   listenState(category: StateCategories, stateName: string, cb: (changedValues: Dictionary) => void): number {
@@ -63,56 +63,56 @@ export default class Api {
       if (category !== currentCategory || stateName !== currentStateName) return;
 
       const changedValues: Dictionary = pick(
-        this.system.state.getState(category, stateName),
+        this.context.state.getState(category, stateName),
         ...changedParams
       );
 
       cb(changedValues);
     };
 
-    return this.system.state.onChange(handlerWrapper);
+    return this.context.state.onChange(handlerWrapper);
   }
 
   getDeviceStatus(deviceId: string): Dictionary | undefined {
-    return this.system.state.getState(StateCategories.devicesStatus, deviceId);
+    return this.context.state.getState(StateCategories.devicesStatus, deviceId);
   }
 
   getDeviceConfig(deviceId: string): Dictionary | undefined {
-    return this.system.state.getState(StateCategories.devicesConfig, deviceId);
+    return this.context.state.getState(StateCategories.devicesConfig, deviceId);
   }
 
   async setDeviceConfig(deviceId: string, partialState: Dictionary): Promise<void> {
-    const device = this.system.devicesManager.getDevice(deviceId);
+    const device = this.context.system.devicesManager.getDevice(deviceId);
 
     if (device.setConfig) return device.setConfig(partialState);
   }
 
   getState(category: StateCategories, stateName: string): Dictionary | undefined {
-    return this.system.state.getState(category, stateName);
+    return this.context.state.getState(category, stateName);
   }
 
   getHostConfig(): HostConfig {
-    return this.system.config;
+    return this.context.config;
   }
 
   getHostConfigValue(configParam: string): JsonTypes {
-    return objGet(this.system.config, configParam);
+    return objGet(this.context.config, configParam);
   }
 
   getHostInfo(): HostInfo {
     return {
-      usedIo: this.system.ioManager.getNames(),
+      usedIo: this.context.system.ioManager.getNames(),
     };
   }
 
   getSessionStore(sessionId: string, key: string): JsonTypes | undefined {
-    return this.system.sessions.getStorage(sessionId, key);
+    return this.context.sessions.getStorage(sessionId, key);
   }
 
   listenLog(logLevel: LogLevel = 'info', cb: (msg: string) => void): number {
     const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(logLevel);
 
-    return this.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
+    return this.context.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
       if (allowedLogLevels.includes(level)) cb(message);
     });
   }
@@ -127,11 +127,11 @@ export default class Api {
    * Remove listeners for state, device status and device config
    */
   removeStateListener(handlerIndex: number) {
-    this.system.state.removeListener(handlerIndex);
+    this.context.state.removeListener(handlerIndex);
   }
 
   removeLogListener(handlerIndex: number) {
-    this.system.events.removeListener(LOGGER_EVENT, handlerIndex);
+    this.context.system.events.removeListener(LOGGER_EVENT, handlerIndex);
   }
 
 }

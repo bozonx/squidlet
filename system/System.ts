@@ -6,13 +6,16 @@ import IoSet from './interfaces/IoSet';
 import IoManager from './managers/IoManager';
 import ApiManager from './managers/ApiManager';
 import Api from './Api';
-import Context, {AppLifeCycleEvents} from './Context';
+import Context from './Context';
 import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
+import IndexedEventEmitter from './lib/IndexedEventEmitter';
+import {AppLifeCycleEvents} from './constants';
 
 
 export default class System {
   readonly context: Context;
+  readonly events = new IndexedEventEmitter();
   readonly envSet: EnvSet;
   readonly ioManager: IoManager;
   readonly driversManager: DriversManager;
@@ -52,13 +55,14 @@ export default class System {
 
   destroy = async () => {
     this.context.log.info('destroying...');
-    this.riseSystemEvent(AppLifeCycleEvents.beforeDestroy);
+    this.events.emit(AppLifeCycleEvents.beforeDestroy);
     await this.apiManager.destroy();
     await this.devicesManager.destroy();
     await this.servicesManager.destroy();
     await this.driversManager.destroy();
     await this.ioManager.destroy();
     this.context.destroy();
+    this.events.destroy();
     console.info('System has been successfully destroyed');
   }
 
@@ -72,33 +76,20 @@ export default class System {
 
     console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();
-    this.riseSystemEvent(AppLifeCycleEvents.systemDriversInitialized);
 
     console.info(`---> Initializing system services`);
     await this.servicesManager.initSystemServices();
-    this.riseSystemEvent(AppLifeCycleEvents.systemServicesInitialized);
 
     await this.initTopLayer();
 
     this._isAppInitialized = true;
-    this.riseSystemEvent(AppLifeCycleEvents.appInitialized);
+    await this.events.emitSync(AppLifeCycleEvents.appInitialized);
 
     // remove initialization config
     delete this._initializationConfig;
 
     console.info(`===> System initialization has been finished`);
   }
-
-  // private async initNetwork(): Promise<void> {
-  //   console.info(`---> Initializing network`);
-  //   this.network.init(this.host.id, this.host.networkConfig);
-  //   this.riseEvent(topics.system.networkInitialized);
-  //
-  //   console.info(`---> Initializing messenger`);
-  //   this.messenger.init();
-  //   this.devices.init();
-  //   this.riseEvent(topics.system.messengerInitialized);
-  // }
 
   /**
    * Init top layer - devices, regular drivers and regular services
@@ -111,12 +102,7 @@ export default class System {
     console.info(`---> Initializing devices`);
     await this.devicesManager.init();
     this._isDevicesInitialized = true;
-    this.riseSystemEvent(AppLifeCycleEvents.devicesInitialized);
-  }
-
-
-  private riseSystemEvent(eventName: number) {
-    this.context.events.emit(eventName);
+    await this.events.emitSync(AppLifeCycleEvents.devicesInitialized);
   }
 
 }

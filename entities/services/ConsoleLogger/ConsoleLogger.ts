@@ -1,7 +1,7 @@
 import ServiceBase from 'system/base/ServiceBase';
 import LogLevel, {LOG_LEVELS} from 'system/interfaces/LogLevel';
 import {calcAllowedLogLevels} from 'system/lib/helpers';
-import {LOGGER_EVENT} from 'system/LogPublisher';
+import {LOGGER_EVENT} from '../../../system/constants';
 
 
 const consoleLog = {
@@ -39,7 +39,7 @@ export default class ConsoleLogger extends ServiceBase<Props> {
     for (let level of allowedLogLevels) {
       const eventName = `${LOGGER_EVENT}_${level}`;
 
-      this.env.events.addListener(eventName, (message: string, level: LogLevel) => {
+      this.context.system.events.addListener(eventName, (message: string, level: LogLevel) => {
         if (!LOG_LEVELS.includes(level)) return consoleLog.error(`Unsupported level: ${level}`);
 
         (consoleLog as any)[level](message);

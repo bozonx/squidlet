@@ -12,6 +12,13 @@ export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
     this.indexedEvents[eventName].emit(...args);
   }
 
+  // TODO: test
+  emitSync(eventName: string | number, ...args: any[]): Promise<void> {
+    if (!this.indexedEvents[eventName]) return Promise.resolve();
+
+    return this.indexedEvents[eventName].emitSync(...args);
+  }
+
   /**
    * Register listener and return its index
    */

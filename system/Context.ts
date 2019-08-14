@@ -6,22 +6,11 @@ import HostConfig from './interfaces/HostConfig';
 import System from './System';
 import {mergeDeep} from './lib/collections';
 import {makeUniqId} from './lib/uniqId';
-import IndexedEventEmitter from './lib/IndexedEventEmitter';
-
-
-export enum AppLifeCycleEvents {
-  systemDriversInitialized,
-  systemServicesInitialized,
-  devicesInitialized,
-  appInitialized,
-  beforeDestroy,
-}
+import {AppLifeCycleEvents} from './constants';
 
 
 export default class Context {
   readonly system: System;
-  // TODO: лучше пусть будет в system - но сделать обертку здесь для навешивания на события
-  readonly events = new IndexedEventEmitter();
   readonly systemConfig: typeof systemConfig;
   readonly log: LogPublisher = new LogPublisher(this);
   readonly sessions: Sessions = new Sessions(makeUniqId);
@@ -66,30 +55,31 @@ export default class Context {
   destroy() {
     this.sessions.destroy();
     this.state.destroy();
-    this.events.destroy();
   }
 
 
   onDevicesInit(cb: () => void): number {
-    // call immediately if devices are initialized
-    if (this.system.isDevicesInitialized) {
-      cb();
-
-      return -1;
-    }
-
-    return this.events.once(AppLifeCycleEvents.devicesInitialized, cb);
+    return this.addListenerOnce(this.system.isDevicesInitialized, AppLifeCycleEvents.devicesInitialized, cb);
   }
 
   onAppInit(cb: () => void): number {
-    // call immediately if app is initialized
-    if (this.system.isAppInitialized) {
+    return this.addListenerOnce(this.system.isAppInitialized, AppLifeCycleEvents.appInitialized, cb);
+  }
+
+  onBeforeDestroy(cb: () => void): number {
+    return this.system.events.once(AppLifeCycleEvents.beforeDestroy, cb);
+  }
+
+
+  private addListenerOnce(isFulfilles: boolean, eventName: AppLifeCycleEvents, cb: () => void): number {
+    // call immediately if devices are initialized
+    if (isFulfilles) {
       cb();
 
       return -1;
     }
 
-    return this.events.once(AppLifeCycleEvents.appInitialized, cb);
+    return this.system.events.once(eventName, cb);
   }
 
 }

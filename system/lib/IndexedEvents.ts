@@ -35,7 +35,7 @@ export default class IndexedEvents<T extends AnyHandler> {
     }
   }) as T;
 
-  emitSync = ((...args: any[]): Promise<any[]> => {
+  emitSync = ((...args: any[]): Promise<void> => {
     const promises: Promise<any>[] = [];
 
     for (let handler of this.handlers) {
@@ -46,7 +46,7 @@ export default class IndexedEvents<T extends AnyHandler> {
       if (typeof result === 'object' && result.then) promises.push(result);
     }
 
-    return Promise.all(promises);
+    return Promise.all(promises).then(() => undefined);
   });
 
   /**

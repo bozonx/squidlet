@@ -1,7 +1,5 @@
 import LogLevel from './interfaces/LogLevel';
-
-
-export const LOGGER_EVENT = 'LOGGER';
+import {LOGGER_EVENT} from './constants';
 
 
 export default class LogPublisher {
