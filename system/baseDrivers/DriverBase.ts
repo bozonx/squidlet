@@ -6,7 +6,7 @@ import EntityEnv from '../entities/EntityEnv';
 
 
 export default class DriverBase<Props extends {[index: string]: any} = any> extends EntityBase<Props> {
-  protected readonly env: EntityEnv;
+  //protected readonly env: EntityEnv;
 
   constructor(definition: EntityDefinition, env: EntityEnv) {
     super(definition, env);

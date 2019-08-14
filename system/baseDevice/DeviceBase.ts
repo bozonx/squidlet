@@ -35,7 +35,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.configState.isReading() || this.configState.isWriting();
   }
 
-  protected readonly env: EntityEnv;
+  //protected readonly env: EntityEnv;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
    */

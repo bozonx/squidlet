@@ -1,17 +1,12 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import System from '../System';
 import ServiceBase from '../baseServices/ServiceBase';
 
 
-export default class ServicesManager extends EntityManagerBase<ServiceBase, ServiceEnv> {
-  constructor(system: System) {
-    super(system, ServiceEnv);
-  }
-
+export default class ServicesManager extends EntityManagerBase<ServiceBase> {
   async initSystemServices() {
-    const systemServicesList: string[] = await this.system.envSet.loadConfig<string[]>(
-      this.system.initializationConfig.fileNames.systemServices
+    const systemServicesList: string[] = await this.context.system.envSet.loadConfig<string[]>(
+      this.context.system.initializationConfig.fileNames.systemServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(systemServicesList);
 
@@ -19,8 +14,8 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
   }
 
   async initRegularServices() {
-    const regularServicesList = await this.system.envSet.loadConfig<string[]>(
-      this.system.initializationConfig.fileNames.regularServices
+    const regularServicesList = await this.context.system.envSet.loadConfig<string[]>(
+      this.context.system.initializationConfig.fileNames.regularServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(regularServicesList);
 
@@ -31,7 +26,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
     const service: ServiceBase | undefined = this.instances[serviceId];
 
     if (!service) {
-      this.env.log.error(`ServicesManager.getService: Can't find the service "${serviceId}"`);
+      this.context.log.error(`ServicesManager.getService: Can't find the service "${serviceId}"`);
       throw new Error(`Can't find the service "${serviceId}"`);
     }
 
@@ -40,8 +35,8 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
 
 
   private async initServices(servicesIds: string[]) {
-    const definitions = await this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initializationConfig.fileNames.servicesDefinitions
+    const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
+      this.context.system.initializationConfig.fileNames.servicesDefinitions
     );
 
     for (let serviceId of servicesIds) {
@@ -53,8 +48,8 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase, Serv
 
   private async generateServiceIdsList(allowedClassNames: string[]): Promise<string[]> {
     const servicesIds: string[] = [];
-    const definitions = await this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initializationConfig.fileNames.servicesDefinitions
+    const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
+      this.context.system.initializationConfig.fileNames.servicesDefinitions
     );
 
     for (let serviceId of Object.keys(definitions)) {

@@ -1,6 +1,4 @@
-import System from '../System';
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DriverEnv from '../baseDrivers/DriverEnv';
 import EntityManagerBase from './EntityManagerBase';
 import DriverBase from '../baseDrivers/DriverBase';
 
@@ -8,15 +6,11 @@ import DriverBase from '../baseDrivers/DriverBase';
 /**
  * Driver manager
  */
-export default class DriversManager extends EntityManagerBase<DriverBase, DriverEnv> {
-  constructor(system: System) {
-    super(system, DriverEnv);
-  }
-
+export default class DriversManager extends EntityManagerBase<DriverBase> {
   async initSystemDrivers(): Promise<void> {
     // get list of system drivers from json file
-    const systemDriversList = await this.system.envSet.loadConfig<string[]>(
-      this.system.initializationConfig.fileNames.systemDrivers
+    const systemDriversList = await this.context.system.envSet.loadConfig<string[]>(
+      this.context.system.initializationConfig.fileNames.systemDrivers
     );
 
     await this.initDrivers(systemDriversList);
@@ -24,8 +18,8 @@ export default class DriversManager extends EntityManagerBase<DriverBase, Driver
 
   async initRegularDrivers(): Promise<void> {
     // get list of regular drivers from json file
-    const regularDriversList = await this.system.envSet.loadConfig<string[]>(
-      this.system.initializationConfig.fileNames.regularDrivers
+    const regularDriversList = await this.context.system.envSet.loadConfig<string[]>(
+      this.context.system.initializationConfig.fileNames.regularDrivers
     );
 
     await this.initDrivers(regularDriversList);
@@ -49,7 +43,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase, Driver
     const driver: DriverBase | undefined = this.instances[driverName];
 
     if (!driver) {
-      this.env.log.error(`DriversManager.getDriver: Can't find the driver "${driverName}"`);
+      this.context.log.error(`DriversManager.getDriver: Can't find the driver "${driverName}"`);
       throw new Error(`Can't find the driver "${driverName}"`);
     }
 
@@ -94,8 +88,8 @@ export default class DriversManager extends EntityManagerBase<DriverBase, Driver
    * requires config file driversDefinitions.json
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
-    return this.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.system.initializationConfig.fileNames.driversDefinitions
+    return this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
+      this.context.system.initializationConfig.fileNames.driversDefinitions
     );
   }
 

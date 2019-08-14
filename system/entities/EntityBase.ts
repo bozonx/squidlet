@@ -1,6 +1,5 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import ManifestBase from '../interfaces/ManifestBase';
-import EnvBase from './EnvBase';
 
 
 interface KindOfDriver {

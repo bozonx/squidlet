@@ -1,10 +1,8 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from './DriverBase';
-import DriverEnv from './DriverEnv';
 import {validateProps, validateRequiredProps} from '../lib/validate';
 import {mergeDeep} from '../lib/collections';
-import EnvBase from '../entities/EnvBase';
 
 
 /**

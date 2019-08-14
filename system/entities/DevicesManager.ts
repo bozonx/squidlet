@@ -1,24 +1,19 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import DeviceEnv from '../baseDevice/DeviceEnv';
 import EntityManagerBase from './EntityManagerBase';
-import System from '../System';
 import DeviceBase from '../baseDevice/DeviceBase';
 
 
 /**
  * Creates instances of local devices and prepare config for them.
  */
-export default class DevicesManager extends EntityManagerBase<DeviceBase, DeviceEnv> {
-  constructor(system: System) {
-    super(system, DeviceEnv);
-  }
+export default class DevicesManager extends EntityManagerBase<DeviceBase> {
 
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */
   async init() {
-    const definitions = await this.system.envSet.loadConfig<EntityDefinition[]>(
-      this.system.initializationConfig.fileNames.devicesDefinitions
+    const definitions = await this.context.system.envSet.loadConfig<EntityDefinition[]>(
+      this.context.system.initializationConfig.fileNames.devicesDefinitions
     );
 
     for (let definition of definitions) {
@@ -40,7 +35,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase, Device
     const device: DeviceBase | undefined = this.instances[deviceId];
 
     if (!device) {
-      this.env.log.error(`DevicesManager.getDevice: Can't find the device "${deviceId}"`);
+      this.context.log.error(`DevicesManager.getDevice: Can't find the device "${deviceId}"`);
       throw new Error(`Can't find the device "${deviceId}"`);
     }
 
