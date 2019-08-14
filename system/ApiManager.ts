@@ -60,7 +60,7 @@ export default class ApiManager {
 
 
   private async callApi(methodName: string, args: any[]): Promise<any> {
-    return (this.system.api as any)[methodName](...args);
+    return (this.context.system.api as any)[methodName](...args);
   }
 
   private makeNewSession(sessionId: string) {
@@ -68,8 +68,8 @@ export default class ApiManager {
       // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
       async (message: RemoteCallMessage) => this.rcOutcomeEvents.emit(sessionId, message),
       this.callApi,
-      this.system.config.config.ioSetResponseTimoutSec,
-      this.system.log.error,
+      this.context.config.config.ioSetResponseTimoutSec,
+      this.context.log.error,
       makeUniqId
     );
   }

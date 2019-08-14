@@ -3,6 +3,7 @@ import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from './DriverBase';
 import {validateProps, validateRequiredProps} from '../lib/validate';
 import {mergeDeep} from '../lib/collections';
+import Context from '../Context';
 
 
 /**
@@ -17,20 +18,20 @@ import {mergeDeep} from '../lib/collections';
  */
 export default abstract class DriverFactoryBase<Instance extends DriverBase> {
   protected instances: {[index: string]: Instance} = {};
-  protected abstract DriverClass: new (definition: EntityDefinition, env: DriverEnv) => Instance;
+  protected abstract DriverClass: new (context: Context, definition: EntityDefinition) => Instance;
   protected instanceAlwaysNew: boolean = false;
   protected instanceAlwaysSame: boolean = false;
   // name of instance id in props
   protected instanceByPropName?: string;
   // calculate instance id by calling a function
   protected instanceIdCalc?: (props: {[index: string]: any}) => string;
+  protected readonly context: Context;
   protected readonly definition: EntityDefinition;
-  protected readonly env: EnvBase;
 
 
-  constructor(definition: EntityDefinition, env: EnvBase) {
+  constructor(context: Context, definition: EntityDefinition) {
     this.definition = definition;
-    this.env = env;
+    this.context = context;
   }
 
 
@@ -89,7 +90,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> {
       props,
     };
 
-    const instance: Instance = new this.DriverClass(definition, this.env);
+    const instance: Instance = new this.DriverClass(this.context, definition);
 
     // init it
     if (instance.init) await instance.init();
@@ -101,7 +102,8 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> {
     instanceProps: {[index: string]: any},
     mergedProps: {[index: string]: any}
   ) {
-    const manifest: DriverManifest = await this.env.loadManifest(this.definition.id);
+    // TODO: review
+    const manifest: DriverManifest = await this.loadManifest(this.definition.id);
 
     if (!manifest.props) return;
 

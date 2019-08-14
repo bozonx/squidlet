@@ -30,6 +30,7 @@ export default class Context {
     return this.config.id;
   }
   get config(): HostConfig {
+    // TODO: review
     //return this.hostConfig as HostConfig;
     return await this.envSet.loadConfig<HostConfig>(
       this.system.initializationConfig.fileNames.hostConfig

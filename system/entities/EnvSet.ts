@@ -29,8 +29,8 @@ export default class EnvSet {
    */
   loadConfig<T>(configFileName: string): Promise<T> {
     const pathToFile: string = pathJoin(
-      this.system.systemConfig.rootDirs.envSet,
-      this.system.systemConfig.envSetDirs.configs,
+      this.context.systemConfig.rootDirs.envSet,
+      this.context.systemConfig.envSetDirs.configs,
       configFileName
     );
 
@@ -45,11 +45,11 @@ export default class EnvSet {
    */
   loadManifest<T extends ManifestBase>(pluralType: ManifestsTypePluralName, entityName: string) : Promise<T> {
     const pathToFile = pathJoin(
-      this.system.systemConfig.rootDirs.envSet,
-      this.system.systemConfig.envSetDirs.entities,
+      this.context.systemConfig.rootDirs.envSet,
+      this.context.systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
-      this.system.initializationConfig.fileNames.manifest
+      this.context.system.initializationConfig.fileNames.manifest
     );
 
     return this.readJsonObjectFile(pathToFile) as Promise<T>;
@@ -117,8 +117,8 @@ export default class EnvSet {
 
     // make absolute path
     return pathJoin(
-      this.system.systemConfig.rootDirs.envSet,
-      this.system.systemConfig.envSetDirs.entities,
+      this.context.systemConfig.rootDirs.envSet,
+      this.context.systemConfig.envSetDirs.entities,
       pluralType,
       entityName,
       fileName

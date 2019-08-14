@@ -1,6 +1,5 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../entities/EntityBase';
-import EntityDefinition from '../interfaces/EntityDefinition';
 import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../lib/ConsistentState';
 import DeviceState from './DeviceState';
@@ -49,11 +48,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   private _configState?: DeviceState;
 
 
-  constructor(definition: EntityDefinition, env: EntityEnv) {
-    super(definition, env);
-    this.env = env;
-  }
-
   protected doInit = async () => {
     const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
 
@@ -61,13 +55,13 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       this._statusState = new DeviceState(
         manifest.status,
         (): Dictionary => {
-          return this.env.system.state.getState(StateCategories.devicesStatus, this.id) || {};
+          return this.context.state.getState(StateCategories.devicesStatus, this.id) || {};
         },
         (partialState: Dictionary): void => {
-          this.env.system.state.updateState(StateCategories.devicesStatus, this.id, partialState);
+          this.context.state.updateState(StateCategories.devicesStatus, this.id, partialState);
         },
-        this.env.system.log.error,
-        this.env.config.config.queueJobTimeoutSec,
+        this.log.error,
+        this.context.config.config.queueJobTimeoutSec,
         this.initialStatus,
         this.statusGetter,
         this.statusSetter
@@ -78,20 +72,20 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       this._configState = new DeviceState(
         manifest.config,
         (): Dictionary => {
-          return this.env.system.state.getState(StateCategories.devicesConfig, this.id) || {};
+          return this.context.state.getState(StateCategories.devicesConfig, this.id) || {};
         },
         (partialState: Dictionary): void => {
-          this.env.system.state.updateState(StateCategories.devicesConfig, this.id, partialState);
+          this.context.state.updateState(StateCategories.devicesConfig, this.id, partialState);
         },
-        this.env.system.log.error,
-        this.env.config.config.queueJobTimeoutSec,
+        this.log.error,
+        this.context.config.config.queueJobTimeoutSec,
         this.initialConfig,
         this.configGetter,
         this.configSetter
       );
     }
 
-    this.env.system.onAppInit(async () => {
+    this.context.onAppInit(async () => {
       await Promise.all([
         this.statusState && this.statusState.init(),
         this.configState && this.configState.init(),
@@ -115,7 +109,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
   async loadManifest(className: string): Promise<DeviceManifest> {
-    return this.system.envSet.loadManifest<DeviceManifest>('devices', className);
+    return this.context.system.envSet.loadManifest<DeviceManifest>('devices', className);
   }
 
   /**
@@ -130,7 +124,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       result = await this.actions[actionName](...params);
     }
     catch (err) {
-      this.env.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
+      this.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
 
       return;
     }
@@ -190,7 +184,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       cb(paramName, value);
     };
 
-    return this.env.system.state.onChangeParam(wrapper);
+    return this.context.state.onChangeParam(wrapper);
   }
 
   getConfig(): Dictionary {
@@ -240,7 +234,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       cb();
     };
 
-    return this.env.system.state.onChange(wrapper);
+    return this.context.state.onChange(wrapper);
   }
 
 }

@@ -5,6 +5,7 @@ import LogPublisher from '../LogPublisher';
 import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import DriverBase from '../baseDrivers/DriverBase';
+import ServiceManifest from '../interfaces/ServiceManifest';
 
 
 interface KindOfDriver {
@@ -81,24 +82,24 @@ export default class EntityBase<Props = {}> {
 
     if (this.devicesDidInit) {
       // TODO: будет не синхронно
-      this.env.system.onDevicesInit(async () => {
+      this.context.onDevicesInit(async () => {
         try {
           this.devicesDidInit && await this.devicesDidInit();
         }
         catch (err) {
-          this.env.log.error(err);
+          this.log.error(err);
         }
       });
     }
 
     if (this.appDidInit) {
       // TODO: будет не синхронно
-      this.env.system.onAppInit(async () => {
+      this.context.onAppInit(async () => {
         try {
           this.appDidInit && await this.appDidInit();
         }
         catch (err) {
-          this.env.log.error(err);
+          this.log.error(err);
         }
       });
     }
@@ -114,7 +115,7 @@ export default class EntityBase<Props = {}> {
         await this.didInit(getDriverDep);
       }
       catch (err) {
-        this.env.log.error(err);
+        this.log.error(err);
       }
     }
   }
@@ -125,7 +126,6 @@ export default class EntityBase<Props = {}> {
 
 
   getIo<T extends IoItem>(shortDevName: string): T {
-    //return this.system.driversManager.getDev<T>(shortDevName);
     return this.context.system.ioManager.getIo<T>(shortDevName);
   }
 
@@ -137,7 +137,8 @@ export default class EntityBase<Props = {}> {
    * Load manifest of this entity
    */
   protected async getManifest<T extends ManifestBase>(): Promise<T> {
-    return this.env.loadManifest(this.className) as Promise<T>;
+    return this.context.system.envSet.loadManifest<ServiceManifest>('services', className);
+    //return this.loadManifest(this.className) as Promise<T>;
   }
 
   /**
@@ -147,10 +148,10 @@ export default class EntityBase<Props = {}> {
     return (...args: any[]) => {
       try {
         cb(...args)
-          .catch(this.env.log.error);
+          .catch(this.log.error);
       }
       catch (err) {
-        this.env.log.error(err);
+        this.log.error(err);
       }
     };
   }
@@ -158,7 +159,7 @@ export default class EntityBase<Props = {}> {
 
   private getDriverDepCb(): GetDriverDep {
     return (driverName: string): KindOfDriver => {
-      return this.env.getDriver(driverName) as any;
+      return this.getDriver(driverName) as any;
     };
   }
 
