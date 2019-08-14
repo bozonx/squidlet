@@ -119,6 +119,8 @@ export default class Api {
 
   switchToIoServer() {
     // TODO: !!!!
+    // TODO: запретить в dev режиме и если стоит параметр конфига
+    // TODO: либо в dev режиме жестко указывать параметр конфига
   }
 
   /**

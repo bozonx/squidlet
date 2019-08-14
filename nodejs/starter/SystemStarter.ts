@@ -42,6 +42,8 @@ export default class SystemStarter {
         varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
         tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
       },
+
+      // TODO: передать user group
     };
   }
 

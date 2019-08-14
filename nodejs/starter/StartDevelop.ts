@@ -31,6 +31,8 @@ export default class StartDevelop {
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
+    argUser?: string,
+    argGroup?: string,
     argIoset?: string,
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
@@ -41,7 +43,9 @@ export default class StartDevelop {
       argForce,
       argMachine,
       argHostName,
-      argWorkDir
+      argWorkDir,
+      argUser,
+      argGroup,
     );
     this.systemStarter = new SystemStarter(this.os, this.props);
   }

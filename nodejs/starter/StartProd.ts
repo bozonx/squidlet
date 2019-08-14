@@ -30,7 +30,9 @@ export default class StartProd {
     argForce: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
-    argWorkDir?: string
+    argWorkDir?: string,
+    argUser?: string,
+    argGroup?: string,
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
     this.props = new Props(
@@ -40,6 +42,8 @@ export default class StartProd {
       argMachine,
       argHostName,
       argWorkDir,
+      argUser,
+      argGroup,
     );
     this.prodBuild = new ProdBuild(this.os, this.props);
     this.systemStarter = new SystemStarter(this.os, this.props);

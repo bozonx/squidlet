@@ -8,6 +8,8 @@ interface CommandStartArgs {
   name?: string;
   prod?: boolean;
   force?: boolean;
+  user?: string;
+  group?: string;
   ioset?: string;
 }
 

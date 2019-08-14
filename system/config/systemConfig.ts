@@ -38,9 +38,9 @@ const systemConfig = {
   //topicSeparator: '/',
   //eventNameSeparator: '|',
 
-  channels: {
-    network: 255,
-  },
+  // channels: {
+  //   network: 255,
+  // },
 };
 
 export default systemConfig;

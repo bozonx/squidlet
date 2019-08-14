@@ -21,6 +21,8 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
+  readonly user?: string;
+  readonly group?: string;
   destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
   get hostConfig(): PreHostConfig {
@@ -46,6 +48,8 @@ export default class Props {
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
+    argUser?: string,
+    argGroup?: string,
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
@@ -53,6 +57,8 @@ export default class Props {
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
+    this.user = argUser;
+    this.group = argGroup;
   }
 
 
