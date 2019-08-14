@@ -107,7 +107,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     // make deferred impulse
     this.impulse()
       .catch((err) => {
-        this.env.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
+        this.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
       });
   }
 

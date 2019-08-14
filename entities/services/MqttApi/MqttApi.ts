@@ -20,14 +20,14 @@ export default class MqttApi extends ServiceBase<MqttProps> {
     this.depsInstances.mqtt = await getDriverDep('Mqtt')
       .getInstance(this.props);
 
-    this.sessionId = this.env.system.sessions.newSession(0);
+    this.sessionId = this.context.sessions.newSession(0);
   }
 
   protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
     // listen outcome api requests
-    this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
+    this.context.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
   protected devicesDidInit = async () => {
@@ -35,7 +35,7 @@ export default class MqttApi extends ServiceBase<MqttProps> {
   }
 
   destroy = async () => {
-    this.env.system.sessions.shutDownImmediately(this.sessionId);
+    this.context.sessions.shutDownImmediately(this.sessionId);
   }
 
 
@@ -51,10 +51,10 @@ export default class MqttApi extends ServiceBase<MqttProps> {
       msg = deserializeJson(data);
     }
     catch (err) {
-      return this.env.log.error(`MqttApi: Can't decode message: ${err}`);
+      return this.log.error(`MqttApi: Can't decode message: ${err}`);
     }
 
-    return this.env.system.apiManager.incomeRemoteCall(this.sessionId, msg);
+    return this.context.system.apiManager.incomeRemoteCall(this.sessionId, msg);
   });
 
   private handleOutcomeMessages = this.wrapErrors(async (sessionId: string, message: RemoteCallMessage) => {
@@ -69,7 +69,7 @@ export default class MqttApi extends ServiceBase<MqttProps> {
    * Subscribe to remoteCall topic
    */
   private subscribeToTopic = async () => {
-    this.env.log.info(`--> Register MQTT subscriber of remote call api topic`);
+    this.log.info(`--> Register MQTT subscriber of remote call api topic`);
 
     await this.mqtt.subscribe(this.makeTopic());
   }

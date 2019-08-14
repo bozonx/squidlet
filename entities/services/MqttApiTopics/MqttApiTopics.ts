@@ -19,7 +19,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this._apiTopicsLogic = new ApiTopicsLogic(this.env.system);
+    this._apiTopicsLogic = new ApiTopicsLogic(this.context);
     this.apiTopicsLogic.init();
     this.depsInstances.mqtt = await getDriverDep('Mqtt')
       .getInstance(this.props);
@@ -68,12 +68,12 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    * Subscribe to all the device's actions calls on broker
    */
   private subscribeToDevices = async () => {
-    this.env.log.info(`--> Register MQTT subscribers of devices actions`);
+    this.log.info(`--> Register MQTT subscribers of devices actions`);
 
     const devicesActionsTopics: string[] = this.getDevicesActionTopics();
 
     for (let topic of devicesActionsTopics) {
-      this.env.log.info(`MQTT subscribe: ${topic}`);
+      this.log.info(`MQTT subscribe: ${topic}`);
 
       await this.mqtt.subscribe(topic);
     }
@@ -85,10 +85,10 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    */
   private getDevicesActionTopics(): string[] {
     const topics: string[] = [];
-    const devicesIds: string[] = this.env.system.devicesManager.getInstantiatedDevicesIds();
+    const devicesIds: string[] = this.context.system.devicesManager.getInstantiatedDevicesIds();
 
     for (let deviceId of devicesIds) {
-      const device = this.env.system.devicesManager.getDevice(deviceId);
+      const device = this.context.system.devicesManager.getDevice(deviceId);
 
       for (let actionName of device.getActionsList()) {
         const deviceActionTopic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);

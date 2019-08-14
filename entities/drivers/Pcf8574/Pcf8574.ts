@@ -61,7 +61,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   protected didInit = async () => {
     this.i2cDriver.addPollErrorListener((dataAddressStr: number | string | undefined, err: Error) => {
-      this.env.log.error(String(err));
+      this.log.error(String(err));
     });
 
     this.i2cDriver.addListener(this.handleIcStateChange);
@@ -73,7 +73,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       await this.writeToIc(this.currentState);
     }
     catch (err) {
-      this.env.log.error(`PCF8574. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
+      this.log.error(`PCF8574. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
     }
   }
 
@@ -82,7 +82,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
-      this.env.log.warn(`PCF8574Driver.setupInput(${pin}, ${debounce}, ${edge}). This pin has been already set up`);
+      this.log.warn(`PCF8574Driver.setupInput(${pin}, ${debounce}, ${edge}). This pin has been already set up`);
 
       return;
     }
@@ -99,7 +99,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
-      this.env.log.warn(`PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up`);
+      this.log.warn(`PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up`);
 
       return;
     }
@@ -338,12 +338,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   private checkInitialization(methodWhichCheck: string): boolean {
     if (this.initingIcInProgress) {
-      this.env.log.warn(`PCF8574Driver.${methodWhichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+      this.log.warn(`PCF8574Driver.${methodWhichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }
-    else if (!this.env.system.isInitialized) {
-      this.env.log.warn(`PCF8574Driver.${methodWhichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+    else if (!this.context.isInitialized) {
+      this.log.warn(`PCF8574Driver.${methodWhichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }

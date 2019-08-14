@@ -100,8 +100,6 @@ export const NO_MODE = 0x21;
 export class PortExpander extends DriverBase<PortExpanderProps> {
   wasIcInited: boolean = false;
   readonly state: State = new State(this);
-  // TODO: does it really need?
-  readonly log: LogPublisher = this.env.log;
   get node(): DuplexDriver {
     return this.depsInstances.node;
   }
@@ -134,7 +132,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
     this.node.onReceive((dataAddressStr: number | string, data: Uint8Array) => {
       // TODO: не может быть undefined
       if (typeof dataAddressStr === 'undefined') {
-        this.env.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
+        this.log.error(`PortExpanderDriver: No command have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
       else if (dataAddressStr === INCOME_COMMANDS.newAllDigitalState) {
         this.state.updateDigitalState(data);
@@ -148,7 +146,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
         this.state.setAnalogInput(pinNumber, value);
       }
       else {
-        this.env.log.error(`PortExpanderDriver: Unknown command "${dataAddressStr}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
+        this.log.error(`PortExpanderDriver: Unknown command "${dataAddressStr}" have been received from node. Props are: ${JSON.stringify(this.props)}`);
       }
     });
   }
@@ -305,7 +303,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
         await this.digitalPins.writeOutputStateToIc();
       }
       catch (err) {
-        this.env.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+        this.log.warn(`PortExpanderDriver init. Can't write initial digital output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
       }
     }
 
@@ -315,7 +313,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
         await this.analogPins.writeOutputStateToIc();
       }
       catch (err) {
-        this.env.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
+        this.log.warn(`PortExpanderDriver init. Can't write initial analog output values to IC. Props are "${JSON.stringify(this.props)}". ${String(err)}`);
       }
     }
 
@@ -325,12 +323,12 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
 
   checkInitialization(method: string): boolean {
     if (!this.initingIcInProgress) {
-      this.env.log.warn(`PortExpanderDriver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
+      this.log.warn(`PortExpanderDriver.${method}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }
-    else if (!this.env.system.isInitialized) {
-      this.env.log.warn(`PortExpanderDriver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
+    else if (!this.context.isInitialized) {
+      this.log.warn(`PortExpanderDriver.${method}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
 
       return false;
     }

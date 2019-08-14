@@ -60,7 +60,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
     });
 
-    this.env.system.sessions.onSessionClosed((sessionId) => {
+    this.context.sessions.onSessionClosed((sessionId) => {
       // listen only ours session
       if (!Object.keys(this.sessionConnections).includes(sessionId)) return;
 
@@ -71,7 +71,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
   destroy = async () => {
     for (let sessionId of Object.keys(this.sessionConnections)) {
-      this.env.system.sessions.shutDownImmediately(sessionId);
+      this.context.sessions.shutDownImmediately(sessionId);
     }
 
     delete this.sessionConnections;
@@ -81,7 +81,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
 
   send(sessionId: string, data: string | Uint8Array): Promise<void> {
-    if (!this.env.system.sessions.isSessionActive(sessionId)) {
+    if (!this.context.sessions.isSessionActive(sessionId)) {
       throw new Error(`WsServerSessions.send: Session ${sessionId} is inactive`);
     }
     else if (!this.sessionConnections[sessionId]) {
@@ -101,7 +101,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     await this.server.closeConnection(connectionId, 0, 'Close session request');
 
-    this.env.system.sessions.shutDownImmediately(sessionId);
+    this.context.sessions.shutDownImmediately(sessionId);
 
     delete this.sessionConnections[sessionId];
   }
@@ -134,13 +134,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     const requestCookie: { [SESSIONID_COOKIE]?: string } = parseCookie(request.headers.cookie);
     let sessionId: string | undefined = requestCookie[SESSIONID_COOKIE];
 
-    if (sessionId && this.env.system.sessions.isSessionActive(sessionId)) {
+    if (sessionId && this.context.sessions.isSessionActive(sessionId)) {
       // if session exists - recover it
-      this.env.system.sessions.recoverSession(sessionId);
+      this.context.sessions.recoverSession(sessionId);
     }
     else {
       // create a new session if there isn't cookie of session is inactive
-      sessionId = this.env.system.sessions.newSession(this.props.expiredSec);
+      sessionId = this.context.sessions.newSession(this.props.expiredSec);
 
       const cookie = `${SESSIONID_COOKIE}=${sessionId}`;
 
@@ -172,14 +172,14 @@ export default class Factory extends DriverFactoryBase<WsServerSessions> {
 //
 //   const parsedCookie: {SESSIONID?: string} = parseCookie(request.headers.cookie);
 //
-//   if (parsedCookie.SESSIONID && this.env.system.sessions.isSessionActive(parsedCookie.SESSIONID)) {
+//   if (parsedCookie.SESSIONID && this.context.sessions.isSessionActive(parsedCookie.SESSIONID)) {
 //     // if session exists - recover it
-//     return this.env.system.sessions.recoverSession(parsedCookie.SESSIONID);
+//     return this.context.sessions.recoverSession(parsedCookie.SESSIONID);
 //   }
 //
 //   // or create a new session
 //
-//   const sessionId: string = this.env.system.sessions.newSession(this.props.expiredSec);
+//   const sessionId: string = this.context.sessions.newSession(this.props.expiredSec);
 //   headers['Set-Cookie'] = `SESSIONID=${sessionId}`;
 //   // rise a new session event
 //   this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, request);
@@ -192,7 +192,7 @@ export default class Factory extends DriverFactoryBase<WsServerSessions> {
 // onMessage(cb: (sessionId: string, data: string | Uint8Array) => void): number {
 //   return this.events.addListener(WS_SESSIONS_EVENTS.message, cb);
 //
-//   // if (!this.env.system.sessions.isSessionActive(sessionId)) {
+//   // if (!this.context.sessions.isSessionActive(sessionId)) {
 //   //   throw new Error(`WsServerSessions.onMessage: Session ${sessionId} is inactive`);
 //   // }
 //   //
@@ -211,11 +211,11 @@ export default class Factory extends DriverFactoryBase<WsServerSessions> {
 // }
 
 // onSessionClose(sessionId: string, cb: () => void): number {
-//   if (!this.env.system.sessions.isSessionActive(sessionId)) {
+//   if (!this.context.sessions.isSessionActive(sessionId)) {
 //     throw new Error(`WsServerSessions.onSessionClose: Session ${sessionId} is inactive`);
 //   }
 //
-//   return this.env.system.sessions.onSessionClossed((closedSession: string) => {
+//   return this.context.sessions.onSessionClossed((closedSession: string) => {
 //     if (closedSession === sessionId) cb();
 //   });
 // }

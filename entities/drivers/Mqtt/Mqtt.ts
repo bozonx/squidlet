@@ -29,7 +29,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   //private wasPrevOpenFulfilled: boolean = false;
   private connectionId?: string;
   private get mqttIo(): MqttIo {
-    return this.env.getIo('Mqtt') as any;
+    return this.getIo('Mqtt') as any;
   }
   private get closedMsg() {
     return `Connection "${this.props.url}" has been closed`;
@@ -39,7 +39,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   protected willInit = async () => {
     this.openPromise = new Promised<void>();
 
-    this.env.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
+    this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
       omit(this.props, 'url')
@@ -58,7 +58,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
       this.openPromise && this.openPromise.reject(new Error(msg));
 
-      this.env.log.error(msg);
+      this.log.error(msg);
     });
 
     // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
@@ -73,7 +73,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     await this.mqttIo.onError((connectionId: string, error: Error) => {
       if (connectionId !== this.connectionId) return;
 
-      this.env.log.error(`Mqtt connection "${connectionId}": ${error}`);
+      this.log.error(`Mqtt connection "${connectionId}": ${error}`);
     });
 
     // wait for connection established

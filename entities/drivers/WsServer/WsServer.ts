@@ -16,7 +16,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
   private get wsServerIo(): WebSocketServerIo {
-    return this.env.getIo('WebSocketServer') as any;
+    return this.getIo('WebSocketServer') as any;
   }
   private server?: WsServerLogic;
   private get closedMsg() {
@@ -29,8 +29,8 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
       this.wsServerIo,
       this.props,
       this.onServerClosed,
-      this.env.log.info,
-      this.env.log.error
+      this.log.info,
+      this.log.error
     );
   }
 
@@ -95,7 +95,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 
 
   private onServerClosed = () => {
-    this.env.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
+    this.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
   }
 
 }

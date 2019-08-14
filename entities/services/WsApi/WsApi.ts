@@ -27,14 +27,14 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
     this.wsServerSessions.onSessionClose(this.wrapErrors(async (sessionId: string) => {
       this.sessions = removeItemFromArray(this.sessions, sessionId);
 
-      await this.env.system.apiManager.remoteCallSessionClosed(sessionId);
+      await this.context.system.apiManager.remoteCallSessionClosed(sessionId);
     }));
 
     // listen income api requests
     this.wsServerSessions.onMessage(this.handleIncomeMessages);
 
     // listen outcome api requests
-    this.env.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
+    this.context.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
   destroy = async () => {
@@ -55,10 +55,10 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       msg = deserializeJson(data);
     }
     catch (err) {
-      return this.env.log.error(`WsApi: Can't decode message: ${err}`);
+      return this.log.error(`WsApi: Can't decode message: ${err}`);
     }
 
-    return this.env.system.apiManager.incomeRemoteCall(sessionId, msg);
+    return this.context.system.apiManager.incomeRemoteCall(sessionId, msg);
   });
 
   private handleOutcomeMessages = this.wrapErrors(async (sessionId: string, message: RemoteCallMessage) => {
