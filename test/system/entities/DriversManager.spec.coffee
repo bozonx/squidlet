@@ -1,4 +1,4 @@
-DriversManager = require('../../../system/entities/DriversManager').default
+DriversManager = require('../../../system/managers/DriversManager').default
 initializationConfig = require('../../../system/config/initializationConfig').default
 
 

@@ -1,4 +1,4 @@
-DevicesManager = require('../../../system/entities/DevicesManager').default
+DevicesManager = require('../../../system/managers/DevicesManager').default
 initializationConfig = require('../../../system/config/initializationConfig').default
 
 

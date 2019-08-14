@@ -1,10 +1,10 @@
-import DevicesManager from './entities/DevicesManager';
-import DriversManager from './entities/DriversManager';
-import ServicesManager from './entities/ServicesManager';
+import DevicesManager from './managers/DevicesManager';
+import DriversManager from './managers/DriversManager';
+import ServicesManager from './managers/ServicesManager';
 import EnvSet from './entities/EnvSet';
 import IoSet from './interfaces/IoSet';
-import IoManager from './entities/IoManager';
-import ApiManager from './ApiManager';
+import IoManager from './managers/IoManager';
+import ApiManager from './managers/ApiManager';
 import Api from './Api';
 import Context, {AppLifeCycleEvents} from './Context';
 import InitializationConfig from './interfaces/InitializationConfig';

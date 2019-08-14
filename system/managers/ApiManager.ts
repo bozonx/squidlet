@@ -1,8 +1,8 @@
-import Context from './Context';
-import IndexedEvents from './lib/IndexedEvents';
-import RemoteCall from './lib/remoteCall/RemoteCall';
-import RemoteCallMessage from './interfaces/RemoteCallMessage';
-import {makeUniqId} from './lib/uniqId';
+import Context from '../Context';
+import IndexedEvents from '../lib/IndexedEvents';
+import RemoteCall from '../lib/remoteCall/RemoteCall';
+import RemoteCallMessage from '../interfaces/RemoteCallMessage';
+import {makeUniqId} from '../lib/uniqId';
 
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
