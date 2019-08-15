@@ -15,7 +15,7 @@ export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
   private readonly storageWrapper: StorageEnvMemoryWrapper;
-  private readonly ioCollection: {[index: string]: IoItem} = {};
+  private wrappedStorageIo?: StorageIo;
   private remoteIoCollection: RemoteIoCollection;
 
 
@@ -33,43 +33,39 @@ export default class IoSetDevelopRemote implements IoSet {
     this.remoteIoCollection = new RemoteIoCollection(host, port);
   }
 
-
   async prepare() {
     await this.storageWrapper.init();
   }
 
   async init(context: Context) {
-    await this.remoteIoCollection.init(context);
+    await this.remoteIoCollection.init();
 
     // check io dependencies
     checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.ioNames);
 
-    for (let ioName of this.remoteIoCollection.ioNames) {
-      if (ioName === 'Storage') {
-        this.ioCollection[ioName] = this.storageWrapper.makeWrapper(
-          this.remoteIoCollection.ioCollection[ioName] as StorageIo
-        );
-      }
-      else {
-        this.ioCollection[ioName] = this.remoteIoCollection.ioCollection[ioName];
-      }
-    }
+    this.wrappedStorageIo = this.storageWrapper.makeWrapper(
+      this.remoteIoCollection.ioCollection['Storage'] as StorageIo
+    );
   }
 
   async destroy() {
     await this.remoteIoCollection.destroy();
   }
 
+
   getIo<T extends IoItem>(ioName: string): T {
-    if (!this.ioCollection[ioName]) {
+    if (!this.remoteIoCollection.ioCollection[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
     }
+    else if (ioName === 'Storage') {
+      return this.wrappedStorageIo as any;
+    }
 
-    return this.ioCollection[ioName] as T;
+    return this.remoteIoCollection.ioCollection[ioName] as T;
   }
 
   getNames(): string[] {
-    return Object.keys(this.ioCollection);
+    return this.remoteIoCollection.ioNames;
   }
 
 

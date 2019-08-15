@@ -29,7 +29,6 @@ export default class IoSetDevelopSource implements IoSet {
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
   }
 
-
   async prepare() {
     await this.storageWrapper.init();
   }

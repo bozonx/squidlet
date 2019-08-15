@@ -1,6 +1,5 @@
 import * as path from 'path';
 
-import Context from '../../system/Context';
 import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../helpers';
 import WsApiClient from '../WsApiClient';
@@ -25,10 +24,7 @@ export default class RemoteIoCollection {
   }
 
 
-  async init(context: Context): Promise<void> {
-
-    // TODO: system не нужен ???
-
+  async init(): Promise<void> {
     this._client = new WsApiClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,
