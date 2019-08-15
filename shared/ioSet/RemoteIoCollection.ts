@@ -25,6 +25,9 @@ export default class RemoteIoCollection {
 
 
   async init(): Promise<void> {
+
+    // TODO: это не api client , а IoServerClient !!!!
+
     this._client = new WsApiClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,
@@ -69,8 +72,9 @@ export default class RemoteIoCollection {
     }
 
     for (let methodName of ioMethods) {
+      // TODO: review
       // skip init and configure methods because io item has already initialized and configured on a host
-      if (methodName === 'init' || methodName === 'configure') continue;
+      //if (methodName === 'init' || methodName === 'configure') continue;
 
       ioItem[methodName] = this.makeMethod(ioName, methodName);
     }

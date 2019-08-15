@@ -58,23 +58,26 @@ export default class Context {
   }
 
 
-  onDevicesInit(cb: () => void): number {
+  onDevicesInit(cb: () => Promise<void>): number {
     return this.addListenerOnce(this.system.isDevicesInitialized, AppLifeCycleEvents.devicesInitialized, cb);
   }
 
-  onAppInit(cb: () => void): number {
+  onAppInit(cb: () => Promise<void>): number {
     return this.addListenerOnce(this.system.isAppInitialized, AppLifeCycleEvents.appInitialized, cb);
   }
 
+  // TODO: может тоже сделать асинронный ???
   onBeforeDestroy(cb: () => void): number {
     return this.system.events.once(AppLifeCycleEvents.beforeDestroy, cb);
   }
 
 
-  private addListenerOnce(isFulfilles: boolean, eventName: AppLifeCycleEvents, cb: () => void): number {
+  private addListenerOnce(isFulfilled: boolean, eventName: AppLifeCycleEvents, cb: () => Promise<void>): number {
     // call immediately if devices are initialized
-    if (isFulfilles) {
-      cb();
+    if (isFulfilled) {
+      const promise: Promise<void> | undefined = cb();
+
+      if (promise) promise.catch(this.log.error);
 
       return -1;
     }
