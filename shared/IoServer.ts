@@ -8,6 +8,8 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import {makeUniqId} from '../system/lib/uniqId';
 
 
+export const IO_API = 'ioApi';
+export const IO_NAMES_METHOD = 'getIoNames';
 export const METHOD_DELIMITER = '.';
 export const defaultProps: WebSocketServerProps = {
   host: 'localhost',
@@ -111,13 +113,22 @@ export default class IoServer {
     const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
 
     if (!methodName) {
-      return this.logError(`No method name: "${fullName}"`);
+      throw new Error(`No method name: "${fullName}"`);
+    }
+
+    if (ioName === IO_API) {
+      if (methodName === IO_NAMES_METHOD) {
+
+        return this.ioSet.getNames();
+      }
+
+      throw new Error(`Unknown ioApi method`);
     }
 
     const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
 
     if (!IoItem[methodName]) {
-      return this.logError(`Method doesn't exist: "${fullName}"`);
+      throw new Error(`Method doesn't exist: "${fullName}"`);
     }
 
     return IoItem[methodName](...args);

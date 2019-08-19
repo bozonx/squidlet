@@ -4,7 +4,7 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
-import {defaultProps, METHOD_DELIMITER} from './IoServer';
+import {defaultProps, IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from './IoServer';
 
 
 const wsClientIo = new WebSocketClient();
@@ -68,7 +68,7 @@ export default class IoClient {
   }
 
   getIoNames(): Promise<string[]> {
-    const pathToMethod = `ioApi${METHOD_DELIMITER}getIoNames`;
+    const pathToMethod = `${IO_API}${METHOD_DELIMITER}${IO_NAMES_METHOD}`;
 
     return this.remoteCall.callMethod(pathToMethod);
   }
