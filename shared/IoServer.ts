@@ -8,8 +8,8 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import {makeUniqId} from '../system/lib/uniqId';
 
 
-const METHOD_DELIMITER = '.';
-const defaultProps: WebSocketServerProps = {
+export const METHOD_DELIMITER = '.';
+export const defaultProps: WebSocketServerProps = {
   host: 'localhost',
   port: 8089,
 };

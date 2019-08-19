@@ -1,19 +1,12 @@
-import * as yaml from 'js-yaml';
-import * as path from 'path';
-import * as fs from 'fs';
-
 import RemoteCall from '../system/lib/remoteCall/RemoteCall';
 import {deserializeJson, serializeJson} from '../system/lib/binaryHelpers';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
-import {ENCODE} from '../system/constants';
-import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
+import {defaultProps, METHOD_DELIMITER} from './IoServer';
 
 
-// TODO: откуда берем манифесн
-const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');
 const wsClientIo = new WebSocketClient();
 
 
@@ -68,8 +61,16 @@ export default class IoServerClient {
   /**
    * Call api's method
    */
-  callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
+  callIoMethod(ioName: string, methodName: string, ...args: any[]): Promise<any> {
+    const pathToMethod = `${ioName}${METHOD_DELIMITER}${methodName}`;
+
     return this.remoteCall.callMethod(pathToMethod, ...args);
+  }
+
+  getIoNames(): Promise<string[]> {
+    const pathToMethod = `ioApi${METHOD_DELIMITER}getIoNames`;
+
+    return this.remoteCall.callMethod(pathToMethod);
   }
 
   async close() {
@@ -107,11 +108,8 @@ export default class IoServerClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
-    const yamlContent: string = fs.readFileSync(wsClientManifestPath, ENCODE);
-    const clientManifest = yaml.safeLoad(yamlContent);
-    const clientProps = collectPropsDefaults(clientManifest.props);
-    const host: string = specifiedHost || clientProps.host;
-    const port: number= specifiedPort || clientProps.port;
+    const host: string = specifiedHost || defaultProps.host;
+    const port: number= specifiedPort || defaultProps.port;
     const url = `ws://${host}:${port}`;
 
     return  {

@@ -12,7 +12,7 @@ export default class RemoteIoCollection {
   private readonly host?: string;
   private readonly port?: number;
   private _client?: IoServerClient;
-  private get client(): IoServerClient {
+  private get ioClient(): IoServerClient {
     return this._client as any;
   }
 
@@ -32,9 +32,9 @@ export default class RemoteIoCollection {
       this.port
     );
 
-    await this.client.init();
+    await this.ioClient.init();
 
-    this.ioNames = await this.askIoNames();
+    this.ioNames = await this.ioClient.getIoNames();
 
     // make fake io items
     for (let ioName of this.ioNames) {
@@ -43,7 +43,7 @@ export default class RemoteIoCollection {
   }
 
   async destroy() {
-    await this.client.destroy();
+    await this.ioClient.destroy();
     delete this._client;
     delete this.ioNames;
   }
@@ -57,10 +57,6 @@ export default class RemoteIoCollection {
     return this.ioNames;
   }
 
-
-  private async askIoNames(): Promise<string[]> {
-    return this.client.callMethod('ioApi.getIoNames');
-  }
 
   private makeFakeIo(ioName: string): IoItem {
     const ioDefinitionPath = path.join(SYSTEM_DIR, 'interfaces', 'io', `${ioName}Io`);
@@ -83,7 +79,7 @@ export default class RemoteIoCollection {
 
   private makeMethod(ioName: string, methodName: string): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => {
-      return this.client.callMethod(ioName, methodName, ...args);
+      return this.ioClient.callIoMethod(ioName, methodName, ...args);
     };
   }
 
