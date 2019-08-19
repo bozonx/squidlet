@@ -3,7 +3,7 @@ import * as path from 'path';
 import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../helpers';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
-import IoServerClient from '../IoServerClient';
+import IoClient from '../IoClient';
 
 
 export default class RemoteIoCollection {
@@ -11,9 +11,9 @@ export default class RemoteIoCollection {
   private ioNames: string[] = [];
   private readonly host?: string;
   private readonly port?: number;
-  private _client?: IoServerClient;
-  private get ioClient(): IoServerClient {
-    return this._client as any;
+  private _ioClient?: IoClient;
+  private get ioClient(): IoClient {
+    return this._ioClient as any;
   }
 
 
@@ -24,7 +24,7 @@ export default class RemoteIoCollection {
 
 
   async init(): Promise<void> {
-    this._client = new IoServerClient(
+    this._ioClient = new IoClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,
       console.error,
@@ -44,7 +44,7 @@ export default class RemoteIoCollection {
 
   async destroy() {
     await this.ioClient.destroy();
-    delete this._client;
+    delete this._ioClient;
     delete this.ioNames;
   }
 

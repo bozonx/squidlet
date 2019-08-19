@@ -70,7 +70,7 @@ export default class IoServer {
 
     this.remoteCall = new RemoteCall(
       // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
-      this.sendBack,
+      this.sendToClient,
       this.callIo,
       // TODO: merge with ioServer or host's config - ioSetResponseTimoutSec
       30,
@@ -86,13 +86,13 @@ export default class IoServer {
       msg = deserializeJson(data);
     }
     catch (err) {
-      return this.logError(`WsApi: Can't decode message: ${err}`);
+      return this.logError(`IoServer: Can't decode message: ${err}`);
     }
 
     return this.remoteCall && this.remoteCall.incomeMessage(msg);
   }
 
-  private sendBack = async (message: RemoteCallMessage): Promise<void> => {
+  private sendToClient = async (message: RemoteCallMessage): Promise<void> => {
     if (!this.connectionId) return;
 
     let binData: Uint8Array;

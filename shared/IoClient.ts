@@ -10,7 +10,7 @@ import {defaultProps, METHOD_DELIMITER} from './IoServer';
 const wsClientIo = new WebSocketClient();
 
 
-export default class IoServerClient {
+export default class IoClient {
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private readonly client: WsClientLogic;
@@ -59,7 +59,7 @@ export default class IoServerClient {
 
 
   /**
-   * Call api's method
+   * Call remote io's method
    */
   callIoMethod(ioName: string, methodName: string, ...args: any[]): Promise<any> {
     const pathToMethod = `${ioName}${METHOD_DELIMITER}${methodName}`;
@@ -83,28 +83,32 @@ export default class IoServerClient {
    * Encode and send remote call message to server
    */
   private sendToServer = async (message: RemoteCallMessage): Promise<void> => {
-    try {
-      const binData: Uint8Array = serializeJson(message);
+    let binData: Uint8Array;
 
-      return this.client.send(binData);
+    try {
+      binData = serializeJson(message);
     }
     catch (err) {
-      this.logError(err);
+      return this.logError(err);
     }
+
+    await this.client.send(binData);
   }
 
   /**
    * Decode income messages from server and pass it to remoteCall
    */
   private handleIncomeMessage = async (data: string | Uint8Array) => {
-    try {
-      const message: RemoteCallMessage = deserializeJson(data);
+    let msg: RemoteCallMessage;
 
-      await this.remoteCall.incomeMessage(message);
+    try {
+      msg = deserializeJson(data);
     }
     catch (err) {
-      this.logError(err);
+      return this.logError(`IoClient: Can't decode message: ${err}`);
     }
+
+    await this.remoteCall.incomeMessage(msg);
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
