@@ -17,7 +17,7 @@ const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClie
 const wsClientIo = new WebSocketClient();
 
 
-export default class WsApiClient {
+export default class IoServerClient {
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private readonly client: WsClientLogic;

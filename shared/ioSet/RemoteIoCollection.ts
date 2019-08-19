@@ -2,8 +2,8 @@ import * as path from 'path';
 
 import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../helpers';
-import WsApiClient from '../WsApiClient';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
+import IoServerClient from '../IoServerClient';
 
 
 export default class RemoteIoCollection {
@@ -11,8 +11,8 @@ export default class RemoteIoCollection {
   private ioNames: string[] = [];
   private readonly host?: string;
   private readonly port?: number;
-  private _client?: WsApiClient;
-  private get client(): WsApiClient {
+  private _client?: IoServerClient;
+  private get client(): IoServerClient {
     return this._client as any;
   }
 
@@ -24,16 +24,14 @@ export default class RemoteIoCollection {
 
 
   async init(): Promise<void> {
-
-    // TODO: это не api client , а IoServerClient !!!!
-
-    this._client = new WsApiClient(
+    this._client = new IoServerClient(
       hostDefaultConfig.config.ioSetResponseTimoutSec,
       console.info,
       console.error,
       this.host,
       this.port
     );
+
     await this.client.init();
 
     this.ioNames = await this.askIoNames();
@@ -61,10 +59,7 @@ export default class RemoteIoCollection {
 
 
   private async askIoNames(): Promise<string[]> {
-
-    // TODO: use getHostInfo.usedIo
-
-    return this.client.callMethod('getIoNames');
+    return this.client.callMethod('ioApi.getIoNames');
   }
 
   private makeFakeIo(ioName: string): IoItem {
@@ -80,10 +75,6 @@ export default class RemoteIoCollection {
     }
 
     for (let methodName of ioMethods) {
-      // TODO: review
-      // skip init and configure methods because io item has already initialized and configured on a host
-      //if (methodName === 'init' || methodName === 'configure') continue;
-
       ioItem[methodName] = this.makeMethod(ioName, methodName);
     }
 
