@@ -7,9 +7,8 @@ import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 export default class RemoteIoCollection {
-  ioCollection: {[index: string]: IoItem} = {};
-  ioNames: string[] = [];
-
+  private ioCollection: {[index: string]: IoItem} = {};
+  private ioNames: string[] = [];
   private readonly host?: string;
   private readonly port?: number;
   private _client?: WsApiClient;
@@ -49,6 +48,15 @@ export default class RemoteIoCollection {
     await this.client.destroy();
     delete this._client;
     delete this.ioNames;
+  }
+
+
+  getIo(ioName: string): IoItem | undefined {
+    return this.ioCollection[ioName];
+  }
+
+  getIoNames(): string[] {
+    return this.ioNames;
   }
 
 

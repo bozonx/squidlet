@@ -41,10 +41,10 @@ export default class IoSetDevelopRemote implements IoSet {
     await this.remoteIoCollection.init();
 
     // check io dependencies
-    checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.ioNames);
+    checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.getIoNames());
 
     this.wrappedStorageIo = this.storageWrapper.makeWrapper(
-      this.remoteIoCollection.ioCollection['Storage'] as StorageIo
+      this.remoteIoCollection.getIo('Storage') as StorageIo
     );
   }
 
@@ -54,18 +54,18 @@ export default class IoSetDevelopRemote implements IoSet {
 
 
   getIo<T extends IoItem>(ioName: string): T {
-    if (!this.remoteIoCollection.ioCollection[ioName]) {
+    if (!this.remoteIoCollection.getIo(ioName)) {
       throw new Error(`Can't find io instance "${ioName}"`);
     }
     else if (ioName === 'Storage') {
       return this.wrappedStorageIo as any;
     }
 
-    return this.remoteIoCollection.ioCollection[ioName] as T;
+    return this.remoteIoCollection.getIo(ioName) as T;
   }
 
   getNames(): string[] {
-    return this.remoteIoCollection.ioNames;
+    return this.remoteIoCollection.getIoNames();
   }
 
 
