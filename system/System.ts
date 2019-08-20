@@ -11,6 +11,7 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
+import HostConfig from './interfaces/HostConfig';
 
 
 export default class System {
@@ -40,7 +41,7 @@ export default class System {
   private _isAppInitialized: boolean = false;
 
 
-  constructor(ioSet: IoSet, systemConfigExtend?: {[index: string]: any}) {
+  constructor(ioSet: IoSet, systemConfigExtend?: {[index: string]: any}, hostConfigExtend?: HostConfig) {
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
     this.context = new Context(this, systemConfigExtend);

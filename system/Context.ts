@@ -19,6 +19,7 @@ export default class Context {
     return this.config.id;
   }
   get config(): HostConfig {
+    // TODO: куда воткруть hostConfigExtend сююа или в EnvSet
     // TODO: review
     //return this.hostConfig as HostConfig;
     return await this.envSet.loadConfig<HostConfig>(
