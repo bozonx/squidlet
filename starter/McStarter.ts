@@ -50,4 +50,13 @@ class McStarter {
     await ioServer.init();
   }
 
+
+  // private resolveIoSet(specifiedIoSet?: IoSet): IoSet {
+  //   // use specified IO set if it is set
+  //   if (specifiedIoSet) return specifiedIoSet;
+  //
+  //   // use local IO set by default
+  //   return new IoSetLocal();
+  // }
+
 }

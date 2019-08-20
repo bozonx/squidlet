@@ -1,6 +1,5 @@
 import IoSet from '../interfaces/IoSet';
 import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
-import IoSetLocal from '../IoSetLocal';
 import Context from '../Context';
 
 
@@ -9,9 +8,9 @@ export default class IoManager {
   private readonly ioSet: IoSet;
 
 
-  constructor(context: Context, ioSet?: IoSet) {
+  constructor(context: Context, ioSet: IoSet) {
     this.context = context;
-    this.ioSet = this.resolveIoSet(ioSet);
+    this.ioSet = ioSet;
   }
 
   async init(): Promise<void> {
@@ -73,14 +72,6 @@ export default class IoManager {
 
       await ioItem.configure(ioParams[ioName]);
     }
-  }
-
-  private resolveIoSet(specifiedIoSet?: IoSet): IoSet {
-    // use specified IO set if it is set
-    if (specifiedIoSet) return specifiedIoSet;
-
-    // use local IO set by default
-    return new IoSetLocal();
   }
 
 }

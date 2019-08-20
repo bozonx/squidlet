@@ -40,7 +40,7 @@ export default class System {
   private _isAppInitialized: boolean = false;
 
 
-  constructor(ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) {
+  constructor(ioSet: IoSet, systemConfigExtend?: {[index: string]: any}) {
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
     this.context = new Context(this, systemConfigExtend);
