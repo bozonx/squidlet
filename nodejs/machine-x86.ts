@@ -7,7 +7,7 @@ const machineConfig: MachineConfig = {
     './ios/Storage.ts',
     './ios/WebSocketClient.ts',
     './ios/WebSocketServer.ts',
-    //'Sha1',
+    './ios/Sys.ts',
     //'Serial',
     //'Wifi',
     //'Bluetooth',

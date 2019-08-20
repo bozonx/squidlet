@@ -37,7 +37,7 @@ Also you can specify the next params:
  
 ### Start production host
 
-System and entities are rebuilt each time you start prod build. Node modules are installed
+Sys and entities are rebuilt each time you start prod build. Node modules are installed
 only first time or if `--force` parameter is set.
 
     squidletctl start
