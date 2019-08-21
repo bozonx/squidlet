@@ -11,7 +11,6 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
-import HostConfig from './interfaces/HostConfig';
 
 
 export default class System {
@@ -41,7 +40,7 @@ export default class System {
   private _isAppInitialized: boolean = false;
 
 
-  constructor(ioSet: IoSet, systemConfigExtend?: {[index: string]: any}, hostConfigExtend?: HostConfig) {
+  constructor(ioSet: IoSet, systemConfigExtend?: {[index: string]: any}) {
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
     this.context = new Context(this, systemConfigExtend);
@@ -72,8 +71,8 @@ export default class System {
     console.info(`---> Initializing io`);
     await this.ioManager.init();
 
-    console.info(`---> Initializing configs`);
-    await this.context.initConfig();
+    console.info(`---> Initializing context`);
+    await this.context.init();
 
     console.info(`---> Initializing system drivers`);
     await this.driversManager.initSystemDrivers();

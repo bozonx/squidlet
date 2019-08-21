@@ -7,6 +7,9 @@ import System from './System';
 import {mergeDeep} from './lib/collections';
 import {makeUniqId} from './lib/uniqId';
 import {AppLifeCycleEvents} from './constants';
+import IoItem from './interfaces/IoItem';
+import DriverBase from './base/DriverBase';
+import ServiceBase from './base/ServiceBase';
 
 
 export default class Context {
@@ -19,19 +22,13 @@ export default class Context {
     return this.config.id;
   }
   get config(): HostConfig {
-    // TODO: куда воткруть hostConfigExtend сююа или в EnvSet
-    // TODO: review
-    //return this.hostConfig as HostConfig;
-    return await this.envSet.loadConfig<HostConfig>(
-      this.system.initializationConfig.fileNames.hostConfig
-    );
+    return this.hostConfig as any;
   }
-
-  private hostConfig?: HostConfig;
-
   get isInitialized() {
     return this.system.isAppInitialized;
   }
+
+  private hostConfig?: HostConfig;
 
 
   constructor(system: System, systemConfigExtend?: {[index: string]: any}) {
@@ -41,16 +38,9 @@ export default class Context {
 
 
   async init() {
-    // TODO: ???
-  }
-
-  // TODO: ??? add getIo ???
-  // TODO: ??? add getDriver ???
-  // TODO: ??? add getService ???
-  // TODO: ???????? add getDevice ???
-
-  async initConfig() {
-    // TODO: load host config
+    this.hostConfig = await this.system.envSet.loadConfig<HostConfig>(
+      this.system.initializationConfig.fileNames.hostConfig
+    );
   }
 
   destroy() {
@@ -58,6 +48,22 @@ export default class Context {
     this.state.destroy();
   }
 
+
+  getIo<T extends IoItem>(ioName: string): T {
+    return this.system.ioManager.getIo<T>(ioName);
+  }
+
+  getDriver<T extends DriverBase>(driverName: string): T {
+    return this.system.driversManager.getDriver<T>(driverName);
+  }
+
+  getService<T extends ServiceBase>(serviceId: string): T {
+    return this.system.servicesManager.getService<T>(serviceId);
+  }
+
+  // getDevice<T extends DeviceBase>(deviceId: string): T {
+  //   return this.system.devicesManager.getDevice<T>(deviceId);
+  // }
 
   onDevicesInit(cb: () => Promise<void>): number {
     return this.addListenerOnce(this.system.isDevicesInitialized, AppLifeCycleEvents.devicesInitialized, cb);
