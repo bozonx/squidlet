@@ -14,8 +14,6 @@ hosts:
       someParam: 1
       #storageDir: './masterStorage'
 
-    backdoor: {}
-
     devices:
       bedroom:
         people-count-sensor:

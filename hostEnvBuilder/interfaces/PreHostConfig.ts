@@ -66,8 +66,18 @@ export default interface PreHostConfig {
   // shortcut for mqttApi service
   mqttApi?: {[index: string]: any};
   wsApi?: {[index: string]: any};
-  backdoor?: {[index: string]: any};
 
   // additional npm packages which will be installed
   dependencies?: {[index: string]: string};
+
+  // host and port to listen to in IO server mode.
+  // null means don't allow to switch to IO server.
+  // it will use default values if this param is undefined.
+  ioServer?: {
+    // default is localhost
+    host?: string;
+    // default is 8089
+    port?: number;
+  };
+
 }

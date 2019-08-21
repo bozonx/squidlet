@@ -1,7 +1,3 @@
-// TODO: зачем ??????
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-
-
 export interface HostConfigConfig {
   //logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
@@ -37,11 +33,21 @@ export interface HostConfigConfig {
 export default interface HostConfig {
   // id of host e.g master
   id: string;
-  platform: Platforms;
+  platform: string;
   machine: string;
   //platform: Platforms;
   // specific config for each host
   config: HostConfigConfig;
+
+  // host and port to listen to in IO server mode.
+  // null means don't allow to switch to IO server.
+  // it will use default values if this param is undefined.
+  ioServer?: {
+    // default is localhost
+    host?: string;
+    // default is 8089
+    port?: number;
+  };
 
   // // TODO: remove
   // address: Destination;

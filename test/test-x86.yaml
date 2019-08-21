@@ -4,7 +4,6 @@ id: testHost
 platform: nodejs
 machine: x86
 config: {}
-backdoor: {}
 
 devices:
   bedroom:

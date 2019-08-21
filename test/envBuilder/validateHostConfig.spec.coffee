@@ -40,7 +40,7 @@ describe 'envBuilder.validateHostConfig', ->
     assert.isUndefined(validateHostConfig({ @hostConfig..., automation: {param: 1} }))
     assert.isUndefined(validateHostConfig({ @hostConfig..., consoleLogger: {param: 1} }))
     assert.isUndefined(validateHostConfig({ @hostConfig..., mqtt: {param: 1} }))
-    assert.isUndefined(validateHostConfig({ @hostConfig..., backdoor: {param: 1} }))
+    assert.isUndefined(validateHostConfig({ @hostConfig..., ioServer: {param: 1} }))
     # not object
     assert.isString(validateHostConfig({ @hostConfig..., devices: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., drivers: 'str' }))
@@ -49,7 +49,7 @@ describe 'envBuilder.validateHostConfig', ->
     assert.isString(validateHostConfig({ @hostConfig..., automation: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., consoleLogger: 'str' }))
     assert.isString(validateHostConfig({ @hostConfig..., mqtt: 'str' }))
-    assert.isString(validateHostConfig({ @hostConfig..., backdoor: 'str' }))
+    assert.isString(validateHostConfig({ @hostConfig..., ioServer: 'str' }))
 
   it 'devicesDefaults', ->
     # success

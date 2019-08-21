@@ -2,7 +2,6 @@ id: testHost
 platform: lowjs
 machine: esp32wrover
 config: {}
-backdoor: {}
 
 devices:
   bedroom:
