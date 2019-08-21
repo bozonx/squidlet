@@ -34,6 +34,12 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> {
     this.context = context;
   }
 
+  async doDestroy() {
+    for (let name of Object.keys(this.instances)) {
+      if (this.instances[name].doDestroy) await this.instances[name].doDestroy();
+    }
+  }
+
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     // combined instance and definition props
