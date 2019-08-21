@@ -12,15 +12,15 @@ export default class Sys implements SysIo {
     process.exit(0);
   }
 
-  async reboot() {
-    childProcess.exec('reboot', (error: ExecException | null, stdout: string, stderr: string) => {
-      if (error) {
-        console.error(error);
+  reboot(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      childProcess.exec('reboot', (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) {
+          return reject(error);
+        }
 
-        return console.error(stderr);
-      }
-
-      console.info(stdout);
+        resolve();
+      });
     });
   }
 
