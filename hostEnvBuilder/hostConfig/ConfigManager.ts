@@ -92,6 +92,7 @@ export default class ConfigManager {
       platform: normalizedConfig.platform as any,
       machine: normalizedConfig.machine as any,
       config: normalizedConfig.config as any,
+      ioServer: normalizedConfig.ioServer as any,
     };
   }
 
