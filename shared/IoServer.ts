@@ -6,6 +6,12 @@ import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 import RemoteCall from '../system/lib/remoteCall/RemoteCall';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import {makeUniqId} from '../system/lib/uniqId';
+import HostConfig from '../system/interfaces/HostConfig';
+import StorageIo from '../system/interfaces/io/StorageIo';
+import {pathJoin} from '../system/lib/nodeLike';
+import systemConfig from '../system/config/systemConfig';
+import initializationConfig from '../system/config/initializationConfig';
+import InitializationConfig from '../system/interfaces/InitializationConfig';
 
 
 export const IO_API = 'ioApi';
@@ -19,27 +25,31 @@ export const defaultProps: WebSocketServerProps = {
 
 export default class IoServer {
   private readonly ioSet: IoSet;
-  private readonly wsServer: WsServerLogic;
   private remoteCall?: RemoteCall;
   private connectionId?: string;
+  private _wsServer?: WsServerLogic;
+
+  private get wsServer() {
+    return this._wsServer as any;
+  }
 
 
   constructor(ioSet: IoSet) {
     this.ioSet = ioSet;
+  }
 
-    const wsServerIo = ioSet.getIo<WebSocketServerIo>('WebSocketServer');
+  async init() {
+    const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
+    const props = await this.makeProps();
 
-    this.wsServer = new WsServerLogic(
+    this._wsServer = new WsServerLogic(
       wsServerIo,
-      // TODO: добавить переопределение props - см в конфиге
-      defaultProps,
+      props,
       this.handleClose,
       this.loInfo,
       this.logError,
     );
-  }
 
-  async init() {
     await this.wsServer.init();
 
     this.wsServer.onMessage(this.handleIncomeMessages);
@@ -51,7 +61,6 @@ export default class IoServer {
         .catch(this.logError);
     });
   }
-
 
   destroy = async () => {
     await this.wsServer.destroy();
@@ -145,4 +154,22 @@ export default class IoServer {
   private handleClose = () => {
     console.error(`Websocket server was closed`);
   }
+
+  private async makeProps(): Promise<WebSocketServerProps> {
+    const initCfg: InitializationConfig = initializationConfig();
+    const pathToConfig = pathJoin(
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.configs,
+      initCfg.fileNames.hostConfig
+    );
+    const storage = this.ioSet.getIo<StorageIo>('Storage');
+    const configStr: string = await storage.readFile(pathToConfig);
+    const config: HostConfig = JSON.parse(configStr);
+
+    return {
+      ...config.ioServer,
+      ...defaultProps,
+    };
+  }
+
 }
