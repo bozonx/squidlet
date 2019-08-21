@@ -6,7 +6,10 @@ import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import HostInfo from './interfaces/HostInfo';
 import {calcAllowedLogLevels} from './lib/helpers';
-import {LOGGER_EVENT} from './constants';
+import {IO_SERVER_MODE_FILE_NAME, LOGGER_EVENT} from './constants';
+import SysIo from './interfaces/io/SysIo';
+import StorageIo from './interfaces/io/StorageIo';
+import {pathJoin} from './lib/nodeLike';
 
 
 export default class Api {
@@ -117,10 +120,20 @@ export default class Api {
     });
   }
 
-  switchToIoServer() {
-    // TODO: !!!!
-    // TODO: запретить в dev режиме и если стоит параметр конфига
-    // TODO: либо в dev режиме жестко указывать параметр конфига
+  async switchToIoServer() {
+    if (this.context.config.ioServer === null) {
+      throw new Error(`Switching to IO-server isn't allowed it config`);
+    }
+
+    const pathToTmpFile = pathJoin(
+      this.context.systemConfig.rootDirs.tmp,
+      IO_SERVER_MODE_FILE_NAME
+    );
+    const storage = this.context.getIo<StorageIo>('Storage');
+    const sys = this.context.getIo<SysIo>('Sys');
+
+    await storage.writeFile(pathToTmpFile, '1');
+    await sys.restart();
   }
 
   /**

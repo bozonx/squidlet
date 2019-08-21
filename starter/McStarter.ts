@@ -4,9 +4,7 @@ import IoSet from '../system/interfaces/IoSet';
 import IoServer from '../shared/IoServer';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import systemConfig from '../system/config/systemConfig';
-
-
-const MODE_MARK_FILE_NAME = 'ioserver';
+import {IO_SERVER_MODE_FILE_NAME} from '../system/constants';
 
 
 class McStarter {
@@ -32,9 +30,8 @@ class McStarter {
 
   private async isIoServerMode(ioSet: IoSet): Promise<boolean> {
     const storage = ioSet.getIo<StorageIo>('Storage');
-    const markFilePath = `${systemConfig.rootDirs.tmp}/${MODE_MARK_FILE_NAME}`;
 
-    return storage.exists(markFilePath);
+    return storage.exists(this.getMarkFilePath());
   }
 
   private async startSystem(ioSet: IoSet) {
@@ -45,9 +42,17 @@ class McStarter {
   }
 
   private async startIoServer(ioSet: IoSet) {
+    const storage = ioSet.getIo<StorageIo>('Storage');
+    // remove mark file first
+    await storage.unlink(this.getMarkFilePath());
+
     const ioServer = new IoServer(ioSet);
 
     await ioServer.init();
+  }
+
+  private getMarkFilePath(): string {
+    return `${systemConfig.rootDirs.tmp}/${IO_SERVER_MODE_FILE_NAME}`;
   }
 
 
