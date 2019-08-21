@@ -25,16 +25,6 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
     await this.initDrivers(regularDriversList);
   }
 
-  // /**
-  //  * Get dev by short name line 'fs', 'gpio' etc.
-  //  * It rises an error if dev hasn't found.
-  //  */
-  // getDev<T>(shortDevName: string): T {
-  //   const driverName = `${capitalize(shortDevName)}.dev`;
-  //
-  //   return this.getDriver<T>(driverName);
-  // }
-
   /**
    * Get driver instance.
    * It rises an error if driver hasn't found.
@@ -49,28 +39,6 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
 
     return driver as T;
   }
-
-  // /**
-  //  * Set platform specific ios
-  //  * @param ios - like {DeviClassName: DevClass}
-  //  */
-  // async $registerDevs(ios: {[index: string]: EntityClassType}) {
-  //   // TODO: ещё нет configSet
-  //   // load list of definitions of drivers
-  //   //const definitions: {[index: string]: EntityDefinition} = await this.loadDriversDefinitions();
-  //
-  //   for (let driverName of Object.keys(ios)) {
-  //     const DriverClass: EntityClassType = ios[driverName];
-  //
-  //     // TODO: не надо подставлять ложный definition
-  //
-  //     //this.instances[driverName] = new DriverClass(definitions[driverName], this.env);
-  //     this.instances[driverName] = new DriverClass({id: driverName, className: driverName, props: {}}, this.env);
-  //   }
-  //
-  //   await this.initializeAll(Object.keys(ios));
-  // }
-
 
   private async initDrivers(driverNames: string[]) {
     // load list of definitions of drivers
