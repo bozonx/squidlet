@@ -17,7 +17,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase> {
     );
 
     for (let definition of definitions) {
-      this.instances[definition.id] = await this.makeInstance('devices', definition);
+      this.instances[definition.id] = await this.makeInstance('device', definition);
     }
 
     await this.initializeAll(Object.keys(this.instances));

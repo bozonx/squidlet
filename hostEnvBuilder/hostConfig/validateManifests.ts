@@ -1,4 +1,4 @@
-import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/ManifestTypes';
 import {
   isBoolean,
   isLocalPath,
@@ -58,7 +58,7 @@ function validateManifestBase(rawManifest: {[index: string]: any}): string | und
 
 
 export default function validateManifest (
-  manifestType: ManifestsTypeName,
+  manifestType: EntityType,
   manifest: {[index: string]: any}
 ): string | undefined {
   return sequence([

@@ -45,7 +45,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
     const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of driverNames) {
-      this.instances[driverName] = await this.makeInstance('drivers', definitions[driverName]);
+      this.instances[driverName] = await this.makeInstance('driver', definitions[driverName]);
     }
 
     await this.initializeAll(driverNames);

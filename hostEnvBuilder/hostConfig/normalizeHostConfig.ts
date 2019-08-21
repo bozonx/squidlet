@@ -4,7 +4,7 @@ import _cloneDeep = require('lodash/cloneDeep');
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {defaultServices, servicesShortcut} from '../dict/dict';
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypeName} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/ManifestTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 
 
@@ -51,15 +51,15 @@ function makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]
  * Convert definition line { device: MyClass, ... } to { className: MyClass, ... }
  */
 function convertDefinitions(
-  type: ManifestsTypeName,
+  entityType: EntityType,
   preDefinitions: {[index: string]: any}
 ): {[index: string]: PreEntityDefinition} {
   const definitions: {[index: string]: PreEntityDefinition} = {};
 
   for (let id of Object.keys(preDefinitions)) {
     definitions[id] = {
-      ..._omit(preDefinitions[id], type),
-      className: getDefinitionClassName(type, id, preDefinitions[id]),
+      ..._omit(preDefinitions[id], entityType),
+      className: getDefinitionClassName(entityType, id, preDefinitions[id]),
     };
   }
 
@@ -92,12 +92,12 @@ function collectServicesFromShortcuts(
 }
 
 
-function getDefinitionClassName(type: ManifestsTypeName, id: string, preDefinitions: PreEntityDefinition): string {
-  if (type === 'driver') {
+function getDefinitionClassName(entityType: EntityType, id: string, preDefinitions: PreEntityDefinition): string {
+  if (entityType === 'driver') {
     return id;
   }
 
-  return preDefinitions[type];
+  return preDefinitions[entityType];
 }
 
 function makeDefaultServices(

@@ -13,6 +13,8 @@ export type ConfigChangeHandler = () => void;
 
 
 export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
+  readonly entityType = 'device';
+
   get statusState(): DeviceState | undefined {
     return this._statusState;
   }
@@ -106,10 +108,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
   getActionsList(): string[] {
     return Object.keys(this.actions);
-  }
-
-  async loadManifest(className: string): Promise<DeviceManifest> {
-    return this.context.system.envSet.loadManifest<DeviceManifest>('devices', className);
   }
 
   /**

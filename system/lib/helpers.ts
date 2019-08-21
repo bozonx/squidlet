@@ -3,6 +3,7 @@ import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {splitFirstElement} from './strings';
 import {compactUndefined} from './arrays';
+import {EntityType, EntityTypePlural} from '../interfaces/ManifestTypes';
 
 
 export const PATH_SEPARATOR = '/';
@@ -202,6 +203,10 @@ export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[
   }
 
   return result;
+}
+
+export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlural {
+  return `${entityType}s` as any;
 }
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {

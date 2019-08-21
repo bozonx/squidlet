@@ -91,7 +91,7 @@ export default class ConfigsSet {
 //   };
 //   const usedEntitiesNames: EntitiesNames = this.usedEntities.getEntitiesNames();
 //
-//   const collect = (pluralType: ManifestsTypePluralName, classes: string[]) => {
+//   const collect = (pluralType: EntityTypePlural, classes: string[]) => {
 //     for (let className of classes) {
 //       const entitySet: SrcEntitySet = this.usedEntities.getEntitySet(pluralType, className);
 //

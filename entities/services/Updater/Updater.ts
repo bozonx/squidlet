@@ -1,5 +1,5 @@
 import ServiceBase from 'system/base/ServiceBase';
-import {ManifestsTypeName} from 'system/interfaces/ManifestTypes';
+import {EntityType} from 'system/interfaces/ManifestTypes';
 
 
 // TODO: прописать зависимость от драйверов
@@ -11,14 +11,14 @@ enum UPDATER_STATUS {
 }
 
 interface UpdateEntityData {
-  type: ManifestsTypeName;
+  type: EntityType;
   name: string;
   package: Uint8Array;
   remove?: boolean;
 }
 
 interface UpdateEntityResult {
-  type: ManifestsTypeName;
+  type: EntityType;
   name: string;
   status: UPDATER_STATUS;
 }

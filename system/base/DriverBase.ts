@@ -1,13 +1,9 @@
 import EntityBase from './EntityBase';
 import Sender from '../lib/Sender';
-import DriverManifest from '../interfaces/DriverManifest';
 
 
 export default class DriverBase<Props extends {[index: string]: any} = any> extends EntityBase<Props> {
-  async loadManifest(driverName: string): Promise<DriverManifest> {
-    return this.context.system.envSet.loadManifest<DriverManifest>('drivers', driverName);
-  }
-
+  readonly entityType = 'driver';
 
   // TODO: review - move to context
   protected newSender(): Sender {

@@ -1,5 +1,5 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import {ManifestsTypePluralName} from '../interfaces/ManifestTypes';
+import {EntityType} from '../interfaces/ManifestTypes';
 import EntityBase from '../base/EntityBase';
 import Context from '../Context';
 
@@ -25,9 +25,9 @@ export default class EntityManagerBase<EntityInstance extends EntityBase> {
   }
 
 
-  protected async makeInstance(pluralName: ManifestsTypePluralName, definition: EntityDefinition): Promise<EntityInstance> {
+  protected async makeInstance(entityType: EntityType, definition: EntityDefinition): Promise<EntityInstance> {
     const EntityClass = await this.context.system.envSet.loadMain<EntityClassType>(
-      pluralName,
+      entityType,
       definition.className
     );
 

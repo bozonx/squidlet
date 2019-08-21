@@ -5,7 +5,7 @@ import LogPublisher from '../LogPublisher';
 import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import DriverBase from './DriverBase';
-import ServiceManifest from '../interfaces/ServiceManifest';
+import {EntityType} from '../interfaces/ManifestTypes';
 
 
 interface KindOfDriver {
@@ -16,7 +16,8 @@ interface KindOfDriver {
 export type GetDriverDep = (driverName: string) => KindOfDriver;
 
 
-export default class EntityBase<Props = {}> {
+export default abstract class EntityBase<Props = {}> {
+  abstract readonly entityType: EntityType;
   readonly context: Context;
   readonly id: string;
   readonly className: string;
@@ -137,8 +138,7 @@ export default class EntityBase<Props = {}> {
    * Load manifest of this entity
    */
   protected async getManifest<T extends ManifestBase>(): Promise<T> {
-    return this.context.system.envSet.loadManifest<ServiceManifest>('services', className);
-    //return this.loadManifest(this.className) as Promise<T>;
+    return this.context.system.envSet.loadManifest<T>(this.entityType, this.className);
   }
 
   /**
