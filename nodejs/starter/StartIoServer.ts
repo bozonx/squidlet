@@ -5,7 +5,7 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoSet from '../../system/interfaces/IoSet';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import IoServer from '../../shared/IoServer';
-import IoSetLocal from '../../system/IoSetLocal';
+import IoSetBase from './IoSetBase';
 
 
 export default class StartIoServer {
@@ -54,9 +54,8 @@ export default class StartIoServer {
     // TODO: install like in dev mode
     //await this.installModules();
 
-    // TODO: load all the machine's io
-    // TODO: здесь запрашивается индексный файл - а надо загружать реальные source файлы
-    const ioSet = new IoSetLocal();
+    // load all the machine's io
+    const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
     const ioServer = new IoServer(ioSet);
 
     await ioServer.init();
