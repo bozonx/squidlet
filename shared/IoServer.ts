@@ -28,9 +28,14 @@ export default class IoServer {
   private remoteCall?: RemoteCall;
   private connectionId?: string;
   private _wsServer?: WsServerLogic;
+  private _hostConfig?: HostConfig;
 
-  private get wsServer() {
+  private get wsServer(): WsServerLogic {
     return this._wsServer as any;
+  }
+
+  private get hostConfig(): HostConfig {
+    return this._hostConfig as any;
   }
 
 
@@ -41,6 +46,8 @@ export default class IoServer {
   async init() {
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
     const props = await this.makeProps();
+
+    this._hostConfig = await this.loadHostConfig();
 
     this._wsServer = new WsServerLogic(
       wsServerIo,
@@ -155,19 +162,24 @@ export default class IoServer {
     console.error(`Websocket server was closed`);
   }
 
-  private async makeProps(): Promise<WebSocketServerProps> {
+  private async loadHostConfig(): Promise<HostConfig> {
     const initCfg: InitializationConfig = initializationConfig();
     const pathToConfig = pathJoin(
       systemConfig.rootDirs.envSet,
       systemConfig.envSetDirs.configs,
       initCfg.fileNames.hostConfig
     );
+
     const storage = this.ioSet.getIo<StorageIo>('Storage');
     const configStr: string = await storage.readFile(pathToConfig);
-    const config: HostConfig = JSON.parse(configStr);
+
+    return JSON.parse(configStr);
+  }
+
+  private async makeProps(): Promise<WebSocketServerProps> {
 
     return {
-      ...config.ioServer,
+      ...this.hostConfig.ioServer,
       ...defaultProps,
     };
   }

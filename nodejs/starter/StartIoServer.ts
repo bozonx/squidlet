@@ -2,8 +2,6 @@ import NodejsMachines from '../interfaces/NodejsMachines';
 import Props from './Props';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import IoSet from '../../system/interfaces/IoSet';
-import StorageIo from '../../system/interfaces/io/StorageIo';
 import IoServer from '../../shared/IoServer';
 import IoSetBase from './IoSetBase';
 
@@ -23,7 +21,7 @@ export default class StartIoServer {
     argUser?: string,
     argGroup?: string,
   ) {
-    // TODO: configPath может не быть если просто запускаем без настроек
+    // TODO: configPath может не быть если просто запускаем без настроек - тогда использовать default
     this.groupConfig = new GroupConfigParser(this.os, configPath);
     this.props = new Props(
       this.os,
