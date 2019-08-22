@@ -1,5 +1,5 @@
 import ServiceBase from 'system/base/ServiceBase';
-import {EntityType} from 'system/interfaces/ManifestTypes';
+import {EntityType} from 'system/interfaces/EntityTypes';
 
 
 // TODO: прописать зависимость от драйверов

@@ -3,7 +3,7 @@ import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {splitFirstElement} from './strings';
 import {compactUndefined} from './arrays';
-import {EntityType, EntityTypePlural} from '../interfaces/ManifestTypes';
+import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
 
 
 export const PATH_SEPARATOR = '/';

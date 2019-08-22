@@ -5,7 +5,7 @@ import LogPublisher from '../LogPublisher';
 import HostConfig from '../interfaces/HostConfig';
 import IoItem from '../interfaces/IoItem';
 import DriverBase from './DriverBase';
-import {EntityType} from '../interfaces/ManifestTypes';
+import {EntityType} from '../interfaces/EntityTypes';
 
 
 interface KindOfDriver {

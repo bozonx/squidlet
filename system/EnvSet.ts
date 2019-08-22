@@ -1,6 +1,6 @@
 import Context from './Context';
 import ManifestBase from './interfaces/ManifestBase';
-import {EntityType} from './interfaces/ManifestTypes';
+import {EntityType} from './interfaces/EntityTypes';
 import {EntityClassType} from './managers/EntityManagerBase';
 import {pathJoin} from './lib/nodeLike';
 import StorageIo from './interfaces/io/StorageIo';

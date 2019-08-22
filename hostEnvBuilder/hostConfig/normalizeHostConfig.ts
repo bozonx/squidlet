@@ -4,7 +4,7 @@ import _cloneDeep = require('lodash/cloneDeep');
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {defaultServices, servicesShortcut} from '../dict/dict';
 import systemConfig from '../configs/systemConfig';
-import {EntityType} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 
 

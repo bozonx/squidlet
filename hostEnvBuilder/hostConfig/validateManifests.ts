@@ -1,4 +1,4 @@
-import {EntityType} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/EntityTypes';
 import {
   isBoolean,
   isLocalPath,
