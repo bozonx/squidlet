@@ -12,7 +12,7 @@ export type StatusChangeHandler = (paramName: string, value: JsonTypes) => void;
 export type ConfigChangeHandler = () => void;
 
 
-export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props> {
+export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props, DeviceManifest> {
   readonly entityType = 'device';
 
   get statusState(): DeviceState | undefined {
@@ -51,7 +51,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
 
   protected doInit = async () => {
-    const manifest: DeviceManifest = await this.getManifest<DeviceManifest>();
+    const manifest: DeviceManifest = await this.getManifest();
 
     if (manifest.status) {
       this._statusState = new DeviceState(

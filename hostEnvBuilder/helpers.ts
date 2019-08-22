@@ -1,4 +1,5 @@
 import _difference = require('lodash/difference');
+import {EntityType, EntityTypePlural} from '../system/interfaces/EntityTypes';
 
 
 /**
@@ -41,6 +42,10 @@ export function clearRelativePath(rawPath: string): string {
   return rawPath.replace(/\.{1,2}\//g, '');
 }
 
+// TODO: test
+export function convertEntityTypePluralToSingle(entityTypePlural: EntityTypePlural): EntityType {
+  return entityTypePlural.slice(0, -1) as any;
+}
 
 // export function yamlToJs(yamlString: string): any {
 //

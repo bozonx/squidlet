@@ -62,23 +62,23 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
     const machineIos: string[] = makeListOfNamesFromPaths(env.getMachineConfig().ios);
 
     if (machineIos.includes('Digital')) {
-      await env.addUsedEntity('drivers', 'Digital_local');
+      await env.addUsedEntity('driver', 'Digital_local');
     }
 
     if (machineIos.includes('Serial')) {
-      await env.addUsedEntity('drivers', 'SerialDuplex');
+      await env.addUsedEntity('driver', 'SerialDuplex');
     }
 
     if (machineIos.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');
-      await env.addUsedEntity('drivers', 'I2cToSlave');
-      await env.addUsedEntity('drivers', 'I2cDuplex');
+      await env.addUsedEntity('driver', 'I2cToSlave');
+      await env.addUsedEntity('driver', 'I2cDuplex');
     }
 
     if (machineIos.includes('I2cSlave')) {
       //await env.addUsedEntity('drivers', 'I2cSlave');
-      await env.addUsedEntity('drivers', 'I2cToMaster');
-      await env.addUsedEntity('drivers', 'I2cDuplex');
+      await env.addUsedEntity('driver', 'I2cToMaster');
+      await env.addUsedEntity('driver', 'I2cDuplex');
     }
   });
 }

@@ -9,9 +9,10 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import Os from '../../shared/Os';
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypeName, ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/EntityTypes';
 import validateManifest from '../hostConfig/validateManifests';
 import {clearRelativePath} from '../helpers';
+import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 
 
 /**
@@ -38,11 +39,12 @@ export default class Register {
     return this.registeringPromises;
   }
 
-  getEntityManifest(pluralManifestType: ManifestsTypePluralName, className: string): PreManifestBase {
-    const manifest: PreManifestBase | undefined = this[pluralManifestType].get(className);
+  getEntityManifest(entityType: EntityType, className: string): PreManifestBase {
+    const entityTypePlural = convertEntityTypeToPlural(entityType);
+    const manifest: PreManifestBase | undefined = this[entityTypePlural].get(className);
 
     if (!manifest) {
-      throw new Error(`Can't find a manifest of "${pluralManifestType}" "${className}"`);
+      throw new Error(`Can't find a manifest of "${entityType}" "${className}"`);
     }
 
     return manifest;
@@ -99,24 +101,24 @@ export default class Register {
   }
 
 
-  private async addEntity<T extends PreManifestBase>(manifestType: ManifestsTypeName, manifest: string | T) {
+  private async addEntity<T extends PreManifestBase>(entityType: EntityType, manifest: string | T) {
     const resolvePromise: Promise<T> = this.resolveManifest<T>(manifest);
 
     this.registeringPromises.push(resolvePromise);
 
     const parsedManifest: T = await resolvePromise;
 
-    const validateError: string | undefined = validateManifest(manifestType, parsedManifest);
+    const validateError: string | undefined = validateManifest(entityType, parsedManifest);
 
     if (validateError) {
-      throw new Error(`Invalid manifest of ${manifestType}: ${parsedManifest.name}: ${validateError}`);
+      throw new Error(`Invalid manifest of ${entityType}: ${parsedManifest.name}: ${validateError}`);
     }
 
-    const pluralManifestType = `${manifestType}s` as ManifestsTypePluralName;
+    const pluralManifestType = convertEntityTypeToPlural(entityType);
     const manifestsOfType = this[pluralManifestType] as Map<string, T>;
 
     if (manifestsOfType.get(parsedManifest.name)) {
-      throw new Error(`The same ${manifestType} "${parsedManifest.name}" has been already registered!`);
+      throw new Error(`The same ${entityType} "${parsedManifest.name}" has been already registered!`);
     }
 
     this[pluralManifestType] = manifestsOfType.set(parsedManifest.name, parsedManifest);

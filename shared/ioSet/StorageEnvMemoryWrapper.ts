@@ -1,7 +1,7 @@
 import * as path from 'path';
 import _trimStart = require('lodash/trimStart');
 
-import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
+import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
@@ -84,7 +84,7 @@ export default class StorageEnvMemoryWrapper {
    */
   private loadManifest(entityString: string): ManifestBase {
     const [pluralTypeStr, rest] = splitFirstElement(entityString, path.sep);
-    const pluralType = pluralTypeStr as ManifestsTypePluralName;
+    const pluralType = pluralTypeStr as EntityTypePlural;
 
     if (!rest) {
       throw new Error(`StorageEnvMemoryWrapper.loadManifest("${entityString}"): Can't parse entity name`);
@@ -110,7 +110,7 @@ export default class StorageEnvMemoryWrapper {
 // /**
 //  * Make all the paths absolute
 //  */
-// private prepareManifest(pluralType: ManifestsTypePluralName, entityName: string): ManifestBase {
+// private prepareManifest(pluralType: EntityTypePlural, entityName: string): ManifestBase {
 //   if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
 //     throw new Error(`StorageEnvMemoryWrapper.prepareManifest("${pluralType}", "${entityName}"): Can't find an entity`);
 //   }
@@ -124,7 +124,7 @@ export default class StorageEnvMemoryWrapper {
 // }
 
 // loadEntityFile(
-//   pluralType: ManifestsTypePluralName,
+//   pluralType: EntityTypePlural,
 //   entityName: string,
 //   fileName: string
 // ): Promise<string> {
@@ -134,7 +134,7 @@ export default class StorageEnvMemoryWrapper {
 // }
 //
 // loadEntityBinFile(
-//   pluralType: ManifestsTypePluralName,
+//   pluralType: EntityTypePlural,
 //   entityName: string,
 //   fileName: string
 // ): Promise<Uint8Array> {
@@ -148,7 +148,7 @@ export default class StorageEnvMemoryWrapper {
 //  * @param pluralType - devices, drivers or services
 //  * @param entityName - name of entity
 //  */
-// async loadMain<T extends EntityClassType>(pluralType: ManifestsTypePluralName, entityName: string): Promise<T> {
+// async loadMain<T extends EntityClassType>(pluralType: EntityTypePlural, entityName: string): Promise<T> {
 //   const filePath: string = pathJoin(
 //     configSet.entities[pluralType][entityName].srcDir,
 //     configSet.entities[pluralType][entityName].manifest.main,

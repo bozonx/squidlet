@@ -1,4 +1,4 @@
-import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/EntityTypes';
 import IndexedEvents from '../../system/lib/IndexedEvents';
 import Register from './Register';
 import ConfigManager from '../hostConfig/ConfigManager';
@@ -50,9 +50,9 @@ export default class PluginEnv {
    * Register entity on host.
    * Call it after registering.
    */
-  addUsedEntity = async (pluralType: ManifestsTypePluralName, className: string) => {
+  addUsedEntity = async (entityType: EntityType, className: string) => {
     // TODO: промис специально опущен ???
-    this.usedEntities.addEntity(pluralType, className);
+    this.usedEntities.addEntity(entityType, className);
   }
 
   getMachineConfig(): MachineConfig {

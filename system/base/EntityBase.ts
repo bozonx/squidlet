@@ -16,7 +16,7 @@ interface KindOfDriver {
 export type GetDriverDep = (driverName: string) => KindOfDriver;
 
 
-export default abstract class EntityBase<Props = {}> {
+export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
   abstract readonly entityType: EntityType;
   readonly context: Context;
   readonly id: string;
@@ -137,8 +137,8 @@ export default abstract class EntityBase<Props = {}> {
   /**
    * Load manifest of this entity
    */
-  protected async getManifest<T extends ManifestBase>(): Promise<T> {
-    return this.context.system.envSet.loadManifest<T>(this.entityType, this.className);
+  protected async getManifest(): Promise<ManifestType> {
+    return this.context.system.envSet.loadManifest<ManifestType>(this.entityType, this.className);
   }
 
   /**

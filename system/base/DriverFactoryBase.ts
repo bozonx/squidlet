@@ -109,7 +109,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> {
     mergedProps: {[index: string]: any}
   ) {
     const manifest: DriverManifest = await this.context.system.envSet.loadManifest(
-      'drivers',
+      'driver',
       this.definition.id
     );
 

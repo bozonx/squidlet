@@ -205,9 +205,11 @@ export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[
   return result;
 }
 
+// TODO: test
 export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlural {
   return `${entityType}s` as any;
 }
+
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;

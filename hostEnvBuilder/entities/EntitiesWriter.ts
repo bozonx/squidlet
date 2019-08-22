@@ -1,12 +1,14 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
+import {EntityType, EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import Os from '../../shared/Os';
 import Logger from '../interfaces/Logger';
 import buildEntity from './buildEntity';
 import UsedEntities, {EntitiesNames} from './UsedEntities';
 import HostEntitySet from '../interfaces/HostEntitySet';
+import {convertEntityTypeToPlural} from '../../system/lib/helpers';
+import {convertEntityTypePluralToSingle} from '../helpers';
 
 
 /**
@@ -47,17 +49,18 @@ export default class EntitiesWriter {
     await this.os.rimraf(`${this.tmpBuildDir}/**/*`);
 
     for (let typeName of Object.keys(usedEntities)) {
-      const pluralType = typeName as ManifestsTypePluralName;
+      const pluralType = typeName as EntityTypePlural;
+      const entityType = convertEntityTypePluralToSingle(pluralType);
 
       for (let entityName of usedEntities[pluralType]) {
-        await this.proceedEntity(pluralType, entityName);
+        await this.proceedEntity(entityType, entityName);
       }
     }
   }
 
-  private async proceedEntity(pluralType: ManifestsTypePluralName, entityName: string) {
-    const entityDstDir = path.join(this.entitiesDstDir, pluralType, entityName);
-    const entitySet: HostEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
+  private async proceedEntity(entityType: EntityType, entityName: string) {
+    const entityDstDir = path.join(this.entitiesDstDir, convertEntityTypeToPlural(entityType), entityName);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet(entityType, entityName);
 
     // write manifest
     await this.os.writeJson(
@@ -66,7 +69,7 @@ export default class EntitiesWriter {
     );
 
     // build and write main file if exists
-    await this.buildMainFile(pluralType, entityName);
+    await this.buildMainFile(entityType, entityName);
 
     // copy assets
     for (let relativeFileName of entitySet.files) {
@@ -80,16 +83,16 @@ export default class EntitiesWriter {
     }
   }
 
-  private async buildMainFile(pluralType: ManifestsTypePluralName, entityName: string) {
-    const entitySet: HostEntitySet = this.usedEntities.getEntitySet(pluralType, entityName);
-    const entityDstDir: string = path.join(this.entitiesDstDir, pluralType, entityName);
+  private async buildMainFile(entityType: EntityType, entityName: string) {
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet(entityType, entityName);
+    const entityDstDir: string = path.join(this.entitiesDstDir, convertEntityTypeToPlural(entityType), entityName);
 
     this.log.info(`- building main file of entity "${entityName}"`);
-    await this.buildEntity(pluralType, entityName, entitySet.srcDir, entityDstDir);
+    await this.buildEntity(entityType, entityName, entitySet.srcDir, entityDstDir);
   }
 
   private async buildEntity(
-    pluralType: ManifestsTypePluralName,
+    entityType: EntityType,
     entityName: string,
     srcDir: string,
     entityDstDir: string
@@ -98,7 +101,7 @@ export default class EntitiesWriter {
       throw new Error(`Temporary build dir wasn't specified`);
     }
 
-    return buildEntity(pluralType, entityName, this.tmpBuildDir, srcDir, entityDstDir);
+    return buildEntity(entityType, entityName, this.tmpBuildDir, srcDir, entityDstDir);
   }
 
 }

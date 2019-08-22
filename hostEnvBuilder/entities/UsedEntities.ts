@@ -1,7 +1,7 @@
 import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import {ManifestsTypePluralName} from '../../system/interfaces/ManifestTypes';
+import {EntityType} from '../../system/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../hostConfig/ConfigManager';
 import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
@@ -10,6 +10,8 @@ import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../system/interfaces/ManifestBase';
 import SchemaElement from '../../system/interfaces/SchemaElement';
 import validateRules from '../hostConfig/validateRules';
+import {convertEntityTypeToPlural} from '../../system/lib/helpers';
+import {convertEntityTypePluralToSingle} from '../helpers';
 
 
 const baseParamName = '$base';
@@ -42,9 +44,9 @@ export default class UsedEntities {
 
 
   async generate() {
-    await this.proceedDefinitions('devices', this.configManager.preEntities.devices);
-    await this.proceedDefinitions('drivers', this.configManager.preEntities.drivers);
-    await this.proceedDefinitions('services', this.configManager.preEntities.services);
+    await this.proceedDefinitions('device', this.configManager.preEntities.devices);
+    await this.proceedDefinitions('driver', this.configManager.preEntities.drivers);
+    await this.proceedDefinitions('service', this.configManager.preEntities.services);
   }
 
   getUsedIo(): string[] {
@@ -55,8 +57,10 @@ export default class UsedEntities {
     return this.entitiesSet;
   }
 
-  getEntitySet(pluralType: ManifestsTypePluralName, name: string): HostEntitySet {
-    return this.entitiesSet[pluralType][name];
+  getEntitySet(entityType: EntityType, name: string): HostEntitySet {
+    const entityTypePlural = convertEntityTypeToPlural(entityType);
+
+    return this.entitiesSet[entityTypePlural][name];
   }
 
   /**
@@ -70,8 +74,8 @@ export default class UsedEntities {
     };
   }
 
-  async addEntity(pluralType: ManifestsTypePluralName, className: string) {
-    await this.proceedEntity(pluralType, className);
+  async addEntity(entityType: EntityType, className: string) {
+    await this.proceedEntity(entityType, className);
   }
 
 
@@ -79,36 +83,38 @@ export default class UsedEntities {
    * Proceed definitions of devices of drivers or services specified in host config
    */
   private async proceedDefinitions(
-    pluralType: ManifestsTypePluralName,
+    entityType: EntityType,
     definitions: {[index: string]: PreEntityDefinition}
   ) {
     for (let entityId of Object.keys(definitions)) {
       const className: string = definitions[entityId].className;
 
-      await this.proceedEntity(pluralType, className);
+      await this.proceedEntity(entityType, className);
     }
   }
 
-  private async proceedEntity(pluralType: ManifestsTypePluralName, className: string) {
-    // skip if it is proceeded
-    if (this.entitiesSet[pluralType][className]) return;
+  private async proceedEntity(entityType: EntityType, className: string) {
+    const entityTypePlural = convertEntityTypeToPlural(entityType);
 
-    const preManifest: PreManifestBase = this.register.getEntityManifest(pluralType, className);
+    // skip if it is proceeded
+    if (this.entitiesSet[entityTypePlural][className]) return;
+
+    const preManifest: PreManifestBase = this.register.getEntityManifest(entityType, className);
 
     // save entity set which is made of manifest
-    this.entitiesSet[pluralType][className] = await this.makeEntitySet(preManifest);
+    this.entitiesSet[entityTypePlural][className] = await this.makeEntitySet(preManifest);
 
     // resolve devices deps
     for (let depClassName of preManifest.devices || []) {
-      await this.proceedEntity('devices', depClassName);
+      await this.proceedEntity('device', depClassName);
     }
     // resolve drivers deps
     for (let depClassName of preManifest.drivers || []) {
-      await this.proceedEntity('drivers', depClassName);
+      await this.proceedEntity('driver', depClassName);
     }
     // resolve drivers deps
     for (let depClassName of preManifest.services || []) {
-      await this.proceedEntity('services', depClassName);
+      await this.proceedEntity('service', depClassName);
     }
 
     // collect ios
@@ -174,15 +180,15 @@ export default class UsedEntities {
     if (!props[baseParamName]) return props;
 
     const [rawPluralType, entityName] = props[baseParamName].split('.');
-    const pluralType: ManifestsTypePluralName = rawPluralType;
-    const topLayer = _omit(props, baseParamName);
 
-    if (!pluralType || !entityName) {
+    if (!rawPluralType || !entityName) {
       throw new Error(`Invalid "$base" param of props. "${JSON.stringify(props)}"`);
     }
 
+    const entityType = convertEntityTypePluralToSingle(rawPluralType);
+    const topLayer = _omit(props, baseParamName);
     const bottomLayer: {[index: string]: SchemaElement} | undefined = this.resolveEntityProps(
-      pluralType,
+      entityType,
       entityName
     );
 
@@ -193,10 +199,11 @@ export default class UsedEntities {
   }
 
   private resolveEntityProps(
-    pluralType: ManifestsTypePluralName,
+    entityType: EntityType,
     entityName: string
   ): {[index: string]: SchemaElement} | undefined {
-    const entitySet: HostEntitySet | undefined = this.entitiesSet[pluralType][entityName];
+    const entityTypePlural = convertEntityTypeToPlural(entityType);
+    const entitySet: HostEntitySet | undefined = this.entitiesSet[entityTypePlural][entityName];
 
     // try to get previously resolved entity
     // return props or undefined
@@ -204,7 +211,7 @@ export default class UsedEntities {
 
     // else get from register
 
-    const manifest: PreManifestBase = this.register.getEntityManifest(pluralType, entityName);
+    const manifest: PreManifestBase = this.register.getEntityManifest(entityType, entityName);
 
     if (!manifest.props) return;
 
