@@ -32,6 +32,7 @@ export default class RemoteCall {
 
 
   constructor(
+    // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
     send: (message: RemoteCallMessage) => Promise<void>,
     // function which is called a method and returns its result with promise
     methodCaller: MethodCaller | undefined,
@@ -174,7 +175,7 @@ export default class RemoteCall {
       this.logError(`RemoteCall: Can't send a "methodResult" message: ${err}`);
     }
   }
-  
+
   private async safeCallMethod(pathToMethod: string, args: any[]): Promise<{result: any, error: string}> {
     if (!this.methodCaller) {
       throw new Error(`Can't call a method "${pathToMethod}" because there isn't a methodCaller`);
@@ -235,5 +236,5 @@ export default class RemoteCall {
 
     return prepared;
   }
-  
+
 }

@@ -69,7 +69,7 @@ describe 'envBuilder.ConfigManager', ->
         #defaultStatusRepublishIntervalMs: 60000
         senderResendTimeout: 1
         senderTimeout: 60
-        ioSetResponseTimoutSec: 30
+        rcResponseTimoutSec: 30
 
         platformParam: 1
         hostParam: 1

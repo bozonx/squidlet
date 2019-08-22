@@ -25,7 +25,7 @@ export default class RemoteIoCollection {
 
   async init(): Promise<void> {
     this._ioClient = new IoClient(
-      hostDefaultConfig.config.ioSetResponseTimoutSec,
+      hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       console.error,
       this.host,

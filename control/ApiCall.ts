@@ -159,7 +159,7 @@ export default class ApiCall {
 
   private connect(host?: string, port?: string): WsApiClient {
     return new WsApiClient(
-      hostDefaultConfig.config.ioSetResponseTimoutSec,
+      hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       console.error,
       host,

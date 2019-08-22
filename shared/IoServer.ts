@@ -86,10 +86,9 @@ export default class IoServer {
     }
 
     this.remoteCall = new RemoteCall(
-      // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
       this.sendToClient,
       this.callIoApi,
-      this.hostConfig.config.ioSetResponseTimoutSec,
+      this.hostConfig.config.rcResponseTimoutSec,
       this.logError,
       makeUniqId
     );

@@ -65,10 +65,9 @@ export default class ApiManager {
 
   private makeNewSession(sessionId: string) {
     this.remoteCalls[sessionId] = new RemoteCall(
-      // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
       async (message: RemoteCallMessage) => this.rcOutcomeEvents.emit(sessionId, message),
       this.callApi,
-      this.context.config.config.ioSetResponseTimoutSec,
+      this.context.config.config.rcResponseTimoutSec,
       this.context.log.error,
       makeUniqId
     );

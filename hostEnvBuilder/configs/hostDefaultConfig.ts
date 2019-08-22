@@ -6,7 +6,7 @@ export default {
     // timeout in seconds to send a request. It resend on failure or brake connection if timout is finished.
     senderTimeout: 60,
     senderResendTimeout: 1,
-    ioSetResponseTimoutSec: 30,
+    rcResponseTimoutSec: 30,
     queueJobTimeoutSec: 120,
 
     // default params for connections

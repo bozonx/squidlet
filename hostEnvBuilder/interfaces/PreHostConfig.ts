@@ -32,7 +32,7 @@ export default interface PreHostConfig {
     // resend timeout in seconds
     senderResendTimeout?: number;
     // response of remote ioSet
-    ioSetResponseTimoutSec?: number;
+    rcResponseTimoutSec?: number;
     // default timeout for jobs in RequestQueue
     queueJobTimeoutSec?: number;
 

@@ -8,8 +8,8 @@ export interface HostConfigConfig {
   senderTimeout: number;
   // resend timeout in seconds
   senderResendTimeout: number;
-  // response of remote ioSet in seconds
-  ioSetResponseTimoutSec: number;
+  // default response of remote call in seconds
+  rcResponseTimoutSec: number;
   // default timeout for jobs in RequestQueue
   queueJobTimeoutSec: number;
 
