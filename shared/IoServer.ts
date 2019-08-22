@@ -21,6 +21,8 @@ export const defaultProps: WebSocketServerProps = {
 export default class IoServer {
   private readonly ioSet: IoSet;
   private readonly hostConfig: HostConfig;
+  private readonly logInfo: (msg: string) => void;
+  private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;
   private connectionId?: string;
   private _wsServer?: WsServerLogic;
@@ -30,9 +32,16 @@ export default class IoServer {
   }
 
 
-  constructor(ioSet: IoSet, hostConfig: HostConfig) {
+  constructor(
+    ioSet: IoSet,
+    hostConfig: HostConfig,
+    logInfo: (msg: string) => void,
+    logError: (msg: string) => void
+  ) {
     this.ioSet = ioSet;
     this.hostConfig = hostConfig;
+    this.logInfo = logInfo;
+    this.logError = logError;
   }
 
   async init() {
@@ -43,7 +52,7 @@ export default class IoServer {
       wsServerIo,
       props,
       this.handleClose,
-      this.loInfo,
+      this.logInfo,
       this.logError,
     );
 
@@ -79,7 +88,7 @@ export default class IoServer {
     this.remoteCall = new RemoteCall(
       // TODO: как бы сделать чтобы промис всетаки выполнялся когда сообщение доставленно клиенту
       this.sendToClient,
-      this.callIo,
+      this.callIoApi,
       this.hostConfig.config.ioSetResponseTimoutSec,
       this.logError,
       makeUniqId
@@ -114,7 +123,7 @@ export default class IoServer {
     return this.wsServer.send(this.connectionId, binData);
   }
 
-  private async callIo(fullName: string, args: any[]): Promise<any> {
+  private async callIoApi(fullName: string, args: any[]): Promise<any> {
     const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
 
     if (!methodName) {
@@ -122,33 +131,26 @@ export default class IoServer {
     }
 
     if (ioName === IO_API) {
-      if (methodName === IO_NAMES_METHOD) {
-
-        return this.ioSet.getNames();
-      }
+      if (methodName === IO_NAMES_METHOD) return this.ioSet.getNames();
 
       throw new Error(`Unknown ioApi method`);
     }
 
+    return this.callIoMethod(ioName, methodName, args);
+  }
+
+  private async callIoMethod(ioName: string, methodName: string, args: any[]): Promise<any> {
     const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
 
     if (!IoItem[methodName]) {
-      throw new Error(`Method doesn't exist: "${fullName}"`);
+      throw new Error(`Method doesn't exist: "${ioName}.${methodName}"`);
     }
 
     return IoItem[methodName](...args);
   }
 
-  private loInfo = (msg: string) => {
-    console.info(msg);
-  }
-
-  private logError = (msg: string) => {
-    console.error(msg);
-  }
-
   private handleClose = () => {
-    console.error(`Websocket server was closed`);
+    this.logError(`Websocket server was closed`);
   }
 
   private async makeProps(): Promise<WebSocketServerProps> {

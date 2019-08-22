@@ -54,7 +54,7 @@ export default class StartIoServer {
 
     // load all the machine's io
     const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
-    const ioServer = new IoServer(ioSet, this.props.hostConfig);
+    const ioServer = new IoServer(ioSet, this.props.hostConfig, console.info, console.error);
 
     await ioServer.init();
   }

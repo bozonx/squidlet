@@ -13,45 +13,48 @@ import {pathJoin} from '../system/lib/nodeLike';
 
 class McStarter {
   private pathToBundle: string;
+  private readonly ioSet: IoSet;
 
 
   constructor(pathToBundle = `${systemConfig.rootDirs.envSet}/${systemConfig.envSetDirs.system}/System`) {
     this.pathToBundle = pathToBundle;
+    this.ioSet = new IoSetLocal();
   }
 
 
   async start() {
-    const ioSet = new IoSetLocal();
-
-    if (await this.isIoServerMode(ioSet)) {
-      await this.startIoServer(ioSet);
+    if (await this.isIoServerMode()) {
+      await this.startIoServer();
     }
     else {
-      await this.startSystem(ioSet);
+      await this.startSystem();
     }
   }
 
 
-  private async isIoServerMode(ioSet: IoSet): Promise<boolean> {
-    const storage = ioSet.getIo<StorageIo>('Storage');
+  private async isIoServerMode(): Promise<boolean> {
+
+    // TODO: не будет рабоать пока не будет выполнен ioSet.init() !!!!
+
+    const storage = this.ioSet.getIo<StorageIo>('Storage');
 
     return storage.exists(this.getMarkFilePath());
   }
 
-  private async startSystem(ioSet: IoSet) {
+  private async startSystem() {
     const SystemClass: SystemClassType = require(this.pathToBundle).default;
-    const system = new SystemClass(ioSet);
+    const system = new SystemClass(this.ioSet);
 
     await system.start();
   }
 
-  private async startIoServer(ioSet: IoSet) {
-    const storage = ioSet.getIo<StorageIo>('Storage');
+  private async startIoServer() {
+    const storage = this.ioSet.getIo<StorageIo>('Storage');
     // remove mark file first
     await storage.unlink(this.getMarkFilePath());
 
     const hostConfig = await this.loadHostConfig();
-    const ioServer = new IoServer(ioSet, hostConfig);
+    const ioServer = new IoServer(this.ioSet, hostConfig, console.info, console.error);
 
     await ioServer.init();
   }
@@ -73,14 +76,5 @@ class McStarter {
 
     return JSON.parse(configStr);
   }
-
-
-  // private resolveIoSet(specifiedIoSet?: IoSet): IoSet {
-  //   // use specified IO set if it is set
-  //   if (specifiedIoSet) return specifiedIoSet;
-  //
-  //   // use local IO set by default
-  //   return new IoSetLocal();
-  // }
 
 }
