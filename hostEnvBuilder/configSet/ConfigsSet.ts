@@ -53,7 +53,7 @@ export default class ConfigsSet {
     const allSystemDrivers: string[] = [];
 
     for (let driverName of driversClasses) {
-      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', driverName);
+      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('driver', driverName);
 
       if (entitySet.system) allSystemDrivers.push(driverName);
     }
@@ -70,7 +70,7 @@ export default class ConfigsSet {
     const allSystemServices: string[] = [];
 
     for (let serviceName of servicesClasses) {
-      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceName);
+      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('service', serviceName);
 
       if (entitySet.system) allSystemServices.push(serviceName);
     }

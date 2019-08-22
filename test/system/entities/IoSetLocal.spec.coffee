@@ -1,4 +1,4 @@
-IoSetLocal = require('../../../system/IoSetLocal').default;
+IoSetLocal = require('../../../starter/IoSetLocal').default;
 
 
 describe 'system.entities.IoSetLocal', ->

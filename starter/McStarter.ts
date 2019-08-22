@@ -1,5 +1,5 @@
 import {SystemClassType} from '../shared/interfaces/SystemClassType';
-import IoSetLocal from '../system/IoSetLocal';
+import IoSetLocal from './IoSetLocal';
 import IoSet from '../system/interfaces/IoSet';
 import IoServer from '../shared/IoServer';
 import StorageIo from '../system/interfaces/io/StorageIo';

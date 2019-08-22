@@ -74,7 +74,7 @@ export default class Definitions {
     const deviceDef: {[index: string]: any} = this.configManager.preEntities.devices[id];
     const hostDeviceDefaultProps = this.configManager.devicesDefaults;
     const className: string = deviceDef.className;
-    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', className);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('device', className);
     const definitionProps: {[index: string]: any} = _omit(deviceDef, 'className');
     const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
 
@@ -103,7 +103,7 @@ export default class Definitions {
    */
   private generateDriverDef(className: string): EntityDefinition {
     const driverDef: PreEntityDefinition = this.configManager.preEntities.drivers[className];
-    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('drivers', className);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('driver', className);
     const definitionProps: {[index: string]: any} = _omit(driverDef, 'className');
     const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
 
@@ -124,7 +124,7 @@ export default class Definitions {
 
   private generateServiceDef(id: string): EntityDefinition {
     const serviceDef: PreEntityDefinition = this.configManager.preEntities.services[id];
-    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('services', serviceDef.className);
+    const entitySet: HostEntitySet = this.usedEntities.getEntitySet('service', serviceDef.className);
     const definitionProps: {[index: string]: any} = _omit(serviceDef, 'className');
     const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
 
@@ -148,7 +148,7 @@ export default class Definitions {
     if (!defaults) return;
 
     for (let deviceClassName of Object.keys(defaults)) {
-      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('devices', deviceClassName);
+      const entitySet: HostEntitySet = this.usedEntities.getEntitySet('device', deviceClassName);
       const validationError: string | undefined = validateProps(defaults[deviceClassName], entitySet.manifest.props);
 
       if (validationError) {
