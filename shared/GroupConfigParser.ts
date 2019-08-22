@@ -19,7 +19,7 @@ export default class GroupConfigParser {
   }
 
 
-  constructor(os: Os, groupConfigPath: string) {
+  constructor(os: Os, groupConfigPath?: string) {
     this.groupConfigPath = groupConfigPath;
     this.os = os;
   }
@@ -82,7 +82,7 @@ export default class GroupConfigParser {
     }
 
     return {
-      // TODO: add platform and machine ???
+      id: 'single',
       ...hostDefaultConfig,
     };
   }

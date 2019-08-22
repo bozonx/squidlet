@@ -15,7 +15,7 @@ export default class StartIoServer {
 
 
   constructor(
-    configPath: string | undefined,
+    configPath?: string,
     argForce?: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,

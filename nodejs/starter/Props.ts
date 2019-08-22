@@ -66,7 +66,7 @@ export default class Props {
     this._machine = await this.resolveMachine();
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
 
-    this.validate();
+    //this.validate();
 
     this.hostId = this.hostConfig.id as any;
 
@@ -80,13 +80,16 @@ export default class Props {
   }
 
 
-  private validate() {
-    if (this.platform !== this.hostConfig.platform) {
-      throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
-    }
-  }
+  // private validate() {
+  //   if (this.platform !== this.hostConfig.platform) {
+  //     throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
+  //   }
+  // }
 
   private async resolveMachine(): Promise<NodejsMachines> {
+
+    // TODO: maybe get machine from host config too ???
+
     if (this.argMachine) {
       if (!nodejsSupportedMachines.includes(this.argMachine)) {
         throw new Error(`Unsupported machine type "${this.argMachine}"`);
