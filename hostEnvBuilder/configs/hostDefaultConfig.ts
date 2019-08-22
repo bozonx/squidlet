@@ -1,7 +1,7 @@
-import {PreHostConfigConfig} from '../interfaces/PreHostConfig';
+import {HostConfigConfig} from '../../system/interfaces/HostConfig';
 
 
-const config: PreHostConfigConfig = {
+const config: HostConfigConfig = {
   //logLevel: 'info',
   //defaultStatusRepublishIntervalMs: 60000,
   //defaultConfigRepublishIntervalMs: 600000,

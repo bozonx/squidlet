@@ -35,7 +35,7 @@ export default class CommandStart {
     if (this.args.prod) {
       const starter = new StartProd(
         this.configPath,
-        Boolean(this.args.force),
+        this.args.force,
         this.args.machine as any,
         this.args.name,
         this.args.workDir,
@@ -50,7 +50,7 @@ export default class CommandStart {
     // or run dev
     const starter = new StartDevelop(
       this.configPath,
-      Boolean(this.args.force),
+      this.args.force,
       this.args.machine as any,
       this.args.name,
       this.args.workDir,
@@ -67,7 +67,7 @@ export default class CommandStart {
   async startIoServer() {
     const starter = new StartIoServer(
       this.configPath,
-      Boolean(this.args.force),
+      this.args.force,
       this.args.machine as any,
       this.args.name,
       this.args.workDir,

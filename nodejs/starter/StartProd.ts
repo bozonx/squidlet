@@ -27,7 +27,7 @@ export default class StartProd {
 
   constructor(
     configPath: string,
-    argForce: boolean,
+    argForce?: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,

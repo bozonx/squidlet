@@ -5,6 +5,7 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../shared/IoServer';
 import IoSetBase from './IoSetBase';
 import IoSet from '../../system/interfaces/IoSet';
+import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 export default class StartIoServer {
@@ -14,15 +15,14 @@ export default class StartIoServer {
 
 
   constructor(
-    configPath: string,
-    argForce: boolean,
+    configPath: string | undefined,
+    argForce?: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
     argUser?: string,
     argGroup?: string,
   ) {
-    // TODO: configPath может не быть если просто запускаем без настроек - тогда использовать default
     this.groupConfig = new GroupConfigParser(this.os, configPath);
     this.props = new Props(
       this.os,
@@ -58,7 +58,9 @@ export default class StartIoServer {
     const ioServer = new IoServer(
       ioSet,
       this.props.hostConfig.ioServer,
-      this.props.hostConfig.config.rcResponseTimoutSec,
+      (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
+        ? this.props.hostConfig.config.rcResponseTimoutSec
+        : hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       console.error
     );

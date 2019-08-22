@@ -5,7 +5,6 @@ import {isPlainObject} from '../system/lib/lodashLike';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from './Os';
 import GroupConfig from './interfaces/GroupConfig';
-import HostConfig from '../system/interfaces/HostConfig';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
@@ -83,7 +82,7 @@ export default class GroupConfigParser {
     }
 
     return {
-      // TODO: add platform and machine
+      // TODO: add platform and machine ???
       ...hostDefaultConfig,
     };
   }

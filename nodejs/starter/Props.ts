@@ -44,7 +44,7 @@ export default class Props {
   constructor(
     os: Os,
     groupConfig: GroupConfigParser,
-    argForce: boolean,
+    argForce?: boolean,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -53,7 +53,7 @@ export default class Props {
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
-    this.force = argForce;
+    this.force = Boolean(argForce);
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
