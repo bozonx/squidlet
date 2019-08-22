@@ -5,10 +5,12 @@ import {isPlainObject} from '../system/lib/lodashLike';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from './Os';
 import GroupConfig from './interfaces/GroupConfig';
+import HostConfig from '../system/interfaces/HostConfig';
+import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 export default class GroupConfigParser {
-  readonly groupConfigPath: string;
+  readonly groupConfigPath?: string;
   private readonly os: Os;
   private readonly preHostsConfigs: {[index: string]: PreHostConfig} = {};
   private plugins?: string[];
@@ -24,16 +26,12 @@ export default class GroupConfigParser {
   }
 
   async init() {
-    const preConfig = await this.os.loadYamlFile(this.groupConfigPath) as any;
-
-    if (!isPlainObject(preConfig)) {
-      throw new Error(`Config has to be an object`);
-    }
+    const preConfig = await this.loadPreConfig();
 
     if (preConfig.hosts) {
-      const preGroupConfig: GroupConfig = preConfig;
+      const preGroupConfig = preConfig as GroupConfig;
       // it's a group config
-      this.validate(preGroupConfig);
+      this.validateGroupConfig(preGroupConfig);
 
       this.plugins = preGroupConfig.plugins;
       this.hostDefaults = preGroupConfig.hostDefaults;
@@ -42,7 +40,7 @@ export default class GroupConfigParser {
     }
     else {
       // it's just a host config
-      const preHostConfig: PreHostConfig = preConfig;
+      const preHostConfig = preConfig as PreHostConfig;
 
       this.validateHostConfig(preHostConfig);
 
@@ -67,6 +65,27 @@ export default class GroupConfigParser {
     }
 
     throw new Error(`Can't find host "${hostName}" in a group config`);
+  }
+
+  /**
+   * Load config that can be a group config or just a host config.
+   * Or use host defaults if there isn't a specified config path.
+   */
+  private async loadPreConfig(): Promise<{[index: string]: any}> {
+    if (this.groupConfigPath) {
+      const preConfig = await this.os.loadYamlFile(this.groupConfigPath) as any;
+
+      if (!isPlainObject(preConfig)) {
+        throw new Error(`Config has to be an object`);
+      }
+
+      return preConfig;
+    }
+
+    return {
+      // TODO: add platform and machine
+      ...hostDefaultConfig,
+    };
   }
 
   private async makeHosts(preGroupConfig: GroupConfig) {
@@ -101,7 +120,7 @@ export default class GroupConfigParser {
     return preparedHostConfig;
   }
 
-  private validate(preGroupConfig: GroupConfig) {
+  private validateGroupConfig(preGroupConfig: GroupConfig) {
     if (!preGroupConfig.hosts) {
       //throw new Error(`You have to specify a "hosts" param with list of hosts`);
 

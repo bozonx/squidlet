@@ -4,6 +4,7 @@ import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../shared/IoServer';
 import IoSetBase from './IoSetBase';
+import IoSet from '../../system/interfaces/IoSet';
 
 
 export default class StartIoServer {
@@ -53,7 +54,7 @@ export default class StartIoServer {
     //await this.installModules();
 
     // load all the machine's io
-    const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
+    const ioSet = await this.makeIoSet();
     const ioServer = new IoServer(
       ioSet,
       this.props.hostConfig.ioServer,
@@ -63,6 +64,14 @@ export default class StartIoServer {
     );
 
     await ioServer.init();
+  }
+
+  private async makeIoSet(): Promise<IoSet> {
+    const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
+
+    await ioSet.init();
+
+    return ioSet;
   }
 
 }

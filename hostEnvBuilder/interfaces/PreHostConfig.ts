@@ -8,6 +8,30 @@ import {IoItemDefinition} from '../../system/interfaces/IoItem';
 //   [index: string]: any;
 // }
 
+export interface PreHostConfigConfig {
+  //logLevel?: LogLevel;
+  // republish status silently every minute if it hasn't been changed
+  //defaultStatusRepublishIntervalMs?: number;
+  // republish config silently every 10 minutes if it hasn't been changed
+  //defaultConfigRepublishIntervalMs?: number;
+  // main timeout in seconds
+  senderTimeout?: number;
+  // resend timeout in seconds
+  senderResendTimeout?: number;
+  // response of remote ioSet
+  rcResponseTimoutSec?: number;
+  // default timeout for jobs in RequestQueue
+  queueJobTimeoutSec?: number;
+
+  // custom params
+  //params?: {[index: string]: any};
+
+  // network?: {
+  //   routedMessageTTL: number;
+  //   requestTimeout: number;
+  // };
+}
+
 
 // raw host config specified in master config
 export default interface PreHostConfig {
@@ -21,29 +45,7 @@ export default interface PreHostConfig {
   //buildConfig?: BuildConfig;
 
   // specific config for each host
-  config?: {
-    //logLevel?: LogLevel;
-    // republish status silently every minute if it hasn't been changed
-    //defaultStatusRepublishIntervalMs?: number;
-    // republish config silently every 10 minutes if it hasn't been changed
-    //defaultConfigRepublishIntervalMs?: number;
-    // main timeout in seconds
-    senderTimeout?: number;
-    // resend timeout in seconds
-    senderResendTimeout?: number;
-    // response of remote ioSet
-    rcResponseTimoutSec?: number;
-    // default timeout for jobs in RequestQueue
-    queueJobTimeoutSec?: number;
-
-    // custom params
-    //params?: {[index: string]: any};
-
-    // network?: {
-    //   routedMessageTTL: number;
-    //   requestTimeout: number;
-    // };
-  };
+  config?: PreHostConfigConfig;
 
   // devices definitions by deviceId
   devices?: {[index: string]: any};

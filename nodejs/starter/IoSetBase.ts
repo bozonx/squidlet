@@ -9,7 +9,7 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 /**
- * It gets configs and manifests from memory and uses source modules.
+ * It uses source io files.
  */
 export default class IoSetBase implements IoSet {
   private readonly os: Os;
