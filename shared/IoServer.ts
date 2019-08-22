@@ -20,7 +20,9 @@ export const defaultProps: WebSocketServerProps = {
 
 export default class IoServer {
   private readonly ioSet: IoSet;
-  private readonly hostConfig: HostConfig;
+  // user's set props of ioServer
+  private readonly ioServerProps: HostConfig['ioServer'];
+  private readonly rcResponseTimoutSec: number;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;
@@ -34,12 +36,14 @@ export default class IoServer {
 
   constructor(
     ioSet: IoSet,
-    hostConfig: HostConfig,
+    ioServerProps: HostConfig['ioServer'],
+    rcResponseTimoutSec: number,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
-    this.hostConfig = hostConfig;
+    this.ioServerProps = ioServerProps;
+    this.rcResponseTimoutSec = rcResponseTimoutSec;
     this.logInfo = logInfo;
     this.logError = logError;
   }
@@ -88,7 +92,7 @@ export default class IoServer {
     this.remoteCall = new RemoteCall(
       this.sendToClient,
       this.callIoApi,
-      this.hostConfig.config.rcResponseTimoutSec,
+      this.rcResponseTimoutSec,
       this.logError,
       makeUniqId
     );
@@ -154,8 +158,8 @@ export default class IoServer {
 
   private async makeProps(): Promise<WebSocketServerProps> {
     return {
-      ...this.hostConfig.ioServer,
       ...defaultProps,
+      ...this.ioServerProps,
     };
   }
 
