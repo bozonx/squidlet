@@ -11,6 +11,11 @@ export interface Stats {
   mtime: number;
 }
 
+export interface ConfigParams {
+  uid: number;
+  gid: number;
+}
+
 
 export const Methods = [
   'appendFile',
@@ -30,6 +35,7 @@ export const Methods = [
 
 
 export default interface StorageIo extends IoItem {
+  configure(configParams: ConfigParams): Promise<void>;
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void>;
   mkdir(pathTo: string): Promise<void>;
   readdir(pathTo: string): Promise<string[]>;

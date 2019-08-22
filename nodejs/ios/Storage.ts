@@ -1,15 +1,25 @@
 import * as fs from 'fs';
 
-import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
+import StorageIo, {Stats, ConfigParams} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/lib/helpers';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {ENCODE} from 'system/constants';
+
+
+let config: ConfigParams | undefined;
 
 
 /**
  * The same for lowjs and nodejs
  */
 export default class Storage implements StorageIo {
+  async configure(configParams: ConfigParams): Promise<void> {
+    config = {
+      ...config,
+      ...configParams,
+    };
+  }
+
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
       return callPromised(fs.appendFile, pathTo, data, ENCODE);
@@ -49,13 +59,15 @@ export default class Storage implements StorageIo {
     return callPromised(fs.unlink, pathTo);
   }
 
-  writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
+  async writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.writeFile, pathTo, data, ENCODE);
+      await callPromised(fs.writeFile, pathTo, data, ENCODE);
     }
     else {
-      return callPromised(fs.writeFile, pathTo, data);
+      await callPromised(fs.writeFile, pathTo, data);
     }
+
+    await this.chown(pathTo);
   }
 
   async stat(pathTo: string): Promise<Stats> {
@@ -86,8 +98,16 @@ export default class Storage implements StorageIo {
     return callPromised(fs.copyFile, src, dest);
   }
 
-  rename(oldPath: string, newPath: string): Promise<void> {
-    return callPromised(fs.rename, oldPath, newPath);
+  async rename(oldPath: string, newPath: string): Promise<void> {
+    await callPromised(fs.rename, oldPath, newPath);
+    await this.chown(newPath);
+  }
+
+
+  private async chown(pathTo: string) {
+    if (!config) return;
+
+    return callPromised(fs.chown, pathTo, config.uid, config.gid);
   }
 
 }

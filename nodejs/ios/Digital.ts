@@ -38,6 +38,7 @@ export default class Digital implements DigitalIo {
     this.pinInstances[pin] = new Gpio(pin, {
       ...convertedMode,
       edge: this.resolveEdge(edge),
+      //alert: true,
     });
   }
 
@@ -110,7 +111,8 @@ export default class Digital implements DigitalIo {
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
     // start listen
-    pinInstance.on('interrupt', handlerWrapper);
+    //pinInstance.on('interrupt', handlerWrapper);
+    pinInstance.on('alert', handlerWrapper);
     // return an index
     return this.alertListeners.length - 1;
   }
