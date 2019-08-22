@@ -6,6 +6,7 @@ import IoServer from '../../shared/IoServer';
 import IoSetBase from './IoSetBase';
 import IoSet from '../../system/interfaces/IoSet';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
+import IoItem from '../../system/interfaces/IoItem';
 
 
 export default class StartIoServer {
@@ -39,10 +40,8 @@ export default class StartIoServer {
 
   async init() {
     await this.groupConfig.init();
-    // TODO: не все их этого нужно
     await this.props.resolve();
 
-    console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
@@ -72,8 +71,25 @@ export default class StartIoServer {
     const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
 
     await ioSet.init();
+    await this.configureStorage(ioSet);
+    await this.configureIoSet(ioSet);
 
     return ioSet;
+  }
+
+  private async configureStorage(ioSet: IoSet) {
+    // TODO: set user group
+
+  }
+
+  private async configureIoSet(ioSet: IoSet) {
+    if (!this.props.hostConfig.ios) return;
+
+    for (let ioName of Object.keys(this.props.hostConfig.ios)) {
+      const ioItem: IoItem = ioSet.getIo(ioName);
+
+      ioItem.configure && await ioItem.configure(this.props.hostConfig.ios[ioName]);
+    }
   }
 
 }

@@ -35,6 +35,7 @@ export default class IoServer {
 
 
   constructor(
+    // it has to be initialized before
     ioSet: IoSet,
     ioServerProps: HostConfig['ioServer'],
     rcResponseTimoutSec: number,
