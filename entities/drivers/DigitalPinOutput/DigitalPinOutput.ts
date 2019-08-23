@@ -34,7 +34,7 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
     // setup and set initial level
     this.source.setupOutput(this.props.pin, this.props.initialLevel)
       .catch((err) => {
-        this.env.log.error(
+        this.log.error(
           `DigitalPinOutputDriver: Can't setup pin. ` +
           `"${JSON.stringify(this.props)}": ${err.toString()}`
         );

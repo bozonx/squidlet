@@ -5,6 +5,7 @@ import {trim} from 'system/lib/lodashLike';
 import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import Context from 'system/Context';
 
 
 export type TopicType = 'device' | 'api';

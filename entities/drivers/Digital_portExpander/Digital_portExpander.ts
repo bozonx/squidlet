@@ -109,8 +109,8 @@ export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> im
 
   private callOnDevicesInit<T>(cb: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      this.context.onDevicesInit(() => {
-        cb()
+      this.context.onDevicesInit(async () => {
+        return cb()
           .then(resolve)
           .catch(reject);
       });
