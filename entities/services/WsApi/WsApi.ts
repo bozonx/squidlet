@@ -57,7 +57,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
       msg = deserializeJson(data);
     }
     catch (err) {
-      return this.log.error(`WsApi: Can't decode message: ${err}`);
+      throw new Error(`WsApi: Can't decode message: ${err}`);
     }
 
     return this.context.system.apiManager.incomeRemoteCall(sessionId, msg);
