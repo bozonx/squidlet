@@ -37,6 +37,8 @@ export default class Props {
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
+  private readonly argUser?: string;
+  private readonly argGroup?: string;
   private _hostConfig?: PreHostConfig;
   private _machine?: NodejsMachines;
 
@@ -57,14 +59,16 @@ export default class Props {
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
-    this.user = argUser;
-    this.group = argGroup;
+    this.argUser = argUser;
+    this.argGroup = argGroup;
   }
 
 
   async resolve() {
     this._machine = await this.resolveMachine();
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
+    this.uid = await this.resolveUser();
+    this.gid = await this.resolveGroup();
 
     //this.validate();
 
@@ -110,11 +114,12 @@ export default class Props {
   }
 
   private async resolveUser(): Promise<number> {
-
+    // TODO: выполнить spawn
   }
 
   private async resolveGroup(): Promise<number> {
-
+    // TODO: выполнить spawn
+    // TODO: если не задан group, но есть user - то резолвить группу с именем user
   }
 
 }
