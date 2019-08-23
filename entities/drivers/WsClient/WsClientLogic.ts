@@ -28,7 +28,6 @@ export interface WsClientLogicProps {
  */
 export default class WsClientLogic {
   // on first time connect or reconnect
-  // TODO: review logic
   get connectedPromise(): Promise<void> {
     if (!this.connectionId || !this.openPromise) {
       throw new Error(`WsClientLogic.connectedPromise: ${this.closedMsg}`);
@@ -75,13 +74,11 @@ export default class WsClientLogic {
     this.onClose = onClose;
     this.logInfo = logInfo;
     this.logError = logError;
-
     this.openPromise = this.makeOpenPromise();
   }
 
   async init() {
     // make new connection and save connectionId of it
-
     const connectionProps: WebSocketClientProps = {
       url: this.props.url,
     };
@@ -89,6 +86,8 @@ export default class WsClientLogic {
     this.connectionId = await this.wsClientIo.newConnection(connectionProps);
 
     await this.listen();
+    // listen for connection established
+    await this.connectedPromise;
   }
 
   async destroy() {
@@ -149,7 +148,6 @@ export default class WsClientLogic {
     this.wasPrevOpenFulfilled = true;
     this.isConnectionOpened = true;
     this.waitingCookies = true;
-    this.openPromise.resolve();
     this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
 
@@ -175,8 +173,12 @@ export default class WsClientLogic {
       this.waitingCookies = false;
 
       this.setCookie(data);
+      this.openPromise.resolve();
+
+      return;
     }
 
+    // ordinary message
     this.messageEvents.emit(data);
   }
 
@@ -203,6 +205,8 @@ export default class WsClientLogic {
 
     // make new promise if previous was fulfilled
     if (this.wasPrevOpenFulfilled) this.openPromise = this.makeOpenPromise();
+
+    // TODO: нужно тогда опять ждать cookie и потом резолвиться connection promise
 
     // reconnect immediately if reconnectTimeoutMs = 0 or less
     if (this.props.reconnectTimeoutMs <= 0) return this.doReconnect();

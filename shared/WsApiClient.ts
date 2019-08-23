@@ -84,7 +84,7 @@ export default class WsApiClient {
     try {
       const binData: Uint8Array = serializeJson(message);
 
-      return this.client.send(binData);
+      return await this.client.send(binData);
     }
     catch (err) {
       this.logError(err);

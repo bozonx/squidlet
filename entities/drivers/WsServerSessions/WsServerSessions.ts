@@ -145,6 +145,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       const cookie = `${SESSIONID_COOKIE}=${sessionId}`;
 
       await this.server.setCookie(connectionId, cookie);
+      this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, request);
     }
 
     this.sessionConnections[sessionId] = connectionId;

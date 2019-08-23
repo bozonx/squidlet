@@ -9,6 +9,7 @@ import WebSocketServerIo, {
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
 import {callPromised} from 'system/lib/helpers';
+import {convertBufferToUint8Array} from '../../system/lib/buffer';
 
 
 type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
@@ -199,8 +200,17 @@ export default class WebSocketServer implements WebSocketServerIo {
       serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.clientClose, connectionId, code, reason);
     });
 
-    socket.on('message', (data: string | Uint8Array) => {
-      serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.clientMessage, connectionId, data);
+    socket.on('message', (data: string | Buffer) => {
+      let resolvedData: string | Uint8Array;
+
+      if (Buffer.isBuffer(data)) {
+        resolvedData = convertBufferToUint8Array(data);
+      }
+      else {
+        resolvedData = data;
+      }
+
+      serverItem[SERVER_POSITIONS.events].emit(WsServerEvent.clientMessage, connectionId, resolvedData);
     });
 
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {

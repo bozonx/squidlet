@@ -7,6 +7,7 @@ import {callPromised} from 'system/lib/helpers';
 import {omit} from 'system/lib/lodashLike';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';
+import {convertBufferToUint8Array} from '../../system/lib/buffer';
 
 
 /**
@@ -107,7 +108,16 @@ export default class WebSocketClient implements WebSocketClientIo {
     client.on('open', () => this.events.emit(WsClientEvent.open, connectionId));
     client.on('close', () => this.events.emit(WsClientEvent.close, connectionId));
     client.on('message', (data: string | Uint8Array) => {
-      this.events.emit(WsClientEvent.message, connectionId, data);
+      let resolvedData: string | Uint8Array;
+
+      if (Buffer.isBuffer(data)) {
+        resolvedData = convertBufferToUint8Array(data);
+      }
+      else {
+        resolvedData = data;
+      }
+
+      this.events.emit(WsClientEvent.message, connectionId, resolvedData);
     });
     client.on('error', (err: Error) => {
       this.events.emit(WsClientEvent.error, connectionId, err);
