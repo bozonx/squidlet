@@ -200,7 +200,7 @@ export default class WsClientLogic {
   private async reconnect() {
     // do nothing if current reconnection is in progress
     if (this.reconnectTimeout) return;
-    
+
     // make new promise if previous was fulfilled
     if (this.wasPrevOpenFulfilled) this.openPromise = this.makeOpenPromise();
 

@@ -9,7 +9,7 @@ export default class ApiCall {
    * Call device's action
    */
   async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     const result = await apiClient.callMethod('callDeviceAction', actionName, ...args);
 
@@ -23,7 +23,7 @@ export default class ApiCall {
    * If watch param is set then it will listen to changes.
    */
   async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     if (watch) {
       const handlerIndex = await apiClient.callMethod(
@@ -53,7 +53,7 @@ export default class ApiCall {
    * If watch param is set then it will listen to changes.
    */
   async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     if (watch) {
       const handlerIndex = await apiClient.callMethod(
@@ -82,7 +82,7 @@ export default class ApiCall {
    * If watch param is set then it will listen to changes.
    */
   async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     if (watch) {
       const handlerIndex = await apiClient.callMethod(
@@ -111,7 +111,7 @@ export default class ApiCall {
    * Print host's config to console
    */
   async hostConfig(host?: string, port?: string) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     const result = await apiClient.callMethod('getHostConfig');
 
@@ -123,7 +123,7 @@ export default class ApiCall {
    * Print host's info to console
    */
   async hostInfo(host?: string, port?: string) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     const result =  await apiClient.callMethod('getHostInfo');
 
@@ -135,7 +135,7 @@ export default class ApiCall {
    * Listen logs and print them to console
    */
   async log(level?: string, host?: string, port?: string) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     const handlerIndex = await apiClient.callMethod('listenLog', level, (message: string) => {
       console.log(message);
@@ -148,7 +148,7 @@ export default class ApiCall {
   }
 
   async switchToIoServer(host?: string, port?: string) {
-    const apiClient = this.connect(host, port);
+    const apiClient = await this.connect(host, port);
 
     await apiClient.callMethod('switchToIoServer');
 
@@ -157,13 +157,17 @@ export default class ApiCall {
   }
 
 
-  private connect(host?: string, port?: string): WsApiClient {
-    return new WsApiClient(
+  private async connect(host?: string, port?: string): Promise<WsApiClient> {
+    const client: WsApiClient = new WsApiClient(
       hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       console.error,
       host,
       (port) ? parseInt(port) : undefined
     );
+
+    await client.init();
+
+    return client;
   }
 }
