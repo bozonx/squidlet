@@ -1,5 +1,6 @@
 import {trim} from './lodashLike';
 import {Primitives} from '../interfaces/Types';
+import {isExactlyNumber} from './helpers';
 
 
 export interface ParsedType {
@@ -37,7 +38,7 @@ export function parseType(type: Primitives): ParsedType {
 
   for (let item of types) {
     // numbers
-    if (!Number.isNaN(Number(item))) result.constants.push(Number(item));
+    if (isExactlyNumber(item)) result.constants.push(Number(item));
     // constants
     //else if (constants.includes(item)) result.constants.push(item);
     else if (item === 'true') result.constants.push(true);

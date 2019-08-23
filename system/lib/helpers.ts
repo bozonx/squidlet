@@ -210,6 +210,10 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
   return `${entityType}s` as any;
 }
 
+// TODO: test - float
+export function isExactlyNumber(value: any): boolean {
+  return !Number.isNaN(Number(value));
+}
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;

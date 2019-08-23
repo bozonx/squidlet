@@ -92,6 +92,7 @@ export function findIndex(collection: any[] | {[index: string]: any}, cb: (item:
   return -1;
 }
 
+// TODO: remove - better to use String's method
 export function trimStart(src: string, char: string = ' '): string {
   if (typeof src !== 'string') return src;
 
@@ -100,6 +101,7 @@ export function trimStart(src: string, char: string = ' '): string {
   return src.replace(regex, '');
 }
 
+// TODO: remove - better to use String's method
 export function trimEnd(src: string, char: string = ' '): string {
   if (typeof src !== 'string') return src;
 
@@ -108,6 +110,7 @@ export function trimEnd(src: string, char: string = ' '): string {
   return src.replace(regex, '');
 }
 
+// TODO: remove - better to use String's method
 export function trim(src: string, char: string = ' '): string {
   return trimEnd( trimStart(src, char), char);
 }

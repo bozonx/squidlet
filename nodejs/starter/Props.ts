@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os from '../../shared/Os';
+import Os, {SpawnCmdResult} from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
@@ -12,6 +12,7 @@ import {
 import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
+import {isExactlyNumber} from '../../system/lib/helpers';
 
 
 export default class Props {
@@ -50,6 +51,7 @@ export default class Props {
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
+    // TODO: test
     argUser?: string,
     argGroup?: string,
   ) {
@@ -113,13 +115,43 @@ export default class Props {
     return getOsMachine(this.os);
   }
 
-  private async resolveUser(): Promise<number> {
-    // TODO: выполнить spawn
+  // TODO: test
+  private async resolveUser(): Promise<number | undefined> {
+    if (!this.argUser) {
+      return;
+    }
+    else if (isExactlyNumber(this.argUser)) {
+      return parseInt(this.argUser);
+    }
+
+    return this.getIdResult('u', this.argUser);
   }
 
-  private async resolveGroup(): Promise<number> {
-    // TODO: выполнить spawn
-    // TODO: если не задан group, но есть user - то резолвить группу с именем user
+  // TODO: test
+  private async resolveGroup(): Promise<number | undefined> {
+    if (this.argGroup && !this.argUser) {
+      throw new Error(`The "user" argument hasn't been set`);
+    }
+    else if (!this.argGroup) {
+      return;
+    }
+    else if (isExactlyNumber(this.argGroup)) {
+      return parseInt(this.argGroup);
+    }
+
+    return this.getIdResult('g', this.argGroup);
+  }
+
+  // TODO: test
+  private async getIdResult(userOrGroup: 'u' | 'g', name: string): Promise<number> {
+    const cmd = `id -${userOrGroup} ${name}`;
+    const result: SpawnCmdResult = await this.os.spawnCmd(cmd);
+
+    if (result.status) {
+      throw new Error(`Can't resolve id "${cmd}": status ${result.status} ${result.stderr.join(', ')}`);
+    }
+
+    return parseInt( result.stdout.join('').trim() );
   }
 
 }
