@@ -59,7 +59,7 @@ export default class ApiManager {
   }
 
 
-  private async callApi(methodName: string, args: any[]): Promise<any> {
+  private callApi = async (methodName: string, args: any[]): Promise<any> => {
     return (this.context.system.api as any)[methodName](...args);
   }
 

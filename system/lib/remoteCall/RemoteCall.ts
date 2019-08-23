@@ -156,6 +156,8 @@ export default class RemoteCall {
   private async callLocalMethod(payload: CallMethodPayload) {
     const { result, error } = await this.safeCallMethod(payload.method, payload.args);
 
+    // TODO: почему не передалась ошибка ????
+
     // next is sending response
 
     const resultPayload: ResultMethodPayload = {
@@ -187,7 +189,7 @@ export default class RemoteCall {
     const preparedArgs: any[] = this.prepareArgsToCall(args);
 
     try {
-      result = await this.methodCaller(pathToMethod, ...preparedArgs);
+      result = await this.methodCaller(pathToMethod, preparedArgs);
     }
     catch (err) {
       error = err;
