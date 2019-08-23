@@ -132,6 +132,8 @@ export default class Api {
     const storage = this.context.getIo<StorageIo>('Storage');
     const sys = this.context.getIo<SysIo>('Sys');
 
+    this.context.log.info(`Switching to IO server mode`);
+
     await storage.writeFile(pathToTmpFile, '1');
     await sys.restart();
   }

@@ -156,8 +156,6 @@ export default class RemoteCall {
   private async callLocalMethod(payload: CallMethodPayload) {
     const { result, error } = await this.safeCallMethod(payload.method, payload.args);
 
-    // TODO: почему не передалась ошибка ????
-
     // next is sending response
 
     const resultPayload: ResultMethodPayload = {
@@ -178,13 +176,13 @@ export default class RemoteCall {
     }
   }
 
-  private async safeCallMethod(pathToMethod: string, args: any[]): Promise<{result: any, error: string}> {
+  private async safeCallMethod(pathToMethod: string, args: any[]): Promise<{result: any, error: string | undefined}> {
     if (!this.methodCaller) {
       throw new Error(`Can't call a method "${pathToMethod}" because there isn't a methodCaller`);
     }
 
     let result: any;
-    let error;
+    let error: string | undefined;
 
     const preparedArgs: any[] = this.prepareArgsToCall(args);
 
@@ -192,7 +190,7 @@ export default class RemoteCall {
       result = await this.methodCaller(pathToMethod, preparedArgs);
     }
     catch (err) {
-      error = err;
+      error = String(err);
     }
 
     return { result, error };

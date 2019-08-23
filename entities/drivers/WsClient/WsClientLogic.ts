@@ -1,5 +1,5 @@
 import WebSocketClientIo, {
-  OnMessageHandler, WebSocketClientProps,
+  OnMessageHandler, WebSocketClientProps, WsCloseStatus,
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
@@ -91,7 +91,7 @@ export default class WsClientLogic {
   }
 
   async destroy() {
-    await this.wsClientIo.close(this.connectionId, 0, 'Closing on destroy');
+    await this.wsClientIo.close(this.connectionId, WsCloseStatus.closeGoingAway, 'Closing on destroy');
     this.destroyInstance();
   }
 
@@ -108,7 +108,6 @@ export default class WsClientLogic {
 
   async close(code: number, reason?: string) {
     await this.wsClientIo.close(this.connectionId, code, reason);
-    this.destroyInstance();
   }
 
   onMessage(cb: OnMessageHandler): number {
@@ -250,7 +249,7 @@ export default class WsClientLogic {
    * You can't reconnect anymore after this. You should create a new instance if need.
    */
   private async finallyCloseConnection() {
-    await this.wsClientIo.close(this.connectionId, 0);
+    await this.wsClientIo.close(this.connectionId, WsCloseStatus.closeNormal);
 
     // // reject open promise if connection hasn't been established
     // if (!this.wasPrevOpenFulfilled) {
