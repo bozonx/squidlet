@@ -111,8 +111,8 @@ export default class Digital implements DigitalIo {
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
     // start listen
-    //pinInstance.on('interrupt', handlerWrapper);
-    pinInstance.on('alert', handlerWrapper);
+    pinInstance.on('interrupt', handlerWrapper);
+    //pinInstance.on('alert', handlerWrapper);
     // return an index
     return this.alertListeners.length - 1;
   }
