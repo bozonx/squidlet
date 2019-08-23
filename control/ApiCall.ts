@@ -11,7 +11,7 @@ export default class ApiCall {
   async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
     const apiClient = await this.connect(host, port);
 
-    const result = await apiClient.callMethod('callDeviceAction', actionName, ...args);
+    const result = await apiClient.callMethod('callDeviceAction', deviceId, actionName, ...args);
 
     console.info(JSON.stringify(result));
 
