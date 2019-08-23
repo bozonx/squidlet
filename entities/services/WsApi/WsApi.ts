@@ -22,12 +22,14 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
 
     this.wsServerSessions.onNewSession((sessionId: string) => {
       this.sessions.push(sessionId);
+      this.context.log.info(`WsApi: new client has connected, session: ${sessionId}`);
     });
 
     this.wsServerSessions.onSessionClose(this.wrapErrors(async (sessionId: string) => {
       this.sessions = removeItemFromArray(this.sessions, sessionId);
 
       await this.context.system.apiManager.remoteCallSessionClosed(sessionId);
+      this.context.log.info(`WsApi: client disconnected, session: ${sessionId}`);
     }));
 
     // listen income api requests
