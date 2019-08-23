@@ -6,3 +6,6 @@ drivers:
 
 props:
   $base: 'drivers.WsServerSessions'
+  port:
+    type: number
+    default: 8088

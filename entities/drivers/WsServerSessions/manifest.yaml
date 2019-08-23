@@ -6,12 +6,6 @@ drivers:
 
 props:
   $base: 'drivers.WsServer'
-#  host:
-#    type: string
-#    default: localhost
-#  port:
-#    type: number
-#    default: 8080
   # session expiration time in seconds
   expiredSec:
     type: number

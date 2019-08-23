@@ -12,7 +12,7 @@ import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
 
 
-const wsClientManifestPath = path.resolve(__dirname, '../entities/drivers/WsClient/manifest.yaml');
+const wsClientManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');
 const wsClientIo = new WebSocketClient();
 
 
@@ -109,7 +109,7 @@ export default class WsApiClient {
     const yamlContent: string = fs.readFileSync(wsClientManifestPath, ENCODE);
     const clientManifest = yaml.safeLoad(yamlContent);
     const clientProps = collectPropsDefaults(clientManifest.props);
-    const host: string = specifiedHost || clientProps.host;
+    const host: string = specifiedHost || 'localhost';
     const port: number= specifiedPort || clientProps.port;
     const url = `ws://${host}:${port}`;
 

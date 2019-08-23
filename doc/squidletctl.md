@@ -102,7 +102,7 @@ Config is optional, if it does not includes io definitions you don't have to spe
 
 Call device action and print the result.
 
-    squidletctl action <fullDeviceId> <actionName> [value1] [value2] ... --host=my-host [--port=8089]
+    squidletctl action <fullDeviceId> <actionName> [value1] [value2] ... --host=my-host [--port=8088]
 
     # example
     squidletctl action bedroom.switch turn true --host=remotehost
@@ -114,7 +114,7 @@ Params
 
 ## Get device's status
 
-    squidletctl status <fullDeviceId> --host=my-host [--port=8089] [--watch]
+    squidletctl status <fullDeviceId> --host=my-host [--port=8088] [--watch]
     
     # example
     squidletctl status bedroom.switch --host=remotehost
@@ -126,7 +126,7 @@ Params
 
 ## Get device's config
 
-    squidletctl config <fullDeviceId> --host=my-host [--port=8089] [--watch]
+    squidletctl config <fullDeviceId> --host=my-host [--port=8088] [--watch]
     
     # example
     squidletctl config bedroom.switch --host=remotehost
@@ -138,7 +138,7 @@ Params
 
 ## Get state
 
-    squidletctl state <category> <stateName> --host=my-host [--port=8089] [--watch]
+    squidletctl state <category> <stateName> --host=my-host [--port=8088] [--watch]
     
     # example
     squidletctl state 0 bedroom.switch --host=remotehost
@@ -150,7 +150,7 @@ Params
 
 ## Get host config
 
-    squidletctl host-config --host=my-host [--port=8089]
+    squidletctl host-config --host=my-host [--port=8088]
     
 Params
 * --host - set remote host
@@ -158,7 +158,7 @@ Params
 
 ## Get host info
 
-    squidletctl host-info --host=my-host [--port=8089]
+    squidletctl host-info --host=my-host [--port=8088]
     
 Params
 * --host - set remote host
@@ -166,7 +166,7 @@ Params
 
 ## Listen logs of remote host
 
-    squidletctl log --host=my-host [--port=8089] [--level=info]
+    squidletctl log --host=my-host [--port=8088] [--level=info]
     
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
