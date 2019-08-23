@@ -134,7 +134,8 @@ export default class Api {
 
     this.context.log.info(`Switching to IO server mode`);
 
-    await storage.writeFile(pathToTmpFile, '1');
+    // TODO: ошика с путями
+    //await storage.writeFile(pathToTmpFile, '1');
     await sys.restart();
   }
 

@@ -35,16 +35,20 @@ export default class StorageEnvMemoryWrapper {
 
 
   makeWrapper(originalStorage: StorageIo): StorageIo {
-    return {
-      ...originalStorage,
-      readFile: (pathTo: string) => this.readFile(originalStorage, pathTo),
-    };
+    const originalReadFile = originalStorage.readFile.bind(originalStorage);
+
+    originalStorage.readFile = (pathTo: string) => this.readFile(originalReadFile, pathTo);
+
+    return originalStorage;
   }
 
 
-  private readFile = async (originalStorage: StorageIo, pathTo: string): Promise<string> => {
+  private readFile = async (
+    originalReadFile: (pathTo: string) => Promise<string>,
+    pathTo: string
+  ): Promise<string> => {
     // if it isn't config or entity file - just load it.
-    if (pathTo.indexOf(this.envSetDir) === -1) return originalStorage.readFile(pathTo);
+    if (pathTo.indexOf(this.envSetDir) === -1) return originalReadFile(pathTo);
 
     const splat: string[] = pathTo.split(this.envSetDir);
     const relativePath: string = _trimStart(splat[1], path.sep);
@@ -62,7 +66,7 @@ export default class StorageEnvMemoryWrapper {
       return JSON.stringify(this.loadManifest(restPath));
     }
 
-    return originalStorage.readFile(pathTo);
+    return originalReadFile(pathTo);
   }
 
   /**
