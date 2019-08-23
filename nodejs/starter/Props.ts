@@ -21,8 +21,8 @@ export default class Props {
   tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
-  readonly user?: string;
-  readonly group?: string;
+  uid?: number;
+  gid?: number;
   destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
   get hostConfig(): PreHostConfig {
@@ -107,6 +107,14 @@ export default class Props {
 
   private getOsMachine(): Promise<NodejsMachines> {
     return getOsMachine(this.os);
+  }
+
+  private async resolveUser(): Promise<number> {
+
+  }
+
+  private async resolveGroup(): Promise<number> {
+
   }
 
 }

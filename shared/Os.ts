@@ -50,6 +50,10 @@ export default class Os {
     shelljs.mkdir('-p', dirName);
   }
 
+  chown(pathTo: string, uid: number, gid: number): Promise<void> {
+    return callPromised(fs.chown, pathTo, uid, gid);
+  }
+
   readdir(pathTo: string): Promise<string[]> {
     return callPromised(fs.readdir, pathTo, ENCODE) as Promise<string[]>;
   }

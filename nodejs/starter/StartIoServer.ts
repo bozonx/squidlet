@@ -7,6 +7,7 @@ import IoSetBase from './IoSetBase';
 import IoSet from '../../system/interfaces/IoSet';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import IoItem from '../../system/interfaces/IoItem';
+import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
 export default class StartIoServer {
@@ -49,6 +50,12 @@ export default class StartIoServer {
   async start() {
     await this.os.mkdirP(this.props.varDataDir);
     await this.os.mkdirP(this.props.envSetDir);
+
+    if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
+      await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
+      await this.os.chown(this.props.envSetDir, this.props.uid, this.props.gid);
+    }
+
     // TODO: install like in dev mode
     //await this.installModules();
 
@@ -78,8 +85,14 @@ export default class StartIoServer {
   }
 
   private async configureStorage(ioSet: IoSet) {
-    // TODO: set user group
+    if (typeof this.props.uid === 'undefined' || typeof this.props.gid === 'undefined') return;
 
+    const ioItem = ioSet.getIo<StorageIo>('Storage');
+
+    await ioItem.configure({
+      uid: this.props.uid,
+      gid: this.props.gid,
+    });
   }
 
   private async configureIoSet(ioSet: IoSet) {

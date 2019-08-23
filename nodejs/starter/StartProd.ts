@@ -45,6 +45,7 @@ export default class StartProd {
       argUser,
       argGroup,
     );
+    // TODO: set uid, gid
     this.prodBuild = new ProdBuild(this.os, this.props);
     this.systemStarter = new SystemStarter(this.os, this.props);
   }
@@ -67,6 +68,11 @@ export default class StartProd {
     await this.envBuilder.collect();
 
     await this.os.mkdirP(this.props.varDataDir);
+
+    if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
+      await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
+    }
+
     await this.installModules();
 
     //if (!this.props.force && await this.os.exists(prodSystemDirPath)) return;
@@ -116,11 +122,15 @@ export default class StartProd {
 
     await this.os.mkdirP(nodeModulesDir);
 
+    // TODO: use chown
+
     try {
       await this.os.symlink(
         this.getPathToProdSystemDir(),
         symLinkDst
       );
+
+      // TODO: use chown
     }
     catch (e) {
       // do nothing - link exists
@@ -136,6 +146,7 @@ export default class StartProd {
   }
 
   private async runNpmInstall() {
+    // TODO: set uid, gid
     await runCmd(this.os, `npm install`, this.props.workDir);
   }
 

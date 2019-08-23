@@ -69,6 +69,12 @@ export default class StartDevelop {
 
     await this.os.mkdirP(this.props.varDataDir);
     await this.os.mkdirP(this.props.envSetDir);
+
+    if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
+      await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
+      await this.os.chown(this.props.envSetDir, this.props.uid, this.props.gid);
+    }
+
     await this.installModules();
 
     const pathToSystem = this.getPathToProdSystemFile();
@@ -152,6 +158,7 @@ export default class StartDevelop {
   private async installNpmModules(modules: string[] = [], cwd: string) {
     const cmd = `npm install ${modules.join(' ')}`;
 
+    // TODO: use uid and gid
     await runCmd(this.os, cmd, cwd);
   }
 
