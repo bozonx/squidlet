@@ -10,6 +10,7 @@ import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {ENCODE} from '../system/constants';
 import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
+import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 
 
 const wsClientManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');
@@ -73,7 +74,7 @@ export default class WsApiClient {
 
   async close() {
     await this.remoteCall.destroy();
-    await this.client.close(0, 'finish');
+    await this.client.close(WsCloseStatus.closeNormal, 'finish');
   }
 
 

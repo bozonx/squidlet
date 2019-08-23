@@ -5,6 +5,7 @@ import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/Ws
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
 import {defaultProps, IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from './IoServer';
+import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 
 
 const wsClientIo = new WebSocketClient();
@@ -75,7 +76,7 @@ export default class IoClient {
 
   async close() {
     await this.remoteCall.destroy();
-    await this.client.close(0, 'finish');
+    await this.client.close(WsCloseStatus.closeNormal, 'finish');
   }
 
 

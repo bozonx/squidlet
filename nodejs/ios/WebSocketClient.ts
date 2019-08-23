@@ -1,13 +1,17 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 
-import WebSocketClientIo, {WebSocketClientProps, WsClientEvent} from 'system/interfaces/io/WebSocketClientIo';
+import WebSocketClientIo, {
+  WebSocketClientProps,
+  WsClientEvent,
+  WsCloseStatus
+} from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/helpers';
 import {omit} from 'system/lib/lodashLike';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';
-import {convertBufferToUint8Array} from '../../system/lib/buffer';
+import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 
 /**
@@ -20,7 +24,7 @@ export default class WebSocketClient implements WebSocketClientIo {
 
   async destroy() {
     for (let connectionId in this.connections) {
-      await this.close(connectionId, 0, 'destroy');
+      await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy');
     }
   }
 
@@ -42,7 +46,7 @@ export default class WebSocketClient implements WebSocketClientIo {
    * It closes previous connection and makes new one with the same id.
    */
   async reConnect(connectionId: string, props: WebSocketClientProps) {
-    await this.close(connectionId, 0);
+    await this.close(connectionId, WsCloseStatus.closeNormal);
 
     this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
   }
