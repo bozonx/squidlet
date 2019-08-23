@@ -18,6 +18,7 @@ export interface ConfigParams {
 
 
 export const Methods = [
+  'configure',
   'appendFile',
   'mkdir',
   'readdir',

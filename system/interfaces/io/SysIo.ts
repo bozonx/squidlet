@@ -2,7 +2,8 @@ import IoItem from '../IoItem';
 
 
 export const Methods = [
-  'configure',
+  'restart',
+  'reboot',
 ];
 
 
