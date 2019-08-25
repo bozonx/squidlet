@@ -148,15 +148,19 @@ Params
 * --port - set remote port. Is isn't set - default will be used
 * --watch - watch changes of state and print them.
 
-## Get host config
+## Reboot
 
-    squidletctl host-config --host=my-host [--port=8088]
+Reboot the host.
+
+    squidletctl reboot --host=my-host [--port=8088]
     
 Params
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
 
 ## Get host info
+
+Get config as list of ios
 
     squidletctl host-info --host=my-host [--port=8088]
     

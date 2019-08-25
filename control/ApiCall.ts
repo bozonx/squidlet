@@ -39,8 +39,15 @@ export default class ApiCall {
     }
     else {
       const result = await apiClient.callMethod('getDeviceStatus', deviceId);
+      const resultKeys = Object.keys(result);
 
-      console.info(JSON.stringify(result));
+      if (resultKeys.length === 1 && resultKeys[0] === 'default') {
+        console.info(JSON.stringify(resultKeys[0]));
+      }
+      else {
+        console.info(JSON.stringify(result));
+      }
+
       await apiClient.close();
     }
   }
@@ -99,14 +106,15 @@ export default class ApiCall {
   }
 
   /**
-   * Print host's config to console
+   * Print host's info to console
    */
-  async hostConfig(host?: string, port?: string) {
+  async reboot(host?: string, port?: string) {
     const apiClient = await this.connect(host, port);
 
-    const result = await apiClient.callMethod('getHostConfig');
+    await apiClient.callMethod('reboot');
 
-    console.info(JSON.stringify(result));
+    console.info('The remote host was rebooted successfully');
+
     await apiClient.close();
   }
 
@@ -118,7 +126,7 @@ export default class ApiCall {
 
     const result =  await apiClient.callMethod('getHostInfo');
 
-    console.info(JSON.stringify(result));
+    console.info(JSON.stringify(result, null, 2));
     await apiClient.close();
   }
 

@@ -33,8 +33,8 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       return apiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
     case 'state':
       return apiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
-    case 'host-config':
-      return apiCall.hostConfig(args.host, args.port);
+    case 'reboot':
+      return apiCall.reboot(args.host, args.port);
     case 'host-info':
       return apiCall.hostInfo(args.host, args.port);
     case 'switch-to-ioserver':

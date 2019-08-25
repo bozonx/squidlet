@@ -94,17 +94,10 @@ export default class Api {
     return this.context.state.getState(category, stateName);
   }
 
-  getHostConfig(): HostConfig {
-    return this.context.config;
-  }
-
-  getHostConfigValue(configParam: string): JsonTypes {
-    return objGet(this.context.config, configParam);
-  }
-
   getHostInfo(): HostInfo {
     return {
       usedIo: this.context.system.ioManager.getNames(),
+      config: this.context.config,
     };
   }
 
@@ -116,6 +109,8 @@ export default class Api {
     const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(logLevel);
 
     return this.context.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
+      console.log(111111111, message, level, logLevel, allowedLogLevels)
+
       if (allowedLogLevels.includes(level)) cb(message);
     });
   }
@@ -137,6 +132,12 @@ export default class Api {
     // TODO: ошика с путями
     //await storage.writeFile(pathToTmpFile, '1');
     await sys.restart();
+  }
+
+  async reboot() {
+    const Sys = this.context.system.ioManager.getIo<SysIo>('Sys');
+
+    return Sys.reboot();
   }
 
   /**
