@@ -127,9 +127,19 @@ export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
 /**
  * Call cb on SIGTERM and SIGINT signals
  */
-export function listenScriptEnd(cb: () => void) {
-  process.on('SIGTERM', cb);
-  process.on('SIGINT', cb);
+export function listenScriptEnd(cb: () => Promise<void>) {
+  const cbWrapper = () => {
+    return cb()
+      .then(() => process.exit(0))
+      .catch((err) => {
+        console.log(err);
+
+        process.exit(2);
+      });
+  };
+
+  process.on('SIGTERM', cbWrapper);
+  process.on('SIGINT', cbWrapper);
 }
 
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {

@@ -35,10 +35,7 @@ export default class ApiCall {
         }
       );
 
-      listenScriptEnd(() => {
-        apiClient.callMethod('removeStateListener', handlerIndex)
-          .catch(console.error);
-      });
+      listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
     }
     else {
       const result = await apiClient.callMethod('getDeviceStatus', deviceId);
@@ -64,10 +61,7 @@ export default class ApiCall {
         }
       );
 
-      listenScriptEnd(() => {
-        apiClient.callMethod('removeStateListener', handlerIndex)
-          .catch(console.error);
-      });
+      listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
     }
     else {
       const result = await apiClient.callMethod('getDeviceConfig', deviceId);
@@ -94,10 +88,7 @@ export default class ApiCall {
         }
       );
 
-      listenScriptEnd(() => {
-        apiClient.callMethod('removeStateListener', handlerIndex)
-          .catch(console.error);
-      });
+      listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
     }
     else {
       const result = await apiClient.callMethod('getState', parseInt(category), stateName);
@@ -141,10 +132,7 @@ export default class ApiCall {
       console.log(message);
     });
 
-    listenScriptEnd(() => {
-      apiClient.callMethod('removeLogListener', handlerIndex)
-        .catch(console.error);
-    });
+    listenScriptEnd(() => apiClient.callMethod('removeLogListener', handlerIndex));
   }
 
   async switchToIoServer(host?: string, port?: string) {
