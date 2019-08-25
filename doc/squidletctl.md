@@ -160,9 +160,9 @@ Params
 
 ## Get host info
 
-Get config as list of ios
+Get host config, system config and list of ios
 
-    squidletctl host-info --host=my-host [--port=8088]
+    squidletctl info --host=my-host [--port=8088]
     
 Params
 * --host - set remote host
