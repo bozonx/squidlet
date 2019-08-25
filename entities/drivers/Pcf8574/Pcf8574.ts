@@ -253,7 +253,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     const oldState = this.currentState;
 
-    console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', data[0].toString(2));
+    //console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', data[0].toString(2));
 
     // TODO: нужно ли инвертировать???
 
@@ -347,7 +347,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       return false;
     }
-    
+
     return true;
   }
 

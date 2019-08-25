@@ -70,6 +70,7 @@ class SenderRequest {
         setTimeout(() => {
 
           // TODO: print in debug
+          // TODO: use logger
           console.log(`--> resending - ${this.id}`);
 
           // try another one
@@ -116,6 +117,7 @@ export default class Sender {
     try {
       const result: any = await this.requests[id].promise;
       // TODO: print in debug
+      // TODO: use logger
       console.log(`==> Request successfully finished ${id}`);
 
       delete this.requests[id];

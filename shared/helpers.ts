@@ -132,7 +132,7 @@ export function listenScriptEnd(cb: () => Promise<void>) {
     return cb()
       .then(() => process.exit(0))
       .catch((err) => {
-        console.log(err);
+        console.error(err);
 
         process.exit(2);
       });

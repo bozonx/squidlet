@@ -106,14 +106,9 @@ export default class Api {
   }
 
   listenLog(logLevel: LogLevel = 'info', cb: (msg: string) => void): number {
-    console.log(22222222, logLevel)
     const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(logLevel);
 
-    console.log(33333333333, allowedLogLevels)
-
     return this.context.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
-      console.log(111111111, message, level, logLevel, allowedLogLevels)
-
       if (allowedLogLevels.includes(level)) cb(message);
     });
   }

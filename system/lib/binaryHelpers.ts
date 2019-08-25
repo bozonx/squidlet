@@ -314,6 +314,7 @@ export function textToUint8Array(str: string): Uint8Array {
 export function serializeJson(data: any): Uint8Array {
   let binDataTail = new Uint8Array();
 
+  // TODO: не поддерживается undefined
   const stringMsg: string = JSON.stringify(data, (key: string, value: any) => {
     if (value instanceof Uint8Array) {
       const start = binDataTail.length;
@@ -351,6 +352,8 @@ export function deserializeJson(serialized: Uint8Array | any) {
   const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLength);
   const jsonString: string = uint8ArrayToText(jsonBin);
   const binaryTail: Uint8Array = serialized.slice(4 + jsonLength);
+
+  // TODO: не поддерживается undefined
 
   return JSON.parse(jsonString, (key: string, value: any) => {
     if (typeof value === 'string' && value.indexOf(BIN_MARK) === 0) {

@@ -114,8 +114,8 @@ export default class ApiCall {
     await apiClient.callMethod('reboot');
 
     console.info('The remote host was rebooted successfully');
-
     await apiClient.close();
+    process.exit(0);
   }
 
   /**
@@ -133,7 +133,8 @@ export default class ApiCall {
   /**
    * Listen logs and print them to console
    */
-  async log(level?: string, host?: string, port?: string) {
+  // TODO: убрать параметр по умолчанию
+  async log(level: string = 'info', host?: string, port?: string) {
     const apiClient = await this.connect(host, port);
 
     const handlerIndex = await apiClient.callMethod('listenLog', level, (message: string) => {
