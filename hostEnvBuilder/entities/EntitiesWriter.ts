@@ -9,6 +9,7 @@ import UsedEntities, {EntitiesNames} from './UsedEntities';
 import HostEntitySet from '../interfaces/HostEntitySet';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 import {convertEntityTypePluralToSingle} from '../helpers';
+import {OwnerOptions} from '../../shared/interfaces/OnwerOptions';
 
 
 /**
@@ -19,6 +20,7 @@ export default class EntitiesWriter {
   private readonly buildDir: string;
   private readonly tmpBuildDir: string;
   private readonly os: Os;
+  private readonly ownerOptions?: OwnerOptions;
   private readonly log: Logger;
   // entities dir in storage
   private get entitiesDstDir(): string {
@@ -26,12 +28,20 @@ export default class EntitiesWriter {
   }
 
 
-  constructor(os: Os, log: Logger, usedEntities: UsedEntities, buildDir: string, tmpBuildDir: string) {
+  constructor(
+    os: Os,
+    log: Logger,
+    usedEntities: UsedEntities,
+    buildDir: string,
+    tmpBuildDir: string,
+    ownerOptions?: OwnerOptions
+  ) {
     this.os = os;
     this.log = log;
     this.usedEntities = usedEntities;
     this.buildDir = buildDir;
     this.tmpBuildDir = tmpBuildDir;
+    this.ownerOptions = ownerOptions;
   }
 
 

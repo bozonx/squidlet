@@ -50,11 +50,12 @@ export default class EnvBuilder {
       this.log,
       this.usedEntities,
       this.buildDir,
-      this.tmpBuildDir
+      this.tmpBuildDir,
+      ownerOptions
     );
     this.definitions = new Definitions(this.configManager, this.usedEntities);
     this.configsSet = new ConfigsSet(this.configManager, this.usedEntities, this.definitions);
-    this.configsWriter = new ConfigsWriter(this.os, this.configsSet, this.buildDir);
+    this.configsWriter = new ConfigsWriter(this.os, this.configsSet, this.buildDir, ownerOptions);
   }
 
 

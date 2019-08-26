@@ -4,6 +4,7 @@ import systemConfig from '../configs/systemConfig';
 import Os from '../../shared/Os';
 import ConfigsSet from './ConfigsSet';
 import HostConfigSet from '../interfaces/HostConfigSet';
+import {OwnerOptions} from '../../shared/interfaces/OnwerOptions';
 
 
 /**
@@ -14,12 +15,14 @@ export default class ConfigsWriter {
   private readonly os: Os;
   private readonly configsSet: ConfigsSet;
   private readonly buildDir: string;
+  private readonly ownerOptions?: OwnerOptions;
 
 
-  constructor(os: Os, configsSet: ConfigsSet, buildDir: string) {
+  constructor(os: Os, configsSet: ConfigsSet, buildDir: string, ownerOptions?: OwnerOptions) {
     this.os = os;
     this.configsSet = configsSet;
     this.buildDir = buildDir;
+    this.ownerOptions = ownerOptions;
   }
 
 
