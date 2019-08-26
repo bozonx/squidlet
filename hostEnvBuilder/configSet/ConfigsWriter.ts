@@ -35,22 +35,21 @@ export default class ConfigsWriter {
     const fileNames = systemConfig.hostInitCfg.fileNames;
     const configDir = path.join(this.buildDir, systemConfig.hostSysCfg.envSetDirs.configs);
 
-    // TODO: use uid and gid
     // write host's config
     await this.os.writeJson(
       path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
-      hostConfigSet.config
+      hostConfigSet.config,
+      this.ownerOptions
     );
-    // TODO: use uid and gid
     // write host's definitions
-    await this.os.writeJson(path.join(configDir, fileNames.systemDrivers), hostConfigSet.systemDrivers);
-    await this.os.writeJson(path.join(configDir, fileNames.regularDrivers), hostConfigSet.regularDrivers);
-    await this.os.writeJson(path.join(configDir, fileNames.systemServices), hostConfigSet.systemServices);
-    await this.os.writeJson(path.join(configDir, fileNames.regularServices), hostConfigSet.regularServices);
-    await this.os.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostConfigSet.devicesDefinitions);
-    await this.os.writeJson(path.join(configDir, fileNames.driversDefinitions), hostConfigSet.driversDefinitions);
-    await this.os.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostConfigSet.servicesDefinitions);
-    await this.os.writeJson(path.join(configDir, fileNames.iosDefinitions), hostConfigSet.iosDefinitions);
+    await this.os.writeJson(path.join(configDir, fileNames.systemDrivers), hostConfigSet.systemDrivers, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.regularDrivers), hostConfigSet.regularDrivers, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.systemServices), hostConfigSet.systemServices, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.regularServices), hostConfigSet.regularServices, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostConfigSet.devicesDefinitions, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.driversDefinitions), hostConfigSet.driversDefinitions, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostConfigSet.servicesDefinitions, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.iosDefinitions), hostConfigSet.iosDefinitions, this.ownerOptions);
     // TODO: does it really need????
     // write list of entities names
     //await this.writeJson(path.join(buildDir, systemConfig.usedEntitiesNamesFile), hostsUsedEntitiesNames);

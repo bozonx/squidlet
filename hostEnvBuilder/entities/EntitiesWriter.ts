@@ -72,11 +72,11 @@ export default class EntitiesWriter {
     const entityDstDir = path.join(this.entitiesDstDir, convertEntityTypeToPlural(entityType), entityName);
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet(entityType, entityName);
 
-    // TODO: use uid and gid
     // write manifest
     await this.os.writeJson(
       path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
-      entitySet.manifest
+      entitySet.manifest,
+      this.ownerOptions
     );
 
     // build and write main file if exists
@@ -88,12 +88,10 @@ export default class EntitiesWriter {
       const toFileName = path.resolve(entityDstDir, relativeFileName);
 
       // make inner dirs
-      // TODO: use uid and gid
-      await this.os.mkdirP(path.dirname(toFileName));
+      await this.os.mkdirP(path.dirname(toFileName), this.ownerOptions);
 
-      // TODO: use uid and gid
       // copy
-      await this.os.copyFile(fromFile, toFileName);
+      await this.os.copyFile(fromFile, toFileName, this.ownerOptions);
     }
   }
 
