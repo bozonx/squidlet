@@ -13,7 +13,7 @@ import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents, SHUTDOWN_EVENT} from './constants';
 
 
-type ShutdownReason = 'switchToIoServer' | 'switchToApp' | 'restart';
+export type ShutdownReason = 'switchToIoServer' | 'switchToApp' | 'restart';
 
 
 export default class System {

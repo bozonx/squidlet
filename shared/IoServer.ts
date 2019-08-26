@@ -7,6 +7,8 @@ import RemoteCall from '../system/lib/remoteCall/RemoteCall';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import {makeUniqId} from '../system/lib/uniqId';
 import HostConfig from '../system/interfaces/HostConfig';
+import {ShutdownReason} from '../system/System';
+import {SHUTDOWN_EVENT} from '../system/constants';
 
 
 export const IO_API = 'ioApi';
@@ -49,7 +51,7 @@ export default class IoServer {
     this.logError = logError;
   }
 
-  async init() {
+  async start() {
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
     const props = await this.makeProps();
 
@@ -76,6 +78,11 @@ export default class IoServer {
   destroy = async () => {
     await this.wsServer.destroy();
     this.remoteCall && await this.remoteCall.destroy();
+  }
+
+
+  onShutdownRequest(cb: (reason: ShutdownReason) => void) {
+    this.events.addListener(SHUTDOWN_EVENT, cb);
   }
 
 
