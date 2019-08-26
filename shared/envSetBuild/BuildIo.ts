@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os from '../Os';
+import Os, {OwnerOptions} from '../Os';
 import compileTs from '../buildToJs/compileTs';
 import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';
@@ -19,16 +19,25 @@ import {Stats} from '../../system/interfaces/io/StorageIo';
 export default class BuildIo {
   private readonly iosBuildDir: string;
   private readonly iosTmpDir: string;
+  private readonly ownerOptions: OwnerOptions;
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly os: Os;
 
 
-  constructor(os: Os, platform: Platforms, machine: string, iosBuildDir: string, iosTmpDir: string) {
+  constructor(
+    os: Os,
+    platform: Platforms,
+    machine: string,
+    iosBuildDir: string,
+    iosTmpDir: string,
+    ownerOptions: OwnerOptions
+  ) {
     this.platform = platform;
     this.machine = machine;
     this.iosBuildDir = iosBuildDir;
     this.iosTmpDir = iosTmpDir;
+    this.ownerOptions = ownerOptions;
     this.os = os;
   }
 
@@ -40,7 +49,7 @@ export default class BuildIo {
     const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(this.os, platformDir, this.machine);
 
     await this.os.rimraf(`${this.iosBuildDir}/**/*`);
-    await this.os.mkdirP(this.iosBuildDir);
+    await this.os.mkdirP(this.iosBuildDir, this.ownerOptions);
 
     await this.copyIos(machineConfig);
     await this.buildIos();
@@ -57,7 +66,7 @@ export default class BuildIo {
     const platformDir = resolvePlatformDir(this.platform);
 
     await this.os.rimraf(`${usedIosDir}/**/*`);
-    await this.os.mkdirP(usedIosDir);
+    await this.os.mkdirP(usedIosDir, this.ownerOptions);
 
     // copy specified ios
     for (let devPath of machineConfig.ios) {
@@ -65,7 +74,7 @@ export default class BuildIo {
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
       const dstFile: string = path.join(usedIosDir, path.basename(devPath));
 
-      await this.os.copyFile(srcFile, dstFile);
+      await this.os.copyFile(srcFile, dstFile, this.ownerOptions);
     }
   }
 
@@ -100,7 +109,7 @@ export default class BuildIo {
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
       const dstFile: string = path.join(this.iosBuildDir, path.basename(supportFilePath));
 
-      await this.os.copyFile(srcFile, dstFile);
+      await this.os.copyFile(srcFile, dstFile, this.ownerOptions);
     }
   }
 
@@ -120,7 +129,7 @@ export default class BuildIo {
 
     const ioSet: string = `module.exports = {\n${ios.join(',\n')}\n};\n`;
 
-    await this.os.writeFile(indexFilePath, ioSet);
+    await this.os.writeFile(indexFilePath, ioSet, this.ownerOptions);
   }
 
   /**

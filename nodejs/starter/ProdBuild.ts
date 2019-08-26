@@ -73,7 +73,8 @@ export default class ProdBuild {
       this.props.platform,
       this.props.machine,
       buildDir,
-      tmpDir
+      tmpDir,
+      { uid: this.props.uid, gid: this.props.gid }
     );
 
     await buildIo.build();
