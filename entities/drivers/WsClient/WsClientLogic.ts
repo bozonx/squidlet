@@ -168,13 +168,19 @@ export default class WsClientLogic {
     if (connectionId !== this.connectionId) return;
 
     // if the first message is cookie - set it
-    if (this.waitingCookies && this.isCookieMessage(data)) {
+    if (this.waitingCookies) {
+      if (this.isCookieMessage(data)) {
+        this.waitingCookies = false;
+
+        this.setCookie(data);
+        this.openPromise.resolve();
+
+        return;
+      }
+
+      // go to ordinary mode if the first message isn't cookie
       this.waitingCookies = false;
-
-      this.setCookie(data);
       this.openPromise.resolve();
-
-      return;
     }
 
     // ordinary message

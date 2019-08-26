@@ -97,6 +97,8 @@ export default class ApiTopicsLogic {
   private async callApi(methodName: string, data: string) {
     const args: JsonTypes[] = this.parseArgs(data);
 
+    // TODO: call any api's method
+
     switch (methodName) {
       case 'publishWholeState':
         await this.publishWholeState();
