@@ -67,14 +67,8 @@ export default class StartDevelop {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    await this.os.mkdirP(this.props.varDataDir);
-    await this.os.mkdirP(this.props.envSetDir);
-
-    // TODO: set it to mkdirP
-    if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
-      await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
-      await this.os.chown(this.props.envSetDir, this.props.uid, this.props.gid);
-    }
+    await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
+    await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
 
     await this.installModules();
 

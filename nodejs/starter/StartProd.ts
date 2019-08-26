@@ -66,12 +66,7 @@ export default class StartProd {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    await this.os.mkdirP(this.props.varDataDir);
-
-    // TODO: set it to mkdirP
-    if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
-      await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
-    }
+    await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
 
     await this.installModules();
 
@@ -120,17 +115,14 @@ export default class StartProd {
 
     console.info(`===> Making symlink from "${this.getPathToProdSystemDir()}" to "${symLinkDst}"`);
 
-    await this.os.mkdirP(nodeModulesDir);
-
-    // TODO: use chown
+    await this.os.mkdirP(nodeModulesDir, { uid: this.props.uid, gid: this.props.gid });
 
     try {
       await this.os.symlink(
         this.getPathToProdSystemDir(),
-        symLinkDst
+        symLinkDst,
+        { uid: this.props.uid, gid: this.props.gid }
       );
-
-      // TODO: use chown
     }
     catch (e) {
       // do nothing - link exists

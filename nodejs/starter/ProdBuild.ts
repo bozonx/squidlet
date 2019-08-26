@@ -51,7 +51,10 @@ export default class ProdBuild {
   async buildPackageJson(dependencies: {[index: string]: any} = {}) {
     const packageJson: string = await this.generatePackageJson(dependencies);
 
-    await this.os.writeFile(path.join(this.props.workDir, 'package.json'), packageJson);
+    await this.os.writeFile(path.join(this.props.workDir, 'package.json'), packageJson, {
+      uid: this.props.uid,
+      gid: this.props.gid,
+    });
   }
 
   private async generatePackageJson(dependencies: {[index: string]: any}): Promise<string> {
