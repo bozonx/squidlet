@@ -106,8 +106,9 @@ export default class CommandUpdate {
       preHostConfig.platform,
       preHostConfig.machine,
       buildDir,
-      tmpDir
+      tmpDir,
       // TODO: use owner options
+      {}
     );
 
     console.info(`===> Building ios`);

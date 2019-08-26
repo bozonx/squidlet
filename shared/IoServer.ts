@@ -82,7 +82,8 @@ export default class IoServer {
 
 
   onShutdownRequest(cb: (reason: ShutdownReason) => void) {
-    this.events.addListener(SHUTDOWN_EVENT, cb);
+    // TODO: add
+    //this.events.addListener(SHUTDOWN_EVENT, cb);
   }
 
 

@@ -66,7 +66,7 @@ export default class StartIoServer {
       console.error
     );
 
-    await ioServer.init();
+    await ioServer.start();
   }
 
   private async makeIoSet(): Promise<IoSet> {
