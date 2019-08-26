@@ -17,6 +17,11 @@ export interface SpawnCmdResult {
   status: number;
 }
 
+interface SpawnCmdOptions {
+  uid?: number;
+  gid?: number;
+}
+
 
 export default class Os {
   getFileContent(pathTo: string): Promise<string> {
@@ -111,17 +116,19 @@ export default class Os {
    * It don't write to console by itself, it just returns a complete result.
    * @param {string} cmd - your command
    * @param {string} cwd - working dir. Optional.
+   * @param options
    * @return {Promise} with {stdout: String, stderr: String, status: Number}
    */
-  spawnCmd(cmd: string, cwd?: string): Promise<SpawnCmdResult> {
+  spawnCmd(cmd: string, cwd?: string, options?: SpawnCmdOptions): Promise<SpawnCmdResult> {
     const stdout: string[] = [];
     const stderr: string[] = [];
-    const options = {
+    const completedOptions = {
       cwd,
       shell: '/bin/bash',
       encoding: ENCODE,
+      ...options,
     };
-    const spawnedCmd: ChildProcess | null = childProcess.spawn(cmd, options);
+    const spawnedCmd: ChildProcess | null = childProcess.spawn(cmd, completedOptions);
 
     if (!spawnedCmd) {
       throw new Error(`Can't spawn a process: "${cmd}"`);

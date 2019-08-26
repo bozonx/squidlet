@@ -109,11 +109,11 @@ export default class ApiTopicsLogic {
 
   private async callDeviceAction(deviceId: string, actionName?: string, data?: string) {
     if (!actionName) {
-      throw new Error(`MqttApi.callDeviceAction: no actionName: "${deviceId}"`);
+      throw new Error(`MqttApiTopics.callDeviceAction: no actionName: "${deviceId}"`);
     }
 
     // income string-type api message - call device action
-    this.context.log.info(`ApiTopics income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${JSON.stringify(data)}`);
+    this.context.log.info(`MqttApiTopics income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${JSON.stringify(data)}`);
 
     const args: JsonTypes[] = this.parseArgs(data);
 
@@ -180,7 +180,7 @@ export default class ApiTopicsLogic {
   private emitOutcomeMsg(topicType: TopicType, topicBody: string, data: string) {
     const topic = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
 
-    this.context.log.info(`MqttApi outcome: ${topic} - ${JSON.stringify(data)}`);
+    this.context.log.info(`MqttApiTopics outcome: ${topic} - ${JSON.stringify(data)}`);
     this.outcomeEvents.emit(topic, data);
   }
 
