@@ -51,6 +51,7 @@ export default class StartIoServer {
     await this.os.mkdirP(this.props.varDataDir);
     await this.os.mkdirP(this.props.envSetDir);
 
+    // TODO: set it to mkdirP
     if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
       await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
       await this.os.chown(this.props.envSetDir, this.props.uid, this.props.gid);

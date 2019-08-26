@@ -17,7 +17,7 @@ export interface SpawnCmdResult {
   status: number;
 }
 
-interface SpawnCmdOptions {
+export interface OwnerOptions {
   uid?: number;
   gid?: number;
 }
@@ -34,28 +34,36 @@ export default class Os {
     return yaml.safeLoad(yamlContent);
   }
 
-  async writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
+  async writeFile(pathTo: string, data: string | Uint8Array, options?: OwnerOptions): Promise<void> {
     if (typeof data === 'string') {
-      return callPromised(fs.writeFile, pathTo, data, ENCODE);
+      await callPromised(fs.writeFile, pathTo, data, ENCODE);
     }
     else {
-      return callPromised(fs.writeFile, pathTo, data);
+      await callPromised(fs.writeFile, pathTo, data);
     }
+
+    if (!options) return;
+
+    await this.chown(pathTo, options.uid, options.gid);
   }
 
   async copyFile(src: string, dest: string): Promise<void> {
     return callPromised(fs.copyFile, src, dest);
+    // TODO: use chown
   }
 
-  mkdir(pathTo: string): Promise<void> {
+  mkdir(pathTo: string, options?: OwnerOptions): Promise<void> {
     return callPromised(fs.mkdir, pathTo);
+    // TODO: use chown
   }
 
-  async mkdirP(dirName: string): Promise<void> {
+  async mkdirP(dirName: string, options?: OwnerOptions): Promise<void> {
     shelljs.mkdir('-p', dirName);
+    // TODO: use chown
   }
 
-  chown(pathTo: string, uid: number, gid: number): Promise<void> {
+  chown(pathTo: string, uid?: number, gid?: number): Promise<void> {
+    // TODO: use extended logic
     return callPromised(fs.chown, pathTo, uid, gid);
   }
 
@@ -69,6 +77,7 @@ export default class Os {
 
   symlink(from: string, to: string): Promise<void> {
     return callPromised(fs.symlink, from, to);
+    // TODO: use chown
   }
 
   async exists(path: string): Promise<boolean> {
@@ -91,6 +100,7 @@ export default class Os {
 
     await this.mkdirP(path.dirname(fileName));
     await this.writeFile(fileName, content);
+    // TODO: use chown
   }
 
   async rimraf(pathTo: string) {
@@ -119,7 +129,7 @@ export default class Os {
    * @param options
    * @return {Promise} with {stdout: String, stderr: String, status: Number}
    */
-  spawnCmd(cmd: string, cwd?: string, options?: SpawnCmdOptions): Promise<SpawnCmdResult> {
+  spawnCmd(cmd: string, cwd?: string, options?: OwnerOptions): Promise<SpawnCmdResult> {
     const stdout: string[] = [];
     const stderr: string[] = [];
     const completedOptions = {

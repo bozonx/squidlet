@@ -68,6 +68,7 @@ export default class StartProd {
 
     await this.os.mkdirP(this.props.varDataDir);
 
+    // TODO: set it to mkdirP
     if (typeof this.props.uid !== 'undefined' && typeof this.props.gid !== 'undefined') {
       await this.os.chown(this.props.varDataDir, this.props.uid, this.props.gid);
     }

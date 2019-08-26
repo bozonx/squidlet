@@ -32,7 +32,13 @@ export default class EnvBuilder {
   private readonly os = new Os();
 
 
-  constructor(hostConfigOrConfigPath: string | PreHostConfig, absEnvBuildDir: string, tmpBuildDir: string) {
+  constructor(
+    hostConfigOrConfigPath: string | PreHostConfig,
+    absEnvBuildDir: string,
+    tmpBuildDir: string,
+    uid?: number,
+    gid?: number,
+  ) {
     this.buildDir = absEnvBuildDir;
     this.tmpBuildDir = tmpBuildDir;
     this.configManager = new ConfigManager(this.os, hostConfigOrConfigPath);

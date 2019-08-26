@@ -20,17 +20,22 @@ export default class Storage implements StorageIo {
     };
   }
 
-  appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
+  async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
+    const wasExist: boolean = await this.exists(pathTo);
+
     if (typeof data === 'string') {
-      return callPromised(fs.appendFile, pathTo, data, ENCODE);
+      await callPromised(fs.appendFile, pathTo, data, ENCODE);
     }
     else {
-      return callPromised(fs.appendFile, pathTo, data);
+      await callPromised(fs.appendFile, pathTo, data);
     }
+
+    if (!wasExist) await this.chown(pathTo);
   }
 
-  mkdir(pathTo: string): Promise<void> {
-    return callPromised(fs.mkdir, pathTo);
+  async mkdir(pathTo: string): Promise<void> {
+    await callPromised(fs.mkdir, pathTo);
+    await this.chown(pathTo);
   }
 
   readdir(pathTo: string): Promise<string[]> {
@@ -94,8 +99,9 @@ export default class Storage implements StorageIo {
 
   ////// additional
 
-  copyFile(src: string, dest: string): Promise<void> {
-    return callPromised(fs.copyFile, src, dest);
+  async copyFile(src: string, dest: string): Promise<void> {
+    await callPromised(fs.copyFile, src, dest);
+    await this.chown(dest);
   }
 
   async rename(oldPath: string, newPath: string): Promise<void> {
@@ -106,6 +112,8 @@ export default class Storage implements StorageIo {
 
   private async chown(pathTo: string) {
     if (!config) return;
+
+    // TODO: use extended logic
 
     return callPromised(fs.chown, pathTo, config.uid, config.gid);
   }
