@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os, {OwnerOptions} from '../Os';
+import Os from '../Os';
 import compileTs from '../buildToJs/compileTs';
 import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';
@@ -14,6 +14,7 @@ import {
   ORIGINAL_DIR,
 } from '../constants';
 import {Stats} from '../../system/interfaces/io/StorageIo';
+import {OwnerOptions} from '../interfaces/OnwerOptions';
 
 
 export default class BuildIo {

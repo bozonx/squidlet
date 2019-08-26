@@ -32,11 +32,13 @@ export default class ConfigsWriter {
     const fileNames = systemConfig.hostInitCfg.fileNames;
     const configDir = path.join(this.buildDir, systemConfig.hostSysCfg.envSetDirs.configs);
 
+    // TODO: use uid and gid
     // write host's config
     await this.os.writeJson(
       path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
       hostConfigSet.config
     );
+    // TODO: use uid and gid
     // write host's definitions
     await this.os.writeJson(path.join(configDir, fileNames.systemDrivers), hostConfigSet.systemDrivers);
     await this.os.writeJson(path.join(configDir, fileNames.regularDrivers), hostConfigSet.regularDrivers);

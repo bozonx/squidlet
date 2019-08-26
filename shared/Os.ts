@@ -9,17 +9,13 @@ import {ChildProcess} from 'child_process';
 import {Stats} from '../system/interfaces/io/StorageIo';
 import {callPromised} from '../system/lib/helpers';
 import {ENCODE} from '../system/constants';
+import {OwnerOptions} from './interfaces/OnwerOptions';
 
 
 export interface SpawnCmdResult {
   stdout: string[];
   stderr: string[];
   status: number;
-}
-
-export interface OwnerOptions {
-  uid?: number;
-  gid?: number;
 }
 
 

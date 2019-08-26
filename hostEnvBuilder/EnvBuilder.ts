@@ -13,6 +13,7 @@ import systemEntitiesPlugin from '../entities/systemEntitiesPlugin';
 import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
 import {checkIoExistance} from './helpers';
+import {OwnerOptions} from '../shared/interfaces/OnwerOptions';
 
 
 export default class EnvBuilder {
@@ -36,8 +37,7 @@ export default class EnvBuilder {
     hostConfigOrConfigPath: string | PreHostConfig,
     absEnvBuildDir: string,
     tmpBuildDir: string,
-    uid?: number,
-    gid?: number,
+    ownerOptions?: OwnerOptions
   ) {
     this.buildDir = absEnvBuildDir;
     this.tmpBuildDir = tmpBuildDir;
