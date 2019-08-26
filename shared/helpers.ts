@@ -89,18 +89,19 @@ export function makeListOfNamesFromPaths(paths: string[]): string[] {
   return paths.map((item) => getFileNameOfPath(item));
 }
 
-/**
- * Run command and don't print stdout if it returns code 0
- */
-export async function runCmd(os: Os, cmd: string, cwd: string) {
-  const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
-
-  if (result.status) {
-    console.error(`ERROR: npm ends with code ${result.status}`);
-    console.error(result.stdout);
-    console.error(result.stderr);
-  }
-}
+// /**
+//  * Run command and don't print stdout if it returns code 0
+//  */
+// export async function runCmd(os: Os, cmd: string, cwd: string) {
+//   // TODO: use uid, gid
+//   const result: SpawnCmdResult = await os.spawnCmd(cmd, cwd);
+//
+//   if (result.status) {
+//     console.error(`ERROR: npm ends with code ${result.status}`);
+//     console.error(result.stdout);
+//     console.error(result.stderr);
+//   }
+// }
 
 // TODO: !!! test bellow
 

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os from '../../shared/Os';
+import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
@@ -10,7 +10,6 @@ import Props from './Props';
 import ProdBuild from './ProdBuild';
 import SystemStarter from './SystemStarter';
 import {isEmpty} from '../../system/lib/lodashLike';
-import {runCmd} from '../../shared/helpers';
 
 
 export default class StartProd {
@@ -146,8 +145,18 @@ export default class StartProd {
   }
 
   private async runNpmInstall() {
-    // TODO: set uid, gid
-    await runCmd(this.os, `npm install`, this.props.workDir);
+    const cmd = `npm install`;
+
+    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, this.props.workDir, {
+      uid: this.props.uid,
+      gid: this.props.gid,
+    });
+
+    if (result.status) {
+      console.error(`ERROR: npm ends with code ${result.status}`);
+      console.error(result.stdout);
+      console.error(result.stderr);
+    }
   }
 
 }

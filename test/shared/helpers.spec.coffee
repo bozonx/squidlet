@@ -62,12 +62,12 @@ describe 'shared.helpers', ->
       ['file1', 'file2']
     )
 
-  it "runCmd", ->
-    os = {
-      spawnCmd: sinon.stub().returns(Promise.resolve({status: 0}))
-    }
-
-    helpers.runCmd(os, 'cmd', 'cwd')
-
-    sinon.assert.calledOnce(os.spawnCmd)
-    sinon.assert.calledWith(os.spawnCmd, 'cmd', 'cwd')
+#  it "runCmd", ->
+#    os = {
+#      spawnCmd: sinon.stub().returns(Promise.resolve({status: 0}))
+#    }
+#
+#    helpers.runCmd(os, 'cmd', 'cwd')
+#
+#    sinon.assert.calledOnce(os.spawnCmd)
+#    sinon.assert.calledWith(os.spawnCmd, 'cmd', 'cwd')

@@ -1,14 +1,14 @@
 import * as path from 'path';
 
 import {isEmpty} from '../../system/lib/lodashLike';
-import Os from '../../shared/Os';
+import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import {REPO_ROOT, runCmd, SYSTEM_DIR} from '../../shared/helpers';
+import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 import SystemStarter from './SystemStarter';
 import {IoSetClass} from '../interfaces/IoSetClass';
 
@@ -158,8 +158,16 @@ export default class StartDevelop {
   private async installNpmModules(modules: string[] = [], cwd: string) {
     const cmd = `npm install ${modules.join(' ')}`;
 
-    // TODO: use uid and gid
-    await runCmd(this.os, cmd, cwd);
+    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, cwd, {
+      uid: this.props.uid,
+      gid: this.props.gid,
+    });
+
+    if (result.status) {
+      console.error(`ERROR: npm ends with code ${result.status}`);
+      console.error(result.stdout);
+      console.error(result.stderr);
+    }
   }
 
 }
