@@ -168,7 +168,7 @@ export default class WsClientLogic {
     if (connectionId !== this.connectionId) return;
 
     // if the first message is cookie - set it
-    if (this.waitingCookies) {
+    if (this.waitingCookies && this.isCookieMessage(data)) {
       this.waitingCookies = false;
 
       this.setCookie(data);
@@ -279,7 +279,7 @@ export default class WsClientLogic {
   }
 
   private setCookie(data: string | Uint8Array) {
-    if (typeof data !== 'string' || data.indexOf(SETCOOKIE_LABEL) !== 0) return;
+    if (typeof data !== 'string' || !this.isCookieMessage(data)) return;
 
     const [left, cookiePart] = data.split(SETCOOKIE_LABEL);
 
@@ -291,6 +291,12 @@ export default class WsClientLogic {
     catch (err) {
       return this.logError(`WsClientLogic.setCookie: ${err}`);
     }
+  }
+
+  private isCookieMessage(message: any): boolean {
+    if (typeof message !== 'string') return false;
+
+    return message.indexOf(SETCOOKIE_LABEL) === 0;
   }
 
 }
