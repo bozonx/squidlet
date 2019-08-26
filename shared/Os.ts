@@ -42,29 +42,30 @@ export default class Os {
       await callPromised(fs.writeFile, pathTo, data);
     }
 
-    if (!options) return;
-
-    await this.chown(pathTo, options.uid, options.gid);
+    if (options) await this.chown(pathTo, options.uid, options.gid);
   }
 
-  async copyFile(src: string, dest: string): Promise<void> {
-    return callPromised(fs.copyFile, src, dest);
-    // TODO: use chown
+  async copyFile(src: string, dest: string, options?: OwnerOptions): Promise<void> {
+    await callPromised(fs.copyFile, src, dest);
+
+    if (options) await this.chown(dest, options.uid, options.gid);
   }
 
-  mkdir(pathTo: string, options?: OwnerOptions): Promise<void> {
-    return callPromised(fs.mkdir, pathTo);
-    // TODO: use chown
+  async mkdir(pathTo: string, options?: OwnerOptions): Promise<void> {
+    await callPromised(fs.mkdir, pathTo);
+
+    if (options) await this.chown(pathTo, options.uid, options.gid);
   }
 
   async mkdirP(dirName: string, options?: OwnerOptions): Promise<void> {
     shelljs.mkdir('-p', dirName);
-    // TODO: use chown
+
+    if (options) await this.chown(dirName, options.uid, options.gid);
   }
 
-  chown(pathTo: string, uid?: number, gid?: number): Promise<void> {
+  async chown(pathTo: string, uid?: number, gid?: number): Promise<void> {
     // TODO: use extended logic
-    return callPromised(fs.chown, pathTo, uid, gid);
+    await callPromised(fs.chown, pathTo, uid, gid);
   }
 
   readdir(pathTo: string): Promise<string[]> {
@@ -75,9 +76,10 @@ export default class Os {
     return callPromised(fs.readlink, pathTo);
   }
 
-  symlink(from: string, to: string): Promise<void> {
-    return callPromised(fs.symlink, from, to);
-    // TODO: use chown
+  async symlink(from: string, to: string, options?: OwnerOptions): Promise<void> {
+    await callPromised(fs.symlink, from, to);
+
+    if (options) await this.chown(to, options.uid, options.gid);
   }
 
   async exists(path: string): Promise<boolean> {
@@ -95,12 +97,13 @@ export default class Os {
     };
   }
 
-  async writeJson(fileName: string, contentJs: any) {
+  async writeJson(fileName: string, contentJs: any, options?: OwnerOptions) {
     const content = JSON.stringify(contentJs);
 
     await this.mkdirP(path.dirname(fileName));
     await this.writeFile(fileName, content);
-    // TODO: use chown
+
+    if (options) await this.chown(fileName, options.uid, options.gid);
   }
 
   async rimraf(pathTo: string) {
