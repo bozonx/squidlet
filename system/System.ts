@@ -10,7 +10,10 @@ import Context from './Context';
 import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
-import {AppLifeCycleEvents} from './constants';
+import {AppLifeCycleEvents, SHUTDOWN_EVENT} from './constants';
+
+
+type ShutdownReason = 'switchToIoServer' | 'switchToApp' | 'restart';
 
 
 export default class System {
@@ -90,6 +93,11 @@ export default class System {
 
     console.info(`===> System initialization has been finished`);
   }
+
+  onShutdownRequest(cb: (reason: ShutdownReason) => void) {
+    this.events.addListener(SHUTDOWN_EVENT, cb);
+  }
+
 
   /**
    * Init top layer - devices, regular drivers and regular services
