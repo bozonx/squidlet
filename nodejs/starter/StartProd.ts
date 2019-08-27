@@ -4,7 +4,7 @@ import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import systemConfig from '../../system/config/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
+import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
@@ -78,10 +78,9 @@ export default class StartProd {
     // build io
     await this.prodBuild.buildIos();
 
-    const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
     const ioSet: IoSet = new IoSetLocal();
 
-    await this.systemStarter.start(pathToSystem, ioSet);
+    await this.systemStarter.start(this.getPathToProdSystemDir(), ioSet);
   }
 
 

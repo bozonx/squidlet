@@ -1,18 +1,25 @@
 import IoSet from './interfaces/IoSet';
-import {SystemClassType} from './interfaces/SystemClassType';
 import System from './System';
 import IoServer from './IoServer';
-import systemConfig from './config/systemConfig';
 import {ShutdownReason} from './interfaces/ShutdownReason';
+// import systemConfig from './config/systemConfig';
+// import {SystemClassType} from './interfaces/SystemClassType';
 
 
-const defaultPathToSystem = `${systemConfig.rootDirs.envSet}/${systemConfig.envSetDirs.system}/System`;
+//const defaultPathToSystem = `${systemConfig.rootDirs.envSet}/${systemConfig.envSetDirs.system}/System`;
+
+export type AppSwitcherClass = new (
+  ioSet: IoSet,
+  restartRequest: () => void,
+  //pathToSystem?: string,
+  systemConfigExtend?: {[index: string]: any}
+) => AppSwitcher;
 
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
   private readonly restartRequest: () => void;
-  private readonly pathToSystem: string;
+  //private readonly pathToSystem: string;
   private readonly systemConfigExtend?: {[index: string]: any};
   private system?: System;
   private ioServer?: IoServer;
@@ -21,12 +28,12 @@ export default class AppSwitcher {
   constructor(
     ioSet: IoSet,
     restartRequest: () => void,
-    pathToSystem = defaultPathToSystem,
+    //pathToSystem = defaultPathToSystem,
     systemConfigExtend?: {[index: string]: any}
   ) {
     this.ioSet = ioSet;
     this.restartRequest = restartRequest;
-    this.pathToSystem = pathToSystem;
+    //this.pathToSystem = pathToSystem;
     this.systemConfigExtend = systemConfigExtend;
   }
 
@@ -35,11 +42,21 @@ export default class AppSwitcher {
     await this.startSystem();
   }
 
+  async destroy() {
+    if (this.system) {
+      await this.system.destroy();
+    }
+    else if (this.ioServer) {
+      await this.ioServer.destroy();
+    }
+  }
+
 
   private startSystem = async () => {
-    const SystemClass: SystemClassType = require(this.pathToSystem).default;
+    //const SystemClass: SystemClassType = require(this.pathToSystem).default;
 
-    this.system = new SystemClass(this.ioSet, this.handleShutdownRequest, this.systemConfigExtend);
+    //this.system = new SystemClass(this.ioSet, this.handleShutdownRequest, this.systemConfigExtend);
+    this.system = new System(this.ioSet, this.handleShutdownRequest, this.systemConfigExtend);
 
     await this.system.start();
   }

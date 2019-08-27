@@ -1,11 +1,11 @@
 import * as path from 'path';
 
-import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
+import {APP_SWITCHER_FILE_NAME, HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
 import Os from '../../shared/Os';
-import {SystemClassType} from '../../system/interfaces/SystemClassType';
 import {listenScriptEnd} from '../../shared/helpers';
+import AppSwitcher, {AppSwitcherClass} from '../../system/AppSwitcher';
 
 
 export default class SystemStarter {
@@ -19,23 +19,32 @@ export default class SystemStarter {
   }
 
 
-  async start(pathToSystem: string, ioSet: IoSet) {
-    const SystemClass: SystemClassType = this.os.require(pathToSystem).default;
+  async start(pathToSystemDir: string, ioSet: IoSet) {
+    const appSwitcherFile = path.join(pathToSystemDir, APP_SWITCHER_FILE_NAME);
+    //const systemFile = path.join(pathToSystemDir, SYSTEM_FILE_NAME);
+    const appSwitcherClass: AppSwitcherClass = this.os.require(appSwitcherFile).default;
     const systemConfigExtend = this.makeSystemConfigExtend();
 
-    console.info(`===> Initializing system`);
+    console.info(`===> Initializing app`);
 
-    // TODO: use appSwitcher
+    const appSwitcher: AppSwitcher = new appSwitcherClass(
+      ioSet,
+      this.handleRestartRequest,
+      //systemFile,
+      systemConfigExtend
+    );
 
-    const system = new SystemClass(ioSet, systemConfigExtend);
+    this.listenDestroySignals(appSwitcher.destroy);
 
-    this.listenDestroySignals(system.destroy);
+    console.info(`===> Starting app`);
 
-    console.info(`===> Starting system`);
-
-    return system.start();
+    return appSwitcher.start();
   }
 
+
+  private handleRestartRequest = () => {
+
+  }
 
   private makeSystemConfigExtend(): {[index: string]: any} {
     return {

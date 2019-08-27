@@ -6,7 +6,7 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
+import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 import SystemStarter from './SystemStarter';
@@ -72,10 +72,9 @@ export default class StartDevelop {
 
     await this.installModules();
 
-    const pathToSystem = this.getPathToProdSystemFile();
     const ioSet: IoSet = await this.makeIoSet();
 
-    await this.systemStarter.start(pathToSystem, ioSet);
+    await this.systemStarter.start(SYSTEM_DIR, ioSet);
   }
 
 
@@ -143,9 +142,9 @@ export default class StartDevelop {
     return 'IoSetDevelopSource';
   }
 
-  private getPathToProdSystemFile(): string {
-    return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
-  }
+  // private getPathToProdSystemFile(): string {
+  //   return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
+  // }
 
   /**
    * Install npm modules into node_modules of repository and don't save them to package.json
