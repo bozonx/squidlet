@@ -10,7 +10,7 @@ import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
-export default class StartIoServer {
+export default class StartIoServerStandalone {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;

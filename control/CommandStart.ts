@@ -1,6 +1,6 @@
 import StartDevelop from '../nodejs/starter/StartDevelop';
 import StartProd from '../nodejs/starter/StartProd';
-import StartIoServer from '../nodejs/starter/StartIoServer';
+import StartIoServerStandalone from '../nodejs/starter/StartIoServerStandalone';
 
 
 interface CommandStartArgs {
@@ -65,7 +65,7 @@ export default class CommandStart {
    * Start development io server on nodejs
    */
   async startIoServer() {
-    const starter = new StartIoServer(
+    const starter = new StartIoServerStandalone(
       this.configPath,
       this.args.force,
       this.args.machine as any,
