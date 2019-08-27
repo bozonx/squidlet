@@ -2,18 +2,6 @@ lodashLike = require('../../../system/lib/lodashLike')
 
 
 describe.only 'system.lib.lodashLike', ->
-  it 'isEmpty', ->
-    assert.equal(lodashLike.isEmpty(undefined), true)
-    assert.equal(lodashLike.isEmpty(null), true)
-    assert.equal(lodashLike.isEmpty(''), true)
-    assert.equal(lodashLike.isEmpty([]), true)
-    assert.equal(lodashLike.isEmpty({}), true)
-    assert.equal(lodashLike.isEmpty(0), false)
-    assert.equal(lodashLike.isEmpty('a'), false)
-    assert.equal(lodashLike.isEmpty([1]), false)
-    assert.equal(lodashLike.isEmpty({a:1}), false)
-    assert.equal(lodashLike.isEmpty(false), false)
-
   it 'values', ->
     assert.deepEqual(lodashLike.values({a: 0, b: 1}), [0, 1])
 

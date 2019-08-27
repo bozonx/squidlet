@@ -1,5 +1,5 @@
 import SchemaElement from './interfaces/SchemaElement';
-import {isEmpty} from './lib/lodashLike';
+import {isEmptyObject} from './lib/objects';
 import {validateParam} from './lib/validate';
 import ConsistentState, {Getter, Setter, Initialize} from './lib/ConsistentState';
 import {collectPropsDefaults} from './lib/helpers';
@@ -77,7 +77,7 @@ export default class DeviceState extends ConsistentState {
    * Validate data which will be saved and save it.
    */
   async write(partialData: Dictionary): Promise<void> {
-    if (isEmpty(partialData)) return;
+    if (isEmptyObject(partialData)) return;
 
     this.validateDict(
       partialData,

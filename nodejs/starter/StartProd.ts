@@ -9,7 +9,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
 import SystemStarter from './SystemStarter';
-import {isEmpty} from '../../system/lib/lodashLike';
+import {isEmptyObject} from '../../system/lib/objects';
 import IoSetLocal from '../../system/IoSetLocal';
 import IoSet from '../../system/interfaces/IoSet';
 
@@ -103,7 +103,7 @@ export default class StartProd {
 
     console.info(`===> Installing npm modules`);
 
-    if (!isEmpty(this.envBuilder.configManager.dependencies)) {
+    if (!isEmptyObject(this.envBuilder.configManager.dependencies)) {
       await this.runNpmInstall();
     }
 

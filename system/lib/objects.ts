@@ -2,6 +2,17 @@ import {isEqual, values} from './lodashLike';
 import {compactArray} from './arrays';
 
 
+/**
+ * Check is object is empty.
+ * For other types it will return true.
+ */
+export function isEmptyObject(toCheck?: {[index: string]: any}): boolean {
+  if (Array.isArray(toCheck) || toCheck === null) return true;
+  else if (typeof toCheck === 'object') return !Object.keys(toCheck).length;
+
+  return true;
+}
+
 export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
   if (!obj) return {};
 
@@ -168,6 +179,13 @@ export function mergeDeepObjects(
 }
 
 
+// export function isEmpty(toCheck: any): boolean {
+//   if (typeof toCheck == 'undefined' || toCheck === null || toCheck === '') return true;
+//   else if (Array.isArray(toCheck) && !toCheck.length) return true;
+//   else if (typeof toCheck === 'object' && !Object.keys(toCheck).length) return true;
+//
+//   return false;
+// }
 
 // export function findIndexj(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
 //   if (typeof collection === 'undefined') {

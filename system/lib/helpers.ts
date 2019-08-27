@@ -1,4 +1,3 @@
-import {isEmpty} from './lodashLike';
 import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {splitFirstElement} from './strings';
@@ -65,7 +64,7 @@ export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
  * Join topic paths using special path separator
  */
 export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string | undefined>): string {
-  if (isEmpty(subPaths)) return basePath;
+  if (!subPaths.length) return basePath;
 
   return [ basePath, ...compactUndefined(subPaths) ].join(topicSeparator);
 }

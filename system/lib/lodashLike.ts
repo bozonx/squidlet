@@ -5,13 +5,6 @@
  */
 import {isPlainObject} from './objects';
 
-export function isEmpty(toCheck: any): boolean {
-  if (typeof toCheck == 'undefined' || toCheck === null || toCheck === '') return true;
-  else if (toCheck instanceof Array && !toCheck.length) return true;
-  else if (typeof toCheck === 'object' && !Object.keys(toCheck).length) return true;
-
-  return false;
-}
 
 // TODO: зачем это нужно есть же в ts???
 export function values(obj: {[index: string]: any}): any[] {

@@ -2,6 +2,18 @@ objects = require('../../../system/lib/objects')
 
 
 describe 'system.lib.objects', ->
+  it 'isEmptyObjectObject', ->
+    assert.isTrue(objects.isEmptyObject(undefined))
+    assert.isTrue(objects.isEmptyObject(null))
+    assert.isTrue(objects.isEmptyObject(''))
+    assert.isTrue(objects.isEmptyObject([]))
+    assert.isTrue(objects.isEmptyObject({}))
+    assert.isTrue(objects.isEmptyObject(0))
+    assert.isTrue(objects.isEmptyObject('a'))
+    assert.isTrue(objects.isEmptyObject([1]))
+    assert.isTrue(objects.isEmptyObject(false))
+    assert.isFalse(objects.isEmptyObject({a:1}))
+
   it 'omitObj', ->
     assert.deepEqual(objects.omitObj({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
 
@@ -76,3 +88,15 @@ describe 'system.lib.objects', ->
       objects.mergeDeepObjects({top: undefined}, {top: 'top', bottom: 'bottom'}),
       {top: undefined, bottom: 'bottom'}
     )
+
+#  it 'isEmptyObject', ->
+#    assert.equal(objects.isEmptyObject(undefined), true)
+#    assert.equal(objects.isEmptyObject(null), true)
+#    assert.equal(objects.isEmptyObject(''), true)
+#    assert.equal(objects.isEmptyObject([]), true)
+#    assert.equal(objects.isEmptyObject({}), true)
+#    assert.equal(objects.isEmptyObject(0), false)
+#    assert.equal(objects.isEmptyObject('a'), false)
+#    assert.equal(objects.isEmptyObject([1]), false)
+#    assert.equal(objects.isEmptyObject({a:1}), false)
+#    assert.equal(objects.isEmptyObject(false), false)

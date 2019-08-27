@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import {isEmpty} from '../../system/lib/lodashLike';
+import {isEmptyObject} from '../../system/lib/objects';
 import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
@@ -89,7 +89,7 @@ export default class StartDevelop {
 
     const dependencies = this.envBuilder.configManager.dependencies;
 
-    if (!dependencies || isEmpty(dependencies)) return;
+    if (!dependencies || isEmptyObject(dependencies)) return;
 
     const toInstallModules: string[] = [];
 
