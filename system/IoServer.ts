@@ -20,6 +20,7 @@ import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
 export const IO_API = 'ioApi';
 export const IO_NAMES_METHOD = 'getIoNames';
 export const METHOD_DELIMITER = '.';
+// TODO: use hostConfig default's
 export const defaultProps: WebSocketServerProps = {
   host: 'localhost',
   port: 8089,
@@ -49,6 +50,10 @@ export default class IoServer {
     shutdownRequestCb: ShutdownHandler,
     //ioServerProps: HostConfig['ioServer'],
     //rcResponseTimoutSec: number,
+    // this.props.hostConfig.ioServer,
+    // (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
+    //   ? this.props.hostConfig.config.rcResponseTimoutSec
+    //   : hostDefaultConfig.config.rcResponseTimoutSec,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {

@@ -5,7 +5,6 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../system/IoServer';
 import IoSetBase from './IoSetBase';
 import IoSet from '../../system/interfaces/IoSet';
-import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 
@@ -59,10 +58,6 @@ export default class StartIoServerStandalone {
     const ioServer = new IoServer(
       ioSet,
       this.shutdownRequestCb,
-      // this.props.hostConfig.ioServer,
-      // (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
-      //   ? this.props.hostConfig.config.rcResponseTimoutSec
-      //   : hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       console.error
     );
@@ -79,10 +74,22 @@ export default class StartIoServerStandalone {
     const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
 
     await ioSet.init();
-    await this.configureStorage(ioSet);
+
     await this.configureIoSet(ioSet);
 
     return ioSet;
+  }
+
+  private async configureIoSet(ioSet: IoSet) {
+    await this.configureStorage(ioSet);
+
+    if (!this.props.hostConfig.ios) return;
+
+    for (let ioName of Object.keys(this.props.hostConfig.ios)) {
+      const ioItem: IoItem = ioSet.getIo(ioName);
+
+      ioItem.configure && await ioItem.configure(this.props.hostConfig.ios[ioName]);
+    }
   }
 
   private async configureStorage(ioSet: IoSet) {
@@ -94,16 +101,6 @@ export default class StartIoServerStandalone {
       uid: this.props.uid,
       gid: this.props.gid,
     });
-  }
-
-  private async configureIoSet(ioSet: IoSet) {
-    if (!this.props.hostConfig.ios) return;
-
-    for (let ioName of Object.keys(this.props.hostConfig.ios)) {
-      const ioItem: IoItem = ioSet.getIo(ioName);
-
-      ioItem.configure && await ioItem.configure(this.props.hostConfig.ios[ioName]);
-    }
   }
 
 }
