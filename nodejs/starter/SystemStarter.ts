@@ -6,6 +6,8 @@ import Props from './Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
 import AppSwitcher, {AppSwitcherClass} from '../../system/AppSwitcher';
+import {mergeDeepObjects} from '../../system/lib/objects';
+import systemConfig from '../../system/config/systemConfig';
 
 
 export default class SystemStarter {
@@ -22,14 +24,14 @@ export default class SystemStarter {
   async start(pathToSystemDir: string, ioSet: IoSet) {
     const appSwitcherFile = path.join(pathToSystemDir, APP_SWITCHER_FILE_NAME);
     const appSwitcherClass: AppSwitcherClass = this.os.require(appSwitcherFile).default;
-    const systemConfigExtend = this.makeSystemConfigExtend();
+    const systemCfg = this.makeSystemConfig();
 
     console.info(`===> Initializing app`);
 
     const appSwitcher: AppSwitcher = new appSwitcherClass(
       ioSet,
       this.handleRestartRequest,
-      systemConfigExtend
+      systemCfg
     );
 
     this.listenDestroySignals(appSwitcher.destroy);
@@ -49,14 +51,14 @@ export default class SystemStarter {
     process.exit(0);
   }
 
-  private makeSystemConfigExtend(): {[index: string]: any} {
-    return {
+  private makeSystemConfig(): typeof systemConfig{
+    return mergeDeepObjects({
       rootDirs: {
         envSet: this.props.envSetDir,
         varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
         tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
       },
-    };
+    }, systemConfig) as any;
   }
 
   private listenDestroySignals(destroy: () => Promise<void>) {

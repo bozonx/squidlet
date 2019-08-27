@@ -2,19 +2,20 @@ import IoSet from './interfaces/IoSet';
 import System from './System';
 import IoServer from './IoServer';
 import {ShutdownReason} from './interfaces/ShutdownReason';
+import systemConfig from './config/systemConfig';
 
 
 export type AppSwitcherClass = new (
   ioSet: IoSet,
   restartRequest: () => void,
-  systemConfigExtend?: {[index: string]: any}
+  systemCfg: typeof systemConfig
 ) => AppSwitcher;
 
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
   private readonly restartRequest: () => void;
-  private readonly systemConfigExtend?: {[index: string]: any};
+  private readonly systemCfg: typeof systemConfig;
   private system?: System;
   private ioServer?: IoServer;
 
@@ -22,11 +23,11 @@ export default class AppSwitcher {
   constructor(
     ioSet: IoSet,
     restartRequest: () => void,
-    systemConfigExtend?: {[index: string]: any}
+    systemCfg: typeof systemConfig
   ) {
     this.ioSet = ioSet;
     this.restartRequest = restartRequest;
-    this.systemConfigExtend = systemConfigExtend;
+    this.systemCfg = systemCfg;
   }
 
 
@@ -56,7 +57,7 @@ export default class AppSwitcher {
 
 
   private startSystem = async () => {
-    this.system = new System(this.ioSet, this.handleShutdownRequest, this.systemConfigExtend);
+    this.system = new System(this.systemCfg, this.ioSet, this.handleShutdownRequest);
 
     await this.system.start();
   }
