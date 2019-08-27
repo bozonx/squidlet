@@ -3,7 +3,8 @@ import IndexedEvents from '../lib/IndexedEvents';
 import Polling from '../lib/Polling';
 import Sender from '../lib/Sender';
 //import {ImpulseInputProps} from '../drivers/Binary/ImpulseInput.driver';
-import {find, isEqual} from '../lib/lodashLike';
+import {isEqual} from '../lib/lodashLike';
+import {findObj} from '../lib/objects';
 import {hexStringToHexNum} from '../lib/binaryHelpers';
 
 
@@ -187,7 +188,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * If dataAddressStr is undefined then item with dataAddress = undefined will be found.
    */
   protected getPollProps(dataAddressStr: string | number | undefined): PollProps | undefined {
-    return find(this.props.poll, (item: PollProps) => {
+    return findObj(this.props.poll, (item: PollProps) => {
       return item.dataAddress === dataAddressStr;
     });
   }

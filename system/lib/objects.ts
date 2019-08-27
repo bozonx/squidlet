@@ -16,8 +16,7 @@ export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclud
   return result;
 }
 
-// TODO: remake to pickObj
-export function pick(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
+export function pickObj(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
   if (!obj) return {};
 
   const result: {[index: string]: any} = {};
@@ -29,8 +28,8 @@ export function pick(obj: {[index: string]: any} | undefined, ...propToPick: str
   return result;
 }
 
-// TODO: remake to findObj
-export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
+// TODO: remake to support only objects
+export function findObj(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
   if (typeof collection === 'undefined') {
     return;
   }
@@ -56,8 +55,7 @@ export function find(collection: any[] | {[index: string]: any}, cb: (item: any,
 }
 
 // TODO: test
-// TODO: remake to findIndexObj
-export function findIndex(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
+export function findIndexObj(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
   if (typeof collection === 'undefined') {
     return -1;
   }
@@ -76,7 +74,7 @@ export function findIndex(collection: any[] | {[index: string]: any}, cb: (item:
     }
   }
   else {
-    throw new Error(`findIndex: unsupported type of collection "${JSON.stringify(collection)}"`);
+    throw new Error(`findIndexObj: unsupported type of collection "${JSON.stringify(collection)}"`);
   }
 
   return -1;

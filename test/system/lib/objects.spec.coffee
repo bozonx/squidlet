@@ -5,20 +5,20 @@ describe.only 'system.lib.objects', ->
   it 'omitObj', ->
     assert.deepEqual(objects.omitObj({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
 
-  it 'pick', ->
-    assert.deepEqual(objects.pick({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
+  it 'pickObj', ->
+    assert.deepEqual(objects.pickObj({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
 
-  it 'find', ->
+  it 'findObj', ->
 # object
     objCb = (item, index) => item == 1
-    assert.equal(objects.find({a: 0, b: 1}, objCb), 1)
+    assert.equal(objects.findObj({a: 0, b: 1}, objCb), 1)
     # object - not found
-    assert.isUndefined(objects.find({a: 0, b: 2}, objCb))
+    assert.isUndefined(objects.findObj({a: 0, b: 2}, objCb))
     # array
     arrCb = (item, index) => item == 'b'
-    assert.equal(objects.find(['a', 'b'], arrCb), 'b')
+    assert.equal(objects.findObj(['a', 'b'], arrCb), 'b')
     # array - not found
-    assert.isUndefined(objects.find(['a', 'c'], arrCb))
+    assert.isUndefined(objects.findObj(['a', 'c'], arrCb))
 
   it 'isPlainObject', ->
     cl = () ->

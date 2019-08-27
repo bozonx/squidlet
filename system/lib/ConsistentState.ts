@@ -3,7 +3,7 @@ import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue from './RequestQueue';
 import {cloneDeep} from './lodashLike';
-import {pick} from './objects';
+import {pickObj} from './objects';
 import {arraysDifference} from './arrays';
 
 
@@ -232,7 +232,7 @@ export default class ConsistentState {
     }
 
     // generate the last combined data to save
-    const dataToSave: Dictionary = pick(this.getState(), ...this.paramsListToSave);
+    const dataToSave: Dictionary = pickObj(this.getState(), ...this.paramsListToSave);
 
     try {
       await this.setter(dataToSave);
@@ -262,7 +262,7 @@ export default class ConsistentState {
       ...dataToSave,
     };
     // remove saved keys from the list
-    this.paramsListToSave = difference(this.paramsListToSave || [], Object.keys(dataToSave));
+    this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));
   }
 
   /**
@@ -308,7 +308,7 @@ export default class ConsistentState {
 
     return {
       ...this.getState(),
-      ...pick(mostActualState, ...keysToUpdate),
+      ...pickObj(mostActualState, ...keysToUpdate),
     };
   }
 

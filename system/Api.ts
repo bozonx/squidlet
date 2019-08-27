@@ -1,5 +1,5 @@
 import {Dictionary, JsonTypes} from './interfaces/Types';
-import {pick} from './lib/lodashLike';
+import {pickObj} from './lib/objects';
 import Context from './Context';
 import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
@@ -34,7 +34,7 @@ export default class Api {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
-      const changedValues: Dictionary = pick(
+      const changedValues: Dictionary = pickObj(
         this.context.state.getState(category, stateName),
         ...changedParams
       );
@@ -49,7 +49,7 @@ export default class Api {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesConfig || stateName !== deviceId) return;
 
-      const changedValues: Dictionary = pick(
+      const changedValues: Dictionary = pickObj(
         this.context.state.getState(category, stateName),
         ...changedParams
       );
@@ -64,7 +64,7 @@ export default class Api {
     const handlerWrapper = (currentCategory: number, currentStateName: string, changedParams: string[]) => {
       if (category !== currentCategory || stateName !== currentStateName) return;
 
-      const changedValues: Dictionary = pick(
+      const changedValues: Dictionary = pickObj(
         this.context.state.getState(category, stateName),
         ...changedParams
       );

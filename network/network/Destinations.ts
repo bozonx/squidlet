@@ -3,7 +3,7 @@ import DriverEnv from '../../system/baseDrivers/DriverEnv';
 import Connection from './interfaces/Connection';
 import MyAddress from '../interfaces/MyAddress';
 import Destination from './interfaces/Destination';
-import {find} from '../../system/lib/lodashLike';
+import {findObj} from '../../system/lib/objects';
 import {firstLetterToUpperCase} from '../../system/lib/strings';
 
 
@@ -71,7 +71,7 @@ export default class Destinations {
     for (let name in this.neighbors) {
       const dest = this.neighbors[name];
       const connectionId: string = this.generateConnectionId(dest);
-      const found = find(this.myAddresses, (item: MyAddress) => {
+      const found = findObj(this.myAddresses, (item: MyAddress) => {
         return item.type === dest.type && item.bus === dest.bus;
       });
 
