@@ -21,7 +21,6 @@ export default class SystemStarter {
 
   async start(pathToSystemDir: string, ioSet: IoSet) {
     const appSwitcherFile = path.join(pathToSystemDir, APP_SWITCHER_FILE_NAME);
-    //const systemFile = path.join(pathToSystemDir, SYSTEM_FILE_NAME);
     const appSwitcherClass: AppSwitcherClass = this.os.require(appSwitcherFile).default;
     const systemConfigExtend = this.makeSystemConfigExtend();
 
