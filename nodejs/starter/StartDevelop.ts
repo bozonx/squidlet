@@ -17,7 +17,7 @@ export default class StartDevelop {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
-  private readonly argIoset?: string;
+  private readonly argIoSet?: string;
   private readonly systemStarter: SystemStarter;
   private _envBuilder?: EnvBuilder;
   private get envBuilder(): EnvBuilder {
@@ -33,10 +33,10 @@ export default class StartDevelop {
     argWorkDir?: string,
     argUser?: string,
     argGroup?: string,
-    argIoset?: string,
+    argIoSet?: string,
   ) {
     this.groupConfig = new GroupConfigParser(this.os, configPath);
-    this.argIoset = argIoset;
+    this.argIoSet = argIoSet;
     this.props = new Props(
       this.os,
       this.groupConfig,
@@ -122,7 +122,7 @@ export default class StartDevelop {
       this.props.envSetDir,
       this.props.platform,
       this.props.machine,
-      this.argIoset
+      this.argIoSet
     );
 
     ioSet.prepare && await ioSet.prepare();
@@ -135,7 +135,7 @@ export default class StartDevelop {
    * Otherwise source io set which gets configs and manifests from memory and uses source modules.
    */
   private resolveIoSetType(): string {
-    if (this.argIoset) {
+    if (this.argIoSet) {
       return 'IoSetDevelopRemote';
     }
 

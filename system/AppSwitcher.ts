@@ -34,13 +34,24 @@ export default class AppSwitcher {
     await this.startSystem();
   }
 
-  async destroy() {
+  destroy = async () => {
     if (this.system) {
       await this.system.destroy();
     }
     else if (this.ioServer) {
       await this.ioServer.destroy();
     }
+
+    // TODO: make destroy of ioSet
+    // const ioNames: string[] = this.ioSet.getNames();
+    //
+    // for (let ioName of ioNames) {
+    //   const ioItem: IoItem = this.ioSet.getIo(ioName);
+    //
+    //   if (ioItem.destroy) await ioItem.destroy();
+    // }
+    //
+    // await this.ioSet.destroy();
   }
 
 

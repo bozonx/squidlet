@@ -64,13 +64,12 @@ export default class System {
   }
 
   destroy = async () => {
-    this.context.log.info('destroying...');
+    this.context.log.info('... destroying System');
     this.events.emit(AppLifeCycleEvents.beforeDestroy);
     await this.apiManager.destroy();
     await this.devicesManager.destroy();
     await this.servicesManager.destroy();
     await this.driversManager.destroy();
-    await this.ioManager.destroy();
     this.context.destroy();
     this.events.destroy();
     console.info('System has been successfully destroyed');

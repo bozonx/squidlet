@@ -139,8 +139,16 @@ export function listenScriptEnd(cb: () => Promise<void>) {
       });
   };
 
-  process.on('SIGTERM', cbWrapper);
-  process.on('SIGINT', cbWrapper);
+  process.on('SIGTERM', () => {
+    console.info('SIGTERM signal has been caught');
+
+    return cbWrapper();
+  });
+  process.on('SIGINT', () => {
+    console.info('SIGINT signal has been caught');
+
+    return cbWrapper();
+  });
 }
 
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {

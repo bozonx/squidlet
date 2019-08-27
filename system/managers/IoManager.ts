@@ -19,18 +19,6 @@ export default class IoManager {
     await this.configureAllIo();
   }
 
-  async destroy() {
-    const ioNames: string[] = this.ioSet.getNames();
-
-    for (let ioName of ioNames) {
-      const ioItem: IoItem = this.ioSet.getIo(ioName);
-
-      if (ioItem.destroy) await ioItem.destroy();
-    }
-
-    await this.ioSet.destroy();
-  }
-
 
   getIo<T extends IoItem>(ioName: string): T {
     return this.ioSet.getIo<T>(ioName);

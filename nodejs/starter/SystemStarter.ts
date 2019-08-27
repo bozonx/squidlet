@@ -29,7 +29,6 @@ export default class SystemStarter {
     const appSwitcher: AppSwitcher = new appSwitcherClass(
       ioSet,
       this.handleRestartRequest,
-      //systemFile,
       systemConfigExtend
     );
 
@@ -41,8 +40,13 @@ export default class SystemStarter {
   }
 
 
+  /**
+   * It just exits on restart request because this request is make on update
+   * and it needs to reload all the imports.
+   * You should restart the script in the external code e.g in a systemd service.
+   */
   private handleRestartRequest = () => {
-
+    process.exit(0);
   }
 
   private makeSystemConfigExtend(): {[index: string]: any} {
@@ -52,8 +56,6 @@ export default class SystemStarter {
         varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
         tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
       },
-
-      // TODO: передать user group
     };
   }
 
