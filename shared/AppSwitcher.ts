@@ -10,14 +10,22 @@ const defaultPathToSystem = `${systemConfig.rootDirs.envSet}/${systemConfig.envS
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
+  private readonly onRestartRequest: () => void;
   private readonly pathToSystem: string;
   private readonly systemConfigExtend?: {[index: string]: any};
   private system?: System;
   private ioServer?: IoServer;
 
 
-  constructor(ioSet: IoSet, pathToSystem = defaultPathToSystem, systemConfigExtend?: {[index: string]: any}) {
+  constructor(
+    ioSet: IoSet,
+    // TODO: нужно завершить скрипт или перезагрузкиться на мк. Это нужно для обновления
+    onRestartRequest: () => void,
+    pathToSystem = defaultPathToSystem,
+    systemConfigExtend?: {[index: string]: any}
+  ) {
     this.ioSet = ioSet;
+    this.onRestartRequest = onRestartRequest;
     this.pathToSystem = pathToSystem;
     this.systemConfigExtend = systemConfigExtend;
   }
@@ -78,19 +86,7 @@ export default class AppSwitcher {
   }
 
   private async restart() {
-    if (this.system) {
-      await this.system.destroy();
-      delete this.system;
-      await this.startSystem();
-    }
-    else if (this.ioServer) {
-      await this.ioServer.destroy();
-      delete this.ioServer;
-      await this.startIoServer();
-    }
-    else {
-      throw new Error(`Can't restart: IoServer and System aren't set`);
-    }
+    this.onRestartRequest();
   }
 
 }
