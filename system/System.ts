@@ -11,7 +11,10 @@ import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
-import {ShutdownHandler} from './interfaces/SystemClassType';
+import {ShutdownReason} from './interfaces/ShutdownReason';
+
+
+export type ShutdownHandler = (reason: ShutdownReason) => void;
 
 
 export default class System {

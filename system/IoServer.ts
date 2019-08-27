@@ -10,11 +10,11 @@ import initializationConfig from './config/initializationConfig';
 import {pathJoin} from './lib/nodeLike';
 import systemConfig from './config/systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
-import {ShutdownHandler} from './interfaces/SystemClassType';
 // TODO: use ioSet's
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 // TODO: use ioSet's
 import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
+import {ShutdownHandler} from './System';
 
 
 export const IO_API = 'ioApi';
