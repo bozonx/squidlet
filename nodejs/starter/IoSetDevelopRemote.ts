@@ -37,7 +37,7 @@ export default class IoSetDevelopRemote implements IoSet {
     await this.storageWrapper.init();
   }
 
-  async init(context: Context) {
+  async init() {
     await this.remoteIoCollection.init();
 
     // check io dependencies

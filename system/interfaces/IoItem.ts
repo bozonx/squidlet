@@ -7,7 +7,6 @@ export interface IoItemDefinition {
 
 
 export default interface IoItem {
-  init?: () => Promise<void>;
   configure?: (params: any) => Promise<void>;
   destroy?: () => Promise<void>;
   //[index: string]: undefined | ((...args: any[]) => Promise<any>);
