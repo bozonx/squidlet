@@ -44,10 +44,10 @@ export default class System {
 
   constructor(
     ioSet: IoSet,
-    shutdownRequest: ShutdownHandler,
+    shutdownRequestCb: ShutdownHandler,
     systemConfigExtend?: {[index: string]: any}
   ) {
-    this.shutdownRequest = shutdownRequest;
+    this.shutdownRequest = shutdownRequestCb;
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
     this.context = new Context(this, systemConfigExtend);

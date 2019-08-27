@@ -1,8 +1,9 @@
 import IoSet from './interfaces/IoSet';
 import {SystemClassType} from './interfaces/SystemClassType';
-import System, {ShutdownReason} from './System';
+import System from './System';
 import IoServer from './IoServer';
 import systemConfig from './config/systemConfig';
+import {ShutdownReason} from './interfaces/ShutdownReason';
 
 
 const defaultPathToSystem = `${systemConfig.rootDirs.envSet}/${systemConfig.envSetDirs.system}/System`;
@@ -10,7 +11,7 @@ const defaultPathToSystem = `${systemConfig.rootDirs.envSet}/${systemConfig.envS
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
-  private readonly onRestartRequest: () => void;
+  private readonly restartRequest: () => void;
   private readonly pathToSystem: string;
   private readonly systemConfigExtend?: {[index: string]: any};
   private system?: System;
@@ -19,13 +20,12 @@ export default class AppSwitcher {
 
   constructor(
     ioSet: IoSet,
-    // TODO: нужно завершить скрипт или перезагрузкиться на мк. Это нужно для обновления
-    onRestartRequest: () => void,
+    restartRequest: () => void,
     pathToSystem = defaultPathToSystem,
     systemConfigExtend?: {[index: string]: any}
   ) {
     this.ioSet = ioSet;
-    this.onRestartRequest = onRestartRequest;
+    this.restartRequest = restartRequest;
     this.pathToSystem = pathToSystem;
     this.systemConfigExtend = systemConfigExtend;
   }
@@ -39,16 +39,14 @@ export default class AppSwitcher {
   private startSystem = async () => {
     const SystemClass: SystemClassType = require(this.pathToSystem).default;
 
-    this.system = new SystemClass(this.ioSet, this.systemConfigExtend);
+    this.system = new SystemClass(this.ioSet, this.handleShutdownRequest, this.systemConfigExtend);
 
-    this.system.onShutdownRequest(this.handleShutdownRequest);
     await this.system.start();
   }
 
   private startIoServer = async () => {
-    this.ioServer = new IoServer(this.ioSet, console.info, console.error);
+    this.ioServer = new IoServer(this.ioSet, this.handleShutdownRequest, console.info, console.error);
 
-    this.ioServer.onShutdownRequest(this.handleShutdownRequest);
     await this.ioServer.start();
   }
 
@@ -63,8 +61,7 @@ export default class AppSwitcher {
           .catch(console.error);
         break;
       case 'restart':
-        this.restart()
-          .catch(console.error);
+        this.restartRequest();
         break;
     }
   }
@@ -83,10 +80,6 @@ export default class AppSwitcher {
     await this.ioServer.destroy();
     delete this.ioServer;
     await this.startSystem();
-  }
-
-  private async restart() {
-    this.onRestartRequest();
   }
 
 }

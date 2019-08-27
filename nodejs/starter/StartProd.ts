@@ -10,6 +10,8 @@ import Props from './Props';
 import ProdBuild from './ProdBuild';
 import SystemStarter from './SystemStarter';
 import {isEmpty} from '../../system/lib/lodashLike';
+import IoSetLocal from '../../system/IoSetLocal';
+import IoSet from '../../system/interfaces/IoSet';
 
 
 export default class StartProd {
@@ -44,7 +46,6 @@ export default class StartProd {
       argUser,
       argGroup,
     );
-    // TODO: set uid, gid
     this.prodBuild = new ProdBuild(this.os, this.props);
     this.systemStarter = new SystemStarter(this.os, this.props);
   }
@@ -78,8 +79,9 @@ export default class StartProd {
     await this.prodBuild.buildIos();
 
     const pathToSystem = path.join(this.getPathToProdSystemDir(), SYSTEM_FILE_NAME);
+    const ioSet: IoSet = new IoSetLocal();
 
-    await this.systemStarter.start(pathToSystem);
+    await this.systemStarter.start(pathToSystem, ioSet);
   }
 
 

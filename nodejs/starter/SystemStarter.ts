@@ -19,11 +19,13 @@ export default class SystemStarter {
   }
 
 
-  async start(pathToSystem: string, ioSet?: IoSet) {
+  async start(pathToSystem: string, ioSet: IoSet) {
     const SystemClass: SystemClassType = this.os.require(pathToSystem).default;
     const systemConfigExtend = this.makeSystemConfigExtend();
 
     console.info(`===> Initializing system`);
+
+    // TODO: use appSwitcher
 
     const system = new SystemClass(ioSet, systemConfigExtend);
 

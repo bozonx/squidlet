@@ -5,12 +5,12 @@ import RemoteCall from './lib/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {makeUniqId} from './lib/uniqId';
 import HostConfig from './interfaces/HostConfig';
-import {ShutdownReason} from './System';
 import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
 import {pathJoin} from './lib/nodeLike';
 import systemConfig from './config/systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
+import {ShutdownHandler} from './interfaces/SystemClassType';
 // TODO: use ioSet's
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 // TODO: use ioSet's
@@ -28,6 +28,7 @@ export const defaultProps: WebSocketServerProps = {
 
 export default class IoServer {
   private readonly ioSet: IoSet;
+  readonly shutdownRequest: ShutdownHandler;
   // user's set props of ioServer
   //private readonly ioServerProps: HostConfig['ioServer'];
   //private readonly rcResponseTimoutSec: number;
@@ -45,12 +46,14 @@ export default class IoServer {
   constructor(
     // it has to be initialized before
     ioSet: IoSet,
+    shutdownRequestCb: ShutdownHandler,
     //ioServerProps: HostConfig['ioServer'],
     //rcResponseTimoutSec: number,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
+    this.shutdownRequest = shutdownRequestCb;
     //this.ioServerProps = ioServerProps;
     //this.rcResponseTimoutSec = rcResponseTimoutSec;
     this.logInfo = logInfo;
@@ -81,18 +84,15 @@ export default class IoServer {
 
       this.remoteCall && this.remoteCall.destroy()
         .catch(this.logError);
+
+      // switch to normal app on connection close
+      this.shutdownRequest('switchToApp');
     });
   }
 
   destroy = async () => {
     await this.wsServer.destroy();
     this.remoteCall && await this.remoteCall.destroy();
-  }
-
-
-  onShutdownRequest(cb: (reason: ShutdownReason) => void) {
-    // TODO: add
-    //this.events.addListener(SHUTDOWN_EVENT, cb);
   }
 
 
