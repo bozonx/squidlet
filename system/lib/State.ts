@@ -1,6 +1,6 @@
 import {Dictionary, JsonTypes} from '../interfaces/Types';
 import IndexedEvents from './IndexedEvents';
-import {getDifferentKeys, mergeDeep} from './collections';
+import {getDifferentKeys, mergeDeepObjects} from './objects';
 import {isEqual} from './lodashLike';
 
 
@@ -39,7 +39,7 @@ export default class State {
   }
 
   updateState(category: number, stateName: string, newPartialState: Dictionary) {
-    const newState: Dictionary = mergeDeep(newPartialState, this.getState(category, stateName));
+    const newState: Dictionary = mergeDeepObjects(newPartialState, this.getState(category, stateName));
 
     // don't do anything if value isn't changed
     if (isEqual(newState, this.getState(category, stateName))) return;

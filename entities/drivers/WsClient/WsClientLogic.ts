@@ -4,7 +4,7 @@ import WebSocketClientIo, {
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {Primitives} from 'system/interfaces/Types';
-import {mergeDeep} from 'system/lib/collections';
+import {mergeDeepObjects} from 'system/lib/objects';
 import {parseCookie, stringifyCookie} from 'system/lib/strings';
 import Promised from 'system/lib/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
@@ -292,7 +292,7 @@ export default class WsClientLogic {
     try {
       const cookies: {[index: string]: Primitives} = parseCookie(cookiePart);
 
-      this.cookies = mergeDeep(this.cookies, cookies);
+      this.cookies = mergeDeepObjects(this.cookies, cookies);
     }
     catch (err) {
       return this.logError(`WsClientLogic.setCookie: ${err}`);

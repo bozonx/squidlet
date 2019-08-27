@@ -1,5 +1,5 @@
 import DriverBase from 'system/base/DriverBase';
-import {mergeDeep} from '../../../system/lib/collections';
+//import {mergeDeepObjects} from '../../../system/lib/collections';
 import DriverFactoryBase, {WsServer, WebSocketServerDriverProps} from '../WsServer/WsServer';
 import WsDuplexServerLogic from './WsDuplexServerLogic';
 
@@ -39,7 +39,7 @@ export default class Factory extends DriverFactoryBase<WebSocketServerDuplex> {
 
 // export default class WsServerDuplex extends DriverBase {
 //   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<WsServerDuplexLogic> {
-//     const props: WebSocketServerRouterPropsDriverProps = mergeDeep(instanceProps, this.definition.props) as any;
+//     const props: WebSocketServerRouterPropsDriverProps = mergeDeepObjects(instanceProps, this.definition.props) as any;
 //     const serverDriver: WebSocketServer = this.env.getDriver<DriverInstance>('WebSocketServer')
 //       .getInstance(props);
 //     const routerLogic: WsServerDuplexLogic = new WsServerDuplexLogic(serverDriver);

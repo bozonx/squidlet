@@ -4,7 +4,7 @@ import Sessions from './lib/Sessions';
 import State from './lib/State';
 import HostConfig from './interfaces/HostConfig';
 import System from './System';
-import {mergeDeep} from './lib/collections';
+import {mergeDeepObjects} from './lib/objects';
 import {makeUniqId} from './lib/uniqId';
 import {AppLifeCycleEvents} from './constants';
 import IoItem from './interfaces/IoItem';
@@ -33,7 +33,7 @@ export default class Context {
 
   constructor(system: System, systemConfigExtend?: {[index: string]: any}) {
     this.system = system;
-    this.systemConfig = mergeDeep(systemConfigExtend, systemConfig) as any;
+    this.systemConfig = mergeDeepObjects(systemConfigExtend, systemConfig) as any;
   }
 
 

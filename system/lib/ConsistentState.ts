@@ -1,4 +1,4 @@
-import {concatUniqStrArrays, mergeDeep} from './collections';
+import {concatUniqStrArrays, mergeDeepObjects} from './objects';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue from './RequestQueue';
 import {cloneDeep, difference, pick} from './lodashLike';
@@ -96,7 +96,7 @@ export default class ConsistentState {
       const newState = this.generateSafeNewState(partialState);
 
       this.stateUpdater(newState);
-      this.actualRemoteState = mergeDeep(partialState, this.actualRemoteState);
+      this.actualRemoteState = mergeDeepObjects(partialState, this.actualRemoteState);
 
       return;
     }
@@ -141,7 +141,7 @@ export default class ConsistentState {
 
     // Save actual state. It has to be called only once on starting of cycle
     if (!this.actualRemoteState) {
-      // TODO: моно использовать mergeDeep
+      // TODO: моно использовать mergeDeepObjects
       this.actualRemoteState = cloneDeep(this.getState());
     }
 

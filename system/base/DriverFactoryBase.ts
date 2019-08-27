@@ -2,7 +2,7 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from './DriverBase';
 import {validateProps, validateRequiredProps} from '../lib/validate';
-import {mergeDeep} from '../lib/collections';
+import {mergeDeepObjects} from '../lib/objects';
 import Context from '../Context';
 
 
@@ -43,7 +43,7 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase> {
 
   async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     // combined instance and definition props
-    const props: {[index: string]: any} = mergeDeep(instanceProps, this.definition.props);
+    const props: {[index: string]: any} = mergeDeepObjects(instanceProps, this.definition.props);
     const instanceId: string | undefined = this.getInstanceId(props);
 
     // TODO: лучше не ждать до создания инстанса
