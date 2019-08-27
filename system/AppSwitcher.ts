@@ -3,6 +3,7 @@ import System from './System';
 import IoServer from './IoServer';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import systemConfig from './config/systemConfig';
+import IoItem from './interfaces/IoItem';
 
 
 export type AppSwitcherClass = new (
@@ -32,10 +33,12 @@ export default class AppSwitcher {
 
 
   async start() {
+    await this.ioSet.init(this.systemCfg);
     await this.startSystem();
   }
 
   destroy = async () => {
+    // destroy of System or IoServer
     if (this.system) {
       await this.system.destroy();
     }
@@ -43,16 +46,17 @@ export default class AppSwitcher {
       await this.ioServer.destroy();
     }
 
-    // TODO: make destroy of ioSet
-    // const ioNames: string[] = this.ioSet.getNames();
-    //
-    // for (let ioName of ioNames) {
-    //   const ioItem: IoItem = this.ioSet.getIo(ioName);
-    //
-    //   if (ioItem.destroy) await ioItem.destroy();
-    // }
-    //
-    // await this.ioSet.destroy();
+    // destroy of ios
+    const ioNames: string[] = this.ioSet.getNames();
+
+    for (let ioName of ioNames) {
+      const ioItem: IoItem = this.ioSet.getIo(ioName);
+
+      if (ioItem.destroy) await ioItem.destroy();
+    }
+
+    // destroy of ioSet
+    await this.ioSet.destroy();
   }
 
 

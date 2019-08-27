@@ -1,7 +1,7 @@
 import IoSet from './interfaces/IoSet';
 import IoItem from './interfaces/IoItem';
 import {pathJoin} from './lib/paths';
-import Context from './Context';
+import systemConfig from './config/systemConfig';
 
 
 export default class IoSetLocal implements IoSet {
@@ -12,10 +12,10 @@ export default class IoSetLocal implements IoSet {
    * Load ioSet index.js file where included all the used io on platform.
    * It will be called on system start
    */
-  async init(context: Context): Promise<void> {
+  async init(systemCfg: typeof systemConfig): Promise<void> {
     const pathToIoSetIndex = pathJoin(
-      context.systemConfig.rootDirs.envSet,
-      context.systemConfig.envSetDirs.ios,
+      systemCfg.rootDirs.envSet,
+      systemCfg.envSetDirs.ios,
     );
 
     // Load io collection workDir/io/index.js

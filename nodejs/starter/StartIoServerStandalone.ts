@@ -69,10 +69,10 @@ export default class StartIoServerStandalone {
     console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
   }
 
-  // TODO: review
   private async makeIoSet(): Promise<IoSet> {
     const ioSet = new IoSetSrc(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
 
+    ioSet.prepare && await ioSet.prepare();
     await ioSet.init();
 
     await this.configureIoSet(ioSet);

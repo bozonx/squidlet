@@ -1,5 +1,5 @@
 import IoItem from './IoItem';
-import Context from '../Context';
+import systemConfig from '../config/systemConfig';
 
 
 export default interface IoSet {
@@ -11,7 +11,7 @@ export default interface IoSet {
   /**
    * It is called at the beginning of System initialization
    */
-  init(context: Context): Promise<void>;
+  init(systemCfg: typeof systemConfig): Promise<void>;
 
 
   destroy(): Promise<void>;
