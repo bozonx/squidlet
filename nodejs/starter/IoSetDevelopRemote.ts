@@ -1,5 +1,4 @@
 import IoSet from '../../system/interfaces/IoSet';
-import Context from '../../system/Context';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';

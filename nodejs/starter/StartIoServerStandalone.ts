@@ -3,7 +3,7 @@ import Props from './Props';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../system/IoServer';
-import IoSetBase from './IoSetBase';
+import IoSetSrc from './IoSetSrc';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
@@ -71,7 +71,7 @@ export default class StartIoServerStandalone {
 
   // TODO: review
   private async makeIoSet(): Promise<IoSet> {
-    const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
+    const ioSet = new IoSetSrc(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
 
     await ioSet.init();
 

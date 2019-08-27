@@ -1,50 +1,50 @@
-IoSetDevelopSource = require('../../nodejs/starter/IoSetDevelopSource').default
+IoSetDevelopSrc = require('../../nodejs/starter/IoSetDevelopSrc').default
 helpers = require('../../shared/helpers')
 
 
-describe 'nodejs.IoSetDevelopSource', ->
+describe 'nodejs.IoSetDevelopSrc', ->
   beforeEach ->
     @os = {}
     @envBuilder = {}
     @envSetDir = 'envSetDir'
     @platform = 'nodejs'
     @machine = 'x86'
-    @ioSource = new IoSetDevelopSource(@os, @envBuilder, @envSetDir, @platform, @machine)
+    @ioSrc = new IoSetDevelopSrc(@os, @envBuilder, @envSetDir, @platform, @machine)
 
   it 'prepare', ->
-    @ioSource.storageWrapper.init = sinon.stub().returns(Promise.resolve())
+    @ioSrc.storageWrapper.init = sinon.stub().returns(Promise.resolve())
 
-    await @ioSource.prepare()
+    await @ioSrc.prepare()
 
-    sinon.assert.calledOnce(@ioSource.storageWrapper.init)
+    sinon.assert.calledOnce(@ioSrc.storageWrapper.init)
 
   it 'init', ->
     machineConfig = {
       ios: ['./io/Storage.ts']
     }
 
-    @ioSource.os = {
+    @ioSrc.os = {
       require: () => {default: machineConfig}
     }
 
-    @ioSource.instantiateIo = sinon.spy();
+    @ioSrc.instantiateIo = sinon.spy();
 
-    await @ioSource.init()
+    await @ioSrc.init()
 
-    sinon.assert.calledOnce(@ioSource.instantiateIo)
-    sinon.assert.calledWith(@ioSource.instantiateIo, machineConfig.ios[0], helpers.resolvePlatformDir('nodejs'))
+    sinon.assert.calledOnce(@ioSrc.instantiateIo)
+    sinon.assert.calledWith(@ioSrc.instantiateIo, machineConfig.ios[0], helpers.resolvePlatformDir('nodejs'))
 
   it 'instantiateIo - common io', ->
     ioPath = './io/Digital.ts'
     platformDir = helpers.resolvePlatformDir('nodejs')
     class DigitalClass
-    @ioSource.os = {
+    @ioSrc.os = {
       require: () => {default: DigitalClass}
     }
 
-    @ioSource.instantiateIo(ioPath, platformDir)
+    @ioSrc.instantiateIo(ioPath, platformDir)
 
-    assert.isTrue(@ioSource.ioCollection['Digital'] instanceof DigitalClass)
+    assert.isTrue(@ioSrc.ioCollection['Digital'] instanceof DigitalClass)
 
   it 'instantiateIo - Storage io - it uses storage wrapper', ->
     ioPath = './io/Storage.ts'
@@ -54,16 +54,16 @@ describe 'nodejs.IoSetDevelopSource', ->
     wrapperObject = {
       readFile: () =>
     }
-    @ioSource.os = {
+    @ioSrc.os = {
       require: () => {default: StorageClass}
     }
-    @ioSource.storageWrapper = {
+    @ioSrc.storageWrapper = {
       makeWrapper: (arg) =>
         wrapperArg = arg
         wrapperObject
     }
 
-    @ioSource.instantiateIo(ioPath, platformDir)
+    @ioSrc.instantiateIo(ioPath, platformDir)
 
     assert.isTrue(wrapperArg instanceof StorageClass)
-    assert.equal(@ioSource.ioCollection['Storage'], wrapperObject)
+    assert.equal(@ioSrc.ioCollection['Storage'], wrapperObject)

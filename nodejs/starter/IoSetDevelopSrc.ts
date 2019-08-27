@@ -5,13 +5,13 @@ import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import StorageEnvMemoryWrapper from '../../shared/ioSet/StorageEnvMemoryWrapper';
 import StorageIo from '../../system/interfaces/io/StorageIo';
-import IoSetBase from './IoSetBase';
+import IoSetSrc from './IoSetSrc';
 
 
 /**
  * It gets configs and manifests from memory and uses source modules.
  */
-export default class IoSetDevelopSource extends IoSetBase implements IoSet {
+export default class IoSetDevelopSrc extends IoSetSrc implements IoSet {
   private readonly storageWrapper: StorageEnvMemoryWrapper;
 
 

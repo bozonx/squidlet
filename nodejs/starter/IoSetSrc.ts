@@ -11,7 +11,7 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 /**
  * It uses source io files.
  */
-export default class IoSetBase implements IoSet {
+export default class IoSetSrc implements IoSet {
   private readonly os: Os;
   private readonly platform: Platforms;
   private readonly machine: string;
