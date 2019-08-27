@@ -3,6 +3,8 @@
  * 0 is not empty!
  * @param toCheck
  */
+import {isPlainObject} from './objects';
+
 export function isEmpty(toCheck: any): boolean {
   if (typeof toCheck == 'undefined' || toCheck === null || toCheck === '') return true;
   else if (toCheck instanceof Array && !toCheck.length) return true;
@@ -11,85 +13,9 @@ export function isEmpty(toCheck: any): boolean {
   return false;
 }
 
+// TODO: зачем это нужно есть же в ts???
 export function values(obj: {[index: string]: any}): any[] {
   return Object.keys(obj).map(key => obj[key]);
-}
-
-export function omit(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
-  if (!obj) return {};
-
-  const result: {[index: string]: any} = {};
-
-  for (let key of Object.keys(obj)) {
-    if (propToExclude.indexOf(key) < 0) {
-      result[key] = obj[key];
-    }
-  }
-
-  return result;
-}
-
-export function pick(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
-  if (!obj) return {};
-
-  const result: {[index: string]: any} = {};
-
-  for (let key of propToPick) {
-    result[key] = obj[key];
-  }
-
-  return result;
-}
-
-export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
-  if (typeof collection === 'undefined') {
-    return;
-  }
-  else if (Array.isArray(collection)) {
-    for (let index in collection) {
-      const result: any | undefined = cb(collection[index], parseInt(index));
-
-      if (result) return collection[index];
-    }
-  }
-  else if (typeof collection === 'object') {
-    for (let key of Object.keys(collection)) {
-      const result: any = cb(collection[key], key);
-
-      if (result) return collection[key];
-    }
-  }
-  else {
-    throw new Error(`find: unsupported type of collection "${JSON.stringify(collection)}"`);
-  }
-
-  return;
-}
-
-// TODO: test
-export function findIndex(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
-  if (typeof collection === 'undefined') {
-    return -1;
-  }
-  else if (Array.isArray(collection)) {
-    for (let index in collection) {
-      const result: any | undefined = cb(collection[index], parseInt(index));
-
-      if (result) return parseInt(index);
-    }
-  }
-  else if (typeof collection === 'object') {
-    for (let key of Object.keys(collection)) {
-      const result: any = cb(collection[key], key);
-
-      if (result) return key;
-    }
-  }
-  else {
-    throw new Error(`findIndex: unsupported type of collection "${JSON.stringify(collection)}"`);
-  }
-
-  return -1;
 }
 
 // TODO: remove - better to use String's method
@@ -126,9 +52,7 @@ export function padStart(srcString: string, length: number = 0, chars: string = 
   return `${result}${srcString}`;
 }
 
-export function last(arr: any[]) {
-  return arr[arr.length - 1];
-}
+
 //
 // export function uniq(arr: string[]): string[] {
 //   // TODO: !!!!
@@ -164,62 +88,6 @@ export function isEqual(first: any, second: any): boolean {
   // TODO: слишком дорогая процедура
   // arrays and objects
   return JSON.stringify(first) === JSON.stringify(second);
-}
-
-export function isPlainObject(obj: any): boolean {
-  return  typeof obj === 'object' // separate from primitives
-    && obj !== null         // is obvious
-    && obj.constructor === Object // separate instances (Array, DOM, ...)
-    && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math
-}
-
-export function difference(testArr: any[], samples: any[]): any[] {
-  if (typeof testArr === 'undefined' || !testArr.length) return [];
-  else if (typeof samples === 'undefined' || !samples.length) return testArr;
-
-  const diffArr: any[] = [];
-
-  for (let item of testArr) {
-    if (typeof item === 'undefined') continue;
-
-    if (samples.indexOf(item) === -1) {
-      diffArr.push(item);
-    }
-  }
-
-  return diffArr;
-}
-
-export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
-  const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
-    for (let itemName of Object.keys(currentObj)) {
-      const pathOfItem: string = compact([currentPath, itemName]).join('.');
-
-      if (pathOfItem === pathTo) return currentObj[itemName];
-
-      if (isPlainObject(currentObj[itemName])) {
-        return recursive(currentObj[itemName], pathOfItem);
-      }
-    }
-  };
-
-  const result = recursive(obj, '');
-
-  if (typeof result === 'undefined' && typeof defaultValue !== 'undefined') return defaultValue;
-
-  return result;
-}
-
-export function compact(arr: any[]): any[] {
-  const result: any[] = [];
-
-  for (let value of arr) {
-    if (typeof value !== 'undefined' && value !== null && value !== '') {
-      result.push(value);
-    }
-  }
-
-  return result;
 }
 
 // it works properly but very expensive because of using of JSON.stringify -> JSON.parse.

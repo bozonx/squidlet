@@ -17,24 +17,6 @@ describe 'system.lib.lodashLike', ->
   it 'values', ->
     assert.deepEqual(lodashLike.values({a: 0, b: 1}), [0, 1])
 
-  it 'omit', ->
-    assert.deepEqual(lodashLike.omit({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
-
-  it 'pick', ->
-    assert.deepEqual(lodashLike.pick({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
-
-  it 'find', ->
-    # object
-    objCb = (item, index) => item == 1
-    assert.equal(lodashLike.find({a: 0, b: 1}, objCb), 1)
-    # object - not found
-    assert.isUndefined(lodashLike.find({a: 0, b: 2}, objCb))
-    # array
-    arrCb = (item, index) => item == 'b'
-    assert.equal(lodashLike.find(['a', 'b'], arrCb), 'b')
-    # array - not found
-    assert.isUndefined(lodashLike.find(['a', 'c'], arrCb))
-
   it 'trimStart', ->
     assert.equal(lodashLike.trimStart('  a  '), 'a  ')
 
@@ -46,9 +28,6 @@ describe 'system.lib.lodashLike', ->
 
   it 'padStart', ->
     assert.equal(lodashLike.padStart('11', 8, '0'), '00000011')
-
-  it 'last', ->
-    assert.equal(lodashLike.last([0,1,2]), 2)
 
   it 'isEqual', ->
     assert.isTrue(lodashLike.isEqual(1, 1))
@@ -75,39 +54,6 @@ describe 'system.lib.lodashLike', ->
     assert.isFalse(lodashLike.isEqual(uint1, new Uint8Array(1)))
     assert.isFalse(lodashLike.isEqual(uint1, []))
 
-  it 'isPlainObject', ->
-    cl = () ->
-    assert.isTrue(lodashLike.isPlainObject({}))
-    assert.isFalse(lodashLike.isPlainObject(new cl()))
-    assert.isFalse(lodashLike.isPlainObject([]))
-    assert.isFalse(lodashLike.isPlainObject(''))
-    assert.isFalse(lodashLike.isPlainObject(undefined))
-    assert.isFalse(lodashLike.isPlainObject(null))
-    assert.isFalse(lodashLike.isPlainObject(0))
-
-  it 'difference', ->
-    assert.deepEqual(lodashLike.difference([1,4], [1,2,3]), [4])
-    assert.deepEqual(lodashLike.difference([1,3], [1,2,3]), [])
-    assert.deepEqual(lodashLike.difference([], [1,2,3]), [])
-    assert.deepEqual(lodashLike.difference([1,4], []), [1,4])
-
-  it 'objGet', ->
-    obj = {
-      level1: {
-        level2: {
-          level3: 1
-        }
-      }
-    }
-
-    assert.equal(lodashLike.objGet(obj, 'level1.level2.level3'), obj.level1.level2.level3)
-    assert.deepEqual(lodashLike.objGet(obj, 'level1.level2'), obj.level1.level2)
-    assert.deepEqual(lodashLike.objGet(obj, 'level1'), obj.level1)
-    assert.isUndefined(lodashLike.objGet(obj, 'level1.level2.unknown'))
-    assert.equal(lodashLike.objGet(obj, 'level1.level2.unknown', 'default'), 'default')
-
-  it 'compact', ->
-    assert.deepEqual(lodashLike.compact([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
 
 
 #  it 'cloneDeep', ->

@@ -1,3 +1,42 @@
+// TODO: remake to getLastItem
+export function last(arr: any[]) {
+  return arr[arr.length - 1];
+}
+
+// TODO: remake to arraysDifference
+export function difference(testArr: any[], samples: any[]): any[] {
+  if (typeof testArr === 'undefined' || !testArr.length) return [];
+  else if (typeof samples === 'undefined' || !samples.length) return testArr;
+
+  const diffArr: any[] = [];
+
+  for (let item of testArr) {
+    if (typeof item === 'undefined') continue;
+
+    if (samples.indexOf(item) === -1) {
+      diffArr.push(item);
+    }
+  }
+
+  return diffArr;
+}
+
+// TODO: remake to compactArray
+export function compact(arr: any[]): any[] {
+  const result: any[] = [];
+
+  for (let value of arr) {
+    if (typeof value !== 'undefined' && value !== null && value !== '') {
+      result.push(value);
+    }
+  }
+
+  return result;
+}
+
+
+
+
 /**
  * Concat arrays but not create a new one.
  * It mutates the srcArr.

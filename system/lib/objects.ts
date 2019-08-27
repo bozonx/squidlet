@@ -1,4 +1,113 @@
-import {isEqual, isPlainObject, values} from './lodashLike';
+import {compact, isEqual, isPlainObject, values} from './lodashLike';
+
+
+// TODO: remake to omitObj
+export function omit(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
+  if (!obj) return {};
+
+  const result: {[index: string]: any} = {};
+
+  for (let key of Object.keys(obj)) {
+    if (propToExclude.indexOf(key) < 0) {
+      result[key] = obj[key];
+    }
+  }
+
+  return result;
+}
+
+// TODO: remake to pickObj
+export function pick(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
+  if (!obj) return {};
+
+  const result: {[index: string]: any} = {};
+
+  for (let key of propToPick) {
+    result[key] = obj[key];
+  }
+
+  return result;
+}
+
+// TODO: remake to findObj
+export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
+  if (typeof collection === 'undefined') {
+    return;
+  }
+  else if (Array.isArray(collection)) {
+    for (let index in collection) {
+      const result: any | undefined = cb(collection[index], parseInt(index));
+
+      if (result) return collection[index];
+    }
+  }
+  else if (typeof collection === 'object') {
+    for (let key of Object.keys(collection)) {
+      const result: any = cb(collection[key], key);
+
+      if (result) return collection[key];
+    }
+  }
+  else {
+    throw new Error(`find: unsupported type of collection "${JSON.stringify(collection)}"`);
+  }
+
+  return;
+}
+
+// TODO: test
+// TODO: remake to findIndexObj
+export function findIndex(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
+  if (typeof collection === 'undefined') {
+    return -1;
+  }
+  else if (Array.isArray(collection)) {
+    for (let index in collection) {
+      const result: any | undefined = cb(collection[index], parseInt(index));
+
+      if (result) return parseInt(index);
+    }
+  }
+  else if (typeof collection === 'object') {
+    for (let key of Object.keys(collection)) {
+      const result: any = cb(collection[key], key);
+
+      if (result) return key;
+    }
+  }
+  else {
+    throw new Error(`findIndex: unsupported type of collection "${JSON.stringify(collection)}"`);
+  }
+
+  return -1;
+}
+
+export function isPlainObject(obj: any): boolean {
+  return  typeof obj === 'object' // separate from primitives
+    && obj !== null         // is obvious
+    && obj.constructor === Object // separate instances (Array, DOM, ...)
+    && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math
+}
+
+export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
+  const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
+    for (let itemName of Object.keys(currentObj)) {
+      const pathOfItem: string = compact([currentPath, itemName]).join('.');
+
+      if (pathOfItem === pathTo) return currentObj[itemName];
+
+      if (isPlainObject(currentObj[itemName])) {
+        return recursive(currentObj[itemName], pathOfItem);
+      }
+    }
+  };
+
+  const result = recursive(obj, '');
+
+  if (typeof result === 'undefined' && typeof defaultValue !== 'undefined') return defaultValue;
+
+  return result;
+}
 
 
 /**

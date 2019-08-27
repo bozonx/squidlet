@@ -2,6 +2,49 @@ objects = require('../../../system/lib/objects')
 
 
 describe.only 'system.lib.objects', ->
+  it 'omit', ->
+    assert.deepEqual(objects.omit({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
+
+  it 'pick', ->
+    assert.deepEqual(objects.pick({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
+
+  it 'find', ->
+# object
+    objCb = (item, index) => item == 1
+    assert.equal(objects.find({a: 0, b: 1}, objCb), 1)
+    # object - not found
+    assert.isUndefined(objects.find({a: 0, b: 2}, objCb))
+    # array
+    arrCb = (item, index) => item == 'b'
+    assert.equal(objects.find(['a', 'b'], arrCb), 'b')
+    # array - not found
+    assert.isUndefined(objects.find(['a', 'c'], arrCb))
+
+  it 'isPlainObject', ->
+    cl = () ->
+    assert.isTrue(objects.isPlainObject({}))
+    assert.isFalse(objects.isPlainObject(new cl()))
+    assert.isFalse(objects.isPlainObject([]))
+    assert.isFalse(objects.isPlainObject(''))
+    assert.isFalse(objects.isPlainObject(undefined))
+    assert.isFalse(objects.isPlainObject(null))
+    assert.isFalse(objects.isPlainObject(0))
+
+  it 'objGet', ->
+    obj = {
+      level1: {
+        level2: {
+          level3: 1
+        }
+      }
+    }
+
+    assert.equal(objects.objGet(obj, 'level1.level2.level3'), obj.level1.level2.level3)
+    assert.deepEqual(objects.objGet(obj, 'level1.level2'), obj.level1.level2)
+    assert.deepEqual(objects.objGet(obj, 'level1'), obj.level1)
+    assert.isUndefined(objects.objGet(obj, 'level1.level2.unknown'))
+    assert.equal(objects.objGet(obj, 'level1.level2.unknown', 'default'), 'default')
+
   it 'getKeyOfObject', ->
     assert.equal(objects.getKeyOfObject({a: 1, b: 2}, 2), 'b')
     assert.isUndefined(objects.getKeyOfObject({a: 1, b: 2}, 3))
