@@ -1,7 +1,7 @@
 import {GetDriverDep} from 'system/base/EntityBase';
 import ServiceBase from 'system/base/ServiceBase';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import {deserializeJson, serializeJson} from 'system/lib/binaryHelpers';
+import {deserializeJson, serializeJson} from 'system/lib/serialize';
 import {removeItemFromArray} from 'system/lib/arrays';
 import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
 

@@ -1,7 +1,7 @@
 import MyAddress from '../../interfaces/MyAddress';
 import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData';
-import { uint8ArrayToText, textToUint8Array} from '../../../system/lib/binaryHelpers';
+import { uint8ArrayToText, textToUint8Array} from '../../../system/lib/serialize';
 import DriverBase from '../../../system/base/DriverBase';
 import {GetDriverDep} from '../../../system/base/EntityBase';
 

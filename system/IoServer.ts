@@ -1,5 +1,5 @@
 import IoSet from './interfaces/IoSet';
-import {deserializeJson, serializeJson} from './lib/binaryHelpers';
+import {deserializeJson, serializeJson} from './lib/serialize';
 import {WebSocketServerProps} from './interfaces/io/WebSocketServerIo';
 import RemoteCall from './lib/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';

@@ -1,6 +1,6 @@
 import * as SerialPort from 'serialport';
 
-import {textToUint8Array} from 'system/lib/binaryHelpers';
+import {textToUint8Array} from 'system/lib/serialize';
 import SerialIo, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 
