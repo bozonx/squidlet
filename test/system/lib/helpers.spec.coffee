@@ -52,6 +52,6 @@ describe.only 'system.lib.helpers', ->
 #  it 'splitTopicId', ->
 #    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
 
-  it 'makeEventName', ->
-    assert.equal(helpers.makeEventName('|', 'cat', 'topic', 'name', 'otherName'), 'cat|topic|name|otherName')
-    assert.equal(helpers.makeEventName('|', 'cat', undefined, 'name'), 'cat|*|name')
+#  it 'makeEventName', ->
+#    assert.equal(helpers.makeEventName('|', 'cat', 'topic', 'name', 'otherName'), 'cat|topic|name|otherName')
+#    assert.equal(helpers.makeEventName('|', 'cat', undefined, 'name'), 'cat|*|name')

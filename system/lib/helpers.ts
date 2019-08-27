@@ -85,6 +85,8 @@ export function calcAllowedLogLevels(logLevel: LogLevel): LogLevel[] {
  * Collect values which are set in default param of props schema
  */
 export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
+  // TODO: test
+
   const result: {[index: string]: any} = {};
 
   if (!manifestProps) return result;
