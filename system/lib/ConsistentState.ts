@@ -2,7 +2,9 @@ import {mergeDeepObjects} from './objects';
 import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue from './RequestQueue';
-import {cloneDeep, difference, pick} from './lodashLike';
+import {cloneDeep} from './lodashLike';
+import {pick} from './objects';
+import {arraysDifference} from './arrays';
 
 
 export type Initialize = () => Promise<Dictionary>;
@@ -286,7 +288,7 @@ export default class ConsistentState {
 
     const newParams: Dictionary = {};
 
-    for (let paramName of difference(this.paramsListToSave, Object.keys(this.actualRemoteState))) {
+    for (let paramName of arraysDifference(this.paramsListToSave, Object.keys(this.actualRemoteState))) {
       newParams[paramName] = undefined;
     }
 
@@ -302,7 +304,7 @@ export default class ConsistentState {
    */
   private generateSafeNewState(mostActualState: Dictionary): Dictionary {
     // get key witch won't be saved
-    const keysToUpdate: string[] = difference(Object.keys(mostActualState), this.paramsListToSave || []);
+    const keysToUpdate: string[] = arraysDifference(Object.keys(mostActualState), this.paramsListToSave || []);
 
     return {
       ...this.getState(),

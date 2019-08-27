@@ -1,10 +1,8 @@
-// TODO: remake to getLastItem
-export function last(arr: any[]) {
+export function lastItem(arr: any[]): any {
   return arr[arr.length - 1];
 }
 
-// TODO: remake to arraysDifference
-export function difference(testArr: any[], samples: any[]): any[] {
+export function arraysDifference(testArr: any[], samples: any[]): any[] {
   if (typeof testArr === 'undefined' || !testArr.length) return [];
   else if (typeof samples === 'undefined' || !samples.length) return testArr;
 
@@ -21,12 +19,28 @@ export function difference(testArr: any[], samples: any[]): any[] {
   return diffArr;
 }
 
-// TODO: remake to compactArray
-export function compact(arr: any[]): any[] {
+/**
+ * Like lodash's compact. It removes undefined, null and '' from array.
+ * It make a new array.
+ */
+export function compactArray(arr: any[]): any[] {
   const result: any[] = [];
 
   for (let value of arr) {
     if (typeof value !== 'undefined' && value !== null && value !== '') {
+      result.push(value);
+    }
+  }
+
+  return result;
+}
+
+// TODO: test
+export function compactUndefined(arr: any[]): any[] {
+  const result: any[] = [];
+
+  for (let value of arr) {
+    if (typeof value !== 'undefined') {
       result.push(value);
     }
   }
@@ -79,19 +93,6 @@ export function concatUniqStrArrays(...arrays: string[][]): string[] {
   }
 
   return Object.keys(result);
-}
-
-// TODO: test
-export function compactUndefined(arr: any[]): any[] {
-  const result: any[] = [];
-
-  for (let value of arr) {
-    if (typeof value !== 'undefined') {
-      result.push(value);
-    }
-  }
-
-  return result;
 }
 
 /**

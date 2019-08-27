@@ -1,5 +1,5 @@
-import _difference = require('lodash/difference');
 import {EntityType, EntityTypePlural} from '../system/interfaces/EntityTypes';
+import {arraysDifference} from '../system/lib/arrays';
 
 
 /**
@@ -27,7 +27,7 @@ export function sortByIncludeInList(wholeSet: string[], targetItems: string[]): 
 }
 
 export function checkIoExistance(hostIos: string[], machineIos: string[]) {
-  const diff: string[] = _difference(hostIos, machineIos);
+  const diff: string[] = arraysDifference(hostIos, machineIos);
 
   if (diff.length) {
     throw new Error(`There aren't some IO "${JSON.stringify(diff)}" in the selected platform`);

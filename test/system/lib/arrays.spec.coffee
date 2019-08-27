@@ -2,17 +2,17 @@ arrays = require('../../../system/lib/arrays')
 
 
 describe.only 'system.lib.arrays', ->
-  it 'last', ->
-    assert.equal(arrays.last([0,1,2]), 2)
+  it 'lastItem', ->
+    assert.equal(arrays.lastItem([0,1,2]), 2)
 
-  it 'difference', ->
-    assert.deepEqual(arrays.difference([1,4], [1,2,3]), [4])
-    assert.deepEqual(arrays.difference([1,3], [1,2,3]), [])
-    assert.deepEqual(arrays.difference([], [1,2,3]), [])
-    assert.deepEqual(arrays.difference([1,4], []), [1,4])
+  it 'arraysDifference', ->
+    assert.deepEqual(arrays.arraysDifference([1,4], [1,2,3]), [4])
+    assert.deepEqual(arrays.arraysDifference([1,3], [1,2,3]), [])
+    assert.deepEqual(arrays.arraysDifference([], [1,2,3]), [])
+    assert.deepEqual(arrays.arraysDifference([1,4], []), [1,4])
 
-  it 'compact', ->
-    assert.deepEqual(arrays.compact([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
+  it 'compactArray', ->
+    assert.deepEqual(arrays.compactArray([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
 
   it 'appendArray', ->
     arr = [1]

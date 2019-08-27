@@ -1,4 +1,5 @@
-import {compact, isEqual, isPlainObject, values} from './lodashLike';
+import {isEqual} from './lodashLike';
+import {compactArray} from './arrays';
 
 
 // TODO: remake to omitObj
@@ -92,7 +93,7 @@ export function isPlainObject(obj: any): boolean {
 export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
   const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
     for (let itemName of Object.keys(currentObj)) {
-      const pathOfItem: string = compact([currentPath, itemName]).join('.');
+      const pathOfItem: string = compactArray([currentPath, itemName]).join('.');
 
       if (pathOfItem === pathTo) return currentObj[itemName];
 

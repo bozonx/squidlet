@@ -4,7 +4,7 @@ import DriverEnv from '../../system/baseDrivers/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
-import {last} from '../../system/lib/lodashLike';
+import {lastItem} from '../../system/lib/arrays';
 
 
 type RouterHandler = (error: Error | null, payload?: any) => void;
@@ -79,7 +79,7 @@ export default class Router {
     }
 
     // if it's final destination - pass message to income listeners
-    if (last(routerMessage.route) === this.network.hostId) {
+    if (lastItem(routerMessage.route) === this.network.hostId) {
       this.msgEvents.emit(null, routerMessage.payload);
 
       return;
@@ -105,7 +105,7 @@ export default class Router {
    */
   private resolveNextHostId(route: Array<string>): string {
     if (route.length < 2) throw new Error(`Incorrect route ${JSON.stringify(route)}`);
-    if (last(route) === this.network.hostId) {
+    if (lastItem(route) === this.network.hostId) {
       throw new Error(`Incorrect route ${JSON.stringify(route)} current host ${this.network.hostId} is the last`);
     }
 
