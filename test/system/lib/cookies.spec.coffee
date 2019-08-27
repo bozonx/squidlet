@@ -1,9 +1,9 @@
-strings = require('../../../system/lib/strings')
+cookies = require('../../../system/lib/cookies')
 
 
-describe 'system.lib.strings', ->
+describe 'system.lib.cookies', ->
   it 'parseCookie', ->
-    assert.deepEqual(strings.parseCookie('param1=value1; param2=2; param3=true'), {
+    assert.deepEqual(cookies.parseCookie('param1=value1; param2=2; param3=true'), {
       param1: 'value1'
       param2: 2
       param3: true
@@ -19,7 +19,7 @@ describe 'system.lib.strings', ->
     }
     cookie = 'param1=value1; param2=2; param3=true; param4=null; param5=undefined'
 
-    assert.deepEqual(strings.parseCookie(cookie), obj)
+    assert.deepEqual(cookies.parseCookie(cookie), obj)
 
   it 'stringifyCookie', ->
     obj = {
@@ -31,4 +31,4 @@ describe 'system.lib.strings', ->
     }
     cookie = 'param1=value1; param2=2; param3=true; param4=null; param5=undefined'
 
-    assert.deepEqual(strings.stringifyCookie(obj), cookie)
+    assert.deepEqual(cookies.stringifyCookie(obj), cookie)

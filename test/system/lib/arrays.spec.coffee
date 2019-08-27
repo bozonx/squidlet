@@ -1,7 +1,7 @@
 arrays = require('../../../system/lib/arrays')
 
 
-describe.only 'system.lib.arrays', ->
+describe 'system.lib.arrays', ->
   it 'lastItem', ->
     assert.equal(arrays.lastItem([0,1,2]), 2)
 

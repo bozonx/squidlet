@@ -2,7 +2,6 @@ strings = require('../../../system/lib/strings')
 
 
 describe 'system.lib.strings', ->
-
   it 'firstLetterToUpperCase', ->
     assert.equal(strings.firstLetterToUpperCase('str str'), 'Str str')
     assert.equal(strings.firstLetterToUpperCase('strStr'), 'StrStr')
