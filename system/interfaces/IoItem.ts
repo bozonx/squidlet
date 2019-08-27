@@ -9,5 +9,4 @@ export interface IoItemDefinition {
 export default interface IoItem {
   configure?: (params: any) => Promise<void>;
   destroy?: () => Promise<void>;
-  //[index: string]: undefined | ((...args: any[]) => Promise<any>);
 }

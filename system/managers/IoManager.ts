@@ -29,16 +29,6 @@ export default class IoManager {
   }
 
 
-  // private async initAllIo() {
-  //   const ioNames: string[] = this.ioSet.getNames();
-  //
-  //   for (let ioName of ioNames) {
-  //     const ioItem: IoItem = this.ioSet.getIo(ioName);
-  //
-  //     if (ioItem.init) await ioItem.init();
-  //   }
-  // }
-
   private async configureAllIo() {
     const ioNames: string[] = this.ioSet.getNames();
     const ioParams = await this.context.system.envSet.loadConfig<IoItemDefinition>(
