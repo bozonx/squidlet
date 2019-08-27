@@ -22,54 +22,6 @@ export function convertToLevel(value: any): boolean {
 }
 
 /**
- * Parse string numbers and constants to pure numbers and constants
- */
-export function parseValue(rawValue: any): any {
-  if (
-    typeof rawValue === 'undefined'
-    || rawValue === null
-    || typeof rawValue === 'boolean'
-    || Number.isNaN(rawValue)
-    || rawValue === ''
-  ) {
-    return rawValue;
-  }
-  else if (rawValue === 'true') {
-    return true;
-  }
-  else if (rawValue === 'false') {
-    return false;
-  }
-  else if (rawValue === 'undefined') {
-    return undefined;
-  }
-  else if (rawValue === 'null') {
-    return null;
-  }
-  else if (rawValue === 'NaN') {
-    return NaN;
-  }
-  // it is for - 2. strings
-  else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
-    return rawValue;
-  }
-
-  const toNumber = parseFloat(rawValue);
-
-  if (!Number.isNaN(toNumber)) {
-    // it's number
-    return toNumber;
-  }
-
-  if (typeof rawValue === 'string') {
-    return rawValue;
-  }
-
-  // array or object - as is
-  return rawValue;
-}
-
-/**
  * Is actually inverted.
  * Pullup inverts only if invertOnPullup is set.
  */
@@ -110,24 +62,6 @@ export function resolveEdge(edge: Edge | undefined, inverted?: boolean): Edge {
 }
 
 /**
- * Call error-first callback functions like a promised
- */
-export function callPromised(method: Function, ...params: any[]): Promise<any> {
-  return new Promise((resolve, reject) => {
-    try {
-      method(...params, (err: Error, data: any) => {
-        if (err) return reject(err);
-
-        resolve(data);
-      });
-    }
-    catch (err) {
-      reject(err);
-    }
-  });
-}
-
-/**
  * Join topic paths using special path separator
  */
 export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string | undefined>): string {
@@ -135,46 +69,6 @@ export function combineTopic(topicSeparator: string, basePath: string, ...subPat
 
   return [ basePath, ...compactUndefined(subPaths) ].join(topicSeparator);
 }
-
-// /**
-//  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
-//  */
-// export function splitTopicId(topicSeparator: string, topic: string): [ string, string | undefined ] {
-//   return splitFirstElement(topic, topicSeparator);
-// }
-
-// TODO: review
-// TODO: test
-export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-  // TODO: rerutn an object and add method - cancel
-  return new Promise<T>((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        resolve(await cb());
-      }
-      catch(err) {
-        reject(err);
-      }
-    }, delayMs);
-  });
-}
-
-// TODO: review
-// TODO: test
-export function callOnDifferentValues(
-  arr1: any[],
-  arr2: any[],
-  cb: (index: number, value1: any, value2: any) => void
-) {
-  for (let indexStr in arr1) {
-    const index: number = parseInt(indexStr);
-
-    if (arr1[index] !== arr2[index]) {
-      cb(index, arr1[index], arr2[index]);
-    }
-  }
-}
-
 
 /**
  * Makes ['info', 'warn', 'error'] if log level is 'info'
@@ -210,10 +104,45 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
   return `${entityType}s` as any;
 }
 
-// TODO: test - float
-export function isExactlyNumber(value: any): boolean {
-  return !Number.isNaN(Number(value));
+// TODO: review
+// TODO: test
+export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+  // TODO: rerutn an object and add method - cancel
+  return new Promise<T>((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        resolve(await cb());
+      }
+      catch(err) {
+        reject(err);
+      }
+    }, delayMs);
+  });
 }
+
+// TODO: review
+// TODO: test
+export function callOnDifferentValues(
+  arr1: any[],
+  arr2: any[],
+  cb: (index: number, value1: any, value2: any) => void
+) {
+  for (let indexStr in arr1) {
+    const index: number = parseInt(indexStr);
+
+    if (arr1[index] !== arr2[index]) {
+      cb(index, arr1[index], arr2[index]);
+    }
+  }
+}
+
+
+// /**
+//  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]
+//  */
+// export function splitTopicId(topicSeparator: string, topic: string): [ string, string | undefined ] {
+//   return splitFirstElement(topic, topicSeparator);
+// }
 
 // export function isCorrectEdge(value: boolean, edge?: Edge): boolean {
 //   if (!edge || edge === 'both') return true;
