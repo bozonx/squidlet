@@ -53,3 +53,14 @@ export function splitLastElement(
 
   return [ last, split.join(separator) ];
 }
+
+export function padStart(srcString: string, length: number = 0, chars: string = ' '): string {
+  let result = '';
+  const repeats = length - srcString.length;
+
+  if (repeats <= 0) return srcString;
+
+  for (let i = 0; i < repeats; i ++) result += chars;
+
+  return `${result}${srcString}`;
+}

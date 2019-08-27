@@ -1,4 +1,4 @@
-import {padStart} from './lodashLike';
+import {padStart} from './strings';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../constants';
 
 

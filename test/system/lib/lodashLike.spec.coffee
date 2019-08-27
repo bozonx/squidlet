@@ -14,9 +14,6 @@ describe.only 'system.lib.lodashLike', ->
   it 'trim', ->
     assert.equal(lodashLike.trim('  a  '), 'a')
 
-  it 'padStart', ->
-    assert.equal(lodashLike.padStart('11', 8, '0'), '00000011')
-
   it 'isEqual', ->
     assert.isTrue(lodashLike.isEqual(1, 1))
     assert.isFalse(lodashLike.isEqual(1, 0))

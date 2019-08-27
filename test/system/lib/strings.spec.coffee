@@ -14,3 +14,6 @@ describe 'system.lib.strings', ->
   it 'splitLastElement', ->
     assert.deepEqual(strings.splitLastElement('path/to/dest', '/'), [ 'dest', 'path/to' ])
     assert.deepEqual(strings.splitLastElement('path', '/'), [ 'path', undefined ])
+
+  it 'padStart', ->
+    assert.equal(strings.padStart('11', 8, '0'), '00000011')
