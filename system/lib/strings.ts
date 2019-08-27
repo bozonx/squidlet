@@ -1,6 +1,6 @@
 import {trim} from './lodashLike';
 import {Primitives} from '../interfaces/Types';
-import {parseValue} from './helpers';
+import {parseValue} from './common';
 
 declare const btoa: ((data: any) => any) | undefined;
 declare const atob: ((data: any) => any) | undefined;

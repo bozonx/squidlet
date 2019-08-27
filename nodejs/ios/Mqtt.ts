@@ -6,7 +6,7 @@ import * as mqtt from 'mqtt';
 
 import MqttIo, {MqttOptions, MqttIoEvents} from 'system/interfaces/io/MqttIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {callPromised} from 'system/lib/helpers';
+import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 

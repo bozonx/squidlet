@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 
 import StorageIo, {Stats, ConfigParams} from 'system/interfaces/io/StorageIo';
-import {callPromised} from 'system/lib/helpers';
+import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {ENCODE} from 'system/constants';
 

@@ -7,7 +7,7 @@ import WebSocketClientIo, {
   WsCloseStatus
 } from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {callPromised} from 'system/lib/helpers';
+import {callPromised} from 'system/lib/common';
 import {omit} from 'system/lib/lodashLike';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';

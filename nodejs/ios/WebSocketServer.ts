@@ -8,7 +8,7 @@ import WebSocketServerIo, {
 } from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
-import {callPromised} from 'system/lib/helpers';
+import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from '../../system/lib/buffer';
 
 

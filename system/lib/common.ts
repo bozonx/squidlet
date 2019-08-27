@@ -1,4 +1,3 @@
-
 /**
  * Parse string numbers and constants to pure numbers and constants
  */
