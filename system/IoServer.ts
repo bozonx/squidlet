@@ -1,19 +1,21 @@
-import IoSet from '../system/interfaces/IoSet';
-import {deserializeJson, serializeJson} from '../system/lib/binaryHelpers';
-import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
-import {WebSocketServerProps} from '../system/interfaces/io/WebSocketServerIo';
+import IoSet from './interfaces/IoSet';
+import {deserializeJson, serializeJson} from './lib/binaryHelpers';
+import {WebSocketServerProps} from './interfaces/io/WebSocketServerIo';
+import RemoteCall from './lib/remoteCall/RemoteCall';
+import RemoteCallMessage from './interfaces/RemoteCallMessage';
+import {makeUniqId} from './lib/uniqId';
+import HostConfig from './interfaces/HostConfig';
+import {ShutdownReason} from './System';
+import InitializationConfig from './interfaces/InitializationConfig';
+import initializationConfig from './config/initializationConfig';
+import {pathJoin} from './lib/nodeLike';
+import systemConfig from './config/systemConfig';
+import StorageIo from './interfaces/io/StorageIo';
+import {SHUTDOWN_EVENT} from './constants';
+// TODO: use ioSet's
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
-import RemoteCall from '../system/lib/remoteCall/RemoteCall';
-import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
-import {makeUniqId} from '../system/lib/uniqId';
-import HostConfig from '../system/interfaces/HostConfig';
-import {ShutdownReason} from '../system/System';
-import {SHUTDOWN_EVENT} from '../system/constants';
-import InitializationConfig from '../system/interfaces/InitializationConfig';
-import initializationConfig from '../system/config/initializationConfig';
-import {pathJoin} from '../system/lib/nodeLike';
-import systemConfig from '../system/config/systemConfig';
-import StorageIo from '../system/interfaces/io/StorageIo';
+// TODO: use ioSet's
+import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
 
 
 export const IO_API = 'ioApi';
@@ -29,7 +31,7 @@ export default class IoServer {
   private readonly ioSet: IoSet;
   // user's set props of ioServer
   //private readonly ioServerProps: HostConfig['ioServer'];
-  private readonly rcResponseTimoutSec: number;
+  //private readonly rcResponseTimoutSec: number;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;

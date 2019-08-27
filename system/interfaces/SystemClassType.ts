@@ -1,5 +1,5 @@
-import IoSet from '../../system/interfaces/IoSet';
-import System from '../../system';
+import IoSet from './IoSet';
+import System from '../index';
 
 
 export type SystemClassType = new (ioSet?: IoSet, systemConfigExtend?: {[index: string]: any}) => System;

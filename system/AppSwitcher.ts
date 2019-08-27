@@ -1,8 +1,8 @@
-import IoSet from '../system/interfaces/IoSet';
+import IoSet from './interfaces/IoSet';
 import {SystemClassType} from './interfaces/SystemClassType';
-import System, {ShutdownReason} from '../system/System';
+import System, {ShutdownReason} from './System';
 import IoServer from './IoServer';
-import systemConfig from '../system/config/systemConfig';
+import systemConfig from './config/systemConfig';
 
 
 const defaultPathToSystem = `${systemConfig.rootDirs.envSet}/${systemConfig.envSetDirs.system}/System`;

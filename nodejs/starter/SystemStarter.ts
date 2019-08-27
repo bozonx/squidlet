@@ -4,7 +4,7 @@ import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
 import Os from '../../shared/Os';
-import {SystemClassType} from '../../shared/interfaces/SystemClassType';
+import {SystemClassType} from '../../system/interfaces/SystemClassType';
 import {listenScriptEnd} from '../../shared/helpers';
 
 

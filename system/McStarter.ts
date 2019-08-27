@@ -1,7 +1,7 @@
 import IoSetLocal from './IoSetLocal';
-import IoSet from '../system/interfaces/IoSet';
-import AppSwitcher from '../shared/AppSwitcher';
-import SysIo from '../system/interfaces/io/SysIo';
+import IoSet from './interfaces/IoSet';
+import AppSwitcher from './AppSwitcher';
+import SysIo from './interfaces/io/SysIo';
 
 
 /**

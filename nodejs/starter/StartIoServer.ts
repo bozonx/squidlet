@@ -2,7 +2,7 @@ import NodejsMachines from '../interfaces/NodejsMachines';
 import Props from './Props';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import IoServer from '../../shared/IoServer';
+import IoServer from '../../system/IoServer';
 import IoSetBase from './IoSetBase';
 import IoSet from '../../system/interfaces/IoSet';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
