@@ -9,6 +9,11 @@ import {makeUniqId} from '../system/lib/uniqId';
 import HostConfig from '../system/interfaces/HostConfig';
 import {ShutdownReason} from '../system/System';
 import {SHUTDOWN_EVENT} from '../system/constants';
+import InitializationConfig from '../system/interfaces/InitializationConfig';
+import initializationConfig from '../system/config/initializationConfig';
+import {pathJoin} from '../system/lib/nodeLike';
+import systemConfig from '../system/config/systemConfig';
+import StorageIo from '../system/interfaces/io/StorageIo';
 
 
 export const IO_API = 'ioApi';
@@ -23,7 +28,7 @@ export const defaultProps: WebSocketServerProps = {
 export default class IoServer {
   private readonly ioSet: IoSet;
   // user's set props of ioServer
-  private readonly ioServerProps: HostConfig['ioServer'];
+  //private readonly ioServerProps: HostConfig['ioServer'];
   private readonly rcResponseTimoutSec: number;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
@@ -39,19 +44,22 @@ export default class IoServer {
   constructor(
     // it has to be initialized before
     ioSet: IoSet,
-    ioServerProps: HostConfig['ioServer'],
-    rcResponseTimoutSec: number,
+    //ioServerProps: HostConfig['ioServer'],
+    //rcResponseTimoutSec: number,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
-    this.ioServerProps = ioServerProps;
-    this.rcResponseTimoutSec = rcResponseTimoutSec;
+    //this.ioServerProps = ioServerProps;
+    //this.rcResponseTimoutSec = rcResponseTimoutSec;
     this.logInfo = logInfo;
     this.logError = logError;
   }
 
   async start() {
+    // TODO: !!!!????? host config может и не быть
+    const hostConfig = await this.loadHostConfig();
+
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
     const props = await this.makeProps();
 
@@ -170,6 +178,21 @@ export default class IoServer {
       ...defaultProps,
       ...this.ioServerProps,
     };
+  }
+
+  private async loadHostConfig(): Promise<HostConfig> {
+    // TODO: review
+    const initCfg: InitializationConfig = initializationConfig();
+    const pathToConfig = pathJoin(
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.configs,
+      initCfg.fileNames.hostConfig
+    );
+
+    const storage = this.ioSet.getIo<StorageIo>('Storage');
+    const configStr: string = await storage.readFile(pathToConfig);
+
+    return JSON.parse(configStr);
   }
 
 }
