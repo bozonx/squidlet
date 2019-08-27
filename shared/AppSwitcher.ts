@@ -47,55 +47,50 @@ export default class AppSwitcher {
   private handleShutdownRequest(reason: ShutdownReason) {
     switch (reason) {
       case 'switchToIoServer':
-        this.switchToIoServer();
-
+        this.switchToIoServer()
+          .catch(console.error);
         break;
       case 'switchToApp':
-        this.switchToApp();
-
+        this.switchToApp()
+          .catch(console.error);
         break;
       case 'restart':
-        this.restart();
-        if (this.system) {
-          this.system.destroy()
-            .then(this.startSystem)
-            .catch(console.error);
-        }
-        else if (this.ioServer) {
-          this.ioServer.destroy()
-            .then(this.startIoServer)
-            .catch(console.error);
-        }
-        else {
-          throw new Error(`Can't restart: IoServer and System aren't set`);
-        }
-
+        this.restart()
+          .catch(console.error);
         break;
     }
   }
 
-  private switchToIoServer() {
+  private async switchToIoServer() {
     if (!this.system) throw new Error(`System isn't set`);
 
-    this.system.destroy()
-      .then(this.startIoServer)
-      .catch(console.error);
-
+    await this.system.destroy();
     delete this.system;
+    await this.startIoServer();
   }
 
-  private switchToApp() {
+  private async switchToApp() {
     if (!this.ioServer) throw new Error(`IoServer isn't set`);
 
-    this.ioServer.destroy()
-      .then(this.startSystem)
-      .catch(console.error);
-
+    await this.ioServer.destroy();
     delete this.ioServer;
+    await this.startSystem();
   }
 
-  private restart() {
-
+  private async restart() {
+    if (this.system) {
+      await this.system.destroy();
+      delete this.system;
+      await this.startSystem();
+    }
+    else if (this.ioServer) {
+      await this.ioServer.destroy();
+      delete this.ioServer;
+      await this.startIoServer();
+    }
+    else {
+      throw new Error(`Can't restart: IoServer and System aren't set`);
+    }
   }
 
 }
