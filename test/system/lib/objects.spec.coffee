@@ -1,7 +1,7 @@
 objects = require('../../../system/lib/objects')
 
 
-describe.only 'system.lib.objects', ->
+describe 'system.lib.objects', ->
   it 'omitObj', ->
     assert.deepEqual(objects.omitObj({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
 
@@ -9,16 +9,9 @@ describe.only 'system.lib.objects', ->
     assert.deepEqual(objects.pickObj({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
 
   it 'findObj', ->
-# object
     objCb = (item, index) => item == 1
     assert.equal(objects.findObj({a: 0, b: 1}, objCb), 1)
-    # object - not found
     assert.isUndefined(objects.findObj({a: 0, b: 2}, objCb))
-    # array
-    arrCb = (item, index) => item == 'b'
-    assert.equal(objects.findObj(['a', 'b'], arrCb), 'b')
-    # array - not found
-    assert.isUndefined(objects.findObj(['a', 'c'], arrCb))
 
   it 'isPlainObject', ->
     cl = () ->

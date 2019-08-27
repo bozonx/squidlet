@@ -28,20 +28,23 @@ export function pickObj(obj: {[index: string]: any} | undefined, ...propToPick: 
   return result;
 }
 
-// TODO: test - remove array
-export function findObj(obj: {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
+/**
+ * Find element in object. Like lodash's find function.
+ */
+export function findObj(obj: {[index: string]: any}, cb: (item: any, index: string | number) => any): boolean | undefined {
   if (typeof obj === 'undefined') {
     return;
   }
-  else if (typeof obj === 'object') {
-    for (let key of Object.keys(obj)) {
-      const result: any = cb(obj[key], key);
-
-      if (result) return obj[key];
-    }
-  }
-  else {
+  else if (typeof obj !== 'object') {
     throw new Error(`findObj: unsupported type of object "${JSON.stringify(obj)}"`);
+  }
+
+  for (let key of Object.keys(obj)) {
+    const result: any = cb(obj[key], key);
+
+    if (result === false || typeof result === 'undefined') continue;
+
+    return obj[key];
   }
 
   return;
@@ -122,17 +125,17 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
 }
 
 /**
- * Clear all the props in object
- */
-export function clearObject(obj: {[index: string]: any}) {
-  for (let name of Object.keys(obj)) delete obj[name];
-}
-
-/**
  * Is an object (plain or instance of some class), not an array
  */
 export function isExactlyObject(item: any): boolean {
   return item && typeof item === 'object' && !Array.isArray(item) || false;
+}
+
+/**
+ * Clear all the props in object
+ */
+export function clearObject(obj: {[index: string]: any}) {
+  for (let name of Object.keys(obj)) delete obj[name];
 }
 
 /**
