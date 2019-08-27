@@ -55,13 +55,14 @@ export default class StartIoServer {
     //await this.installModules();
 
     // load all the machine's io
-    const ioSet = await this.makeIoSet();
+    const ioSet: IoSet = await this.makeIoSet();
     const ioServer = new IoServer(
       ioSet,
-      this.props.hostConfig.ioServer,
-      (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
-        ? this.props.hostConfig.config.rcResponseTimoutSec
-        : hostDefaultConfig.config.rcResponseTimoutSec,
+      this.shutdownRequestCb,
+      // this.props.hostConfig.ioServer,
+      // (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
+      //   ? this.props.hostConfig.config.rcResponseTimoutSec
+      //   : hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       console.error
     );
@@ -69,6 +70,11 @@ export default class StartIoServer {
     await ioServer.start();
   }
 
+  private shutdownRequestCb = () => {
+    console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
+  }
+
+  // TODO: review
   private async makeIoSet(): Promise<IoSet> {
     const ioSet = new IoSetBase(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
 
