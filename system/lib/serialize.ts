@@ -1,10 +1,29 @@
-import {base64ToString, stringToBase64} from './strings';
 import {concatUint8Arr, int32ToUint8Arr, uint8ToNum} from './binaryHelpers';
 
 
 const BIN_MARK = '!BIN!';
 const BIN_LENGTH_SEP = ':';
 
+
+declare const btoa: ((data: any) => any) | undefined;
+declare const atob: ((data: any) => any) | undefined;
+
+
+export function base64ToString(str: string): string {
+  if (typeof btoa === 'undefined') {
+    return Buffer.from(str).toString('base64');
+  }
+
+  return btoa(str);
+}
+
+export function stringToBase64(base64Str: string): string {
+  if (typeof atob === 'undefined') {
+    return Buffer.from(base64Str, 'base64').toString();
+  }
+
+  return atob(base64Str);
+}
 
 // see https://stackoverflow.com/questions/17191945/conversion-between-utf-8-arraybuffer-and-string
 export function uint8ArrayToText(uintArray: Uint8Array): string {

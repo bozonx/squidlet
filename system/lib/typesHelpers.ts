@@ -1,6 +1,6 @@
 import {trim} from './lodashLike';
 import {Primitives} from '../interfaces/Types';
-import {isExactlyNumber} from './helpers';
+import {isExactlyNumber} from './common';
 
 
 export interface ParsedType {

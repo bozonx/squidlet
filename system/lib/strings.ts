@@ -1,27 +1,3 @@
-import {trim} from './lodashLike';
-import {Primitives} from '../interfaces/Types';
-import {parseValue} from './common';
-
-declare const btoa: ((data: any) => any) | undefined;
-declare const atob: ((data: any) => any) | undefined;
-
-
-export function base64ToString(str: string): string {
-  if (typeof btoa === 'undefined') {
-    return Buffer.from(str).toString('base64');
-  }
-
-  return btoa(str);
-}
-
-export function stringToBase64(base64Str: string): string {
-  if (typeof atob === 'undefined') {
-    return Buffer.from(base64Str, 'base64').toString();
-  }
-
-  return atob(base64Str);
-}
-
 /**
  * Turn only the first letter to upper case
  */
@@ -77,50 +53,3 @@ export function splitLastElement(
 
   return [ last, split.join(separator) ];
 }
-
-/**
- * Parse cookie like "param1=value1; param2=value2;" to { param1: 'value1', param2: 'value2' }
- * example - lang=ru-RU; gdpr-cookie-consent=accepted;
- */
-export function parseCookie(cookies?: string): {[index: string]: Primitives} {
-  if (!cookies) return {};
-
-  const splat: string[] = cookies.split(';');
-  const result: {[index: string]: any} = {};
-
-  for (let item of splat) {
-    const [key, value] = item.split('=');
-
-    result[trim(key)] = parseValue(trim(value));
-  }
-
-  return result;
-}
-
-export function stringifyCookie(obj: {[index: string]: Primitives}): string {
-  const result: string[] = [];
-
-  for (let key of Object.keys(obj)) {
-    const value: Primitives = obj[key];
-    if (
-      typeof value !== 'boolean'
-      && typeof value !== 'string'
-      && typeof value !== 'number'
-      && typeof value !== 'undefined'
-      && value !== null
-    ) throw new Error(`stringifyCookie: invalid received object`);
-
-    result.push(`${key}=${value}`);
-  }
-
-  return result.join('; ');
-}
-
-
-/*
-import * as querystring from 'querystring';
-
-const splitUrl: string[] = (request.url as any).split('?');
-const getParams: {clientId: string} = querystring.parse(splitUrl[1]) as any;
-const clientId: string = getParams.clientId;
- */
