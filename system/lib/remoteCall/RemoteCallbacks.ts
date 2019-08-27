@@ -4,7 +4,7 @@ import RemoteCallMessage, {
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
 import {waitForResponse} from './helpers';
-import {clearObject} from '../collections';
+import {clearObject} from '../objects';
 
 
 type CbResultHandler = (payload: ResultCbPayload) => void;

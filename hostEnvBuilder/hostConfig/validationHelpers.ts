@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {isExactlyObject} from '../../system/lib/collections';
+import {isExactlyObject} from '../../system/lib/objects';
 
 
 export function sequence(exprs: (() => string | undefined)[]): string | undefined {

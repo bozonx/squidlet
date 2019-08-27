@@ -1,4 +1,5 @@
-import {concatUniqStrArrays, mergeDeepObjects} from './objects';
+import {mergeDeepObjects} from './objects';
+import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue from './RequestQueue';
 import {cloneDeep, difference, pick} from './lodashLike';

@@ -1,6 +1,7 @@
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {bitsToBytes} from 'system/lib/binaryHelpers';
-import {getKeyOfObject, setArrayDimension} from 'system/lib/collections';
+import {getKeyOfObject} from 'system/lib/objects';
+import {setArrayDimension} from 'system/lib/arrays';
 
 import {
   COMMANDS,
@@ -22,7 +23,7 @@ export default class DigitalPins {
   // pin modes which are set at init time.
   private pinModes: number[] = [];
   private readonly expander: PortExpander;
-  
+
 
   constructor(expander: PortExpander) {
     this.expander = expander;

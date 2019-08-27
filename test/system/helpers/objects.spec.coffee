@@ -40,9 +40,3 @@ describe.only 'system.helpers.objects', ->
       objects.mergeDeepObjects({top: undefined}, {top: 'top', bottom: 'bottom'}),
       {top: undefined, bottom: 'bottom'}
     )
-
-  it 'removeItemFromArray', ->
-    arr = ['a', 'b', 'c', 'b']
-
-    assert.deepEqual(objects.removeItemFromArray(arr, 'b'), ['a', 'c', 'b'])
-    assert.deepEqual(objects.removeItemFromArray(arr, 'b', false), ['a', 'c'])

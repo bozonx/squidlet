@@ -12,7 +12,7 @@ const BIN_LENGTH_SEP = ':';
  */
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
   if (!(arr instanceof Uint8Array)) {
-    throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
+    throw new Error(`binaryHelpers.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
   }
 
   const shift = 1;
@@ -30,7 +30,7 @@ export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
  */
 export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8Array {
   if (!(arr instanceof Uint8Array)) {
-    throw new Error(`collections.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
+    throw new Error(`binaryHelpers.withoutFirstItemUint8Arr: array have to be an Uint8Array`);
   }
 
   const itemsToAdd = 1;

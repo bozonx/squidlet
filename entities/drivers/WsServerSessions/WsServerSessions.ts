@@ -5,7 +5,7 @@ import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie} from 'system/lib/strings';
 import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {getKeyOfObject} from 'system/lib/collections';
+import {getKeyOfObject} from 'system/lib/objects';
 import {omit} from 'system/lib/lodashLike';
 import {WsServer} from '../WsServer/WsServer';
 
