@@ -7,7 +7,7 @@ import {makeUniqId} from './lib/uniqId';
 import HostConfig from './interfaces/HostConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
-import {pathJoin} from './lib/nodeLike';
+import {pathJoin} from './lib/paths';
 import systemConfig from './config/systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
 // TODO: use ioSet's

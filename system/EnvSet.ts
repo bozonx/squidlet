@@ -2,7 +2,7 @@ import Context from './Context';
 import ManifestBase from './interfaces/ManifestBase';
 import {EntityType} from './interfaces/EntityTypes';
 import {EntityClassType} from './managers/EntityManagerBase';
-import {pathJoin} from './lib/nodeLike';
+import {pathJoin} from './lib/paths';
 import StorageIo from './interfaces/io/StorageIo';
 import {splitFirstElement} from './lib/strings';
 import {convertEntityTypeToPlural} from './lib/helpers';

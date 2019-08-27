@@ -1,6 +1,6 @@
 import IoSet from './interfaces/IoSet';
 import IoItem from './interfaces/IoItem';
-import {pathJoin} from './lib/nodeLike';
+import {pathJoin} from './lib/paths';
 import Context from './Context';
 
 

@@ -8,7 +8,7 @@ import {calcAllowedLogLevels} from './lib/helpers';
 import {IO_SERVER_MODE_FILE_NAME, LOGGER_EVENT} from './constants';
 import SysIo from './interfaces/io/SysIo';
 import StorageIo from './interfaces/io/StorageIo';
-import {pathJoin} from './lib/nodeLike';
+import {pathJoin} from './lib/paths';
 
 
 export default class Api {
