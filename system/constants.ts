@@ -14,4 +14,3 @@ export enum AppLifeCycleEvents {
   beforeDestroy,
 }
 export const LOGGER_EVENT = 'LOGGER';
-export const SHUTDOWN_EVENT = 'shutdown';

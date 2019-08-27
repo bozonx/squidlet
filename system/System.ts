@@ -10,13 +10,12 @@ import Context from './Context';
 import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './config/initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
-import {AppLifeCycleEvents, SHUTDOWN_EVENT} from './constants';
-
-
-export type ShutdownReason = 'switchToIoServer' | 'switchToApp' | 'restart';
+import {AppLifeCycleEvents} from './constants';
+import {ShutdownHandler} from './interfaces/SystemClassType';
 
 
 export default class System {
+  readonly shutdownRequest: ShutdownHandler;
   readonly context: Context;
   readonly events = new IndexedEventEmitter();
   readonly envSet: EnvSet;
@@ -43,7 +42,12 @@ export default class System {
   private _isAppInitialized: boolean = false;
 
 
-  constructor(ioSet: IoSet, systemConfigExtend?: {[index: string]: any}) {
+  constructor(
+    ioSet: IoSet,
+    shutdownRequest: ShutdownHandler,
+    systemConfigExtend?: {[index: string]: any}
+  ) {
+    this.shutdownRequest = shutdownRequest;
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
     this.context = new Context(this, systemConfigExtend);
@@ -92,10 +96,6 @@ export default class System {
     delete this._initializationConfig;
 
     console.info(`===> System initialization has been finished`);
-  }
-
-  onShutdownRequest(cb: (reason: ShutdownReason) => void) {
-    this.events.addListener(SHUTDOWN_EVENT, cb);
   }
 
 

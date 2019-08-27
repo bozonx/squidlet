@@ -118,18 +118,8 @@ export default class Api {
       throw new Error(`Switching to IO-server isn't allowed it config`);
     }
 
-    const pathToTmpFile = pathJoin(
-      this.context.systemConfig.rootDirs.tmp,
-      IO_SERVER_MODE_FILE_NAME
-    );
-    const storage = this.context.getIo<StorageIo>('Storage');
-    const sys = this.context.getIo<SysIo>('Sys');
-
-    this.context.log.info(`Switching to IO server mode`);
-
-    // TODO: ошика с путями
-    //await storage.writeFile(pathToTmpFile, '1');
-    await sys.restart();
+    this.context.log.info(`Switching to IO server`);
+    this.context.system.shutdownRequest('switchToIoServer');
   }
 
   async reboot() {
