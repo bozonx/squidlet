@@ -73,20 +73,15 @@ export function combineTopic(topicSeparator: string, basePath: string, ...subPat
  * Makes ['info', 'warn', 'error'] if log level is 'info'
  */
 export function calcAllowedLogLevels(logLevel: LogLevel): LogLevel[] {
-  // TODO: test
-
   const currentLevelIndex: number = LOG_LEVELS.indexOf(logLevel);
 
   return LOG_LEVELS.slice(currentLevelIndex) as LogLevel[];
 }
 
-
 /**
  * Collect values which are set in default param of props schema
  */
 export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[index: string]: any} {
-  // TODO: test
-
   const result: {[index: string]: any} = {};
 
   if (!manifestProps) return result;
@@ -100,7 +95,6 @@ export function collectPropsDefaults(manifestProps?: {[index: string]: any}): {[
   return result;
 }
 
-// TODO: test
 export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlural {
   return `${entityType}s` as any;
 }

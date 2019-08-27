@@ -2,8 +2,8 @@ lodashLike = require('../../../system/lib/lodashLike')
 
 
 describe.only 'system.lib.lodashLike', ->
-  it 'values', ->
-    assert.deepEqual(lodashLike.values({a: 0, b: 1}), [0, 1])
+#  it 'values', ->
+#    assert.deepEqual(lodashLike.values({a: 0, b: 1}), [0, 1])
 
   it 'trimStart', ->
     assert.equal(lodashLike.trimStart('  a  '), 'a  ')

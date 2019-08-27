@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe.only 'system.lib.helpers', ->
+describe 'system.lib.helpers', ->
   it 'convertToLevel', ->
     assert.isTrue(helpers.convertToLevel(true))
     assert.isTrue(helpers.convertToLevel(1))
@@ -48,6 +48,29 @@ describe.only 'system.lib.helpers', ->
     assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
     assert.equal(helpers.combineTopic('/', 'first', undefined, 'third'), 'first/third')
     assert.equal(helpers.combineTopic('/', 'first', 'second', undefined), 'first/second')
+
+  it 'calcAllowedLogLevels', ->
+    assert.deepEqual(helpers.calcAllowedLogLevels('debug'), ['debug', 'info', 'warn', 'error'])
+    assert.deepEqual(helpers.calcAllowedLogLevels('info'), ['info', 'warn', 'error'])
+    assert.deepEqual(helpers.calcAllowedLogLevels('warn'), ['warn', 'error'])
+    assert.deepEqual(helpers.calcAllowedLogLevels('error'), ['error'])
+
+  it 'collectPropsDefaults', ->
+    assert.deepEqual(helpers.collectPropsDefaults(undefined ), {})
+    assert.deepEqual(helpers.collectPropsDefaults({
+      param1: {
+        default: 1
+      }
+      param2: {
+        default: 2
+      }
+      param3: {}
+    }), { param1: 1, param2: 2})
+
+  it 'convertEntityTypeToPlural', ->
+    assert.equal(helpers.convertEntityTypeToPlural('driver'), 'drivers')
+    assert.equal(helpers.convertEntityTypeToPlural('service'), 'services')
+    assert.equal(helpers.convertEntityTypeToPlural('device'), 'devices')
 
 #  it 'splitTopicId', ->
 #    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])
