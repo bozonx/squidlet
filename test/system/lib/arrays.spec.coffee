@@ -1,7 +1,7 @@
 arrays = require('../../../system/lib/arrays')
 
 
-describe.only 'system.helpers.arrays', ->
+describe.only 'system.lib.arrays', ->
   it 'appendArray', ->
     arr = [1]
     arrays.appendArray(arr, [2])

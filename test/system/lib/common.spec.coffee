@@ -1,7 +1,7 @@
 common = require('../../../system/lib/common')
 
 
-describe.only 'system.hepers.common', ->
+describe.only 'system.lib.common', ->
   it 'parseValue', ->
     assert.isUndefined(common.parseValue(undefined))
     assert.isUndefined(common.parseValue('undefined'))

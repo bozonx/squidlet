@@ -1,7 +1,7 @@
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.helpers.Promised', ->
+describe 'system.lib.Promised', ->
   beforeEach ->
     @promised = new Promised()
 

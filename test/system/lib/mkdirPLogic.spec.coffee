@@ -4,7 +4,7 @@ mkdirPLogic = require('../../../system/lib/mkdirPLogic').default
 # TODO: review
 
 
-describe 'system.helpers.mkdirPLogic', ->
+describe 'system.lib.mkdirPLogic', ->
   it 'common usage', ->
     fullPath = '/path/to/my/dir'
     existentPath = '/path'

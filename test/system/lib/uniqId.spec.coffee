@@ -1,7 +1,7 @@
 uniqId = require('../../../system/lib/uniqId')
 
 
-describe 'system.helpers.uniqId', ->
+describe 'system.lib.uniqId', ->
   it 'makeUniqNumber', ->
     assert.isNumber(uniqId.makeUniqNumber())
     assert.isTrue(uniqId.makeUniqNumber() != uniqId.makeUniqNumber())

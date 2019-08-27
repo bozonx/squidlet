@@ -1,7 +1,7 @@
 hashSum = require('../../../system/lib/hashSum').default
 
 
-describe 'system.helpers.hashSum', ->
+describe 'system.lib.hashSum', ->
   it 'sum', ->
     str = 'asdfgh123456qwerylgjfn fidf eiefijef efi 34539987 kjgndfkj dfgojfgl'
     assert.equal(hashSum(str), hashSum(str))

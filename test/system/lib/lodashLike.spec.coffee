@@ -1,7 +1,7 @@
 lodashLike = require('../../../system/lib/lodashLike')
 
 
-describe 'system.helpers.lodashLike', ->
+describe 'system.lib.lodashLike', ->
   it 'isEmpty', ->
     assert.equal(lodashLike.isEmpty(undefined), true)
     assert.equal(lodashLike.isEmpty(null), true)

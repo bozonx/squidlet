@@ -1,7 +1,7 @@
 RequestQueue = require('../../../system/lib/RequestQueue').default;
 
 
-describe 'system.helpers.RequestQueue', ->
+describe 'system.lib.RequestQueue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'

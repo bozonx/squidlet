@@ -1,7 +1,7 @@
 types = require('../../../system/lib/typesHelpers');
 
 
-describe 'system.helpers.typesHelpers', ->
+describe 'system.lib.typesHelpers', ->
   it "parseType", ->
     assert.deepEqual(types.parseType('number'), {
       types: ['number']

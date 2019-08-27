@@ -1,7 +1,7 @@
 buffer = require('../../../system/lib/buffer')
 
 
-describe 'system.helpers.buffer', ->
+describe 'system.lib.buffer', ->
   it 'convertBufferToUint8Array', ->
     arr = [0,1,2]
     data = new Buffer(arr)

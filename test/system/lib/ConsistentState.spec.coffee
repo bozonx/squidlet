@@ -1,7 +1,7 @@
 ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 
-describe 'system.helpers.ConsistentState', ->
+describe 'system.lib.ConsistentState', ->
   beforeEach ->
     @cbPromise = (dataToResolve) => new Promise((resolve) =>
       setTimeout((() -> resolve(dataToResolve)), 1)

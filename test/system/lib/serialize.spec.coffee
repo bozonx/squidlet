@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/serialize')
 
 
-describe.only 'system.helpers.serialize', ->
+describe.only 'system.lib.serialize', ->
   it 'uint8ArrayToText and textToUint8Array', ->
     str = 'my строка'
     encoded = helpers.textToUint8Array(str)
