@@ -48,9 +48,6 @@ export function compactUndefined(arr: any[]): any[] {
   return result;
 }
 
-
-
-
 /**
  * Concat arrays but not create a new one.
  * It mutates the srcArr.
@@ -123,3 +120,48 @@ export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntr
     });
   }
 }
+
+// TODO: test
+export function findIndexArray(arr: any[], cb: (item: any, index: number) => any): number {
+  if (typeof arr === 'undefined') {
+    return -1;
+  }
+  else if (Array.isArray(arr)) {
+    for (let index in arr) {
+      const result: any | undefined = cb(arr[index], parseInt(index));
+
+      if (typeof result !== 'undefined') return parseInt(index);
+    }
+  }
+  else {
+    throw new Error(`findIndexArray: unsupported type of "arr" param "${JSON.stringify(arr)}"`);
+  }
+
+  return -1;
+}
+
+
+// export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
+//   if (typeof collection === 'undefined') {
+//     return;
+//   }
+//   else if (Array.isArray(collection)) {
+//     for (let index in collection) {
+//       const result: any | undefined = cb(collection[index], parseInt(index));
+//
+//       if (result) return collection[index];
+//     }
+//   }
+//   else if (typeof collection === 'object') {
+//     for (let key of Object.keys(collection)) {
+//       const result: any = cb(collection[key], key);
+//
+//       if (result) return collection[key];
+//     }
+//   }
+//   else {
+//     throw new Error(`find: unsupported type of collection "${JSON.stringify(collection)}"`);
+//   }
+//
+//   return;
+// }

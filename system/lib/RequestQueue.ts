@@ -1,5 +1,5 @@
 import IndexedEvents from './IndexedEvents';
-import {findIndexObj} from './objects';
+import {findIndexArray} from './arrays';
 
 
 /**
@@ -393,7 +393,7 @@ export default class RequestQueue {
   }
 
   private getJobIndex(jobId: JobId): number {
-    return findIndexObj(this.queue, (item: Job) => item[JobPositions.id] === jobId) as number;
+    return findIndexArray(this.queue, (item: Job) => item[JobPositions.id] === jobId) as number;
   }
 
   private getQueuedJobs(): string[] {

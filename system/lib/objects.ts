@@ -1,4 +1,4 @@
-import {isEqual} from './lodashLike';
+import {isEqual, values} from './lodashLike';
 import {compactArray} from './arrays';
 
 
@@ -28,56 +28,23 @@ export function pickObj(obj: {[index: string]: any} | undefined, ...propToPick: 
   return result;
 }
 
-// TODO: remake to support only objects
-export function findObj(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
-  if (typeof collection === 'undefined') {
+// TODO: test - remove array
+export function findObj(obj: {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
+  if (typeof obj === 'undefined') {
     return;
   }
-  else if (Array.isArray(collection)) {
-    for (let index in collection) {
-      const result: any | undefined = cb(collection[index], parseInt(index));
+  else if (typeof obj === 'object') {
+    for (let key of Object.keys(obj)) {
+      const result: any = cb(obj[key], key);
 
-      if (result) return collection[index];
-    }
-  }
-  else if (typeof collection === 'object') {
-    for (let key of Object.keys(collection)) {
-      const result: any = cb(collection[key], key);
-
-      if (result) return collection[key];
+      if (result) return obj[key];
     }
   }
   else {
-    throw new Error(`find: unsupported type of collection "${JSON.stringify(collection)}"`);
+    throw new Error(`findObj: unsupported type of object "${JSON.stringify(obj)}"`);
   }
 
   return;
-}
-
-// TODO: test
-export function findIndexObj(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
-  if (typeof collection === 'undefined') {
-    return -1;
-  }
-  else if (Array.isArray(collection)) {
-    for (let index in collection) {
-      const result: any | undefined = cb(collection[index], parseInt(index));
-
-      if (result) return parseInt(index);
-    }
-  }
-  else if (typeof collection === 'object') {
-    for (let key of Object.keys(collection)) {
-      const result: any = cb(collection[key], key);
-
-      if (result) return key;
-    }
-  }
-  else {
-    throw new Error(`findIndexObj: unsupported type of collection "${JSON.stringify(collection)}"`);
-  }
-
-  return -1;
 }
 
 export function isPlainObject(obj: any): boolean {
@@ -196,6 +163,33 @@ export function mergeDeepObjects(
 
   return result;
 }
+
+
+
+// export function findIndexj(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): number | string {
+//   if (typeof collection === 'undefined') {
+//     return -1;
+//   }
+//   else if (Array.isArray(collection)) {
+//     for (let index in collection) {
+//       const result: any | undefined = cb(collection[index], parseInt(index));
+//
+//       if (result) return parseInt(index);
+//     }
+//   }
+//   else if (typeof collection === 'object') {
+//     for (let key of Object.keys(collection)) {
+//       const result: any = cb(collection[key], key);
+//
+//       if (result) return key;
+//     }
+//   }
+//   else {
+//     throw new Error(`findIndexObj: unsupported type of collection "${JSON.stringify(collection)}"`);
+//   }
+//
+//   return -1;
+// }
 
 // /**
 //  * It works with common structures like
