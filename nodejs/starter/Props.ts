@@ -12,7 +12,7 @@ import {
 import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
-import {isExactlyNumber} from '../../system/lib/common';
+import {isKindOfNumber} from '../../system/lib/common';
 
 
 export default class Props {
@@ -120,7 +120,7 @@ export default class Props {
     if (!this.argUser) {
       return;
     }
-    else if (isExactlyNumber(this.argUser)) {
+    else if (isKindOfNumber(this.argUser)) {
       return parseInt(this.argUser);
     }
 
@@ -135,7 +135,7 @@ export default class Props {
     else if (!this.argGroup) {
       return;
     }
-    else if (isExactlyNumber(this.argGroup)) {
+    else if (isKindOfNumber(this.argGroup)) {
       return parseInt(this.argGroup);
     }
 

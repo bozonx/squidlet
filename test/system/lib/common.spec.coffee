@@ -1,7 +1,7 @@
 common = require('../../../system/lib/common')
 
 
-describe.only 'system.lib.common', ->
+describe 'system.lib.common', ->
   it 'parseValue', ->
     assert.isUndefined(common.parseValue(undefined))
     assert.isUndefined(common.parseValue('undefined'))
@@ -37,3 +37,28 @@ describe.only 'system.lib.common', ->
     promised = common.callPromised(errMethod, data)
 
     assert.isRejected(promised);
+
+  it 'isKindOfNumber', ->
+    assert.isTrue(common.isKindOfNumber(0))
+    assert.isTrue(common.isKindOfNumber(1))
+    assert.isTrue(common.isKindOfNumber(-1))
+    assert.isTrue(common.isKindOfNumber(0.5))
+    assert.isTrue(common.isKindOfNumber(1.1))
+    assert.isTrue(common.isKindOfNumber(-0.0001))
+    assert.isTrue(common.isKindOfNumber(-1.111))
+    assert.isTrue(common.isKindOfNumber('1'))
+    assert.isTrue(common.isKindOfNumber('0'))
+    assert.isTrue(common.isKindOfNumber('-1'))
+    assert.isTrue(common.isKindOfNumber('0.5'))
+    assert.isTrue(common.isKindOfNumber('1.1'))
+    assert.isTrue(common.isKindOfNumber('-0.0001'))
+    assert.isTrue(common.isKindOfNumber('-1.111'))
+
+    assert.isFalse(common.isKindOfNumber('1a'))
+    assert.isFalse(common.isKindOfNumber('a'))
+    assert.isFalse(common.isKindOfNumber(true))
+    assert.isFalse(common.isKindOfNumber(false))
+    assert.isFalse(common.isKindOfNumber(undefined))
+    assert.isFalse(common.isKindOfNumber(null))
+    assert.isFalse(common.isKindOfNumber([]))
+    assert.isFalse(common.isKindOfNumber({}))

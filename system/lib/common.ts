@@ -64,7 +64,13 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
   });
 }
 
-// TODO: test - float
-export function isExactlyNumber(value: any): boolean {
-  return !Number.isNaN(Number(value));
+/**
+ * Is number or number as string.
+ */
+export function isKindOfNumber(value: any): boolean {
+  if (typeof value === 'string') {
+    return !Number.isNaN(Number(value));
+  }
+
+  return typeof value === 'number';
 }
