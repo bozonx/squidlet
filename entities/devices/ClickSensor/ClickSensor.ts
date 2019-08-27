@@ -1,6 +1,6 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
 import {GetDriverDep} from 'system/base/EntityBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
@@ -20,7 +20,7 @@ export default class ClickSensor extends DeviceBase<Props> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryClick = await getDriverDep('BinaryClick')
-      .getInstance(omit(this.props, 'publish'));
+      .getInstance(omitObj(this.props, 'publish'));
   }
 
   protected didInit = async () => {

@@ -1,4 +1,3 @@
-import _omit = require('lodash/omit');
 import _cloneDeep = require('lodash/cloneDeep');
 
 import PreHostConfig from '../interfaces/PreHostConfig';
@@ -6,6 +5,7 @@ import {defaultServices, servicesShortcut} from '../dict/dict';
 import systemConfig from '../configs/systemConfig';
 import {EntityType} from '../../system/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
+import {omitObj} from '../../system/lib/objects';
 
 
 /**
@@ -58,7 +58,7 @@ function convertDefinitions(
 
   for (let id of Object.keys(preDefinitions)) {
     definitions[id] = {
-      ..._omit(preDefinitions[id], entityType),
+      ...omitObj(preDefinitions[id], entityType),
       className: getDefinitionClassName(entityType, id, preDefinitions[id]),
     };
   }
@@ -138,7 +138,7 @@ export default function normalizeHostConfig(preHostConfig: PreHostConfig): PreHo
   };
 
   return {
-    ..._omit(preHostConfig, Object.keys(servicesShortcut)),
+    ...omitObj(preHostConfig, ...Object.keys(servicesShortcut)),
     devices: convertDefinitions('device', plainDevices),
     drivers: convertDefinitions('driver', preHostConfig.drivers || {}),
 

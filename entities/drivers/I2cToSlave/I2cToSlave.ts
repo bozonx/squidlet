@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import {GetDriverDep} from 'system/base/EntityBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/base/MasterSlaveBaseNodeDriver';
 
 import {I2cMaster} from '../I2cMaster/I2cMaster';
@@ -31,7 +31,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     }
 
     this.depsInstances.i2cMaster = await getDriverDep('I2cMaster')
-      .getInstance(omit(this.props,
+      .getInstance(omitObj(this.props,
         'address', 'int', 'poll', 'feedback', 'pollInterval'
       ));
 

@@ -1,5 +1,4 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
-import _omit = require('lodash/omit');
 
 import EntityDefinition from '../../system/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
@@ -9,6 +8,7 @@ import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 import {validateProps} from '../../system/lib/validate';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import {collectPropsDefaults} from '../../system/lib/helpers';
+import {omitObj} from '../../system/lib/objects';
 
 
 /**
@@ -75,7 +75,7 @@ export default class Definitions {
     const hostDeviceDefaultProps = this.configManager.devicesDefaults;
     const className: string = deviceDef.className;
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('device', className);
-    const definitionProps: {[index: string]: any} = _omit(deviceDef, 'className');
+    const definitionProps: {[index: string]: any} = omitObj(deviceDef, 'className');
     const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
 
     if (validationError) {
@@ -104,7 +104,7 @@ export default class Definitions {
   private generateDriverDef(className: string): EntityDefinition {
     const driverDef: PreEntityDefinition = this.configManager.preEntities.drivers[className];
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('driver', className);
-    const definitionProps: {[index: string]: any} = _omit(driverDef, 'className');
+    const definitionProps: {[index: string]: any} = omitObj(driverDef, 'className');
     const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
 
     if (validationError) {
@@ -125,7 +125,7 @@ export default class Definitions {
   private generateServiceDef(id: string): EntityDefinition {
     const serviceDef: PreEntityDefinition = this.configManager.preEntities.services[id];
     const entitySet: HostEntitySet = this.usedEntities.getEntitySet('service', serviceDef.className);
-    const definitionProps: {[index: string]: any} = _omit(serviceDef, 'className');
+    const definitionProps: {[index: string]: any} = omitObj(serviceDef, 'className');
     const validationError: string | undefined = validateProps(definitionProps, entitySet.manifest.props);
 
     if (validationError) {

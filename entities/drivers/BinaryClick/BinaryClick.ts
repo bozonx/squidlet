@@ -3,7 +3,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 
 import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
 
@@ -34,7 +34,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.binaryInput = await getDriverDep('BinaryInput')
       .getInstance({
-        ...omit(this.props, 'releaseTimeoutMs'),
+        ...omitObj(this.props, 'releaseTimeoutMs'),
         blockTime: 0,
       });
   }

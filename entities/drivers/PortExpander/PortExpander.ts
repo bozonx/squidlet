@@ -15,7 +15,7 @@ import DriverBase from 'system/base/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {PollProps} from 'system/base/MasterSlaveBaseNodeDriver';
 import {uint8ToNum} from 'system/lib/binaryHelpers';
 
@@ -113,7 +113,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
     const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex`;
 
     const props = {
-      ...omit(this.props, 'connection', 'digitalPinsCount', 'analogPinsCount'),
+      ...omitObj(this.props, 'connection', 'digitalPinsCount', 'analogPinsCount'),
       poll: <PollProps[]>[],
     };
 

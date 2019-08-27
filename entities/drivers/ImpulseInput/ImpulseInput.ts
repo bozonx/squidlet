@@ -3,7 +3,7 @@ import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 
 import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
@@ -45,7 +45,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput')
       .getInstance({
-        ...omit(
+        ...omitObj(
           this.props,
           'impulseLength',
           'blockTime',

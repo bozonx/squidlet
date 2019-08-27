@@ -2,7 +2,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {convertToLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
@@ -36,7 +36,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput')
       .getInstance({
-        ...omit(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
+        ...omitObj(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
         initialLevel: this.resolveInitialLevel(),
       });
   }

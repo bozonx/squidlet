@@ -1,7 +1,7 @@
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
 
@@ -42,7 +42,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
-      omit(this.props, 'url')
+      omitObj(this.props, 'url')
     );
 
     await this.mqttIo.onMessage((connectionId: string, topic: string, data: string | Uint8Array) => {

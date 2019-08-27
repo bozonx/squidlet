@@ -1,9 +1,9 @@
-import _omit = require('lodash/omit');
 import * as yargs from 'yargs';
 
 import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
 import ApiCall from './ApiCall';
+import {omitObj} from '../system/lib/objects';
 
 
 const apiCall = new ApiCall();
@@ -48,7 +48,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
 
 export default async function resolveCommand() {
   const positionArgs: string[] = [ ...yargs.argv._ ];
-  const args: {[index: string]: any} = _omit(yargs.argv, '_');
+  const args: {[index: string]: any} = omitObj(yargs.argv, '_');
 
   if (!positionArgs || !positionArgs.length) {
     throw new Error(`You should specify a command`);

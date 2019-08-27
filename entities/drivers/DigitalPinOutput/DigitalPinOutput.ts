@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {DigitalSubDriver} from 'system/interfaces/io/DigitalIo';
 
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
@@ -26,7 +26,7 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
     const driverName = `Digital_${this.props.source}`;
 
     this.depsInstances.source = await getDriverDep(driverName)
-      .getInstance(omit(this.props, 'initialLevel', 'pin', 'source'));
+      .getInstance(omitObj(this.props, 'initialLevel', 'pin', 'source'));
   }
 
   // setup pin after drivers and devices have been initialized

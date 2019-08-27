@@ -1,7 +1,7 @@
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {deferCall, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';
 
@@ -33,7 +33,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput')
       .getInstance({
-        ...omit(
+        ...omitObj(
           this.props,
           'impulseLength',
           'blockTime',

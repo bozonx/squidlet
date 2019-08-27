@@ -6,7 +6,7 @@ import {parseCookie} from 'system/lib/strings';
 import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {getKeyOfObject} from 'system/lib/objects';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {WsServer} from '../WsServer/WsServer';
 
 
@@ -39,7 +39,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.server = await getDriverDep('WsServer')
-      .getInstance(omit(this.props, 'expiredSec'));
+      .getInstance(omitObj(this.props, 'expiredSec'));
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onConnectionClose((connectionId: string) => {

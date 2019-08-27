@@ -1,4 +1,3 @@
-import _omit = require('lodash/omit');
 import _defaultsDeep = require('lodash/defaultsDeep');
 
 import {EntityType} from '../../system/interfaces/EntityTypes';
@@ -12,6 +11,7 @@ import SchemaElement from '../../system/interfaces/SchemaElement';
 import validateRules from '../hostConfig/validateRules';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 import {convertEntityTypePluralToSingle} from '../helpers';
+import {omitObj} from '../../system/lib/objects';
 
 
 const baseParamName = '$base';
@@ -135,7 +135,7 @@ export default class UsedEntities {
   }
 
   private async finalizeManifest(preManifest: PreManifestBase): Promise<ManifestBase> {
-    const finalManifest: ManifestBase = _omit(
+    const finalManifest = omitObj(
       preManifest,
       'files',
       'system',
@@ -144,7 +144,7 @@ export default class UsedEntities {
       'drivers',
       'ios',
       'props'
-    );
+    ) as ManifestBase;
 
     let props: {[index: string]: SchemaElement} | undefined;
 
@@ -186,7 +186,7 @@ export default class UsedEntities {
     }
 
     const entityType = convertEntityTypePluralToSingle(rawPluralType);
-    const topLayer = _omit(props, baseParamName);
+    const topLayer = omitObj(props, baseParamName);
     const bottomLayer: {[index: string]: SchemaElement} | undefined = this.resolveEntityProps(
       entityType,
       entityName

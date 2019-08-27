@@ -2,8 +2,8 @@ objects = require('../../../system/lib/objects')
 
 
 describe.only 'system.lib.objects', ->
-  it 'omit', ->
-    assert.deepEqual(objects.omit({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
+  it 'omitObj', ->
+    assert.deepEqual(objects.omitObj({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
 
   it 'pick', ->
     assert.deepEqual(objects.pick({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})

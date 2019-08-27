@@ -8,7 +8,7 @@ import WebSocketClientIo, {
 } from 'system/interfaces/io/WebSocketClientIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/common';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {makeConnectionParams} from './WebSocketServer';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
@@ -107,7 +107,7 @@ export default class WebSocketClient implements WebSocketClientIo {
 
 
   private connectToServer(connectionId: string, props: WebSocketClientProps): WebSocket {
-    const client = new WebSocket(props.url, omit(props, 'url'));
+    const client = new WebSocket(props.url, omitObj(props, 'url'));
 
     client.on('open', () => this.events.emit(WsClientEvent.open, connectionId));
     client.on('close', () => this.events.emit(WsClientEvent.close, connectionId));

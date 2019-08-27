@@ -2,8 +2,7 @@ import {isEqual} from './lodashLike';
 import {compactArray} from './arrays';
 
 
-// TODO: remake to omitObj
-export function omit(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
+export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
   if (!obj) return {};
 
   const result: {[index: string]: any} = {};

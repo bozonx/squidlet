@@ -4,7 +4,7 @@ import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 
 import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
 
@@ -34,7 +34,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
     this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput')
       .getInstance({
-        ...omit(
+        ...omitObj(
           this.props,
           'blockTime',
           'invertOnPullup',

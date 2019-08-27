@@ -2,7 +2,7 @@ import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'system/int
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
-import {omit} from 'system/lib/lodashLike';
+import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
@@ -45,7 +45,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
     const driverName = `Digital_${this.props.source}`;
 
     this.depsInstances.source = await getDriverDep(driverName)
-      .getInstance(omit(
+      .getInstance(omitObj(
         this.props,
         'doubleCheck',
         'pullup',
