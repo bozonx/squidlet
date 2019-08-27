@@ -12,7 +12,7 @@ import {
 import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
-import {isExactlyNumber} from '../../system/lib/helpers';
+import {isExactlyNumber} from '../../system/lib/common';
 
 
 export default class Props {

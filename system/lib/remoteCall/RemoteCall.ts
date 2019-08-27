@@ -4,7 +4,7 @@ import RemoteCallMessage, {
   REMOTE_CALL_MESSAGE_TYPES
 } from '../../interfaces/RemoteCallMessage';
 import IndexedEvents from '../IndexedEvents';
-import {isPlainObject} from '../lodashLike';
+import {isPlainObject} from '../objects';
 import RemoteCallbacks from './RemoteCallbacks';
 import {waitForResponse} from './helpers';
 

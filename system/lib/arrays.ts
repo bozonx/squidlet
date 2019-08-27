@@ -35,7 +35,6 @@ export function compactArray(arr: any[]): any[] {
   return result;
 }
 
-// TODO: test
 export function compactUndefined(arr: any[]): any[] {
   const result: any[] = [];
 
@@ -79,19 +78,6 @@ export function setArrayDimension(arr: any[], count: number): any[] {
   return result;
 }
 
-// TODO: test
-export function concatUniqStrArrays(...arrays: string[][]): string[] {
-  const result: {[index: string]: true} = {};
-
-  for (let arr of arrays) {
-    for (let value of arr) {
-      result[value] = true;
-    }
-  }
-
-  return Object.keys(result);
-}
-
 /**
  * Remove item from array. E.g removeItemFromArray(['a', 'b', 'c'], 'b') => ['a', 'c']
  * It can remove all the found items
@@ -121,20 +107,37 @@ export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntr
   }
 }
 
-// TODO: test
-export function findIndexArray(arr: any[], cb: (item: any, index: number) => any): number {
+export function concatUniqStrArrays(...arrays: string[][]): string[] {
+  const result: {[index: string]: true} = {};
+
+  for (let arr of arrays) {
+    for (let value of arr) {
+      result[value] = true;
+    }
+  }
+
+  return Object.keys(result);
+}
+
+/**
+ * Find index of array.
+ * Cb has to return boolean of undefined. If true then it means that item is found.
+ */
+export function findIndexArray(arr: any[], cb: (item: any, index: number) => boolean | undefined): number {
   if (typeof arr === 'undefined') {
     return -1;
   }
-  else if (Array.isArray(arr)) {
-    for (let index in arr) {
-      const result: any | undefined = cb(arr[index], parseInt(index));
-
-      if (typeof result !== 'undefined') return parseInt(index);
-    }
-  }
-  else {
+  else if (!Array.isArray(arr)) {
     throw new Error(`findIndexArray: unsupported type of "arr" param "${JSON.stringify(arr)}"`);
+  }
+
+  for (let index in arr) {
+    const indexNum: number = parseInt(index);
+    const result: any | undefined = cb(arr[indexNum], indexNum);
+
+    if (result === false || typeof result === 'undefined') continue;
+
+    return indexNum;
   }
 
   return -1;

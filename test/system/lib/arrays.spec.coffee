@@ -14,6 +14,9 @@ describe.only 'system.lib.arrays', ->
   it 'compactArray', ->
     assert.deepEqual(arrays.compactArray([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
 
+  it 'compactUndefined', ->
+    assert.deepEqual(arrays.compactUndefined([undefined, null, 0, 1, '', 'str']), [null, 0, 1, '', 'str'])
+
   it 'appendArray', ->
     arr = [1]
     arrays.appendArray(arr, [2])
@@ -44,3 +47,11 @@ describe.only 'system.lib.arrays', ->
 
     assert.deepEqual(arrays.removeItemFromArray(arr, 'b'), ['a', 'c', 'b'])
     assert.deepEqual(arrays.removeItemFromArray(arr, 'b', false), ['a', 'c'])
+
+  it 'concatUniqStrArrays', ->
+    assert.deepEqual(arrays.concatUniqStrArrays(['a', 'b'], ['b', 'c']), ['a', 'b', 'c'])
+
+  it 'findIndexArray', ->
+    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'b'), 1)
+    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'c'), -1)
+    assert.equal(arrays.findIndexArray(undefined, (item) => item == 'c'), -1)
