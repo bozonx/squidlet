@@ -6,10 +6,9 @@
 import {isPlainObject} from './objects';
 
 
-// TODO: зачем это нужно есть же в ts???
-export function values(obj: {[index: string]: any}): any[] {
-  return Object.keys(obj).map(key => obj[key]);
-}
+// export function values(obj: {[index: string]: any}): any[] {
+//   return Object.keys(obj).map(key => obj[key]);
+// }
 
 // TODO: remove - better to use String's method
 export function trimStart(src: string, char: string = ' '): string {
@@ -33,12 +32,6 @@ export function trimEnd(src: string, char: string = ' '): string {
 export function trim(src: string, char: string = ' '): string {
   return trimEnd( trimStart(src, char), char);
 }
-
-
-//
-// export function uniq(arr: string[]): string[] {
-//   // TODO: !!!!
-// }
 
 // TODO: better to not use it at all
 export function isEqual(first: any, second: any): boolean {

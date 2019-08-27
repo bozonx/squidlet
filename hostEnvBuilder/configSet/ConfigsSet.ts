@@ -1,5 +1,3 @@
-import _values = require('lodash/values');
-
 import HostEntitySet from '../interfaces/HostEntitySet';
 import {sortByIncludeInList} from '../helpers';
 import Definitions from './Definitions';
@@ -37,7 +35,7 @@ export default class ConfigsSet {
       regularDrivers,
       systemServices,
       regularServices,
-      devicesDefinitions: _values(this.definitions.getDevicesDefinitions()),
+      devicesDefinitions: (this.definitions.getDevicesDefinitions() as {[index: string]: any}).values(),
       driversDefinitions: this.definitions.getDriversDefinitions(),
       servicesDefinitions: this.definitions.getServicesDefinitions(),
       iosDefinitions: this.definitions.getIosDefinitions(),
