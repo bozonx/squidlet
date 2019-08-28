@@ -13,12 +13,13 @@ import StorageIo from './interfaces/io/StorageIo';
 import {ShutdownHandler} from './System';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
-import IoItem from './interfaces/IoItem';
+import IoItem, {IoItemDefinition} from './interfaces/IoItem';
 
 
 export const IO_API = 'ioApi';
 export const IO_NAMES_METHOD = 'getIoNames';
 export const METHOD_DELIMITER = '.';
+const initCfg: InitializationConfig = initializationConfig();
 
 
 export default class IoServer {
@@ -50,7 +51,7 @@ export default class IoServer {
   }
 
   async start() {
-    this.hostConfig = await this.loadHostConfig();
+    this.hostConfig = await this.loadConfig<HostConfig>(initCfg.fileNames.hostConfig);
 
     await this.configureIoSet();
     await this.initWsServer();
@@ -142,16 +143,15 @@ export default class IoServer {
     this.logError(`Websocket server was closed`);
   }
 
-  private async loadHostConfig(): Promise<HostConfig> {
-    const initCfg: InitializationConfig = initializationConfig();
-    const pathToConfig = pathJoin(
+  private async loadConfig<T>(configFileName: string): Promise<T> {
+    const pathToFile = pathJoin(
       systemConfig.rootDirs.envSet,
       systemConfig.envSetDirs.configs,
-      initCfg.fileNames.hostConfig
+      configFileName
     );
 
     const storage = this.ioSet.getIo<StorageIo>('Storage');
-    const configStr: string = await storage.readFile(pathToConfig);
+    const configStr: string = await storage.readFile(pathToFile);
 
     return JSON.parse(configStr);
   }
@@ -189,13 +189,14 @@ export default class IoServer {
   }
 
   private async configureIoSet() {
-    // TODO: load io definitions
-    if (!this.hostConfig || !this.hostConfig.ios) return;
+    const ioParams = await this.loadConfig<IoItemDefinition>(
+      initCfg.fileNames.iosDefinitions
+    );
 
-    for (let ioName of Object.keys(this.hostConfig.ios)) {
+    for (let ioName of Object.keys(ioParams)) {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      ioItem.configure && await ioItem.configure(this.hostConfig.ios[ioName]);
+      ioItem.configure && await ioItem.configure(ioParams[ioName]);
     }
   }
 
