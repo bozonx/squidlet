@@ -3,7 +3,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import StorageEnvMemoryWrapper from '../../shared/ioSet/StorageEnvMemoryWrapper';
+import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import IoSetSrc from './IoSetSrc';
 

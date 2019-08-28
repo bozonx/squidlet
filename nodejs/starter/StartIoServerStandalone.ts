@@ -3,7 +3,7 @@ import Props from './Props';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../system/IoServer';
-import IoSetSrc from './IoSetSrc';
+import IoSetSrc from '../ioSet/IoSetSrc';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';

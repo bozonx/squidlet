@@ -1,9 +1,9 @@
 import * as path from 'path';
 
 import IoItem from '../../system/interfaces/IoItem';
-import {SYSTEM_DIR} from '../helpers';
+import {SYSTEM_DIR} from '../../shared/helpers';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
-import IoClient from '../IoClient';
+import IoClient from '../../shared/IoClient';
 
 
 export default class RemoteIoCollection {

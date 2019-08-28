@@ -1,4 +1,4 @@
-IoSetDevelopSrc = require('../../nodejs/starter/IoSetDevelopSrc').default
+IoSetDevelopSrc = require('../../nodejs/ioSet/IoSetDevelopSrc').default
 helpers = require('../../shared/helpers')
 
 
