@@ -58,6 +58,7 @@ export default class IoServer {
   }
 
   destroy = async () => {
+    this.logInfo('... destroying IoServer');
     await this.wsServer.destroy();
     this.remoteCall && await this.remoteCall.destroy();
   }

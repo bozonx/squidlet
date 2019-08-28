@@ -4,6 +4,9 @@ import {pathJoin} from './lib/paths';
 import systemConfig from './config/systemConfig';
 
 
+/**
+ * It loads IO set index file where all the used IOs are defined.
+ */
 export default class IoSetLocal implements IoSet {
   private ioCollection: {[index: string]: IoItem} = {};
 

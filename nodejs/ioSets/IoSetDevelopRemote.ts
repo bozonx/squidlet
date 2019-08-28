@@ -10,6 +10,9 @@ import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {checkIoExistance} from '../../hostEnvBuilder/helpers';
 
 
+/**
+ * It uses IOs of remote host.
+ */
 export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
