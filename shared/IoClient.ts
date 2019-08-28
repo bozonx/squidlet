@@ -6,7 +6,7 @@ import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
 import {IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from '../system/IoServer';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
-import {consoleError} from '../system/lib/helpers';
+import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 const wsClientIo = new WebSocketClient();
@@ -23,7 +23,6 @@ export default class IoClient {
     responseTimoutSec: number,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void,
-    // TODO: наверное можно требовать обязательно чтобы во внешнем коде их зарезолвили
     host?: string,
     port?: number
   ) {
@@ -35,9 +34,9 @@ export default class IoClient {
     this.client = new WsClientLogic(
       wsClientIo,
       clientProps,
-      () => this.logInfo(`Websocket connection has been closed`),
+      () => this.logError(`Websocket connection has been closed`),
       this.logInfo,
-      consoleError
+      this.logError
     );
     // listen income data
     this.client.onMessage(this.handleIncomeMessage);
@@ -115,11 +114,8 @@ export default class IoClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
-
-    // TODO: get from host config
-
-    const host: string = specifiedHost || defaultProps.host;
-    const port: number= specifiedPort || defaultProps.port;
+    const host: string = specifiedHost || hostDefaultConfig.ioServer.host;
+    const port: number= specifiedPort || hostDefaultConfig.ioServer.port;
     const url = `ws://${host}:${port}`;
 
     return  {

@@ -6,8 +6,6 @@ export const DATA_ADDRESS_LENGTH = 1;
 export const BITS_IN_BYTE = 8;
 export const ENCODE = 'utf8';
 
-export const IO_SERVER_MODE_FILE_NAME = 'ioserver';
-
 export enum AppLifeCycleEvents {
   devicesInitialized,
   appInitialized,
