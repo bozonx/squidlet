@@ -8,6 +8,7 @@ import {listenScriptEnd} from '../../shared/helpers';
 import AppSwitcher, {AppSwitcherClass} from '../../system/AppSwitcher';
 import {mergeDeepObjects} from '../../system/lib/objects';
 import systemConfig from '../../system/config/systemConfig';
+import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
 export default class SystemStarter {
@@ -22,6 +23,8 @@ export default class SystemStarter {
 
 
   async start(pathToSystemDir: string, ioSet: IoSet) {
+    await this.configureStorage(ioSet);
+
     const appSwitcherFile = path.join(pathToSystemDir, APP_SWITCHER_FILE_NAME);
     const appSwitcherClass: AppSwitcherClass = this.os.require(appSwitcherFile).default;
     const systemCfg = this.makeSystemConfig();
@@ -79,6 +82,17 @@ export default class SystemStarter {
       console.error(err);
       this.os.processExit(2);
     }
+  }
+
+  private async configureStorage(ioSet: IoSet) {
+    if (typeof this.props.uid === 'undefined' || typeof this.props.gid === 'undefined') return;
+
+    const ioItem = ioSet.getIo<StorageIo>('Storage');
+
+    await ioItem.configure({
+      uid: this.props.uid,
+      gid: this.props.gid,
+    });
   }
 
 }
