@@ -88,29 +88,9 @@ export default class StartIoServerStandalone {
 
     ioSet.prepare && await ioSet.prepare();
     await ioSet.init();
-
-    await this.configureIoSet(ioSet);
-
-    // this.props.hostConfig.ioServer,
-    // (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
-    //   ? this.props.hostConfig.config.rcResponseTimoutSec
-    //   : hostDefaultConfig.config.rcResponseTimoutSec,
-
-    return ioSet;
-  }
-
-  private async configureIoSet(ioSet: IoSet) {
     await this.configureStorage(ioSet);
 
-    // TODO: move to ioServer ????
-
-    if (!this.props.hostConfig.ios) return;
-
-    for (let ioName of Object.keys(this.props.hostConfig.ios)) {
-      const ioItem: IoItem = ioSet.getIo(ioName);
-
-      ioItem.configure && await ioItem.configure(this.props.hostConfig.ios[ioName]);
-    }
+    return ioSet;
   }
 
   private async configureStorage(ioSet: IoSet) {

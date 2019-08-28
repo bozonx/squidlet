@@ -13,6 +13,7 @@ import StorageIo from './interfaces/io/StorageIo';
 import {ShutdownHandler} from './System';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
+import IoItem from './interfaces/IoItem';
 
 
 export const IO_API = 'ioApi';
@@ -51,36 +52,8 @@ export default class IoServer {
   async start() {
     this.hostConfig = await this.loadHostConfig();
 
-    // TODO: make configure of ioSet ????
-
-    if (!this.hostConfig.ioServer) {
-      throw new Error(`ioServer param in the host config is null`);
-    }
-
-    const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
-    const props = this.hostConfig.ioServer;
-
-    this._wsServer = new WsServerLogic(
-      wsServerIo,
-      props,
-      this.handleClose,
-      this.logInfo,
-      this.logError,
-    );
-
-    await this.wsServer.init();
-
-    this.wsServer.onMessage(this.handleIncomeMessages);
-    this.wsServer.onConnection(this.handleNewConnection);
-    this.wsServer.onConnectionClose(() => {
-      this.connectionId = undefined;
-
-      this.remoteCall && this.remoteCall.destroy()
-        .catch(this.logError);
-
-      // switch to normal app on connection close
-      this.shutdownRequest('switchToApp');
-    });
+    await this.configureIoSet();
+    await this.initWsServer();
   }
 
   destroy = async () => {
@@ -181,6 +154,49 @@ export default class IoServer {
     const configStr: string = await storage.readFile(pathToConfig);
 
     return JSON.parse(configStr);
+  }
+
+  private async initWsServer() {
+    if (!this.hostConfig || !this.hostConfig.ioServer) {
+      throw new Error(`ioServer param in the host config is null`);
+    }
+
+    const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
+    const props = this.hostConfig.ioServer;
+
+    this._wsServer = new WsServerLogic(
+      wsServerIo,
+      props,
+      this.handleClose,
+      this.logInfo,
+      this.logError,
+    );
+
+    await this.wsServer.init();
+
+    this.wsServer.onMessage(this.handleIncomeMessages);
+    this.wsServer.onConnection(this.handleNewConnection);
+    this.wsServer.onConnectionClose(() => {
+      this.connectionId = undefined;
+
+      this.remoteCall && this.remoteCall.destroy()
+        .catch(this.logError);
+
+      // TODO: может не делать этого - а делать запрос на переключение на app
+      // switch to normal app on connection close
+      //this.shutdownRequest('switchToApp');
+    });
+  }
+
+  private async configureIoSet() {
+    // TODO: load io definitions
+    if (!this.hostConfig || !this.hostConfig.ios) return;
+
+    for (let ioName of Object.keys(this.hostConfig.ios)) {
+      const ioItem: IoItem = this.ioSet.getIo(ioName);
+
+      ioItem.configure && await ioItem.configure(this.hostConfig.ios[ioName]);
+    }
   }
 
 }
