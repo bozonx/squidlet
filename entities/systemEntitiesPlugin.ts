@@ -31,6 +31,8 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'ImpulseOutput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPinInput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'DigitalPinOutput/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'HttpClient/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'HttpServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital_local/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital_pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital_portExpander/manifest.yaml'));
