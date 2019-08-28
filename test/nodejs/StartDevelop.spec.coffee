@@ -106,7 +106,7 @@ describe 'nodejs.StartDevelop', ->
   it 'resolveIoSetType - no arg --ioset', ->
     startDevelop = @newInstance()
 
-    assert.equal(startDevelop.resolveIoSetType(), 'IoSetDevelopSource')
+    assert.equal(startDevelop.resolveIoSetType(), 'IoSetDevelopSrc')
 
 
 #  it 'installModules - not force and node_modules exists - do nothing', ->

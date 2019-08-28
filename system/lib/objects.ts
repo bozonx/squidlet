@@ -98,7 +98,7 @@ export function getKeyOfObject(obj: {[index: string]: any}, value: any): string 
     throw new Error(`collection.getKeyOfObject: obj param has to be an object!`);
   }
 
-  const valuesOfObj: any[] = obj.values();
+  const valuesOfObj: any[] = Object.values(obj);
   const keys: string[] = Object.keys(obj);
   const valueIndex: number = valuesOfObj.indexOf(value);
 

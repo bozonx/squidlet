@@ -115,7 +115,7 @@ export default class Storage implements StorageIo {
 
     // TODO: use extended logic
 
-    return callPromised(fs.chown, pathTo, config.uid, config.gid);
+    //return callPromised(fs.chown, pathTo, config.uid, config.gid);
   }
 
 }

@@ -35,7 +35,7 @@ export default class ConfigsSet {
       regularDrivers,
       systemServices,
       regularServices,
-      devicesDefinitions: (this.definitions.getDevicesDefinitions() as {[index: string]: any}).values(),
+      devicesDefinitions: Object.values(this.definitions.getDevicesDefinitions()),
       driversDefinitions: this.definitions.getDriversDefinitions(),
       servicesDefinitions: this.definitions.getServicesDefinitions(),
       iosDefinitions: this.definitions.getIosDefinitions(),

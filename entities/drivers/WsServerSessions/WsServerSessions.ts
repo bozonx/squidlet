@@ -2,7 +2,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import {parseCookie} from 'system/lib/strings';
+import {parseCookie} from 'system/lib/cookies';
 import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {getKeyOfObject} from 'system/lib/objects';

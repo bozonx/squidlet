@@ -111,7 +111,7 @@ export default class StartDevelop {
    */
   private async makeIoSet(): Promise<IoSet> {
     const ioSetFile: string = this.resolveIoSetType();
-    const ioSetPath = path.resolve(__dirname, `.${path.sep}${ioSetFile}`);
+    const ioSetPath = path.resolve(__dirname, `..${path.sep}ioSets${path.sep}${ioSetFile}`);
     const IoSetClass: IoSetClass = this.os.require(ioSetPath).default;
 
     console.info(`using io set "${ioSetFile}"`);
@@ -139,7 +139,7 @@ export default class StartDevelop {
       return 'IoSetDevelopRemote';
     }
 
-    return 'IoSetDevelopSource';
+    return 'IoSetDevelopSrc';
   }
 
   /**

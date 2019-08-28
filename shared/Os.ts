@@ -61,7 +61,7 @@ export default class Os {
 
   async chown(pathTo: string, uid?: number, gid?: number): Promise<void> {
     // TODO: use extended logic
-    await callPromised(fs.chown, pathTo, uid, gid);
+    //await callPromised(fs.chown, pathTo, uid, gid);
   }
 
   readdir(pathTo: string): Promise<string[]> {
