@@ -46,6 +46,12 @@ export default class System {
   private _isAppInitialized: boolean = false;
 
 
+  /**
+   * The main app.
+   * @param systemCfg - completed system config
+   * @param ioSet - has to be initialized before
+   * @param shutdownRequestCb - handler of shutdown request
+   */
   constructor(systemCfg: typeof systemConfig, ioSet: IoSet, shutdownRequestCb: ShutdownHandler) {
     this.shutdownRequest = shutdownRequestCb;
     // config which is used only on initialization time

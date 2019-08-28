@@ -14,7 +14,6 @@ export default class IoManager {
   }
 
   async init(): Promise<void> {
-    await this.ioSet.init(this.context.systemConfig);
     await this.configureAllIo();
   }
 

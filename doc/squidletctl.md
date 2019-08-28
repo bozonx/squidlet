@@ -87,7 +87,7 @@ Config is optional, if it does not includes io definitions you don't have to spe
 * --force - it runs `npm install`
 * --user - owner of files which will be written. It can be a user name or uid. It is optional
 * --group - group of files which will be written, It can be a group name or uid. It is optional
-* --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in this host
+* --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in config of remote host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
