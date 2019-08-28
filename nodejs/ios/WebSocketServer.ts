@@ -18,6 +18,7 @@ type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket
 enum SERVER_POSITIONS {
   wsServer,
   events,
+  // saved Socket instances
   connections
 }
 
@@ -46,7 +47,10 @@ export default class WebSocketServer implements WebSocketServerIo {
 
   async destroy() {
     for (let serverId in this.servers) {
-      await this.closeServer(serverId);
+      // destroy events of server
+      this.servers[Number(serverId)][SERVER_POSITIONS.events].destroy();
+
+      await this.destroyServer(serverId);
     }
   }
 
@@ -62,10 +66,15 @@ export default class WebSocketServer implements WebSocketServerIo {
   }
 
   async closeServer(serverId: string): Promise<void> {
-    if (!this.servers[Number(serverId)]) return;
+    const events = this.servers[Number(serverId)][SERVER_POSITIONS.events];
 
-    // destroy events of server
-    this.servers[Number(serverId)][SERVER_POSITIONS.events].destroy();
+    await this.destroyServer(serverId);
+
+    events.destroy();
+  }
+
+  private async destroyServer(serverId: string) {
+    if (!this.servers[Number(serverId)]) return;
 
     const server = this.servers[Number(serverId)][SERVER_POSITIONS.wsServer];
 

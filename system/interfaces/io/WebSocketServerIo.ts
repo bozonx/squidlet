@@ -54,6 +54,9 @@ export interface ConnectionParams {
 
 
 export default interface WebSocketServerIo extends IoItem {
+  /**
+   * Destroy server and don't rise a close event.
+   */
   destroy: () => Promise<void>;
 
   /**
@@ -62,7 +65,8 @@ export default interface WebSocketServerIo extends IoItem {
   newServer(props: WebSocketServerProps): Promise<string>;
 
   /**
-   * Shut down a server which has been previously created
+   * Shut down a server which has been previously created.
+   * After than a close event will be risen.
    */
   closeServer(serverId: string): Promise<void>;
 
