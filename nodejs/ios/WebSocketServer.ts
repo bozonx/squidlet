@@ -64,10 +64,12 @@ export default class WebSocketServer implements WebSocketServerIo {
   async closeServer(serverId: string): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
+    // destroy events of server
     this.servers[Number(serverId)][SERVER_POSITIONS.events].destroy();
 
     const server = this.servers[Number(serverId)][SERVER_POSITIONS.wsServer];
 
+    // call server close
     await callPromised(server.close.bind(server));
 
     delete this.servers[Number(serverId)];

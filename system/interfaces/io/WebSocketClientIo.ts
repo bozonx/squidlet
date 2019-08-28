@@ -3,6 +3,8 @@ import IoItem from '../IoItem';
 
 
 export const Methods = [
+  'destroy',
+
   'newConnection',
   'reConnect',
 
@@ -54,6 +56,8 @@ export interface WebSocketClientProps {
 }
 
 export default interface WebSocketClientIo extends IoItem {
+  destroy: () => Promise<void>;
+
   newConnection       (props: WebSocketClientProps): Promise<string>;
   reConnect           (connectionId: string, props: WebSocketClientProps): Promise<void>;
 

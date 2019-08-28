@@ -25,6 +25,8 @@ export default class Mqtt implements MqttIo {
 
 
   async destroy() {
+    this.events.destroy();
+
     for (let connectionId in this.connections) {
       await this.end(connectionId);
     }

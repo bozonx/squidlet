@@ -2,6 +2,7 @@ import IoItem from '../IoItem';
 
 
 export const Methods = [
+  'destroy',
   'newServer',
   'closeServer',
   'onConnection',
@@ -53,6 +54,8 @@ export interface ConnectionParams {
 
 
 export default interface WebSocketServerIo extends IoItem {
+  destroy: () => Promise<void>;
+
   /**
    * make new server and return serverId
    */

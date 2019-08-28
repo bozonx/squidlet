@@ -2,6 +2,7 @@ import IoItem from '../IoItem';
 
 
 export const Methods = [
+  'destroy',
   'newConnection',
   'reConnect',
   'end',
@@ -35,6 +36,7 @@ export interface MqttOptions {
 }
 
 export default interface MqttIo extends IoItem {
+  destroy: () => Promise<void>;
   newConnection(url: string, options: MqttOptions): Promise<string>;
   reConnect(connectionId: string): Promise<void>;
   end(connectionId: string, force?: boolean): Promise<void>;

@@ -23,6 +23,8 @@ export default class WebSocketClient implements WebSocketClientIo {
 
 
   async destroy() {
+    this.events.destroy();
+
     for (let connectionId in this.connections) {
       await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy');
     }
