@@ -1,11 +1,11 @@
-import {HttpRequest} from './HttpServerIo';
+import {HttpRequest, HttpResponse} from './HttpServerIo';
 
 
 export const Methods = [
-
+  'fetch',
 ];
 
 
 export interface HttpClientIo {
-  send(request: HttpRequest): Promise<HttpRequest>;
+  fetch(request: HttpRequest): Promise<HttpResponse>;
 }

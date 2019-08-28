@@ -19,17 +19,30 @@ interface HttpServerProps {
   port: number;
 }
 
-interface HttpHeaders {
+interface HttpRequestHeaders {
   contentType?: string;
 }
+
+interface HttpResponseHeaders {
+  contentType?: string;
+}
+
+// TODO: поддержка Uint8Array
 
 export interface HttpRequest {
   method: HttpMethods;
   url: string;
-  headers: HttpHeaders;
+  headers: HttpRequestHeaders;
+  body?: string | Uint8Array;
+}
+
+export interface HttpResponse {
+  method: HttpMethods;
+  url: string;
+  headers: HttpResponseHeaders;
   status: number;
   statusString: string;
-  body?: string;
+  body?: string | Uint8Array;
 }
 
 type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
