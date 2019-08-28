@@ -42,7 +42,10 @@ export function pickObj(obj: {[index: string]: any} | undefined, ...propToPick: 
 /**
  * Find element in object. Like lodash's find function.
  */
-export function findObj(obj: {[index: string]: any}, cb: (item: any, index: string | number) => any): boolean | undefined {
+export function findObj<T extends any>(
+  obj: {[index: string]: any},
+  cb: (item: any, index: string | number) => any
+): T | undefined {
   if (typeof obj === 'undefined') {
     return;
   }

@@ -188,7 +188,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * If dataAddressStr is undefined then item with dataAddress = undefined will be found.
    */
   protected getPollProps(dataAddressStr: string | number | undefined): PollProps | undefined {
-    return findObj(this.props.poll, (item: PollProps) => {
+    return findObj<PollProps>(this.props.poll, (item: PollProps) => {
       return item.dataAddress === dataAddressStr;
     });
   }
