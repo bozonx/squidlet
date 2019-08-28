@@ -23,13 +23,18 @@ interface HttpHeaders {
   contentType?: string;
 }
 
+export interface HttpRequest {
+  method: HttpMethods;
+  url: string;
+  headers: HttpHeaders;
+  status: number;
+  statusString: string;
+  body?: string;
+}
+
 type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
-type HttpRequestHandler = (
-  method: HttpMethods,
-  url: string,
-  headers: HttpHeaders,
-  body?: string
-) => void;
+// TODO: сформировать ответ
+type HttpRequestHandler = (request: HttpRequest) => void;
 
 
 export interface HttpServerIo {
