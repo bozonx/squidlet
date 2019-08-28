@@ -10,6 +10,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from '../../system/lib/buffer';
+import {WsCloseStatus} from '../../system/interfaces/io/WebSocketClientIo';
 
 
 type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
@@ -146,7 +147,7 @@ export default class WebSocketServer implements WebSocketServerIo {
     await callPromised(socket.send.bind(socket), data);
   }
 
-  async close(serverId: string, connectionId: string, code: number, reason: string): Promise<void> {
+  async close(serverId: string, connectionId: string, code: WsCloseStatus, reason: string): Promise<void> {
     if (
       !this.servers[Number(serverId)]
       || !this.servers[Number(serverId)][SERVER_POSITIONS.connections][Number(connectionId)]

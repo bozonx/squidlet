@@ -62,12 +62,13 @@ export default class WsServerLogic {
       return this.logError(`WsServerLogic.destroy: Server hasn't been initialized yet.`);
     }
 
+    this.events.destroy();
     await this.wsServerIo.closeServer(this.serverId);
   }
 
 
   isInitialized(): boolean {
-    return !this.serverId;
+    return Boolean(this.serverId);
   }
 
   /**

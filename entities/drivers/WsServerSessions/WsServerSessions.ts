@@ -8,6 +8,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {getKeyOfObject} from 'system/lib/objects';
 import {omitObj} from 'system/lib/objects';
 import {WsServer} from '../WsServer/WsServer';
+import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
 export enum WS_SESSIONS_EVENTS {
@@ -43,6 +44,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onConnectionClose((connectionId: string) => {
+      // TODO: похоже может выполниться после дестроя
+
       // handle only ours active sessions
       const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
 
@@ -75,8 +78,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     }
 
     delete this.sessionConnections;
-    await this.server.destroy();
     this.events.destroy();
+    await this.server.destroy();
   }
 
 
@@ -99,7 +102,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     if (!connectionId) return;
 
-    await this.server.closeConnection(connectionId, 0, 'Close session request');
+    await this.server.closeConnection(connectionId, WsCloseStatus.closeGoingAway, 'Close session request');
 
     this.context.sessions.shutDownImmediately(sessionId);
 
