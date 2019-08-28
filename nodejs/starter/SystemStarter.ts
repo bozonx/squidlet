@@ -85,7 +85,7 @@ export default class SystemStarter {
   }
 
   private async configureStorage(ioSet: IoSet) {
-    if (typeof this.props.uid === 'undefined' || typeof this.props.gid === 'undefined') return;
+    if (typeof this.props.uid === 'undefined' && typeof this.props.gid === 'undefined') return;
 
     const ioItem = ioSet.getIo<StorageIo>('Storage');
 

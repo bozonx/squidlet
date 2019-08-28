@@ -12,8 +12,8 @@ export interface Stats {
 }
 
 export interface ConfigParams {
-  uid: number;
-  gid: number;
+  uid?: number;
+  gid?: number;
 }
 
 

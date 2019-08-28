@@ -13,6 +13,7 @@ export default class StartIoServerStandalone {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
+  private ioSet?: IoSet;
 
 
   constructor(
@@ -41,11 +42,15 @@ export default class StartIoServerStandalone {
   async init() {
     await this.groupConfig.init();
     await this.props.resolve();
+    // load all the machine's io
+    this.ioSet = await this.makeIoSet();
 
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
   async destroy() {
+    if (!this.ioSet) throw new Error(`No IoSet`);
+
     // destroy of ios
     const ioNames: string[] = this.ioSet.getNames();
 
@@ -61,16 +66,16 @@ export default class StartIoServerStandalone {
 
 
   async start() {
+    if (!this.ioSet) throw new Error(`No IoSet`);
+
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
     await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
 
     // TODO: install like in dev mode
     //await this.installModules();
 
-    // load all the machine's io
-    const ioSet: IoSet = await this.makeIoSet();
     const ioServer = new IoServer(
-      ioSet,
+      this.ioSet,
       this.shutdownRequestCb,
       console.info,
       console.error
@@ -94,7 +99,7 @@ export default class StartIoServerStandalone {
   }
 
   private async configureStorage(ioSet: IoSet) {
-    if (typeof this.props.uid === 'undefined' || typeof this.props.gid === 'undefined') return;
+    if (typeof this.props.uid === 'undefined' && typeof this.props.gid === 'undefined') return;
 
     const ioItem = ioSet.getIo<StorageIo>('Storage');
 
