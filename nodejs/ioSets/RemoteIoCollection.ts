@@ -2,7 +2,6 @@ import * as path from 'path';
 
 import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../../shared/helpers';
-import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import IoClient from '../../shared/IoClient';
 import {consoleError} from '../../system/lib/helpers';
 
@@ -26,7 +25,6 @@ export default class RemoteIoCollection {
 
   async init(): Promise<void> {
     this._ioClient = new IoClient(
-      hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
       consoleError,
       this.host,

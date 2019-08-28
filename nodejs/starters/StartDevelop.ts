@@ -142,10 +142,6 @@ export default class StartDevelop {
     return 'IoSetDevelopSource';
   }
 
-  // private getPathToProdSystemFile(): string {
-  //   return path.join(SYSTEM_DIR, SYSTEM_FILE_NAME);
-  // }
-
   /**
    * Install npm modules into node_modules of repository and don't save them to package.json
    */
