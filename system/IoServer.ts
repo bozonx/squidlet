@@ -51,6 +51,8 @@ export default class IoServer {
   async start() {
     this.hostConfig = await this.loadHostConfig();
 
+    // TODO: make configure of ioSet ????
+
     if (!this.hostConfig.ioServer) {
       throw new Error(`ioServer param in the host config is null`);
     }

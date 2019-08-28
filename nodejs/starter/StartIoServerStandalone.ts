@@ -45,6 +45,20 @@ export default class StartIoServerStandalone {
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
+  async destroy() {
+    // destroy of ios
+    const ioNames: string[] = this.ioSet.getNames();
+
+    for (let ioName of ioNames) {
+      const ioItem: IoItem = this.ioSet.getIo(ioName);
+
+      if (ioItem.destroy) await ioItem.destroy();
+    }
+
+    // destroy of ioSet
+    await this.ioSet.destroy();
+  }
+
 
   async start() {
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
@@ -87,6 +101,8 @@ export default class StartIoServerStandalone {
 
   private async configureIoSet(ioSet: IoSet) {
     await this.configureStorage(ioSet);
+
+    // TODO: move to ioServer ????
 
     if (!this.props.hostConfig.ios) return;
 
