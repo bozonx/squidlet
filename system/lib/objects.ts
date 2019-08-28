@@ -95,7 +95,7 @@ export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue
  */
 export function getKeyOfObject(obj: {[index: string]: any}, value: any): string | undefined {
   if (!isExactlyObject(obj)) {
-    throw new Error(`collection.getKeyOfObject: obj param has to be an object!`);
+    throw new Error(`objects.getKeyOfObject: obj param has to be an object!`);
   }
 
   const valuesOfObj: any[] = Object.values(obj);

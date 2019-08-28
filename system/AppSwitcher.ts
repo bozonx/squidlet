@@ -78,7 +78,7 @@ export default class AppSwitcher {
     await this.ioServer.start();
   }
 
-  private handleShutdownRequest(reason: ShutdownReason) {
+  private handleShutdownRequest = (reason: ShutdownReason) => {
     switch (reason) {
       case 'switchToIoServer':
         this.switchToIoServer()
