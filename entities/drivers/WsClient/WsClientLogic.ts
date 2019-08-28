@@ -1,5 +1,5 @@
 import WebSocketClientIo, {
-  OnMessageHandler, WebSocketClientProps, WsCloseStatus,
+  OnMessageHandler, WebSocketClientProps, WsClientEvent, WsCloseStatus,
 } from 'system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
@@ -8,6 +8,7 @@ import {mergeDeepObjects} from 'system/lib/objects';
 import {parseCookie, stringifyCookie} from 'system/lib/cookies';
 import Promised from 'system/lib/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
+import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION} from 'system/constants';
 
 
 export interface WsClientLogicProps {
@@ -54,6 +55,7 @@ export default class WsClientLogic {
   private isConnectionOpened: boolean = false;
   private cookies: {[index: string]: Primitives} = {};
   private waitingCookies: boolean = true;
+  private handlerIndexes: [WsClientEvent, number][] = [];
   // TODO: use in other cases
   private get closedMsg() {
     return `Connection "${this.props.url}" has been closed`;
@@ -91,7 +93,7 @@ export default class WsClientLogic {
   }
 
   async destroy() {
-    // TODO: поднимутся close события ?????
+    await this.removeListeners();
     await this.wsClientIo.close(this.connectionId, WsCloseStatus.closeGoingAway, 'Closing on destroy');
     this.destroyInstance();
   }
@@ -108,6 +110,7 @@ export default class WsClientLogic {
   }
 
   async close(code: number, reason?: string) {
+    // TODO: проверить поднимется ли событие close
     await this.wsClientIo.close(this.connectionId, code, reason);
   }
 
@@ -121,24 +124,30 @@ export default class WsClientLogic {
 
 
   private async listen() {
-    await this.wsClientIo.onOpen(this.handleConnectionOpen);
-    await this.wsClientIo.onClose(this.handleConnectionClose);
-    await this.wsClientIo.onMessage(this.handleMessage);
-
-    await this.wsClientIo.onError((connectionId: string, err: Error) => {
+    const openIndex: number = await this.wsClientIo.onOpen(this.handleConnectionOpen);
+    const closeIndex: number = await this.wsClientIo.onClose(this.handleConnectionClose);
+    const messageIndex: number = await this.wsClientIo.onMessage(this.handleMessage);
+    const errorIndex: number = await this.wsClientIo.onError((connectionId: string, err: Error) => {
       if (connectionId !== this.connectionId) return;
 
       this.logError(String(err));
     });
+    const unexpectedIndex: number = await this.wsClientIo.onUnexpectedResponse(
+      (connectionId: string, response: ConnectionParams) => {
+        if (connectionId !== this.connectionId) return;
 
-    await this.wsClientIo.onUnexpectedResponse((connectionId: string, response: ConnectionParams) => {
-      if (connectionId !== this.connectionId) return;
+        this.logError(
+          `The unexpected response has been received on ` +
+          `connection "${this.connectionId}": ${JSON.stringify(response)}`
+        );
+      }
+    );
 
-      this.logError(
-        `The unexpected response has been received on ` +
-        `connection "${this.connectionId}": ${JSON.stringify(response)}`
-      );
-    });
+    this.handlerIndexes.push([WsClientEvent.open, openIndex]);
+    this.handlerIndexes.push([WsClientEvent.close, closeIndex]);
+    this.handlerIndexes.push([WsClientEvent.message, messageIndex]);
+    this.handlerIndexes.push([WsClientEvent.error, errorIndex]);
+    this.handlerIndexes.push([WsClientEvent.unexpectedResponse, unexpectedIndex]);
   }
 
   private handleConnectionOpen = (connectionId: string) => {
@@ -256,6 +265,7 @@ export default class WsClientLogic {
    * You can't reconnect anymore after this. You should create a new instance if need.
    */
   private async finallyCloseConnection() {
+    await this.removeListeners();
     await this.wsClientIo.close(this.connectionId, WsCloseStatus.closeNormal);
 
     // // reject open promise if connection hasn't been established
@@ -304,6 +314,16 @@ export default class WsClientLogic {
     if (typeof message !== 'string') return false;
 
     return message.indexOf(SETCOOKIE_LABEL) === 0;
+  }
+
+  private async removeListeners() {
+    for (let handlerIndex of this.handlerIndexes) {
+      await this.wsClientIo.removeEventListener(
+        this.connectionId,
+        handlerIndex[HANDLER_EVENT_POSITION],
+        handlerIndex[HANDLER_INDEX_POSITION]
+      );
+    }
   }
 
 }

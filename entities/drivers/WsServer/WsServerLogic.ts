@@ -93,9 +93,11 @@ export default class WsServerLogic {
   }
 
   /**
-   * Force closing a connection
+   * Force closing a connection.
+   * Close event will be risen
    */
   closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
+    // TODO: проверить будет ли поднято событие close ???
     return this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
