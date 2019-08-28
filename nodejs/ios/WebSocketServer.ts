@@ -73,17 +73,6 @@ export default class WebSocketServer implements WebSocketServerIo {
     events.destroy();
   }
 
-  private async destroyServer(serverId: string) {
-    if (!this.servers[Number(serverId)]) return;
-
-    const server = this.servers[Number(serverId)][SERVER_POSITIONS.wsServer];
-
-    // call server close
-    await callPromised(server.close.bind(server));
-
-    delete this.servers[Number(serverId)];
-  }
-
   async onConnection(
     serverId: string,
     cb: (connectionId: string, request: ConnectionParams) => void
@@ -194,6 +183,17 @@ export default class WebSocketServer implements WebSocketServerIo {
       // an empty connections
       [],
     ];
+  }
+
+  private async destroyServer(serverId: string) {
+    if (!this.servers[Number(serverId)]) return;
+
+    const server = this.servers[Number(serverId)][SERVER_POSITIONS.wsServer];
+
+    // call server close
+    await callPromised(server.close.bind(server));
+
+    delete this.servers[Number(serverId)];
   }
 
   private handleIncomeConnection(serverId: string, socket: WebSocket, request: IncomingMessage) {

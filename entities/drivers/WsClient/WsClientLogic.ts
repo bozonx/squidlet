@@ -91,6 +91,7 @@ export default class WsClientLogic {
   }
 
   async destroy() {
+    // TODO: поднимутся close события ?????
     await this.wsClientIo.close(this.connectionId, WsCloseStatus.closeGoingAway, 'Closing on destroy');
     this.destroyInstance();
   }

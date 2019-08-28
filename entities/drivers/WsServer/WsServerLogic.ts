@@ -1,6 +1,11 @@
-import WebSocketServerIo, {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
+import WebSocketServerIo, {
+  ConnectionParams,
+  WebSocketServerProps,
+  WsServerEvent
+} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Promised from 'system/lib/Promised';
+import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION} from 'system/constants';
 
 
 export enum WS_SERVER_EVENTS {
@@ -27,6 +32,7 @@ export default class WsServerLogic {
   private readonly logError: (message: string) => void;
   private serverId: string = '';
   private _listeningPromised: Promised<void>;
+  private handlerIndexes: [WsServerEvent, number][] = [];
 
 
   constructor(
@@ -63,6 +69,15 @@ export default class WsServerLogic {
     }
 
     this.events.destroy();
+
+    for (let handlerIndex of this.handlerIndexes) {
+      await this.wsServerIo.removeEventListener(
+        this.serverId,
+        handlerIndex[HANDLER_EVENT_POSITION],
+        handlerIndex[HANDLER_INDEX_POSITION]
+      );
+    }
+
     await this.wsServerIo.closeServer(this.serverId);
   }
 
@@ -135,25 +150,41 @@ export default class WsServerLogic {
 
     await this.wsServerIo.onServerClose(this.serverId, () => this.onClose());
     await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
+
+    //this.handlerIndexes.push([WsServerEvent.clientClose, closeHandlerIndex]);
   }
 
   private async listenConnectionEvents() {
-    await this.wsServerIo.onClose(this.serverId, (connectionId: string) => {
-      this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
-    });
+    const closeHandlerIndex: number = await this.wsServerIo.onClose(
+      this.serverId,
+      (connectionId: string) => {
+        this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
+      }
+    );
+    const messageHandlerIndex: number = await this.wsServerIo.onMessage(
+      this.serverId,
+      (connectionId: string, data: string | Uint8Array) => {
+        this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
+      }
+    );
+    const errorHandlerIndex: number = await this.wsServerIo.onError(
+      this.serverId,
+      (connectionId: string, err: Error) => this.logError(String(err))
+    );
+    const unexpectedHandlerIndex: number = await this.wsServerIo.onUnexpectedResponse(
+      this.serverId,
+      (connectionId: string, response: ConnectionParams) => {
+        this.logError(
+          `Unexpected response has been received on server "${this.serverId}", ` +
+          `connection "${connectionId}": ${JSON.stringify(response)}`
+        );
+      }
+    );
 
-    await this.wsServerIo.onMessage(this.serverId, (connectionId: string, data: string | Uint8Array) => {
-      this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
-    });
-
-    await this.wsServerIo.onError(this.serverId, (connectionId: string, err: Error) => this.logError(String(err)));
-
-    await this.wsServerIo.onUnexpectedResponse(this.serverId, (connectionId: string, response: ConnectionParams) => {
-      this.logError(
-        `Unexpected response has been received on server "${this.serverId}", ` +
-        `connection "${connectionId}": ${JSON.stringify(response)}`
-      );
-    });
+    this.handlerIndexes.push([WsServerEvent.clientClose, closeHandlerIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientMessage, messageHandlerIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientError, errorHandlerIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientUnexpectedResponse, unexpectedHandlerIndex]);
   }
 
 }

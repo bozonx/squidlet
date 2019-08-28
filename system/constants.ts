@@ -6,6 +6,9 @@ export const DATA_ADDRESS_LENGTH = 1;
 export const BITS_IN_BYTE = 8;
 export const ENCODE = 'utf8';
 
+export const HANDLER_EVENT_POSITION = 0;
+export const HANDLER_INDEX_POSITION = 1;
+
 export enum AppLifeCycleEvents {
   devicesInitialized,
   appInitialized,
