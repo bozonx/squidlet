@@ -1,4 +1,4 @@
-StartProd = require('../../nodejs/starter/StartProd').default
+StartProd = require('../../nodejs/starters/StartProd').default
 
 
 describe 'nodejs.StartProd', ->

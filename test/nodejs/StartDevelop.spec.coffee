@@ -1,4 +1,4 @@
-StartDevelop = require('../../nodejs/starter/StartDevelop').default
+StartDevelop = require('../../nodejs/starters/StartDevelop').default
 
 
 describe 'nodejs.StartDevelop', ->

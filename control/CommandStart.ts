@@ -1,6 +1,6 @@
-import StartDevelop from '../nodejs/starter/StartDevelop';
-import StartProd from '../nodejs/starter/StartProd';
-import StartIoServerStandalone from '../nodejs/starter/StartIoServerStandalone';
+import StartDevelop from '../nodejs/starters/StartDevelop';
+import StartProd from '../nodejs/starters/StartProd';
+import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
 
 
 interface CommandStartArgs {
