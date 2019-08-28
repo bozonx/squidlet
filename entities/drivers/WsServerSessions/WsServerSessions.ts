@@ -44,14 +44,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onConnectionClose((connectionId: string) => {
-      // TODO: похоже может выполниться после дестроя
-
       // handle only ours active sessions
       const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
 
       if (!sessionId) return;
 
       // clear connectionId
+      // TODO: почему null а не undefined ????
       this.sessionConnections[sessionId] = null;
     });
     this.server.onMessage((connectionId: string, data: string | Uint8Array) => {
@@ -77,9 +76,9 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       this.context.sessions.shutDownImmediately(sessionId);
     }
 
-    delete this.sessionConnections;
     this.events.destroy();
     await this.server.destroy();
+    delete this.sessionConnections;
   }
 
 
@@ -151,6 +150,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, request);
     }
 
+    // TODO: может установить раньше до установки куки ???
     this.sessionConnections[sessionId] = connectionId;
   });
 
