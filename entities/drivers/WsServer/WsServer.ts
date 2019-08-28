@@ -1,8 +1,8 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
 import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
+import WsServerLogic, {WS_SERVER_EVENTS} from './WsServerLogic';
 
 
 export class WsServer extends DriverBase<WebSocketServerProps> {

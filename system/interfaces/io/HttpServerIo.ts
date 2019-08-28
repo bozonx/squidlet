@@ -16,17 +16,19 @@ export enum HttpServerEvent {
   request,
 }
 
-interface HttpServerProps {
+export interface HttpServerProps {
   host: string;
   port: number;
 }
 
-interface HttpRequestHeaders {
-  contentType?: string;
+interface CommonHeaders {
+  'content-type'?: string;
 }
 
-interface HttpResponseHeaders {
-  contentType?: string;
+export interface HttpRequestHeaders extends CommonHeaders {
+}
+
+export interface HttpResponseHeaders extends CommonHeaders {
 }
 
 // TODO: поддержка Uint8Array
@@ -43,11 +45,11 @@ export interface HttpResponse {
   // url: string;
   headers: HttpResponseHeaders;
   status: number;
-  statusString: string;
+  //statusString: string;
   body?: string | Uint8Array;
 }
 
-type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
+export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
 type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
 
@@ -77,6 +79,7 @@ export interface HttpServerIo {
    */
   onServerListening(serverId: string, cb: () => void): Promise<number>;
 
+  // TODO: может резуьтат возвращать в промисе
   /**
    * Handle new request.
    * Please call the sendResponse with a received `requestId` to make a response to client.
