@@ -1,6 +1,6 @@
 import IoSet from './interfaces/IoSet';
 import {deserializeJson, serializeJson} from './lib/serialize';
-import {WebSocketServerProps} from './interfaces/io/WebSocketServerIo';
+import WebSocketServerIo from './interfaces/io/WebSocketServerIo';
 import RemoteCall from './lib/remoteCall/RemoteCall';
 import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {makeUniqId} from './lib/uniqId';
@@ -10,29 +10,20 @@ import initializationConfig from './config/initializationConfig';
 import {pathJoin} from './lib/paths';
 import systemConfig from './config/systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
-// TODO: use ioSet's
-import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
-// TODO: use ioSet's
-import WebSocketServerIo from '../nodejs/ios/WebSocketServer';
 import {ShutdownHandler} from './System';
+// TODO: use ioSet's - use driver
+import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 
 
 export const IO_API = 'ioApi';
 export const IO_NAMES_METHOD = 'getIoNames';
 export const METHOD_DELIMITER = '.';
-// TODO: use hostConfig default's
-export const defaultProps: WebSocketServerProps = {
-  host: 'localhost',
-  port: 8089,
-};
 
 
 export default class IoServer {
   private readonly ioSet: IoSet;
-  readonly shutdownRequest: ShutdownHandler;
-  // user's set props of ioServer
-  //private readonly ioServerProps: HostConfig['ioServer'];
-  //private readonly rcResponseTimoutSec: number;
+  private readonly shutdownRequest: ShutdownHandler;
+  private hostConfig?: HostConfig;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;
@@ -45,32 +36,27 @@ export default class IoServer {
 
 
   constructor(
-    // it has to be initialized before
+    // initialized ioSet
     ioSet: IoSet,
     shutdownRequestCb: ShutdownHandler,
-    //ioServerProps: HostConfig['ioServer'],
-    //rcResponseTimoutSec: number,
-    // this.props.hostConfig.ioServer,
-    // (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
-    //   ? this.props.hostConfig.config.rcResponseTimoutSec
-    //   : hostDefaultConfig.config.rcResponseTimoutSec,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
     this.shutdownRequest = shutdownRequestCb;
-    //this.ioServerProps = ioServerProps;
-    //this.rcResponseTimoutSec = rcResponseTimoutSec;
     this.logInfo = logInfo;
     this.logError = logError;
   }
 
   async start() {
-    // TODO: !!!!????? host config может и не быть
-    const hostConfig = await this.loadHostConfig();
+    this.hostConfig = await this.loadHostConfig();
+
+    if (!this.hostConfig.ioServer) {
+      throw new Error(`ioServer param in the host config is null`);
+    }
 
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
-    const props = await this.makeProps();
+    const props = this.hostConfig.ioServer;
 
     this._wsServer = new WsServerLogic(
       wsServerIo,
@@ -112,10 +98,12 @@ export default class IoServer {
       return;
     }
 
+    if (!this.hostConfig) return this.logError(`No host config`);
+
     this.remoteCall = new RemoteCall(
       this.sendToClient,
       this.callIoApi,
-      this.rcResponseTimoutSec,
+      this.hostConfig.config.rcResponseTimoutSec,
       this.logError,
       makeUniqId
     );
@@ -179,15 +167,7 @@ export default class IoServer {
     this.logError(`Websocket server was closed`);
   }
 
-  private async makeProps(): Promise<WebSocketServerProps> {
-    return {
-      ...defaultProps,
-      ...this.ioServerProps,
-    };
-  }
-
   private async loadHostConfig(): Promise<HostConfig> {
-    // TODO: review
     const initCfg: InitializationConfig = initializationConfig();
     const pathToConfig = pathJoin(
       systemConfig.rootDirs.envSet,

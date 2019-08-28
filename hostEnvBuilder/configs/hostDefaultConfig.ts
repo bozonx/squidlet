@@ -27,4 +27,8 @@ const config: HostConfigConfig = {
 
 export default {
   config,
+  ioServer: {
+    host: 'localhost',
+    port: 8089
+  },
 };

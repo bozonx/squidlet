@@ -77,6 +77,11 @@ export default class StartIoServerStandalone {
 
     await this.configureIoSet(ioSet);
 
+    // this.props.hostConfig.ioServer,
+    // (this.props.hostConfig.config && this.props.hostConfig.config.rcResponseTimoutSec)
+    //   ? this.props.hostConfig.config.rcResponseTimoutSec
+    //   : hostDefaultConfig.config.rcResponseTimoutSec,
+
     return ioSet;
   }
 
