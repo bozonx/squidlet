@@ -5,6 +5,8 @@ export const Methods = [
   'onServerError',
   'onServerListening',
   'onRequest',
+  'sendResponse',
+  'removeListener',
 ];
 
 export enum HttpServerEvent {
@@ -37,8 +39,8 @@ export interface HttpRequest {
 }
 
 export interface HttpResponse {
-  method: HttpMethods;
-  url: string;
+  // method: HttpMethods;
+  // url: string;
   headers: HttpResponseHeaders;
   status: number;
   statusString: string;
@@ -46,8 +48,7 @@ export interface HttpResponse {
 }
 
 type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
-// TODO: сформировать ответ
-type HttpRequestHandler = (request: HttpRequest) => void;
+type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
 
 export interface HttpServerIo {
@@ -77,9 +78,16 @@ export interface HttpServerIo {
   onServerListening(serverId: string, cb: () => void): Promise<number>;
 
   /**
-   * Handle new request
+   * Handle new request.
+   * Please call the sendResponse with a received `requestId` to make a response to client.
    */
   onRequest(serverId: string, cb: HttpRequestHandler): Promise<number>;
+
+  /**
+   * Send a response to client.
+   * Call it only when you are handled a request.
+   */
+  sendResponse(requestId: number, response: HttpResponse): Promise<void>;
 
   /**
    * Remove one of server listeners
