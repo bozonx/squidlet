@@ -68,7 +68,7 @@ export default class WsServerLogic {
 
 
   isInitialized(): boolean {
-    return Boolean(this.serverId);
+    return typeof this.serverId !== 'undefined';
   }
 
   /**
