@@ -7,7 +7,7 @@ export const Methods = [
   'onRequest',
 ];
 
-export enum HttpEvent {
+export enum HttpServerEvent {
   listening,
   serverClose,
   serverError,
@@ -84,5 +84,5 @@ export interface HttpServerIo {
   /**
    * Remove one of server listeners
    */
-  removeListener(serverId: string, eventName: HttpEvent,handlerIndex: number): Promise<void>;
+  removeListener(serverId: string, eventName: HttpServerEvent,handlerIndex: number): Promise<void>;
 }
