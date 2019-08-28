@@ -7,6 +7,7 @@ import IoSetSrc from '../ioSets/IoSetSrc';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
+import {consoleError} from '../../system/lib/helpers';
 
 
 export default class StartIoServerStandalone {
@@ -78,7 +79,7 @@ export default class StartIoServerStandalone {
       this.ioSet,
       this.shutdownRequestCb,
       console.info,
-      console.error
+      consoleError
     );
 
     await ioServer.start();

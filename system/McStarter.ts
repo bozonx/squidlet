@@ -2,6 +2,7 @@ import IoSetLocal from './IoSetLocal';
 import IoSet from './interfaces/IoSet';
 import AppSwitcher from './AppSwitcher';
 import SysIo from './interfaces/io/SysIo';
+import {consoleError} from './lib/helpers';
 
 
 /**
@@ -30,7 +31,7 @@ class McStarter {
     const sysIo = this.ioSet.getIo<SysIo>('Sys');
 
     sysIo.reboot()
-      .catch(console.error);
+      .catch(consoleError);
   }
 
 }

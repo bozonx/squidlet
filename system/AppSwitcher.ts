@@ -4,6 +4,7 @@ import IoServer from './IoServer';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import systemConfig from './config/systemConfig';
 import IoItem from './interfaces/IoItem';
+import {consoleError} from './lib/helpers';
 
 
 export type AppSwitcherClass = new (
@@ -67,7 +68,12 @@ export default class AppSwitcher {
   }
 
   private startIoServer = async () => {
-    this.ioServer = new IoServer(this.ioSet, this.handleShutdownRequest, console.info, console.error);
+    this.ioServer = new IoServer(
+      this.ioSet,
+      this.handleShutdownRequest,
+      console.info,
+      consoleError
+    );
 
     await this.ioServer.start();
   }
@@ -76,11 +82,11 @@ export default class AppSwitcher {
     switch (reason) {
       case 'switchToIoServer':
         this.switchToIoServer()
-          .catch(console.error);
+          .catch(consoleError);
         break;
       case 'switchToApp':
         this.switchToApp()
-          .catch(console.error);
+          .catch(consoleError);
         break;
       case 'restart':
         this.restartRequest();

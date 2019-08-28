@@ -2,6 +2,7 @@ import WsApiClient from '../shared/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {Dictionary} from '../system/interfaces/Types';
 import {listenScriptEnd} from '../shared/helpers';
+import {consoleError} from '../system/lib/helpers';
 
 
 export default class ApiCall {
@@ -158,7 +159,7 @@ export default class ApiCall {
     const client: WsApiClient = new WsApiClient(
       hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
-      console.error,
+      consoleError,
       host,
       (port) ? parseInt(port) : undefined
     );

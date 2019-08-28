@@ -131,6 +131,10 @@ export function callOnDifferentValues(
   }
 }
 
+export function consoleError(msg: string) {
+  console.error(`ERROR: ${msg}`);
+}
+
 
 // /**
 //  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]

@@ -5,7 +5,7 @@ import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {Primitives} from 'system/interfaces/Types';
 import {mergeDeepObjects} from 'system/lib/objects';
-import {parseCookie, stringifyCookie} from 'system/lib/strings';
+import {parseCookie, stringifyCookie} from 'system/lib/cookies';
 import Promised from 'system/lib/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
 

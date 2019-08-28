@@ -6,6 +6,7 @@ import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
 import {IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from '../system/IoServer';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
+import {consoleError} from '../system/lib/helpers';
 
 
 const wsClientIo = new WebSocketClient();
@@ -22,6 +23,7 @@ export default class IoClient {
     responseTimoutSec: number,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void,
+    // TODO: наверное можно требовать обязательно чтобы во внешнем коде их зарезолвили
     host?: string,
     port?: number
   ) {
@@ -35,7 +37,7 @@ export default class IoClient {
       clientProps,
       () => this.logInfo(`Websocket connection has been closed`),
       this.logInfo,
-      this.logError
+      consoleError
     );
     // listen income data
     this.client.onMessage(this.handleIncomeMessage);

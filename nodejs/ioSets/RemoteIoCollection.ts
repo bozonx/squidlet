@@ -4,6 +4,7 @@ import IoItem from '../../system/interfaces/IoItem';
 import {SYSTEM_DIR} from '../../shared/helpers';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import IoClient from '../../shared/IoClient';
+import {consoleError} from '../../system/lib/helpers';
 
 
 export default class RemoteIoCollection {
@@ -27,7 +28,7 @@ export default class RemoteIoCollection {
     this._ioClient = new IoClient(
       hostDefaultConfig.config.rcResponseTimoutSec,
       console.info,
-      console.error,
+      consoleError,
       this.host,
       this.port
     );
