@@ -1,7 +1,7 @@
 import IoItem from '../IoItem';
 
 
-export interface Stats {
+export interface StatsSimplified {
   // in bytes
   size: number;
   // is it dir or file
@@ -52,7 +52,7 @@ export default interface StorageIo extends IoItem {
   rmdir(pathTo: string): Promise<void>;
   unlink(pathTo: string): Promise<void>;
   writeFile(pathTo: string, data: string | Uint8Array): Promise<void>;
-  stat(pathTo: string): Promise<Stats>;
+  stat(pathTo: string): Promise<StatsSimplified>;
   exists(pathTo: string): Promise<boolean>;
   copyFile(src: string, dest: string): Promise<void>;
   rename(oldPath: string, newPath: string): Promise<void>;

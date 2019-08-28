@@ -13,7 +13,7 @@ import {
   MODERN_DIR,
   ORIGINAL_DIR,
 } from '../constants';
-import {Stats} from '../../system/interfaces/io/StorageIo';
+import {StatsSimplified} from '../../system/interfaces/io/StorageIo';
 import {OwnerOptions} from '../interfaces/OnwerOptions';
 
 
@@ -138,7 +138,7 @@ export default class BuildIo {
    * If it a regular file - it returns filePath as is.
    */
   private async resolveFileTargetPath(filePath: string): Promise<string> {
-    const stat: Stats = await this.os.stat(filePath);
+    const stat: StatsSimplified = await this.os.stat(filePath);
 
     if (!stat.symbolicLink) return filePath;
 

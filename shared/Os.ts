@@ -1,12 +1,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
+import {Stats} from 'fs';
 import * as shelljs from 'shelljs';
 import * as rimraf from 'rimraf';
 import * as yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
-import {Stats} from '../system/interfaces/io/StorageIo';
+import {StatsSimplified} from '../system/interfaces/io/StorageIo';
 import {callPromised} from '../system/lib/common';
 import {ENCODE} from '../system/constants';
 import {OwnerOptions} from './interfaces/OnwerOptions';
@@ -60,8 +61,25 @@ export default class Os {
   }
 
   async chown(pathTo: string, uid?: number, gid?: number): Promise<void> {
-    // TODO: use extended logic
-    //await callPromised(fs.chown, pathTo, uid, gid);
+    if (typeof uid === 'undefined' && typeof gid === 'undefined') {
+      // noting to change - just return
+      return;
+    }
+    else if (typeof uid !== 'undefined' && typeof gid !== 'undefined') {
+      // uid and gid are specified - set both
+      return await callPromised(fs.chown, pathTo, uid, gid);
+    }
+
+    // else load stats to resolve lack of params
+
+    const stat: Stats = await callPromised(fs.lstat, pathTo);
+
+    await callPromised(
+      fs.chown,
+      pathTo,
+      (typeof uid === 'undefined') ? stat.uid : uid,
+      (typeof gid === 'undefined') ? stat.gid : gid,
+    );
   }
 
   readdir(pathTo: string): Promise<string[]> {
@@ -82,7 +100,7 @@ export default class Os {
     return fs.existsSync(path);
   }
 
-  async stat(pathTo: string): Promise<Stats> {
+  async stat(pathTo: string): Promise<StatsSimplified> {
     const stat = await callPromised(fs.lstat, pathTo);
 
     return {

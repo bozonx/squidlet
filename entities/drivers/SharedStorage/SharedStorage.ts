@@ -1,4 +1,4 @@
-import StorageIo, {Stats} from 'system/interfaces/io/StorageIo';
+import StorageIo, {StatsSimplified} from 'system/interfaces/io/StorageIo';
 import DriverBase from 'system/base/DriverBase';
 import {pathDirname, pathJoin} from 'system/lib/paths';
 
@@ -24,14 +24,14 @@ export class SharedStorage extends DriverBase {
 
   async isDir(pathToDir: string): Promise<boolean> {
     const absPath: string = pathJoin(this.rootDir, pathToDir);
-    const stats: Stats = await this.storageDev.stat(absPath);
+    const stats: StatsSimplified = await this.storageDev.stat(absPath);
 
     return stats.dir;
   }
 
   async isFile(pathToFile: string) {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
-    const stats: Stats = await this.storageDev.stat(absPath);
+    const stats: StatsSimplified = await this.storageDev.stat(absPath);
 
     return !stats.dir;
   }
@@ -74,7 +74,7 @@ export class SharedStorage extends DriverBase {
    */
   async rm(pathToFileOrDir: string) {
     const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
-    const stats: Stats = await this.storageDev.stat(pathToFileOrDir);
+    const stats: StatsSimplified = await this.storageDev.stat(pathToFileOrDir);
 
     if (stats.dir) {
       return this.storageDev.rmdir(absPath);
@@ -90,7 +90,7 @@ export class SharedStorage extends DriverBase {
     return this.storageDev.appendFile(absPath, data);
   }
 
-  stat(pathToFileOrDir: string): Promise<Stats> {
+  stat(pathToFileOrDir: string): Promise<StatsSimplified> {
     const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
 
     return this.storageDev.stat(absPath);

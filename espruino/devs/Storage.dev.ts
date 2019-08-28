@@ -14,7 +14,7 @@
 //import * as fs from 'fs';
 const fs = require('fs');
 
-import Storage, {Stats} from 'host/src/app/interfaces/dev/Storage';
+import Storage, {StatsSimplified} from 'host/src/app/interfaces/dev/Storage';
 
 
 export default class StorageDev implements Storage {
@@ -87,10 +87,10 @@ export default class StorageDev implements Storage {
     });
   }
 
-  stat(path: string): Promise<Stats> {
+  stat(path: string): Promise<StatsSimplified> {
     return new Promise((resolve, reject) => {
-      const fn = (fs.statSync as any) as (path: string) => Stats | undefined;
-      const result: Stats | undefined = fn(path);
+      const fn = (fs.statSync as any) as (path: string) => StatsSimplified | undefined;
+      const result: StatsSimplified | undefined = fn(path);
 
       if (result) return resolve(result);
 

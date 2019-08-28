@@ -1,6 +1,7 @@
 import * as fs from 'fs';
+import {Stats} from 'fs';
 
-import StorageIo, {Stats, ConfigParams} from 'system/interfaces/io/StorageIo';
+import StorageIo, {StatsSimplified, ConfigParams} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {ENCODE} from 'system/constants';
@@ -13,6 +14,8 @@ let config: ConfigParams | undefined;
  * The same for lowjs and nodejs
  */
 export default class Storage implements StorageIo {
+  //private readonly os = new Os();
+
   async configure(configParams: ConfigParams): Promise<void> {
     config = {
       ...config,
@@ -75,7 +78,7 @@ export default class Storage implements StorageIo {
     await this.chown(pathTo);
   }
 
-  async stat(pathTo: string): Promise<Stats> {
+  async stat(pathTo: string): Promise<StatsSimplified> {
     const stat = await callPromised(fs.lstat, pathTo);
 
     return {
@@ -113,9 +116,25 @@ export default class Storage implements StorageIo {
   private async chown(pathTo: string) {
     if (!config) return;
 
-    // TODO: use extended logic
+    if (typeof config.uid === 'undefined' && typeof config.gid === 'undefined') {
+      // noting to change - just return
+      return;
+    }
+    else if (typeof config.uid !== 'undefined' && typeof config.gid !== 'undefined') {
+      // uid and gid are specified - set both
+      return await callPromised(fs.chown, pathTo, config.uid, config.gid);
+    }
 
-    //return callPromised(fs.chown, pathTo, config.uid, config.gid);
+    // else load stats to resolve lack of params
+
+    const stat: Stats = await callPromised(fs.lstat, pathTo);
+
+    await callPromised(
+      fs.chown,
+      pathTo,
+      (typeof config.uid === 'undefined') ? stat.uid : config.uid,
+      (typeof config.gid === 'undefined') ? stat.gid : config.gid,
+    );
   }
 
 }
