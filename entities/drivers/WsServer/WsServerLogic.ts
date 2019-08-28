@@ -52,6 +52,7 @@ export default class WsServerLogic {
     this._listeningPromised = new Promised<void>();
   }
 
+
   /**
    * Start server
    */
@@ -69,15 +70,7 @@ export default class WsServerLogic {
     }
 
     this.events.destroy();
-
-    for (let handlerIndex of this.handlerIndexes) {
-      await this.wsServerIo.removeEventListener(
-        this.serverId,
-        handlerIndex[HANDLER_EVENT_POSITION],
-        handlerIndex[HANDLER_INDEX_POSITION]
-      );
-    }
-
+    await this.removeListeners();
     await this.wsServerIo.closeServer(this.serverId);
   }
 
@@ -134,44 +127,53 @@ export default class WsServerLogic {
 
   private async listenServerEvents() {
     const listeningTimeout = setTimeout(() => {
-      this._listeningPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
-      this.wsServerIo.closeServer(this.serverId)
+      this.handleTimeout()
         .catch(this.logError);
     }, SERVER_START_LISTENING_SEC * 1000);
 
-    await this.wsServerIo.onServerListening(this.serverId, () => {
-      clearTimeout(listeningTimeout);
-      this._listeningPromised.resolve();
-    });
+    const listeningIndex: number = await this.wsServerIo.onServerListening(
+      this.serverId,
+      () => {
+        clearTimeout(listeningTimeout);
+        this._listeningPromised.resolve();
+      }
+    );
+    const connectionIndex: number = await this.wsServerIo.onConnection(
+      this.serverId,
+      (connectionId: string, request: ConnectionParams) => {
+        this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
+      }
+    );
+    const closeIndex: number = await this.wsServerIo.onServerClose(
+      this.serverId,
+      () => this.onClose()
+    );
+    const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
 
-    await this.wsServerIo.onConnection(this.serverId, (connectionId: string, request: ConnectionParams) => {
-      this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
-    });
-
-    await this.wsServerIo.onServerClose(this.serverId, () => this.onClose());
-    await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
-
-    //this.handlerIndexes.push([WsServerEvent.clientClose, closeHandlerIndex]);
+    this.handlerIndexes.push([WsServerEvent.listening, listeningIndex]);
+    this.handlerIndexes.push([WsServerEvent.newConnection, connectionIndex]);
+    this.handlerIndexes.push([WsServerEvent.serverClose, closeIndex]);
+    this.handlerIndexes.push([WsServerEvent.serverError, errorIndex]);
   }
 
   private async listenConnectionEvents() {
-    const closeHandlerIndex: number = await this.wsServerIo.onClose(
+    const closeIndex: number = await this.wsServerIo.onClose(
       this.serverId,
       (connectionId: string) => {
         this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
       }
     );
-    const messageHandlerIndex: number = await this.wsServerIo.onMessage(
+    const messageIndex: number = await this.wsServerIo.onMessage(
       this.serverId,
       (connectionId: string, data: string | Uint8Array) => {
         this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
       }
     );
-    const errorHandlerIndex: number = await this.wsServerIo.onError(
+    const errorIndex: number = await this.wsServerIo.onError(
       this.serverId,
       (connectionId: string, err: Error) => this.logError(String(err))
     );
-    const unexpectedHandlerIndex: number = await this.wsServerIo.onUnexpectedResponse(
+    const unexpectedIndex: number = await this.wsServerIo.onUnexpectedResponse(
       this.serverId,
       (connectionId: string, response: ConnectionParams) => {
         this.logError(
@@ -181,10 +183,26 @@ export default class WsServerLogic {
       }
     );
 
-    this.handlerIndexes.push([WsServerEvent.clientClose, closeHandlerIndex]);
-    this.handlerIndexes.push([WsServerEvent.clientMessage, messageHandlerIndex]);
-    this.handlerIndexes.push([WsServerEvent.clientError, errorHandlerIndex]);
-    this.handlerIndexes.push([WsServerEvent.clientUnexpectedResponse, unexpectedHandlerIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientClose, closeIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientMessage, messageIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientError, errorIndex]);
+    this.handlerIndexes.push([WsServerEvent.clientUnexpectedResponse, unexpectedIndex]);
+  }
+
+  private async removeListeners() {
+    for (let handlerIndex of this.handlerIndexes) {
+      await this.wsServerIo.removeEventListener(
+        this.serverId,
+        handlerIndex[HANDLER_EVENT_POSITION],
+        handlerIndex[HANDLER_INDEX_POSITION]
+      );
+    }
+  }
+
+  private async handleTimeout() {
+    this._listeningPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
+    await this.removeListeners();
+    await this.wsServerIo.closeServer(this.serverId);
   }
 
 }
