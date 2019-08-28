@@ -4,7 +4,7 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
-import {defaultProps, IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from '../system/IoServer';
+import {IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from '../system/IoServer';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 
 
@@ -113,6 +113,9 @@ export default class IoClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
+
+    // TODO: get from host config
+
     const host: string = specifiedHost || defaultProps.host;
     const port: number= specifiedPort || defaultProps.port;
     const url = `ws://${host}:${port}`;

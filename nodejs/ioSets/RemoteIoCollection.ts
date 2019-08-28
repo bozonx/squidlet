@@ -46,6 +46,7 @@ export default class RemoteIoCollection {
     await this.ioClient.destroy();
     delete this._ioClient;
     delete this.ioNames;
+    delete this.ioCollection;
   }
 
 
