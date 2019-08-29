@@ -39,6 +39,8 @@ export default class CommandStart {
         this.args.machine as any,
         this.args.name,
         this.args.workDir,
+        this.args.user,
+        this.args.group,
       );
 
       await starter.init();
@@ -54,6 +56,8 @@ export default class CommandStart {
       this.args.machine as any,
       this.args.name,
       this.args.workDir,
+      this.args.user,
+      this.args.group,
       this.args.ioset,
     );
 
@@ -71,7 +75,8 @@ export default class CommandStart {
       this.args.machine as any,
       this.args.name,
       this.args.workDir,
-      this.args.ioset,
+      this.args.user,
+      this.args.group,
     );
 
     await starter.init();

@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import NodejsMachines from '../interfaces/NodejsMachines';
 import Props from './Props';
 import Os from '../../shared/Os';
@@ -11,7 +13,8 @@ import systemConfig from '../../system/config/systemConfig';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import {omitObj} from '../../system/lib/objects';
+import {mergeDeepObjects, omitObj} from '../../system/lib/objects';
+import {HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
 
 
 export default class StartIoServerStandalone {
@@ -19,6 +22,11 @@ export default class StartIoServerStandalone {
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
   private ioSet?: IoSet;
+  private _systemCfg?: typeof systemConfig;
+
+  private get systemCfg(): typeof systemConfig {
+    return this._systemCfg as any;
+  }
 
 
   constructor(
@@ -47,6 +55,7 @@ export default class StartIoServerStandalone {
   async init() {
     await this.groupConfig.init();
     await this.props.resolve();
+    this._systemCfg = this.makeSystemConfig();
     // load all the machine's io
     this.ioSet = await this.makeIoSet();
 
@@ -80,7 +89,7 @@ export default class StartIoServerStandalone {
     //await this.installModules();
 
     const ioServer = new IoServer(
-      systemConfig,
+      this.systemCfg,
       this.ioSet,
       this.shutdownRequestCb,
       console.info,
@@ -97,6 +106,9 @@ export default class StartIoServerStandalone {
   private async makeIoSet(): Promise<IoSet> {
     const envBuilder = new EnvBuilder(this.preparePreHostConfig(), this.props.envSetDir, this.props.tmpDir);
     //const ioSet = new IoSetStandaloneIoServer(this.os, this.props.hostConfig, this.props.platform, this.props.machine);
+
+    await envBuilder.collect();
+
     const ioSet: IoSet = new IoSetDevelopSrc(
       this.os,
       envBuilder,
@@ -106,7 +118,7 @@ export default class StartIoServerStandalone {
     );
 
     ioSet.prepare && await ioSet.prepare();
-    ioSet.init && await ioSet.init(systemConfig);
+    ioSet.init && await ioSet.init(this.systemCfg);
     await this.configureStorage(ioSet);
 
     return ioSet;
@@ -143,4 +155,14 @@ export default class StartIoServerStandalone {
     });
   }
 
+  // TODO: remove
+  private makeSystemConfig(): typeof systemConfig{
+    return mergeDeepObjects({
+      rootDirs: {
+        envSet: this.props.envSetDir,
+        varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
+        tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
+      },
+    }, systemConfig) as any;
+  }
 }

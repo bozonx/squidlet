@@ -54,6 +54,7 @@ export default class SystemStarter {
     process.exit(0);
   }
 
+  // TODO: remove
   private makeSystemConfig(): typeof systemConfig{
     return mergeDeepObjects({
       rootDirs: {

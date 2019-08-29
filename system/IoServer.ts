@@ -92,6 +92,8 @@ export default class IoServer {
       this.logError,
       makeUniqId
     );
+
+    this.logInfo(`New IO client has been connected`);
   }
 
   private handleIncomeMessages = (connectionId: string, data: string | Uint8Array) => {
@@ -190,6 +192,8 @@ export default class IoServer {
 
       this.remoteCall && this.remoteCall.destroy()
         .catch(this.logError);
+
+      this.logInfo(`IO client has been disconnected`);
 
       // TODO: может не делать этого - а делать запрос на переключение на app
       // switch to normal app on connection close
