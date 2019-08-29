@@ -112,7 +112,7 @@ export default class Api {
   }
 
   async switchToIoServer() {
-    if (this.context.config.ioServer === null) {
+    if (!this.context.config.ioServer) {
       throw new Error(`Switching to IO-server isn't allowed it config`);
     }
 

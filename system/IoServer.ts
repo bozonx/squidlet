@@ -159,7 +159,7 @@ export default class IoServer {
 
   private async initWsServer() {
     if (!this.hostConfig || !this.hostConfig.ioServer) {
-      throw new Error(`ioServer param in the host config is null`);
+      throw new Error(`Can't init ioServer because it isn't allowed in a host config`);
     }
 
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
