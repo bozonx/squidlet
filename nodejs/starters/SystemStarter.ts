@@ -16,9 +16,9 @@ interface SystemKind {
 }
 // AppSwitcher of System class
 type SystemKindClass = new (
+  systemCfg: typeof systemConfig,
   ioSet: IoSet,
   restartRequest: () => void,
-  systemCfg: typeof systemConfig
 ) => SystemKind;
 
 
@@ -44,12 +44,12 @@ export default class SystemStarter {
     const systemKindClass: SystemKindClass = this.os.require(appSwitcherFile).default;
     const systemCfg = this.makeSystemConfig();
 
-    console.info(`===> Initializing app`);
+    console.info(`===> Initializing app, using "${fileName}"`);
 
     const appSwitcher: SystemKind = new systemKindClass(
+      systemCfg,
       ioSet,
-      this.handleRestartRequest,
-      systemCfg
+      this.handleRestartRequest
     );
 
     this.listenDestroySignals(appSwitcher.destroy);

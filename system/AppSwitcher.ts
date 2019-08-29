@@ -16,9 +16,9 @@ export default class AppSwitcher {
 
 
   constructor(
+    systemCfg: typeof systemConfig,
     ioSet: IoSet,
     restartRequest: () => void,
-    systemCfg: typeof systemConfig
   ) {
     this.ioSet = ioSet;
     this.restartRequest = restartRequest;
