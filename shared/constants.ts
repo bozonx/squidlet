@@ -21,5 +21,5 @@ export const HOST_TMP_HOST_DIR = 'host';
 
 export const IOSET_STRING_DELIMITER = ':';
 
-//export const SYSTEM_FILE_NAME = 'System';
+export const SYSTEM_FILE_NAME = 'System';
 export const APP_SWITCHER_FILE_NAME = 'AppSwitcher';

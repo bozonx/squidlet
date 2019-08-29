@@ -1,37 +1,52 @@
 import * as path from 'path';
 
-import {APP_SWITCHER_FILE_NAME, HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR} from '../../shared/constants';
+import {APP_SWITCHER_FILE_NAME, HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
-import AppSwitcher, {AppSwitcherClass} from '../../system/AppSwitcher';
 import {mergeDeepObjects} from '../../system/lib/objects';
 import systemConfig from '../../system/config/systemConfig';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
+interface SystemKind {
+  start(): Promise<void>;
+  destroy(): Promise<void>;
+}
+// AppSwitcher of System class
+type SystemKindClass = new (
+  ioSet: IoSet,
+  restartRequest: () => void,
+  systemCfg: typeof systemConfig
+) => SystemKind;
+
+
 export default class SystemStarter {
   private readonly os: Os;
   private readonly props: Props;
+  private readonly bareSystem: boolean;
 
 
-  constructor(os: Os, props: Props) {
+  constructor(os: Os, props: Props, bareSystem: boolean = false) {
     this.props = props;
     this.os = os;
+    this.bareSystem = bareSystem;
   }
 
 
   async start(pathToSystemDir: string, ioSet: IoSet) {
     await this.configureStorage(ioSet);
 
-    const appSwitcherFile = path.join(pathToSystemDir, APP_SWITCHER_FILE_NAME);
-    const appSwitcherClass: AppSwitcherClass = this.os.require(appSwitcherFile).default;
+    // use System if bareSystem is true or AppSwitcher if false
+    const fileName: string = (this.bareSystem) ? SYSTEM_FILE_NAME : APP_SWITCHER_FILE_NAME;
+    const appSwitcherFile = path.join(pathToSystemDir, fileName);
+    const systemKindClass: SystemKindClass = this.os.require(appSwitcherFile).default;
     const systemCfg = this.makeSystemConfig();
 
     console.info(`===> Initializing app`);
 
-    const appSwitcher: AppSwitcher = new appSwitcherClass(
+    const appSwitcher: SystemKind = new systemKindClass(
       ioSet,
       this.handleRestartRequest,
       systemCfg

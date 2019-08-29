@@ -7,13 +7,6 @@ import IoItem from './interfaces/IoItem';
 import {consoleError} from './lib/helpers';
 
 
-export type AppSwitcherClass = new (
-  ioSet: IoSet,
-  restartRequest: () => void,
-  systemCfg: typeof systemConfig
-) => AppSwitcher;
-
-
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
   private readonly restartRequest: () => void;

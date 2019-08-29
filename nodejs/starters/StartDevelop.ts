@@ -47,7 +47,7 @@ export default class StartDevelop {
       argUser,
       argGroup,
     );
-    this.systemStarter = new SystemStarter(this.os, this.props);
+    this.systemStarter = new SystemStarter(this.os, this.props, this.isRemoteIoSet());
   }
 
   async init() {
@@ -58,8 +58,13 @@ export default class StartDevelop {
 
     this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
 
-    console.info(`Use working dir ${this.props.workDir}`);
-    console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
+    if (this.isRemoteIoSet()) {
+      console.info(`Using remote ioset of host "${this.argIoSet}"`);
+    }
+    else {
+      console.info(`Using working dir ${this.props.workDir}`);
+      console.info(`Using host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
+    }
   }
 
 
@@ -71,7 +76,7 @@ export default class StartDevelop {
     await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
 
     // install node modules in local mode. And don't install in remote mode
-    if (!this.argIoSet) {
+    if (!this.isRemoteIoSet()) {
       await this.installModules();
     }
 
@@ -138,7 +143,7 @@ export default class StartDevelop {
    * Otherwise source io set which gets configs and manifests from memory and uses source modules.
    */
   private resolveIoSetType(): string {
-    if (this.argIoSet) {
+    if (this.isRemoteIoSet()) {
       return 'IoSetDevelopRemote';
     }
 
@@ -161,6 +166,10 @@ export default class StartDevelop {
       console.error(result.stdout);
       console.error(result.stderr);
     }
+  }
+
+  private isRemoteIoSet(): boolean {
+    return Boolean(this.argIoSet);
   }
 
 }
