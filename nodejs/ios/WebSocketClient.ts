@@ -107,6 +107,13 @@ export default class WebSocketClient implements WebSocketClientIo {
     // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
   }
 
+  /**
+   * destroy all the events of connection and close it
+   */
+  async destroyConnection(connectionId: string): Promise<void> {
+    // TODO: destroy all the events of connection
+  }
+
 
   private connectToServer(connectionId: string, props: WebSocketClientProps): WebSocket {
     const client = new WebSocket(props.url, omitObj(props, 'url'));

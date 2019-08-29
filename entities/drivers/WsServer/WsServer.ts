@@ -61,6 +61,12 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
     await this.server.closeConnection(connectionId, code, reason);
   }
 
+  async destroyConnection(connectionId: string) {
+    if (!this.server) return;
+
+    await this.server.destroyConnection(connectionId);
+  }
+
   async setCookie(connectionId: string, cookie: string) {
     if (!this.server) return;
 
@@ -81,6 +87,10 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
     return this.server.onConnection(cb);
   }
 
+  /**
+   * Ordinary connection close.
+   * It won't be called on destroy
+   */
   onConnectionClose(cb: (connectionId: string) => void): number {
     if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.closedMsg}`);
 

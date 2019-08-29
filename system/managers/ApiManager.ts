@@ -54,10 +54,6 @@ export default class ApiManager {
    * Call this method if session has just been closed
    */
   async remoteCallSessionClosed(sessionId: string) {
-
-    // TODO: не правильно поидее - это заглушка если уже был вызван общий дестрой
-    if (!this.remoteCalls || !this.remoteCalls[sessionId]) return ;
-
     await this.remoteCalls[sessionId].destroy();
     delete this.remoteCalls[sessionId];
   }

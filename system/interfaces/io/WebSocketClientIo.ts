@@ -18,6 +18,7 @@ export const Methods = [
 
   'send',
   'close',
+  'destroyConnection',
 ];
 
 // export const wsEventNames: {[index: string]: WsEvents} = {
@@ -71,4 +72,5 @@ export default interface WebSocketClientIo extends IoItem {
 
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;
   close               (connectionId: string, code: number, reason?: string): Promise<void>;
+  destroyConnection   (connectionId: string): Promise<void>;
 }

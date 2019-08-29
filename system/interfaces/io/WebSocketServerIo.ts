@@ -16,6 +16,7 @@ export const Methods = [
   'removeEventListener',
   'send',
   'close',
+  'destroyConnection',
 ];
 
 export enum WsServerEvent {
@@ -110,4 +111,9 @@ export default interface WebSocketServerIo extends IoItem {
 
   send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void>;
   close(serverId: string, connectionId: string, code: number, reason: string): Promise<void>;
+
+  /**
+   * Destroy the connection and not rise an close event
+   */
+  destroyConnection(serverId: string, connectionId: string): Promise<void>;
 }

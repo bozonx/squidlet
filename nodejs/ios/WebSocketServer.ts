@@ -165,6 +165,11 @@ export default class WebSocketServer implements WebSocketServerIo {
     // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
   }
 
+  async destroyConnection(serverId: string, connectionId: string): Promise<void> {
+    // TODO: удалить обработчики событий close на это connection
+    // TODO: закрыть
+  }
+
 
   private makeServer(serverId: string, props: WebSocketServerProps): ServerItem {
     const events = new IndexedEventEmitter();

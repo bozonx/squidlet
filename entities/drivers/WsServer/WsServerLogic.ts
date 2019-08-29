@@ -6,6 +6,7 @@ import WebSocketServerIo, {
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Promised from 'system/lib/Promised';
 import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION} from 'system/constants';
+import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
 export enum WS_SERVER_EVENTS {
@@ -71,6 +72,7 @@ export default class WsServerLogic {
 
     this.events.destroy();
     await this.removeListeners();
+    // TODO: use destroyServer - it removes all the events before destroy
     await this.wsServerIo.closeServer(this.serverId);
   }
 
@@ -99,6 +101,12 @@ export default class WsServerLogic {
   closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
     // TODO: проверить будет ли поднято событие close ???
     return this.wsServerIo.close(this.serverId, connectionId, code, reason);
+  }
+
+  async destroyConnection(connectionId: string) {
+    // TODO: может проще тут отписаться от события и выполнить просто close
+    return this.wsServerIo.close(this.serverId, connectionId, WsCloseStatus.closeGoingAway, 'Destroy connection');
+    //await this.wsServerIo.destroyConnection(this.serverId, connectionId);
   }
 
   /**
