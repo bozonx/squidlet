@@ -8,6 +8,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 const NO_DATA_ADDRESS = 'null';
 const REGISTER_LENGTH = 1;
 
+// TODO: don't use null
 type SlaveHandler = (error: Error | null, data?: Uint8Array) => void;
 
 interface I2cSlaveProps {
@@ -105,6 +106,7 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
 
   private handleIncomeData = (data: Uint8Array) => {
     // emit handler for all the income data any way
+    // TODO: don't use null
     this.events.emit(NO_DATA_ADDRESS, null, data);
 
     if (!data.length) return;
@@ -113,9 +115,11 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
 
     // emit handler of data address
     if (data.length > REGISTER_LENGTH) {
+      // TODO: don't use null
       this.events.emit(id, null, withoutFirstItemUint8Arr(data));
     }
     else if (data.length === REGISTER_LENGTH) {
+      // TODO: don't use null
       this.events.emit(id, null, undefined);
     }
   }

@@ -21,6 +21,7 @@ export function parseValue(rawValue: any): any {
   else if (rawValue === 'undefined') {
     return undefined;
   }
+  // TODO: don't use null
   else if (rawValue === 'null') {
     return null;
   }

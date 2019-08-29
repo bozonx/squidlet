@@ -27,6 +27,7 @@ export function compactArray(arr: any[]): any[] {
   const result: any[] = [];
 
   for (let value of arr) {
+    // TODO: don't use null
     if (typeof value !== 'undefined' && value !== null && value !== '') {
       result.push(value);
     }

@@ -32,6 +32,7 @@ export function stringifyCookie(obj: {[index: string]: Primitives}): string {
       && typeof value !== 'string'
       && typeof value !== 'number'
       && typeof value !== 'undefined'
+      // TODO: don't use null
       && value !== null
     ) throw new Error(`stringifyCookie: invalid received object`);
 

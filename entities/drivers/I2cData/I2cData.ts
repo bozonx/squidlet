@@ -16,7 +16,9 @@ const DATA_MARK_POSITION = 0;
 const DATA_LENGTH_REQUEST = 3;
 const MIN_DATA_LENGTH = 1;
 
+// TODO: don't use null
 export type DataHandler = (error: Error | null, payload?: Uint8Array) => void;
+// TODO: don't use null
 type I2cDriverHandler = (error: Error | null, data?: Uint8Array) => void;
 
 export interface I2cDriverClass {
@@ -69,6 +71,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
   listenIncome(i2cAddress: string | number | undefined, dataMark: number | undefined, handler: DataHandler): number {
     const resolvedDataMark = this.resolveDataMark(dataMark);
 
+    // TODO: don't use null
     const wrapper = async (error: Error | null, payload?: Uint8Array): Promise<void> => {
       await this.handleIncome(i2cAddress, resolvedDataMark, handler, error, payload);
     };
@@ -122,6 +125,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
     i2cAddress: string | number | undefined,
     dataMark: number,
     handler: DataHandler,
+    // TODO: don't use null
     error: Error | null,
     payload?: Uint8Array
   ): Promise<void> {
@@ -141,6 +145,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
         return handler(new Error(`Incorrect received data length ${data.length}`));
       }
 
+      // TODO: don't use null
       handler(null, data);
     }
     catch(err) {

@@ -7,6 +7,7 @@ export type EventName = 'data' | 'dataString' | 'error' | 'open';
 
 export interface Options {
   bytesize?: 7 | 8;                      // (default 8)How many data bits - 7 or 8
+  // TODO: не использовать null
   parity?: null | 'none' | 'o' | 'odd' | 'e' | 'even'; // (default none) Parity bit
   stopbits?: number;                     // (default 1) Number of stop bits to use
 }
