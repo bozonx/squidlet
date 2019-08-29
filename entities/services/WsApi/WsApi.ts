@@ -41,7 +41,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
 
   destroy = async () => {
     for (let sessionId of this.sessions) {
-      await this.wsServerSessions.close(sessionId);
+      await this.wsServerSessions.destroySession(sessionId);
     }
 
     delete this.sessions;

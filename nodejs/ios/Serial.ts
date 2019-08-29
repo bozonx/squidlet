@@ -5,6 +5,8 @@ import SerialIo, {BaudRate, EventName, Options} from 'system/interfaces/io/Seria
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 
+// TODO: проверить чтобы когда драйвер дестроится - то события должны отписаться
+
 
 export default class Serial implements SerialIo {
   private readonly instances: SerialPort[] = [];

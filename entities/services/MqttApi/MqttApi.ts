@@ -35,7 +35,7 @@ export default class MqttApi extends ServiceBase<MqttProps> {
   }
 
   destroy = async () => {
-    this.context.sessions.shutDownImmediately(this.sessionId);
+    this.context.sessions.destroySession(this.sessionId);
   }
 
 

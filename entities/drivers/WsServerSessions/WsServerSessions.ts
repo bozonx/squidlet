@@ -8,7 +8,6 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {getKeyOfObject} from 'system/lib/objects';
 import {omitObj} from 'system/lib/objects';
 import {WsServer} from '../WsServer/WsServer';
-import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
 export enum WS_SESSIONS_EVENTS {
@@ -34,8 +33,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private get server(): WsServer {
     return this.depsInstances.server;
   }
-  // like {sessionId: connectionId} - null means connection is closed
-  private sessionConnections: {[index: string]: string | null} = {};
+  // like {sessionId: connectionId}
+  private sessionConnections: {[index: string]: string} = {};
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
@@ -43,16 +42,6 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       .getInstance(omitObj(this.props, 'expiredSec'));
 
     this.server.onConnection(this.handleNewConnection);
-    this.server.onConnectionClose((connectionId: string) => {
-      // handle only ours active sessions
-      const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
-
-      if (!sessionId) return;
-
-      // clear connectionId
-      // TODO: почему null а не undefined ????
-      this.sessionConnections[sessionId] = null;
-    });
     this.server.onMessage((connectionId: string, data: string | Uint8Array) => {
       // handle only ours active sessions
       const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
@@ -61,7 +50,15 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
     });
+    this.server.onConnectionClose((connectionId: string) => {
+      // handle only ours active sessions
+      const sessionId: string | undefined = getKeyOfObject(this.sessionConnections, connectionId);
 
+      if (!sessionId) return;
+
+      // clear connectionId
+      delete this.sessionConnections[sessionId];
+    });
     this.context.sessions.onSessionClosed((sessionId) => {
       // listen only ours session
       if (!Object.keys(this.sessionConnections).includes(sessionId)) return;
@@ -73,11 +70,11 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
   destroy = async () => {
     for (let sessionId of Object.keys(this.sessionConnections)) {
-      this.context.sessions.shutDownImmediately(sessionId);
+      this.context.sessions.destroySession(sessionId);
     }
 
     this.events.destroy();
-    await this.server.destroy();
+
     delete this.sessionConnections;
   }
 
@@ -94,16 +91,23 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   /**
-   * Close connection of session
+   * Close connection of session manually.
    */
   async close(sessionId: string) {
+    if (!this.sessionConnections[sessionId]) return;
+
+    await this.destroySession(sessionId);
+    this.events.emit(WS_SESSIONS_EVENTS.sessionClose, sessionId);
+  }
+
+  async destroySession(sessionId: string) {
     const connectionId = this.sessionConnections[sessionId];
 
     if (!connectionId) return;
 
-    await this.server.closeConnection(connectionId, WsCloseStatus.closeGoingAway, 'Close session request');
-
-    this.context.sessions.shutDownImmediately(sessionId);
+    await this.server.destroyConnection(connectionId);
+    // destroy session and not rise a close event
+    this.context.sessions.destroySession(sessionId);
 
     delete this.sessionConnections[sessionId];
   }
@@ -137,21 +141,28 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     let sessionId: string | undefined = requestCookie[SESSIONID_COOKIE];
 
     if (sessionId && this.context.sessions.isSessionActive(sessionId)) {
+      this.sessionConnections[sessionId] = connectionId;
       // if session exists - recover it
       this.context.sessions.recoverSession(sessionId);
     }
     else {
       // create a new session if there isn't cookie of session is inactive
       sessionId = this.context.sessions.newSession(this.props.expiredSec);
+      this.sessionConnections[sessionId] = connectionId;
 
       const cookie = `${SESSIONID_COOKIE}=${sessionId}`;
 
-      await this.server.setCookie(connectionId, cookie);
+      try {
+        await this.server.setCookie(connectionId, cookie);
+      }
+      catch (err) {
+        delete this.sessionConnections[sessionId];
+
+        throw err;
+      }
+
       this.events.emit(WS_SESSIONS_EVENTS.newSession, sessionId, request);
     }
-
-    // TODO: может установить раньше до установки куки ???
-    this.sessionConnections[sessionId] = connectionId;
   });
 
 }

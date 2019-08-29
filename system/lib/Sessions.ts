@@ -77,7 +77,18 @@ export default class Sessions {
   }
 
   shutDownImmediately(sessionId: string) {
-    this.closeSession(sessionId);
+    this.closeEvents.emit(sessionId);
+    this.destroySession(sessionId);
+  }
+
+  /**
+   * Call it only when you are destroying your entity.
+   */
+  destroySession(sessionId: string) {
+    clearTimeout(this.closeConnectionTimeouts[sessionId]);
+    delete this.closeConnectionTimeouts[sessionId];
+    delete this.sessionStorage[sessionId];
+    delete this.activeSession[sessionId];
   }
 
   onSessionClosed(cb: (sessionId: string) => void): number {
@@ -106,16 +117,9 @@ export default class Sessions {
     delete this.closeConnectionTimeouts[sessionId];
 
     this.closeConnectionTimeouts[sessionId] = setTimeout(() => {
-      this.closeSession(sessionId);
+      this.closeEvents.emit(sessionId);
+      this.destroySession(sessionId);
     }, this.activeSession[sessionId] * 1000);
-  }
-
-  private closeSession(sessionId: string) {
-    clearTimeout(this.closeConnectionTimeouts[sessionId]);
-    this.closeEvents.emit(sessionId);
-    delete this.closeConnectionTimeouts[sessionId];
-    delete this.sessionStorage[sessionId];
-    delete this.activeSession[sessionId];
   }
 
 }
