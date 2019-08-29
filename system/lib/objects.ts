@@ -7,6 +7,7 @@ import {compactArray} from './arrays';
  * For other types it will return true.
  */
 export function isEmptyObject(toCheck?: {[index: string]: any}): boolean {
+  // TODO: don't use null
   if (Array.isArray(toCheck) || toCheck === null) return true;
   else if (typeof toCheck === 'object') return !Object.keys(toCheck).length;
 

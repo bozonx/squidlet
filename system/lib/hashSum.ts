@@ -34,6 +34,7 @@ function foldObject (hash: any, o: any, seen: any) {
 
 function foldValue (input: any, value: any, key: any, seen: any) {
   var hash = fold(fold(fold(input, key), toString(value)), typeof value);
+  // TODO: don't use null
   if (value === null) {
     return fold(hash, 'null');
   }

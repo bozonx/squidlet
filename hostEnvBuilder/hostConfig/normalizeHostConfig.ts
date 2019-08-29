@@ -108,6 +108,7 @@ function makeDefaultServices(
 
   for(let serviceId of defaultServices) {
     // if it has a definition of is disabled - do nothing
+    // TODO: don't use null
     if (fullServices[serviceId] || (preHostConfig as any)[serviceId] === null) continue;
 
     const serviceClassName: string | undefined = servicesShortcut[serviceId];

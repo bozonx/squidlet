@@ -11,7 +11,8 @@ hosts:
 
     wsApi:
       host: 0.0.0.0
-    ioServer: {}
+    ioServer:
+      host: 0.0.0.0
 
     #platform: lowjs
     #machine: esp32wrover

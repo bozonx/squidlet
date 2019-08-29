@@ -4,6 +4,7 @@
 export function parseValue(rawValue: any): any {
   if (
     typeof rawValue === 'undefined'
+    // TODO: don't use null
     || rawValue === null
     || typeof rawValue === 'boolean'
     || Number.isNaN(rawValue)

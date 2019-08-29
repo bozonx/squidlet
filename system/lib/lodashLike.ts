@@ -36,11 +36,13 @@ export function trim(src: string, char: string = ' '): string {
 // TODO: better to not use it at all
 export function isEqual(first: any, second: any): boolean {
   if (
+    // TODO: don't use null
     first === null
     || typeof first === 'string'
     || typeof first === 'number'
     || typeof first === 'undefined'
     || typeof first === 'function'
+    // TODO: don't use null
     || second === null
     || typeof second === 'string'
     || typeof second === 'number'
@@ -72,6 +74,7 @@ export function isEqual(first: any, second: any): boolean {
 export function cloneDeep(value: any): any {
   // not cloneable
   if (
+    // TODO: don't use null
     value === null
     || typeof value === 'number'
     || typeof value === 'undefined'

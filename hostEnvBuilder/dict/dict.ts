@@ -12,5 +12,5 @@ export const defaultServices = [
   //'automation',
   'consoleLogger',
   //'updater',
-  'wsApi',
+  //'wsApi',
 ];
