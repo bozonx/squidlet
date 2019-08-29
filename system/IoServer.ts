@@ -23,6 +23,7 @@ const initCfg: InitializationConfig = initializationConfig();
 
 
 export default class IoServer {
+  private readonly systemCfg: typeof systemConfig;
   private readonly ioSet: IoSet;
   private readonly shutdownRequest: ShutdownHandler;
   private hostConfig?: HostConfig;
@@ -38,12 +39,14 @@ export default class IoServer {
 
 
   constructor(
+    systemCfg: typeof systemConfig,
     // initialized ioSet
     ioSet: IoSet,
     shutdownRequestCb: ShutdownHandler,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
+    this.systemCfg = systemCfg;
     this.ioSet = ioSet;
     this.shutdownRequest = shutdownRequestCb;
     this.logInfo = logInfo;
@@ -53,8 +56,13 @@ export default class IoServer {
   async start() {
     this.hostConfig = await this.loadConfig<HostConfig>(initCfg.fileNames.hostConfig);
 
+    this.logInfo('--> Configuring Io');
     await this.configureIoSet();
+
+    this.logInfo('--> Initializing websocket server');
     await this.initWsServer();
+
+    this.logInfo('===> IoServer initialization has been finished');
   }
 
   destroy = async () => {
@@ -146,8 +154,8 @@ export default class IoServer {
 
   private async loadConfig<T>(configFileName: string): Promise<T> {
     const pathToFile = pathJoin(
-      systemConfig.rootDirs.envSet,
-      systemConfig.envSetDirs.configs,
+      this.systemCfg.rootDirs.envSet,
+      this.systemCfg.envSetDirs.configs,
       configFileName
     );
 

@@ -8,6 +8,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {consoleError} from '../../system/lib/helpers';
+import systemConfig from '../../system/config/systemConfig';
 
 
 export default class StartIoServerStandalone {
@@ -76,6 +77,8 @@ export default class StartIoServerStandalone {
     //await this.installModules();
 
     const ioServer = new IoServer(
+      // TODO: нужно переопределить параметры в systemCfg
+      systemConfig,
       this.ioSet,
       this.shutdownRequestCb,
       console.info,

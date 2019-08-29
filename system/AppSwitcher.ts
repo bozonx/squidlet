@@ -69,6 +69,7 @@ export default class AppSwitcher {
 
   private startIoServer = async () => {
     this.ioServer = new IoServer(
+      this.systemCfg,
       this.ioSet,
       this.handleShutdownRequest,
       console.info,
