@@ -8,7 +8,10 @@ import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {consoleError} from '../../system/lib/helpers';
 import systemConfig from '../../system/config/systemConfig';
-import IoSetStandaloneIoServer from '../ioSets/IoSetStandaloneIoServer';
+import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import {omitObj} from '../../system/lib/objects';
 
 
 export default class StartIoServerStandalone {
@@ -91,14 +94,42 @@ export default class StartIoServerStandalone {
     console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
   }
 
-  private async makeIoSet(): Promise<IoSetStandaloneIoServer> {
-    const ioSet = new IoSetStandaloneIoServer(this.os, this.props.hostConfig, this.props.platform, this.props.machine);
+  private async makeIoSet(): Promise<IoSet> {
+    const envBuilder = new EnvBuilder(this.preparePreHostConfig(), this.props.envSetDir, this.props.tmpDir);
+    //const ioSet = new IoSetStandaloneIoServer(this.os, this.props.hostConfig, this.props.platform, this.props.machine);
+    const ioSet: IoSet = new IoSetDevelopSrc(
+      this.os,
+      envBuilder,
+      this.props.envSetDir,
+      this.props.platform,
+      this.props.machine
+    );
 
     ioSet.prepare && await ioSet.prepare();
-    ioSet.init && await ioSet.init();
+    ioSet.init && await ioSet.init(systemConfig);
     await this.configureStorage(ioSet);
 
     return ioSet;
+  }
+
+  /**
+   * Remove useless props from host config such as entities definitions.
+   */
+  private preparePreHostConfig(): PreHostConfig {
+    return omitObj(
+      this.props.hostConfig,
+      'plugins',
+      'devices',
+      'drivers',
+      'services',
+      'devicesDefaults',
+      'automation',
+      'consoleLogger',
+      'mqttApi',
+      'wsApi',
+      'httpApi',
+      'dependencies',
+    );
   }
 
   private async configureStorage(ioSet: IoSet) {

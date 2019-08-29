@@ -68,6 +68,7 @@ export default interface PreHostConfig {
   // shortcut for mqttApi service
   mqttApi?: {[index: string]: any};
   wsApi?: {[index: string]: any};
+  httpApi?: {[index: string]: any};
 
   // additional npm packages which will be installed
   dependencies?: {[index: string]: string};
