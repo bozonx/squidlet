@@ -18,7 +18,7 @@ export default class IoSetSrc implements IoSet {
   private ioCollection: {[index: string]: IoItem} = {};
 
 
-  constructor(os: Os, envSetDir: string, platform: Platforms, machine: string) {
+  constructor(os: Os, platform: Platforms, machine: string) {
     this.os = os;
     this.platform = platform;
     this.machine = machine;

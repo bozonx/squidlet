@@ -1,28 +1,27 @@
 import IoSet from '../../system/interfaces/IoSet';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
 import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
-import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
-import StorageIo from '../../system/interfaces/io/StorageIo';
+import HostConfig from '../../system/interfaces/HostConfig';
 import IoSetSrc from './IoSetSrc';
+import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
 /**
- * It gets configs and manifests from memory and uses source modules.
+ * Io set which is used in standalone IO server.
+ * It just gets host config from memory.
  */
-export default class IoSetDevelopSrc extends IoSetSrc implements IoSet {
-  private readonly storageWrapper: StorageEnvMemoryWrapper;
+export default class IoSetStandaloneIoServer extends IoSetSrc implements IoSet {
+  private readonly hostConfig: HostConfig;
 
 
-  constructor(os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string) {
+  constructor(os: Os, hostConfig: HostConfig, platform: Platforms, machine: string) {
     super(os, platform, machine);
 
-    this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
+    this.hostConfig = hostConfig;
   }
 
   async prepare() {
-    await this.storageWrapper.init();
   }
 
   protected makeInstance(IoItemClass: new () => IoItem, ioName: string): IoItem {

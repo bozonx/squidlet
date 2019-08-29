@@ -3,12 +3,12 @@ import Props from './Props';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../system/IoServer';
-import IoSetSrc from '../ioSets/IoSetSrc';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {consoleError} from '../../system/lib/helpers';
 import systemConfig from '../../system/config/systemConfig';
+import IoSetStandaloneIoServer from '../ioSets/IoSetStandaloneIoServer';
 
 
 export default class StartIoServerStandalone {
@@ -77,7 +77,6 @@ export default class StartIoServerStandalone {
     //await this.installModules();
 
     const ioServer = new IoServer(
-      // TODO: нужно переопределить параметры в systemCfg
       systemConfig,
       this.ioSet,
       this.shutdownRequestCb,
@@ -92,8 +91,8 @@ export default class StartIoServerStandalone {
     console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
   }
 
-  private async makeIoSet(): Promise<IoSet> {
-    const ioSet = new IoSetSrc(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
+  private async makeIoSet(): Promise<IoSetStandaloneIoServer> {
+    const ioSet = new IoSetStandaloneIoServer(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
 
     ioSet.prepare && await ioSet.prepare();
     await ioSet.init();
