@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _trimStart = require('lodash/trimStart');
 
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
@@ -9,6 +8,7 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement} from '../../system/lib/strings';
 import systemConfig from '../../system/config/systemConfig';
 import {getFileNameOfPath} from '../../shared/helpers';
+import {trimStart} from '../../system/lib/lodashLike';
 
 
 /**
@@ -51,7 +51,7 @@ export default class StorageEnvMemoryWrapper {
     if (pathTo.indexOf(this.envSetDir) === -1) return originalReadFile(pathTo);
 
     const splat: string[] = pathTo.split(this.envSetDir);
-    const relativePath: string = _trimStart(splat[1], path.sep);
+    const relativePath: string = trimStart(splat[1], path.sep);
 
     if (!relativePath) throw new Error(`StorageEnvMemoryWrapper.readFile: Can't read path "${pathTo}"`);
 

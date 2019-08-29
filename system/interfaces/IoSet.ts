@@ -11,7 +11,7 @@ export default interface IoSet {
   /**
    * It is called at the beginning of System initialization
    */
-  init(systemCfg: typeof systemConfig): Promise<void>;
+  init?(systemCfg: typeof systemConfig): Promise<void>;
 
 
   destroy(): Promise<void>;

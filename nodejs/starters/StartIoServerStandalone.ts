@@ -92,10 +92,10 @@ export default class StartIoServerStandalone {
   }
 
   private async makeIoSet(): Promise<IoSetStandaloneIoServer> {
-    const ioSet = new IoSetStandaloneIoServer(this.os, this.props.envSetDir, this.props.platform, this.props.machine);
+    const ioSet = new IoSetStandaloneIoServer(this.os, this.props.hostConfig, this.props.platform, this.props.machine);
 
     ioSet.prepare && await ioSet.prepare();
-    await ioSet.init();
+    ioSet.init && await ioSet.init();
     await this.configureStorage(ioSet);
 
     return ioSet;
