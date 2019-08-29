@@ -46,6 +46,9 @@ export default class SystemStarter {
 
     console.info(`===> Initializing app, using "${fileName}"`);
 
+    // init ioSet in bareSystem mode
+    this.bareSystem && ioSet.init && await ioSet.init(systemCfg);
+
     const appSwitcher: SystemKind = new systemKindClass(
       systemCfg,
       ioSet,

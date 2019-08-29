@@ -56,11 +56,11 @@ export default class IoSetDevelopRemote implements IoSet {
 
 
   getIo<T extends IoItem>(ioName: string): T {
-    if (!this.remoteIoCollection.getIo(ioName)) {
-      throw new Error(`Can't find io instance "${ioName}"`);
-    }
-    else if (ioName === 'Storage') {
+    if (ioName === 'Storage') {
       return this.wrappedStorageIo as any;
+    }
+    else if (!this.remoteIoCollection.getIo(ioName)) {
+      throw new Error(`Can't find io instance "${ioName}"`);
     }
 
     return this.remoteIoCollection.getIo(ioName) as T;
