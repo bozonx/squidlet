@@ -41,7 +41,7 @@ export default class SystemStarter {
 
     console.info(`===> Starting app`);
 
-    return appSwitcher.start();
+    await appSwitcher.start();
   }
 
 

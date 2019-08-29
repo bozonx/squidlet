@@ -70,7 +70,10 @@ export default class StartDevelop {
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
     await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
 
-    await this.installModules();
+    // install node modules in local mode. And don't install in remote mode
+    if (!this.argIoSet) {
+      await this.installModules();
+    }
 
     const ioSet: IoSet = await this.makeIoSet();
 
