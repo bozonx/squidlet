@@ -2,6 +2,18 @@ strings = require('../../../system/lib/strings')
 
 
 describe 'system.lib.strings', ->
+  it 'trimStart', ->
+    assert.equal(strings.trimCharStart('  a  '), 'a  ')
+    assert.equal(strings.trimCharStart('--a--', '-'), 'a--')
+
+  it 'trimEnd', ->
+    assert.equal(strings.trimCharEnd('  a  '), '  a')
+    assert.equal(strings.trimCharEnd('--a--', '-'), '--a')
+
+  it 'trim', ->
+    assert.equal(strings.trimChar('  a  '), 'a')
+    assert.equal(strings.trimChar('--a--', '-'), 'a')
+
   it 'firstLetterToUpperCase', ->
     assert.equal(strings.firstLetterToUpperCase('str str'), 'Str str')
     assert.equal(strings.firstLetterToUpperCase('strStr'), 'StrStr')

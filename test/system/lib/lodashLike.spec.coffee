@@ -5,15 +5,6 @@ describe.only 'system.lib.lodashLike', ->
 #  it 'values', ->
 #    assert.deepEqual(lodashLike.values({a: 0, b: 1}), [0, 1])
 
-  it 'trimStart', ->
-    assert.equal(lodashLike.trimStart('  a  '), 'a  ')
-
-  it 'trimEnd', ->
-    assert.equal(lodashLike.trimEnd('  a  '), '  a')
-
-  it 'trim', ->
-    assert.equal(lodashLike.trim('  a  '), 'a')
-
   it 'isEqual', ->
     assert.isTrue(lodashLike.isEqual(1, 1))
     assert.isFalse(lodashLike.isEqual(1, 0))

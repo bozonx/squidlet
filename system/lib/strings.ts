@@ -1,3 +1,23 @@
+export function trimCharStart(src: string, char: string = ' '): string {
+  if (typeof src !== 'string') return src;
+
+  const regex = new RegExp(`^\\${char}*`);
+
+  return src.replace(regex, '');
+}
+
+export function trimCharEnd(src: string, char: string = ' '): string {
+  if (typeof src !== 'string') return src;
+
+  const regex = new RegExp(`\\${char}*$`);
+
+  return src.replace(regex, '');
+}
+
+export function trimChar(src: string, char: string = ' '): string {
+  return trimCharEnd( trimCharStart(src, char), char);
+}
+
 /**
  * Turn only the first letter to upper case
  */

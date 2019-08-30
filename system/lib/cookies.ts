@@ -1,5 +1,4 @@
 import {Primitives} from '../interfaces/Types';
-import {trim} from './lodashLike';
 import {parseValue} from './common';
 
 
@@ -16,7 +15,7 @@ export function parseCookie(cookies?: string): {[index: string]: Primitives} {
   for (let item of splat) {
     const [key, value] = item.split('=');
 
-    result[trim(key)] = parseValue(trim(value));
+    result[key.trim()] = parseValue((value || '').trim());
   }
 
   return result;

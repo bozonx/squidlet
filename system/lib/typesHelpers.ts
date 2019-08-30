@@ -1,4 +1,3 @@
-import {trim} from './lodashLike';
 import {Primitives} from '../interfaces/Types';
 import {isKindOfNumber} from './common';
 
@@ -33,7 +32,7 @@ export function parseType(type: Primitives): ParsedType {
     throw new Error(`type "${JSON.stringify(type)}" is not supported`);
   }
 
-  const types: string[] = String(type).split('|').map((item) => trim(item));
+  const types: string[] = String(type).split('|').map((item) => item.trim());
   const result: ParsedType = {types: [], constants:[]};
 
   for (let item of types) {

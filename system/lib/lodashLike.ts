@@ -10,29 +10,6 @@ import {isPlainObject} from './objects';
 //   return Object.keys(obj).map(key => obj[key]);
 // }
 
-// TODO: remove - better to use String's method
-export function trimStart(src: string, char: string = ' '): string {
-  if (typeof src !== 'string') return src;
-
-  const regex = new RegExp(`^\\${char}*`);
-
-  return src.replace(regex, '');
-}
-
-// TODO: remove - better to use String's method
-export function trimEnd(src: string, char: string = ' '): string {
-  if (typeof src !== 'string') return src;
-
-  const regex = new RegExp(`\\${char}*$`);
-
-  return src.replace(regex, '');
-}
-
-// TODO: remove - better to use String's method
-export function trim(src: string, char: string = ' '): string {
-  return trimEnd( trimStart(src, char), char);
-}
-
 // TODO: better to not use it at all
 export function isEqual(first: any, second: any): boolean {
   if (

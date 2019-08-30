@@ -1,6 +1,6 @@
 import {PATH_SEPARATOR} from './helpers';
-import {trimEnd} from './lodashLike';
 import {pathDirname, pathBasename, pathIsAbsolute} from './paths';
+import {trimCharEnd} from './strings';
 
 
 export default async function mkdirPLogic (
@@ -14,7 +14,7 @@ export default async function mkdirPLogic (
 
   if (isDirExists(pathToDir)) return false;
 
-  const preparedPath = trimEnd(pathToDir, PATH_SEPARATOR);
+  const preparedPath = trimCharEnd(pathToDir, PATH_SEPARATOR);
 
   // path parts from closest to further
   const pathParts: string[] = [];

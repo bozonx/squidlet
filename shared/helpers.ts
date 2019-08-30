@@ -1,5 +1,4 @@
 import * as path from 'path';
-import _trim = require('lodash/trim');
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../hostEnvBuilder/interfaces/Platforms';
@@ -58,7 +57,7 @@ export function parseHostNameCtlResult(stdout: string): {osName: string, arch: s
   }
 
   return {
-    osName: _trim(osMatch[1]),
+    osName: osMatch[1].trim(),
     arch: architectureMatch[1],
   };
 }

@@ -5,10 +5,9 @@ import ManifestBase from '../../system/interfaces/ManifestBase';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import {splitFirstElement} from '../../system/lib/strings';
+import {splitFirstElement, trimCharStart} from '../../system/lib/strings';
 import systemConfig from '../../system/systemConfig';
 import {getFileNameOfPath} from '../../shared/helpers';
-import {trimStart} from '../../system/lib/lodashLike';
 
 
 /**
@@ -59,7 +58,7 @@ export default class StorageEnvMemoryWrapper {
     if (pathTo.indexOf(systemConfig.rootDirs.envSet) === -1) return originalReadFile(pathTo);
 
     const splat: string[] = pathTo.split(systemConfig.rootDirs.envSet);
-    const relativePath: string = trimStart(splat[1], path.sep);
+    const relativePath: string = trimCharStart(splat[1], path.sep);
 
     if (!relativePath) throw new Error(`StorageEnvMemoryWrapper.readFile: Can't read path "${pathTo}"`);
 
