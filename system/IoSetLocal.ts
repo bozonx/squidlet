@@ -15,10 +15,10 @@ export default class IoSetLocal implements IoSet {
    * Load ioSet index.js file where included all the used io on platform.
    * It will be called on system start
    */
-  async init(systemCfg: typeof systemConfig): Promise<void> {
+  async init(): Promise<void> {
     const pathToIoSetIndex = pathJoin(
-      systemCfg.rootDirs.envSet,
-      systemCfg.envSetDirs.ios,
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.ios,
     );
 
     // Load io collection workDir/io/index.js
