@@ -11,6 +11,7 @@ import {loadMachineConfigInPlatformDir, makeListOfNamesFromPaths, resolvePlatfor
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
+import Platforms from '../interfaces/Platforms';
 
 
 export default class ConfigManager {
@@ -33,6 +34,8 @@ export default class ConfigManager {
     return this._hostConfig as any;
   }
 
+  private readonly platform: Platforms;
+  private readonly machine: string;
   private readonly os: Os;
   private _hostConfig?: HostConfig;
   private _machineConfig?: MachineConfig;
@@ -40,9 +43,16 @@ export default class ConfigManager {
   private hostConfigOrConfigPath: string | PreHostConfig;
 
 
-  constructor(os: Os, hostConfigOrConfigPath: string | PreHostConfig) {
+  constructor(
+    os: Os,
+    hostConfigOrConfigPath: string | PreHostConfig,
+    platform: Platforms,
+    machine: string,
+  ) {
     this.os = os;
     this.hostConfigOrConfigPath = hostConfigOrConfigPath;
+    this.platform = platform;
+    this.machine = machine;
   }
 
   async init() {
@@ -89,8 +99,8 @@ export default class ConfigManager {
   private finalizeHostConfig(normalizedConfig: PreHostConfig): HostConfig {
     return {
       id: normalizedConfig.id as any,
-      platform: normalizedConfig.platform as any,
-      machine: normalizedConfig.machine as any,
+      platform: this.platform as any,
+      machine: this.machine as any,
       config: normalizedConfig.config as any,
       ioServer: normalizedConfig.ioServer as any,
     };
@@ -119,16 +129,17 @@ export default class ConfigManager {
 
   // This wrapper needs for test purpose
   private loadMachineConfig(preHostConfig: PreHostConfig): MachineConfig {
-    if (!preHostConfig.platform) {
+    // TODO: review
+    if (!this.platform) {
       throw new Error(`Host config "${preHostConfig.id}" doesn't have a platform param`);
     }
-    else if (!preHostConfig.machine) {
+    else if (!this.machine) {
       throw new Error(`Host config "${preHostConfig.id}" doesn't have a machine param`);
     }
 
-    const platformDir = resolvePlatformDir(preHostConfig.platform);
+    const platformDir = resolvePlatformDir(this.platform);
 
-    return loadMachineConfigInPlatformDir(this.os, platformDir, preHostConfig.machine);
+    return loadMachineConfigInPlatformDir(this.os, platformDir, this.machine);
 
     //return loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
   }

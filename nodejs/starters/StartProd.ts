@@ -56,7 +56,14 @@ export default class StartProd {
 
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
 
-    this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+    this._envBuilder = new EnvBuilder(
+      this.props.hostConfig,
+      this.props.envSetDir,
+      tmpDir,
+      this.props.platform,
+      this.props.machine,
+      { uid: this.props.uid, gid: this.props.gid }
+    );
 
     console.info(`Use working dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);

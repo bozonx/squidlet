@@ -2,6 +2,8 @@
  * This is system config for master configurator and host
  */
 
+// TODO: расформировать
+
 import initializationConfig from '../../system/initializationConfig';
 import InitializationConfig from '../../system/interfaces/InitializationConfig';
 import systemConfig from '../../system/systemConfig';

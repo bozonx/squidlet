@@ -14,6 +14,7 @@ import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
 import {checkIoExistance} from './helpers';
 import {OwnerOptions} from '../shared/interfaces/OnwerOptions';
+import Platforms from './interfaces/Platforms';
 
 
 export default class EnvBuilder {
@@ -37,11 +38,13 @@ export default class EnvBuilder {
     hostConfigOrConfigPath: string | PreHostConfig,
     absEnvBuildDir: string,
     tmpBuildDir: string,
+    platform: Platforms,
+    machine: string,
     ownerOptions?: OwnerOptions
   ) {
     this.buildDir = absEnvBuildDir;
     this.tmpBuildDir = tmpBuildDir;
-    this.configManager = new ConfigManager(this.os, hostConfigOrConfigPath);
+    this.configManager = new ConfigManager(this.os, hostConfigOrConfigPath, platform, machine);
     this.register = new Register(this.os);
     this.usedEntities = new UsedEntities(this.configManager, this.register);
     this.pluginEnv = new PluginEnv(this.configManager, this.register, this.usedEntities);

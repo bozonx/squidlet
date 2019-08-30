@@ -89,31 +89,31 @@ export default class CommandUpdate {
   }
 
   private async buildIos(preHostConfig: PreHostConfig) {
-    if (!preHostConfig.id) {
-      throw new Error(`Host has to have an id param`);
-    }
-    else if (!preHostConfig.platform) {
-      throw new Error(`Host config doesn't have a platform param`);
-    }
-    else if (!preHostConfig.machine) {
-      throw new Error(`Host config doesn't have a machine param`);
-    }
-
-    const buildDir = path.join(this.dirs.hostsBuildDir, preHostConfig.id, systemConfig.envSetDirs.ios);
-    const tmpDir = path.join(this.dirs.hostsTmpDir, preHostConfig.id, systemConfig.envSetDirs.ios);
-    const buildIo: BuildIo = new BuildIo(
-      this.os,
-      preHostConfig.platform,
-      preHostConfig.machine,
-      buildDir,
-      tmpDir,
-      // TODO: use owner options
-      {}
-    );
-
-    console.info(`===> Building ios`);
-
-    await buildIo.build();
+    // if (!preHostConfig.id) {
+    //   throw new Error(`Host has to have an id param`);
+    // }
+    // else if (!preHostConfig.platform) {
+    //   throw new Error(`Host config doesn't have a platform param`);
+    // }
+    // else if (!preHostConfig.machine) {
+    //   throw new Error(`Host config doesn't have a machine param`);
+    // }
+    //
+    // const buildDir = path.join(this.dirs.hostsBuildDir, preHostConfig.id, systemConfig.envSetDirs.ios);
+    // const tmpDir = path.join(this.dirs.hostsTmpDir, preHostConfig.id, systemConfig.envSetDirs.ios);
+    // const buildIo: BuildIo = new BuildIo(
+    //   this.os,
+    //   preHostConfig.platform,
+    //   preHostConfig.machine,
+    //   buildDir,
+    //   tmpDir,
+    //   // TODO: use owner options
+    //   {}
+    // );
+    //
+    // console.info(`===> Building ios`);
+    //
+    // await buildIo.build();
   }
 
   private async buildEnvSet(hostConfig: PreHostConfig) {

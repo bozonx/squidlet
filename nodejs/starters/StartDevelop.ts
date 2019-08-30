@@ -56,7 +56,14 @@ export default class StartDevelop {
 
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
 
-    this._envBuilder = new EnvBuilder(this.props.hostConfig, this.props.envSetDir, tmpDir);
+    this._envBuilder = new EnvBuilder(
+      this.props.hostConfig,
+      this.props.envSetDir,
+      tmpDir,
+      this.props.platform,
+      this.props.machine,
+      { uid: this.props.uid, gid: this.props.gid }
+    );
 
     if (this.isRemoteIoSet()) {
       console.info(`Using remote ioset of host "${this.argIoSet}"`);
@@ -126,6 +133,7 @@ export default class StartDevelop {
 
     const ioSet = new IoSetClass(
       this.os,
+      // TODO: не передавать
       this.envBuilder,
       this.props.platform,
       this.props.machine,

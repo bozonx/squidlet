@@ -1,4 +1,3 @@
-import Platforms from './Platforms';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 
 
@@ -37,8 +36,8 @@ export interface PreHostConfigConfig {
 export default interface PreHostConfig {
   // host unique id
   id?: string;
-  platform?: Platforms;
-  machine?: string;
+  // platform?: Platforms;
+  // machine?: string;
 
   plugins?: string[];
 

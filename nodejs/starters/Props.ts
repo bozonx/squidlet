@@ -93,9 +93,6 @@ export default class Props {
   // }
 
   private async resolveMachine(): Promise<NodejsMachines> {
-
-    // TODO: maybe get machine from host config too ???
-
     if (this.argMachine) {
       if (!nodejsSupportedMachines.includes(this.argMachine)) {
         throw new Error(`Unsupported machine type "${this.argMachine}"`);

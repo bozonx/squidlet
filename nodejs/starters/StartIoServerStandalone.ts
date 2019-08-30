@@ -93,7 +93,14 @@ export default class StartIoServerStandalone {
   }
 
   private async makeIoSet(): Promise<IoSet> {
-    const envBuilder = new EnvBuilder(this.preparePreHostConfig(), this.props.envSetDir, this.props.tmpDir);
+    const envBuilder = new EnvBuilder(
+      this.preparePreHostConfig(),
+      this.props.envSetDir,
+      this.props.tmpDir,
+      this.props.platform,
+      this.props.machine,
+      { uid: this.props.uid, gid: this.props.gid }
+    );
     //const ioSet = new IoSetStandaloneIoServer(this.os, this.props.hostConfig, this.props.platform, this.props.machine);
 
     await envBuilder.collect();

@@ -36,12 +36,6 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
   return sequence([
     () => isString(rawConfig.id, 'id'),
 
-    () => required(rawConfig.platform, 'platform'),
-    () => oneOf(rawConfig.platform, ['nodejs', 'lowjs', 'espruino'], 'platform'),
-
-    () => required(rawConfig.machine, 'machine'),
-    () => isString(rawConfig.machine, 'machine'),
-
     () => isStringArray(rawConfig.plugins, 'plugins'),
 
     () => isObject(rawConfig.devices, 'devices'),
@@ -63,8 +57,6 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
 
     () => whiteList(rawConfig, [
       'id',
-      'platform',
-      'machine',
       'plugins',
       //'buildConfig',
       'config',
