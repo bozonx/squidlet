@@ -96,7 +96,6 @@ export default class Api {
       // TODO: add platform, machine, host id
       usedIo: this.context.system.ioManager.getNames(),
       //config: this.context.config,
-      //systemConfig: this.context.systemConfig,
     };
   }
 

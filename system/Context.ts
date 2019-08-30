@@ -1,4 +1,3 @@
-import systemConfig from './config/systemConfig';
 import LogPublisher from './LogPublisher';
 import Sessions from './lib/Sessions';
 import State from './lib/State';
@@ -13,7 +12,6 @@ import ServiceBase from './base/ServiceBase';
 
 export default class Context {
   readonly system: System;
-  readonly systemConfig = systemConfig;
   readonly log: LogPublisher = new LogPublisher(this);
   readonly sessions: Sessions = new Sessions(makeUniqId);
   readonly state: State = new State();

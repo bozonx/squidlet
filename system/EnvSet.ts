@@ -6,8 +6,8 @@ import {pathJoin} from './lib/paths';
 import StorageIo from './interfaces/io/StorageIo';
 import {splitFirstElement} from './lib/strings';
 import {convertEntityTypeToPlural} from './lib/helpers';
+import systemConfig from './config/systemConfig';
 
-// TODO: лучше же просто entityType а не plural
 
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
@@ -31,8 +31,8 @@ export default class EnvSet {
    */
   loadConfig<T>(configFileName: string): Promise<T> {
     const pathToFile: string = pathJoin(
-      this.context.systemConfig.rootDirs.envSet,
-      this.context.systemConfig.envSetDirs.configs,
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.configs,
       configFileName
     );
 
@@ -47,8 +47,8 @@ export default class EnvSet {
    */
   loadManifest<T extends ManifestBase>(entityType: EntityType, entityName: string) : Promise<T> {
     const pathToFile = pathJoin(
-      this.context.systemConfig.rootDirs.envSet,
-      this.context.systemConfig.envSetDirs.entities,
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.entities,
       convertEntityTypeToPlural(entityType),
       entityName,
       this.context.system.initializationConfig.fileNames.manifest
@@ -119,8 +119,8 @@ export default class EnvSet {
 
     // make absolute path
     return pathJoin(
-      this.context.systemConfig.rootDirs.envSet,
-      this.context.systemConfig.envSetDirs.entities,
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.entities,
       convertEntityTypeToPlural(entityType),
       entityName,
       fileName

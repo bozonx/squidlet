@@ -1,6 +1,7 @@
 import StorageIo, {StatsSimplified} from 'system/interfaces/io/StorageIo';
 import DriverBase from 'system/base/DriverBase';
 import {pathDirname, pathJoin} from 'system/lib/paths';
+import systemConfig from 'system/config/systemConfig';
 
 
 /**
@@ -16,8 +17,8 @@ export class SharedStorage extends DriverBase {
   protected willInit = async () => {
     this.depsInstances.storageDev = this.getIo('Storage');
     this.rootDir = pathJoin(
-      this.context.systemConfig.rootDirs.varData,
-      this.context.systemConfig.storageDirs.common,
+      systemConfig.rootDirs.varData,
+      systemConfig.storageDirs.common,
     );
   }
 
