@@ -6,10 +6,12 @@ import StorageIo from '../../system/interfaces/io/StorageIo';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement} from '../../system/lib/strings';
-import systemConfig from '../../system/config/systemConfig';
+import systemConfig from '../../system/systemConfig';
 import {getFileNameOfPath} from '../../shared/helpers';
 import {trimStart} from '../../system/lib/lodashLike';
 
+
+// TODO: use workdir instead of system config
 
 /**
  * It wraps a Storage io instance to load configs and manifests from memory.
@@ -33,6 +35,26 @@ export default class StorageEnvMemoryWrapper {
     this.envSet = this.envBuilder.generateDevelopEnvSet();
   }
 
+
+  // private makeSystemConfig(): typeof systemConfig{
+  //   return mergeDeepObjects({
+  //     rootDirs: {
+  //       envSet: this.props.envSetDir,
+  //       varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
+  //       tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
+  //     },
+  //   }, systemConfig) as any;
+  // }
+
+  // private makeSystemConfig(): typeof systemConfig{
+  //   return mergeDeepObjects({
+  //     rootDirs: {
+  //       envSet: this.props.envSetDir,
+  //       varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
+  //       tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
+  //     },
+  //   }, systemConfig) as any;
+  // }
 
   makeWrapper(originalStorage: StorageIo): StorageIo {
     const originalReadFile = originalStorage.readFile.bind(originalStorage);

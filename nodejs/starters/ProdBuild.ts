@@ -1,7 +1,7 @@
 import * as path from 'path';
 import _template = require('lodash/template');
 
-import systemConfig from '../../system/config/systemConfig';
+import systemConfig from '../../system/systemConfig';
 import BuildSystem from '../../shared/envSetBuild/BuildSystem';
 import BuildIo from '../../shared/envSetBuild/BuildIo';
 import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';

@@ -6,7 +6,7 @@ import {pathJoin} from './lib/paths';
 import StorageIo from './interfaces/io/StorageIo';
 import {splitFirstElement} from './lib/strings';
 import {convertEntityTypeToPlural} from './lib/helpers';
-import systemConfig from './config/systemConfig';
+import systemConfig from './systemConfig';
 
 
 /**

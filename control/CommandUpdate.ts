@@ -7,7 +7,7 @@ import Os from '../shared/Os';
 import ResolveDirs, {Args} from './ResolveDirs';
 import BuildSystem from '../shared/envSetBuild/BuildSystem';
 import BuildIo from '../shared/envSetBuild/BuildIo';
-import systemConfig from '../system/config/systemConfig';
+import systemConfig from '../system/systemConfig';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 
 

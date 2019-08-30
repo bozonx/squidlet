@@ -1,7 +1,7 @@
 import StorageIo, {StatsSimplified} from 'system/interfaces/io/StorageIo';
 import DriverBase from 'system/base/DriverBase';
 import {pathDirname, pathJoin} from 'system/lib/paths';
-import systemConfig from 'system/config/systemConfig';
+import systemConfig from 'system/systemConfig';
 
 
 /**

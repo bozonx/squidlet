@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import {BUILD_HOSTS_DIR, BUILD_ROOT_DIR} from '../shared/constants';
 import {resolveWorkDir} from '../shared/helpers';
-import systemConfig from '../system/config/systemConfig';
+import systemConfig from '../system/systemConfig';
 
 
 export interface Args {

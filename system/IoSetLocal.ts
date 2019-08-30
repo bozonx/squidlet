@@ -1,7 +1,7 @@
 import IoSet from './interfaces/IoSet';
 import IoItem from './interfaces/IoItem';
 import {pathJoin} from './lib/paths';
-import systemConfig from './config/systemConfig';
+import systemConfig from './systemConfig';
 
 
 /**

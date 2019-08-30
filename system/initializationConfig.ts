@@ -1,4 +1,4 @@
-import InitializationConfig from '../interfaces/InitializationConfig';
+import InitializationConfig from './interfaces/InitializationConfig';
 
 
 export default function initializationConfig(): InitializationConfig {

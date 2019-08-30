@@ -6,9 +6,9 @@ import RemoteCallMessage from './interfaces/RemoteCallMessage';
 import {makeUniqId} from './lib/uniqId';
 import HostConfig from './interfaces/HostConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
-import initializationConfig from './config/initializationConfig';
+import initializationConfig from './initializationConfig';
 import {pathJoin} from './lib/paths';
-import systemConfig from './config/systemConfig';
+import systemConfig from './systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
 import {ShutdownHandler} from './System';
 // TODO: use ioSet's - use driver

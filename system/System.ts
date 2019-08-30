@@ -8,7 +8,7 @@ import ApiManager from './managers/ApiManager';
 import Api from './Api';
 import Context from './Context';
 import InitializationConfig from './interfaces/InitializationConfig';
-import initializationConfig from './config/initializationConfig';
+import initializationConfig from './initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
