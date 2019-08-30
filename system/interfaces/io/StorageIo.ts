@@ -14,6 +14,8 @@ export interface StatsSimplified {
 export interface ConfigParams {
   uid?: number;
   gid?: number;
+  // if set then it will be used as root of all the files which are read and written using Storage.
+  workDir?: string;
 }
 
 

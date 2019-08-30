@@ -46,16 +46,6 @@ export default class StorageEnvMemoryWrapper {
   //   }, systemConfig) as any;
   // }
 
-  // private makeSystemConfig(): typeof systemConfig{
-  //   return mergeDeepObjects({
-  //     rootDirs: {
-  //       envSet: this.props.envSetDir,
-  //       varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
-  //       tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
-  //     },
-  //   }, systemConfig) as any;
-  // }
-
   makeWrapper(originalStorage: StorageIo): StorageIo {
     const originalReadFile = originalStorage.readFile.bind(originalStorage);
 
