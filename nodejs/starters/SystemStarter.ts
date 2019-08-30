@@ -1,12 +1,10 @@
 import * as path from 'path';
 
-import {APP_SWITCHER_FILE_NAME, HOST_TMP_HOST_DIR, HOST_VAR_DATA_DIR, SYSTEM_FILE_NAME} from '../../shared/constants';
+import {APP_SWITCHER_FILE_NAME, SYSTEM_FILE_NAME} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
-import {mergeDeepObjects} from '../../system/lib/objects';
-import systemConfig from '../../system/config/systemConfig';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 
 
@@ -16,7 +14,6 @@ interface SystemKind {
 }
 // AppSwitcher of System class
 type SystemKindClass = new (
-  systemCfg: typeof systemConfig,
   ioSet: IoSet,
   restartRequest: () => void,
 ) => SystemKind;
@@ -42,15 +39,13 @@ export default class SystemStarter {
     const fileName: string = (this.bareSystem) ? SYSTEM_FILE_NAME : APP_SWITCHER_FILE_NAME;
     const appSwitcherFile = path.join(pathToSystemDir, fileName);
     const systemKindClass: SystemKindClass = this.os.require(appSwitcherFile).default;
-    const systemCfg = this.makeSystemConfig();
 
     console.info(`===> Initializing app, using "${fileName}"`);
 
     // init ioSet in bareSystem mode
-    this.bareSystem && ioSet.init && await ioSet.init(systemCfg);
+    this.bareSystem && ioSet.init && await ioSet.init();
 
     const appSwitcher: SystemKind = new systemKindClass(
-      systemCfg,
       ioSet,
       this.handleRestartRequest
     );
@@ -70,17 +65,6 @@ export default class SystemStarter {
    */
   private handleRestartRequest = () => {
     process.exit(0);
-  }
-
-  // TODO: remove
-  private makeSystemConfig(): typeof systemConfig{
-    return mergeDeepObjects({
-      rootDirs: {
-        envSet: this.props.envSetDir,
-        varData: path.join(this.props.workDir, HOST_VAR_DATA_DIR),
-        tmp: path.join(this.props.tmpDir, HOST_TMP_HOST_DIR),
-      },
-    }, systemConfig) as any;
   }
 
   private listenDestroySignals(destroy: () => Promise<void>) {
