@@ -12,7 +12,6 @@ import initializationConfig from './config/initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
-import systemConfig from './config/systemConfig';
 
 
 export type ShutdownHandler = (reason: ShutdownReason) => void;
@@ -48,15 +47,14 @@ export default class System {
 
   /**
    * The main app.
-   * @param systemCfg - completed system config
    * @param ioSet - has to be initialized before
    * @param shutdownRequestCb - handler of shutdown request
    */
-  constructor(systemCfg: typeof systemConfig, ioSet: IoSet, shutdownRequestCb: ShutdownHandler) {
+  constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler) {
     this.shutdownRequest = shutdownRequestCb;
     // config which is used only on initialization time
     this._initializationConfig = initializationConfig();
-    this.context = new Context(this, systemCfg);
+    this.context = new Context(this);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);
     this.driversManager = new DriversManager(this.context);

@@ -13,7 +13,7 @@ import ServiceBase from './base/ServiceBase';
 
 export default class Context {
   readonly system: System;
-  readonly systemConfig: typeof systemConfig;
+  readonly systemConfig = systemConfig;
   readonly log: LogPublisher = new LogPublisher(this);
   readonly sessions: Sessions = new Sessions(makeUniqId);
   readonly state: State = new State();
@@ -30,9 +30,8 @@ export default class Context {
   private hostConfig?: HostConfig;
 
 
-  constructor(system: System, systemCfg: typeof systemConfig) {
+  constructor(system: System) {
     this.system = system;
-    this.systemConfig = systemCfg;
   }
 
 

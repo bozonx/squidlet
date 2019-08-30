@@ -93,11 +93,20 @@ export default class Api {
 
   getHostInfo(): HostInfo {
     return {
+      // TODO: add platform, machine, host id
       usedIo: this.context.system.ioManager.getNames(),
-      config: this.context.config,
-      systemConfig: this.context.systemConfig,
+      //config: this.context.config,
+      //systemConfig: this.context.systemConfig,
     };
   }
+
+  // getHostConfig(): HostInfo {
+  //   return {
+  //     // TODO: add used drivers, services, devices and its defenitions
+  //     config: this.context.config,
+  //   };
+  // }
+
 
   getSessionStore(sessionId: string, key: string): JsonTypes | undefined {
     return this.context.sessions.getStorage(sessionId, key);
