@@ -127,7 +127,6 @@ export default class StartDevelop {
     const ioSet = new IoSetClass(
       this.os,
       this.envBuilder,
-      this.props.envSetDir,
       this.props.platform,
       this.props.machine,
       this.argIoSet

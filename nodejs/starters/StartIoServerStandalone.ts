@@ -101,7 +101,6 @@ export default class StartIoServerStandalone {
     const ioSet: IoSet = new IoSetDevelopSrc(
       this.os,
       envBuilder,
-      this.props.envSetDir,
       this.props.platform,
       this.props.machine
     );

@@ -21,14 +21,14 @@ export default class IoSetDevelopRemote implements IoSet {
   private remoteIoCollection: RemoteIoCollection;
 
 
-  constructor(os: Os, envBuilder: EnvBuilder, envSetDir: string, platform: Platforms, machine: string, paramsString?: string) {
+  constructor(os: Os, envBuilder: EnvBuilder, platform: Platforms, machine: string, paramsString?: string) {
     if (!paramsString) {
       throw new Error(`IoSetDevelopRemote: paramsString has to be set`);
     }
 
     this.os = os;
     this.envBuilder = envBuilder;
-    this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder, envSetDir);
+    this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
 
     const {host, port} = this.parseIoSetString(paramsString);
 

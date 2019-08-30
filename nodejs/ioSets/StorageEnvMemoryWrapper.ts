@@ -11,21 +11,17 @@ import {getFileNameOfPath} from '../../shared/helpers';
 import {trimStart} from '../../system/lib/lodashLike';
 
 
-// TODO: use workdir instead of system config
-
 /**
  * It wraps a Storage io instance to load configs and manifests from memory.
  * But other files it loads as an original Storage.
  */
 export default class StorageEnvMemoryWrapper {
   private readonly envBuilder: EnvBuilder;
-  private readonly envSetDir: string;
   private envSet?: HostEnvSet;
 
 
-  constructor(envBuilder: EnvBuilder, envSetDir: string) {
+  constructor(envBuilder: EnvBuilder) {
     this.envBuilder = envBuilder;
-    this.envSetDir = envSetDir;
   }
 
 
@@ -60,9 +56,9 @@ export default class StorageEnvMemoryWrapper {
     pathTo: string
   ): Promise<string> => {
     // if it isn't config or entity file - just load it.
-    if (pathTo.indexOf(this.envSetDir) === -1) return originalReadFile(pathTo);
+    if (pathTo.indexOf(systemConfig.rootDirs.envSet) === -1) return originalReadFile(pathTo);
 
-    const splat: string[] = pathTo.split(this.envSetDir);
+    const splat: string[] = pathTo.split(systemConfig.rootDirs.envSet);
     const relativePath: string = trimStart(splat[1], path.sep);
 
     if (!relativePath) throw new Error(`StorageEnvMemoryWrapper.readFile: Can't read path "${pathTo}"`);
