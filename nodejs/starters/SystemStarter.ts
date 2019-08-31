@@ -40,20 +40,22 @@ export default class SystemStarter {
 
     console.info(`===> Initializing app, using "${fileName}"`);
 
+
     // init ioSet
     ioSet.init && await ioSet.init();
+    // TODO: не запускать это в режиме удаленного IOset
     await this.configureStorage(ioSet);
 
-    const appSwitcher: SystemKind = new systemKindClass(
+    const systemKind: SystemKind = new systemKindClass(
       ioSet,
       this.handleRestartRequest
     );
 
-    this.listenDestroySignals(appSwitcher.destroy);
+    this.listenDestroySignals(systemKind.destroy);
 
     console.info(`===> Starting app`);
 
-    await appSwitcher.start();
+    await systemKind.start();
   }
 
 

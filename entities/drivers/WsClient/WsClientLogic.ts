@@ -19,6 +19,7 @@ export interface WsClientLogicProps {
   reconnectTimeoutMs: number;
   // reconnect times. -1 = infinity. 0 means none.
   maxTries: number;
+  useCookie: boolean;
 }
 
 
@@ -88,8 +89,9 @@ export default class WsClientLogic {
     this.connectionId = await this.wsClientIo.newConnection(connectionProps);
 
     await this.listen();
+
     // listen for connection established
-    await this.connectedPromise;
+    //await this.connectedPromise;
   }
 
   async destroy() {
@@ -105,6 +107,8 @@ export default class WsClientLogic {
 
   async send(data: string | Uint8Array): Promise<void> {
     await this.connectedPromise;
+
+    console.log(555555555)
 
     return this.wsClientIo.send(this.connectionId, data);
   }
@@ -176,6 +180,8 @@ export default class WsClientLogic {
 
   private handleMessage = (connectionId: string, data: string | Uint8Array) => {
     if (connectionId !== this.connectionId) return;
+
+    console.log(44444444444, connectionId, data.toString())
 
     // if the first message is cookie - set it
     if (this.waitingCookies) {

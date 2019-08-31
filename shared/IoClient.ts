@@ -123,6 +123,7 @@ export default class IoClient {
       autoReconnect: false,
       reconnectTimeoutMs: 0,
       maxTries: 0,
+      useCookie: false,
     };
   }
 

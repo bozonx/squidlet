@@ -19,3 +19,6 @@ props:
   maxTries:
     type: number
     default: -1
+  useCookie:
+    type: boolean
+    default: false

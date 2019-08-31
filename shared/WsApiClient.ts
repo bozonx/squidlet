@@ -119,6 +119,7 @@ export default class WsApiClient {
       autoReconnect: false,
       reconnectTimeoutMs: 0,
       maxTries: 0,
+      useCookie: true,
     };
   }
 
