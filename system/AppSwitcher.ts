@@ -23,7 +23,6 @@ export default class AppSwitcher {
 
 
   async start() {
-    this.ioSet.init && await this.ioSet.init();
     await this.startSystem();
   }
 

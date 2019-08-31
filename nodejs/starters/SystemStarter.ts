@@ -33,8 +33,6 @@ export default class SystemStarter {
 
 
   async start(pathToSystemDir: string, ioSet: IoSet) {
-    await this.configureStorage(ioSet);
-
     // use System if bareSystem is true or AppSwitcher if false
     const fileName: string = (this.bareSystem) ? SYSTEM_FILE_NAME : APP_SWITCHER_FILE_NAME;
     const appSwitcherFile = path.join(pathToSystemDir, fileName);
@@ -42,8 +40,9 @@ export default class SystemStarter {
 
     console.info(`===> Initializing app, using "${fileName}"`);
 
-    // init ioSet in bareSystem mode
-    this.bareSystem && ioSet.init && await ioSet.init();
+    // init ioSet
+    ioSet.init && await ioSet.init();
+    await this.configureStorage(ioSet);
 
     const appSwitcher: SystemKind = new systemKindClass(
       ioSet,
