@@ -160,7 +160,14 @@ export default class WsClientLogic {
     this.connectionTries = 0;
     this.wasPrevOpenFulfilled = true;
     this.isConnectionOpened = true;
-    this.waitingCookies = true;
+
+    if (this.props.useCookie) {
+      this.waitingCookies = true;
+    }
+    else {
+      this.openPromise.resolve();
+    }
+
     this.logInfo(`WsClientLogic: connection opened. ${this.props.url} Id: ${this.connectionId}`);
   }
 
@@ -180,8 +187,6 @@ export default class WsClientLogic {
 
   private handleMessage = (connectionId: string, data: string | Uint8Array) => {
     if (connectionId !== this.connectionId) return;
-
-    console.log(44444444444, connectionId, data.toString())
 
     // if the first message is cookie - set it
     if (this.waitingCookies) {

@@ -44,7 +44,7 @@ export default class SystemStarter {
     // init ioSet
     ioSet.init && await ioSet.init();
     // TODO: не запускать это в режиме удаленного IOset
-    await this.configureStorage(ioSet);
+    //await this.configureStorage(ioSet);
 
     const systemKind: SystemKind = new systemKindClass(
       ioSet,

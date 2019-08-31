@@ -80,6 +80,8 @@ export default class IoServer {
       return;
     }
 
+    this.connectionId = connectionId;
+
     if (!this.hostConfig) return this.logError(`No host config`);
 
     this.remoteCall = new RemoteCall(
@@ -121,7 +123,7 @@ export default class IoServer {
     return this.wsServer.send(this.connectionId, binData);
   }
 
-  private async callIoApi(fullName: string, args: any[]): Promise<any> {
+  private callIoApi = async (fullName: string, args: any[]): Promise<any> => {
     const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
 
     if (!methodName) {
@@ -129,7 +131,9 @@ export default class IoServer {
     }
 
     if (ioName === IO_API) {
-      if (methodName === IO_NAMES_METHOD) return this.ioSet.getNames();
+      if (methodName === IO_NAMES_METHOD) {
+        return this.ioSet.getNames();
+      }
 
       throw new Error(`Unknown ioApi method`);
     }
