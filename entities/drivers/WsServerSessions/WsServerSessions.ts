@@ -73,6 +73,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   destroy = async () => {
+    this.context.log.debug(`... destroying WsServerSessions: ${this.props.host}:${this.props.port}`);
+
     for (let sessionId of Object.keys(this.sessionConnections)) {
       this.context.sessions.destroySession(sessionId);
     }

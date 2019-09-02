@@ -42,6 +42,7 @@ export default class WsClientLogic {
   private readonly wsClientIo: WebSocketClientIo;
   private readonly props: WsClientLogicProps;
   private readonly onClose: () => void;
+  private readonly logDebug: (message: string) => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private connectionId: string = '';
@@ -69,12 +70,14 @@ export default class WsClientLogic {
     // It rises a handler only if connection is really closed. It doesn't rise it on reconnect.
     // It's better to destroy this instance and make new one if need.
     onClose: () => void,
+    logDebug: (message: string) => void,
     logInfo: (message: string) => void,
     logError: (message: string) => void,
   ) {
     this.wsClientIo = wsClientIo;
     this.props = props;
     this.onClose = onClose;
+    this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
     this.openPromise = this.makeOpenPromise();
@@ -95,6 +98,7 @@ export default class WsClientLogic {
   }
 
   async destroy() {
+    this.logDebug(`... destroying WsClientLogic: ${this.props.url}`);
     await this.removeListeners();
     await this.wsClientIo.close(this.connectionId, WsCloseStatus.closeGoingAway, 'Closing on destroy');
     this.destroyInstance();
@@ -108,10 +112,13 @@ export default class WsClientLogic {
   async send(data: string | Uint8Array): Promise<void> {
     await this.connectedPromise;
 
+    this.logDebug(`WsClientLogic send to ${this.props.url}, connection id ${this.connectionId}, data length ${data.length}`);
+
     return this.wsClientIo.send(this.connectionId, data);
   }
 
   async close(code: number, reason?: string) {
+    this.logDebug(`WsClientLogic manual close connection ${this.connectionId} to ${this.props.url}`);
     // TODO: проверить поднимется ли событие close
     await this.wsClientIo.close(this.connectionId, code, reason);
   }
@@ -191,6 +198,7 @@ export default class WsClientLogic {
       if (this.isCookieMessage(data)) {
         this.waitingCookies = false;
 
+        this.logDebug(`WsClientLogic income set cookie request of connection ${this.connectionId} from ${this.props.url}, ${data}`);
         this.setCookie(data);
         this.openPromise.resolve();
 
@@ -202,6 +210,7 @@ export default class WsClientLogic {
       this.openPromise.resolve();
     }
 
+    this.logDebug(`WsClientLogic income message connection ${this.connectionId} from ${this.props.url}, data length ${data.length}`);
     // ordinary message
     this.messageEvents.emit(data);
   }
@@ -244,6 +253,7 @@ export default class WsClientLogic {
     this.logInfo(`WsClientLogic: Reconnecting connection "${this.connectionId}" ...`);
 
     // TODO: при этом не сработает close ??? или сработает???
+    // TODO: писать в debug о reconnect
 
     const connectionProps: WebSocketClientProps = {
       url: this.props.url,

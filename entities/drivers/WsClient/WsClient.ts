@@ -34,6 +34,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
       this.wsClientIo,
       this.props,
       this.onConnectionClosed,
+      this.log.debug,
       this.log.info,
       this.log.error
     );
@@ -66,7 +67,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
     return this.client.onMessage(cb);
   }
-  
+
   onClose(cb: () => void): number {
     return this.closeEvents.addListener(cb);
   }
@@ -76,7 +77,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
     this.client.removeMessageListener(handlerId);
   }
-  
+
   removeCloseListener(handlerIndex: number) {
     this.closeEvents.removeListener(handlerIndex);
   }
@@ -87,7 +88,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
    */
   private onConnectionClosed = () => {
     delete this.client;
-    
+
     this.closeEvents.emit();
   }
 

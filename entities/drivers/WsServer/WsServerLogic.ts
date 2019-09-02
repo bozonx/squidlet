@@ -29,6 +29,7 @@ export default class WsServerLogic {
   private readonly wsServerIo: WebSocketServerIo;
   private readonly props: WebSocketServerProps;
   private readonly onClose: () => void;
+  private readonly logDebug: (message: string) => void;
   private readonly logInfo: (message: string) => void;
   private readonly logError: (message: string) => void;
   private serverId: string = '';
@@ -42,12 +43,14 @@ export default class WsServerLogic {
     // It rises a handler only if server is closed.
     // It's better to destroy this instance and make new one if need.
     onClose: () => void,
+    logDebug: (message: string) => void,
     logInfo: (message: string) => void,
     logError: (message: string) => void,
   ) {
     this.wsServerIo = wsServerIo;
     this.props = props;
     this.onClose = onClose;
+    this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
     this._listeningPromised = new Promised<void>();
@@ -70,6 +73,7 @@ export default class WsServerLogic {
       return this.logError(`WsServerLogic.destroy: Server hasn't been initialized yet.`);
     }
 
+    this.logDebug(`... destroying websocket server: ${this.props.host}:${this.props.port}`);
     this.events.destroy();
     await this.removeListeners();
     // TODO: use destroyServer - it removes all the events before destroy

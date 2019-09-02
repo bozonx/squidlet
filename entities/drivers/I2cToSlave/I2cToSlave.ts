@@ -76,6 +76,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     const resolvedLength: number = this.resolveReadLength(dataAddressStr, readLength);
     const senderId = this.makeSenderId(dataAddressStr, 'request', resolvedLength);
     // make request
+    // TODO: why not request method ???
     const result: Uint8Array = await this.sender.send<Uint8Array>(
       senderId,
       this.i2cMaster.request,

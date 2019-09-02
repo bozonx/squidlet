@@ -18,6 +18,7 @@ const wsClientIo = new WebSocketClient();
 
 
 export default class WsApiClient {
+  private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private readonly client: WsClientLogic;
@@ -26,11 +27,13 @@ export default class WsApiClient {
 
   constructor(
     responseTimoutSec: number,
+    logDebug: (msg: string) => void,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void,
     host?: string,
     port?: number
   ) {
+    this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
 
@@ -40,6 +43,7 @@ export default class WsApiClient {
       wsClientIo,
       clientProps,
       () => this.logInfo(`Websocket connection has been closed`),
+      this.logDebug,
       this.logInfo,
       this.logError
     );

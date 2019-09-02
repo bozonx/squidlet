@@ -158,6 +158,7 @@ export default class ApiCall {
   private async connect(host?: string, port?: string): Promise<WsApiClient> {
     const client: WsApiClient = new WsApiClient(
       hostDefaultConfig.config.rcResponseTimoutSec,
+      console.log,
       console.info,
       consoleError,
       host,
