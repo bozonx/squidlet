@@ -21,17 +21,17 @@ export default class IoSetDevelopRemote implements IoSet {
   private remoteIoCollection: RemoteIoCollection;
 
 
-  constructor(os: Os, envBuilder: EnvBuilder, platform: Platforms, machine: string, paramsString?: string) {
-    if (!paramsString) {
-      throw new Error(`IoSetDevelopRemote: paramsString has to be set`);
-    }
-
+  constructor(
+    os: Os,
+    envBuilder: EnvBuilder,
+    platform: Platforms,
+    machine: string,
+    host?: string,
+    port?: number
+  ) {
     this.os = os;
     this.envBuilder = envBuilder;
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
-
-    const {host, port} = this.parseIoSetString(paramsString);
-
     this.remoteIoCollection = new RemoteIoCollection(host, port);
   }
 
@@ -68,18 +68,6 @@ export default class IoSetDevelopRemote implements IoSet {
 
   getNames(): string[] {
     return this.remoteIoCollection.getIoNames();
-  }
-
-
-  private parseIoSetString(ioSetString?: string): {host?: string, port?: number} {
-    if (!ioSetString) return {};
-
-    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
-
-    return {
-      host: splat[0],
-      port: splat[1] && parseInt(splat[1]) || undefined,
-    };
   }
 
 }

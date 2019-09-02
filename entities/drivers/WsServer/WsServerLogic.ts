@@ -151,11 +151,14 @@ export default class WsServerLogic {
         .catch(this.logError);
     }, SERVER_START_LISTENING_SEC * 1000);
 
+    //console.log(111111111, this.props)
+
     const listeningIndex: number = await this.wsServerIo.onServerListening(
       this.serverId,
       () => {
-        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} started listening`);
         clearTimeout(listeningTimeout);
+        //console.log(22222222222)
+        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} started listening`);
         this._listeningPromised.resolve();
       }
     );

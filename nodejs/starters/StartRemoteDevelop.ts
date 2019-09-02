@@ -5,6 +5,7 @@ import LogLevel from '../../system/interfaces/LogLevel';
 import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartDevelopBase from './StartDevelopBase';
 import SystemStarter from './SystemStarter';
+import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 
 
 export default class StartRemoteDevelop extends StartDevelopBase {
@@ -49,18 +50,32 @@ export default class StartRemoteDevelop extends StartDevelopBase {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   protected async makeIoSet(): Promise<IoSet> {
+    const {host, port} = this.parseIoSetString(this.argIoSet);
+
     const ioSet = new IoSetDevelopRemote(
       this.os,
       // TODO: не передавать
       this.envBuilder,
       this.props.platform,
       this.props.machine,
-      this.argIoSet
+      host,
+      port
     );
 
     ioSet.prepare && await ioSet.prepare();
 
     return ioSet;
+  }
+
+  private parseIoSetString(ioSetString?: string): {host?: string, port?: number} {
+    if (!ioSetString) return {};
+
+    const splat = ioSetString.split(IOSET_STRING_DELIMITER);
+
+    return {
+      host: splat[0],
+      port: splat[1] && parseInt(splat[1]) || undefined,
+    };
   }
 
 }
