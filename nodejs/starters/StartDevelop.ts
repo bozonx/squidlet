@@ -32,10 +32,7 @@ export default class StartDevelop extends StartDevelopBase {
   protected async makeIoSet(): Promise<IoSet> {
     const ioSet = new IoSetDevelopSrc(
       this.os,
-      // TODO: не передавать
       this.envBuilder,
-      this.props.platform,
-      this.props.machine,
     );
 
     ioSet.prepare && await ioSet.prepare();

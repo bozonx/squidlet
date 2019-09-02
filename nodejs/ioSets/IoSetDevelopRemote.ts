@@ -24,8 +24,6 @@ export default class IoSetDevelopRemote implements IoSet {
   constructor(
     os: Os,
     envBuilder: EnvBuilder,
-    platform: Platforms,
-    machine: string,
     host?: string,
     port?: number
   ) {

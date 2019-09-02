@@ -65,8 +65,6 @@ export default class StartIoServerStandalone extends StartDevelopBase {
     const ioSet: IoSet = new IoSetDevelopSrc(
       this.os,
       this.envBuilder,
-      this.props.platform,
-      this.props.machine
     );
 
     ioSet.prepare && await ioSet.prepare();

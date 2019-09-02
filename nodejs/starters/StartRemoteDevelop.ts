@@ -54,10 +54,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
     const ioSet = new IoSetDevelopRemote(
       this.os,
-      // TODO: не передавать
       this.envBuilder,
-      this.props.platform,
-      this.props.machine,
       host,
       port
     );

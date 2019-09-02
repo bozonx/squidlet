@@ -15,7 +15,7 @@ export default class IoSetDevelopSrc extends IoSetSrc implements IoSet {
   private readonly storageWrapper: StorageEnvMemoryWrapper;
 
 
-  constructor(os: Os, envBuilder: EnvBuilder, platform: Platforms, machine: string) {
+  constructor(os: Os, envBuilder: EnvBuilder) {
     super(os, platform, machine);
 
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
