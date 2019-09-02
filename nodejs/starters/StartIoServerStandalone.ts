@@ -19,6 +19,7 @@ export default class StartIoServerStandalone extends StartDevelopBase {
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
+  // TODO: review
   async destroy() {
     if (!this.ioSet) throw new Error(`No IoSet`);
 

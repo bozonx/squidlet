@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os from '../../shared/Os';
+import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
@@ -9,6 +9,8 @@ import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import LogLevel from '../../system/interfaces/LogLevel';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import {isEmptyObject} from '../../system/lib/objects';
+import {REPO_ROOT} from '../../shared/helpers';
 
 
 export default abstract class StartDevelopBase {
@@ -78,6 +80,52 @@ export default abstract class StartDevelopBase {
 
   protected resolveHostConfig(): PreHostConfig {
     return this.props.hostConfig;
+  }
+
+  /**
+   * Install modules that specified in host config according to platform.
+   * It installs modules into root node_modules dir of squidlet repository.
+   */
+  protected async installModules() {
+
+    // TODO: review
+    // TODO: why REPO_ROOT ????
+
+    const dependencies = this.envBuilder.configManager.dependencies;
+
+    if (!dependencies || isEmptyObject(dependencies)) return;
+
+    const toInstallModules: string[] = [];
+
+    for (let moduleName of Object.keys(dependencies)) {
+      if (!this.props.force && await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
+
+      toInstallModules.push(`${moduleName}@${dependencies[moduleName]}`);
+    }
+
+    if (!toInstallModules.length) return;
+
+    console.info(`===> Installing npm modules`);
+
+    await this.installNpmModules(toInstallModules, REPO_ROOT);
+  }
+
+  /**
+   * Install npm modules into node_modules of repository and don't save them to package.json
+   */
+  protected async installNpmModules(modules: string[] = [], cwd: string) {
+    const cmd = `npm install ${modules.join(' ')}`;
+
+    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, cwd, {
+      uid: this.props.uid,
+      gid: this.props.gid,
+    });
+
+    if (result.status) {
+      console.error(`ERROR: npm ends with code ${result.status}`);
+      console.error(result.stdout);
+      console.error(result.stderr);
+    }
   }
 
 }

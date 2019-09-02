@@ -15,6 +15,7 @@ export function waitForResponse(
 
       wasFulfilled = true;
       events.removeListener(handlerIndex);
+      // TODO: check message
       reject(`Remote dev set request timeout has been exceeded.`);
     }, responseTimoutSec * 1000);
 
